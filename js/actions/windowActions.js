@@ -246,20 +246,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to the store to set a preview frame.
-   * This should only be called internally by `WINDOW_SET_TAB_HOVER_STATE`
-   * when we need to delay updating the preview frame value
-   *
-   * @param {Object} frameKey - the frame key for the webview in question.
-   */
-  setPreviewFrame: function (frameKey) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_PREVIEW_FRAME,
-      frameKey
-    })
-  },
-
-  /**
    * Dispatches a message to the store to set the tab page index.
    *
    * @param {number} index - the tab page index to change to
@@ -290,12 +276,15 @@ const windowActions = {
    *
    * @param {Object} frameKey - the frame key for the webview in question.
    * @param {boolean} hoverState - whether or not mouse is over tab
+   * @param {boolean} previewMode - whether or not the next tab should be previewed
+   * based on mouse idle time
    */
-  setTabHoverState: function (frameKey, hoverState) {
+  setTabHoverState: function (frameKey, hoverState, previewMode) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_TAB_HOVER_STATE,
       frameKey,
-      hoverState
+      hoverState,
+      previewMode
     })
   },
 
@@ -1018,6 +1007,13 @@ const windowActions = {
   onTabClosedWithMouse: function (data) {
     dispatch({
       actionType: windowConstants.WINDOW_TAB_CLOSED_WITH_MOUSE,
+      data
+    })
+  },
+
+  onTabMouseMove: function (data) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_MOUSE_MOVE,
       data
     })
   },

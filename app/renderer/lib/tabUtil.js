@@ -36,3 +36,17 @@ module.exports.hasBreakpoint = (breakpoint, arr) => {
   arr = Array.isArray(arr) ? arr : [arr]
   return arr.includes(breakpoint)
 }
+
+/**
+ * Check whether or not the related target is a tab
+ * by checking the parentNode dataset
+ * @param {Object} event - The mouse event
+ * @returns {Boolean} Whether or not the related target is a tab
+ */
+module.exports.hasTabAsRelatedTarget = (event) => {
+  const relatedTarget = event.relatedTarget
+  const hasDataset = relatedTarget.parentNode && relatedTarget.parentNode.dataset
+  const tabAsRelatedTarget = hasDataset.tab || hasDataset.tabArea
+
+  return hasDataset && tabAsRelatedTarget
+}

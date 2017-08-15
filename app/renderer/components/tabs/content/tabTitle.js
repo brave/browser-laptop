@@ -72,7 +72,9 @@ const styles = StyleSheet.create({
     lineHeight: '1.6',
     padding: globalStyles.spacing.defaultTabPadding,
     color: 'transparent',
-    WebkitBackgroundClip: 'text'
+    WebkitBackgroundClip: 'text',
+    // prevents the title from being the target of mouse events.
+    pointerEvents: 'none'
   },
 
   enforceFontVisibility: {

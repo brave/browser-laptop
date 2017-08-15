@@ -590,38 +590,42 @@ const setPreviewTabPageIndex = (state, index, immediate = false) => {
   return state.setIn(['ui', 'tabs', 'previewTabPageIndex'], newTabPageIndex)
 }
 
-const setPreviewFrameKey = (state, frameKey, immediate = false) => {
+/**
+ * Defines whether or not a tab should be allowed to preview its content
+ * based on mouse idle time defined by mouse move in tab.js
+ * @see windowConstants.WINDOW_TAB_MOUSE_MOVE for information
+ * on how the data is handled in the store.
+ * @param state {Object} - Application state
+ * @param previewMode {Boolean} - Whether or not minimium idle time
+ * has match the criteria
+ */
+const setPreviewMode = (state, previewMode) => {
+  return state.setIn(['ui', 'tabs', 'previewMode'], previewMode)
+}
+
+/**
+ * Gets the previewMode application state
+ * @param state {Object} - Application state
+ * @return Immutable top level application state for previewMode
+ */
+const getPreviewMode = (state) => {
+  return state.getIn(['ui', 'tabs', 'previewMode'])
+}
+
+const setPreviewFrameKey = (state, frameKey) => {
   clearTimeout(tabHoverTimeout)
   const frame = getFrameByKey(state, frameKey)
   const isActive = isFrameKeyActive(state, frameKey)
   const previewTabs = getSetting(settings.SHOW_TAB_PREVIEWS)
   const hoverState = getTabHoverState(state, frameKey)
+  const previewMode = getPreviewMode(state)
   let newPreviewFrameKey = frameKey
 
-  if (!previewTabs || frame == null || !hoverState || isActive) {
+  if (!previewTabs || !previewMode || frame == null || !hoverState || isActive) {
     newPreviewFrameKey = null
   }
 
-  if (!immediate) {
-    // if there is an existing preview frame key then we're already in preview mode
-    // we use actions here because that is the only way to delay updating the state
-    const previewMode = getPreviewFrameKey(state) != null
-    if (previewMode && newPreviewFrameKey == null) {
-      // add a small delay when we are clearing the preview frame key so we don't lose
-      // previewMode if the user mouses over another tab - see below
-      tabHoverTimeout = setTimeout(windowActions.setPreviewFrame.bind(null, null), 200)
-      return state
-    }
-
-    if (!previewMode) {
-      // If user isn't in previewMode so we add a bit of delay to avoid tab from flashing out
-      // as reported here: https://github.com/brave/browser-laptop/issues/1434
-      // using an action here because that is the only way we can do a delayed state update
-      tabHoverTimeout = setTimeout(windowActions.setPreviewFrame.bind(null, newPreviewFrameKey), 200)
-      return state
-    }
-  }
-
+  // TODO: remove this method to a tabPageIndex-related one
   const index = frame ? getFrameTabPageIndex(state, frame.get('tabId')) : -1
   if (index !== -1) {
     if (index !== state.getIn(['ui', 'tabs', 'tabPageIndex'])) {
@@ -692,11 +696,11 @@ const setHoverTabIndex = (state, frameKey, hoverState) => {
  * @param hoverState {Boolean} - True if the current tab is being hovered.
  * @return Immutable top level application state for hoverTabIndex
  */
-
-const setTabHoverState = (state, frameKey, hoverState) => {
+const setTabHoverState = (state, frameKey, hoverState, enablePreviewMode) => {
   const frameIndex = getFrameIndex(state, frameKey)
   if (frameIndex !== -1) {
     state = setHoverTabIndex(state, frameKey, hoverState)
+    state = setPreviewMode(state, enablePreviewMode)
     state = setPreviewFrameKey(state, frameKey)
   }
   return state

@@ -41,15 +41,20 @@ const contextMenus = require('../../../../js/contextMenus')
 const dnd = require('../../../../js/dnd')
 const throttle = require('../../../../js/lib/throttle')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const {getTabBreakpoint, tabUpdateFrameRate} = require('../../lib/tabUtil')
+const {
+  getTabBreakpoint,
+  tabUpdateFrameRate,
+  hasBreakpoint,
+  hasTabAsRelatedTarget
+} = require('../../lib/tabUtil')
 const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const {getCurrentWindowId} = require('../../currentWindow')
 const UrlUtil = require('../../../../js/lib/urlutil')
-const {hasBreakpoint} = require('../../lib/tabUtil')
 
 class Tab extends React.Component {
   constructor (props) {
     super(props)
+    this.onMouseMove = this.onMouseMove.bind(this)
     this.onMouseEnter = this.onMouseEnter.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
     this.onUpdateTabSize = this.onUpdateTabSize.bind(this)
@@ -129,12 +134,22 @@ class Tab extends React.Component {
     dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.frameKey, this.draggingOverData, e)
   }
 
-  onMouseLeave () {
-    windowActions.setTabHoverState(this.props.frameKey, false)
+  onMouseLeave (e) {
+    // mouseleave will keep the previewMode
+    // as long as the related target is another tab
+    windowActions.setTabHoverState(this.props.frameKey, false, hasTabAsRelatedTarget(e))
   }
 
   onMouseEnter (e) {
-    windowActions.setTabHoverState(this.props.frameKey, true)
+    // if mouse entered a tab we only trigger a new preview
+    // if user is in previewMode, which is defined by mouse move
+    windowActions.setTabHoverState(this.props.frameKey, true, this.props.previewMode)
+  }
+
+  onMouseMove () {
+    // dispatch a message to the store so it can delay
+    // and preview the tab based on mouse idle time
+    windowActions.onTabMouseMove(this.props.frameKey)
   }
 
   onAuxClick (e) {
@@ -257,6 +272,7 @@ class Tab extends React.Component {
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
     props.hasTabInFullScreen = tabContentState.hasTabInFullScreen(currentWindow)
     props.tabId = frame.get('tabId', tabState.TAB_ID_NONE)
+    props.previewMode = currentWindow.getIn(['ui', 'tabs', 'previewMode'])
 
     return props
   }
@@ -274,6 +290,7 @@ class Tab extends React.Component {
       }
     })
     return <div
+      data-tab-area
       className={cx({
         tabArea: true,
         draggingOverLeft: this.isDraggingOverLeft && !this.isDraggingOverSelf,
@@ -283,6 +300,7 @@ class Tab extends React.Component {
         partOfFullPageSet: this.props.partOfFullPageSet || !!this.props.tabWidth
       })}
       style={this.props.tabWidth ? { flex: `0 0 ${this.props.tabWidth}px` } : {}}
+      onMouseMove={this.onMouseMove}
       onMouseEnter={this.onMouseEnter}
       onMouseLeave={this.onMouseLeave}>
       {
@@ -291,6 +309,7 @@ class Tab extends React.Component {
           : null
       }
       <div
+        data-tab
         ref={(node) => { this.tabNode = node }}
         className={css(
           styles.tab,

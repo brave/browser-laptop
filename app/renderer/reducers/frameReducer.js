@@ -38,6 +38,7 @@ const closeFrame = (state, action) => {
 
   const frameProps = frameStateUtil.getFrameByKey(state, action.frameKey)
   const hoverState = frameStateUtil.getTabHoverState(state, action.frameKey)
+  const previewMode = state.getIn(['ui', 'tabs', 'previewMode'])
 
   state = state.merge(frameStateUtil.removeFrame(
     state,
@@ -58,7 +59,8 @@ const closeFrame = (state, action) => {
     // This allow us to have closeTab button visible for sequential frames closing,
     // until onMouseLeave event happens.
     if (hoverState) {
-      state = frameStateUtil.setTabHoverState(state, nextFrame.get('key'), hoverState)
+      state = frameStateUtil
+        .setTabHoverState(state, nextFrame.get('key'), hoverState, previewMode)
     }
   } else if (hoverState && frameStateUtil.getPreviewFrameKey(state) === action.frameKey) {
     state = frameStateUtil.setPreviewFrameKey(state, null)
