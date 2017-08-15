@@ -286,16 +286,13 @@ class Frame extends React.Component {
         if (this.props.tabUrl !== this.props.location &&
           !this.isAboutPage() &&
           !isTorrentViewerURL(this.props.location)) {
-          this.webview.loadURL(this.props.location)
+          appActions.loadURLRequested(this.props.tabId, this.props.location)
         } else {
           tabActions.reload(this.props.tabId)
         }
         break
       case 'clean-reload':
         tabActions.reload(this.props.tabId, true)
-        break
-      case 'explicitLoadURL':
-        this.webview.loadURL(this.props.location)
         break
       case 'zoom-in':
         this.zoomIn()
