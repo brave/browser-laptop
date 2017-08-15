@@ -429,6 +429,18 @@ describe('tabContentState unit tests', function () {
       })
       assert.equal(tabContentState.hasFixedCloseIcon(), false)
     })
+
+    it('frame is active and breakpoint is dynamic', function () {
+      getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', () => {
+        return Immutable.fromJS({
+          breakpoint: 'dynamic'
+        })
+      })
+      isFrameKeyActive = sinon.stub(frameStateUtil, 'isFrameKeyActive', () => {
+        return true
+      })
+      assert.equal(tabContentState.hasFixedCloseIcon(), false)
+    })
   })
 
   describe('hasRelativeCloseIcon', function () {
@@ -457,6 +469,16 @@ describe('tabContentState unit tests', function () {
       getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', () => {
         return Immutable.fromJS({
           breakpoint: 'default'
+        })
+      })
+      assert.equal(tabContentState.hasRelativeCloseIcon(state, frameKey), true)
+    })
+
+    it('if hovering (tabIndex === hoverTabIndex) and break point is dynamic', function () {
+      const state = defaultWindowStore
+      getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', () => {
+        return Immutable.fromJS({
+          breakpoint: 'dynamic'
         })
       })
       assert.equal(tabContentState.hasRelativeCloseIcon(state, frameKey), true)
