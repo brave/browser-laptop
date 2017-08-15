@@ -270,7 +270,7 @@ class AppStore extends EventEmitter {
   }
 
   emitChanges (emitFullState) {
-    if (lastEmittedState && lastEmittedState !== appState) {
+    if (lastEmittedState) {
       const d = diff(lastEmittedState, appState)
       if (!d.isEmpty()) {
         BrowserWindow.getAllWindows().forEach((wnd) => {
