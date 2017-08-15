@@ -443,7 +443,7 @@ const setVersionInformation = (immutableData) => {
     ['libchromiumcontent', () => { return process.versions['chrome'] }],
     ['V8', () => { return process.versions.v8 }],
     ['Node.js', () => { return process.versions.node }],
-    ['Update Channel', Channel.channel],
+    ['Update Channel', Channel.formattedChannel],
     ['OS Platform', () => platformUtil.formatOsPlatform(os.platform())],
     ['OS Release', os.release],
     ['OS Architecture', os.arch]
@@ -784,8 +784,9 @@ module.exports.loadAppState = () => {
 
       immutableData = module.exports.runPostMigrations(immutableData)
     }
-    immutableData = setVersionInformation(immutableData)
+
     locale.init(immutableData.getIn(['settings', settings.LANGUAGE])).then((locale) => {
+      immutableData = setVersionInformation(immutableData)
       app.setLocale(locale)
       resolve(immutableData)
     })

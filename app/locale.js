@@ -255,7 +255,10 @@ var rendererIdentifiers = function () {
     'connectionError',
     'unknownError',
     'allowAutoplay',
-    'autoplayMedia'
+    'autoplayMedia',
+    // Release channels
+    'channelDev',
+    'channelBeta'
   ]
 }
 
