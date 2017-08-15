@@ -211,13 +211,14 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     display: 'flex',
     flex: 1,
-    padding: `${globalStyles.spacing.navbarMenubarMargin} ${globalStyles.spacing.bookmarksToolbarPadding}`
+    padding: `0 ${globalStyles.spacing.bookmarksToolbarPadding}`,
+    margin: `${globalStyles.spacing.navbarMenubarMargin} 0`
   },
   bookmarksToolbar__allowDragging: {
     WebkitAppRegion: 'drag'
   },
   bookmarksToolbar__showOnlyFavicon: {
-    padding: `${globalStyles.spacing.navbarMenubarMargin} 0 ${globalStyles.spacing.tabPagesHeight} ${globalStyles.spacing.bookmarksToolbarPadding}`
+    padding: `0 0 0 ${globalStyles.spacing.bookmarksToolbarPadding}`
   },
   bookmarksToolbar__bookmarkButton: {
     boxSizing: 'border-box',

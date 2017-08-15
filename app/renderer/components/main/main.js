@@ -607,7 +607,11 @@ class Main extends React.Component {
         ? <PopupWindow />
         : null
       }
-      <div className='top'
+      <div className={cx({
+            top: true,
+            allowDragging: this.props.shouldAllowWindowDrag,
+          })
+        }
         onMouseEnter={windowActions.setMouseInTitlebar.bind(null, true)}
         onMouseLeave={windowActions.setMouseInTitlebar.bind(null, false)}
         >
@@ -690,18 +694,22 @@ class Main extends React.Component {
           ? <BookmarksToolbar />
           : null
         }
-        <div className={cx({
-          tabPages: true,
-          allowDragging: this.props.shouldAllowWindowDrag,
-          singlePage: this.props.isSinglePage
-        })}
-          onContextMenu={this.onTabContextMenu}>
-          {
-            this.props.showTabPages
-            ? <TabPages />
-            : null
-          }
-        </div>
+        {
+          this.props.isSinglePage
+          ? null
+          : <div className={cx({
+            tabPages: true,
+            allowDragging: this.props.shouldAllowWindowDrag,
+            singlePage: this.props.isSinglePage
+          })}
+            onContextMenu={this.onTabContextMenu}>
+            {
+              this.props.showTabPages
+              ? <TabPages />
+              : null
+            }
+          </div>
+        }
         <TabsToolbar key='tab-bar' />
         {
           this.props.showNotificationBar
