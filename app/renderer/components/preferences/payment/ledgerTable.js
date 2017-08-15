@@ -264,7 +264,7 @@ class LedgerTable extends ImmutableComponent {
       <div className={css(styles.hideExcludedSites)}>
         <div className={css(styles.columnOffset)} />
         <div className={css(styles.rightColumn)}>
-          <SettingCheckbox small
+          <SettingCheckbox small compact
             dataL10nId='hideExcluded'
             prefKey={settings.PAYMENTS_SITES_HIDE_EXCLUDED}
             settings={this.props.settings}

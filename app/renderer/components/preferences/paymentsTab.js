@@ -196,9 +196,11 @@ class PaymentsTab extends ImmutableComponent {
           styles.flexAlignCenter,
           styles.paymentsSwitches
         )}>
-          <div className={css(styles.flexAlignEnd, styles.switchWrap)} data-test-id='enablePaymentsSwitch'>
+          <div className={css(styles.flexAlignCenter, styles.switchWrap)} data-test-id='enablePaymentsSwitch'>
             <span className={css(styles.switchWrap__switchSpan)} data-l10n-id='off' />
-            <SettingCheckbox dataL10nId='on'
+            <SettingCheckbox
+              dataL10nId='on'
+              compact
               prefKey={settings.PAYMENTS_ENABLED}
               settings={this.props.settings}
               onChangeSetting={this.props.onChangeSetting}
@@ -226,6 +228,7 @@ class PaymentsTab extends ImmutableComponent {
               <div className={css(styles.switchWrap__autoSuggestSwitch)}>
                 <div className={css(styles.flexAlignCenter, styles.autoSuggestSwitch__subtext)}>
                   <SettingCheckbox dataL10nId='autoSuggestSites'
+                    compact
                     prefKey={settings.PAYMENTS_SITES_AUTO_SUGGEST}
                     settings={this.props.settings}
                     disabled={!enabled}
@@ -280,10 +283,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center'
   },
-  flexAlignEnd: {
-    display: 'flex',
-    alignItems: 'flex-end'
-  },
 
   paymentsContainer: {
     position: 'relative',
@@ -306,11 +305,6 @@ const styles = StyleSheet.create({
 
   switchWrap: {
     width: paymentStyles.width.tableCell
-  },
-  switchWrap__switchControl: {
-    // TODO: Refactor switchControls.less
-    paddingTop: '0 !important',
-    paddingBottom: '0 !important'
   },
   switchWrap__switchSpan: {
     color: '#999',
@@ -340,8 +334,7 @@ const styles = StyleSheet.create({
   },
   autoSuggestSwitch__moreInfoBtnSuggest: {
     position: 'relative',
-    top: '-1px',
-    left: '8px',
+    left: '3px',
     cursor: 'pointer',
 
     // TODO: refactor preferences.less to remove !important

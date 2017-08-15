@@ -36,6 +36,19 @@
       }
     }
   }
+  
+  &.small {
+    .switchBackground {
+      height: @smallSwitchHeight;
+      width: @smallSwitchWidth;
+      .switchIndicator {
+        height: @smallSwitchNubDiameter;
+        width: @smallSwitchNubDiameter;
+        top: 1px;
+        right: calc(@smallSwitchWidth - @smallSwitchNubDiameter - @switchNubRightMargin);
+      }
+    }
+  }
 
   .switchControlText {
     margin: auto 0;
