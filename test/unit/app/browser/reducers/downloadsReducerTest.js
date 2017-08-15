@@ -247,7 +247,7 @@ describe('downloadsReducer', function () {
       })
 
       it('passes the correct properties object', function () {
-        assert.deepEqual(options.properties, ['openDirectory'])
+        assert.deepEqual(options.properties, ['openDirectory', 'createDirectory'])
       })
     })
   })
