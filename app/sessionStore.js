@@ -393,7 +393,7 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
 
   if (immutableData.get('extensions')) {
     Array.from(immutableData.get('extensions').keys()).forEach((extensionId) => {
-      immutableData = immutableData.delete('extensions', extensionId, 'tabs')
+      immutableData = immutableData.deleteIn(['extensions', extensionId, 'tabs'])
     })
   }
   return immutableData
