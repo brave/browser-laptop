@@ -89,6 +89,7 @@ module.exports.newPrivateTabMenuItem = () => {
 module.exports.newPartitionedTabMenuItem = () => {
   const newPartitionedMenuItem = (partitionNumber) => ({
     label: `${locale.translation('newSessionTab')} ${partitionNumber}`,
+    accelerator: 'CmdOrCtrl+Alt+' + partitionNumber,
     click: (item, focusedWindow) => {
       ensureAtLeastOneWindow({
         partitionNumber
