@@ -51,7 +51,7 @@ module.exports = { "providers" :
       "shortcut" : ":s"
     },
     {
-      "name" : "Mozilla Developer Network (MDN)",
+      "name" : "MDN Web Docs",
       "base": "https://developer.mozilla.org/search",
       "image" : "https://developer.cdn.mozilla.net/static/img/favicon32.png",
       "search" : "https://developer.mozilla.org/search?q={searchTerms}",
