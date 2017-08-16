@@ -1212,6 +1212,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
       if (contextsPassed) {
         info['menuItemId'] = extensionContextMenu.menuItemId
         if (extensionContextMenu.properties.parentId) {
+          info['parentMenuItemId'] = extensionContextMenu.properties.parentId
           if (templateMap[extensionContextMenu.properties.parentId].submenu === undefined) {
             templateMap[extensionContextMenu.properties.parentId].submenu = []
           }
