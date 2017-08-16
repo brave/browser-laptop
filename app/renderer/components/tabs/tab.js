@@ -303,7 +303,9 @@ class Tab extends React.Component {
       style={this.props.tabWidth ? { flex: `0 0 ${this.props.tabWidth}px` } : {}}
       onMouseMove={this.onMouseMove}
       onMouseEnter={this.onMouseEnter}
-      onMouseLeave={this.onMouseLeave}>
+      onMouseLeave={this.onMouseLeave}
+      data-test-id='tab-area'
+      data-frame-key={this.props.frameKey}>
       {
         this.props.isActive && this.props.notificationBarActive
           ? <NotificationBarCaret />
