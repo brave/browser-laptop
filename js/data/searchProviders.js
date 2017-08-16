@@ -146,6 +146,14 @@ module.exports = { "providers" :
       "image" : "https://searx.me/favicon.ico",
       "search" : "https://searx.me/?q={searchTerms}&categories=general",
       "shortcut" : ":x"
+    },
+    {
+      "name": "findx",
+      "base": "https://www.findx.com",
+      "image": "https://www.findx.com/favicon.ico",
+      "search": "https://www.findx.com/search?q={searchTerms}&type=web",
+      "autocomplete": "https://www.findx.com/api/web-search/suggestions/?q={searchTerms}&type=opensearch",
+      "shortcut": ":fx"
     }
   ]
 }
