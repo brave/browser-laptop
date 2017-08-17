@@ -17,14 +17,13 @@ const globalStyles = require('../../styles/global')
 class TabIcon extends ImmutableComponent {
   render () {
     const styles = StyleSheet.create({
-      icon: {
+      tabIcon: {
         fontSize: this.props.symbolContent ? '8px' : 'inherit',
         display: 'flex',
-        alignSelf: 'center',
         width: globalStyles.spacing.iconSize,
         height: globalStyles.spacing.iconSize,
         alignItems: 'center',
-        justifyContent: this.props.symbolContent ? 'flex-end' : 'left',
+        justifyContent: this.props.symbolContent ? 'flex-end' : 'center',
         fontWeight: this.props.symbolContent ? 'bold' : 'normal',
         color: this.props.symbolContent ? globalStyles.color.black100 : 'inherit'
       }
@@ -51,7 +50,7 @@ class TabIcon extends ImmutableComponent {
           ? <span
             className={cx({
               [this.props.symbol]: true,
-              [css(styles.icon)]: true
+              [css(styles.tabIcon)]: true
             })}
             data-test-id={this.props['data-test-id']}
             data-test2-id={this.props['data-test2-id']}
