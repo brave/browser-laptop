@@ -60,6 +60,7 @@ class BrowserButton extends ImmutableComponent {
     return <button
       disabled={this.props.disabled}
       data-extension-button={this.props.extensionButton}
+      data-bookmarks-overflow-indicator={this.props.bookmarksOverflowIndicator}
       data-l10n-id={this.props.l10nId}
       data-test-id={this.props.testId}
       data-test2-id={this.props.test2Id}
