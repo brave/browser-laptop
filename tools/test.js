@@ -15,7 +15,14 @@ switch (TEST_DIR) {
   case 'codecov':
     cmd.push('bash tools/codecov.sh')
     break
-  default:
+  case 'performance':
+    // 2017-09-28 Use debug builds for tests which require muon to run with
+    // --debug, currently broken in Linux on prod muon builds.
+    if (process.platform === 'linux') {
+      cmd.push('node tools/downloadMuonDebugBuild.js')
+    }
+    // Intentionally no break, because perf tests also run the below
+  default: // eslint-disable-line
     cmd.push(`mocha "test/${TEST_DIR}/**/*Test.js"`)
 }
 

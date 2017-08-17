@@ -345,7 +345,7 @@ var exports = {
         .waitForVisible(urlInput)
     })
 
-    this.app.client.addCommand('waitForUrl', function (url) {
+    this.app.client.addCommand('waitForUrl', function (url, timeout = 5000, interval = 100) {
       logVerbose('waitForUrl("' + url + '")')
       return this.waitUntil(function () {
         return this.tabByUrl(url).then((response) => {
@@ -355,7 +355,7 @@ var exports = {
           logVerbose('tabByUrl("' + url + '") => false')
           return false
         })
-      }, 5000, null, 100)
+      }, timeout, null, interval)
     })
 
     this.app.client.addCommand('waitForSelectedText', function (text) {
@@ -703,7 +703,7 @@ var exports = {
       }).then((response) => response.value)
     })
 
-    this.app.client.addCommand('newTab', function (createProperties = {}) {
+    this.app.client.addCommand('newTab', function (createProperties = {}, activateIfOpen = false, isRestore = false) {
       return this
         .execute(function (createProperties) {
           return devTools('appActions').createTabRequested(createProperties)
@@ -733,20 +733,18 @@ var exports = {
       return this.execute(function (siteDetail) {
         return devTools('appActions').addBookmark(siteDetail)
       }, siteDetail).then((response) => response.value)
-      .waitForBookmarkEntry(waitUrl, false)
+      .waitForBookmarkEntry(waitUrl)
     })
 
-    this.app.client.addCommand('waitForBookmarkEntry', function (location, waitForTitle = true) {
-      logVerbose('waitForBookmarkEntry("' + location + '", "' + waitForTitle + '")')
+    this.app.client.addCommand('waitForBookmarkEntry', function (location) {
+      logVerbose('waitForBookmarkEntry("' + location + '")')
       return this.waitUntil(function () {
         return this.getAppState().then((val) => {
-          const ret = val.value && val.value.bookmarks && Array.from(Object.values(val.value.bookmarks)).find(
-              (bookmark) => bookmark.location === location &&
-              (!waitForTitle || (waitForTitle && bookmark.title)))
-          logVerbose('waitForBookmarkEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
+          const ret = val.value.cache.bookmarkLocation.hasOwnProperty(location)
+          logVerbose('waitForBookmarkEntry("' + location + '") => ' + ret)
           return ret
         })
-      }, 5000, null, 100)
+      }, 10000, null, 100)
     })
 
     /**
@@ -1149,7 +1147,10 @@ var exports = {
     })
   },
 
-  startApp: function () {
+  /**
+   * @param {Array=} extraArgs
+   */
+  startApp: function (extraArgs) {
     if (process.env.KEEP_BRAVE_USER_DATA_DIR) {
       console.log('BRAVE_USER_DATA_DIR=' + userDataDir)
     }
@@ -1158,6 +1159,8 @@ var exports = {
       BRAVE_USER_DATA_DIR: userDataDir,
       SPECTRON: true
     }
+    let args = ['./', '--enable-logging', '--v=1']
+    if (extraArgs) { args = args.concat(extraArgs) }
     this.app = new Application({
       quitTimeout: 0,
       waitTimeout: exports.defaultTimeout,
@@ -1167,7 +1170,7 @@ var exports = {
         ? 'node_modules/electron-prebuilt/dist/brave.exe'
         : './node_modules/.bin/electron',
       env,
-      args: ['./', '--enable-logging', '--v=1'],
+      args,
       requireName: 'devTools'
     })
     return this.app.start()
