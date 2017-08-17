@@ -61,7 +61,6 @@ describe('sessionStoreShutdown unit tests', function () {
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('leveldown', {})
-    mockery.registerMock('keytar', {})
     sessionStore = require('../../../app/sessionStore')
     sessionStoreShutdown = require('../../../app/sessionStoreShutdown')
     appActions = require('../../../js/actions/appActions')

@@ -99,7 +99,6 @@
     "immutable": "^3.7.5",
     "immutablediff": "^0.4.2",
     "immutablepatch": "brave/immutable-js-patch",
-    "keytar": "^3.0.0",
     "l20n": "^3.5.1",
     "ledger-balance": "^0.9.1",
     "ledger-client": "^0.9.18",
