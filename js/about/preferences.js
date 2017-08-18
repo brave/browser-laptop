@@ -839,8 +839,7 @@ class AboutPreferences extends React.Component {
       settings.TORRENT_VIEWER_ENABLED,
       settings.SMOOTH_SCROLL_ENABLED,
       settings.SEND_CRASH_REPORTS,
-      settings.UPDATE_TO_PREVIEW_RELEASES,
-      settings.TOOLBAR_UI_SCALE
+      settings.UPDATE_TO_PREVIEW_RELEASES
     ]
     if (settingsRequiringRestart.includes(key)) {
       ipc.send(messages.PREFS_RESTART, key, value)
