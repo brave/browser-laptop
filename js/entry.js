@@ -87,7 +87,7 @@ ipc.on(messages.INITIALIZE_WINDOW, (e, mem) => {
   appStoreRenderer.state = Immutable.fromJS(message.appState)
   windowStore.state = newState
   generateTabs(newState, message.frames, windowValue.id)
-  appActions.windowReady(windowValue.id)
+  appActions.windowReady(windowValue.id, windowValue)
   ReactDOM.render(<Window />, document.getElementById('appContainer'))
 })
 

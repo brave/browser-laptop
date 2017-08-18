@@ -37,10 +37,14 @@ const appActions = {
     })
   },
 
-  windowReady: function (windowId) {
+  windowReady: function (windowId, windowValue) {
     dispatch({
       actionType: appConstants.APP_WINDOW_READY,
-      windowId
+      windowId,
+      windowValue,
+      queryInfo: {
+        windowId
+      }
     })
   },
 
