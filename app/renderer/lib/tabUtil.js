@@ -44,9 +44,15 @@ module.exports.hasBreakpoint = (breakpoint, arr) => {
  * @returns {Boolean} Whether or not the related target is a tab
  */
 module.exports.hasTabAsRelatedTarget = (event) => {
-  const relatedTarget = event.relatedTarget
-  const hasDataset = relatedTarget.parentNode && relatedTarget.parentNode.dataset
-  const tabAsRelatedTarget = hasDataset.tab || hasDataset.tabArea
+  let tabAsRelatedTarget = false
+  const relatedTarget = event && event.relatedTarget
 
-  return hasDataset && tabAsRelatedTarget
+  if (relatedTarget != null) {
+    const hasDataset = relatedTarget.parentNode && relatedTarget.parentNode.dataset
+    if (hasDataset != null) {
+      tabAsRelatedTarget = (hasDataset.tab || hasDataset.tabArea) || false
+    }
+  }
+
+  return tabAsRelatedTarget
 }
