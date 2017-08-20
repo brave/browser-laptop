@@ -1,21 +1,23 @@
-const appStoreRenderer = require('../../js/stores/appStoreRenderer')
-const windowState = require('../common/state/windowState')
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const windowState = require('../common/state/windowState')
 let currentWindowId = -1
 let currentWindow = null
 
-const isMaximized = () => {
-  const win = windowState.getByWindowId(appStoreRenderer.state, currentWindowId)
-  return win && win.get('state') === 'maximized'
+const isMaximized = (state) => {
+  const win = windowState.getByWindowId(state, currentWindowId)
+  return (win && win.get('state') === 'maximized') || false
 }
 
-const isFullScreen = () => {
-  const win = windowState.getByWindowId(appStoreRenderer.state, currentWindowId)
-  return win && win.get('state') === 'fullscreen'
+const isFullScreen = (state) => {
+  const win = windowState.getByWindowId(state, currentWindowId)
+  return (win && win.get('state') === 'fullscreen') || false
 }
 
-const isFocused = () => {
-  const win = windowState.getByWindowId(appStoreRenderer.state, currentWindowId)
+const isFocused = (state) => {
+  const win = windowState.getByWindowId(state, currentWindowId)
   return (win && win.get('focused')) || false
 }
 

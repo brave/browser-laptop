@@ -530,11 +530,12 @@ class Main extends React.Component {
     const activeOrigin = !activeFrame.isEmpty() ? urlUtil.getOrigin(activeFrame.get('location')) : null
     const widevinePanelDetail = currentWindow.get('widevinePanelDetail', Immutable.Map())
     const loginRequiredDetails = basicAuthState.getLoginRequiredDetail(state, activeTabId)
+    const focused = isFocused(state)
 
     const props = {}
     // used in renderer
     props.isFullScreen = activeFrame.get('isFullScreen', false)
-    props.isMaximized = isMaximized() || isFullScreen()
+    props.isMaximized = isMaximized(state) || isFullScreen(state)
     props.captionButtonsVisible = isWindows
     props.showContextMenu = currentWindow.has('contextMenuDetail')
     props.showPopupWindow = currentWindow.has('popupWindowDetail')
@@ -554,10 +555,10 @@ class Main extends React.Component {
     props.showNoScript = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible']) &&
       urlUtil.getOrigin(activeFrame.get('location'))
     props.showReleaseNotes = currentWindow.getIn(['ui', 'releaseNotes', 'isVisible'])
-    props.showCheckDefault = isFocused() && defaultBrowserState.shouldDisplayDialog(state)
+    props.showCheckDefault = focused && defaultBrowserState.shouldDisplayDialog(state)
     props.showUpdate = updateState.isUpdateVisible(state)
     props.showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused())
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, focused)
     props.isSinglePage = nonPinnedFrames.size <= tabsPerPage
     props.showTabPages = nonPinnedFrames.size > tabsPerPage
     props.showNotificationBar = activeOrigin && state.get('notifications').filter((item) =>
