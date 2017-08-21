@@ -21,17 +21,17 @@ const {
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
 const appActions = require('../../../../js/actions/appActions')
-const countries = require('../../../../js/constants/countries')
 
 // Constants
 const KeyCodes = require('../../../common/constants/keyCodes')
+const countryCodes = require('../../../common/constants/countryCodes')
 
 // Styles
 const commonStyles = require('../styles/commonStyles')
 const globalStyles = require('../styles/global')
 
 // Localization
-const locale = require('../../../../js/l10n') // NOTE: path will change; it's located at `./js/l10n`
+const locale = require('../../../../js/l10n')
 
 const commonForm = css(
   commonStyles.formControl,
@@ -126,9 +126,10 @@ class AutofillAddressPanel extends React.Component {
   }
   get countryList () {
     const countryList = []
-    for (let i = 0; i < countries.length; i++) {
-      let localizedCountryName = locale.translation(countries[i].Code)
-      countryList.push(<option value={countries[i].Code}>{localizedCountryName}</option>)
+    for (let i = 0; i < countryCodes.length; i++) {
+      const countryCode = countryCodes[i]
+      const localizedCountryName = locale.translation(countryCode)
+      countryList.push(<option value={countryCode}>{localizedCountryName}</option>)
     }
     return countryList
   }
