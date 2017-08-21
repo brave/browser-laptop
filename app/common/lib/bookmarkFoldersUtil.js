@@ -130,7 +130,7 @@ const buildFolder = (folderDetails, folders) => {
     title: folderDetails.get('title'),
     folderId: Number(key),
     key: key.toString(),
-    parentFolderId: ~~folderDetails.get('parentFolderId', 0),
+    parentFolderId: Number(folderDetails.get('parentFolderId', 0)),
     partitionNumber: Number(folderDetails.get('partitionNumber', 0)),
     objectId: folderDetails.get('objectId', null),
     type: siteTags.BOOKMARK_FOLDER,

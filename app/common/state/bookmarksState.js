@@ -148,7 +148,7 @@ const bookmarksState = {
     const removedBookmarks = []
     const bookmarks = bookmarksState.getBookmarks(state)
       .filter(bookmark => {
-        if (bookmark.get('parentFolderId') !== ~~parentFolderId) {
+        if (bookmark.get('parentFolderId') !== Number(parentFolderId)) {
           return true
         }
         if (syncEnabled) {
@@ -205,14 +205,17 @@ const bookmarksState = {
 
     // move bookmark into a new folder
     if (moveIntoParent || destinationItem.get('parentFolderId') !== bookmark.get('parentFolderId')) {
-      const parentFolderId = destinationItem.get('type') === siteTags.BOOKMARK
+      let parentFolderId = destinationItem.get('type') === siteTags.BOOKMARK
         ? destinationItem.get('parentFolderId')
         : destinationItem.get('folderId')
 
+      if (parentFolderId == null) {
+        parentFolderId = destinationKey
+      }
+
       state = bookmarkOrderCache.removeCacheKey(state, bookmark.get('parentFolderId'), bookmarkKey)
       state = bookmarkLocationCache.removeCacheKey(state, bookmark.get('location'), bookmarkKey)
-
-      bookmark = bookmark.set('parentFolderId', ~~parentFolderId)
+      bookmark = bookmark.set('parentFolderId', Number(parentFolderId))
       const newKey = bookmarkUtil.getKey(bookmark)
 
       state = state.deleteIn([STATE_SITES.BOOKMARKS, bookmarkKey])

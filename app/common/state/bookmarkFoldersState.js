@@ -65,7 +65,7 @@ const bookmarkFoldersState = {
 
     const newFolder = oldFolder.merge(makeImmutable({
       title: folderDetails.get('title'),
-      parentFolderId: ~~folderDetails.get('parentFolderId', 0)
+      parentFolderId: Number(folderDetails.get('parentFolderId', 0))
     }))
 
     if (oldFolder.get('parentFolderId') !== newFolder.get('parentFolderId')) {
@@ -90,7 +90,7 @@ const bookmarkFoldersState = {
       syncActions.removeSites([folder.toJS()])
     }
 
-    folders.filter(folder => folder.get('parentFolderId') === ~~folderKey)
+    folders.filter(folder => folder.get('parentFolderId') === Number(folderKey))
       .map(folder => {
         state = bookmarksState.removeBookmarksByParentId(state, folder.get('folderId'))
         state = bookmarkFoldersState.removeFolder(state, folder.get('folderId'))
@@ -150,7 +150,7 @@ const bookmarkFoldersState = {
         : destinationItem.get('folderId')
 
       state = bookmarkOrderCache.removeCacheKey(state, folder.get('parentFolderId'), folderKey)
-      folder = folder.set('parentFolderId', ~~parentFolderId)
+      folder = folder.set('parentFolderId', Number(parentFolderId))
       const newKey = bookmarkFoldersUtil.getKey(folder)
       state = state.deleteIn([STATE_SITES.BOOKMARK_FOLDERS, folderKey])
       state = bookmarkOrderCache.addFolderToCache(state, folder.get('parentFolderId'), newKey)
