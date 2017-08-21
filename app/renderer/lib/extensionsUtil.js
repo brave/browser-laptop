@@ -30,12 +30,12 @@ const metamask = config.metamaskExtensionId
  * Properties such as name and description are referenced like keys for proper l10n
  */
 const dummyData = [
-  // {
-  //   id: bitwarden,
-  //   name: 'bitwarden',
-  //   description: 'bitwardenDesc',
-  //   icon: 'img/extensions/bitwarden-128.png'
-  // },
+  {
+    id: bitwarden,
+    name: 'bitwarden',
+    description: 'bitwardenDesc',
+    icon: 'img/extensions/bitwarden-128.png'
+  },
   // {
   //   id: pinterest,
   //   name: 'Pinterest Save',
