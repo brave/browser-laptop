@@ -169,6 +169,7 @@ const api = {
       defaultBrowserState.shouldDisplayDialog(state)
 
     return !state.get('contextMenuDetail') &&
+      !windowState.get('popupWindowDetail') &&
       !windowState.get('bookmarkDetail') &&
       !windowState.getIn(['ui', 'siteInfo', 'isVisible']) &&
       !braveryPanelIsVisible &&
