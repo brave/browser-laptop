@@ -585,7 +585,9 @@ const doAction = (action) => {
       if (!action.importBrowserDataDetail) {
         windowState = windowState.delete('importBrowserDataDetail')
       } else {
-        windowState = windowState.set('importBrowserDataDetail', Immutable.fromJS(action.importBrowserDataDetail))
+        const oldState = windowState.get('importBrowserDataDetail', Immutable.Map())
+        const newState = oldState.merge(Immutable.fromJS(action.importBrowserDataDetail))
+        windowState = windowState.set('importBrowserDataDetail', newState)
       }
       break
     case windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_SELECTED:
@@ -593,7 +595,7 @@ const doAction = (action) => {
         windowState = windowState.delete('importBrowserDataSelected')
       } else {
         if (typeof action.selected === 'number') {
-          const detail = windowState.getIn(['importBrowserDataDetail', action.selected])
+          const detail = windowState.getIn(['importBrowserDataDetail', 'browsers', action.selected])
           windowState = windowState.set('importBrowserDataSelected', detail)
         } else {
           for (let prop in action.selected) {

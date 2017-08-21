@@ -815,7 +815,7 @@ const windowActions = {
 
   /**
    * Sets the import browser data popup detail
-   * @param {Array} importBrowserDataDetail - list of supported browsers
+   * @param {Object} importBrowserDataDetail - array of list of supported browsers and loading status
    */
   setImportBrowserDataDetail: function (importBrowserDataDetail) {
     dispatch({

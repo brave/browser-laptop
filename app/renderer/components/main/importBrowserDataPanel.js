@@ -53,8 +53,10 @@ class ImportBrowserDataPanel extends React.Component {
     data.type = this.props.type
     data.passwords = this.props.passwords
 
+    windowActions.setImportBrowserDataDetail({
+      loading: true
+    })
     appActions.importBrowserData(Immutable.fromJS(data))
-    this.onHide()
   }
 
   onChange (e) {
@@ -75,13 +77,14 @@ class ImportBrowserDataPanel extends React.Component {
     const currentWindow = state.get('currentWindow')
     const importBrowserDataSelected = currentWindow.get('importBrowserDataSelected', Immutable.Map())
     const importBrowserDataDetail = currentWindow.get('importBrowserDataDetail', Immutable.Map())
+    const browsers = importBrowserDataDetail.get('browsers', Immutable.Map())
     const index = importBrowserDataSelected.get('index', '0')
-    const currentSelectedBrowser = importBrowserDataDetail.get(index, Immutable.Map())
+    const currentSelectedBrowser = browsers.get(index, Immutable.Map())
 
     const props = {}
     // used in renderer
-    props.browserNames = importBrowserDataDetail.map((browser) => browser.get('name'))
-    props.browserIndexes = importBrowserDataDetail.map((browser) => browser.get('index'))
+    props.browserNames = browsers.map((browser) => browser.get('name'))
+    props.browserIndexes = browsers.map((browser) => browser.get('index'))
     props.isSupportingHistory = currentSelectedBrowser.get('history', false)
     props.isSupportingFavorites = currentSelectedBrowser.get('favorites', false)
     props.isSupportingCookies = currentSelectedBrowser.get('cookies', false)
@@ -92,6 +95,7 @@ class ImportBrowserDataPanel extends React.Component {
     props.history = importBrowserDataSelected.get('history')
     props.type = importBrowserDataSelected.get('type')
     props.passwords = importBrowserDataSelected.get('passwords')
+    props.isLoading = importBrowserDataDetail.get('loading', false)
 
     // used in other functions
     props.selectedIndex = importBrowserDataSelected.get('index')
@@ -109,6 +113,7 @@ class ImportBrowserDataPanel extends React.Component {
         <CommonFormSection data-test-id='importBrowserDataOptions'>
           <div className={css(styles.dropdownWrapper)}>
             <CommonFormDropdown
+              disabled={this.props.isLoading}
               value={this.props.currentIndex}
               onChange={this.onChange} >
               {
@@ -148,12 +153,28 @@ class ImportBrowserDataPanel extends React.Component {
           <div data-l10n-id='importDataCloseBrowserWarning' />
         </CommonFormSection>
         <CommonFormButtonWrapper data-test-id='importBrowserDataButtons'>
-          <Button l10nId='cancel' className='whiteButton' onClick={this.onHide} />
-          <Button l10nId='import' className='primaryButton' onClick={this.onImport} />
+          <Button
+            l10nId='cancel'
+            className='whiteButton'
+            onClick={this.onHide}
+            disabled={this.props.isLoading}
+          />
+          <Button
+            l10nId='import'
+            className='primaryButton'
+            onClick={this.onImport}
+            disabled={this.props.isLoading}
+          />
         </CommonFormButtonWrapper>
-        <CommonFormBottomWrapper data-test-id='importBrowserDataWarning'>
-          <div data-l10n-id='importDataWarning' />
-        </CommonFormBottomWrapper>
+        {
+          this.props.isLoading
+          ? <CommonFormBottomWrapper data-test-id='importDataLoading'>
+            <div data-l10n-id='importDataLoading' />
+          </CommonFormBottomWrapper>
+          : <CommonFormBottomWrapper data-test-id='importBrowserDataWarning'>
+            <div data-l10n-id='importDataWarning' />
+          </CommonFormBottomWrapper>
+        }
       </CommonForm>
     </Dialog>
   }

@@ -426,7 +426,9 @@ class Main extends React.Component {
     })
 
     ipc.on(messages.IMPORTER_LIST, (e, detail) => {
-      windowActions.setImportBrowserDataDetail(detail)
+      windowActions.setImportBrowserDataDetail({
+        browsers: detail
+      })
       windowActions.setImportBrowserDataSelected()
     })
     // DO NOT ADD TO THIS LIST - see above
@@ -545,7 +547,7 @@ class Main extends React.Component {
     props.showBravery = shieldState.braveShieldsEnabled(activeFrame) &&
       !!currentWindow.get('braveryPanelDetail')
     props.showClearData = currentWindow.getIn(['ui', 'isClearBrowsingDataPanelVisible'], false)
-    props.showImportData = currentWindow.has('importBrowserDataDetail')
+    props.showImportData = currentWindow.hasIn(['importBrowserDataDetail', 'browsers'])
     props.showWidevine = currentWindow.getIn(['widevinePanelDetail', 'shown']) && !isLinux
     props.showAutoFillAddress = currentWindow.has('autofillAddressDetail')
     props.showAutoFillCC = currentWindow.has('autofillCreditCardDetail')

@@ -25,6 +25,7 @@ const settings = require('../js/constants/settings')
 
 // Actions
 const appActions = require('../js/actions/appActions')
+const windowActions = require('../js/actions/windowActions')
 const syncActions = require('../js/actions/syncActions')
 
 // Utils
@@ -269,6 +270,7 @@ const showImportSuccess = function () {
 }
 
 app.on('show-warning-dialog', (e) => {
+  windowActions.setImportBrowserDataDetail()
   showImportWarning()
 })
 
@@ -279,8 +281,12 @@ importer.on('import-success', (e) => {
       appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
     }
   }
+  setImmediate(() => {
+    windowActions.setImportBrowserDataDetail()
+  })
   showImportSuccess()
 })
 
 importer.on('import-dismiss', (e) => {
+  windowActions.setImportBrowserDataDetail()
 })

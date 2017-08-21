@@ -174,7 +174,7 @@ const api = {
       !windowState.getIn(['ui', 'siteInfo', 'isVisible']) &&
       !braveryPanelIsVisible &&
       !windowState.getIn(['ui', 'isClearBrowsingDataPanelVisible']) &&
-      !windowState.get('importBrowserDataDetail') &&
+      !windowState.hasIn(['importBrowserDataDetail', 'browsers']) &&
       !windowState.getIn(['widevinePanelDetail', 'shown']) &&
       !windowState.get('autofillAddressDetail') &&
       !windowState.get('autofillCreditCardDetail') &&
