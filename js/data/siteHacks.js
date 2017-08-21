@@ -14,7 +14,7 @@ const googleTagServicesRedirect = 'data:application/javascript;base64,' + base64
 const emptyDataURI = {
   enableForAdblock: true,
   enableForTrackingProtection: true,
-  onBeforeRequest: function(details) {
+  onBeforeRequest: function (details) {
     return {
       redirectURL: 'data:application/javascript;base64,MA=='
     }
@@ -43,7 +43,7 @@ module.exports.localStorageExceptions = [
   ['https://mail.google.com', 'https://hangouts.google.com']
 ]
 
-const braveUAWhitelist = ['adobe.com', 'duckduckgo.com', 'brave.com']
+const braveUAWhitelist = ['adobe.com', 'duckduckgo.com', 'brave.com', 'netflix.com']
 
 module.exports.siteHacks = {
   'sp1.nypost.com': emptyDataURI,
@@ -101,7 +101,7 @@ module.exports.siteHacks = {
       }
       return {
         redirectURL: googleTagServicesRedirect
-       }
+      }
     }
   },
   'twitter.com': {
@@ -128,7 +128,7 @@ module.exports.siteHacks = {
   'www.youtube.com': {
     allowFirstPartyAdblockChecks: true
   },
-   'www.theatlantic.com': {
+  'www.theatlantic.com': {
     allowFirstPartyAdblockChecks: true
   }
 }
@@ -145,4 +145,3 @@ braveUAWhitelist.forEach((domain) => {
     }
   }
 })
-
