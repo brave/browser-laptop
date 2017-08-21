@@ -121,7 +121,8 @@ class ExtensionsTab extends ImmutableComponent {
             className={css(styles.moreInfo__link)}
             onClick={aboutActions.createTabRequested.bind(null, {
               url: 'https://community.brave.com/c/feature-requests/extension-requests'
-            }, true)} />.
+            }, true)}
+          />.
         </HelpfulText>
       </footer>
     </section>
