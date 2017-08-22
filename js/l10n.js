@@ -12,6 +12,8 @@ var rendererTranslationCache = {}
 
 // As for a translation for the current language
 exports.translation = (token) => {
+  if (!token) return ''
+
   // If we are in the renderer process
   if (ipcRenderer) {
     // If the token does not exist in the renderer translations cache
