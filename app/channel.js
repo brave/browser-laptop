@@ -7,9 +7,9 @@
 // The package npm task builds this module
 const config = require('../js/constants/buildConfig')
 
-// The current channel is retrieved first from the environment,
-// then the buildConfig constants file and finally defaults to dev
-var channel = process.env.CHANNEL || config.channel || 'dev'
+// The current channel is retrieved first from the buildConfig constants file,
+// then the environments and finally defaults to dev
+var channel = config.channel || process.env.CHANNEL || 'dev'
 let channels = new Set(['dev', 'beta', 'stable'])
 
 if (!channels.has(channel)) {
