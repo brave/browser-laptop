@@ -299,6 +299,7 @@ const availableLanguages = [
   'cs',
   'nl-NL',
   'en-US',
+  'en-GB',
   'fr-FR',
   'de-DE',
   'hi-IN',
