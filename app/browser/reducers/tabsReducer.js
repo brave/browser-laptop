@@ -26,7 +26,7 @@ const getSetting = require('../../../js/settings').getSetting
 const settings = require('../../../js/constants/settings')
 const {tabCloseAction} = require('../../common/constants/settingsEnums')
 const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
-const {isSourceAboutUrl, isTargetAboutUrl, isIntermediateAboutPage} = require('../../../js/lib/appUrlUtil')
+const {isSourceAboutUrl, isTargetAboutUrl, isNavigatableAboutPage} = require('../../../js/lib/appUrlUtil')
 
 const updateActiveTab = (state, closeTabId) => {
   if (!tabState.getByTabId(state, closeTabId)) {
@@ -149,7 +149,7 @@ const tabsReducer = (state, action, immutableAction) => {
       const url = action.getIn(['createProperties', 'url'])
       setImmediate(() => {
         if (action.get('activateIfOpen') ||
-            ((isSourceAboutUrl(url) || isTargetAboutUrl(url)) && !isIntermediateAboutPage(url))) {
+            ((isSourceAboutUrl(url) || isTargetAboutUrl(url)) && isNavigatableAboutPage(url))) {
           tabs.maybeCreateTab(state, action.get('createProperties'))
         } else {
           tabs.create(action.get('createProperties'), null, action.get('isRestore'))
