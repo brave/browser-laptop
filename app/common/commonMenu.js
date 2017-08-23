@@ -6,7 +6,6 @@
 
 const appActions = require('../../js/actions/appActions')
 const messages = require('../../js/constants/messages')
-const Immutable = require('immutable')
 const locale = require('../../js/l10n')
 const settings = require('../../js/constants/settings')
 const {tabs} = require('../../js/constants/config')
@@ -25,7 +24,7 @@ if (process.type === 'browser') {
 const ensureAtLeastOneWindow = (frameOpts = {}) => {
   if (process.type === 'browser') {
     if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow(Immutable.fromJS({location: frameOpts.url}))
+      appActions.newWindow(frameOpts)
       return
     }
   }
