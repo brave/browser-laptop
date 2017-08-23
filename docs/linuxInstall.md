@@ -120,6 +120,5 @@ sudo rpm -i ./brave.rpm
 ## Raw x64 binaries:
 
 ```
-wget -O brave.tar.bz2 https://laptop-updates.brave.com/latest/linux64
-tar xvjf brave.tar.bz2
+wget https://laptop-updates.brave.com/latest/linux64 -O- | tar xj
 ```
