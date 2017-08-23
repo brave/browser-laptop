@@ -157,15 +157,9 @@ module.exports = {
     'privacy.opened-tab-suggestions': true,
     'privacy.autocomplete.history-size': 500,
     'bookmarks.toolbar.show': false,
-    'bookmarks.toolbar.showFavicon': false,
-    'bookmarks.toolbar.showOnlyFavicon': false,
     'privacy.autofill-enabled': true,
     'privacy.do-not-track': false,
     'security.passwords.active-password-manager': null, // Set in settings.js by passwordManagerDefault (defaults to built in)
-    'security.passwords.manager-enabled': true,
-    'security.passwords.one-password-enabled': false,
-    'security.passwords.dashlane-enabled': false,
-    'security.passwords.last-pass-enabled': false,
     'security.passwords.enpass-enabled': false,
     'security.passwords.bitwarden-enabled': false,
     'security.fullscreen.content': fullscreenOption.ALWAYS_ASK,
@@ -228,7 +222,34 @@ module.exports = {
     'general.bookmarks-toolbar-mode': null,
     'general.is-default-browser': null,
     'notification-add-funds-timestamp': null,
-    'notification-reconcile-soon-timestamp': null
+    'notification-reconcile-soon-timestamp': null,
+
+    // DEPRECATED settings
+    // DO NOT REMOVE OR CHANGE THESE VALUES
+    // ########################
+    // These values should only ever be references from ./settings.js
+    // Any place using those should have a migration to convert the value
+    // ########################
+
+    // START - DEPRECATED WITH 0.11.4
+    'security.passwords.manager-enabled': true,
+    'security.passwords.one-password-enabled': false,
+    'security.passwords.dashlane-enabled': false,
+    'security.passwords.last-pass-enabled': false,
+    // END - DEPRECATED WITH 0.11.4
+
+    // START - DEPRECATED WITH 0.12.6
+    'bookmarks.toolbar.showFavicon': false,
+    'bookmarks.toolbar.showOnlyFavicon': false,
+    // END - DEPRECATED WITH 0.12.6
+
+    // START - DEPRECATED WITH 0.21.0
+    'advanced.hide-excluded-sites': false,
+    'advanced.minimum-visit-time': 8000,
+    'advanced.minimum-visits': 1,
+    'advanced.auto-suggest-sites': true,
+    'advanced.hide-lower-sites': true
+    // END - DEPRECATED WITH 0.21.0
   },
   defaultFavicon: 'img/empty_favicon.png'
 }

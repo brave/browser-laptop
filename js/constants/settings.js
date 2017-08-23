@@ -86,26 +86,39 @@ const settings = {
   SYNC_TYPE_HISTORY: 'sync.type.history',
   SYNC_TYPE_SITE_SETTING: 'sync.type.siteSetting',
   SYNC_NETWORK_DISABLED: 'sync.network.disabled', // disable network connection to sync server. only used in testing.
-  // DEPRECATED settings
-  // ########################
-  // these constants should not appear outside of this file, ../settings.js, and our tests
-  // NOTE: these settings rely on default values being set in ./appConfig.js
-  // ########################
-  // > phased out with 0.11.4
-  PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
-  ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
-  DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
-  LAST_PASS_ENABLED: 'security.passwords.last-pass-enabled',
-  ENPASS_ENABLED: 'security.passwords.enpass-enabled',
-  BITWARDEN_ENABLED: 'security.passwords.bitwarden-enabled',
-  // > phased out with 0.12.6
-  SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
-  SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',
+  // Extension settings
   POCKET_ENABLED: 'extensions.pocket.enabled',
   VIMIUM_ENABLED: 'extensions.vimium.enabled',
   HONEY_ENABLED: 'extensions.honey.enabled',
   PINTEREST_ENABLED: 'extensions.pinterest.enabled',
-  METAMASK_ENABLED: 'extensions.metamask.enabled'
+  METAMASK_ENABLED: 'extensions.metamask.enabled',
+
+  // DEPRECATED settings
+  // DO NOT REMOVE OR CHANGE THESE VALUES
+  // ########################
+  // these constants should not appear outside of this file, ../settings.js, and our tests
+  // NOTE: these settings rely on default values being set in ./appConfig.js
+  // ########################
+
+  // START - DEPRECATED WITH 0.11.4
+  PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
+  ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
+  DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
+  LAST_PASS_ENABLED: 'security.passwords.last-pass-enabled',
+  // END - DEPRECATED WITH 0.11.4
+
+  // START - DEPRECATED WITH 0.12.6
+  SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
+  SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',
+  // END - DEPRECATED WITH 0.12.6
+
+  // START - DEPRECATED WITH 0.21.0
+  HIDE_EXCLUDED_SITES: 'advanced.hide-excluded-sites',
+  HIDE_LOWER_SITES: 'advanced.hide-lower-sites',
+  MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
+  MINIMUM_VISITS: 'advanced.minimum-visits',
+  AUTO_SUGGEST_SITES: 'advanced.auto-suggest-sites'
+  // END - DEPRECATED WITH 0.21.0
 }
 
 module.exports = settings

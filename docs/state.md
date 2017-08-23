@@ -210,8 +210,6 @@ AppStore
     'advanced.smooth-scroll-enabled': boolean, // false if smooth scrolling should be explicitly disabled
     'advanced.torrent-viewer-enabled': boolean, // whether to render magnet links in the browser
     'bookmarks.toolbar.show': boolean, // true if the bookmakrs toolbar should be shown
-    'bookmarks.toolbar.showFavicon': boolean, // true if bookmark favicons should be shown on the bookmarks toolbar
-    'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
     'extensions.pocket.enabled': boolean, // true if pocket is enabled
     'extensions.vimium.enabled': boolean, // true if vimium is enabled
     'extensions.honey.enabled': boolean, // true if Honey is enabled
@@ -254,12 +252,6 @@ AppStore
     'shields.blocked-count-badge': boolean, // true if blocked counts on the shield button should be enabled
     'shields.compact-bravery-panel': boolean, // true if the compact Bravery panel should be enabled
     'security.passwords.active-password-manager': string, // name of active password manager
-    'security.passwords.bitwarden-enabled': boolean, // true if the bitwarden extension should be enabled
-    'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
-    'security.passwords.enpass-enabled': boolean, // true if the Enpass extension should be enabled
-    'security.passwords.last-pass-enabled': boolean, // true if the Last password extension should be enabled
-    'security.passwords.manager-enabled': boolean, // whether to use default password manager
-    'security.passwords.one-password-enabled': boolean, // true if the 1Password extension should be enabled
     'security.fullscreen.content': string, // whether or not user choose to allow fullscreen content by default
     'shutdown.clear-all-site-cookies': boolean, // true to clear all site cookies on shutdown
     'shutdown.clear-autocomplete-data': boolean, // true to clear all autocomplete data on shutdown
@@ -272,7 +264,24 @@ AppStore
     'tabs.paint-tabs': boolean, // true if the page theme color and favicon color should be used for tabs
     'tabs.show-tab-previews': boolean, // true to show tab previews
     'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
-    'tabs.tabs-per-page': number // number of tabs per tab page
+    'tabs.tabs-per-page': number, // number of tabs per tab page
+
+    // DEPRECATED with 0.11.4
+    'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
+    'security.passwords.last-pass-enabled': boolean, // true if the Last password extension should be enabled
+    'security.passwords.manager-enabled': boolean, // whether to use default password manager
+    'security.passwords.one-password-enabled': boolean, // true if the 1Password extension should be enabled
+
+    // DEPRECATED with 0.12.6
+    'bookmarks.toolbar.showFavicon': boolean, // true if bookmark favicons should be shown on the bookmarks toolbar
+    'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
+
+    // DEPRECATED with 0.21.0
+    'advanced.hide-excluded-sites': boolean, // whether to hide excluded sites in the payments list
+    'advanced.hide-lower-sites': boolean,
+    'advanced.minimum-visit-time': number,
+    'advanced.minimum-visits': number,
+    'advanced.auto-suggest-sites': boolean // show auto suggestion
   },
   locationSiteKeyCache: {
     [location]: Array.<string> // location -> site keys
