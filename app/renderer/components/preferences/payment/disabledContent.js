@@ -21,27 +21,27 @@ const CoinBase2 = require('../../../../extensions/brave/img/coinbase_2x.png')
 class DisabledContent extends ImmutableComponent {
   render () {
     return <section className={css(styles.disabledContent)} data-test-id='disabledContent'>
-      <div className={css(styles.paymentsMessage)} data-test-id='paymentsMessage'>
-        <h3 className={css(styles.h3)} data-l10n-id='paymentsWelcomeTitle' />
-        <div className={css(styles.text)} data-l10n-id='paymentsWelcomeText1' />
-        <div className={css(styles.boldText, styles.text)} data-l10n-id='paymentsWelcomeText2' />
-        <div className={css(styles.text)} data-l10n-id='paymentsWelcomeText3' />
-        <div className={css(styles.text)} data-l10n-id='paymentsWelcomeText4' />
-        <div className={css(styles.text)}data-l10n-id='paymentsWelcomeText5' />
-        <div className={css(styles.text)}>
+      <div className={css(styles.disabledContent__message)} data-test-id='paymentsMessage'>
+        <h3 className={css(styles.disabledContent__message__header)} data-l10n-id='paymentsWelcomeTitle' />
+        <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText1' />
+        <div className={css(styles.disabledContent__message__text, styles.disabledContent__message__text_bold)} data-l10n-id='paymentsWelcomeText2' />
+        <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText3' />
+        <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText4' />
+        <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText5' />
+        <div className={css(styles.disabledContent__message__text)}>
           <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
           <a className='linkText' href='https://brave.com/Payments_FAQ.html' rel='noopener' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
           <span data-l10n-id='paymentsWelcomeText7' />
         </div>
       </div>
-      <div className={css(styles.paymentsSidebar)}>
-        <h2 className={css(styles.sideH2)} data-l10n-id='paymentsSidebarText1' />
-        <div className={css(styles.textSide)} data-l10n-id='paymentsSidebarText2' />
-        <a href='https://www.privateinternetaccess.com/' rel='noopener' target='_blank'><span className={css(styles.paymentsSidebarPIA)} /></a>
-        <div className={css(styles.textSide)} data-l10n-id='paymentsSidebarText3' />
-        <a href='https://www.bitgo.com/' rel='noopener' target='_blank'><span className={css(styles.paymentsSidebarBitgo)} /></a>
-        <div className={css(styles.textSide)} data-l10n-id='paymentsSidebarText4' />
-        <a href='https://www.coinbase.com/' rel='noopener' target='_blank'><span className={css(styles.paymentsSidebarCoinbase)} /></a>
+      <div className={css(styles.disabledContent__sidebar)}>
+        <h2 className={css(styles.disabledContent__sidebar__header)} data-l10n-id='paymentsSidebarText1' />
+        <div className={css(styles.disabledContent__sidebar__text)} data-l10n-id='paymentsSidebarText2' />
+        <a href='https://www.privateinternetaccess.com/' rel='noopener' target='_blank'><span className={css(styles.disabledContent__sidebar__logo, styles.disabledContent__sidebar__logo_PIA)} /></a>
+        <div className={css(styles.disabledContent__sidebar__text)} data-l10n-id='paymentsSidebarText3' />
+        <a href='https://www.bitgo.com/' rel='noopener' target='_blank'><span className={css(styles.disabledContent__sidebar__logo, styles.disabledContent__sidebar__logo_bitgo)} /></a>
+        <div className={css(styles.disabledContent__sidebar__text)} data-l10n-id='paymentsSidebarText4' />
+        <a href='https://www.coinbase.com/' rel='noopener' target='_blank'><span className={css(styles.disabledContent__sidebar__logo, styles.disabledContent__sidebar__logo_coinbase)} /></a>
       </div>
     </section>
   }
@@ -55,67 +55,66 @@ const styles = StyleSheet.create({
     marginTop: globalStyles.spacing.panelMargin
   },
 
-  paymentsMessage: {
+  disabledContent__message: {
     backgroundColor: globalStyles.color.lightGray,
     borderRadius: globalStyles.radius.borderRadiusUIbox,
+    boxSizing: 'border-box',
     padding: '40px',
     fontSize: paymentStyles.font.regular,
     lineHeight: '1.8em',
-    color: globalStyles.color.mediumGray,
-    width: '500px'
+    color: globalStyles.color.mediumGray
   },
 
-  text: {
-    padding: '0.5em 0'
-  },
-
-  textSide: {
-    fontSize: paymentStyles.font.regular,
-    margin: '50px 0 20px 12px'
-  },
-
-  h3: {
+  disabledContent__message__header: {
     fontSize: '18px',
     paddingBottom: '0.5em'
   },
 
-  sideH2: {
-    fontSize: '18px',
-    margin: '70px 0 -15px 12px'
+  disabledContent__message__text: {
+    padding: '0.5em 0'
   },
 
-  boldText: {
+  disabledContent__message__text_bold: {
     fontWeight: 'bold'
   },
 
-  paymentsSidebar: {
-    opacity: 0.8,
-    width: '200px',
-    marginLeft: '23px'
+  disabledContent__sidebar: {
+    minWidth: '200px',
+    marginLeft: '35px'
   },
 
-  paymentsSidebarPIA: {
+  disabledContent__sidebar__header: {
+    opacity: 0.8,
+    fontSize: '18px',
+    margin: '70px 0 30px'
+  },
+
+  disabledContent__sidebar__text: {
+    opacity: 0.8,
+    fontSize: paymentStyles.font.regular
+  },
+
+  disabledContent__sidebar__logo: {
+    margin: '20px 0px 50px',
+    display: 'block'
+  },
+
+  disabledContent__sidebar__logo_PIA: {
     backgroundImage: `-webkit-image-set(url(${PIA}) 1x, url(${PIA2}) 2x)`,
     width: '195px',
-    height: '20px',
-    margin: '0 0 20px 12px',
-    display: 'block'
+    height: '20px'
   },
 
-  paymentsSidebarBitgo: {
+  disabledContent__sidebar__logo_bitgo: {
     backgroundImage: `-webkit-image-set(url(${BitGo}) 1x, url(${BitGo2}) 2x)`,
     width: '100px',
-    height: '25px',
-    margin: '0 0 20px 12px',
-    display: 'block'
+    height: '25px'
   },
 
-  paymentsSidebarCoinbase: {
+  disabledContent__sidebar__logo_coinbase: {
     backgroundImage: `-webkit-image-set(url(${CoinBase}) 1x, url(${CoinBase2}) 2x)`,
     width: '100px',
-    height: '35px',
-    margin: '0 0 20px 12px',
-    display: 'block'
+    height: '35px'
   }
 })
 
