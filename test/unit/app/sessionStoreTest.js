@@ -69,6 +69,9 @@ describe('sessionStore unit tests', function () {
       return new Promise((resolve, reject) => {
         resolve()
       })
+    },
+    translation: (token) => {
+      return token
     }
   }
 
@@ -945,54 +948,156 @@ describe('sessionStore unit tests', function () {
   })
 
   describe('runPreMigrations', function () {
-    let data = {
-      settings: {
-        [settings.AUTO_SUGGEST_SITES]: 'sure thing',
-        [settings.MINIMUM_VISIT_TIME]: 'almost instantly',
-        [settings.MINIMUM_VISITS]: 'a million',
-        [settings.HIDE_LOWER_SITES]: 'pls do it',
-        [settings.HIDE_EXCLUDED_SITES]: 'no thanks',
-        'payments.notificationTryPaymentsDismissed': 'why would I?'
-      }
-    }
+    let data
+    let runPreMigrations
 
-    describe('if data.settings exist', function () {
-      it('PAYMENTS_SITES_AUTO_SUGGEST inherits data from AUTO_SUGGEST_SITES', function () {
-        const runPreMigrations = sessionStore.runPreMigrations(data)
-        const newValue = runPreMigrations.settings[settings.PAYMENTS_SITES_AUTO_SUGGEST]
-        const oldValue = runPreMigrations.settings[settings.AUTO_SUGGEST_SITES]
-        assert.equal(newValue, oldValue)
+    before(function () {
+      const defaultAppState = sessionStore.defaultAppState()
+      // NOTE: it's important that this merges similar to loadAppState
+      // It's immutable since runPreMigrations does delete values
+      data = Immutable.fromJS(Object.assign({}, defaultAppState, {
+        autofill: {
+          addresses: ['guid1', 'guid2'],
+          creditCards: ['guid1', 'guid2']
+        },
+        settings: {
+          [settings.DEFAULT_SEARCH_ENGINE]: 'content/search/google.xml',
+          [settings.AUTO_SUGGEST_SITES]: 'sure thing',
+          [settings.MINIMUM_VISIT_TIME]: 'almost instantly',
+          [settings.MINIMUM_VISITS]: 'a million',
+          [settings.HIDE_LOWER_SITES]: 'pls do it',
+          [settings.HIDE_EXCLUDED_SITES]: 'no thanks',
+          'payments.notificationTryPaymentsDismissed': 'why would I?'
+        },
+        sites: {
+        }
+      }))
+      runPreMigrations = sessionStore.runPreMigrations(data.toJS())
+    })
+
+    describe('when `data.autofill` exists', function () {
+      describe('migrate `data.autofill.addresses` from array to map', function () {
+        it('copies the values into a field called guid', function () {
+          const oldValue = data.getIn(['autofill', 'addresses'])
+          const newValue = runPreMigrations.autofill.addresses.guid
+          assert.deepEqual(newValue, oldValue.toJS())
+        })
+        it('converts the value to a map', function () {
+          assert.equal(Array.isArray(runPreMigrations.autofill.addresses), false)
+        })
       })
-      it('PAYMENTS_MINIMUM_VISIT_TIME inherits data from MINIMUM_VISIT_TIME', function () {
-        const runPreMigrations = sessionStore.runPreMigrations(data)
-        const newValue = runPreMigrations.settings[settings.PAYMENTS_MINIMUM_VISIT_TIME]
-        const oldValue = runPreMigrations.settings[settings.MINIMUM_VISIT_TIME]
-        assert.equal(newValue, oldValue)
+
+      describe('migrate `data.autofill.creditCards` from array to map', function () {
+        it('copies the values into a field called guid', function () {
+          const oldValue = data.getIn(['autofill', 'creditCards'])
+          const newValue = runPreMigrations.autofill.creditCards.guid
+          assert.deepEqual(newValue, oldValue.toJS())
+        })
+        it('converts the value to a map', function () {
+          assert.equal(Array.isArray(runPreMigrations.autofill.creditCards), false)
+        })
       })
-      it('PAYMENTS_MINIMUM_VISITS inherits data from MINIMUM_VISITS', function () {
-        const runPreMigrations = sessionStore.runPreMigrations(data)
-        const newValue = runPreMigrations.settings[settings.PAYMENTS_MINIMUM_VISITS]
-        const oldValue = runPreMigrations.settings[settings.MINIMUM_VISITS]
-        assert.equal(newValue, oldValue)
+
+      describe('updates guids in `data.autofill.addresses.guid` if they are an object', function () {
+        // TODO:
       })
-      it('PAYMENTS_SITES_SHOW_LESS inherits data from HIDE_LOWER_SITES', function () {
-        const runPreMigrations = sessionStore.runPreMigrations(data)
-        const newValue = runPreMigrations.settings[settings.PAYMENTS_SITES_SHOW_LESS]
-        const oldValue = runPreMigrations.settings[settings.HIDE_LOWER_SITES]
-        assert.equal(newValue, oldValue)
-      })
-      it('PAYMENTS_SITES_HIDE_EXCLUDED inherits data from HIDE_EXCLUDED_SITES', function () {
-        const runPreMigrations = sessionStore.runPreMigrations(data)
-        const newValue = runPreMigrations.settings[settings.PAYMENTS_SITES_HIDE_EXCLUDED]
-        const oldValue = runPreMigrations.settings[settings.HIDE_EXCLUDED_SITES]
-        assert.equal(newValue, oldValue)
-      })
-      it('PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED inherits data from payments.notificationTryPaymentsDismissed', function () {
-        const runPreMigrations = sessionStore.runPreMigrations(data)
-        const newValue = runPreMigrations.settings[settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED]
-        const oldValue = runPreMigrations.settings['payments.notificationTryPaymentsDismissed']
-        assert.equal(newValue, oldValue)
+
+      describe('updates guids in `data.autofill.creditCards.guid` if they are an object', function () {
+        // TODO:
       })
     })
+
+    describe('when `data.settings` exists', function () {
+      describe('migrate search engine settings', function () {
+        it('updates settings.DEFAULT_SEARCH_ENGINE if set to google.xml', function () {
+          const newValue = runPreMigrations.settings[settings.DEFAULT_SEARCH_ENGINE]
+          assert.equal(newValue, 'Google')
+        })
+        it('updates settings.DEFAULT_SEARCH_ENGINE if set to duckduckgo.xml', function () {
+          // this one has to run a second time, since it modifies the same value as test before
+          const dataCopy = data.setIn(['settings', settings.DEFAULT_SEARCH_ENGINE], 'content/search/duckduckgo.xml')
+          const output = sessionStore.runPreMigrations(dataCopy.toJS())
+          const newValue = output.settings[settings.DEFAULT_SEARCH_ENGINE]
+          assert.equal(newValue, 'DuckDuckGo')
+        })
+      })
+
+      describe('payments migration (0.21.x)', function () {
+        it('sets PAYMENTS_SITES_AUTO_SUGGEST based on AUTO_SUGGEST_SITES', function () {
+          const oldValue = data.getIn(['settings', settings.AUTO_SUGGEST_SITES])
+          const newValue = runPreMigrations.settings[settings.PAYMENTS_SITES_AUTO_SUGGEST]
+          assert.equal(newValue, oldValue)
+        })
+        it('sets PAYMENTS_MINIMUM_VISIT_TIME based on MINIMUM_VISIT_TIME', function () {
+          const oldValue = data.getIn(['settings', settings.MINIMUM_VISIT_TIME])
+          const newValue = runPreMigrations.settings[settings.PAYMENTS_MINIMUM_VISIT_TIME]
+          assert.equal(newValue, oldValue)
+        })
+        it('sets PAYMENTS_MINIMUM_VISITS based on MINIMUM_VISITS', function () {
+          const oldValue = data.getIn(['settings', settings.MINIMUM_VISITS])
+          const newValue = runPreMigrations.settings[settings.PAYMENTS_MINIMUM_VISITS]
+          assert.equal(newValue, oldValue)
+        })
+        it('sets PAYMENTS_SITES_SHOW_LESS based on HIDE_LOWER_SITES', function () {
+          const oldValue = data.getIn(['settings', settings.HIDE_LOWER_SITES])
+          const newValue = runPreMigrations.settings[settings.PAYMENTS_SITES_SHOW_LESS]
+          assert.equal(newValue, oldValue)
+        })
+        it('sets PAYMENTS_SITES_HIDE_EXCLUDED based on HIDE_EXCLUDED_SITES', function () {
+          const oldValue = data.getIn(['settings', settings.HIDE_EXCLUDED_SITES])
+          const newValue = runPreMigrations.settings[settings.PAYMENTS_SITES_HIDE_EXCLUDED]
+          assert.equal(newValue, oldValue)
+        })
+        it('sets PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED based on payments.notificationTryPaymentsDismissed', function () {
+          const oldValue = data.getIn(['settings', 'payments.notificationTryPaymentsDismissed'])
+          const newValue = runPreMigrations.settings[settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED]
+          assert.equal(newValue, oldValue)
+        })
+        it('removes the old values', function () {
+          assert.equal(runPreMigrations.settings[settings.AUTO_SUGGEST_SITES], undefined)
+          assert.equal(runPreMigrations.settings[settings.MINIMUM_VISIT_TIME], undefined)
+          assert.equal(runPreMigrations.settings[settings.MINIMUM_VISITS], undefined)
+          assert.equal(runPreMigrations.settings[settings.HIDE_LOWER_SITES], undefined)
+          assert.equal(runPreMigrations.settings[settings.HIDE_EXCLUDED_SITES], undefined)
+          assert.equal(runPreMigrations.settings['payments.notificationTryPaymentsDismissed'], undefined)
+        })
+      })
+    })
+
+    describe('when `data.sites` exists', function () {
+      describe('run split sites migration', function () {
+        describe('pinned sites', function () {
+          // TODO:
+        })
+
+        describe('default sites', function () {
+          // TODO:
+        })
+
+        describe('bookmark order', function () {
+          // TODO:
+        })
+
+        describe('bookmarks', function () {
+          // TODO:
+        })
+
+        describe('add cache to the state', function () {
+          // TODO:
+        })
+
+        describe('history', function () {
+          // TODO:
+        })
+
+        describe('delete `data.sites`', function () {
+          // TODO:
+        })
+      })
+    })
+  })
+
+  describe('runPostMigrations', function () {
+    // TODO:
   })
 })
