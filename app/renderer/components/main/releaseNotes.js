@@ -61,7 +61,8 @@ const styles = StyleSheet.create({
   releaseNotes: {
     width: 'auto',
     maxWidth: '350px',
-    textAlign: 'left'
+    textAlign: 'left',
+    overflowY: 'auto'
   },
 
   header: {
