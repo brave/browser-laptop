@@ -490,7 +490,7 @@ module.exports.runPreMigrations = (data) => {
       })
       data.autofill.creditCards = creditCards
     }
-    if (data.autofill.addresses.guid) {
+    if (data.autofill.addresses && data.autofill.addresses.guid) {
       let guids = []
       data.autofill.addresses.guid.forEach((guid) => {
         if (typeof guid === 'object') {
@@ -501,7 +501,7 @@ module.exports.runPreMigrations = (data) => {
       })
       data.autofill.addresses.guid = guids
     }
-    if (data.autofill.creditCards.guid) {
+    if (data.autofill.creditCards && data.autofill.creditCards.guid) {
       let guids = []
       data.autofill.creditCards.guid.forEach((guid) => {
         if (typeof guid === 'object') {

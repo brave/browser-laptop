@@ -78,6 +78,9 @@ describe('sessionStore unit tests', function () {
       return new Promise((resolve, reject) => {
         resolve()
       })
+    },
+    translation: (token) => {
+      return token
     }
   }
 
@@ -960,6 +963,75 @@ describe('sessionStore unit tests', function () {
         const setting = result.siteSettings[defaultSiteSettingsList[0].pattern]
         assert.equal(setting[defaultSiteSettingsList[0].name], 'BRAVE')
       }
+    })
+  })
+
+  describe('runPreMigrations', function () {
+    let data
+    let runPreMigrations
+
+    before(function () {
+      const defaultAppState = sessionStore.defaultAppState()
+      // NOTE: it's important that this merges similar to loadAppState
+      // It's immutable since runPreMigrations does delete values
+      data = Immutable.fromJS(Object.assign({}, defaultAppState, {
+        autofill: {
+          addresses: ['guid1', 'guid2'],
+          creditCards: ['guid1', 'guid2']
+        },
+        settings: {
+          [settings.DEFAULT_SEARCH_ENGINE]: 'content/search/google.xml'
+        }
+      }))
+      runPreMigrations = sessionStore.runPreMigrations(data.toJS())
+    })
+
+    describe('when `data.autofill` exists', function () {
+      describe('migrate `data.autofill.addresses` from array to map', function () {
+        it('copies the values into a field called guid', function () {
+          const oldValue = data.getIn(['autofill', 'addresses'])
+          const newValue = runPreMigrations.autofill.addresses.guid
+          assert.deepEqual(newValue, oldValue.toJS())
+        })
+        it('converts the value to a map', function () {
+          assert.equal(Array.isArray(runPreMigrations.autofill.addresses), false)
+        })
+      })
+
+      describe('migrate `data.autofill.creditCards` from array to map', function () {
+        it('copies the values into a field called guid', function () {
+          const oldValue = data.getIn(['autofill', 'creditCards'])
+          const newValue = runPreMigrations.autofill.creditCards.guid
+          assert.deepEqual(newValue, oldValue.toJS())
+        })
+        it('converts the value to a map', function () {
+          assert.equal(Array.isArray(runPreMigrations.autofill.creditCards), false)
+        })
+      })
+
+      describe('updates guids in `data.autofill.addresses.guid` if they are an object', function () {
+        // TODO:
+      })
+
+      describe('updates guids in `data.autofill.creditCards.guid` if they are an object', function () {
+        // TODO:
+      })
+    })
+
+    describe('when `data.settings` exists', function () {
+      describe('migrate search engine settings', function () {
+        it('updates settings.DEFAULT_SEARCH_ENGINE if set to google.xml', function () {
+          const newValue = runPreMigrations.settings[settings.DEFAULT_SEARCH_ENGINE]
+          assert.equal(newValue, 'Google')
+        })
+        it('updates settings.DEFAULT_SEARCH_ENGINE if set to duckduckgo.xml', function () {
+          // this one has to run a second time, since it modifies the same value as test before
+          const dataCopy = data.setIn(['settings', settings.DEFAULT_SEARCH_ENGINE], 'content/search/duckduckgo.xml')
+          const output = sessionStore.runPreMigrations(dataCopy.toJS())
+          const newValue = output.settings[settings.DEFAULT_SEARCH_ENGINE]
+          assert.equal(newValue, 'DuckDuckGo')
+        })
+      })
     })
   })
 
