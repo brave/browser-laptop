@@ -154,11 +154,15 @@ module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
   }
 
   let newKey = 0
-  const cleanFrame = (immutableFrame) => {
+  let activeFrameKey = immutablePerWindowData.get('activeFrameKey')
+  // If adjustActive is set to true then activeFrameKey will be set to the new frame key.
+  // We re-use this function for both closedFrames and frames, and we only want to adjust the active for frames.
+  const cleanFrame = (immutableFrame, adjustActive) => {
     newKey++
     // Reset the ids back to sequential numbers
-    if (immutableFrame.get('key') === immutablePerWindowData.get('activeFrameKey')) {
-      immutablePerWindowData = immutablePerWindowData.set('activeFrameKey', newKey)
+    if (adjustActive &&
+        immutableFrame.get('key') === immutablePerWindowData.get('activeFrameKey')) {
+      activeFrameKey = newKey
     } else {
       // For now just set everything to unloaded unless it's the active frame
       immutableFrame = immutableFrame.set('unloaded', true)
@@ -193,6 +197,7 @@ module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
       'guestInstanceId',
       // Tab ids are per-session and should not be persisted
       'tabId',
+      'openerTabId',
       // Do not show the audio indicator until audio starts playing
       'audioMuted',
       'audioPlaybackActive',
@@ -246,20 +251,24 @@ module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
   if (immutablePerWindowData.get('closedFrames')) {
     immutablePerWindowData =
       immutablePerWindowData.get('closedFrames').reduce((immutablePerWindowData, immutableFrame, index) => {
-        const cleanImmutableFrame = cleanFrame(immutableFrame)
+        const cleanImmutableFrame = cleanFrame(immutableFrame, false)
         return immutablePerWindowData.setIn(['closedFrames', index], cleanImmutableFrame)
       }, immutablePerWindowData)
   }
-  if (immutablePerWindowData.get('frames')) {
+  let immutableFrames = immutablePerWindowData.get('frames')
+  if (immutableFrames) {
     // Don't restore pinned locations because they will be auto created by the app state change event
-    immutablePerWindowData = immutablePerWindowData.set('frames',
-      immutablePerWindowData.get('frames')
-        .filter((frame) => !frame.get('pinnedLocation')))
+    immutableFrames = immutableFrames
+        .filter((frame) => !frame.get('pinnedLocation'))
+    immutablePerWindowData = immutablePerWindowData.set('frames', immutableFrames)
     immutablePerWindowData =
-      immutablePerWindowData.get('frames').reduce((immutablePerWindowData, immutableFrame, index) => {
-        const cleanImmutableFrame = cleanFrame(immutableFrame)
+      immutableFrames.reduce((immutablePerWindowData, immutableFrame, index) => {
+        const cleanImmutableFrame = cleanFrame(immutableFrame, true)
         return immutablePerWindowData.setIn(['frames', index], cleanImmutableFrame)
       }, immutablePerWindowData)
+    if (activeFrameKey !== undefined) {
+      immutablePerWindowData = immutablePerWindowData.set('activeFrameKey', activeFrameKey)
+    }
   }
   return immutablePerWindowData
 }

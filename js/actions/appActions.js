@@ -84,6 +84,17 @@ const appActions = {
   },
 
   /**
+   * The tab strip is empty
+   * @param {Number} windowId
+   */
+  tabStripEmpty: function (windowId) {
+    dispatch({
+      actionType: appConstants.APP_TAB_STRIP_EMPTY,
+      windowId
+    })
+  },
+
+  /**
    * A new tab has been created
    * @param {Object} tabValue
    */
@@ -95,15 +106,48 @@ const appActions = {
   },
 
   /**
+   * Tab moved event fired from muon
+   * @param {Object} tabValue
+   */
+  tabMoved: function (tabId) {
+    dispatch({
+      actionType: appConstants.APP_TAB_MOVED,
+      tabId
+    })
+  },
+
+  /**
+   * A tab has been attached
+   * @param {Object} tabValue
+   */
+  tabAttached: function (tabId) {
+    dispatch({
+      actionType: appConstants.APP_TAB_ATTACHED,
+      tabId
+    })
+  },
+
+  /**
+   * A tab will be attached
+   * @param {Object} tabValue
+   */
+  tabWillAttach: function (tabId) {
+    dispatch({
+      actionType: appConstants.APP_TAB_WILL_ATTACH,
+      tabId
+    })
+  },
+
+  /**
    * A tab has been moved to another window
    * @param {Number} tabId
    * @param {Object} frameOpts
    * @param {Object} browserOpts
    * @param {Number} windowId
    */
-  tabMoved: function (tabId, frameOpts, browserOpts, windowId) {
+  tabDetachMenuItemClicked: function (tabId, frameOpts, browserOpts, windowId) {
     dispatch({
-      actionType: appConstants.APP_TAB_MOVED,
+      actionType: appConstants.APP_TAB_DETACH_MENU_ITEM_CLICKED,
       tabId,
       frameOpts,
       browserOpts,

@@ -16,7 +16,6 @@ const appActions = require('../../../js/actions/appActions')
 
 // Utils
 const frameStateUtil = require('../../../js/state/frameStateUtil')
-const {getCurrentWindowId} = require('../currentWindow')
 const {getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
 
@@ -39,15 +38,13 @@ const closeFrame = (state, action) => {
 
   state = state.merge(frameStateUtil.removeFrame(
     state,
-    frameProps.set('closedAtIndex', index),
+    frameProps
+      .set('closedAtIndex', index)
+      .delete('openerTabId'),
     index
   ))
   state = frameStateUtil.deleteFrameInternalIndex(state, frameProps)
   state = frameStateUtil.updateFramesInternalIndex(state, index)
-
-  if (state.get('frames', Immutable.List()).size === 0) {
-    appActions.closeWindow(getCurrentWindowId())
-  }
 
   const nextFrame = frameStateUtil.getFrameByIndex(state, index)
 
