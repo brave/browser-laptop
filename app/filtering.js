@@ -32,7 +32,8 @@ const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 const {fullscreenOption} = require('./common/constants/settingsEnums')
 const isThirdPartyHost = require('./browser/isThirdPartyHost')
-var extensionState = require('./common/state/extensionState.js')
+const extensionState = require('./common/state/extensionState')
+const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
 
 let appStore = null
 
@@ -58,6 +59,22 @@ const registeredSessions = {}
  * Maps permission notification bar messages to their callback
  */
 const permissionCallbacks = {}
+
+const getBraverySettingsForUrl = (url, appState, isPrivate) => {
+  const cachedBraverySettings = getBraverySettingsCache(url)
+  if (cachedBraverySettings) {
+    return cachedBraverySettings
+  }
+  const savedSettings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
+  const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
+
+  let braverySettings = siteSettings.activeSettings(savedSettings, appState, appConfig)
+  if (isPrivate && tempSettings) {
+    braverySettings = siteSettings.activeSettings(tempSettings, appState, appConfig)
+  }
+  updateBraverySettingsCache(url, braverySettings)
+  return braverySettings
+}
 
 module.exports.registerBeforeSendHeadersFilteringCB = (filteringFn) => {
   beforeSendHeadersFilteringFns.push(filteringFn)
@@ -694,28 +711,22 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
   if (resourceName === 'flash') {
     return true
   }
+  const appState = appStore.getState()
+  const settingsState = appState.get('settings')
 
   if (resourceName === 'pdfjs') {
-    return getSetting(settings.PDFJS_ENABLED)
+    return getSetting(settings.PDFJS_ENABLED, settingsState)
   }
   if (resourceName === 'webtorrent') {
-    return getSetting(settings.TORRENT_VIEWER_ENABLED)
+    return getSetting(settings.TORRENT_VIEWER_ENABLED, settingsState)
   }
-
-  const appState = appStore.getState()
 
   if (resourceName === 'webtorrent') {
     const extension = extensionState.getExtensionById(appState, config.torrentExtensionId)
     return extension !== undefined ? extension.get('enabled') : false
   }
 
-  const savedSettings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
-  const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
-
-  let braverySettings = siteSettings.activeSettings(savedSettings, appState, appConfig)
-  if (isPrivate && tempSettings) {
-    braverySettings = siteSettings.activeSettings(tempSettings, appState, appConfig)
-  }
+  const braverySettings = getBraverySettingsForUrl(url, appState, isPrivate)
 
   // If full shields are down never enable extra protection
   if (braverySettings.shieldsUp === false) {
