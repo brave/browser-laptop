@@ -56,8 +56,15 @@ const getL10nId = (download) => {
   return ''
 }
 
-const getPercentageComplete = (download) =>
-  Math.ceil(download.get('receivedBytes') / download.get('totalBytes') * 100) + '%'
+const getPercentageComplete = (download) => {
+  const totalBytes = download.get('totalBytes')
+  if (!totalBytes) {
+    // Most likely totalBytes has not been calculated yet. Avoid
+    // division by 0.
+    return '0%'
+  }
+  return Math.ceil(download.get('receivedBytes') / totalBytes * 100) + '%'
+}
 
 const shouldAllowCopyLink = (download) => !!download.get('url')
 
