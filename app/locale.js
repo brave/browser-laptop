@@ -312,6 +312,7 @@ const availableLanguages = [
   'pt-BR',
   'ru',
   'sl',
+  'sv-SE',
   'es',
   'ta',
   'te',
