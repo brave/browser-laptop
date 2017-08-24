@@ -408,6 +408,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/shareReducer'),
       require('../../app/browser/reducers/updatesReducer'),
       require('../../app/browser/reducers/topSitesReducer'),
+      require('../../app/browser/reducers/braverySettingsReducer'),
       require('../../app/ledger').doAction,
       require('../../app/browser/menu')
     ]
