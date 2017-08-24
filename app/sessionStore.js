@@ -569,14 +569,12 @@ module.exports.runPreMigrations = (data) => {
 
   if (data.sites) {
     // pinned sites
-    if (!data.pinnedSites) {
-      data.pinnedSites = {}
-      for (let key of Object.keys(data.sites)) {
-        const site = data.sites[key]
-        if (site.tags && site.tags.includes('pinned')) {
-          delete site.tags
-          data.pinnedSites[key] = site
-        }
+    data.pinnedSites = data.pinnedSites || {}
+    for (let key of Object.keys(data.sites)) {
+      const site = data.sites[key]
+      if (site.tags && site.tags.includes('pinned')) {
+        delete site.tags
+        data.pinnedSites[key] = site
       }
     }
 

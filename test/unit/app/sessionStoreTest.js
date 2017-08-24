@@ -970,6 +970,79 @@ describe('sessionStore unit tests', function () {
           'payments.notificationTryPaymentsDismissed': 'why would I?'
         },
         sites: {
+          'https://pinned-tab.com|0|0': {
+            'lastAccessedTime': 1503519023578,
+            'order': 123,
+            'partitionNumber': 0,
+            'favicon': 'https://pinned-tab.com/images/favicon.ico',
+            'location': 'https://pinned-tab.com',
+            'title': 'Brave Software - Example Pinned Tab',
+            'tags': [
+              'pinned'
+            ],
+            'themeColor': 'rgb(255, 255, 255)'
+          }
+        },
+        'about': {
+          'newtab': {
+            'gridLayoutSize': 'small',
+            'sites': [
+              {
+                'lastAccessedTime': 1502862465998,
+                'order': 935,
+                'count': 1026,
+                'partitionNumber': 0,
+                'favicon': 'http://pinned-top-site/favicon.ico',
+                'location': 'http://pinned-top-site/',
+                'title': 'Brave Software - Pinned Top Site',
+                'tags': [],
+                'themeColor': 'rgb(255, 0, 102)'
+              }
+            ],
+            'ignoredTopSites': [
+              {
+                'count': 23,
+                'favicon': 'https://ignored-top-site/favicon.ico',
+                'lastAccessedTime': 1491092970349,
+                'location': 'https://ignored-top-site/',
+                'order': 1237,
+                'tags': [],
+                'themeColor': 'rgb(241, 241, 241)',
+                'title': 'Brave Software - Ignored Top Site'
+              }
+            ],
+            'pinnedTopSites': [
+              {
+                'lastAccessedTime': 1502300205351,
+                'order': 951,
+                'count': 1008,
+                'partitionNumber': 0,
+                'favicon': 'http://pinned-top-site/favicon.ico',
+                'location': 'http://pinned-top-site/',
+                'title': 'Brave Software - Pinned Top Site',
+                'tags': [],
+                'themeColor': 'rgb(255, 0, 102)'
+              },
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            'updatedStamp': 1502862482168
+          }
         }
       }))
       runPreMigrations = sessionStore.runPreMigrations(data.toJS())
@@ -1066,12 +1139,50 @@ describe('sessionStore unit tests', function () {
 
     describe('when `data.sites` exists', function () {
       describe('run split sites migration', function () {
-        describe('pinned sites', function () {
-          // TODO:
+        describe('when moving pinned sites', function () {
+          let oldValue
+          let newValue
+
+          before(function () {
+            oldValue = data.getIn(['sites', 'https://pinned-tab.com|0|0'])
+            newValue = runPreMigrations.pinnedSites['https://pinned-tab.com|0|0']
+          })
+
+          it('copies lastAccessedTime', function () {
+            assert.equal(oldValue.get('lastAccessedTime'), newValue.lastAccessedTime)
+          })
+          it('copies order', function () {
+            assert.equal(oldValue.get('order'), newValue.order)
+          })
+          it('copies partitionNumber', function () {
+            assert.equal(oldValue.get('partitionNumber'), newValue.partitionNumber)
+          })
+          it('copies favicon', function () {
+            assert.equal(oldValue.get('favicon'), newValue.favicon)
+          })
+          it('copies location', function () {
+            assert.equal(oldValue.get('location'), newValue.location)
+          })
+          it('copies title', function () {
+            assert.equal(oldValue.get('title'), newValue.title)
+          })
+          it('copies themeColor', function () {
+            assert.equal(oldValue.get('themeColor'), newValue.themeColor)
+          })
         })
 
         describe('default sites', function () {
-          // TODO:
+          it('stores only the keys for ignoredTopSites', function () {
+            const oldValue = data.getIn(['about', 'newtab', 'ignoredTopSites', 0])
+            assert.equal(runPreMigrations.about.newtab.ignoredTopSites[0], oldValue.get('location') + '|0|0')
+          })
+          it('stores the pinnedTopSites with key', function () {
+            const oldValue = data.getIn(['about', 'newtab', 'pinnedTopSites', 0])
+            assert.equal(runPreMigrations.about.newtab.pinnedTopSites[0].key, oldValue.get('location') + '|0|0')
+          })
+          it('clears the sites', function () {
+            assert.deepEqual(runPreMigrations.about.newtab.sites, [])
+          })
         })
 
         describe('bookmark order', function () {
@@ -1090,8 +1201,8 @@ describe('sessionStore unit tests', function () {
           // TODO:
         })
 
-        describe('delete `data.sites`', function () {
-          // TODO:
+        it('deletes `data.sites`', function () {
+          assert.equal(runPreMigrations.sites, undefined)
         })
       })
     })
