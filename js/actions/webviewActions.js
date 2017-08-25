@@ -21,18 +21,6 @@ const webviewActions = {
   },
 
   /**
-   * Inspect the element for the active webview at the x, y content position
-   * @param {number} x - horizontal position of the element to inspect
-   * @param {number} y - vertical position of the element to inspect
-   */
-  inspectElement: function (x, y) {
-    const webview = getWebview()
-    if (webview) {
-      webview.inspectElement(x, y)
-    }
-  },
-
-  /**
    * Shows the certificate infomation
    */
   showCertificate: function () {
