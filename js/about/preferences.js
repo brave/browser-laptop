@@ -6,7 +6,6 @@
 const React = require('react')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const Immutable = require('immutable')
-const UrlUtil = require('../lib/urlutil')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
@@ -137,17 +136,7 @@ class GeneralTab extends ImmutableComponent {
       )
     })
 
-    let homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
-    if (typeof homepageValue === 'string') {
-      const punycodeUrl = UrlUtil.getPunycodeUrl(homepageValue)
-      if (punycodeUrl.replace(/\/$/, '') !== homepageValue) {
-        homepageValue = UrlUtil.getPunycodeUrl(homepageValue)
-      }
-
-      // we use | as a separator for multiple home pages
-      homepageValue = homepageValue.replace(/%7C/g, '|')
-    }
-    const homepage = homepageValue && homepageValue.trim()
+    const homepage = getSetting(settings.HOMEPAGE, this.props.settings)
     const disableShowHomeButton = !homepage || !homepage.length
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const defaultBrowser = getSetting(settings.IS_DEFAULT_BROWSER, this.props.settings)
@@ -192,7 +181,7 @@ class GeneralTab extends ImmutableComponent {
           <SettingTextbox
             spellCheck='false'
             data-l10n-id='homepageInput'
-            value={homepageValue}
+            value={homepage}
             onChange={changeSetting.bind(null, this.onChangeSetting, settings.HOMEPAGE)} />
         </SettingItem>
         <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON}

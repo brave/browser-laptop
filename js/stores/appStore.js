@@ -118,7 +118,7 @@ const emitChanges = debounce(appStore.emitChanges.bind(appStore), 5)
  * Useful for updating non-react preferences (electron properties, etc).
  * Called when any settings are modified (ex: via preferences).
  */
-function handleChangeSettingAction (settingKey, settingValue) {
+function handleChangeSettingAction (state, settingKey, settingValue) {
   switch (settingKey) {
     case settings.AUTO_HIDE_MENU:
       BrowserWindow.getAllWindows().forEach(function (wnd) {
@@ -129,14 +129,32 @@ function handleChangeSettingAction (settingKey, settingValue) {
     case settings.DEFAULT_ZOOM_LEVEL:
       filtering.setDefaultZoomLevel(settingValue)
       break
-    case settings.TOOLBAR_UI_SCALE: {
-      const newZoomLevel = zoomLevel[settingValue] || 0
-      BrowserWindow.getAllWindows().forEach(function (wnd) {
-        wnd.webContents.setZoomLevel(newZoomLevel)
-      })
-    } break
-    default:
+    case settings.TOOLBAR_UI_SCALE:
+      {
+        const newZoomLevel = zoomLevel[settingValue] || 0
+        BrowserWindow.getAllWindows().forEach(function (wnd) {
+          wnd.webContents.setZoomLevel(newZoomLevel)
+        })
+        break
+      }
+    case settings.HOMEPAGE:
+      {
+        let homeArray = settingValue.split('|')
+        homeArray = homeArray.map(page => {
+          page = page.trim()
+          const punycodeUrl = urlUtil.getPunycodeUrl(page)
+          if (punycodeUrl.replace(/\/$/, '') !== page) {
+            page = urlUtil.getPunycodeUrl(page)
+          }
+
+          return page
+        })
+
+        state = state.setIn(['settings', settingKey], homeArray.join('|'))
+      }
   }
+
+  return state
 }
 
 let reducers = []
@@ -261,7 +279,7 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_CHANGE_SETTING:
       appState = appState.setIn(['settings', action.key], action.value)
-      handleChangeSettingAction(action.key, action.value)
+      appState = handleChangeSettingAction(appState, action.key, action.value)
       break
     case appConstants.APP_ALLOW_FLASH_ONCE:
       {
