@@ -868,6 +868,21 @@ const appActions = {
   },
 
   /**
+   * Dispatches a message to inspect desired element on the page
+   * @param {number} tabId - The tabId
+   * @param {number} x - horizontal position of the element
+   * @param {number} y - vertical position of the element
+   */
+  inspectElement: function (tabId, x, y) {
+    dispatch({
+      actionType: appConstants.APP_INSPECT_ELEMENT,
+      tabId,
+      x,
+      y
+    })
+  },
+
+  /**
    * Dispatches a message when a tab is being cloned
    * @param {number} tabId - The tabId of the tab to clone
    * @param {object} options - object containing options such as acive, back, and forward booleans
