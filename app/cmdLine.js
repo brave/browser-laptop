@@ -136,3 +136,39 @@ module.exports.newWindowURL = () => {
   }
   return newWindowURL
 }
+
+const storeDevtoolFlagName = '--store-devtool'
+
+const shouldConnectToReduxDevtools = (
+  process.env.NODE_ENV === 'development' &&
+  process.argv.includes(storeDevtoolFlagName)
+)
+
+let reduxDevtoolsPort
+if (shouldConnectToReduxDevtools) {
+  // default port to connect
+  reduxDevtoolsPort = 8181
+  // allow port override from cli args
+  const argIdx = process.argv.indexOf(storeDevtoolFlagName)
+  if (argIdx !== -1) {
+    const argValRaw = process.argv[argIdx + 1]
+    if (argValRaw) {
+      const argVal = Number(argValRaw)
+      if (!Number.isNaN(argVal)) {
+        reduxDevtoolsPort = argVal
+      }
+    }
+  }
+}
+
+/**
+ * Visualize dispatched actions, their data, and the state after all reducers have run for each action.
+ * Enable this by running with the flag '--store-devtool',
+ *  and then monitoring with a tool from https://github.com/zalmoxisus/remotedev#monitoring
+ */
+module.exports.shouldConnectToReduxDevtools = shouldConnectToReduxDevtools
+
+/**
+ * If enabled, http port number to connect to remote redux tools on
+ */
+module.exports.reduxDevtoolsPort = reduxDevtoolsPort

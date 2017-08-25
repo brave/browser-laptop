@@ -1,7 +1,14 @@
 const path = require('path')
 const spawn = require('child_process').spawn
+const startReduxDevtoolsServer = require('./reduxRemoteDevtoolsServer')
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
+
+const storeDevtoolFlagName = '--store-devtool'
+if (process.env.NODE_ENV === 'development' && process.argv.includes(storeDevtoolFlagName)) {
+  startReduxDevtoolsServer(storeDevtoolFlagName)
+}
+
 const options = {
   env: process.env,
   stdio: 'inherit',

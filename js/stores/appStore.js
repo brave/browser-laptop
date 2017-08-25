@@ -33,6 +33,7 @@ const assert = require('assert')
 const profiles = require('../../app/browser/profiles')
 const {zoomLevel} = require('../../app/common/constants/toolbarUserInterfaceScale')
 const {HrtimeLogger} = require('../../app/common/lib/logUtil')
+const cmdLine = require('../../app/cmdLine')
 
 // state helpers
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
@@ -141,13 +142,31 @@ function handleChangeSettingAction (settingKey, settingValue) {
 
 let reducers = []
 
-const applyReducers = (state, action, immutableAction) => reducers.reduce(
+let applyReducers = (state, action, immutableAction) => reducers.reduce(
     (appState, reducer) => {
       const newState = reducer(appState, action, immutableAction)
       assert.ok(action.actionType === appConstants.APP_SET_STATE || Immutable.Map.isMap(newState),
         `Oops! action ${action.actionType} didn't return valid state for reducer:\n\n${reducer}`)
       return newState
     }, appState)
+
+function connectStoreActionsToRemote (reducer) {
+  // start monitor http server
+  const remoteDev = require('remotedev').connectViaExtension({
+    hostname: 'localhost',
+    port: cmdLine.reduxDevtoolsPort
+  })
+  return (state, action, immutableAction) => {
+    const newState = reducer(state, action, immutableAction)
+    remoteDev.send({ type: action.actionType, ...action }, newState)
+    return newState
+  }
+}
+
+if (cmdLine.shouldConnectToReduxDevtools) {
+  console.log(`Remote store logging enabled. View store actions along with changes in state at http://localhost:${cmdLine.reduxDevtoolsPort}`);
+  applyReducers = connectStoreActionsToRemote(applyReducers)
+}
 
 const handleAppAction = (action) => {
   const timeStart = process.hrtime()
