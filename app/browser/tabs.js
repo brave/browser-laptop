@@ -533,6 +533,13 @@ const api = {
     }
   },
 
+  inspectElement: (tabId, x, y) => {
+    const tab = getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.inspectElement(x, y)
+    }
+  },
+
   setActive: (tabId) => {
     let tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {

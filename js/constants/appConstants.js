@@ -145,7 +145,8 @@ const appConstants = {
   APP_SPELLING_SUGGESTED: _,
   APP_LEARN_SPELLING: _,
   APP_FORGET_LEARNED_SPELLING: _,
-  APP_SET_VERSION_INFO: _
+  APP_SET_VERSION_INFO: _,
+  APP_INSPECT_ELEMENT: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
