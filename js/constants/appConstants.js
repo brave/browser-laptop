@@ -150,7 +150,8 @@ const appConstants = {
   APP_REMOVE_BOOKMARK_FOLDER: _,
   APP_REMOVE_BOOKMARK: _,
   APP_MOVE_BOOKMARK_FOLDER: _,
-  APP_MOVE_BOOKMARK: _
+  APP_MOVE_BOOKMARK: _,
+  APP_INSPECT_ELEMENT: _
 }
 
 module.exports = mapValuesByKeys(appConstants)

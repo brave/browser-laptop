@@ -1154,8 +1154,8 @@ function mainTemplateInit (nodeProps, frame, tab) {
   if (!isAboutPage) {
     template.push({
       label: locale.translation('inspectElement'),
-      click: (item) => {
-        webviewActions.inspectElement(nodeProps.x, nodeProps.y)
+      click: () => {
+        appActions.inspectElement(frame.get('tabId'), nodeProps.x, nodeProps.y)
       }
     })
   }
