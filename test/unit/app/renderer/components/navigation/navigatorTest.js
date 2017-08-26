@@ -89,6 +89,9 @@ describe('Navigator component unit tests', function () {
         return settingDefaultValue
       }
     })
+    mockery.registerMock('../../../../../js/l10n', {
+      translation: (token) => token
+    })
     appStore = require('../../../../../../js/stores/appStoreRenderer')
     windowStore = require('../../../../../../js/stores/windowStore')
     Navigator = require('../../../../../../app/renderer/components/navigation/navigator')
