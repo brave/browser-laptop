@@ -10,12 +10,11 @@ const prefsShieldsUrl = 'about:preferences#shields'
 
 function * setup (client) {
   yield client
-    .waitForUrl(Brave.newTabUrl)
     .waitForBrowserWindow()
     .waitForVisible(urlInput)
 }
 
-function * setupBrave (client) {
+function * setupBrave () {
   Brave.addCommands()
 }
 
@@ -54,7 +53,7 @@ describe('General Panel', function () {
         .waitForVisible(homepageInput)
         .click(homepageInput)
         .keys(Brave.keys.END)
-        .typeText(homepageInput, '|https://duckduckgo.com', 'https://www.brave.com/')
+        .typeText(homepageInput, '|https://duckduckgo.com', 'https://www.brave.com')
     })
   })
 
@@ -64,22 +63,37 @@ describe('General Panel', function () {
     before(function * () {
       yield Brave.startApp()
       yield setupBrave(Brave.app.client)
+      yield setup(Brave.app.client)
     })
 
     it('from scratch', function * () {
       const page1 = 'https://start.duckduckgo.com/'
-      const page2 = 'https://brave.com/'
+      const page2 = 'https://clifton.io/'
+      const contacted = `${page1}|${page2}`
 
-      yield setup(Brave.app.client)
       yield Brave.app.client.changeSetting(settings.STARTUP_MODE, startsWithOption.HOMEPAGE)
       // TODO remove when #6920 is fixed
-      yield Brave.app.client.changeSetting(settings.NEWTAB_MODE, newTabMode.HOMEPAGE)
-      yield Brave.app.client.changeSetting(settings.HOMEPAGE, `${page1}|${page2}`)
+      yield Brave.app.client
+        .changeSetting(settings.NEWTAB_MODE, newTabMode.HOMEPAGE)
+        .changeSetting(settings.HOMEPAGE, contacted)
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.settings['general.homepage'] === contacted
+          })
+        })
 
-      yield Brave.stopApp(false)
+      yield Brave.stopApp(false, 10000)
       yield Brave.startApp()
       yield setupBrave(Brave.app.client)
+      yield setup(Brave.app.client)
+
       yield Brave.app.client
+        .waitUntil(function () {
+          return this.getAppState().then((val) => {
+            return val.value.settings['general.homepage'] === contacted
+          })
+        })
+        .waitForTabCount(2)
         .waitForBrowserWindow()
         .waitUntil(function () {
           return this.getWindowState().then((val) => {
