@@ -642,10 +642,7 @@ WindowStore
     downloadsToolbar: {
       isVisible: boolean // whether or not the downloads toolbar is visible
     },
-    isFocused: boolean, // true if window has focus
     isClearBrowsingDataPanelVisible: boolean, // true if the Clear Browsing Data panel is visible
-    isFullScreen: boolean, // true if window is fullscreen
-    isMaximized: boolean, // true if window is maximized
     menubar: {
       isVisible: boolean, // true if Menubar control is visible
       lastFocusedSelector: string, // selector for the last selected element (browser ui, not frame content)
@@ -655,14 +652,12 @@ WindowStore
     noScriptInfo: {
       isVisible: boolean // Whether the noscript infobox is visible
     },
-    position: array, // last known window position [x, y]
     releaseNotes: {
       isVisible: boolean // whether or not to show release notes
     },
     siteInfo: {
       isVisible: boolean // whether or not to show site info like # of blocked ads
     },
-    size: array, // last known window size [x, y]
     tabs: {
       hoverTabIndex: number, // index of the current hovered tab
       previewMode: boolean, // whether or not tab preview should be fired based on mouse idle time
@@ -674,6 +669,15 @@ WindowStore
     alsoAddRememberSiteSetting: boolean, // true if an allow always rule should be added for the acitve frame as well if installed
     location: string, // location this dialog is for
     shown: boolean // true if the panel is shown
+  },
+  windowInfo: {
+    focused: boolean,
+    height: number,
+    left: number,
+    state: string  // "normal", "minimized", "maximized", or "fullscreen"
+    top: number,
+    type: string,  // "normal", "popup", or "devtools"
+    width: number,
   }
 }
 ```

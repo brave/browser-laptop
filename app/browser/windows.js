@@ -18,6 +18,7 @@ const settings = require('../../js/constants/settings')
 const siteTags = require('../../js/constants/siteTags')
 const windowState = require('../common/state/windowState')
 const Immutable = require('immutable')
+const windowActions = require('../../js/actions/windowActions')
 
 // TODO(bridiver) - set window uuid
 let currentWindows = {}
@@ -55,10 +56,11 @@ const getWindowValue = (windowId) => {
   }
 }
 
-const updateWindow = (windowId) => {
+const updateWindow = (windowId, updateDefault = false) => {
   const windowValue = getWindowValue(windowId)
   if (windowValue) {
-    appActions.windowUpdated(windowValue)
+    appActions.windowUpdated(windowValue, updateDefault)
+    windowActions.onWindowUpdate(windowId, windowValue)
   }
 }
 
@@ -196,6 +198,7 @@ const api = {
         LocalShortcuts.register(win)
 
         appActions.windowCreated(windowValue)
+        windowActions.onWindowUpdate(windowId, windowValue)
       })
       win.once('closed', () => {
         cleanupWindow(windowId)
@@ -205,8 +208,7 @@ const api = {
         updateWindowDebounce(windowId)
       })
       win.on('focus', () => {
-        appActions.windowFocused(windowId)
-        updateWindowDebounce(windowId)
+        updateWindowDebounce(windowId, true)
       })
       win.on('show', () => {
         updateWindowDebounce(windowId)
@@ -215,7 +217,7 @@ const api = {
         updateWindowDebounce(windowId)
       })
       win.on('maximize', () => {
-        updateWindowDebounce(windowId)
+        updateWindowDebounce(windowId, true)
       })
       win.on('unmaximize', () => {
         updateWindowDebounce(windowId)
@@ -227,18 +229,10 @@ const api = {
         updateWindowDebounce(windowId)
       })
       win.on('resize', () => {
-        updateWindowDebounce(windowId)
-        const size = win.getSize()
-        const position = win.getPosition()
-        // NOTE: the default window size is whatever the last window resize was
-        appActions.defaultWindowParamsChanged(size, position)
+        updateWindowDebounce(windowId, true)
       })
       win.on('move', () => {
-        updateWindowMove(windowId)
-        const size = win.getSize()
-        const position = win.getPosition()
-        // NOTE: the default window position is whatever the last window move was
-        appActions.defaultWindowParamsChanged(size, position)
+        updateWindowMove(windowId, true)
       })
       win.on('enter-full-screen', () => {
         updateWindowDebounce(windowId)

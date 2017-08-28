@@ -44,20 +44,22 @@ const navbarHeight = () => {
  */
 const setWindowDimensions = (browserOpts, defaults, immutableWindowState) => {
   assert(isImmutable(immutableWindowState))
-  if (immutableWindowState.getIn(['ui', 'size'])) {
-    browserOpts.width = firstDefinedValue(browserOpts.width, immutableWindowState.getIn(['ui', 'size', 0]))
-    browserOpts.height = firstDefinedValue(browserOpts.height, immutableWindowState.getIn(['ui', 'size', 1]))
-  }
-  browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
-  // height and innerHeight are the frame webview size
-  browserOpts.height = firstDefinedValue(browserOpts.height, browserOpts.innerHeight)
-  if (typeof browserOpts.height === 'number') {
-    // add navbar height to get total height for BrowserWindow
-    browserOpts.height = browserOpts.height + navbarHeight()
+  if (immutableWindowState.getIn(['windowInfo'])) {
+    browserOpts.width = firstDefinedValue(browserOpts.width, immutableWindowState.getIn(['windowInfo', 'width']))
+    browserOpts.height = firstDefinedValue(browserOpts.height, immutableWindowState.getIn(['windowInfo', 'height']))
   } else {
-    // no inner height so check outer height or use default
-    browserOpts.height = firstDefinedValue(browserOpts.outerHeight, defaults.height)
+    browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
+    // height and innerHeight are the frame webview size
+    browserOpts.height = firstDefinedValue(browserOpts.height, browserOpts.innerHeight)
+    if (typeof browserOpts.height === 'number') {
+      // add navbar height to get total height for BrowserWindow
+      browserOpts.height = browserOpts.height + navbarHeight()
+    } else {
+      // no inner height so check outer height or use default
+      browserOpts.height = firstDefinedValue(browserOpts.outerHeight, defaults.height)
+    }
   }
+
   return browserOpts
 }
 
@@ -69,10 +71,10 @@ const setWindowPosition = (browserOpts, defaults, immutableWindowState) => {
     const screenPos = electron.screen.getCursorScreenPoint()
     browserOpts.x = screenPos.x
     browserOpts.y = screenPos.y
-  } else if (immutableWindowState.getIn(['ui', 'position'])) {
+  } else if (immutableWindowState.getIn(['windowInfo'])) {
     // Position comes from window state
-    browserOpts.x = firstDefinedValue(browserOpts.x, immutableWindowState.getIn(['ui', 'position', 0]))
-    browserOpts.y = firstDefinedValue(browserOpts.y, immutableWindowState.getIn(['ui', 'position', 1]))
+    browserOpts.x = firstDefinedValue(browserOpts.x, immutableWindowState.getIn(['windowInfo', 'left']))
+    browserOpts.y = firstDefinedValue(browserOpts.y, immutableWindowState.getIn(['windowInfo', 'top']))
   } else if (typeof defaults.x === 'number' && typeof defaults.y === 'number') {
     // Position comes from the default position
     browserOpts.x = firstDefinedValue(browserOpts.x, defaults.x)
@@ -83,6 +85,18 @@ const setWindowPosition = (browserOpts, defaults, immutableWindowState) => {
     browserOpts.y = firstDefinedValue(browserOpts.y, browserOpts.top, browserOpts.screenY)
   }
   return browserOpts
+}
+
+const setMaximized = (state, browserOpts, immutableWindowState) => {
+  if (Object.keys(browserOpts).length > 0 && !browserOpts.checkMaximized) {
+    return false
+  }
+
+  if (immutableWindowState.getIn(['windowInfo'])) {
+    return immutableWindowState.getIn(['windowInfo', 'state']) === 'maximized'
+  }
+
+  return state.getIn(['defaultWindowParams', 'maximized']) || false
 }
 
 function windowDefaults (state) {
@@ -116,6 +130,7 @@ function setDefaultWindowSize (state) {
   if (!state) {
     return
   }
+
   const screen = electron.screen
   const primaryDisplay = screen.getPrimaryDisplay()
   if (!state.getIn(['defaultWindowParams', 'width']) && !state.get('defaultWindowWidth') &&
@@ -133,6 +148,7 @@ const createWindow = (state, action) => {
   const immutableWindowState = action.get('restoredState') || Immutable.Map()
   state = setDefaultWindowSize(state)
   const defaults = windowDefaults(state)
+  const isMaximized = setMaximized(state, browserOpts, immutableWindowState)
 
   browserOpts = setWindowDimensions(browserOpts, defaults, immutableWindowState)
   browserOpts = setWindowPosition(browserOpts, defaults, immutableWindowState)
@@ -141,9 +157,18 @@ const createWindow = (state, action) => {
   delete browserOpts.top
 
   const screen = electron.screen
-  const primaryDisplay = screen.getPrimaryDisplay()
+  let primaryDisplay = screen.getPrimaryDisplay()
   const parentWindowKey = browserOpts.parentWindowKey
-  const parentWindow = parentWindowKey ? BrowserWindow.fromId(parentWindowKey) : BrowserWindow.getFocusedWindow()
+  if (browserOpts.x != null && browserOpts.y != null) {
+    const matchingDisplay = screen.getDisplayMatching(browserOpts)
+    if (matchingDisplay != null) {
+      primaryDisplay = matchingDisplay
+    }
+  }
+
+  const parentWindow = parentWindowKey
+    ? BrowserWindow.fromId(parentWindowKey)
+    : BrowserWindow.getFocusedWindow()
   const bounds = parentWindow ? parentWindow.getBounds() : primaryDisplay.bounds
 
   // position on screen should be relative to focused window
@@ -207,6 +232,10 @@ const createWindow = (state, action) => {
     windowProps.icon = path.join(__dirname, '..', '..', 'res', 'app.png')
   }
 
+  if (immutableWindowState.getIn(['windowInfo', 'state']) === 'fullscreen') {
+    windowProps.fullscreen = true
+  }
+
   const homepageSetting = getSetting(settings.HOMEPAGE)
   const startupSetting = getSetting(settings.STARTUP_MODE)
   const toolbarUserInterfaceScale = getSetting(settings.TOOLBAR_UI_SCALE)
@@ -218,7 +247,7 @@ const createWindow = (state, action) => {
 
     // initialize frames state
     let frames = Immutable.List()
-    if (restoredImmutableWindowState) {
+    if (restoredImmutableWindowState && restoredImmutableWindowState.get('frames', Immutable.List()).size > 0) {
       frames = restoredImmutableWindowState.get('frames')
       restoredImmutableWindowState = restoredImmutableWindowState.set('frames', Immutable.List())
       restoredImmutableWindowState = restoredImmutableWindowState.set('tabs', Immutable.List())
@@ -242,12 +271,8 @@ const createWindow = (state, action) => {
       frames = Immutable.fromJS([{}])
     }
 
-    if (immutableWindowState.getIn(['ui', 'isMaximized'])) {
+    if (isMaximized) {
       mainWindow.maximize()
-    }
-
-    if (immutableWindowState.getIn(['ui', 'isFullScreen'])) {
-      mainWindow.setFullScreen(true)
     }
 
     mainWindow.webContents.on('did-finish-load', (e) => {
@@ -310,15 +335,13 @@ const windowsReducer = (state, action, immutableAction) => {
       break
     case appConstants.APP_WINDOW_UPDATED:
       state = windowState.maybeCreateWindow(state, action)
-      break
-    case appConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED:
-      if (action.get('size')) {
-        state = state.setIn(['defaultWindowParams', 'width'], action.getIn(['size', 0]))
-        state = state.setIn(['defaultWindowParams', 'height'], action.getIn(['size', 1]))
-      }
-      if (action.get('position')) {
-        state = state.setIn(['defaultWindowParams', 'x'], action.getIn(['position', 0]))
-        state = state.setIn(['defaultWindowParams', 'y'], action.getIn(['position', 1]))
+      if (action.get('updateDefault')) {
+        state = state
+          .setIn(['defaultWindowParams', 'width'], action.getIn(['windowValue', 'width']))
+          .setIn(['defaultWindowParams', 'height'], action.getIn(['windowValue', 'height']))
+          .setIn(['defaultWindowParams', 'x'], action.getIn(['windowValue', 'x']))
+          .setIn(['defaultWindowParams', 'y'], action.getIn(['windowValue', 'y']))
+          .setIn(['defaultWindowParams', 'maximized'], action.getIn(['windowValue', 'state']) === 'maximized')
       }
       break
     case windowConstants.WINDOW_SHOULD_SET_TITLE:

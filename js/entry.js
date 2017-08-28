@@ -74,7 +74,7 @@ ipc.on(messages.CLEAR_CLOSED_FRAMES, (e, location) => {
   windowActions.clearClosedFrames(location)
 })
 
-window.addEventListener('beforeunload', function (e) {
+window.addEventListener('beforeunload', function () {
   ipc.send(messages.LAST_WINDOW_STATE, windowStore.getState().toJS())
 })
 

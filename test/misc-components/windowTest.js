@@ -40,6 +40,7 @@ describe('application window', function () {
 
   describe('appActions.newWindow', function () {
     describe('default', function () {
+      const isLinux = process.platform === 'linux'
       Brave.beforeAll(this)
 
       before(function * () {
@@ -71,24 +72,53 @@ describe('application window', function () {
         yield this.app.client
           .windowByIndex(1).browserWindow.getBounds().should.eventually.have.property('height').should.eventually.be.getDefaultWindowHeight()
       })
+
+      it('is maximized', function * () {
+        if (!isLinux) {
+          this.skip()
+          return
+        }
+
+        yield this.app.client
+          .waitForBrowserWindow()
+          .waitUntil(function () {
+            return this.getWindowState().then((val) => {
+              return val &&
+                val.value &&
+                val.value.windowInfo &&
+                val.value.windowInfo.state === 'maximized'
+            })
+          })
+      })
     })
 
     describe('after resize', function () {
       Brave.beforeAll(this)
+      const width = 600
+      const height = 700
 
       before(function * () {
         yield this.app.client
           .waitForUrl(Brave.newTabUrl)
           .waitForBrowserWindow()
           .unmaximize()
-          .resizeWindow(600, 700)
+          .resizeWindow(width, height)
           .waitUntil(function () {
             return this.getAppState().then((val) => {
               return val &&
                 val.value &&
                 val.value.defaultWindowParams &&
-                val.value.defaultWindowParams.width === 600 &&
-                val.value.defaultWindowParams.height === 700
+                val.value.defaultWindowParams.width === width &&
+                val.value.defaultWindowParams.height === height
+            })
+          })
+          .waitUntil(function () {
+            return this.getWindowState().then((val) => {
+              return val &&
+                val.value &&
+                val.value.windowInfo &&
+                val.value.windowInfo.width === width &&
+                val.value.windowInfo.height === height
             })
           })
           .newWindowAction()
@@ -111,8 +141,31 @@ describe('application window', function () {
 
       it('has the width and height of the last window resize', function * () {
         yield this.app.client
-          .windowByIndex(1).browserWindow.getBounds().should.eventually.have.property('width').should.become(600)
-          .windowByIndex(1).browserWindow.getBounds().should.eventually.have.property('height').should.become(700)
+          .windowByIndex(1).browserWindow.getBounds().should.eventually.have.property('width').should.become(width)
+          .windowByIndex(1).browserWindow.getBounds().should.eventually.have.property('height').should.become(height)
+      })
+
+      it('check if new window has the same state data', function * () {
+        yield this.app.client
+          .waitForBrowserWindow()
+          .waitUntil(function () {
+            return this.getAppState().then((val) => {
+              return val &&
+                val.value &&
+                val.value.defaultWindowParams &&
+                val.value.defaultWindowParams.width === width &&
+                val.value.defaultWindowParams.height === height
+            })
+          })
+          .waitUntil(function () {
+            return this.getWindowState().then((val) => {
+              return val &&
+                val.value &&
+                val.value.windowInfo &&
+                val.value.windowInfo.width === width &&
+                val.value.windowInfo.height === height
+            })
+          })
       })
     })
 

@@ -433,14 +433,11 @@ class Main extends React.Component {
 
     window.addEventListener('focus', () => {
       windowActions.setFocusedFrame(this.props.location, this.props.tabId)
-      windowActions.onFocus(getCurrentWindowId())
       // For whatever reason other elements are preserved but webviews are not.
       if (document.activeElement && document.activeElement.tagName === 'BODY') {
         webviewActions.setWebviewFocused()
       }
     }, { passive: true })
-
-    windowActions.onFocus(getCurrentWindowId())
 
     // disable dnd by default
     window.addEventListener('dragover', function (event) {
@@ -469,7 +466,6 @@ class Main extends React.Component {
     const self = this
     window.onblur = () => {
       self.resetAltMenuProcessing()
-      windowActions.onBlur(getCurrentWindowId())
     }
   }
 
