@@ -620,8 +620,6 @@ const setPreviewTabPageIndex = (state, index, immediate = false) => {
 /**
 * Defines whether or not a tab should be allowed to preview its content
 * based on mouse idle time defined by mouse move in tab.js
-* @see windowConstants.WINDOW_TAB_MOUSE_MOVE for information
-* on how the data is handled in the store.
 * @param state {Object} - Application state
 * @param previewMode {Boolean} - Whether or not minimium idle time
 * has match the criteria
