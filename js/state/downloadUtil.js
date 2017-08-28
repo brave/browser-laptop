@@ -69,11 +69,12 @@ const getPercentageComplete = (download) => {
 const shouldAllowCopyLink = (download) => (download && !!download.get('url')) || false
 
 const getDownloadItems = (state) => {
-  if (!state || !state.get('downloads')) {
+  const downloads = state && state.get('downloads')
+  if (!downloads) {
     return Immutable.List()
   }
 
-  const downloadsSize = state.get('downloads').size
+  const downloadsSize = downloads.size
   const downloadItemWidth = domUtil.getStyleConstants('download-item-width')
   const downloadItemMargin = domUtil.getStyleConstants('download-item-margin')
   const downloadBarPadding = domUtil.getStyleConstants('download-bar-padding')
@@ -83,11 +84,21 @@ const getDownloadItems = (state) => {
     (downloadItemWidth + downloadItemMargin)
   )
 
-  return state.get('downloads')
+  return downloads
     .sort((x, y) => x.get('startTime') - y.get('startTime'))
     .skip(downloadsSize - numItems)
     .reverse()
     .map((download, downloadId) => downloadId)
+}
+
+const getActiveDownloads = (state) => {
+  if (!state.get('downloads')) {
+    return Immutable.Map()
+  }
+
+  return state
+    .get('downloads')
+    .filter((item) => item.get('state') === downloadStates.IN_PROGRESS)
 }
 
 module.exports = {
@@ -102,5 +113,6 @@ module.exports = {
   getL10nId,
   getPercentageComplete,
   shouldAllowCopyLink,
-  getDownloadItems
+  getDownloadItems,
+  getActiveDownloads
 }

@@ -243,6 +243,10 @@ var rendererIdentifiers = function () {
     'downloadItemClear',
     'downloadToolbarHide',
     'downloadItemClearCompleted',
+    'downloadNotificationTitle',
+    'downloadNotificationMessage',
+    'downloadNotificationContinue',
+    'downloadNotificationQuit',
     'torrentDesc',
     // Caption buttons in titlebar (min/max/close - Windows only)
     'windowCaptionButtonMinimize',
