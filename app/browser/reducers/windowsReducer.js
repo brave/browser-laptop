@@ -28,17 +28,22 @@ const windowsReducer = (state, action, immutableAction) => {
       }
       break
     case appConstants.APP_CLOSE_WINDOW:
-      state = windows.closeWindow(state, action.get('windowId'))
+      windows.closeWindow(action.get('windowId'))
       break
     case appConstants.APP_WINDOW_CLOSED:
       state = windowState.removeWindow(state, action)
-      sessionStoreShutdown.removeWindowFromCache(action.getIn(['windowValue', 'windowId']))
+      const windowId = action.getIn(['windowValue', 'windowId'])
+      sessionStoreShutdown.removeWindowFromCache(windowId)
+      windows.cleanupWindow(windowId)
       break
     case appConstants.APP_WINDOW_CREATED:
       state = windowState.maybeCreateWindow(state, action)
       break
     case appConstants.APP_WINDOW_UPDATED:
       state = windowState.maybeCreateWindow(state, action)
+      break
+    case appConstants.APP_TAB_STRIP_EMPTY:
+      windows.closeWindow(action.get('windowId'))
       break
     case appConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED:
       if (action.get('size')) {
