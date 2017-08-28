@@ -65,10 +65,11 @@ const appActions = {
     })
   },
 
-  windowUpdated: function (windowValue) {
+  windowUpdated: function (windowValue, updateDefault) {
     dispatch({
       actionType: appConstants.APP_WINDOW_UPDATED,
-      windowValue
+      windowValue,
+      updateDefault
     })
   },
 
@@ -301,19 +302,6 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED,
       recoverySucceeded: false
-    })
-  },
-
-  /**
-   * Sets the default window size / position
-   * @param {Array} size - [width, height]
-   * @param {Array} position - [x, y]
-   */
-  defaultWindowParamsChanged: function (size, position) {
-    dispatch({
-      actionType: appConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED,
-      size,
-      position
     })
   },
 
@@ -633,18 +621,6 @@ const appActions = {
   windowBlurred: function (windowId) {
     dispatch({
       actionType: appConstants.APP_WINDOW_BLURRED,
-      windowId: windowId
-    })
-  },
-
-  /**
-   * Dispatches a message when windowId gains focus
-   *
-   * @param {Number} windowId - the unique id of the window
-   */
-  windowFocused: function (windowId) {
-    dispatch({
-      actionType: appConstants.APP_WINDOW_FOCUSED,
       windowId: windowId
     })
   },

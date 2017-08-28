@@ -488,7 +488,7 @@ function tabTemplateInit (frameProps) {
     template.push({
       label: locale.translation('detach'),
       click: (item) => {
-        const browserOpts = { positionByMouseCursor: true }
+        const browserOpts = { positionByMouseCursor: true, checkMaximized: true }
         appActions.tabMoved(tabId, frameProps.toJS(), browserOpts, -1)
       }
     })

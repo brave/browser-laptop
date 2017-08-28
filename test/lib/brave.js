@@ -906,6 +906,13 @@ var exports = {
       }, width, height).then((response) => response.value)
     })
 
+    this.app.client.addCommand('setWindowPosition', function (x, y) {
+      logVerbose('setWindowPosition("' + x + '", "' + y + '")')
+      return this.execute(function (x, y) {
+        return devTools('electron').remote.getCurrentWindow().setPosition(x, y)
+      }, x, y).then((response) => response.value)
+    })
+
     this.app.client.addCommand('windowParentByUrl', function (url, childSelector = 'webview') {
       logVerbose('windowParentByUrl("' + url + '", "' + childSelector + '")')
       var context = this

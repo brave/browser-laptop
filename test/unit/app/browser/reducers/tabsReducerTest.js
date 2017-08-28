@@ -715,6 +715,7 @@ describe('tabsReducer unit tests', function () {
       })
       // Passes browser options for position by mouse cursor
       assert.deepEqual(args[3], {
+        checkMaximized: true,
         positionByMouseCursor: true
       })
       // Dropping on window ID is -1

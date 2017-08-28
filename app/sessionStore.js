@@ -67,18 +67,26 @@ module.exports.saveAppState = (immutablePayload, isShutdown) => {
   assert(isImmutable(immutablePayload))
 
   return new Promise((resolve, reject) => {
-    // Don't persist private frames
     let startupModeSettingValue = getSetting(settings.STARTUP_MODE)
     const savePerWindowState = startupModeSettingValue == null ||
       startupModeSettingValue === 'lastTime'
-    if (immutablePayload.get('perWindowState') && savePerWindowState) {
-      immutablePayload.get('perWindowState').forEach((immutableWndPayload, i) => {
-        const frames = immutableWndPayload.get('frames').filter((frame) => !frame.get('isPrivate'))
-        immutableWndPayload = immutableWndPayload.set('frames', frames)
-        immutablePayload = immutablePayload.setIn(['perWindowState', i], immutableWndPayload)
-      })
-    } else {
-      immutablePayload = immutablePayload.delete('perWindowState')
+
+    // Don't persist private frames
+    if (immutablePayload.get('perWindowState')) {
+      if (savePerWindowState) {
+        immutablePayload.get('perWindowState').forEach((immutableWndPayload, i) => {
+          const frames = immutableWndPayload.get('frames').filter((frame) => !frame.get('isPrivate'))
+          immutableWndPayload = immutableWndPayload.set('frames', frames)
+          immutablePayload = immutablePayload.setIn(['perWindowState', i], immutableWndPayload)
+        })
+      } else {
+        // we still need to preserve window position/size info
+        immutablePayload.get('perWindowState').forEach((immutableWndPayload, i) => {
+          let windowInfo = Immutable.Map()
+          windowInfo = windowInfo.set('windowInfo', immutableWndPayload.get('windowInfo'))
+          immutablePayload = immutablePayload.setIn(['perWindowState', i], windowInfo)
+        })
+      }
     }
 
     try {
@@ -135,7 +143,6 @@ module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
     'braveryPanelDetail',
     // Don't restore drag data and clearBrowsingDataPanel's visibility
     // This is no longer stored, we can remove this line eventually
-    ['ui', 'isFocused'],
     ['ui', 'mouseInTitlebar'],
     ['ui', 'mouseInFrame'],
     ['ui', 'dragging'],

@@ -802,24 +802,6 @@ const doAction = (action) => {
     case windowConstants.WINDOW_FRAME_MOUSE_LEAVE:
       windowState = windowState.setIn(['ui', 'mouseInFrame'], false)
       break
-    case windowConstants.WINDOW_ON_MAXIMIZE:
-      windowState = windowState.setIn(['ui', 'isMaximized'], true)
-      break
-    case windowConstants.WINDOW_ON_MINIMIZE:
-      windowState = windowState.setIn(['ui', 'isMaximized'], false)
-      break
-    case windowConstants.WINDOW_ON_FOCUS:
-      windowState = windowState.setIn(['ui', 'isFocused'], true)
-      break
-    case windowConstants.WINDOW_ON_BLUR:
-      windowState = windowState.setIn(['ui', 'isFocused'], false)
-      break
-    case windowConstants.WINDOW_ON_ENTER_FULL_SCREEN:
-      windowState = windowState.setIn(['ui', 'isFullScreen'], true)
-      break
-    case windowConstants.WINDOW_ON_EXIT_FULL_SCREEN:
-      windowState = windowState.setIn(['ui', 'isFullScreen'], false)
-      break
     case windowConstants.WINDOW_ON_CERT_ERROR:
       {
         const frame = frameStateUtil.getFrameByTabId(windowState, action.tabId) || Immutable.Map()
@@ -833,6 +815,9 @@ const doAction = (action) => {
         }
         break
       }
+    case windowConstants.WINDOW_ON_WINDOW_UPDATE:
+      windowState = windowState.set('windowInfo', action.windowValue)
+      break
     default:
       break
   }
