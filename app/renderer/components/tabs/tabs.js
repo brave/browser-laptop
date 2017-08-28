@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ReactDOM = require('react-dom')
 const Immutable = require('immutable')
 
 // Components
@@ -82,12 +81,18 @@ class Tabs extends React.Component {
       // This must be executed async because the state change that this causes
       // will cause the onDragEnd to never run
       setTimeout(() => {
+        // collect data
         const key = sourceDragData.get('key')
-        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frameKey !== key), clientX).selectedRef
-        if (droppedOnTab) {
-          const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-
-          windowActions.moveTab(key, droppedOnTab.props.frameKey, isLeftSide)
+        const srcTabIdx = sourceDragData.get('displayIndex')
+        const droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frameKey !== key), clientX).selectedRef
+        const destTabKey = droppedOnTab.props.frameKey
+        const destTabIdx = droppedOnTab.props.displayIndex
+        // validate
+        if (Number.isInteger(srcTabIdx) && Number.isInteger(destTabIdx) && Number.isInteger(destTabKey)) {
+          // calculate if move to left or right
+          const prepend = (srcTabIdx > destTabIdx)
+          // perform move
+          windowActions.moveTab(key, destTabKey, prepend)
           if (sourceDragData.get('pinnedLocation')) {
             appActions.tabPinned(sourceDragData.get('tabId'), false)
           }
@@ -177,9 +182,10 @@ class Tabs extends React.Component {
         }
         {
           this.props.currentTabs
-            .map((frameKey) =>
+            .map((frameKey, index) =>
               <Tab
                 key={'tab-' + frameKey}
+                displayIndex={index}
                 ref={(node) => this.tabRefs.push(node)}
                 frameKey={frameKey}
                 partOfFullPageSet={this.props.partOfFullPageSet} />

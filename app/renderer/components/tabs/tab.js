@@ -93,9 +93,9 @@ class Tab extends React.Component {
 
   get isDragging () {
     const sourceDragData = dnd.getInterBraveDragData()
-    return sourceDragData &&
+    return sourceDragData && this.props.dragData &&
       sourceDragData.get('tabId') === this.props.tabId &&
-      sourceDragData.get('draggingOverWindowId') === getCurrentWindowId()
+      this.props.dragData.get('windowId') === getCurrentWindowId()
   }
 
   get isDraggingOverSelf () {
@@ -128,7 +128,7 @@ class Tab extends React.Component {
       // this is added back to original size when onDrag event is happening
       this.tabSentinel.style.width = 0
 
-      dnd.onDragStart(dragTypes.TAB, this.frame, e)
+      dnd.onDragStart(dragTypes.TAB, this.frame.set('displayIndex', this.props.displayIndex), e)
       // cancel tab preview while dragging. see #10103
       windowActions.setTabHoverState(this.props.frameKey, false, false)
     }
@@ -146,7 +146,7 @@ class Tab extends React.Component {
   }
 
   onDragOver (e) {
-    dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.tabId, this.draggingOverData, e)
+    dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.tabId, this.draggingOverData, e, this.props.displayIndex)
   }
 
   onMouseLeave (e) {
@@ -266,6 +266,7 @@ class Tab extends React.Component {
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
     props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.themeColor = tabUIState.getThemeColor(currentWindow, frameKey)
+    props.displayIndex = ownProps.displayIndex
     props.title = frame.get('title')
     props.partOfFullPageSet = partOfFullPageSet
     props.showAudioTopBorder = audioState.showAudioTopBorder(currentWindow, frameKey, isPinned)
@@ -273,6 +274,18 @@ class Tab extends React.Component {
 
     // used in other functions
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
+    // select drag specifics
+    props.insertingPrevious = props.insertingNext = false
+    if (props.dragData) {
+      console.log('evaluated drag data', props.displayIndex)
+      const elIdx = props.displayIndex
+      const srcIdx = props.dragData.getIn(['data', 'displayIndex'])
+      const curIdx = props.dragData.getIn(['dragOverData', 'draggingOverIndex'])
+      const windowId = props.dragData.getIn(['dragOverData', 'draggingOverWindowId'])
+      const draggingToThisWindow = windowId === getCurrentWindowId()
+      props.insertingPrevious = (draggingToThisWindow && elIdx < srcIdx && elIdx >= curIdx)
+      props.insertingNext = (draggingToThisWindow && elIdx > srcIdx && elIdx <= curIdx)
+    }
     props.tabId = tabId
     props.previewMode = currentWindow.getIn(['ui', 'tabs', 'previewMode'])
 
@@ -291,31 +304,44 @@ class Tab extends React.Component {
         }
       }
     })
+
     return <div
       data-tab-area
+      ref={(node) => { this.tabNode = node }}
+      data-index={this.props.displayIndex}
       className={cx({
-        tabArea: true,
-        draggingOverLeft: this.isDraggingOverLeft && !this.isDraggingOverSelf,
-        draggingOverRight: this.isDraggingOverRight && !this.isDraggingOverSelf,
-        isDragging: this.isDragging,
+        tabDragArea: true,
         isPinned: this.props.isPinnedTab,
         partOfFullPageSet: this.props.partOfFullPageSet || !!this.props.tabWidth
       })}
       style={this.props.tabWidth ? { flex: `0 0 ${this.props.tabWidth}px` } : {}}
-      onMouseMove={this.onMouseMove}
-      onMouseEnter={this.onMouseEnter}
-      onMouseLeave={this.onMouseLeave}
+      onDragOver={this.onDragOver}
       data-test-id='tab-area'
-      data-frame-key={this.props.frameKey}>
-      {
-        this.props.isActive && this.props.notificationBarActive
-          ? <NotificationBarCaret />
+      data-frame-key={this.props.frameKey}
+      >
+      <div
+        className={cx({
+          tabArea: true,
+          insertingPrevious: this.props.insertingPrevious,
+          insertingNext: this.props.insertingNext,
+          isDragging: this.isDragging,
+          isPinned: this.props.isPinnedTab
+        })}
+        onMouseMove={this.onMouseMove}
+        onMouseEnter={this.onMouseEnter}
+        onMouseLeave={this.onMouseLeave}
+        onDragStart={this.onDragStart}
+        onDragEnd={this.onDragEnd}
+        onDrag={this.onDrag}
+          >
+        {
+      this.props.isActive && this.props.notificationBarActive
+        ? <NotificationBarCaret />
           : null
       }
-      <div
-        data-tab
-        ref={(node) => { this.tabNode = node }}
-        className={css(
+        <div
+          data-tab
+          className={css(
           styles.tab,
           // Windows specific style
           isWindows && styles.tab_forWindows,
@@ -328,35 +354,32 @@ class Tab extends React.Component {
           this.props.isActive && this.props.isPrivateTab && styles.tab_active_private,
           this.props.centralizeTabIcons && styles.tab__content_centered
         )}
-        data-test-id='tab'
-        data-test-active-tab={this.props.isActive}
-        data-test-pinned-tab={this.props.isPinnedTab}
-        data-test-private-tab={this.props.isPrivateTab}
-        data-frame-key={this.props.frameKey}
-        draggable
-        title={this.props.title}
-        onDrag={this.onDrag}
-        onDragStart={this.onDragStart}
-        onDragEnd={this.onDragEnd}
-        onDragOver={this.onDragOver}
-        onClick={this.onClickTab}
-        onContextMenu={contextMenus.onTabContextMenu.bind(this, this.frame)}
+          data-test-id='tab'
+          data-test-active-tab={this.props.isActive}
+          data-test-pinned-tab={this.props.isPinnedTab}
+          data-test-private-tab={this.props.isPrivateTab}
+          data-frame-key={this.props.frameKey}
+          draggable
+          title={this.props.title}
+          onClick={this.onClickTab}
+          onContextMenu={contextMenus.onTabContextMenu.bind(this, this.frame)}
       >
-        <div
-          ref={(node) => { this.tabSentinel = node }}
-          className={css(styles.tab__sentinel)}
+          <div
+            ref={(node) => { this.tabSentinel = node }}
+            className={css(styles.tab__sentinel)}
         />
-        <div className={css(
+          <div className={css(
           styles.tab__identity,
           this.props.centralizeTabIcons && styles.tab__content_centered
         )}>
-          <Favicon tabId={this.props.tabId} />
-          <AudioTabIcon tabId={this.props.tabId} />
-          <TabTitle tabId={this.props.tabId} />
+            <Favicon tabId={this.props.tabId} />
+            <AudioTabIcon tabId={this.props.tabId} />
+            <TabTitle tabId={this.props.tabId} />
+          </div>
+          <PrivateIcon tabId={this.props.tabId} />
+          <NewSessionIcon tabId={this.props.tabId} />
+          <CloseTabIcon tabId={this.props.tabId} fixTabWidth={this.fixTabWidth} />
         </div>
-        <PrivateIcon tabId={this.props.tabId} />
-        <NewSessionIcon tabId={this.props.tabId} />
-        <CloseTabIcon tabId={this.props.tabId} fixTabWidth={this.fixTabWidth} />
       </div>
     </div>
   }

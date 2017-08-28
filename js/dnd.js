@@ -49,7 +49,7 @@ module.exports.onDragEnd = () => {
   }, 100)
 }
 
-module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, draggingOverDetail, e) => {
+module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, draggingOverDetail, e, draggingOverIndex = null) => {
   if (module.exports.getInterBraveDragType() !== dragType) {
     return
   }
@@ -63,6 +63,7 @@ module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, drag
       draggingOverType: dragType,
       draggingOverLeftHalf: false,
       draggingOverRightHalf: false,
+      draggingOverIndex,
       draggingOverWindowId: getCurrentWindowId()
     })
     return
@@ -71,24 +72,23 @@ module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, drag
   if (!sourceBoundingRect) {
     return
   }
-
-  if (e.clientX > sourceBoundingRect.left && e.clientX < sourceBoundingRect.left + (sourceBoundingRect.width / 5) &&
-    (!draggingOverDetail || !draggingOverDetail.get('draggingOverLeftHalf'))) {
+  if (e.clientX > sourceBoundingRect.left && e.clientX < sourceBoundingRect.left + (sourceBoundingRect.width / 5)) {
     appActions.draggedOver({
       draggingOverKey,
       draggingOverType: dragType,
       draggingOverLeftHalf: true,
       draggingOverRightHalf: false,
+      draggingOverIndex,
       draggingOverWindowId: getCurrentWindowId()
     })
     windowActions.setContextMenuDetail()
-  } else if (e.clientX < sourceBoundingRect.right && e.clientX >= sourceBoundingRect.left + (sourceBoundingRect.width / 5) &&
-    (!draggingOverDetail || !draggingOverDetail.get('draggingOverRightHalf'))) {
+  } else if (e.clientX < sourceBoundingRect.right && e.clientX >= sourceBoundingRect.left + (sourceBoundingRect.width / 5)) {
     appActions.draggedOver({
       draggingOverKey,
       draggingOverType: dragType,
       draggingOverLeftHalf: false,
       draggingOverRightHalf: true,
+      draggingOverIndex,
       draggingOverWindowId: getCurrentWindowId()
     })
     windowActions.setContextMenuDetail()
