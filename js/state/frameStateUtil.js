@@ -393,7 +393,7 @@ function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, 
  */
 function removeFrame (state, frameProps, framePropsIndex) {
   const frames = state.get('frames')
-  let closedFrames = state.get('closedFrames')
+  let closedFrames = state.get('closedFrames') || Immutable.List()
   const newFrames = frames.splice(framePropsIndex, 1)
 
   if (isValidClosedFrame(frameProps)) {
