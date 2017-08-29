@@ -16,7 +16,6 @@ const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const windowState = require('../common/state/windowState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
-const pinnedSitesUtil = require('../common/lib/pinnedSitesUtil')
 const windowActions = require('../../js/actions/windowActions')
 
 // TODO(bridiver) - set window uuid
@@ -332,6 +331,19 @@ const api = {
     }
 
     return windowState.WINDOW_ID_NONE
+  },
+
+  privateMethods: () => {
+    return process.env.NODE_ENV === 'test'
+    ? {
+      cleanupWindow,
+      getWindowState,
+      getWindowValue,
+      updateWindow,
+      siteMatchesTab,
+      updatePinnedTabs
+    }
+    : {}
   }
 }
 
