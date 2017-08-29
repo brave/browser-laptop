@@ -223,8 +223,8 @@ app.on('ready', () => {
       } else {
         appActions.showNotification({
           buttons: [
-            {text: locale.translation('allow')},
-            {text: locale.translation('deny')}
+            {text: locale.translation('yes')},
+            {text: locale.translation('no')}
           ],
           options: {
             persist: false
