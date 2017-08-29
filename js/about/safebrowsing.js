@@ -7,7 +7,6 @@ const BrowserButton = require('../../app/renderer/components/common/browserButto
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 
-require('../../less/button.less')
 require('../../less/window.less')
 require('../../less/about/error.less')
 
