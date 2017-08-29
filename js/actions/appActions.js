@@ -1087,10 +1087,9 @@ const appActions = {
   },
 
   /**
-   * Update ledger publishers pinned percentages according to the new synopsis
-   * Open dialog for default download path setting
-   * Dispatches a message when a tab is being pinned
+   * Dispatches a message to change a the pinned status of a tab
    * @param {number} tabId - The tabId of the tab to pin
+   * @param {boolean} pinned - true if the pin should be pinned, false if the tab should be unpinned
    */
   tabPinned: function (tabId, pinned) {
     dispatch({
@@ -1100,7 +1099,7 @@ const appActions = {
     })
   },
 
-  /*
+  /**
    * Dispatches a message when a web contents is added
    * @param {number} windowId - The windowId of the host window
    * @param {object} frameOpts - frame options for the added web contents
@@ -1117,7 +1116,7 @@ const appActions = {
     })
   },
 
-  /*
+  /**
    * Notifies the app that a drag operation started from within the app
    * @param {number} windowId - The source windowId the drag is starting from
    * @param {string} dragType - The type of data

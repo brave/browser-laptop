@@ -15,9 +15,7 @@ const {getPinnedTabsByWindowId} = require('../common/state/tabState')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const windowState = require('../common/state/windowState')
-const Immutable = require('immutable')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
-const pinnedSitesUtil = require('../common/lib/pinnedSitesUtil')
 const windowActions = require('../../js/actions/windowActions')
 
 // TODO(bridiver) - set window uuid
@@ -64,51 +62,44 @@ const updateWindow = (windowId, updateDefault = false) => {
   }
 }
 
+const siteMatchesTab = (site, tab) => {
+  const matchesLocation = getLocationIfPDF(tab.get('url')) === site.get('location')
+  const matchesPartition = tab.get('partitionNumber', 0) === site.get('partitionNumber', 0)
+  return matchesLocation && matchesPartition
+}
+
 const updatePinnedTabs = (win) => {
   if (win.webContents.browserWindowOptions.disposition === 'new-popup') {
     return
   }
-
   const appStore = require('../../js/stores/appStore')
   const state = appStore.getState()
   const windowId = win.id
-  const pinnedSites = pinnedSitesState.getSites(state).map(site => pinnedSitesUtil.getPinnedSiteProps(site))
-  const pinnedTabs = getPinnedTabsByWindowId(state, windowId)
-
-  pinnedSites.filter((site) =>
-    pinnedTabs.find((tab) =>
-      getLocationIfPDF(tab.get('url')) === site.get('location') &&
-      (tab.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0))).forEach((site) => {
-        win.__alreadyPinnedSites = win.__alreadyPinnedSites.add(site)
+  const pinnedSites = pinnedSitesState.getSites(state)
+  let pinnedWindowTabs = getPinnedTabsByWindowId(state, windowId)
+  // sites are instructions of what should be pinned
+  // tabs are sites our window already has pinned
+  // for each site which should be pinned, find if it's already pinned
+  for (const site of pinnedSites.values()) {
+    const existingPinnedTabIdx = pinnedWindowTabs.findIndex(tab => siteMatchesTab(site, tab))
+    if (existingPinnedTabIdx !== -1) {
+      // if it's already pinned we don't need to consider the tab in further searches
+      pinnedWindowTabs = pinnedWindowTabs.remove(existingPinnedTabIdx)
+    } else {
+      // if it's not already pinned, create new pinned tab
+      appActions.createTabRequested({
+        url: site.get('location'),
+        partitionNumber: site.get('partitionNumber'),
+        pinned: true,
+        active: false,
+        windowId
       })
-
-  const sitesToAdd = pinnedSites.filter((site) =>
-    !win.__alreadyPinnedSites.find((pinned) => pinned.equals(site)))
-
-  sitesToAdd.forEach((site) => {
-    win.__alreadyPinnedSites = win.__alreadyPinnedSites.add(site)
-    appActions.createTabRequested({
-      url: site.get('location'),
-      partitionNumber: site.get('partitionNumber'),
-      pinned: true,
-      active: false,
-      windowId
-    })
-  })
-
-  const sitesToClose = win.__alreadyPinnedSites.filter((pinned) =>
-    !pinnedSites.find((site) => pinned.equals(site)))
-
-  sitesToClose
-    .forEach((site) => {
-      const tab = pinnedTabs.find((tab) =>
-        tab.get('url') === site.get('location') &&
-        (tab.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0))
-      if (tab) {
-        appActions.tabCloseRequested(tab.get('tabId'), true)
-      }
-      win.__alreadyPinnedSites = win.__alreadyPinnedSites.remove(site)
-    })
+    }
+  }
+  // all that's left for tabs are the ones that we should close
+  for (const tab of pinnedWindowTabs) {
+    appActions.tabCloseRequested(tab.get('tabId'), true)
+  }
 }
 
 const api = {
@@ -310,7 +301,6 @@ const api = {
     setImmediate(() => {
       const win = currentWindows[windowId]
       if (win && !win.isDestroyed()) {
-        win.__alreadyPinnedSites = new Immutable.Set()
         updatePinnedTabs(win)
         win.__ready = true
       }
@@ -341,6 +331,19 @@ const api = {
     }
 
     return windowState.WINDOW_ID_NONE
+  },
+
+  privateMethods: () => {
+    return process.env.NODE_ENV === 'test'
+    ? {
+      cleanupWindow,
+      getWindowState,
+      getWindowValue,
+      updateWindow,
+      siteMatchesTab,
+      updatePinnedTabs
+    }
+    : {}
   }
 }
 
