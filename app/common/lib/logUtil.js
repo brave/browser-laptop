@@ -34,7 +34,7 @@ module.exports.HrtimeLogger = class {
     if (this.shouldLogValue(msTime) !== true) { return }
     const data = `${Date.now()},${label},${msTime}`
     fs.appendFile(this.path, data + os.EOL, (err) => {
-      if (err) { console.log(err) }
+      if (err) { console.error(err) }
     })
   }
 }

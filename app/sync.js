@@ -464,7 +464,7 @@ module.exports.init = function (appState) {
           newDeviceId ? new Immutable.List(newDeviceId) : null, null, seedQr)
       })
     } catch (ex) {
-      console.log('qr image error: ' + ex.toString())
+      console.error('qr image error: ' + ex.toString())
       appActions.saveSyncInitData(new Immutable.List(seed),
         newDeviceId ? new Immutable.List(newDeviceId) : null)
     }

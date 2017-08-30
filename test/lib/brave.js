@@ -136,7 +136,7 @@ var exports = {
 
       Server.create(`${__dirname}/../fixtures/`, (err, _server) => {
         if (err) {
-          console.log(err.stack)
+          console.error(err.stack)
         }
         exports.server = _server
         done()

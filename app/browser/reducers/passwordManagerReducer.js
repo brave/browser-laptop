@@ -132,7 +132,7 @@ const passwordManagerReducer = (state, action, immutableAction) => {
       init()
       // Log a warning if they are updating from <0.15.300 to 0.21 or higher
       if (state.getIn(['passwords', 0])) {
-        console.log('Warning: unable to migrate old passwords.')
+        console.warn('Warning: unable to migrate old passwords.')
       }
       // legacyPasswords was added in 0.15.300 to backup old passwords in case
       // the migration failed

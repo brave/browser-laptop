@@ -120,7 +120,7 @@ module.exports.init = (resourceName, version, startExtension, onInitDone, forceD
       .then(module.exports.readDataFile.bind(null, resourceName, url))
       .then(doneInit)
       .catch((err) => {
-        console.log(`Could not init ${resourceName}`, err || '')
+        console.error(`Could not init ${resourceName}`, err || '')
       })
     })
 

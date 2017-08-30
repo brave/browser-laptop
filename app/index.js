@@ -260,7 +260,7 @@ app.on('ready', () => {
           acceptCertDomains[host] = true
         }
       } catch (e) {
-        console.log('Cannot add url `' + url + '` to accepted domain list', e)
+        console.error('Cannot add url `' + url + '` to accepted domain list', e)
       }
     })
 
