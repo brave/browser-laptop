@@ -481,7 +481,9 @@ function registerPermissionHandler (session, partition) {
       return
     }
 
-    const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, origin).replace(/{{\s*permission\s*}}/, permissions[permission].action)
+    // Display 'Brave Browser' if the origin is null; ex: when a mailto: link
+    // is opened in a new tab via right-click
+    const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, origin || 'Brave Browser').replace(/{{\s*permission\s*}}/, permissions[permission].action)
 
     // If this is a duplicate, clear the previous callback and use the new one
     if (permissionCallbacks[message]) {
@@ -495,7 +497,7 @@ function registerPermissionHandler (session, partition) {
       ],
       frameOrigin: getOrigin(mainFrameUrl),
       options: {
-        persist: true
+        persist: !!origin
       },
       message
     })
