@@ -150,7 +150,7 @@
     "electron-prebuilt": "brave/electron-prebuilt",
     "empty-port": "0.0.2",
     "enzyme": "^2.9.1",
-    "flow-bin": "^0.22.1",
+    "flow-bin": "~0.53.1",
     "git-rev-sync": "^1.8.0",
     "gulp": "^3.9.0",
     "istanbul": "^1.1.0-alpha.1",
