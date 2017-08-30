@@ -13,6 +13,7 @@ const ipc = window.chrome.ipcRenderer
 
 const cx = require('../lib/classSet')
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 const {
@@ -20,7 +21,7 @@ const {
   AboutPageSectionSubTitle
 } = require('../../app/renderer/components/common/sectionTitle')
 
-require('../../less/about/history.less')
+require('../../less/about/siteDetails.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const tranformVersionInfoToString = (versionInformation) =>
@@ -44,7 +45,10 @@ class AboutBrave extends React.Component {
   }
 
   render () {
-    return <div className='siteDetailsPage'>
+    return <div className={cx({
+      siteDetailsPage: true,
+      [css(styles.aboutBrave)]: true
+    })}>
       <div className='siteDetailsPageHeader'>
         <AboutPageSectionTitle data-l10n-id='aboutBrave' />
         <div data-l10n-id='braveInfo' />
@@ -52,8 +56,7 @@ class AboutBrave extends React.Component {
 
       <div className={cx({
         siteDetailsPageContent: true,
-        aboutBrave: true,
-        [css(commonStyles.siteDetailsPageContent)]: true
+        [css(styles.aboutBrave__content)]: true
       })}>
         <AboutPageSectionSubTitle data-l10n-id='releaseNotes' />
 
@@ -65,7 +68,7 @@ class AboutBrave extends React.Component {
           <span data-l10n-id='relNotesInfo3' />
         </div>
 
-        <div className={css(styles.versionInformationWrapper)}>
+        <div className={css(styles.aboutBrave__content__versionInformation)}>
           <AboutPageSectionSubTitle data-l10n-id='versionInformation' />
           <ClipboardButton
             dataL10nId='copyToClipboard'
@@ -75,6 +78,7 @@ class AboutBrave extends React.Component {
         </div>
 
         <SortableTable
+          fillAvailable
           headings={['Name', 'Version']}
           rows={this.state.versionInformation.map((version, name) => [
             {
@@ -95,11 +99,22 @@ class AboutBrave extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  versionInformationWrapper: {
+  aboutBrave: {
+    width: '400px',
+    marginTop: globalStyles.spacing.aboutPageSectionPadding,
+
+    // See issue #10711
+    padding: '0 !important'
+  },
+
+  aboutBrave__content: {
+    marginLeft: globalStyles.spacing.aboutPageSectionPadding
+  },
+
+  aboutBrave__content__versionInformation: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'baseline',
-    width: '400px'
+    alignItems: 'baseline'
   }
 })
 
