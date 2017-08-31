@@ -18,7 +18,6 @@ const fetchSearchSuggestions = require('./fetchSearchSuggestions')
 const {getFrameByTabId, getTabsByWindowId} = require('../../common/state/tabState')
 const {query} = require('./siteSuggestions')
 const debounce = require('../../../js/lib/debounce')
-const assert = require('assert')
 
 const sigmoid = (t) => {
   return 1 / (1 + Math.pow(Math.E, -t))
@@ -86,15 +85,15 @@ const sortingPriority = (count, currentTime, lastAccessedTime, ageDecayConstant)
 const sortByAccessCountWithAgeDecay = (s1, s2) => {
   const now = new Date()
   const s1Priority = sortingPriority(
-    s1.count || 0,
+    s1.get('count') || 0,
     now.getTime(),
-    s1.lastAccessedTime || 0,
+    s1.get('lastAccessedTime') || 0,
     appConfig.urlSuggestions.ageDecayConstant
   )
   const s2Priority = sortingPriority(
-    s2.count || 0,
+    s2.get('count') || 0,
     now.getTime(),
-    s2.lastAccessedTime || 0,
+    s2.get('lastAccessedTime') || 0,
     appConfig.urlSuggestions.ageDecayConstant
   )
   return s2Priority - s1Priority
@@ -166,20 +165,20 @@ const shouldNormalizeLocation = (input) => {
  *
  * @param {Array[Object]} sites - array of similar sites
  */
-var virtualSite = (sites) => {
+const virtualSite = (sites) => {
   // array of sites without paths or query params
-  var simple = sites.filter((parsed) => {
+  const simple = sites.filter((parsed) => {
     return (parsed.hash === null && parsed.search === null && parsed.query === null && parsed.pathname === '/')
   })
   // if there are no simple locations then we will build and return one
   if (simple.length === 0) {
     // we need to create a virtual history item
-    return {
+    return Immutable.fromJS({
       location: sites[0].protocol + '//' + sites[0].host,
       count: 0,
       title: sites[0].host,
       lastAccessedTime: (new Date()).getTime()
-    }
+    })
   }
 }
 
@@ -196,22 +195,22 @@ const createVirtualHistoryItems = (historySites, urlLocationLower) => {
   // parse each history item
   const parsedHistorySites = []
   historySites.forEach((site) => {
-    if (site && site.location) {
+    if (site.get && site.get('location')) {
       parsedHistorySites.push(
-        urlParse(site.location)
+        urlParse(site.get('location'))
       )
     }
   })
   // group them by host
-  var grouped = _.groupBy(parsedHistorySites, (parsedSite) => {
+  const grouped = _.groupBy(parsedHistorySites, (parsedSite) => {
     return parsedSite.host || 'unknown'
   })
   // find groups with more than 2 of the same host
-  var multiGroupKeys = _.filter(_.keys(grouped), (k) => {
+  const multiGroupKeys = _.filter(_.keys(grouped), (k) => {
     return grouped[k].length > 0
   })
   // potentially create virtual history items
-  var virtualHistorySites = _.map(multiGroupKeys, (location) => {
+  let virtualHistorySites = _.map(multiGroupKeys, (location) => {
     return virtualSite(grouped[location])
   })
   virtualHistorySites = _.filter(virtualHistorySites, (site) => {
@@ -219,7 +218,7 @@ const createVirtualHistoryItems = (historySites, urlLocationLower) => {
   })
 
   if (urlLocationLower) {
-    virtualHistorySites = virtualHistorySites.filter((vs) => vs.location.indexOf(urlLocationLower) !== -1)
+    virtualHistorySites = virtualHistorySites.filter((vs) => vs.get('location').indexOf(urlLocationLower) !== -1)
   }
 
   return virtualHistorySites
@@ -239,8 +238,8 @@ const getSortByDomainForSites = (userInputLower, userInputHost) => {
     // any count or frequency calculation.
     // Note that for parsed URLs that are not complete, the pathname contains
     // what the user is entering as the host and the host is null.
-    let host1 = s1.parsedUrl.host || s1.parsedUrl.pathname || s1.location || ''
-    let host2 = s2.parsedUrl.host || s2.parsedUrl.pathname || s2.location || ''
+    let host1 = s1.get('parsedUrl').host || s1.get('parsedUrl').pathname || s1.get('location') || ''
+    let host2 = s2.get('parsedUrl').host || s2.get('parsedUrl').pathname || s2.get('location') || ''
     host1 = host1.replace('www.', '')
     host2 = host2.replace('www.', '')
 
@@ -342,16 +341,16 @@ const getSortForSearchSuggestions = (userInput) => {
  */
 const sortBySimpleURL = (s1, s2) => {
   // If one of the URLs is a simpleURL and the other isn't then sort the simple one first
-  const url1IsSimple = isParsedUrlSimpleDomainNameValue(s1.parsedUrl)
-  const url2IsSimple = isParsedUrlSimpleDomainNameValue(s2.parsedUrl)
+  const url1IsSimple = isParsedUrlSimpleDomainNameValue(s1.get('parsedUrl'))
+  const url2IsSimple = isParsedUrlSimpleDomainNameValue(s2.get('parsedUrl'))
   if (url1IsSimple && !url2IsSimple) {
     return -1
   }
   if (!url1IsSimple && url2IsSimple) {
     return 1
   }
-  const url1IsSecure = s1.parsedUrl.protocol === 'https:'
-  const url2IsSecure = s2.parsedUrl.protocol === 'https:'
+  const url1IsSecure = s1.get('parsedUrl').protocol === 'https:'
+  const url2IsSecure = s2.get('parsedUrl').protocol === 'https:'
   if (url1IsSimple && url2IsSimple) {
     if (url1IsSecure && !url2IsSecure) {
       return -1
@@ -363,9 +362,9 @@ const sortBySimpleURL = (s1, s2) => {
 
   // Prefer smaller less complicated domains
   // hostname could be null in cases like javascript: bookmarklets
-  if (s1.parsedUrl.hostname && s2.parsedUrl.hostname) {
-    const parts1 = s1.parsedUrl.hostname.split('.')
-    const parts2 = s2.parsedUrl.hostname.split('.')
+  if (s1.get('parsedUrl').hostname && s2.get('parsedUrl').hostname) {
+    const parts1 = s1.get('parsedUrl').hostname.split('.')
+    const parts2 = s2.get('parsedUrl').hostname.split('.')
     let parts1Size = parts1.length
     let parts2Size = parts2.length
     if (parts1[0] === 'www') {
@@ -386,7 +385,7 @@ const sortBySimpleURL = (s1, s2) => {
 
 /**
  * Returns a function that sorts 2 sites by their host.
- * The result of that function is a postive, negative, or 0 result.
+ * The result of that function is a positive, negative, or 0 result.
  */
 const getSortByPath = (userInputLower) => {
   return (path1, path2) => {
@@ -423,11 +422,8 @@ const getSortForSuggestions = (userInputLower) => {
   const sortByPath = getSortByPath(userInputLower)
 
   return (s1, s2) => {
-    if (s1.toJS || s2.toJS) {
-      assert('These sorting functions are not meant for Immutable data!')
-    }
-    s1.parsedUrl = s1.parsedUrl || urlParse(getURL(s1) || '')
-    s2.parsedUrl = s2.parsedUrl || urlParse(getURL(s2) || '')
+    s1 = s1.set('parsedUrl', s1.get('parsedUrl ') || urlParse(getURL(s1) || ''))
+    s2 = s2.set('parsedUrl', s2.get('parsedUrl ') || urlParse(getURL(s2) || ''))
 
     if (!userInputValue) {
       const sortByDomainResult = sortByDomain(s1, s2)
@@ -436,8 +432,8 @@ const getSortForSuggestions = (userInputLower) => {
       }
     }
 
-    const path1 = s1.parsedUrl.host + s1.parsedUrl.path + (s1.parsedUrl.hash || '')
-    const path2 = s2.parsedUrl.host + s2.parsedUrl.path + (s2.parsedUrl.hash || '')
+    const path1 = s1.get('parsedUrl').host + s1.get('parsedUrl').path + (s1.get('parsedUrl').hash || '')
+    const path2 = s2.get('parsedUrl').host + s2.get('parsedUrl').path + (s2.get('parsedUrl').hash || '')
     const sortByPathResult = sortByPath(path1, path2)
     if (sortByPathResult !== 0) {
       return sortByPathResult
@@ -472,8 +468,8 @@ const getMapListToElements = (urlLocationLower) => ({data, maxResults, type,
   // Filter out things which are already in our own list at a smaller index
   // Filter out things which are already in the suggestions list
   let filteredData = data.filter((site) =>
-    suggestionsList.findIndex((x) => (x.location || '').toLowerCase() === (getURL(site) || '').toLowerCase()) === -1 ||
-      // Tab autosuggestions should always be included since they will almost always be in history
+    suggestionsList.findIndex((x) => ((x.get && x.location) || '').toLowerCase() === (getURL(site) || '').toLowerCase()) === -1 ||
+      // Tab autosuggestion should always be included since they will almost always be in history
       type === suggestionTypes.TAB)
   // Per suggestion provider filter
   if (filterValue) {
