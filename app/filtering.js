@@ -287,6 +287,7 @@ function registerForBeforeSendHeaders (session, partition) {
     if (cookieSetting) {
       const parsedTargetUrl = urlParse(details.url || '')
       const parsedFirstPartyUrl = urlParse(firstPartyUrl)
+      const targetOrigin = details.url
 
       if (cookieSetting === 'blockAllCookies' ||
         isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
@@ -295,11 +296,15 @@ function registerForBeforeSendHeaders (session, partition) {
             getOrigin(firstPartyUrl) !== pdfjsOrigin) {
           requestHeaders['Cookie'] = undefined
         }
-        if (cookieSetting !== 'blockAllCookies' &&
-            requestHeaders['Referer'] &&
-            !refererExceptions.includes(parsedTargetUrl.hostname)) {
-          requestHeaders['Referer'] = getOrigin(details.url)
-        }
+      }
+      const referer = requestHeaders['Referer']
+      if (referer &&
+          cookieSetting !== 'allowAllCookies' &&
+          !refererExceptions.includes(parsedTargetUrl.hostname) &&
+          targetOrigin !== getOrigin(referer)) {
+        // Unless the setting is 'allow all cookies', spoof the referer if it
+        // is a cross-origin referer
+        requestHeaders['Referer'] = targetOrigin
       }
     }
     if (sendDNT) {
