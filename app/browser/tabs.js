@@ -491,7 +491,7 @@ const api = {
         // webcontents is still the embedder.
         const tabValue = getTabValue(tabId)
         const windowId = tabValue.get('windowId')
-        tab.once('will-attach', () => {
+        tab.once('did-attach', () => {
           appActions.tabStripEmpty(windowId)
         })
       })
