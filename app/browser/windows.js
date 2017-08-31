@@ -23,11 +23,6 @@ const windowActions = require('../../js/actions/windowActions')
 // TODO(bridiver) - set window uuid
 let currentWindows = {}
 
-const cleanupWindow = (windowId) => {
-  delete currentWindows[windowId]
-  appActions.windowClosed({ windowId })
-}
-
 const getWindowState = (win) => {
   if (win.isFullScreen()) {
     return 'fullscreen'
@@ -38,6 +33,10 @@ const getWindowState = (win) => {
   } else {
     return 'normal'
   }
+}
+
+const cleanupWindow = (windowId) => {
+  delete currentWindows[windowId]
 }
 
 const getWindowValue = (windowId) => {
@@ -137,6 +136,7 @@ const api = {
         win.webContents.once('close', () => {
           LocalShortcuts.unregister(win)
         })
+
         win.once('close', () => {
           LocalShortcuts.unregister(win)
         })
@@ -201,7 +201,6 @@ const api = {
         windowActions.onWindowUpdate(windowId, windowValue)
       })
       win.once('closed', () => {
-        cleanupWindow(windowId)
       })
       win.on('blur', () => {
         appActions.windowBlurred(windowId)
@@ -324,7 +323,7 @@ const api = {
     })
   },
 
-  closeWindow: (state, windowId) => {
+  closeWindow: (windowId) => {
     let win = api.getWindow(windowId)
     try {
       setImmediate(() => {
@@ -335,7 +334,6 @@ const api = {
     } catch (e) {
       // ignore
     }
-    return windowState.removeWindowByWindowId(state, windowId)
   },
 
   getWindow: (windowId) => {
@@ -346,7 +344,6 @@ const api = {
     if (BrowserWindow.getFocusedWindow()) {
       return BrowserWindow.getFocusedWindow().id
     }
-
     return windowState.WINDOW_ID_NONE
   }
 }

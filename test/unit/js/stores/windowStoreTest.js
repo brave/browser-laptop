@@ -136,7 +136,7 @@ describe('Window store unit tests', function () {
 
     describe('APP_NEW_WEB_CONTENTS_ADDED', function () {
       let windowState
-      let tabIndexChangedStub
+      let tabDetachMenuItemClickedStub
       const demoWindowState = {
         frames: [{
           security: {
@@ -183,7 +183,15 @@ describe('Window store unit tests', function () {
           loading: false,
           unloaded: true,
           key: 2
-        }]
+        }],
+        framesInternal: {
+          index: {
+            8: 0
+          },
+          tabIndex: {
+            8: 0
+          }
+        }
       }
       const demoAction = {
         actionType: appConstants.APP_NEW_WEB_CONTENTS_ADDED,
@@ -194,7 +202,8 @@ describe('Window store unit tests', function () {
           location: 'about:blank',
           partition: 'persist:default',
           active: true,
-          guestInstanceId: 8,
+          guestInstanceId: 2,
+          tabId: 8,
           isPinned: false,
           openerTabId: 8,
           disposition: 'foreground-tab',
@@ -205,14 +214,14 @@ describe('Window store unit tests', function () {
           width: 300,
           active: true,
           height: 300,
-          guestInstanceId: 8,
+          guestInstanceId: 2,
           autoDiscardable: true,
           partition: 'persist:default',
           windowId: -1,
           incognito: false,
           canGoForward: false,
           url: '',
-          tabId: 33,
+          tabId: 8,
           index: -1,
           status: 'complete',
           highlighted: false,
@@ -223,7 +232,7 @@ describe('Window store unit tests', function () {
             muted: false,
             reason: 'user'
           },
-          id: 33,
+          id: 8,
           selected: true,
           discarded: false,
           canGoBack: false
@@ -231,7 +240,7 @@ describe('Window store unit tests', function () {
       }
 
       beforeEach(function () {
-        tabIndexChangedStub = sinon.stub(appActions, 'tabIndexChanged')
+        tabDetachMenuItemClickedStub = sinon.stub(appActions, 'tabDetachMenuItemClicked')
       })
 
       afterEach(function () {
@@ -239,7 +248,7 @@ describe('Window store unit tests', function () {
           mockery.deregisterMock(reducer)
         })
 
-        tabIndexChangedStub.restore()
+        tabDetachMenuItemClickedStub.restore()
       })
 
       describe('when tab being opened is active', function () {
