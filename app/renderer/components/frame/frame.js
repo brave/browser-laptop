@@ -162,12 +162,14 @@ class Frame extends React.Component {
       this.addEventListeners()
       if (cb) {
         this.runOnDomReady = cb
-        let eventCallback = (e) => {
-          this.webview.removeEventListener(e.type, eventCallback)
+        let didAttachCallback = (e) => {
+          this.webview.removeEventListener(e.type, didAttachCallback)
           this.runOnDomReady()
           delete this.runOnDomReady
         }
-        this.webview.addEventListener('did-attach', eventCallback, { passive: true })
+        this.webview.addEventListener('will-attach', () => {
+        })
+        this.webview.addEventListener('did-attach', didAttachCallback, { passive: true })
       }
 
       if (!this.props.guestInstanceId || !this.webview.attachGuest(this.props.guestInstanceId)) {

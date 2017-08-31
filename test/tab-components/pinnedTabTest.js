@@ -14,8 +14,8 @@ describe('pinnedTabs', function () {
   }
 
   describe('Pins an existing frame', function () {
-    Brave.beforeAll(this)
-    before(function * () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
       yield setup(this.app.client)
       this.page1 = Brave.server.url('page1.html')
       yield this.app.client
@@ -34,7 +34,7 @@ describe('pinnedTabs', function () {
     })
     it('unpins and creates a non-pinned tab', function * () {
       yield this.app.client
-        .pinTabByIndex(1, false)
+        .pinTabByIndex(0, false)
         .waitForExist('[data-test-pinned-tab="false"][data-frame-key="2"]')
         .waitForElementCount(pinnedTabsTabs, 0)
         .waitForElementCount(tabsTabs, 2)
@@ -42,7 +42,6 @@ describe('pinnedTabs', function () {
     })
     it('pinning the same site again combines it', function * () {
       yield this.app.client
-        .pinTabByIndex(1, true)
         .newTab({ url: this.page1 })
         .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
@@ -123,9 +122,10 @@ describe('pinnedTabs', function () {
 
     it('from same window as pinned', function * () {
       yield this.app.client
+        .windowByIndex(0)
         .pinTabByIndex(1, false)
         .waitForElementCount(pinnedTabsTabs, 0)
-        .windowByIndex(0)
+        .windowByIndex(1)
         .waitForElementCount(pinnedTabsTabs, 0)
     })
 

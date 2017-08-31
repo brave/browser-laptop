@@ -613,7 +613,7 @@ var exports = {
         const frame = val.value.frames[index]
         return this.execute(function (tabId, windowId, frame) {
           const browserOpts = { positionByMouseCursor: true }
-          devTools('appActions').tabMoved(tabId, frame, browserOpts, windowId)
+          devTools('appActions').tabDetachMenuItemClicked(tabId, frame, browserOpts, windowId)
         }, frame.tabId, windowId, frame)
       })
     })
