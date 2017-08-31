@@ -72,7 +72,7 @@ class Tab extends React.Component {
   get draggingOverData () {
     const draggingOverData = this.props.dragData && this.props.dragData.get('dragOverData')
     if (!draggingOverData ||
-        draggingOverData.get('draggingOverKey') !== this.props.frameKey ||
+        draggingOverData.get('draggingOverKey') !== this.props.tabId ||
         draggingOverData.get('draggingOverWindowId') !== getCurrentWindowId()) {
       return
     }
@@ -82,8 +82,8 @@ class Tab extends React.Component {
       return
     }
     const location = sourceDragData.get('location')
-    const key = draggingOverData.get('draggingOverKey')
-    const draggingOverFrame = windowStore.getFrame(key)
+    const tabId = draggingOverData.get('draggingOverKey')
+    const draggingOverFrame = windowStore.getFrameByTabId(tabId)
     if ((location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location)) &&
         (draggingOverFrame && draggingOverFrame.get('pinnedLocation'))) {
       return
@@ -95,7 +95,7 @@ class Tab extends React.Component {
   get isDragging () {
     const sourceDragData = dnd.getInterBraveDragData()
     return sourceDragData &&
-      sourceDragData.get('key') === this.props.frameKey &&
+      sourceDragData.get('tabId') === this.props.tabId &&
       sourceDragData.get('draggingOverWindowId') === getCurrentWindowId()
   }
 
@@ -105,7 +105,7 @@ class Tab extends React.Component {
     if (!draggingOverData || !sourceDragData) {
       return false
     }
-    return draggingOverData.get('draggingOverKey') === sourceDragData.get('key')
+    return draggingOverData.get('draggingOverKey') === sourceDragData.get('tabId')
   }
 
   get isDraggingOverLeft () {
@@ -131,7 +131,7 @@ class Tab extends React.Component {
   }
 
   onDragOver (e) {
-    dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.frameKey, this.draggingOverData, e)
+    dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.tabId, this.draggingOverData, e)
   }
 
   onMouseLeave (e) {

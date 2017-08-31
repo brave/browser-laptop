@@ -53,6 +53,5 @@ module.exports.hasTabAsRelatedTarget = (event) => {
       tabAsRelatedTarget = (hasDataset.tab || hasDataset.tabArea) || false
     }
   }
-
   return tabAsRelatedTarget
 }

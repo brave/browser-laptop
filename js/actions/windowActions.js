@@ -223,13 +223,6 @@ const windowActions = {
     })
   },
 
-  activeFrameChanged: function (frameProps) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ACTIVE_FRAME_CHANGED,
-      frameProps: frameProps
-    })
-  },
-
   /**
    * Dispatches a message to the store when the frame is active and the window is focused
    *
