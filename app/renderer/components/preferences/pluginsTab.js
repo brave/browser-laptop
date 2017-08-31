@@ -17,6 +17,9 @@ const WidevineInfo = require('../main/widevineInfo')
 const flash = appConfig.resourceNames.FLASH
 const widevine = appConfig.resourceNames.WIDEVINE
 
+const {css} = require('aphrodite/no-important')
+const commonStyles = require('../styles/commonStyles')
+
 const {SettingsList, SettingCheckbox} = require('../common/settings')
 const {DefaultSectionTitle} = require('../common/sectionTitle')
 
@@ -62,7 +65,7 @@ class PluginsTab extends ImmutableComponent {
             ? <div>
               {this.infoCircle(appConfig.flash.installUrl)}
               <span data-l10n-id='enableFlashSubtext' />&nbsp;
-              <span className='linkText' onClick={aboutActions.createTabRequested.bind(null, {
+              <span className={css(commonStyles.linkText)} onClick={aboutActions.createTabRequested.bind(null, {
                 url: appConfig.flash.installUrl
               })} title={appConfig.flash.installUrl}>{'Adobe'}</span>.
             </div>
@@ -74,7 +77,7 @@ class PluginsTab extends ImmutableComponent {
           <div>
             {this.infoCircle(flashInfoLink)}
             <span data-l10n-id='flashTroubleshooting' />&nbsp;
-            <span className='linkText'
+            <span className={css(commonStyles.linkText)}
               onClick={aboutActions.createTabRequested.bind(null, {
                 url: flashInfoLink,
                 active: true
