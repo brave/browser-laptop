@@ -547,7 +547,7 @@ function tabTemplateInit (frameProps) {
       label: locale.translation('detach'),
       click: (item) => {
         const browserOpts = { positionByMouseCursor: true }
-        appActions.tabMoved(tabId, frameProps.toJS(), browserOpts, -1)
+        appActions.tabDetachMenuItemClicked(tabId, frameProps.toJS(), browserOpts, -1)
       }
     })
   }
