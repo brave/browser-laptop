@@ -318,7 +318,7 @@ const frameOptsFromFrame = (frame) => {
  * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
  * @return Immutable top level application state ready to merge back in
  */
-function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, insertionIndex, active) {
+function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, insertionIndex) {
   const frames = state.get('frames')
 
   const location = frameOpts.location // page url
