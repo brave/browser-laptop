@@ -71,3 +71,6 @@ httpse.leveldb
 
 # sync bundle file should be built and copied from the brave/sync repo for now
 app/extensions/brave/content/scripts/sync.js
+
+# script used for signing for widevine
+signature_generator.py
