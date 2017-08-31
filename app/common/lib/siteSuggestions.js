@@ -7,6 +7,9 @@ const {isUrl} = require('../../../js/lib/appUrlUtil')
 const siteTags = require('../../../js/constants/siteTags')
 const urlParse = require('../urlParse')
 
+let take = 1000
+let initialQueInterval = null
+let initialQueTime = 50
 let initialized = false
 let engine
 let lastQueryOptions
@@ -24,14 +27,20 @@ const getSiteIdentity = (data) => {
   return (data.location || '') + (data.partitionNumber ? '|' + data.partitionNumber : '')
 }
 
+const loadOtherSites = (sites) => {
+  add(sites.slice(0, take))
+  return sites.slice(take)
+}
+
 const init = (sites) => {
   sites = sites.toJS ? sites.toJS() : sites
   // Sort sites with smaller count first because later ones will overwrite with correct counts based on the site identity.
   // This can happen when a user bookmarks the same site multiple times, but only one of the items are getting counts
   // incremented by normal operations.
   sites = sites.sort((s1, s2) => (s1.count || 0) - (s2.count || 0))
+  const initSites = sites.slice(0, take)
   engine = new Bloodhound({
-    local: sites,
+    local: initSites,
     sorter: sortForSuggestions,
     queryTokenizer: tokenizeInput,
     datumTokenizer: tokenizeInput,
@@ -40,6 +49,18 @@ const init = (sites) => {
   const promise = engine.initialize()
   promise.then(() => {
     initialized = true
+
+    if (sites > take) {
+      sites = sites.slice(take)
+    }
+
+    initialQueInterval = setInterval(() => {
+      sites = loadOtherSites(sites)
+
+      if (sites.length === 0) {
+        clearInterval(initialQueInterval)
+      }
+    }, initialQueTime)
   })
   return promise
 }
