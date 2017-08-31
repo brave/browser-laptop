@@ -240,12 +240,12 @@ module.exports.applyCookieSetting = (requestHeaders, url, firstPartyUrl, isPriva
   if (cookieSetting) {
     const parsedTargetUrl = urlParse(url || '')
     const parsedFirstPartyUrl = urlParse(firstPartyUrl)
+    const targetOrigin = getOrigin(url)
 
     if (cookieSetting === 'blockAllCookies' ||
       isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
       let hasCookieException = false
       const firstPartyOrigin = getOrigin(firstPartyUrl)
-      const targetOrigin = getOrigin(url)
       if (cookieExceptions.hasOwnProperty(firstPartyOrigin)) {
         const subResources = cookieExceptions[firstPartyOrigin]
         for (let i = 0; i < subResources.length; ++i) {
@@ -266,10 +266,16 @@ module.exports.applyCookieSetting = (requestHeaders, url, firstPartyUrl, isPriva
           firstPartyOrigin !== pdfjsOrigin && !hasCookieException) {
         requestHeaders['Cookie'] = undefined
       }
-      if (requestHeaders['Referer'] &&
-          !refererExceptions.includes(parsedTargetUrl.hostname)) {
-        requestHeaders['Referer'] = targetOrigin
-      }
+    }
+
+    const referer = requestHeaders['Referer']
+    if (referer &&
+        cookieSetting !== 'allowAllCookies' &&
+        !refererExceptions.includes(parsedTargetUrl.hostname) &&
+        targetOrigin !== getOrigin(referer)) {
+      // Unless the setting is 'allow all cookies', spoof the referer if it
+      // is a cross-origin referer
+      requestHeaders['Referer'] = targetOrigin
     }
   }
 
