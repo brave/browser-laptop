@@ -739,11 +739,11 @@ module.exports.runPreMigrations = (data) => {
   }
 
   if (data.lastAppVersion) {
-    // Force WidevineCdm to be upgraded when last app version <= 0.18.23
+    // Force WidevineCdm to be upgraded when last app version <= 0.18.25
     let runWidevineCleanup = false
     const compareVersions = require('compare-versions')
 
-    try { runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.23') < 1 } catch (e) {}
+    try { runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1 } catch (e) {}
 
     if (runWidevineCleanup) {
       const fs = require('fs-extra')
