@@ -26,24 +26,24 @@ const raiseError = (errorMessage) => {
   process.exit(1)
 }
 
-if (isDarwin || isWindows) {
-  const requiredText = 'is required for widevine signing'
-  if (!process.env.SIGN_WIDEVINE_PASSPHRASE) {
-    raiseError('SIGN_WIDEVINE_PASSPHRASE ' + requiredText)
-  }
-  if (!process.env.SIGN_WIDEVINE_CERT) {
-    raiseError('SIGN_WIDEVINE_CERT ' + requiredText)
-  }
-  if (!process.env.SIGN_WIDEVINE_KEY) {
-    raiseError('SIGN_WIDEVINE_KEY ' + requiredText)
-  }
+// if (isDarwin || isWindows) {
+//   const requiredText = 'is required for widevine signing'
+//   if (!process.env.SIGN_WIDEVINE_PASSPHRASE) {
+//     raiseError('SIGN_WIDEVINE_PASSPHRASE ' + requiredText)
+//   }
+//   if (!process.env.SIGN_WIDEVINE_CERT) {
+//     raiseError('SIGN_WIDEVINE_CERT ' + requiredText)
+//   }
+//   if (!process.env.SIGN_WIDEVINE_KEY) {
+//     raiseError('SIGN_WIDEVINE_KEY ' + requiredText)
+//   }
 
-  // check if widevine script exists
-  const fs = require('fs')
-  if (!fs.existsSync('tools/signature_generator.py')) {
-    raiseError('`tools/signature_generator.py` ' + requiredText)
-  }
-}
+//   // check if widevine script exists
+//   const fs = require('fs')
+//   if (!fs.existsSync('tools/signature_generator.py')) {
+//     raiseError('`tools/signature_generator.py` ' + requiredText)
+//   }
+// }
 
 if (isDarwin) {
   const identifier = process.env.IDENTIFIER
@@ -51,9 +51,9 @@ if (isDarwin) {
     raiseError('IDENTIFIER needs to be set to the certificate organization')
   }
 
-  const wvBundle = buildDir + '/Brave.app/Contents/Frameworks/Brave Framework.framework/Brave Framework'
-  const wvBundleSig = buildDir + '/Brave.app/Contents/Frameworks/Widevine Resources.bundle/Contents/Resources/Brave Framework.sig'
-  const wvPlugin = buildDir + '/Brave.app/Contents/Frameworks/Brave Framework.framework/Libraries/WidevineCdm/_platform_specific/mac_x64/widevinecdmadapter.plugin'
+  // const wvBundle = buildDir + '/Brave.app/Contents/Frameworks/Brave Framework.framework/Brave Framework'
+  // const wvBundleSig = buildDir + '/Brave.app/Contents/Frameworks/Widevine Resources.bundle/Contents/Resources/Brave Framework.sig'
+  // const wvPlugin = buildDir + '/Brave.app/Contents/Frameworks/Brave Framework.framework/Libraries/WidevineCdm/_platform_specific/mac_x64/widevinecdmadapter.plugin'
   // Do not codesign verification because it will fail duto widevine signature
   process.env['CSC_IDENTITY_AUTO_DISCOVERY'] = false
   cmds = [
@@ -68,8 +68,8 @@ if (isDarwin) {
 
     // sign for widevine
     'cd ..',
-    'python tools/signature_generator.py --input_file "' + wvBundle + '" --output_file "' + wvBundleSig + '" --flag 1',
-    'python tools/signature_generator.py --input_file "' + wvPlugin + '"',
+    // 'python tools/signature_generator.py --input_file "' + wvBundle + '" --output_file "' + wvBundleSig + '" --flag 1',
+    // 'python tools/signature_generator.py --input_file "' + wvPlugin + '"',
 
     // Package it into a dmg
     'build ' +
@@ -102,9 +102,9 @@ if (isDarwin) {
   const wvPlugin = buildDir + '/WidevineCdm/_platform_specific/' + widevineCdmArch + '/widevinecdmadapter.dll'
   cmds = [
     getSignCmd(wvExe),
-    getSignCmd(wvPlugin),
-    'python tools/signature_generator.py --input_file "' + wvExe + '" --flag 1',
-    'python tools/signature_generator.py --input_file "' + wvPlugin + '"'
+    getSignCmd(wvPlugin)
+    // 'python tools/signature_generator.py --input_file "' + wvExe + '" --flag 1',
+    // 'python tools/signature_generator.py --input_file "' + wvPlugin + '"'
   ]
   execute(cmds, {}, (err) => {
     if (err) {
