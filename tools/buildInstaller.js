@@ -90,10 +90,19 @@ if (isDarwin) {
     raiseError('Certificate password required. Set environment variable CERT_PASSWORD.')
   }
 
+  const getSignCmd = (file) => {
+    // https://docs.microsoft.com/en-us/dotnet/framework/tools/signtool-exe
+    const signtool = '"C:/Program Files (x86)/Windows Kits/10/bin/x86/signtool"'
+    return signtool + ' sign /fd sha256 /f "' +
+      path.resolve(cert) + '" /p "' + certPassword + '" ' + file
+  }
+
   // sign for widevine
   const wvExe = buildDir + '/Brave.exe'
   const wvPlugin = buildDir + '/WidevineCdm/_platform_specific/' + widevineCdmArch + '/widevinecdmadapter.dll'
   cmds = [
+    getSignCmd(wvExe),
+    getSignCmd(wvPlugin),
     'python tools/signature_generator.py --input_file "' + wvExe + '" --flag 1',
     'python tools/signature_generator.py --input_file "' + wvPlugin + '"'
   ]
@@ -116,7 +125,7 @@ if (isDarwin) {
       loadingGif: 'res/brave_splash_installing.gif',
       setupIcon: 'res/brave_installer.ico',
       iconUrl: 'https://brave.com/favicon.ico',
-      signWithParams: format('-a -fd sha256 -f "%s" -p "%s" -t http://timestamp.verisign.com/scripts/timstamp.dll', path.resolve(cert), certPassword),
+      signWithParams: format('-a -fd sha256 -f "%s" -p "%s"', path.resolve(cert), certPassword),
       noMsi: true,
       exe: 'Brave.exe'
     })
