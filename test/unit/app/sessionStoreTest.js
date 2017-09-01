@@ -6,6 +6,7 @@ const Immutable = require('immutable')
 const settings = require('../../../js/constants/settings')
 const {makeImmutable} = require('../../../app/common/state/immutableUtil')
 const downloadStates = require('../../../js/constants/downloadStates')
+const compareVersions = require('compare-versions')
 
 require('../braveUnit')
 
@@ -62,6 +63,10 @@ describe('sessionStore unit tests', function () {
     existsSync: (path) => {
       console.log('calling mocked fs.existsSync')
       return true
+    },
+    remove: (path, callback) => {
+      console.log('calling mocked fs.remove')
+      if (callback) callback()
     }
   }
   const fakeLocale = {
@@ -83,6 +88,7 @@ describe('sessionStore unit tests', function () {
     })
     mockery.registerMock('fs-extra', fakeFileSystem)
     mockery.registerMock('fs', fakeFileSystem)
+    mockery.registerMock('compare-versions', compareVersions)
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('./locale', fakeLocale)
     mockery.registerMock('./autofill', fakeAutofill)
