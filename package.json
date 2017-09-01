@@ -89,6 +89,7 @@
     "async": "^2.0.1",
     "bloodhound-js": "^1.2.1",
     "clipboard-copy": "^1.0.0",
+    "compare-versions": "^3.0.1",
     "electron-localshortcut": "^0.6.0",
     "electron-squirrel-startup": "brave/electron-squirrel-startup",
     "file-loader": "^0.8.5",
