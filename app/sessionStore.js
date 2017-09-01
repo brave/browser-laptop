@@ -738,6 +738,20 @@ module.exports.runPreMigrations = (data) => {
     delete data.sites
   }
 
+  if (data.lastAppVersion) {
+    // Force WidevineCdm to be upgraded when last app version <= 0.18.23
+    const compareVersions = require('compare-versions')
+    if (compareVersions(data.lastAppVersion, '0.18.23') < 1) {
+      const fs = require('fs-extra')
+      const wvExtPath = path.join(app.getPath('userData'), 'Extensions', 'WidevineCdm')
+      fs.remove(wvExtPath, (err) => {
+        if (err) {
+          console.error(`Could not remove ${wvExtPath}`)
+        }
+      })
+    }
+  }
+
   return data
 }
 
