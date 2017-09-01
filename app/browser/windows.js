@@ -35,10 +35,6 @@ const getWindowState = (win) => {
   }
 }
 
-const cleanupWindow = (windowId) => {
-  delete currentWindows[windowId]
-}
-
 const getWindowValue = (windowId) => {
   let win = BrowserWindow.fromId(windowId)
   if (win) {
