@@ -169,7 +169,7 @@
     "muon-winstaller": "^2.5.5",
     "ncp": "^2.0.0",
     "node-gyp": "^3.3.1",
-    "node-libs-browser": "^1.0.0",
+    "node-libs-browser": "~2.0.0",
     "node-static": "^0.7.7",
     "nsp": "^2.2.0",
     "pre-commit": "brave/pre-commit",
