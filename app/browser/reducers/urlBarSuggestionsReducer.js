@@ -20,16 +20,16 @@ const urlBarSuggestionsReducer = (state, action) => {
     case appConstants.APP_EDIT_BOOKMARK:
       if (Immutable.List.isList(action.siteDetail)) {
         action.siteDetail.forEach((s) => {
-          add(s)
+          add(makeImmutable(s))
         })
       } else {
-        add(action.siteDetail)
+        add(makeImmutable(action.siteDetail))
       }
       break
     case appConstants.APP_SET_STATE:
       const bookmarks = bookmarksState.getBookmarks(action.appState)
       const history = historyState.getSites(action.appState)
-      init(Object.values(bookmarks.concat(history).toJS()))
+      init(bookmarks, history)
       break
     case appConstants.APP_URL_BAR_TEXT_CHANGED:
       generateNewSuggestionsList(state, action.windowId, action.tabId, action.input)

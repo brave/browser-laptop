@@ -128,38 +128,44 @@ describe('suggestion unit tests', function () {
 
     it('handles entries with unparseable "location" field', function () {
       const badInput = [
-        {
+        Immutable.fromJS({
           location: undefined
-        }, {
+        }),
+        Immutable.fromJS({
           location: null
-        }, {
+        }),
+        Immutable.fromJS({
           location: ''
-        }, {
+        }),
+        Immutable.fromJS({
           location: 'httphttp://lol.com'
-        }
+        })
       ]
 
       assert.ok(suggestion.createVirtualHistoryItems(badInput))
     })
 
     it('shows virtual history item', function () {
-      var history = [site1, site2, site3]
-      var virtual = suggestion.createVirtualHistoryItems(history)
+      const history = [Immutable.fromJS(site1), Immutable.fromJS(site2), Immutable.fromJS(site3)]
+      const virtual = suggestion.createVirtualHistoryItems(history)
       assert.ok(virtual.length > 0, 'virtual location created')
-      assert.ok(virtual[0].location === 'http://www.foo.com')
-      assert.ok(virtual[0].title === 'www.foo.com')
-      assert.ok(virtual[0].lastAccessedTime > 0)
+      assert.ok(virtual[0].get('location') === 'http://www.foo.com')
+      assert.ok(virtual[0].get('title') === 'www.foo.com')
+      assert.ok(virtual[0].get('lastAccessedTime') > 0)
     })
 
     it('filters virtual sites to only matching input', function () {
-      var history = [{
-        location: 'https://www.google.com/test',
-        title: 'Google 1!'
-      }, {
-        location: 'https://www.google.com/blah',
-        title: 'Google 2!'
-      }]
-      var virtual = suggestion.createVirtualHistoryItems(history, 'google.ca')
+      const history = [
+        Immutable.fromJS({
+          location: 'https://www.google.com/test',
+          title: 'Google 1!'
+        }),
+        Immutable.fromJS({
+          location: 'https://www.google.com/blah',
+          title: 'Google 2!'
+        })
+      ]
+      const virtual = suggestion.createVirtualHistoryItems(history, 'google.ca')
       assert.equal(virtual.length, 0)
     })
   })
@@ -194,8 +200,8 @@ describe('suggestion unit tests', function () {
       before(function () {
         this.sort = (url1, url2) => {
           return suggestion.sortBySimpleURL(
-            { location: url1, parsedUrl: urlParse(url1) },
-            { location: url2, parsedUrl: urlParse(url2) }
+            Immutable.fromJS({ location: url1, parsedUrl: urlParse(url1) }),
+            Immutable.fromJS({ location: url2, parsedUrl: urlParse(url2) })
           )
         }
       })
@@ -235,8 +241,8 @@ describe('suggestion unit tests', function () {
         const internalSort = suggestion.getSortByDomainForSites(userInputLower, userInputHost)
         this.sort = (url1, url2) => {
           return internalSort(
-            { location: url1, parsedUrl: urlParse(url1) },
-            { location: url2, parsedUrl: urlParse(url2) }
+            Immutable.fromJS({ location: url1, parsedUrl: urlParse(url1) }),
+            Immutable.fromJS({ location: url2, parsedUrl: urlParse(url2) })
           )
         }
       })
@@ -271,29 +277,29 @@ describe('suggestion unit tests', function () {
         const url1 = 'https://facebook.github.com'
         const url2 = 'https://facebook.brave.com'
         const sort = suggestion.getSortByDomainForSites('facebook', 'facebook')
-        assert.equal(sort({
-          location: url1,
-          parsedUrl: urlParse(url1)
-        }, {
-          location: url2,
-          parsedUrl: urlParse(url2)
-        }), 0)
+        assert.equal(sort(
+          Immutable.fromJS({location: url1, parsedUrl: urlParse(url1)}),
+          Immutable.fromJS({location: url2, parsedUrl: urlParse(url2)})
+        ), 0)
       })
       it('sorts simple domains that match equally but have different activity based on activity', function () {
         const url1 = 'https://facebook.github.com'
         const url2 = 'https://facebook.brave.com'
         const sort = suggestion.getSortByDomainForSites('facebook', 'facebook')
-        assert(sort({
-          location: url1,
-          parsedUrl: urlParse(url1),
-          lastAccessedTime: 1495335766455,
-          count: 30
-        }, {
-          location: url2,
-          parsedUrl: urlParse(url2),
-          lastAccessedTime: 1495334766432,
-          count: 10
-        }) < 0)
+        assert(sort(
+          Immutable.fromJS({
+            location: url1,
+            parsedUrl: urlParse(url1),
+            lastAccessedTime: 1495335766455,
+            count: 30
+          }),
+          Immutable.fromJS({
+            location: url2,
+            parsedUrl: urlParse(url2),
+            lastAccessedTime: 1495334766432,
+            count: 10
+          })
+        ) < 0)
       })
     })
     describe('getSortByDomainForHosts', function () {
@@ -359,8 +365,8 @@ describe('suggestion unit tests', function () {
           const internalSort = suggestion.getSortForSuggestions(userInputLower, userInputHost)
           this.sort = (url1, url2) => {
             return internalSort(
-              { location: url1, parsedUrl: urlParse(url1) },
-              { location: url2, parsedUrl: urlParse(url2) }
+              Immutable.fromJS({ location: url1, parsedUrl: urlParse(url1) }),
+              Immutable.fromJS({ location: url2, parsedUrl: urlParse(url2) })
             )
           }
         })
@@ -379,8 +385,8 @@ describe('suggestion unit tests', function () {
           const internalSort = suggestion.getSortForSuggestions(userInputLower, userInputHost)
           this.sort = (url1, url2) => {
             return internalSort(
-              { location: url1, parsedUrl: urlParse(url1) },
-              { location: url2, parsedUrl: urlParse(url2) }
+              Immutable.fromJS({ location: url1, parsedUrl: urlParse(url1) }),
+              Immutable.fromJS({ location: url2, parsedUrl: urlParse(url2) })
             )
           }
         })
@@ -400,8 +406,8 @@ describe('suggestion unit tests', function () {
         const internalSort = suggestion.getSortForSuggestions(userInputLower, userInputLower)
         const sort = (url1, url2) => {
           return internalSort(
-            { location: url1, parsedUrl: urlParse(url1) },
-            { location: url2, parsedUrl: urlParse(url2) }
+            Immutable.fromJS({ location: url1, parsedUrl: urlParse(url1) }),
+            Immutable.fromJS({ location: url2, parsedUrl: urlParse(url2) })
           )
         }
         assert(sort('https://facebook.github.io/', 'https://www.facebook.com/') > 0)
@@ -411,8 +417,8 @@ describe('suggestion unit tests', function () {
         const internalSort = suggestion.getSortForSuggestions(userInputLower, userInputLower)
         const sort = (url1, url2) => {
           return internalSort(
-            { location: url1, parsedUrl: urlParse(url1) },
-            { location: url2, parsedUrl: urlParse(url2) }
+            Immutable.fromJS({ location: url1, parsedUrl: urlParse(url1) }),
+            Immutable.fromJS({ location: url2, parsedUrl: urlParse(url2) })
           )
         }
         assert(sort('https://facebook.github.io/brian', 'https://www.facebook.com/brian') > 0)
@@ -422,8 +428,8 @@ describe('suggestion unit tests', function () {
         const internalSort = suggestion.getSortForSuggestions(userInputLower, userInputLower)
         const sort = (url1, url2) => {
           return internalSort(
-            { location: url1, parsedUrl: urlParse(url1) },
-            { location: url2, parsedUrl: urlParse(url2) }
+            Immutable.fromJS({ location: url1, parsedUrl: urlParse(url1) }),
+            Immutable.fromJS({ location: url2, parsedUrl: urlParse(url2) })
           )
         }
         assert.equal(sort('https://www.facebook.com/brian2', 'https://www.facebook.com/brian/test1'), 0)
@@ -433,18 +439,21 @@ describe('suggestion unit tests', function () {
         const url1 = 'https://twitter.com/'
         const url2 = 'https://www.twilio.com/'
         const sort = suggestion.getSortForSuggestions(userInputLower, userInputLower)
-        assert(sort({
-          location: url1,
-          title: 'Twitter. It\'s what\'s happening.',
-          parsedUrl: urlParse(url1),
-          count: 2,
-          lastAccessedTime: 1495376582112
-        }, {
-          location: url2,
-          title: 'Twilio - APIs for Text Messaging, VoIP & Voice in the Cloud',
-          parsedUrl: urlParse(url2),
-          lastAccessedTime: 0
-        }) < 0)
+        assert(sort(
+          Immutable.fromJS({
+            location: url1,
+            title: 'Twitter. It\'s what\'s happening.',
+            parsedUrl: urlParse(url1),
+            count: 2,
+            lastAccessedTime: 1495376582112
+          }),
+          Immutable.fromJS({
+            location: url2,
+            title: 'Twilio - APIs for Text Messaging, VoIP & Voice in the Cloud',
+            parsedUrl: urlParse(url2),
+            lastAccessedTime: 0
+          })
+        ) < 0)
       })
     })
   })

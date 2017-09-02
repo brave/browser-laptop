@@ -60,7 +60,9 @@ describe('urlBarSuggestionsReducer', function () {
       urlBarSuggestionsReducer(Immutable.Map(), {actionType: appConstants.APP_SET_STATE, appState: initState})
       const callCount = this.siteSuggestionsStub.init.calledOnce
       assert.equal(callCount, 1)
-      assert.deepEqual(this.siteSuggestionsStub.init.args[0][0], [site1])
+      assert.deepEqual(this.siteSuggestionsStub.init.args[0][0], Immutable.fromJS({
+        'key': site1
+      }))
     })
   })
   describe('APP_ADD_BOOKMARK', function () {
@@ -68,7 +70,7 @@ describe('urlBarSuggestionsReducer', function () {
       const newState = urlBarSuggestionsReducer(initState, {actionType: appConstants.APP_ADD_BOOKMARK, siteDetail: site1})
       const callCount = this.siteSuggestionsStub.add.calledOnce
       assert.equal(callCount, 1)
-      assert.deepEqual(this.siteSuggestionsStub.add.args[0][0], site1)
+      assert.deepEqual(this.siteSuggestionsStub.add.args[0][0], Immutable.fromJS(site1))
       assert.deepEqual(newState, initState)
     })
   })
@@ -77,7 +79,7 @@ describe('urlBarSuggestionsReducer', function () {
       const newState = urlBarSuggestionsReducer(initState, {actionType: appConstants.APP_ADD_HISTORY_SITE, siteDetail: site1})
       const callCount = this.siteSuggestionsStub.add.calledOnce
       assert.equal(callCount, 1)
-      assert.deepEqual(this.siteSuggestionsStub.add.args[0][0], site1)
+      assert.deepEqual(this.siteSuggestionsStub.add.args[0][0], Immutable.fromJS(site1))
       assert.deepEqual(newState, initState)
     })
   })
@@ -86,7 +88,7 @@ describe('urlBarSuggestionsReducer', function () {
       const newState = urlBarSuggestionsReducer(initState, {actionType: appConstants.APP_EDIT_BOOKMARK, siteDetail: site1})
       const callCount = this.siteSuggestionsStub.add.calledOnce
       assert.equal(callCount, 1)
-      assert.deepEqual(this.siteSuggestionsStub.add.args[0][0], site1)
+      assert.deepEqual(this.siteSuggestionsStub.add.args[0][0], Immutable.fromJS(site1))
       assert.deepEqual(newState, initState)
     })
   })

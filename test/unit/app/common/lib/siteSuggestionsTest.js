@@ -2,6 +2,7 @@
 const {tokenizeInput, init, query, add} = require('../../../../../app/common/lib/siteSuggestions')
 const assert = require('assert')
 const Immutable = require('immutable')
+const sinon = require('sinon')
 const fakeElectron = require('../../../lib/fakeElectron')
 const mockery = require('mockery')
 
@@ -36,11 +37,7 @@ const siteEqual = (actual, expected) => {
   if (expected.constructor === Array) {
     assert.equal(actual.length, expected.length)
     for (let i = 0; i < actual.length; i++) {
-      const a = Object.assign({}, actual[i])
-      delete a.parsedUrl
-      const e = Object.assign({}, expected[i])
-      delete e.parsedUrl
-      assert.deepEqual(a, e)
+      assert.deepEqual(actual[i].delete('parsedUrl').toJS(), expected[i].delete('parsedUrl').toJS())
     }
   } else {
     const a = Object.assign({}, actual)
@@ -100,7 +97,7 @@ describe('siteSuggestions lib', function () {
       assert.deepEqual(tokenizeInput('brad\\hates\\primes'), ['brad', 'hates', 'primes'])
     })
     it('can tokenize site objects', function () {
-      assert.deepEqual(tokenizeInput(site1), ['do', 'not', 'use', '3', 'for', 'items', 'because', 'it', 'is', 'prime', 'www', 'bradrichter', 'co', 'bad_numbers', '3', 'https:'])
+      assert.deepEqual(tokenizeInput(Immutable.fromJS(site1)), ['do', 'not', 'use', '3', 'for', 'items', 'because', 'it', 'is', 'prime', 'www', 'bradrichter', 'co', 'bad_numbers', '3', 'https:'])
     })
     it('non URLs get tokenized', function () {
       assert.deepEqual(tokenizeInput('hello world Greatest...Boss...Ever'), ['hello', 'world', 'greatest', 'boss', 'ever'])
@@ -121,9 +118,16 @@ describe('siteSuggestions lib', function () {
   })
 
   describe('query', function () {
+    let sites
+
     before(function (cb) {
-      const sites = [site1, site2, site3, site4, site5]
+      sites = Immutable.fromJS([site1, site2, site3, site4, site5])
+      this.clock = sinon.useFakeTimers()
       init(sites).then(cb.bind(null, null))
+      this.clock.tick(1510)
+    })
+    after(function () {
+      this.clock.restore()
     })
     it('can query with empty string', function (cb) {
       checkResult('', [], cb)
@@ -138,19 +142,19 @@ describe('siteSuggestions lib', function () {
       checkResult('hello', [], cb)
     })
     it('returns matched result on an exact token', function (cb) {
-      checkResult('bradrichter', [site1, site3], cb)
+      checkResult('bradrichter', [sites.get(0), sites.get(2)], cb)
     })
     it('returns matched result on a token prefix', function (cb) {
-      checkResult('brad', [site1, site3, site4], cb)
+      checkResult('brad', [sites.get(0), sites.get(2), sites.get(3).delete('count')], cb)
     })
     it('returns no results on input that has a token as a prefix', function (cb) {
       checkResult('bradrichterhatesprimes.com', [], cb)
     })
     it('can query on title', function (cb) {
-      checkResult('back', [site2], cb)
+      checkResult('back', [sites.get(1)], cb)
     })
     it('can query on multiple tokens in different order', function (cb) {
-      checkResult('back really', [site2], cb)
+      checkResult('back really', [sites.get(1)], cb)
     })
     it('all tokens must match, not just some', function (cb) {
       checkResult('brave brad', [], cb)
@@ -181,25 +185,25 @@ describe('siteSuggestions lib', function () {
       })
       it('orders shortest match first', function (cb) {
         query('twitter.com').then((results) => {
-          siteEqual(results[0], { location: 'https://twitter.com' })
+          siteEqual(results[0], Immutable.fromJS({ location: 'https://twitter.com' }))
           cb()
         })
       })
       it('matches prefixes first', function (cb) {
         query('twi').then((results) => {
-          siteEqual(results[0], { location: 'https://twitter.com' })
+          siteEqual(results[0], Immutable.fromJS({ location: 'https://twitter.com' }))
           cb()
         })
       })
       it('closest to the left match wins', function (cb) {
         query('twitter.com brian').then((results) => {
-          siteEqual(results[0], { location: 'https://twitter.com/brianbondy' })
+          siteEqual(results[0], Immutable.fromJS({ location: 'https://twitter.com/brianbondy' }))
           cb()
         })
       })
       it('matches based on tokens and not exactly', function (cb) {
         query('twitter.com/moments').then((results) => {
-          siteEqual(results[0], { location: 'https://twitter.com/i/moments' })
+          siteEqual(results[0], Immutable.fromJS({ location: 'https://twitter.com/i/moments' }))
           cb()
         })
       })
@@ -226,7 +230,7 @@ describe('siteSuggestions lib', function () {
         })
         it('highest count first', function (cb) {
           query('https://brave.com/page').then((results) => {
-            siteEqual(results[0], this.page2)
+            siteEqual(results[0], Immutable.fromJS(this.page2))
             cb()
           })
         })
@@ -248,7 +252,7 @@ describe('siteSuggestions lib', function () {
         })
         it('highest count first', function (cb) {
           query('https://brave.com/page').then((results) => {
-            siteEqual(results[0], this.page2)
+            siteEqual(results[0], Immutable.fromJS(this.page2))
             cb()
           })
         })
@@ -285,7 +289,7 @@ describe('siteSuggestions lib', function () {
         })
         it('most recently accessed get sorted first', function (cb) {
           query('bravebrowser').then((results) => {
-            siteEqual(results[0], this.site)
+            siteEqual(results[0], Immutable.fromJS(this.site))
             cb()
           })
         })
@@ -316,7 +320,7 @@ describe('siteSuggestions lib', function () {
         })
         it('most recently accessed get sorted first', function (cb) {
           query('bravebrowser').then((results) => {
-            siteEqual(results[0], this.site)
+            siteEqual(results[0], Immutable.fromJS(this.site))
             cb()
           })
         })
@@ -334,7 +338,7 @@ describe('siteSuggestions lib', function () {
       }).then(cb.bind(null, null))
     })
     it('can be found', function (cb) {
-      checkResult('slack', [{ location: 'https://slack.com' }], cb)
+      checkResult('slack', [Immutable.fromJS({ location: 'https://slack.com' })], cb)
     })
     it('adding twice results in 1 result only with latest results', function (cb) {
       const newSite = {
@@ -343,19 +347,19 @@ describe('siteSuggestions lib', function () {
         title: 'SlickSlack'
       }
       add(newSite)
-      checkResult('slack', [newSite], cb)
+      checkResult('slack', [Immutable.fromJS(newSite)], cb)
     })
     it('can add simple strings', function (cb) {
       add({
         location: 'https://slashdot.org'
       })
-      checkResult('slash', [{ location: 'https://slashdot.org' }], cb)
+      checkResult('slash', [Immutable.fromJS({ location: 'https://slashdot.org' })], cb)
     })
     it('can add Immutable objects', function (cb) {
       add(Immutable.fromJS({
         location: 'https://microsoft.com'
       }))
-      checkResult('micro', [{ location: 'https://microsoft.com' }], cb)
+      checkResult('micro', [Immutable.fromJS({ location: 'https://microsoft.com' })], cb)
     })
   })
 })
