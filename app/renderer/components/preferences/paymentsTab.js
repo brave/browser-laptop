@@ -214,8 +214,8 @@ class PaymentsTab extends ImmutableComponent {
               [css(styles.autoSuggestSwitch__moreInfoBtnSuggest)]: true
             })}
               href='https://brave.com/Payments_FAQ.html'
-              target='_blank'
               data-l10n-id='paymentsFAQLink'
+              rel='noopener' target='_blank'
             />
           </div>
           {

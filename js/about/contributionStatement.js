@@ -451,7 +451,7 @@ class ContributionStatement extends React.Component {
                 transactions.map(function (tx) {
                   return (
                     <li>
-                      <a className={css(styles.list__anchor)} href={aboutContributionsUrl + '#' + tx.get('viewingId')} target='_blank'>
+                      <a className={css(styles.list__anchor)} href={aboutContributionsUrl + '#' + tx.get('viewingId')} rel='noopener' target='_blank'>
                         {this.receiptFileName(tx)}
                       </a>
                     </li>
