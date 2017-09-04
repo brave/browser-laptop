@@ -142,6 +142,7 @@ const styles = StyleSheet.create({
 
   // notificationBar
   notificationBar: {
+    '-webkit-app-region': 'no-drag',
     display: 'inline-block',
     boxSizing: 'border-box',
     width: '100%',
