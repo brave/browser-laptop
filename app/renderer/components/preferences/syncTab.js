@@ -421,7 +421,7 @@ class SyncTab extends ImmutableComponent {
       try {
         inputCode = window.niceware.passphraseToBytes(text.split(' '))
       } catch (e) {
-        console.log('Could not convert niceware passphrase', e)
+        console.error('Could not convert niceware passphrase', e)
       }
       if (inputCode && inputCode.length === 32) {
         // QR code and device ID are set after sync restarts

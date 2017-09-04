@@ -28,7 +28,7 @@ const os = require('os')
 var debug = function (contents) {
   const updateLogPath = path.join(app.getPath('userData'), 'updateLog.log')
   fs.appendFile(updateLogPath, new Date().toISOString() + ' - ' + contents + os.EOL, (err) => {
-    if (err) console.log(err)
+    if (err) console.error(err)
   })
 }
 
@@ -106,7 +106,7 @@ exports.init = (platform, arch, ver, updateToPreview) => {
       // add the preview flag to the base feed url
       autoUpdater.setFeedURL(`${baseUrl}?${querystring.stringify(query)}`)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   } else {
     debug('No updateUrl, not scheduling updates.')

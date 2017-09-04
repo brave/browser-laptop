@@ -65,7 +65,7 @@ const removeDuplicateDomains = (list) => {
         return true
       }
     } catch (e) {
-      console.log('Error parsing hostname: ', e)
+      console.error('Error parsing hostname: ', e)
     }
     return false
   })

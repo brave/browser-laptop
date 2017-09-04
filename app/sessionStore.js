@@ -309,7 +309,7 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
     try {
       autofill.clearAutocompleteData()
     } catch (e) {
-      console.log('cleanAppData: error calling autofill.clearAutocompleteData: ', e)
+      console.error('cleanAppData: error calling autofill.clearAutocompleteData: ', e)
     }
   }
   const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
@@ -396,14 +396,14 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
   try {
     immutableData = tabState.getPersistentState(immutableData)
   } catch (e) {
-    console.log('cleanAppData: error calling tabState.getPersistentState: ', e)
+    console.error('cleanAppData: error calling tabState.getPersistentState: ', e)
     immutableData = immutableData.set('tabs', Immutable.List())
   }
 
   try {
     immutableData = windowState.getPersistentState(immutableData)
   } catch (e) {
-    console.log('cleanAppData: error calling windowState.getPersistentState: ', e)
+    console.error('cleanAppData: error calling windowState.getPersistentState: ', e)
     immutableData = immutableData.set('windows', Immutable.List())
   }
 
@@ -441,9 +441,9 @@ const safeGetVersion = (fieldName, getFieldVersion) => {
       versionField.version = getFieldVersion()
       return versionField
     }
-    console.log('ERROR getting value for field ' + fieldName + ' in sessionStore::setVersionInformation(): ', getFieldVersion, ' is not a function')
+    console.error('ERROR getting value for field ' + fieldName + ' in sessionStore::setVersionInformation(): ', getFieldVersion, ' is not a function')
   } catch (e) {
-    console.log('ERROR getting value for field ' + fieldName + ' in sessionStore::setVersionInformation(): ', e)
+    console.error('ERROR getting value for field ' + fieldName + ' in sessionStore::setVersionInformation(): ', e)
   }
   return versionField
 }
@@ -780,7 +780,7 @@ module.exports.runPostMigrations = (immutableData) => {
     immutableData = immutableData.setIn(['fingerprintingProtectionAll', 'enabled'],
       globalFpSetting).deleteIn(['settings', 'privacy.block-canvas-fingerprinting'])
   } catch (e) {
-    console.log('fingerprinting protection migration failed', e)
+    console.error('fingerprinting protection migration failed', e)
   }
   return immutableData
 }
@@ -829,7 +829,7 @@ module.exports.loadAppState = () => {
       // corrupted value for people to report into support.
       module.exports.backupSession()
       if (data) {
-        console.log('could not parse data: ', data, e)
+        console.error('could not parse data: ', data, e)
       }
       data = {}
     }
@@ -887,9 +887,9 @@ module.exports.backupSession = () => {
   if (fs.existsSync(src)) {
     try {
       fs.copySync(src, dest)
-      console.log('An error occurred. For support purposes, file "' + src + '" has been copied to "' + dest + '".')
+      console.error('An error occurred. For support purposes, file "' + src + '" has been copied to "' + dest + '".')
     } catch (e) {
-      console.log('backupSession: error making copy of session file: ', e)
+      console.error('backupSession: error making copy of session file: ', e)
     }
   }
 }

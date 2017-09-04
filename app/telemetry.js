@@ -127,7 +127,7 @@ var sendTelemetry = (measure, value, extra) => {
       }
     },
     function (err, response, body) {
-      if (err) console.log(err)
+      if (err) console.error(err)
       if (DEBUG) console.log(body)
     })
   }

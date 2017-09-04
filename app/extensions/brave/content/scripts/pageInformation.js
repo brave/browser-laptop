@@ -156,7 +156,7 @@
       try {
         if (!resolve(rule.condition, context)) continue
       } catch (ex) {
-        console.log('error resolving rule at position #' + i + '\n' + ex.stack)
+        console.error('error resolving rule at position #' + i + '\n', ex)
         continue
       }
 

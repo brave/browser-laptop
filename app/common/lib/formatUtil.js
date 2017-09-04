@@ -92,7 +92,7 @@ module.exports.toLocaleString = (epoch, defaultValue) => {
         return date
       }
     } catch (e) {
-      console.log('Error parsing date: ', e)
+      console.error('Error parsing date: ', e)
     }
   }
   return defaultValue || ''
