@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // util
 const {changeSetting} = require('../../../lib/settingsUtil')
@@ -28,8 +28,8 @@ class AdvancedSettingsContent extends ImmutableComponent {
     const minPublisherVisits = this.props.ledgerData.getIn(['synopsisOptions', 'minPublisherVisits'])
 
     return <section className={css(styles.advancedSettings)} data-test-id='advancedSettings'>
-      <div className={css(styles.settingsPanelDivider)}>
-        <div className={css(styles.minimumSetting)} data-l10n-id='minimumPageTimeSetting' />
+      <div>
+        <div className={css(styles.advancedSettings__minimumSetting)} data-l10n-id='minimumPageTimeSetting' />
         <SettingsList>
           <SettingItem>
             <SettingDropdown
@@ -42,7 +42,7 @@ class AdvancedSettingsContent extends ImmutableComponent {
             </SettingDropdown>
           </SettingItem>
         </SettingsList>
-        <div className={css(styles.minimumSetting)} data-l10n-id='minimumVisitsSetting' />
+        <div className={css(styles.advancedSettings__minimumSetting)} data-l10n-id='minimumVisitsSetting' />
         <SettingsList className={css(commonStyles.noMarginBottom)}>
           <SettingItem>
             <SettingDropdown
@@ -56,19 +56,16 @@ class AdvancedSettingsContent extends ImmutableComponent {
           </SettingItem>
         </SettingsList>
       </div>
-      <div className={css(styles.settingsPanelDivider, styles.lastDivider)}>
-        <SettingsList className={css(commonStyles.noMarginBottom)}
-          listClassName={css(styles.list)}
-        >
+      <div className={css(styles.advancedSettings__switches)}>
+        <SettingsList className={css(commonStyles.noMarginBottom)}>
           <SettingCheckbox
             dataTestId='payment-advance-notifications'
             dataL10nId='notifications'
             prefKey={settings.PAYMENTS_NOTIFICATIONS}
             settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting}
-            className={css(styles.listItem)}
-            switchClassName={css(styles.checkboxSwitch)}
-            labelClassName={css(commonStyles.noMarginBottom)}
+            className={css(styles.advancedSettings__switches__listItem_first)}
+            switchClassName={css(styles.advancedSettings__switches__listItem__checkboxSwitch)}
           />
           <SettingCheckbox
             dataTestId='payment-advance-nonverified'
@@ -76,9 +73,7 @@ class AdvancedSettingsContent extends ImmutableComponent {
             prefKey={settings.PAYMENTS_ALLOW_NON_VERIFIED}
             settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting}
-            className={css(styles.listItem, commonStyles.noMarginBottom)}
-            switchClassName={css(styles.checkboxSwitch)}
-            labelClassName={css(commonStyles.noMarginBottom)}
+            switchClassName={css(styles.advancedSettings__switches__listItem__checkboxSwitch)}
           />
         </SettingsList>
       </div>
@@ -110,35 +105,26 @@ class AdvancedSettingsFooter extends ImmutableComponent {
 
 const styles = StyleSheet.create({
   advancedSettings: {
-    display: 'flex',
-    flexWrap: 'nowrap'
+    display: 'grid',
+    gridTemplateColumns: '1fr .75fr',
+    gridColumnGap: '32px'
   },
-  settingsPanelDivider: {
-    width: '100%'
-  },
-  minimumSetting: {
+
+  advancedSettings__minimumSetting: {
     marginBottom: globalStyles.spacing.modalPanelHeaderMarginBottom
   },
-  lastDivider: {
+
+  advancedSettings__switches: {
     display: 'flex',
-    alignItems: 'center',
-    width: 'auto',
-    position: 'relative',
-    left: '1em'
+    alignItems: 'center'
   },
-  list: {
-    display: 'flex',
-    flexFlow: 'column nowrap',
-    justifyContent: 'space-between'
-  },
-  listItem: {
-    display: 'flex',
+
+  advancedSettings__switches__listItem_first: {
     marginBottom: '1em'
   },
-  checkboxSwitch: {
-    marginTop: '2px',
-    paddingTop: 0,
-    paddingBottom: 0
+
+  advancedSettings__switches__listItem__checkboxSwitch: {
+    padding: 0
   }
 })
 
