@@ -126,6 +126,7 @@ class AutofillAddressPanel extends React.Component {
   }
   get countryList () {
     const countryList = []
+    countryList.push(<option />)
     for (let i = 0; i < countryCodes.length; i++) {
       const countryCode = countryCodes[i]
       const localizedCountryName = locale.translation(countryCode)
