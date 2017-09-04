@@ -77,15 +77,6 @@ class ExtensionsTab extends ImmutableComponent {
           checked={this.getCheckedExtension(extension.get('id'))}
           onChangeSetting={this.props.onChangeSetting} />
       }
-      // { // Exclude option
-      //  /* TODO @cezaraugusto reenable it once we can be able
-      //   * to recover from an excluded->re-enabled extension state
-      //  html: !extension.get('isDummy') && !isBuiltInExtension(extension.get('id'))
-      //  ? <div className={globalStyles.appIcons.trash}
-      //    onClick={this.onRemoveExtension.bind(this, extension.get('id'))} />
-      //  : <span data-l10n-id={isBuiltInExtension(extension.get('id')) ? 'integrated' : 'notInstalled'} />
-      //  */
-      // }
     ]
   }
 
