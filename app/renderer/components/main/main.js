@@ -603,9 +603,10 @@ class Main extends React.Component {
         ? <PopupWindow />
         : null
       }
-      <div className={cx({
+      <div className={
+          cx({
             top: true,
-            allowDragging: this.props.shouldAllowWindowDrag,
+            allowDragging: this.props.shouldAllowWindowDrag
           })
         }
         onMouseEnter={windowActions.setMouseInTitlebar.bind(null, true)}
