@@ -7,6 +7,7 @@ const Immutable = require('immutable')
 const tableSort = require('tablesort')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
@@ -370,7 +371,8 @@ class SortableTable extends React.Component {
 
         return <td className={cx({
           [hasColumnClassNames]: true,
-          [customCellClassesStr]: true
+          [customCellClassesStr]: true,
+          [css(styles.table__tbody__tr__td, this.props.smallRow && styles.table__tbody__tr_smallRow__td)]: true
         })}
           data-sort={value} data-td-index={`${j}`}>
           {
@@ -400,7 +402,10 @@ class SortableTable extends React.Component {
           data-context-menu-disable={rowAttributes && rowAttributes.onContextMenu ? true : undefined}
           data-table-id={this.tableID}
           data-row-index={`${currentIndex}`}
-          className={classes.join(' ')}>{entry}</tr>
+          className={cx({
+            [css(styles.table__tbody__tr, this.props.largeRow && styles.table__tbody__tr_largeRow)]: true,
+            [classes.join(' ')]: classes
+          })}>{entry}</tr>
         : null
     })
   }
@@ -448,7 +453,8 @@ class SortableTable extends React.Component {
             }
             const headerClasses = {
               'sort-header': true,
-              'sort-default': this.sortingDisabled || heading === this.props.defaultHeading
+              'sort-default': this.sortingDisabled || heading === this.props.defaultHeading,
+              [css(styles.table__th)]: true
             }
             const isString = typeof heading === 'string'
             const sortMethod = this.sortingDisabled ? 'none' : (dataType === 'number' ? 'number' : undefined)
@@ -461,6 +467,7 @@ class SortableTable extends React.Component {
                 isString
                   ? <div className={cx({
                     'th-inner': true,
+                    [css(styles.table__th__inner, this.props.smallRow && styles.table__th__inner_smallRow)]: true,
                     [this.props.headerClassNames]: !!this.props.headerClassNames
                   })} data-l10n-id={heading} />
                   : heading
@@ -490,6 +497,58 @@ const styles = StyleSheet.create({
   // Setting 'fillAvailable' maximizes the width of the table.
   table_fillAvailable: {
     width: '-webkit-fill-available'
+  },
+
+  table__th: {
+    background: `linear-gradient(to bottom, ${globalStyles.color.lightGray}, ${globalStyles.color.veryLightGray})`,
+    borderTop: `1px solid ${globalStyles.color.gray}`,
+    borderLeft: `1px solid ${globalStyles.color.braveOrange}`,
+    textAlign: 'left',
+    fontWeight: 300,
+    padding: '1ch',
+    whiteSpace: 'nowrap',
+
+    // Up/down arrow
+    ':after': {
+      fontFamily: 'FontAwesome',
+      fontSize: '8pt',
+      marginLeft: '4px',
+      position: 'relative',
+      bottom: '2px'
+    },
+
+    ':first-child': {
+      borderLeft: 'none'
+    }
+  },
+
+  table__th__inner: {
+    display: 'inline-block',
+    userSelect: 'none'
+  },
+
+  // See ledgerTable.js for an example
+  table__th__inner_smallRow: {
+    fontSize: '14px'
+  },
+
+  table__tbody__tr: {
+    height: '1rem'
+  },
+
+  // Add 'largeRow' to SortableTable to increase the height of tr.
+  table__tbody__tr_largeRow: {
+    height: '4rem'
+  },
+
+  table__tbody__tr__td: {
+    padding: '.5ch 1ch'
+  },
+
+  // Add 'smallRow' to SortableTable to decrease padding-top and padding-bottom of td.
+  table__tbody__tr_smallRow__td: {
+    paddingTop: '.3ch',
+    paddingBottom: '.3ch'
   }
 })
 

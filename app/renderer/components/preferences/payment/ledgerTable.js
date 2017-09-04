@@ -112,13 +112,13 @@ class LedgerTable extends ImmutableComponent {
 
   get columnClassNames () {
     return [
-      css(styles.tableTd, styles.alignRight, styles.verifiedTd), // verified
-      css(styles.tableTd, styles.alignRight), // sites
-      css(styles.tableTd),                    // include
-      css(styles.tableTd, styles.alignRight), // views
-      css(styles.tableTd, styles.alignRight), // time spent
-      css(styles.tableTd, styles.alignRight, styles.percTd), // percentage
-      css(styles.tableTd, styles.alignLeft)   // actions
+      css(styles.alignRight, styles.verifiedTd), // verified
+      css(styles.alignRight), // sites
+      css(styles.alignLeft),  // include
+      css(styles.alignRight), // views
+      css(styles.alignRight), // time spent
+      css(styles.alignRight, styles.percTd), // percentage
+      css(styles.alignLeft)   // actions
     ]
   }
 
@@ -129,14 +129,14 @@ class LedgerTable extends ImmutableComponent {
       pinnedRows.map(item => {
         j++
         return this.enabledForSite(item)
-          ? css(styles.tableTr, j % 2 && styles.tableTdBg)
-          : css(styles.tableTr, styles.paymentsDisabled, j % 2 && styles.tableTdBg)
+          ? css(j % 2 && styles.tableTdBg)
+          : css(styles.paymentsDisabled, j % 2 && styles.tableTdBg)
       }).toJS(),
       unPinnedRows.map(item => {
         j++
         return this.enabledForSite(item)
-          ? css(styles.tableTr, j % 2 && styles.tableTdBg)
-          : css(styles.tableTr, styles.paymentsDisabled, j % 2 && styles.tableTdBg)
+          ? css(j % 2 && styles.tableTdBg)
+          : css(styles.paymentsDisabled, j % 2 && styles.tableTdBg)
       }).toJS()
     ]
   }
@@ -274,6 +274,7 @@ class LedgerTable extends ImmutableComponent {
       </div>
       <SortableTable
         fillAvailable
+        smallRow
         headings={['', 'publisher', 'include', 'views', 'timeSpent', 'percentage', 'actions']}
         defaultHeading='percentage'
         defaultHeadingSortOrder='desc'
@@ -341,17 +342,7 @@ const styles = StyleSheet.create({
 
   tableTh: {
     color: paymentStylesVariables.tableHeader.fontColor,
-    fontSize: '14px',
     fontWeight: paymentStylesVariables.tableHeader.fontWeight
-  },
-
-  tableTr: {
-    height: '26px'
-  },
-
-  tableTd: {
-    position: 'relative',
-    padding: '0 15px'
   },
 
   tableTdBg: {
@@ -363,8 +354,7 @@ const styles = StyleSheet.create({
   },
 
   percTd: {
-    width: '45px',
-    paddingLeft: '5px'
+    width: '45px'
   },
 
   hideTd: {

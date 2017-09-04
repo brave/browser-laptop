@@ -6,8 +6,6 @@
 
 table.sort {
   th {
-    color: @buttonColor;
-
     &:hover {
       color: #000;
     }
@@ -16,30 +14,7 @@ table.sort {
 
 table.sortableTable {
   tr {
-    height: 1.7em;
-    padding: 5px 20px;
-
     th {
-      background: linear-gradient(to bottom, @lightGray, @veryLightGray);
-      border-top: 1px solid @gray;
-      text-align: left;
-      font-weight: 300;
-      padding: 8px;
-      box-sizing: border-box;
-
-      .th-inner {
-        display: inline-block;
-        user-select: none;
-      }
-
-      &:after {
-        font-family: FontAwesome;
-        font-size: 8pt;
-        margin-top: 3px;
-        margin-right: 3px;
-        float: right;
-      }
-
       &[aria-sort="ascending"]:after {
         content: "\f077";
       }
@@ -47,9 +22,6 @@ table.sortableTable {
       &[aria-sort="descending"]:after {
         content: "\f078";
       }
-    }
-    th + th {
-      border-left: 1px solid @braveOrange;
     }
 
     td {
@@ -59,23 +31,30 @@ table.sortableTable {
       width: auto;
     }
   }
+
   tr.rowHover:hover {
     background: @lightGray;
+
     &.selected {
       background: @braveOrange;
+
       td {
         color: white;
       }
+
       div {
         color: white;
       }
     }
   }
+
   tr.selected {
     background-color: lighten(@gray, 20%);
+
     td {
       color: @buttonColor;
     }
+
     div {
       color: @buttonColor;
     }
