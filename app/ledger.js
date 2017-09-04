@@ -294,7 +294,7 @@ const doAction = (state, action) => {
 var init = () => {
   try {
     initialize(getSetting(settings.PAYMENTS_ENABLED))
-  } catch (ex) { console.error('ledger.js initialization failed: ' + ex.toString() + '\n' + ex.stack) }
+  } catch (ex) { console.error('ledger.js initialization failed: ', ex) }
 }
 
 var quit = () => {
@@ -323,7 +323,7 @@ var boot = () => {
       appActions.updateLedgerInfo({})
 
       bootP = false
-      return console.error('ledger client boot error: ' + ex.toString() + '\n' + ex.stack)
+      return console.error('ledger client boot error: ', ex)
     }
     if (client.sync(callback) === true) run(random.randomInt({ min: msecs.minute, max: 10 * msecs.minute }))
     getBalance()
@@ -338,7 +338,9 @@ var reset = (doneP) => {
   if (!doneP) files.push(statePath)
   files.forEach((file) => {
     fs.unlink(pathName(file), (err) => {
-      if ((err) && (err.code !== 'ENOENT')) console.error(err)
+      if ((err) && (err.code !== 'ENOENT')) {
+        console.error('error removing file ' + file + ': ', err)
+      }
     })
   })
 }
@@ -754,7 +756,7 @@ var initialize = (paymentsEnabled) => {
             })
           }
         } catch (ex) {
-          return console.error('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
+          return console.error('ledger client creation error: ', ex)
         }
 
         // speed-up browser start-up by delaying the first synchronization action
@@ -859,8 +861,16 @@ var enable = (paymentsEnabled) => {
     // change undefined include publishers to include publishers
     appActions.enableUndefinedPublishers(synopsis.publishers)
 
-    fs.unlink(pathName(publisherPath), (err) => { if ((err) && (err.code !== 'ENOENT')) console.error(err) })
-    fs.unlink(pathName(scoresPath), (err) => { if ((err) && (err.code !== 'ENOENT')) console.error(err) })
+    fs.unlink(pathName(publisherPath), (err) => {
+      if ((err) && (err.code !== 'ENOENT')) {
+        console.error('error removing file ' + pathName(publisherPath) + ': ', err)
+      }
+    })
+    fs.unlink(pathName(scoresPath), (err) => {
+      if ((err) && (err.code !== 'ENOENT')) {
+        console.error('error removing file ' + pathName(scoresPath) + ': ', err)
+      }
+    })
   })
 }
 
@@ -1376,7 +1386,7 @@ var cacheRuleSet = (ruleset) => {
 
     updatePublisherInfo()
   } catch (ex) {
-    console.error('ruleset error: ' + ex.toString() + '\n' + ex.stack)
+    console.error('ruleset error: ', ex)
   }
 }
 
