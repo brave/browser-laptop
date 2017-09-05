@@ -3,9 +3,9 @@
   "productName": "Brave",
   "npmRebuild": false,
   "mac": {
-    "target": "dmg"
+    "target": "dmg",
+    "identity": null
   },
-  "identity": null,
   "dmg": {
     "title": "Brave",
     "background": "res/background.png",
