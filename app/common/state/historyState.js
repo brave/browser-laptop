@@ -27,6 +27,11 @@ const historyState = {
     return state.getIn([STATE_SITES.HISTORY_SITES, key], Immutable.Map())
   },
 
+  hasSite: (state, key) => {
+    state = validateState(state)
+    return state.hasIn([STATE_SITES.HISTORY_SITES, key], Immutable.Map())
+  },
+
   addSite: (state, siteDetail) => {
     let sites = historyState.getSites(state)
     let siteKey = historyUtil.getKey(siteDetail)

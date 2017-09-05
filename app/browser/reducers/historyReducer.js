@@ -16,9 +16,11 @@ const messages = require('../../../js/constants/messages')
 
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
+const {remove} = require('../../common/lib/siteSuggestions')
 const syncUtil = require('../../../js/state/syncUtil')
 const filtering = require('../../filtering')
 const {calculateTopSites} = require('../api/topSites')
+const bookmarkLocationCache = require('../../common/cache/bookmarkLocationCache')
 
 /**
  * Helper to pass message to windows to clear closed frames
@@ -43,6 +45,15 @@ const historyReducer = (state, action, immutableAction) => {
         const temp = state.get('tempClearBrowsingData', Immutable.Map())
         const clearData = defaults ? defaults.merge(temp) : temp
         if (clearData.get('browserHistory')) {
+          let historyList = Immutable.List()
+          historyState.getSites(state).forEach((site) => {
+            const bookmarkKey = bookmarkLocationCache.getCacheKey(state, site.get('location'))
+            if (bookmarkKey.size === 0) {
+              historyList = historyList.push(site)
+            }
+          })
+
+          remove(historyList)
           state = historyState.clearSites(state)
           state = aboutHistoryState.clearHistory(state)
           filtering.clearHistory()

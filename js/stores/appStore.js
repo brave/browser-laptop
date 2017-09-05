@@ -178,6 +178,7 @@ const handleAppAction = (action) => {
       // until we have a better way to manage dependencies.
       // tabsReducer must be above dragDropReducer.
       require('../../app/browser/reducers/tabsReducer'),
+      require('../../app/browser/reducers/urlBarSuggestionsReducer'),
       require('../../app/browser/reducers/bookmarksReducer'),
       require('../../app/browser/reducers/bookmarkFoldersReducer'),
       require('../../app/browser/reducers/historyReducer'),
@@ -185,7 +186,6 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/windowsReducer'),
       require('../../app/browser/reducers/syncReducer'),
       require('../../app/browser/reducers/clipboardReducer'),
-      require('../../app/browser/reducers/urlBarSuggestionsReducer'),
       require('../../app/browser/reducers/passwordManagerReducer'),
       require('../../app/browser/reducers/spellCheckerReducer'),
       require('../../app/browser/reducers/tabMessageBoxReducer'),

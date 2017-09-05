@@ -135,6 +135,13 @@ const add = (data) => {
   engine.add(data.toJS ? data : Immutable.fromJS(data))
 }
 
+const remove = (data) => {
+  if (!initialized) {
+    return
+  }
+  engine.remove(data.toJS ? data : Immutable.fromJS(data))
+}
+
 const query = (input, options = {}) => {
   if (!initialized) {
     return Promise.resolve([])
@@ -163,5 +170,6 @@ module.exports = {
   init,
   add,
   tokenizeInput,
-  query
+  query,
+  remove
 }
