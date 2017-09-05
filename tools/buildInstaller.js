@@ -54,8 +54,7 @@ if (isDarwin) {
   const wvBundle = buildDir + '/Brave.app/Contents/Frameworks/Brave Framework.framework/Brave Framework'
   const wvBundleSig = buildDir + '/Brave.app/Contents/Frameworks/Widevine Resources.bundle/Contents/Resources/Brave Framework.sig'
   const wvPlugin = buildDir + '/Brave.app/Contents/Frameworks/Brave Framework.framework/Libraries/WidevineCdm/_platform_specific/mac_x64/widevinecdmadapter.plugin'
-  // Do not codesign verification because it will fail duto widevine signature
-  process.env['CSC_IDENTITY_AUTO_DISCOVERY'] = false
+  const wvPluginSig = wvPlugin + '.sig'
   cmds = [
     // Remove old
     'rm -f ' + outDir + '/Brave.dmg',
@@ -69,9 +68,15 @@ if (isDarwin) {
     // sign for widevine
     'cd ..',
     'python tools/signature_generator.py --input_file "' + wvBundle + '" --output_file "' + wvBundleSig + '" --flag 1',
-    'python tools/signature_generator.py --input_file "' + wvPlugin + '"',
+    'python tools/signature_generator.py --input_file "' + wvPlugin + '" --output_file "' + wvPluginSig + '"',
+    'cd ' + buildDir,
+
+    // codesign the widevine signature itself
+    'codesign --force --strict --verbose --sign $IDENTIFIER ' + wvBundleSig,
+    'codesign --force --strict --verbose --sign $IDENTIFIER ' + wvPluginSig,
 
     // Package it into a dmg
+    'cd ..',
     'build ' +
       '--prepackaged="' + buildDir + '/Brave.app" ' +
       '--mac=dmg ' +
