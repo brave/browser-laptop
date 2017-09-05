@@ -3,8 +3,7 @@
   "productName": "Brave",
   "npmRebuild": false,
   "mac": {
-    "target": "dmg",
-    "identity": null
+    "target": "dmg"
   },
   "dmg": {
     "title": "Brave",
