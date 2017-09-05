@@ -45,6 +45,7 @@ class PopupWindow extends ImmutableComponent {
     if (src) {
       let webview = document.createElement('webview')
       webview.setAttribute('src', src)
+      webview.setAttribute('name', 'browserAction')
       webview.addEventListener('crashed', () => {
         windowActions.setPopupWindowDetail()
       })
