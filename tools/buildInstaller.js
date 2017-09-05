@@ -72,8 +72,8 @@ if (isDarwin) {
     'cd ' + buildDir,
 
     // codesign the widevine signature itself
-    'codesign --force --strict --verbose --sign $IDENTIFIER ' + wvBundleSig,
-    'codesign --force --strict --verbose --sign $IDENTIFIER ' + wvPluginSig,
+    'codesign --force --strict --verbose --sign $IDENTIFIER "' + wvBundleSig + '"',
+    'codesign --force --strict --verbose --sign $IDENTIFIER "' + wvPluginSig + '"',
 
     // Package it into a dmg
     'cd ..',
