@@ -69,14 +69,12 @@ if (isDarwin) {
     'cd ..',
     'python tools/signature_generator.py --input_file "' + wvBundle + '" --output_file "' + wvBundleSig + '" --flag 1',
     'python tools/signature_generator.py --input_file "' + wvPlugin + '" --output_file "' + wvPluginSig + '"',
-    'cd ' + buildDir,
 
     // codesign the widevine signature itself
     'codesign --force --strict --verbose --sign $IDENTIFIER "' + wvBundleSig + '"',
     'codesign --force --strict --verbose --sign $IDENTIFIER "' + wvPluginSig + '"',
 
     // Package it into a dmg
-    'cd ..',
     'build ' +
       '--prepackaged="' + buildDir + '/Brave.app" ' +
       '--mac=dmg ' +
