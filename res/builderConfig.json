@@ -5,6 +5,7 @@
   "mac": {
     "target": "dmg"
   },
+  "identity": null,
   "dmg": {
     "title": "Brave",
     "background": "res/background.png",
