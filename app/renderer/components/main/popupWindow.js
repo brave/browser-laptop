@@ -35,6 +35,7 @@ class PopupWindow extends React.Component {
     if (this.props.src) {
       let webview = document.createElement('webview')
       webview.setAttribute('src', this.props.src)
+      webview.setAttribute('name', 'browserAction')
       webview.addEventListener('crashed', () => {
         windowActions.setPopupWindowDetail()
       })
