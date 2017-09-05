@@ -341,8 +341,6 @@ globalStyles.color.loadTimeColor = globalStyles.color.highlightBlue
 globalStyles.color.activeTabDefaultColor = globalStyles.color.chromePrimary
 globalStyles.color.switchBG_on = globalStyles.color.braveOrange
 
-globalStyles.spacing.tabHeight = globalStyles.spacing.tabsToolbarHeight
-
 globalStyles.braveryPanel.stats.colorAds = globalStyles.color.statsRed
 globalStyles.braveryPanel.stats.colorRedirected = globalStyles.color.statsBlue
 globalStyles.braveryPanel.stats.colorFp = globalStyles.color.statsYellow
