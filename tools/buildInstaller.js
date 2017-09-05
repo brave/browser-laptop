@@ -52,13 +52,18 @@ if (isDarwin) {
   }
 
   const wvBundle = buildDir + '/Brave.app/Contents/Frameworks/Brave Framework.framework/Brave Framework'
-  const wvBundleSig = buildDir + '/Brave.app/Contents/Frameworks/Widevine Resources.bundle/Contents/Resources/Brave Framework.sig'
+  const wvBundleDir = buildDir + '/Brave.app/Contents/Frameworks/Widevine Resources.bundle'
+  const wvContents = wvBundleDir + '/Contents'
+  const wvResources = wvContents + '/Resources'
+  const wvBundleSig = wvResources + '/Brave Framework.sig'
   const wvPlugin = buildDir + '/Brave.app/Contents/Frameworks/Brave Framework.framework/Libraries/WidevineCdm/_platform_specific/mac_x64/widevinecdmadapter.plugin'
   cmds = [
     // Remove old
     'rm -f ' + outDir + '/Brave.dmg',
 
     // sign for widevine
+    'mkdir -p "' + wvResources + '"',
+    'cp ' + buildDir + '/Brave.app/Contents/Info.plist "' + wvContents + '"',
     'codesign --deep --force --strict --verbose --sign $IDENTIFIER "' + wvBundle + '"',
     'codesign --deep --force --strict --verbose --sign $IDENTIFIER "' + wvPlugin + '"',
     'python tools/signature_generator.py --input_file "' + wvBundle + '" --output_file "' + wvBundleSig + '" --flag 1',
