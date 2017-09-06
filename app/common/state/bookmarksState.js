@@ -270,10 +270,15 @@ const bookmarksState = {
         : destinationItem.get('folderId')
 
       state = bookmarkOrderCache.removeCacheKey(state, bookmark.get('parentFolderId'), bookmarkKey)
+      state = bookmarkLocationCache.removeCacheKey(state, bookmark.get('location'), bookmarkKey)
+
       bookmark = bookmark.set('parentFolderId', ~~parentFolderId)
       const newKey = bookmarkUtil.getKey(bookmark)
+
       state = state.deleteIn([STATE_SITES.BOOKMARKS, bookmarkKey])
       state = bookmarkOrderCache.addBookmarkToCache(state, bookmark.get('parentFolderId'), newKey)
+      state = bookmarkLocationCache.addCacheKey(state, bookmark.get('location'), newKey)
+
       bookmark = bookmark.set('key', newKey)
       return state.setIn([STATE_SITES.BOOKMARKS, newKey], bookmark)
     }
