@@ -4,7 +4,8 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const {StyleSheet, css} = require('aphrodite/no-important')
+const {css} = require('aphrodite/no-important')
+
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
@@ -13,7 +14,7 @@ const {
   CommonFormLarge,
   CommonFormSection,
   CommonFormTitle,
-  CommonFormDropdown,
+  CommonFormFullWidthDropdown,
   CommonFormButtonWrapper,
   commonFormStyles
 } = require('../common/commonForm')
@@ -28,7 +29,6 @@ const countryCodes = require('../../../common/constants/countryCodes')
 
 // Styles
 const commonStyles = require('../styles/commonStyles')
-const globalStyles = require('../styles/global')
 
 // Localization
 const locale = require('../../../../js/l10n')
@@ -240,17 +240,14 @@ class AutofillAddressPanel extends React.Component {
                   defaultValue={this.props.postalCode}
                 />
               </div>
-              <div className={css(
-              commonFormStyles.input__marginRow,
-              styles.expirationDate__dropdowns
-              )}>
-                <CommonFormDropdown
+              <div className={css(commonFormStyles.input__marginRow)}>
+                <CommonFormFullWidthDropdown
                   value={this.props.country}
                   onChange={this.onCountryChange}
                   data-test-id='country'
                 >
                   {this.countryList}
-                </CommonFormDropdown>
+                </CommonFormFullWidthDropdown>
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
                 <input
@@ -294,21 +291,3 @@ class AutofillAddressPanel extends React.Component {
 }
 
 module.exports = ReduxComponent.connect(AutofillAddressPanel)
-
-const styles = StyleSheet.create({
-  // Copied from textbox.js
-  input: {
-    width: '100%'
-  },
-
-  sectionWrapper__expirationDate: {
-    alignItems: 'center',
-    justifyContent: 'flex-end'
-  },
-  expirationDate__dropdowns: {
-    display: 'flex'
-  },
-  dropdown__right: {
-    marginLeft: `calc(${globalStyles.spacing.dialogInsideMargin} / 3)`
-  }
-})
