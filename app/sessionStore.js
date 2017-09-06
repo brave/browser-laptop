@@ -17,6 +17,7 @@ const os = require('os')
 const assert = require('assert')
 const Immutable = require('immutable')
 const app = electron.app
+const compareVersions = require('compare-versions')
 
 // Constants
 const UpdateStatus = require('../js/constants/updateStatus')
@@ -741,7 +742,6 @@ module.exports.runPreMigrations = (data) => {
   if (data.lastAppVersion) {
     // Force WidevineCdm to be upgraded when last app version <= 0.18.25
     let runWidevineCleanup = false
-    const compareVersions = require('compare-versions')
 
     try { runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1 } catch (e) {}
 
