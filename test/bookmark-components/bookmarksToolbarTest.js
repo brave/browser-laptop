@@ -26,7 +26,7 @@ describe('bookmarksToolbar', function () {
     it('shows the bookmarks toolbar if the setting is enabled', function * () {
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
-        .waitForVisible(bookmarksToolbar)
+        .waitForElementCount(bookmarksToolbar, 1)
     })
 
     it('hides the bookmarks toolbar if the setting is disabled', function * () {
@@ -46,7 +46,7 @@ describe('bookmarksToolbar', function () {
     it('shows a context menu', function * () {
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
-        .waitForVisible(bookmarksToolbar)
+        .waitForElementCount(bookmarksToolbar, 1)
         .addBookmarkFolder({
           title: 'demo1',
           folderId: 105,
@@ -66,7 +66,7 @@ describe('bookmarksToolbar', function () {
 
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
-        .waitForVisible(bookmarksToolbar)
+        .waitForElementCount(bookmarksToolbar, 1)
         .addBookmarkFolder({
           title: 'demo1',
           folderId: folderId1,
@@ -110,7 +110,7 @@ describe('bookmarksToolbar', function () {
       const folderId1 = 40
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
-        .waitForVisible(bookmarksToolbar)
+        .waitForElementCount(bookmarksToolbar, 1)
         .addBookmarkFolder({
           title: 'demo1',
           folderId: folderId1,
@@ -154,7 +154,7 @@ describe('bookmarksToolbar', function () {
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON, true)
-        .waitForVisible(bookmarksToolbar)
+        .waitForElementCount(bookmarksToolbar, 1)
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(pageWithFavicon)
         .windowParentByUrl(pageWithFavicon)
@@ -180,7 +180,7 @@ describe('bookmarksToolbar', function () {
       yield this.app.client
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
         .changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON, true)
-        .waitForVisible(bookmarksToolbar)
+        .waitForElementCount(bookmarksToolbar, 1)
         .waitForUrl(Brave.newTabUrl)
         .loadUrl(pageWithoutFavicon)
         .windowParentByUrl(pageWithoutFavicon)
