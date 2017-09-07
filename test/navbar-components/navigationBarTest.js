@@ -118,11 +118,12 @@ describe('navigationBar tests', function () {
           .leftClick('#open_target')
       })
 
-      it('updates the location in the navbar when changed by the opener', function * () {
+      it('does not navigate to the tabnapped location', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend('shortcut-focus-url')
-          .waitForInputText(urlInput, 'data:text/html;,<title>Tabnapping Target</title>')
+          .pause(500)
+          .getText(activeTabTitle)
+          .then((title) => assert(title !== 'tabnapped'))
       })
     })
 
