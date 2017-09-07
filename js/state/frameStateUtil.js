@@ -289,18 +289,32 @@ function isAncestorFrameKey (state, frame, parentFrameKey) {
   return isAncestorFrameKey(state, parentFrame, parentFrameKey)
 }
 
+/**
+ * @param {string} partition - the name of the partition
+ * @returns {number}
+ */
 function getPartitionNumber (partition) {
-  const regex = /(?:persist:)?partition-(\d+)/
+  const regex = /^(?:persist:)?partition-(\d+)$/
   const matches = regex.exec(partition)
-  return Number((matches && matches[1]) || 0)
+  const partitionNumber = Number((matches && matches[1]) || 0)
+  // Return negative numbers for private sessions to avoid conflicts with
+  // regular sessions
+  return isPrivatePartition(partition) ? -partitionNumber : partitionNumber
 }
 
 function isPrivatePartition (partition) {
-  return partition && !partition.startsWith('persist:')
+  if (partition === '') {
+    return true
+  }
+  if (partition) {
+    return !partition.startsWith('persist:')
+  }
+  return false
 }
 
 function isSessionPartition (partition) {
-  return partition && partition.startsWith('persist:partition-')
+  return partition &&
+    (partition.startsWith('persist:partition-') || partition.startsWith('partition-'))
 }
 
 function getPartition (frameOpts) {
@@ -308,12 +322,9 @@ function getPartition (frameOpts) {
 }
 
 function getPartitionFromNumber (partitionNumber, incognito) {
-  if (!partitionNumber && !incognito) {
-    return 'persist:default'
-  } else if (incognito) {
-    return 'default'
-  }
-  return `persist:partition-${partitionNumber}`
+  const partition = partitionNumber ? `partition-${Math.abs(partitionNumber)}` : 'default'
+  const prefix = incognito ? '' : 'persist:'
+  return `${prefix}${partition}`
 }
 
 const frameOptsFromFrame = (frame) => {

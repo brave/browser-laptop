@@ -10,13 +10,7 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {tabs} = require('../../../../js/constants/config')
 
 module.exports.isPartitionTab = (state, frameKey) => {
-  const frame = frameStateUtil.getFrameByKey(state, frameKey)
-
-  if (frame == null) {
-    return false
-  }
-
-  return !!frame.get('partitionNumber')
+  return module.exports.getPartitionNumber(state, frameKey) > 0
 }
 
 module.exports.getPartitionNumber = (state, frameKey) => {
@@ -28,9 +22,9 @@ module.exports.getPartitionNumber = (state, frameKey) => {
 
   const partitionNumber = frame.get('partitionNumber')
   if (typeof partitionNumber === 'string') {
-    return partitionNumber.replace(/^partition-/i, '')
+    return Number(partitionNumber.replace(/^partition-/i, ''))
   }
-  return partitionNumber
+  return Number(partitionNumber)
 }
 
 module.exports.getMaxAllowedPartitionNumber = (state, frameKey) => {
