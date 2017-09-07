@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.18.29](https://github.com/brave/browser-laptop/releases/tag/v0.18.29dev)
+ - Optimized page load time to reduce jank. ([#9987](https://github.com/brave/browser-laptop/issues/9987))
+ - Fixed Netflix player by adding VMP support. ([#10449](https://github.com/brave/browser-laptop/issues/10449))
+ - Fixed white tab displayed if 'last viewed tab' isn't available. ([#10645](https://github.com/brave/browser-laptop/issues/10645))
+ - Fixed tombstone tabs and tabs refreshing themselves. ([#10561](https://github.com/brave/browser-laptop/issues/10561))
+ - Fixed focus is always set to first tab, Page view not shown for single tab. ([#10532](https://github.com/brave/browser-laptop/issues/10532))
+ - Fixed Brave UI becomes unresponsive. ([#10436](https://github.com/brave/browser-laptop/issues/10436))
+ - Fixed about: pages are not always being populated. ([#10384](https://github.com/brave/browser-laptop/issues/10384))
+ - Fixed bookmark cannot be moved to bookmark folder on bookmark toolbar. ([#10101](https://github.com/brave/browser-laptop/issues/10101))
+ - Fixed toolbar and UI elements scale control. ([#10089](https://github.com/brave/browser-laptop/issues/10089))
+ - Fixed active tab closing selecting the wrong next index. ([#10038](https://github.com/brave/browser-laptop/issues/10038))
+ - Fixed error while closing tab pages: `Could not find tab for <id>`. ([#9722](https://github.com/brave/browser-laptop/issues/9722))
+ - Fixed tear off last tab to window causes original windows last tab to be shown in white. ([#9671](https://github.com/brave/browser-laptop/issues/9671))
+ - Fixed unable to switch tabs sometimes. ([#9385](https://github.com/brave/browser-laptop/issues/9385))
+ - Fixed HTTP referrer not being blocked. ([#10721](https://github.com/brave/browser-laptop/issues/10721))
+ - Upgrade to muon 4.3.16. ([#10730](https://github.com/brave/browser-laptop/issues/10730))
+ - Upgrade to Chromium 60.0.3112.113. ([#10799](https://github.com/brave/browser-laptop/issues/10799))
+
 ## [0.18.23](https://github.com/brave/browser-laptop/releases/tag/v0.18.23dev)
  - Fixed spell check not working on Disqus comment boxes. ([#10040](https://github.com/brave/browser-laptop/issues/10040))
  - Fixed findbar slowness (cmd + F, typing). ([#10271](https://github.com/brave/browser-laptop/issues/10271))
