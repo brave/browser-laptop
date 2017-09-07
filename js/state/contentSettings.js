@@ -19,7 +19,6 @@ const {registerUserPrefs} = require('./userPrefs')
 const {getSetting} = require('../settings')
 const {autoplayOption} = require('../../app/common/constants/settingsEnums')
 const {getFlashResourceId} = require('../flash')
-const net = require('net')
 
 // backward compatibility with appState siteSettings
 const parseSiteSettingsPattern = (pattern) => {
@@ -28,7 +27,7 @@ const parseSiteSettingsPattern = (pattern) => {
   }
   let normalizedPattern = pattern.replace('https?', 'https')
   let parsed = urlParse(normalizedPattern)
-  if (net.isIP(parsed.hostname)) {
+  if (muon.url.new(normalizedPattern).hostIsIPAddress()) {
     return parsed.host
   } else if (parsed.host) {
     return '[*.]' + parsed.host
