@@ -12,12 +12,18 @@ const clearBraverySettingsCache = () => {
   currentBraverySettingsCache.clear()
 }
 
-const getBraverySettingsCache = (url) => {
-  return currentBraverySettingsCache.get(url)
+const getBraverySettingsCache = (url, isPrivate) => {
+  const key = generateKey(url, isPrivate)
+  return currentBraverySettingsCache.get(key)
 }
 
-const updateBraverySettingsCache = (url, braverySettings) => {
-  currentBraverySettingsCache.set(url, braverySettings)
+const updateBraverySettingsCache = (url, isPrivate, braverySettings) => {
+  const key = generateKey(url, isPrivate)
+  currentBraverySettingsCache.set(key, braverySettings)
+}
+
+const generateKey = (url, isPrivate) => {
+  return `${url}|${isPrivate}`
 }
 
 module.exports = {

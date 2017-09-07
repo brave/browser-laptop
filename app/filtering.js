@@ -60,7 +60,7 @@ const registeredSessions = {}
 const permissionCallbacks = {}
 
 const getBraverySettingsForUrl = (url, appState, isPrivate) => {
-  const cachedBraverySettings = getBraverySettingsCache(url)
+  const cachedBraverySettings = getBraverySettingsCache(url, isPrivate)
   if (cachedBraverySettings) {
     return cachedBraverySettings
   }
@@ -71,7 +71,8 @@ const getBraverySettingsForUrl = (url, appState, isPrivate) => {
   if (isPrivate && tempSettings) {
     braverySettings = siteSettings.activeSettings(tempSettings, appState, appConfig)
   }
-  updateBraverySettingsCache(url, braverySettings)
+  updateBraverySettingsCache(url, isPrivate, braverySettings)
+
   return braverySettings
 }
 
