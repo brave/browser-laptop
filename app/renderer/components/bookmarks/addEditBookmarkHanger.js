@@ -143,6 +143,7 @@ class AddEditBookmarkHanger extends React.Component {
           folders={this.props.folders}
           isAdded={this.props.isAdded}
           isDisabled={!this.props.isBookmarkNameValid}
+          hasBookmarks={this.props.hasBookmarks}
         />
         {
           !this.props.isModal
