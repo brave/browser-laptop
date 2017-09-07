@@ -372,4 +372,46 @@ describe('urlutil', function () {
       assert.strictEqual(urlUtil.getOrigin('http://http/test'), 'http://http')
     })
   })
+
+  describe('stripLocation', function () {
+    it('null scenario', function () {
+      const result = urlUtil.stripLocation(null)
+      assert.equal(result, '')
+    })
+
+    it('empty string', function () {
+      const result = urlUtil.stripLocation('')
+      assert.equal(result, '')
+    })
+
+    it('normal url without # or /', function () {
+      const result = urlUtil.stripLocation('https://brave.com')
+      assert.equal(result, 'https://brave.com')
+    })
+
+    it('normal url with # but not at the end', function () {
+      const result = urlUtil.stripLocation('https://brave.com#title')
+      assert.equal(result, 'https://brave.com#title')
+    })
+
+    it('normal url with # at the end', function () {
+      const result = urlUtil.stripLocation('https://brave.com#')
+      assert.equal(result, 'https://brave.com')
+    })
+
+    it('normal url with / at the end', function () {
+      const result = urlUtil.stripLocation('https://brave.com/')
+      assert.equal(result, 'https://brave.com')
+    })
+
+    it('normal url with /# at the end', function () {
+      const result = urlUtil.stripLocation('https://brave.com/#')
+      assert.equal(result, 'https://brave.com')
+    })
+
+    it('normal url with white space at the end', function () {
+      const result = urlUtil.stripLocation('https://brave.com   ')
+      assert.equal(result, 'https://brave.com')
+    })
+  })
 })

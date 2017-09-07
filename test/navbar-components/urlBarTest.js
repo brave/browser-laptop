@@ -269,6 +269,7 @@ describe('urlBar tests', function () {
           .tabByIndex(0)
           .loadUrl(this.page)
           .windowByUrl(Brave.browserWindowUrl)
+          .activateURLMode()
           .ipcSend('shortcut-focus-url')
           .waitForElementFocus(urlInput)
           .setValue(urlInput, 'google')
