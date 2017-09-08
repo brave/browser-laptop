@@ -154,6 +154,14 @@ module.exports = { "providers" :
       "search": "https://www.findx.com/search?q={searchTerms}&type=web",
       "autocomplete": "https://www.findx.com/api/web-search/suggestions/?q={searchTerms}&type=opensearch",
       "shortcut": ":fx"
+    },
+    {
+      "name" : "yellCast",
+      "base" : "https://yellCast.com",
+      "image" : "https://yellCast.com/images/yC32.png",
+      "search" : "https://yellcast.com/?q={searchTerms}&loc={geo:locationString?}&at={geo:lat?}&lon={geo:lon?}&src=brave",
+      "autocomplete" : "https://yellcast.com/getcat.php?str={searchTerms}",
+      "shortcut" : ":yc"
     }
   ]
 }
