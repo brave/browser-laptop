@@ -703,6 +703,10 @@ describe('sessionStore unit tests', function () {
             result = sessionStore.cleanAppData(data, false)
             assert.equal(result.getIn(['downloads', 'entry1', 'state']), downloadStates.CANCELLED)
 
+            data = getEntry(downloadStates.UNAUTHORIZED)
+            result = sessionStore.cleanAppData(data, false)
+            assert.equal(result.getIn(['downloads', 'entry1', 'state']), downloadStates.UNAUTHORIZED)
+
             data = getEntry(downloadStates.PENDING)
             result = sessionStore.cleanAppData(data, false)
             assert.equal(result.getIn(['downloads', 'entry1', 'state']), downloadStates.PENDING)

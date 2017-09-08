@@ -6,7 +6,7 @@ const downloadStates = require('../constants/downloadStates')
 const domUtil = require('../../app/renderer/lib/domUtil')
 
 const pendingStates = [downloadStates.IN_PROGRESS, downloadStates.PAUSED]
-const stopStates = [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED]
+const stopStates = [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.UNAUTHORIZED, downloadStates.COMPLETED]
 const notErrorStates = [downloadStates.IN_PROGRESS, downloadStates.PAUSED, downloadStates.COMPLETED]
 
 const downloadIsInState = (download, list) =>
@@ -42,6 +42,8 @@ const getL10nId = (download) => {
       return 'downloadInterrupted'
     case downloadStates.CANCELLED:
       return 'downloadCancelled'
+    case downloadStates.UNAUTHORIZED:
+      return 'downloadUnauthorized'
     case downloadStates.IN_PROGRESS:
       if (!download.get('totalBytes')) {
         return 'downloadInProgressUnknownTotal'

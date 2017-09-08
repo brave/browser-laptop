@@ -139,7 +139,7 @@ describe('downloadItem component', function () {
         appActions.downloadActionPerformed.restore()
       })
 
-      testButton('[data-test-id="redownloadButton"]', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED], function (button) {
+      testButton('[data-test-id="redownloadButton"]', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.UNAUTHORIZED, downloadStates.COMPLETED], function (button) {
         const spy = sinon.spy(appActions, 'downloadRedownloaded')
         button.simulate('click')
         assert(spy.withArgs(downloadId).calledOnce)
@@ -160,7 +160,7 @@ describe('downloadItem component', function () {
         appActions.downloadRevealed.restore()
       })
 
-      testButton('[data-test-id="deleteButton"]', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED], function (button) {
+      testButton('[data-test-id="deleteButton"]', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.UNAUTHORIZED, downloadStates.COMPLETED], function (button) {
         const spy = sinon.spy(appActions, 'showDownloadDeleteConfirmation')
         try {
           // Confirmation should NOT be visible by default
@@ -175,7 +175,7 @@ describe('downloadItem component', function () {
       })
     })
 
-    if ([downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED].includes(state)) {
+    if ([downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.UNAUTHORIZED, downloadStates.COMPLETED].includes(state)) {
       describe(`${state} download item when delete button has been clicked`, function () {
         before(function () {
           downloadId = uuid.v4()
@@ -183,7 +183,7 @@ describe('downloadItem component', function () {
           result = mount(<DownloadItem downloadId={downloadId} />)
         })
 
-        testButton('[data-test-id="confirmDeleteButton"]', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED], function (button) {
+        testButton('[data-test-id="confirmDeleteButton"]', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.UNAUTHORIZED, downloadStates.COMPLETED], function (button) {
           const spy = sinon.spy(appActions, 'downloadDeleted')
           try {
             // Accepting confirmation should delete the item

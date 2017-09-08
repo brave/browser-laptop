@@ -80,6 +80,10 @@ class DownloadItem extends React.Component {
     return this.props.downloadState === downloadStates.INTERRUPTED
   }
 
+  get isUnauthorized () {
+    return this.props.downloadState === downloadStates.UNAUTHORIZED
+  }
+
   get isInProgress () {
     return this.props.downloadState === downloadStates.IN_PROGRESS
   }
@@ -132,7 +136,7 @@ class DownloadItem extends React.Component {
       width: this.props.percentageComplete
     }
 
-    if (this.isCancelled || this.isInterrupted) {
+    if (this.isCancelled || this.isInterrupted || this.isUnauthorized) {
       progressStyle.display = 'none'
     } else if (this.props.isPendingState) {
       l10nStateArgs.downloadPercent = this.props.percentageComplete
@@ -269,7 +273,7 @@ class DownloadItem extends React.Component {
               : null
           }
           {
-            this.isCancelled || this.isInterrupted || this.isCompleted || this.isPaused || this.isInProgress
+            this.isCancelled || this.isInterrupted || this.isUnauthorized || this.isCompleted || this.isPaused || this.isInProgress
             ? <div className='downloadState' data-l10n-id={this.props.statel10n} data-l10n-args={JSON.stringify(l10nStateArgs)} />
             : null
           }
