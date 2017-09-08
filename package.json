@@ -128,7 +128,7 @@
     "webtorrent-remote": "^2.0.2"
   },
   "devDependencies": {
-    "asar": "^0.11.0",
+    "asar": "~0.13.0",
     "babel": "^6.1.18",
     "babel-core": "^6.3.15",
     "babel-loader": "^7.1.1",
