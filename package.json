@@ -227,7 +227,6 @@
       "unittest"
     ]
   },
-  "engineStrict": true,
   "engines": {
     "node": ">= 7.9.0"
   }
