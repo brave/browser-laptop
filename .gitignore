@@ -74,3 +74,6 @@ app/extensions/brave/content/scripts/sync.js
 
 # script used for signing for widevine
 signature_generator.py
+
+# Issue 8283
+package-lock.json
