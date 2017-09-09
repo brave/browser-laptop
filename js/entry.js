@@ -6,7 +6,6 @@
 require('../less/window.less')
 require('../less/button.less')
 require('../less/contextMenu.less')
-require('../less/main.less')
 require('../less/navigationBar.less')
 require('../less/forms.less')
 require('../less/switchControls.less')
