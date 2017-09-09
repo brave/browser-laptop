@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
 
     // globalStyles.spacing.tabHeight has been set to globalStyles.spacing.tabsToolbarHeight,
     // which is 1px extra due to the border-top of .tabsToolbar
-    height: '-webkit-fill-available',
+    height: `calc(${globalStyles.spacing.tabsToolbarHeight} - 1px)`,
 
     ':hover': {
       background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(250, 250, 250, 0.4))'
