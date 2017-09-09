@@ -10,7 +10,7 @@ const stopStates = [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downlo
 const notErrorStates = [downloadStates.IN_PROGRESS, downloadStates.PAUSED, downloadStates.COMPLETED]
 
 const downloadIsInState = (download, list) =>
- list.includes(download.get('state'))
+ (download && list && list.includes(download.get('state'))) || false
 
 const isPendingState = (download) =>
  downloadIsInState(download, pendingStates)
@@ -57,7 +57,7 @@ const getL10nId = (download) => {
 }
 
 const getPercentageComplete = (download) => {
-  const totalBytes = download.get('totalBytes')
+  const totalBytes = download && download.get('totalBytes')
   if (!totalBytes) {
     // Most likely totalBytes has not been calculated yet. Avoid
     // division by 0.
@@ -66,10 +66,10 @@ const getPercentageComplete = (download) => {
   return Math.ceil(download.get('receivedBytes') / totalBytes * 100) + '%'
 }
 
-const shouldAllowCopyLink = (download) => !!download.get('url')
+const shouldAllowCopyLink = (download) => (download && !!download.get('url')) || false
 
 const getDownloadItems = (state) => {
-  if (!state.get('downloads')) {
+  if (!state || !state.get('downloads')) {
     return Immutable.List()
   }
 
