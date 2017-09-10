@@ -14,11 +14,11 @@ const SwitchControl = require('../../app/renderer/components/common/switchContro
 const {DefaultTextArea} = require('../../app/renderer/components/common/textbox')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
 
 const ipc = window.chrome.ipcRenderer
 
 // Stylesheets
-require('../../less/switchControls.less')
 require('../../less/about/common.less')
 
 class AdBlockItem extends ImmutableComponent {
@@ -115,16 +115,19 @@ class AboutAdBlock extends React.Component {
 
 const styles = StyleSheet.create({
   adblockDetailsPage: {
-    margin: '20px',
+    margin: globalStyles.spacing.aboutPageMargin,
     minWidth: '704px'
   },
+
   adblockDetailsPage__h2: {
     marginBottom: '10px'
   },
+
   adblockDetailsPage__h3: {
     marginTop: '20px',
     marginBottom: '10px'
   },
+
   adblockDetailsPageContent: {
     marginBottom: '10px'
   },
@@ -132,6 +135,7 @@ const styles = StyleSheet.create({
   adblockLists: {
     marginTop: '10px'
   },
+
   adblockLists__adblockItem__switchControl: {
     // TODO: refactor switchControl to remove !important
     marginLeft: '15px !important'

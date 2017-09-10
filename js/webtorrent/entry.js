@@ -13,6 +13,9 @@ const messages = require('../constants/messages')
 const urlParse = require('../../app/common/urlParse')
 
 // Stylesheets
+require('../../less/about/common.less')
+require('../../less/about/itemList.less')
+require('../../less/about/siteDetails.less')
 require('../../less/webtorrent.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 

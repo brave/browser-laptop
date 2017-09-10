@@ -251,16 +251,20 @@ const styles = StyleSheet.create({
       backgroundColor: '#9cd4fe'
     }
   },
+
   passwordsPage: {
-    margin: '20px'
+    margin: globalStyles.spacing.aboutPageMargin
   },
+
   passwordsPageContent: {
     borderTop: `1px solid ${globalStyles.color.chromeBorderColor}`
   },
+
   passwordsList: {
     paddingTop: '10px',
     overflow: 'hidden'
   },
+
   passwordInstructions: {
     borderTop: `1px solid ${globalStyles.color.chromeBorderColor}`,
     paddingTop: '10px',
@@ -268,10 +272,12 @@ const styles = StyleSheet.create({
     fontSize: '18px',
     color: 'grey'
   },
+
   passwordsPageFooter: {
     padding: '10px',
     marginBottom: '20px'
   },
+
   passwordsPageFooterClear: {
     color: 'grey',
     cursor: 'pointer',
@@ -282,6 +288,7 @@ const styles = StyleSheet.create({
     padding: itemPadding,
     textAlign: 'left'
   },
+
   passwordsTr: {
     cursor: 'default',
     overflow: 'hidden',
@@ -294,14 +301,17 @@ const styles = StyleSheet.create({
       backgroundColor: '#ceeaff'
     }
   },
+
   isHead: {
     ':hover': {
       backgroundColor: 'inherit'
     }
   },
+
   passwordsTd: {
     padding: itemPadding
   },
+
   isAction: {
     padding: 0
   }

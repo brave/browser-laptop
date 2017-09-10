@@ -13,6 +13,7 @@ const locale = require('../../js/l10n')
 
 const ipc = window.chrome.ipcRenderer
 
+require('../../less/about/common.less')
 require('../../less/about/autofill.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 

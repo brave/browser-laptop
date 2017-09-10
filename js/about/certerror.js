@@ -9,8 +9,8 @@ const messages = require('../constants/messages')
 const ipc = window.chrome.ipcRenderer
 const {isSourceAboutUrl, getTargetAboutUrl} = require('../lib/appUrlUtil')
 
-require('../../less/button.less')
 require('../../less/window.less')
+require('../../less/about/common.less')
 require('../../less/about/error.less')
 
 function toHexString (byteArray) {

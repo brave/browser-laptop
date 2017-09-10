@@ -8,8 +8,8 @@ const BrowserButton = require('../../app/renderer/components/common/browserButto
 const appActions = require('../../js/actions/appActions')
 const tabActions = require('../../app/common/actions/tabActions')
 
-require('../../less/button.less')
 require('../../less/window.less')
+require('../../less/about/common.less')
 require('../../less/about/error.less')
 
 class ErrorPage extends React.Component {

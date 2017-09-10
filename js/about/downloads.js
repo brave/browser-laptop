@@ -83,16 +83,19 @@ class AboutDownloads extends React.Component {
 
 const styles = StyleSheet.create({
   downloadsPage: {
-    margin: '20px'
+    margin: globalStyles.spacing.aboutPageMargin
   },
+
   downloadPageContent: {
     borderTop: `1px solid ${globalStyles.color.chromeBorderColor}`,
     display: 'flex'
   },
+
   downloadList: {
     marginTop: globalStyles.spacing.aboutPageSectionMargin,
     overflow: 'hidden'
   },
+
   downloadListItem: {
     flexDirection: 'column'
   }

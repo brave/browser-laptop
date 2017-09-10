@@ -30,6 +30,9 @@ const {
 } = require('../../app/renderer/components/common/sectionTitle')
 
 // Stylesheets
+require('../../less/about/common.less')
+require('../../less/about/itemList.less')
+require('../../less/about/siteDetails.less')
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 

@@ -11,8 +11,8 @@ const aboutActions = require('./aboutActions')
 
 const ipc = window.chrome.ipcRenderer
 
-const cx = require('../lib/classSet')
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 const {
@@ -20,6 +20,7 @@ const {
   AboutPageSectionSubTitle
 } = require('../../app/renderer/components/common/sectionTitle')
 
+require('../../less/about/common.less')
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
@@ -44,57 +45,59 @@ class AboutBrave extends React.Component {
   }
 
   render () {
-    return <div className='siteDetailsPage'>
-      <div className='siteDetailsPageHeader'>
-        <AboutPageSectionTitle data-l10n-id='aboutBrave' />
-        <div data-l10n-id='braveInfo' />
-      </div>
+    return <div className={css(styles.aboutPage)}>
+      <div className='siteDetailsPage'>
+        <div className='siteDetailsPageHeader'>
+          <AboutPageSectionTitle data-l10n-id='aboutBrave' />
+          <div data-l10n-id='braveInfo' />
+        </div>
 
-      <div className={cx({
-        siteDetailsPageContent: true,
-        aboutBrave: true,
-        [css(commonStyles.siteDetailsPageContent)]: true
-      })}>
-        <AboutPageSectionSubTitle data-l10n-id='releaseNotes' />
+        <div className='siteDetailsPageContent aboutBrave'>
+          <AboutPageSectionSubTitle data-l10n-id='releaseNotes' />
 
-        <div>
-          <span data-l10n-id='relNotesInfo1' />
-          &nbsp;
-          <a className={css(commonStyles.linkText)}
-            href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.get('Brave')}dev`}
-            data-l10n-id='relNotesInfo2'
-            rel='noopener' target='_blank'
+          <div>
+            <span data-l10n-id='relNotesInfo1' />
+            &nbsp;
+            <a className={css(commonStyles.linkText)}
+              href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.get('Brave')}dev`}
+              data-l10n-id='relNotesInfo2'
+              rel='noopener' target='_blank'
+            />
+            &nbsp;
+            <span data-l10n-id='relNotesInfo3' />
+          </div>
+
+          <div className={css(styles.versionInformationWrapper)}>
+            <AboutPageSectionSubTitle data-l10n-id='versionInformation' />
+            <ClipboardButton copyAction={this.onCopy} />
+          </div>
+
+          <SortableTable
+            headings={['Name', 'Version']}
+            rows={this.state.versionInformation.map((version, name) => [
+              {
+                html: name,
+                value: name
+              },
+              {
+                html: name === 'rev'
+                  ? <a className={css(commonStyles.linkText)} href={`https://github.com/brave/browser-laptop/commit/${version}`} rel='noopener' target='_blank'>{(version && version.substring(0, 7)) || ''}</a>
+                  : version,
+                value: version
+              }
+            ])}
           />
-          &nbsp;
-          <span data-l10n-id='relNotesInfo3' />
         </div>
-
-        <div className={css(styles.versionInformationWrapper)}>
-          <AboutPageSectionSubTitle data-l10n-id='versionInformation' />
-          <ClipboardButton copyAction={this.onCopy} />
-        </div>
-
-        <SortableTable
-          headings={['Name', 'Version']}
-          rows={this.state.versionInformation.map((version, name) => [
-            {
-              html: name,
-              value: name
-            },
-            {
-              html: name === 'rev'
-                ? <a className={css(commonStyles.linkText)} href={`https://github.com/brave/browser-laptop/commit/${version}`} rel='noopener' target='_blank'>{(version && version.substring(0, 7)) || ''}</a>
-                : version,
-              value: version
-            }
-          ])}
-        />
       </div>
     </div>
   }
 }
 
 const styles = StyleSheet.create({
+  aboutPage: {
+    margin: globalStyles.spacing.aboutPageMargin
+  },
+
   versionInformationWrapper: {
     display: 'flex',
     justifyContent: 'space-between',

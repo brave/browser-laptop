@@ -1,16 +1,14 @@
-@import "./common.less";
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-div, span, li, em, p, a {
-  font-weight: 400;
-  -webkit-font-smoothing: antialiased;
-}
+@import "../variables.less";
 
-strong {
-  font-weight: 600
-}
-
-body {
-  background: @veryLightGray;
+html,
+body,
+#appContainer,
+#appContainer > div {
+  height: 100%;
 }
 
 .notImplemented {

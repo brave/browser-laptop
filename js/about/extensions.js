@@ -156,7 +156,7 @@ class AboutExtensions extends React.Component {
 
 const styles = StyleSheet.create({
   extensionDetailsPage: {
-    margin: '20px',
+    margin: globalStyles.spacing.aboutPageMargin,
     minWidth: globalStyles.spacing.aboutPageDetailsPageWidth
   },
 
