@@ -17,6 +17,7 @@ class Dropdown extends ImmutableComponent {
       styles.dropdown,
       this.props['data-isCommonForm'] && styles.commonForm,
       this.props['data-isSettings'] && styles.settings,
+      this.props['data-isFullWidth'] && styles.fullWidth,
       this.props['data-isBraveryPanel'] && styles.braveryPanel
     )
 
@@ -59,6 +60,7 @@ const styles = StyleSheet.create({
     '-webkit-appearance': 'none',
     width: 'auto'
   },
+
   outlineable: {
     ':focus': {
       outlineColor: globalStyles.color.statsBlue,
@@ -67,13 +69,20 @@ const styles = StyleSheet.create({
       outlineWidth: '1px'
     }
   },
+
   commonForm: {
     backgroundColor: '#fff',
     fontSize: globalStyles.fontSize.flyoutDialog
   },
+
   settings: {
     width: '280px'
   },
+
+  fullWidth: {
+    width: '100%'
+  },
+
   braveryPanel: {
     fontSize: '13px',
     width: '100%'

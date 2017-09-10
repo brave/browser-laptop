@@ -270,7 +270,11 @@ const createViewSubmenu = () => {
       click: function () {
         const win = BrowserWindow.getActiveWindow()
         const activeTab = tabState.getActiveTab(appStore.getState(), win.id)
-        appActions.toggleDevTools(activeTab.get('tabId'))
+        if (activeTab) {
+          appActions.toggleDevTools(activeTab.get('tabId'))
+        } else {
+          console.warn('Unable to open developer tools; activeTab is null or undefined')
+        }
       }
     },
     CommonMenu.separatorMenuItem,

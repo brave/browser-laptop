@@ -13,6 +13,8 @@ const {LANGUAGE, REQUEST_LANGUAGE} = require('../js/constants/messages')
 
 // Exhaustive list of identifiers used by top and context menus
 var rendererIdentifiers = function () {
+  const countryCodes = require('./common/constants/countryCodes')
+
   return [
     'downloadsManager',
     'confirmClearPasswords',
@@ -259,7 +261,7 @@ var rendererIdentifiers = function () {
     // Release channels
     'channelDev',
     'channelBeta'
-  ]
+  ].concat(countryCodes)
 }
 
 var ctx = null
@@ -383,7 +385,9 @@ exports.init = function (language) {
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'app.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'error.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'passwords.properties'),
-      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'common.properties'))
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'common.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'countries.properties')
+      )
   }
 
   appendLangProperties(lang)
