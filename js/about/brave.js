@@ -11,6 +11,7 @@ const aboutActions = require('./aboutActions')
 
 const ipc = window.chrome.ipcRenderer
 
+const cx = require('../lib/classSet')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
@@ -21,7 +22,9 @@ const {
 } = require('../../app/renderer/components/common/sectionTitle')
 
 require('../../less/about/common.less')
-require('../../less/about/history.less')
+require('../../less/about/itemList.less')
+require('../../less/about/siteDetails.less')
+
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const tranformVersionInfoToString = (versionInformation) =>
@@ -45,49 +48,54 @@ class AboutBrave extends React.Component {
   }
 
   render () {
-    return <div className={css(styles.aboutPage)}>
-      <div className='siteDetailsPage'>
-        <div className='siteDetailsPageHeader'>
-          <AboutPageSectionTitle data-l10n-id='aboutBrave' />
-          <div data-l10n-id='braveInfo' />
-        </div>
+    return <div className={cx({
+      [css(styles.aboutPage)]: true,
+      siteDetailsPage: true
+    })}>
+      <div className={cx({
+        [css(styles.aboutPage__header)]: true,
+        siteDetailsPageHeader: true
+      })}>
+        <AboutPageSectionTitle data-l10n-id='aboutBrave' />
+        <div data-l10n-id='braveInfo' />
+      </div>
 
-        <div className='siteDetailsPageContent aboutBrave'>
-          <AboutPageSectionSubTitle data-l10n-id='releaseNotes' />
+      <div className='siteDetailsPageContent'>
+        <AboutPageSectionSubTitle data-l10n-id='releaseNotes' />
 
-          <div>
-            <span data-l10n-id='relNotesInfo1' />
-            &nbsp;
-            <a className={css(commonStyles.linkText)}
-              href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.get('Brave')}dev`}
-              data-l10n-id='relNotesInfo2'
-              rel='noopener' target='_blank'
-            />
-            &nbsp;
-            <span data-l10n-id='relNotesInfo3' />
-          </div>
-
-          <div className={css(styles.versionInformationWrapper)}>
-            <AboutPageSectionSubTitle data-l10n-id='versionInformation' />
-            <ClipboardButton copyAction={this.onCopy} />
-          </div>
-
-          <SortableTable
-            headings={['Name', 'Version']}
-            rows={this.state.versionInformation.map((version, name) => [
-              {
-                html: name,
-                value: name
-              },
-              {
-                html: name === 'rev'
-                  ? <a className={css(commonStyles.linkText)} href={`https://github.com/brave/browser-laptop/commit/${version}`} rel='noopener' target='_blank'>{(version && version.substring(0, 7)) || ''}</a>
-                  : version,
-                value: version
-              }
-            ])}
+        <div>
+          <span data-l10n-id='relNotesInfo1' />
+          &nbsp;
+          <a className={css(commonStyles.linkText)}
+            href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.get('Brave')}dev`}
+            data-l10n-id='relNotesInfo2'
+            rel='noopener' target='_blank'
           />
+          &nbsp;
+          <span data-l10n-id='relNotesInfo3' />
         </div>
+
+        <div className={css(styles.aboutPage__versionInformation)}>
+          <AboutPageSectionSubTitle data-l10n-id='versionInformation' />
+          <ClipboardButton copyAction={this.onCopy} />
+        </div>
+
+        <SortableTable
+          fillAvailable
+          headings={['Name', 'Version']}
+          rows={this.state.versionInformation.map((version, name) => [
+            {
+              html: name,
+              value: name
+            },
+            {
+              html: name === 'rev'
+                ? <a className={css(commonStyles.linkText)} href={`https://github.com/brave/browser-laptop/commit/${version}`} rel='noopener' target='_blank'>{(version && version.substring(0, 7)) || ''}</a>
+                : version,
+              value: version
+            }
+          ])}
+        />
       </div>
     </div>
   }
@@ -95,14 +103,23 @@ class AboutBrave extends React.Component {
 
 const styles = StyleSheet.create({
   aboutPage: {
-    margin: globalStyles.spacing.aboutPageMargin
+    width: '400px',
+    margin: globalStyles.spacing.aboutPageMargin,
+
+    // Issue #10711
+    // TODO: Refactor siteDetails.less to remove !important
+    paddingTop: '0 !important'
   },
 
-  versionInformationWrapper: {
+  aboutPage__header: {
+    // TODO: Refactor siteDetails.less to remove !important
+    padding: '0 !important'
+  },
+
+  aboutPage__versionInformation: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'baseline',
-    width: '400px'
+    alignItems: 'baseline'
   }
 })
 
