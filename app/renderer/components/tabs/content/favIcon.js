@@ -27,7 +27,7 @@ const loadingIconSvg = require('../../../../extensions/brave/img/tabs/loading.sv
 
 class Favicon extends React.Component {
   get defaultIcon () {
-    return (!this.props.isTabLoading && !this.props.favicon)
+    return (!this.props.deprecatedIsTabLoading && !this.props.favicon)
       ? globalStyles.appIcons.defaultIcon
       : null
   }
@@ -36,15 +36,15 @@ class Favicon extends React.Component {
     const currentWindow = state.get('currentWindow')
     const frameKey = ownProps.frameKey
     const frame = frameStateUtil.getFrameByKey(currentWindow, frameKey) || Immutable.Map()
-    const isTabLoading = faviconState.isTabLoading(currentWindow, frameKey)
+    const deprecatedIsTabLoading = faviconState.deprecatedIsTabLoading(currentWindow, frameKey)
     const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
     const props = {}
 
     // used in renderer
 
     // there's no need to show loading icon for about pages
-    props.isTabLoading = !isSourceAboutUrl(frame.get('location')) && isTabLoading
-    props.favicon = !isTabLoading && frame.get('icon')
+    props.deprecatedIsTabLoading = !isSourceAboutUrl(frame.get('location')) && deprecatedIsTabLoading
+    props.favicon = !deprecatedIsTabLoading && frame.get('icon')
     props.isPinnedTab = tabState.isTabPinned(state, tabId)
     props.tabIconColor = tabUIState.getTabIconColor(currentWindow, frameKey)
     props.isNarrowestView = tabUIState.isNarrowestView(currentWindow, frameKey)
@@ -72,14 +72,14 @@ class Favicon extends React.Component {
 
     return <TabIcon
       data-test-favicon={this.props.favicon}
-      data-test-id={this.props.isTabLoading ? 'loading' : 'defaultIcon'}
+      data-test-id={this.props.deprecatedIsTabLoading ? 'loading' : 'defaultIcon'}
       className={css(
         styles.icon,
         this.props.favicon && iconStyles.favicon,
         !this.props.isPinnedTab && this.props.isNarrowestView && styles.faviconNarrowView
       )}
       symbol={
-        (this.props.isTabLoading && css(styles.loadingIcon, iconStyles.loadingIconColor)) ||
+        (this.props.deprecatedIsTabLoading && css(styles.loadingIcon, iconStyles.loadingIconColor)) ||
         this.defaultIcon
       } />
   }
