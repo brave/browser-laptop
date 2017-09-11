@@ -3,6 +3,16 @@
   "version": "0.21.0",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
+  "build": {
+    "appId": "brave.com",
+    "electronDist": "node_modules/electron-prebuilt/dist",
+    "mac": {
+      "category": "your.app.category.type"
+    },
+    "muonVersion": "1.2.3.4",
+    "npmRebuild": true,
+    "nodeGypRebuild": false
+  },
   "config": {
     "port": "8080"
   },
@@ -20,11 +30,13 @@
     "clean-sb-data": "node ./tools/clean.js userData SafeBrowsingData.dat",
     "clean-session-store": "node ./tools/clean.js userData session-store-1",
     "clean-tp-data": "node ./tools/clean.js userData TrackingProtection.dat",
+    "build32imageapp": "electron-builder --ia32",
     "download-languages": "node ./tools/downloadLanguages",
     "download-sync-client": "node ./tools/downloadSyncClient",
     "electron-rebuild": "electron-rebuild",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "lint": "standard",
+    "pack": "electron-builder --dir",
     "postinstall": "npm run download-sync-client && webpack",
     "start-log": "node ./tools/start.js --user-data-dir=brave-development --enable-logging=stderr --v=1 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
     "start": "node ./tools/start.js --user-data-dir=brave-development --enable-logging --v=0 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
@@ -105,6 +117,7 @@
     "ledger-client": "^0.9.18",
     "ledger-geoip": "^0.9.0",
     "ledger-publisher": "^0.9.4",
+    "level": "^1.7.0",
     "lru-cache": "^1.0.0",
     "moment": "^2.15.1",
     "niceware": "^1.0.4",
@@ -145,7 +158,7 @@
     "co-mocha": "^1.1.2",
     "cross-env": "^3.1.4",
     "css-loader": "~0.28.7",
-    "electron-builder": "^17.1.1",
+    "electron-builder": "^19.24.2",
     "electron-chromedriver": "^1.7.1",
     "electron-packager": "brave/electron-packager",
     "electron-prebuilt": "brave/electron-prebuilt",
@@ -162,7 +175,6 @@
     "jsonfile": "^2.2.3",
     "less": "^2.5.3",
     "less-loader": "^2.2.1",
-    "level": "^1.7.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.3.4",
     "mockery": "^2.1.0",
