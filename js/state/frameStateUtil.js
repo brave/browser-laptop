@@ -739,6 +739,14 @@ const setTabHoverState = (state, frameKey, hoverState, enablePreviewMode) => {
   return state
 }
 
+const frameLocationMatch = (frame, location) => {
+  if (frame == null) {
+    return false
+  }
+
+  return frame.get('location') === location
+}
+
 module.exports = {
   setTabPageHoverState,
   setPreviewTabPageIndex,
@@ -803,5 +811,6 @@ module.exports = {
   isValidClosedFrame,
   getTabPageCount,
   getSortedFrameKeys,
-  frameStatePathByTabId
+  frameStatePathByTabId,
+  frameLocationMatch
 }
