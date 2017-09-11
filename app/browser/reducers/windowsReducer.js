@@ -229,7 +229,7 @@ const createWindow = (state, action) => {
   }
 
   if (process.platform === 'linux') {
-    windowProps.icon = path.join(__dirname, '..', '..', 'res', 'app.png')
+    windowProps.icon = path.join(__dirname, '..', '..', '..', 'res', 'app.png')
   }
 
   if (immutableWindowState.getIn(['windowInfo', 'state']) === 'fullscreen') {
