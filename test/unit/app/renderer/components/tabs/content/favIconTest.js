@@ -54,7 +54,7 @@ const defaultWindowStore = Immutable.fromJS({
   }
 })
 
-describe('Tabs content - Favicon', function () {
+describe.skip('Tabs content - Favicon', function () {
   let Tab, windowStore
 
   before(function () {

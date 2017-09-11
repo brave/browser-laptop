@@ -17,6 +17,7 @@ const tabState = require('../../../../common/state/tabState')
 // Utils
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const {isSourceAboutUrl} = require('../../../../../js/lib/appUrlUtil')
+const {hasBreakpoint} = require('../../../lib/tabUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
@@ -36,7 +37,6 @@ class Favicon extends React.Component {
     const frame = frameStateUtil.getFrameByKey(currentWindow, frameKey) || Immutable.Map()
     const isTabLoading = tabContentState.isTabLoading(currentWindow, frameKey)
     const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
-
     const props = {}
 
     // used in renderer
@@ -47,7 +47,7 @@ class Favicon extends React.Component {
     props.isPinnedTab = tabState.isTabPinned(state, tabId)
     props.tabIconColor = tabContentState.getTabIconColor(currentWindow, frameKey)
     props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, frameKey)
-
+    props.showFavIcon = !((hasBreakpoint(ownProps.breakpoint, 'extraSmall') && ownProps.isActive) || frame.get('location') === 'about:newtab')
     // used in functions
     props.frameKey = frameKey
 
@@ -55,6 +55,9 @@ class Favicon extends React.Component {
   }
 
   render () {
+    if (!this.props.showFavIcon) {
+      return null
+    }
     const iconStyles = StyleSheet.create({
       favicon: {
         backgroundImage: `url(${this.props.favicon})`,
