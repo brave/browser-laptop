@@ -32,19 +32,21 @@ class NotificationItem extends React.Component {
 
   clickHandler (buttonIndex) {
     if (this.props.nonce) {
-      ipc.emit(
+      ipc.send(
         messages.NOTIFICATION_RESPONSE + this.props.nonce,
         {},
         this.props.message,
         buttonIndex,
-        this.checkbox ? this.checkbox.checked : false
+        this.checkbox ? this.checkbox.checked : false,
+        this.props.index
       )
     } else {
       ipc.send(
         messages.NOTIFICATION_RESPONSE,
         this.props.message,
         buttonIndex,
-        this.checkbox ? this.checkbox.checked : false
+        this.checkbox ? this.checkbox.checked : false,
+        this.props.index
       )
     }
   }
@@ -74,6 +76,7 @@ class NotificationItem extends React.Component {
     props.advancedLink = notification.getIn(['options', 'advancedLink'])
     props.persist = notification.getIn(['options', 'persist'])
     props.nonce = notification.getIn(['options', 'nonce'])
+    props.index = notification.getIn(['options', 'index'])
 
     return props
   }
