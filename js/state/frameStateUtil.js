@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
 
@@ -14,6 +14,7 @@ const webviewActions = require('../actions/webviewActions')
 
 // State
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
+const tabState = require('../../app/common/state/tabState')
 
 // Utils
 const {getSetting} = require('../settings')
@@ -117,9 +118,9 @@ function getTabIdsByNonPinnedDisplayIndex (state) {
     .map((frame) => frame.get('tabId'))
 }
 
- /**
- * Obtains the display index for the specified tab ID excluding pins
- */
+/**
+* Obtains the display index for the specified tab ID excluding pins
+*/
 function findNonPinnedDisplayIndexForTabId (state, tabId) {
   return getTabIdsByNonPinnedDisplayIndex(state)
     .findIndex((displayKey) => displayKey === tabId)
@@ -188,6 +189,11 @@ function getIndexByTabId (state, tabId) {
   return getFramesInternalIndexByTabId(state, tabId)
 }
 
+const getTabIdByFrameKey = (state, frameKey) => {
+  const frame = getFrameByKey(state, frameKey)
+  return frame && frame.get('tabId', tabState.TAB_ID_NONE)
+}
+
 function getActiveFrame (state) {
   const activeFrameIndex = getActiveFrameIndex(state)
   return state.get('frames').get(activeFrameIndex)
@@ -239,24 +245,24 @@ function getPreviousFrame (state) {
 }
 
 /**
- * Obtains the display index for the specified frame key
- */
+* Obtains the display index for the specified frame key
+*/
 function findDisplayIndexForFrameKey (state, key) {
   return getFrameKeysByDisplayIndex(state).findIndex((displayKey) => displayKey === key)
 }
 
 /**
- * Determines if the specified frame was opened from the specified
- * ancestorFrameKey.
- *
- * For example you may go to google.com and open 3 links in new tabs:
- * G g1 g2 g3
- * Then you may change to g1 and open another tab:
- * G g1 g1.1 g2 g3
- * But then you may go back to google.com and open another tab.
- * It should go like so:
- * G g1 g1.1 g2 g3 g4
- */
+* Determines if the specified frame was opened from the specified
+* ancestorFrameKey.
+*
+* For example you may go to google.com and open 3 links in new tabs:
+* G g1 g2 g3
+* Then you may change to g1 and open another tab:
+* G g1 g1.1 g2 g3
+* But then you may go back to google.com and open another tab.
+* It should go like so:
+* G g1 g1.1 g2 g3 g4
+*/
 function isAncestorFrameKey (state, frame, parentFrameKey) {
   if (!frame || !frame.get('parentFrameKey')) {
     return false
@@ -315,9 +321,9 @@ const frameOptsFromFrame = (frame) => {
 }
 
 /**
- * Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
- * @return Immutable top level application state ready to merge back in
- */
+* Adds a frame specified by frameOpts and newKey and sets the activeFrameKey
+* @return Immutable top level application state ready to merge back in
+*/
 function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, insertionIndex) {
   const frames = state.get('frames')
 
@@ -387,9 +393,9 @@ function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, 
 }
 
 /**
- * Removes a frame specified by frameProps
- * @return Immutable top level application state ready to merge back in
- */
+* Removes a frame specified by frameProps
+* @return Immutable top level application state ready to merge back in
+*/
 function removeFrame (state, frameProps, framePropsIndex) {
   const frames = state.get('frames')
   let closedFrames = state.get('closedFrames') || Immutable.List()
@@ -452,27 +458,23 @@ function getTotalBlocks (frame) {
 }
 
 /**
- * Check if frame is pinned or not
- */
+* Check if frame is pinned or not
+*/
 function isPinned (state, frameKey) {
   const frame = getFrameByKey(state, frameKey)
 
   return frame && !!frame.get('pinnedLocation')
 }
 
-const getCurrentTabPageFrameKeys = (state) => {
+const isFirstFrameKeyInTabPage = (state, frameKey) => {
   const pageIndex = getTabPageIndex(state)
   const tabsPerTabPage = Number(getSetting(settings.TABS_PER_PAGE))
   const startingFrameIndex = pageIndex * tabsPerTabPage
   const unpinnedTabs = getNonPinnedFrames(state) || Immutable.List()
+  const firstFrame = unpinnedTabs
+    .slice(startingFrameIndex, startingFrameIndex + tabsPerTabPage).first()
 
-  return unpinnedTabs
-    .slice(startingFrameIndex, startingFrameIndex + tabsPerTabPage)
-    .map((tab) => tab.get('key'))
-}
-
-const isFirstFrameKeyInTabPage = (state, frameKey) => {
-  return getCurrentTabPageFrameKeys(state).first() === frameKey
+  return firstFrame.get('key') === frameKey
 }
 
 const getTabPageIndex = (state) => {
@@ -483,11 +485,11 @@ const getTabPageIndex = (state) => {
 }
 
 /**
- * Updates the tab page index to the specified frameProps
- * @param state{Object} - Window state
- * @param tabId{number} - Tab id for the frame
- * @param tabsPerPage{string} - Current setting for tabs per page, with a default value
- */
+* Updates the tab page index to the specified frameProps
+* @param state{Object} - Window state
+* @param tabId{number} - Tab id for the frame
+* @param tabsPerPage{string} - Current setting for tabs per page, with a default value
+*/
 function updateTabPageIndex (state, tabId, tabsPerPage = getSetting(settings.TABS_PER_PAGE)) {
   const index = getFrameTabPageIndex(state, tabId, tabsPerPage)
 
@@ -624,23 +626,23 @@ const setPreviewTabPageIndex = (state, index, immediate = false) => {
 }
 
 /**
- * Defines whether or not a tab should be allowed to preview its content
- * based on mouse idle time defined by mouse move in tab.js
- * @see windowConstants.WINDOW_TAB_MOUSE_MOVE for information
- * on how the data is handled in the store.
- * @param state {Object} - Application state
- * @param previewMode {Boolean} - Whether or not minimium idle time
- * has match the criteria
- */
+* Defines whether or not a tab should be allowed to preview its content
+* based on mouse idle time defined by mouse move in tab.js
+* @see windowConstants.WINDOW_TAB_MOUSE_MOVE for information
+* on how the data is handled in the store.
+* @param state {Object} - Application state
+* @param previewMode {Boolean} - Whether or not minimium idle time
+* has match the criteria
+*/
 const setPreviewMode = (state, previewMode) => {
   return state.setIn(['ui', 'tabs', 'previewMode'], previewMode)
 }
 
 /**
- * Gets the previewMode application state
- * @param state {Object} - Application state
- * @return Immutable top level application state for previewMode
- */
+* Gets the previewMode application state
+* @param state {Object} - Application state
+* @return Immutable top level application state for previewMode
+*/
 const getPreviewMode = (state) => {
   return state.getIn(['ui', 'tabs', 'previewMode'])
 }
@@ -682,36 +684,36 @@ const setTabPageHoverState = (state, tabPageIndex, hoverState) => {
 }
 
 /**
- * Checks if the current tab index is being hovered
- * @param state {Object} - Application state
- * @param frameKey {Number} - The current tab's frameKey
- * @return Boolean - wheter or not hoverState is true
- */
+* Checks if the current tab index is being hovered
+* @param state {Object} - Application state
+* @param frameKey {Number} - The current tab's frameKey
+* @return Boolean - wheter or not hoverState is true
+*/
 const getTabHoverState = (state, frameKey) => {
   const index = getFrameIndex(state, frameKey)
   return getHoverTabIndex(state) === index
 }
 
 /**
- * Gets the hovered tab index state
- * This check will return null if no tab is being hovered
- * and is used getTabHoverState to check if current index is being hovered.
- * If the method to apply for does not know the right index
- * this should be used instead of getTabHoverState
- * @param state {Object} - Application state
- * @return Immutable top level application state for hoverTabIndex
- */
+* Gets the hovered tab index state
+* This check will return null if no tab is being hovered
+* and is used getTabHoverState to check if current index is being hovered.
+* If the method to apply for does not know the right index
+* this should be used instead of getTabHoverState
+* @param state {Object} - Application state
+* @return Immutable top level application state for hoverTabIndex
+*/
 const getHoverTabIndex = (state) => {
   return state.getIn(['ui', 'tabs', 'hoverTabIndex'])
 }
 
 /**
- * Sets the hover state for current tab index in top level state
- * @param state {Object} - Application state
- * @param frameKey {Number} - The current tab's frameKey
- * @param hoverState {Boolean} - True if the current tab is being hovered.
- * @return Immutable top level application state for hoverTabIndex
- */
+* Sets the hover state for current tab index in top level state
+* @param state {Object} - Application state
+* @param frameKey {Number} - The current tab's frameKey
+* @param hoverState {Boolean} - True if the current tab is being hovered.
+* @return Immutable top level application state for hoverTabIndex
+*/
 const setHoverTabIndex = (state, frameKey, hoverState) => {
   const frameIndex = getFrameIndex(state, frameKey)
   if (!hoverState) {
@@ -722,13 +724,13 @@ const setHoverTabIndex = (state, frameKey, hoverState) => {
 }
 
 /**
- * Gets values from the window setTabHoverState action from the store
- * and is used to apply both hoverState and previewFrameKey
- * @param state {Object} - Application state
- * @param frameKey {Number} - The current tab's frameKey
- * @param hoverState {Boolean} - True if the current tab is being hovered.
- * @return Immutable top level application state for hoverTabIndex
- */
+* Gets values from the window setTabHoverState action from the store
+* and is used to apply both hoverState and previewFrameKey
+* @param state {Object} - Application state
+* @param frameKey {Number} - The current tab's frameKey
+* @param hoverState {Boolean} - True if the current tab is being hovered.
+* @return Immutable top level application state for hoverTabIndex
+*/
 const setTabHoverState = (state, frameKey, hoverState, enablePreviewMode) => {
   const frameIndex = getFrameIndex(state, frameKey)
   if (frameIndex !== -1) {
@@ -743,11 +745,17 @@ const frameLocationMatch = (frame, location) => {
   if (frame == null) {
     return false
   }
+  const validFrame = Immutable.Map.isMap(frame)
+  return validFrame && frame.get('location') === location
+}
 
-  return frame.get('location') === location
+const hasFrame = (state, frameKey) => {
+  const frame = getFrameByKey(state, frameKey)
+  return frame && !frame.isEmpty()
 }
 
 module.exports = {
+  hasFrame,
   setTabPageHoverState,
   setPreviewTabPageIndex,
   getTabHoverState,
@@ -783,6 +791,7 @@ module.exports = {
   getFrameByKey,
   getFrameByTabId,
   getIndexByTabId,
+  getTabIdByFrameKey,
   getPartitionNumber,
   setFrameLastAccessedTime,
   setActiveFrameKey,
@@ -804,7 +813,6 @@ module.exports = {
   onFindBarHide,
   getTotalBlocks,
   isPinned,
-  getCurrentTabPageFrameKeys,
   isFirstFrameKeyInTabPage,
   getTabPageIndex,
   updateTabPageIndex,

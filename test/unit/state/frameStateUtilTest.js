@@ -411,4 +411,37 @@ describe('frameStateUtil', function () {
       assert.equal(result, 1)
     })
   })
+
+  describe('frameLocationMatch', function () {
+    before(function () {
+      this.frameKey = 1
+      this.location = 'nespresso.com'
+      this.state = defaultWindowStore.mergeIn(['frames', 0], {
+        location: this.location,
+        frameKey: this.frameKey
+      })
+      this.frame = this.state.getIn(['frames', 0])
+    })
+
+    it('returns false if frame is empty', function () {
+      const result = frameStateUtil.frameLocationMatch(null, this.location)
+      assert.equal(result, false)
+    })
+    it('returns false if frame is not an Immutable map', function () {
+      const result = frameStateUtil.frameLocationMatch(this.frame.toJS(), this.location)
+      assert.equal(result, false)
+    })
+    it('returns false if location is empty', function () {
+      const result = frameStateUtil.frameLocationMatch(this.frame, '')
+      assert.equal(result, false)
+    })
+    it('returns false if location is a partial match', function () {
+      const result = frameStateUtil.frameLocationMatch(this.frame, 'nespresso.co.uk')
+      assert.equal(result, false)
+    })
+    it('returns true if location match', function () {
+      const result = frameStateUtil.frameLocationMatch(this.frame, this.location)
+      assert.equal(result, true)
+    })
+  })
 })
