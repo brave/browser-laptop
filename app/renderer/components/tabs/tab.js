@@ -24,6 +24,7 @@ const windowActions = require('../../../../js/actions/windowActions')
 const windowStore = require('../../../../js/stores/windowStore')
 
 // State
+const audioState = require('../../../common/state/tabContentState/audioState')
 const tabUIState = require('../../../common/state/tabUIState')
 const tabState = require('../../../common/state/tabState')
 
@@ -245,7 +246,7 @@ class Tab extends React.Component {
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, props.frameKey)
     props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.isPinnedTab = tabState.isTabPinned(state, tabId)
-    props.canPlayAudio = tabUIState.canPlayAudio(currentWindow, props.frameKey)
+    props.canPlayAudio = audioState.canPlayAudio(currentWindow, props.frameKey)
     props.themeColor = tabUIState.getThemeColor(currentWindow, props.frameKey)
     props.isNarrowView = tabUIState.isNarrowView(currentWindow, props.frameKey)
     props.isNarrowestView = tabUIState.isNarrowestView(currentWindow, props.frameKey)

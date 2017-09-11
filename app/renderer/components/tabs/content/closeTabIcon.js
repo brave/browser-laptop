@@ -10,8 +10,8 @@ const Immutable = require('immutable')
 const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
-// State
-const tabUIState = require('../../../../common/state/tabUIState')
+// State helpers
+const closeState = require('../../../../common/state/tabContentState/closeState')
 const tabState = require('../../../../common/state/tabState')
 
 // Actions
@@ -58,8 +58,8 @@ class CloseTabIcon extends React.Component {
     // used in renderer
     props.showCloseIcon = !isPinnedTab &&
       (
-        tabUIState.hasRelativeCloseIcon(currentWindow, frameKey) ||
-        tabUIState.hasFixedCloseIcon(currentWindow, frameKey)
+        closeState.hasRelativeCloseIcon(currentWindow, frameKey) ||
+        closeState.hasFixedCloseIcon(currentWindow, frameKey)
       )
 
     // used in functions

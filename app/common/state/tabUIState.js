@@ -4,11 +4,12 @@
 
 // Constants
 const settings = require('../../../js/constants/settings')
-const {braveExtensionId} = require('../../../js/constants/config')
+
+// State helpers
+const closeState = require('./tabContentState/closeState')
+const frameStateUtil = require('../../../js/state/frameStateUtil')
 
 // Utils
-const locale = require('../../../js/l10n')
-const frameStateUtil = require('../../../js/state/frameStateUtil')
 const {getTextColorForBackground} = require('../../../js/lib/color')
 const {hasBreakpoint} = require('../../renderer/lib/tabUtil')
 const {getSetting} = require('../../../js/settings')
@@ -17,29 +18,6 @@ const {getSetting} = require('../../../js/settings')
 const styles = require('../../renderer/components/styles/global')
 
 const tabUIState = {
-  getDisplayTitle: (state, frameKey) => {
-    const frame = frameStateUtil.getFrameByKey(state, frameKey)
-
-    if (frame == null) {
-      return ''
-    }
-
-    // For renderer initiated navigation, make sure we show Untitled
-    // until we know what we're loading.  We should probably do this for
-    // all about: pages that we already know the title for so we don't have
-    // to wait for the title to be parsed.
-    if (frame.get('location') === 'about:blank') {
-      return locale.translation('aboutBlankTitle')
-    } else if (frame.get('location') === 'about:newtab') {
-      return locale.translation('newTab')
-    }
-
-    // YouTube tries to change the title to add a play icon when
-    // there is audio. Since we have our own audio indicator we get
-    // rid of it.
-    return (frame.get('title') || frame.get('location') || '').replace('▶ ', '')
-  },
-
   hasTabInFullScreen: (state) => {
     return state.get('frames')
       .map((frame) => frame.get('isFullScreen'))
@@ -54,40 +32,6 @@ const tabUIState = {
     }
 
     return getSetting(settings.PAINT_TABS) && (frame.get('themeColor') || frame.get('computedThemeColor'))
-  },
-
-  canPlayAudio (state, frameKey) {
-    const frame = frameStateUtil.getFrameByKey(state, frameKey)
-
-    if (frame == null) {
-      return false
-    }
-
-    return frame.get('audioPlaybackActive') || frame.get('audioMuted')
-  },
-
-  isTabLoading: (state, frameKey) => {
-    const frame = frameStateUtil.getFrameByKey(state, frameKey)
-
-    if (frame == null) {
-      return false
-    }
-
-    return (
-      frame.get('loading') ||
-      frame.get('location') === 'about:blank'
-    ) &&
-    (
-      !frame.get('provisionalLocation') ||
-      !frame.get('provisionalLocation').startsWith(`chrome-extension://${braveExtensionId}/`)
-    )
-  },
-
-  getPageIndex: (state) => {
-    const tabPageIndex = state.getIn(['ui', 'tabs', 'tabPageIndex'], 0)
-    const previewTabPageIndex = state.getIn(['ui', 'tabs', 'previewTabPageIndex'])
-
-    return previewTabPageIndex != null ? previewTabPageIndex : tabPageIndex
   },
 
   isMediumView: (state, frameKey) => {
@@ -132,39 +76,6 @@ const tabUIState = {
   },
 
   /**
-   * Check whether or not closeTab icon is always visible (fixed) in tab
-   */
-  hasFixedCloseIcon: (state, frameKey) => {
-    const frame = frameStateUtil.getFrameByKey(state, frameKey)
-    const isActive = frameStateUtil.isFrameKeyActive(state, frameKey)
-
-    if (frame == null) {
-      return false
-    }
-
-    return (
-      isActive &&
-      // Larger sizes still have a relative closeIcon
-      // We don't resize closeIcon as we do with favicon so don't show it (smallest)
-      !hasBreakpoint(frame.get('breakpoint'), ['dynamic', 'default', 'large', 'smallest'])
-    )
-  },
-
-  /**
-   * Check whether or not closeTab icon is relative to hover state
-   */
-  hasRelativeCloseIcon: (state, frameKey) => {
-    const frame = frameStateUtil.getFrameByKey(state, frameKey)
-
-    if (frame == null) {
-      return false
-    }
-
-    return frameStateUtil.getTabHoverState(state, frameKey) &&
-      hasBreakpoint(frame.get('breakpoint'), ['dynamic', 'default', 'large'])
-  },
-
-  /**
    * Check whether or not private or newSession icon should be visible
    */
   hasVisibleSecondaryIcon: (state, frameKey) => {
@@ -176,9 +87,9 @@ const tabUIState = {
 
     return (
       // Hide icon on hover
-      !tabUIState.hasRelativeCloseIcon(state, frameKey) &&
+      !closeState.hasRelativeCloseIcon(state, frameKey) &&
       // If closeIcon is fixed then there's no room for another icon
-      !tabUIState.hasFixedCloseIcon(state, frameKey) &&
+      !closeState.hasFixedCloseIcon(state, frameKey) &&
       // completely hide it for small sizes
       !hasBreakpoint(frame.get('breakpoint'),
         ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest'])

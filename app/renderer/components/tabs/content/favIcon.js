@@ -10,7 +10,8 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
-// State
+// State helpers
+const faviconState = require('../../../../common/state/tabContentState/faviconState')
 const tabUIState = require('../../../../common/state/tabUIState')
 const tabState = require('../../../../common/state/tabState')
 
@@ -35,7 +36,7 @@ class Favicon extends React.Component {
     const currentWindow = state.get('currentWindow')
     const frameKey = ownProps.frameKey
     const frame = frameStateUtil.getFrameByKey(currentWindow, frameKey) || Immutable.Map()
-    const isTabLoading = tabUIState.isTabLoading(currentWindow, frameKey)
+    const isTabLoading = faviconState.isTabLoading(currentWindow, frameKey)
     const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
     const props = {}
 

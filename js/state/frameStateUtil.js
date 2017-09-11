@@ -460,6 +460,13 @@ function isPinned (state, frameKey) {
   return frame && !!frame.get('pinnedLocation')
 }
 
+const getTabPageIndex = (state) => {
+  const tabPageIndex = state.getIn(['ui', 'tabs', 'tabPageIndex'], 0)
+  const previewTabPageIndex = state.getIn(['ui', 'tabs', 'previewTabPageIndex'])
+
+  return previewTabPageIndex || tabPageIndex
+}
+
 /**
  * Updates the tab page index to the specified frameProps
  * @param state{Object} - Window state
@@ -774,6 +781,7 @@ module.exports = {
   onFindBarHide,
   getTotalBlocks,
   isPinned,
+  getTabPageIndex,
   updateTabPageIndex,
   isValidClosedFrame,
   getTabPageCount,

@@ -8,7 +8,8 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 // Components
 const ReduxComponent = require('../../reduxComponent')
 
-// State
+// State helpers
+const titleState = require('../../../../common/state/tabContentState/titleState')
 const tabUIState = require('../../../../common/state/tabUIState')
 
 // Utils
@@ -30,7 +31,7 @@ class TabTitle extends React.Component {
     // used in renderer
     props.enforceFontVisibility = isDarwin && tabIconColor === 'white'
     props.tabIconColor = tabIconColor
-    props.displayTitle = tabUIState.getDisplayTitle(currentWindow, frameKey)
+    props.displayTitle = titleState.getDisplayTitle(currentWindow, frameKey)
     props.showTitle = !ownProps.isPinnedTab &&
     !(
       (hasBreakpoint(ownProps.breakpoint, ['mediumSmall', 'small']) && ownProps.isActive) ||
