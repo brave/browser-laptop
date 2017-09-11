@@ -260,7 +260,6 @@ class Tab extends React.Component {
     props.showSessionIcon = partition && hasSeconardImage
     props.showPrivateIcon = props.isPrivateTab && hasSeconardImage
     props.showFavIcon = !((hasBreakpoint(breakpoint, 'extraSmall') && props.isActive) || frame.get('location') === 'about:newtab')
-    props.showAudioIcon = breakpoint === 'default' && !!frame.get('audioPlaybackActive')
     props.partOfFullPageSet = ownProps.partOfFullPageSet
     props.showTitle = !props.isPinnedTab &&
       !(
@@ -352,11 +351,7 @@ class Tab extends React.Component {
             ? <Favicon frameKey={this.props.frameKey} />
             : null
           }
-          {
-            this.props.showAudioIcon
-            ? <AudioTabIcon frameKey={this.props.frameKey} />
-            : null
-          }
+          <AudioTabIcon breakpoint={this.props.breakpoint} frameKey={this.props.frameKey} />
           {
             this.props.showTitle
             ? <TabTitle frameKey={this.props.frameKey} />

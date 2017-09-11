@@ -47,6 +47,7 @@ class AudioTabIcon extends React.Component {
     // AudioIcon will never be created if there is no frameKey, but for consistency
     // across other components I added teh || Immutable.Map()
     const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
+    const breakpoint = ownProps.breakpoint
 
     const props = {}
     // used in other functions
@@ -54,11 +55,15 @@ class AudioTabIcon extends React.Component {
     props.pageCanPlayAudio = !!frame.get('audioPlaybackActive')
     props.tabId = frame.get('tabId', tabState.TAB_ID_NONE)
     props.audioMuted = frame.get('audioMuted')
+    props.showAudioIcon = breakpoint === 'default' && !!frame.get('audioPlaybackActive')
 
     return props
   }
 
   render () {
+    if (!this.props.showAudioIcon) {
+      return null
+    }
     return <TabIcon
       className={css(styles.icon, styles.icon_audio)}
       symbol={this.audioIcon}
