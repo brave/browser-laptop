@@ -14,7 +14,6 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
-const tabStyles = require('../../styles/tab')
 const privateSvg = require('../../../../extensions/brave/img/tabs/private.svg')
 
 class PrivateIcon extends React.Component {
@@ -41,7 +40,7 @@ class PrivateIcon extends React.Component {
 
     return <TabIcon
       data-test-id='privateIcon'
-      className={css(tabStyles.icon, styles.secondaryIcon, privateStyles.icon)}
+      className={css(styles.icon, styles.secondaryIcon, privateStyles.icon)}
     />
   }
 }
@@ -49,6 +48,18 @@ class PrivateIcon extends React.Component {
 module.exports = ReduxComponent.connect(PrivateIcon)
 
 const styles = StyleSheet.create({
+  icon: {
+    width: globalStyles.spacing.iconSize,
+    minWidth: globalStyles.spacing.iconSize,
+    height: globalStyles.spacing.iconSize,
+    backgroundSize: globalStyles.spacing.iconSize,
+    fontSize: globalStyles.fontSize.tabIcon,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    paddingLeft: globalStyles.spacing.defaultIconPadding,
+    paddingRight: globalStyles.spacing.defaultIconPadding
+  },
+
   secondaryIcon: {
     WebkitMaskRepeat: 'no-repeat',
     WebkitMaskPosition: 'center',

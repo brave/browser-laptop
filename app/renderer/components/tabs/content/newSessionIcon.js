@@ -20,7 +20,7 @@ const {tabs} = require('../../../../../js/constants/config')
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
-const tabStyles = require('../../styles/tab')
+const globalStyles = require('../../styles/global')
 const newSessionSvg = require('../../../../extensions/brave/img/tabs/new_session.svg')
 
 class NewSessionIcon extends React.Component {
@@ -57,7 +57,7 @@ class NewSessionIcon extends React.Component {
 
     return <TabIcon symbol
       data-test-id='newSessionIcon'
-      className={css(tabStyles.icon, styles.newSession, newSession.indicator)}
+      className={css(styles.icon, styles.newSession, newSession.indicator)}
       symbolContent={this.props.partitionIndicator}
       l10nArgs={this.props.partitionNumber}
       l10nId='sessionInfoTab'
@@ -68,6 +68,18 @@ class NewSessionIcon extends React.Component {
 module.exports = ReduxComponent.connect(NewSessionIcon)
 
 const styles = StyleSheet.create({
+  icon: {
+    width: globalStyles.spacing.iconSize,
+    minWidth: globalStyles.spacing.iconSize,
+    height: globalStyles.spacing.iconSize,
+    backgroundSize: globalStyles.spacing.iconSize,
+    fontSize: globalStyles.fontSize.tabIcon,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    paddingLeft: globalStyles.spacing.defaultIconPadding,
+    paddingRight: globalStyles.spacing.defaultIconPadding
+  },
+
   newSession: {
     position: 'relative',
     backgroundImage: `url(${newSessionSvg})`,

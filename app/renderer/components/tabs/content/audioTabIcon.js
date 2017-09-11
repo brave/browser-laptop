@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {css} = require('aphrodite/no-important')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const Immutable = require('immutable')
 
 // Components
@@ -21,7 +21,6 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
-const tabStyles = require('../../styles/tab')
 
 class AudioTabIcon extends React.Component {
   constructor (props) {
@@ -61,11 +60,36 @@ class AudioTabIcon extends React.Component {
 
   render () {
     return <TabIcon
-      className={css(tabStyles.icon, tabStyles.icon_audio)}
+      className={css(styles.icon, styles.icon_audio)}
       symbol={this.audioIcon}
       onClick={this.toggleMute}
     />
   }
 }
+
+const styles = StyleSheet.create({
+  icon: {
+    width: globalStyles.spacing.iconSize,
+    minWidth: globalStyles.spacing.iconSize,
+    height: globalStyles.spacing.iconSize,
+    backgroundSize: globalStyles.spacing.iconSize,
+    fontSize: globalStyles.fontSize.tabIcon,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    paddingLeft: globalStyles.spacing.defaultIconPadding,
+    paddingRight: globalStyles.spacing.defaultIconPadding
+  },
+
+  icon_audio: {
+    color: globalStyles.color.highlightBlue,
+
+    // 16px
+    fontSize: `calc(${globalStyles.fontSize.tabIcon} + 2px)`,
+
+    // equal spacing around audio icon (favicon and tabTitle)
+    padding: globalStyles.spacing.defaultTabPadding,
+    paddingRight: '0 !important'
+  }
+})
 
 module.exports = ReduxComponent.connect(AudioTabIcon)

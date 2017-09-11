@@ -20,7 +20,6 @@ const {isSourceAboutUrl} = require('../../../../../js/lib/appUrlUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
-const tabStyles = require('../../styles/tab')
 const {spinKeyframes} = require('../../styles/animations')
 const loadingIconSvg = require('../../../../extensions/brave/img/tabs/loading.svg')
 
@@ -71,7 +70,7 @@ class Favicon extends React.Component {
       data-test-favicon={this.props.favicon}
       data-test-id={this.props.isTabLoading ? 'loading' : 'defaultIcon'}
       className={css(
-        tabStyles.icon,
+        styles.icon,
         this.props.favicon && iconStyles.favicon,
         !this.props.isPinnedTab && this.props.isNarrowestView && styles.faviconNarrowView
       )}
@@ -85,6 +84,18 @@ class Favicon extends React.Component {
 module.exports = ReduxComponent.connect(Favicon)
 
 const styles = StyleSheet.create({
+  icon: {
+    width: globalStyles.spacing.iconSize,
+    minWidth: globalStyles.spacing.iconSize,
+    height: globalStyles.spacing.iconSize,
+    backgroundSize: globalStyles.spacing.iconSize,
+    fontSize: globalStyles.fontSize.tabIcon,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    paddingLeft: globalStyles.spacing.defaultIconPadding,
+    paddingRight: globalStyles.spacing.defaultIconPadding
+  },
+
   faviconNarrowView: {
     minWidth: 'auto',
     width: globalStyles.spacing.narrowIconSize,
