@@ -66,7 +66,6 @@ const hintCount = 3
 require('../../less/switchControls.less')
 require('../../less/about/preferences.less')
 require('../../less/forms.less')
-require('../../less/button.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const permissionNames = {
