@@ -57,7 +57,7 @@ const defaultWindowStore = Immutable.fromJS({
   }
 })
 
-describe('Tabs content - PrivateIcon', function () {
+describe.skip('Tabs content - PrivateIcon', function () {
   let Tab, windowStore
 
   before(function () {

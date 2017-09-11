@@ -9,6 +9,9 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
+// State
+const tabContentState = require('../../../../common/state/tabContentState')
+
 // Utils
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
@@ -20,18 +23,23 @@ class PrivateIcon extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frameKey = ownProps.frameKey
+    const hasSeconardImage = tabContentState.hasVisibleSecondaryIcon(currentWindow, ownProps.frameKey)
 
     const props = {}
     // used in renderer
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
 
     // used in functions
+    props.showPrivateIcon = ownProps.isPrivateTab && hasSeconardImage
     props.frameKey = frameKey
 
     return props
   }
 
   render () {
+    if (!this.props.showPrivateIcon) {
+      return null
+    }
     const privateStyles = StyleSheet.create({
       icon: {
         backgroundColor: this.props.isActive ? globalStyles.color.white100 : globalStyles.color.black100

@@ -257,7 +257,6 @@ class Tab extends React.Component {
     props.isPlayIndicatorBreakpoint = tabContentState.isMediumView(currentWindow, props.frameKey) || props.isNarrowView
     props.title = frame.get('title')
     props.showSessionIcon = partition && hasSeconardImage
-    props.showPrivateIcon = props.isPrivateTab && hasSeconardImage
     props.partOfFullPageSet = ownProps.partOfFullPageSet
 
     // used in other functions
@@ -352,11 +351,7 @@ class Tab extends React.Component {
             isActive={this.props.isActive}
           />
         </div>
-        {
-          this.props.showPrivateIcon
-          ? <PrivateIcon frameKey={this.props.frameKey} />
-          : null
-        }
+        <PrivateIcon isPrivateTab={this.props.isPrivateTab} frameKey={this.props.frameKey} />
         {
           this.props.showSessionIcon
           ? <NewSessionIcon frameKey={this.props.frameKey} />
