@@ -12,6 +12,7 @@ const ReduxComponent = require('../../reduxComponent')
 const tabContentState = require('../../../../common/state/tabContentState')
 
 // Utils
+const {hasBreakpoint} = require('../../../lib/tabUtil')
 const platformUtil = require('../../../../common/lib/platformUtil')
 const isWindows = platformUtil.isWindows()
 const isDarwin = platformUtil.isDarwin()
@@ -30,7 +31,11 @@ class TabTitle extends React.Component {
     props.enforceFontVisibility = isDarwin && tabIconColor === 'white'
     props.tabIconColor = tabIconColor
     props.displayTitle = tabContentState.getDisplayTitle(currentWindow, frameKey)
-
+    props.showTitle = !ownProps.isPinnedTab &&
+    !(
+      (hasBreakpoint(ownProps.breakpoint, ['mediumSmall', 'small']) && ownProps.isActive) ||
+      hasBreakpoint(ownProps.breakpoint, ['extraSmall', 'smallest'])
+    )
     // used in functions
     props.frameKey = frameKey
 
@@ -38,6 +43,9 @@ class TabTitle extends React.Component {
   }
 
   render () {
+    if (!this.props.showTitle) {
+      return null
+    }
     const titleStyles = StyleSheet.create({
       gradientText: {
         backgroundImage: `-webkit-linear-gradient(left,

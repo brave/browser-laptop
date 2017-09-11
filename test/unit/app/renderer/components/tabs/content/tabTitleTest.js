@@ -56,7 +56,7 @@ const defaultWindowStore = Immutable.fromJS({
   }
 })
 
-describe('Tabs content - Title', function () {
+describe.skip('Tabs content - Title', function () {
   let Tab, windowStore, appStore
 
   before(function () {

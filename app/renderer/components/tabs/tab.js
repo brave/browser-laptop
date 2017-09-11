@@ -236,7 +236,6 @@ class Tab extends React.Component {
     const notificationBarActive = frame.get('location') && notificationOrigins &&
       notificationOrigins.includes(UrlUtil.getUrlOrigin(frame.get('location')))
     const hasSeconardImage = tabContentState.hasVisibleSecondaryIcon(currentWindow, ownProps.frameKey)
-    const breakpoint = frame.get('breakpoint')
     const partition = typeof frame.get('partitionNumber') === 'string'
       ? frame.get('partitionNumber').replace(/^partition-/i, '')
       : frame.get('partitionNumber')
@@ -260,11 +259,6 @@ class Tab extends React.Component {
     props.showSessionIcon = partition && hasSeconardImage
     props.showPrivateIcon = props.isPrivateTab && hasSeconardImage
     props.partOfFullPageSet = ownProps.partOfFullPageSet
-    props.showTitle = !props.isPinnedTab &&
-      !(
-        (hasBreakpoint(breakpoint, ['mediumSmall', 'small']) && props.isActive) ||
-        hasBreakpoint(breakpoint, ['extraSmall', 'smallest'])
-      )
 
     // used in other functions
     props.totalTabs = state.get('tabs').size
@@ -351,11 +345,12 @@ class Tab extends React.Component {
             frameKey={this.props.frameKey}
           />
           <AudioTabIcon breakpoint={this.props.breakpoint} frameKey={this.props.frameKey} />
-          {
-            this.props.showTitle
-            ? <TabTitle frameKey={this.props.frameKey} />
-            : null
-          }
+          <TabTitle
+            frameKey={this.props.frameKey}
+            breakpoint={this.props.breakpoint}
+            isPinnedTab={this.props.isPinnedTab}
+            isActive={this.props.isActive}
+          />
         </div>
         {
           this.props.showPrivateIcon
