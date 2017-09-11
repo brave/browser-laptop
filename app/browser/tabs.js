@@ -49,7 +49,7 @@ const normalizeUrl = function (url) {
 
 const getTabValue = function (tabId) {
   let tab = getWebContents(tabId)
-  if (tab) {
+  if (tab && !tab.isDestroyed()) {
     let tabValue = makeImmutable(tab.tabValue())
     tabValue = tabValue.set('canGoBack', tab.canGoBack())
     tabValue = tabValue.set('canGoForward', tab.canGoForward())
