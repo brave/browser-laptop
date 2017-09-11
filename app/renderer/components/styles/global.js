@@ -46,6 +46,17 @@ const globalStyles = {
       smallest: '19px'
     }
   },
+  intersection: {
+    // whereas 1 === 100%
+    noIntersection: 1,
+    at75: 0.75,
+    at60: 0.6,
+    at45: 0.45,
+    at40: 0.4,
+    at30: 0.3,
+    at20: 0.20,
+    at12: 0.125
+  },
   color: {
     commonTextColor: '#3b3b3b',
     linkColor: '#0099CC',
@@ -127,6 +138,7 @@ const globalStyles = {
     carotRadius: '8px'
   },
   spacing: {
+    sentinelSize: '120px',
     navigatorHeight: '48px',
     defaultSpacing: '12px',
     defaultFontSize: '13px',

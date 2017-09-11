@@ -473,7 +473,6 @@ WindowStore
     audioMuted: boolean, // frame is muted
     audioPlaybackActive: boolean, // frame is playing audio
     basicAuthDetail: object,
-    breakpoint: string, // breakpoint name for current tab size, specified in app/renderer/components/styles/tab.js
     closedAtIndex: number, // index the frame was last closed at, cleared unless the frame is inside of closedFrames
     computedThemeColor: string, // CSS computed theme color from the favicon
     endtLoadTime: datetime,
@@ -696,6 +695,7 @@ WindowStore
     },
     tabs: {
       hoverTabIndex: number, // index of the current hovered tab
+      intersectionRatio: number, // at which tab size position the tab sentinel is being intersected
       previewMode: boolean, // whether or not tab preview should be fired based on mouse idle time
       previewTabPageIndex: number, // index of the tab being previewed
       tabPageIndex: number // index of the current tab page

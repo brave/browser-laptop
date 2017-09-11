@@ -263,6 +263,14 @@ const windowActions = {
     })
   },
 
+  setTabIntersectionState: function (frameKey, ratio) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_TAB_CONTENT_INTERSECTION_STATE,
+      frameKey,
+      ratio
+    })
+  },
+
   /**
    * Dispatches a message to the store to set the current tab hover state.
    *

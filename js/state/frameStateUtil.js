@@ -460,6 +460,21 @@ function isPinned (state, frameKey) {
   return frame && !!frame.get('pinnedLocation')
 }
 
+const getCurrentTabPageFrameKeys = (state) => {
+  const pageIndex = getTabPageIndex(state)
+  const tabsPerTabPage = Number(getSetting(settings.TABS_PER_PAGE))
+  const startingFrameIndex = pageIndex * tabsPerTabPage
+  const unpinnedTabs = getNonPinnedFrames(state) || Immutable.List()
+
+  return unpinnedTabs
+    .slice(startingFrameIndex, startingFrameIndex + tabsPerTabPage)
+    .map((tab) => tab.get('key'))
+}
+
+const isFirstFrameKeyInTabPage = (state, frameKey) => {
+  return getCurrentTabPageFrameKeys(state).first() === frameKey
+}
+
 const getTabPageIndex = (state) => {
   const tabPageIndex = state.getIn(['ui', 'tabs', 'tabPageIndex'], 0)
   const previewTabPageIndex = state.getIn(['ui', 'tabs', 'previewTabPageIndex'])
@@ -781,6 +796,8 @@ module.exports = {
   onFindBarHide,
   getTotalBlocks,
   isPinned,
+  getCurrentTabPageFrameKeys,
+  isFirstFrameKeyInTabPage,
   getTabPageIndex,
   updateTabPageIndex,
   isValidClosedFrame,

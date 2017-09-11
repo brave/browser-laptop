@@ -49,6 +49,7 @@ const {
 } = require('../../lib/tabUtil')
 const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const {getCurrentWindowId} = require('../../currentWindow')
+const {setObserver} = require('../../lib/observerUtil')
 const UrlUtil = require('../../../../js/lib/urlutil')
 
 class Tab extends React.Component {
@@ -62,6 +63,7 @@ class Tab extends React.Component {
     this.onDragEnd = this.onDragEnd.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onClickTab = this.onClickTab.bind(this)
+    this.onObserve = this.onObserve.bind(this)
     this.tabNode = null
   }
 
@@ -206,17 +208,44 @@ class Tab extends React.Component {
   }
 
   componentDidMount () {
-    this.onUpdateTabSize()
+    // do not observe pinned tabs
+    if (this.props.isPinned) {
+      this.observer.unobserve(this.tabSentinel)
+    }
+    const threshold = Object.values(globalStyles.intersection)
+    // At this moment Chrome can't handle unitless zeroes for rootMargin
+    // see https://github.com/w3c/IntersectionObserver/issues/244
+    const margin = '0px'
+    this.observer = setObserver(this.tabSentinel, threshold, margin, this.onObserve)
+    this.observer.observe(this.tabSentinel)
+
+    this.onUpdateTabSize() // TODO: this will be depreacated
     this.tabNode.addEventListener('auxclick', this.onAuxClick.bind(this))
     window.addEventListener('resize', throttle(this.onUpdateTabSize, tabUpdateFrameRate), { passive: true })
   }
 
   componentDidUpdate () {
-    this.onUpdateTabSize()
+    // if a tab was just pinned, unobserve its intersection
+    // this gives us some more performance boost
+    if (this.props.isPinnedTab) {
+      this.observer.unobserve(this.tabSentinel)
+    }
+    this.onUpdateTabSize() // TODO: deprecate
   }
 
   componentWillUnmount () {
+    this.observer.unobserve(this.tabSentinel)
     window.removeEventListener('resize', this.onUpdateTabSize)
+  }
+
+  onObserve (entries) {
+    // avoid observing pinned tabs
+    if (this.props.isPinnedTab) {
+      return
+    }
+    // we only have one entry
+    const entry = entries[0]
+    windowActions.setTabIntersectionState(this.props.frameKey, entry.intersectionRatio)
   }
 
   get fixTabWidth () {
@@ -328,6 +357,10 @@ class Tab extends React.Component {
         onClick={this.onClickTab}
         onContextMenu={contextMenus.onTabContextMenu.bind(this, this.frame)}
       >
+        <div
+          ref={(node) => { this.tabSentinel = node }}
+          className={css(styles.tab__sentinel)}
+        />
         <div className={css(
           styles.tabId,
           this.props.isNarrowView && styles.tabIdNarrowView,
@@ -387,6 +420,18 @@ const styles = StyleSheet.create({
     ':hover': {
       background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(250, 250, 250, 0.4))'
     }
+  },
+
+  // The sentinel is responsible to respond to tabs
+  // intersection state. This is an empty hidden element
+  // which `width` value shouldn't be changed unless the intersection
+  // point needs to be edited.
+  tab__sentinel: {
+    position: 'absolute',
+    left: 0,
+    height: '1px',
+    background: 'transparent',
+    width: globalStyles.spacing.sentinelSize
   },
 
   // Custom classes based on tab's width and behaviour
