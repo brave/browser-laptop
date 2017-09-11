@@ -67,6 +67,7 @@ const eventUtil = require('../../../../js/lib/eventUtil')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId, isMaximized, isFocused, isFullScreen} = require('../../currentWindow')
 const platformUtil = require('../../../common/lib/platformUtil')
+const {hasBraveDragData} = require('../../../../js/dndData')
 const isDarwin = platformUtil.isDarwin()
 const isWindows = platformUtil.isWindows()
 const isLinux = platformUtil.isLinux()
@@ -441,8 +442,10 @@ class Main extends React.Component {
 
     // disable dnd by default
     window.addEventListener('dragover', function (event) {
-      // allow webviews to handle dnd
-      if (event.target.tagName === 'WEBVIEW') {
+      // allow webviews to handle dnd as long as the dragged object isn't from
+      // Brave itself
+      if (event.target.tagName === 'WEBVIEW' &&
+        !hasBraveDragData(event.dataTransfer)) {
         return true
       }
       event.dataTransfer.dropEffect = 'none'
@@ -451,8 +454,10 @@ class Main extends React.Component {
     }, true)
 
     window.addEventListener('drop', function (event) {
-      // allow webviews to handle dnd
-      if (event.target.tagName === 'WEBVIEW') {
+      // allow webviews to handle dnd as long as the dragged object isn't from
+      // Brave itself
+      if (event.target.tagName === 'WEBVIEW' &&
+        !hasBraveDragData(event.dataTransfer)) {
         return true
       }
       event.preventDefault()
