@@ -59,7 +59,7 @@ const defaultWindowStore = Immutable.fromJS({
   }
 })
 
-describe('Tabs content - NewSessionIcon', function () {
+describe.skip('Tabs content - NewSessionIcon', function () {
   let Tab, windowStore, NewSessionIcon
 
   before(function () {

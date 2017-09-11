@@ -29,9 +29,11 @@ class NewSessionIcon extends React.Component {
     const frameKey = ownProps.frameKey
     const frame = frameStateUtil.getFrameByKey(currentWindow, frameKey) || Immutable.Map()
     const partition = frame.get('partitionNumber')
+    const hasSeconardImage = tabContentState.hasVisibleSecondaryIcon(currentWindow, ownProps.frameKey)
 
     const props = {}
     // used in renderer
+    props.showSessionIcon = !!partition && hasSeconardImage
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
     props.iconColor = tabContentState.getTabIconColor(currentWindow, frameKey)
     props.partitionNumber = typeof partition === 'string'
@@ -48,6 +50,9 @@ class NewSessionIcon extends React.Component {
   }
 
   render () {
+    if (!this.props.showSessionIcon) {
+      return null
+    }
     const newSession = StyleSheet.create({
       indicator: {
         // Based on getTextColorForBackground() icons can be only black or white.

@@ -44,7 +44,6 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {
   getTabBreakpoint,
   tabUpdateFrameRate,
-  hasBreakpoint,
   hasTabAsRelatedTarget
 } = require('../../lib/tabUtil')
 const isWindows = require('../../../common/lib/platformUtil').isWindows()
@@ -235,10 +234,6 @@ class Tab extends React.Component {
     const notificationOrigins = notifications ? notifications.map(bar => bar.get('frameOrigin')) : false
     const notificationBarActive = frame.get('location') && notificationOrigins &&
       notificationOrigins.includes(UrlUtil.getUrlOrigin(frame.get('location')))
-    const hasSeconardImage = tabContentState.hasVisibleSecondaryIcon(currentWindow, ownProps.frameKey)
-    const partition = typeof frame.get('partitionNumber') === 'string'
-      ? frame.get('partitionNumber').replace(/^partition-/i, '')
-      : frame.get('partitionNumber')
     const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
 
     const props = {}
@@ -256,7 +251,6 @@ class Tab extends React.Component {
     props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, props.frameKey)
     props.isPlayIndicatorBreakpoint = tabContentState.isMediumView(currentWindow, props.frameKey) || props.isNarrowView
     props.title = frame.get('title')
-    props.showSessionIcon = partition && hasSeconardImage
     props.partOfFullPageSet = ownProps.partOfFullPageSet
 
     // used in other functions
@@ -352,11 +346,7 @@ class Tab extends React.Component {
           />
         </div>
         <PrivateIcon isPrivateTab={this.props.isPrivateTab} frameKey={this.props.frameKey} />
-        {
-          this.props.showSessionIcon
-          ? <NewSessionIcon frameKey={this.props.frameKey} />
-          : null
-        }
+        <NewSessionIcon frameKey={this.props.frameKey} />
         <CloseTabIcon
           frameKey={this.props.frameKey}
           fixTabWidth={this.fixTabWidth}
