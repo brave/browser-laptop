@@ -58,8 +58,8 @@ class CloseTabIcon extends React.Component {
     // used in renderer
     props.showCloseIcon = !isPinnedTab &&
       (
-        closeState.hasRelativeCloseIcon(currentWindow, frameKey) ||
-        closeState.hasFixedCloseIcon(currentWindow, frameKey)
+        closeState.deprecatedHasRelativeCloseIcon(currentWindow, frameKey) ||
+        closeState.deprecatedHasFixedCloseIcon(currentWindow, frameKey)
       )
 
     // used in functions

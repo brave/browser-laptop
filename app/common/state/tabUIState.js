@@ -87,9 +87,9 @@ const tabUIState = {
 
     return (
       // Hide icon on hover
-      !closeState.hasRelativeCloseIcon(state, frameKey) &&
+      !closeState.deprecatedHasRelativeCloseIcon(state, frameKey) &&
       // If closeIcon is fixed then there's no room for another icon
-      !closeState.hasFixedCloseIcon(state, frameKey) &&
+      !closeState.deprecatedHasFixedCloseIcon(state, frameKey) &&
       // completely hide it for small sizes
       !hasBreakpoint(frame.get('breakpoint'),
         ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest'])
