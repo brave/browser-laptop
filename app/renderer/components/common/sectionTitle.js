@@ -90,7 +90,8 @@ const styles = StyleSheet.create({
   },
 
   aboutPageSectionTitle: {
-    display: 'inline-block'
+    display: 'block',
+    whiteSpace: 'nowrap'
   },
   aboutPageSectionSubTitle: {
     fontSize: '16px',

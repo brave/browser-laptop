@@ -7,6 +7,9 @@ const React = require('react')
 const Immutable = require('immutable')
 const ipc = window.chrome.ipcRenderer
 
+const cx = require('../../../../js/lib/classSet')
+const {StyleSheet, css} = require('aphrodite/no-important')
+
 // Components
 const {AboutPageSectionTitle} = require('../../components/common/sectionTitle')
 const BookmarkFolderList = require('./bookmarkFolderList')
@@ -133,7 +136,10 @@ class Bookmarks extends React.Component {
 
   render () {
     return <div className='siteDetailsPage bookmarksManager' onClick={this.onClick}>
-      <div className='siteDetailsPageHeader'>
+      <div className={cx({
+        siteDetailsPageHeader: true,
+        [css(styles.bookmarksManager__header)]: true
+      })}>
         <AboutPageSectionTitle data-l10n-id='bookmarkManager' />
         <div className='headerActions'>
           <div className='searchWrapper'>
@@ -163,7 +169,8 @@ class Bookmarks extends React.Component {
             isRoot
             selectedFolderId={this.state.selectedFolderId}
             search={this.state.search}
-            bookmarkOrder={this.state.bookmarkOrder} />
+            bookmarkOrder={this.state.bookmarkOrder}
+          />
         </div>
         <div className='organizeView'>
           <BookmarksList
@@ -176,11 +183,20 @@ class Bookmarks extends React.Component {
             allBookmarkFolders={this.state.bookmarkFolders}
             sortable={false}
             draggable={!this.state.search}
-            selectedFolderId={this.state.selectedFolderId} />
+            selectedFolderId={this.state.selectedFolderId}
+          />
         </div>
       </div>
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  bookmarksManager__header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  }
+})
 
 module.exports = <Bookmarks />
