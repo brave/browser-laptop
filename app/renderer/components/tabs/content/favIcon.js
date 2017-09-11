@@ -11,7 +11,7 @@ const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
 // State
-const tabContentState = require('../../../../common/state/tabContentState')
+const tabUIState = require('../../../../common/state/tabUIState')
 const tabState = require('../../../../common/state/tabState')
 
 // Utils
@@ -35,7 +35,7 @@ class Favicon extends React.Component {
     const currentWindow = state.get('currentWindow')
     const frameKey = ownProps.frameKey
     const frame = frameStateUtil.getFrameByKey(currentWindow, frameKey) || Immutable.Map()
-    const isTabLoading = tabContentState.isTabLoading(currentWindow, frameKey)
+    const isTabLoading = tabUIState.isTabLoading(currentWindow, frameKey)
     const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
     const props = {}
 
@@ -45,8 +45,8 @@ class Favicon extends React.Component {
     props.isTabLoading = !isSourceAboutUrl(frame.get('location')) && isTabLoading
     props.favicon = !isTabLoading && frame.get('icon')
     props.isPinnedTab = tabState.isTabPinned(state, tabId)
-    props.tabIconColor = tabContentState.getTabIconColor(currentWindow, frameKey)
-    props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, frameKey)
+    props.tabIconColor = tabUIState.getTabIconColor(currentWindow, frameKey)
+    props.isNarrowestView = tabUIState.isNarrowestView(currentWindow, frameKey)
     props.showFavIcon = !((hasBreakpoint(ownProps.breakpoint, 'extraSmall') && ownProps.isActive) || frame.get('location') === 'about:newtab')
     // used in functions
     props.frameKey = frameKey

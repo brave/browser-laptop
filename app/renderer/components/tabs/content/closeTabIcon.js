@@ -11,7 +11,7 @@ const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
 // State
-const tabContentState = require('../../../../common/state/tabContentState')
+const tabUIState = require('../../../../common/state/tabUIState')
 const tabState = require('../../../../common/state/tabState')
 
 // Actions
@@ -58,8 +58,8 @@ class CloseTabIcon extends React.Component {
     // used in renderer
     props.showCloseIcon = !isPinnedTab &&
       (
-        tabContentState.hasRelativeCloseIcon(currentWindow, frameKey) ||
-        tabContentState.hasFixedCloseIcon(currentWindow, frameKey)
+        tabUIState.hasRelativeCloseIcon(currentWindow, frameKey) ||
+        tabUIState.hasFixedCloseIcon(currentWindow, frameKey)
       )
 
     // used in functions

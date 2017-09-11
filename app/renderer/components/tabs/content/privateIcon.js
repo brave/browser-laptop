@@ -10,7 +10,7 @@ const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
 // State
-const tabContentState = require('../../../../common/state/tabContentState')
+const tabUIState = require('../../../../common/state/tabUIState')
 
 // Utils
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
@@ -23,7 +23,7 @@ class PrivateIcon extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frameKey = ownProps.frameKey
-    const hasSeconardImage = tabContentState.hasVisibleSecondaryIcon(currentWindow, ownProps.frameKey)
+    const hasSeconardImage = tabUIState.hasVisibleSecondaryIcon(currentWindow, ownProps.frameKey)
 
     const props = {}
     // used in renderer

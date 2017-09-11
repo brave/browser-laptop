@@ -40,8 +40,8 @@ const defaultWindowStore = Immutable.fromJS({
   }
 })
 
-describe('tabContentState unit tests', function () {
-  let tabContentState
+describe('tabUIState unit tests', function () {
+  let tabUIState
   let frameStateUtil
   let getFrameByKeyMock
   let defaultValue
@@ -62,7 +62,7 @@ describe('tabContentState unit tests', function () {
     mockery.registerMock('../../../js/settings', {
       getSetting: () => defaultValue
     })
-    tabContentState = require('../../../../../app/common/state/tabContentState')
+    tabUIState = require('../../../../../app/common/state/tabUIState')
   })
 
   beforeEach(function () {
@@ -88,7 +88,7 @@ describe('tabContentState unit tests', function () {
 
   describe('getDisplayTitle', function () {
     it('should return empty string if frame is not found', function * () {
-      const result = tabContentState.getDisplayTitle(defaultWindowStore, 0)
+      const result = tabUIState.getDisplayTitle(defaultWindowStore, 0)
       assert.equal(result, '')
     })
 
@@ -96,7 +96,7 @@ describe('tabContentState unit tests', function () {
       const windowStore = defaultWindowStore.mergeIn(['frames', 0], {
         location: 'about:blank'
       })
-      const result = tabContentState.getDisplayTitle(windowStore, frameKey)
+      const result = tabUIState.getDisplayTitle(windowStore, frameKey)
       assert.equal(result, 'translated')
     })
 
@@ -104,7 +104,7 @@ describe('tabContentState unit tests', function () {
       const windowStore = defaultWindowStore.mergeIn(['frames', 0], {
         location: 'about:blank'
       })
-      const result = tabContentState.getDisplayTitle(windowStore, frameKey)
+      const result = tabUIState.getDisplayTitle(windowStore, frameKey)
       assert.equal(result, 'translated')
     })
 
@@ -113,12 +113,12 @@ describe('tabContentState unit tests', function () {
       const windowStore = defaultWindowStore.mergeIn(['frames', 0], {
         title: title
       })
-      const result = tabContentState.getDisplayTitle(windowStore, frameKey)
+      const result = tabUIState.getDisplayTitle(windowStore, frameKey)
       assert.equal(result, title)
     })
 
     it('should return location if title is not provided', function * () {
-      const result = tabContentState.getDisplayTitle(defaultWindowStore, frameKey)
+      const result = tabUIState.getDisplayTitle(defaultWindowStore, frameKey)
       assert.equal(result, defaultWindowStore.getIn(['frames', 0, 'location']))
     })
 
@@ -126,14 +126,14 @@ describe('tabContentState unit tests', function () {
       const windowStore = defaultWindowStore.mergeIn(['frames', 0], {
         title: '▶ Brave'
       })
-      const result = tabContentState.getDisplayTitle(windowStore, frameKey)
+      const result = tabUIState.getDisplayTitle(windowStore, frameKey)
       assert.equal(result, 'Brave')
     })
   })
 
   describe('isTabLoading', function () {
     it('handles frame being null/undefined', function () {
-      assert.equal(tabContentState.isTabLoading(), false)
+      assert.equal(tabUIState.isTabLoading(), false)
     })
 
     describe('when provisionalLocation is not set', function () {
@@ -141,13 +141,13 @@ describe('tabContentState unit tests', function () {
         getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', (state, frameKey) => {
           return Immutable.fromJS({loading: true})
         })
-        assert.equal(tabContentState.isTabLoading(), true)
+        assert.equal(tabUIState.isTabLoading(), true)
       })
       it('returns true if location is about:blank', function () {
         getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', (state, frameKey) => {
           return Immutable.fromJS({location: 'about:blank'})
         })
-        assert.equal(tabContentState.isTabLoading(), true)
+        assert.equal(tabUIState.isTabLoading(), true)
       })
     })
 
@@ -159,7 +159,7 @@ describe('tabContentState unit tests', function () {
             provisionalLocation: `chrome-extension://${braveExtensionId}/pageGoesHere`
           })
         })
-        assert.equal(tabContentState.isTabLoading(), false)
+        assert.equal(tabUIState.isTabLoading(), false)
       })
       it('returns true if loading and provisionalLocation is not a brave about page', function () {
         getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', (state, frameKey) => {
@@ -168,65 +168,65 @@ describe('tabContentState unit tests', function () {
             provisionalLocation: 'https://brave.com'
           })
         })
-        assert.equal(tabContentState.isTabLoading(), true)
+        assert.equal(tabUIState.isTabLoading(), true)
       })
     })
   })
 
   describe('isMediumView', function () {
     it('handles frame being null/undefined', function () {
-      assert.equal(tabContentState.isMediumView(), false)
+      assert.equal(tabUIState.isMediumView(), false)
     })
 
     it('returns true if valid', function () {
       getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', (state, frameKey) => {
         return Immutable.fromJS({breakpoint: 'large'})
       })
-      assert.equal(tabContentState.isMediumView(), true)
+      assert.equal(tabUIState.isMediumView(), true)
     })
   })
 
   describe('isNarrowView', function () {
     it('returns false if null/undefined', function () {
-      assert.equal(tabContentState.isNarrowView(), false)
+      assert.equal(tabUIState.isNarrowView(), false)
     })
 
     it('returns true if valid', function () {
       getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', (state, frameKey) => {
         return Immutable.fromJS({breakpoint: 'small'})
       })
-      assert.equal(tabContentState.isNarrowView(), true)
+      assert.equal(tabUIState.isNarrowView(), true)
     })
   })
 
   describe('isNarrowestView', function () {
     it('handles frame being null/undefined', function () {
-      assert.equal(tabContentState.isNarrowestView(), false)
+      assert.equal(tabUIState.isNarrowestView(), false)
     })
 
     it('returns true if valid', function () {
       getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', (state, frameKey) => {
         return Immutable.fromJS({breakpoint: 'extraSmall'})
       })
-      assert.equal(tabContentState.isNarrowestView(), true)
+      assert.equal(tabUIState.isNarrowestView(), true)
     })
   })
 
   describe('getThemeColor', function () {
     it('handles frame being null/undefined', function () {
-      assert.equal(tabContentState.getThemeColor(), false)
+      assert.equal(tabUIState.getThemeColor(), false)
     })
 
     it('if PAINT_TABS is false', function () {
       defaultValue = false
-      assert.equal(tabContentState.getThemeColor(), false)
+      assert.equal(tabUIState.getThemeColor(), false)
     })
 
     it('if PAINT_TABS is true, but dont have themeColor', function () {
       getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', () => {
         return null
       })
-      assert.equal(tabContentState.getThemeColor(), false)
+      assert.equal(tabUIState.getThemeColor(), false)
     })
 
     it('if PAINT_TABS is true and have themeColor', function () {
@@ -235,7 +235,7 @@ describe('tabContentState unit tests', function () {
           themeColor: '#F00'
         })
       })
-      assert.equal(tabContentState.getThemeColor(), '#F00')
+      assert.equal(tabUIState.getThemeColor(), '#F00')
     })
 
     it('if PAINT_TABS is true and have computedThemeColor', function () {
@@ -244,7 +244,7 @@ describe('tabContentState unit tests', function () {
           computedThemeColor: '#FFF'
         })
       })
-      assert.equal(tabContentState.getThemeColor(), '#FFF')
+      assert.equal(tabUIState.getThemeColor(), '#FFF')
     })
 
     it('if PAINT_TABS is true and both theme colors are provided', function () {
@@ -254,20 +254,20 @@ describe('tabContentState unit tests', function () {
           computedThemeColor: '#FFF'
         })
       })
-      assert.equal(tabContentState.getThemeColor(), '#F00')
+      assert.equal(tabUIState.getThemeColor(), '#F00')
     })
   })
 
   describe('canPlayAudio', function () {
     it('handles frame being null/undefined', function () {
-      assert.equal(tabContentState.canPlayAudio(), false)
+      assert.equal(tabUIState.canPlayAudio(), false)
     })
 
     it('if audioPlaybackActive and audioMuted is not defined', function () {
       getFrameByKeyMock = sinon.stub(frameStateUtil, 'getFrameByKey', () => {
         return null
       })
-      assert.equal(tabContentState.canPlayAudio(), false)
+      assert.equal(tabUIState.canPlayAudio(), false)
     })
 
     it('if audioPlaybackActive is true', function () {
@@ -276,7 +276,7 @@ describe('tabContentState unit tests', function () {
           audioPlaybackActive: true
         })
       })
-      assert.equal(tabContentState.canPlayAudio(), true)
+      assert.equal(tabUIState.canPlayAudio(), true)
     })
 
     it('if audioMuted is true', function () {
@@ -285,7 +285,7 @@ describe('tabContentState unit tests', function () {
           audioMuted: true
         })
       })
-      assert.equal(tabContentState.canPlayAudio(), true)
+      assert.equal(tabUIState.canPlayAudio(), true)
     })
 
     it('if both provided', function () {
@@ -295,14 +295,14 @@ describe('tabContentState unit tests', function () {
           audioMuted: false
         })
       })
-      assert.equal(tabContentState.canPlayAudio(), true)
+      assert.equal(tabUIState.canPlayAudio(), true)
     })
   })
 
   describe('getPageIndex', function () {
     it('handles frame being null/undefined', function () {
       const state = Immutable.fromJS({})
-      assert.equal(tabContentState.getPageIndex(state), 0)
+      assert.equal(tabUIState.getPageIndex(state), 0)
     })
 
     it('tabPageIndex is provided', function () {
@@ -313,7 +313,7 @@ describe('tabContentState unit tests', function () {
           }
         }
       })
-      assert.equal(tabContentState.getPageIndex(state), 1)
+      assert.equal(tabUIState.getPageIndex(state), 1)
     })
 
     it('previewTabPageIndex is provided', function () {
@@ -324,7 +324,7 @@ describe('tabContentState unit tests', function () {
           }
         }
       })
-      assert.equal(tabContentState.getPageIndex(state), 1)
+      assert.equal(tabUIState.getPageIndex(state), 1)
     })
 
     it('both are provided', function () {
@@ -336,14 +336,14 @@ describe('tabContentState unit tests', function () {
           }
         }
       })
-      assert.equal(tabContentState.getPageIndex(state), 1)
+      assert.equal(tabUIState.getPageIndex(state), 1)
     })
   })
 
   describe('getTabIconColor', function () {
     it('handles frame being null/undefined', function () {
       const state = Immutable.fromJS({})
-      assert.equal(tabContentState.getTabIconColor(state), '')
+      assert.equal(tabUIState.getTabIconColor(state), '')
     })
 
     it('tab is private and active', function () {
@@ -356,7 +356,7 @@ describe('tabContentState unit tests', function () {
       isFrameKeyActive = sinon.stub(frameStateUtil, 'isFrameKeyActive', () => {
         return true
       })
-      assert.equal(tabContentState.getTabIconColor(state), styles.color.white100)
+      assert.equal(tabUIState.getTabIconColor(state), styles.color.white100)
     })
 
     it('tab is not private and active, but paint is disabled', function () {
@@ -370,7 +370,7 @@ describe('tabContentState unit tests', function () {
         return true
       })
       defaultValue = false
-      assert.equal(tabContentState.getTabIconColor(state), styles.color.black100)
+      assert.equal(tabUIState.getTabIconColor(state), styles.color.black100)
     })
 
     it('all valid', function () {
@@ -384,14 +384,14 @@ describe('tabContentState unit tests', function () {
       isFrameKeyActive = sinon.stub(frameStateUtil, 'isFrameKeyActive', () => {
         return true
       })
-      assert.equal(tabContentState.getTabIconColor(state), 'white')
+      assert.equal(tabUIState.getTabIconColor(state), 'white')
     })
   })
 
   describe('hasFixedCloseIcon', function () {
     it('handles frame being null/undefined', function () {
       const state = Immutable.fromJS({})
-      assert.equal(tabContentState.hasFixedCloseIcon(state), false)
+      assert.equal(tabUIState.hasFixedCloseIcon(state), false)
     })
 
     it('frame is not active', function () {
@@ -403,7 +403,7 @@ describe('tabContentState unit tests', function () {
       isFrameKeyActive = sinon.stub(frameStateUtil, 'isFrameKeyActive', () => {
         return false
       })
-      assert.equal(tabContentState.hasFixedCloseIcon(), false)
+      assert.equal(tabUIState.hasFixedCloseIcon(), false)
     })
 
     it('frame is active and breakpoint is small', function () {
@@ -415,7 +415,7 @@ describe('tabContentState unit tests', function () {
       isFrameKeyActive = sinon.stub(frameStateUtil, 'isFrameKeyActive', () => {
         return true
       })
-      assert.equal(tabContentState.hasFixedCloseIcon(), true)
+      assert.equal(tabUIState.hasFixedCloseIcon(), true)
     })
 
     it('frame is active and breakpoint is default', function () {
@@ -427,7 +427,7 @@ describe('tabContentState unit tests', function () {
       isFrameKeyActive = sinon.stub(frameStateUtil, 'isFrameKeyActive', () => {
         return true
       })
-      assert.equal(tabContentState.hasFixedCloseIcon(), false)
+      assert.equal(tabUIState.hasFixedCloseIcon(), false)
     })
 
     it('frame is active and breakpoint is dynamic', function () {
@@ -439,19 +439,19 @@ describe('tabContentState unit tests', function () {
       isFrameKeyActive = sinon.stub(frameStateUtil, 'isFrameKeyActive', () => {
         return true
       })
-      assert.equal(tabContentState.hasFixedCloseIcon(), false)
+      assert.equal(tabUIState.hasFixedCloseIcon(), false)
     })
   })
 
   describe('hasRelativeCloseIcon', function () {
     it('handles frame being null/undefined', function () {
       const state = Immutable.fromJS({})
-      assert.equal(tabContentState.hasRelativeCloseIcon(state), false)
+      assert.equal(tabUIState.hasRelativeCloseIcon(state), false)
     })
 
     it('if not hovering (tabIndex !== hoverTabIndex)', function () {
       const state = defaultWindowStore.setIn(['ui', 'tabs', 'hoverTabIndex'], null)
-      assert.equal(tabContentState.hasRelativeCloseIcon(state, frameKey), false)
+      assert.equal(tabUIState.hasRelativeCloseIcon(state, frameKey), false)
     })
 
     it('if hovering (tabIndex === hoverTabIndex) and break point is small', function () {
@@ -461,7 +461,7 @@ describe('tabContentState unit tests', function () {
           breakpoint: 'small'
         })
       })
-      assert.equal(tabContentState.hasRelativeCloseIcon(state, frameKey), false)
+      assert.equal(tabUIState.hasRelativeCloseIcon(state, frameKey), false)
     })
 
     it('if hovering (tabIndex === hoverTabIndex) and break point is default', function () {
@@ -471,7 +471,7 @@ describe('tabContentState unit tests', function () {
           breakpoint: 'default'
         })
       })
-      assert.equal(tabContentState.hasRelativeCloseIcon(state, frameKey), true)
+      assert.equal(tabUIState.hasRelativeCloseIcon(state, frameKey), true)
     })
 
     it('if hovering (tabIndex === hoverTabIndex) and break point is dynamic', function () {
@@ -481,7 +481,7 @@ describe('tabContentState unit tests', function () {
           breakpoint: 'dynamic'
         })
       })
-      assert.equal(tabContentState.hasRelativeCloseIcon(state, frameKey), true)
+      assert.equal(tabUIState.hasRelativeCloseIcon(state, frameKey), true)
     })
   })
 
@@ -501,7 +501,7 @@ describe('tabContentState unit tests', function () {
 
     it('handles frame being null/undefined', function () {
       const state = Immutable.fromJS({})
-      assert.equal(tabContentState.hasVisibleSecondaryIcon(state), false)
+      assert.equal(tabUIState.hasVisibleSecondaryIcon(state), false)
     })
 
     it('hasRelativeCloseIcon, dont have hasFixedCloseIcon and is default', function () {
@@ -510,13 +510,13 @@ describe('tabContentState unit tests', function () {
           breakpoint: 'default'
         })
       })
-      hasRelativeCloseIcon = sinon.stub(tabContentState, 'hasRelativeCloseIcon', () => {
+      hasRelativeCloseIcon = sinon.stub(tabUIState, 'hasRelativeCloseIcon', () => {
         return true
       })
-      hasFixedCloseIcon = sinon.stub(tabContentState, 'hasFixedCloseIcon', () => {
+      hasFixedCloseIcon = sinon.stub(tabUIState, 'hasFixedCloseIcon', () => {
         return false
       })
-      assert.equal(tabContentState.hasVisibleSecondaryIcon(), false)
+      assert.equal(tabUIState.hasVisibleSecondaryIcon(), false)
     })
 
     it('dont have hasRelativeCloseIcon, have hasFixedCloseIcon and is default', function () {
@@ -525,13 +525,13 @@ describe('tabContentState unit tests', function () {
           breakpoint: 'default'
         })
       })
-      hasRelativeCloseIcon = sinon.stub(tabContentState, 'hasRelativeCloseIcon', () => {
+      hasRelativeCloseIcon = sinon.stub(tabUIState, 'hasRelativeCloseIcon', () => {
         return false
       })
-      hasFixedCloseIcon = sinon.stub(tabContentState, 'hasFixedCloseIcon', () => {
+      hasFixedCloseIcon = sinon.stub(tabUIState, 'hasFixedCloseIcon', () => {
         return true
       })
-      assert.equal(tabContentState.hasVisibleSecondaryIcon(), false)
+      assert.equal(tabUIState.hasVisibleSecondaryIcon(), false)
     })
 
     it('dont have hasRelativeCloseIcon, dont have hasFixedCloseIcon and is small', function () {
@@ -540,13 +540,13 @@ describe('tabContentState unit tests', function () {
           breakpoint: 'small'
         })
       })
-      hasRelativeCloseIcon = sinon.stub(tabContentState, 'hasRelativeCloseIcon', () => {
+      hasRelativeCloseIcon = sinon.stub(tabUIState, 'hasRelativeCloseIcon', () => {
         return false
       })
-      hasFixedCloseIcon = sinon.stub(tabContentState, 'hasFixedCloseIcon', () => {
+      hasFixedCloseIcon = sinon.stub(tabUIState, 'hasFixedCloseIcon', () => {
         return false
       })
-      assert.equal(tabContentState.hasVisibleSecondaryIcon(), false)
+      assert.equal(tabUIState.hasVisibleSecondaryIcon(), false)
     })
 
     it('dont have hasRelativeCloseIcon, dont have hasFixedCloseIcon and is default', function () {
@@ -555,13 +555,13 @@ describe('tabContentState unit tests', function () {
           breakpoint: 'default'
         })
       })
-      hasRelativeCloseIcon = sinon.stub(tabContentState, 'hasRelativeCloseIcon', () => {
+      hasRelativeCloseIcon = sinon.stub(tabUIState, 'hasRelativeCloseIcon', () => {
         return false
       })
-      hasFixedCloseIcon = sinon.stub(tabContentState, 'hasFixedCloseIcon', () => {
+      hasFixedCloseIcon = sinon.stub(tabUIState, 'hasFixedCloseIcon', () => {
         return false
       })
-      assert.equal(tabContentState.hasVisibleSecondaryIcon(), true)
+      assert.equal(tabUIState.hasVisibleSecondaryIcon(), true)
     })
   })
 })

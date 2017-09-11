@@ -17,7 +17,7 @@ const windowActions = require('../../../../js/actions/windowActions')
 
 // State
 const windowState = require('../../../common/state/windowState')
-const tabContentState = require('../../../common/state/tabContentState')
+const tabUIState = require('../../../common/state/tabUIState')
 
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
@@ -129,7 +129,7 @@ class Tabs extends React.Component {
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const pageIndex = tabContentState.getPageIndex(currentWindow)
+    const pageIndex = tabUIState.getPageIndex(currentWindow)
     const tabsPerTabPage = Number(getSetting(settings.TABS_PER_PAGE))
     const startingFrameIndex = pageIndex * tabsPerTabPage
     const unpinnedTabs = frameStateUtil.getNonPinnedFrames(currentWindow) || Immutable.List()

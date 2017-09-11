@@ -16,7 +16,7 @@ const {getSetting} = require('../../../js/settings')
 // Styles
 const styles = require('../../renderer/components/styles/global')
 
-const tabContentState = {
+const tabUIState = {
   getDisplayTitle: (state, frameKey) => {
     const frame = frameStateUtil.getFrameByKey(state, frameKey)
 
@@ -176,9 +176,9 @@ const tabContentState = {
 
     return (
       // Hide icon on hover
-      !tabContentState.hasRelativeCloseIcon(state, frameKey) &&
+      !tabUIState.hasRelativeCloseIcon(state, frameKey) &&
       // If closeIcon is fixed then there's no room for another icon
-      !tabContentState.hasFixedCloseIcon(state, frameKey) &&
+      !tabUIState.hasFixedCloseIcon(state, frameKey) &&
       // completely hide it for small sizes
       !hasBreakpoint(frame.get('breakpoint'),
         ['medium', 'mediumSmall', 'small', 'extraSmall', 'smallest'])
@@ -186,4 +186,4 @@ const tabContentState = {
   }
 }
 
-module.exports = tabContentState
+module.exports = tabUIState

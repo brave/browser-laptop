@@ -24,7 +24,7 @@ const windowActions = require('../../../../js/actions/windowActions')
 const windowStore = require('../../../../js/stores/windowStore')
 
 // State
-const tabContentState = require('../../../common/state/tabContentState')
+const tabUIState = require('../../../common/state/tabUIState')
 const tabState = require('../../../common/state/tabState')
 
 // Constants
@@ -245,18 +245,18 @@ class Tab extends React.Component {
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, props.frameKey)
     props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.isPinnedTab = tabState.isTabPinned(state, tabId)
-    props.canPlayAudio = tabContentState.canPlayAudio(currentWindow, props.frameKey)
-    props.themeColor = tabContentState.getThemeColor(currentWindow, props.frameKey)
-    props.isNarrowView = tabContentState.isNarrowView(currentWindow, props.frameKey)
-    props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, props.frameKey)
-    props.isPlayIndicatorBreakpoint = tabContentState.isMediumView(currentWindow, props.frameKey) || props.isNarrowView
+    props.canPlayAudio = tabUIState.canPlayAudio(currentWindow, props.frameKey)
+    props.themeColor = tabUIState.getThemeColor(currentWindow, props.frameKey)
+    props.isNarrowView = tabUIState.isNarrowView(currentWindow, props.frameKey)
+    props.isNarrowestView = tabUIState.isNarrowestView(currentWindow, props.frameKey)
+    props.isPlayIndicatorBreakpoint = tabUIState.isMediumView(currentWindow, props.frameKey) || props.isNarrowView
     props.title = frame.get('title')
     props.partOfFullPageSet = ownProps.partOfFullPageSet
 
     // used in other functions
     props.totalTabs = state.get('tabs').size
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
-    props.hasTabInFullScreen = tabContentState.hasTabInFullScreen(currentWindow)
+    props.hasTabInFullScreen = tabUIState.hasTabInFullScreen(currentWindow)
     props.tabId = tabId
     props.previewMode = currentWindow.getIn(['ui', 'tabs', 'previewMode'])
 

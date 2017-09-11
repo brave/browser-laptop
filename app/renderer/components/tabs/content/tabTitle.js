@@ -9,7 +9,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ReduxComponent = require('../../reduxComponent')
 
 // State
-const tabContentState = require('../../../../common/state/tabContentState')
+const tabUIState = require('../../../../common/state/tabUIState')
 
 // Utils
 const {hasBreakpoint} = require('../../../lib/tabUtil')
@@ -24,13 +24,13 @@ class TabTitle extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frameKey = ownProps.frameKey
-    const tabIconColor = tabContentState.getTabIconColor(currentWindow, frameKey)
+    const tabIconColor = tabUIState.getTabIconColor(currentWindow, frameKey)
 
     const props = {}
     // used in renderer
     props.enforceFontVisibility = isDarwin && tabIconColor === 'white'
     props.tabIconColor = tabIconColor
-    props.displayTitle = tabContentState.getDisplayTitle(currentWindow, frameKey)
+    props.displayTitle = tabUIState.getDisplayTitle(currentWindow, frameKey)
     props.showTitle = !ownProps.isPinnedTab &&
     !(
       (hasBreakpoint(ownProps.breakpoint, ['mediumSmall', 'small']) && ownProps.isActive) ||
