@@ -216,6 +216,8 @@ const bookmarksState = {
         if (syncEnabled) {
           removedBookmarks.push(bookmark.toJS())
         }
+
+        state = bookmarkLocationCache.removeCacheKey(state, bookmark.get('location'), bookmark.get('key'))
         return false
       })
 
