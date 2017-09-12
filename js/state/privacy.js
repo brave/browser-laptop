@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const AppDispatcher = require('../dispatcher/appDispatcher')
+const appDispatcher = require('../dispatcher/appDispatcher')
 const AppStore = require('../stores/appStore')
 const appConstants = require('../constants/appConstants')
 const {passwordManagers} = require('../constants/passwordManagers')
@@ -24,7 +24,7 @@ let updateTrigger
 // Register callback to handle all updates
 const doAction = (action) => {
   if (action.actionType === appConstants.APP_CHANGE_SETTING) {
-    AppDispatcher.waitFor([AppStore.dispatchToken], () => {
+    appDispatcher.waitFor([AppStore.dispatchToken], () => {
       updateTrigger()
     })
   }
@@ -32,5 +32,5 @@ const doAction = (action) => {
 
 module.exports.init = () => {
   updateTrigger = registerUserPrefs(() => getPrivacySettings())
-  AppDispatcher.register(doAction)
+  appDispatcher.register(doAction)
 }
