@@ -8,12 +8,12 @@ const {mount} = require('enzyme')
 const assert = require('assert')
 const Immutable = require('immutable')
 const fakeElectron = require('../../../../../lib/fakeElectron')
+const {intersection} = require('../../../../../../../app/renderer/components/styles/global')
 require('../../../../../braveUnit')
 
 const index = 0
 const tabId = 1
 const frameKey = 1
-const invalidFrameKey = 71
 
 const fakeAppStoreRenderer = Immutable.fromJS({
   windows: [{
@@ -51,11 +51,6 @@ const defaultWindowStore = Immutable.fromJS({
     tabIndex: {
       1: 0
     }
-  },
-  ui: {
-    tabs: {
-      hoverTabIndex: index
-    }
   }
 })
 
@@ -69,8 +64,7 @@ describe('Tabs content - CloseTabIcon', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_hover.svg')
-    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_normal.svg')
+    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn.svg')
     windowStore = require('../../../../../../../js/stores/windowStore')
     appStore = require('../../../../../../../js/stores/appStoreRenderer')
     CloseTabIcon = require('../../../../../../../app/renderer/components/tabs/content/closeTabIcon')
@@ -83,155 +77,46 @@ describe('Tabs content - CloseTabIcon', function () {
   })
 
   describe('should show icon', function () {
-    it('if mouse is over tab and breakpoint is default', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        hoverState: true,
-        breakpoint: 'default'
+    it('if not intersected and tab is hovered', function * () {
+      windowStore.state = defaultWindowStore.mergeIn(['ui', 'tabs'], {
+        intersectionRatio: intersection.noIntersection,
+        hoverTabIndex: index
       })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
+      const wrapper = mount(<CloseTabIcon tabId={tabId} />)
+      assert.equal(wrapper.find('TabIcon').length, 1)
     })
 
-    it('if mouse is over tab and breakpoint is large', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        hoverState: true,
-        breakpoint: 'large'
-      })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
-    })
-
-    it('if tab size is largeMedium and tab is active', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        hoverState: false,
-        breakpoint: 'largeMedium'
-      })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
-    })
-
-    it('if tab size is medium and tab is active', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        hoverState: false,
-        breakpoint: 'medium'
-      })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
-    })
-
-    it('if tab size is mediumSmall and tab is active', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        hoverState: false,
-        breakpoint: 'mediumSmall'
-      })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
-    })
-
-    it('if tab size is small and tab is active', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        hoverState: false,
-        breakpoint: 'small'
-      })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
-    })
-
-    it('if tab size is extraSmall and tab is active', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        hoverState: false,
-        breakpoint: 'extraSmall'
-      })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-on')
-    })
-
-    it('passing in a frame key which does not exist does not fail', function () {
+    it('if intersection is at less than 75% size and tab is active', function * () {
       windowStore.state = defaultWindowStore
-      const wrapper = mount(<CloseTabIcon frameKey={invalidFrameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at75)
+      const wrapper = mount(<CloseTabIcon tabId={tabId} />)
+      assert.equal(wrapper.find('TabIcon').length, 1)
     })
   })
 
   describe('should not show icon', function () {
-    it('if tab is pinned', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        hoverState: true,
-        pinnedLocation: true
-      })
-      appStore.state = fakeAppStoreRenderer.setIn(['tabs', 0, 'pinned'], true)
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
+    it('if tab is intersected at 15% size or less', function * () {
+      windowStore.state = defaultWindowStore
+        .setIn(['ui', 'tabs', 'intersectionRatio', intersection.at20])
+      const wrapper = mount(<CloseTabIcon tabId={tabId} />)
+      assert.equal(wrapper.find('TabIcon').length, 0)
     })
 
-    it('if tab size is largeMedium and tab is not active', function () {
-      windowStore.state = defaultWindowStore.merge({
-        activeFrameKey: 0,
-        frames: [{
-          hoverState: true,
-          breakpoint: 'largeMedium'
-        }]
+    it('if not intersected and tab is not hovered', function * () {
+      windowStore.state = defaultWindowStore.mergeIn(['ui', 'tabs'], {
+        intersectionRatio: intersection.noIntersection,
+        hoverTabIndex: 1337
       })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
+      const wrapper = mount(<CloseTabIcon tabId={tabId} />)
+      assert.equal(wrapper.find('TabIcon').length, 0)
     })
 
-    it('if tab size is medium and tab is not active', function () {
-      windowStore.state = defaultWindowStore.merge({
-        activeFrameKey: 0,
-        frames: [{
-          hoverState: true,
-          breakpoint: 'medium'
-        }]
-      })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
-    })
-
-    it('if tab size is mediumSmall and tab is not active', function () {
-      windowStore.state = defaultWindowStore.merge({
-        activeFrameKey: 0,
-        frames: [{
-          hoverState: true,
-          breakpoint: 'mediumSmall'
-        }]
-      })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
-    })
-
-    it('if tab size is small and tab is not active', function () {
-      windowStore.state = defaultWindowStore.merge({
-        activeFrameKey: 0,
-        frames: [{
-          hoverState: true,
-          breakpoint: 'small'
-        }]
-      })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
-    })
-
-    it('if tab size is extraSmall and tab is not active', function () {
-      windowStore.state = defaultWindowStore.merge({
-        activeFrameKey: 0,
-        frames: [{
-          hoverState: true,
-          breakpoint: 'extraSmall'
-        }]
-      })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
-    })
-
-    // TODO check what is going on
-    it.skip('if tab size is the smallest size', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        hoverState: true,
-        breakpoint: 'extraSmall'
-      })
-      const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
+    it('if intersection is at less than 75% size and tab is not active', function * () {
+      windowStore.state = defaultWindowStore
+        .set('activeFrameKey', 1337)
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at45)
+      const wrapper = mount(<CloseTabIcon tabId={tabId} />)
+      assert.equal(wrapper.find('TabIcon').length, 0)
     })
   })
 })
