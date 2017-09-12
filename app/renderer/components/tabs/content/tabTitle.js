@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
@@ -10,10 +10,11 @@ const ReduxComponent = require('../../reduxComponent')
 
 // State helpers
 const titleState = require('../../../../common/state/tabContentState/titleState')
+const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const tabUIState = require('../../../../common/state/tabUIState')
+const tabState = require('../../../../common/state/tabState')
 
 // Utils
-const {hasBreakpoint} = require('../../../lib/tabUtil')
 const platformUtil = require('../../../../common/lib/platformUtil')
 const isWindows = platformUtil.isWindows()
 const isDarwin = platformUtil.isDarwin()
@@ -24,43 +25,34 @@ const globalStyles = require('../../styles/global')
 class TabTitle extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const frameKey = ownProps.frameKey
-    const tabIconColor = tabUIState.getTabIconColor(currentWindow, frameKey)
+    const tabId = ownProps.tabId
+    const frameKey = frameStateUtil.getFrameKeyByTabId(currentWindow, tabId)
 
     const props = {}
-    // used in renderer
-    props.enforceFontVisibility = isDarwin && tabIconColor === 'white'
-    props.tabIconColor = tabIconColor
+    props.isWindows = isWindows
+    props.isDarwin = isDarwin
+    props.isPinned = tabState.isTabPinned(state, tabId)
+    props.showTabTitle = titleState.showTabTitle(currentWindow, frameKey)
     props.displayTitle = titleState.getDisplayTitle(currentWindow, frameKey)
-    props.showTitle = !ownProps.isPinnedTab &&
-    !(
-      (hasBreakpoint(ownProps.breakpoint, ['mediumSmall', 'small']) && ownProps.isActive) ||
-      hasBreakpoint(ownProps.breakpoint, ['extraSmall', 'smallest'])
-    )
-    // used in functions
-    props.frameKey = frameKey
+    props.addExtraGutter = tabUIState.addExtraGutterToTitle(currentWindow, frameKey)
+    props.isTextWhite = tabUIState.checkIfTextColor(currentWindow, frameKey, 'white')
+    props.tabId = tabId
 
     return props
   }
 
   render () {
-    if (!this.props.showTitle) {
+    if (this.props.isPinned || !this.props.showTabTitle) {
       return null
     }
-    const titleStyles = StyleSheet.create({
-      gradientText: {
-        backgroundImage: `-webkit-linear-gradient(left,
-        ${this.props.tabIconColor} 90%, ${globalStyles.color.almostInvisible} 100%)`
-      }
-    })
 
     return <div data-test-id='tabTitle'
       className={css(
-        styles.tabTitle,
-        titleStyles.gradientText,
-        this.props.enforceFontVisibility && styles.enforceFontVisibility,
+        styles.tab__title,
+        this.props.addExtraGutter && styles.tab__title_extraGutter,
+        (this.props.isDarwin && this.props.isTextWhite) && styles.tab__title_isDarwin,
         // Windows specific style
-        isWindows && styles.tabTitleForWindows
+        this.props.isWindows && styles.tab__title_isWindows
       )}>
       {this.props.displayTitle}
     </div>
@@ -70,28 +62,28 @@ class TabTitle extends React.Component {
 module.exports = ReduxComponent.connect(TabTitle)
 
 const styles = StyleSheet.create({
-  tabTitle: {
-    display: 'flex',
-    flex: '1',
-    userSelect: 'none',
+  tab__title: {
     boxSizing: 'border-box',
+    display: 'flex',
+    flex: 1,
+    userSelect: 'none',
     fontSize: globalStyles.fontSize.tabTitle,
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
     lineHeight: '1.6',
-    padding: globalStyles.spacing.defaultTabPadding,
-    color: 'transparent',
-    WebkitBackgroundClip: 'text',
-    // prevents the title from being the target of mouse events.
-    pointerEvents: 'none'
+    minWidth: 0, // see https://stackoverflow.com/a/36247448/4902448
+    marginLeft: '4px',
+    overflow: 'hidden'
   },
 
-  enforceFontVisibility: {
-    fontWeight: '600'
+  tab__title_isDarwin: {
+    fontWeight: '400'
   },
 
-  tabTitleForWindows: {
+  tab__title_isWindows: {
     fontWeight: '500',
     fontSize: globalStyles.fontSize.tabTitle
+  },
+
+  tab__title_extraGutter: {
+    margin: '0 2px'
   }
 })

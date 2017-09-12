@@ -1,21 +1,19 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-/* global describe, before, it, after */
+/* global describe, before, after, it */
 
 const mockery = require('mockery')
 const {mount} = require('enzyme')
 const assert = require('assert')
 const Immutable = require('immutable')
 const fakeElectron = require('../../../../../lib/fakeElectron')
+const {intersection} = require('../../../../../../../app/renderer/components/styles/global')
 require('../../../../../braveUnit')
 
-const url1 = 'https://brave.com'
-const pageTitle1 = 'Brave Software'
+const index = 0
 const tabId = 1
 const frameKey = 1
-const invalidFrameKey = 71
 
 const fakeAppStoreRenderer = Immutable.fromJS({
   windows: [{
@@ -26,7 +24,7 @@ const fakeAppStoreRenderer = Immutable.fromJS({
     tabId: tabId,
     windowId: 1,
     windowUUID: 'uuid',
-    url: url1
+    url: 'https://brave.com'
   }],
   tabsInternal: {
     index: {
@@ -40,11 +38,11 @@ const defaultWindowStore = Immutable.fromJS({
   frames: [{
     key: frameKey,
     tabId: tabId,
-    location: url1,
-    title: pageTitle1
+    location: 'http://brave.com'
   }],
   tabs: [{
-    key: frameKey
+    key: frameKey,
+    index: index
   }],
   framesInternal: {
     index: {
@@ -53,12 +51,16 @@ const defaultWindowStore = Immutable.fromJS({
     tabIndex: {
       1: 0
     }
+  },
+  ui: {
+    tabs: {
+      tabHoverState: 1
+    }
   }
 })
 
-describe.skip('Tabs content - Title', function () {
-  let Tab, windowStore, appStore
-
+describe('Tabs content - TabTitle', function () {
+  let TabTitle, windowStore, appStore
   before(function () {
     mockery.enable({
       warnOnReplace: false,
@@ -66,14 +68,11 @@ describe.skip('Tabs content - Title', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    mockery.registerMock('../../../../extensions/brave/img/tabs/loading.svg')
-    mockery.registerMock('../../../../extensions/brave/img/tabs/new_session.svg')
+    mockery.registerMock('../../../../js/l10n', { translation: () => 'translated' })
     mockery.registerMock('../../../../extensions/brave/img/tabs/private.svg')
-    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_hover.svg')
-    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_normal.svg')
     windowStore = require('../../../../../../../js/stores/windowStore')
     appStore = require('../../../../../../../js/stores/appStoreRenderer')
-    Tab = require('../../../../../../../app/renderer/components/tabs/tab')
+    TabTitle = require('../../../../../../../app/renderer/components/tabs/content/tabTitle')
     appStore.state = fakeAppStoreRenderer
   })
 
@@ -82,119 +81,86 @@ describe.skip('Tabs content - Title', function () {
     mockery.disable()
   })
 
-  describe('should show text', function () {
-    it('if page has a title', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
-        title: pageTitle1
-      })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabTitle div').text(), pageTitle1)
-    })
-    it('if breakpoint is default', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
-        title: pageTitle1,
-        breakpoint: 'default'
-      })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabTitle div').text(), pageTitle1)
-    })
-    it('if breakpoint is large', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
-        title: pageTitle1,
-        breakpoint: 'large'
-      })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabTitle div').text(), pageTitle1)
-    })
-    it('if breakpoint is medium', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
-        title: pageTitle1,
-        breakpoint: 'medium'
-      })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabTitle div').text(), pageTitle1)
-    })
-    it('if breakpoint is mediumSmall and tab is not active', function () {
-      windowStore.state = defaultWindowStore.merge({
-        activeFrameKey: 0,
-        frames: [{
-          location: url1,
-          title: pageTitle1,
-          breakpoint: 'mediumSmall'
-        }]
-      })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabTitle div').text(), pageTitle1)
-    })
-    it('if breakpoint is small and tab is not active', function () {
-      windowStore.state = defaultWindowStore.merge({
-        activeFrameKey: 0,
-        frames: [{
-          location: url1,
-          title: pageTitle1,
-          breakpoint: 'small'
-        }]
-      })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabTitle div').text(), pageTitle1)
-    })
-    it('passing in a frame key which does not exist does not fail', function () {
+  describe('should show icon', function () {
+    it('if is not intersected at 35% of tab size', function * () {
       windowStore.state = defaultWindowStore
-      const wrapper = mount(<Tab frameKey={invalidFrameKey} />)
-      assert.equal(wrapper.find('TabTitle div').text(), '')
+        .set('activeFrameKey', 1337)
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at60)
+        .mergeIn(['frames', index], {
+          isPrivate: false,
+          partitionNumber: false
+        })
+      const wrapper = mount(<TabTitle tabId={tabId} />)
+      assert.equal(wrapper.find('TabTitle').props().showTabTitle, true)
+    })
+
+    it('if not active and intersected at 45% of tab size with no private icon visible', function * () {
+      windowStore.state = defaultWindowStore
+        .set('activeFrameKey', 1337)
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at45)
+        .setIn(['frames', index, 'isPrivate'], false)
+      const wrapper = mount(<TabTitle tabId={tabId} />)
+      assert.equal(wrapper.find('TabTitle').props().showTabTitle, true)
+    })
+
+    it('if not active and intersected at 45% of tab size with no partition icon visible', function * () {
+      windowStore.state = defaultWindowStore
+        .set('activeFrameKey', 1337)
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at45)
+        .setIn(['frames', index, 'partitionNumber'], null)
+      const wrapper = mount(<TabTitle tabId={tabId} />)
+      assert.equal(wrapper.find('TabTitle').props().showTabTitle, true)
+    })
+
+    it('if is intersected at 45% of tab size and is about:newtab', function * () {
+      windowStore.state = defaultWindowStore
+        .set('activeFrameKey', 1337)
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at45)
+        .setIn(['frames', index, 'location'], 'about:newtab')
+      const wrapper = mount(<TabTitle tabId={tabId} />)
+      assert.equal(wrapper.find('TabTitle').props().showTabTitle, true)
+    })
+
+    it('if is intersected at 45% of tab size and is not active', function * () {
+      windowStore.state = defaultWindowStore
+        .set('activeFrameKey', 1337)
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at45)
+      const wrapper = mount(<TabTitle tabId={tabId} />)
+      assert.equal(wrapper.find('TabTitle').props().showTabTitle, true)
     })
   })
 
-  describe('should not show text', function () {
-    it('if tab is pinned', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
-        title: pageTitle1,
-        pinnedLocation: true
-      })
-      appStore.state = fakeAppStoreRenderer.setIn(['tabs', 0, 'pinned'], true)
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabTitle').length, 0)
+  describe('should not show icon', function () {
+    it('if is intersected at 35% of tab size', function * () {
+      windowStore.state = defaultWindowStore
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at40)
+      const wrapper = mount(<TabTitle tabId={tabId} />)
+      assert.equal(wrapper.find('TabTitle').props().showTabTitle, false)
     })
-    it('if breakpoint is mediumSmall and tab is active', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
-        title: pageTitle1,
-        breakpoint: 'mediumSmall'
-      })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabTitle').length, 0)
+
+    it('if active and intersected at 45% of tab size', function * () {
+      windowStore.state = defaultWindowStore
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at45)
+      const wrapper = mount(<TabTitle tabId={tabId} />)
+      assert.equal(wrapper.find('TabTitle').props().showTabTitle, false)
     })
-    it('if breakpoint is small and tab is active', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
-        title: pageTitle1,
-        breakpoint: 'small'
-      })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabTitle').length, 0)
+
+    it('if not active and intersected at 45% of tab size with partition icon visible', function * () {
+      windowStore.state = defaultWindowStore
+        .set('activeFrameKey', 1337)
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at45)
+        .setIn(['frames', index, 'partitionNumber'], 1)
+      const wrapper = mount(<TabTitle tabId={tabId} />)
+      assert.equal(wrapper.find('TabTitle').props().showTabTitle, false)
     })
-    it('if breakpoint is extraSmall', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
-        title: pageTitle1,
-        breakpoint: 'extraSmall'
-      })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabTitle').length, 0)
-    })
-    it('if breakpoint is the smallest', function () {
-      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
-        title: pageTitle1,
-        breakpoint: 'smallest'
-      })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('TabTitle').length, 0)
+
+    it('if not active and intersected at 45% of tab size with private icon visible', function * () {
+      windowStore.state = defaultWindowStore
+        .set('activeFrameKey', 1337)
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at45)
+        .setIn(['frames', index, 'isPrivate'], true)
+      const wrapper = mount(<TabTitle tabId={tabId} />)
+      assert.equal(wrapper.find('TabTitle').props().showTabTitle, false)
     })
   })
 })

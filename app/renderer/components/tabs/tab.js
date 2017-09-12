@@ -372,12 +372,7 @@ class Tab extends React.Component {
             frameKey={this.props.frameKey}
           />
           <AudioTabIcon breakpoint={this.props.breakpoint} frameKey={this.props.frameKey} />
-          <TabTitle
-            frameKey={this.props.frameKey}
-            breakpoint={this.props.breakpoint}
-            isPinnedTab={this.props.isPinnedTab}
-            isActive={this.props.isActive}
-          />
+          <TabTitle tabId={this.props.tabId} />
         </div>
         <PrivateIcon isPrivateTab={this.props.isPrivateTab} frameKey={this.props.frameKey} />
         <NewSessionIcon frameKey={this.props.frameKey} />
