@@ -5,21 +5,13 @@
 const {opacityIncreaseKeyframes} = require('./animations')
 
 /**
- * Historically this file includes styles with no defined criteria.
- * Imagine this file as a future reference for theming, in a way
- * that each component should be an object wrapping all properties
- * that would change in a dark mode, for example.
- *
- * Valid as well for things that needs to be fully global,
- * i.e. breakpoints, icons and zIndexes.
- *
- * Thus said, please take preference for inlined styles in the component itself.
- * If you really feel repetitve writing the same style for a given component,
- * consider including a variable inside component.
+ * Use this file when the style you need
+ * is applied in more than one element, or depends on it
+ * Use theme.js file to include colors that can be customized
  *
  * TODO:
  * remove unnecessary styles properties (as items get refactored)
- * Remove fully global items and take preference for component properties (@see button)
+ * migrate customizable options to theme.js
  */
 
 const globalStyles = {
