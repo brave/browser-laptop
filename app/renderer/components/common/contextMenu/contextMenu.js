@@ -20,6 +20,7 @@ const cx = require('../../../../../js/lib/classSet')
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const {separatorMenuItem} = require('../../../../common/commonMenu')
 const {wrappingClamp} = require('../../../../common/lib/formatUtil')
+
 /**
  * Represents a context menu including all submenus
  */

@@ -29,7 +29,7 @@ class ContextMenuItem extends ImmutableComponent {
     return this.props.contextMenuItem.get('items')
   }
   get hasSubmenu () {
-    return this.submenu && this.submenu.size > 0
+    return (this.submenu && this.submenu.size > 0) || this.props.contextMenuItem.has('folderKey')
   }
   get isMulti () {
     return this.items && this.items.size > 0
@@ -44,6 +44,27 @@ class ContextMenuItem extends ImmutableComponent {
   get hasAccelerator () {
     return this.accelerator !== null
   }
+
+  /**
+   * Get Y position (top) fo the current event (target)
+   * @param e {event} - event for which we want to determinate top position
+   * @returns {number} - Y position
+   */
+  getYAxis (e) {
+    let node = e.target
+    while (node && !elementHasDataset(node, 'contextMenuItem')) {
+      node = node.parentNode
+    }
+    let parentNode = node.parentNode
+    while (parentNode && !elementHasDataset(parentNode, 'contextMenu')) {
+      parentNode = parentNode.parentNode
+    }
+    const parentBoundingRect = parentNode.getBoundingClientRect()
+    const boundingRect = node.getBoundingClientRect()
+
+    return boundingRect.top - parentBoundingRect.top - 1 + parentNode.scrollTop
+  }
+
   onClick (clickAction, shouldHide, e) {
     e.stopPropagation()
     if (clickAction) {
@@ -88,28 +109,21 @@ class ContextMenuItem extends ImmutableComponent {
   }
 
   onMouseEnter (e) {
-    let openedSubmenuDetails = this.props.contextMenuDetail.get('openedSubmenuDetails')
-    openedSubmenuDetails = openedSubmenuDetails
-      ? openedSubmenuDetails.splice(this.props.submenuIndex, this.props.contextMenuDetail.get('openedSubmenuDetails').size)
-      : new Immutable.List()
-
-    if (this.hasSubmenu) {
-      let node = e.target
-      while (node && !elementHasDataset(node, 'contextMenuItem')) {
-        node = node.parentNode
-      }
-      let parentNode = node.parentNode
-      while (parentNode && !elementHasDataset(parentNode, 'contextMenu')) {
-        parentNode = parentNode.parentNode
-      }
-      const parentBoundingRect = parentNode.getBoundingClientRect()
-      const boundingRect = node.getBoundingClientRect()
+    if (this.props.contextMenuItem.has('folderKey')) {
+      const yAxis = this.getYAxis(e)
+      windowActions.onShowBookmarkFolderMenu(this.props.contextMenuItem.get('folderKey'), yAxis, null, this.props.submenuIndex)
+    } else if (this.hasSubmenu) {
+      let openedSubmenuDetails = this.props.contextMenuDetail.get('openedSubmenuDetails')
+      openedSubmenuDetails = openedSubmenuDetails
+        ? openedSubmenuDetails.splice(this.props.submenuIndex, openedSubmenuDetails.size)
+        : new Immutable.List()
+      const yAxis = this.getYAxis(e)
       openedSubmenuDetails = openedSubmenuDetails.push(Immutable.fromJS({
-        y: boundingRect.top - parentBoundingRect.top - 1 + parentNode.scrollTop,
+        y: yAxis,
         template: this.submenu
       }))
+      windowActions.setContextMenuDetail(this.props.contextMenuDetail.set('openedSubmenuDetails', openedSubmenuDetails))
     }
-    windowActions.setContextMenuDetail(this.props.contextMenuDetail.set('openedSubmenuDetails', openedSubmenuDetails))
   }
   getLabelForItem (item) {
     const label = item.get('label')

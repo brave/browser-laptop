@@ -464,7 +464,7 @@ const bookmarkItemsInit = (state, items) => {
       }
     }
     if (isFolder) {
-      templateItem.submenu = showBookmarkFolderInit(state, siteKey)
+      templateItem.folderKey = siteKey
     }
     template.push(templateItem)
   }
@@ -509,11 +509,24 @@ const onShowBookmarkFolderMenu = (state, action) => {
   state = validateState(state)
 
   const menuTemplate = showBookmarkFolderInit(state, action.get('bookmarkKey'))
-  state = contextMenuState.setContextMenu(state, makeImmutable({
-    left: action.get('left'),
-    top: action.get('top'),
-    template: menuTemplate
-  }))
+  if (action.get('submenuIndex') != null) {
+    let contextMenu = contextMenuState.getContextMenu(state)
+    let openedSubmenuDetails = contextMenu.get('openedSubmenuDetails', Immutable.List())
+
+    openedSubmenuDetails = openedSubmenuDetails
+      .splice(action.get('submenuIndex'), openedSubmenuDetails.size)
+      .push(makeImmutable({
+        y: action.get('left'),
+        template: menuTemplate
+      }))
+    state = contextMenuState.setContextMenu(state, contextMenu.set('openedSubmenuDetails', openedSubmenuDetails))
+  } else {
+    state = contextMenuState.setContextMenu(state, makeImmutable({
+      left: action.get('left'),
+      top: action.get('top'),
+      template: menuTemplate
+    }))
+  }
 
   return state
 }
