@@ -10,6 +10,9 @@ const sinon = require('sinon')
 
 const appConstants = require('../../../../../js/constants/appConstants')
 require('../../../braveUnit')
+const settings = require('../../../../../js/constants/settings')
+const {getSetting} = require('../../../../../js/settings')
+const fakeElectron = require('../../../lib/fakeElectron')
 
 describe('historyReducer unit test', function () {
   let historyReducer, historyState, aboutHistoryState
@@ -101,6 +104,7 @@ describe('historyReducer unit test', function () {
       clearHistory: () => {
       }
     })
+    mockery.registerMock('electron', fakeElectron)
     historyReducer = require('../../../../../app/browser/reducers/historyReducer')
     historyState = require('../../../../../app/common/state/historyState')
     aboutHistoryState = require('../../../../../app/common/state/aboutHistoryState')
@@ -322,6 +326,32 @@ describe('historyReducer unit test', function () {
       assert.equal(spy.calledOnce, true)
       assert.equal(spyAbout.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
+    })
+
+    it('we only have limited history size limit', function () {
+      let newState = state
+      const maxSize = getSetting(settings.AUTOCOMPLETE_HISTORY_SIZE)
+
+      for (let i = 0; i <= (maxSize + 1); i++) {
+        newState = newState.setIn(['historySites', `h${i}|0`], Immutable.fromJS({
+          [`https://h${i}.io/|0`]: {
+            count: i,
+            key: `https://h${i}.io/|0`,
+            location: `https://h${i}.io/`,
+            partitionNumber: 0
+          }
+        }))
+      }
+
+      const result = historyReducer(newState, {
+        actionType: appConstants.APP_ADD_HISTORY_SITE,
+        siteDetail: {
+          location: 'https://clifton.io/',
+          title: 'Clifton'
+        }
+      })
+
+      assert.deepEqual(result.get('historySites').size, maxSize)
     })
   })
 

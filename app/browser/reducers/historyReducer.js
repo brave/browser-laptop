@@ -13,6 +13,7 @@ const aboutHistoryState = require('../../common/state/aboutHistoryState')
 const appConstants = require('../../../js/constants/appConstants')
 const {STATE_SITES} = require('../../../js/constants/stateConstants')
 const messages = require('../../../js/constants/messages')
+const settings = require('../../../js/constants/settings')
 
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
@@ -21,6 +22,7 @@ const syncUtil = require('../../../js/state/syncUtil')
 const filtering = require('../../filtering')
 const {calculateTopSites} = require('../api/topSites')
 const bookmarkLocationCache = require('../../common/cache/bookmarkLocationCache')
+const {getSetting} = require('../../../js/settings')
 
 /**
  * Helper to pass message to windows to clear closed frames
@@ -78,8 +80,19 @@ const historyReducer = (state, action, immutableAction) => {
           state = syncUtil.updateObjectCache(state, detail, STATE_SITES.HISTORY_SITES)
         }
 
+        const historyLimit = getSetting(settings.AUTOCOMPLETE_HISTORY_SIZE)
+        let historySites = historyState.getSites(state)
+
+        if (historySites.size > historyLimit) {
+          historySites = historySites
+            .sort((site1, site2) => (site2.get('lastAccessedTime') || 0) - (site1.get('lastAccessedTime') || 0))
+            .take(historyLimit)
+
+          state = state.set(STATE_SITES.HISTORY_SITES, historySites)
+        }
+
         calculateTopSites(true)
-        state = aboutHistoryState.setHistory(state, historyState.getSites(state))
+        state = aboutHistoryState.setHistory(state, historySites)
         break
       }
 
