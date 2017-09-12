@@ -166,14 +166,14 @@ class LedgerTable extends ImmutableComponent {
         value: ''
       },
       {
-        html: <div>
-          <a className={css(styles.siteData)} href={publisherURL} rel='noopener' target='_blank' tabIndex={-1}>
+        html: <div className={css(styles.siteData)}>
+          <a className={css(styles.siteData__anchor)} href={publisherURL} rel='noopener' target='_blank' tabIndex={-1}>
             {
               faviconURL
-                ? <img className={css(styles.siteData__icon_favicon)} src={faviconURL} alt={siteName} />
-                : <span className={css(styles.siteData__icon_default)}><span className={globalStyles.appIcons.defaultIcon} /></span>
+                ? <img className={css(styles.siteData__anchor__icon_favicon)} src={faviconURL} alt={siteName} />
+                : <span className={css(styles.siteData__anchor__icon_default)}><span className={globalStyles.appIcons.defaultIcon} /></span>
             }
-            <span className={css(styles.siteData__url)} data-test-id='siteName'>{siteName}</span>
+            <span className={css(styles.siteData__anchor__url)} data-test-id='siteName'>{siteName}</span>
           </a>
         </div>,
         value: publisherKey
@@ -184,7 +184,7 @@ class LedgerTable extends ImmutableComponent {
             small
             disabled
             checkedOn
-            switchClassName={css(styles.switchControl_center)}
+            customWrapperClassName={css(styles.switchControl_center)}
             indicatorClassName={css(styles.pinnedToggle)}
             testId='pinnedDisabled'
             onClick={() => {}}
@@ -276,16 +276,17 @@ class LedgerTable extends ImmutableComponent {
     return <section data-test-id='ledgerTable'>
       <div className={css(styles.hideExcludedSites)}>
         <div className={css(gridStyles.row1col1)} />
-        <div className={css(gridStyles.row1col2)}>
-          <SettingCheckbox
-            small
-            dataL10nId='hideExcluded'
-            prefKey={settings.PAYMENTS_SITES_HIDE_EXCLUDED}
-            settings={this.props.settings}
-            onChangeSetting={this.props.onChangeSetting}
-            switchClassName={css(styles.hideExcludedSites__switchWrap__switchControl)}
-          />
-        </div>
+        <SettingCheckbox
+          small
+          dataL10nId='hideExcluded'
+          prefKey={settings.PAYMENTS_SITES_HIDE_EXCLUDED}
+          settings={this.props.settings}
+          onChangeSetting={this.props.onChangeSetting}
+          switchClassName={css(
+            gridStyles.row1col2,
+            styles.hideExcludedSites__settingCheckbox
+          )}
+        />
       </div>
       <SortableTable
         fillAvailable
@@ -401,19 +402,20 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
 
-  siteData__icon_favicon: {
+  siteData__anchor__icon_favicon: {
     width: globalStyles.spacing.iconSize,
     height: globalStyles.spacing.iconSize
   },
 
-  siteData__icon_default: {
+  siteData__anchor__icon_default: {
     fontSize: '15px',
     width: globalStyles.spacing.iconSize,
     textAlign: 'center'
   },
 
-  siteData__url: {
-    padding: '0 6px'
+  siteData__anchor__url: {
+    // See table__tbody__tr_smallRow__td on sortableTable.js
+    paddingLeft: globalStyles.sortableTable.cell.small.padding
   },
 
   switchControl_center: {
@@ -424,12 +426,14 @@ const styles = StyleSheet.create({
     display: 'grid',
     alignItems: 'center',
     gridTemplateColumns: '2fr 1fr',
-    width: `calc(100% - calc(${globalStyles.spacing.panelPadding} / 2))`,
+    width: '100%',
     marginBottom: globalStyles.spacing.panelMargin
   },
 
-  hideExcludedSites__switchWrap__switchControl: {
-    padding: '0 5px 0 0'
+  hideExcludedSites__settingCheckbox: {
+    padding: '0 !important',
+    position: 'relative',
+    whiteSpace: 'nowrap' // Disable line wrap
   },
 
   alignRight: {
