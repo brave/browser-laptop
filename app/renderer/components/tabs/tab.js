@@ -367,7 +367,7 @@ class Tab extends React.Component {
           this.props.breakpoint === 'smallest' && styles.tabIdMinAllowedSize
           )}>
           <Favicon tabId={this.props.tabId} />
-          <AudioTabIcon breakpoint={this.props.breakpoint} frameKey={this.props.frameKey} />
+          <AudioTabIcon tabId={this.props.tabId} />
           <TabTitle tabId={this.props.tabId} />
         </div>
         <PrivateIcon isPrivateTab={this.props.isPrivateTab} frameKey={this.props.frameKey} />
