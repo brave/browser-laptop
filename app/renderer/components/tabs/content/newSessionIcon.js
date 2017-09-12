@@ -1,22 +1,18 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
-const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
 // State
+const partitionState = require('../../../../common/state/tabContentState/partitionState')
 const tabUIState = require('../../../../common/state/tabUIState')
-
-// Constants
-const {tabs} = require('../../../../../js/constants/config')
-
-// Utils
+const tabState = require('../../../../common/state/tabState')
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
@@ -26,45 +22,42 @@ const newSessionSvg = require('../../../../extensions/brave/img/tabs/new_session
 class NewSessionIcon extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const frameKey = ownProps.frameKey
-    const frame = frameStateUtil.getFrameByKey(currentWindow, frameKey) || Immutable.Map()
-    const partition = frame.get('partitionNumber')
-    const hasSeconardImage = tabUIState.hasVisibleSecondaryIcon(currentWindow, ownProps.frameKey)
+    const tabId = ownProps.tabId
+    const frameKey = frameStateUtil.getFrameKeyByTabId(currentWindow, tabId)
 
     const props = {}
-    // used in renderer
-    props.showSessionIcon = !!partition && hasSeconardImage
+    props.isPinned = tabState.isTabPinned(state, tabId)
+    props.showPartitionIcon = partitionState.showPartitionIcon(currentWindow, frameKey)
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
-    props.iconColor = tabUIState.getTabIconColor(currentWindow, frameKey)
-    props.partitionNumber = typeof partition === 'string'
-      ? partition.replace(/^partition-/i, '')
-      : partition
-    props.partitionIndicator = props.partitionNumber > tabs.maxAllowedNewSessions
-      ? tabs.maxAllowedNewSessions
-      : props.partitionNumber
-
-    // used in functions
-    props.frameKey = frameKey
+    props.textIsWhite = tabUIState.checkIfTextColor(currentWindow, frameKey, 'white')
+    props.partitionNumber = partitionState.getMaxAllowedPartitionNumber(currentWindow, frameKey)
+    props.tabId = tabId
 
     return props
   }
 
   render () {
-    if (!this.props.showSessionIcon) {
+    if (
+      this.props.isPinned ||
+      !this.props.showPartitionIcon ||
+      this.props.partitionNumber === 0
+    ) {
       return null
     }
-    const newSession = StyleSheet.create({
-      indicator: {
-        // Based on getTextColorForBackground() icons can be only black or white.
-        filter: this.props.isActive && this.props.iconColor === 'white' ? 'invert(100%)' : 'none'
+
+    const newSessionProps = StyleSheet.create({
+      newSession__indicator: {
+        filter: this.props.isActive && this.props.textIsWhite
+          ? 'invert(100%)'
+          : 'none'
       }
     })
 
     return <TabIcon symbol
       data-test-id='newSessionIcon'
-      className={css(styles.icon, styles.newSession, newSession.indicator)}
-      symbolContent={this.props.partitionIndicator}
-      l10nArgs={this.props.partitionNumber}
+      className={css(styles.newSession__icon, newSessionProps.newSession__indicator)}
+      symbolContent={this.props.partitionNumber}
+      l10nArgs={{partitionNumber: this.props.partitionNumber}}
       l10nId='sessionInfoTab'
     />
   }
@@ -73,21 +66,17 @@ class NewSessionIcon extends React.Component {
 module.exports = ReduxComponent.connect(NewSessionIcon)
 
 const styles = StyleSheet.create({
-  icon: {
-    width: globalStyles.spacing.iconSize,
-    minWidth: globalStyles.spacing.iconSize,
-    height: globalStyles.spacing.iconSize,
-    backgroundSize: globalStyles.spacing.iconSize,
-    fontSize: globalStyles.fontSize.tabIcon,
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    paddingLeft: globalStyles.spacing.defaultIconPadding,
-    paddingRight: globalStyles.spacing.defaultIconPadding
-  },
-
-  newSession: {
-    position: 'relative',
+  newSession__icon: {
+    zIndex: globalStyles.zindex.zindexWindow,
+    boxSizing: 'border-box',
+    display: 'flex',
+    alignItems: 'center',
     backgroundImage: `url(${newSessionSvg})`,
-    backgroundPosition: 'left'
+    backgroundPosition: 'center left',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: '13px',
+    width: globalStyles.spacing.iconSize,
+    height: globalStyles.spacing.iconSize,
+    marginRight: globalStyles.spacing.defaultTabMargin
   }
 })

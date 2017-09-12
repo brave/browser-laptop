@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // State helpers
+const tabUIState = require('../tabUIState')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 // Constants
@@ -45,4 +46,20 @@ module.exports.getMaxAllowedPartitionNumber = (state, frameKey) => {
     return tabs.maxAllowedNewSessions
   }
   return partitionNumber
+}
+
+module.exports.showPartitionIcon = (state, frameKey) => {
+  const frame = frameStateUtil.getFrameByKey(state, frameKey)
+
+  if (frame == null) {
+    if (process.env.NODE_ENV !== 'test') {
+      console.error('Unable to find frame for showPartitionIcon method')
+    }
+    return false
+  }
+
+  return (
+    module.exports.isPartitionTab(state, frameKey) &&
+    tabUIState.showTabEndIcon(state, frameKey)
+  )
 }

@@ -371,7 +371,7 @@ class Tab extends React.Component {
           <TabTitle tabId={this.props.tabId} />
         </div>
         <PrivateIcon tabId={this.props.tabId} />
-        <NewSessionIcon frameKey={this.props.frameKey} />
+        <NewSessionIcon tabId={this.props.tabId} />
         <CloseTabIcon tabId={this.props.tabId} fixTabWidth={this.fixTabWidth} />
       </div>
     </div>
