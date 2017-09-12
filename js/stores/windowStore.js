@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const AppDispatcher = require('../dispatcher/appDispatcher')
+const appDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
 const appActions = require('../actions/appActions')
 const appConstants = require('../constants/appConstants')
@@ -796,6 +796,6 @@ frameShortcuts.forEach((shortcut) => {
   }
 })
 
-AppDispatcher.register(doAction)
+appDispatcher.registerLocalCallback(doAction)
 
 module.exports = windowStore

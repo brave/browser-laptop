@@ -19,6 +19,9 @@ describe('Window store unit tests', function () {
   const fakeDispatcher = {
     register: (actionHandler) => {
       doAction = actionHandler
+    },
+    registerLocalCallback: (actionHandler) => {
+      doAction = actionHandler
     }
   }
 
