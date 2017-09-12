@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // State helpers
+const tabUIState = require('../tabUIState')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 module.exports.isPrivateTab = (state, frameKey) => {
@@ -13,4 +14,17 @@ module.exports.isPrivateTab = (state, frameKey) => {
   }
 
   return !!frame.get('isPrivate')
+}
+
+module.exports.showPrivateIcon = (state, frameKey) => {
+  const frame = frameStateUtil.getFrameByKey(state, frameKey)
+
+  if (frame == null) {
+    return false
+  }
+
+  return (
+    module.exports.isPrivateTab(state, frameKey) &&
+    tabUIState.showTabEndIcon(state, frameKey)
+  )
 }
