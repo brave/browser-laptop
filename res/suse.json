@@ -19,7 +19,7 @@
   ],
   "requires": [
     "gconf2",
-    "libXss.so.1",
+    "libXss",
     "lsb"
   ]
 }
