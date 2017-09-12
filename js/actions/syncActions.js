@@ -3,25 +3,25 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 'use strict'
-const AppDispatcher = require('../dispatcher/appDispatcher')
+const appDispatcher = require('../dispatcher/appDispatcher')
 const syncConstants = require('../constants/syncConstants')
 
 const syncActions = {
   removeSite: function (item) {
-    AppDispatcher.dispatch({
+    appDispatcher.dispatch({
       actionType: syncConstants.SYNC_REMOVE_SITE,
       item
     })
   },
 
   clearHistory: function () {
-    AppDispatcher.dispatch({
+    appDispatcher.dispatch({
       actionType: syncConstants.SYNC_CLEAR_HISTORY
     })
   },
 
   clearSiteSettings: function () {
-    AppDispatcher.dispatch({
+    appDispatcher.dispatch({
       actionType: syncConstants.SYNC_CLEAR_SITE_SETTINGS
     })
   }

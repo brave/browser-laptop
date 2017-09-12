@@ -6,7 +6,7 @@
 const appConstants = require('../constants/appConstants')
 const windowConstants = require('../constants/windowConstants')
 const ExtensionConstants = require('../../app/common/constants/extensionConstants')
-const AppDispatcher = require('../dispatcher/appDispatcher')
+const appDispatcher = require('../dispatcher/appDispatcher')
 const settings = require('../constants/settings')
 const siteUtil = require('../state/siteUtil')
 const syncUtil = require('../state/syncUtil')
@@ -193,7 +193,7 @@ const handleAppAction = (action) => {
       appState = require('../../app/sync').init(appState, action, appStore)
       break
     case appConstants.APP_SHUTTING_DOWN:
-      AppDispatcher.shutdown()
+      appDispatcher.shutdown()
       app.quit()
       break
     case appConstants.APP_CHANGE_NEW_TAB_DETAIL:
@@ -678,6 +678,6 @@ const handleAppAction = (action) => {
   emitChanges()
 }
 
-appStore.dispatchToken = AppDispatcher.register(handleAppAction)
+appStore.dispatchToken = appDispatcher.register(handleAppAction)
 
 module.exports = appStore
