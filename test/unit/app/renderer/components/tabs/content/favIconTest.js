@@ -5,34 +5,32 @@
 
 const mockery = require('mockery')
 const {mount} = require('enzyme')
-const Immutable = require('immutable')
 const assert = require('assert')
-const globalStyles = require('../../../../../../../app/renderer/components/styles/global')
+const Immutable = require('immutable')
 const fakeElectron = require('../../../../../lib/fakeElectron')
 require('../../../../../braveUnit')
 
-const url1 = 'https://brave.com'
-const favicon1 = 'https://brave.com/favicon.ico'
-
+const index = 0
 const tabId = 1
 const frameKey = 1
 
-const fakeAppStoreRenderer = {
-  state: Immutable.fromJS({
-    windows: [{
-      windowId: 1,
-      windowUUID: 'uuid'
-    }],
-    tabs: [{
-      tabId: tabId,
-      windowId: 1,
-      windowUUID: 'uuid',
-      url: 'https://brave.com'
-    }]
-  }),
-  addChangeListener: () => {},
-  removeChangeListener: () => {}
-}
+const fakeAppStoreRenderer = Immutable.fromJS({
+  windows: [{
+    windowId: 1,
+    windowUUID: 'uuid'
+  }],
+  tabs: [{
+    tabId: tabId,
+    windowId: 1,
+    windowUUID: 'uuid',
+    url: 'https://brave.com'
+  }],
+  tabsInternal: {
+    index: {
+      1: 0
+    }
+  }
+})
 
 const defaultWindowStore = Immutable.fromJS({
   activeFrameKey: frameKey,
@@ -42,7 +40,8 @@ const defaultWindowStore = Immutable.fromJS({
     location: 'http://brave.com'
   }],
   tabs: [{
-    key: frameKey
+    key: frameKey,
+    index: index
   }],
   framesInternal: {
     index: {
@@ -54,8 +53,8 @@ const defaultWindowStore = Immutable.fromJS({
   }
 })
 
-describe.skip('Tabs content - Favicon', function () {
-  let Tab, windowStore
+describe('Tabs content - Favicon', function () {
+  let Favicon, windowStore, appStore
 
   before(function () {
     mockery.enable({
@@ -64,17 +63,12 @@ describe.skip('Tabs content - Favicon', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    mockery.registerMock('../../../js/l10n', {
-      translation: () => 'translated'
-    })
-    mockery.registerMock('../../../js/stores/appStoreRenderer', fakeAppStoreRenderer)
+    mockery.registerMock('../../../../extensions/brave/img/tabs/default.svg')
     mockery.registerMock('../../../../extensions/brave/img/tabs/loading.svg')
-    mockery.registerMock('../../../../extensions/brave/img/tabs/new_session.svg')
-    mockery.registerMock('../../../../extensions/brave/img/tabs/private.svg')
-    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_hover.svg')
-    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_normal.svg')
     windowStore = require('../../../../../../../js/stores/windowStore')
-    Tab = require('../../../../../../../app/renderer/components/tabs/tab')
+    appStore = require('../../../../../../../js/stores/appStoreRenderer')
+    Favicon = require('../../../../../../../app/renderer/components/tabs/content/favicon')
+    appStore.state = fakeAppStoreRenderer
   })
 
   after(function () {
@@ -82,43 +76,71 @@ describe.skip('Tabs content - Favicon', function () {
     mockery.disable()
   })
 
-  describe('should show', function () {
-    it('favicon if page has one', function () {
+  describe('loading icon', function () {
+    it('shows when tab is loading', function * () {
       windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
-        icon: favicon1,
+        icon: 'winter-is-coming.jpg',
+        loading: true
+      })
+      const wrapper = mount(<Favicon tabId={tabId} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test-id'], 'loading')
+    })
+    it('does not show when tab is not loading', function * () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        icon: 'winter-is-coming.jpg',
         loading: false
       })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('Favicon').length, 1)
+      const wrapper = mount(<Favicon tabId={tabId} />)
+      assert.notEqual(wrapper.find('TabIcon').props()['data-test-id'], 'loading')
+      assert.equal(wrapper.find('TabIcon').props()['data-test-id'], 'winter-is-coming.jpg')
     })
-
-    it('placeholder icon if page has no favicon', function () {
+  })
+  describe('default icon', function () {
+    it('shows when tab has no icon', function * () {
       windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
         icon: null,
         loading: false
       })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('Favicon TabIcon').props().symbol, globalStyles.appIcons.defaultIcon)
+      const wrapper = mount(<Favicon tabId={tabId} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test-id'], 'defaultIcon')
     })
-
-    it('loading icon if page is still loading', function () {
+    it('does not show when tab has an icon', function * () {
       windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-        location: url1,
-        icon: favicon1,
-        loading: true
+        icon: 'the-night-is-dark-and-full-of-terror.jpg',
+        loading: false
       })
-      const wrapper = mount(<Tab frameKey={frameKey} />)
-      assert.equal(wrapper.find('Favicon TabIcon').props()['data-test-id'], 'loading')
+      const wrapper = mount(<Favicon tabId={tabId} />)
+      assert.notEqual(wrapper.find('TabIcon').props()['data-test-id'], 'defaultIcon')
     })
   })
-
-  it('should not show favicon for new tab page', function () {
-    windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
-      location: 'about:newtab'
+  describe('favicon', function () {
+    it('shows if page has a favicon', function * () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        icon: 'bbondy-king-of-the-north.jpg',
+        loading: false
+      })
+      const wrapper = mount(<Favicon tabId={tabId} />)
+      assert.equal(wrapper.find('TabIcon').props()['data-test-id'], 'bbondy-king-of-the-north.jpg')
     })
-    const wrapper = mount(<Tab frameKey={frameKey} />)
-    assert.equal(wrapper.find('Favicon').length, 0)
+
+    it('does not show if page is loading', function * () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        icon: 'iron-throne-belongs-to-serg.jpg',
+        loading: true
+      })
+      const wrapper = mount(<Favicon tabId={tabId} />)
+      assert.notEqual(wrapper.find('TabIcon').props()['data-test-id'], 'iron-throne-belongs-to-serg.jpg')
+      assert.equal(wrapper.find('TabIcon').props()['data-test-id'], 'loading')
+    })
+
+    it('does not show if page has no favicon', function * () {
+      windowStore.state = defaultWindowStore.mergeIn(['frames', 0], {
+        icon: null,
+        loading: false
+      })
+      const wrapper = mount(<Favicon tabId={tabId} />)
+      assert.notEqual(wrapper.find('TabIcon').props()['data-test-id'], null)
+      assert.equal(wrapper.find('TabIcon').props()['data-test-id'], 'defaultIcon')
+    })
   })
 })

@@ -366,11 +366,7 @@ class Tab extends React.Component {
           this.props.isNarrowView && styles.tabIdNarrowView,
           this.props.breakpoint === 'smallest' && styles.tabIdMinAllowedSize
           )}>
-          <Favicon
-            isActive={this.props.isActive}
-            breakpoint={this.props.breakpoint}
-            frameKey={this.props.frameKey}
-          />
+          <Favicon tabId={this.props.tabId} />
           <AudioTabIcon breakpoint={this.props.breakpoint} frameKey={this.props.frameKey} />
           <TabTitle tabId={this.props.tabId} />
         </div>

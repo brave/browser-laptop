@@ -1,86 +1,96 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
-// State helpers
+// State
 const faviconState = require('../../../../common/state/tabContentState/faviconState')
+const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const tabUIState = require('../../../../common/state/tabUIState')
 const tabState = require('../../../../common/state/tabState')
 
-// Utils
-const frameStateUtil = require('../../../../../js/state/frameStateUtil')
-const {isSourceAboutUrl} = require('../../../../../js/lib/appUrlUtil')
-const {hasBreakpoint} = require('../../../lib/tabUtil')
-
 // Styles
-const globalStyles = require('../../styles/global')
-const {spinKeyframes} = require('../../styles/animations')
+const defaultIconSvg = require('../../../../extensions/brave/img/tabs/default.svg')
 const loadingIconSvg = require('../../../../extensions/brave/img/tabs/loading.svg')
+const {filter, color, spacing} = require('../../styles/global')
+const {spinKeyframes} = require('../../styles/animations')
 
 class Favicon extends React.Component {
-  get defaultIcon () {
-    return (!this.props.deprecatedIsTabLoading && !this.props.favicon)
-      ? globalStyles.appIcons.defaultIcon
-      : null
-  }
-
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const frameKey = ownProps.frameKey
-    const frame = frameStateUtil.getFrameByKey(currentWindow, frameKey) || Immutable.Map()
-    const deprecatedIsTabLoading = faviconState.deprecatedIsTabLoading(currentWindow, frameKey)
-    const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
+    const tabId = ownProps.tabId
+    const frameKey = frameStateUtil.getFrameKeyByTabId(currentWindow, tabId)
+
     const props = {}
-
-    // used in renderer
-
-    // there's no need to show loading icon for about pages
-    props.deprecatedIsTabLoading = !isSourceAboutUrl(frame.get('location')) && deprecatedIsTabLoading
-    props.favicon = !deprecatedIsTabLoading && frame.get('icon')
-    props.isPinnedTab = tabState.isTabPinned(state, tabId)
+    props.isPinned = tabState.isTabPinned(state, tabId)
+    props.favicon = faviconState.getFavicon(currentWindow, frameKey)
+    props.showIcon = faviconState.showFavicon(currentWindow, frameKey)
+    props.tabLoading = faviconState.showLoadingIcon(currentWindow, frameKey)
     props.tabIconColor = tabUIState.getTabIconColor(currentWindow, frameKey)
-    props.isNarrowestView = tabUIState.isNarrowestView(currentWindow, frameKey)
-    props.showFavIcon = !((hasBreakpoint(ownProps.breakpoint, 'extraSmall') && ownProps.isActive) || frame.get('location') === 'about:newtab')
-    // used in functions
-    props.frameKey = frameKey
+    props.showIconWithLessMargin = faviconState.showIconWithLessMargin(currentWindow, frameKey)
+    props.showIconAtReducedSize = faviconState.showFaviconAtReducedSize(currentWindow, frameKey)
+    props.tabId = tabId
 
     return props
   }
 
+  get testingIcon () {
+    // this is only for testing purposes
+    return this.props.tabLoading
+      ? 'loading'
+      : this.props.favicon || 'defaultIcon'
+  }
+
   render () {
-    if (!this.props.showFavIcon) {
+    if (!this.props.isPinned && !this.props.showIcon) {
       return null
     }
+
     const iconStyles = StyleSheet.create({
-      favicon: {
-        backgroundImage: `url(${this.props.favicon})`,
-        filter: this.props.tabIconColor === 'white' ? globalStyles.filter.whiteShadow : 'none'
+      icon__loading_color: {
+        filter: this.props.tabIconColor === 'white'
+          ? filter.makeWhite
+          : 'none'
       },
-      loadingIconColor: {
-        // Don't change icon color unless when it should be white
-        filter: this.props.tabIconColor === 'white' ? globalStyles.filter.makeWhite : 'none'
+      icon__favicon: {
+        backgroundImage: `url(${this.props.favicon})`,
+        filter: this.props.tabIconColor === 'white'
+          ? filter.whiteShadow
+          : 'none'
+      },
+      icon__default_sizeAndColor: {
+        WebkitMaskSize: this.props.showIconAtReducedSize ? '10px' : '12px',
+        backgroundColor: this.props.tabIconColor === 'white'
+          ? color.white100
+          : color.mediumGray
       }
     })
 
     return <TabIcon
-      data-test-favicon={this.props.favicon}
-      data-test-id={this.props.deprecatedIsTabLoading ? 'loading' : 'defaultIcon'}
+      data-test-id={this.testingIcon}
       className={css(
         styles.icon,
-        this.props.favicon && iconStyles.favicon,
-        !this.props.isPinnedTab && this.props.isNarrowestView && styles.faviconNarrowView
+        this.props.favicon && iconStyles.icon__favicon,
+        !this.props.isPinned && this.props.showIconWithLessMargin && styles.icon_lessMargin,
+        !this.props.isPinned && this.props.showIconAtReducedSize && styles.icon_reducedSize
       )}
       symbol={
-        (this.props.deprecatedIsTabLoading && css(styles.loadingIcon, iconStyles.loadingIconColor)) ||
-        this.defaultIcon
+        this.props.tabLoading
+          ? (
+            // no loading icon if there's no room for the icon
+            !this.props.showIconAtReducedSize &&
+            css(styles.icon__loading, iconStyles.icon__loading_color)
+          )
+          : (
+            !this.props.favicon &&
+            css(styles.icon__default, iconStyles.icon__default_sizeAndColor)
+          )
       } />
   }
 }
@@ -89,32 +99,44 @@ module.exports = ReduxComponent.connect(Favicon)
 
 const styles = StyleSheet.create({
   icon: {
-    width: globalStyles.spacing.iconSize,
-    minWidth: globalStyles.spacing.iconSize,
-    height: globalStyles.spacing.iconSize,
-    backgroundSize: globalStyles.spacing.iconSize,
-    fontSize: globalStyles.fontSize.tabIcon,
+    position: 'relative',
+    boxSizing: 'border-box',
+    width: spacing.iconSize,
+    height: spacing.iconSize,
+    backgroundSize: spacing.iconSize,
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
-    paddingLeft: globalStyles.spacing.defaultIconPadding,
-    paddingRight: globalStyles.spacing.defaultIconPadding
+    display: 'flex',
+    alignSelf: 'center'
   },
 
-  faviconNarrowView: {
-    minWidth: 'auto',
-    width: globalStyles.spacing.narrowIconSize,
-    backgroundSize: 'contain',
-    padding: 0,
-    fontSize: '10px',
-    backgroundPosition: 'center center'
+  icon_lessMargin: {
+    margin: 0
   },
 
-  loadingIcon: {
+  icon_reducedSize: {
+    width: spacing.narrowIconSize,
+    height: '-webkit-fill-available',
+    alignItems: 'center',
+    backgroundSize: spacing.narrowIconSize
+  },
+
+  icon__loading: {
+    position: 'absolute',
+    left: 0,
     willChange: 'transform',
     backgroundImage: `url(${loadingIconSvg})`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'top left',
     animationName: spinKeyframes,
     animationTimingFunction: 'linear',
     animationDuration: '1200ms',
     animationIterationCount: 'infinite'
+  },
+
+  icon__default: {
+    WebkitMaskRepeat: 'no-repeat',
+    WebkitMaskPosition: 'center',
+    WebkitMaskImage: `url(${defaultIconSvg})`
   }
 })
