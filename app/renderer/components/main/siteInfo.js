@@ -251,7 +251,7 @@ class SiteInfo extends React.Component {
         className={cx({
           [css(commonStyles.flyoutDialog)]: true,
           [css(styles.siteInfo__wrapper)]: true,
-          [css(styles.siteInfo__wrapper__large)]: (this.isBlockedRunInsecureContent || this.runInsecureContent)
+          [css(styles.siteInfo__wrapper__large)]: (this.props.isBlockedRunInsecureContent || this.props.runInsecureContent)
         })}>
         {
           this.secureIcon
