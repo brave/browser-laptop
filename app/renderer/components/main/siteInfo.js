@@ -64,12 +64,10 @@ class SiteInfo extends React.Component {
   get secureIcon () {
     if (this.props.isFullySecured) {
       // fully secure
-      return <div className={css(styles.secureIcon__wrapper)}>
+      return <div className={css(styles.secureIcon)}>
         <span className={cx({
-          fa: true,
-          'fa-lock': true,
-          [css(styles.secureIcon__fa)]: true,
-          [css(styles.secureIcon__extendedValidation)]: this.props.isExtendedValidation
+          [globalStyles.appIcons.lock]: true,
+          [css(styles.secureIcon__fa, this.props.isExtendedValidation && styles.secureIcon__fa_extendedValidation)]: true
         })} />
         <span
           className={css(styles.secureIcon__label)}
@@ -79,10 +77,9 @@ class SiteInfo extends React.Component {
       </div>
     } else if (this.props.isMixedContent) {
       // passive mixed content loaded
-      return <div className={css(styles.secureIcon__wrapper)}>
+      return <div className={css(styles.secureIcon)}>
         <span className={cx({
-          fa: true,
-          'fa-unlock': true,
+          [globalStyles.appIcons.unlock]: true,
           [css(styles.secureIcon__fa)]: true
         })} />
         <span
@@ -93,10 +90,9 @@ class SiteInfo extends React.Component {
       </div>
     } else {
       // insecure
-      return <div className={css(styles.secureIcon__wrapper)}>
+      return <div className={css(styles.secureIcon)}>
         <span className={cx({
-          fa: true,
-          'fa-unlock': true,
+          [globalStyles.appIcons.unlock]: true,
           [css(styles.secureIcon__fa)]: true
         })} />
         <span
@@ -115,10 +111,9 @@ class SiteInfo extends React.Component {
         partitionNumber: this.props.partitionNumber
       }
 
-      return <div className={css(styles.secureIcon__wrapper)}>
+      return <div className={css(styles.secureIcon)}>
         <span className={cx({
-          fa: true,
-          'fa-user': true,
+          [globalStyles.appIcons.user]: true,
           [css(styles.secureIcon__fa)]: true
         })} />
         <span
@@ -136,7 +131,7 @@ class SiteInfo extends React.Component {
   get viewCertificateButton () {
     // TODO(Anthony): Hide it until muon support linux
     if (!isLinux) {
-      return <div className={css(styles.flexJustifyEnd, styles.viewCertificateButton__wrapper)}>
+      return <div className={css(styles.connectionInfo__viewCertificateButton)}>
         <Button
           l10nId='viewCertificate'
           className='primaryButton'
@@ -155,13 +150,13 @@ class SiteInfo extends React.Component {
     }
 
     if (this.props.maybePhishingLocation) {
-      return <div className={css(styles.connectionInfo__wrapper)}>
+      return <div className={css(styles.connectionInfo)}>
         <div data-l10n-id='phishingConnectionInfo' data-test-id='phishingConnectionInfo' />
       </div>
     } else if (this.props.isBlockedRunInsecureContent) {
-      return <div className={css(styles.connectionInfo__wrapper)}>
+      return <div className={css(styles.connectionInfo)}>
         <div data-test-id='runInsecureContentWarning' data-l10n-id='runInsecureContentWarning' />
-        <div className={css(styles.flexJustifyEnd, styles.viewCertificateButton__wrapper)}>
+        <div className={css(styles.connectionInfo__viewCertificateButton)}>
           <Button
             l10nId='allowRunInsecureContent'
             className='whiteButton'
@@ -178,9 +173,9 @@ class SiteInfo extends React.Component {
         {this.viewCertificateButton}
       </div>
     } else if (this.props.runInsecureContent) {
-      return <div className={css(styles.connectionInfo__wrapper)}>
+      return <div className={css(styles.connectionInfo)}>
         <div data-test-id='denyRunInsecureContentWarning' data-l10n-id='denyRunInsecureContentWarning' />
-        <div className={css(styles.flexJustifyEnd, styles.viewCertificateButton__wrapper)}>
+        <div className={css(styles.connectionInfo__viewCertificateButton)}>
           <Button
             l10nId='dismissDenyRunInsecureContent'
             className='whiteButton'
@@ -197,22 +192,22 @@ class SiteInfo extends React.Component {
         {this.viewCertificateButton}
       </div>
     } else if (this.props.secureConnection) {
-      return <div className={css(styles.connectionInfo__wrapper)}>
+      return <div className={css(styles.connectionInfo)}>
         <div data-l10n-id='secureConnectionInfo' />
         {this.viewCertificateButton}
       </div>
     } else if (this.props.partiallySecureConnection) {
-      return <div className={css(styles.connectionInfo__wrapper)}>
+      return <div className={css(styles.connectionInfo)}>
         <div data-l10n-id='partiallySecureConnectionInfo' />
         {this.viewCertificateButton}
       </div>
     } else if (this.props.certErrorConnection) {
-      return <div className={css(styles.connectionInfo__wrapper)}>
+      return <div className={css(styles.connectionInfo)}>
         <div data-l10n-id='certErrConnectionInfo' data-l10n-args={JSON.stringify(certErrl10nArgs)} />
         {this.viewCertificateButton}
       </div>
     } else {
-      return <div className={css(styles.connectionInfo__wrapper)}>
+      return <div className={css(styles.connectionInfo)}>
         <div data-l10n-id='insecureConnectionInfo' />
       </div>
     }
@@ -248,11 +243,11 @@ class SiteInfo extends React.Component {
   render () {
     return <Dialog testId='siteInfoDialog' onHide={this.onHide} className='siteInfo' isClickDismiss>
       <div onClick={(e) => e.stopPropagation()}
-        className={cx({
-          [css(commonStyles.flyoutDialog)]: true,
-          [css(styles.siteInfo__wrapper)]: true,
-          [css(styles.siteInfo__wrapper__large)]: (this.props.isBlockedRunInsecureContent || this.props.runInsecureContent)
-        })}>
+        className={css(
+          commonStyles.flyoutDialog,
+          styles.siteInfo,
+          (this.props.isBlockedRunInsecureContent || this.props.runInsecureContent) && styles.siteInfo_large
+      )}>
         {
           this.secureIcon
         }
@@ -267,40 +262,38 @@ class SiteInfo extends React.Component {
   }
 }
 
-module.exports = ReduxComponent.connect(SiteInfo)
-
 const styles = StyleSheet.create({
-  flexJustifyEnd: {
-    display: 'flex',
-    justifyContent: 'flex-end'
-  },
-
-  secureIcon__wrapper: {
+  secureIcon: {
     display: 'flex',
     alignItems: 'center'
   },
+
   secureIcon__fa: {
     position: 'absolute'
   },
-  secureIcon__extendedValidation: {
+
+  secureIcon__fa_extendedValidation: {
     color: '#008000'
   },
+
   secureIcon__label: {
     position: 'relative',
     left: globalStyles.spacing.dialogInsideMargin
   },
 
-  viewCertificateButton__wrapper: {
-    marginTop: globalStyles.spacing.dialogInsideMargin
-  },
-
-  connectionInfo__wrapper: {
+  connectionInfo: {
     display: 'flex',
     flexFlow: 'column nowrap',
     margin: `${globalStyles.spacing.dialogInsideMargin} 0 0 ${globalStyles.spacing.dialogInsideMargin}`
   },
 
-  siteInfo__wrapper: {
+  connectionInfo__viewCertificateButton: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginTop: globalStyles.spacing.dialogInsideMargin
+  },
+
+  siteInfo: {
     maxHeight: '300px',
     maxWidth: '400px',
     width: 'auto',
@@ -309,8 +302,11 @@ const styles = StyleSheet.create({
     userSelect: 'none',
     cursor: 'default'
   },
-  siteInfo__wrapper__large: {
+
+  siteInfo_large: {
     // temporary workaround
     maxWidth: '500px'
   }
 })
+
+module.exports = ReduxComponent.connect(SiteInfo)
