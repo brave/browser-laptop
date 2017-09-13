@@ -1810,6 +1810,18 @@ const appActions = {
     })
   },
 
+  /*
+   * Removes cookies
+   * @param {Array.Object=} cookies - Cookies to remove or undefined if all
+   *  cookies should be removed
+   */
+  removeCookies: function (cookies) {
+    dispatch({
+      actionType: appConstants.APP_REMOVE_COOKIES,
+      cookies
+    })
+  },
+
   onBitcoinToBatBeginTransition: function () {
     dispatch({
       actionType: appConstants.APP_ON_BTC_TO_BAT_BEGIN_TRANSITION

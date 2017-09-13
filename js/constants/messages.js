@@ -143,7 +143,9 @@ const messages = {
   // PDFJS
   LOAD_URL_REQUESTED: _,
   // Torrent
-  TORRENT_MESSAGE: _
+  TORRENT_MESSAGE: _,
+  // Cookie manager
+  COOKIES_UPDATED: _
   // DO NOT ADD TO THIS LIST - see above
 }
 

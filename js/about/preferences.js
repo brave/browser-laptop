@@ -588,7 +588,7 @@ class SecurityTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='autofillData' prefKey={settings.SHUTDOWN_CLEAR_AUTOFILL_DATA} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='savedSiteSettings' prefKey={settings.SHUTDOWN_CLEAR_SITE_SETTINGS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         {/* TODO: move this inline style to Aphrodite once refactored */}
-        <div style={{marginTop: '15px'}}>
+        <div style={{marginTop: '15px', marginBottom: '15px'}}>
           <BrowserButton
             primaryColor
             l10nId='clearBrowsingDataNow'
@@ -596,6 +596,10 @@ class SecurityTab extends ImmutableComponent {
             onClick={this.clearBrowsingDataNow}
           />
         </div>
+        <label className={css(commonStyles.linkText, commonStyles.linkText_small)} data-l10n-id='manageCookies'
+          onClick={aboutActions.createTabRequested.bind(null, {
+            url: 'about:cookies'
+          })} />
       </SettingsList>
       <DefaultSectionTitle data-l10n-id='passwordsAndForms' />
       <SettingsList>

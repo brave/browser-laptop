@@ -820,6 +820,34 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
 }
 
 /**
+ * Cookie methods
+ */
+module.exports.cookies = {
+  getAll: (cb) => {
+    const cookiesMap = {}
+    for (let partition in registeredSessions) {
+      const ses = registeredSessions[partition]
+      ses.cookies.get({}, (error, cookies) => {
+        if (error) { console.error(error) }
+        cookiesMap[partition] = cookies
+        if (Object.keys(cookiesMap).length ===
+          Object.keys(registeredSessions).length) {
+          cb(cookiesMap)
+        }
+      })
+    }
+  },
+  remove: (url, name, partition, cb) => {
+    const ses = registeredSessions[partition]
+    if (ses) {
+      ses.cookies.remove(url, name, cb || function () {})
+    } else {
+      console.error('No session to remove cookies for: ' + partition)
+    }
+  }
+}
+
+/**
  * Clears all storage data.
  * This includes: appcache, cookies, filesystem, indexdb, local storage,
  * shadercache, websql, and serviceworkers.

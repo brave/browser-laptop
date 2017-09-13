@@ -98,6 +98,7 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:brave': module.exports.getBraveExtUrl('about-brave.html'),
   'about:certerror': module.exports.getBraveExtUrl('about-certerror.html'),
   'about:config': module.exports.getBraveExtUrl('about-config.html'),
+  'about:cookies': module.exports.getBraveExtUrl('about-cookies.html'),
   'about:downloads': module.exports.getBraveExtUrl('about-downloads.html'),
   'about:error': module.exports.getBraveExtUrl('about-error.html'),
   'about:extensions': module.exports.getBraveExtUrl('about-extensions.html'),
