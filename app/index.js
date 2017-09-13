@@ -131,14 +131,14 @@ const notifyCertError = (webContents, url, error, cert) => {
 }
 
 app.on('ready', () => {
-  app.on('certificate-error', (e, webContents, url, error, cert, resourceType, overridable, strictEnforcement, expiredPreviousDecision, cb) => {
+  app.on('certificate-error', (e, webContents, url, error, cert, resourceType, overridable, strictEnforcement, expiredPreviousDecision, muonCb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
-      cb('continue')
+      muonCb('continue')
       return
     } else {
-      cb('deny')
+      muonCb('deny')
     }
 
     if (resourceType !== 'mainFrame') {

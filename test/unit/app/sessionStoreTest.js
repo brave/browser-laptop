@@ -24,10 +24,10 @@ describe('sessionStore unit tests', function () {
   }
   global.muon = {
     file: {
-      writeImportant: (path, data, cb) => {
+      writeImportant: (path, data, fn) => {
         // simulate running on another thread
         setImmediate(() => {
-          cb(true)
+          fn(true)
         })
       }
     }

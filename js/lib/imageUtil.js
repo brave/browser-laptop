@@ -22,7 +22,7 @@ module.exports.getBase64FromImageUrl = (url) => {
 
 module.exports.getWorkingImageUrl = (url, cb) => {
   const img = new window.Image()
-  img.onload = () => cb(true)
-  img.onerror = () => cb(false)
+  img.onload = () => cb(null)
+  img.onerror = () => cb(new Error(`There was problem loading image: ${url}`))
   img.src = url
 }
