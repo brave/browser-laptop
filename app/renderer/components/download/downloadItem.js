@@ -4,10 +4,13 @@
 
 const React = require('react')
 const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite/no-important')
+
+const globalStyles = require('../styles/global')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
-const Button = require('../common/button')
+const BrowserButton = require('../common/browserButton')
 
 // Constants
 const downloadStates = require('../../../../js/constants/downloadStates')
@@ -143,7 +146,7 @@ class DownloadItem extends React.Component {
       l10nStateArgs.downloadPercent = this.props.percentageComplete
     }
 
-    return <span
+    return <section
       onContextMenu={contextMenus.onDownloadsToolbarContextMenu.bind(null, this.props.downloadId, this.props.download)}
       onDoubleClick={this.onOpenDownload}
       onMouseLeave={this.onHideDeleteConfirmation}
@@ -156,96 +159,117 @@ class DownloadItem extends React.Component {
       })}>
       {
         this.props.deleteConfirmationVisible
-        ? <div className='deleteConfirmation'>
-          <span data-l10n-id='downloadDeleteConfirmation' /><Button testId='confirmDeleteButton' l10nId='ok' className='primaryButton confirmDeleteButton' onClick={this.onDeleteDownload} />
+        ? <div className={cx({
+          deleteConfirmation: true,
+          [css(styles.downloadItems__deleteConfirmation)]: true
+        })}>
+          <span data-l10n-id='downloadDeleteConfirmation' />
+          <BrowserButton primaryColor smallItem
+            testId='confirmDeleteButton'
+            l10nId='ok'
+            onClick={this.onDeleteDownload}
+          />
         </div>
         : null
       }
-      <div className='downloadActions'>
-        {
-          this.props.allowPause
-          ? <Button
-            testId='pauseButton'
-            className='pauseButton'
-            l10nId='downloadPause'
-            iconClass='fa-pause'
-            onClick={this.onPauseDownload}
-          />
-          : null
-        }
-        {
-          this.props.allowResume
-          ? <Button
-            testId='resumeButton'
-            className='resumeButton'
-            l10nId='downloadResume'
-            iconClass='fa-play'
-            onClick={this.onResumeDownload}
-          />
-          : null
-        }
-        {
-          this.props.allowCancel
-          ? <Button
-            testId='cancelButton'
-            className='cancelButton'
-            l10nId='downloadCancel'
-            iconClass='fa-times'
-            onClick={this.onCancelDownload}
-          />
-          : null
-        }
-        {
-          this.props.allowRedownload
-          ? <Button
-            testId='redownloadButton'
-            className='redownloadButton'
-            l10nId='downloadRedownload'
-            iconClass='fa-repeat'
-            onClick={this.onReDownload}
-          />
-          : null
-        }
-        {
-          this.props.allowCopyLink
-          ? <Button
-            testId='copyLinkButton'
-            className='copyLinkButton'
-            l10nId='downloadCopyLinkLocation'
-            iconClass='fa-link'
-            onClick={this.onCopyLinkToClipboard}
-          />
-          : null
-        }
-        {
-          this.props.allowOpenDownloadLocation
-          ? <Button
-            testId='revealButton'
-            className='revealButton'
-            l10nId='downloadOpenPath'
-            iconClass='fa-folder-open-o'
-            onClick={this.onRevealDownload}
-          />
-          : null
-        }
-        {
-          this.props.allowDelete
-          ? <Button
-            testId='deleteButton'
-            className='deleteButton'
-            l10nId='downloadDelete'
-            iconClass='fa-trash-o'
-            onClick={this.onShowDeleteConfirmation}
-          />
-          : null
-        }
+      <div className={cx({
+        downloadActions: true,
+        [css(styles.downloadItems__item__actions)]: true
+      })}>
+        <div className={css(styles.downloadItems__item__actions__left)}>
+          {
+            this.props.allowPause
+            ? <BrowserButton
+              iconOnly
+              iconClass={globalStyles.appIcons.pause}
+              size='15px'
+              testId='pauseButton'
+              l10nId='downloadPause'
+              onClick={this.onPauseDownload}
+            />
+            : null
+          }
+          {
+            this.props.allowResume
+            ? <BrowserButton
+              iconOnly
+              iconClass={globalStyles.appIcons.resume}
+              size='15px'
+              testId='resumeButton'
+              l10nId='downloadResume'
+              onClick={this.onResumeDownload}
+            />
+            : null
+          }
+          {
+            this.props.allowCancel
+            ? <BrowserButton
+              iconOnly
+              iconClass={globalStyles.appIcons.remove}
+              size='15px'
+              testId='cancelButton'
+              l10nId='downloadCancel'
+              onClick={this.onCancelDownload}
+            />
+            : null
+          }
+          {
+            this.props.allowRedownload
+            ? <BrowserButton
+              iconOnly
+              iconClass={globalStyles.appIcons.retry}
+              size='15px'
+              testId='redownloadButton'
+              l10nId='downloadRedownload'
+              onClick={this.onReDownload}
+            />
+            : null
+          }
+          {
+            this.props.allowCopyLink
+            ? <BrowserButton
+              iconOnly
+              iconClass={globalStyles.appIcons.link}
+              size='15px'
+              testId='copyLinkButton'
+              l10nId='downloadCopyLinkLocation'
+              onClick={this.onCopyLinkToClipboard}
+            />
+            : null
+          }
+          {
+            this.props.allowOpenDownloadLocation
+            ? <BrowserButton
+              iconOnly
+              iconClass={globalStyles.appIcons.openLocation}
+              size='15px'
+              testId='revealButton'
+              l10nId='downloadOpenPath'
+              onClick={this.onRevealDownload}
+            />
+            : null
+          }
+          {
+            this.props.allowDelete
+            ? <BrowserButton
+              iconOnly
+              iconClass={globalStyles.appIcons.trashO}
+              size='15px'
+              testId='deleteButton'
+              l10nId='downloadDelete'
+              onClick={this.onShowDeleteConfirmation}
+            />
+            : null
+          }
+        </div>
         {
           this.props.allowRemoveFromList
-          ? <Button
+          ? <BrowserButton
+            iconOnly
+            iconClass={globalStyles.appIcons.remove}
+            size='15px'
             testId='downloadRemoveFromList'
             l10nId='downloadRemoveFromList'
-            iconClass='fa-times'
-            className='removeDownloadFromList'
             onClick={this.onClearDownload}
           />
           : null
@@ -256,8 +280,11 @@ class DownloadItem extends React.Component {
         ? <div data-test-id='downloadProgress' className='downloadProgress' style={progressStyle} />
         : null
       }
-      <div className='downloadInfo'>
-        <span>
+      <div className={cx({
+        downloadInfo: true,
+        [css(styles.downloadItems__item__info)]: true
+      })}>
+        <div>
           <div data-test-id='downloadFilename' className='downloadFilename' title={this.props.fileName + '\n' + locale.translation(this.props.statel10n)}>
             {this.props.fileName}
           </div>
@@ -280,11 +307,43 @@ class DownloadItem extends React.Component {
             ? <div className='downloadState' data-l10n-id={this.props.statel10n} data-l10n-args={JSON.stringify(l10nStateArgs)} />
             : null
           }
-        </span>
+        </div>
         <span className='downloadArrow fa-caret-down fa' />
       </div>
-    </span>
+    </section>
   }
 }
+
+const styles = StyleSheet.create({
+  downloadItems__deleteConfirmation: {
+    fontSize: '12px',
+    marginTop: globalStyles.downloadBar.item.info.margin,
+    paddingBottom: globalStyles.downloadBar.item.info.margin
+  },
+
+  downloadItems__item__actions: {
+    boxSizing: 'border-box',
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: globalStyles.downloadBar.item.info.margin
+  },
+
+  downloadItems__item__actions__left: {
+    display: 'flex',
+    justifyContent: 'space-between',
+
+    // magic number
+    width: '90px'
+  },
+
+  downloadItems__item__info: {
+    boxSizing: 'border-box',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: globalStyles.downloadBar.item.info.margin,
+    marginBottom: globalStyles.downloadBar.item.info.margin
+  }
+})
 
 module.exports = ReduxComponent.connect(DownloadItem)

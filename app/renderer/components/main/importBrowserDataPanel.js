@@ -9,7 +9,7 @@ const Immutable = require('immutable')
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
-const Button = require('../common/button')
+const BrowserButton = require('../common/browserButton')
 const SwitchControl = require('../common/switchControl')
 const {
   CommonForm,
@@ -139,14 +139,19 @@ class ImportBrowserDataPanel extends React.Component {
             onClick={this.onTogglePasswords}
             disabled={!this.props.isSupportingPasswords}
           />
-
         </CommonFormSection>
         <CommonFormSection>
           <div data-l10n-id='importDataCloseBrowserWarning' />
         </CommonFormSection>
         <CommonFormSection buttons testId='importBrowserDataButtons'>
-          <Button l10nId='cancel' className='whiteButton' onClick={this.onHide} />
-          <Button l10nId='import' className='primaryButton' onClick={this.onImport} />
+          <BrowserButton groupedItem secondaryColor
+            l10nId='cancel'
+            onClick={this.onHide}
+          />
+          <BrowserButton groupedItem primaryColor
+            l10nId='import'
+            onClick={this.onImport}
+          />
         </CommonFormSection>
         <CommonFormSection bottom testId='importBrowserDataWarning'>
           <div data-l10n-id='importDataWarning' />

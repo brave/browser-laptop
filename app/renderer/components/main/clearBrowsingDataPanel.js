@@ -9,7 +9,7 @@ const ipc = require('electron').ipcRenderer
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
-const Button = require('../common/button')
+const BrowserButton = require('../common/browserButton')
 const SwitchControl = require('../common/switchControl')
 const {
   CommonForm,
@@ -125,12 +125,12 @@ class ClearBrowsingDataPanel extends React.Component {
             onClick={this.onToggleSavedSiteSettings} />
         </CommonFormSection>
         <CommonFormSection buttons>
-          <Button className='whiteButton'
+          <BrowserButton groupedItem secondaryColor
             l10nId='cancel'
             testId='cancelButton'
             onClick={this.onCancel}
           />
-          <Button className='primaryButton'
+          <BrowserButton groupedItem primaryColor
             l10nId='clear'
             testId='clearDataButton'
             onClick={this.onClear}

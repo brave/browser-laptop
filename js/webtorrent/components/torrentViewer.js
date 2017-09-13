@@ -5,7 +5,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
 
 // Components
-const Button = require('../../../app/renderer/components/common/button')
+const BrowserButton = require('../../../app/renderer/components/common/browserButton')
 const TorrentFileList = require('./torrentFileList')
 const TorrentStatus = require('./torrentStatus')
 
@@ -41,7 +41,7 @@ class TorrentViewer extends React.Component {
         )
       }
       mainButton = (
-        <Button className='primaryButton mainButton'
+        <BrowserButton primaryColor
           l10nId='stopDownload'
           testId='stopDownload'
           onClick={() => dispatch('stop')}
@@ -67,7 +67,7 @@ class TorrentViewer extends React.Component {
         />
       )
       mainButton = (
-        <Button className='primaryButton mainButton'
+        <BrowserButton groupedItem primaryColor
           l10nId='startDownload'
           testId='startDownload'
           onClick={() => dispatch('start')}
@@ -81,7 +81,7 @@ class TorrentViewer extends React.Component {
 
     if (torrentIdProtocol === 'magnet:') {
       saveButton = (
-        <Button className='whiteButton copyMagnetLink'
+        <BrowserButton groupedItem secondaryColor
           l10nId='copyMagnetLink'
           testId='copyMagnetLink'
           onClick={() => dispatch('copyMagnetLink')}
@@ -89,7 +89,7 @@ class TorrentViewer extends React.Component {
       )
     } else {
       saveButton = (
-        <Button className='whiteButton saveTorrentFile'
+        <BrowserButton groupedItem secondaryColor
           l10nId='saveTorrentFile'
           testId='saveTorrentFile'
           onClick={() => dispatch('saveTorrentFile')}

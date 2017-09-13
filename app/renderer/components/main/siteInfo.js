@@ -10,7 +10,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
 const FlyoutDialog = require('../common/flyoutDialog')
-const Button = require('../common/button')
+const BrowserButton = require('../common/browserButton')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -132,9 +132,8 @@ class SiteInfo extends React.Component {
     // TODO(Anthony): Hide it until muon support linux
     if (!isLinux) {
       return <div className={css(styles.connectionInfo__viewCertificateButton)}>
-        <Button
+        <BrowserButton primaryColor
           l10nId='viewCertificate'
-          className='primaryButton'
           testId='viewCertificate'
           onClick={this.onViewCertificate}
         />
@@ -157,15 +156,13 @@ class SiteInfo extends React.Component {
       return <div className={css(styles.connectionInfo)}>
         <div data-test-id='runInsecureContentWarning' data-l10n-id='runInsecureContentWarning' />
         <div className={css(styles.connectionInfo__viewCertificateButton)}>
-          <Button
+          <BrowserButton groupedItem secondaryColor
             l10nId='allowRunInsecureContent'
-            className='whiteButton'
             testId='allowRunInsecureContentButton'
             onClick={this.onAllowRunInsecureContent}
           />
-          <Button
+          <BrowserButton groupedItem primaryColor
             l10nId='dismissAllowRunInsecureContent'
-            className='primaryButton'
             testId='dismissAllowRunInsecureContentButton'
             onClick={this.onHide}
           />
@@ -176,15 +173,13 @@ class SiteInfo extends React.Component {
       return <div className={css(styles.connectionInfo)}>
         <div data-test-id='denyRunInsecureContentWarning' data-l10n-id='denyRunInsecureContentWarning' />
         <div className={css(styles.connectionInfo__viewCertificateButton)}>
-          <Button
+          <BrowserButton groupedItem secondaryColor
             l10nId='dismissDenyRunInsecureContent'
-            className='whiteButton'
             testId='dismissDenyRunInsecureContentButton'
             onClick={this.onHide}
           />
-          <Button
+          <BrowserButton groupedItem primaryColor
             l10nId='denyRunInsecureContent'
-            className='primaryButton'
             testId='denyRunInsecureContentButton'
             onClick={this.onDenyRunInsecureContent}
           />

@@ -7,7 +7,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const Dialog = require('../common/dialog')
-const Button = require('../common/button')
+const BrowserButton = require('../common/browserButton')
 const {
   CommonForm,
   CommonFormSection,
@@ -137,8 +137,14 @@ class LoginRequired extends React.Component {
           </div>
         </CommonFormSection>
         <CommonFormSection buttons>
-          <Button l10nId='cancel' className='whiteButton' onClick={this.onClose} />
-          <Button l10nId='ok' className='primaryButton' onClick={this.onSave} />
+          <BrowserButton groupedItem secondaryColor
+            l10nId='cancel'
+            onClick={this.onClose}
+          />
+          <BrowserButton groupedItem primaryColor
+            l10nId='ok'
+            onClick={this.onSave}
+          />
         </CommonFormSection>
       </CommonForm>
     </Dialog>

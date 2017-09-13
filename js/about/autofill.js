@@ -8,7 +8,7 @@ const Immutable = require('immutable')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const cx = require('../lib/classSet')
 const aboutActions = require('./aboutActions')
-const Button = require('../../app/renderer/components/common/button')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
 const locale = require('../../js/l10n')
 
 const ipc = window.chrome.ipcRenderer
@@ -218,7 +218,7 @@ class AboutAutofill extends React.Component {
         <h2 data-l10n-id='addresses' />
         <div className='autofillPageContent'>
           {savedAddresssPage}
-          <Button className='primaryButton'
+          <BrowserButton primaryColor
             l10nId='addAddress'
             testId='addAddressButton'
             onClick={this.onAddAddress}
@@ -228,7 +228,7 @@ class AboutAutofill extends React.Component {
         <h2 data-l10n-id='creditCards' />
         <div className='autofillPageContent'>
           {savedCreditCardsPage}
-          <Button className='primaryButton'
+          <BrowserButton primaryColor
             l10nId='addCreditCard'
             testId='addCreditCardButton'
             onClick={this.onAddCreditCard}

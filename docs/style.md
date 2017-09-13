@@ -730,18 +730,18 @@ Once we have our own set of icons we can remove that, but for now you'll need to
 
 ## Testing styled-components
 
-As styles are converted from LESS to Aphrodite, we will lose the ability to control the generated class names. This means for our webdriver tests will no longer be able to use class names as selectors. Instead we will be adding the attribute `data-test-id` to elements. This approach gives us the added benefit of differentiating between code meant for presentation and code meant for testing.
+As styles are converted from LESS to Aphrodite, we will lose the ability to control the generated class names. This means for our webdriver tests will no longer be able to use class names as selectors. Instead we will be adding the attribute `data-test-id` or `testId` to elements. This approach gives us the added benefit of differentiating between code meant for presentation and code meant for testing.
 
 An example would be moving:
 
 ```jsx
-<Button className='paymentHistoryButton' l10nId={buttonText} onClick={onButtonClick.bind(this)} />
+<Dialog className='autofillCreditCardPanel' l10nId={buttonText} onClick={onButtonClick.bind(this)} />
 ```
 
 to:
 
 ```jsx
-<Button className={css(paymentButton)} data-test-id='paymentHistoryButton' l10nId={buttonText} onClick={onButtonClick.bind(this)} />
+<Dialog testId='autofillCreditCardPanel' l10nId={buttonText} onClick={onButtonClick.bind(this)} />
 ```
 
 ## All set, where do I start?

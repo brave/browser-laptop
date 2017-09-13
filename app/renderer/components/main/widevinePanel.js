@@ -9,7 +9,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
-const Button = require('../common/button')
+const BrowserButton = require('../common/browserButton')
 const WidevineInfo = require('./widevineInfo')
 const SwitchControl = require('../common/switchControl')
 const {
@@ -82,25 +82,27 @@ class WidevinePanel extends React.Component {
           <WidevineInfo createTabRequestedAction={appActions.createTabRequested} />
         </CommonFormSection>
         <CommonFormSection buttons>
-          <Button className='whiteButton'
+          <BrowserButton groupedItem secondaryColor
             l10nId='cancel'
             testId='cancelButton'
             onClick={this.onHide}
           />
-          <Button className='primaryButton'
+          <BrowserButton groupedItem primaryColor
             l10nId='installAndAllow'
             testId='installAndAllowButton'
-            onClick={this.onInstallAndAllow} />
+            onClick={this.onInstallAndAllow}
+          />
         </CommonFormSection>
         <CommonFormSection bottom>
           <div className={css(styles.flexJustifyCenter)}>
-            {/* TODO: refactor switchControl.js to remove commonStyles.noPadding */}
+            {/* TODO (Suguru): refactor switchControl.js to remove commonStyles.noPadding */}
             <SwitchControl
               className={css(commonStyles.noPadding)}
               rightl10nId='rememberThisDecision'
               rightl10nArgs={JSON.stringify({origin: this.props.origin})}
               onClick={this.onClickRememberForNetflix}
-              checkedOn={this.props.alsoAddRememberSiteSetting} />
+              checkedOn={this.props.alsoAddRememberSiteSetting}
+            />
           </div>
         </CommonFormSection>
       </CommonForm>
