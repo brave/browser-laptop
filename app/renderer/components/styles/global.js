@@ -25,18 +25,7 @@ const globalStyles = {
     breakpointExtensionButtonPadding: '720px',
     breakpointSmallWin32: '650px',
     breakpointTinyWin32: '500px',
-    breakpointNewPrivateTab: '890px',
-    tab: {
-      dynamic: '99999px', // add a large number as new spec will set tab width based on window size
-      default: '184px', // match tabArea max-width
-      large: '120px',
-      largeMedium: '83px',
-      medium: '66px',
-      mediumSmall: '53px',
-      small: '46px',
-      extraSmall: '40px',
-      smallest: '19px'
-    }
+    breakpointNewPrivateTab: '890px'
   },
   intersection: {
     // whereas 1 === 100%

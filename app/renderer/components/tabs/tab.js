@@ -40,13 +40,8 @@ const {getTextColorForBackground} = require('../../../../js/lib/color')
 const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 const contextMenus = require('../../../../js/contextMenus')
 const dnd = require('../../../../js/dnd')
-const throttle = require('../../../../js/lib/throttle')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const {
-  getTabBreakpoint,
-  tabUpdateFrameRate,
-  hasTabAsRelatedTarget
-} = require('../../lib/tabUtil')
+const {hasTabAsRelatedTarget} = require('../../lib/tabUtil')
 const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const {getCurrentWindowId} = require('../../currentWindow')
 const {setObserver} = require('../../lib/observerUtil')
@@ -58,7 +53,6 @@ class Tab extends React.Component {
     this.onMouseMove = this.onMouseMove.bind(this)
     this.onMouseEnter = this.onMouseEnter.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
-    this.onUpdateTabSize = this.onUpdateTabSize.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
     this.onDragEnd = this.onDragEnd.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
@@ -191,22 +185,6 @@ class Tab extends React.Component {
     }
   }
 
-  get tabSize () {
-    const tab = this.tabNode
-    // Avoid TypeError keeping it null until component is mounted
-    return tab && !this.props.isPinnedTab ? tab.getBoundingClientRect().width : null
-  }
-
-  onUpdateTabSize () {
-    const currentSize = getTabBreakpoint(this.tabSize)
-    // Avoid updating breakpoint when user enters fullscreen (see #7301)
-    // Also there can be a race condition for pinned tabs if we update when not needed
-    // since a new tab component with the same key gets created which is not pinned.
-    if (this.props.breakpoint !== currentSize && !this.props.hasTabInFullScreen) {
-      windowActions.setTabBreakpoint(this.props.frameKey, currentSize)
-    }
-  }
-
   componentDidMount () {
     // do not observe pinned tabs
     if (this.props.isPinned) {
@@ -219,9 +197,7 @@ class Tab extends React.Component {
     this.observer = setObserver(this.tabSentinel, threshold, margin, this.onObserve)
     this.observer.observe(this.tabSentinel)
 
-    this.onUpdateTabSize() // TODO: this will be depreacated
     this.tabNode.addEventListener('auxclick', this.onAuxClick.bind(this))
-    window.addEventListener('resize', throttle(this.onUpdateTabSize, tabUpdateFrameRate), { passive: true })
   }
 
   componentDidUpdate () {
@@ -230,12 +206,10 @@ class Tab extends React.Component {
     if (this.props.isPinnedTab) {
       this.observer.unobserve(this.tabSentinel)
     }
-    this.onUpdateTabSize() // TODO: deprecate
   }
 
   componentWillUnmount () {
     this.observer.unobserve(this.tabSentinel)
-    window.removeEventListener('resize', this.onUpdateTabSize)
   }
 
   onObserve (entries) {
@@ -270,23 +244,18 @@ class Tab extends React.Component {
     // used in renderer
     props.frameKey = ownProps.frameKey
     props.isPrivateTab = frame.get('isPrivate')
-    props.breakpoint = frame.get('breakpoint')
     props.notificationBarActive = notificationBarActive
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, props.frameKey)
     props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.isPinnedTab = tabState.isTabPinned(state, tabId)
     props.canPlayAudio = audioState.canPlayAudio(currentWindow, props.frameKey)
     props.themeColor = tabUIState.getThemeColor(currentWindow, props.frameKey)
-    props.isNarrowView = tabUIState.isNarrowView(currentWindow, props.frameKey)
-    props.isNarrowestView = tabUIState.isNarrowestView(currentWindow, props.frameKey)
-    props.isPlayIndicatorBreakpoint = tabUIState.isMediumView(currentWindow, props.frameKey) || props.isNarrowView
     props.title = frame.get('title')
     props.partOfFullPageSet = ownProps.partOfFullPageSet
 
     // used in other functions
     props.totalTabs = state.get('tabs').size
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
-    props.hasTabInFullScreen = tabUIState.hasTabInFullScreen(currentWindow)
     props.tabId = tabId
     props.previewMode = currentWindow.getIn(['ui', 'tabs', 'previewMode'])
 
@@ -335,19 +304,12 @@ class Tab extends React.Component {
           isWindows && styles.tabForWindows,
           this.props.isPinnedTab && styles.isPinned,
           this.props.isActive && styles.active,
-          this.props.isPlayIndicatorBreakpoint && this.props.canPlayAudio && styles.narrowViewPlayIndicator,
           this.props.isActive && this.props.themeColor && perPageStyles.themeColor,
           // Private color should override themeColor
           this.props.isPrivateTab && styles.private,
-          this.props.isActive && this.props.isPrivateTab && styles.activePrivateTab,
-          !this.props.isPinnedTab && this.props.isNarrowView && styles.tabNarrowView,
-          !this.props.isPinnedTab && this.props.isNarrowestView && styles.tabNarrowestView,
-          !this.props.isPinnedTab && this.props.breakpoint === 'smallest' && styles.tabMinAllowedSize
+          this.props.isActive && this.props.isPrivateTab && styles.activePrivateTab
         )}
         data-test-id='tab'
-        data-test-active-tab={this.props.isActive}
-        data-test-pinned-tab={this.props.isPinnedTab}
-        data-test-private-tab={this.props.isPrivateTab}
         data-frame-key={this.props.frameKey}
         draggable
         title={this.props.title}
@@ -361,11 +323,7 @@ class Tab extends React.Component {
           ref={(node) => { this.tabSentinel = node }}
           className={css(styles.tab__sentinel)}
         />
-        <div className={css(
-          styles.tabId,
-          this.props.isNarrowView && styles.tabIdNarrowView,
-          this.props.breakpoint === 'smallest' && styles.tabIdMinAllowedSize
-          )}>
+        <div className={css(styles.tabId)}>
           <Favicon tabId={this.props.tabId} />
           <AudioTabIcon tabId={this.props.tabId} />
           <TabTitle tabId={this.props.tabId} />
@@ -422,44 +380,6 @@ const styles = StyleSheet.create({
     width: globalStyles.spacing.sentinelSize
   },
 
-  // Custom classes based on tab's width and behaviour
-  tabNarrowView: {
-    padding: '0 2px'
-  },
-
-  narrowViewPlayIndicator: {
-    '::before': {
-      content: `''`,
-      display: 'block',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: '2px',
-      background: 'lightskyblue'
-    }
-  },
-
-  tabNarrowestView: {
-    justifyContent: 'center'
-  },
-
-  tabMinAllowedSize: {
-    padding: 0
-  },
-
-  tabIdNarrowView: {
-    flex: 'inherit'
-  },
-
-  tabIdMinAllowedSize: {
-    overflow: 'hidden'
-  },
-
-  alternativePlayIndicator: {
-    borderTop: '2px solid lightskyblue'
-  },
-
   tabId: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -514,29 +434,6 @@ const styles = StyleSheet.create({
         opacity: '0'
       }
     }
-  },
-
-  icon: {
-    width: globalStyles.spacing.iconSize,
-    minWidth: globalStyles.spacing.iconSize,
-    height: globalStyles.spacing.iconSize,
-    backgroundSize: globalStyles.spacing.iconSize,
-    fontSize: globalStyles.fontSize.tabIcon,
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    paddingLeft: globalStyles.spacing.defaultIconPadding,
-    paddingRight: globalStyles.spacing.defaultIconPadding
-  },
-
-  icon_audio: {
-    color: globalStyles.color.highlightBlue,
-
-    // 16px
-    fontSize: `calc(${globalStyles.fontSize.tabIcon} + 2px)`,
-
-    // equal spacing around audio icon (favicon and tabTitle)
-    padding: globalStyles.spacing.defaultTabPadding,
-    paddingRight: '0 !important'
   }
 })
 

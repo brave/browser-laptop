@@ -7,29 +7,8 @@ const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {isEntryIntersected} = require('../../../../app/renderer/lib/observerUtil')
 
-// TODO deprecate
-const {braveExtensionId} = require('../../../../js/constants/config')
-
 // Styles
 const {intersection} = require('../../../renderer/components/styles/global')
-
-// TODO deprecate
-module.exports.deprecatedIsTabLoading = (state, frameKey) => {
-  const frame = frameStateUtil.getFrameByKey(state, frameKey)
-
-  if (frame == null) {
-    return false
-  }
-
-  return (
-    frame.get('loading') ||
-    frame.get('location') === 'about:blank'
-  ) &&
-  (
-    !frame.get('provisionalLocation') ||
-    !frame.get('provisionalLocation').startsWith(`chrome-extension://${braveExtensionId}/`)
-  )
-}
 
 module.exports.showFavicon = (state, frameKey) => {
   const frame = frameStateUtil.getFrameByKey(state, frameKey)

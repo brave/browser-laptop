@@ -166,7 +166,6 @@ describe('Window store unit tests', function () {
           },
           tabId: 8,
           zoomLevel: 0,
-          breakpoint: 'default',
           index: 1,
           partitionNumber: 0,
           history: [],
