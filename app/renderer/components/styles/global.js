@@ -25,7 +25,7 @@ const globalStyles = {
     breakpointExtensionButtonPadding: '720px',
     breakpointSmallWin32: '650px',
     breakpointTinyWin32: '500px',
-    breakpointNewPrivateTab: '890px'
+    breakpointNewPrivateTab: '890px' // page's breakpoint for the private tab page
   },
   intersection: {
     // whereas 1 === 100%
@@ -162,7 +162,7 @@ const globalStyles = {
     aboutPageDetailsPageWidth: '704px',
     aboutPageSectionPadding: '24px',
     aboutPageSectionMargin: '10px',
-    defaultTabPadding: '0 4px',
+    defaultTabMargin: '6px',
     defaultIconPadding: '2px',
     iconSize: '16px',
     sessionIconSize: '15px',
@@ -214,6 +214,7 @@ const globalStyles = {
     zindexWindowIsPreview: '1100',
     zindexDownloadsBar: '1000',
     zindexTabs: '1000',
+    zindexTabsAudioTopBorder: '10001',
     zindexTabsThumbnail: '1100',
     zindexTabsDragIndicator: '1100',
     zindexNavigationBar: '2000',

@@ -1,9 +1,9 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const Immutable = require('immutable')
 
 // Components
@@ -23,7 +23,8 @@ const windowActions = require('../../../../js/actions/windowActions')
 // Store
 const windowStore = require('../../../../js/stores/windowStore')
 
-// State
+// State helpers
+const privateState = require('../../../common/state/tabContentState/privateState')
 const audioState = require('../../../common/state/tabContentState/audioState')
 const tabUIState = require('../../../common/state/tabUIState')
 const tabState = require('../../../common/state/tabState')
@@ -33,6 +34,7 @@ const dragTypes = require('../../../../js/constants/dragTypes')
 
 // Styles
 const globalStyles = require('../styles/global')
+const {theme} = require('../styles/theme')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
@@ -119,10 +121,17 @@ class Tab extends React.Component {
   }
 
   onDragStart (e) {
+    // showing up the sentinel while dragging leads to show the shadow
+    // of the next tab. See 10691#issuecomment-329854096
+    // this is added back when dragEnd event happens
+    this.tabSentinel.style.display = 'none'
+
     dnd.onDragStart(dragTypes.TAB, this.frame, e)
   }
 
   onDragEnd (e) {
+    // re-enable the tabSentinel after drag ends
+    this.tabSentinel.style.display = 'block'
     dnd.onDragEnd(dragTypes.TAB, this.frame, e)
   }
 
@@ -186,9 +195,11 @@ class Tab extends React.Component {
   }
 
   componentDidMount () {
-    // do not observe pinned tabs
+    // unobserve tabs that we don't need. This will
+    // likely be made by onObserve method but added again as
+    // just to double-check
     if (this.props.isPinned) {
-      this.observer.unobserve(this.tabSentinel)
+      this.observer && this.observer.unobserve(this.tabSentinel)
     }
     const threshold = Object.values(globalStyles.intersection)
     // At this moment Chrome can't handle unitless zeroes for rootMargin
@@ -200,20 +211,11 @@ class Tab extends React.Component {
     this.tabNode.addEventListener('auxclick', this.onAuxClick.bind(this))
   }
 
-  componentDidUpdate () {
-    // if a tab was just pinned, unobserve its intersection
-    // this gives us some more performance boost
-    if (this.props.isPinnedTab) {
-      this.observer.unobserve(this.tabSentinel)
-    }
-  }
-
   componentWillUnmount () {
     this.observer.unobserve(this.tabSentinel)
   }
 
   onObserve (entries) {
-    // avoid observing pinned tabs
     if (this.props.isPinnedTab) {
       return
     }
@@ -234,27 +236,32 @@ class Tab extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
+    const frameKey = ownProps.frameKey
+    const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
+    const isPinned = tabState.isTabPinned(state, tabId)
+    const partOfFullPageSet = ownProps.partOfFullPageSet
+
+    // TODO: this should have its own method
     const notifications = state.get('notifications')
     const notificationOrigins = notifications ? notifications.map(bar => bar.get('frameOrigin')) : false
     const notificationBarActive = frame.get('location') && notificationOrigins &&
       notificationOrigins.includes(UrlUtil.getUrlOrigin(frame.get('location')))
-    const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
 
     const props = {}
-    // used in renderer
-    props.frameKey = ownProps.frameKey
-    props.isPrivateTab = frame.get('isPrivate')
+    // TODO: this should have its own method
     props.notificationBarActive = notificationBarActive
-    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, props.frameKey)
+    props.frameKey = frameKey
+    props.isPinnedTab = isPinned
+    props.isPrivateTab = privateState.isPrivateTab(currentWindow, frameKey)
+    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
     props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
-    props.isPinnedTab = tabState.isTabPinned(state, tabId)
-    props.canPlayAudio = audioState.canPlayAudio(currentWindow, props.frameKey)
-    props.themeColor = tabUIState.getThemeColor(currentWindow, props.frameKey)
+    props.themeColor = tabUIState.getThemeColor(currentWindow, frameKey)
     props.title = frame.get('title')
-    props.partOfFullPageSet = ownProps.partOfFullPageSet
+    props.partOfFullPageSet = partOfFullPageSet
+    props.showAudioTopBorder = audioState.showAudioTopBorder(currentWindow, frameKey, isPinned)
+    props.centralizeTabIcons = tabUIState.centralizeTabIcons(currentWindow, frameKey, isPinned)
 
     // used in other functions
-    props.totalTabs = state.get('tabs').size
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
     props.tabId = tabId
     props.previewMode = currentWindow.getIn(['ui', 'tabs', 'previewMode'])
@@ -265,7 +272,7 @@ class Tab extends React.Component {
   render () {
     // we don't want themeColor if tab is private
     const perPageStyles = !this.props.isPrivateTab && StyleSheet.create({
-      themeColor: {
+      tab_themeColor: {
         color: this.props.themeColor ? getTextColorForBackground(this.props.themeColor) : 'inherit',
         background: this.props.themeColor ? this.props.themeColor : 'inherit',
         ':hover': {
@@ -301,13 +308,15 @@ class Tab extends React.Component {
         className={css(
           styles.tab,
           // Windows specific style
-          isWindows && styles.tabForWindows,
-          this.props.isPinnedTab && styles.isPinned,
-          this.props.isActive && styles.active,
-          this.props.isActive && this.props.themeColor && perPageStyles.themeColor,
+          isWindows && styles.tab_forWindows,
+          this.props.isPinnedTab && styles.tab_pinned,
+          this.props.isActive && styles.tab_active,
+          this.props.showAudioTopBorder && styles.tab_audioTopBorder,
+          this.props.isActive && this.props.themeColor && perPageStyles.tab_themeColor,
           // Private color should override themeColor
-          this.props.isPrivateTab && styles.private,
-          this.props.isActive && this.props.isPrivateTab && styles.activePrivateTab
+          this.props.isPrivateTab && styles.tab_private,
+          this.props.isActive && this.props.isPrivateTab && styles.tab_active_private,
+          this.props.centralizeTabIcons && styles.tab__content_centered
         )}
         data-test-id='tab'
         data-frame-key={this.props.frameKey}
@@ -323,7 +332,10 @@ class Tab extends React.Component {
           ref={(node) => { this.tabSentinel = node }}
           className={css(styles.tab__sentinel)}
         />
-        <div className={css(styles.tabId)}>
+        <div className={css(
+          styles.tab__identity,
+          this.props.centralizeTabIcons && styles.tab__content_centered
+        )}>
           <Favicon tabId={this.props.tabId} />
           <AudioTabIcon tabId={this.props.tabId} />
           <TabTitle tabId={this.props.tabId} />
@@ -337,34 +349,39 @@ class Tab extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  // Windows specific style
-  tabForWindows: {
-    color: '#555'
-  },
-
   tab: {
     borderWidth: '0 1px 0 0',
     borderStyle: 'solid',
     borderColor: '#bbb',
     boxSizing: 'border-box',
-    color: '#5a5a5a',
+    color: theme.tab.color,
     display: 'flex',
     marginTop: '0',
-    transition: `transform 200ms ease, ${globalStyles.transition.tabBackgroundTransition}`,
+    transition: theme.tab.transition,
     left: '0',
     opacity: '1',
-    width: '100%',
+    height: '-webkit-fill-available',
+    width: '-webkit-fill-available',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: globalStyles.spacing.defaultTabPadding,
+    padding: 0,
     position: 'relative',
 
-    // globalStyles.spacing.tabHeight has been set to globalStyles.spacing.tabsToolbarHeight,
-    // which is 1px extra due to the border-top of .tabsToolbar
-    height: '-webkit-fill-available',
+    ':hover': {
+      background: theme.tab.hover.background
+    }
+  },
+
+  // Windows specific style
+  tab_forWindows: {
+    color: theme.tab.forWindows.color
+  },
+
+  tab_active: {
+    background: theme.tab.active.background,
 
     ':hover': {
-      background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(250, 250, 250, 0.4))'
+      background: theme.tab.active.background
     }
   },
 
@@ -380,59 +397,56 @@ const styles = StyleSheet.create({
     width: globalStyles.spacing.sentinelSize
   },
 
-  tabId: {
-    justifyContent: 'center',
+  tab_audioTopBorder: {
+    '::before': {
+      content: `''`,
+      display: 'block',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: '2px',
+      background: 'lightskyblue'
+    }
+  },
+
+  tab__identity: {
+    justifyContent: 'flex-start',
     alignItems: 'center',
     display: 'flex',
     flex: '1',
-
-    // @see https://bugzilla.mozilla.org/show_bug.cgi?id=1108514#c5
-    minWidth: '0',
-
-    // prevent the icons wrapper from being the target of mouse events.
-    pointerEvents: 'none'
+    minWidth: '0', // @see https://bugzilla.mozilla.org/show_bug.cgi?id=1108514#c5
+    marginLeft: globalStyles.spacing.defaultTabMargin
   },
 
-  isPinned: {
+  tab__content_centered: {
+    justifyContent: 'center',
+    flex: 'auto',
     padding: 0,
-    width: `calc(${globalStyles.spacing.tabsToolbarHeight} * 1.1)`,
+    margin: 0
+  },
+
+  tab_pinned: {
+    padding: 0,
+    width: '28px',
     justifyContent: 'center'
   },
 
-  active: {
-    background: `rgba(255, 255, 255, 1.0)`,
-    marginTop: '0',
-    borderWidth: '0 1px 0 0',
-    borderStyle: 'solid',
-    borderColor: '#bbb',
-    color: '#000',
+  tab_active_private: {
+    background: theme.tab.active.private.background,
+    color: theme.tab.active.private.color,
 
     ':hover': {
-      background: `linear-gradient(to bottom, #fff, ${globalStyles.color.chromePrimary})`
+      background: theme.tab.active.private.background
     }
   },
 
-  activePrivateTab: {
-    background: globalStyles.color.privateTabBackgroundActive,
+  tab_private: {
+    background: theme.tab.private.background,
 
     ':hover': {
-      background: globalStyles.color.privateTabBackgroundActive
-    }
-  },
-
-  private: {
-    background: 'rgba(75, 60, 110, 0.2)',
-
-    ':hover': {
-      background: globalStyles.color.privateTabBackgroundActive
-    }
-  },
-
-  dragging: {
-    ':hover': {
-      closeTab: {
-        opacity: '0'
-      }
+      color: theme.tab.active.private.color,
+      background: theme.tab.active.private.background
     }
   }
 })

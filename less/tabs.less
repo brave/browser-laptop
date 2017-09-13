@@ -10,7 +10,7 @@
   flex: 1;
   overflow: auto;
   padding: 0;
-  height: @tabsToolbarHeight;
+  height: -webkit-fill-available;
   position: relative;
   white-space: nowrap;
   z-index: @zindexTabs;
@@ -59,6 +59,7 @@
   position: relative;
   vertical-align: top;
   overflow: hidden;
+  height: -webkit-fill-available;
   // There's a special case that tabs should span the full width
   // if there are a full set of them.
   &:not(.partOfFullPageSet) {
@@ -123,14 +124,17 @@
   box-sizing: border-box;
   background: @tabsBackground;
   display: flex;
-  height: @tabsToolbarHeight;
+  // This element is set as border-box so it does not
+  // take into account the borders as width gutter, so we
+  // increase its size by 1px to include the top border
+  height: calc(~'@{tabsToolbarHeight} + 1px');
   border-top: 1px solid @tabsToolbarBorderColor;
   user-select: none;
 }
 
 .tabsToolbarButtons {
   box-sizing: border-box;
-  height: @tabHeight;
+  height: -webkit-fill-available;
   padding-right: 5px;
 
   .browserButton {
@@ -222,6 +226,8 @@
 }
 
 .pinnedTabs {
+  height: -webkit-fill-available;
+  box-sizing: border-box;
   margin-left: 0;
   margin-top: 0;
   background: @tabsBackgroundInactive;
