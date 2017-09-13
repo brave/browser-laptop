@@ -463,7 +463,7 @@ function registerPermissionHandler (session, partition) {
 
       // If this is a duplicate, clear the previous callback and use the new one
       if (permissionCallbacks[message]) {
-        permissionCallbacks[message](0, false, i)
+        permissionCallbacks[message](0, false)
       }
 
       appActions.showNotification({
@@ -479,7 +479,11 @@ function registerPermissionHandler (session, partition) {
         message
       })
 
-      permissionCallbacks[message] = (buttonIndex, persist, index) => {
+      // Use a closure here for the index instead of passing an index to the
+      // function because ipcMain.on(messages.NOTIFICATION_RESPONSE above
+      // calls into the callback without knowing an index.
+      const index = i
+      permissionCallbacks[message] = (buttonIndex, persist) => {
         // hide the notification if this was triggered automatically
         appActions.hideNotification(message)
         const result = !!(buttonIndex)
