@@ -136,7 +136,6 @@ execute(cmds, env, (err) => {
   if (err) {
     console.error('buildPackage failed', err)
     process.exit(1)
-    return
   }
   config.clearBuildConfig()
   console.log('done')

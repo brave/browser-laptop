@@ -443,13 +443,13 @@ module.exports.init = () => {
       // Verify we don't have info about an extension which doesn't exist
       // on disk anymore.  It will crash if it doesn't exist, so this is
       // just a safety net.
-      fs.exists(path.join(extensionPath, 'manifest.json'), (exists) => {
-        if (exists) {
-          session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
-        } else {
+      fs.access(path.join(extensionPath, 'manifest.json'), fs.constants.F_OK, (err) => {
+        if (err) {
           // This is an error condition, but we can recover.
           extensionInfo.setState(extensionId, undefined)
           componentUpdater.checkNow(extensionId)
+        } else {
+          session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
         }
       })
     } else {

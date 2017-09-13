@@ -38,7 +38,7 @@ class CommonFormMedium extends ImmutableComponent {
     return <div className={css(
       commonStyles.flyoutDialog,
       styles.commonForm,
-      styles.commonFormMedium,
+      styles.commonFormMedium
     )} {...this.props} />
   }
 }
