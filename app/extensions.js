@@ -134,6 +134,20 @@ let generateBraveManifest = () => {
           getBraveExtUrl('about-blank.html'),
           getBraveExtUrl('about-blank.html') + '#*'
         ]
+      },
+      {
+        run_at: 'document_start',
+        all_frames: true,
+        js: [
+          'content/scripts/dndHandler.js'
+        ],
+        matches: [
+          '<all_urls>'
+        ],
+        exclude_globs: [
+          indexHTML,
+          getBraveExtUrl('*')
+        ]
       }
     ],
     web_accessible_resources: [
