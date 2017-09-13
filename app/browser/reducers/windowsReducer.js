@@ -112,12 +112,9 @@ function windowDefaults (state) {
     minModalWidth: 100,
     windowOffset: 20,
     webPreferences: {
+      // XXX: Do not edit without security review
       sharedWorker: true,
-      nodeIntegration: false,
-      partition: 'default',
-      webSecurity: false,
-      allowFileAccessFromFileUrls: true,
-      allowUniversalAccessFromFileUrls: true
+      partition: 'default'
     }
   }
 }

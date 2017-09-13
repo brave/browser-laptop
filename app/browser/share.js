@@ -8,7 +8,7 @@ const {shell} = require('electron')
 const tabs = require('./tabs')
 
 const templateUrls = {
-  email: 'mailto:?subject={title}&body={url}',
+  email: 'mailto:?subject={title}&body={url}', // Do not edit without security review
   facebook: 'https://www.facebook.com/sharer.php?u={url}',
   pinterest: 'https://pinterest.com/pin/create/bookmarklet/?url={url}&description={title}',
   twitter: 'https://twitter.com/intent/tweet?url={url}&text={title}&hashtags=brave',
