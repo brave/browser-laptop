@@ -1,8 +1,7 @@
 <!--
-Before submitting this issue, please visit our wiki for common ones: https://github.com/brave/browser-laptop/wiki
-
 Have you searched for similar issues? There is a lot of feedbacks and bug reports we have received and closed as duplicate.
-By using search engines along with GitHub search function you would be able to find duplicates more efficiently.
+Before submitting this issue, please visit our wiki for common ones: https://github.com/brave/browser-laptop/wiki
+By using search engines along with GitHub search function, you would be able to find duplicates more efficiently.
 
 For more, check out our community site: https://community.brave.com/
 -->
