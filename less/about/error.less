@@ -1,5 +1,10 @@
 @import "./common.less";
 
+// See siteDetails.less
+body {
+  background: @veryLightGray;
+}
+
 #appContainer {
   &.errorPageContainer {
     overflow: auto;
@@ -12,7 +17,6 @@
       margin: 20vh auto;
       line-height: 1.6em;
       flex-direction: column;
-      background-color: #FFF;
       padding: 40px;
       height: auto;
 
@@ -64,6 +68,11 @@
 
     &.safeBrowsing {
       background-color: red;
+
+      .errorContent {
+        // See the body property above
+        background: @veryLightGray;
+      }
     }
   }
 }
