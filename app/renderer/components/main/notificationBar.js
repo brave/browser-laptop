@@ -26,14 +26,22 @@ const globalStyles = require('../styles/global')
 
 class NotificationItem extends ImmutableComponent {
   clickHandler (buttonIndex, e) {
-    const nonce = this.props.detail.get('options').get('nonce')
+    const nonce = this.props.detail.getIn(['options', 'nonce'])
+    const index = this.props.detail.getIn(['options', 'index'])
     if (nonce) {
-      ipc.emit(messages.NOTIFICATION_RESPONSE + nonce, {},
-               this.props.detail.get('message'),
-               buttonIndex, this.checkbox ? this.checkbox.checked : false)
+      ipc.send(
+        messages.NOTIFICATION_RESPONSE + nonce, {},
+        this.props.detail.get('message'),
+        buttonIndex, this.checkbox ? this.checkbox.checked : false,
+        index
+      )
     } else {
-      ipc.send(messages.NOTIFICATION_RESPONSE, this.props.detail.get('message'),
-               buttonIndex, this.checkbox ? this.checkbox.checked : false)
+      ipc.send(
+        messages.NOTIFICATION_RESPONSE,
+        this.props.detail.get('message'),
+        buttonIndex, this.checkbox ? this.checkbox.checked : false,
+        index
+      )
     }
   }
 
