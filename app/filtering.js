@@ -426,41 +426,35 @@ function registerPermissionHandler (session, partition) {
     let response = []
     for (let i = 0; i < permissionTypes.length; i++) {
       const permission = permissionTypes[i]
+      const alwaysAllowFullscreen = module.exports.alwaysAllowFullscreen() === fullscreenOption.ALWAYS_ALLOW
       if (!permissions[permission]) {
         console.warn('WARNING: got unregistered permission request', permission)
         response.push(false)
-      }
-
-      // The Torrent Viewer extension is always allowed to show fullscreen media
-      if (permission === 'fullscreen' &&
+      } else if (permission === 'fullscreen' &&
+        // The Torrent Viewer extension is always allowed to show fullscreen media
         origin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
         response.push(true)
-      }
-
-      // Always allow fullscreen if setting is ON
-      const alwaysAllowFullscreen = module.exports.alwaysAllowFullscreen() === fullscreenOption.ALWAYS_ALLOW
-      if (permission === 'fullscreen' && alwaysAllowFullscreen) {
+      } else if (permission === 'fullscreen' && alwaysAllowFullscreen) {
+        // Always allow fullscreen if setting is ON
         response.push(true)
-      }
-
-      // The Brave extension and PDFJS are always allowed to open files in an external app
-      if (permission === 'openExternal' && (
+      } else if (permission === 'openExternal' && (
+        // The Brave extension and PDFJS are always allowed to open files in an external app
         origin.startsWith('chrome-extension://' + config.PDFJSExtensionId) ||
         origin.startsWith('chrome-extension://' + config.braveExtensionId))) {
         response.push(true)
-      }
-
-      const permissionName = permission + 'Permission'
-      let isAllowed
-      if (settings) {
-        isAllowed = settings.get(permissionName)
-      }
-      // Private tabs inherit settings from normal tabs, but not vice versa.
-      if (isPrivate && tempSettings) {
-        isAllowed = tempSettings.get(permissionName)
-      }
-      if (typeof isAllowed === 'boolean') {
-        response.push(isAllowed)
+      } else {
+        const permissionName = permission + 'Permission'
+        let isAllowed
+        if (settings) {
+          isAllowed = settings.get(permissionName)
+        }
+        // Private tabs inherit settings from normal tabs, but not vice versa.
+        if (isPrivate && tempSettings) {
+          isAllowed = tempSettings.get(permissionName)
+        }
+        if (typeof isAllowed === 'boolean') {
+          response.push(isAllowed)
+        }
       }
 
       // Display 'Brave Browser' if the origin is null; ex: when a mailto: link
