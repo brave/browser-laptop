@@ -9,6 +9,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
+const FlyoutDialog = require('../common/flyoutDialog')
 const Button = require('../common/button')
 
 // Actions
@@ -28,7 +29,6 @@ const urlUtil = require('../../../../js/lib/urlutil')
 
 // Styles
 const globalStyles = require('../styles/global')
-const commonStyles = require('../styles/commonStyles')
 
 class SiteInfo extends React.Component {
   constructor (props) {
@@ -242,12 +242,11 @@ class SiteInfo extends React.Component {
 
   render () {
     return <Dialog testId='siteInfoDialog' onHide={this.onHide} className='siteInfo' isClickDismiss>
-      <div onClick={(e) => e.stopPropagation()}
-        className={css(
-          commonStyles.flyoutDialog,
+      <FlyoutDialog onClick={(e) => e.stopPropagation()}
+        custom={[
           styles.siteInfo,
           (this.props.isBlockedRunInsecureContent || this.props.runInsecureContent) && styles.siteInfo_large
-      )}>
+        ]}>
         {
           this.secureIcon
         }
@@ -257,7 +256,7 @@ class SiteInfo extends React.Component {
         {
           this.connectionInfo
         }
-      </div>
+      </FlyoutDialog>
     </Dialog>
   }
 }

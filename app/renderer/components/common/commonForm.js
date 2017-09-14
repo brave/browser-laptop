@@ -7,8 +7,8 @@ const ImmutableComponent = require('../immutableComponent')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
-const commonStyles = require('../styles/commonStyles')
 
+const FlyoutDialog = require('./flyoutDialog')
 const {FormDropdown} = require('./dropdown')
 const {FormTextbox} = require('./textbox')
 
@@ -16,50 +16,53 @@ const {FormTextbox} = require('./textbox')
 
 class CommonForm extends ImmutableComponent {
   render () {
-    return <div className={css(
-      commonStyles.flyoutDialog,
-      styles.commonForm
-    )} {...this.props} />
+    return <FlyoutDialog custom={styles.commonForm}>
+      {this.props.children}
+    </FlyoutDialog>
   }
 }
 
 class CommonFormSmall extends ImmutableComponent {
   render () {
-    return <div className={css(
-      commonStyles.flyoutDialog,
+    return <FlyoutDialog custom={[
       styles.commonForm,
       styles.commonFormSmall
-    )} {...this.props} />
+    ]}>
+      {this.props.children}
+    </FlyoutDialog>
   }
 }
 
 class CommonFormMedium extends ImmutableComponent {
   render () {
-    return <div className={css(
-      commonStyles.flyoutDialog,
+    return <FlyoutDialog custom={[
       styles.commonForm,
       styles.commonFormMedium
-    )} {...this.props} />
+    ]}>
+      {this.props.children}
+    </FlyoutDialog>
   }
 }
 
 class CommonFormLarge extends ImmutableComponent {
   render () {
-    return <div className={css(
-      commonStyles.flyoutDialog,
+    return <FlyoutDialog custom={[
       styles.commonForm,
       styles.commonFormLarge
-    )} {...this.props} />
+    ]}>
+      {this.props.children}
+    </FlyoutDialog>
   }
 }
 
 class CommonFormBookmarkHanger extends ImmutableComponent {
   render () {
-    return <div className={css(
-      commonStyles.flyoutDialog,
+    return <FlyoutDialog custom={[
       styles.commonForm,
       styles.commonFormBookmarkHanger
-    )} {...this.props} />
+    ]}>
+      {this.props.children}
+    </FlyoutDialog>
   }
 }
 
@@ -139,8 +142,10 @@ const styles = StyleSheet.create({
     maxWidth: globalStyles.spacing.dialogWidth,
     minWidth: '310px',
     height: 'auto',
-    maxHeight: '100vh', // #8634: commonStyles.flyoutDialog,
-    userSelect: 'none'
+    userSelect: 'none',
+
+    // #8634: commonStyles.flyoutDialog,
+    maxHeight: '100vh'
 
     // Need a general solution
     // See: #7930
