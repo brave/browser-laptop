@@ -449,6 +449,7 @@ function registerPermissionHandler (session, partition) {
 
     let response = []
     for (let i = 0; i < permissionTypes.length; i++) {
+      const responseSizeThisIteration = response.length
       const permission = permissionTypes[i]
       const alwaysAllowFullscreen = module.exports.alwaysAllowFullscreen() === fullscreenOption.ALWAYS_ALLOW
       if (!permissions[permission]) {
@@ -490,37 +491,43 @@ function registerPermissionHandler (session, partition) {
         permissionCallbacks[message](0, false)
       }
 
-      appActions.showNotification({
-        buttons: [
-          {text: locale.translation('deny')},
-          {text: locale.translation('allow')}
-        ],
-        frameOrigin: getOrigin(mainFrameUrl),
-        options: {
-          persist: !!origin,
-          index: i
-        },
-        message
-      })
+      const responseAutoAdded = responseSizeThisIteration !== response.length
+      if (!responseAutoAdded) {
+        appActions.showNotification({
+          buttons: [
+            {text: locale.translation('deny')},
+            {text: locale.translation('allow')}
+          ],
+          frameOrigin: getOrigin(mainFrameUrl),
+          options: {
+            persist: !!origin,
+            index: i
+          },
+          message
+        })
 
-      // Use a closure here for the index instead of passing an index to the
-      // function because ipcMain.on(messages.NOTIFICATION_RESPONSE above
-      // calls into the callback without knowing an index.
-      const index = i
-      permissionCallbacks[message] = (buttonIndex, persist) => {
-        // hide the notification if this was triggered automatically
-        appActions.hideNotification(message)
-        const result = !!(buttonIndex)
-        response[index] = result
-        if (persist) {
-          // remember site setting for this host
-          appActions.changeSiteSetting(origin, permission + 'Permission', result, isPrivate)
-        }
-        if (response.length === permissionTypes.length) {
-          permissionCallbacks[message] = null
-          cb(response)
+        // Use a closure here for the index instead of passing an index to the
+        // function because ipcMain.on(messages.NOTIFICATION_RESPONSE above
+        // calls into the callback without knowing an index.
+        const index = i
+        permissionCallbacks[message] = (buttonIndex, persist) => {
+          // hide the notification if this was triggered automatically
+          appActions.hideNotification(message)
+          const result = !!(buttonIndex)
+          response[index] = result
+          if (persist) {
+            // remember site setting for this host
+            appActions.changeSiteSetting(origin, permission + 'Permission', result, isPrivate)
+          }
+          if (response.length === permissionTypes.length) {
+            permissionCallbacks[message] = null
+            cb(response)
+          }
         }
       }
+    }
+    if (response.length === permissionTypes.length) {
+      cb(response)
     }
   })
 }
