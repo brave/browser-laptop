@@ -9,12 +9,10 @@ const Immutable = require('immutable')
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
+const FlyoutDialog = require('../common/flyoutDialog')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
-
-// Styles
-const commonStyles = require('../styles/commonStyles')
 
 class ReleaseNotes extends React.Component {
   constructor (props) {
@@ -41,21 +39,14 @@ class ReleaseNotes extends React.Component {
   }
 
   render () {
-    const className = css(
-      commonStyles.flyoutDialog,
-      styles.releaseNotes
-    )
-
     return <Dialog onHide={this.onHide} isClickDismiss>
-      <div className={className} onClick={this.onClick}>
+      <FlyoutDialog className={styles.releaseNotes} onClick={this.onClick}>
         <h1 className={css(styles.header)}>{this.props.name}</h1>
         <div>{this.props.notes}</div>
-      </div>
+      </FlyoutDialog>
     </Dialog>
   }
 }
-
-module.exports = ReduxComponent.connect(ReleaseNotes)
 
 const styles = StyleSheet.create({
   releaseNotes: {
@@ -69,3 +60,5 @@ const styles = StyleSheet.create({
     marginBottom: '10px'
   }
 })
+
+module.exports = ReduxComponent.connect(ReleaseNotes)
