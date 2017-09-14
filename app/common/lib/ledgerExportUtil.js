@@ -197,7 +197,7 @@ module.exports.getPublisherVoteData = (transactions, viewingIds) => {
  * Generates a contribution breakdown by publisher in an array of CSV rows from an array of transactions
  * @example
  * txUtil.getTransactionCSVRows(client.state.transactions)
- * // [ ['Publisher,Votes,Fraction,BTC,USD'],
+ * // [ ['Publisher,Votes,Fraction,BAT,USD'],
  * //   ['chronicle.com,2,0.04081632653061224,0.0000033221,0.20 USD'],
  * //   ['waitbutwhy.com,3,0.061224489795918366,0.0000049832,0.31 USD'],
  * //   ['archlinux.org,1,0.02040816326530612,0.0000016611,0.10 USD'],
@@ -234,13 +234,13 @@ module.exports.getTransactionCSVRows = (transactions, viewingIds, addTotalRow, s
 
   const currency = (publishers.length ? txContribData[publishers[0]].contribution.currency : 'USD')
 
-  const headerRow = ['Publisher', 'Votes', 'Fraction', 'BTC', currency].join(',')
+  const headerRow = ['Publisher', 'Votes', 'Fraction', 'BAT', currency].join(',')
 
   var totalsRow = {
     label: 'TOTAL',
     votes: 0,
     fraction: 0,
-    btc: 0,
+    bat: 0,
     fiat: 0
   }
 
@@ -249,10 +249,10 @@ module.exports.getTransactionCSVRows = (transactions, viewingIds, addTotalRow, s
   rows = rows.concat(publishers.map(function (pub) {
     var pubRow = txContribData[pub]
 
-    let rowBTC = pubRow.contribution.satoshis / Math.pow(10, 10)
+    let rowBAT = pubRow.contribution.satoshis / Math.pow(10, 10)
     totalsRow.votes += pubRow.votes
     totalsRow.fraction += pubRow.fraction
-    totalsRow.btc += rowBTC
+    totalsRow.bat += rowBAT
 
     if (pubRow.contribution.currency === currency) {
       totalsRow.fiat += parseFloat(pubRow.contribution.fiat || '0')
@@ -264,7 +264,7 @@ module.exports.getTransactionCSVRows = (transactions, viewingIds, addTotalRow, s
       pub,
       pubRow.votes,
       pubRow.fraction,
-      rowBTC,
+      rowBAT,
       pubRow.contribution.fiat.toFixed(2) + ' ' + pubRow.contribution.currency
     ].join(',')
   }))
@@ -275,7 +275,7 @@ module.exports.getTransactionCSVRows = (transactions, viewingIds, addTotalRow, s
       totalsRow.label,
       totalsRow.votes,
       totalsRow.fraction,
-      totalsRow.btc,
+      totalsRow.bat,
       totalsRow.fiat.toFixed(2) + ' ' + currency
     ].join(','))
   }
@@ -287,7 +287,7 @@ module.exports.getTransactionCSVRows = (transactions, viewingIds, addTotalRow, s
  * Generates a contribution breakdown by publisher in an array of CSV rows from an array of transactions
  * @example
  * txUtil.getTransactionCSVText(state.transactions)
- * // 'Publisher,Votes,Fraction,BTC,USD\nchronicle.com,2,0.04081632653061224,0.0000033221,0.20 USD\nwaitbutwhy.com,3,0.061224489795918366,0.0000049832,0.31 USD\narchlinux.org,1,0.02040816326530612,0.0000016611,0.10 USD /.../'
+ * // 'Publisher,Votes,Fraction,BAT,USD\nchronicle.com,2,0.04081632653061224,0.0000033221,0.20 USD\nwaitbutwhy.com,3,0.061224489795918366,0.0000049832,0.31 USD\narchlinux.org,1,0.02040816326530612,0.0000016611,0.10 USD /.../'
  *
  * @param {Object[]} transactions - array of transactions
  * @param {string[]=} viewingIds - OPTIONAL array/string with one or more viewingIds to filter transactions by (if empty, uses all tx)

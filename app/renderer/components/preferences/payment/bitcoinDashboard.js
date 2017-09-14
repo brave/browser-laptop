@@ -5,26 +5,26 @@
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
-// components
+// Components
 const BrowserButton = require('../../common/browserButton')
-const cx = require('../../../../../js/lib/classSet')
 const ModalOverlay = require('../../common/modalOverlay')
 const ImmutableComponent = require('../../immutableComponent')
 
-// styles
+// Styles
 const globalStyles = require('../../styles/global')
 const commonStyles = require('../../styles/commonStyles')
-
 const CoinBase = require('../../../../extensions/brave/img/coinbase_logo.png')
 const Andorid = require('../../../../extensions/brave/img/android_download.svg')
 const IOS = require('../../../../extensions/brave/img/ios_download.svg')
 
-// other
+// Actions
+const aboutActions = require('../../../../../js/about/aboutActions')
+
+// Utils
 const coinbaseCountries = require('../../../../../js/constants/coinbaseCountries')
-const config = require('../../../../../js/constants/config')
 const getSetting = require('../../../../../js/settings').getSetting
 const settings = require('../../../../../js/constants/settings')
-const aboutActions = require('../../../../../js/about/aboutActions')
+const cx = require('../../../../../js/lib/classSet')
 
 class BitcoinDashboard extends ImmutableComponent {
   constructor () {
@@ -41,17 +41,6 @@ class BitcoinDashboard extends ImmutableComponent {
     return getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings) || 0
   }
 
-  get canUseCoinbase () {
-    if (!this.props.ledgerData.get('buyMaximumUSD')) return true
-
-    return this.currency === 'USD' && this.amount < this.props.ledgerData.get('buyMaximumUSD')
-  }
-
-  get userInAmerica () {
-    const countryCode = this.props.ledgerData.get('countryCode')
-    return !(countryCode && countryCode !== 'US')
-  }
-
   openBuyURLTab () {
     // close parent dialog
     this.props.hideParentOverlay()
@@ -64,6 +53,7 @@ class BitcoinDashboard extends ImmutableComponent {
       [css(styles.faCreditCard)]: true
     })} />
   }
+
   faBitcoin () {
     return <span className={cx({
       'fa-stack': true,
@@ -83,6 +73,7 @@ class BitcoinDashboard extends ImmutableComponent {
       })} />
     </span>
   }
+
   faSmartphone () {
     return <span className={cx({
       fa: true,
@@ -91,69 +82,32 @@ class BitcoinDashboard extends ImmutableComponent {
     })} />
   }
 
-  bitcoinPurchaseButton (options) {
-    const disabled = options && options.disabled
+  cardButton () {
     const buttonAttrs = {
       l10nId: 'add',
       testId: 'bitcoinPurchaseButton',
       primaryColor: true,
-      panelItem: true,
-      disabled: disabled
+      panelItem: true
     }
     const hrefAttrs = {
       href: this.props.ledgerData.get('buyURL'),
       target: '_blank',
-      rel: 'noopener'
+      rel: 'noopener',
+      onClick: this.openBuyURLTab
     }
 
-    if (disabled) {
-      buttonAttrs.disabled = 'disabled'
-      hrefAttrs.disabled = 'disabled'
-    } else {
-      hrefAttrs.onClick = this.openBuyURLTab
-    }
-
-    if (!this.props.ledgerData.get('buyURLFrame')) {
-      if (!disabled) {
-        buttonAttrs.onClick = this.props.showOverlay.bind(this)
-      }
-      return <BrowserButton {...buttonAttrs} />
-    }
-
-    return <a {...hrefAttrs}>
-      <BrowserButton {...buttonAttrs} />
-    </a>
-  }
-
-  coinbaseAvailability () {
-    const disabled = true
-    if (this.canUseCoinbase) {
-      return <section className={css(styles.panel__divider, styles.panel__divider_right)}>
-        {this.bitcoinPurchaseButton({disabled})}
-        {
-          disabled
-          ? <div className={css(
-            styles.panel__divider_right__title,
-            styles.panel__divider_right__subTitle,
-            styles.panel__divider_right__disabledSubTitle
-          )}>
-            <div data-l10n-id='fundingDisabled1' />
-            <div>
-              <span data-l10n-id='fundingDisabled2' />&nbsp;
-              <a href='https://community.brave.com/c/payments' data-l10n-id='fundingDisabled3' rel='noopener' target='_blank' />
-            </div>
-          </div>
-          : <div className={css(
-             styles.panel__divider_right__title,
-             styles.panel__divider_right__subTitle
-          )} data-l10n-id='transferTime' />
-        }
-      </section>
-    } else {
-      return <section className={css(styles.panel__divider, styles.panel__divider_right)}>
-        <div data-l10n-id='coinbaseNotAvailable' />
-      </section>
-    }
+    return <section className={css(styles.panel__divider, styles.panel__divider_right)}>
+      <a {...hrefAttrs}>
+        <BrowserButton {...buttonAttrs} />
+      </a>
+      <div
+        className={css(
+         styles.panel__divider_right__title,
+         styles.panel__divider_right__subTitle
+        )}
+        data-l10n-id='transferTime'
+      />
+    </section>
   }
 
   coinbasePanel () {
@@ -172,62 +126,7 @@ class BitcoinDashboard extends ImmutableComponent {
           </div>
         </div>
       </div>
-      {this.coinbaseAvailability()}
-    </section>
-  }
-  exchangePanel () {
-    const url = this.props.ledgerData.getIn(['exchangeInfo', 'exchangeURL'])
-    const name = this.props.ledgerData.getIn(['exchangeInfo', 'exchangeName'])
-    // Call worldWidePanel if we don't have the URL or Name
-    if (!url || !name) {
-      return this.worldWidePanel()
-    } else {
-      return <section className={css(styles.panel, styles.panel__coinbase)}>
-        <div className={css(styles.panel__divider, styles.panel__divider_left)}>
-          <div className={css(styles.panel__divider_left__titleWrapper)}>
-            <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
-              {this.faCreditCard()}
-            </div>
-            <div className={css(styles.panel__divider_left__listTitleWrapper)}>
-              <div className={css(styles.panel__divider_left__listTitleWrapper__title)} data-l10n-id='outsideUSAPayment' />
-            </div>
-          </div>
-        </div>
-        <div className={css(styles.panel__divider, styles.panel__divider_right)}>
-          <a href={url} rel='noopener' target='_blank'>
-            <BrowserButton
-              primaryColor
-              panelItem
-              testId='exchangePanelButton'
-              l10nId={name}
-            />
-          </a>
-        </div>
-      </section>
-    }
-  }
-  worldWidePanel () {
-    return <section className={css(styles.panel)}>
-      <div className={css(styles.panel__divider, styles.panel__divider_left)}>
-        <div className={css(styles.panel__divider_left__titleWrapper)}>
-          <div className={css(styles.panel__divider_left__titleWrapper__iconWrapper)}>
-            {this.faCreditCard()}
-          </div>
-          <div className={css(styles.panel__divider_left__listTitleWrapper)}>
-            <div className={css(styles.panel__divider_left__listTitleWrapper__title)} data-l10n-id='outsideUSAPayment' />
-          </div>
-        </div>
-      </div>
-      <div className={css(styles.panel__divider, styles.panel__divider_right)}>
-        <a href='https://www.buybitcoinworldwide.com/' rel='noopener' target='_blank'>
-          <BrowserButton
-            primaryColor
-            panelItem
-            testId='worldWidePanelButton'
-            label='buybitcoinworldwide.com'
-          />
-        </a>
-      </div>
+      {this.cardButton()}
     </section>
   }
 
@@ -321,6 +220,7 @@ class BitcoinDashboard extends ImmutableComponent {
       />
     </section>
   }
+
   qrcodeOverlayFooter () {
     if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
       return <section className={css(styles.modalOverlay__qrcodeOverlay__footerWrapper__footer)}>
@@ -344,52 +244,12 @@ class BitcoinDashboard extends ImmutableComponent {
     return null
   }
 
-  bitcoinOverlayContent () {
-    return <iframe className={css(styles.modalOverlay__coinbaseOverlay__bodyWrapper__body__iframe)}
-      src={this.props.ledgerData.get('buyURL')}
-    />
-  }
-
   copyToClipboard (text) {
     aboutActions.setClipboard(text)
   }
 
-  onMessage (e) {
-    if (!e.data || e.origin !== config.coinbaseOrigin) {
-      return
-    }
-    if (e.data.event === 'modal_closed') {
-      if (this.buyCompleted) {
-        this.props.hideParentOverlay()
-        this.buyCompleted = false
-      } else {
-        this.props.hideOverlay()
-      }
-    } else if (e.data.event === 'buy_completed') {
-      this.buyCompleted = true
-    }
-  }
-
   render () {
-    window.addEventListener('message', this.onMessage.bind(this), false)
-    const ledgerData = this.props.ledgerData
-
     return <section data-test-id='bitcoinDashboard'>
-      {
-        this.props.bitcoinOverlayVisible
-          ? <ModalOverlay
-            title={'bitcoinBuy'}
-            content={this.bitcoinOverlayContent()}
-            customDialogClasses={css(styles.modalOverlay__coinbaseOverlay)}
-            customDialogHeaderClasses={css(styles.modalOverlay__coinbaseOverlay__header)}
-            customDialogBodyWrapperClasses={css(styles.modalOverlay__coinbaseOverlay__bodyWrapper)}
-            customDialogBodyClasses={css(styles.modalOverlay__coinbaseOverlay__bodyWrapper__body)}
-            customDialogFooterClasses={css(styles.modalOverlay__coinbaseOverlay__footer)}
-            emptyDialog
-            onHide={this.props.hideOverlay.bind(this)}
-          />
-          : null
-      }
       {
         this.props.qrcodeOverlayVisible
           ? <ModalOverlay
@@ -405,11 +265,7 @@ class BitcoinDashboard extends ImmutableComponent {
           />
           : null
       }
-      {
-        (this.userInAmerica || ledgerData.get('buyURLFrame'))
-          ? this.coinbasePanel()
-          : this.exchangePanel()
-      }
+      {this.coinbasePanel()}
       {this.bitcoinPanel()}
       {this.smartphonePanel()}
     </section>
@@ -417,30 +273,18 @@ class BitcoinDashboard extends ImmutableComponent {
 }
 
 class BitcoinDashboardFooter extends ImmutableComponent {
-  get coinbaseCountries () {
-    return coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1
-  }
-
-  get coinbaseMessageWrapper () {
-    return <section className={css(styles.dashboardFooter_coinbaseFooter__coinbaseMessageWrapper)}>
-      <div className={css(this.coinbaseCountries && styles.coinbaseLogo)} />
-      <span className={css(styles.dashboardFooter_coinbaseFooter__coinbaseMessageWrapper__message)} data-l10n-id='coinbaseMessage' />
-    </section>
-  }
-
   render () {
     return <section className={css(
       styles.dashboardFooter,
-      this.coinbaseCountries && styles.dashboardFooter_coinbaseFooter
+      styles.dashboardFooter_coinbaseFooter
     )}>
-      {
-        this.coinbaseCountries
-          ? this.coinbaseMessageWrapper
-          : null
-      }
+      <section className={css(styles.dashboardFooter_coinbaseFooter__coinbaseMessageWrapper)}>
+        <div className={css(styles.coinbaseLogo)} />
+        <span className={css(styles.dashboardFooter_coinbaseFooter__coinbaseMessageWrapper__message)} data-l10n-id='upholdMessage' />
+      </section>
       <BrowserButton
         secondaryColor
-        custom={this.coinbaseCountries && styles.dashboardFooter_coinbaseFooter__doneButton}
+        custom={styles.dashboardFooter_coinbaseFooter__doneButton}
         l10nId='done'
         testId='panelDoneButton'
         onClick={this.props.hideParentOverlay}

@@ -75,6 +75,7 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get overlayTitle () {
+    // TODO are we still limited by coinbase?
     if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
       return 'addFunds'
     } else {

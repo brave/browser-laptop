@@ -72,7 +72,6 @@ const {fileUrl} = require('../js/lib/appUrlUtil')
 // "only-when-needed" loading...
 let ledgerBalance = null
 let ledgerClient = null
-let ledgerGeoIP = null
 let ledgerPublisher = null
 
 // testing data
@@ -102,7 +101,8 @@ const clientOptions = {
   rulesTestP: process.env.LEDGER_RULES_TESTING,
   verboseP: process.env.LEDGER_VERBOSE,
   server: process.env.LEDGER_SERVER_URL,
-  createWorker: app.createWorker
+  createWorker: app.createWorker,
+  version: 'v2'
 }
 
 var doneTimer
@@ -271,6 +271,7 @@ const doAction = (state, action) => {
       break
 
     case appConstants.APP_NAVIGATOR_HANDLER_REGISTERED:
+      // TODO will this be changed when switching to BAT
       ledgerInfo.hasBitcoinHandler = (action.protocol === 'bitcoin')
       appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
       break
@@ -708,7 +709,7 @@ var initialize = (paymentsEnabled) => {
   }
   if (client) return
 
-  if (!ledgerPublisher) ledgerPublisher = require('ledger-publisher')
+  if (!ledgerPublisher) ledgerPublisher = require('bat-publisher')
   ruleset = []
   ledgerPublisher.ruleset.forEach(rule => { if (rule.consequent) ruleset.push(rule) })
   cacheRuleSet(ruleset)
@@ -781,7 +782,7 @@ var initialize = (paymentsEnabled) => {
 }
 
 var clientprep = () => {
-  if (!ledgerClient) ledgerClient = require('ledger-client')
+  if (!ledgerClient) ledgerClient = require('bat-client')
   ledgerInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_CLIENT_DEBUG)
   publisherInfo._internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_DEBUG)
   publisherInfo._internal.verboseP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_VERBOSE)
@@ -795,13 +796,13 @@ var enable = (paymentsEnabled) => {
   publisherInfo._internal.enabled = paymentsEnabled
   if (synopsis) return updatePublisherInfo()
 
-  if (!ledgerPublisher) ledgerPublisher = require('ledger-publisher')
+  if (!ledgerPublisher) ledgerPublisher = require('bat-publisher')
   synopsis = new (ledgerPublisher.Synopsis)()
   fs.readFile(pathName(synopsisPath), (err, data) => {
     var initSynopsis = () => {
       var value
 
-      // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
+      // cf., the `Synopsis` constructor, https://github.com/brave/bat-publisher/blob/master/index.js#L167
       value = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
       if (!value) {
         value = 8 * 1000
@@ -1522,15 +1523,15 @@ var ledgerInfo = {
           currency: undefined
         },
         rates: {
-          [currency]: undefined // bitcoin value in <currency>
+          [currency]: undefined // bat value in <currency>
         },
-        satoshis: undefined,
+        probi: undefined,
         fee: undefined
       },
       submissionStamp: undefined,
       submissionId: undefined,
       count: undefined,
-      satoshis: undefined,
+      probi: undefined,
       votes: undefined,
       ballots: {
         [publisher]: undefined
@@ -1540,16 +1541,16 @@ var ledgerInfo = {
   ],
 
   // set from ledger client's state.paymentInfo OR client's getWalletProperties
-  // Bitcoin wallet address
+  // BAT wallet address
   address: undefined,
 
-  // Bitcoin wallet balance (truncated BTC and satoshis)
+  // BAT wallet balance (truncated BAT and probi)
   balance: undefined,
   unconfirmed: undefined,
-  satoshis: undefined,
+  probi: undefined,
 
-  // the desired contribution (the btc value approximates the amount/currency designation)
-  btc: undefined,
+  // the desired contribution (the bat value approximates the amount/currency designation)
+  bat: undefined,
   amount: undefined,
   currency: undefined,
 
@@ -1568,30 +1569,24 @@ var ledgerInfo = {
 
   hasBitcoinHandler: false,
 
-  // geoIP/exchange information
-  countryCode: undefined,
-  exchangeInfo: undefined,
-
   _internal: {
     exchangeExpiry: 0,
-    exchanges: {},
-    geoipExpiry: 0
+    exchanges: {}
   },
   error: null
 }
 
 var updateLedgerInfo = () => {
   var info = ledgerInfo._internal.paymentInfo
-  var now = underscore.now()
 
   if (info) {
     underscore.extend(ledgerInfo,
-                      underscore.pick(info, [ 'address', 'passphrase', 'balance', 'unconfirmed', 'satoshis', 'btc', 'amount',
+                      underscore.pick(info, [ 'address', 'passphrase', 'balance', 'unconfirmed', 'probi', 'bat', 'amount',
                         'currency' ]))
-    if ((!info.buyURLExpires) || (info.buyURLExpires > now)) {
-      ledgerInfo.buyURL = info.buyURL
-      ledgerInfo.buyMaximumUSD = 6
-    }
+    ledgerInfo.buyURL = info.buyURL
+    ledgerInfo.buyMaximumUSD = 6 // TODO what happens with this one
+
+    // TODO do we still need this check?
     if (typeof process.env.ADDFUNDS_URL !== 'undefined') {
       ledgerInfo.buyURLFrame = true
       ledgerInfo.buyURL = process.env.ADDFUNDS_URL + '?' +
@@ -1602,29 +1597,6 @@ var updateLedgerInfo = () => {
     }
 
     underscore.extend(ledgerInfo, ledgerInfo._internal.cache || {})
-  }
-
-  if ((client) && (now > ledgerInfo._internal.geoipExpiry)) {
-    ledgerInfo._internal.geoipExpiry = now + (5 * msecs.minute)
-
-    if (!ledgerGeoIP) ledgerGeoIP = require('ledger-geoip')
-    return ledgerGeoIP.getGeoIP(client.options, (err, provider, result) => {
-      if (err) console.warn('ledger geoip warning: ' + JSON.stringify(err, null, 2))
-      if (result) ledgerInfo.countryCode = result
-
-      ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
-
-      if (now <= ledgerInfo._internal.exchangeExpiry) return updateLedgerInfo()
-
-      ledgerInfo._internal.exchangeExpiry = now + msecs.day
-      roundtrip({ path: '/v1/exchange/providers' }, client.options, (err, response, body) => {
-        if (err) console.error('ledger exchange error: ' + JSON.stringify(err, null, 2))
-
-        ledgerInfo._internal.exchanges = body || {}
-        ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
-        updateLedgerInfo()
-      })
-    })
   }
 
   if (ledgerInfo._internal.debugP) {
@@ -1896,7 +1868,8 @@ var getStateInfo = (state) => {
   if (!state.properties.wallet) return
 
   ledgerInfo.paymentId = state.properties.wallet.paymentId
-  ledgerInfo.passphrase = state.properties.wallet.keychains.passphrase
+  if (!ledgerClient) ledgerClient = require('bat-client')
+  ledgerInfo.passphrase = ledgerClient.prototype.getWalletPassphrase(state)
 
   ledgerInfo.created = !!state.properties.wallet
   ledgerInfo.creating = !ledgerInfo.created
@@ -1936,7 +1909,7 @@ var getStateInfo = (state) => {
 }
 
 // Observe ledger client state.transactions for changes.
-// Called by getStateInfo(). Updated state provided by ledger-client.
+// Called by getStateInfo(). Updated state provided by bat-client.
 var cachedTransactions = null
 var observeTransactions = (transactions) => {
   if (underscore.isEqual(cachedTransactions, transactions)) {
@@ -1961,7 +1934,7 @@ var getBalance = () => {
   balanceTimeoutId = setTimeout(getBalance, 1 * msecs.minute)
   if (!ledgerInfo.address) return
 
-  if (!ledgerBalance) ledgerBalance = require('ledger-balance')
+  if (!ledgerBalance) ledgerBalance = require('bat-balance')
   ledgerBalance.getBalance(ledgerInfo.address, underscore.extend({ balancesP: true }, client.options),
   (err, provider, result) => {
     var unconfirmed
@@ -2021,12 +1994,12 @@ var getPaymentInfo = () => {
         return
       }
 
-      info = underscore.extend(info, underscore.pick(body, [ 'buyURL', 'buyURLExpires', 'balance', 'unconfirmed', 'satoshis' ]))
+      info = underscore.extend(info, underscore.pick(body, [ 'buyURL', 'balance', 'unconfirmed', 'probi' ]))
       info.address = client.getWalletAddress()
       if ((amount) && (currency)) {
         info = underscore.extend(info, { amount: amount, currency: currency })
         if ((body.rates) && (body.rates[currency])) {
-          info.btc = (amount / body.rates[currency]).toFixed(8)
+          info.bat = (amount / body.rates[currency]).toFixed(8) // TODO maybe use probi here for exact bat amount
         }
       }
       ledgerInfo._internal.paymentInfo = info
@@ -2070,7 +2043,8 @@ var cacheReturnValue = () => {
   if (!ledgerInfo._internal.cache) ledgerInfo._internal.cache = {}
   cache = ledgerInfo._internal.cache
 
-  paymentURL = 'bitcoin:' + info.address + '?amount=' + info.btc + '&label=' + encodeURI('Brave Software')
+  // TODO do we need to change this?
+  paymentURL = 'bitcoin:' + info.address + '?amount=' + info.bat + '&label=' + encodeURI('Brave Software')
   if (cache.paymentURL === paymentURL) return
 
   cache.paymentURL = paymentURL
@@ -2187,8 +2161,8 @@ const showEnabledNotifications = () => {
 const sufficientBalanceToReconcile = () => {
   const balance = Number(ledgerInfo.balance || 0)
   const unconfirmed = Number(ledgerInfo.unconfirmed || 0)
-  return ledgerInfo.btc &&
-    (balance + unconfirmed > 0.9 * Number(ledgerInfo.btc))
+  return ledgerInfo.bat &&
+    (balance + unconfirmed > 0.9 * Number(ledgerInfo.bat))
 }
 
 const shouldShowNotificationAddFunds = () => {
