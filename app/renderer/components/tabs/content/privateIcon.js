@@ -58,12 +58,14 @@ module.exports = ReduxComponent.connect(PrivateIcon)
 
 const styles = StyleSheet.create({
   private__icon: {
+    zIndex: 99,
     boxSizing: 'border-box',
     WebkitMaskRepeat: 'no-repeat',
     WebkitMaskPosition: 'center',
     WebkitMaskImage: `url(${privateSvg})`,
     WebkitMaskSize: globalStyles.spacing.sessionIconSize,
     width: globalStyles.spacing.sessionIconSize,
-    height: globalStyles.spacing.sessionIconSize
+    height: globalStyles.spacing.sessionIconSize,
+    marginRight: globalStyles.spacing.defaultTabMargin
   }
 })

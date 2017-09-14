@@ -72,6 +72,7 @@ class AudioTabIcon extends React.Component {
 const styles = StyleSheet.create({
   audioTab__icon: {
     margin: '0 -2px 0 2px',
+    zIndex: globalStyles.zindex.zindexTabsAudioTopBorder,
     color: theme.tab.content.icon.audio.color,
     fontSize: '13px',
     height: globalStyles.spacing.iconSize,

@@ -55,6 +55,7 @@ class Tab extends React.Component {
     this.onMouseMove = this.onMouseMove.bind(this)
     this.onMouseEnter = this.onMouseEnter.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
+    this.onDrag = this.onDrag.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
     this.onDragEnd = this.onDragEnd.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
@@ -123,15 +124,18 @@ class Tab extends React.Component {
   onDragStart (e) {
     // showing up the sentinel while dragging leads to show the shadow
     // of the next tab. See 10691#issuecomment-329854096
-    // this is added back when dragEnd event happens
-    this.tabSentinel.style.display = 'none'
+    // this is added back to original size when onDrag event is happening
+    this.tabSentinel.style.width = 0
 
     dnd.onDragStart(dragTypes.TAB, this.frame, e)
   }
 
+  onDrag () {
+    // re-enable the tabSentinel while dragging
+    this.tabSentinel.style.width = globalStyles.spacing.sentinelSize
+  }
+
   onDragEnd (e) {
-    // re-enable the tabSentinel after drag ends
-    this.tabSentinel.style.display = 'block'
     dnd.onDragEnd(dragTypes.TAB, this.frame, e)
   }
 
@@ -260,6 +264,7 @@ class Tab extends React.Component {
     props.partOfFullPageSet = partOfFullPageSet
     props.showAudioTopBorder = audioState.showAudioTopBorder(currentWindow, frameKey, isPinned)
     props.centralizeTabIcons = tabUIState.centralizeTabIcons(currentWindow, frameKey, isPinned)
+    props.gradientColor = tabUIState.getTabEndIconBackgroundColor(currentWindow, frameKey)
 
     // used in other functions
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
@@ -278,6 +283,13 @@ class Tab extends React.Component {
         ':hover': {
           color: this.props.themeColor ? getTextColorForBackground(this.props.themeColor) : 'inherit',
           background: this.props.themeColor ? this.props.themeColor : 'inherit'
+        }
+      }
+    })
+    const perPageGradient = StyleSheet.create({
+      tab_gradient: {
+        '::after': {
+          background: this.props.gradientColor
         }
       }
     })
@@ -307,12 +319,13 @@ class Tab extends React.Component {
         ref={(node) => { this.tabNode = node }}
         className={css(
           styles.tab,
+          !this.props.isPinnedTab && perPageGradient.tab_gradient,
           // Windows specific style
           isWindows && styles.tab_forWindows,
           this.props.isPinnedTab && styles.tab_pinned,
           this.props.isActive && styles.tab_active,
-          this.props.showAudioTopBorder && styles.tab_audioTopBorder,
           this.props.isActive && this.props.themeColor && perPageStyles.tab_themeColor,
+          this.props.showAudioTopBorder && styles.tab_audioTopBorder,
           // Private color should override themeColor
           this.props.isPrivateTab && styles.tab_private,
           this.props.isActive && this.props.isPrivateTab && styles.tab_active_private,
@@ -322,6 +335,7 @@ class Tab extends React.Component {
         data-frame-key={this.props.frameKey}
         draggable
         title={this.props.title}
+        onDrag={this.onDrag}
         onDragStart={this.onDragStart}
         onDragEnd={this.onDragEnd}
         onDragOver={this.onDragOver}
@@ -356,19 +370,26 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     color: theme.tab.color,
     display: 'flex',
-    marginTop: '0',
     transition: theme.tab.transition,
-    left: '0',
-    opacity: '1',
     height: '-webkit-fill-available',
     width: '-webkit-fill-available',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 0,
     position: 'relative',
 
     ':hover': {
       background: theme.tab.hover.background
+    },
+
+    // this enable us to have gradient text
+    '::after': {
+      zIndex: globalStyles.zindex.zindexTabs,
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      right: 0,
+      width: '-webkit-fill-available',
+      height: '-webkit-fill-available'
     }
   },
 
@@ -377,11 +398,31 @@ const styles = StyleSheet.create({
     color: theme.tab.forWindows.color
   },
 
+  tab_pinned: {
+    padding: 0,
+    width: '28px',
+    justifyContent: 'center'
+  },
+
   tab_active: {
     background: theme.tab.active.background,
 
     ':hover': {
       background: theme.tab.active.background
+    }
+  },
+
+  tab_audioTopBorder: {
+    '::before': {
+      zIndex: globalStyles.zindex.zindexTabsAudioTopBorder,
+      content: `''`,
+      display: 'block',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: '2px',
+      background: 'lightskyblue'
     }
   },
 
@@ -397,26 +438,14 @@ const styles = StyleSheet.create({
     width: globalStyles.spacing.sentinelSize
   },
 
-  tab_audioTopBorder: {
-    '::before': {
-      content: `''`,
-      display: 'block',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: '2px',
-      background: 'lightskyblue'
-    }
-  },
-
   tab__identity: {
     justifyContent: 'flex-start',
     alignItems: 'center',
+    overflow: 'hidden',
     display: 'flex',
     flex: '1',
     minWidth: '0', // @see https://bugzilla.mozilla.org/show_bug.cgi?id=1108514#c5
-    marginLeft: globalStyles.spacing.defaultTabMargin
+    margin: `0 ${globalStyles.spacing.defaultTabMargin}`
   },
 
   tab__content_centered: {
@@ -424,12 +453,6 @@ const styles = StyleSheet.create({
     flex: 'auto',
     padding: 0,
     margin: 0
-  },
-
-  tab_pinned: {
-    padding: 0,
-    width: '28px',
-    justifyContent: 'center'
   },
 
   tab_active_private: {

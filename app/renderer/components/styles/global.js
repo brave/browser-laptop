@@ -1,18 +1,18 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const {opacityIncreaseKeyframes} = require('./animations')
 
 /**
- * Use this file when the style you need
- * is applied in more than one element, or depends on it
- * Use theme.js file to include colors that can be customized
- *
- * TODO:
- * remove unnecessary styles properties (as items get refactored)
- * migrate customizable options to theme.js
- */
+* Use this file when the style you need
+* is applied in more than one element, or depends on it
+* Use theme.js file to include colors that can be customized
+*
+* TODO:
+* remove unnecessary styles properties (as items get refactored)
+* migrate customizable options to theme.js
+*/
 
 const globalStyles = {
   defaultFontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI"` +
@@ -214,7 +214,7 @@ const globalStyles = {
     zindexWindowIsPreview: '1100',
     zindexDownloadsBar: '1000',
     zindexTabs: '1000',
-    zindexTabsAudioTopBorder: '10001',
+    zindexTabsAudioTopBorder: '1001',
     zindexTabsThumbnail: '1100',
     zindexTabsDragIndicator: '1100',
     zindexNavigationBar: '2000',

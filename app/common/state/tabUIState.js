@@ -6,6 +6,8 @@
 const settings = require('../../../js/constants/settings')
 
 // State helpers
+const partitionState = require('../../common/state/tabContentState/partitionState')
+const privateState = require('../../common/state/tabContentState/privateState')
 const closeState = require('../../common/state/tabContentState/closeState')
 const frameStateUtil = require('../../../js/state/frameStateUtil')
 
@@ -18,6 +20,7 @@ const {getSetting} = require('../../../js/settings')
 
 // Styles
 const {intersection} = require('../../renderer/components/styles/global')
+const {theme} = require('../../renderer/components/styles/theme')
 
 module.exports.getThemeColor = (state, frameKey) => {
   const frame = frameStateUtil.getFrameByKey(state, frameKey)
@@ -113,4 +116,45 @@ module.exports.centralizeTabIcons = (state, frameKey, isPinned) => {
   }
 
   return isPinned || isEntryIntersected(state, 'tabs', intersection.at40)
+}
+
+module.exports.getTabEndIconBackgroundColor = (state, frameKey) => {
+  const frame = frameStateUtil.getFrameByKey(state, frameKey)
+
+  if (frame == null) {
+    if (process.env.NODE_ENV !== 'test') {
+      console.error('Unable to find frame for getTabEndIconBackgroundColor method')
+    }
+    return false
+  }
+
+  const themeColor = module.exports.getThemeColor(state, frameKey)
+  const isPrivate = privateState.isPrivateTab(state, frameKey)
+  const isPartition = partitionState.isPartitionTab(state, frameKey)
+  const isHover = frameStateUtil.getTabHoverState(state, frameKey)
+  const isActive = frameStateUtil.isFrameKeyActive(state, frameKey)
+  const hasCloseIcon = closeState.showCloseTabIcon(state, frameKey)
+  const isIntersecting = isEntryIntersected(state, 'tabs', intersection.at40)
+
+  let backgroundColor = theme.tab.background
+
+  if (isActive && themeColor) {
+    backgroundColor = themeColor
+  }
+  if (isActive && !themeColor) {
+    backgroundColor = theme.tab.active.background
+  }
+  if (isIntersecting) {
+    backgroundColor = 'transparent'
+  }
+  if (!isActive && isPrivate) {
+    backgroundColor = theme.tab.private.background
+  }
+  if ((isActive || isHover) && isPrivate) {
+    backgroundColor = theme.tab.active.private.background
+  }
+
+  return isPartition || isPrivate || hasCloseIcon
+    ? `linear-gradient(to left, ${backgroundColor} 10px, transparent 40px)`
+    : `linear-gradient(to left, ${backgroundColor} 0, transparent 12px)`
 }
