@@ -52,7 +52,7 @@ if (process.platform === 'win32') {
     spawnSync(getBraveDefaultsBinPath(), ['-uninstall'])
   }
 
-  if (shouldQuit) {
+  if (shouldQuit()) {
     process.exit(0)
   }
 }
