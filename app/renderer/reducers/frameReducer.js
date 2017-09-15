@@ -146,10 +146,18 @@ const frameReducer = (state, action, immutableAction) => {
           // see bug #8429
           const isNewTab = changeInfo.isEmpty()
           const activeTabHasUpdated = changeInfo.get('active') != null
+          const hasBeenActivated = frame.get('hasBeenActivated')
 
           if (!isNewTab && activeTabHasUpdated) {
             state = frameStateUtil.updateTabPageIndex(state, tabId)
             state = state.set('previewFrameKey', null)
+            // Show the phishing warning if we are showing a data: tab
+            // for the first time
+            state = state.setIn(['ui', 'siteInfo', 'isVisible'],
+              !hasBeenActivated && isPotentialPhishingUrl(tab.get('url')))
+          }
+          if (!frame.get('hasBeenActivated')) {
+            state = state.setIn(['frames', index, 'hasBeenActivated'], true)
           }
         }
       }
@@ -183,7 +191,8 @@ const frameReducer = (state, action, immutableAction) => {
         })
       }
       // For potential phishing pages, show a warning
-      state = state.setIn(['ui', 'siteInfo', 'isVisible'], isPotentialPhishingUrl(action.location))
+      state = state.setIn(['ui', 'siteInfo', 'isVisible'],
+        isPotentialPhishingUrl(action.location) && frameStateUtil.isFrameKeyActive(state, action.key))
       break
     case windowConstants.WINDOW_CLOSE_FRAMES:
       let closedFrames = new Immutable.List()

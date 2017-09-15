@@ -490,6 +490,7 @@ WindowStore
       internalFindStatePresent: boolean // true if a find-first (ie findNext: false) call has been made
     }
     guestInstanceId: string, // not persisted
+    hasBeenActivated: boolean, // whether this frame has ever been the active frame
     history: array, // navigation history
     hrefPreview: string, // show hovered link preview
     httpsEverywhere: Object<string, Array<string>>, // map of XML rulesets name to redirected resources
