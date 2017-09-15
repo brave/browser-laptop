@@ -128,6 +128,8 @@ class Tab extends React.Component {
     this.tabSentinel.style.width = 0
 
     dnd.onDragStart(dragTypes.TAB, this.frame, e)
+    // cancel tab preview while dragging. see #10103
+    windowActions.setTabHoverState(this.props.frameKey, false, false)
   }
 
   onDrag () {
