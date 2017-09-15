@@ -17,19 +17,20 @@ module.exports.init = () => {
   }
 
   Filtering.registerBeforeSendHeadersFilteringCB((details, isPrivate) => {
-    if (details.resourceType !== 'mainFrame') {
+    const mainFrameUrl = Filtering.getMainFrameUrl(details)
+    if (!mainFrameUrl) {
       return {
         resourceName
       }
     }
 
-    // This filter only applies to top-level requests, so details.url == mainFrameUrl
-    let domain = urlParse(details.url).hostname.split('.').slice(-2).join('.')
-    let hack = siteHacks[domain]
+    const domain = urlParse(mainFrameUrl).hostname.split('.').slice(-2).join('.')
+    const hack = siteHacks[domain]
     let customCookie
     let requestHeaders
     let cancel
-    if (hack && hack.onBeforeSendHeaders) {
+    if (hack && hack.onBeforeSendHeaders &&
+      domain === urlParse(details.url).hostname.split('.').slice(-2).join('.')) {
       const result = hack.onBeforeSendHeaders.call(this, details)
       if (result) {
         customCookie = result.customCookie
