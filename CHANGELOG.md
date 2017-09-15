@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.18.36](https://github.com/brave/browser-laptop/releases/tag/v0.18.36dev)
+ - Added support for MacBook trackpad pinch to zoom gesture. ([#1364](https://github.com/brave/browser-laptop/issues/1364))
+ - Fixed issues with opening some PDFs. ([#10867](https://github.com/brave/browser-laptop/issues/10867))
+ - Fixed UI unresponsiveness when sometimes pressing "cmd/ctrl + w". ([#9083](https://github.com/brave/browser-laptop/issues/9083))
+ - Fixed second click not deselecting text and placing the cursor in between the URL text for some DPIs on Windows. ([#8472](https://github.com/brave/browser-laptop/issues/8472))
+ - Fixed blocking rules not limited to private tabs. ([#10829](https://github.com/brave/browser-laptop/issues/10829))
+ - Fixed spell check corrected word still retaining the red underline. ([#9324](https://github.com/brave/browser-laptop/issues/9324))
+ - Upgrade to muon 4.3.22. ([#10834](https://github.com/brave/browser-laptop/issues/10834))
+ - Upgrade to Chromium 61.0.3163.79. ([#10718](https://github.com/brave/browser-laptop/issues/10718))
+
 ## [0.18.29](https://github.com/brave/browser-laptop/releases/tag/v0.18.29dev)
  - Optimized page load time to reduce jank. ([#9987](https://github.com/brave/browser-laptop/issues/9987))
  - Fixed Netflix player by adding VMP support. ([#10449](https://github.com/brave/browser-laptop/issues/10449))
