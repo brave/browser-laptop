@@ -11,9 +11,8 @@ const Dialog = require('../common/dialog')
 const BrowserButton = require('../common/browserButton')
 const SwitchControl = require('../common/switchControl')
 const {
-  CommonFormMedium,
-  CommonFormSection,
-  CommonFormButtonWrapper
+  CommonForm,
+  CommonFormSection
 } = require('../common/commonForm')
 
 // Actions
@@ -78,7 +77,7 @@ class CheckDefaultBrowserDialog extends React.Component {
 
   render () {
     return <Dialog className='checkDefaultBrowserDialog'>
-      <CommonFormMedium onClick={this.onClick}>
+      <CommonForm medium onClick={this.onClick}>
         <CommonFormSection>
           <div className={css(styles.flexAlignCenter)}>
             <div className={css(styles.section__braveIcon)} />
@@ -93,7 +92,7 @@ class CheckDefaultBrowserDialog extends React.Component {
             </div>
           </div>
         </CommonFormSection>
-        <CommonFormButtonWrapper>
+        <CommonFormSection buttons>
           <BrowserButton groupedItem secondaryColor
             l10nId='notNow'
             testId='notNowButton'
@@ -104,13 +103,11 @@ class CheckDefaultBrowserDialog extends React.Component {
             testId='useBraveButton'
             onClick={this.onUseBrave}
           />
-        </CommonFormButtonWrapper>
-      </CommonFormMedium>
+        </CommonFormSection>
+      </CommonForm>
     </Dialog>
   }
 }
-
-module.exports = ReduxComponent.connect(CheckDefaultBrowserDialog)
 
 const styles = StyleSheet.create({
   flexAlignCenter: {
@@ -134,3 +131,5 @@ const styles = StyleSheet.create({
     marginTop: `calc(${globalStyles.spacing.dialogInsideMargin} / 2)`
   }
 })
+
+module.exports = ReduxComponent.connect(CheckDefaultBrowserDialog)
