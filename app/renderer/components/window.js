@@ -40,7 +40,7 @@ class Window extends React.Component {
 
   mergeProps (state, ownProps) {
     const props = {}
-    props.isFocused = isFocused()
+    props.isFocused = isFocused(state)
 
     return props
   }
