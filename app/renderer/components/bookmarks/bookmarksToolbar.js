@@ -154,7 +154,7 @@ class BookmarksToolbar extends React.Component {
     // used in renderer
     props.showOnlyFavicon = bookmarkUtil.showOnlyFavicon()
     props.showFavicon = bookmarkUtil.showFavicon()
-    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused()) &&
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state)) &&
       !isWindows
     props.visibleBookmarks = bookmarks.visibleBookmarks
     props.hiddenBookmarks = bookmarks.hiddenBookmarks

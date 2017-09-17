@@ -13,7 +13,7 @@ const windowActions = require('../../../../../js/actions/windowActions')
 
 // Utils
 const locale = require('../../../../../js/l10n')
-const {getCurrentWindowId, isMaximized, isFullScreen} = require('../../../currentWindow')
+const {getCurrentWindowId} = require('../../../currentWindow')
 const cx = require('../../../../../js/lib/classSet')
 
 class WindowCaptionButtons extends ImmutableComponent {
@@ -26,26 +26,27 @@ class WindowCaptionButtons extends ImmutableComponent {
   }
 
   get maximizeTitle () {
-    return this.props.windowMaximized
+    return this.props.windowMaximizedFullScreen
       ? 'windowCaptionButtonRestore'
       : 'windowCaptionButtonMaximize'
   }
 
-  onMinimizeClick (e) {
+  onMinimizeClick () {
     windowActions.shouldMinimize(getCurrentWindowId())
   }
 
-  onMaximizeClick (e) {
-    if (isFullScreen()) {
+  onMaximizeClick () {
+    const currentWindowId = getCurrentWindowId()
+    if (this.props.windowFullScreen) {
       // If full screen, toggle full screen status and restore window (make smaller)
-      windowActions.shouldExitFullScreen(getCurrentWindowId())
-      if (isMaximized()) windowActions.shouldUnmaximize(getCurrentWindowId())
+      windowActions.shouldExitFullScreen(currentWindowId)
+      if (this.props.windowMaximized) windowActions.shouldUnmaximize(currentWindowId)
       return false
     }
-    return (!isMaximized()) ? windowActions.shouldMaximize(getCurrentWindowId()) : windowActions.shouldUnmaximize(getCurrentWindowId())
+    return (!this.props.windowMaximized) ? windowActions.shouldMaximize(currentWindowId) : windowActions.shouldUnmaximize(currentWindowId)
   }
 
-  onCloseClick (e) {
+  onCloseClick () {
     appActions.closeWindow(getCurrentWindowId())
   }
 
@@ -60,7 +61,7 @@ class WindowCaptionButtons extends ImmutableComponent {
     const props = { tabIndex: -1 }
 
     return <div className={cx({
-      fullscreen: this.props.windowMaximized,
+      fullscreen: this.props.windowMaximizedFullScreen,
       windowCaptionButtons: true,
       verticallyCenter: this.props.verticallyCenter
     })}>
@@ -69,7 +70,7 @@ class WindowCaptionButtons extends ImmutableComponent {
           {...props}
           className={cx({
             normalizeButton: true,
-            fullscreen: this.props.windowMaximized,
+            fullscreen: this.props.windowMaximizedFullScreen,
             captionButton: true,
             minimize: true
           })}
@@ -81,7 +82,7 @@ class WindowCaptionButtons extends ImmutableComponent {
           {...props}
           className={cx({
             normalizeButton: true,
-            fullscreen: this.props.windowMaximized,
+            fullscreen: this.props.windowMaximizedFullScreen,
             captionButton: true,
             maximize: true
           })}
@@ -97,7 +98,7 @@ class WindowCaptionButtons extends ImmutableComponent {
           {...props}
           className={cx({
             normalizeButton: true,
-            fullscreen: this.props.windowMaximized,
+            fullscreen: this.props.windowMaximizedFullScreen,
             captionButton: true,
             close: true
           })}

@@ -116,6 +116,8 @@ class Navigator extends React.Component {
       })
       .filter((browserAction) => browserAction)
       .toList()
+    const fullScreen = isFullScreen(state)
+    const maximized = isMaximized(state)
 
     const props = {}
     // used in renderer
@@ -123,14 +125,16 @@ class Navigator extends React.Component {
     props.shieldsDown = !braverySettings.shieldsUp
     props.shieldEnabled = braveShieldsEnabled(activeFrame)
     props.menuBarVisible = menuBarState.isMenuBarVisible(currentWindow)
-    props.isMaximized = isMaximized() || isFullScreen()
+    props.isMaximizedFullScreen = maximized || fullScreen
+    props.isMaximized = maximized
+    props.isFullScreen = fullScreen
     props.isCaptionButton = isWindows && !props.menuBarVisible
     props.activeTabShowingMessageBox = activeTabShowingMessageBox
     props.extensionBrowserActions = extensionBrowserActions
     props.showBrowserActions = !activeTabShowingMessageBox &&
       extensionBrowserActions &&
       extensionBrowserActions.size > 0
-    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused())
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state))
     props.isCounterEnabled = getSetting(settings.BLOCKED_COUNT_BADGE) &&
       props.totalBlocks &&
       props.shieldEnabled
@@ -154,7 +158,11 @@ class Navigator extends React.Component {
           this.props.menuBarVisible
             ? <div className='menubarContainer'>
               <MenuBar />
-              <WindowCaptionButtons windowMaximized={this.props.isMaximized} />
+              <WindowCaptionButtons
+                windowMaximizedFullScreen={this.props.isMaximizedFullScreen}
+                windowMaximized={this.props.isMaximized}
+                windowFullScreen={this.props.isFullScreen}
+              />
             </div>
             : null
         }
@@ -165,7 +173,7 @@ class Navigator extends React.Component {
         >
           <div className={cx({
             backforward: true,
-            fullscreen: isFullScreen()
+            fullscreen: this.props.isFullScreen
           })}>
             <BackButton />
             <ForwardButton />
@@ -228,7 +236,12 @@ class Navigator extends React.Component {
       </div>
       {
         this.props.isCaptionButton
-          ? <WindowCaptionButtons windowMaximized={this.props.isMaximized} verticallyCenter='true' />
+          ? <WindowCaptionButtons
+            windowMaximizedFullScreen={this.props.isMaximizedFullScreen}
+            windowMaximized={this.props.isMaximized}
+            windowFullScreen={this.props.isFullScreen}
+            verticallyCenter='true'
+          />
           : null
       }
     </div>

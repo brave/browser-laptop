@@ -184,7 +184,7 @@ class Frame extends React.Component {
   }
 
   onPropsChanged (prevProps = {}) {
-    if (this.props.isActive && !prevProps.isActive && isFocused()) {
+    if (this.props.isActive && !prevProps.isActive && this.props.isFocused) {
       windowActions.setFocusedFrame(this.props.location, this.props.tabId)
     }
   }
@@ -887,6 +887,7 @@ class Frame extends React.Component {
     props.location = location
     props.tabId = tabId
     props.showMessageBox = tabMessageBoxState.hasMessageBoxDetail(state, tabId)
+    props.isFocused = isFocused(state)
 
     // used in other functions
     props.frameKey = ownProps.frameKey
