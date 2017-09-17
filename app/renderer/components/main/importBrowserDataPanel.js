@@ -14,10 +14,7 @@ const SwitchControl = require('../common/switchControl')
 const {
   CommonForm,
   CommonFormDropdown,
-  CommonFormSection,
-  CommonFormTitle,
-  CommonFormButtonWrapper,
-  CommonFormBottomWrapper
+  CommonFormSection
 } = require('../common/commonForm')
 
 // Actions
@@ -101,12 +98,12 @@ class ImportBrowserDataPanel extends React.Component {
 
   render () {
     return <Dialog onHide={this.onHide} testId='importBrowserDataPanel' isClickDismiss>
-      <CommonForm data-test-id='importBrowserData' onClick={(e) => e.stopPropagation()}>
-        <CommonFormTitle
-          data-test-id='importBrowserDataTitle'
-          data-l10n-id='importBrowserData'
+      <CommonForm testId='importBrowserData' onClick={(e) => e.stopPropagation()}>
+        <CommonFormSection title
+          l10nId='importBrowserData'
+          testId='importBrowserDataTitle'
         />
-        <CommonFormSection data-test-id='importBrowserDataOptions'>
+        <CommonFormSection testId='importBrowserDataOptions'>
           <div className={css(styles.dropdownWrapper)}>
             <CommonFormDropdown
               value={this.props.currentIndex}
@@ -147,22 +144,22 @@ class ImportBrowserDataPanel extends React.Component {
         <CommonFormSection>
           <div data-l10n-id='importDataCloseBrowserWarning' />
         </CommonFormSection>
-        <CommonFormButtonWrapper data-test-id='importBrowserDataButtons'>
+        <CommonFormSection buttons testId='importBrowserDataButtons'>
           <Button l10nId='cancel' className='whiteButton' onClick={this.onHide} />
           <Button l10nId='import' className='primaryButton' onClick={this.onImport} />
-        </CommonFormButtonWrapper>
-        <CommonFormBottomWrapper data-test-id='importBrowserDataWarning'>
+        </CommonFormSection>
+        <CommonFormSection bottom testId='importBrowserDataWarning'>
           <div data-l10n-id='importDataWarning' />
-        </CommonFormBottomWrapper>
+        </CommonFormSection>
       </CommonForm>
     </Dialog>
   }
 }
-
-module.exports = ReduxComponent.connect(ImportBrowserDataPanel)
 
 const styles = StyleSheet.create({
   dropdownWrapper: {
     marginBottom: `calc(${globalStyles.spacing.dialogInsideMargin} / 2)`
   }
 })
+
+module.exports = ReduxComponent.connect(ImportBrowserDataPanel)

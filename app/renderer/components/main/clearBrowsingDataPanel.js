@@ -12,11 +12,8 @@ const Dialog = require('../common/dialog')
 const Button = require('../common/button')
 const SwitchControl = require('../common/switchControl')
 const {
-  CommonFormSmall,
-  CommonFormSection,
-  CommonFormTitle,
-  CommonFormButtonWrapper,
-  CommonFormBottomWrapper
+  CommonForm,
+  CommonFormSection
 } = require('../common/commonForm')
 
 // Actions
@@ -87,8 +84,8 @@ class ClearBrowsingDataPanel extends React.Component {
 
   render () {
     return <Dialog onHide={this.onHide} testId='clearBrowsingDataPanel' isClickDismiss>
-      <CommonFormSmall onClick={(e) => e.stopPropagation()}>
-        <CommonFormTitle data-l10n-id='clearBrowsingData' />
+      <CommonForm small onClick={(e) => e.stopPropagation()}>
+        <CommonFormSection title l10nId='clearBrowsingData' />
         <CommonFormSection>
           <SwitchControl
             rightl10nId='browserHistory'
@@ -127,7 +124,7 @@ class ClearBrowsingDataPanel extends React.Component {
             checkedOn={this.props.savedSiteSettings}
             onClick={this.onToggleSavedSiteSettings} />
         </CommonFormSection>
-        <CommonFormButtonWrapper>
+        <CommonFormSection buttons>
           <Button className='whiteButton'
             l10nId='cancel'
             testId='cancelButton'
@@ -138,11 +135,11 @@ class ClearBrowsingDataPanel extends React.Component {
             testId='clearDataButton'
             onClick={this.onClear}
           />
-        </CommonFormButtonWrapper>
-        <CommonFormBottomWrapper>
+        </CommonFormSection>
+        <CommonFormSection bottom>
           <div data-l10n-id='clearDataWarning' />
-        </CommonFormBottomWrapper>
-      </CommonFormSmall>
+        </CommonFormSection>
+      </CommonForm>
     </Dialog>
   }
 }

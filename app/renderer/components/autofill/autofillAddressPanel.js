@@ -11,11 +11,9 @@ const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
 const Button = require('../common/button')
 const {
-  CommonFormLarge,
+  CommonForm,
   CommonFormSection,
-  CommonFormTitle,
   CommonFormDropdown,
-  CommonFormButtonWrapper,
   commonFormStyles
 } = require('../common/commonForm')
 
@@ -160,8 +158,8 @@ class AutofillAddressPanel extends React.Component {
 
   render () {
     return <Dialog onHide={this.onHide} testId='autofillAddressPanel' isClickDismiss>
-      <CommonFormLarge onClick={this.onClick}>
-        <CommonFormTitle data-l10n-id='editAddress' />
+      <CommonForm large onClick={this.onClick}>
+        <CommonFormSection title l10nId='editAddress' />
         <CommonFormSection>
           <div className={css(commonFormStyles.sectionWrapper)}>
             <div className={css(commonFormStyles.inputWrapper, commonFormStyles.inputWrapper__label)}>
@@ -273,7 +271,7 @@ class AutofillAddressPanel extends React.Component {
             </div>
           </div>
         </CommonFormSection>
-        <CommonFormButtonWrapper>
+        <CommonFormSection buttons>
           <Button className='whiteButton'
             l10nId='cancel'
             testId='cancelAddressButton'
@@ -285,8 +283,8 @@ class AutofillAddressPanel extends React.Component {
             testId='saveAddressButton'
             onClick={this.onSave}
           />
-        </CommonFormButtonWrapper>
-      </CommonFormLarge>
+        </CommonFormSection>
+      </CommonForm>
     </Dialog>
   }
 }

@@ -13,11 +13,8 @@ const Button = require('../common/button')
 const WidevineInfo = require('./widevineInfo')
 const SwitchControl = require('../common/switchControl')
 const {
-  CommonFormLarge,
-  CommonFormTitle,
-  CommonFormSection,
-  CommonFormButtonWrapper,
-  CommonFormBottomWrapper
+  CommonForm,
+  CommonFormSection
 } = require('../common/commonForm')
 
 // Constants
@@ -79,12 +76,12 @@ class WidevinePanel extends React.Component {
        to be installed on the computer.
     */
     return <Dialog onHide={this.onHide} testId='widevinePanelDialog'>
-      <CommonFormLarge onClick={(e) => e.stopPropagation()}>
-        <CommonFormTitle data-l10n-id='widevinePanelTitle' />
+      <CommonForm large onClick={(e) => e.stopPropagation()}>
+        <CommonFormSection title l10nId='widevinePanelTitle' />
         <CommonFormSection>
           <WidevineInfo createTabRequestedAction={appActions.createTabRequested} />
         </CommonFormSection>
-        <CommonFormButtonWrapper>
+        <CommonFormSection buttons>
           <Button className='whiteButton'
             l10nId='cancel'
             testId='cancelButton'
@@ -94,8 +91,8 @@ class WidevinePanel extends React.Component {
             l10nId='installAndAllow'
             testId='installAndAllowButton'
             onClick={this.onInstallAndAllow} />
-        </CommonFormButtonWrapper>
-        <CommonFormBottomWrapper>
+        </CommonFormSection>
+        <CommonFormSection bottom>
           <div className={css(styles.flexJustifyCenter)}>
             {/* TODO: refactor switchControl.js to remove commonStyles.noPadding */}
             <SwitchControl
@@ -105,13 +102,11 @@ class WidevinePanel extends React.Component {
               onClick={this.onClickRememberForNetflix}
               checkedOn={this.props.alsoAddRememberSiteSetting} />
           </div>
-        </CommonFormBottomWrapper>
-      </CommonFormLarge>
+        </CommonFormSection>
+      </CommonForm>
     </Dialog>
   }
 }
-
-module.exports = ReduxComponent.connect(WidevinePanel)
 
 const styles = StyleSheet.create({
   flexJustifyCenter: {
@@ -119,3 +114,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   }
 })
+
+module.exports = ReduxComponent.connect(WidevinePanel)

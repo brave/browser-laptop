@@ -11,9 +11,7 @@ const Button = require('../common/button')
 const {
   CommonForm,
   CommonFormSection,
-  CommonFormTitle,
   CommonFormTextbox,
-  CommonFormButtonWrapper,
   commonFormStyles
 } = require('../common/commonForm')
 
@@ -95,8 +93,10 @@ class LoginRequired extends React.Component {
     }
     return <Dialog onHide={this.onClose} isClickDismiss>
       <CommonForm onClick={this.onClick.bind(this)}>
-        <CommonFormTitle data-l10n-id='basicAuthRequired' />
-        <CommonFormSection data-l10n-id='basicAuthMessage' data-l10n-args={JSON.stringify(l10nArgs)} />
+        <CommonFormSection title l10nId='basicAuthRequired' />
+        <CommonFormSection>
+          <span data-l10n-id='basicAuthMessage' data-l10n-args={JSON.stringify(l10nArgs)} />
+        </CommonFormSection>
         <CommonFormSection>
           <div className={css(styles.sectionWrapper)}>
             <div className={css(
@@ -108,9 +108,9 @@ class LoginRequired extends React.Component {
             </div>
             {
               <div id='loginInput' className={css(
-                  commonFormStyles.inputWrapper,
-                  commonFormStyles.inputWrapper__input
-                )}>
+                commonFormStyles.inputWrapper,
+                commonFormStyles.inputWrapper__input
+              )}>
                 <input className={css(
                   commonStyles.formControl,
                   commonStyles.textbox,
@@ -136,16 +136,14 @@ class LoginRequired extends React.Component {
             }
           </div>
         </CommonFormSection>
-        <CommonFormButtonWrapper>
+        <CommonFormSection buttons>
           <Button l10nId='cancel' className='whiteButton' onClick={this.onClose} />
           <Button l10nId='ok' className='primaryButton' onClick={this.onSave} />
-        </CommonFormButtonWrapper>
+        </CommonFormSection>
       </CommonForm>
     </Dialog>
   }
 }
-
-module.exports = LoginRequired
 
 const styles = StyleSheet.create({
   sectionWrapper: {
@@ -153,3 +151,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   }
 })
+
+module.exports = LoginRequired

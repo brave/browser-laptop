@@ -4,13 +4,15 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
 const AddEditBookmarkFolderForm = require('./addEditBookmarkFolderForm')
-const {CommonFormBookmarkHanger} = require('../common/commonForm')
+const {
+  CommonFormHanger,
+  CommonFormSection
+} = require('../common/commonForm')
 
 // State
 const bookmarkFoldersState = require('../../../common/state/bookmarkFoldersState')
@@ -22,9 +24,6 @@ const windowActions = require('../../../../js/actions/windowActions')
 // Utils
 const cx = require('../../../../js/lib/classSet')
 const bookmarkFoldersUtil = require('../../../common/lib/bookmarkFoldersUtil')
-
-// Styles
-const globalStyles = require('../styles/global')
 
 class AddEditBookmarkFolder extends React.Component {
   constructor (props) {
@@ -68,11 +67,8 @@ class AddEditBookmarkFolder extends React.Component {
     return <Dialog className={cx({
       bookmarkDialog: true
     })} onHide={this.onClose} isClickDismiss>
-      <CommonFormBookmarkHanger onClick={this.onClick}>
-        <div className={cx({
-          [css(styles.commonFormSection)]: true,
-          [css(styles.commonFormTitle)]: true
-        })} data-l10n-id={this.props.heading} />
+      <CommonFormHanger bookmark onClick={this.onClick}>
+        <CommonFormSection title l10nId={this.props.heading} />
         <AddEditBookmarkFolderForm
           folderName={this.props.folderName}
           editKey={this.props.editKey}
@@ -83,21 +79,9 @@ class AddEditBookmarkFolder extends React.Component {
           isDisabled={!this.props.isFolderNameValid}
           hasBookmarks={this.props.hasBookmarks}
         />
-      </CommonFormBookmarkHanger>
+      </CommonFormHanger>
     </Dialog>
   }
 }
-
-const styles = StyleSheet.create({
-  // Copied from commonForm.js
-  commonFormSection: {
-    // PR #7985
-    margin: `${globalStyles.spacing.dialogInsideMargin} 30px`
-  },
-  commonFormTitle: {
-    color: globalStyles.color.braveOrange,
-    fontSize: '1.2em'
-  }
-})
 
 module.exports = ReduxComponent.connect(AddEditBookmarkFolder)
