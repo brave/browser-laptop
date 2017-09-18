@@ -674,6 +674,15 @@ WindowStore
     alsoAddRememberSiteSetting: boolean, // true if an allow always rule should be added for the acitve frame as well if installed
     location: string, // location this dialog is for
     shown: boolean // true if the panel is shown
-  }
+  },
+  // framesInternal is the same as index in the frames list, it's just a cache by frameKey and tabId
+  framesInternal: {
+    index: {
+      [frameKey]: [index]
+    },
+    tabIndex: {
+      [tabId]: [index]
+    }
+  },
 }
 ```

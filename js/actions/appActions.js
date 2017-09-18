@@ -242,14 +242,14 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message to the store to change the tab index
+   * Dispatches a message to the store to indicate a user action requested that the tab index change
    *
    * @param {Number} tabId - the tabId
    * @param {Number} index - the new index
    */
-  tabIndexChanged: function (tabId, index) {
+  tabIndexChangeRequested: function (tabId, index) {
     dispatch({
-      actionType: appConstants.APP_TAB_INDEX_CHANGED,
+      actionType: appConstants.APP_TAB_INDEX_CHANGE_REQUESTED,
       tabId,
       index
     })
