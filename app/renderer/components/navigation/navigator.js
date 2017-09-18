@@ -93,7 +93,7 @@ class Navigator extends React.Component {
       return
     }
 
-    return !isMaximized()
+    return !this.props.isMaximized
       ? windowActions.shouldMaximize(getCurrentWindowId())
       : windowActions.shouldMinimize(getCurrentWindowId())
   }
