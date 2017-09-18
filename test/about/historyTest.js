@@ -1,6 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
+const assert = require('assert')
 const {urlInput} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const aboutHistoryUrl = getTargetAboutUrl('about:history')
@@ -172,6 +173,23 @@ describe('about:history', function () {
         // key depressed
         .keys(Brave.keys.SHIFT)
         .click('table.sortableTable td.title[data-sort="Brave"]')
+    })
+    it('selects multiple contiguous rows when shift clicked after sorting', function * () {
+      yield this.app.client
+        .tabByUrl(aboutHistoryUrl)
+        .loadUrl(aboutHistoryUrl)
+        .waitForVisible('.heading-title')
+        .click('.heading-title')
+        // wait for sort
+        .pause(200)
+        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .keys(Brave.keys.SHIFT)
+        .click('table.sortableTable td.title[data-sort="https://www.facebook.com"]')
+        .keys(Brave.keys.SHIFT)
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://brave.com/test"]')
+        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.facebook.com"]')
+        .isExisting('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]', (isExisting) => assert(!isExisting))
     })
     it('deselects everything if something other than the table is clicked', function * () {
       yield this.app.client
