@@ -31,6 +31,7 @@ const {calculateTopSites} = require('../../app/browser/api/topSites')
 const assert = require('assert')
 const profiles = require('../../app/browser/profiles')
 const {zoomLevel} = require('../../app/common/constants/toolbarUserInterfaceScale')
+const platformUtil = require('../../app/common/lib/platformUtil')
 
 // state helpers
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
@@ -542,12 +543,22 @@ const handleAppAction = (action) => {
     }
     case appConstants.APP_DEFAULT_BROWSER_UPDATED:
       if (action.useBrave) {
-        for (const p of defaultProtocols) {
-          app.setAsDefaultProtocolClient(p)
+        let isDefaultBrowser
+        if (platformUtil.isLinux()) {
+          const desktopName = 'brave.desktop'
+          for (const p of defaultProtocols) {
+            app.setAsDefaultProtocolClient(p, desktopName)
+            app.setAsDefaultProtocolClient('', desktopName)
+          }
+          isDefaultBrowser = app.isDefaultProtocolClient('', desktopName)
+        } else {
+          for (const p of defaultProtocols) {
+            app.setAsDefaultProtocolClient(p)
+          }
+          isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
         }
+        appState = appState.setIn(['settings', settings.IS_DEFAULT_BROWSER], isDefaultBrowser)
       }
-      let isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
-      appState = appState.setIn(['settings', settings.IS_DEFAULT_BROWSER], isDefaultBrowser)
       break
     case appConstants.APP_DEFAULT_BROWSER_CHECK_COMPLETE:
       appState = appState.set('defaultBrowserCheckComplete', {})
