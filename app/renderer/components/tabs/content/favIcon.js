@@ -19,7 +19,7 @@ const tabState = require('../../../../common/state/tabState')
 const defaultIconSvg = require('../../../../extensions/brave/img/tabs/default.svg')
 const loadingIconSvg = require('../../../../extensions/brave/img/tabs/loading.svg')
 const {filter, color, spacing} = require('../../styles/global')
-const {spinKeyframes} = require('../../styles/animations')
+const {spinKeyframes, opacityIncreaseKeyframes} = require('../../styles/animations')
 
 class Favicon extends React.Component {
   mergeProps (state, ownProps) {
@@ -99,6 +99,14 @@ module.exports = ReduxComponent.connect(Favicon)
 
 const styles = StyleSheet.create({
   icon: {
+    opacity: 0,
+    willChange: 'opacity',
+    animationName: opacityIncreaseKeyframes,
+    animationDelay: '50ms',
+    animationTimingFunction: 'linear',
+    animationDuration: '200ms',
+    animationFillMode: 'forwards',
+
     position: 'relative',
     boxSizing: 'border-box',
     width: spacing.iconSize,

@@ -17,6 +17,7 @@ const tabState = require('../../../../common/state/tabState')
 // Styles
 const {theme} = require('../../styles/theme')
 const globalStyles = require('../../styles/global')
+const {opacityIncreaseKeyframes} = require('../../styles/animations')
 const privateSvg = require('../../../../extensions/brave/img/tabs/private.svg')
 
 class PrivateIcon extends React.Component {
@@ -58,7 +59,15 @@ module.exports = ReduxComponent.connect(PrivateIcon)
 
 const styles = StyleSheet.create({
   private__icon: {
-    zIndex: 99,
+    opacity: 0,
+    willChange: 'opacity',
+    animationName: opacityIncreaseKeyframes,
+    animationDelay: '100ms',
+    animationTimingFunction: 'linear',
+    animationDuration: '200ms',
+    animationFillMode: 'forwards',
+
+    zIndex: globalStyles.zindex.zindexWindow,
     boxSizing: 'border-box',
     WebkitMaskRepeat: 'no-repeat',
     WebkitMaskPosition: 'center',

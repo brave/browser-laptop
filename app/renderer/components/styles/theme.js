@@ -13,7 +13,7 @@
       // mimics chrome hover effect
       transition: `
         background-color 200ms cubic-bezier(0.26, 0.63, 0.39, 0.65),
-        color 200ms linear
+        color 200ms cubic-bezier(0.26, 0.63, 0.39, 0.65)
       `,
       background: '#ddd',
       borderColor: '#bbb',

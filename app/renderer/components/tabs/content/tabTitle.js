@@ -62,6 +62,7 @@ class TabTitle extends React.Component {
 module.exports = ReduxComponent.connect(TabTitle)
 
 const styles = StyleSheet.create({
+
   tab__title: {
     boxSizing: 'border-box',
     display: 'flex',

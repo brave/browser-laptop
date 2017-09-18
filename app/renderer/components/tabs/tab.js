@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     },
 
     // this enable us to have gradient text
-    '::after': {
+    '::before': {
       zIndex: globalStyles.zindex.zindexTabs,
       content: '""',
       position: 'absolute',

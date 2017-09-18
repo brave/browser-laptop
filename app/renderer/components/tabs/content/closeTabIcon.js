@@ -21,7 +21,7 @@ const appActions = require('../../../../../js/actions/appActions')
 
 // Styles
 const {theme} = require('../../styles/theme')
-const {spacing} = require('../../styles/global')
+const {spacing, zindex} = require('../../styles/global')
 const {opacityIncreaseKeyframes} = require('../../styles/animations')
 const closeTabSvg = require('../../../../extensions/brave/img/tabs/close_btn.svg')
 
@@ -91,10 +91,12 @@ const styles = StyleSheet.create({
     willChange: 'opacity',
     animationName: opacityIncreaseKeyframes,
     animationTimingFunction: 'linear',
-    animationDuration: '100ms',
+    animationDuration: '200ms',
     animationDelay: '25ms',
     animationFillMode: 'forwards',
+
     boxSizing: 'border-box',
+    zIndex: zindex.zindexTabsThumbnail,
     backgroundImage: `url(${closeTabSvg})`,
     backgroundSize: spacing.closeIconSize,
     // mask icon to gray to avoid calling another icon on hover

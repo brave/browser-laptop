@@ -17,6 +17,7 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
+const {opacityIncreaseKeyframes} = require('../../styles/animations')
 const newSessionSvg = require('../../../../extensions/brave/img/tabs/new_session.svg')
 
 class NewSessionIcon extends React.Component {
@@ -67,6 +68,14 @@ module.exports = ReduxComponent.connect(NewSessionIcon)
 
 const styles = StyleSheet.create({
   newSession__icon: {
+    opacity: 0,
+    willChange: 'opacity',
+    animationName: opacityIncreaseKeyframes,
+    animationDelay: '100ms',
+    animationTimingFunction: 'linear',
+    animationDuration: '200ms',
+    animationFillMode: 'forwards',
+
     zIndex: globalStyles.zindex.zindexWindow,
     boxSizing: 'border-box',
     display: 'flex',
