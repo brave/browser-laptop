@@ -175,12 +175,17 @@ const tabsReducer = (state, action, immutableAction) => {
               break
             }
             const windowId = tabState.getWindowId(state, tabId)
+            const isPinned = tabState.isTabPinned(state, tabId)
             const nonPinnedTabs = tabState.getNonPinnedTabsByWindowId(state, windowId)
             const pinnedTabs = tabState.getPinnedTabsByWindowId(state, windowId)
 
             if (nonPinnedTabs.size > 1 ||
               (nonPinnedTabs.size > 0 && pinnedTabs.size > 0)) {
               setImmediate(() => {
+                if (isPinned) {
+                  // if a tab is pinned, unpin before closing
+                  state = tabs.pin(state, tabId, false)
+                }
                 tabs.closeTab(tabId, action.get('forceClosePinned'))
               })
             } else {
