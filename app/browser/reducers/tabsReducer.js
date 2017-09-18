@@ -219,7 +219,7 @@ const tabsReducer = (state, action, immutableAction) => {
         tabs.setActive(action.get('tabId'))
       })
       break
-    case appConstants.APP_TAB_INDEX_CHANGED:
+    case appConstants.APP_TAB_INDEX_CHANGE_REQUESTED:
       setImmediate(() => {
         tabs.setTabIndex(action.get('tabId'), action.get('index'))
       })
