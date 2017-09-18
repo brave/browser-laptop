@@ -1036,6 +1036,7 @@ var updatePublisherInfo = (changedPublisher) => {
 }
 
 var blockedP = (publisher) => {
+  console.log('blocked')
   var siteSetting = appStore.getState().get('siteSettings').get(`https?://${publisher}`)
 
   return ((!!siteSetting) && (siteSetting.get('ledgerPaymentsShown') === false))
@@ -1193,6 +1194,7 @@ var synopsisNormalizer = (changedPublisher) => {
   const scorekeeper = synopsis.options.scorekeeper
 
   results = []
+  console.log('visible')
   underscore.keys(synopsis.publishers).forEach((publisher) => {
     if (!visibleP(publisher)) return
 
