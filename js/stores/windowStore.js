@@ -381,25 +381,6 @@ const doAction = (action) => {
         windowState = frameStateUtil.setTabPageHoverState(windowState, action.tabPageIndex, action.hoverState)
         break
       }
-    case windowConstants.WINDOW_TAB_MOVE:
-      {
-        const sourceFrameProps = frameStateUtil.getFrameByKey(windowState, action.sourceFrameKey)
-        const sourceFrameIndex = frameStateUtil.getFrameIndex(windowState, action.sourceFrameKey)
-        const activeFrame = frameStateUtil.getActiveFrame(windowState)
-        let newIndex = frameStateUtil.getFrameIndex(windowState, action.destinationFrameKey) + (action.prepend ? 0 : 1)
-        let frames = frameStateUtil.getFrames(windowState).splice(sourceFrameIndex, 1)
-        if (newIndex > sourceFrameIndex) {
-          newIndex--
-        }
-        frames = frames.splice(newIndex, 0, sourceFrameProps)
-        windowState = windowState.set('frames', frames)
-        // Since the tab could have changed pages, update the tab page as well
-        windowState = frameStateUtil.updateFramesInternalIndex(windowState, Math.min(sourceFrameIndex, newIndex))
-        windowState = frameStateUtil.moveFrame(windowState, sourceFrameProps.get('tabId'), newIndex)
-        windowState = frameStateUtil.updateTabPageIndex(windowState, activeFrame.get('tabId'))
-        appActions.tabIndexChanged(activeFrame.get('tabId'), newIndex)
-        break
-      }
     case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
       {
         const framePath = frameStateUtil.activeFrameStatePath(windowState)
