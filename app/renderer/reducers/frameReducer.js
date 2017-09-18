@@ -94,26 +94,26 @@ const frameReducer = (state, action, immutableAction) => {
       if (!frame) {
         break
       }
-
       let frames = state.get('frames')
-      const changeInfoIndex = changeInfo.get('index')
-      const sourceFrameIndex = frameStateUtil.getFrameIndex(state, frame.get('key'))
-      // When cloning index can be largerthan number of created frames, in this
-      // case we don't want to do anything.
-      if (changeInfoIndex !== undefined &&
-          sourceFrameIndex !== changeInfoIndex &&
-          changeInfoIndex < frames.size) {
-        frame = frame.set('index', changeInfoIndex)
+      const index = tab.get('index')
+      const sourceFrameIndex = frameStateUtil.getIndexByTabId(state, tabId)
+      if (index != null &&
+          sourceFrameIndex !== index) {
+        frame = frame.set('index', index)
         frames = frames
           .splice(sourceFrameIndex, 1)
-          .splice(changeInfoIndex, 0, frame)
+          .splice(index, 0, frame)
         state = state.set('frames', frames)
         // Since the tab could have changed pages, update the tab page as well
-        state = frameStateUtil.updateFramesInternalIndex(state, Math.min(sourceFrameIndex, changeInfoIndex))
-        state = frameStateUtil.moveFrame(state, tabId, changeInfoIndex)
+        state = frameStateUtil.updateFramesInternalIndex(state, Math.min(sourceFrameIndex, index))
+        state = frameStateUtil.moveFrame(state, tabId, index)
+
+        // Update tab page index to the active tab in case the active tab changed
+        const activeFrame = frameStateUtil.getActiveFrame(state)
+        state = frameStateUtil.updateTabPageIndex(state, activeFrame.get('tabId'))
+        state = frameStateUtil.setPreviewFrameKey(state, null)
       }
 
-      const index = frameStateUtil.getIndexByTabId(state, tabId)
       const pinned = immutableAction.getIn(['changeInfo', 'pinned'])
       if (pinned != null) {
         if (pinned) {
@@ -246,7 +246,6 @@ const frameReducer = (state, action, immutableAction) => {
     case windowConstants.WINDOW_SET_FULL_SCREEN:
       state = setFullScreen(state, action)
       break
-
     case windowConstants.WINDOW_ON_FRAME_BOOKMARK:
       {
         // TODO make this an appAction that gets the bookmark data from tabState
@@ -257,6 +256,18 @@ const frameReducer = (state, action, immutableAction) => {
         }
         break
       }
+    // TODO(bbondy): We should remove this window action completely and just go directly to
+    // the browser process with an app action.
+    case windowConstants.WINDOW_TAB_MOVE: {
+      const sourceFrameIndex = frameStateUtil.getFrameIndex(state, action.sourceFrameKey)
+      let newIndex = frameStateUtil.getFrameIndex(state, action.destinationFrameKey) + (action.prepend ? 0 : 1)
+      if (newIndex > sourceFrameIndex) {
+        newIndex--
+      }
+      const frame = frameStateUtil.getFrameByIndex(state, sourceFrameIndex)
+      appActions.tabIndexChangeRequested(frame.get('tabId'), newIndex)
+      break
+    }
   }
 
   return state

@@ -65,8 +65,11 @@ function getNonPinnedFrames (state) {
   return state.get('frames').filter((frame) => !frame.get('pinnedLocation'))
 }
 
-function getFrameIndex (state, key) {
-  return getFramesInternalIndex(state, key)
+function getFrameIndex (state, frameKey) {
+  if (frameKey == null) return -1
+
+  const index = state.getIn(['framesInternal', 'index', frameKey.toString()])
+  return index == null ? -1 : index
 }
 
 function getActiveFrameIndex (state) {
@@ -181,11 +184,14 @@ function getNonPinnedFrameCount (state) {
 }
 
 function getFrameByTabId (state, tabId) {
-  return getFrameByIndex(state, getFramesInternalIndexByTabId(state, tabId))
+  return getFrameByIndex(state, getIndexByTabId(state, tabId))
 }
 
 function getIndexByTabId (state, tabId) {
-  return getFramesInternalIndexByTabId(state, tabId)
+  if (tabId == null) return -1
+
+  const index = state.getIn(['framesInternal', 'tabIndex', tabId.toString()])
+  return index == null ? -1 : index
 }
 
 function getActiveFrame (state) {
@@ -492,20 +498,6 @@ const frameStatePathByTabId = (state, tabId) => {
 }
 
 const activeFrameStatePath = (state) => frameStatePath(state, getActiveFrameKey(state))
-
-const getFramesInternalIndex = (state, frameKey) => {
-  if (frameKey == null) return -1
-
-  const index = state.getIn(['framesInternal', 'index', frameKey.toString()])
-  return index == null ? -1 : index
-}
-
-const getFramesInternalIndexByTabId = (state, tabId) => {
-  if (tabId == null) return -1
-
-  const index = state.getIn(['framesInternal', 'tabIndex', tabId.toString()])
-  return index == null ? -1 : index
-}
 
 const deleteTabInternalIndex = (state, tabId) => {
   return state.deleteIn(['framesInternal', 'tabIndex', tabId.toString()])

@@ -678,6 +678,15 @@ WindowStore
     top: number,
     type: string,  // "normal", "popup", or "devtools"
     width: number,
-  }
+  },
+  // framesInternal is the same as index in the frames list, it's just a cache by frameKey and tabId
+  framesInternal: {
+    index: {
+      [frameKey]: [index]
+    },
+    tabIndex: {
+      [tabId]: [index]
+    }
+  },
 }
 ```
