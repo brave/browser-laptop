@@ -207,8 +207,7 @@ app.on('ready', () => {
         isDefaultBrowser = true
       } else if (process.platform === 'linux') {
         const desktopName = 'brave.desktop'
-        isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p, desktopName)) &&
-          app.isDefaultProtocolClient('', desktopName)
+        isDefaultBrowser = app.isDefaultProtocolClient('', desktopName)
       } else {
         isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
       }

@@ -560,8 +560,7 @@ const handleAppAction = (action) => {
             app.setAsDefaultProtocolClient(p, desktopName)
             app.setAsDefaultProtocolClient('', desktopName)
           }
-          isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p, desktopName)) &&
-            app.isDefaultProtocolClient('', desktopName)
+          isDefaultBrowser = app.isDefaultProtocolClient('', desktopName)
         } else {
           for (const p of defaultProtocols) {
             app.setAsDefaultProtocolClient(p)
