@@ -7,6 +7,7 @@ const {isUrl} = require('../../../js/lib/appUrlUtil')
 const siteTags = require('../../../js/constants/siteTags')
 const urlParse = require('../urlParse')
 const Immutable = require('immutable')
+const urlUtil = require('../../../js/lib/urlutil')
 
 let take = 1000
 let initialQueTime = 50
@@ -25,7 +26,11 @@ const getSiteIdentity = (data) => {
   if (typeof data === 'string') {
     return data
   }
-  return (data.get('location') || '') + (data.get('partitionNumber') ? '|' + data.get('partitionNumber') : '')
+
+  const partitionNumber = data.get('partitionNumber')
+  let location = data.get('location') || ''
+  location = urlUtil.stripLocation(location)
+  return location + (partitionNumber ? '|' + partitionNumber : '')
 }
 
 const loadOtherSites = (sites) => {

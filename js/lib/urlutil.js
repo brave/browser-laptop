@@ -441,6 +441,16 @@ const UrlUtil = {
       return parsed.slashes ? [parsed.protocol, parsed.host].join('//') : [parsed.protocol, parsed.host].join('')
     }
     return null
+  },
+
+  stripLocation: (url) => {
+    if (!url) {
+      return ''
+    }
+
+    return url
+      .replace(/((#?\/?)|(\/#?))$/, '') // remove trailing # and /
+      .trim() // remove whitespaces
   }
 }
 

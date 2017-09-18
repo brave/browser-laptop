@@ -190,29 +190,39 @@ const virtualSite = (sites) => {
  * @param {object} - history
  */
 const createVirtualHistoryItems = (historySites, urlLocationLower) => {
+  let foundRoot = []
   historySites = historySites || []
 
   // parse each history item
   const parsedHistorySites = []
   historySites.forEach((site) => {
     if (site.get && site.get('location')) {
-      parsedHistorySites.push(
-        urlParse(site.get('location'))
-      )
+      const parsed = urlParse(site.get('location'))
+
+      // don't create virtual root, because we already have it
+      if (parsed.path === '/') {
+        foundRoot.push(parsed.host)
+      } else {
+        parsedHistorySites.push(parsed)
+      }
     }
   })
+
   // group them by host
   const grouped = _.groupBy(parsedHistorySites, (parsedSite) => {
     return parsedSite.host || 'unknown'
   })
+
   // find groups with more than 2 of the same host
   const multiGroupKeys = _.filter(_.keys(grouped), (k) => {
-    return grouped[k].length > 0
+    return grouped[k].length > 0 && !foundRoot.includes(k)
   })
+
   // potentially create virtual history items
   let virtualHistorySites = _.map(multiGroupKeys, (location) => {
     return virtualSite(grouped[location])
   })
+
   virtualHistorySites = _.filter(virtualHistorySites, (site) => {
     return !!site
   })
