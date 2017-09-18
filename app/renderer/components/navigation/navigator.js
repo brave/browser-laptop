@@ -134,7 +134,7 @@ class Navigator extends React.Component {
     props.showBrowserActions = !activeTabShowingMessageBox &&
       extensionBrowserActions &&
       extensionBrowserActions.size > 0
-    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state))
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, getCurrentWindowId(), activeFrame, isFocused(state))
     props.isCounterEnabled = getSetting(settings.BLOCKED_COUNT_BADGE) &&
       props.totalBlocks &&
       props.shieldEnabled

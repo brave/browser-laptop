@@ -426,10 +426,10 @@ class Main extends React.Component {
     })
 
     ipc.on(messages.IMPORTER_LIST, (e, detail) => {
-      windowActions.setImportBrowserDataDetail({
+      appActions.setImportBrowserDataDetail(getCurrentWindowId(), {
         browsers: detail
       })
-      windowActions.setImportBrowserDataSelected()
+      appActions.setImportBrowserDataSelected(getCurrentWindowId())
     })
     // DO NOT ADD TO THIS LIST - see above
 
@@ -534,6 +534,7 @@ class Main extends React.Component {
     const widevinePanelDetail = currentWindow.get('widevinePanelDetail', Immutable.Map())
     const loginRequiredDetails = basicAuthState.getLoginRequiredDetail(state, activeTabId)
     const focused = isFocused(state)
+    const windowId = getCurrentWindowId()
 
     const props = {}
     // used in renderer
@@ -547,7 +548,7 @@ class Main extends React.Component {
     props.showBravery = shieldState.braveShieldsEnabled(activeFrame) &&
       !!currentWindow.get('braveryPanelDetail')
     props.showClearData = currentWindow.getIn(['ui', 'isClearBrowsingDataPanelVisible'], false)
-    props.showImportData = currentWindow.hasIn(['importBrowserDataDetail', 'browsers'])
+    props.showImportData = state.hasIn(['windows', windowId, 'importBrowserDataDetail', 'browsers'])
     props.showWidevine = currentWindow.getIn(['widevinePanelDetail', 'shown']) && !isLinux
     props.showAutoFillAddress = currentWindow.has('autofillAddressDetail')
     props.showAutoFillCC = currentWindow.has('autofillCreditCardDetail')
@@ -561,7 +562,7 @@ class Main extends React.Component {
     props.showCheckDefault = focused && defaultBrowserState.shouldDisplayDialog(state)
     props.showUpdate = updateState.isUpdateVisible(state)
     props.showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, focused)
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, windowId, activeFrame, focused)
     props.isSinglePage = nonPinnedFrames.size <= tabsPerPage
     props.showTabPages = nonPinnedFrames.size > tabsPerPage
     props.showNotificationBar = activeOrigin && state.get('notifications').filter((item) =>

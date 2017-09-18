@@ -160,7 +160,7 @@ const api = {
 
   // TODO (nejc) we should only pass in one state
   // refactor when window state is merged into app state
-  shouldAllowWindowDrag: (state, windowState, frame, isFocused) => {
+  shouldAllowWindowDrag: (state, windowState, currentWindowId, frame, isFocused) => {
     const shieldState = require('./shieldState')
     const defaultBrowserState = require('./defaultBrowserState')
     const braveryPanelIsVisible = shieldState.braveShieldsEnabled(frame) &&
@@ -174,7 +174,7 @@ const api = {
       !windowState.getIn(['ui', 'siteInfo', 'isVisible']) &&
       !braveryPanelIsVisible &&
       !windowState.getIn(['ui', 'isClearBrowsingDataPanelVisible']) &&
-      !windowState.hasIn(['importBrowserDataDetail', 'browsers']) &&
+      !state.hasIn(['windows', currentWindowId, 'importBrowserDataDetail', 'browsers']) &&
       !windowState.getIn(['widevinePanelDetail', 'shown']) &&
       !windowState.get('autofillAddressDetail') &&
       !windowState.get('autofillCreditCardDetail') &&

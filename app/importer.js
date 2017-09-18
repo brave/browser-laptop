@@ -25,7 +25,6 @@ const settings = require('../js/constants/settings')
 
 // Actions
 const appActions = require('../js/actions/appActions')
-const windowActions = require('../js/actions/windowActions')
 const syncActions = require('../js/actions/syncActions')
 
 // Utils
@@ -40,6 +39,14 @@ const FunctionBuffer = require('../js/lib/functionBuffer')
 let isImportingBookmarks = false
 let hasBookmarks
 let bookmarkList
+
+const getCurrentWindowId = () => {
+  if (BrowserWindow.getFocusedWindow()) {
+    return BrowserWindow.getFocusedWindow().webContents.id
+  }
+
+  return -1
+}
 
 exports.init = () => {
   importer.initialize()
@@ -270,7 +277,7 @@ const showImportSuccess = function () {
 }
 
 app.on('show-warning-dialog', (e) => {
-  windowActions.setImportBrowserDataDetail()
+  appActions.setImportBrowserDataDetail(getCurrentWindowId())
   showImportWarning()
 })
 
@@ -282,11 +289,11 @@ importer.on('import-success', (e) => {
     }
   }
   setImmediate(() => {
-    windowActions.setImportBrowserDataDetail()
+    appActions.setImportBrowserDataDetail(getCurrentWindowId())
   })
   showImportSuccess()
 })
 
 importer.on('import-dismiss', (e) => {
-  windowActions.setImportBrowserDataDetail()
+  appActions.setImportBrowserDataDetail(getCurrentWindowId())
 })

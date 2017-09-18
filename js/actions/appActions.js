@@ -1634,6 +1634,32 @@ const appActions = {
       destinationKey,
       prepend
     })
+  },
+
+  /**
+   * Sets the import browser data popup detail
+   * @param {number} windowId - window where we are doing import
+   * @param {Object} importBrowserDataDetail - array of list of supported browsers and loading status
+   */
+  setImportBrowserDataDetail: function (windowId, importBrowserDataDetail) {
+    dispatch({
+      actionType: appConstants.APP_ON_IMPORT_BROWSER_DATA_DETAIL,
+      windowId,
+      importBrowserDataDetail
+    })
+  },
+
+  /**
+   * Sets the selected import browser data
+   * @param {number} windowId - window where we are doing import
+   * @param {Object} selected - selected browser data to import
+   */
+  setImportBrowserDataSelected: function (windowId, selected) {
+    dispatch({
+      actionType: appConstants.APP_ON_IMPORT_BROWSER_DATA_SELECTED,
+      windowId,
+      selected
+    })
   }
 }
 

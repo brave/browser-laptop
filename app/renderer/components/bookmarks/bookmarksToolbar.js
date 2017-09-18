@@ -24,7 +24,7 @@ const dragTypes = require('../../../../js/constants/dragTypes')
 const siteTags = require('../../../../js/constants/siteTags')
 
 // Utils
-const {isFocused} = require('../../currentWindow')
+const {isFocused, getCurrentWindowId} = require('../../currentWindow')
 const contextMenus = require('../../../../js/contextMenus')
 const cx = require('../../../../js/lib/classSet')
 const dnd = require('../../../../js/dnd')
@@ -154,7 +154,7 @@ class BookmarksToolbar extends React.Component {
     // used in renderer
     props.showOnlyFavicon = bookmarkUtil.showOnlyFavicon()
     props.showFavicon = bookmarkUtil.showFavicon()
-    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state)) &&
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, getCurrentWindowId(), activeFrame, isFocused(state)) &&
       !isWindows
     props.visibleBookmarks = bookmarks.visibleBookmarks
     props.hiddenBookmarks = bookmarks.hiddenBookmarks

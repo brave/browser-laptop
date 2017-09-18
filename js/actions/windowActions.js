@@ -813,28 +813,6 @@ const windowActions = {
     })
   },
 
-  /**
-   * Sets the import browser data popup detail
-   * @param {Object} importBrowserDataDetail - array of list of supported browsers and loading status
-   */
-  setImportBrowserDataDetail: function (importBrowserDataDetail) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL,
-      importBrowserDataDetail
-    })
-  },
-
-  /**
-   * Sets the selected import browser data
-   * @param {Object} selected - selected browser data to import
-   */
-  setImportBrowserDataSelected: function (selected) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_SELECTED,
-      selected
-    })
-  },
-
   widevineSiteAccessedWithoutInstall: function () {
     dispatch({
       actionType: windowConstants.WINDOW_WIDEVINE_SITE_ACCESSED_WITHOUT_INSTALL

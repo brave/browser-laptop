@@ -153,7 +153,9 @@ const appConstants = {
   APP_REMOVE_BOOKMARK: _,
   APP_MOVE_BOOKMARK_FOLDER: _,
   APP_MOVE_BOOKMARK: _,
-  APP_INSPECT_ELEMENT: _
+  APP_INSPECT_ELEMENT: _,
+  APP_ON_IMPORT_BROWSER_DATA_DETAIL: _,
+  APP_ON_IMPORT_BROWSER_DATA_SELECTED: _
 }
 
 module.exports = mapValuesByKeys(appConstants)

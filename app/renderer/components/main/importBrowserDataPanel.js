@@ -22,7 +22,9 @@ const {
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
-const windowActions = require('../../../../js/actions/windowActions')
+
+// Utils
+const {getCurrentWindowId} = require('../../currentWindow')
 
 // Styles
 const globalStyles = require('../styles/global')
@@ -36,10 +38,11 @@ class ImportBrowserDataPanel extends React.Component {
     this.onTogglePasswords = this.onToggleSetting.bind(this, 'passwords')
     this.onImport = this.onImport.bind(this)
     this.onChange = this.onChange.bind(this)
+    this.onHide = this.onHide.bind(this)
   }
 
   onToggleSetting (setting, e) {
-    windowActions.setImportBrowserDataSelected({
+    appActions.setImportBrowserDataSelected(this.props.windowId, {
       [setting]: e.target.value
     })
   }
@@ -53,30 +56,30 @@ class ImportBrowserDataPanel extends React.Component {
     data.type = this.props.type
     data.passwords = this.props.passwords
 
-    windowActions.setImportBrowserDataDetail({
+    appActions.setImportBrowserDataDetail(this.props.windowId, {
       loading: true
     })
     appActions.importBrowserData(Immutable.fromJS(data))
   }
 
   onChange (e) {
-    windowActions.setImportBrowserDataSelected(~~e.target.value)
+    appActions.setImportBrowserDataSelected(this.props.windowId, ~~e.target.value)
   }
 
   onHide () {
-    windowActions.setImportBrowserDataDetail()
+    appActions.setImportBrowserDataDetail(this.props.windowId)
   }
 
   componentWillMount () {
     if (this.props.selectedIndex == null) {
-      windowActions.setImportBrowserDataSelected(0)
+      appActions.setImportBrowserDataSelected(this.props.windowId, 0)
     }
   }
 
   mergeProps (state, ownProps) {
-    const currentWindow = state.get('currentWindow')
-    const importBrowserDataSelected = currentWindow.get('importBrowserDataSelected', Immutable.Map())
-    const importBrowserDataDetail = currentWindow.get('importBrowserDataDetail', Immutable.Map())
+    const windowId = getCurrentWindowId()
+    const importBrowserDataSelected = state.getIn(['windows', windowId, 'importBrowserDataSelected'], Immutable.Map())
+    const importBrowserDataDetail = state.getIn(['windows', windowId, 'importBrowserDataDetail'], Immutable.Map())
     const browsers = importBrowserDataDetail.get('browsers', Immutable.Map())
     const index = importBrowserDataSelected.get('index', '0')
     const currentSelectedBrowser = browsers.get(index, Immutable.Map())
@@ -99,6 +102,7 @@ class ImportBrowserDataPanel extends React.Component {
 
     // used in other functions
     props.selectedIndex = importBrowserDataSelected.get('index')
+    props.windowId = windowId
 
     return props
   }

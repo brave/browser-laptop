@@ -195,6 +195,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/updatesReducer'),
       require('../../app/browser/reducers/topSitesReducer'),
       require('../../app/browser/reducers/braverySettingsReducer'),
+      require('../../app/browser/reducers/importerReducer'),
       require('../../app/ledger').doAction,
       require('../../app/browser/menu')
     ]
@@ -466,18 +467,6 @@ const handleAppAction = (action) => {
     case appConstants.APP_ON_CANCEL_BROWSING_DATA:
       appState = appState.set('tempClearBrowsingData', Immutable.Map())
       break
-    case appConstants.APP_IMPORT_BROWSER_DATA:
-      {
-        const importer = require('../../app/importer')
-        if (action.selected.get('type') === 5) {
-          if (action.selected.get('favorites')) {
-            importer.importHTML(action.selected)
-          }
-        } else {
-          importer.importData(action.selected)
-        }
-        break
-      }
     case appConstants.APP_ADD_AUTOFILL_ADDRESS:
       autofill.addAutofillAddress(action.detail)
       break
