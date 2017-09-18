@@ -177,6 +177,8 @@
     "react-addons-perf": "^15.2.1",
     "react-addons-test-utils": "^15.4.1",
     "react-test-renderer": "^15.5.4",
+    "remotedev": "^0.2.7",
+    "remotedev-server": "^0.2.3",
     "request": "^2.81.0",
     "sinon": "^1.17.6",
     "spectron": "brave/spectron#chromium60",
