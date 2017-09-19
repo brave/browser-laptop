@@ -40,7 +40,7 @@ const {initWindowCacheState} = require('../../app/sessionStoreShutdown')
 const platformUtil = require('../../app/common/lib/platformUtil')
 
 // state helpers
-const {isImmutable, makeImmutable} = require('../../app/common/state/immutableUtil')
+const {isImmutable, makeImmutable, makeJS} = require('../../app/common/state/immutableUtil')
 const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
@@ -117,8 +117,8 @@ const setWindowPosition = (browserOpts, defaults, immutableWindowState) => {
 }
 
 const createWindow = (action) => {
-  const frameOpts = (action.frameOpts && action.frameOpts.toJS()) || {}
-  let browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
+  const frameOpts = makeJS(action.frameOpts, {})
+  let browserOpts = makeJS(action.browserOpts, {})
   const immutableWindowState = action.restoredState || Immutable.Map()
   const defaults = windowDefaults()
 
