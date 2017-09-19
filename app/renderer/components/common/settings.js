@@ -88,12 +88,6 @@ class SettingCheckbox extends ImmutableComponent {
       props.id = this.props.id
     }
 
-    const labelClass = cx({
-      [css(settingCheckboxStyles.label)]: this.props.small,
-      [this.props.labelClassName]: !!this.props.labelClassName,
-      [css(settingCheckboxStyles.expansiveRightText)]: !this.props.compact
-    })
-
     return <div {...props} data-test-id={this.props.dataTestId}>
       <SwitchControl id={this.props.prefKey}
         small={this.props.small}
@@ -101,23 +95,16 @@ class SettingCheckbox extends ImmutableComponent {
         onClick={this.onClick}
         checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)}
         className={this.props.switchClassName}
-        customRightTextClassName={labelClass}
+        customRightTextClassName={this.props.rightLabelClassName}
+        customLeftTextClassName={this.props.leftLabelClassName}
         rightl10nId={this.props.dataL10nId}
         rightl10nArgs={this.props.dataL10nArgs}
+        leftl10nId={this.props.dataL10nIdLeft}
       />
       {this.props.options}
     </div>
   }
 }
-
-const settingCheckboxStyles = StyleSheet.create({
-  label: {
-    fontSize: 'smaller'
-  },
-  expansiveRightText: {
-    paddingLeft: '9px'
-  }
-})
 
 class SiteSettingCheckbox extends ImmutableComponent {
   constructor () {
