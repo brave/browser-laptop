@@ -1,15 +1,42 @@
 /* global describe, it */
 const ledgerUtil = require('../../../../../app/common/lib/ledgerUtil')
 const assert = require('assert')
+const Immutable = require('immutable')
 
 require('../../../braveUnit')
 
 describe('ledgerUtil test', function () {
   describe('shouldTrackView', function () {
-    const validView = { tabId: 1, url: 'https://brave.com/' }
-    const validResponseList = [{ tabId: validView.tabId, details: { newURL: validView.url, httpResponseCode: 200 } }]
-    const noMatchResponseList = [{ tabId: 3, details: { newURL: 'https://not-brave.com' } }]
-    const matchButErrored = [{ tabId: validView.tabId, details: { newURL: validView.url, httpResponseCode: 404 } }]
+    const validView = Immutable.fromJS({
+      tabId: 1,
+      url: 'https://brave.com/'
+    })
+    const validResponseList = Immutable.fromJS([
+      {
+        tabId: validView.get('tabId'),
+        details: {
+          newURL: validView.get('url'),
+          httpResponseCode: 200
+        }
+      }
+    ])
+    const noMatchResponseList = Immutable.fromJS([
+      {
+        tabId: 3,
+        details: {
+          newURL: 'https://not-brave.com'
+        }
+      }
+    ])
+    const matchButErrored = Immutable.fromJS([
+      {
+        tabId: validView.get('tabId'),
+        details: {
+          newURL: validView.get('url'),
+          httpResponseCode: 404
+        }
+      }
+    ])
 
     describe('input validation', function () {
       it('returns false if view is falsey', function () {

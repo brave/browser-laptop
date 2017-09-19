@@ -36,7 +36,6 @@ const os = require('os')
 const path = require('path')
 const urlParse = require('./common/urlParse')
 const urlFormat = require('url').format
-const util = require('util')
 const Immutable = require('immutable')
 
 const electron = require('electron')
@@ -57,16 +56,17 @@ const uuid = require('uuid')
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
 const appConstants = require('../js/constants/appConstants')
+const windowConstants = require('../js/constants/windowConstants')
 const messages = require('../js/constants/messages')
 const settings = require('../js/constants/settings')
 const request = require('../js/lib/request')
 const getSetting = require('../js/settings').getSetting
 const locale = require('./locale')
 const appStore = require('../js/stores/appStore')
-const eventStore = require('../js/stores/eventStore')
 const rulesolver = require('./extensions/brave/content/scripts/pageInformation')
 const ledgerUtil = require('./common/lib/ledgerUtil')
 const tabs = require('./browser/tabs')
+const pageDataState = require('./common/state/pageDataState')
 const {fileUrl} = require('../js/lib/appUrlUtil')
 
 // "only-when-needed" loading...
@@ -191,6 +191,7 @@ const doAction = (state, action) => {
       }
 
     case appConstants.APP_IDLE_STATE_CHANGED:
+      state = pageDataChanged(state)
       visit('NOOP', underscore.now(), null)
       break
 
@@ -284,8 +285,15 @@ const doAction = (state, action) => {
       appActions.updateLedgerInfo(underscore.omit(ledgerInfo, [ '_internal' ]))
       break
 
-    default:
-      break
+    case 'event-set-page-info':
+    case appConstants.APP_WINDOW_BLURRED:
+    case appConstants.APP_CLOSE_WINDOW:
+    case windowConstants.WINDOW_SET_FOCUSED_FRAME:
+    case windowConstants.WINDOW_GOT_RESPONSE_DETAILS:
+      {
+        state = pageDataChanged(state)
+        break
+      }
   }
 
   return state
@@ -628,68 +636,79 @@ underscore.keys(fileTypes).forEach((fileType) => {
 })
 signatureMax = Math.ceil(signatureMax * 1.5)
 
-eventStore.addChangeListener(() => {
-  var initP
-  const eventState = eventStore.getState().toJS()
-  var view = eventState.page_view
-  var info = eventState.page_info
-  var pageLoad = eventState.page_load
+const pageDataChanged = (state) => {
+  // NB: in theory we have already seen every element in info except for (perhaps) the last one...
+  const info = pageDataState.getLastInfo(state)
 
-  if ((!synopsis) || (!util.isArray(info))) return
-
-// NB: in theory we have already seen every element in info except for (perhaps) the last one...
-  underscore.rest(info, info.length - 1).forEach((page) => {
-    let pattern, publisher
-    let location = page.url
-
-    if (location.match(/^about/)) return
-
-    location = urlFormat(underscore.pick(urlParse(location), [ 'protocol', 'host', 'hostname', 'port', 'pathname' ]))
-    publisher = locations[location] && locations[location].publisher
-    if (publisher) {
-      if (synopsis.publishers[publisher] &&
-        (typeof synopsis.publishers[publisher].faviconURL === 'undefined' || synopsis.publishers[publisher].faviconURL === null)) {
-        getFavIcon(synopsis.publishers[publisher], page, location)
-      }
-      return updateLocation(location, publisher)
-    }
-
-    if (!page.publisher) {
-      try {
-        publisher = ledgerPublisher.getPublisher(location, publisherInfo._internal.ruleset.raw)
-        if ((publisher) && (blockedP(publisher))) publisher = null
-        if (publisher) page.publisher = publisher
-      } catch (ex) {
-        console.error('getPublisher error for ' + location + ': ' + ex.toString())
-      }
-    }
-    locations[location] = underscore.omit(page, [ 'url', 'protocol', 'faviconURL' ])
-    if (!page.publisher) return
-
-    publisher = page.publisher
-    pattern = `https?://${publisher}`
-    initP = !synopsis.publishers[publisher]
-    synopsis.initPublisher(publisher)
-    if (initP) {
-      excludeP(publisher, (unused, exclude) => {
-        if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
-          exclude = false
-        } else {
-          exclude = !exclude
-        }
-        appActions.changeSiteSetting(pattern, 'ledgerPayments', exclude)
-        updatePublisherInfo()
-      })
-    }
-    updateLocation(location, publisher)
-    getFavIcon(synopsis.publishers[publisher], page, location)
-  })
-
-  view = underscore.last(view) || {}
-  if (ledgerUtil.shouldTrackView(view, pageLoad)) {
-    visit(view.url || 'NOOP', view.timestamp || underscore.now(), view.tabId)
+  if (!synopsis || info.isEmpty()) {
+    return
   }
-})
+
+  if (info.get('url', '').match(/^about/)) {
+    return
+  }
+
+  let publisher = info.get('publisher')
+  const location = info.get('key')
+  if (publisher) {
+    // TODO refactor
+    if (synopsis.publishers[publisher] &&
+      (typeof synopsis.publishers[publisher].faviconURL === 'undefined' || synopsis.publishers[publisher].faviconURL === null)) {
+      getFavIcon(synopsis.publishers[publisher], info, location)
+    }
+
+    // TODO refactor
+    return updateLocation(location, publisher)
+  } else {
+    try {
+      publisher = ledgerPublisher.getPublisher(location, publisherInfo._internal.ruleset.raw)
+      // TODO refactor
+      if (publisher && !blockedP(publisher)) {
+        state = pageDataState.setPublisher(state, location, publisher)
+      } else {
+        publisher = null
+      }
+    } catch (ex) {
+      console.error('getPublisher error for ' + location + ': ' + ex.toString())
+    }
+  }
+
+  if (!publisher) {
+    return
+  }
+
+  const pattern = `https?://${publisher}`
+  const initP = !synopsis.publishers[publisher]
+  // TODO refactor
+  synopsis.initPublisher(publisher)
+
+  if (initP) {
+    // TODO refactor
+    excludeP(publisher, (unused, exclude) => {
+      if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
+        exclude = false
+      } else {
+        exclude = !exclude
+      }
+      appActions.changeSiteSetting(pattern, 'ledgerPayments', exclude)
+      updatePublisherInfo()
+    })
+  }
+  // TODO refactor
+  updateLocation(location, publisher)
+  // TODO refactor
+  getFavIcon(synopsis.publishers[publisher], info, location)
+
+  const pageLoad = pageDataState.getLoad(state)
+  const view = pageDataState.getView(state)
+
+  if (ledgerUtil.shouldTrackView(view, pageLoad)) {
+    // TODO refactor
+    visit(view.get('url', 'NOOP'), view.get('timestamp', underscore.now()), view.get('tabId'))
+  }
+
+  return state
+}
 
 /*
  * module initialization

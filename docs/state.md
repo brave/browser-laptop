@@ -174,6 +174,85 @@ AppStore
       themeColor: string
     }
   },
+  ledger: {
+    isBooting: boolean, // flag which telll us if wallet is still creating or not
+    isQuiting: boolan, // flag which tell us if we are closing ledger (because of browser close) 
+    synopsis: {
+      options: {
+        emptyScores: {
+          concave: number,
+          visits: number
+        },
+        frameSize: number,
+        minPublisherDuration: number,
+        minPublisherVisits: number,
+        numFrames: number,
+        scorekeeper: string, // concave or visits
+        scorekeepers: Array<string>, // concave and visits
+        showOnlyVerified: boolean        
+      },
+      publishers: {
+        [publisherId]: {
+          duration: number,
+          faviconUrl: string,
+          options: {
+            exclude: boolean,
+            verified: boolean,
+            stickyP: boolean
+          },
+          pinPercentage: number,
+          protocol: string,
+          scores: {
+            concave: number,
+            visits: number
+          },
+          visits: number,
+          weight: number
+        }
+      }
+    },
+    creating: boolean,
+    created: boolan,
+    reconcileFrequency: number,
+    reconcileStamp: number,    
+    address: string, // Bitcoin wallet address
+  
+    // Bitcoin wallet balance (truncated BTC and satoshis)
+    balance: undefined,
+    unconfirmed: undefined,
+    satoshis: undefined,
+  
+    // the desired contribution (the btc value approximates the amount/currency designation)
+    btc: undefined,
+    amount: undefined,
+    currency: undefined,
+  
+    paymentURL: undefined,
+    buyURL: undefined,
+    bravery: undefined,
+  
+    // wallet credentials
+    paymentId: undefined,
+    passphrase: undefined,
+  
+    // advanced ledger settings
+    minPublisherDuration: undefined,
+    minPublisherVisits: undefined,
+    showOnlyVerified: undefined,
+  
+    hasBitcoinHandler: false,
+  
+    // geoIP/exchange information
+    countryCode: undefined,
+    exchangeInfo: undefined,
+  
+    _internal: {
+      exchangeExpiry: 0,
+      exchanges: {},
+      geoipExpiry: 0
+    },
+    error: null // TODO we don't need it anymore
+  },
   menu: {
     template: object // used on Windows and by our tests: template object with Menubar control
   },
@@ -193,6 +272,39 @@ AppStore
   }], // the notifications for the frame. not preserved across restart.
   noScript: {
     enabled: boolean // enable noscript
+  },
+  pageData: {
+    info: [{
+      faviconURL: string,
+      protocol: string,
+      publisher: string,
+      timestamp: number,
+      url: string,
+    }],
+    last: {
+      info: string, // last added info
+      tabId: number, // last active tabId
+      url: string // last active URL
+    },
+    load: [{
+     timestamp: number,
+     url: string,
+     tabId: number,
+     details: {
+       status: boolean,
+       newURL: string,
+       originalURL: string,
+       httpResponseCode: number,
+       requestMethod: string,
+       referrer: string,
+       resourceType: string
+     }   
+    }],
+    view: {
+      timestamp: number,
+      url: string,
+      tabId: number
+    } // we save only the last view
   },
   pinnedSites: {
     [siteKey]: {
@@ -284,9 +396,6 @@ AppStore
     'advanced.minimum-visit-time': number,
     'advanced.minimum-visits': number,
     'advanced.auto-suggest-sites': boolean // show auto suggestion
-  },
-  locationSiteKeyCache: {
-    [location]: Array.<string> // location -> site keys
   },
   siteSettings: {
     [hostPattern]: {
@@ -650,29 +759,6 @@ WindowStore
       exclude: boolean, // wheter or not site is in the excluded list
       stickyP: boolean, // wheter or not site was added using addFunds urlbar toggle
       timestamp: number // timestamp in milliseconds
-    }
-  },
-  publisherInfo: {
-    synopsis: [{
-      daysSpent: number, // e.g., 1
-      duration: number, // total millisecond-views, e.g., 93784000 = 1 day, 2 hours, 3 minutes, 4 seconds
-      faviconURL: string, // i.e., "data:image/...;base64,..."
-      hoursSpent: number, // e.g., 2
-      minutesSpent: number, // e.g., 3
-      percentage: number, // i.e., 0, 1, ... 100
-      pinPercentage: number, // i.e., 0, 1, ... 100
-      publisherURL: string, // publisher site, e.g., "https://wikipedia.org/"
-      rank: number, // i.e., 1, 2, 3, ...
-      score: number, // float indicating the current score
-      secondsSpent: number, // e.g., 4
-      site: string, // publisher name, e.g., "wikipedia.org"
-      verified: boolean, // there is a verified wallet for this publisher
-      views: number, // total page-views,
-      weight: number // float indication of the ration
-    }], // one entry for each publisher having a non-zero `score`
-    synopsisOptions: {
-      minPublisherDuration: number, // e.g., 8000 for 8 seconds
-      minPublisherVisits: number // e.g., 0
     }
   },
   searchResults: array, // autocomplete server results if enabled

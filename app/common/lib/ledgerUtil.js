@@ -4,44 +4,56 @@
 
 'use strict'
 
-const {responseHasContent} = require('./httpUtil')
 const moment = require('moment')
+
+// Utils
+const {responseHasContent} = require('./httpUtil')
+const {makeImmutable} = require('../../common/state/immutableUtil')
 
 /**
  * Is page an actual page being viewed by the user? (not an error page, etc)
  * If the page is invalid, we don't want to collect usage info.
- * @param {Object} view - an entry from page_view (from EventStore)
- * @param {Object} responseList - full page_response array (from EventStore)
+ * @param {Map} view - an entry from ['pageData', 'view']
+ * @param {List} responseList - full ['pageData', 'load'] List
  * @return {boolean} true if page should have usage collected, false if not
  */
-module.exports.shouldTrackView = (view, responseList) => {
-  if (!view || !view.url || !view.tabId) {
+const shouldTrackView = (view, responseList) => {
+  view = makeImmutable(view)
+
+  if (view == null) {
     return false
   }
-  if (!responseList || !Array.isArray(responseList) || !responseList.length) {
+
+  const tabId = view.get('tabId')
+  const url = view.get('url')
+
+  if (!url || !tabId) {
     return false
   }
 
-  const tabId = view.tabId
-  const url = view.url
+  responseList = makeImmutable(responseList)
+  if (!responseList || responseList.size === 0) {
+    return false
+  }
 
-  for (let i = responseList.length; i > -1; i--) {
-    const response = responseList[i]
+  for (let i = (responseList.size - 1); i > -1; i--) {
+    const response = responseList.get(i)
 
-    if (!response) continue
+    if (!response) {
+      continue
+    }
 
-    const responseUrl = response && response.details
-      ? response.details.newURL
-      : null
+    const responseUrl = response.getIn(['details', 'newURL'], null)
 
-    if (url === responseUrl && response.tabId === tabId) {
-      return responseHasContent(response.details.httpResponseCode)
+    if (url === responseUrl && response.get('tabId') === tabId) {
+      return responseHasContent(response.getIn(['details', 'httpResponseCode']))
     }
   }
+
   return false
 }
 
-module.exports.btcToCurrencyString = (btc, ledgerData) => {
+const btcToCurrencyString = (btc, ledgerData) => {
   const balance = Number(btc || 0)
   const currency = ledgerData.get('currency') || 'USD'
 
@@ -69,17 +81,17 @@ module.exports.btcToCurrencyString = (btc, ledgerData) => {
   return `${balance} BTC`
 }
 
-module.exports.formattedTimeFromNow = (timestamp) => {
+const formattedTimeFromNow = (timestamp) => {
   moment.locale(navigator.language)
   return moment(new Date(timestamp)).fromNow()
 }
 
-module.exports.formattedDateFromTimestamp = (timestamp, format) => {
+const formattedDateFromTimestamp = (timestamp, format) => {
   moment.locale(navigator.language)
   return moment(new Date(timestamp)).format(format)
 }
 
-module.exports.walletStatus = (ledgerData) => {
+const walletStatus = (ledgerData) => {
   let status = {}
 
   if (ledgerData.get('error')) {
@@ -93,7 +105,7 @@ module.exports.walletStatus = (ledgerData) => {
       status.id = 'insufficientFundsStatus'
     } else if (pendingFunds > 0) {
       status.id = 'pendingFundsStatus'
-      status.args = {funds: module.exports.btcToCurrencyString(pendingFunds, ledgerData)}
+      status.args = {funds: btcToCurrencyString(pendingFunds, ledgerData)}
     } else if (transactions && transactions.size > 0) {
       status.id = 'defaultWalletStatus'
     } else {
@@ -105,4 +117,12 @@ module.exports.walletStatus = (ledgerData) => {
     status.id = 'createWalletStatus'
   }
   return status
+}
+
+module.exports = {
+  shouldTrackView,
+  btcToCurrencyString,
+  formattedTimeFromNow,
+  formattedDateFromTimestamp,
+  walletStatus
 }
