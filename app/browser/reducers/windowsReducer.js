@@ -24,6 +24,7 @@ const getSetting = require('../../../js/settings').getSetting
 const {zoomLevel} = require('../../common/constants/toolbarUserInterfaceScale')
 const platformUtil = require('../../common/lib/platformUtil')
 const {initWindowCacheState} = require('../../sessionStoreShutdown')
+const appDispatcher = require('../../../js/dispatcher/appDispatcher')
 
 const isDarwin = platformUtil.isDarwin()
 const isWindows = platformUtil.isWindows()
@@ -238,9 +239,9 @@ const createWindow = (state, action) => {
   const toolbarUserInterfaceScale = getSetting(settings.TOOLBAR_UI_SCALE)
 
   setImmediate(() => {
-    let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts, {disposition: frameOpts.disposition}))
+    const win = new BrowserWindow(Object.assign(windowProps, browserOpts, {disposition: frameOpts.disposition}))
     let restoredImmutableWindowState = action.get('restoredState')
-    initWindowCacheState(mainWindow.id, restoredImmutableWindowState)
+    initWindowCacheState(win.id, restoredImmutableWindowState)
 
     // initialize frames state
     let frames = Immutable.List()
@@ -269,17 +270,18 @@ const createWindow = (state, action) => {
     }
 
     if (isMaximized) {
-      mainWindow.maximize()
+      win.maximize()
     }
 
-    mainWindow.webContents.on('did-finish-load', (e) => {
+    appDispatcher.registerWindow(win, win.webContents)
+    win.webContents.on('did-finish-load', (e) => {
       const appStore = require('../../../js/stores/appStore')
-      mainWindow.webContents.setZoomLevel(zoomLevel[toolbarUserInterfaceScale] || 0.0)
+      win.webContents.setZoomLevel(zoomLevel[toolbarUserInterfaceScale] || 0.0)
 
       const mem = muon.shared_memory.create({
         windowValue: {
           disposition: frameOpts.disposition,
-          id: mainWindow.id
+          id: win.id
         },
         appState: appStore.getLastEmittedState().toJS(),
         frames: frames.toJS(),
@@ -291,11 +293,11 @@ const createWindow = (state, action) => {
       }
     })
 
-    mainWindow.on('ready-to-show', () => {
-      mainWindow.show()
+    win.on('ready-to-show', () => {
+      win.show()
     })
 
-    mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
+    win.loadURL(appUrlUtil.getBraveExtIndexHTML())
   })
 
   return state
