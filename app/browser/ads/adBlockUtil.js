@@ -2,10 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const {siteHacks} = require('../../../js/data/siteHacks')
 const {FilterOptions} = require('ad-block')
-const isThirdPartyHost = require('../isThirdPartyHost')
-
 const whitelistHosts = ['disqus.com', 'a.disquscdn.com']
 
 /**
@@ -30,20 +27,8 @@ const mapFilterType = {
  */
 const shouldDoAdBlockCheck = (resourceType, firstPartyUrl, url, shouldCheckMainFrame) =>
   firstPartyUrl.protocol &&
-  // By default first party hosts are allowed, but enable the check if a flag is specified in siteHacks
-  (
-    shouldCheckMainFrame ||
-    (
-      (
-        resourceType !== 'mainFrame' &&
-        isThirdPartyHost(firstPartyUrl.hostname || '', url.hostname)
-      ) ||
-      (
-        siteHacks[firstPartyUrl.hostname] &&
-        siteHacks[firstPartyUrl.hostname].allowFirstPartyAdblockChecks
-      )
-    )
-  ) &&
+  // By default first party hosts are allowed
+  (shouldCheckMainFrame || resourceType !== 'mainFrame') &&
   // Only check http and https for now
   firstPartyUrl.protocol.startsWith('http') &&
   // Only do adblock if the host isn't in the whitelist
