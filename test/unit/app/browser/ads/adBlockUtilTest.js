@@ -34,8 +34,8 @@ describe('adBlockUtil test', function () {
     it('should check third party urls', function () {
       assert.ok(shouldDoAdBlockCheck('script', site, thirdPartyResource, false))
     })
-    it('should NOT check first party urls', function () {
-      assert.ok(!shouldDoAdBlockCheck('script', site, firstPartyResource, false))
+    it('should check first party urls', function () {
+      assert.ok(shouldDoAdBlockCheck('script', site, firstPartyResource, false))
     })
     it('Avoid checks with unknown resource types', function () {
       // This test is valid just as long as we don't start handling beefaroni resource types in the ad block lib!!!
