@@ -28,7 +28,8 @@ const emptyDataURI = {
 module.exports.cookieExceptions = {
   'https://inbox.google.com': ['https://hangouts.google.com'],
   'https://mail.google.com': ['https://hangouts.google.com'],
-  'https://drive.google.com': ['https://doc-*-docs.googleusercontent.com']
+  'https://drive.google.com': ['https://doc-*-docs.googleusercontent.com'],
+  'https://reddit.com': ['https://www.google.com']
 }
 
 // Third party domains that require a valid referer to work
