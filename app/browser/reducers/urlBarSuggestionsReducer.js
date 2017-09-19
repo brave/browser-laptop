@@ -7,11 +7,13 @@
 const Immutable = require('immutable')
 const appConstants = require('../../../js/constants/appConstants')
 const {generateNewSuggestionsList, generateNewSearchXHRResults} = require('../../common/lib/suggestion')
-const {init, add} = require('../../common/lib/siteSuggestions')
+const {init, add, remove} = require('../../common/lib/siteSuggestions')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const tabState = require('../../common/state/tabState')
 const historyState = require('../../common/state/historyState')
 const bookmarksState = require('../../common/state/bookmarksState')
+const historyUtil = require('../../common/lib/historyUtil')
+const bookmarkLocationCache = require('../../common/cache/bookmarkLocationCache')
 
 const urlBarSuggestionsReducer = (state, action) => {
   switch (action.actionType) {
@@ -26,6 +28,67 @@ const urlBarSuggestionsReducer = (state, action) => {
         add(makeImmutable(action.siteDetail))
       }
       break
+    case appConstants.APP_REMOVE_BOOKMARK:
+      {
+        const bookmarkKey = action.bookmarkKey
+        if (bookmarkKey == null) {
+          break
+        }
+
+        let data = null
+        if (Array.isArray(bookmarkKey)) {
+          data = Immutable.List()
+          bookmarkKey.forEach((key) => {
+            const bookmark = bookmarksState.getBookmark(state, key)
+            const historyKey = historyUtil.getKey(bookmark)
+            if (!historyState.hasSite(state, historyKey)) {
+              data = data.push(bookmark)
+            }
+          })
+        } else {
+          const bookmark = bookmarksState.getBookmark(state, bookmarkKey)
+          const historyKey = historyUtil.getKey(bookmark)
+          if (!historyState.hasSite(state, historyKey)) {
+            data = bookmark
+          }
+        }
+
+        if (data != null) {
+          remove(data)
+        }
+        break
+      }
+
+    case appConstants.APP_REMOVE_HISTORY_SITE:
+      {
+        const historyKey = action.historyKey
+        if (historyKey == null) {
+          break
+        }
+
+        let data = null
+        if (Array.isArray(historyKey)) {
+          data = Immutable.List()
+          historyKey.map((key) => {
+            const site = historyState.getSite(state, key)
+            const bookmarkKey = bookmarkLocationCache.getCacheKey(state, site.get('location'))
+            if (bookmarkKey.size === 0) {
+              data = data.push(site)
+            }
+          })
+        } else {
+          const site = historyState.getSite(state, historyKey)
+          const bookmarkKey = bookmarkLocationCache.getCacheKey(state, site.get('location'))
+          if (bookmarkKey.size === 0) {
+            data = site
+          }
+        }
+
+        if (data != null) {
+          remove(data)
+        }
+        break
+      }
     case appConstants.APP_SET_STATE:
       const bookmarks = bookmarksState.getBookmarks(action.appState)
       const history = historyState.getSites(action.appState)
