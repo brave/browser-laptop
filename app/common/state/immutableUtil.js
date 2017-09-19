@@ -38,6 +38,13 @@ const api = {
       }
       return result.delete(path)
     }, obj)
+  },
+
+  makeJS: (obj, defaultValue) => {
+    if (obj == null && defaultValue !== undefined) {
+      return defaultValue
+    }
+    return api.isImmutable(obj) ? obj.toJS() : obj
   }
 }
 
