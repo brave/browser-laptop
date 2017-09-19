@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const appConstants = require('../constants/appConstants')
-const AppDispatcher = require('../dispatcher/appDispatcher')
+const appDispatcher = require('../dispatcher/appDispatcher')
 const AppStore = require('./appStore')
 const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
@@ -111,7 +111,7 @@ const doAction = (action) => {
       }
       break
     case appConstants.APP_CLOSE_WINDOW:
-      AppDispatcher.waitFor([AppStore.dispatchToken], () => {
+      appDispatcher.waitFor([AppStore.dispatchToken], () => {
         windowClosed(action.windowId)
       })
       break
@@ -150,6 +150,6 @@ const doAction = (action) => {
   emitChanges()
 }
 
-AppDispatcher.register(doAction)
+appDispatcher.register(doAction)
 
 module.exports = eventStore

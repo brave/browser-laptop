@@ -6,7 +6,7 @@
 const appConstants = require('../constants/appConstants')
 const windowConstants = require('../constants/windowConstants')
 const ExtensionConstants = require('../../app/common/constants/extensionConstants')
-const AppDispatcher = require('../dispatcher/appDispatcher')
+const appDispatcher = require('../dispatcher/appDispatcher')
 const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
 const siteUtil = require('../state/siteUtil')
@@ -199,9 +199,9 @@ const createWindow = (action) => {
   const toolbarUserInterfaceScale = getSetting(settings.TOOLBAR_UI_SCALE)
 
   setImmediate(() => {
-    let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts, {disposition: frameOpts.disposition}))
+    const win = new BrowserWindow(Object.assign(windowProps, browserOpts, {disposition: frameOpts.disposition}))
     let restoredImmutableWindowState = action.restoredState
-    initWindowCacheState(mainWindow.id, restoredImmutableWindowState)
+    initWindowCacheState(win.id, restoredImmutableWindowState)
 
     // initialize frames state
     let frames = Immutable.List()
@@ -230,21 +230,22 @@ const createWindow = (action) => {
     }
 
     if (immutableWindowState.getIn(['ui', 'isMaximized'])) {
-      mainWindow.maximize()
+      win.maximize()
     }
 
     if (immutableWindowState.getIn(['ui', 'isFullScreen'])) {
-      mainWindow.setFullScreen(true)
+      win.setFullScreen(true)
     }
 
-    mainWindow.webContents.on('did-finish-load', (e) => {
+    appDispatcher.registerWindow(win, win.webContents)
+    win.webContents.on('did-finish-load', (e) => {
       lastEmittedState = appState
-      mainWindow.webContents.setZoomLevel(zoomLevel[toolbarUserInterfaceScale] || 0.0)
+      win.webContents.setZoomLevel(zoomLevel[toolbarUserInterfaceScale] || 0.0)
 
       const mem = muon.shared_memory.create({
         windowValue: {
           disposition: frameOpts.disposition,
-          id: mainWindow.id
+          id: win.id
         },
         appState: appState.toJS(),
         frames: frames.toJS(),
@@ -256,11 +257,11 @@ const createWindow = (action) => {
       }
     })
 
-    mainWindow.on('ready-to-show', () => {
-      mainWindow.show()
+    win.on('ready-to-show', () => {
+      win.show()
     })
 
-    mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
+    win.loadURL(appUrlUtil.getBraveExtIndexHTML())
   })
 }
 
@@ -436,7 +437,7 @@ const handleAppAction = (action) => {
       appState = require('../../app/sync').init(appState, action, appStore)
       break
     case appConstants.APP_SHUTTING_DOWN:
-      AppDispatcher.shutdown()
+      appDispatcher.shutdown()
       app.quit()
       break
     case appConstants.APP_NEW_WINDOW:
@@ -890,6 +891,6 @@ const handleAppAction = (action) => {
   emitChanges()
 }
 
-appStore.dispatchToken = AppDispatcher.register(handleAppAction)
+appStore.dispatchToken = appDispatcher.register(handleAppAction)
 
 module.exports = appStore
