@@ -118,8 +118,6 @@ const messages = {
   SET_CERT_ERROR_DETAIL: _,
   SET_SECURITY_STATE: _, /** @arg {number} key of frame, @arg {Object} security state */
   HTTPSE_RULE_APPLIED: _, /** @arg {string} name of ruleset file, @arg {Object} details of rewritten request */
-  // Dispatch related message
-  WINDOW_RENDERER_READY: _,
   // Extensions
   NEW_POPUP_WINDOW: _,
   // Localization

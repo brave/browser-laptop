@@ -6,7 +6,7 @@
 const appConstants = require('../constants/appConstants')
 const windowConstants = require('../constants/windowConstants')
 const ExtensionConstants = require('../../app/common/constants/extensionConstants')
-const appDispatcher = require('../dispatcher/appDispatcher')
+const AppDispatcher = require('../dispatcher/appDispatcher')
 const settings = require('../constants/settings')
 const siteUtil = require('../state/siteUtil')
 const syncUtil = require('../state/syncUtil')
@@ -55,81 +55,6 @@ class AppStore extends EventEmitter {
     this.lastEmittedState = null
   }
 
-<<<<<<< HEAD
-=======
-  const homepageSetting = getSetting(settings.HOMEPAGE)
-  const startupSetting = getSetting(settings.STARTUP_MODE)
-  const toolbarUserInterfaceScale = getSetting(settings.TOOLBAR_UI_SCALE)
-
-  setImmediate(() => {
-    const win = new BrowserWindow(Object.assign(windowProps, browserOpts, {disposition: frameOpts.disposition}))
-    let restoredImmutableWindowState = action.restoredState
-    initWindowCacheState(win.id, restoredImmutableWindowState)
-
-    // initialize frames state
-    let frames = Immutable.List()
-    if (restoredImmutableWindowState) {
-      frames = restoredImmutableWindowState.get('frames')
-      restoredImmutableWindowState = restoredImmutableWindowState.set('frames', Immutable.List())
-      restoredImmutableWindowState = restoredImmutableWindowState.set('tabs', Immutable.List())
-    } else {
-      if (frameOpts && Object.keys(frameOpts).length > 0) {
-        if (frameOpts.forEach) {
-          frames = Immutable.fromJS(frameOpts)
-        } else {
-          frames = frames.push(Immutable.fromJS(frameOpts))
-        }
-      } else if (startupSetting === 'homePage' && homepageSetting) {
-        frames = Immutable.fromJS(homepageSetting.split('|').map((homepage) => {
-          return {
-            location: homepage
-          }
-        }))
-      }
-    }
-
-    if (frames.size === 0) {
-      frames = Immutable.fromJS([{}])
-    }
-
-    if (immutableWindowState.getIn(['ui', 'isMaximized'])) {
-      win.maximize()
-    }
-
-    if (immutableWindowState.getIn(['ui', 'isFullScreen'])) {
-      win.setFullScreen(true)
-    }
-
-    appDispatcher.registerWindow(win, win.webContents)
-    win.webContents.on('did-finish-load', (e) => {
-      lastEmittedState = appState
-      win.webContents.setZoomLevel(zoomLevel[toolbarUserInterfaceScale] || 0.0)
-
-      const mem = muon.shared_memory.create({
-        windowValue: {
-          disposition: frameOpts.disposition,
-          id: win.id
-        },
-        appState: appState.toJS(),
-        frames: frames.toJS(),
-        windowState: (restoredImmutableWindowState && restoredImmutableWindowState.toJS()) || undefined})
-
-      e.sender.sendShared(messages.INITIALIZE_WINDOW, mem)
-      if (action.cb) {
-        action.cb()
-      }
-    })
-
-    win.on('ready-to-show', () => {
-      win.show()
-    })
-
-    win.loadURL(appUrlUtil.getBraveExtIndexHTML())
-  })
-}
-
-class AppStore extends EventEmitter {
->>>>>>> db1c16f77... Fix dispatch issues for actions pre windowReady
   getState () {
     return appState
   }
@@ -268,7 +193,7 @@ const handleAppAction = (action) => {
       appState = require('../../app/sync').init(appState, action, appStore)
       break
     case appConstants.APP_SHUTTING_DOWN:
-      appDispatcher.shutdown()
+      AppDispatcher.shutdown()
       app.quit()
       break
     case appConstants.APP_CHANGE_NEW_TAB_DETAIL:
@@ -753,6 +678,6 @@ const handleAppAction = (action) => {
   emitChanges()
 }
 
-appStore.dispatchToken = appDispatcher.register(handleAppAction)
+appStore.dispatchToken = AppDispatcher.register(handleAppAction)
 
 module.exports = appStore
