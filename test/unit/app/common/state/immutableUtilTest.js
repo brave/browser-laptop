@@ -97,6 +97,47 @@ describe('immutableUtil unit test', function () {
       assert.deepEqual(immutableUtil.makeImmutable(Immutable.List()).constructor, Immutable.List)
     })
   })
+  describe('makeJS', function () {
+    it('converts an Object an Object', function () {
+      assert.deepEqual(immutableUtil.makeJS({a: 1}), {a: 1})
+    })
+    it('converts an Array to an Array', function () {
+      assert.deepEqual(immutableUtil.makeJS([1]), [1])
+    })
+    it('converts an Immutable.Map Object to an Object', function () {
+      assert.deepEqual(immutableUtil.makeJS(Immutable.fromJS({a: 1})), {a: 1})
+    })
+    it('converts an Immutable.List to an Array', function () {
+      assert.deepEqual(immutableUtil.makeJS(Immutable.fromJS([1])), [1])
+    })
+    it('converts a string to a string', function () {
+      assert.equal(immutableUtil.makeJS('hi'), 'hi')
+    })
+    it('converts a boolean to a boolean', function () {
+      assert.equal(immutableUtil.makeJS(false), false)
+    })
+    it('converts a number to a number', function () {
+      assert.equal(immutableUtil.makeJS(42), 42)
+    })
+    it('converts undefined to undefined', function () {
+      assert.equal(immutableUtil.makeJS(undefined), undefined)
+    })
+    it('converts null to null', function () {
+      assert.equal(immutableUtil.makeJS(null), null)
+    })
+    it('converts null to null', function () {
+      assert.equal(immutableUtil.makeJS(null), null)
+    })
+    it('converts null to default value if a deafult value is specified', function () {
+      assert.deepEqual(immutableUtil.makeJS(null, {a: 1}), {a: 1})
+    })
+    it('converts undefined to default value if a deafult value is specified', function () {
+      assert.deepEqual(immutableUtil.makeJS(undefined, {a: 1}), {a: 1})
+    })
+    it('converts false to false when a default value is specified', function () {
+      assert.deepEqual(immutableUtil.makeJS(false, {a: 1}), false)
+    })
+  })
   describe('deleteImmutablePaths', function () {
     it('removes properties with simple strings', function () {
       const data = Immutable.fromJS({a: 'Cezar is a black belt in ameri-do-te', b: 2, c: 3})
