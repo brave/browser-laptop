@@ -33,7 +33,6 @@ const bookmarksState = require('../common/state/bookmarksState')
 const bookmarkFoldersState = require('../common/state/bookmarkFoldersState')
 const historyState = require('../common/state/historyState')
 const bookmarkOrderCache = require('../common/cache/bookmarkOrderCache')
-const {getWindow} = require('./windows')
 
 let currentPartitionNumber = 0
 const incrementPartitionNumber = () => ++currentPartitionNumber
@@ -737,27 +736,9 @@ const api = {
         createProperties.discarded = false
         createProperties.autoDiscardable = false
       }
-
-      const doCreate = () => {
-        extensions.createTab(createProperties, (tab) => {
-          cb && cb(tab)
-        })
-      }
-
-      if (createProperties.windowId) {
-        const win = getWindow(createProperties.windowId)
-        if (!win || win.isDestroyed()) {
-          console.error('Cannot create a tab for a window which does not exist or is destroyed')
-          return
-        }
-        if (!win.__ready) {
-          win.once(messages.WINDOW_RENDERER_READY, () => {
-            doCreate()
-          })
-          return
-        }
-      }
-      doCreate()
+      extensions.createTab(createProperties, (tab) => {
+        cb && cb(tab)
+      })
     })
   },
 

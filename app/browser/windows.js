@@ -302,7 +302,6 @@ const api = {
       if (win && !win.isDestroyed()) {
         updatePinnedTabs(win)
         win.__ready = true
-        win.emit(messages.WINDOW_RENDERER_READY)
       }
     })
   },

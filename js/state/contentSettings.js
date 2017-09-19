@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const appDispatcher = require('../dispatcher/appDispatcher')
+const AppDispatcher = require('../dispatcher/appDispatcher')
 const AppStore = require('../stores/appStore')
 const appConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
@@ -383,21 +383,21 @@ const doAction = (action) => {
     case appConstants.APP_REMOVE_SITE_SETTING:
     case appConstants.APP_CHANGE_SITE_SETTING:
     case appConstants.APP_ADD_NOSCRIPT_EXCEPTIONS:
-      appDispatcher.waitFor([AppStore.dispatchToken], () => {
+      AppDispatcher.waitFor([AppStore.dispatchToken], () => {
         userPrefsUpdateTrigger(action.temporary)
         contentSettingsUpdateTrigger(action.temporary)
       })
       break
     case appConstants.APP_CHANGE_SETTING:
     case appConstants.APP_SET_RESOURCE_ENABLED:
-      appDispatcher.waitFor([AppStore.dispatchToken], () => {
+      AppDispatcher.waitFor([AppStore.dispatchToken], () => {
         userPrefsUpdateTrigger()
         contentSettingsUpdateTrigger()
       })
       break
     case appConstants.APP_ALLOW_FLASH_ONCE:
     case appConstants.APP_ALLOW_FLASH_ALWAYS:
-      appDispatcher.waitFor([AppStore.dispatchToken], () => {
+      AppDispatcher.waitFor([AppStore.dispatchToken], () => {
         userPrefsUpdateTrigger(action.isPrivate)
         contentSettingsUpdateTrigger(action.isPrivate)
       })
@@ -415,5 +415,5 @@ module.exports.init = () => {
     updateContentSettings(AppStore.getState(), appConfig, incognito)
   )
 
-  appDispatcher.register(doAction)
+  AppDispatcher.register(doAction)
 }
