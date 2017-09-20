@@ -422,12 +422,13 @@ function registerPermissionHandler (session, partition) {
     // TODO(bridiver) - the permission handling should be converted to an action because we should never call `appStore.getState()`
     // Check whether there is a persistent site setting for this host
     const appState = appStore.getState()
+    const isBraveOrigin = origin.startsWith(`chrome-extension://${config.braveExtensionId}/`)
+    const isPDFOrigin = origin.startsWith(`${pdfjsOrigin}/`)
     let settings
     let tempSettings
-    if (mainFrameUrl === appUrlUtil.getBraveExtIndexHTML() ||
-      origin.startsWith('chrome-extension://' + config.braveExtensionId)) {
-      // lookup, display and store site settings by "Brave Browser"
-      origin = 'Brave Browser'
+    if (mainFrameUrl === appUrlUtil.getBraveExtIndexHTML() || isPDFOrigin || isBraveOrigin) {
+      // lookup, display and store site settings by the origin alias
+      origin = isPDFOrigin ? 'PDF Viewer' : 'Brave Browser'
       // display on all tabs
       mainFrameUrl = null
       // Lookup by exact host pattern match since 'Brave Browser' is not
@@ -464,8 +465,7 @@ function registerPermissionHandler (session, partition) {
         response.push(true)
       } else if (permission === 'openExternal' && (
         // The Brave extension and PDFJS are always allowed to open files in an external app
-        origin.startsWith('chrome-extension://' + config.PDFJSExtensionId) ||
-        origin.startsWith('chrome-extension://' + config.braveExtensionId))) {
+        isPDFOrigin || isBraveOrigin)) {
         response.push(true)
       } else {
         const permissionName = permission + 'Permission'
