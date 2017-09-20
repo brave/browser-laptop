@@ -36,6 +36,17 @@ describe('General Panel', function () {
         .waitForInputText(homepageInput, 'https://www.brave.xn--com-8cd/')
     })
 
+    it('homepage displays punycode without HTTP prefix', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(prefsUrl)
+        .waitForVisible(homepageInput)
+        .click(homepageInput)
+        .keys(Array.apply(null, Array(50)).map(() => Brave.keys.BACKSPACE))
+        .keys('а')
+        .waitForInputText(homepageInput, 'xn--80a')
+    })
+
     it('homepage can be backspaced', function * () {
       yield this.app.client
         .tabByIndex(0)

@@ -280,8 +280,11 @@ describe('urlutil', function () {
   })
 
   describe('getPunycodeUrl', function () {
-    it('returns empty string if input is not a URL', function () {
-      assert.equal(UrlUtil.getPunycodeUrl('invalid-url-goes-here'), 'invalid-url-goes-here')
+    it('returns original string if input is ASCII', function () {
+      assert.equal(urlUtil.getPunycodeUrl('invalid-url-goes-here'), 'invalid-url-goes-here')
+    })
+    it('returns punycode ASCII string if input is non-ASCII', function () {
+      assert.equal(urlUtil.getPunycodeUrl('ebаy.com'), 'xn--eby-7cd.com')
     })
     it('returns the punycode URL when given a valid URL', function () {
       assert.equal(UrlUtil.getPunycodeUrl('http://brave:brave@ebаy.com:1234/brave#brave'), 'http://brave:brave@xn--eby-7cd.com:1234/brave#brave')
