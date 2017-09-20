@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   },
 
   section__braveIcon: {
-    backgroundImage: `image-set(url(${braveAbout}) 2x)`,
+    backgroundImage: `-webkit-image-set(url(${braveAbout}) 2x)`,
     backgroundRepeat: 'no-repeat',
     height: '64px',
     width: '64px',
