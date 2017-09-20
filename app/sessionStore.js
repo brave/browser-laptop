@@ -674,7 +674,7 @@ module.exports.runPreMigrations = (data) => {
 
   if (data.sites) {
     // pinned sites
-    data.pinnedSites = data.pinnedSites || {}
+    data.pinnedSites = {}
     for (let key of Object.keys(data.sites)) {
       const site = data.sites[key]
       if (site.tags && site.tags.includes('pinned')) {
@@ -716,46 +716,43 @@ module.exports.runPreMigrations = (data) => {
     let bookmarkOrder = {}
 
     // bookmark folders
-    if (!data.bookmarkFolders) {
-      data.bookmarkFolders = {}
+    data.bookmarkFolders = {}
+    for (let key of Object.keys(data.sites)) {
+      const oldFolder = data.sites[key]
+      if (oldFolder.tags && oldFolder.tags.includes(siteTags.BOOKMARK_FOLDER)) {
+        let folder = {}
+        key = key.toString()
 
-      for (let key of Object.keys(data.sites)) {
-        const oldFolder = data.sites[key]
-        if (oldFolder.tags && oldFolder.tags.includes(siteTags.BOOKMARK_FOLDER)) {
-          let folder = {}
-          key = key.toString()
-
-          if (oldFolder.customTitle) {
-            folder.title = oldFolder.customTitle
-          } else {
-            folder.title = oldFolder.title
-          }
-
-          if (oldFolder.parentFolderId == null) {
-            folder.parentFolderId = 0
-          } else {
-            folder.parentFolderId = oldFolder.parentFolderId
-          }
-
-          folder.folderId = oldFolder.folderId
-          folder.partitionNumber = oldFolder.partitionNumber
-          folder.objectId = oldFolder.objectId
-          folder.type = siteTags.BOOKMARK_FOLDER
-          folder.key = key
-          data.bookmarkFolders[key] = folder
-
-          // bookmark order
-          const id = folder.parentFolderId.toString()
-          if (!bookmarkOrder[id]) {
-            bookmarkOrder[id] = []
-          }
-
-          bookmarkOrder[id].push({
-            key: key,
-            order: oldFolder.order,
-            type: siteTags.BOOKMARK_FOLDER
-          })
+        if (oldFolder.customTitle) {
+          folder.title = oldFolder.customTitle
+        } else {
+          folder.title = oldFolder.title
         }
+
+        if (oldFolder.parentFolderId == null) {
+          folder.parentFolderId = 0
+        } else {
+          folder.parentFolderId = oldFolder.parentFolderId
+        }
+
+        folder.folderId = oldFolder.folderId
+        folder.partitionNumber = oldFolder.partitionNumber
+        folder.objectId = oldFolder.objectId
+        folder.type = siteTags.BOOKMARK_FOLDER
+        folder.key = key
+        data.bookmarkFolders[key] = folder
+
+        // bookmark order
+        const id = folder.parentFolderId.toString()
+        if (!bookmarkOrder[id]) {
+          bookmarkOrder[id] = []
+        }
+
+        bookmarkOrder[id].push({
+          key: key,
+          order: oldFolder.order,
+          type: siteTags.BOOKMARK_FOLDER
+        })
       }
     }
 
