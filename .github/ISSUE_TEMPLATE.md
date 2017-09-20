@@ -30,8 +30,15 @@ Add screenshots if needed
 **Reproduces how often:** [What percentage of the time does it reproduce?]
 
 ### Brave Version
+
+**about:brave info:**
 <!--
 Please open about:brave, copy the version information, and paste it.
+-->
+
+**Reproducible on current live release:**
+<!--
+Is this a problem with the live build? It matters for triage reasons.
 -->
 
 ### Additional Information
