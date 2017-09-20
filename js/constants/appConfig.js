@@ -6,7 +6,6 @@ const {getTargetAboutUrl} = require('../lib/appUrlUtil')
 // BRAVE_UPDATE_HOST should be set to the host name for the auto-updater server
 const updateHost = process.env.BRAVE_UPDATE_HOST || 'https://brave-laptop-updates.global.ssl.fastly.net'
 const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-download.global.ssl.fastly.net'
-const crashURL = process.env.BRAVE_CRASH_URL || 'https://brave-laptop-updates.herokuapp.com/1/crashes'
 const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 const isTest = process.env.NODE_ENV === 'test'
 
@@ -90,9 +89,6 @@ module.exports = {
   adInsertion: {
     enabled: false,
     url: adHost
-  },
-  crashes: {
-    crashSubmitUrl: crashURL
   },
   payments: {
     delayNotificationTryPayments: 1000 * 60 * 60 * 24 * 10 // 10 days (from firstRunTimestamp)
