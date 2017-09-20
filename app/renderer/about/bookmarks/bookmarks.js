@@ -142,16 +142,14 @@ class Bookmarks extends React.Component {
       })}>
         <AboutPageSectionTitle data-l10n-id='bookmarkManager' />
         <div className='headerActions'>
-          <div className='searchWrapper'>
-            <span data-l10n-id='importBrowserData' className='importBrowserData' onClick={this.importBrowserData} />
-            <span data-l10n-id='exportBookmarks' className='exportBookmarks' onClick={this.exportBookmarks} />
-            <input type='text' className='searchInput' ref='bookmarkSearch' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
-            {
-              this.state.search
-                ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear' />
-                : <span className='fa fa-search searchInputPlaceholder' />
-            }
-          </div>
+          <span data-l10n-id='importBrowserData' className='importBrowserData' onClick={this.importBrowserData} />
+          <span data-l10n-id='exportBookmarks' className='exportBookmarks' onClick={this.exportBookmarks} />
+          <input type='text' className='searchInput' ref='bookmarkSearch' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
+          {
+            this.state.search
+              ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear' />
+              : <span className='fa fa-search searchInputPlaceholder' />
+          }
         </div>
       </div>
 

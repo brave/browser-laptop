@@ -214,26 +214,23 @@ class AboutHistory extends React.Component {
       })}>
         <AboutPageSectionTitle data-l10n-id='history' />
         <div className='headerActions'>
-          <div className='searchWrapper'>
-            <input type='text' className='searchInput' ref='historySearch' id='historySearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='historySearch' />
-            {
-              this.state.search
-              ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear' />
-              : <span className='fa fa-search searchInputPlaceholder' />
-            }
-          </div>
           <BrowserButton primaryColor
             l10nId='clearBrowsingDataNow'
             testId='clearBrowsingDataButton'
             onClick={this.clearBrowsingDataNow}
           />
+          <input type='text' className='searchInput' ref='historySearch' id='historySearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='historySearch' />
+          {
+            this.state.search
+            ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear' />
+            : <span className='fa fa-search searchInputPlaceholder' />
+          }
         </div>
       </div>
 
       <div className={cx({
         siteDetailsPageContent: true,
-        [css(commonStyles.siteDetailsPageContent)]: true,
-        [css(commonStyles.noMarginLeft)]: true
+        [css(commonStyles.siteDetailsPageContent, commonStyles.noMarginLeft)]: true
       })}>
         <GroupedHistoryList
           languageCodes={this.state.languageCodes}
