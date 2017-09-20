@@ -143,12 +143,6 @@ span.settingsListCopy {
       font-size: 0.95em;
     }
 
-    span.linkText {
-      text-align: left;
-      display: inline;
-      margin-left: 10px;
-    }
-
     input[type="number"] {
       width: 50px;
       min-width: 50px;
@@ -193,23 +187,6 @@ input[type="checkbox"][disabled] {
   pointer-events: none;
 }
 
-.linkText {
-  display: inline-block;
-  text-decoration: underline;
-  color: @braveOrange;
-  cursor: pointer;
-  margin: 0;
-
-  &:hover {
-    color: #000;
-  }
-}
-
-.linkTextSmall {
-  .linkText;
-  font-size: 14px;
-}
-
 .permissionItem {
   color: grey;
 }
@@ -247,8 +224,6 @@ input[type="checkbox"][disabled] {
 }
 
 table.sortableTable {
-  width: 704px;
-
   tbody td:first-of-type {
     text-align: center;
     color: @braveOrange;
@@ -256,7 +231,7 @@ table.sortableTable {
   }
 
   .default {
-    width: 95x;
+    width: 95px;
   }
   .searchEngine {
     width: 304px !important;
@@ -272,105 +247,6 @@ table.sortableTable {
   width: 16px;
   height: 16px;
   color: @braveOrange;
-}
-
-.prefTabContainer .switchControl {
-  display: inline-block;
-  vertical-align: middle;
-  align-items: center;
-  padding: 5px;
-  cursor: pointer;
-
-  &.disabled {
-    .switchBackground {
-      opacity: 0.3;
-    }
-    .switchControlRightText, .switchControlLeftText {
-      opacity: 0.3;
-    }
-    cursor: default;
-  }
-
-  &:not(.disabled) {
-    .switchBackground.switchedOn {
-      background-color: @switchBG_on;
-      .switchIndicator {
-        right: 2px;
-      }
-    }
-  }
-
-  &.large {
-    .switchBackground {
-      height: 26px;
-      width: 60px;
-      .switchIndicator {
-        height: 22px;
-        width: 22px;
-      }
-    }
-  }
-
-  &.small {
-    .switchBackground {
-      height: @smallSwitchHeight;
-      width: @smallSwitchWidth;
-      .switchIndicator {
-        height: @smallSwitchNubDiameter;
-        width: @smallSwitchNubDiameter;
-        top: 1px;
-        right: calc(@smallSwitchWidth - @smallSwitchNubDiameter - @switchNubRightMargin);
-      }
-    }
-  }
-
-  > label {
-    vertical-align: middle;
-  }
-
-  .switchControlText {
-    margin: auto 0;
-  }
-
-  .switchControlLeftText {
-    margin: auto 5px auto 0;
-  }
-
-  .switchControlRightText {
-    margin: auto 0 auto 5px;
-  }
-
-  .switchControlTopText {
-    margin: 0 auto 5px auto;
-  }
-
-  .switchControlRight {
-    display: flex;
-  }
-
-  .switchMiddle {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .switchBackground {
-    background-color: @switchBG_off;
-    border-radius: 12px;
-    height: @switchHeight;
-    position: relative;
-    width: @switchWidth;
-    box-shadow: @switchShadow;
-
-    .switchIndicator {
-      background-color: white;
-      border-radius: 100%;
-      height: @switchNubDiameter;
-      position: absolute;
-      top: @switchNubTopMargin;
-      width: @switchNubDiameter;
-      box-shadow: @switchNubShadow;
-    }
-  }
 }
 
 .widevineInfo {

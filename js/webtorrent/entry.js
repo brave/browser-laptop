@@ -6,11 +6,12 @@ const path = require('path')
 const querystring = require('querystring')
 const React = require('react')
 const ReactDOM = require('react-dom')
-const url = require('url')
+const urlFormat = require('url').format
 const WebTorrentRemoteClient = require('webtorrent-remote/client')
 
 const App = require('./components/app')
 const messages = require('../constants/messages')
+const urlParse = require('../../app/common/urlParse')
 
 // Stylesheets
 require('../../less/webtorrent.less')
@@ -37,7 +38,7 @@ window.addEventListener('hashchange', init)
 function init () {
   store.torrentId = window.decodeURIComponent(window.location.hash.substring(1))
 
-  const parsedUrl = url.parse(store.torrentId)
+  const parsedUrl = urlParse(store.torrentId)
   store.torrentIdProtocol = parsedUrl.protocol
 
   // `ix` param can be set by query param or hash, e.g. ?ix=1 or #ix=1
@@ -182,12 +183,13 @@ function stop () {
 }
 
 function saveTorrentFile () {
-  const parsedUrl = url.parse(store.torrentId, true)
+  const parsedUrl = urlParse(store.torrentId, true)
   parsedUrl.query.download = true
   const name = path.basename(parsedUrl.pathname) || 'untitled.torrent'
-  const href = url.format(parsedUrl)
+  const href = urlFormat(parsedUrl)
 
   const a = document.createElement('a')
+  a.rel = 'noopener'
   a.target = '_blank'
   a.download = name
   a.href = href

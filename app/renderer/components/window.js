@@ -14,6 +14,7 @@ const appActions = require('../../../js/actions/appActions')
 // Utils
 const cx = require('../../../js/lib/classSet')
 const {getPlatformStyles} = require('../../common/lib/platformUtil')
+const {isFocused} = require('../currentWindow')
 
 window.appActions = appActions
 
@@ -38,10 +39,8 @@ class Window extends React.Component {
   }
 
   mergeProps (state, ownProps) {
-    const currentWindow = state.get('currentWindow')
-
     const props = {}
-    props.isFocused = currentWindow.getIn(['ui', 'isFocused'])
+    props.isFocused = isFocused(state)
 
     return props
   }

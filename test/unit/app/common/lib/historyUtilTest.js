@@ -9,30 +9,25 @@ describe('historyUtil', function () {
   const historyDayOne = Immutable.fromJS({
     lastAccessedTime: 1477944718876,
     location: 'https://brave.com/page1',
-    title: 'sample 1',
-    tags: []
+    title: 'sample 1'
   })
   const historyDayTwo = Immutable.fromJS({
     lastAccessedTime: 1478079042097,
     location: 'https://brave.com/page2',
-    title: 'sample 2',
-    tags: []
+    title: 'sample 2'
   })
   const historyDayThree = Immutable.fromJS([{
     lastAccessedTime: 1478157051910,
     location: 'https://brave.com/page3',
-    title: 'sample 3',
-    tags: []
+    title: 'sample 3'
   }, {
     lastAccessedTime: 1478157051921,
     location: 'https://brave.com/page4',
-    title: 'sample 4',
-    tags: []
+    title: 'sample 4'
   }, {
     lastAccessedTime: 1478157051932,
     location: 'https://brave.com/page5',
-    title: 'sample 5',
-    tags: []
+    title: 'sample 5'
   }])
   const historyMultipleDays = historyDayThree.push(historyDayTwo, historyDayOne)
 

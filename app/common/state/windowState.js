@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const { makeImmutable, isMap, isList } = require('./immutableUtil')
+const Immutable = require('immutable')
 const assert = require('assert')
 
 // TODO(bridiver) - make these generic validation functions
@@ -154,7 +155,7 @@ const api = {
   getPersistentState: (state) => {
     // TODO(bridiver) handle restoring state
     state = makeImmutable(state)
-    return state.delete('windows')
+    return state.set('windows', Immutable.List())
   },
 
   // TODO (nejc) we should only pass in one state
@@ -168,6 +169,7 @@ const api = {
       defaultBrowserState.shouldDisplayDialog(state)
 
     return !state.get('contextMenuDetail') &&
+      !windowState.get('popupWindowDetail') &&
       !windowState.get('bookmarkDetail') &&
       !windowState.getIn(['ui', 'siteInfo', 'isVisible']) &&
       !braveryPanelIsVisible &&

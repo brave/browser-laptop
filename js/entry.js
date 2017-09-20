@@ -6,7 +6,6 @@
 require('../less/window.less')
 require('../less/button.less')
 require('../less/contextMenu.less')
-require('../less/main.less')
 require('../less/navigationBar.less')
 require('../less/forms.less')
 require('../less/switchControls.less')
@@ -48,7 +47,11 @@ webFrame.setPageScaleLimits(1, 1)
 l10n.init()
 
 ipc.on(messages.REQUEST_WINDOW_STATE, (evt, requestId) => {
-  ipc.send(messages.RESPONSE_WINDOW_STATE, windowStore.getState().toJS(), requestId)
+  const mem = muon.shared_memory.create({
+    windowState: windowStore.getState().toJS(),
+    requestId
+  })
+  ipc.sendShared(messages.RESPONSE_WINDOW_STATE, mem)
 })
 
 if (process.env.NODE_ENV === 'test') {
@@ -66,11 +69,11 @@ ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
     : appStoreRenderer.state = Immutable.fromJS(action.state)
 })
 
-ipc.on(messages.CLEAR_CLOSED_FRAMES, () => {
-  windowActions.clearClosedFrames()
+ipc.on(messages.CLEAR_CLOSED_FRAMES, (e, location) => {
+  windowActions.clearClosedFrames(location)
 })
 
-window.addEventListener('beforeunload', function (e) {
+window.addEventListener('beforeunload', function () {
   ipc.send(messages.LAST_WINDOW_STATE, windowStore.getState().toJS())
 })
 

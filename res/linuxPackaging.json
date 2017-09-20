@@ -38,8 +38,6 @@
     "libxtst6",
     "libxss1",
     "python",
-    "xdg-utils",
-    "gir1.2-gnomekeyring-1.0",
-    "libgnome-keyring0"
+    "xdg-utils"
   ]
 }

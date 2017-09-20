@@ -35,6 +35,7 @@ const globalStyles = {
     breakpointTinyWin32: '500px',
     breakpointNewPrivateTab: '890px',
     tab: {
+      dynamic: '99999px', // add a large number as new spec will set tab width based on window size
       default: '184px', // match tabArea max-width
       large: '120px',
       largeMedium: '83px',
@@ -241,21 +242,22 @@ const globalStyles = {
     prefsPanelHeading: '23px'
   },
   appIcons: {
+    angleDoubleRight: 'fa fa-angle-double-right',
     clipboard: 'fa fa-clipboard',
     closeTab: 'fa fa-times-circle',
     defaultIcon: 'fa fa-file-o',
+    exclude: 'fa fa-ban',
+    findNext: 'fa fa-caret-down',
+    findPrev: 'fa fa-caret-up',
     loading: 'fa fa-spinner fa-spin',
+    moreInfo: 'fa fa-info-circle',
     private: 'fa fa-eye',
+    question: 'fa fa-question-circle',
     refresh: 'fa fa-refresh',
     remove: 'fa fa-times',
-    volumeOff: 'fa fa-volume-off',
-    volumeOn: 'fa fa-volume-up',
-    exclude: 'fa fa-ban',
     trash: 'fa fa-trash',
-    moreInfo: 'fa fa-info-circle',
-    angleDoubleRight: 'fa fa-angle-double-right',
-    findPrev: 'fa fa-caret-up',
-    findNext: 'fa fa-caret-down'
+    volumeOff: 'fa fa-volume-off',
+    volumeOn: 'fa fa-volume-up'
   },
   animations: {
     subtleShowUp: {
@@ -303,6 +305,10 @@ const globalStyles = {
     action: {
       backgroundColor: '#4099FF',
       hoverColor: '#000'
+    },
+
+    panel: {
+      width: '180px'
     }
   },
 
@@ -327,6 +333,13 @@ const globalStyles = {
         background: '#ccc'
       }
     }
+  },
+
+  // TODO (Suguru): move them to payment.js after style refactoring is done
+  payments: {
+    fontSize: {
+      regular: '14.5px'
+    }
   }
 }
 
@@ -338,8 +351,6 @@ globalStyles.color.siteSecureColor = globalStyles.color.buttonColor
 globalStyles.color.loadTimeColor = globalStyles.color.highlightBlue
 globalStyles.color.activeTabDefaultColor = globalStyles.color.chromePrimary
 globalStyles.color.switchBG_on = globalStyles.color.braveOrange
-
-globalStyles.spacing.tabHeight = globalStyles.spacing.tabsToolbarHeight
 
 globalStyles.braveryPanel.stats.colorAds = globalStyles.color.statsRed
 globalStyles.braveryPanel.stats.colorRedirected = globalStyles.color.statsBlue

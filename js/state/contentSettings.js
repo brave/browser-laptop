@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const AppDispatcher = require('../dispatcher/appDispatcher')
+const appDispatcher = require('../dispatcher/appDispatcher')
 const AppStore = require('../stores/appStore')
 const appConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
@@ -19,7 +19,6 @@ const {registerUserPrefs} = require('./userPrefs')
 const {getSetting} = require('../settings')
 const {autoplayOption} = require('../../app/common/constants/settingsEnums')
 const {getFlashResourceId} = require('../flash')
-const net = require('net')
 
 // backward compatibility with appState siteSettings
 const parseSiteSettingsPattern = (pattern) => {
@@ -28,7 +27,7 @@ const parseSiteSettingsPattern = (pattern) => {
   }
   let normalizedPattern = pattern.replace('https?', 'https')
   let parsed = urlParse(normalizedPattern)
-  if (net.isIP(parsed.hostname)) {
+  if (muon.url.new(normalizedPattern).hostIsIPAddress()) {
     return parsed.host
   } else if (parsed.host) {
     return '[*.]' + parsed.host
@@ -75,6 +74,7 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
       primaryPattern: '*'
     }],
     cookies: getDefault3rdPartyStorageSettings(braveryDefaults, appSettings, appConfig),
+    canvasFingerprinting: getDefaultFingerprintingSetting(braveryDefaults),
     referer: [{
       setting: braveryDefaults.get('cookieControl') !== 'allowAllCookies' ? 'block' : 'allow',
       primaryPattern: '*'
@@ -99,10 +99,6 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
       setting: 'allow',
       secondaryPattern: '*',
       primaryPattern: 'chrome-extension://*'
-    }],
-    canvasFingerprinting: [{
-      setting: braveryDefaults.get('fingerprintingProtection') ? 'block' : 'allow',
-      primaryPattern: '*'
     }],
     runInsecureContent: [{
       setting: 'block',
@@ -168,6 +164,40 @@ const getDefaultPluginSettings = (braveryDefaults, appSettings, appConfig) => {
       primaryPattern: '[*.]macromedia.com'
     }
   ]
+}
+
+const getDefaultFingerprintingSetting = (braveryDefaults, appSettings, appConfig) => {
+  braveryDefaults = makeImmutable(braveryDefaults)
+  if (braveryDefaults.get('fingerprintingProtection') === 'block3rdPartyFingerprinting') {
+    return [
+      {
+        setting: 'block',
+        primaryPattern: '*',
+        secondaryPattern: '*'
+      },
+      {
+        setting: 'allow',
+        primaryPattern: '*',
+        secondaryPattern: '[firstParty]'
+      }
+    ]
+  } else if (braveryDefaults.get('fingerprintingProtection') === 'blockAllFingerprinting') {
+    return [
+      {
+        setting: 'block',
+        primaryPattern: '*',
+        secondaryPattern: '*'
+      }
+    ]
+  } else {
+    return [
+      {
+        setting: 'allow',
+        primaryPattern: '*',
+        secondaryPattern: '*'
+      }
+    ]
+  }
 }
 
 const getDefault3rdPartyStorageSettings = (braveryDefaults, appSettings, appConfig) => {
@@ -278,8 +308,15 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
         contentSettings = addContentSettings(contentSettings, 'referer', primaryPattern, '*', 'allow')
       }
     }
-    if (typeof siteSetting.get('fingerprintingProtection') === 'boolean') {
-      contentSettings = addContentSettings(contentSettings, 'canvasFingerprinting', primaryPattern, '*', siteSetting.get('fingerprintingProtection') ? 'block' : 'allow')
+    if (siteSetting.get('fingerprintingProtection')) {
+      if (siteSetting.get('fingerprintingProtection') === 'block3rdPartyFingerprinting') {
+        contentSettings = addContentSettings(contentSettings, 'canvasFingerprinting', primaryPattern, '*', 'block')
+        contentSettings = addContentSettings(contentSettings, 'canvasFingerprinting', primaryPattern, '[firstParty]', 'allow')
+      } else if (siteSetting.get('fingerprintingProtection') === 'blockAllFingerprinting') {
+        contentSettings = addContentSettings(contentSettings, 'canvasFingerprinting', primaryPattern, '*', 'block')
+      } else {
+        contentSettings = addContentSettings(contentSettings, 'canvasFingerprinting', primaryPattern, '*', 'allow')
+      }
     }
     if (siteSetting.get('adControl')) {
       contentSettings = addContentSettings(contentSettings, 'adInsertion', primaryPattern, '*', siteSetting.get('adControl') === 'showBraveAds' ? 'allow' : 'block')
@@ -346,21 +383,21 @@ const doAction = (action) => {
     case appConstants.APP_REMOVE_SITE_SETTING:
     case appConstants.APP_CHANGE_SITE_SETTING:
     case appConstants.APP_ADD_NOSCRIPT_EXCEPTIONS:
-      AppDispatcher.waitFor([AppStore.dispatchToken], () => {
+      appDispatcher.waitFor([AppStore.dispatchToken], () => {
         userPrefsUpdateTrigger(action.temporary)
         contentSettingsUpdateTrigger(action.temporary)
       })
       break
     case appConstants.APP_CHANGE_SETTING:
     case appConstants.APP_SET_RESOURCE_ENABLED:
-      AppDispatcher.waitFor([AppStore.dispatchToken], () => {
+      appDispatcher.waitFor([AppStore.dispatchToken], () => {
         userPrefsUpdateTrigger()
         contentSettingsUpdateTrigger()
       })
       break
     case appConstants.APP_ALLOW_FLASH_ONCE:
     case appConstants.APP_ALLOW_FLASH_ALWAYS:
-      AppDispatcher.waitFor([AppStore.dispatchToken], () => {
+      appDispatcher.waitFor([AppStore.dispatchToken], () => {
         userPrefsUpdateTrigger(action.isPrivate)
         contentSettingsUpdateTrigger(action.isPrivate)
       })
@@ -378,5 +415,5 @@ module.exports.init = () => {
     updateContentSettings(AppStore.getState(), appConfig, incognito)
   )
 
-  AppDispatcher.register(doAction)
+  appDispatcher.register(doAction)
 }

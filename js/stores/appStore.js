@@ -6,27 +6,23 @@
 const appConstants = require('../constants/appConstants')
 const windowConstants = require('../constants/windowConstants')
 const ExtensionConstants = require('../../app/common/constants/extensionConstants')
-const AppDispatcher = require('../dispatcher/appDispatcher')
-const appConfig = require('../constants/appConfig')
+const appDispatcher = require('../dispatcher/appDispatcher')
 const settings = require('../constants/settings')
-const siteUtil = require('../state/siteUtil')
+const {STATE_SITES} = require('../constants/stateConstants')
 const syncUtil = require('../state/syncUtil')
 const siteSettings = require('../state/siteSettings')
-const appUrlUtil = require('../lib/appUrlUtil')
 const electron = require('electron')
 const app = electron.app
 const messages = require('../constants/messages')
 const UpdateStatus = require('../constants/updateStatus')
 const BrowserWindow = electron.BrowserWindow
 const syncActions = require('../actions/syncActions')
-const firstDefinedValue = require('../lib/functional').firstDefinedValue
 const dates = require('../../app/dates')
-const getSetting = require('../settings').getSetting
 const EventEmitter = require('events').EventEmitter
 const Immutable = require('immutable')
+const path = require('path')
 const diff = require('immutablediff')
 const debounce = require('../lib/debounce')
-const path = require('path')
 const autofill = require('../../app/autofill')
 const nativeImage = require('../../app/nativeImage')
 const filtering = require('../../app/filtering')
@@ -36,7 +32,8 @@ const {calculateTopSites} = require('../../app/browser/api/topSites')
 const assert = require('assert')
 const profiles = require('../../app/browser/profiles')
 const {zoomLevel} = require('../../app/common/constants/toolbarUserInterfaceScale')
-const {initWindowCacheState} = require('../../app/sessionStoreShutdown')
+const {HrtimeLogger} = require('../../app/common/lib/logUtil')
+const platformUtil = require('../../app/common/lib/platformUtil')
 
 // state helpers
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
@@ -45,9 +42,10 @@ const extensionState = require('../../app/common/state/extensionState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
 const aboutHistoryState = require('../../app/common/state/aboutHistoryState')
 const tabState = require('../../app/common/state/tabState')
-
-const isDarwin = process.platform === 'darwin'
-const isWindows = process.platform === 'win32'
+const bookmarksState = require('../../app/common/state/bookmarksState')
+const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
+const historyState = require('../../app/common/state/historyState')
+const urlUtil = require('../lib/urlutil')
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
@@ -55,233 +53,41 @@ const CHANGE_EVENT = 'app-state-change'
 const defaultProtocols = ['https', 'http']
 
 let appState = null
-let lastEmittedState
 let initialized = false
 
-// TODO cleanup all this createWindow crap
-function isModal (browserOpts) {
-  // this needs some better checks
-  return browserOpts.scrollbars === false
-}
-
-const navbarHeight = () => {
-  // TODO there has to be a better way to get this or at least add a test
-  return 75
-}
-
 /**
- * Determine window dimensions (width / height)
+ * Enable reducer logging with env var REDUCER_TIME_LOG_THRESHOLD={time in ns}
+ * Log format: `{unix timestamp (ms)},{label},{run time (ns)}`
  */
-const setWindowDimensions = (browserOpts, defaults, windowState) => {
-  if (windowState.ui && windowState.ui.size) {
-    browserOpts.width = firstDefinedValue(browserOpts.width, windowState.ui.size[0])
-    browserOpts.height = firstDefinedValue(browserOpts.height, windowState.ui.size[1])
-  }
-  browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
-  // height and innerHeight are the frame webview size
-  browserOpts.height = firstDefinedValue(browserOpts.height, browserOpts.innerHeight)
-  if (typeof browserOpts.height === 'number') {
-    // add navbar height to get total height for BrowserWindow
-    browserOpts.height = browserOpts.height + navbarHeight()
-  } else {
-    // no inner height so check outer height or use default
-    browserOpts.height = firstDefinedValue(browserOpts.outerHeight, defaults.height)
-  }
-  return browserOpts
+const TIME_LOG_PATH = process.env.REDUCER_TIME_LOG_PATH ||
+  path.join(app.getPath('userData'), `reducer-time-${new Date().toISOString()}.log`)
+const TIME_LOG_THRESHOLD = parseInt(process.env.REDUCER_TIME_LOG_THRESHOLD)
+const SHOULD_LOG_TIME = (TIME_LOG_THRESHOLD > 0)
+if (SHOULD_LOG_TIME) {
+  console.log(`Logging reducer runtimes above ${TIME_LOG_THRESHOLD} ms to ${TIME_LOG_PATH}`)
 }
-
-/**
- * Determine window position (x / y)
- */
-const setWindowPosition = (browserOpts, defaults, windowState) => {
-  if (browserOpts.positionByMouseCursor) {
-    const screenPos = electron.screen.getCursorScreenPoint()
-    browserOpts.x = screenPos.x
-    browserOpts.y = screenPos.y
-  } else if (windowState.ui && windowState.ui.position) {
-    // Position comes from window state
-    browserOpts.x = firstDefinedValue(browserOpts.x, windowState.ui.position[0])
-    browserOpts.y = firstDefinedValue(browserOpts.y, windowState.ui.position[1])
-  } else if (typeof defaults.x === 'number' && typeof defaults.y === 'number') {
-    // Position comes from the default position
-    browserOpts.x = firstDefinedValue(browserOpts.x, defaults.x)
-    browserOpts.y = firstDefinedValue(browserOpts.y, defaults.y)
-  } else {
-    // Default the position
-    browserOpts.x = firstDefinedValue(browserOpts.x, browserOpts.left, browserOpts.screenX)
-    browserOpts.y = firstDefinedValue(browserOpts.y, browserOpts.top, browserOpts.screenY)
-  }
-  return browserOpts
-}
-
-const createWindow = (action) => {
-  const frameOpts = (action.frameOpts && action.frameOpts.toJS()) || {}
-  let browserOpts = (action.browserOpts && action.browserOpts.toJS()) || {}
-  const windowState = action.restoredState || {}
-  const defaults = windowDefaults()
-
-  browserOpts = setWindowDimensions(browserOpts, defaults, windowState)
-  browserOpts = setWindowPosition(browserOpts, defaults, windowState)
-
-  delete browserOpts.left
-  delete browserOpts.top
-
-  const screen = electron.screen
-  const primaryDisplay = screen.getPrimaryDisplay()
-  const parentWindowKey = browserOpts.parentWindowKey
-  const parentWindow = parentWindowKey ? BrowserWindow.fromId(parentWindowKey) : BrowserWindow.getFocusedWindow()
-  const bounds = parentWindow ? parentWindow.getBounds() : primaryDisplay.bounds
-
-  // position on screen should be relative to focused window
-  // or the primary display if there is no focused window
-  const display = screen.getDisplayNearestPoint(bounds)
-
-  // if no parentWindow, x, y or center is defined then go ahead
-  // and center it if it's smaller than the display width
-  // typeof and isNaN are used because 0 is falsey
-  if (!(parentWindow ||
-      browserOpts.center === false ||
-      browserOpts.x > 0 ||
-      browserOpts.y > 0) &&
-      browserOpts.width < display.bounds.width) {
-    browserOpts.center = true
-  } else {
-    browserOpts.center = false
-    // don't offset if focused window is at least as big as the screen it's on
-    if (bounds.width >= display.bounds.width && bounds.height >= display.bounds.height) {
-      browserOpts.x = firstDefinedValue(browserOpts.x, display.bounds.x)
-      browserOpts.y = firstDefinedValue(browserOpts.y, display.bounds.y)
-    } else {
-      browserOpts.x = firstDefinedValue(browserOpts.x, bounds.x + defaults.windowOffset)
-      browserOpts.y = firstDefinedValue(browserOpts.y, bounds.y + defaults.windowOffset)
-    }
-
-    // make sure the browser won't be outside the viewable area of any display
-    // negative numbers aren't allowed so we don't need to worry about that
-    const displays = screen.getAllDisplays()
-    const maxX = Math.max(...displays.map((display) => { return display.bounds.x + display.bounds.width }))
-    const maxY = Math.max(...displays.map((display) => { return display.bounds.y + display.bounds.height }))
-
-    browserOpts.x = Math.min(browserOpts.x, maxX - defaults.windowOffset)
-    browserOpts.y = Math.min(browserOpts.y, maxY - defaults.windowOffset)
-  }
-
-  const minWidth = isModal(browserOpts) ? defaults.minModalWidth : defaults.minWidth
-  const minHeight = isModal(browserOpts) ? defaults.minModalHeight : defaults.minHeight
-
-  // min width and height don't seem to work when the window is first created
-  browserOpts.width = browserOpts.width < minWidth ? minWidth : browserOpts.width
-  browserOpts.height = browserOpts.height < minHeight ? minHeight : browserOpts.height
-
-  const autoHideMenuBarSetting = isDarwin || getSetting(settings.AUTO_HIDE_MENU)
-
-  const windowProps = {
-    // smaller min size for "modal" windows
-    minWidth,
-    minHeight,
-    // Neither a frame nor a titlebar
-    // frame: false,
-    // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
-    titleBarStyle: 'hidden-inset',
-    autoHideMenuBar: autoHideMenuBarSetting,
-    title: appConfig.name,
-    webPreferences: defaults.webPreferences,
-    frame: !isWindows
-  }
-
-  if (process.platform === 'linux') {
-    windowProps.icon = path.join(__dirname, '..', '..', 'res', 'app.png')
-  }
-
-  const homepageSetting = getSetting(settings.HOMEPAGE)
-  const startupSetting = getSetting(settings.STARTUP_MODE)
-  const toolbarUserInterfaceScale = getSetting(settings.TOOLBAR_UI_SCALE)
-
-  setImmediate(() => {
-    let mainWindow = new BrowserWindow(Object.assign(windowProps, browserOpts, {disposition: frameOpts.disposition}))
-    initWindowCacheState(mainWindow.id, action.restoredState)
-
-    // initialize frames state
-    let frames = []
-    if (action.restoredState) {
-      frames = action.restoredState.frames
-      action.restoredState.frames = []
-      action.restoredState.tabs = []
-    } else {
-      if (frameOpts && Object.keys(frameOpts).length > 0) {
-        if (frameOpts.forEach) {
-          frames = frameOpts
-        } else {
-          frames.push(frameOpts)
-        }
-      } else if (startupSetting === 'homePage' && homepageSetting) {
-        frames = homepageSetting.split('|').map((homepage) => {
-          return {
-            location: homepage
-          }
-        })
-      }
-    }
-
-    if (frames.length === 0) {
-      frames = [{}]
-    }
-
-    if (windowState.ui && windowState.ui.isMaximized) {
-      mainWindow.maximize()
-    }
-
-    if (windowState.ui && windowState.ui.isFullScreen) {
-      mainWindow.setFullScreen(true)
-    }
-
-    mainWindow.webContents.on('did-finish-load', (e) => {
-      lastEmittedState = appState
-      mainWindow.webContents.setZoomLevel(zoomLevel[toolbarUserInterfaceScale] || 0.0)
-
-      const mem = muon.shared_memory.create({
-        windowValue: {
-          disposition: frameOpts.disposition,
-          id: mainWindow.id
-        },
-        appState: appState.toJS(),
-        frames,
-        windowState: action.restoredState})
-
-      e.sender.sendShared(messages.INITIALIZE_WINDOW, mem)
-      if (action.cb) {
-        action.cb()
-      }
-    })
-
-    mainWindow.on('ready-to-show', () => {
-      mainWindow.show()
-    })
-
-    mainWindow.loadURL(appUrlUtil.getBraveExtIndexHTML())
-  })
-}
+const timeLogger = new HrtimeLogger(TIME_LOG_PATH, TIME_LOG_THRESHOLD)
 
 class AppStore extends EventEmitter {
+  constructor () {
+    super()
+    this.lastEmittedState = null
+  }
+
   getState () {
     return appState
   }
 
-  emitFullWindowState (wnd) {
-    wnd.webContents.send(messages.APP_STATE_CHANGE, { state: appState.toJS() })
-    lastEmittedState = appState
-  }
-
-  emitChanges (emitFullState) {
-    if (lastEmittedState) {
-      const d = diff(lastEmittedState, appState)
+  emitChanges () {
+    if (this.lastEmittedState && this.lastEmittedState !== appState) {
+      const d = diff(this.lastEmittedState, appState)
       if (!d.isEmpty()) {
         BrowserWindow.getAllWindows().forEach((wnd) => {
           if (wnd.webContents && !wnd.webContents.isDestroyed()) {
             wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() })
           }
         })
-        lastEmittedState = appState
+        this.lastEmittedState = appState
         this.emit(CHANGE_EVENT, d.toJS())
       }
     } else {
@@ -296,47 +102,13 @@ class AppStore extends EventEmitter {
   removeChangeListener (callback) {
     this.removeListener(CHANGE_EVENT, callback)
   }
-}
 
-function windowDefaults () {
-  setDefaultWindowSize()
-
-  return {
-    show: false,
-    width: appState.getIn(['defaultWindowParams', 'width']) || appState.get('defaultWindowWidth'),
-    height: appState.getIn(['defaultWindowParams', 'height']) || appState.get('defaultWindowHeight'),
-    x: appState.getIn(['defaultWindowParams', 'x']) || undefined,
-    y: appState.getIn(['defaultWindowParams', 'y']) || undefined,
-    minWidth: 480,
-    minHeight: 300,
-    minModalHeight: 100,
-    minModalWidth: 100,
-    windowOffset: 20,
-    webPreferences: {
-      sharedWorker: true,
-      nodeIntegration: false,
-      partition: 'default',
-      webSecurity: false,
-      allowFileAccessFromFileUrls: true,
-      allowUniversalAccessFromFileUrls: true
+  getLastEmittedState () {
+    if (!this.lastEmittedState) {
+      this.lastEmittedState = appState
     }
-  }
-}
 
-/**
- * set the default width and height if they
- * haven't been initialized yet
- */
-function setDefaultWindowSize () {
-  if (!appState) {
-    return
-  }
-  const screen = electron.screen
-  const primaryDisplay = screen.getPrimaryDisplay()
-  if (!appState.getIn(['defaultWindowParams', 'width']) && !appState.get('defaultWindowWidth') &&
-      !appState.getIn(['defaultWindowParams', 'height']) && !appState.get('defaultWindowHeight')) {
-    appState = appState.setIn(['defaultWindowParams', 'width'], primaryDisplay.workAreaSize.width)
-    appState = appState.setIn(['defaultWindowParams', 'height'], primaryDisplay.workAreaSize.height)
+    return this.lastEmittedState
   }
 }
 
@@ -344,20 +116,10 @@ const appStore = new AppStore()
 const emitChanges = debounce(appStore.emitChanges.bind(appStore), 5)
 
 /**
- * Clears out the top X non tagged sites.
- * This is debounced to every 1 minute, the cleanup is not particularly intensive
- * but there's no point to cleanup frequently.
- */
-const filterOutNonRecents = debounce(() => {
-  appState = appState.set('sites', siteUtil.filterOutNonRecents(appState.get('sites')))
-  emitChanges()
-}, 60 * 1000)
-
-/**
  * Useful for updating non-react preferences (electron properties, etc).
  * Called when any settings are modified (ex: via preferences).
  */
-function handleChangeSettingAction (settingKey, settingValue) {
+function handleChangeSettingAction (state, settingKey, settingValue) {
   switch (settingKey) {
     case settings.AUTO_HIDE_MENU:
       BrowserWindow.getAllWindows().forEach(function (wnd) {
@@ -368,14 +130,32 @@ function handleChangeSettingAction (settingKey, settingValue) {
     case settings.DEFAULT_ZOOM_LEVEL:
       filtering.setDefaultZoomLevel(settingValue)
       break
-    case settings.TOOLBAR_UI_SCALE: {
-      const newZoomLevel = zoomLevel[settingValue] || 0
-      BrowserWindow.getAllWindows().forEach(function (wnd) {
-        wnd.webContents.setZoomLevel(newZoomLevel)
-      })
-    } break
-    default:
+    case settings.TOOLBAR_UI_SCALE:
+      {
+        const newZoomLevel = zoomLevel[settingValue] || 0
+        BrowserWindow.getAllWindows().forEach(function (wnd) {
+          wnd.webContents.setZoomLevel(newZoomLevel)
+        })
+        break
+      }
+    case settings.HOMEPAGE:
+      {
+        let homeArray = settingValue.split('|')
+        homeArray = homeArray.map(page => {
+          page = page.trim()
+          const punycodeUrl = urlUtil.getPunycodeUrl(page)
+          if (punycodeUrl.replace(/\/$/, '') !== page) {
+            page = urlUtil.getPunycodeUrl(page)
+          }
+
+          return page
+        })
+
+        state = state.setIn(['settings', settingKey], homeArray.join('|'))
+      }
   }
+
+  return state
 }
 
 let reducers = []
@@ -389,6 +169,7 @@ const applyReducers = (state, action, immutableAction) => reducers.reduce(
     }, appState)
 
 const handleAppAction = (action) => {
+  const timeStart = process.hrtime()
   if (action.actionType === appConstants.APP_SET_STATE) {
     reducers = [
       require('../../app/browser/reducers/downloadsReducer'),
@@ -398,11 +179,14 @@ const handleAppAction = (action) => {
       // until we have a better way to manage dependencies.
       // tabsReducer must be above dragDropReducer.
       require('../../app/browser/reducers/tabsReducer'),
-      require('../../app/browser/reducers/sitesReducer'),
+      require('../../app/browser/reducers/urlBarSuggestionsReducer'),
+      require('../../app/browser/reducers/bookmarksReducer'),
+      require('../../app/browser/reducers/bookmarkFoldersReducer'),
+      require('../../app/browser/reducers/historyReducer'),
+      require('../../app/browser/reducers/pinnedSitesReducer'),
       require('../../app/browser/reducers/windowsReducer'),
       require('../../app/browser/reducers/syncReducer'),
       require('../../app/browser/reducers/clipboardReducer'),
-      require('../../app/browser/reducers/urlBarSuggestionsReducer'),
       require('../../app/browser/reducers/passwordManagerReducer'),
       require('../../app/browser/reducers/spellCheckerReducer'),
       require('../../app/browser/reducers/tabMessageBoxReducer'),
@@ -411,6 +195,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/shareReducer'),
       require('../../app/browser/reducers/updatesReducer'),
       require('../../app/browser/reducers/topSitesReducer'),
+      require('../../app/browser/reducers/braverySettingsReducer'),
       require('../../app/ledger').doAction,
       require('../../app/browser/menu')
     ]
@@ -437,41 +222,20 @@ const handleAppAction = (action) => {
       appState = webtorrent.init(appState, action, appStore)
       appState = profiles.init(appState, action, appStore)
       appState = require('../../app/sync').init(appState, action, appStore)
+      calculateTopSites(true, true)
       break
     case appConstants.APP_SHUTTING_DOWN:
-      AppDispatcher.shutdown()
+      appDispatcher.shutdown()
       app.quit()
-      break
-    case appConstants.APP_NEW_WINDOW:
-      createWindow(action)
       break
     case appConstants.APP_CHANGE_NEW_TAB_DETAIL:
       appState = aboutNewTabState.mergeDetails(appState, action)
       if (action.refresh) {
-        calculateTopSites(true)
+        calculateTopSites(true, true)
       }
-      break
-    case appConstants.APP_POPULATE_HISTORY:
-      appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_DATA_URL_COPIED:
       nativeImage.copyDataURL(action.dataURL, action.html, action.text)
-      break
-    case appConstants.APP_ADD_SITE:
-    case appConstants.APP_ADD_BOOKMARK:
-    case appConstants.APP_EDIT_BOOKMARK:
-      const oldSiteSize = appState.get('sites').size
-      calculateTopSites(false)
-      appState = aboutHistoryState.setHistory(appState, action)
-      // If there was an item added then clear out the old history entries
-      if (oldSiteSize !== appState.get('sites').size) {
-        filterOutNonRecents()
-      }
-      break
-    case appConstants.APP_APPLY_SITE_RECORDS:
-    case appConstants.APP_REMOVE_SITE:
-      calculateTopSites(true)
-      appState = aboutHistoryState.setHistory(appState, action)
       break
     case appConstants.APP_SET_DATA_FILE_ETAG:
       appState = appState.setIn([action.resourceName, 'etag'], action.etag)
@@ -516,13 +280,13 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_CHANGE_SETTING:
       appState = appState.setIn(['settings', action.key], action.value)
-      handleChangeSettingAction(action.key, action.value)
+      appState = handleChangeSettingAction(appState, action.key, action.value)
       break
     case appConstants.APP_ALLOW_FLASH_ONCE:
       {
         const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
         appState = appState.set(propertyName,
-          siteSettings.mergeSiteSetting(appState.get(propertyName), siteUtil.getOrigin(action.url), 'flash', 1))
+          siteSettings.mergeSiteSetting(appState.get(propertyName), urlUtil.getOrigin(action.url), 'flash', 1))
         break
       }
     case appConstants.APP_ALLOW_FLASH_ALWAYS:
@@ -530,7 +294,7 @@ const handleAppAction = (action) => {
         const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
         const expirationTime = Date.now() + (7 * 24 * 3600 * 1000)
         appState = appState.set(propertyName,
-          siteSettings.mergeSiteSetting(appState.get(propertyName), siteUtil.getOrigin(action.url), 'flash', expirationTime))
+          siteSettings.mergeSiteSetting(appState.get(propertyName), urlUtil.getOrigin(action.url), 'flash', expirationTime))
         break
       }
     case appConstants.APP_CHANGE_SITE_SETTING:
@@ -640,11 +404,11 @@ const handleAppAction = (action) => {
       if (!tabValue) {
         break
       }
-      const origin = siteUtil.getOrigin(tabValue.get('url'))
+      const origin = urlUtil.getOrigin(tabValue.get('url'))
 
       if (origin) {
         const tabsInOrigin = tabState.getTabs(appState).find((tabValue) =>
-          siteUtil.getOrigin(tabValue.get('url')) === origin && tabValue.get('tabId') !== immutableAction.get('tabId'))
+          urlUtil.getOrigin(tabValue.get('url')) === origin && tabValue.get('tabId') !== immutableAction.get('tabId'))
         if (!tabsInOrigin) {
           appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
             return notification.get('frameOrigin') === origin
@@ -665,8 +429,8 @@ const handleAppAction = (action) => {
       const clearData = defaults ? defaults.merge(temp) : temp
 
       if (clearData.get('browserHistory')) {
-        calculateTopSites(true)
-        appState = aboutHistoryState.setHistory(appState)
+        appState = aboutNewTabState.clearTopSites(appState)
+        appState = aboutHistoryState.clearHistory(appState)
         syncActions.clearHistory()
         BrowserWindow.getAllWindows().forEach((wnd) => wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES))
       }
@@ -789,19 +553,30 @@ const handleAppAction = (action) => {
     }
     case appConstants.APP_DEFAULT_BROWSER_UPDATED:
       if (action.useBrave) {
-        for (const p of defaultProtocols) {
-          app.setAsDefaultProtocolClient(p)
+        let isDefaultBrowser
+        if (platformUtil.isLinux()) {
+          const desktopName = 'brave.desktop'
+          for (const p of defaultProtocols) {
+            app.setAsDefaultProtocolClient(p, desktopName)
+            app.setAsDefaultProtocolClient('', desktopName)
+          }
+          isDefaultBrowser = app.isDefaultProtocolClient('', desktopName)
+        } else {
+          for (const p of defaultProtocols) {
+            app.setAsDefaultProtocolClient(p)
+          }
+          isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
         }
+        appState = appState.setIn(['settings', settings.IS_DEFAULT_BROWSER], isDefaultBrowser)
       }
-      let isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
-      appState = appState.setIn(['settings', settings.IS_DEFAULT_BROWSER], isDefaultBrowser)
       break
     case appConstants.APP_DEFAULT_BROWSER_CHECK_COMPLETE:
       appState = appState.set('defaultBrowserCheckComplete', {})
       break
     case windowConstants.WINDOW_SET_FAVICON:
-      appState = siteUtil.updateSiteFavicon(appState, action.frameProps.get('location'), action.favicon)
       if (action.frameProps.get('favicon') !== action.favicon) {
+        appState = bookmarksState.updateFavicon(appState, action.frameProps.get('location'), action.favicon)
+        appState = historyState.updateFavicon(appState, action.frameProps, action.favicon)
         calculateTopSites(false)
       }
       break
@@ -814,10 +589,8 @@ const handleAppAction = (action) => {
       if (obj && obj.constructor === Immutable.Map) {
         appState = appState.setIn(action.objectPath.concat(['objectId']),
           action.objectId)
-        // Update the site cache if this is a site
-        if (action.objectPath[0] === 'sites') {
-          appState = syncUtil.updateSiteCache(appState, obj)
-        }
+        appState = syncUtil.updateObjectCache(appState, obj,
+          action.objectPath[0])
       }
       break
     case appConstants.APP_SAVE_SYNC_DEVICES:
@@ -849,24 +622,31 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['sync', 'setupError'], action.error)
       break
     case appConstants.APP_CREATE_SYNC_CACHE:
-      appState = syncUtil.createSiteCache(appState)
+      appState = syncUtil.createObjectCache(appState)
       break
     case appConstants.APP_RESET_SYNC_DATA:
       const sessionStore = require('../../app/sessionStore')
       const syncDefault = Immutable.fromJS(sessionStore.defaultAppState().sync)
-      const originalSeed = appState.getIn(['sync', 'seed'])
       appState = appState.set('sync', syncDefault)
-      appState.get('sites').forEach((site, key) => {
-        if (site.has('objectId') && syncUtil.isSyncable('bookmark', site)) {
-          // Remember which profile this bookmark was originally synced to.
-          // Since old bookmarks should be synced when a new profile is created,
-          // we have to keep track of which profile already has these bookmarks
-          // or else the old profile may have these bookmarks duplicated. #7405
-          appState = appState.setIn(['sites', key, 'originalSeed'], originalSeed)
-        }
-      })
-      appState.setIn(['sync', 'devices'], {})
-      appState.setIn(['sync', 'objectsById'], {})
+
+      // Remember which profile this bookmark was originally synced to.
+      // Since old bookmarks should be synced when a new profile is created,
+      // we have to keep track of which profile already has these bookmarks
+      // or else the old profile may have these bookmarks duplicated. #7405
+      const originalSeed = appState.getIn(['sync', 'seed'])
+      const setOriginalSeed = (state, objects) => {
+        objects.forEach((site, key) => {
+          if (!site.has('objectId')) {
+            return true
+          }
+          state = state.setIn([STATE_SITES.BOOKMARKS, key, 'originalSeed'], originalSeed)
+        })
+        return state
+      }
+      appState = setOriginalSeed(appState, bookmarksState.getBookmarks(appState))
+      appState = setOriginalSeed(appState, bookmarkFoldersState.getFolders(appState))
+      appState = appState.setIn(['sync', 'devices'], {})
+      appState = appState.setIn(['sync', 'objectsById'], {})
       break
     case appConstants.APP_SET_VERSION_INFO:
       if (action.name && action.version) {
@@ -911,9 +691,12 @@ const handleAppAction = (action) => {
     default:
   }
 
+  if (SHOULD_LOG_TIME) {
+    timeLogger.log(timeStart, action.actionType)
+  }
   emitChanges()
 }
 
-appStore.dispatchToken = AppDispatcher.register(handleAppAction)
+appStore.dispatchToken = appDispatcher.register(handleAppAction)
 
 module.exports = appStore

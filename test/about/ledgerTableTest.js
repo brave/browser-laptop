@@ -56,7 +56,7 @@ function * before (client, siteList) {
       .tabByIndex(0)
       .loadUrl(site)
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForSiteEntry(site, false)
+      .waitForHistoryEntry(site, false)
       .tabByUrl(site)
   }
 

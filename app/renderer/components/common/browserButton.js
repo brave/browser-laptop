@@ -60,6 +60,7 @@ class BrowserButton extends ImmutableComponent {
     return <button
       disabled={this.props.disabled}
       data-extension-button={this.props.extensionButton}
+      data-bookmarks-overflow-indicator={this.props.bookmarksOverflowIndicator}
       data-l10n-id={this.props.l10nId}
       data-test-id={this.props.testId}
       data-test2-id={this.props.test2Id}
@@ -122,7 +123,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     boxShadow: globalStyles.button.default.boxShadow,
     cursor: 'pointer',
-    width: 'auto',
 
     // TODO: #9223
     height: '32px', // 32px == 1rem * 2
@@ -140,8 +140,9 @@ const styles = StyleSheet.create({
     paddingRight: '16px',
     paddingLeft: '16px',
 
-    // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L98
-    minWidth: `calc(${globalStyles.spacing.defaultFontSize} * 6)`, // issue #6384
+    // Ensure that the button label does not overflow
+    width: `calc(${globalStyles.spacing.defaultFontSize} * 6)`, // issue #6384
+    minWidth: 'fit-content',
 
     ':active': {
       // push the button down when active
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
   },
 
   browserButton_panelItem: {
-    minWidth: '180px'
+    minWidth: globalStyles.button.panel.width
   },
 
   browserButton_iconOnly: {

@@ -95,7 +95,7 @@ const downloadsReducer = (state, action) => {
 
       dialog.showOpenDialog(focusedWindow, {
         defaultPath: app.getPath('downloads'),
-        properties: ['openDirectory']
+        properties: ['openDirectory', 'createDirectory']
       }, (folder) => {
         if (Array.isArray(folder) && fs.lstatSync(folder[0]).isDirectory()) {
           appActions.changeSetting(settings.DOWNLOAD_DEFAULT_PATH, folder[0])

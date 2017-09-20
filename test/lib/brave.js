@@ -10,6 +10,7 @@ const path = require('path')
 const fs = require('fs-extra')
 const os = require('os')
 const {getTargetAboutUrl, isSourceAboutUrl, getBraveExtIndexHTML} = require('../../js/lib/appUrlUtil')
+const pinnedSiteUtils = require('../../app/common/lib/pinnedSitesUtil')
 
 var chaiAsPromised = require('chai-as-promised')
 chai.should()
@@ -135,7 +136,7 @@ var exports = {
 
       Server.create(`${__dirname}/../fixtures/`, (err, _server) => {
         if (err) {
-          console.log(err.stack)
+          console.error(err.stack)
         }
         exports.server = _server
         done()
@@ -452,41 +453,14 @@ var exports = {
       }, 5000, null, 100)
     })
 
-    this.app.client.addCommand('waitForSiteEntry', function (location, waitForTitle = true) {
-      logVerbose('waitForSiteEntry("' + location + '", "' + waitForTitle + '")')
-      return this.waitUntil(function () {
-        return this.getAppState().then((val) => {
-          const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
-            (site) => site.location === location &&
-              (!waitForTitle || (waitForTitle && site.title)))
-          logVerbose('waitForSiteEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
-          return ret
-        })
-      }, 5000, null, 100)
-    })
-
-    this.app.client.addCommand('waitForAddressEntry', function (location, waitForTitle = true) {
-      logVerbose('waitForAddressEntry("' + location + '", "' + waitForTitle + '")')
-      return this.waitUntil(function () {
-        return this.getAppState().then((val) => {
-          const ret = val.value && val.value.sites && Array.from(Object.values(val.value.sites)).find(
-            (site) => site.location === location &&
-              (!waitForTitle || (waitForTitle && site.title)))
-          logVerbose('sites:' + JSON.stringify(val.value.sites))
-          logVerbose('waitForSiteEntry("' + location + '", ' + waitForTitle + ') => ' + ret)
-          return ret
-        })
-      }, 5000, null, 100)
-    })
-
     this.app.client.addCommand('waitForBookmarkDetail', function (location, title) {
       logVerbose('waitForBookmarkDetail("' + location + '", "' + title + '")')
       return this.waitUntil(function () {
         return this.getWindowState().then((val) => {
           const bookmarkDetailLocation = val.value && val.value.bookmarkDetail &&
             val.value.bookmarkDetail.siteDetail && val.value.bookmarkDetail.siteDetail.location
-          const bookmarkDetailTitle = (val.value && val.value.bookmarkDetail && val.value.bookmarkDetail.siteDetail &&
-            val.value.bookmarkDetail.siteDetail.customTitle) || val.value.bookmarkDetail.siteDetail.title
+          const bookmarkDetailTitle = val.value && val.value.bookmarkDetail && val.value.bookmarkDetail.siteDetail &&
+            val.value.bookmarkDetail.siteDetail.title
           const ret = bookmarkDetailLocation === location && bookmarkDetailTitle === title
           logVerbose('waitForBookmarkDetail("' + location + '", "' + title + '") => ' + ret +
             ' (bookmarkDetailLocation = ' + bookmarkDetailLocation + ', bookmarkDetailTitle = ' + bookmarkDetailTitle + ')')
@@ -613,7 +587,7 @@ var exports = {
         const frame = val.value.frames[index]
         return this.execute(function (tabId, windowId, frame) {
           const browserOpts = { positionByMouseCursor: true }
-          devTools('appActions').tabMoved(tabId, frame, browserOpts, windowId)
+          devTools('appActions').tabDetachMenuItemClicked(tabId, frame, browserOpts, windowId)
         }, frame.tabId, windowId, frame)
       })
     })
@@ -625,6 +599,43 @@ var exports = {
           devTools('appActions').tabCloseRequested(tabId)
         }, tab.tabId)
       })
+    })
+
+    this.app.client.addCommand('moveTabByFrameKey', function (sourceKey, destinationKey, prepend) {
+      logVerbose(`moveTabByFrameKey(${sourceKey}, ${destinationKey}, ${prepend})`)
+      return this.execute(function (sourceKey, destinationKey, prepend) {
+        return devTools('electron').testData.windowActions.moveTab(sourceKey, destinationKey, prepend)
+      }, sourceKey, destinationKey, prepend)
+    })
+
+    this.app.client.addCommand('movePinnedTabByFrameKey', async function (sourceKey, destinationKey, prepend, windowId = 1) {
+      logVerbose(`movePinnedTabByFrameKey(${sourceKey}, ${destinationKey}, ${prepend})`)
+      // get info on tabs to move
+      const state = await this.getAppState()
+      const sourceTab = state.value.tabs.find(tab => tab.windowId === windowId && tab.frame.key === sourceKey)
+      if (!sourceTab) {
+        throw new Error(`movePinnedTabByIndex could not find source tab with key ${sourceKey} in window ${windowId}`)
+      }
+      const destinationTab = state.value.tabs.find(tab => tab.windowId === windowId && tab.frame.key === destinationKey)
+      if (!destinationTab) {
+        throw new Error(`movePinnedTabByIndex could not find destination tab with key ${destinationKey} in window ${windowId}`)
+      }
+      const sourceTabSiteDetail = Immutable.fromJS({
+        location: sourceTab.url,
+        partitionNumber: sourceTab.partitionNumber
+      })
+      const destinationTabSiteDetail = Immutable.fromJS({
+        location: destinationTab.url,
+        paritionNumber: destinationTab.partitionNumber
+      })
+      // do actual move
+      await this.moveTabByFrameKey(sourceKey, destinationKey, prepend)
+      // notify pinned tabs have changed, required for state change
+      const sourcePinKey = pinnedSiteUtils.getKey(sourceTabSiteDetail)
+      const destinationPinKey = pinnedSiteUtils.getKey(destinationTabSiteDetail)
+      return this.execute(function (sourcePinKey, destinationPinKey, prepend) {
+        return devTools('appActions').onPinnedTabReorder(sourcePinKey, destinationPinKey, prepend)
+      }, sourcePinKey, destinationPinKey, prepend)
     })
 
     this.app.client.addCommand('ipcOn', function (message, fn) {
@@ -672,51 +683,113 @@ var exports = {
     })
 
     /**
-     * Adds a site to the sites list, such as a bookmarks.
+     * Adds a bookmark
      *
      * @param {object} siteDetail - Properties for the siteDetail to add
-     * @param {string} tag - A site tag from js/constants/siteTags.js
      */
-    this.app.client.addCommand('addSite', function (siteDetail, tag) {
-      logVerbose('addSite("' + siteDetail + '", "' + tag + '")')
+    this.app.client.addCommand('addBookmark', function (siteDetail) {
+      logVerbose('addBookmark("' + siteDetail + '")')
       let waitUrl = siteDetail.location
       if (isSourceAboutUrl(waitUrl)) {
         waitUrl = getTargetAboutUrl(waitUrl)
       }
-      return this.execute(function (siteDetail, tag) {
-        return devTools('appActions').addSite(siteDetail, tag)
-      }, siteDetail, tag).then((response) => response.value)
-      .waitForSiteEntry(waitUrl, false)
-    })
-
-    /**
-     * Adds a bookmark to the bookmarks list.
-     *
-     * @param {object} siteDetail - Properties for the siteDetail to add
-     * @param {string} tag - A site tag from js/constants/siteTags.js
-     */
-    this.app.client.addCommand('addBookmark', function (siteDetail, tag) {
-      logVerbose('addBookmark("' + siteDetail + '", "' + tag + '")')
-      let waitUrl = siteDetail.location
-      if (isSourceAboutUrl(waitUrl)) {
-        waitUrl = getTargetAboutUrl(waitUrl)
-      }
-      return this.execute(function (siteDetail, tag) {
-        return devTools('appActions').addBookmark(siteDetail, tag)
-      }, siteDetail, tag).then((response) => response.value)
-      .waitForSiteEntry(waitUrl, false)
-    })
-
-    /**
-     * Adds a list sites to the sites list, including bookmark and foler.
-     *
-     * @param {object} siteDetail - Properties for the siteDetail to add
-     */
-    this.app.client.addCommand('addSiteList', function (siteDetail) {
-      logVerbose('addSiteList("' + siteDetail + '")')
       return this.execute(function (siteDetail) {
-        return devTools('appActions').addSite(siteDetail)
+        return devTools('appActions').addBookmark(siteDetail)
       }, siteDetail).then((response) => response.value)
+      .waitForBookmarkEntry(waitUrl, false)
+    })
+
+    this.app.client.addCommand('waitForBookmarkEntry', function (location, waitForTitle = true) {
+      logVerbose('waitForBookmarkEntry("' + location + '", "' + waitForTitle + '")')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          const ret = val.value && val.value.bookmarks && Array.from(Object.values(val.value.bookmarks)).find(
+              (bookmark) => bookmark.location === location &&
+              (!waitForTitle || (waitForTitle && bookmark.title)))
+          logVerbose('waitForBookmarkEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
+          return ret
+        })
+      }, 5000, null, 100)
+    })
+
+    /**
+     * Adds a history site
+     *
+     * @param {object} siteDetail - Properties for the siteDetail to add
+     */
+    this.app.client.addCommand('addHistorySite', function (siteDetail) {
+      logVerbose('addHistorySite("' + siteDetail + '")')
+      let waitUrl = siteDetail.location
+      if (isSourceAboutUrl(waitUrl)) {
+        waitUrl = getTargetAboutUrl(waitUrl)
+      }
+      return this.execute(function (siteDetail) {
+        return devTools('appActions').addHistorySite(siteDetail)
+      }, siteDetail).then((response) => response.value)
+        .waitForHistoryEntry(waitUrl, false)
+    })
+
+    this.app.client.addCommand('waitForHistoryEntry', function (location, waitForTitle = true) {
+      logVerbose('waitForHistoryEntry("' + location + '", "' + waitForTitle + '")')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          const ret = val.value && val.value.historySites && Array.from(Object.values(val.value.historySites)).find(
+              (site) => site.location === location &&
+              (!waitForTitle || (waitForTitle && site.title)))
+          logVerbose('waitForHistoryEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
+          return ret
+        })
+      }, 5000, null, 100)
+    })
+
+    /**
+     * Adds a bookmark folder
+     *
+     * @param {object} siteDetail - Properties for the siteDetail to add
+     */
+    this.app.client.addCommand('addBookmarkFolder', function (siteDetail) {
+      logVerbose('addBookmarkFolder("' + JSON.stringify(siteDetail) + '")')
+      return this.execute(function (siteDetail) {
+        return devTools('appActions').addBookmarkFolder(siteDetail)
+      }, siteDetail).then((response) => response.value)
+      .waitForBookmarkFolderEntry(siteDetail.folderId, false)
+    })
+
+    this.app.client.addCommand('waitForBookmarkFolderEntry', function (folderId, waitForTitle = true) {
+      logVerbose('waitForBookmarkFolderEntry("' + folderId + '", "' + waitForTitle + '")')
+      return this.waitUntil(function () {
+        return this.getAppState().then((val) => {
+          const ret = val.value && val.value.bookmarkFolders && Array.from(Object.values(val.value.bookmarkFolders)).find(
+              (folder) => folder.folderId === folderId &&
+              (!waitForTitle || (waitForTitle && folder.title)))
+          logVerbose('waitForBookmarkFolderEntry("' + folderId + ', ' + waitForTitle + '") => ' + ret)
+          return ret
+        })
+      }, 5000, null, 100)
+    })
+
+    /**
+     * Adds a list of bookmarks
+     *
+     * @param {object} bookmarkList - List of bookmarks to add
+     */
+    this.app.client.addCommand('addBookmarks', function (bookmarkList) {
+      logVerbose('addBookmarks("' + bookmarkList + '")')
+      return this.execute(function (bookmarkList) {
+        return devTools('appActions').addBookmark(bookmarkList)
+      }, bookmarkList).then((response) => response.value)
+    })
+
+    /**
+     * Adds a list of history sites
+     *
+     * @param {object} historyList - List of history sites to add
+     */
+    this.app.client.addCommand('addHistorySites', function (historyList) {
+      logVerbose('addHistorySites("' + historyList + '")')
+      return this.execute(function (historyList) {
+        return devTools('appActions').addHistorySite(historyList)
+      }, historyList).then((response) => response.value)
     })
 
     /**
@@ -749,16 +822,27 @@ var exports = {
     })
 
     /**
-     * Removes a site from the sites list, or removes a bookmark.
+     * Removes a bookmark.
      *
-     * @param {object} siteDetail - Properties for the frame to add
-     * @param {string} tag - A site tag from js/constants/siteTags.js
+     * @param bookmarkKey {string|Immutable.List} - Bookmark key that we want to remove. This could also be list of keys
      */
-    this.app.client.addCommand('removeSite', function (siteDetail, tag) {
-      logVerbose('removeSite("' + siteDetail + '", "' + tag + '")')
-      return this.execute(function (siteDetail, tag) {
-        return devTools('appActions').removeSite(siteDetail, tag)
-      }, siteDetail, tag).then((response) => response.value)
+    this.app.client.addCommand('removeBookmark', function (bookmarkKey) {
+      logVerbose('removeBookmark("' + bookmarkKey + '")')
+      return this.execute(function (bookmarkKey) {
+        return devTools('appActions').removeBookmark(bookmarkKey)
+      }, bookmarkKey).then((response) => response.value)
+    })
+
+    /**
+     * Removes a bookmark folder.
+     *
+     * @param {object} folderKey folder key to remove
+     */
+    this.app.client.addCommand('removeBookmarkFolder', function (folderKey) {
+      logVerbose('removeBookmarkFolder("' + folderKey + '")')
+      return this.execute(function (folderKey) {
+        return devTools('appActions').removeBookmarkFolder(folderKey)
+      }, folderKey).then((response) => response.value)
     })
 
     /**
@@ -858,6 +942,13 @@ var exports = {
       return this.execute(function (width, height) {
         return devTools('electron').remote.getCurrentWindow().setSize(width, height)
       }, width, height).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('setWindowPosition', function (x, y) {
+      logVerbose('setWindowPosition("' + x + '", "' + y + '")')
+      return this.execute(function (x, y) {
+        return devTools('electron').remote.getCurrentWindow().setPosition(x, y)
+      }, x, y).then((response) => response.value)
     })
 
     this.app.client.addCommand('windowParentByUrl', function (url, childSelector = 'webview') {

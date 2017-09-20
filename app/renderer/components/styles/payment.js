@@ -4,16 +4,6 @@
 
 const globalStyles = require('./global')
 
-const paymentStyles = {
-  font: {
-    regular: '14.5px'
-  },
-  width: {
-    tableRow: '235px',
-    tableCell: '265px' // width.tableRow + 30px
-  }
-}
-
 const paymentStylesVariables = {
   spacing: {
     paymentHistoryTablePadding: '30px'
@@ -26,6 +16,5 @@ const paymentStylesVariables = {
 }
 
 module.exports = {
-  paymentStyles,
   paymentStylesVariables
 }

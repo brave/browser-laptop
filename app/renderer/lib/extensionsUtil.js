@@ -35,7 +35,14 @@ const dummyData = [
     name: 'bitwarden',
     description: 'bitwardenDesc',
     icon: 'img/extensions/bitwarden-128.png'
-  }, {
+  },
+  // {
+  //   id: pinterest,
+  //   name: 'Pinterest Save',
+  //   description: 'pinterestDesc',
+  //   icon: 'img/extensions/pinterest-128.png'
+  // }
+  {
     id: dashlane,
     name: 'dashlane',
     description: 'dashlaneDesc',
@@ -66,12 +73,6 @@ const dummyData = [
     name: 'honey',
     description: 'honeyDesc',
     icon: 'img/extensions/honey-128.png'
-  },
-  {
-    id: pinterest,
-    name: 'Pinterest Save',
-    description: 'pinterestDesc',
-    icon: 'img/extensions/pinterest-128.png'
   }
   // {
   //   id: metamask,

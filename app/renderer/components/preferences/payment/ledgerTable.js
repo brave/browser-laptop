@@ -32,7 +32,7 @@ class LedgerTable extends ImmutableComponent {
   }
 
   showAll (value) {
-    this.props.onChangeSetting(settings.HIDE_LOWER_SITES, value)
+    this.props.onChangeSetting(settings.PAYMENTS_SITES_SHOW_LESS, value)
   }
 
   getFormattedTime (synopsis) {
@@ -69,7 +69,7 @@ class LedgerTable extends ImmutableComponent {
         return result
       }
     }
-    return getSetting(settings.AUTO_SUGGEST_SITES, this.props.settings)
+    return getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST, this.props.settings)
   }
 
   shouldShow (synopsis) {
@@ -112,13 +112,13 @@ class LedgerTable extends ImmutableComponent {
 
   get columnClassNames () {
     return [
-      css(styles.tableTd, styles.alignRight, styles.verifiedTd), // verified
-      css(styles.tableTd, styles.alignRight), // sites
-      css(styles.tableTd),                    // include
-      css(styles.tableTd, styles.alignRight), // views
-      css(styles.tableTd, styles.alignRight), // time spent
-      css(styles.tableTd, styles.alignRight, styles.percTd), // percentage
-      css(styles.tableTd, styles.alignLeft)   // actions
+      css(styles.alignRight, styles.verifiedTd), // verified
+      css(styles.alignRight), // sites
+      css(styles.alignLeft),  // include
+      css(styles.alignRight), // views
+      css(styles.alignRight), // time spent
+      css(styles.alignRight, styles.percTd), // percentage
+      css(styles.alignLeft)   // actions
     ]
   }
 
@@ -129,14 +129,14 @@ class LedgerTable extends ImmutableComponent {
       pinnedRows.map(item => {
         j++
         return this.enabledForSite(item)
-          ? css(styles.tableTr, j % 2 && styles.tableTdBg)
-          : css(styles.tableTr, styles.paymentsDisabled, j % 2 && styles.tableTdBg)
+          ? css(j % 2 && styles.tableTdBg)
+          : css(styles.paymentsDisabled, j % 2 && styles.tableTdBg)
       }).toJS(),
       unPinnedRows.map(item => {
         j++
         return this.enabledForSite(item)
-          ? css(styles.tableTr, j % 2 && styles.tableTdBg)
-          : css(styles.tableTr, styles.paymentsDisabled, j % 2 && styles.tableTdBg)
+          ? css(j % 2 && styles.tableTdBg)
+          : css(styles.paymentsDisabled, j % 2 && styles.tableTdBg)
       }).toJS()
     ]
   }
@@ -164,7 +164,7 @@ class LedgerTable extends ImmutableComponent {
       },
       {
         html: <div>
-          <a className={css(styles.siteData)} href={publisherURL} target='_blank' tabIndex={-1}>
+          <a className={css(styles.siteData)} href={publisherURL} rel='noopener' target='_blank' tabIndex={-1}>
             {
               faviconURL
                 ? <img className={css(styles.favicon)} src={faviconURL} alt={site} />
@@ -233,7 +233,7 @@ class LedgerTable extends ImmutableComponent {
     }
 
     const allRows = this.synopsis.filter(synopsis => {
-      return (!getSetting(settings.HIDE_EXCLUDED_SITES, this.props.settings) || this.enabledForSite(synopsis)) &&
+      return (!getSetting(settings.PAYMENTS_SITES_HIDE_EXCLUDED, this.props.settings) || this.enabledForSite(synopsis)) &&
         this.shouldShow(synopsis)
     })
     const pinnedRows = allRows.filter(synopsis => {
@@ -244,9 +244,9 @@ class LedgerTable extends ImmutableComponent {
     })
 
     const totalUnPinnedRows = unPinnedRows.size
-    const hideLower = getSetting(settings.HIDE_LOWER_SITES, this.props.settings)
+    const showLess = getSetting(settings.PAYMENTS_SITES_SHOW_LESS, this.props.settings)
 
-    if (hideLower && totalUnPinnedRows > 10) {
+    if (showLess && totalUnPinnedRows > 10) {
       let sumUnPinned = 0
       let threshold = 90
       const limit = 0.9 // show only 90th of publishers
@@ -258,22 +258,25 @@ class LedgerTable extends ImmutableComponent {
       })
     }
 
-    const showButton = (hideLower && totalUnPinnedRows !== unPinnedRows.size) || (!hideLower && totalUnPinnedRows > 10)
+    const showButton = (showLess && totalUnPinnedRows !== unPinnedRows.size) || (!showLess && totalUnPinnedRows > 10)
 
     return <section data-test-id='ledgerTable'>
       <div className={css(styles.hideExcludedSites)}>
-        <div className={css(styles.columnOffset)} />
-        <div className={css(styles.rightColumn)}>
-          <SettingCheckbox small
+        <div className={css(gridStyles.row1col1)} />
+        <div className={css(gridStyles.row1col2)}>
+          <SettingCheckbox
+            small
             dataL10nId='hideExcluded'
-            prefKey={settings.HIDE_EXCLUDED_SITES}
+            prefKey={settings.PAYMENTS_SITES_HIDE_EXCLUDED}
             settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting}
+            switchClassName={css(styles.hideExcludedSites__switchWrap__switchControl)}
           />
         </div>
       </div>
       <SortableTable
-        tableClassNames={css(styles.tableClass)}
+        fillAvailable
+        smallRow
         headings={['', 'publisher', 'include', 'views', 'timeSpent', 'percentage', 'actions']}
         defaultHeading='percentage'
         defaultHeadingSortOrder='desc'
@@ -306,9 +309,9 @@ class LedgerTable extends ImmutableComponent {
         showButton
         ? <div className={css(styles.ledgerTable__showAllWrap)}>
           <BrowserButton secondaryColor
-            testId={hideLower ? 'showAll' : 'hideLower'}
-            l10nId={hideLower ? 'showAll' : 'hideLower'}
-            onClick={this.showAll.bind(this, !hideLower)}
+            testId={showLess ? 'showAll' : 'showLess'}
+            l10nId={showLess ? 'showAll' : 'showLess'}
+            onClick={this.showAll.bind(this, !showLess)}
           />
         </div>
         : null
@@ -325,6 +328,18 @@ const verifiedBadge = (icon) => ({
   background: `url(${icon}) center no-repeat`
 })
 
+const gridStyles = StyleSheet.create({
+  row1col1: {
+    gridRow: 1,
+    gridColumn: 1
+  },
+
+  row1col2: {
+    gridRow: 1,
+    gridColumn: 2
+  }
+})
+
 const styles = StyleSheet.create({
   verified: verifiedBadge(verifiedGreenIcon),
   disabled: verifiedBadge(verifiedWhiteIcon),
@@ -339,26 +354,9 @@ const styles = StyleSheet.create({
     }
   },
 
-  tableClass: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    border: 'none',
-    margin: '0 auto'
-  },
-
   tableTh: {
     color: paymentStylesVariables.tableHeader.fontColor,
-    fontSize: '14px',
     fontWeight: paymentStylesVariables.tableHeader.fontWeight
-  },
-
-  tableTr: {
-    height: '26px'
-  },
-
-  tableTd: {
-    position: 'relative',
-    padding: '0 15px'
   },
 
   tableTdBg: {
@@ -370,8 +368,7 @@ const styles = StyleSheet.create({
   },
 
   percTd: {
-    width: '45px',
-    paddingLeft: '5px'
+    width: '45px'
   },
 
   hideTd: {
@@ -405,22 +402,15 @@ const styles = StyleSheet.create({
   },
 
   hideExcludedSites: {
-    display: 'flex',
-    flex: 1,
+    display: 'grid',
     alignItems: 'center',
-    height: '35px'
+    gridTemplateColumns: '2fr 1fr',
+    width: `calc(100% - calc(${globalStyles.spacing.panelPadding} / 2))`,
+    marginBottom: globalStyles.spacing.panelMargin
   },
 
-  columnOffset: {
-    display: 'flex',
-    flexGrow: 8,
-    flexShrink: 8
-  },
-
-  rightColumn: {
-    display: 'flex',
-    flexGrow: 1,
-    flexShrink: 1
+  hideExcludedSites__switchWrap__switchControl: {
+    padding: '0 5px 0 0'
   },
 
   alignRight: {

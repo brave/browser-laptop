@@ -9,9 +9,6 @@ const Immutable = require('immutable')
 const ImmutableComponent = require('../../components/immutableComponent')
 const BookmarkFolderItem = require('./bookmarkFolderItem')
 
-// Constants
-const siteTags = require('../../../../js/constants/siteTags')
-
 class BookmarkFolderList extends ImmutableComponent {
   render () {
     return <list className='bookmarkFolderList'>
@@ -34,7 +31,11 @@ class BookmarkFolderList extends ImmutableComponent {
             onChangeSelectedFolder={this.props.onChangeSelectedFolder}
             allBookmarkFolders={this.props.allBookmarkFolders}
             selectedFolderId={this.props.selectedFolderId}
-            bookmarkFolder={Immutable.fromJS({folderId: 0, tags: [siteTags.BOOKMARK_FOLDER]})}
+            bookmarkFolder={Immutable.fromJS({
+              folderId: 0,
+              key: '0'
+            })}
+            bookmarkOrder={this.props.bookmarkOrder}
           />
           : null
       }
@@ -50,6 +51,7 @@ class BookmarkFolderList extends ImmutableComponent {
               selected={!this.props.search && this.props.selectedFolderId === bookmarkFolder.get('folderId')}
               selectedFolderId={this.props.selectedFolderId}
               onChangeSelectedFolder={this.props.onChangeSelectedFolder}
+              bookmarkOrder={this.props.bookmarkOrder}
             />
         )
       }
@@ -64,7 +66,11 @@ class BookmarkFolderList extends ImmutableComponent {
             onChangeSelectedFolder={this.props.onChangeSelectedFolder}
             allBookmarkFolders={this.props.allBookmarkFolders}
             selectedFolderId={this.props.selectedFolderId}
-            bookmarkFolder={Immutable.fromJS({folderId: -1, tags: [siteTags.BOOKMARK_FOLDER]})}
+            bookmarkFolder={Immutable.fromJS({
+              folderId: -1,
+              key: '-1'
+            })}
+            bookmarkOrder={this.props.bookmarkOrder}
           />
           : null
       }

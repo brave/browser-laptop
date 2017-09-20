@@ -119,6 +119,7 @@
 }
 
 .tabsToolbar {
+  -webkit-app-region: no-drag;
   box-sizing: border-box;
   background: @tabsBackground;
   display: flex;
@@ -143,7 +144,7 @@
   display: flex;
   justify-content: center;
   height: @tabPagesHeight;
-  padding: @tabPagesHeight 0 @navbarMenubarMargin 0;
+  margin: @navbarMenubarMargin 0 @navbarMenubarMargin 0;
   position: relative;
   z-index: @zindexTabs;
 
@@ -152,11 +153,6 @@
     >* {
       -webkit-app-region: no-drag;
     }
-  }
-
-  &.singlePage {
-    margin: 0;
-    padding: 0;
   }
 
   >div {

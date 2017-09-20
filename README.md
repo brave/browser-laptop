@@ -9,6 +9,7 @@
 [![Navbar Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=navbar-components&label=navbar-components-tests)](https://travis-ci.org/brave/browser-laptop)
 [![Tab Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=tab-components&label=tab-components-tests)](https://travis-ci.org/brave/browser-laptop)
 [![codecov.io](https://codecov.io/github/brave/browser-laptop/coverage.svg?branch=master)](https://codecov.io/gh/brave/browser-laptop?branch=master)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 # Brave Browser
 
@@ -26,7 +27,7 @@ To download the latest release, [see our releases page](https://github.com/brave
 
 You can also [visit our website](https://brave.com/downloads.html) to get the latest stable release (along with a more user-friendly download page).
 
-Brave supports 3 [release channels](https://github.com/brave/browser-laptop/wiki/Release-channels): release, beta, and developer.
+Brave supports 4 [release channels](https://github.com/brave/browser-laptop/wiki/Release-channels): Release, Beta, Developer, and Nightly.
 
 ## Community
 
@@ -59,13 +60,13 @@ For other platforms (macOS, Linux) You'll need certain packages installed before
 #### On Debian / Ubuntu /Mint
 
 ````
-apt-get install libgnome-keyring-dev build-essential rpm ninja-build
+apt-get install build-essential rpm ninja-build
 ````
 
 #### On Fedora
 
 ````
-dnf install libgnome-keyring-devel rpm-build
+dnf install rpm-build
 dnf group install "Development Tools" "C Development Tools and Libraries"
 ````
 

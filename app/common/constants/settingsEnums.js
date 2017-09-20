@@ -21,6 +21,12 @@ const bookmarksToolbarMode = {
   FAVICONS_ONLY: 'faviconsOnly'
 }
 
+const tabPreviewTiming = {
+  LONG: 2000,
+  NORMAL: 1000,
+  SHORT: 500
+}
+
 const tabCloseAction = {
   LAST_ACTIVE: 'lastActive',
   NEXT: 'next',
@@ -41,6 +47,7 @@ module.exports = {
   startsWithOption,
   newTabMode,
   bookmarksToolbarMode,
+  tabPreviewTiming,
   tabCloseAction,
   fullscreenOption,
   autoplayOption

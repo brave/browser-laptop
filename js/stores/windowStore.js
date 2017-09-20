@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const AppDispatcher = require('../dispatcher/appDispatcher')
+const appDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
 const appActions = require('../actions/appActions')
 const appConstants = require('../constants/appConstants')
@@ -23,6 +23,9 @@ const assert = require('assert')
 const contextMenuState = require('../../app/common/state/contextMenuState')
 const appStoreRenderer = require('./appStoreRenderer')
 const windowActions = require('../actions/windowActions')
+const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
+const bookmarksState = require('../../app/common/state/bookmarksState')
+const bookmarkUtil = require('../../app/common/lib/bookmarkUtil')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -38,6 +41,7 @@ let windowState = Immutable.fromJS({
   }
 })
 let lastEmittedState
+let mouseTimeout
 
 const CHANGE_EVENT = 'change'
 
@@ -64,12 +68,12 @@ class WindowStore extends EventEmitter {
     windowState = newWindowState
   }
 
-  getFrames () {
-    return frameStateUtil.getFrames(this.state)
-  }
-
   getFrame (key) {
     return frameStateUtil.getFrameByKey(windowState, key)
+  }
+
+  getFrameByTabId (tabId) {
+    return frameStateUtil.getFrameByTabId(windowState, tabId)
   }
 
   emitChanges () {
@@ -105,7 +109,7 @@ const newFrame = (state, frameOpts) => {
   // handle tabs.create properties
   let insertionIndex = frameOpts.index !== undefined
     ? frameOpts.index
-    : undefined
+    : 0
 
   if (frameOpts.partition) {
     frameOpts.isPrivate = frameStateUtil.isPrivatePartition(frameOpts.partition)
@@ -117,7 +121,6 @@ const newFrame = (state, frameOpts) => {
 
   const active = frameOpts.active
   delete frameOpts.active
-  delete frameOpts.openInForeground // clean up any legacy openInForeground props
   let openInForeground = active
 
   if (openInForeground == null && frameOpts.disposition) {
@@ -144,52 +147,18 @@ const newFrame = (state, frameOpts) => {
       frameOpts.location = ''
     }
   }
-
-  // TODO: longer term get rid of parentFrameKey completely instead of
-  // calculating it here.
-  let parentFrameKey = frameOpts.parentFrameKey
-  if (frameOpts.openerTabId) {
-    parentFrameKey = frameStateUtil.getFrameKeyByTabId(state, frameOpts.openerTabId)
-  }
-
-  // Find the closest index to the current frame's index which has
-  // a different ancestor frame key.
-  const frames = frameStateUtil.getFrames(state)
-  if (insertionIndex === undefined) {
-    insertionIndex = frameStateUtil.getFrameIndex(state, frameOpts.indexByFrameKey || parentFrameKey)
-    if (frameOpts.prependIndexByFrameKey === false) {
-      insertionIndex++
-    }
-    if (insertionIndex === -1) {
-      insertionIndex = frames.size
-    // frameOpts.indexByFrameKey is used when the insertionIndex should be used exactly
-    } else if (!frameOpts.indexByFrameKey) {
-      while (insertionIndex < frames.size) {
-        ++insertionIndex
-        if (!frameStateUtil.isAncestorFrameKey(state, frames.get(insertionIndex), parentFrameKey)) {
-          break
-        }
-      }
-    }
-  }
-  if (frameStateUtil.isFrameKeyPinned(state, parentFrameKey)) {
-    insertionIndex = 0
-  }
-
   const nextKey = incrementNextKey()
-
   state = state.merge(
     frameStateUtil.addFrame(
       state, frameOpts,
       nextKey, frameOpts.partitionNumber, openInForeground, insertionIndex))
-
   state = frameStateUtil.updateFramesInternalIndex(state, insertionIndex)
 
   if (openInForeground) {
     const tabId = frameOpts.tabId
     const frame = frameStateUtil.getFrameByTabId(state, tabId)
     state = frameStateUtil.updateTabPageIndex(state, tabId)
-    if (active) {
+    if (active && frame) {
       // only set the activeFrameKey if the tab is already active
       state = state.set('activeFrameKey', frame.get('key'))
     } else {
@@ -213,7 +182,8 @@ const frameTabIdChanged = (state, action) => {
   const index = frameStateUtil.getFrameIndex(state, action.getIn(['frameProps', 'key']))
   state = state.mergeIn(['frames', index], newFrameProps)
   state = frameStateUtil.deleteTabInternalIndex(state, oldTabId)
-  return frameStateUtil.updateFramesInternalIndex(state, index)
+  state = frameStateUtil.updateFramesInternalIndex(state, index)
+  return state
 }
 
 const frameGuestInstanceIdChanged = (state, action) => {
@@ -369,10 +339,12 @@ const doAction = (action) => {
       }
       break
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
-      windowState = windowState.set('closedFrames', new Immutable.List())
-      break
-    case windowConstants.WINDOW_SET_PREVIEW_FRAME:
-      windowState = frameStateUtil.setPreviewFrameKey(windowState, action.frameKey, true)
+      if (!action.location) {
+        windowState = windowState.set('closedFrames', new Immutable.List())
+      } else {
+        windowState = windowState.set('closedFrames',
+          windowState.get('closedFrames').filterNot((frame) => frame.get('location') === action.location))
+      }
       break
     case windowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX:
       windowState = frameStateUtil.setPreviewTabPageIndex(windowState, action.previewTabPageIndex, true)
@@ -396,31 +368,28 @@ const doAction = (action) => {
         }
         break
       }
+    case windowConstants.WINDOW_TAB_MOUSE_MOVE:
+      {
+        // previewMode is only triggered if mouse is idle over a tab
+        // for a given amount of time based on timing defined in prefs->tabs
+        // we use actions here because that is the only way to delay updating the state
+        clearTimeout(mouseTimeout)
+        mouseTimeout = setTimeout(
+          () => windowActions.setTabHoverState(action.data, true, true),
+          getSetting(settings.TAB_PREVIEW_TIMING)
+        )
+        break
+      }
     case windowConstants.WINDOW_SET_TAB_HOVER_STATE:
       {
-        windowState = frameStateUtil.setTabHoverState(windowState, action.frameKey, action.hoverState)
+        clearTimeout(mouseTimeout)
+        windowState = frameStateUtil
+          .setTabHoverState(windowState, action.frameKey, action.hoverState, action.previewMode)
         break
       }
     case windowConstants.WINDOW_SET_TAB_PAGE_HOVER_STATE:
       {
         windowState = frameStateUtil.setTabPageHoverState(windowState, action.tabPageIndex, action.hoverState)
-        break
-      }
-    case windowConstants.WINDOW_TAB_MOVE:
-      {
-        const sourceFrameProps = frameStateUtil.getFrameByKey(windowState, action.sourceFrameKey)
-        const sourceFrameIndex = frameStateUtil.getFrameIndex(windowState, action.sourceFrameKey)
-        const activeFrame = frameStateUtil.getActiveFrame(windowState)
-        let newIndex = frameStateUtil.getFrameIndex(windowState, action.destinationFrameKey) + (action.prepend ? 0 : 1)
-        let frames = frameStateUtil.getFrames(windowState).splice(sourceFrameIndex, 1)
-        if (newIndex > sourceFrameIndex) {
-          newIndex--
-        }
-        frames = frames.splice(newIndex, 0, sourceFrameProps)
-        windowState = windowState.set('frames', frames)
-        // Since the tab could have changed pages, update the tab page as well
-        windowState = frameStateUtil.updateFramesInternalIndex(windowState, Math.min(sourceFrameIndex, newIndex))
-        windowState = frameStateUtil.updateTabPageIndex(windowState, activeFrame.get('tabId'))
         break
       }
     case windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW:
@@ -471,37 +440,54 @@ const doAction = (action) => {
       windowState = windowState.delete('bookmarkDetail')
       break
     case windowConstants.WINDOW_ON_EDIT_BOOKMARK:
-      const siteDetail = appStoreRenderer.state.getIn(['sites', action.editKey])
-
-      windowState = windowState.setIn(['bookmarkDetail'], Immutable.fromJS({
-        siteDetail: siteDetail,
-        editKey: action.editKey,
-        isBookmarkHanger: action.isHanger
-      }))
-      break
-    case windowConstants.WINDOW_ON_BOOKMARK_ADDED:
       {
-        let editKey = action.editKey
-        const site = appStoreRenderer.state.getIn(['sites', editKey])
-        let siteDetail = action.siteDetail
-
-        if (site) {
-          siteDetail = site
-        }
-
-        if (siteDetail == null) {
-          siteDetail = frameStateUtil.getActiveFrame(windowState)
-        }
-
-        siteDetail = siteDetail.set('location', UrlUtil.getLocationIfPDF(siteDetail.get('location')))
+        const siteDetail = bookmarksState.getBookmark(appStoreRenderer.state, action.editKey)
 
         windowState = windowState.setIn(['bookmarkDetail'], Immutable.fromJS({
           siteDetail: siteDetail,
+          editKey: action.editKey,
+          isBookmarkHanger: action.isHanger
+        }))
+        break
+      }
+    case windowConstants.WINDOW_ON_BOOKMARK_ADDED:
+      {
+        let bookmarkDetail = action.bookmarkDetail
+
+        if (bookmarkDetail == null) {
+          bookmarkDetail = frameStateUtil.getActiveFrame(windowState)
+        }
+
+        bookmarkDetail = bookmarkDetail.set('location', UrlUtil.getLocationIfPDF(bookmarkDetail.get('location')))
+
+        const editKey = bookmarkUtil.getKey(bookmarkDetail)
+
+        windowState = windowState.setIn(['bookmarkDetail'], Immutable.fromJS({
+          siteDetail: bookmarkDetail,
           editKey: editKey,
           isBookmarkHanger: action.isHanger,
           isAdded: true
         }))
       }
+      break
+    case windowConstants.WINDOW_ON_ADD_BOOKMARK_FOLDER:
+      windowState = windowState.setIn(['bookmarkFolderDetail'], Immutable.fromJS({
+        folderDetails: action.folderDetails,
+        closestKey: action.closestKey
+      }))
+      break
+    case windowConstants.WINDOW_ON_EDIT_BOOKMARK_FOLDER:
+      {
+        const folderDetails = bookmarkFoldersState.getFolder(appStoreRenderer.state, action.editKey)
+
+        windowState = windowState.setIn(['bookmarkFolderDetail'], Immutable.fromJS({
+          folderDetails: folderDetails,
+          editKey: action.editKey
+        }))
+        break
+      }
+    case windowConstants.WINDOW_ON_BOOKMARK_FOLDER_CLOSE:
+      windowState = windowState.delete('bookmarkFolderDetail')
       break
     case windowConstants.WINDOW_AUTOFILL_SELECTION_CLICKED:
       ipc.send('autofill-selection-clicked', action.tabId, action.value, action.frontEndId, action.index)
@@ -769,24 +755,6 @@ const doAction = (action) => {
     case windowConstants.WINDOW_FRAME_MOUSE_LEAVE:
       windowState = windowState.setIn(['ui', 'mouseInFrame'], false)
       break
-    case windowConstants.WINDOW_ON_MAXIMIZE:
-      windowState = windowState.setIn(['ui', 'isMaximized'], true)
-      break
-    case windowConstants.WINDOW_ON_MINIMIZE:
-      windowState = windowState.setIn(['ui', 'isMaximized'], false)
-      break
-    case windowConstants.WINDOW_ON_FOCUS:
-      windowState = windowState.setIn(['ui', 'isFocused'], true)
-      break
-    case windowConstants.WINDOW_ON_BLUR:
-      windowState = windowState.setIn(['ui', 'isFocused'], false)
-      break
-    case windowConstants.WINDOW_ON_ENTER_FULL_SCREEN:
-      windowState = windowState.setIn(['ui', 'isFullScreen'], true)
-      break
-    case windowConstants.WINDOW_ON_EXIT_FULL_SCREEN:
-      windowState = windowState.setIn(['ui', 'isFullScreen'], false)
-      break
     case windowConstants.WINDOW_ON_CERT_ERROR:
       {
         const frame = frameStateUtil.getFrameByTabId(windowState, action.tabId) || Immutable.Map()
@@ -800,6 +768,9 @@ const doAction = (action) => {
         }
         break
       }
+    case windowConstants.WINDOW_ON_WINDOW_UPDATE:
+      windowState = windowState.set('windowInfo', action.windowValue)
+      break
     default:
       break
   }
@@ -847,18 +818,21 @@ ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e) => {
   })
 })
 
-const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'copy', 'find-next', 'find-prev']
+const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'find-next', 'find-prev']
 frameShortcuts.forEach((shortcut) => {
   // Listen for actions on the active frame
   ipc.on(`shortcut-active-frame-${shortcut}`, (e, args) => {
     if (shortcut === 'toggle-dev-tools') {
       appActions.toggleDevTools(frameStateUtil.getActiveFrameTabId(windowState))
     } else {
-      windowState = windowState.mergeIn(frameStateUtil.activeFrameStatePath(windowState), {
-        activeShortcut: shortcut,
-        activeShortcutDetails: args
-      })
-      emitChanges()
+      const framePath = frameStateUtil.activeFrameStatePath(windowState)
+      if (framePath) {
+        windowState = windowState.mergeIn(framePath, {
+          activeShortcut: shortcut,
+          activeShortcutDetails: args
+        })
+        emitChanges()
+      }
     }
   })
   // Listen for actions on frame N
@@ -874,6 +848,6 @@ frameShortcuts.forEach((shortcut) => {
   }
 })
 
-AppDispatcher.register(doAction)
+appDispatcher.registerLocalCallback(doAction)
 
 module.exports = windowStore

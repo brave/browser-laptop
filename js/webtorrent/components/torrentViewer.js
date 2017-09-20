@@ -54,7 +54,7 @@ class TorrentViewer extends React.Component {
         })}
           data-l10n-id='poweredByWebTorrent'
           href='https://webtorrent.io'
-          target='_blank'
+          rel='noopener' target='_blank'
         />
       )
     } else {

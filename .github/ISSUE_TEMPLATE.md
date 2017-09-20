@@ -1,31 +1,47 @@
-- Did you search for similar issues before submitting this one?
+<!--
+Have you searched for similar issues? There is a lot of feedbacks and bug reports we have received and closed as duplicate.
+Before submitting this issue, please visit our wiki for common ones: https://github.com/brave/browser-laptop/wiki
+By using search engines along with GitHub search function, you would be able to find duplicates more efficiently.
 
-- Describe the issue you encountered:
+For more, check out our community site: https://community.brave.com/
+-->
 
-- Platform (Win7, 8, 10? macOS? Linux distro?):
+### Description
+<!--
+[Description of the issue]
+-->
 
-- Brave Version (revision SHA):
+### Steps to Reproduce
+<!--
+Please add a series of steps to reproduce the problem. See https://stackoverflow.com/help/mcve for in depth information on how to create a mimimal, complete, and verifiable example.
+-->
 
-- Steps to reproduce:
-    1.
-    2.
-    3.
-    
-- Actual result:
+  1.
+  2.
+  3.
 
-- Expected result:
+**Actual result:**
+<!--
+Add screenshots if needed
+-->
 
-- Will the steps above reproduce in a fresh profile? If not what other info can be added?
+**Expected result:**
 
-- Is this an issue in the currently released version?
+**Reproduces how often:** [What percentage of the time does it reproduce?]
 
-- Can this issue be consistently reproduced?
+### Brave Version
 
-- Extra QA steps:
-    1.
-    2.
-    3.
+**about:brave info:**
+<!--
+Please open about:brave, copy the version information, and paste it.
+-->
 
-- Screenshot if needed:
+**Reproducible on current live release:**
+<!--
+Is this a problem with the live build? It matters for triage reasons.
+-->
 
-- Any related issues:
+### Additional Information
+<!--
+Any additional information, related issues, extra QA steps, configuration or data that might be necessary to reproduce the issue.
+-->

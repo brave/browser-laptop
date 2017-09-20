@@ -20,8 +20,8 @@ describe('autoplayReducer unit tests', function () {
   const message = `Allow ${origin} to autoplay media?`
   const showNotificationArg = {
     buttons: [
-      {text: 'Yes'},
-      {text: 'No'}
+      {text: 'Allow'},
+      {text: 'Deny'}
     ],
     message,
     frameOrigin: origin,
@@ -58,11 +58,11 @@ describe('autoplayReducer unit tests', function () {
       translation: (msg, arg) => {
         let retMsg = ''
         switch (msg) {
-          case 'yes':
-            retMsg += 'Yes'
+          case 'allow':
+            retMsg += 'Allow'
             break
-          case 'no':
-            retMsg += 'No'
+          case 'deny':
+            retMsg += 'Deny'
             break
           case 'allowAutoplay':
             retMsg += `Allow ${arg.origin} to autoplay media?`
@@ -116,8 +116,8 @@ describe('autoplayReducer unit tests', function () {
 
     it('calls local.translation', function () {
       assert(translationSpy.withArgs('allowAutoplay', {origin}).called)
-      assert(translationSpy.withArgs('yes').called)
-      assert(translationSpy.withArgs('no').called)
+      assert(translationSpy.withArgs('allow').called)
+      assert(translationSpy.withArgs('deny').called)
     })
 
     it('calls appActions.showNotification', function () {
@@ -154,8 +154,8 @@ describe('autoplayReducer unit tests', function () {
 
     it('calls local.translation', function () {
       assert(translationSpy.withArgs('allowAutoplay', {origin}).called)
-      assert(translationSpy.withArgs('yes').called)
-      assert(translationSpy.withArgs('no').called)
+      assert(translationSpy.withArgs('allow').called)
+      assert(translationSpy.withArgs('deny').called)
     })
 
     it('calls appActions.showNotification', function () {
@@ -188,8 +188,8 @@ describe('autoplayReducer unit tests', function () {
 
     it('calls local.translation', function () {
       assert(translationSpy.withArgs('allowAutoplay', {origin}).called)
-      assert(translationSpy.withArgs('yes').called)
-      assert(translationSpy.withArgs('no').called)
+      assert(translationSpy.withArgs('allow').called)
+      assert(translationSpy.withArgs('deny').called)
     })
 
     it('calls appActions.showNotification', function () {
@@ -218,8 +218,8 @@ describe('autoplayReducer unit tests', function () {
 
     it('calls local.translation', function () {
       assert(translationSpy.withArgs('allowAutoplay', {origin}).called)
-      assert(translationSpy.withArgs('yes').called)
-      assert(translationSpy.withArgs('no').called)
+      assert(translationSpy.withArgs('allow').called)
+      assert(translationSpy.withArgs('deny').called)
     })
 
     it('calls appActions.showNotification', function () {

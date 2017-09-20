@@ -20,8 +20,8 @@ const windowActions = require('../../../../js/actions/windowActions')
 const windowState = require('../../../common/state/windowState')
 
 // Constants
-const siteTags = require('../../../../js/constants/siteTags')
 const dragTypes = require('../../../../js/constants/dragTypes')
+const siteTags = require('../../../../js/constants/siteTags')
 
 // Utils
 const {isFocused} = require('../../currentWindow')
@@ -32,6 +32,7 @@ const dndData = require('../../../../js/dndData')
 const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const bookmarkUtil = require('../../../common/lib/bookmarkUtil')
+const {elementHasDataset} = require('../../../../js/lib/eventUtil')
 
 // Styles
 const globalStyles = require('../styles/global')
@@ -55,34 +56,43 @@ class BookmarksToolbar extends React.Component {
         if (!bookmarkRef) {
           return false
         }
-        return bookmarkRef.props.bookmarkKey !== bookmark.get('bookmarkKey')
+        return bookmarkRef.props.bookmarkKey !== bookmark.get('key')
       }), e.clientX)
       if (droppedOn.selectedRef) {
-        const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
+        const isRightSide = !dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
         const droppedOnKey = droppedOn.selectedRef.props.bookmarkKey
         const isDestinationParent = droppedOn.selectedRef.props.isFolder && droppedOn && droppedOn.isDroppedOn
-        appActions.moveSite(bookmark.get('bookmarkKey'), droppedOnKey, isLeftSide, isDestinationParent)
+
+        if (bookmark.get('type') === siteTags.BOOKMARK_FOLDER) {
+          appActions.moveBookmarkFolder(bookmark.get('key'), droppedOnKey, isRightSide, isDestinationParent)
+        } else {
+          appActions.moveBookmark(bookmark.get('key'), droppedOnKey, isRightSide, isDestinationParent)
+        }
         dnd.onDragEnd()
       }
       return
     }
+
     const droppedHTML = e.dataTransfer.getData('text/html')
     if (droppedHTML) {
       const parser = new window.DOMParser()
       const doc = parser.parseFromString(droppedHTML, 'text/html')
       const a = doc.querySelector('a')
       if (a && a.href) {
-        appActions.addSite({
+        appActions.addBookmark(Immutable.fromJS({
           title: a.innerText,
           location: e.dataTransfer.getData('text/plain')
-        }, siteTags.BOOKMARK)
+        }))
         return
       }
     }
 
     if (e.dataTransfer.files.length > 0) {
       Array.from(e.dataTransfer.items).forEach((item) => {
-        item.getAsString((name) => appActions.addSite({ location: item.type, title: name }, siteTags.BOOKMARK))
+        item.getAsString((name) => appActions.addBookmark(Immutable.fromJS({
+          location: item.type,
+          title: name
+        })))
       })
       return
     }
@@ -92,12 +102,12 @@ class BookmarksToolbar extends React.Component {
       .map((x) => x.trim())
       .filter((x) => !x.startsWith('#') && x.length > 0)
       .forEach((url) =>
-        appActions.addSite({ location: url }, siteTags.BOOKMARK))
+        appActions.addBookmark(Immutable.fromJS({ location: url })))
   }
 
   onDragEnter (e) {
     if (dndData.hasDragData(e.dataTransfer, dragTypes.BOOKMARK)) {
-      if (Array.from(e.target.classList).includes('overflowIndicator')) {
+      if (elementHasDataset(e.target, 'overflowIndicator')) {
         this.onMoreBookmarksMenu(e)
       }
     }
@@ -144,7 +154,7 @@ class BookmarksToolbar extends React.Component {
     // used in renderer
     props.showOnlyFavicon = bookmarkUtil.showOnlyFavicon()
     props.showFavicon = bookmarkUtil.showFavicon()
-    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused()) &&
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state)) &&
       !isWindows
     props.visibleBookmarks = bookmarks.visibleBookmarks
     props.hiddenBookmarks = bookmarks.hiddenBookmarks
@@ -183,6 +193,7 @@ class BookmarksToolbar extends React.Component {
       {
         this.props.hiddenBookmarks.size !== 0
         ? <BrowserButton
+          bookmarksOverflowIndicator
           iconClass={globalStyles.appIcons.angleDoubleRight}
           onClick={this.onMoreBookmarksMenu}
           custom={[
@@ -200,13 +211,14 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     display: 'flex',
     flex: 1,
-    padding: `${globalStyles.spacing.navbarMenubarMargin} ${globalStyles.spacing.bookmarksToolbarPadding}`
+    padding: `0 ${globalStyles.spacing.bookmarksToolbarPadding}`,
+    margin: `${globalStyles.spacing.navbarMenubarMargin} 0`
   },
   bookmarksToolbar__allowDragging: {
     WebkitAppRegion: 'drag'
   },
   bookmarksToolbar__showOnlyFavicon: {
-    padding: `${globalStyles.spacing.navbarMenubarMargin} 0 ${globalStyles.spacing.tabPagesHeight} ${globalStyles.spacing.bookmarksToolbarPadding}`
+    padding: `0 0 0 ${globalStyles.spacing.bookmarksToolbarPadding}`
   },
   bookmarksToolbar__bookmarkButton: {
     boxSizing: 'border-box',

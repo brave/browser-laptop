@@ -65,10 +65,11 @@ const appActions = {
     })
   },
 
-  windowUpdated: function (windowValue) {
+  windowUpdated: function (windowValue, updateDefault) {
     dispatch({
       actionType: appConstants.APP_WINDOW_UPDATED,
-      windowValue
+      windowValue,
+      updateDefault
     })
   },
 
@@ -84,6 +85,17 @@ const appActions = {
   },
 
   /**
+   * The tab strip is empty
+   * @param {Number} windowId
+   */
+  tabStripEmpty: function (windowId) {
+    dispatch({
+      actionType: appConstants.APP_TAB_STRIP_EMPTY,
+      windowId
+    })
+  },
+
+  /**
    * A new tab has been created
    * @param {Object} tabValue
    */
@@ -95,15 +107,48 @@ const appActions = {
   },
 
   /**
+   * Tab moved event fired from muon
+   * @param {Object} tabValue
+   */
+  tabMoved: function (tabId) {
+    dispatch({
+      actionType: appConstants.APP_TAB_MOVED,
+      tabId
+    })
+  },
+
+  /**
+   * A tab has been attached
+   * @param {Object} tabValue
+   */
+  tabAttached: function (tabId) {
+    dispatch({
+      actionType: appConstants.APP_TAB_ATTACHED,
+      tabId
+    })
+  },
+
+  /**
+   * A tab will be attached
+   * @param {Object} tabValue
+   */
+  tabWillAttach: function (tabId) {
+    dispatch({
+      actionType: appConstants.APP_TAB_WILL_ATTACH,
+      tabId
+    })
+  },
+
+  /**
    * A tab has been moved to another window
    * @param {Number} tabId
    * @param {Object} frameOpts
    * @param {Object} browserOpts
    * @param {Number} windowId
    */
-  tabMoved: function (tabId, frameOpts, browserOpts, windowId) {
+  tabDetachMenuItemClicked: function (tabId, frameOpts, browserOpts, windowId) {
     dispatch({
-      actionType: appConstants.APP_TAB_MOVED,
+      actionType: appConstants.APP_TAB_DETACH_MENU_ITEM_CLICKED,
       tabId,
       frameOpts,
       browserOpts,
@@ -198,14 +243,14 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message to the store to change the tab index
+   * Dispatches a message to the store to indicate a user action requested that the tab index change
    *
    * @param {Number} tabId - the tabId
    * @param {Number} index - the new index
    */
-  tabIndexChanged: function (tabId, index) {
+  tabIndexChangeRequested: function (tabId, index) {
     dispatch({
-      actionType: appConstants.APP_TAB_INDEX_CHANGED,
+      actionType: appConstants.APP_TAB_INDEX_CHANGE_REQUESTED,
       tabId,
       index
     })
@@ -242,49 +287,22 @@ const appActions = {
   /**
    * Adds a site to the site list
    * @param {Object} siteDetail - Properties of the site in question, can also be an array of siteDetail
-   * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
-   * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if addSite was triggered by Sync)
    */
-  addSite: function (siteDetail, tag, skipSync) {
+  addHistorySite: function (siteDetail) {
     dispatch({
-      actionType: appConstants.APP_ADD_SITE,
-      siteDetail,
-      tag,
-      skipSync
+      actionType: appConstants.APP_ADD_HISTORY_SITE,
+      siteDetail
     })
   },
 
   /**
    * Removes a site from the site list
-   * @param {Object} siteDetail - Properties of the site in question
-   * @param {string} tag - A tag to associate with the site. e.g. bookmarks.
-   * @param {boolean} skipSync - Set true if a site isn't eligible for Sync (e.g. if this removal was triggered by Sync)
+   * @param {string|Immutable.List} historyKey - Hisotry item key that we want to remove, can be list of keys as well
    */
-  removeSite: function (siteDetail, tag, skipSync) {
+  removeHistorySite: function (historyKey) {
     dispatch({
-      actionType: appConstants.APP_REMOVE_SITE,
-      siteDetail,
-      tag,
-      skipSync
-    })
-  },
-
-  /**
-   * Dispatches a message to move a site locations.
-   *
-   * @param {string} sourceKey - the source key of the source moved site
-   * @param {string} destinationKey - the destination key of the destination moved site
-   * @param {boolean} prepend - Whether or not to prepend to the destinationLocation
-   *   If false, the destinationDetail is considered a sibling.
-   * @param {boolean} destinationIsParent - Whether or not the destinationDetail should be considered the new parent.
-   */
-  moveSite: function (sourceKey, destinationKey, prepend, destinationIsParent) {
-    dispatch({
-      actionType: appConstants.APP_MOVE_SITE,
-      sourceKey,
-      destinationKey,
-      prepend,
-      destinationIsParent
+      actionType: appConstants.APP_REMOVE_HISTORY_SITE,
+      historyKey
     })
   },
 
@@ -328,19 +346,6 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED,
       recoverySucceeded: false
-    })
-  },
-
-  /**
-   * Sets the default window size / position
-   * @param {Array} size - [width, height]
-   * @param {Array} position - [x, y]
-   */
-  defaultWindowParamsChanged: function (size, position) {
-    dispatch({
-      actionType: appConstants.APP_DEFAULT_WINDOW_PARAMS_CHANGED,
-      size,
-      position
     })
   },
 
@@ -665,18 +670,6 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message when windowId gains focus
-   *
-   * @param {Number} windowId - the unique id of the window
-   */
-  windowFocused: function (windowId) {
-    dispatch({
-      actionType: appConstants.APP_WINDOW_FOCUSED,
-      windowId: windowId
-    })
-  },
-
-  /**
    * Saves current menubar template for use w/ Windows titlebar
    * @param {Object} menubarTemplate - JSON used to build the menu
    */
@@ -895,6 +888,21 @@ const appActions = {
   },
 
   /**
+   * Dispatches a message to inspect desired element on the page
+   * @param {number} tabId - The tabId
+   * @param {number} x - horizontal position of the element
+   * @param {number} y - vertical position of the element
+   */
+  inspectElement: function (tabId, x, y) {
+    dispatch({
+      actionType: appConstants.APP_INSPECT_ELEMENT,
+      tabId,
+      x,
+      y
+    })
+  },
+
+  /**
    * Dispatches a message when a tab is being cloned
    * @param {number} tabId - The tabId of the tab to clone
    * @param {object} options - object containing options such as acive, back, and forward booleans
@@ -999,18 +1007,6 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_SET_SYNC_SETUP_ERROR,
       error
-    })
-  },
-
-  /**
-   * Dispatches a message to apply a batch of site records from Brave Sync
-   * TODO: Refactor this to merge it into addSite/removeSite
-   * @param {Array.<Object>} records
-   */
-  applySiteRecords: function (records) {
-    dispatch({
-      actionType: appConstants.APP_APPLY_SITE_RECORDS,
-      records
     })
   },
 
@@ -1135,10 +1131,9 @@ const appActions = {
   },
 
   /**
-   * Update ledger publishers pinned percentages according to the new synopsis
-   * Open dialog for default download path setting
-   * Dispatches a message when a tab is being pinned
+   * Dispatches a message to change a the pinned status of a tab
    * @param {number} tabId - The tabId of the tab to pin
+   * @param {boolean} pinned - true if the pin should be pinned, false if the tab should be unpinned
    */
   tabPinned: function (tabId, pinned) {
     dispatch({
@@ -1148,7 +1143,7 @@ const appActions = {
     })
   },
 
-  /*
+  /**
    * Dispatches a message when a web contents is added
    * @param {number} windowId - The windowId of the host window
    * @param {object} frameOpts - frame options for the added web contents
@@ -1165,7 +1160,7 @@ const appActions = {
     })
   },
 
-  /*
+  /**
    * Notifies the app that a drag operation started from within the app
    * @param {number} windowId - The source windowId the drag is starting from
    * @param {string} dragType - The type of data
@@ -1483,21 +1478,111 @@ const appActions = {
     })
   },
 
-  addBookmark: function (siteDetail, tag, closestKey) {
+  /**
+   * Dispatches a message that adds a bookmark
+   * @param siteDetail{Immutable.Map|Immutable.List} - Bookmark details that we want to add, this can be a List as well
+   * @param closestKey{string} - Key of the sibling where we would like to place this new bookmark
+   */
+  addBookmark: function (siteDetail, closestKey) {
     dispatch({
       actionType: appConstants.APP_ADD_BOOKMARK,
       siteDetail,
-      tag,
       closestKey
     })
   },
 
-  editBookmark: function (siteDetail, editKey, tag) {
+  /**
+   * Dispatches a message that edits a bookmark
+   * @param editKey{string} - Key of the bookmark that we want to edit
+   * @param siteDetail{Immutable.Map} - Data that we want to change
+   */
+  editBookmark: function (editKey, siteDetail) {
     dispatch({
       actionType: appConstants.APP_EDIT_BOOKMARK,
-      siteDetail,
-      tag,
-      editKey
+      editKey,
+      siteDetail
+    })
+  },
+
+  /**
+   * Dispatches a message that moves a bookmark to another destination
+   * @param bookmarkKey{string} - Key of the bookmark that we want to move
+   * @param destinationKey{string} - Key of the bookmark/folder where we would like to move
+   * @param append{boolean} - Defines if we will append(true) or prepend(false) moved bookmark
+   * @param moveIntoParent{boolean} - Should we move folder into destination folder or not
+   */
+  moveBookmark: function (bookmarkKey, destinationKey, append, moveIntoParent) {
+    dispatch({
+      actionType: appConstants.APP_MOVE_BOOKMARK,
+      bookmarkKey,
+      destinationKey,
+      append,
+      moveIntoParent
+    })
+  },
+
+  /**
+   * Dispatches a message that removes a bookmark
+   * @param bookmarkKey {string|Immutable.List} - Bookmark key that we want to remove. This could also be list of keys
+   */
+  removeBookmark: function (bookmarkKey) {
+    dispatch({
+      actionType: appConstants.APP_REMOVE_BOOKMARK,
+      bookmarkKey
+    })
+  },
+
+  /**
+   * Dispatches a message that adds a bookmark folder
+   * @param folderDetails{Immutable.Map|Immutable.List} - Folder details that we want to add, this can be List as well
+   * @param closestKey{string} - Key of the sibling where we would like to place this new folder
+   */
+  addBookmarkFolder: function (folderDetails, closestKey) {
+    dispatch({
+      actionType: appConstants.APP_ADD_BOOKMARK_FOLDER,
+      folderDetails,
+      closestKey
+    })
+  },
+
+  /**
+   * Dispatches a message that edits a bookmark folder
+   * @param editKey{string} - Key of the folder that we want to edit
+   * @param folderDetails{Immutable.Map} - Data that we want to change
+   */
+  editBookmarkFolder: function (editKey, folderDetails) {
+    dispatch({
+      actionType: appConstants.APP_EDIT_BOOKMARK_FOLDER,
+      editKey,
+      folderDetails
+    })
+  },
+
+  /**
+   * Dispatches a message that moves a bookmark folder to another destination
+   * @param folderKey{string} - Key of the folder that we want to move
+   * @param destinationKey{string} - Key of the bookmark/folder where we would like to move
+   * @param append{boolean} - Defines if we will append(true) or prepend(false) moved folder
+   * @param moveIntoParent{boolean} - Should we move folder into destination folder or not
+   */
+  moveBookmarkFolder: function (folderKey, destinationKey, append, moveIntoParent) {
+    dispatch({
+      actionType: appConstants.APP_MOVE_BOOKMARK_FOLDER,
+      folderKey,
+      destinationKey,
+      append,
+      moveIntoParent
+    })
+  },
+
+  /**
+   * Dispatches a message that removes a bookmark folder
+   * @param folderKey{string} - Key of the folder that we want to remove
+   */
+  removeBookmarkFolder: function (folderKey) {
+    dispatch({
+      actionType: appConstants.APP_REMOVE_BOOKMARK_FOLDER,
+      folderKey
     })
   },
 
@@ -1539,6 +1624,15 @@ const appActions = {
       actionType: appConstants.APP_SET_VERSION_INFO,
       name,
       version
+    })
+  },
+
+  onPinnedTabReorder: function (siteKey, destinationKey, prepend) {
+    dispatch({
+      actionType: appConstants.APP_ON_PINNED_TAB_REORDER,
+      siteKey,
+      destinationKey,
+      prepend
     })
   }
 }

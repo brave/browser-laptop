@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const styles = require('../components/styles/global')
+const tabBreakpoint = require('../components/styles/global').breakpoint.tab
 
 /**
  * Get tab's breakpoint name for current tab size.
@@ -10,11 +10,11 @@ const styles = require('../components/styles/global')
  * @returns {String} The matching breakpoint.
  */
 module.exports.getTabBreakpoint = (tabWidth) => {
-  const sizes = ['default', 'large', 'largeMedium', 'medium', 'mediumSmall', 'small', 'extraSmall', 'smallest']
+  const sizes = Object.keys(tabBreakpoint)
   let currentSize
 
   sizes.map(size => {
-    if (tabWidth <= Number.parseInt(styles.breakpoint.tab[size], 10)) {
+    if (tabWidth <= Number.parseInt(tabBreakpoint[size], 10)) {
       currentSize = size
       return false
     }
@@ -35,4 +35,23 @@ module.exports.tabUpdateFrameRate = 66
 module.exports.hasBreakpoint = (breakpoint, arr) => {
   arr = Array.isArray(arr) ? arr : [arr]
   return arr.includes(breakpoint)
+}
+
+/**
+ * Check whether or not the related target is a tab
+ * by checking the parentNode dataset
+ * @param {Object} event - The mouse event
+ * @returns {Boolean} Whether or not the related target is a tab
+ */
+module.exports.hasTabAsRelatedTarget = (event) => {
+  let tabAsRelatedTarget = false
+  const relatedTarget = event && event.relatedTarget
+
+  if (relatedTarget != null) {
+    const hasDataset = relatedTarget.parentNode && relatedTarget.parentNode.dataset
+    if (hasDataset != null) {
+      tabAsRelatedTarget = (hasDataset.tab || hasDataset.tabArea) || false
+    }
+  }
+  return tabAsRelatedTarget
 }

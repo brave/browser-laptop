@@ -16,6 +16,7 @@ const getSetting = require('../../../../js/settings').getSetting
 // Components
 const ReduxComponent = require('../reduxComponent')
 const FullScreenWarning = require('./fullScreenWarning')
+const HrefPreview = require('./hrefPreview')
 const MessageBox = require('../common/messageBox')
 
 // Store
@@ -30,7 +31,6 @@ const tabMessageBoxState = require('../../../common/state/tabMessageBoxState')
 
 // Utils
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const siteUtil = require('../../../../js/state/siteUtil')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const cx = require('../../../../js/lib/classSet')
 const urlParse = require('../../../common/urlParse')
@@ -49,6 +49,7 @@ const {isFocused} = require('../../currentWindow')
 const debounce = require('../../../../js/lib/debounce')
 const locale = require('../../../../js/l10n')
 const imageUtil = require('../../../../js/lib/imageUtil')
+const historyUtil = require('../../../common/lib/historyUtil')
 
 // Constants
 const settings = require('../../../../js/constants/settings')
@@ -161,12 +162,14 @@ class Frame extends React.Component {
       this.addEventListeners()
       if (cb) {
         this.runOnDomReady = cb
-        let eventCallback = (e) => {
-          this.webview.removeEventListener(e.type, eventCallback)
+        let didAttachCallback = (e) => {
+          this.webview.removeEventListener(e.type, didAttachCallback)
           this.runOnDomReady()
           delete this.runOnDomReady
         }
-        this.webview.addEventListener('did-attach', eventCallback, { passive: true })
+        this.webview.addEventListener('will-attach', () => {
+        })
+        this.webview.addEventListener('did-attach', didAttachCallback, { passive: true })
       }
 
       if (!this.props.guestInstanceId || !this.webview.attachGuest(this.props.guestInstanceId)) {
@@ -181,7 +184,7 @@ class Frame extends React.Component {
   }
 
   onPropsChanged (prevProps = {}) {
-    if (this.props.isActive && !prevProps.isActive && isFocused()) {
+    if (this.props.isActive && !prevProps.isActive && this.props.isFocused) {
       windowActions.setFocusedFrame(this.props.location, this.props.tabId)
     }
   }
@@ -285,16 +288,13 @@ class Frame extends React.Component {
         if (this.props.tabUrl !== this.props.location &&
           !this.isAboutPage() &&
           !isTorrentViewerURL(this.props.location)) {
-          this.webview.loadURL(this.props.location)
+          appActions.loadURLRequested(this.props.tabId, this.props.location)
         } else {
           tabActions.reload(this.props.tabId)
         }
         break
       case 'clean-reload':
         tabActions.reload(this.props.tabId, true)
-        break
-      case 'explicitLoadURL':
-        this.webview.loadURL(this.props.location)
         break
       case 'zoom-in':
         this.zoomIn()
@@ -624,7 +624,7 @@ class Frame extends React.Component {
         // with setTitle. We either need to delay this call until the title is
         // or add a way to update it
         setTimeout(() => {
-          appActions.addSite(siteUtil.getDetailFromFrame(this.frame))
+          appActions.addHistorySite(historyUtil.getDetailFromFrame(this.frame))
         }, 250)
       }
 
@@ -667,8 +667,9 @@ class Frame extends React.Component {
           errorCode: e.errorCode,
           url: e.validatedURL
         })
+        const key = historyUtil.getKey(this.frame)
         appActions.loadURLRequested(this.props.tabId, 'about:error')
-        appActions.removeSite(siteUtil.getDetailFromFrame(this.frame))
+        appActions.removeHistorySite(key)
       } else if (isAborted(e.errorCode)) {
         // just stay put
       } else if (provisionLoadFailure) {
@@ -721,18 +722,6 @@ class Frame extends React.Component {
       if (!this.frame.isEmpty()) {
         windowActions.setNavigated(e.url, this.props.frameKey, false, this.props.tabId)
       }
-    }, { passive: true })
-    this.webview.addEventListener('crashed', (e) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      windowActions.setFrameError(this.frame, {
-        event_type: 'crashed',
-        title: 'unexpectedError',
-        url: this.props.location
-      })
-      appActions.loadURLRequested(this.props.tabId, 'about:error')
-      this.webview = false
     }, { passive: true })
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
       if (e.isMainFrame) {
@@ -884,10 +873,9 @@ class Frame extends React.Component {
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frame.get('key'))
     props.showFullScreenWarning = frame.get('showFullScreenWarning')
     props.location = location
-    props.hrefPreview = frame.get('hrefPreview')
-    props.showOnRight = frame.get('showOnRight')
     props.tabId = tabId
     props.showMessageBox = tabMessageBoxState.hasMessageBoxDetail(state, tabId)
+    props.isFocused = isFocused(state)
 
     // used in other functions
     props.frameKey = ownProps.frameKey
@@ -944,16 +932,7 @@ class Frame extends React.Component {
           webviewContainer: true,
           isPreview: this.props.isPreview
         })} />
-      {
-        this.props.hrefPreview
-        ? <div className={cx({
-          hrefPreview: true,
-          right: this.props.showOnRight
-        })}>
-          {this.props.hrefPreview}
-        </div>
-        : null
-      }
+      <HrefPreview frameKey={this.props.frameKey} />
       {
         this.props.showMessageBox
         ? <MessageBox

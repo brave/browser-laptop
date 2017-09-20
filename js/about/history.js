@@ -12,7 +12,7 @@ const settings = require('../constants/settings')
 const aboutActions = require('./aboutActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../../app/renderer/components/common/sortableTable')
-const Button = require('../../app/renderer/components/common/button')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const historyUtil = require('../../app/common/lib/historyUtil')
 
@@ -78,7 +78,9 @@ class HistoryDay extends ImmutableComponent {
       <div className={css(styles.subTitleMargin)}>
         <AboutPageSectionSubTitle>{this.props.date}</AboutPageSectionSubTitle>
       </div>
-      <SortableTable headings={['time', 'title', 'domain']}
+      <SortableTable
+        fillAvailable
+        headings={['time', 'title', 'domain']}
         defaultHeading='time'
         defaultHeadingSortOrder='desc'
         rows={this.props.entries.map((entry) => [
@@ -206,7 +208,10 @@ class AboutHistory extends React.Component {
   }
   render () {
     return <div className='siteDetailsPage' onClick={this.onClick}>
-      <div className='siteDetailsPageHeader'>
+      <div className={cx({
+        siteDetailsPageHeader: true,
+        [css(styles.history__header)]: true
+      })}>
         <AboutPageSectionTitle data-l10n-id='history' />
         <div className='headerActions'>
           <div className='searchWrapper'>
@@ -217,7 +222,7 @@ class AboutHistory extends React.Component {
               : <span className='fa fa-search searchInputPlaceholder' />
             }
           </div>
-          <Button className='primaryButton'
+          <BrowserButton primaryColor
             l10nId='clearBrowsingDataNow'
             testId='clearBrowsingDataButton'
             onClick={this.clearBrowsingDataNow}
@@ -245,6 +250,12 @@ class AboutHistory extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  history__header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+
   subTitleMargin: {
     marginLeft: globalStyles.spacing.aboutPageSectionPadding
   }

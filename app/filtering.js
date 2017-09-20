@@ -27,13 +27,15 @@ const dialog = electron.dialog
 const app = electron.app
 const uuid = require('uuid')
 const path = require('path')
-const getOrigin = require('../js/state/siteUtil').getOrigin
+const fs = require('fs')
+const getOrigin = require('../js/lib/urlutil').getOrigin
 const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 const {fullscreenOption} = require('./common/constants/settingsEnums')
 const isThirdPartyHost = require('./browser/isThirdPartyHost')
-var extensionState = require('./common/state/extensionState.js')
+const extensionState = require('./common/state/extensionState')
 const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
+const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
 
 let appStore = null
 
@@ -56,6 +58,23 @@ const registeredSessions = {}
  * Maps permission notification bar messages to their callback
  */
 const permissionCallbacks = {}
+
+const getBraverySettingsForUrl = (url, appState, isPrivate) => {
+  const cachedBraverySettings = getBraverySettingsCache(url, isPrivate)
+  if (cachedBraverySettings) {
+    return cachedBraverySettings
+  }
+  const savedSettings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
+  const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
+
+  let braverySettings = siteSettings.activeSettings(savedSettings, appState, appConfig)
+  if (isPrivate && tempSettings) {
+    braverySettings = siteSettings.activeSettings(tempSettings, appState, appConfig)
+  }
+  updateBraverySettingsCache(url, isPrivate, braverySettings)
+
+  return braverySettings
+}
 
 module.exports.registerBeforeSendHeadersFilteringCB = (filteringFn) => {
   beforeSendHeadersFilteringFns.push(filteringFn)
@@ -223,12 +242,12 @@ module.exports.applyCookieSetting = (requestHeaders, url, firstPartyUrl, isPriva
   if (cookieSetting) {
     const parsedTargetUrl = urlParse(url || '')
     const parsedFirstPartyUrl = urlParse(firstPartyUrl)
+    const targetOrigin = getOrigin(url)
 
     if (cookieSetting === 'blockAllCookies' ||
       isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
       let hasCookieException = false
       const firstPartyOrigin = getOrigin(firstPartyUrl)
-      const targetOrigin = getOrigin(url)
       if (cookieExceptions.hasOwnProperty(firstPartyOrigin)) {
         const subResources = cookieExceptions[firstPartyOrigin]
         for (let i = 0; i < subResources.length; ++i) {
@@ -249,10 +268,16 @@ module.exports.applyCookieSetting = (requestHeaders, url, firstPartyUrl, isPriva
           firstPartyOrigin !== pdfjsOrigin && !hasCookieException) {
         requestHeaders['Cookie'] = undefined
       }
-      if (requestHeaders['Referer'] &&
-          !refererExceptions.includes(parsedTargetUrl.hostname)) {
-        requestHeaders['Referer'] = targetOrigin
-      }
+    }
+
+    const referer = requestHeaders['Referer']
+    if (referer &&
+        cookieSetting !== 'allowAllCookies' &&
+        !refererExceptions.includes(parsedTargetUrl.hostname) &&
+        targetOrigin !== getOrigin(referer)) {
+      // Unless the setting is 'allow all cookies', spoof the referer if it
+      // is a cross-origin referer
+      requestHeaders['Referer'] = targetOrigin
     }
   }
 
@@ -364,7 +389,7 @@ function registerPermissionHandler (session, partition) {
   const isPrivate = module.exports.isPrivate(partition)
   // Keep track of per-site permissions granted for this session.
   let permissions = null
-  session.setPermissionRequestHandler((origin, mainFrameUrl, permission, cb) => {
+  session.setPermissionRequestHandler((origin, mainFrameUrl, permissionTypes, cb) => {
     if (!permissions) {
       permissions = {
         media: {
@@ -394,42 +419,16 @@ function registerPermissionHandler (session, partition) {
       }
     }
 
-    if (!permissions[permission]) {
-      console.log('WARNING: got unregistered permission request', permission)
-      cb(false)
-      return
-    }
-
-    // The Torrent Viewer extension is always allowed to show fullscreen media
-    if (permission === 'fullscreen' &&
-      origin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
-      cb(true)
-      return
-    }
-
-    // Always allow fullscreen if setting is ON
-    const alwaysAllowFullscreen = module.exports.alwaysAllowFullscreen() === fullscreenOption.ALWAYS_ALLOW
-    if (permission === 'fullscreen' && alwaysAllowFullscreen) {
-      cb(true)
-      return
-    }
-
-    // The Brave extension and PDFJS are always allowed to open files in an external app
-    if (permission === 'openExternal' && (
-      origin.startsWith('chrome-extension://' + config.PDFJSExtensionId) ||
-      origin.startsWith('chrome-extension://' + config.braveExtensionId))) {
-      cb(true)
-      return
-    }
-
+    // TODO(bridiver) - the permission handling should be converted to an action because we should never call `appStore.getState()`
     // Check whether there is a persistent site setting for this host
     const appState = appStore.getState()
+    const isBraveOrigin = origin.startsWith(`chrome-extension://${config.braveExtensionId}/`)
+    const isPDFOrigin = origin.startsWith(`${pdfjsOrigin}/`)
     let settings
     let tempSettings
-    if (mainFrameUrl === appUrlUtil.getBraveExtIndexHTML() ||
-      origin.startsWith('chrome-extension://' + config.braveExtensionId)) {
-      // lookup, display and store site settings by "Brave Browser"
-      origin = 'Brave Browser'
+    if (mainFrameUrl === appUrlUtil.getBraveExtIndexHTML() || isPDFOrigin || isBraveOrigin) {
+      // lookup, display and store site settings by the origin alias
+      origin = isPDFOrigin ? 'PDF Viewer' : 'Brave Browser'
       // display on all tabs
       mainFrameUrl = null
       // Lookup by exact host pattern match since 'Brave Browser' is not
@@ -449,49 +448,86 @@ function registerPermissionHandler (session, partition) {
       tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), origin)
     }
 
-    const permissionName = permission + 'Permission'
-    let isAllowed
-    if (settings) {
-      isAllowed = settings.get(permissionName)
-    }
-    // Private tabs inherit settings from normal tabs, but not vice versa.
-    if (isPrivate && tempSettings) {
-      isAllowed = tempSettings.get(permissionName)
-    }
-    if (typeof isAllowed === 'boolean') {
-      cb(isAllowed)
-      return
-    }
-
-    const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, origin).replace(/{{\s*permission\s*}}/, permissions[permission].action)
-
-    // If this is a duplicate, clear the previous callback and use the new one
-    if (permissionCallbacks[message]) {
-      permissionCallbacks[message](0, false)
-    }
-
-    appActions.showNotification({
-      buttons: [
-        {text: locale.translation('deny')},
-        {text: locale.translation('allow')}
-      ],
-      frameOrigin: getOrigin(mainFrameUrl),
-      options: {
-        persist: true
-      },
-      message
-    })
-
-    permissionCallbacks[message] = (buttonIndex, persist) => {
-      permissionCallbacks[message] = null
-      // hide the notification if this was triggered automatically
-      appActions.hideNotification(message)
-      const result = !!(buttonIndex)
-      cb(result)
-      if (persist) {
-        // remember site setting for this host
-        appActions.changeSiteSetting(origin, permission + 'Permission', result, isPrivate)
+    let response = []
+    for (let i = 0; i < permissionTypes.length; i++) {
+      const responseSizeThisIteration = response.length
+      const permission = permissionTypes[i]
+      const alwaysAllowFullscreen = module.exports.alwaysAllowFullscreen() === fullscreenOption.ALWAYS_ALLOW
+      if (!permissions[permission]) {
+        console.warn('WARNING: got unregistered permission request', permission)
+        response.push(false)
+      } else if (permission === 'fullscreen' &&
+        // The Torrent Viewer extension is always allowed to show fullscreen media
+        origin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
+        response.push(true)
+      } else if (permission === 'fullscreen' && alwaysAllowFullscreen) {
+        // Always allow fullscreen if setting is ON
+        response.push(true)
+      } else if (permission === 'openExternal' && (
+        // The Brave extension and PDFJS are always allowed to open files in an external app
+        isPDFOrigin || isBraveOrigin)) {
+        response.push(true)
+      } else {
+        const permissionName = permission + 'Permission'
+        let isAllowed
+        if (settings) {
+          isAllowed = settings.get(permissionName)
+        }
+        // Private tabs inherit settings from normal tabs, but not vice versa.
+        if (isPrivate && tempSettings) {
+          isAllowed = tempSettings.get(permissionName)
+        }
+        if (typeof isAllowed === 'boolean') {
+          response.push(isAllowed)
+        }
       }
+
+      // Display 'Brave Browser' if the origin is null; ex: when a mailto: link
+      // is opened in a new tab via right-click
+      const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, origin || 'Brave Browser').replace(/{{\s*permission\s*}}/, permissions[permission].action)
+
+      // If this is a duplicate, clear the previous callback and use the new one
+      if (permissionCallbacks[message]) {
+        permissionCallbacks[message](0, false)
+      }
+
+      const responseAutoAdded = responseSizeThisIteration !== response.length
+      if (!responseAutoAdded) {
+        appActions.showNotification({
+          buttons: [
+            {text: locale.translation('deny')},
+            {text: locale.translation('allow')}
+          ],
+          frameOrigin: getOrigin(mainFrameUrl),
+          options: {
+            persist: !!origin,
+            index: i
+          },
+          message
+        })
+
+        // Use a closure here for the index instead of passing an index to the
+        // function because ipcMain.on(messages.NOTIFICATION_RESPONSE above
+        // calls into the callback without knowing an index.
+        const index = i
+        permissionCallbacks[message] = (buttonIndex, persist) => {
+          // hide the notification if this was triggered automatically
+          appActions.hideNotification(message)
+          const result = !!(buttonIndex)
+          response[index] = result
+          if (persist) {
+            // remember site setting for this host
+            appActions.changeSiteSetting(origin, permission + 'Permission', result, isPrivate)
+          }
+          if (response.length === permissionTypes.length) {
+            permissionCallbacks[message] = null
+            cb(response)
+          }
+        }
+      }
+    }
+    if (response.length === permissionTypes.length) {
+      cb(response)
     }
   })
 }
@@ -541,8 +577,22 @@ function registerForDownloadListener (session) {
       itemFilename = item.getFilename()
     }
 
-    const defaultPath = path.join(getSetting(settings.DOWNLOAD_DEFAULT_PATH) || getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'), itemFilename)
-    const savePath = ((process.env.SPECTRON || (!getSetting(settings.DOWNLOAD_ALWAYS_ASK) && !item.promptForSaveLocation())) ? defaultPath : dialog.showSaveDialog(win, { defaultPath }))
+    const defaultDir = (getSetting(settings.DOWNLOAD_DEFAULT_PATH) || getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'))
+    let savePath
+    if (process.env.SPECTRON || (!getSetting(settings.DOWNLOAD_ALWAYS_ASK) && !item.promptForSaveLocation())) {
+      let willOverwrite = true
+      let matchedFilenames = 0
+      while (willOverwrite) {
+        savePath = path.join(defaultDir, (matchedFilenames ? `${itemFilename.replace(new RegExp(`${path.extname(itemFilename)}$`), '')} (${matchedFilenames})${path.extname(itemFilename)}` : itemFilename))
+        if (!fs.existsSync(savePath)) {
+          willOverwrite = false
+        } else {
+          matchedFilenames++
+        }
+      }
+    } else {
+      savePath = dialog.showSaveDialog(win, { defaultPath: path.join(defaultDir, itemFilename) })
+    }
 
     // User cancelled out of save dialog prompt
     if (!savePath) {
@@ -716,28 +766,22 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
   if (resourceName === 'flash') {
     return true
   }
+  const appState = appStore.getState()
+  const settingsState = appState.get('settings')
 
   if (resourceName === 'pdfjs') {
-    return getSetting(settings.PDFJS_ENABLED)
+    return getSetting(settings.PDFJS_ENABLED, settingsState)
   }
   if (resourceName === 'webtorrent') {
-    return getSetting(settings.TORRENT_VIEWER_ENABLED)
+    return getSetting(settings.TORRENT_VIEWER_ENABLED, settingsState)
   }
-
-  const appState = appStore.getState()
 
   if (resourceName === 'webtorrent') {
     const extension = extensionState.getExtensionById(appState, config.torrentExtensionId)
     return extension !== undefined ? extension.get('enabled') : false
   }
 
-  const savedSettings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), url)
-  const tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), url)
-
-  let braverySettings = siteSettings.activeSettings(savedSettings, appState, appConfig)
-  if (isPrivate && tempSettings) {
-    braverySettings = siteSettings.activeSettings(tempSettings, appState, appConfig)
-  }
+  const braverySettings = getBraverySettingsForUrl(url, appState, isPrivate)
 
   // If full shields are down never enable extra protection
   if (braverySettings.shieldsUp === false) {

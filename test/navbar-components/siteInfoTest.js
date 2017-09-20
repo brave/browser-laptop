@@ -53,4 +53,42 @@ describe('siteInfo component tests', function () {
         .waitForElementCount(viewCertificateButton, 1)
     })
   })
+
+  describe('siteInfo warning on phishing URLs', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      yield setup(this.app.client)
+    })
+
+    it('siteInfo popup closes when navigating from data: to https:', function * () {
+      const page1 = 'data:text/html,<meta http-equiv="refresh" content="1; url=https://example.com/">'
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(page1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForElementCount(siteInfoDialog, 1)
+        .waitForElementCount(siteInfoDialog, 0)
+    })
+
+    it('shows siteInfo once when switching to a new tab', function * () {
+      const page1 = 'data:,Hello%2C%20World!'
+      yield this.app.client
+        .tabByIndex(0)
+        .url('https://example.com')
+        .windowByUrl(Brave.browserWindowUrl)
+        .newTab({
+          active: false,
+          url: page1
+        })
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForElementCount(siteInfoDialog, 0)
+        .activateTabByIndex(1)
+        .waitForElementCount(siteInfoDialog, 1)
+        .activateTabByIndex(0)
+        .waitForElementCount(siteInfoDialog, 0)
+        .activateTabByIndex(1)
+        .waitForExist('[data-test-active-tab][data-frame-key="2"]')
+        .waitForElementCount(siteInfoDialog, 0)
+    })
+  })
 })

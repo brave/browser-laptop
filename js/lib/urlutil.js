@@ -354,7 +354,7 @@ const UrlUtil = {
       parsed.hostname = punycode.toASCII(parsed.hostname)
       return urlFormat(parsed)
     } catch (e) {
-      return url
+      return punycode.toASCII(url)
     }
   },
 
@@ -410,6 +410,47 @@ const UrlUtil = {
     }
 
     return url
+  },
+
+  /**
+   * Gets a site origin (scheme + hostname + port) from a URL or null if not available.
+   * Warning: For unit tests, this currently runs as node without the parsed.origin
+   * branch of code, but in muon this runs through the parsed.origin branch of code.
+   * @param {string} location
+   * @return {string|null}
+   */
+  getOrigin: (location) => {
+    // Returns scheme + hostname + port
+    if (typeof location !== 'string') {
+      return null
+    }
+
+    if (location.startsWith('file://')) {
+      return 'file:///'
+    }
+
+    let parsed = urlParse(location)
+    // parsed.origin is specific to muon.url.parse
+    if (parsed.origin !== undefined) {
+      if (parsed.protocol === 'about:') {
+        return [parsed.protocol, parsed.path].join('')
+      }
+      return parsed.origin.replace(/\/+$/, '')
+    }
+    if (parsed.host && parsed.protocol) {
+      return parsed.slashes ? [parsed.protocol, parsed.host].join('//') : [parsed.protocol, parsed.host].join('')
+    }
+    return null
+  },
+
+  stripLocation: (url) => {
+    if (!url) {
+      return ''
+    }
+
+    return url
+      .replace(/((#?\/?)|(\/#?))$/, '') // remove trailing # and /
+      .trim() // remove whitespaces
   }
 }
 

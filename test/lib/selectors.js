@@ -49,10 +49,13 @@ module.exports = {
   showAdsOption: '[data-test-id="showAdsOption"]',
   blockAdsOption: '[data-test-id="blockAdsOption"]',
   noScriptSwitch: '[data-test-id="noScriptSwitch"]  .switchMiddle',
+  fpControl: '[data-test-id="fpControl"]',
+  blockFpOption: '[data-test-id="blockAllFingerprinting"]',
+  allowFpOption: '[data-test-id="allowAllFingerprinting"]',
+  defaultFpOption: '[data-test-id="block3rdPartyFingerprinting"]',
   cookieControl: '[data-test-id="cookieControl"]',
   allowAllCookiesOption: '[data-test-id="allowAllCookies"]',
   blockAllCookiesOption: '[data-test-id="blockAllCookies"]',
-  fpSwitch: '[data-test-id="fingerprintingProtectionSwitch"] .switchMiddle',
 
   braveryPanelContainer: '[data-test-id="braveryPanelContainer"]',
   httpsEverywhereSwitch: '[data-test-id="httpsEverywhereSwitch"] .switchMiddle',
@@ -123,6 +126,7 @@ module.exports = {
   downloadPause: '[data-test-id="pauseButton"]',
   downloadResume: '[data-test-id="resumeButton"]',
   downloadCancel: '[data-test-id="cancelButton"]',
+  downloadComplete: '.downloadItem.completed',
   downloadReDownload: '[data-test-id="redownloadButton"]',
   downloadDelete: '[data-test-id="deleteButton"]',
   downloadDeleteConfirm: '[data-test-id="confirmDeleteButton"]',
@@ -133,5 +137,6 @@ module.exports = {
 
   // about:preferences#tabs
   tabsPerTabPageActiveOption: '[data-test-id="tabsPerTabPageOption"][data-test-active="true"]',
-  tabCloseActionActiveOption: '[data-test-id="tabCloseActionActiveOption"][data-test-active="true"]'
+  tabCloseActionActiveOption: '[data-test-id="tabCloseActionActiveOption"][data-test-active="true"]',
+  tabPreviewTimingActiveOption: '[data-test-id="tabPreviewTimingOption"][data-test-active="true"]'
 }

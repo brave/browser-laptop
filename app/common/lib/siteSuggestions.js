@@ -6,10 +6,15 @@ const Bloodhound = require('bloodhound-js')
 const {isUrl} = require('../../../js/lib/appUrlUtil')
 const siteTags = require('../../../js/constants/siteTags')
 const urlParse = require('../urlParse')
+const Immutable = require('immutable')
+const urlUtil = require('../../../js/lib/urlutil')
 
+let take = 1000
+let initialQueTime = 50
 let initialized = false
 let engine
 let lastQueryOptions
+let initialQueInterval = []
 
 // Same as sortByAccessCountWithAgeDecay but if one is a prefix of the
 // other then it is considered always sorted first.
@@ -21,26 +26,53 @@ const getSiteIdentity = (data) => {
   if (typeof data === 'string') {
     return data
   }
-  return (data.location || '') + (data.partitionNumber ? '|' + data.partitionNumber : '')
+
+  const partitionNumber = data.get('partitionNumber')
+  let location = data.get('location') || ''
+  location = urlUtil.stripLocation(location)
+  return location + (partitionNumber ? '|' + partitionNumber : '')
 }
 
-const init = (sites) => {
-  sites = sites.toJS ? sites.toJS() : sites
-  // Sort sites with smaller count first because later ones will overwrite with correct counts based on the site identity.
-  // This can happen when a user bookmarks the same site multiple times, but only one of the items are getting counts
-  // incremented by normal operations.
-  sites = sites.sort((s1, s2) => (s1.count || 0) - (s2.count || 0))
+const loadOtherSites = (sites) => {
+  add(sites.take(take))
+  return sites.skip(take)
+}
+
+const init = (...sites) => {
   engine = new Bloodhound({
-    local: sites,
+    local: [],
     sorter: sortForSuggestions,
     queryTokenizer: tokenizeInput,
     datumTokenizer: tokenizeInput,
     identify: getSiteIdentity
   })
+
   const promise = engine.initialize()
+
   promise.then(() => {
     initialized = true
+    let i = 0
+    for (let item of sites) {
+      item = item.toJS ? item : Immutable.fromJS(item)
+      if (item.size === 0) {
+        continue
+      }
+      let list = item.toList()
+      list = loadOtherSites(list)
+
+      if (list.size > 0) {
+        initialQueInterval[i] = setInterval((j) => {
+          list = loadOtherSites(list)
+
+          if (list.size === 0) {
+            clearInterval(initialQueInterval[j])
+          }
+        }, initialQueTime, i)
+      }
+      i++
+    }
   })
+
   return promise
 }
 
@@ -53,22 +85,16 @@ const tokenizeInput = (data) => {
   let url = data || ''
   let parts = []
 
-  const isSiteObject = typeof data === 'object' && data !== null
+  const isSiteObject = data != null && data.toJS
   if (isSiteObject) {
     // When lastAccessTime is 1 it is a default built-in entry which we don't want
     // to appear in suggestions.
-    if (data.lastAccessedTime === 1) {
+    if (data.get('lastAccessedTime') === 1) {
       return []
     }
-    url = data.location
-    if (data.customTitle) {
-      parts = getPartsFromNonUrlInput(data.customTitle)
-    }
-    if (data.title) {
-      parts = parts.concat(getPartsFromNonUrlInput(data.title))
-    }
-    if (data.tags) {
-      parts = parts.concat(data.tags.map(getTagToken))
+    url = data.get('location')
+    if (data.get('title')) {
+      parts = parts.concat(getPartsFromNonUrlInput(data.get('title')))
     }
   } else {
     if (lastQueryOptions && !lastQueryOptions.historySuggestionsOn && lastQueryOptions.bookmarkSuggestionsOn) {
@@ -78,10 +104,6 @@ const tokenizeInput = (data) => {
 
   if (url && isUrl(url)) {
     const parsedUrl = urlParse(url.toLowerCase())
-    // Cache parsed value for latter use when sorting
-    if (isSiteObject) {
-      data.parsedUrl = parsedUrl
-    }
     if (parsedUrl.hash) {
       parts.push(parsedUrl.hash.slice(1))
     }
@@ -115,11 +137,14 @@ const add = (data) => {
   if (!initialized) {
     return
   }
-  if (typeof data === 'string') {
-    engine.add(data)
-  } else {
-    engine.add(data.toJS ? data.toJS() : data)
+  engine.add(data.toJS ? data : Immutable.fromJS(data))
+}
+
+const remove = (data) => {
+  if (!initialized) {
+    return
   }
+  engine.remove(data.toJS ? data : Immutable.fromJS(data))
 }
 
 const query = (input, options = {}) => {
@@ -150,5 +175,6 @@ module.exports = {
   init,
   add,
   tokenizeInput,
-  query
+  query,
+  remove
 }

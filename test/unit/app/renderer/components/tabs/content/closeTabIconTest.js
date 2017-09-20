@@ -15,22 +15,23 @@ const tabId = 1
 const frameKey = 1
 const invalidFrameKey = 71
 
-const fakeAppStoreRenderer = {
-  state: Immutable.fromJS({
-    windows: [{
-      windowId: 1,
-      windowUUID: 'uuid'
-    }],
-    tabs: [{
-      tabId: tabId,
-      windowId: 1,
-      windowUUID: 'uuid',
-      url: 'https://brave.com'
-    }]
-  }),
-  addChangeListener: () => {},
-  removeChangeListener: () => {}
-}
+const fakeAppStoreRenderer = Immutable.fromJS({
+  windows: [{
+    windowId: 1,
+    windowUUID: 'uuid'
+  }],
+  tabs: [{
+    tabId: tabId,
+    windowId: 1,
+    windowUUID: 'uuid',
+    url: 'https://brave.com'
+  }],
+  tabsInternal: {
+    index: {
+      1: 0
+    }
+  }
+})
 
 const defaultWindowStore = Immutable.fromJS({
   activeFrameKey: frameKey,
@@ -59,7 +60,7 @@ const defaultWindowStore = Immutable.fromJS({
 })
 
 describe('Tabs content - CloseTabIcon', function () {
-  let CloseTabIcon, windowStore
+  let CloseTabIcon, windowStore, appStore
 
   before(function () {
     mockery.enable({
@@ -68,11 +69,12 @@ describe('Tabs content - CloseTabIcon', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    mockery.registerMock('../../../js/stores/appStoreRenderer', fakeAppStoreRenderer)
     mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_hover.svg')
     mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn_normal.svg')
     windowStore = require('../../../../../../../js/stores/windowStore')
+    appStore = require('../../../../../../../js/stores/appStoreRenderer')
     CloseTabIcon = require('../../../../../../../app/renderer/components/tabs/content/closeTabIcon')
+    appStore.state = fakeAppStoreRenderer
   })
 
   after(function () {
@@ -157,6 +159,7 @@ describe('Tabs content - CloseTabIcon', function () {
         hoverState: true,
         pinnedLocation: true
       })
+      appStore.state = fakeAppStoreRenderer.setIn(['tabs', 0, 'pinned'], true)
       const wrapper = mount(<CloseTabIcon frameKey={frameKey} />)
       assert.equal(wrapper.find('TabIcon').props()['data-test2-id'], 'close-icon-off')
     })

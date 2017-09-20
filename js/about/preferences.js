@@ -6,8 +6,8 @@
 const React = require('react')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const Immutable = require('immutable')
-const UrlUtil = require('../lib/urlutil')
-const {css} = require('aphrodite/no-important')
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 // Components
@@ -46,6 +46,8 @@ const searchProviders = require('../data/searchProviders')
 const adblock = appConfig.resourceNames.ADBLOCK
 const cookieblock = appConfig.resourceNames.COOKIEBLOCK
 const cookieblockAll = appConfig.resourceNames.COOKIEBLOCK_ALL
+const fingerprintingProtection = appConfig.resourceNames.FINGERPRINTING_PROTECTION
+const fingerprintingProtectionAll = appConfig.resourceNames.FINGERPRINTING_PROTECTION_ALL
 const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
@@ -88,7 +90,7 @@ const braveryPermissionNames = {
   'cookieControl': ['string'],
   'safeBrowsing': ['boolean'],
   'httpsEverywhere': ['boolean'],
-  'fingerprintingProtection': ['boolean'],
+  'fingerprintingProtection': ['string'],
   'noScript': ['boolean', 'number']
 }
 
@@ -134,17 +136,7 @@ class GeneralTab extends ImmutableComponent {
       )
     })
 
-    let homepageValue = getSetting(settings.HOMEPAGE, this.props.settings)
-    if (typeof homepageValue === 'string') {
-      const punycodeUrl = UrlUtil.getPunycodeUrl(homepageValue)
-      if (punycodeUrl.replace(/\/$/, '') !== homepageValue) {
-        homepageValue = UrlUtil.getPunycodeUrl(homepageValue)
-      }
-
-      // we use | as a separator for multiple home pages
-      homepageValue = homepageValue.replace(/%7C/g, '|')
-    }
-    const homepage = homepageValue && homepageValue.trim()
+    const homepage = getSetting(settings.HOMEPAGE, this.props.settings)
     const disableShowHomeButton = !homepage || !homepage.length
     const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const defaultBrowser = getSetting(settings.IS_DEFAULT_BROWSER, this.props.settings)
@@ -189,7 +181,7 @@ class GeneralTab extends ImmutableComponent {
           <SettingTextbox
             spellCheck='false'
             data-l10n-id='homepageInput'
-            value={homepageValue}
+            value={homepage}
             onChange={changeSetting.bind(null, this.onChangeSetting, settings.HOMEPAGE)} />
         </SettingItem>
         <SettingCheckbox dataL10nId='showHomeButton' prefKey={settings.SHOW_HOME_BUTTON}
@@ -323,8 +315,11 @@ class SearchTab extends ImmutableComponent {
       <DefaultSectionTitle data-test-id='searchSettings' data-l10n-id='searchSettings' />
       <SortableTable headings={['default', 'searchEngine', 'engineGoKey']} rows={this.searchProviders}
         defaultHeading='searchEngine'
-        addHoverClass onClick={this.hoverCallback.bind(this)}
-        columnClassNames={['default', 'searchEngine', 'engineGoKey']} />
+        addHoverClass
+        onClick={this.hoverCallback.bind(this)}
+        tableClassNames={css(styles.sortableTable_searchTab)}
+        columnClassNames={['default', 'searchEngine', 'engineGoKey']}
+      />
       <DefaultSectionTitle data-l10n-id='locationBarSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='showOpenedTabMatches' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
@@ -488,6 +483,10 @@ class ShieldsTab extends ImmutableComponent {
     aboutActions.setResourceEnabled(cookieblock, e.target.value === 'block3rdPartyCookie')
     aboutActions.setResourceEnabled(cookieblockAll, e.target.value === 'blockAllCookies')
   }
+  onChangeFingerprintingProtection (e) {
+    aboutActions.setResourceEnabled(fingerprintingProtection, e.target.value === 'block3rdPartyFingerprinting')
+    aboutActions.setResourceEnabled(fingerprintingProtectionAll, e.target.value === 'blockAllFingerprinting')
+  }
   onToggleSetting (setting, e) {
     aboutActions.setResourceEnabled(setting, e.target.value)
   }
@@ -513,10 +512,18 @@ class ShieldsTab extends ImmutableComponent {
             <option data-l10n-id='blockAllCookies' value='blockAllCookies' />
           </SettingDropdown>
         </SettingItem>
+        <SettingItem dataL10nId='fingerprintingProtection'>
+          <SettingDropdown
+            value={this.props.braveryDefaults.get('fingerprintingProtection')}
+            onChange={this.onChangeFingerprintingProtection}>
+            <option data-l10n-id='block3rdPartyFingerprinting' value='block3rdPartyFingerprinting' />
+            <option data-l10n-id='allowAllFingerprinting' value='allowAllFingerprinting' />
+            <option data-l10n-id='blockAllFingerprinting' value='blockAllFingerprinting' />
+          </SettingDropdown>
+        </SettingItem>
         <SettingCheckbox checked={this.props.braveryDefaults.get('httpsEverywhere')} dataL10nId='httpsEverywhere' onChange={this.onToggleHTTPSE} />
-        <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScriptPref' onChange={this.onToggleNoScript} />
-        <SettingCheckbox dataL10nId='blockCanvasFingerprinting' prefKey={settings.BLOCK_CANVAS_FINGERPRINTING} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
         {/* TODO: move this inline style to Aphrodite once refactored */}
         <div style={{marginTop: '15px'}}>
           <BrowserButton
@@ -607,7 +614,7 @@ class SecurityTab extends ImmutableComponent {
         </SettingItem>
         {
           getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings) === passwordManagers.BUILT_IN
-          ? <label className='linkTextSmall' data-l10n-id='managePasswords'
+          ? <label className={css(commonStyles.linkText, commonStyles.linkText_small)} data-l10n-id='managePasswords'
             onClick={aboutActions.createTabRequested.bind(null, {
               url: 'about:passwords'
             })} />
@@ -615,7 +622,7 @@ class SecurityTab extends ImmutableComponent {
         }
         {
           getSetting(settings.ACTIVE_PASSWORD_MANAGER, this.props.settings) === passwordManagers.LAST_PASS
-          ? <label className='linkTextSmall' data-l10n-id='preferences'
+          ? <label className={css(commonStyles.linkText, commonStyles.linkText_small)} data-l10n-id='preferences'
             onClick={aboutActions.createTabRequested.bind(null, {
               url: lastPassPreferencesUrl
             })} />
@@ -803,8 +810,7 @@ class AboutPreferences extends React.Component {
       settings.TORRENT_VIEWER_ENABLED,
       settings.SMOOTH_SCROLL_ENABLED,
       settings.SEND_CRASH_REPORTS,
-      settings.UPDATE_TO_PREVIEW_RELEASES,
-      settings.TOOLBAR_UI_SCALE
+      settings.UPDATE_TO_PREVIEW_RELEASES
     ]
     if (settingsRequiringRestart.includes(key)) {
       ipc.send(messages.PREFS_RESTART, key, value)
@@ -940,6 +946,13 @@ class AboutPreferences extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  sortableTable_searchTab: {
+    width: '704px',
+    marginBottom: globalStyles.spacing.settingsListContainerMargin // See syncTab.js for use cases
+  }
+})
 
 module.exports = {
   AboutPreferences: <AboutPreferences />

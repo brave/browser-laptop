@@ -12,9 +12,11 @@ const TabIcon = require('./tabIcon')
 
 // State
 const tabContentState = require('../../../../common/state/tabContentState')
+const tabState = require('../../../../common/state/tabState')
 
 // Utils
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
+const {isSourceAboutUrl} = require('../../../../../js/lib/appUrlUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
@@ -34,12 +36,16 @@ class Favicon extends React.Component {
     const frameKey = ownProps.frameKey
     const frame = frameStateUtil.getFrameByKey(currentWindow, frameKey) || Immutable.Map()
     const isTabLoading = tabContentState.isTabLoading(currentWindow, frameKey)
+    const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
 
     const props = {}
+
     // used in renderer
-    props.isTabLoading = isTabLoading
+
+    // there's no need to show loading icon for about pages
+    props.isTabLoading = !isSourceAboutUrl(frame.get('location')) && isTabLoading
     props.favicon = !isTabLoading && frame.get('icon')
-    props.isPinnedTab = frameStateUtil.isPinned(currentWindow, frameKey)
+    props.isPinnedTab = tabState.isTabPinned(state, tabId)
     props.tabIconColor = tabContentState.getTabIconColor(currentWindow, frameKey)
     props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, frameKey)
 
@@ -89,6 +95,7 @@ const styles = StyleSheet.create({
   },
 
   loadingIcon: {
+    willChange: 'transform',
     backgroundImage: `url(${loadingIconSvg})`,
     animationName: spinKeyframes,
     animationTimingFunction: 'linear',

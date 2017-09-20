@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const moment = require('moment')
 
 // util
@@ -15,13 +15,12 @@ const {changeSetting} = require('../../../lib/settingsUtil')
 const ImmutableComponent = require('../../immutableComponent')
 const BrowserButton = require('../../common/browserButton')
 const {FormTextbox} = require('../../common/textbox')
-const {FormDropdown} = require('../../common/dropdown')
-const {SettingsList, SettingItem} = require('../../common/settings')
+const {PanelDropdown} = require('../../common/dropdown')
 const LedgerTable = require('./ledgerTable')
 
 // style
 const globalStyles = require('../../styles/global')
-const {paymentStyles, paymentStylesVariables} = require('../../styles/payment')
+const {paymentStylesVariables} = require('../../styles/payment')
 const cx = require('../../../../../js/lib/classSet')
 
 // other
@@ -84,13 +83,13 @@ class EnabledContent extends ImmutableComponent {
 
     return <section className={css(styles.balance)}>
       <FormTextbox data-test-id='fundsAmount' readOnly value={btcToCurrencyString(value, ledgerData)} />
-      <a className={css(styles.iconLink)} href='https://brave.com/Payments_FAQ.html' target='_blank'>
-        <span className={cx({
-          fa: true,
-          'fa-question-circle': true,
-          [css(styles.iconText)]: true
-        })} />
-      </a>
+      <a className={cx({
+        [globalStyles.appIcons.question]: true,
+        [css(styles.balance__iconLink)]: true
+      })}
+        href='https://brave.com/Payments_FAQ.html'
+        target='_blank' rel='noopener'
+      />
     </section>
   }
 
@@ -116,7 +115,7 @@ class EnabledContent extends ImmutableComponent {
       date: prevReconcileDateValue
     }
 
-    return <section className={css(styles.contribution, styles.lastContribution)}>
+    return <section>
       <div data-l10n-id='lastContribution' />
       <div data-l10n-id={text} data-l10n-args={JSON.stringify(l10nDataArgs)} />
     </section>
@@ -157,7 +156,7 @@ class EnabledContent extends ImmutableComponent {
       reconcileDate: nextReconcileDateRelative
     }
 
-    return <section className={css(styles.contribution, styles.nextContribution)}>
+    return <section>
       <div data-l10n-id='nextContribution' />
       <div data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id={l10nDataId} />
     </section>
@@ -169,65 +168,46 @@ class EnabledContent extends ImmutableComponent {
 
     return <section>
       <div className={css(styles.walletBar)} data-test-id='walletBar'>
-        <table>
-          <thead>
-            <tr className={css(styles.tableTr)}>
-              <th className={css(styles.walletBar__tableTr__tableTh)} data-l10n-id='monthlyBudget' />
-              <th className={css(styles.walletBar__tableTr__tableTh)} data-l10n-id='accountBalance' />
-              <th className={css(styles.walletBar__tableTr__tableTh)} />
-            </tr>
-          </thead>
-          <tbody>
-            <tr className={css(styles.tableTr)}>
-              <td className={css(styles.tableTd)}>
-                <SettingsList className={css(styles.listContainer)}>
-                  <SettingItem>
-                    <FormDropdown
-                      data-test-id='fundsSelectBox'
-                      value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings)}
-                      onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}>
-                      {
-                        [5, 10, 15, 20].map((amount) =>
-                          <option value={amount}>{amount} {ledgerData.get('currency') || 'USD'}</option>
-                        )
-                      }
-                    </FormDropdown>
-                  </SettingItem>
-                  <SettingItem>
-                    {this.lastReconcileMessage()}
-                  </SettingItem>
-                </SettingsList>
-              </td>
-              <td className={css(styles.tableTd)}>
-                {
-                  ledgerData.get('error') && ledgerData.get('error').get('caller') === 'getWalletProperties'
-                    ? <div>
-                      <div data-l10n-id='accountBalanceConnectionError' />
-                      <div className={css(styles.accountBalanceError)} data-l10n-id={this.ledgerDataErrorText()} />
-                    </div>
-                    : <div>
-                      <SettingsList className={css(styles.listContainer)}>
-                        <SettingItem>
-                          {this.fundsAmount()}
-                        </SettingItem>
-                        <SettingItem>
-                          {this.nextReconcileMessage()}
-                        </SettingItem>
-                      </SettingsList>
-                    </div>
-                }
-              </td>
-              <td className={css(styles.tableTd)}>
-                {this.walletButton()}
-                <div className={css(styles.walletStatus)}
-                  data-test-id='walletStatus'
-                  data-l10n-id={walletStatusText.id}
-                  data-l10n-args={walletStatusText.args ? JSON.stringify(walletStatusText.args) : null}
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div className={css(gridStyles.row1col1, styles.walletBar__title)} data-l10n-id='monthlyBudget' />
+        <div className={css(gridStyles.row1col2, styles.walletBar__title)} data-l10n-id='accountBalance' />
+        <div className={css(gridStyles.row1col3)} />
+        <div className={css(gridStyles.row2col1)}>
+          <PanelDropdown
+            data-test-id='fundsSelectBox'
+            value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}>
+            {
+              [5, 10, 15, 20].map((amount) =>
+                <option value={amount}>{amount} {ledgerData.get('currency') || 'USD'}</option>
+              )
+            }
+          </PanelDropdown>
+        </div>
+        <div className={css(gridStyles.row2col2)}>
+          {
+            ledgerData.get('error') && ledgerData.get('error').get('caller') === 'getWalletProperties'
+              ? <div data-l10n-id='accountBalanceConnectionError' />
+              : <div>{this.fundsAmount()}</div>
+          }
+        </div>
+        <div className={css(gridStyles.row2col3)}>
+          {this.walletButton()}
+        </div>
+        <div className={css(gridStyles.row3col1, styles.walletBar__message)}>
+          {this.lastReconcileMessage()}
+        </div>
+        <div className={css(gridStyles.row3col2, styles.walletBar__message)}>
+          {
+            ledgerData.get('error') && ledgerData.get('error').get('caller') === 'getWalletProperties'
+              ? <div data-l10n-id={this.ledgerDataErrorText()} />
+              : <div>{this.nextReconcileMessage()}</div>
+          }
+        </div>
+        <div className={css(gridStyles.row3col3, styles.walletBar__message)}
+          data-test-id='walletStatus'
+          data-l10n-id={walletStatusText.id}
+          data-l10n-args={walletStatusText.args ? JSON.stringify(walletStatusText.args) : null}
+        />
       </div>
       <LedgerTable ledgerData={this.props.ledgerData}
         settings={this.props.settings}
@@ -237,85 +217,89 @@ class EnabledContent extends ImmutableComponent {
   }
 }
 
+const gridStyles = StyleSheet.create({
+  row1col1: {
+    gridRow: 1,
+    gridColumn: 1
+  },
+
+  row1col2: {
+    gridRow: 1,
+    gridColumn: 2
+  },
+
+  row1col3: {
+    gridRow: 1,
+    gridColumn: 3
+  },
+
+  row2col1: {
+    gridRow: 2,
+    gridColumn: 1
+  },
+
+  row2col2: {
+    gridRow: 2,
+    gridColumn: 2
+  },
+
+  row2col3: {
+    gridRow: 2,
+    gridColumn: 3
+  },
+
+  row3col1: {
+    gridRow: 3,
+    gridColumn: 1
+  },
+
+  row3col2: {
+    gridRow: 3,
+    gridColumn: 2
+  },
+
+  row3col3: {
+    gridRow: 3,
+    gridColumn: 3
+  }
+})
+
 const styles = StyleSheet.create({
   walletBar: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr 1fr',
     background: globalStyles.color.lightGray,
     borderRadius: globalStyles.radius.borderRadiusUIbox,
     padding: globalStyles.spacing.panelPadding,
     margin: `${globalStyles.spacing.panelMargin} 0`
   },
 
-  listContainer: {
-    marginBottom: 0
-  },
-
-  walletBar__tableTr__tableTh: {
+  walletBar__title: {
     color: paymentStylesVariables.tableHeader.fontColor,
     fontWeight: paymentStylesVariables.tableHeader.fontWeight,
-    textAlign: 'left'
+    marginBottom: `calc(${globalStyles.spacing.panelPadding} / 1.5)`
   },
 
-  tableTr: {
-    height: '1em'
-  },
-
-  tableTd: {
-    fontSize: paymentStyles.font.regular,
-    padding: '10px 30px 0 0',
-    width: 'auto',
-    minWidth: paymentStyles.width.tableRow,
-    verticalAlign: 'top'
-  },
-
-  accountBalanceError: {
-    marginTop: globalStyles.spacing.panelItemMargin
-  },
-
-  settingsListContainer: {
-    marginBottom: 0
+  walletBar__message: {
+    fontSize: globalStyles.payments.fontSize.regular,
+    lineHeight: 1.5,
+    marginTop: globalStyles.spacing.panelPadding
   },
 
   balance: {
     display: 'flex',
-    alignItems: 'center',
-    verticalAlign: 0,
-    height: '100%',
-    marginBottom: 0
+    alignItems: 'center'
   },
 
-  iconLink: {
+  balance__iconLink: {
+    color: globalStyles.color.mediumGray,
+    fontSize: globalStyles.payments.fontSize.regular,
+    marginLeft: '5px',
     textDecoration: 'none',
 
     ':hover': {
-      textDecoration: 'none'
+      textDecoration: 'none !important'
     }
-  },
-
-  iconText: {
-    color: globalStyles.color.mediumGray,
-    margin: '0 0 0 5px',
-
-    // TODO: refactor preferences.less to remove !important
-    fontSize: `${globalStyles.fontSize.settingItemSubtext} !important`
-  },
-
-  contribution: {
-    lineHeight: 1.5
-  },
-
-  lastContribution: {
-    marginTop: '16px',
-    marginBottom: 0
-  },
-
-  nextContribution: {
-    marginTop: '15px',
-    marginBottom: 0
-  },
-
-  walletStatus: {
-    marginTop: '15px',
-    lineHeight: 1.5
   }
 })
 

@@ -44,8 +44,7 @@ class Dialog extends ImmutableComponent {
     return <div
       data-bookmark-hanger={this.props.bookmarkHanger}
       className={cx({
-        [css(styles.dialog)]: true,
-        [css(styles.dialog_isNotClickDismiss)]: !this.props.isClickDismiss,
+        [css(styles.dialog, !this.props.isClickDismiss && styles.dialog_isNotClickDismiss)]: true,
         [this.props.className]: !!this.props.className
       })}
       data-test-id={this.props.testId}
@@ -80,8 +79,13 @@ const styles = StyleSheet.create({
     zIndex: globalStyles.zindex.zindexDialogs,
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+
+    ':focus': {
+      outline: 'none'
+    }
   },
+
   dialog_isNotClickDismiss: {
     background: 'rgba(0, 0, 0, 0.15)'
   }

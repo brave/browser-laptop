@@ -126,7 +126,7 @@ describe('notificationBar passwords', function () {
         return this.getText(notificationBar).then((val) => {
           return val.includes('brave') && val.includes('brave_user')
         })
-      }).click('button=No')
+      }).click('button=Deny')
   })
 
   it('does not include a password in the notification bar', function * () {
@@ -144,7 +144,7 @@ describe('notificationBar passwords', function () {
         return this.getText(notificationBar).then((val) => {
           return val.includes('your password') && !val.includes('secret')
         })
-      }).click('button=No')
+      }).click('button=Deny')
   })
 
   it('autofills remembered password on login form', function * () {
@@ -159,7 +159,7 @@ describe('notificationBar passwords', function () {
       .waitForExist(notificationBar)
       .waitUntil(function () {
         return this.getText(notificationBar).then((val) => val.includes('brave') && val.includes('brave_user'))
-      }).click('button=Yes')
+      }).click('button=Allow')
       .tabByIndex(0)
       .loadUrl('about:passwords')
       .waitForExist('[data-test-id="passwordItem"]')
@@ -189,7 +189,7 @@ describe('notificationBar passwords', function () {
       .waitForExist(notificationBar)
       .waitUntil(function () {
         return this.getText(notificationBar).then((val) => val.includes('brave') && val.includes('brave_user'))
-      }).click('button=Yes')
+      }).click('button=Allow')
       .tabByIndex(0)
       .loadUrl('about:passwords')
       .waitForExist('[data-test-id="passwordItem"]')
@@ -206,7 +206,7 @@ describe('notificationBar passwords', function () {
       .waitForExist(notificationBar)
       .waitUntil(function () {
         return this.getText(notificationBar).then((val) => val.includes('brave') && val.includes('brave_user') && val.includes('update'))
-      }).click('button=Yes')
+      }).click('button=Allow')
       .tabByIndex(0)
       .url(this.loginUrl1)
       .waitForExist('#acctmgr_loginform')
@@ -334,7 +334,7 @@ describe('Autoplay test', function () {
         .waitUntil(function () {
           return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
         })
-        .click('button=Yes')
+        .click('button=Allow')
         .tabByUrl(url)
         .waitUntil(function () {
           return this.getText('div[id="status"]')
@@ -368,7 +368,7 @@ describe('Autoplay test', function () {
           return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
         })
         .click('[data-l10n-id=rememberDecision]')
-        .click('button=Yes')
+        .click('button=Allow')
         .tabByUrl(url)
         .waitUntil(function () {
           return this.getText('div[id="status"]')
@@ -426,7 +426,7 @@ describe('Autoplay test', function () {
         .waitUntil(function () {
           return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
         })
-        .click('button=No')
+        .click('button=Deny')
         .windowByUrl(Brave.browserWindowUrl)
         .activateURLMode()
         .click(reloadButton)
@@ -458,7 +458,7 @@ describe('Autoplay test', function () {
           return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
         })
         .click('[data-l10n-id=rememberDecision]')
-        .click('button=No')
+        .click('button=Deny')
         .windowByUrl(Brave.browserWindowUrl)
         .click(reloadButton)
         .tabByUrl(url)
@@ -522,7 +522,7 @@ describe('Autoplay test', function () {
         .waitUntil(function () {
           return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
         })
-        .click('button=Yes')
+        .click('button=Allow')
         .tabByUrl(url)
         .waitUntil(function () {
           return this.getText('div[id="status"]')
@@ -556,7 +556,7 @@ describe('Autoplay test', function () {
           return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
         })
         .click('[data-l10n-id=rememberDecision]')
-        .click('button=Yes')
+        .click('button=Allow')
         .tabByUrl(url)
         .waitUntil(function () {
           return this.getText('div[id="status"]')
@@ -614,7 +614,7 @@ describe('Autoplay test', function () {
         .waitUntil(function () {
           return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
         })
-        .click('button=No')
+        .click('button=Deny')
         .windowByUrl(Brave.browserWindowUrl)
         .activateURLMode()
         .click(reloadButton)
@@ -646,7 +646,7 @@ describe('Autoplay test', function () {
           return this.getText(notificationBar).then((val) => val.includes('autoplay media'))
         })
         .click('[data-l10n-id=rememberDecision]')
-        .click('button=No')
+        .click('button=Deny')
         .windowByUrl(Brave.browserWindowUrl)
         .click(reloadButton)
         .tabByUrl(url)

@@ -56,7 +56,7 @@ class ExtensionsTab extends ImmutableComponent {
 
     return [
       { // Icon
-        html: <img className={css(styles.table__row__column__icon)} src={this.getIcon(extension)} />
+        html: <img className={css(styles.icon)} src={this.getIcon(extension)} />
       },
       { // Name
         html: <span data-extension-id={extension.get('id')}
@@ -76,27 +76,7 @@ class ExtensionsTab extends ImmutableComponent {
           settings={this.props.settings}
           checked={this.getCheckedExtension(extension.get('id'))}
           onChangeSetting={this.props.onChangeSetting} />
-      },
-      { // Exclude option
-        /* TODO @cezaraugusto reenable it once we can be able
-         * to recover from an excluded->re-enabled extension state
-        html: !extension.get('isDummy') && !isBuiltInExtension(extension.get('id'))
-        ? <div className={globalStyles.appIcons.trash}
-          onClick={this.onRemoveExtension.bind(this, extension.get('id'))} />
-        : <span data-l10n-id={isBuiltInExtension(extension.get('id')) ? 'integrated' : 'notInstalled'} />
-        */
       }
-    ]
-  }
-
-  get columnClassNames () {
-    return [
-      css(styles.table__row__column, styles.table__row__column_center),
-      css(styles.table__row__column),
-      css(styles.table__row__column),
-      css(styles.table__row__column),
-      css(styles.table__row__column, styles.table__row__column_center)
-      // css(styles.table__row__column, styles.table__row__column_center)
     ]
   }
 
@@ -107,21 +87,23 @@ class ExtensionsTab extends ImmutableComponent {
     return <section>
       <DefaultSectionTitle data-l10n-id='extensions' />
       <SortableTable
+        fillAvailable
+        largeRow
         sortingDisabled
-        tableClassNames={css(styles.table)}
         headings={['icon', 'name', 'description', 'version', 'enabled'] /* 'exclude' */}
-        columnClassNames={this.columnClassNames}
         rowClassNames={
-          this.props.extensions.map(entry => css(styles.table__row)).toJS()
+          this.props.extensions.map(entry => css(styles.tableRow)).toJS()
         }
-        rows={this.props.extensions.map(entry => this.getRow(entry))} />
+        rows={this.props.extensions.map(entry => this.getRow(entry))}
+      />
       <footer className={css(styles.moreInfo)}>
         <HelpfulText l10nId='extensionsTabFooterInfo'>&nbsp;
           <span data-l10n-id='community'
             className={css(styles.moreInfo__link)}
             onClick={aboutActions.createTabRequested.bind(null, {
               url: 'https://community.brave.com/c/feature-requests/extension-requests'
-            }, true)} />.
+            }, true)}
+          />.
         </HelpfulText>
       </footer>
     </section>
@@ -129,18 +111,9 @@ class ExtensionsTab extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
-  table: {
-    // TODO (Suguru): refactor sortableTable.js to remove !important
-    width: '100% !important',
-    marginBottom: '0 !important'
-  },
-
-  table__row: {
+  tableRow: {
     fontSize: '15px',
     background: '#fff',
-
-    // TODO (Suguru): refactor sortableTable.js to remove !important
-    height: '56px !important',
 
     ':nth-child(even)': {
       background: globalStyles.color.veryLightGray
@@ -151,15 +124,7 @@ const styles = StyleSheet.create({
     }
   },
 
-  table__row__column: {
-    padding: '0 8px'
-  },
-
-  table__row__column_center: {
-    textAlign: 'center'
-  },
-
-  table__row__column__icon: {
+  icon: {
     display: 'flex',
     margin: 'auto',
     width: '32px',

@@ -146,7 +146,7 @@ const tabContentState = {
       isActive &&
       // Larger sizes still have a relative closeIcon
       // We don't resize closeIcon as we do with favicon so don't show it (smallest)
-      !hasBreakpoint(frame.get('breakpoint'), ['default', 'large', 'smallest'])
+      !hasBreakpoint(frame.get('breakpoint'), ['dynamic', 'default', 'large', 'smallest'])
     )
   },
 
@@ -161,7 +161,7 @@ const tabContentState = {
     }
 
     return frameStateUtil.getTabHoverState(state, frameKey) &&
-      hasBreakpoint(frame.get('breakpoint'), ['default', 'large'])
+      hasBreakpoint(frame.get('breakpoint'), ['dynamic', 'default', 'large'])
   },
 
   /**

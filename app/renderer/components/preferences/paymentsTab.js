@@ -29,7 +29,7 @@ const {LedgerRecoveryContent, LedgerRecoveryFooter} = require('./payment/ledgerR
 
 // style
 const globalStyles = require('../styles/global')
-const {paymentStyles, paymentStylesVariables} = require('../styles/payment')
+const {paymentStylesVariables} = require('../styles/payment')
 const settingsIcon = require('../../../extensions/brave/img/ledger/icon_settings.svg')
 const historyIcon = require('../../../extensions/brave/img/ledger/icon_history.svg')
 
@@ -183,83 +183,86 @@ class PaymentsTab extends ImmutableComponent {
       }
 
       <SectionTitleWrapper>
-        { /* Note: This div cannot be replaced with SectionTitleLabelWrapper */ }
-        <div className={cx({
-          [css(styles.titleWrapper)]: true,
-          [css(sectionTitleStyles.beta)]: true
-        })}>
-          <AboutPageSectionTitle>Brave Payments</AboutPageSectionTitle>
-          <SectionLabelTitle>beta</SectionLabelTitle>
-        </div>
+        <section className={css(styles.titleWrapper)}>
+          { /* Note: This div cannot be replaced with SectionTitleLabelWrapper */ }
+          <div className={css(
+            gridStyles.row1col1,
+            styles.titleWrapper__title,
+            sectionTitleStyles.beta
+          )}>
+            <AboutPageSectionTitle>Brave Payments</AboutPageSectionTitle>
+            <SectionLabelTitle>beta</SectionLabelTitle>
+          </div>
 
-        <div className={css(
-          styles.flexAlignCenter,
-          styles.paymentsSwitches
-        )}>
-          <div className={css(styles.flexAlignEnd, styles.switchWrap)} data-test-id='enablePaymentsSwitch'>
-            <span className={css(styles.switchWrap__switchSpan)} data-l10n-id='off' />
-            <SettingCheckbox dataL10nId='on'
+          <div data-test-id='enablePaymentsSwitch' className={css(
+            gridStyles.row1col2,
+            styles.titleWrapper__switchWrap
+          )}>
+            <SettingCheckbox
+              dataL10nId='on'
+              dataL10nIdLeft='off'
               prefKey={settings.PAYMENTS_ENABLED}
               settings={this.props.settings}
               onChangeSetting={this.props.onChangeSetting}
               switchClassName={css(styles.switchWrap__switchControl)}
-              labelClassName={css(styles.switchWrap__label)}
+              leftLabelClassName={css(styles.switchWrap__label, styles.switchWrap__label_left)}
+              rightLabelClassName={css(styles.switchWrap__label, styles.switchWrap__label_right)}
             />
             <a className={cx({
               fa: true,
               'fa-question-circle': true,
-              [css(styles.autoSuggestSwitch__moreInfo)]: true,
-              [css(styles.autoSuggestSwitch__moreInfoBtnSuggest)]: true
+              [css(styles.autoSuggestSwitch__moreInfo, styles.autoSuggestSwitch__moreInfoBtnSuggest)]: true
             })}
               href='https://brave.com/Payments_FAQ.html'
-              target='_blank'
               data-l10n-id='paymentsFAQLink'
+              rel='noopener' target='_blank'
             />
           </div>
-          {
-            this.enabled
-            ? <div className={css(
-                styles.flexAlignCenter,
+
+          <div className={css(gridStyles.row1col3)}>
+            {
+              this.enabled
+              ? <div className={css(
                 styles.switchWrap,
                 styles.switchWrap__right
               )}>
-              <div className={css(styles.switchWrap__autoSuggestSwitch)}>
-                <div className={css(styles.flexAlignCenter, styles.autoSuggestSwitch__subtext)}>
-                  <SettingCheckbox dataL10nId='autoSuggestSites'
-                    prefKey={settings.AUTO_SUGGEST_SITES}
-                    settings={this.props.settings}
-                    disabled={!enabled}
-                    onChangeSetting={this.props.onChangeSetting}
-                    switchClassName={css(styles.switchWrap__switchControl)}
-                  />
+                <div className={css(styles.switchWrap__autoSuggestSwitch)}>
+                  <div className={css(styles.flexAlignCenter, styles.autoSuggestSwitch__subtext)}>
+                    <SettingCheckbox
+                      dataL10nId='autoSuggestSites'
+                      prefKey={settings.PAYMENTS_SITES_AUTO_SUGGEST}
+                      settings={this.props.settings}
+                      disabled={!enabled}
+                      onChangeSetting={this.props.onChangeSetting}
+                      switchClassName={css(styles.switchWrap__switchControl)}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className={css(styles.switchWrap__mainIconsRight)}>
-                <a
-                  data-test-id={this.hasWalletTransaction ? 'paymentHistoryButton' : 'disabledPaymentHistoryButton'}
-                  data-l10n-id='paymentHistoryIcon'
-                  className={css(
+                <div className={css(styles.switchWrap__mainIconsRight)}>
+                  <a className={css(
                     styles.switchWrap__mainIcons,
                     styles.mainIcons__historyIcon,
                     !this.hasWalletTransaction && styles.mainIcons__historyDisabled
                   )}
-                  onClick={(enabled && this.hasWalletTransaction) ? this.props.showOverlay.bind(this, 'paymentHistory') : () => {}}
-                />
-                <a
-                  data-test-id={!enabled ? 'advancedSettingsButtonLoading' : 'advancedSettingsButton'}
-                  data-l10n-id='advancedSettingsIcon'
-                  className={css(
+                    data-test-id={this.hasWalletTransaction ? 'paymentHistoryButton' : 'disabledPaymentHistoryButton'}
+                    data-l10n-id='paymentHistoryIcon'
+                    onClick={(enabled && this.hasWalletTransaction) ? this.props.showOverlay.bind(this, 'paymentHistory') : () => {}}
+                  />
+                  <a className={css(
                     styles.switchWrap__mainIcons,
                     styles.mainIcons__settingsIcon,
                     !enabled && styles.mainIcons__settingsIconDisabled
                   )}
-                  onClick={enabled ? this.props.showOverlay.bind(this, 'advancedSettings') : () => {}}
-                />
+                    data-test-id={!enabled ? 'advancedSettingsButtonLoading' : 'advancedSettingsButton'}
+                    data-l10n-id='advancedSettingsIcon'
+                    onClick={enabled ? this.props.showOverlay.bind(this, 'advancedSettings') : () => {}}
+                  />
+                </div>
               </div>
-            </div>
-            : null
-          }
-        </div>
+              : null
+            }
+          </div>
+        </section>
       </SectionTitleWrapper>
       {
         this.enabled
@@ -275,14 +278,27 @@ class PaymentsTab extends ImmutableComponent {
   }
 }
 
+const gridStyles = StyleSheet.create({
+  row1col1: {
+    gridRow: 1,
+    gridColumn: 1
+  },
+
+  row1col2: {
+    gridRow: 1,
+    gridColumn: 2
+  },
+
+  row1col3: {
+    gridRow: 1,
+    gridColumn: 3
+  }
+})
+
 const styles = StyleSheet.create({
   flexAlignCenter: {
     display: 'flex',
     alignItems: 'center'
-  },
-  flexAlignEnd: {
-    display: 'flex',
-    alignItems: 'flex-end'
   },
 
   paymentsContainer: {
@@ -291,38 +307,46 @@ const styles = StyleSheet.create({
     width: '805px',
     paddingBottom: '40px' // cf: padding of .prefTabContainer
   },
-  paymentsSwitches: {
-    display: 'flex',
-    position: 'relative',
-    bottom: '2px',
-    minHeight: '29px'
-  },
 
   titleWrapper: {
-    position: 'relative',
-    marginRight: '49px',
-    minWidth: '240px'
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr 1fr',
+    alignItems: 'center',
+    width: '100%',
+    padding: `0 ${globalStyles.spacing.panelPadding}`
   },
 
-  switchWrap: {
-    width: paymentStyles.width.tableCell
+  titleWrapper__title: {
+    position: 'relative',
+    right: globalStyles.spacing.panelPadding
   },
-  switchWrap__switchControl: {
-    // TODO: Refactor switchControls.less
-    paddingTop: '0 !important',
-    paddingBottom: '0 !important'
+
+  titleWrapper__switchWrap: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%'
   },
-  switchWrap__switchSpan: {
+
+  switchWrap__label: {
     color: '#999',
     fontWeight: 'bold'
   },
-  switchWrap__label: {
-    fontWeight: 'bold',
+
+  switchWrap__label_left: {
+    paddingRight: '.75ch !important'
+  },
+
+  switchWrap__label_right: {
+    // TODO: Add 'position: relative' and 'bottom: 1px' for macOS (en_US) only.
+    paddingLeft: '.75ch !important',
     color: globalStyles.color.braveOrange
   },
+
   switchWrap__right: {
+    display: 'flex',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    position: 'relative'
+    width: `calc(100% + ${globalStyles.spacing.panelPadding})`
   },
 
   // Auto suggest switch
@@ -339,11 +363,6 @@ const styles = StyleSheet.create({
     color: globalStyles.color.commonTextColor
   },
   autoSuggestSwitch__moreInfoBtnSuggest: {
-    position: 'relative',
-    top: '-1px',
-    left: '8px',
-    cursor: 'pointer',
-
     // TODO: refactor preferences.less to remove !important
     ':hover': {
       textDecoration: 'none !important'
@@ -353,7 +372,6 @@ const styles = StyleSheet.create({
   // History and settings icons
   switchWrap__mainIconsRight: {
     position: 'relative',
-    right: '12px',
     top: '3.5px'
   },
   switchWrap__mainIcons: {

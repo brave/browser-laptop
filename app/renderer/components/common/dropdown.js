@@ -16,7 +16,9 @@ class Dropdown extends ImmutableComponent {
       this.props['data-isFormControl'] && commonStyles.formControl,
       styles.dropdown,
       this.props['data-isCommonForm'] && styles.commonForm,
+      this.props['data-isFullWidth'] && styles.fullWidth,
       this.props['data-isSettings'] && styles.settings,
+      this.props['data-isPanel'] && styles.settings_panel,
       this.props['data-isBraveryPanel'] && styles.braveryPanel
     )
 
@@ -38,6 +40,12 @@ class SettingDropdown extends ImmutableComponent {
   }
 }
 
+class PanelDropdown extends ImmutableComponent {
+  render () {
+    return <FormDropdown data-isPanel {...this.props} />
+  }
+}
+
 class BraveryPanelDropdown extends ImmutableComponent {
   render () {
     return <FormDropdown data-isBraveryPanel {...this.props} />
@@ -55,10 +63,11 @@ const styles = StyleSheet.create({
     height: '2rem',
     outline: 'none',
     // right padding is larger, to account for the down arrow SVG
-    padding: `${selectPadding} 1.5em ${selectPadding} ${selectPadding}`,
+    padding: `${selectPadding} 2em ${selectPadding} ${selectPadding}`,
     '-webkit-appearance': 'none',
     width: 'auto'
   },
+
   outlineable: {
     ':focus': {
       outlineColor: globalStyles.color.statsBlue,
@@ -67,13 +76,24 @@ const styles = StyleSheet.create({
       outlineWidth: '1px'
     }
   },
+
   commonForm: {
     backgroundColor: '#fff',
     fontSize: globalStyles.fontSize.flyoutDialog
   },
+
+  fullWidth: {
+    width: '100%'
+  },
+
   settings: {
     width: '280px'
   },
+
+  settings_panel: {
+    width: globalStyles.button.panel.width
+  },
+
   braveryPanel: {
     fontSize: '13px',
     width: '100%'
@@ -84,5 +104,6 @@ module.exports = {
   Dropdown,
   FormDropdown,
   SettingDropdown,
+  PanelDropdown,
   BraveryPanelDropdown
 }

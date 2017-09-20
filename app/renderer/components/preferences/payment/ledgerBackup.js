@@ -26,26 +26,31 @@ class LedgerBackupContent extends ImmutableComponent {
 
     return <section>
       <span data-l10n-id='ledgerBackupContent' />
-      <div className={css(styles.copyKeyContainer)}>
-        <BrowserButton secondaryColor
-          l10nId='copy'
-          testId='copyButtonFirst'
-          onClick={this.copyToClipboard.bind(this, paymentId)}
-        />
-        <div className={css(styles.keyContainer)}>
-          <h3 className={css(styles.keyContainer__h3)} data-l10n-id='firstKey' />
-          <span className={css(styles.keyContainer__span)}>{paymentId}</span>
+      <div className={css(styles.ledgerBackupContent)}>
+        <div className={css(styles.ledgerBackupContent__copyKey)}>
+          <BrowserButton secondaryColor
+            l10nId='copy'
+            testId='copyButtonFirst'
+            onClick={this.copyToClipboard.bind(this, paymentId)}
+          />
+          <div className={css(styles.ledgerBackupContent__copyKey__key)}>
+            <h3 className={css(styles.ledgerBackupContent__copyKey__key__header)} data-l10n-id='firstKey' />
+            <span className={css(styles.ledgerBackupContent__copyKey__key__phrase)}>{paymentId}</span>
+          </div>
         </div>
-      </div>
-      <div className={css(styles.copyKeyContainer)}>
-        <BrowserButton secondaryColor
-          l10nId='copy'
-          testId='copyButtonSecond'
-          onClick={this.copyToClipboard.bind(this, passphrase)}
-        />
-        <div className={css(styles.keyContainer)}>
-          <h3 className={css(styles.keyContainer__h3)} data-l10n-id='secondKey' />
-          <span className={css(styles.keyContainer__span)}>{passphrase}</span>
+        <div className={css(
+          styles.ledgerBackupContent__copyKey,
+          styles.ledgerBackupContent__copyKey_second
+        )}>
+          <BrowserButton secondaryColor
+            l10nId='copy'
+            testId='copyButtonSecond'
+            onClick={this.copyToClipboard.bind(this, passphrase)}
+          />
+          <div className={css(styles.ledgerBackupContent__copyKey__key)}>
+            <h3 className={css(styles.ledgerBackupContent__copyKey__key__header)} data-l10n-id='secondKey' />
+            <span className={css(styles.ledgerBackupContent__copyKey__key__phrase)}>{passphrase}</span>
+          </div>
         </div>
       </div>
     </section>
@@ -93,21 +98,31 @@ class LedgerBackupFooter extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
-  copyKeyContainer: {
+  ledgerBackupContent: {
+    // Align the buttons and keys even when the width of the strings is not equal
+    width: 'max-content',
+    margin: 'auto'
+  },
+
+  ledgerBackupContent__copyKey: {
     display: 'flex',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
+    alignItems: 'center',
     margin: `${globalStyles.spacing.dialogInsideMargin} auto`
   },
 
-  keyContainer: {
-    marginLeft: '2em'
+  ledgerBackupContent__copyKey_second: {
+    marginBottom: 0
   },
-  keyContainer__h3: {
+
+  ledgerBackupContent__copyKey__key: {
+    marginLeft: `calc(${globalStyles.spacing.dialogInsideMargin} * 2)`
+  },
+
+  ledgerBackupContent__copyKey__key__header: {
     marginBottom: globalStyles.spacing.modalPanelHeaderMarginBottom
   },
-  keyContainer__span: {
-    whiteSpace: 'nowrap',
+
+  ledgerBackupContent__copyKey__key__phrase: {
     userSelect: 'initial',
     cursor: 'initial'
   }

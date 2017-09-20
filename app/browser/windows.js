@@ -5,26 +5,21 @@
 const {app, BrowserWindow, ipcMain} = require('electron')
 const appActions = require('../../js/actions/appActions')
 const appUrlUtil = require('../../js/lib/appUrlUtil')
+const {getLocationIfPDF} = require('../../js/lib/urlutil')
 const debounce = require('../../js/lib/debounce')
 const {getSetting} = require('../../js/settings')
 const locale = require('../locale')
 const LocalShortcuts = require('../localShortcuts')
-const {getPinnedSiteProps} = require('../common/lib/windowsUtil')
 const {makeImmutable} = require('../common/state/immutableUtil')
 const {getPinnedTabsByWindowId} = require('../common/state/tabState')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
-const siteTags = require('../../js/constants/siteTags')
 const windowState = require('../common/state/windowState')
-const Immutable = require('immutable')
+const pinnedSitesState = require('../common/state/pinnedSitesState')
+const windowActions = require('../../js/actions/windowActions')
 
 // TODO(bridiver) - set window uuid
 let currentWindows = {}
-
-const cleanupWindow = (windowId) => {
-  delete currentWindows[windowId]
-  appActions.windowClosed({ windowId })
-}
 
 const getWindowState = (win) => {
   if (win.isFullScreen()) {
@@ -36,6 +31,10 @@ const getWindowState = (win) => {
   } else {
     return 'normal'
   }
+}
+
+const cleanupWindow = (windowId) => {
+  delete currentWindows[windowId]
 }
 
 const getWindowValue = (windowId) => {
@@ -54,65 +53,52 @@ const getWindowValue = (windowId) => {
   }
 }
 
-const updateWindow = (windowId) => {
+const updateWindow = (windowId, updateDefault = false) => {
   const windowValue = getWindowValue(windowId)
   if (windowValue) {
-    appActions.windowUpdated(windowValue)
+    appActions.windowUpdated(windowValue, updateDefault)
+    windowActions.onWindowUpdate(windowId, windowValue)
   }
+}
+
+const siteMatchesTab = (site, tab) => {
+  const matchesLocation = getLocationIfPDF(tab.get('url')) === site.get('location')
+  const matchesPartition = tab.get('partitionNumber', 0) === site.get('partitionNumber', 0)
+  return matchesLocation && matchesPartition
 }
 
 const updatePinnedTabs = (win) => {
   if (win.webContents.browserWindowOptions.disposition === 'new-popup') {
     return
   }
-
   const appStore = require('../../js/stores/appStore')
   const state = appStore.getState()
   const windowId = win.id
-  const pinnedSites = state.get('sites').toList().filter((site) => {
-    const tags = site.get('tags')
-    if (!tags) {
-      return false
-    }
-    return tags.includes(siteTags.PINNED)
-  })
-      .map(site => getPinnedSiteProps(site))
-  const pinnedTabs = getPinnedTabsByWindowId(state, windowId)
-
-  pinnedSites.filter((site) =>
-    pinnedTabs.find((tab) =>
-      tab.get('url') === site.get('location') &&
-      (tab.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0))).forEach((site) => {
-        win.__alreadyPinnedSites = win.__alreadyPinnedSites.add(site)
+  const pinnedSites = pinnedSitesState.getSites(state)
+  let pinnedWindowTabs = getPinnedTabsByWindowId(state, windowId)
+  // sites are instructions of what should be pinned
+  // tabs are sites our window already has pinned
+  // for each site which should be pinned, find if it's already pinned
+  for (const site of pinnedSites.values()) {
+    const existingPinnedTabIdx = pinnedWindowTabs.findIndex(tab => siteMatchesTab(site, tab))
+    if (existingPinnedTabIdx !== -1) {
+      // if it's already pinned we don't need to consider the tab in further searches
+      pinnedWindowTabs = pinnedWindowTabs.remove(existingPinnedTabIdx)
+    } else {
+      // if it's not already pinned, create new pinned tab
+      appActions.createTabRequested({
+        url: site.get('location'),
+        partitionNumber: site.get('partitionNumber'),
+        pinned: true,
+        active: false,
+        windowId
       })
-
-  const sitesToAdd = pinnedSites.filter((site) =>
-    !win.__alreadyPinnedSites.find((pinned) => pinned.equals(site)))
-
-  sitesToAdd.forEach((site) => {
-    win.__alreadyPinnedSites = win.__alreadyPinnedSites.add(site)
-    appActions.createTabRequested({
-      url: site.get('location'),
-      partitionNumber: site.get('partitionNumber'),
-      pinned: true,
-      active: false,
-      windowId
-    })
-  })
-
-  const sitesToClose = win.__alreadyPinnedSites.filter((pinned) =>
-    !pinnedSites.find((site) => pinned.equals(site)))
-
-  sitesToClose
-    .forEach((site) => {
-      const tab = pinnedTabs.find((tab) =>
-        tab.get('url') === site.get('location') &&
-        (tab.get('partitionNumber') || 0) === (site.get('partitionNumber') || 0))
-      if (tab) {
-        appActions.tabCloseRequested(tab.get('tabId'), true)
-      }
-      win.__alreadyPinnedSites = win.__alreadyPinnedSites.remove(site)
-    })
+    }
+  }
+  // all that's left for tabs are the ones that we should close
+  for (const tab of pinnedWindowTabs) {
+    appActions.tabCloseRequested(tab.get('tabId'), true)
+  }
 }
 
 const api = {
@@ -134,6 +120,7 @@ const api = {
         win.webContents.once('close', () => {
           LocalShortcuts.unregister(win)
         })
+
         win.once('close', () => {
           LocalShortcuts.unregister(win)
         })
@@ -195,17 +182,16 @@ const api = {
         LocalShortcuts.register(win)
 
         appActions.windowCreated(windowValue)
+        windowActions.onWindowUpdate(windowId, windowValue)
       })
       win.once('closed', () => {
-        cleanupWindow(windowId)
       })
       win.on('blur', () => {
         appActions.windowBlurred(windowId)
         updateWindowDebounce(windowId)
       })
       win.on('focus', () => {
-        appActions.windowFocused(windowId)
-        updateWindowDebounce(windowId)
+        updateWindowDebounce(windowId, true)
       })
       win.on('show', () => {
         updateWindowDebounce(windowId)
@@ -214,7 +200,7 @@ const api = {
         updateWindowDebounce(windowId)
       })
       win.on('maximize', () => {
-        updateWindowDebounce(windowId)
+        updateWindowDebounce(windowId, true)
       })
       win.on('unmaximize', () => {
         updateWindowDebounce(windowId)
@@ -226,18 +212,10 @@ const api = {
         updateWindowDebounce(windowId)
       })
       win.on('resize', () => {
-        updateWindowDebounce(windowId)
-        const size = win.getSize()
-        const position = win.getPosition()
-        // NOTE: the default window size is whatever the last window resize was
-        appActions.defaultWindowParamsChanged(size, position)
+        updateWindowDebounce(windowId, true)
       })
       win.on('move', () => {
-        updateWindowMove(windowId)
-        const size = win.getSize()
-        const position = win.getPosition()
-        // NOTE: the default window position is whatever the last window move was
-        appActions.defaultWindowParamsChanged(size, position)
+        updateWindowMove(windowId, true)
       })
       win.on('enter-full-screen', () => {
         updateWindowDebounce(windowId)
@@ -294,7 +272,7 @@ const api = {
   setTitle: (windowId, title) => {
     setImmediate(() => {
       const win = currentWindows[windowId]
-      if (win && !win.isDestroyed()) {
+      if (win && !win.isDestroyed() && title != null) {
         win.setTitle(title)
       }
     })
@@ -322,14 +300,14 @@ const api = {
     setImmediate(() => {
       const win = currentWindows[windowId]
       if (win && !win.isDestroyed()) {
-        win.__alreadyPinnedSites = new Immutable.Set()
         updatePinnedTabs(win)
         win.__ready = true
+        win.emit(messages.WINDOW_RENDERER_READY)
       }
     })
   },
 
-  closeWindow: (state, windowId) => {
+  closeWindow: (windowId) => {
     let win = api.getWindow(windowId)
     try {
       setImmediate(() => {
@@ -340,7 +318,6 @@ const api = {
     } catch (e) {
       // ignore
     }
-    return windowState.removeWindowByWindowId(state, windowId)
   },
 
   getWindow: (windowId) => {
@@ -351,8 +328,20 @@ const api = {
     if (BrowserWindow.getFocusedWindow()) {
       return BrowserWindow.getFocusedWindow().id
     }
-
     return windowState.WINDOW_ID_NONE
+  },
+
+  privateMethods: () => {
+    return process.env.NODE_ENV === 'test'
+    ? {
+      cleanupWindow,
+      getWindowState,
+      getWindowValue,
+      updateWindow,
+      siteMatchesTab,
+      updatePinnedTabs
+    }
+    : {}
   }
 }
 

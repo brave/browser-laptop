@@ -41,15 +41,20 @@ const contextMenus = require('../../../../js/contextMenus')
 const dnd = require('../../../../js/dnd')
 const throttle = require('../../../../js/lib/throttle')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const {getTabBreakpoint, tabUpdateFrameRate} = require('../../lib/tabUtil')
+const {
+  getTabBreakpoint,
+  tabUpdateFrameRate,
+  hasBreakpoint,
+  hasTabAsRelatedTarget
+} = require('../../lib/tabUtil')
 const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const {getCurrentWindowId} = require('../../currentWindow')
 const UrlUtil = require('../../../../js/lib/urlutil')
-const {hasBreakpoint} = require('../../lib/tabUtil')
 
 class Tab extends React.Component {
   constructor (props) {
     super(props)
+    this.onMouseMove = this.onMouseMove.bind(this)
     this.onMouseEnter = this.onMouseEnter.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
     this.onUpdateTabSize = this.onUpdateTabSize.bind(this)
@@ -67,7 +72,7 @@ class Tab extends React.Component {
   get draggingOverData () {
     const draggingOverData = this.props.dragData && this.props.dragData.get('dragOverData')
     if (!draggingOverData ||
-        draggingOverData.get('draggingOverKey') !== this.props.frameKey ||
+        draggingOverData.get('draggingOverKey') !== this.props.tabId ||
         draggingOverData.get('draggingOverWindowId') !== getCurrentWindowId()) {
       return
     }
@@ -77,8 +82,8 @@ class Tab extends React.Component {
       return
     }
     const location = sourceDragData.get('location')
-    const key = draggingOverData.get('draggingOverKey')
-    const draggingOverFrame = windowStore.getFrame(key)
+    const tabId = draggingOverData.get('draggingOverKey')
+    const draggingOverFrame = windowStore.getFrameByTabId(tabId)
     if ((location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location)) &&
         (draggingOverFrame && draggingOverFrame.get('pinnedLocation'))) {
       return
@@ -90,7 +95,7 @@ class Tab extends React.Component {
   get isDragging () {
     const sourceDragData = dnd.getInterBraveDragData()
     return sourceDragData &&
-      sourceDragData.get('key') === this.props.frameKey &&
+      sourceDragData.get('tabId') === this.props.tabId &&
       sourceDragData.get('draggingOverWindowId') === getCurrentWindowId()
   }
 
@@ -100,7 +105,7 @@ class Tab extends React.Component {
     if (!draggingOverData || !sourceDragData) {
       return false
     }
-    return draggingOverData.get('draggingOverKey') === sourceDragData.get('key')
+    return draggingOverData.get('draggingOverKey') === sourceDragData.get('tabId')
   }
 
   get isDraggingOverLeft () {
@@ -126,15 +131,25 @@ class Tab extends React.Component {
   }
 
   onDragOver (e) {
-    dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.frameKey, this.draggingOverData, e)
+    dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.tabId, this.draggingOverData, e)
   }
 
-  onMouseLeave () {
-    windowActions.setTabHoverState(this.props.frameKey, false)
+  onMouseLeave (e) {
+    // mouseleave will keep the previewMode
+    // as long as the related target is another tab
+    windowActions.setTabHoverState(this.props.frameKey, false, hasTabAsRelatedTarget(e))
   }
 
   onMouseEnter (e) {
-    windowActions.setTabHoverState(this.props.frameKey, true)
+    // if mouse entered a tab we only trigger a new preview
+    // if user is in previewMode, which is defined by mouse move
+    windowActions.setTabHoverState(this.props.frameKey, true, this.props.previewMode)
+  }
+
+  onMouseMove () {
+    // dispatch a message to the store so it can delay
+    // and preview the tab based on mouse idle time
+    windowActions.onTabMouseMove(this.props.frameKey)
   }
 
   onAuxClick (e) {
@@ -225,6 +240,7 @@ class Tab extends React.Component {
     const partition = typeof frame.get('partitionNumber') === 'string'
       ? frame.get('partitionNumber').replace(/^partition-/i, '')
       : frame.get('partitionNumber')
+    const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
 
     const props = {}
     // used in renderer
@@ -234,7 +250,7 @@ class Tab extends React.Component {
     props.notificationBarActive = notificationBarActive
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, props.frameKey)
     props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
-    props.isPinnedTab = frameStateUtil.isPinned(currentWindow, props.frameKey)
+    props.isPinnedTab = tabState.isTabPinned(state, tabId)
     props.canPlayAudio = tabContentState.canPlayAudio(currentWindow, props.frameKey)
     props.themeColor = tabContentState.getThemeColor(currentWindow, props.frameKey)
     props.isNarrowView = tabContentState.isNarrowView(currentWindow, props.frameKey)
@@ -256,7 +272,8 @@ class Tab extends React.Component {
     props.totalTabs = state.get('tabs').size
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
     props.hasTabInFullScreen = tabContentState.hasTabInFullScreen(currentWindow)
-    props.tabId = frame.get('tabId', tabState.TAB_ID_NONE)
+    props.tabId = tabId
+    props.previewMode = currentWindow.getIn(['ui', 'tabs', 'previewMode'])
 
     return props
   }
@@ -274,6 +291,7 @@ class Tab extends React.Component {
       }
     })
     return <div
+      data-tab-area
       className={cx({
         tabArea: true,
         draggingOverLeft: this.isDraggingOverLeft && !this.isDraggingOverSelf,
@@ -283,14 +301,18 @@ class Tab extends React.Component {
         partOfFullPageSet: this.props.partOfFullPageSet || !!this.props.tabWidth
       })}
       style={this.props.tabWidth ? { flex: `0 0 ${this.props.tabWidth}px` } : {}}
+      onMouseMove={this.onMouseMove}
       onMouseEnter={this.onMouseEnter}
-      onMouseLeave={this.onMouseLeave}>
+      onMouseLeave={this.onMouseLeave}
+      data-test-id='tab-area'
+      data-frame-key={this.props.frameKey}>
       {
         this.props.isActive && this.props.notificationBarActive
           ? <NotificationBarCaret />
           : null
       }
       <div
+        data-tab
         ref={(node) => { this.tabNode = node }}
         className={css(
           styles.tab,

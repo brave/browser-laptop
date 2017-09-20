@@ -4,7 +4,7 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -124,32 +124,31 @@ class MessageBox extends React.Component {
   }
 
   render () {
-    return <Dialog testId='messageBoxDialog' className={css(styles.dialog)}>
-      <div data-test-id={'msgBoxTab_' + this.props.tabId}
+    return <Dialog testId='messageBoxDialog'>
+      <div className={css(commonStyles.flyoutDialog)}
+        data-test-id={'msgBoxTab_' + this.props.tabId}
         onKeyDown={this.onKeyDown}
-        className={css(
-          commonStyles.flyoutDialog,
-          styles.container
-        )}>
+      >
         <div className={css(styles.title)} data-test-id='msgBoxTitle'>
           {this.props.title}
         </div>
         <div className={css(styles.body)} data-test-id='msgBoxMessage'>
           {this.props.message}
         </div>
-        <div className={css(this.showSuppress && styles.actions)}>
+        <div className={css(this.props.showSuppress && styles.actions)}>
           {
             this.props.showSuppress
               ? <SwitchControl
-                testId='showSuppressSwitch'
-                // TODO: refactor SwitchControl
+                // TODO (Suguru): Refactor SwitchControl to remove the className
                 className={css(
                   commonStyles.noPaddingLeft,
                   styles.switchControl_marginBottom
                 )}
+                testId='showSuppressSwitch'
                 rightl10nId='preventMoreAlerts'
                 checkedOn={this.props.suppress}
-                onClick={this.onSuppressChanged} />
+                onClick={this.onSuppressChanged}
+              />
               : null
           }
           <div className={css(styles.buttons)} data-test-id='msgBoxButtons'>
@@ -162,34 +161,31 @@ class MessageBox extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  dialog: {
-    outline: 'none'
-  },
-  container: {
-    outline: 'none',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  },
   title: {
     fontWeight: 'bold',
     fontSize: '12pt',
     userSelect: 'text'
   },
+
   body: {
     marginTop: globalStyles.spacing.dialogInsideMargin,
-    minWidth: '425px',
     marginBottom: globalStyles.spacing.dialogInsideMargin,
-    userSelect: 'text',
+    minWidth: '425px',
     maxHeight: 'calc(80vh - 220px)',
     overflowY: 'auto',
-    overflowX: 'hidden'
+    overflowX: 'hidden',
+    userSelect: 'text',
+
+    // See #10119
+    whiteSpace: 'pre-wrap'
   },
+
   actions: {
     display: 'flex',
     flexFlow: 'column nowrap',
     justifyContent: 'space-between'
   },
+
   buttons: {
     display: 'flex',
     justifyContent: 'flex-end'

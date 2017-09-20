@@ -134,6 +134,20 @@ let generateBraveManifest = () => {
           getBraveExtUrl('about-blank.html'),
           getBraveExtUrl('about-blank.html') + '#*'
         ]
+      },
+      {
+        run_at: 'document_start',
+        all_frames: true,
+        js: [
+          'content/scripts/dndHandler.js'
+        ],
+        matches: [
+          '<all_urls>'
+        ],
+        exclude_globs: [
+          indexHTML,
+          getBraveExtUrl('*')
+        ]
       }
     ],
     web_accessible_resources: [
@@ -500,11 +514,11 @@ module.exports.init = () => {
       disableExtension(extensionIds[passwordManagers.LAST_PASS])
     }
 
-    if (activePasswordManager === passwordManagers.ENPASS) {
-      registerComponent(extensionIds[passwordManagers.ENPASS], publicKeys[passwordManagers.ENPASS])
-    } else {
-      disableExtension(extensionIds[passwordManagers.ENPASS])
-    }
+    // if (activePasswordManager === passwordManagers.ENPASS) {
+    //   registerComponent(extensionIds[passwordManagers.ENPASS], publicKeys[passwordManagers.ENPASS])
+    // } else {
+    //   disableExtension(extensionIds[passwordManagers.ENPASS])
+    // }
 
     if (activePasswordManager === passwordManagers.BITWARDEN) {
       registerComponent(extensionIds[passwordManagers.BITWARDEN], publicKeys[passwordManagers.BITWARDEN])
@@ -518,11 +532,11 @@ module.exports.init = () => {
       disableExtension(config.PocketExtensionId)
     }
 
-    if (getSetting(settings.VIMIUM_ENABLED)) {
-      registerComponent(config.vimiumExtensionId, config.vimiumExtensionPublicKey)
-    } else {
-      disableExtension(config.vimiumExtensionId)
-    }
+    // if (getSetting(settings.VIMIUM_ENABLED)) {
+    //   registerComponent(config.vimiumExtensionId, config.vimiumExtensionPublicKey)
+    // } else {
+    //   disableExtension(config.vimiumExtensionId)
+    // }
 
     if (getSetting(settings.HONEY_ENABLED)) {
       registerComponent(config.honeyExtensionId, config.honeyExtensionPublicKey)
@@ -530,11 +544,11 @@ module.exports.init = () => {
       disableExtension(config.honeyExtensionId)
     }
 
-    if (getSetting(settings.PINTEREST_ENABLED)) {
-      registerComponent(config.pinterestExtensionId, config.pinterestExtensionPublicKey)
-    } else {
-      disableExtension(config.pinterestExtensionId)
-    }
+    // if (getSetting(settings.PINTEREST_ENABLED)) {
+    //   registerComponent(config.pinterestExtensionId, config.pinterestExtensionPublicKey)
+    // } else {
+    //   disableExtension(config.pinterestExtensionId)
+    // }
 
     if (getSetting(settings.METAMASK_ENABLED)) {
       registerComponent(config.metamaskExtensionId, config.metamaskPublicKey)

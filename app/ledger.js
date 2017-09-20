@@ -204,21 +204,21 @@ const doAction = (state, action) => {
           setPaymentInfo(action.value)
           break
 
-        case settings.MINIMUM_VISIT_TIME:
+        case settings.PAYMENTS_MINIMUM_VISIT_TIME:
           if (action.value <= 0) break
 
           synopsis.options.minPublisherDuration = action.value
           updatePublisherInfo()
           break
 
-        case settings.MINIMUM_VISITS:
+        case settings.PAYMENTS_MINIMUM_VISITS:
           if (action.value <= 0) break
 
           synopsis.options.minPublisherVisits = action.value
           updatePublisherInfo()
           break
 
-        case settings.PAYMENTS_NON_VERIFIED:
+        case settings.PAYMENTS_ALLOW_NON_VERIFIED:
           synopsis.options.showOnlyVerified = action.value
           updatePublisherInfo()
           break
@@ -294,7 +294,7 @@ const doAction = (state, action) => {
 var init = () => {
   try {
     initialize(getSetting(settings.PAYMENTS_ENABLED))
-  } catch (ex) { console.log('ledger.js initialization failed: ' + ex.toString() + '\n' + ex.stack) }
+  } catch (ex) { console.error('ledger.js initialization failed: ', ex) }
 }
 
 var quit = () => {
@@ -312,7 +312,7 @@ var boot = () => {
   fs.access(pathName(statePath), fs.FF_OK, (err) => {
     if (!err) return
 
-    if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
+    if (err.code !== 'ENOENT') console.error('statePath read error: ' + err.toString())
 
     ledgerInfo.creating = true
     appActions.updateLedgerInfo({ creating: true })
@@ -323,7 +323,7 @@ var boot = () => {
       appActions.updateLedgerInfo({})
 
       bootP = false
-      return console.log('ledger client boot error: ' + ex.toString() + '\n' + ex.stack)
+      return console.error('ledger client boot error: ', ex)
     }
     if (client.sync(callback) === true) run(random.randomInt({ min: msecs.minute, max: 10 * msecs.minute }))
     getBalance()
@@ -338,7 +338,9 @@ var reset = (doneP) => {
   if (!doneP) files.push(statePath)
   files.forEach((file) => {
     fs.unlink(pathName(file), (err) => {
-      if ((err) && (err.code !== 'ENOENT')) console.log(err)
+      if ((err) && (err.code !== 'ENOENT')) {
+        console.error('error removing file ' + file + ': ', err)
+      }
     })
   })
 }
@@ -367,7 +369,7 @@ var backupKeys = (appState, action) => {
 
   fs.writeFile(filePath, message, (err) => {
     if (err) {
-      console.log(err)
+      console.error(err)
     } else {
       tabs.create({url: fileUrl(filePath)}, (webContents) => {
         if (action.backupAction === 'print') {
@@ -654,7 +656,7 @@ eventStore.addChangeListener(() => {
         if ((publisher) && (blockedP(publisher))) publisher = null
         if (publisher) page.publisher = publisher
       } catch (ex) {
-        console.log('getPublisher error for ' + location + ': ' + ex.toString())
+        console.error('getPublisher error for ' + location + ': ' + ex.toString())
       }
     }
     locations[location] = underscore.omit(page, [ 'url', 'protocol', 'faviconURL' ])
@@ -666,7 +668,7 @@ eventStore.addChangeListener(() => {
     synopsis.initPublisher(publisher)
     if (initP) {
       excludeP(publisher, (unused, exclude) => {
-        if (!getSetting(settings.AUTO_SUGGEST_SITES)) {
+        if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
           exclude = false
         } else {
           exclude = !exclude
@@ -718,13 +720,13 @@ var initialize = (paymentsEnabled) => {
       fs.readFile(pathName(statePath), (err, data) => {
         var state
 
-        if (err) return console.log('read error: ' + err.toString())
+        if (err) return console.error('read error: ' + err.toString())
 
         try {
           state = JSON.parse(data)
           if (clientOptions.verboseP) console.log('\nstarting up ledger client integration')
         } catch (ex) {
-          return console.log('statePath parse error: ' + ex.toString())
+          return console.error('statePath parse error: ' + ex.toString())
         }
 
         getStateInfo(state)
@@ -743,7 +745,7 @@ var initialize = (paymentsEnabled) => {
           let ledgerWindow = (synopsis.options.numFrames - 1) * synopsis.options.frameSize
           if (typeof timeUntilReconcile === 'number' && timeUntilReconcile < -ledgerWindow) {
             client.setTimeUntilReconcile(null, (err, stateResult) => {
-              if (err) return console.log('ledger setTimeUntilReconcile error: ' + err.toString())
+              if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
 
               if (!stateResult) {
                 return
@@ -754,7 +756,7 @@ var initialize = (paymentsEnabled) => {
             })
           }
         } catch (ex) {
-          return console.log('ledger client creation error: ' + ex.toString() + '\n' + ex.stack)
+          return console.error('ledger client creation error: ', ex)
         }
 
         // speed-up browser start-up by delaying the first synchronization action
@@ -773,7 +775,7 @@ var initialize = (paymentsEnabled) => {
       return
     }
 
-    if (err.code !== 'ENOENT') console.log('statePath read error: ' + err.toString())
+    if (err.code !== 'ENOENT') console.error('statePath read error: ' + err.toString())
     appActions.updateLedgerInfo({})
   })
 }
@@ -800,19 +802,19 @@ var enable = (paymentsEnabled) => {
       var value
 
       // cf., the `Synopsis` constructor, https://github.com/brave/ledger-publisher/blob/master/index.js#L167
-      value = getSetting(settings.MINIMUM_VISIT_TIME)
+      value = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
       if (!value) {
         value = 8 * 1000
-        appActions.changeSetting(settings.MINIMUM_VISIT_TIME, value)
+        appActions.changeSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME, value)
       }
 
       // for earlier versions of the code...
       if ((value > 0) && (value < 1000)) synopsis.options.minPublisherDuration = value * 1000
 
-      value = getSetting(settings.MINIMUM_VISITS)
+      value = getSetting(settings.PAYMENTS_MINIMUM_VISITS)
       if (!value) {
         value = 1
-        appActions.changeSetting(settings.MINIMUM_VISITS, value)
+        appActions.changeSetting(settings.PAYMENTS_MINIMUM_VISITS, value)
       }
       if (value > 0) synopsis.options.minPublisherVisits = value
 
@@ -839,7 +841,7 @@ var enable = (paymentsEnabled) => {
     if (publisherInfo._internal.verboseP) console.log('\nstarting up ledger publisher integration')
 
     if (err) {
-      if (err.code !== 'ENOENT') console.log('synopsisPath read error: ' + err.toString())
+      if (err.code !== 'ENOENT') console.error('synopsisPath read error: ' + err.toString())
       initSynopsis()
       return updatePublisherInfo()
     }
@@ -848,7 +850,7 @@ var enable = (paymentsEnabled) => {
     try {
       synopsis = new (ledgerPublisher.Synopsis)(data)
     } catch (ex) {
-      console.log('synopsisPath parse error: ' + ex.toString())
+      console.error('synopsisPath parse error: ' + ex.toString())
     }
     initSynopsis()
     underscore.keys(synopsis.publishers).forEach((publisher) => {
@@ -859,8 +861,16 @@ var enable = (paymentsEnabled) => {
     // change undefined include publishers to include publishers
     appActions.enableUndefinedPublishers(synopsis.publishers)
 
-    fs.unlink(pathName(publisherPath), (err) => { if ((err) && (err.code !== 'ENOENT')) console.log(err) })
-    fs.unlink(pathName(scoresPath), (err) => { if ((err) && (err.code !== 'ENOENT')) console.log(err) })
+    fs.unlink(pathName(publisherPath), (err) => {
+      if ((err) && (err.code !== 'ENOENT')) {
+        console.error('error removing file ' + pathName(publisherPath) + ': ', err)
+      }
+    })
+    fs.unlink(pathName(scoresPath), (err) => {
+      if ((err) && (err.code !== 'ENOENT')) {
+        console.error('error removing file ' + pathName(scoresPath) + ': ', err)
+      }
+    })
   })
 }
 
@@ -959,7 +969,7 @@ const fetchFavIcon = (entry, url, redirects) => {
     }
 
     if (err) {
-      console.log('response error: ' + err.toString() + '\n' + err.stack)
+      console.error('response error: ' + err.toString() + '\n' + err.stack)
       return null
     }
 
@@ -1054,7 +1064,7 @@ var stickyP = (publisher) => {
 
 var eligibleP = (publisher) => {
   if (!synopsis.options.minPublisherDuration && process.env.NODE_ENV !== 'test') {
-    synopsis.options.minPublisherDuration = getSetting(settings.MINIMUM_VISIT_TIME)
+    synopsis.options.minPublisherDuration = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
   }
 
   return ((synopsis.publishers[publisher].scores[synopsis.options.scorekeeper] > 0) &&
@@ -1064,7 +1074,7 @@ var eligibleP = (publisher) => {
 
 var visibleP = (publisher) => {
   if (synopsis.options.showOnlyVerified === undefined) {
-    synopsis.options.showOnlyVerified = getSetting(settings.PAYMENTS_NON_VERIFIED)
+    synopsis.options.showOnlyVerified = getSetting(settings.PAYMENTS_ALLOW_NON_VERIFIED)
   }
 
   const publisherOptions = synopsis.publishers[publisher].options
@@ -1376,7 +1386,7 @@ var cacheRuleSet = (ruleset) => {
 
     updatePublisherInfo()
   } catch (ex) {
-    console.log('ruleset error: ' + ex.toString() + '\n' + ex.stack)
+    console.error('ruleset error: ', ex)
   }
 }
 
@@ -1421,19 +1431,19 @@ var excludeP = (publisher, callback) => {
           regexp = new RegExp(data.key.substr(4))
           if (!regexp.test(props[tldP ? 'TLD' : 'SLD'])) return
         } catch (ex) {
-          console.log(v2RulesetPath + ' stream invalid regexp ' + data.key + ': ' + ex.toString())
+          console.error(v2RulesetPath + ' stream invalid regexp ' + data.key + ': ' + ex.toString())
         }
       }
 
       try {
         result = JSON.parse(data.value)
       } catch (ex) {
-        console.log(v2RulesetPath + ' stream invalid JSON ' + data.entry + ': ' + data.value)
+        console.error(v2RulesetPath + ' stream invalid JSON ' + data.entry + ': ' + data.value)
       }
 
       done(null, result.exclude)
     }).on('error', (err) => {
-      console.log(v2RulesetPath + ' stream error: ' + JSON.stringify(err, null, 2))
+      console.error(v2RulesetPath + ' stream error: ' + JSON.stringify(err, null, 2))
     }).on('close', () => {
     }).on('end', () => {
       if (!doneP) done(null, false)
@@ -1474,14 +1484,14 @@ var inspectP = (db, path, publisher, property, key, callback) => {
     var result
 
     if (err) {
-      if (!err.notFound) console.log(path + ' get ' + key + ' error: ' + JSON.stringify(err, null, 2))
+      if (!err.notFound) console.error(path + ' get ' + key + ' error: ' + JSON.stringify(err, null, 2))
       return done(err)
     }
 
     try {
       result = JSON.parse(value)
     } catch (ex) {
-      console.log(v2RulesetPath + ' stream invalid JSON ' + key + ': ' + value)
+      console.error(v2RulesetPath + ' stream invalid JSON ' + key + ': ' + value)
       result = {}
     }
 
@@ -1599,7 +1609,7 @@ var updateLedgerInfo = () => {
 
     if (!ledgerGeoIP) ledgerGeoIP = require('ledger-geoip')
     return ledgerGeoIP.getGeoIP(client.options, (err, provider, result) => {
-      if (err) console.log('ledger geoip warning: ' + JSON.stringify(err, null, 2))
+      if (err) console.warn('ledger geoip warning: ' + JSON.stringify(err, null, 2))
       if (result) ledgerInfo.countryCode = result
 
       ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
@@ -1608,7 +1618,7 @@ var updateLedgerInfo = () => {
 
       ledgerInfo._internal.exchangeExpiry = now + msecs.day
       roundtrip({ path: '/v1/exchange/providers' }, client.options, (err, response, body) => {
-        if (err) console.log('ledger exchange error: ' + JSON.stringify(err, null, 2))
+        if (err) console.error('ledger exchange error: ' + JSON.stringify(err, null, 2))
 
         ledgerInfo._internal.exchanges = body || {}
         ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
@@ -1669,7 +1679,7 @@ var callback = (err, result, delayTime) => {
     })
 
     v2RulesetDB.batch(entries, (err) => {
-      if (err) return console.log(v2RulesetPath + ' error: ' + JSON.stringify(err, null, 2))
+      if (err) return console.error(v2RulesetPath + ' error: ' + JSON.stringify(err, null, 2))
 
       if (entries.length === 0) return
 
@@ -1698,7 +1708,7 @@ var callback = (err, result, delayTime) => {
       }
     })
     v2PublishersDB.batch(entries, (err) => {
-      if (err) return console.log(v2PublishersPath + ' error: ' + JSON.stringify(err, null, 2))
+      if (err) return console.error(v2PublishersPath + ' error: ' + JSON.stringify(err, null, 2))
     })
   }
 
@@ -1957,7 +1967,7 @@ var getBalance = () => {
     var unconfirmed
     var info = ledgerInfo._internal.paymentInfo
 
-    if (err) return console.log('ledger balance warning: ' + JSON.stringify(err, null, 2))
+    if (err) return console.warn('ledger balance warning: ' + JSON.stringify(err, null, 2))
 
     if (typeof result.unconfirmed === 'undefined') return
 
@@ -1984,7 +1994,7 @@ var logError = (err, caller) => {
       caller: caller,
       error: err
     }
-    console.log('Error in %j: %j', caller, err)
+    console.error('Error in %j: %j', caller, err)
     return true
   } else {
     ledgerInfo.error = null
@@ -2024,7 +2034,7 @@ var getPaymentInfo = () => {
       cacheReturnValue()
     })
   } catch (ex) {
-    console.log('properties error: ' + ex.toString())
+    console.error('properties error: ' + ex.toString())
   }
 }
 
@@ -2044,7 +2054,7 @@ var setPaymentInfo = (amount) => {
 
   underscore.extend(bravery.fee, { amount: amount })
   client.setBraveryProperties(bravery, (err, result) => {
-    if (err) return console.log('ledger setBraveryProperties: ' + err.toString())
+    if (err) return console.error('ledger setBraveryProperties: ' + err.toString())
 
     if (result) muonWriter(pathName(statePath), result)
   })
@@ -2073,7 +2083,7 @@ var cacheReturnValue = () => {
       updateLedgerInfo()
     })
   } catch (ex) {
-    console.log('qr.imageSync error: ' + ex.toString())
+    console.error('qr.imageSync error: ' + ex.toString())
   }
 }
 
@@ -2096,11 +2106,11 @@ var networkConnected = underscore.debounce(() => {
 
 var muonWriter = (path, payload) => {
   muon.file.writeImportant(path, JSON.stringify(payload, null, 2), (success) => {
-    if (!success) return console.log('write error: ' + path)
+    if (!success) return console.error('write error: ' + path)
 
     if ((quitP) && (!getSetting(settings.PAYMENTS_ENABLED)) && (getSetting(settings.SHUTDOWN_CLEAR_HISTORY))) {
       if (ledgerInfo._internal.debugP) console.log('\ndeleting ' + path)
-      return fs.unlink(path, (err) => { if (err) console.log('unlink error: ' + err.toString()) })
+      return fs.unlink(path, (err) => { if (err) console.error('unlink error: ' + err.toString()) })
     }
 
     if (ledgerInfo._internal.debugP) console.log('\nwrote ' + path)

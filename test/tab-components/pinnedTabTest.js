@@ -14,8 +14,8 @@ describe('pinnedTabs', function () {
   }
 
   describe('Pins an existing frame', function () {
-    Brave.beforeAll(this)
-    before(function * () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
       yield setup(this.app.client)
       this.page1 = Brave.server.url('page1.html')
       yield this.app.client
@@ -34,7 +34,7 @@ describe('pinnedTabs', function () {
     })
     it('unpins and creates a non-pinned tab', function * () {
       yield this.app.client
-        .pinTabByIndex(1, false)
+        .pinTabByIndex(0, false)
         .waitForExist('[data-test-pinned-tab="false"][data-frame-key="2"]')
         .waitForElementCount(pinnedTabsTabs, 0)
         .waitForElementCount(tabsTabs, 2)
@@ -42,7 +42,6 @@ describe('pinnedTabs', function () {
     })
     it('pinning the same site again combines it', function * () {
       yield this.app.client
-        .pinTabByIndex(1, true)
         .newTab({ url: this.page1 })
         .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
@@ -50,6 +49,59 @@ describe('pinnedTabs', function () {
         .pinTabByIndex(2, true)
         .waitForElementCount(pinnedTabsTabs, 1)
         .waitForElementCount(tabsTabs, 1)
+    })
+    it('can pin a PDF', function * () {
+      const pdfUrl = 'http://orimi.com/pdf-test.pdf'
+      yield this.app.client
+        .tabByIndex(0)
+        .url(pdfUrl)
+        .pause(1000) // wait for PDF load
+        .windowByUrl(Brave.browserWindowUrl)
+        .pinTabByIndex(1, true)
+        .waitForElementCount(pinnedTabsTabs, 2)
+        .waitForElementCount(tabsTabs, 0)
+    })
+  })
+
+  describe('Moving pinned tabs', function () {
+    Brave.beforeEach(this)
+    // test case for bug solved with #10531
+    it('reorders pins without forgetting about them', function * () {
+      yield setup(this.app.client)
+      const page1 = Brave.server.url('page1.html')
+      const page2 = Brave.server.url('page2.html')
+      const page3 = Brave.server.url('page_no_title.html')
+      const page4 = Brave.server.url('red_bg.html')
+      yield this.app.client
+        // open new tab and pin it
+        .newTab({ url: page1 })
+        .waitForUrl(page1)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
+        .pinTabByIndex(1, true)
+        // open another new tab and pin it
+        .newTab({ url: page2 })
+        .waitForUrl(page2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('[data-test-id="tab"][data-frame-key="3"]')
+        .pinTabByIndex(2, true)
+        // make sure a non pinned page exists
+        .newTab({ url: page3 })
+        .waitForUrl(page3)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('[data-test-id="tab"][data-frame-key="4"]')
+        // change pinned tabs order
+        .movePinnedTabByFrameKey(3, 2, true)
+        // check the move worked
+        .waitForExist('[data-test-id="tab-area"][data-frame-key="3"] + [data-test-id="tab-area"][data-frame-key="2"]')
+        // create another tab and pin it
+        .newTab({ url: page4 })
+        .waitForUrl(page4)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist('[data-test-id="tab"][data-frame-key="5"]')
+        .pinTabByIndex(4, true)
+        // check we still have the other pinned tabs
+        .waitForExist('[data-test-id="tab-area"][data-frame-key="3"] + [data-test-id="tab-area"][data-frame-key="2"] + [data-test-id="tab-area"][data-frame-key="5"]')
     })
   })
 
@@ -123,9 +175,10 @@ describe('pinnedTabs', function () {
 
     it('from same window as pinned', function * () {
       yield this.app.client
+        .windowByIndex(0)
         .pinTabByIndex(1, false)
         .waitForElementCount(pinnedTabsTabs, 0)
-        .windowByIndex(0)
+        .windowByIndex(1)
         .waitForElementCount(pinnedTabsTabs, 0)
     })
 
@@ -157,6 +210,7 @@ describe('pinnedTabs', function () {
       yield setup(this.app.client)
       this.page1 = Brave.server.url('page1.html')
       yield this.app.client
+        .activateURLMode()
         .newTab({ url: this.page1 })
         .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)

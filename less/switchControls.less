@@ -37,16 +37,21 @@
     }
   }
 
+  &.small {
+    .switchBackground {
+      height: @smallSwitchHeight;
+      width: @smallSwitchWidth;
+      .switchIndicator {
+        height: @smallSwitchNubDiameter;
+        width: @smallSwitchNubDiameter;
+        top: 1px;
+        right: calc(@smallSwitchWidth - @smallSwitchNubDiameter - @switchNubRightMargin);
+      }
+    }
+  }
+
   .switchControlText {
     margin: auto 0;
-  }
-
-  .switchControlLeftText {
-    margin: auto 5px auto 0;
-  }
-
-  .switchControlRightText {
-    margin: auto 0 auto 5px;
   }
 
   .switchControlTopText {

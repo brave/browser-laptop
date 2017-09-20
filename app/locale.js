@@ -13,6 +13,8 @@ const {LANGUAGE, REQUEST_LANGUAGE} = require('../js/constants/messages')
 
 // Exhaustive list of identifiers used by top and context menus
 var rendererIdentifiers = function () {
+  const countryCodes = require('./common/constants/countryCodes')
+
   return [
     'downloadsManager',
     'confirmClearPasswords',
@@ -255,8 +257,11 @@ var rendererIdentifiers = function () {
     'connectionError',
     'unknownError',
     'allowAutoplay',
-    'autoplayMedia'
-  ]
+    'autoplayMedia',
+    // Release channels
+    'channelDev',
+    'channelBeta'
+  ].concat(countryCodes)
 }
 
 var ctx = null
@@ -296,6 +301,7 @@ const availableLanguages = [
   'cs',
   'nl-NL',
   'en-US',
+  'en-GB',
   'fr-FR',
   'de-DE',
   'hi-IN',
@@ -308,6 +314,7 @@ const availableLanguages = [
   'pt-BR',
   'ru',
   'sl',
+  'sv-SE',
   'es',
   'ta',
   'te',
@@ -378,7 +385,9 @@ exports.init = function (language) {
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'app.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'error.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'passwords.properties'),
-      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'common.properties'))
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'common.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'countries.properties')
+      )
   }
 
   appendLangProperties(lang)

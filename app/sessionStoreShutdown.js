@@ -13,26 +13,28 @@ const async = require('async')
 const messages = require('../js/constants/messages')
 const appActions = require('../js/actions/appActions')
 const platformUtil = require('./common/lib/platformUtil')
+const Immutable = require('immutable')
+const {makeImmutable} = require('./common/state/immutableUtil')
 
 // Used to collect the per window state when shutting down the application
-let perWindowState
+let immutablePerWindowState
 let sessionStateStoreComplete
 let sessionStateStoreCompleteCallback
 let saveAppStateTimeout
 let windowCloseRequestId
 let shuttingDown
-let lastWindowThatWasClosedState
+let immutableLastWindowClosedState
 let isAllWindowsClosed
 let sessionStateSaveInterval
 // Stores the last window state for each requested window in case a hung window happens,
 // we'll at least have the last known window state.
-let windowStateCache
+let immutableWindowStateCache
 let sessionStoreQueue
 let appStore
 
 // Useful for automated tests
 const reset = () => {
-  perWindowState = []
+  immutablePerWindowState = Immutable.List()
   sessionStateStoreComplete = false
   if (saveAppStateTimeout) {
     clearTimeout(saveAppStateTimeout)
@@ -40,10 +42,10 @@ const reset = () => {
   saveAppStateTimeout = null
   windowCloseRequestId = 0
   shuttingDown = false
-  lastWindowThatWasClosedState = undefined
+  immutableLastWindowClosedState = undefined
   isAllWindowsClosed = false
   sessionStateSaveInterval = null
-  windowStateCache = {}
+  immutableWindowStateCache = Immutable.Map()
   if (sessionStateStoreCompleteCallback) {
     sessionStateStoreCompleteCallback()
   }
@@ -73,10 +75,8 @@ const saveAppState = (forceSave = false) => {
     app.exit(0)
   }
 
-  const appState = appStore.getState().toJS()
-  appState.perWindowState = perWindowState
-
-  const receivedAllWindows = perWindowState.length === BrowserWindow.getAllWindows().length
+  let immutableAppState = appStore.getState().set('perWindowState', immutablePerWindowState)
+  const receivedAllWindows = immutablePerWindowState.size === BrowserWindow.getAllWindows().length
   if (receivedAllWindows) {
     clearTimeout(saveAppStateTimeout)
   }
@@ -85,7 +85,7 @@ const saveAppState = (forceSave = false) => {
     return
   }
 
-  return sessionStore.saveAppState(appState, shuttingDown).catch((e) => {
+  return sessionStore.saveAppState(immutableAppState, shuttingDown).catch((e) => {
     logSaveAppStateError(e)
   }).then(() => {
     if (receivedAllWindows || forceSave) {
@@ -96,21 +96,21 @@ const saveAppState = (forceSave = false) => {
       if (shuttingDown) {
         // If the status is still UPDATE_AVAILABLE then the user wants to quit
         // and not restart
-        if (appState.updates && (appState.updates.status === updateStatus.UPDATE_AVAILABLE ||
-            appState.updates.status === updateStatus.UPDATE_AVAILABLE_DEFERRED)) {
+        if (immutableAppState.get('updates') && (immutableAppState.getIn(['updates', 'status']) === updateStatus.UPDATE_AVAILABLE ||
+            immutableAppState.getIn(['updates', 'status']) === updateStatus.UPDATE_AVAILABLE_DEFERRED)) {
           // In this case on win32, the process doesn't try to auto restart, so avoid the user
           // having to open the app twice.  Maybe squirrel detects the app is already shutting down.
           if (platformUtil.isWindows()) {
-            appState.updates.status = updateStatus.UPDATE_APPLYING_RESTART
+            immutableAppState = immutableAppState.setIn(['updates', 'status'], updateStatus.UPDATE_APPLYING_RESTART)
           } else {
-            appState.updates.status = updateStatus.UPDATE_APPLYING_NO_RESTART
+            immutableAppState = immutableAppState.setIn(['updates', 'status'], updateStatus.UPDATE_APPLYING_NO_RESTART)
           }
         }
 
         // If there's an update to apply, then do it here.
         // Otherwise just quit.
-        if (appState.updates && (appState.updates.status === updateStatus.UPDATE_APPLYING_NO_RESTART ||
-            appState.updates.status === updateStatus.UPDATE_APPLYING_RESTART)) {
+        if (immutableAppState.get('updates') && (immutableAppState.getIn(['updates', 'status']) === updateStatus.UPDATE_APPLYING_NO_RESTART ||
+            immutableAppState.getIn(['updates', 'status']) === updateStatus.UPDATE_APPLYING_RESTART)) {
           updater.quitAndInstall()
         } else {
           app.quit()
@@ -132,11 +132,11 @@ const initiateSessionStateSave = () => {
   sessionStoreQueue.push((cb) => {
     sessionStateStoreComplete = false
     sessionStateStoreCompleteCallback = cb
-    perWindowState.length = 0
+    immutablePerWindowState = Immutable.List()
 
     // quit triggered by window-all-closed should save last window state
-    if (isAllWindowsClosed && lastWindowThatWasClosedState) {
-      perWindowState.push(lastWindowThatWasClosedState)
+    if (isAllWindowsClosed && immutableLastWindowClosedState) {
+      immutablePerWindowState = immutablePerWindowState.push(immutableLastWindowClosedState)
       saveAppState(true)
     } else if (BrowserWindow.getAllWindows().length > 0) {
       ++windowCloseRequestId
@@ -148,9 +148,9 @@ const initiateSessionStateSave = () => {
       // In this case just save session store for the windows that we have already.
       saveAppStateTimeout = setTimeout(() => {
         // Rewrite perwindowstate here
-        perWindowState = windowIds
-          .filter((windowId) => windowStateCache[windowId])
-          .map((windowId) => windowStateCache[windowId])
+        immutablePerWindowState = Immutable.fromJS(windowIds
+          .filter((windowId) => immutableWindowStateCache.get(windowId))
+          .map((windowId) => immutableWindowStateCache.get(windowId)))
         saveAppState(true)
       }, appConfig.quitTimeout)
     } else {
@@ -163,11 +163,11 @@ const removeWindowFromCache = (windowId) => {
   if (shuttingDown) {
     return
   }
-  delete windowStateCache[windowId]
+  immutableWindowStateCache = immutableWindowStateCache.delete(windowId)
 }
 
-const initWindowCacheState = (windowId, windowState) => {
-  windowStateCache[windowId] = Object.assign({}, windowState)
+const initWindowCacheState = (windowId, immutableWindowState) => {
+  immutableWindowStateCache = immutableWindowStateCache.set(windowId, immutableWindowState)
 }
 
 app.on('before-quit', (e) => {
@@ -188,40 +188,43 @@ app.on('before-quit', (e) => {
   if (sessionStateSaveInterval !== undefined) {
     clearInterval(sessionStateSaveInterval)
   }
-  initiateSessionStateSave()
+  module.exports.initiateSessionStateSave()
 })
 
 const startSessionSaveInterval = () => {
   // save app state every 5 minutes regardless of update frequency
-  initiateSessionStateSave()
-  sessionStateSaveInterval = setInterval(initiateSessionStateSave, appConfig.sessionSaveInterval)
+  sessionStateSaveInterval = setInterval(module.exports.initiateSessionStateSave, appConfig.sessionSaveInterval)
 }
 
 // User initiated exit using File->Quit
-ipcMain.on(messages.RESPONSE_WINDOW_STATE, (evt, data, id) => {
+ipcMain.on(messages.RESPONSE_WINDOW_STATE, (evt, mem) => {
+  const memory = mem.memory()
+  const data = memory.windowState
+  const id = memory.requestId
+  const immutableWindowState = makeImmutable(data)
   const senderWindowId = evt.sender.getOwnerBrowserWindow().id
   if (id !== windowCloseRequestId) {
     return
   }
 
   if (data) {
-    perWindowState.push(data)
-    windowStateCache[senderWindowId] = data
+    immutablePerWindowState = immutablePerWindowState.push(immutableWindowState)
+    immutableWindowStateCache = immutableWindowStateCache.set(senderWindowId, immutableWindowState)
   }
   saveAppState()
 })
 
 ipcMain.on(messages.LAST_WINDOW_STATE, (evt, data) => {
   if (data) {
-    lastWindowThatWasClosedState = data
+    immutableLastWindowClosedState = Immutable.fromJS(data)
   }
 })
 
 process.on(messages.UNDO_CLOSED_WINDOW, () => {
-  if (lastWindowThatWasClosedState) {
-    sessionStore.cleanPerWindowData(lastWindowThatWasClosedState)
-    appActions.newWindow(undefined, undefined, lastWindowThatWasClosedState)
-    lastWindowThatWasClosedState = undefined
+  if (immutableLastWindowClosedState) {
+    immutableLastWindowClosedState = sessionStore.cleanPerWindowData(immutableLastWindowClosedState)
+    appActions.newWindow(undefined, undefined, immutableLastWindowClosedState)
+    immutableLastWindowClosedState = undefined
   }
 })
 

@@ -33,10 +33,11 @@ const WidevinePanel = require('./widevinePanel')
 const AutofillAddressPanel = require('../autofill/autofillAddressPanel')
 const AutofillCreditCardPanel = require('../autofill/autofillCreditCardPanel')
 const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
+const AddEditBookmarkFolder = require('../bookmarks/addEditBookmarkFolder')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('../bookmarks/bookmarksToolbar')
-const ContextMenu = require('../common/contextMenu')
+const ContextMenu = require('../common/contextMenu/contextMenu')
 const PopupWindow = require('./popupWindow')
 const NoScriptInfo = require('./noScriptInfo')
 const CheckDefaultBrowserDialog = require('./checkDefaultBrowserDialog')
@@ -51,7 +52,6 @@ const keyLocations = require('../../../common/constants/keyLocations')
 // State handling
 const basicAuthState = require('../../../common/state/basicAuthState')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const siteUtil = require('../../../../js/state/siteUtil')
 const searchProviders = require('../../../../js/data/searchProviders')
 const defaultBrowserState = require('../../../common/state/defaultBrowserState')
 const shieldState = require('../../../common/state/shieldState')
@@ -67,6 +67,8 @@ const eventUtil = require('../../../../js/lib/eventUtil')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId, isMaximized, isFocused, isFullScreen} = require('../../currentWindow')
 const platformUtil = require('../../../common/lib/platformUtil')
+const urlUtil = require('../../../../js/lib/urlutil')
+const {hasBraveDragData} = require('../../../../js/dndData')
 const isDarwin = platformUtil.isDarwin()
 const isWindows = platformUtil.isWindows()
 const isLinux = platformUtil.isLinux()
@@ -433,19 +435,18 @@ class Main extends React.Component {
 
     window.addEventListener('focus', () => {
       windowActions.setFocusedFrame(this.props.location, this.props.tabId)
-      windowActions.onFocus(getCurrentWindowId())
       // For whatever reason other elements are preserved but webviews are not.
       if (document.activeElement && document.activeElement.tagName === 'BODY') {
         webviewActions.setWebviewFocused()
       }
     }, { passive: true })
 
-    windowActions.onFocus(getCurrentWindowId())
-
     // disable dnd by default
     window.addEventListener('dragover', function (event) {
-      // allow webviews to handle dnd
-      if (event.target.tagName === 'WEBVIEW') {
+      // allow webviews to handle dnd as long as the dragged object isn't from
+      // Brave itself
+      if (event.target.tagName === 'WEBVIEW' &&
+        !hasBraveDragData(event.dataTransfer)) {
         return true
       }
       event.dataTransfer.dropEffect = 'none'
@@ -454,8 +455,10 @@ class Main extends React.Component {
     }, true)
 
     window.addEventListener('drop', function (event) {
-      // allow webviews to handle dnd
-      if (event.target.tagName === 'WEBVIEW') {
+      // allow webviews to handle dnd as long as the dragged object isn't from
+      // Brave itself
+      if (event.target.tagName === 'WEBVIEW' &&
+        !hasBraveDragData(event.dataTransfer)) {
         return true
       }
       event.preventDefault()
@@ -469,7 +472,6 @@ class Main extends React.Component {
     const self = this
     window.onblur = () => {
       self.resetAltMenuProcessing()
-      windowActions.onBlur(getCurrentWindowId())
     }
   }
 
@@ -526,36 +528,38 @@ class Main extends React.Component {
     const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
     const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(currentWindow)
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
-    const activeOrigin = !activeFrame.isEmpty() ? siteUtil.getOrigin(activeFrame.get('location')) : null
+    const activeOrigin = !activeFrame.isEmpty() ? urlUtil.getOrigin(activeFrame.get('location')) : null
     const widevinePanelDetail = currentWindow.get('widevinePanelDetail', Immutable.Map())
     const loginRequiredDetails = basicAuthState.getLoginRequiredDetail(state, activeTabId)
+    const focused = isFocused(state)
 
     const props = {}
     // used in renderer
     props.isFullScreen = activeFrame.get('isFullScreen', false)
-    props.isMaximized = isMaximized() || isFullScreen()
+    props.isMaximized = isMaximized(state) || isFullScreen(state)
     props.captionButtonsVisible = isWindows
-    props.showContextMenu = !!currentWindow.get('contextMenuDetail')
-    props.showPopupWindow = !!currentWindow.get('popupWindowDetail')
+    props.showContextMenu = currentWindow.has('contextMenuDetail')
+    props.showPopupWindow = currentWindow.has('popupWindowDetail')
     props.showSiteInfo = currentWindow.getIn(['ui', 'siteInfo', 'isVisible']) &&
       !isSourceAboutUrl(activeFrame.get('location'))
     props.showBravery = shieldState.braveShieldsEnabled(activeFrame) &&
       !!currentWindow.get('braveryPanelDetail')
-    props.showClearData = !!currentWindow.getIn(['ui', 'isClearBrowsingDataPanelVisible'])
-    props.showImportData = !!currentWindow.get('importBrowserDataDetail')
+    props.showClearData = currentWindow.getIn(['ui', 'isClearBrowsingDataPanelVisible'], false)
+    props.showImportData = currentWindow.has('importBrowserDataDetail')
     props.showWidevine = currentWindow.getIn(['widevinePanelDetail', 'shown']) && !isLinux
-    props.showAutoFillAddress = !!currentWindow.get('autofillAddressDetail')
-    props.showAutoFillCC = !!currentWindow.get('autofillCreditCardDetail')
+    props.showAutoFillAddress = currentWindow.has('autofillAddressDetail')
+    props.showAutoFillCC = currentWindow.has('autofillCreditCardDetail')
     props.showLogin = !!loginRequiredDetails
-    props.showBookmarkHanger = currentWindow.get('bookmarkDetail') &&
+    props.showBookmarkHanger = currentWindow.has('bookmarkDetail') &&
       !currentWindow.getIn(['bookmarkDetail', 'isBookmarkHanger'])
+    props.showBookmarkFolderDialog = currentWindow.has('bookmarkFolderDetail')
     props.showNoScript = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible']) &&
-      siteUtil.getOrigin(activeFrame.get('location'))
+      urlUtil.getOrigin(activeFrame.get('location'))
     props.showReleaseNotes = currentWindow.getIn(['ui', 'releaseNotes', 'isVisible'])
-    props.showCheckDefault = isFocused() && defaultBrowserState.shouldDisplayDialog(state)
+    props.showCheckDefault = focused && defaultBrowserState.shouldDisplayDialog(state)
     props.showUpdate = updateState.isUpdateVisible(state)
     props.showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused())
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, focused)
     props.isSinglePage = nonPinnedFrames.size <= tabsPerPage
     props.showTabPages = nonPinnedFrames.size > tabsPerPage
     props.showNotificationBar = activeOrigin && state.get('notifications').filter((item) =>
@@ -579,7 +583,7 @@ class Main extends React.Component {
     props.tabId = activeTabId
     props.location = activeFrame.get('location')
     props.isWidevineReady = state.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])
-    props.widevineLocation = siteUtil.getOrigin(widevinePanelDetail.get('location'))
+    props.widevineLocation = urlUtil.getOrigin(widevinePanelDetail.get('location'))
     props.widevineRememberSettings = widevinePanelDetail.get('alsoAddRememberSiteSetting') ? 1 : 0
 
     return props
@@ -605,7 +609,12 @@ class Main extends React.Component {
         ? <PopupWindow />
         : null
       }
-      <div className='top'
+      <div className={
+          cx({
+            top: true,
+            allowDragging: this.props.shouldAllowWindowDrag
+          })
+        }
         onMouseEnter={windowActions.setMouseInTitlebar.bind(null, true)}
         onMouseLeave={windowActions.setMouseInTitlebar.bind(null, false)}
         >
@@ -659,6 +668,11 @@ class Main extends React.Component {
           : null
         }
         {
+          this.props.showBookmarkFolderDialog
+            ? <AddEditBookmarkFolder />
+            : null
+        }
+        {
           this.props.showNoScript
             ? <NoScriptInfo />
             : null
@@ -683,18 +697,22 @@ class Main extends React.Component {
           ? <BookmarksToolbar />
           : null
         }
-        <div className={cx({
-          tabPages: true,
-          allowDragging: this.props.shouldAllowWindowDrag,
-          singlePage: this.props.isSinglePage
-        })}
-          onContextMenu={this.onTabContextMenu}>
-          {
-            this.props.showTabPages
-            ? <TabPages />
-            : null
-          }
-        </div>
+        {
+          this.props.isSinglePage
+          ? null
+          : <div className={cx({
+            tabPages: true,
+            allowDragging: this.props.shouldAllowWindowDrag,
+            singlePage: this.props.isSinglePage
+          })}
+            onContextMenu={this.onTabContextMenu}>
+            {
+              this.props.showTabPages
+              ? <TabPages />
+              : null
+            }
+          </div>
+        }
         <TabsToolbar key='tab-bar' />
         {
           this.props.showNotificationBar

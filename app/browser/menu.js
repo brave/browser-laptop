@@ -17,7 +17,6 @@ const appConstants = require('../../js/constants/appConstants')
 const windowConstants = require('../../js/constants/windowConstants')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
-const siteTags = require('../../js/constants/siteTags')
 
 // State
 const {getByTabId} = require('../common/state/tabState')
@@ -35,8 +34,8 @@ const frameStateUtil = require('../../js/state/frameStateUtil')
 const menuUtil = require('../common/lib/menuUtil')
 const {getSetting} = require('../../js/settings')
 const locale = require('../locale')
-const {isLocationBookmarked} = require('../../js/state/siteUtil')
 const platformUtil = require('../common/lib/platformUtil')
+const bookmarkUtil = require('../common/lib/bookmarkUtil')
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
 const isWindows = platformUtil.isWindows()
@@ -271,7 +270,11 @@ const createViewSubmenu = () => {
       click: function () {
         const win = BrowserWindow.getActiveWindow()
         const activeTab = tabState.getActiveTab(appStore.getState(), win.id)
-        appActions.toggleDevTools(activeTab.get('tabId'))
+        if (activeTab) {
+          appActions.toggleDevTools(activeTab.get('tabId'))
+        } else {
+          console.warn('Unable to open developer tools; activeTab is null or undefined')
+        }
       }
     },
     CommonMenu.separatorMenuItem,
@@ -376,7 +379,7 @@ const updateRecentlyClosedMenuItems = (state) => {
 }
 
 const isCurrentLocationBookmarked = (state) => {
-  return isLocationBookmarked(state, currentLocation)
+  return bookmarkUtil.isLocationBookmarked(state, currentLocation)
 }
 
 const createBookmarksSubmenu = (state) => {
@@ -406,7 +409,7 @@ const createBookmarksSubmenu = (state) => {
     CommonMenu.exportBookmarksMenuItem()
   ]
 
-  const bookmarks = menuUtil.createBookmarkTemplateItems(state.get('sites'))
+  const bookmarks = menuUtil.createBookmarkTemplateItems(state)
   if (bookmarks.length > 0) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu = submenu.concat(bookmarks)
@@ -673,8 +676,15 @@ const doAction = (state, action) => {
       }
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
       {
-        closedFrames = new Immutable.OrderedMap()
-        lastClosedUrl = null
+        if (!action.location) {
+          closedFrames = new Immutable.OrderedMap()
+          lastClosedUrl = null
+        } else {
+          closedFrames = closedFrames.delete(action.location)
+          if (lastClosedUrl === action.location) {
+            lastClosedUrl = null
+          }
+        }
         updateRecentlyClosedMenuItems(state)
         break
       }
@@ -693,38 +703,14 @@ const doAction = (state, action) => {
         }
         break
       }
-    case appConstants.APP_APPLY_SITE_RECORDS:
-      if (action.records && action.records.find((record) => record.objectData === 'bookmark')) {
-        createMenu(state)
-      }
-      break
-    case appConstants.APP_ADD_SITE:
     case appConstants.APP_ADD_BOOKMARK:
     case appConstants.APP_EDIT_BOOKMARK:
-      {
-        if (action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
-          createMenu(state)
-        } else if (action.siteDetail && action.siteDetail.constructor === Immutable.List && action.tag === undefined) {
-          let shouldRebuild = false
-          action.siteDetail.forEach((site) => {
-            const tag = site.getIn(['tags', 0])
-            if (tag === siteTags.BOOKMARK || tag === siteTags.BOOKMARK_FOLDER) {
-              shouldRebuild = true
-            }
-          })
-          if (shouldRebuild) {
-            createMenu(state)
-          }
-        }
-        break
-      }
-    case appConstants.APP_REMOVE_SITE:
-      {
-        if (action.tag === siteTags.BOOKMARK || action.tag === siteTags.BOOKMARK_FOLDER) {
-          createMenu(state)
-        }
-        break
-      }
+    case appConstants.APP_REMOVE_BOOKMARK:
+    case appConstants.APP_ADD_BOOKMARK_FOLDER:
+    case appConstants.APP_EDIT_BOOKMARK_FOLDER:
+    case appConstants.APP_REMOVE_BOOKMARK_FOLDER:
+      createMenu(state)
+      break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
       {
         const defaults = state.get('clearBrowsingDataDefaults')

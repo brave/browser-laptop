@@ -214,17 +214,12 @@ const windowActions = {
 
   /**
    * Dispatches a message to the store to clear closed frames
+   * @param {string=} location - only clear frames with this location
    */
-  clearClosedFrames: function () {
+  clearClosedFrames: function (location) {
     dispatch({
-      actionType: windowConstants.WINDOW_CLEAR_CLOSED_FRAMES
-    })
-  },
-
-  activeFrameChanged: function (frameProps) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ACTIVE_FRAME_CHANGED,
-      frameProps: frameProps
+      actionType: windowConstants.WINDOW_CLEAR_CLOSED_FRAMES,
+      location
     })
   },
 
@@ -239,20 +234,6 @@ const windowActions = {
       actionType: windowConstants.WINDOW_SET_FOCUSED_FRAME,
       location,
       tabId
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to set a preview frame.
-   * This should only be called internally by `WINDOW_SET_TAB_HOVER_STATE`
-   * when we need to delay updating the preview frame value
-   *
-   * @param {Object} frameKey - the frame key for the webview in question.
-   */
-  setPreviewFrame: function (frameKey) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_PREVIEW_FRAME,
-      frameKey
     })
   },
 
@@ -287,12 +268,15 @@ const windowActions = {
    *
    * @param {Object} frameKey - the frame key for the webview in question.
    * @param {boolean} hoverState - whether or not mouse is over tab
+   * @param {boolean} previewMode - whether or not the next tab should be previewed
+   * based on mouse idle time
    */
-  setTabHoverState: function (frameKey, hoverState) {
+  setTabHoverState: function (frameKey, hoverState, previewMode) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_TAB_HOVER_STATE,
       frameKey,
-      hoverState
+      hoverState,
+      previewMode
     })
   },
 
@@ -504,7 +488,7 @@ const windowActions = {
    * Used for displaying bookmark hanger
    * when editing bookmark site or folder
    */
-  editBookmark: function (isHanger, editKey) {
+  editBookmark: function (editKey, isHanger) {
     dispatch({
       actionType: windowConstants.WINDOW_ON_EDIT_BOOKMARK,
       editKey,
@@ -512,11 +496,16 @@ const windowActions = {
     })
   },
 
-  onBookmarkAdded: function (isHanger, editKey, siteDetail) {
+  /**
+   * Used for adding bookmark site directly and then allowing to
+   * edit it right afterwords
+   * @param isHanger
+   * @param bookmarkDetail - bookmark data, if empty active frame will be used
+   */
+  onBookmarkAdded: function (isHanger, bookmarkDetail) {
     dispatch({
       actionType: windowConstants.WINDOW_ON_BOOKMARK_ADDED,
-      siteDetail,
-      editKey,
+      bookmarkDetail,
       isHanger
     })
   },
@@ -527,6 +516,38 @@ const windowActions = {
   onBookmarkClose: function () {
     dispatch({
       actionType: windowConstants.WINDOW_ON_BOOKMARK_CLOSE
+    })
+  },
+
+  /**
+   * Used for displaying bookmark folder dialog
+   * when adding bookmark site or folder
+   */
+  addBookmarkFolder: function (folderDetails, closestKey) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_ADD_BOOKMARK_FOLDER,
+      folderDetails,
+      closestKey
+    })
+  },
+
+  /**
+   * Used for displaying bookmark folder dialog
+   * when editing bookmark site or folder
+   */
+  editBookmarkFolder: function (editKey) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_EDIT_BOOKMARK_FOLDER,
+      editKey
+    })
+  },
+
+  /**
+   * Used for closing a bookmark dialog
+   */
+  onBookmarkFolderClose: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_BOOKMARK_FOLDER_CLOSE
     })
   },
 
@@ -1019,6 +1040,13 @@ const windowActions = {
     })
   },
 
+  onTabMouseMove: function (data) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_MOUSE_MOVE,
+      data
+    })
+  },
+
   onTabMouseLeave: function (data) {
     dispatch({
       actionType: windowConstants.WINDOW_TAB_MOUSE_LEAVE,
@@ -1037,20 +1065,6 @@ const windowActions = {
     dispatch({
       actionType: windowConstants.WINDOW_FRAME_MOUSE_LEAVE,
       tabId
-    })
-  },
-
-  onMaximize: function (windowId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_MAXIMIZE,
-      windowId
-    })
-  },
-
-  onMinimize: function (windowId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_MINIMIZE,
-      windowId
     })
   },
 
@@ -1094,34 +1108,6 @@ const windowActions = {
   shouldOpenDevTools: function (windowId) {
     dispatch({
       actionType: windowConstants.WINDOW_SHOULD_OPEN_DEV_TOOLS,
-      windowId
-    })
-  },
-
-  onFocus: function (windowId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_FOCUS,
-      windowId
-    })
-  },
-
-  onBlur: function (windowId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_BLUR,
-      windowId
-    })
-  },
-
-  onEnterFullScreen: function (windowId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_ENTER_FULL_SCREEN,
-      windowId
-    })
-  },
-
-  onExitFullScreen: function (windowId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_EXIT_FULL_SCREEN,
       windowId
     })
   },
@@ -1193,19 +1179,31 @@ const windowActions = {
     })
   },
 
-  onShowBookmarkFolderMenu: function (bookmarkKey, left, top) {
+  onShowBookmarkFolderMenu: function (bookmarkKey, left, top, submenuIndex) {
     dispatch({
       actionType: windowConstants.WINDOW_ON_SHOW_BOOKMARK_FOLDER_MENU,
       bookmarkKey,
       left,
-      top
+      top,
+      submenuIndex
     })
   },
 
-  onSiteDetailMenu: function (bookmarkKey) {
+  onSiteDetailMenu: function (bookmarkKey, type) {
     dispatch({
       actionType: windowConstants.WINDOW_ON_SITE_DETAIL_MENU,
-      bookmarkKey
+      bookmarkKey,
+      type
+    })
+  },
+
+  onWindowUpdate: function (windowId, windowValue) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_WINDOW_UPDATE,
+      queryInfo: {
+        windowId
+      },
+      windowValue
     })
   }
 }

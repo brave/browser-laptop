@@ -3,21 +3,36 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const ImmutableComponent = require('../immutableComponent')
+
+const cx = require('../../../../js/lib/classSet')
+
+const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
 
 class HelpfulText extends ImmutableComponent {
   render () {
-    return <div className={this.props.wrapperClassName}>
-      <span className={globalStyles.appIcons.moreInfo}
-        style={{
-          color: globalStyles.color.mediumGray,
-          fontSize: '20px',
-          marginRight: '5px'
-        }} />
-      <span className={this.props.textClassName} data-l10n-id={this.props.l10nId} />
+    return <div className={css(styles.helpfulText)}>
+      <span className={cx({
+        [globalStyles.appIcons.moreInfo]: true,
+        [css(styles.helpfulText__icon)]: true
+      })} />
+      <span data-l10n-id={this.props.l10nId} />
       {this.props.children}
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  helpfulText: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+
+  helpfulText__icon: {
+    color: globalStyles.color.mediumGray,
+    fontSize: '1.25rem',
+    marginRight: '.5ch'
+  }
+})
 
 module.exports = HelpfulText

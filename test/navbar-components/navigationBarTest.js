@@ -118,11 +118,12 @@ describe('navigationBar tests', function () {
           .leftClick('#open_target')
       })
 
-      it('updates the location in the navbar when changed by the opener', function * () {
+      it('does not navigate to the tabnapped location', function * () {
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
-          .ipcSend('shortcut-focus-url')
-          .waitForInputText(urlInput, 'data:text/html;,<title>Tabnapping Target</title>')
+          .pause(500)
+          .getText(activeTabTitle)
+          .then((title) => assert(title !== 'tabnapped'))
       })
     })
 
@@ -266,6 +267,22 @@ describe('navigationBar tests', function () {
           .moveToObject(activeWebview)
           .waitForElementCount(titleBar, 0)
         yield selectsText(this.app.client, page1Url)
+      })
+
+      it('does not show emoji in title mode', function * () {
+        const emojiPage = Brave.server.url('title_with_emoji.html')
+        const emojiPageHost = urlParse(emojiPage).host
+        yield this.app.client
+          .tabByUrl(Brave.newTabUrl)
+          .loadUrl(emojiPage)
+          .windowParentByUrl(emojiPage)
+          .activateTitleMode()
+          .click(activeWebview)
+          .windowParentByUrl(emojiPage)
+          .waitForExist(titleBar)
+          .waitForTextValue(titleBar, `${emojiPageHost} | page with dragon emoji`)
+          .isExisting('🐉').then((isExisting) => assert(!isExisting))
+          .isExisting(navigatorLoadTime).then((isExisting) => assert(!isExisting))
       })
     })
 
@@ -1181,8 +1198,8 @@ describe('navigationBar tests', function () {
           .waitForExist(urlInput)
           .waitForElementFocus(urlInput)
           .waitForInputText(urlInput, '')
-          .addSite({ location: 'https://brave.com', title: 'Brave' })
-          .waitForSiteEntry('https://brave.com')
+          .addHistorySite({ location: 'https://brave.com', title: 'Brave' })
+          .waitForHistoryEntry('https://brave.com')
           .keys('br')
         yield selectsText(this.app.client, 'ave.com')
         yield blur(this.app.client)
@@ -1261,7 +1278,7 @@ describe('navigationBar tests', function () {
         .url(page1Url)
         .waitForUrl(page1Url)
         .windowParentByUrl(page1Url)
-        .waitForSiteEntry(page1Url)
+        .waitForHistoryEntry(page1Url)
         .activateURLMode()
         .waitForExist(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)

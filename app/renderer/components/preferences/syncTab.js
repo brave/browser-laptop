@@ -159,7 +159,6 @@ class SyncTab extends ImmutableComponent {
         defaultHeading='syncDeviceLastActive'
         defaultHeadingSortOrder='desc'
         rows={this.devicesTableRows}
-        customCellClasses={css(styles.devices__devicesListCell)}
         tableClassNames={css(styles.devices__devicesList)}
       />
     </section>
@@ -421,7 +420,7 @@ class SyncTab extends ImmutableComponent {
       try {
         inputCode = window.niceware.passphraseToBytes(text.split(' '))
       } catch (e) {
-        console.log('Could not convert niceware passphrase', e)
+        console.error('Could not convert niceware passphrase', e)
       }
       if (inputCode && inputCode.length === 32) {
         // QR code and device ID are set after sync restarts
@@ -488,7 +487,7 @@ class SyncTab extends ImmutableComponent {
 
         <div className={css(styles.settingsListContainerMargin__bottom)}>
           <span className='settingsListTitle' data-l10n-id='syncTitleMessage' />
-          <a href='https://github.com/brave/sync/wiki/Design' target='_blank'>
+          <a href='https://github.com/brave/sync/wiki/Design' rel='noopener' target='_blank'>
             <span className={cx({
               fa: true,
               'fa-question-circle': true
@@ -590,13 +589,8 @@ const styles = StyleSheet.create({
   },
 
   devices__devicesList: {
-    // TODO: refactor sortableTable to remove !important
-    marginBottom: `${globalStyles.spacing.dialogInsideMargin} !important`,
-    boxSizing: 'border-box',
-    width: '600px !important'
-  },
-  devices__devicesListCell: {
-    padding: '4px 8px'
+    marginBottom: globalStyles.spacing.dialogInsideMargin,
+    width: '600px'
   },
 
   textArea__passphrase: {

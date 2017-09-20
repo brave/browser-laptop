@@ -72,7 +72,6 @@ const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const settings = require('../js/constants/settings')
 const BookmarksExporter = require('./browser/bookmarksExporter')
-const siteUtil = require('../js/state/siteUtil')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 
@@ -95,19 +94,19 @@ const defaultProtocols = ['http', 'https']
 let loadAppStatePromise = SessionStore.loadAppState()
 
 // Some settings must be set right away on startup, those settings should be handled here.
-loadAppStatePromise.then((initialState) => {
+loadAppStatePromise.then((initialImmutableState) => {
   telemetry.setCheckpointAndReport('state-loaded')
   const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED, SEND_CRASH_REPORTS} = require('../js/constants/settings')
-  if (initialState.settings[HARDWARE_ACCELERATION_ENABLED] === false) {
+  if (initialImmutableState.getIn(['settings', HARDWARE_ACCELERATION_ENABLED]) === false) {
     app.disableHardwareAcceleration()
   }
-  if (initialState.settings[SEND_CRASH_REPORTS] !== false) {
+  if (initialImmutableState.getIn(['settings', SEND_CRASH_REPORTS]) !== false) {
     console.log('Crash reporting enabled')
     CrashHerald.init()
   } else {
     console.log('Crash reporting disabled')
   }
-  if (initialState.settings[SMOOTH_SCROLL_ENABLED] === false) {
+  if (initialImmutableState.getIn(['settings', SMOOTH_SCROLL_ENABLED]) === false) {
     app.commandLine.appendSwitch('disable-smooth-scrolling')
   }
 })
@@ -159,19 +158,17 @@ app.on('ready', () => {
     appActions.networkDisconnected()
   })
 
-  loadAppStatePromise.then((initialState) => {
+  loadAppStatePromise.then((initialImmutableState) => {
     // Do this after loading the state
     // For tests we always want to load default app state
-    const loadedPerWindowState = initialState.perWindowState
-    delete initialState.perWindowState
-    // Retore map order after load
-    let state = Immutable.fromJS(initialState)
-    state = state.set('sites', state.get('sites').sort(siteUtil.siteSort))
-    appActions.setState(state)
-    setImmediate(() => perWindowStateLoaded(loadedPerWindowState))
+    const loadedPerWindowImmutableState = initialImmutableState.get('perWindowState')
+    initialImmutableState = initialImmutableState.delete('perWindowState')
+    // Restore map order after load
+    appActions.setState(initialImmutableState)
+    setImmediate(() => perWindowStateLoaded(loadedPerWindowImmutableState))
   })
 
-  const perWindowStateLoaded = (loadedPerWindowState) => {
+  const perWindowStateLoaded = (loadedPerWindowImmutableState) => {
     // TODO(bridiver) - this shold be refactored into reducers
     // DO NOT ADD ANYHING TO THIS LIST
     // See tabsReducer.js for app state init example
@@ -186,12 +183,12 @@ app.on('ready', () => {
     AdInsertion.init()
     PDFJS.init()
 
-    if (!loadedPerWindowState || loadedPerWindowState.length === 0) {
+    if (!loadedPerWindowImmutableState || loadedPerWindowImmutableState.size === 0) {
       if (!CmdLine.newWindowURL()) {
         appActions.newWindow()
       }
     } else {
-      loadedPerWindowState.forEach((wndState) => {
+      loadedPerWindowImmutableState.forEach((wndState) => {
         appActions.newWindow(undefined, undefined, wndState)
       })
     }
@@ -205,8 +202,15 @@ app.on('ready', () => {
       }
     } else {
       // Default browser checking
-      let isDefaultBrowser = ['development', 'test'].includes(process.env.NODE_ENV)
-        ? true : defaultProtocols.every(p => app.isDefaultProtocolClient(p))
+      let isDefaultBrowser
+      if (['development', 'test'].includes(process.env.NODE_ENV)) {
+        isDefaultBrowser = true
+      } else if (process.platform === 'linux') {
+        const desktopName = 'brave.desktop'
+        isDefaultBrowser = app.isDefaultProtocolClient('', desktopName)
+      } else {
+        isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
+      }
       appActions.changeSetting(settings.IS_DEFAULT_BROWSER, isDefaultBrowser)
     }
 
@@ -263,7 +267,7 @@ app.on('ready', () => {
           acceptCertDomains[host] = true
         }
       } catch (e) {
-        console.log('Cannot add url `' + url + '` to accepted domain list', e)
+        console.error('Cannot add url `' + url + '` to accepted domain list', e)
       }
     })
 
@@ -301,17 +305,17 @@ app.on('ready', () => {
     })
 
     ipcMain.on(messages.EXPORT_BOOKMARKS, () => {
-      BookmarksExporter.showDialog(appStore.getState().get('sites'))
+      BookmarksExporter.showDialog(appStore.getState())
     })
     // DO NOT TO THIS LIST - see above
 
     // We need the initial state to read the UPDATE_TO_PREVIEW_RELEASES preference
-    loadAppStatePromise.then((initialState) => {
+    loadAppStatePromise.then((initialImmutableState) => {
       updater.init(
         process.platform,
         process.arch,
         process.env.BRAVE_UPDATE_VERSION || app.getVersion(),
-        initialState.settings[settings.UPDATE_TO_PREVIEW_RELEASES]
+        initialImmutableState.getIn(['settings', settings.UPDATE_TO_PREVIEW_RELEASES])
       )
 
       // This is fired by a menu entry
@@ -330,7 +334,7 @@ app.on('ready', () => {
     })
 
     process.on(messages.EXPORT_BOOKMARKS, () => {
-      BookmarksExporter.showDialog(appStore.getState().get('sites'))
+      BookmarksExporter.showDialog(appStore.getState())
     })
 
     ready = true

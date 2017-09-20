@@ -22,6 +22,7 @@ const postalCode = '94103-1550'
 const postalCodeInput = '[data-test-id="postalCode"]'
 const country = 'US'
 const countryInput = '[data-test-id="country"]'
+const countryValue = 'United States'
 const phone = '0987654321'
 const phoneInput = '[data-test-id="phone"]'
 const email = 'press@brave.com'
@@ -75,8 +76,7 @@ describe('Autofill', function () {
         .typeText(stateInput, state)
         .click(postalCodeInput)
         .typeText(postalCodeInput, postalCode)
-        .click(countryInput)
-        .typeText(countryInput, country)
+        .selectByValue(countryInput, country)
         .click(phoneInput)
         .typeText(phoneInput, phone)
         .click(emailInput)
@@ -100,7 +100,7 @@ describe('Autofill', function () {
         .waitForTextValue(cityInput, city)
         .waitForTextValue(stateInput, state)
         .waitForTextValue(postalCodeInput, postalCode)
-        .waitForTextValue(countryInput, country)
+        .waitForTextValue(countryInput, countryValue)
         .waitForTextValue(phoneInput, phone)
         .waitForTextValue(emailInput, email)
     })
@@ -168,7 +168,7 @@ describe('Autofill', function () {
         .waitForTextValue(cityInput, city)
         .waitForTextValue(stateInput, state)
         .waitForTextValue(postalCodeInput, postalCode)
-        .waitForTextValue(countryInput, country)
+        .waitForTextValue(countryInput, countryValue)
         .waitForTextValue(phoneInput, phone + '123')
         .waitForTextValue(emailInput, email + 'mm')
         // fill out the form
@@ -346,8 +346,7 @@ describe('Autofill', function () {
         .typeText(stateInput, state)
         .click(postalCodeInput)
         .typeText(postalCodeInput, postalCode)
-        .click(countryInput)
-        .typeText(countryInput, country)
+        .selectByValue(countryInput, country)
         .click(phoneInput)
         .typeText(phoneInput, phone)
         .click(emailInput)
@@ -388,7 +387,7 @@ describe('Autofill', function () {
         .waitForTextValue(cityInput, city)
         .waitForTextValue(stateInput, state)
         .waitForTextValue(postalCodeInput, postalCode)
-        .waitForTextValue(countryInput, country)
+        .waitForTextValue(countryInput, countryValue)
         .waitForTextValue(phoneInput, phone)
         .waitForTextValue(emailInput, email)
     })

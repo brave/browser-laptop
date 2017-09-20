@@ -28,6 +28,7 @@ const settings = {
   PAINT_TABS: 'tabs.paint-tabs',
   TABS_PER_PAGE: 'tabs.tabs-per-page',
   SHOW_TAB_PREVIEWS: 'tabs.show-tab-previews',
+  TAB_PREVIEW_TIMING: 'tabs.preview-timing',
   SHOW_DASHBOARD_IMAGES: 'tabs.show-dashboard-images',
   // Privacy Tab
   HISTORY_SUGGESTIONS: 'privacy.history-suggestions',
@@ -36,7 +37,6 @@ const settings = {
   OPENED_TAB_SUGGESTIONS: 'privacy.opened-tab-suggestions',
   AUTOCOMPLETE_HISTORY_SIZE: 'privacy.autocomplete.history-size',
   DO_NOT_TRACK: 'privacy.do-not-track',
-  BLOCK_CANVAS_FINGERPRINTING: 'privacy.block-canvas-fingerprinting',
   // Security Tab
   ACTIVE_PASSWORD_MANAGER: 'security.passwords.active-password-manager',
   SHUTDOWN_CLEAR_HISTORY: 'shutdown.clear-history',
@@ -52,13 +52,18 @@ const settings = {
   // Autofill
   AUTOFILL_ENABLED: 'privacy.autofill-enabled',
   // Payments Tab
+  PAYMENTS_ALLOW_NON_VERIFIED: 'payments.allow-non-verified-publishers',
+  PAYMENTS_CONTRIBUTION_AMOUNT: 'payments.contribution-amount',
   PAYMENTS_ENABLED: 'payments.enabled',
-  PAYMENTS_NOTIFICATIONS: 'payments.notifications',
+  PAYMENTS_MINIMUM_VISIT_TIME: 'payments.minimum-visit-time',
+  PAYMENTS_MINIMUM_VISITS: 'payments.minimum-visits',
   PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP: 'notification-add-funds-timestamp',
   PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP: 'notification-reconcile-soon-timestamp',
-  PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED: 'payments.notificationTryPaymentsDismissed',
-  PAYMENTS_CONTRIBUTION_AMOUNT: 'payments.contribution-amount',
-  PAYMENTS_NON_VERIFIED: 'payments.allow-non-verified-publishers',
+  PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED: 'payments.notification-try-payments-dismissed',
+  PAYMENTS_NOTIFICATIONS: 'payments.notifications',
+  PAYMENTS_SITES_AUTO_SUGGEST: 'payments.sites-auto-suggest',
+  PAYMENTS_SITES_HIDE_EXCLUDED: 'payments.sites-hide-excluded',
+  PAYMENTS_SITES_SHOW_LESS: 'payments.sites-show-less',
   // Shields Tab
   BLOCKED_COUNT_BADGE: 'shields.blocked-count-badge',
   COMPACT_BRAVERY_PANEL: 'shields.compact-bravery-panel',
@@ -72,11 +77,6 @@ const settings = {
   SEND_USAGE_STATISTICS: 'advanced.send-usage-statistics',
   UPDATE_TO_PREVIEW_RELEASES: 'advanced.update-to-preview-releases',
   ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
-  HIDE_EXCLUDED_SITES: 'advanced.hide-excluded-sites',
-  HIDE_LOWER_SITES: 'advanced.hide-lower-sites',
-  MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
-  MINIMUM_VISITS: 'advanced.minimum-visits',
-  AUTO_SUGGEST_SITES: 'advanced.auto-suggest-sites',
   TOOLBAR_UI_SCALE: 'advanced.toolbar-ui-scale',
   SWIPE_NAV_DISTANCE: 'advanced.swipe-nav-distance',
   // Sync settings
@@ -86,26 +86,39 @@ const settings = {
   SYNC_TYPE_HISTORY: 'sync.type.history',
   SYNC_TYPE_SITE_SETTING: 'sync.type.siteSetting',
   SYNC_NETWORK_DISABLED: 'sync.network.disabled', // disable network connection to sync server. only used in testing.
-  // DEPRECATED settings
-  // ########################
-  // these constants should not appear outside of this file, ../settings.js, and our tests
-  // NOTE: these settings rely on default values being set in ./appConfig.js
-  // ########################
-  // > phased out with 0.11.4
-  PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
-  ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
-  DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
-  LAST_PASS_ENABLED: 'security.passwords.last-pass-enabled',
-  ENPASS_ENABLED: 'security.passwords.enpass-enabled',
-  BITWARDEN_ENABLED: 'security.passwords.bitwarden-enabled',
-  // > phased out with 0.12.6
-  SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
-  SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',
+  // Extension settings
   POCKET_ENABLED: 'extensions.pocket.enabled',
   VIMIUM_ENABLED: 'extensions.vimium.enabled',
   HONEY_ENABLED: 'extensions.honey.enabled',
   PINTEREST_ENABLED: 'extensions.pinterest.enabled',
-  METAMASK_ENABLED: 'extensions.metamask.enabled'
+  METAMASK_ENABLED: 'extensions.metamask.enabled',
+
+  // DEPRECATED settings
+  // DO NOT REMOVE OR CHANGE THESE VALUES
+  // ########################
+  // these constants should not appear outside of this file, ../settings.js, and our tests
+  // NOTE: these settings rely on default values being set in ./appConfig.js
+  // ########################
+
+  // START - DEPRECATED WITH 0.11.4
+  PASSWORD_MANAGER_ENABLED: 'security.passwords.manager-enabled',
+  ONE_PASSWORD_ENABLED: 'security.passwords.one-password-enabled',
+  DASHLANE_ENABLED: 'security.passwords.dashlane-enabled',
+  LAST_PASS_ENABLED: 'security.passwords.last-pass-enabled',
+  // END - DEPRECATED WITH 0.11.4
+
+  // START - DEPRECATED WITH 0.12.6
+  SHOW_BOOKMARKS_TOOLBAR_FAVICON: 'bookmarks.toolbar.showFavicon',
+  SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',
+  // END - DEPRECATED WITH 0.12.6
+
+  // START - DEPRECATED WITH 0.21.0
+  HIDE_EXCLUDED_SITES: 'advanced.hide-excluded-sites',
+  HIDE_LOWER_SITES: 'advanced.hide-lower-sites',
+  MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
+  MINIMUM_VISITS: 'advanced.minimum-visits',
+  AUTO_SUGGEST_SITES: 'advanced.auto-suggest-sites'
+  // END - DEPRECATED WITH 0.21.0
 }
 
 module.exports = settings

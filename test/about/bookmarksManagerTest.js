@@ -8,9 +8,7 @@ const aboutBookmarksUrl = getTargetAboutUrl('about:bookmarks')
 const Immutable = require('immutable')
 
 describe('about:bookmarks', function () {
-  const folderId = Math.random()
-  const lastVisit = 1476140184441
-  const bookmarkTag = [siteTags.BOOKMARK]
+  const folderId = Math.floor(Math.random() * (100 - 1 + 1)) + 1
   const browseableSiteUrl = 'page1.html'
   const browseableSiteTitle = 'Page 1'
 
@@ -30,20 +28,18 @@ describe('about:bookmarks', function () {
         location: siteWithFavicon,
         title: 'Page with Favicon',
         favicon: favicon,
-        tags: bookmarkTag,
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        type: siteTags.BOOKMARK,
+        parentFolderId: 0
       },
       {
         location: siteWithoutFavicon,
         title: 'Page without Favicon',
-        tags: bookmarkTag,
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        type: siteTags.BOOKMARK,
+        parentFolderId: 0
       }
     ])
     yield client
-      .addSiteList(sites)
+      .addBookmarks(sites)
       .tabByIndex(0)
       .loadUrl(aboutBookmarksUrl)
   }
@@ -51,73 +47,49 @@ describe('about:bookmarks', function () {
   function * addDemoSites (client) {
     const sites = Immutable.fromJS([
       {
-        customTitle: 'demo1',
-        folderId: folderId,
-        parentFolderId: 0,
-        tags: [siteTags.BOOKMARK_FOLDER]
-      },
-      {
         location: 'https://brave.com',
         title: 'Brave',
-        tags: bookmarkTag,
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        parentFolderId: 0
       },
       {
         location: 'https://brave.com/test',
-        title: 'Test',
-        customTitle: 'customTest',
-        tags: bookmarkTag,
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
-      },
-      {
-        location: 'https://brave.com/test',
-        title: 'Test',
-        customTitle: 'customTest',
-        tags: bookmarkTag,
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        title: 'customTest',
+        parentFolderId: 0
       },
       {
         location: 'https://www.youtube.com',
-        tags: bookmarkTag,
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        parentFolderId: 0
       },
       {
         location: 'https://www.facebook.com',
         title: 'facebook',
-        tags: bookmarkTag,
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
+        parentFolderId: 0
       },
       {
         location: 'https://duckduckgo.com',
         title: 'duckduckgo',
-        tags: bookmarkTag,
-        parentFolderId: folderId,
-        lastAccessedTime: lastVisit
+        parentFolderId: folderId
       },
       {
         location: 'https://google.com',
         title: 'Google',
-        tags: bookmarkTag,
-        parentFolderId: folderId,
-        lastAccessedTime: lastVisit
+        parentFolderId: folderId
       },
       {
         location: 'https://bing.com',
         title: 'Bing',
-        tags: bookmarkTag,
-        parentFolderId: folderId,
-        lastAccessedTime: lastVisit
+        parentFolderId: folderId
       }
     ])
 
     yield client
       .waitForBrowserWindow()
-      .addSiteList(sites)
+      .addBookmarkFolder({
+        title: 'demo1',
+        folderId: folderId,
+        parentFolderId: 0
+      })
+      .addBookmarks(sites)
       .tabByIndex(0)
       .loadUrl(aboutBookmarksUrl)
   }
@@ -126,13 +98,12 @@ describe('about:bookmarks', function () {
     const site = Brave.server.url(browseableSiteUrl)
     yield client
       .waitForBrowserWindow()
-      .addSite({
+      .addBookmark({
         location: site,
         title: browseableSiteTitle,
-        tags: bookmarkTag,
-        parentFolderId: 0,
-        lastAccessedTime: lastVisit
-      }, siteTags.BOOKMARK)
+        type: siteTags.BOOKMARK,
+        parentFolderId: 0
+      })
       .tabByIndex(0)
       .loadUrl(aboutBookmarksUrl)
   }
@@ -153,11 +124,6 @@ describe('about:bookmarks', function () {
     it('displays entries without a title using their URL', function * () {
       yield this.app.client
         .waitForVisible('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
-    })
-
-    it('displays entries using customTitle (if available)', function * () {
-      yield this.app.client
-        .waitForVisible('table.sortableTable td.title[data-sort="customTest"]')
     })
 
     it('shows bookmark folders', function * () {

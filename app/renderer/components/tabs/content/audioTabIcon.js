@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite/no-important')
+const {css} = require('aphrodite/no-important')
 const Immutable = require('immutable')
 
 // Components
@@ -61,17 +61,11 @@ class AudioTabIcon extends React.Component {
 
   render () {
     return <TabIcon
-      className={css(tabStyles.icon, styles.audioIcon)}
+      className={css(tabStyles.icon, tabStyles.icon_audio)}
       symbol={this.audioIcon}
-      onClick={this.toggleMute} />
+      onClick={this.toggleMute}
+    />
   }
 }
 
 module.exports = ReduxComponent.connect(AudioTabIcon)
-
-const styles = StyleSheet.create({
-  audioIcon: {
-    color: globalStyles.color.highlightBlue,
-    fontSize: '16px'
-  }
-})

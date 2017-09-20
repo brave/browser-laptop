@@ -53,6 +53,42 @@ AppStore
       timestamp: number
     }
   },
+  bookmarks: {
+    [bookmarkKey]: {
+      favicon: string, // URL of the favicon
+      key: string, // key is duplication of bookmarkKey
+      location: string,
+      objectId: Array.<number>,
+      originalSeed: Array.<number>, // bookmarks that have been synced before a sync profile reset
+      parentFolderId: number,
+      partitionNumber: number, // optionally specifies a specific session
+      skipSync: boolean,
+      title: string
+    }
+  },
+  bookmarkFolders: {
+    [folderKey]: {
+      folderId: number,
+      key: string, // key is duplication of folderKey
+      objectId: Array.<number>,
+      originalSeed: Array.<number>, // only set for bookmarks that have been synced before a sync profile reset
+      parentFolderId: number, // set for bookmarks and bookmark folders only
+      skipSync: boolean, // Set for objects FETCHed by sync
+      title: string
+    }
+  },
+  cache: {
+    bookmarLocation: {
+      [location]: Array<string> // array of bookmark keys
+    },
+    bookmarkOrder: {
+      [parentId]: [{
+        key: string, // bookmark or folder key
+        order: number,
+        type: string // siteTags.BOOKMARK or siteTags.BOOKMARK_FOLDER
+      }]
+    }
+  }
   clearBrowsingDataDefaults: {
     allSiteCookies: boolean,
     autocompleteData: boolean,
@@ -114,9 +150,27 @@ AppStore
       }
     } // the unique id of the extension
   },
+  fingerprintingProtection: {
+    enabled: boolean // enable 3p fingerprinting blocking. default true.
+  },
+  fingerprintingProtectionAll: {
+    enabled: boolean // enable all fingerprinting blocking. default false.
+  },
   firstRunTimestamp: integer,
   flash: {
     enabled: boolean // enable flash
+  },
+  historySites: {
+    [siteKey]: {
+      favicon: string, // URL of the favicon
+      lastAccessedTime: number, // datetime.getTime()
+      location: string,
+      objectId: Array.<number>,
+      partitionNumber: number, // optionally specifies a specific session
+      skipSync: boolean, // Set for objects FETCHed by sync
+      title: string,
+      themeColor: string
+    }
   },
   menu: {
     template: object // used on Windows and by our tests: template object with Menubar control
@@ -138,42 +192,24 @@ AppStore
   noScript: {
     enabled: boolean // enable noscript
   },
-  passwords: [{
-    // not being used anymore
-    action: string, // URL of the form action
-    authTag: string, // AES-GCM authentication data, binary-encoded
-    encryptedPassword: string, // encrypted by master password, binary-encoded
-    iv: string, // AES-GCM initialization vector, binary-encoded
-    origin: string, // origin of the form
-    username: string
-  }],
-  legacyPasswords: [{
-    // backup of passwords migration
-    action: string, // URL of the form action
-    authTag: string, // AES-GCM authentication data, binary-encoded
-    encryptedPassword: string, // encrypted by master password, binary-encoded
-    iv: string, // AES-GCM initialization vector, binary-encoded
-    origin: string, // origin of the form
-    username: string
-  }],
+  pinnedSites: {
+    [siteKey]: {
+      location: string,
+      title: string,
+      order: number
+    }
+  },
   settings: {
     // See defaults in js/constants/appConfig.js
     'adblock.customRules': string, // custom rules in ABP filter syntax
-    'advanced.auto-suggest-sites': boolean, // show auto suggestion
     'advanced.default-zoom-level': number, // the default zoom level for sites that have no specific setting
     'advanced.hardware-acceleration-enabled': boolean, // false if hardware acceleration should be explicitly disabled
-    'advanced.hide-excluded-sites': boolean, // whether to hide excluded sites in the payments list
-    'advanced.minimum-visit-time': number,
-    'advanced.minimum-visits': number,
-    'advanced.minimum-percentage': boolean,
     'advanced.pdfjs-enabled': boolean, // whether or not to render PDF documents in the browser
     'advanced.send-crash-reports': boolean, // true or undefined if crash reports should be sent
     'advanced.send-usage-statistics': boolean, // true or undefined if usage reports should be sent
     'advanced.smooth-scroll-enabled': boolean, // false if smooth scrolling should be explicitly disabled
     'advanced.torrent-viewer-enabled': boolean, // whether to render magnet links in the browser
     'bookmarks.toolbar.show': boolean, // true if the bookmakrs toolbar should be shown
-    'bookmarks.toolbar.showFavicon': boolean, // true if bookmark favicons should be shown on the bookmarks toolbar
-    'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
     'extensions.pocket.enabled': boolean, // true if pocket is enabled
     'extensions.vimium.enabled': boolean, // true if vimium is enabled
     'extensions.honey.enabled': boolean, // true if Honey is enabled
@@ -189,16 +225,22 @@ AppStore
     'general.newtab-mode': string,  // one of: newTabPage, homePage, defaultSearchEngine
     'general.show-home-button': boolean, // true if the home button should be shown
     'general.startup-mode': string, // one of: lastTime, homePage, newTabPage
-    'general.useragent.value': (undefined|string), // custom user agent value
     'notification-add-funds-timestamp': number, // timestamp on which we decide if we will show notification Add founds
     'notification-reconcile-soon-timestamp': number, // timestamp
+    'payments.allow-non-verified-publishers': boolean,
     'payments.contribution-amount': number, // in USD
     'payments.enabled': boolean, // true if the Payments pane is active
+    'payments.minimum-visit-time': number,
+    'payments.minimum-visits': number,
+    'payments.notification-add-funds-timestamp': number,
+    'payments.notification-reconcile-soon-timestamp': number,
+    'payments.notification-try-payments-dismissed': boolean, // true if you dismiss the message or enable Payments
     'payments.notifications': boolean, // true to show payment notifications
-    'payments.notificationTryPaymentsDismissed': boolean, // true if you dismiss the message or enable Payments
+    'payments.sites-auto-suggest': boolean, // show auto suggestion
+    'payments.sites-hide-excluded': boolean, // whether to hide excluded sites in the payments list
+    'payments.sites-show-less': boolean, // whether to show less sites in the payments list
     'privacy.autocomplete.history-size': number, // number of autocomplete entries to keep
     'privacy.autofill-enabled': boolean, // true to enable autofill
-    'privacy.block-canvas-fingerprinting': boolean, // canvas fingerprinting defense
     'privacy.bookmark-suggestions': boolean, // auto suggest for bookmarks enabled
     'privacy.do-not-track': boolean, // whether DNT is 1
     'privacy.history-suggestions': boolean, // auto suggest for history enabled
@@ -210,12 +252,6 @@ AppStore
     'shields.blocked-count-badge': boolean, // true if blocked counts on the shield button should be enabled
     'shields.compact-bravery-panel': boolean, // true if the compact Bravery panel should be enabled
     'security.passwords.active-password-manager': string, // name of active password manager
-    'security.passwords.bitwarden-enabled': boolean, // true if the bitwarden extension should be enabled
-    'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
-    'security.passwords.enpass-enabled': boolean, // true if the Enpass extension should be enabled
-    'security.passwords.last-pass-enabled': boolean, // true if the Last password extension should be enabled
-    'security.passwords.manager-enabled': boolean, // whether to use default password manager
-    'security.passwords.one-password-enabled': boolean, // true if the 1Password extension should be enabled
     'security.fullscreen.content': string, // whether or not user choose to allow fullscreen content by default
     'shutdown.clear-all-site-cookies': boolean, // true to clear all site cookies on shutdown
     'shutdown.clear-autocomplete-data': boolean, // true to clear all autocomplete data on shutdown
@@ -228,25 +264,24 @@ AppStore
     'tabs.paint-tabs': boolean, // true if the page theme color and favicon color should be used for tabs
     'tabs.show-tab-previews': boolean, // true to show tab previews
     'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
-    'tabs.tabs-per-page': number // number of tabs per tab page
-  },
-  sites: {
-    [siteKey]: {
-      creationTime: number, //creation time of bookmark
-      customTitle: string, // User provided title for bookmark; overrides title
-      favicon: string, // URL of the favicon
-      folderId: number, // set for bookmark folders only
-      lastAccessedTime: number, // datetime.getTime()
-      location: string,
-      objectId: Array.<number>,
-      originalSeed: Array.<number>, // only set for bookmarks that have been synced before a sync profile reset
-      parentFolderId: number, // set for bookmarks and bookmark folders only
-      partitionNumber: number, // optionally specifies a specific session
-      skipSync: boolean, // Set for objects FETCHed by sync
-      tags: [string], // empty, 'bookmark', 'bookmark-folder', 'default', or 'reader'
-      themeColor: string, // CSS compatible color string
-      title: string
-    } // folder: folderId; bookmark/history: location + partitionNumber + parentFolderId
+    'tabs.tabs-per-page': number, // number of tabs per tab page
+
+    // DEPRECATED with 0.11.4
+    'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
+    'security.passwords.last-pass-enabled': boolean, // true if the Last password extension should be enabled
+    'security.passwords.manager-enabled': boolean, // whether to use default password manager
+    'security.passwords.one-password-enabled': boolean, // true if the 1Password extension should be enabled
+
+    // DEPRECATED with 0.12.6
+    'bookmarks.toolbar.showFavicon': boolean, // true if bookmark favicons should be shown on the bookmarks toolbar
+    'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
+
+    // DEPRECATED with 0.21.0
+    'advanced.hide-excluded-sites': boolean, // whether to hide excluded sites in the payments list
+    'advanced.hide-lower-sites': boolean,
+    'advanced.minimum-visit-time': number,
+    'advanced.minimum-visits': number,
+    'advanced.auto-suggest-sites': boolean // show auto suggestion
   },
   locationSiteKeyCache: {
     [location]: Array.<string> // location -> site keys
@@ -255,7 +290,7 @@ AppStore
     [hostPattern]: {
       adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)
       cookieControl: string, // (block3rdPartyCookie | allowAllCookies | blockAllCookies)
-      fingerprintingProtection: boolean,
+      fingerprintingProtection: string, // (block3rdPartyFingerprinting | allowAllFingerprinting | blockAllFingerprinting)
       flash: (number|boolean), // approval expiration time if allowed, false if never allow
       fullscreenPermission: boolean,
       geolocationPermission: boolean,
@@ -455,6 +490,7 @@ WindowStore
       internalFindStatePresent: boolean // true if a find-first (ie findNext: false) call has been made
     }
     guestInstanceId: string, // not persisted
+    hasBeenActivated: boolean, // whether this frame has ever been the active frame
     history: array, // navigation history
     hrefPreview: string, // show hovered link preview
     httpsEverywhere: Object<string, Array<string>>, // map of XML rulesets name to redirected resources
@@ -642,10 +678,7 @@ WindowStore
     downloadsToolbar: {
       isVisible: boolean // whether or not the downloads toolbar is visible
     },
-    isFocused: boolean, // true if window has focus
     isClearBrowsingDataPanelVisible: boolean, // true if the Clear Browsing Data panel is visible
-    isFullScreen: boolean, // true if window is fullscreen
-    isMaximized: boolean, // true if window is maximized
     menubar: {
       isVisible: boolean, // true if Menubar control is visible
       lastFocusedSelector: string, // selector for the last selected element (browser ui, not frame content)
@@ -655,24 +688,41 @@ WindowStore
     noScriptInfo: {
       isVisible: boolean // Whether the noscript infobox is visible
     },
-    position: array, // last known window position [x, y]
     releaseNotes: {
       isVisible: boolean // whether or not to show release notes
     },
     siteInfo: {
       isVisible: boolean // whether or not to show site info like # of blocked ads
     },
-    size: array, // last known window size [x, y]
     tabs: {
       hoverTabIndex: number, // index of the current hovered tab
-      tabPageIndex: number, // index of the current tab page
-      previewTabPageIndex: number // index of the tab being previewed
+      previewMode: boolean, // whether or not tab preview should be fired based on mouse idle time
+      previewTabPageIndex: number, // index of the tab being previewed
+      tabPageIndex: number // index of the current tab page
     },
   },
   widevinePanelDetail: {
     alsoAddRememberSiteSetting: boolean, // true if an allow always rule should be added for the acitve frame as well if installed
     location: string, // location this dialog is for
     shown: boolean // true if the panel is shown
-  }
+  },
+  windowInfo: {
+    focused: boolean,
+    height: number,
+    left: number,
+    state: string  // "normal", "minimized", "maximized", or "fullscreen"
+    top: number,
+    type: string,  // "normal", "popup", or "devtools"
+    width: number,
+  },
+  // framesInternal is the same as index in the frames list, it's just a cache by frameKey and tabId
+  framesInternal: {
+    index: {
+      [frameKey]: [index]
+    },
+    tabIndex: {
+      [tabId]: [index]
+    }
+  },
 }
 ```

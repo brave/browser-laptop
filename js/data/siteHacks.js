@@ -14,7 +14,7 @@ const googleTagServicesRedirect = 'data:application/javascript;base64,' + base64
 const emptyDataURI = {
   enableForAdblock: true,
   enableForTrackingProtection: true,
-  onBeforeRequest: function(details) {
+  onBeforeRequest: function (details) {
     return {
       redirectURL: 'data:application/javascript;base64,MA=='
     }
@@ -43,7 +43,7 @@ module.exports.localStorageExceptions = [
   ['https://mail.google.com', 'https://hangouts.google.com']
 ]
 
-const braveUAWhitelist = ['adobe.com', 'duckduckgo.com']
+const braveUAWhitelist = ['adobe.com', 'duckduckgo.com', 'brave.com', 'netflix.com']
 
 module.exports.siteHacks = {
   'sp1.nypost.com': emptyDataURI,
@@ -61,14 +61,6 @@ module.exports.siteHacks = {
     onBeforeSendHeaders: function (details) {
       return {
         customCookie: details.requestHeaders.Cookie + `; forbes_ab=true; welcomeAd=true; adblock_session=Off; dailyWelcomeCookie=true`
-      }
-    }
-  },
-  'cityam.com': {
-    onBeforeSendHeaders: function (details) {
-      details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36 Googlebot'
-      return {
-        requestHeaders: details.requestHeaders
       }
     }
   },
@@ -109,7 +101,7 @@ module.exports.siteHacks = {
       }
       return {
         redirectURL: googleTagServicesRedirect
-       }
+      }
     }
   },
   'twitter.com': {
@@ -132,12 +124,6 @@ module.exports.siteHacks = {
   'player.siriusxm.com': {
     enableFlashCTP: true,
     redirectURL: 'https://player.siriusxm.com'
-  },
-  'www.youtube.com': {
-    allowFirstPartyAdblockChecks: true
-  },
-   'www.theatlantic.com': {
-    allowFirstPartyAdblockChecks: true
   }
 }
 
@@ -153,4 +139,3 @@ braveUAWhitelist.forEach((domain) => {
     }
   }
 })
-

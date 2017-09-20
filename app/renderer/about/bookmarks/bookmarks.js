@@ -7,6 +7,9 @@ const React = require('react')
 const Immutable = require('immutable')
 const ipc = window.chrome.ipcRenderer
 
+const cx = require('../../../../js/lib/classSet')
+const {StyleSheet, css} = require('aphrodite/no-important')
+
 // Components
 const {AboutPageSectionTitle} = require('../../components/common/sectionTitle')
 const BookmarkFolderList = require('./bookmarkFolderList')
@@ -38,6 +41,7 @@ class Bookmarks extends React.Component {
     this.state = {
       bookmarks: Immutable.Map(),
       bookmarkFolders: Immutable.Map(),
+      bookmarkOrder: Immutable.Map(),
       selectedFolderId: 0,
       search: ''
     }
@@ -46,7 +50,8 @@ class Bookmarks extends React.Component {
       const detail = handle.memory()
       this.setState({
         bookmarks: Immutable.fromJS((detail && detail.bookmarks) || {}),
-        bookmarkFolders: Immutable.fromJS((detail && detail.bookmarkFolders) || {})
+        bookmarkFolders: Immutable.fromJS((detail && detail.bookmarkFolders) || {}),
+        bookmarkOrder: Immutable.fromJS((detail && detail.bookmarkOrder) || {})
       })
     })
   }
@@ -86,13 +91,25 @@ class Bookmarks extends React.Component {
 
   searchedBookmarks (searchTerm, bookmarks) {
     return bookmarks.filter((bookmark) => {
-      const title = bookmark.get('customTitle') + bookmark.get('title') + bookmark.get('location')
+      const title = bookmark.get('title') + bookmark.get('location')
       return title.match(new RegExp(searchTerm, 'gi'))
     })
   }
 
   get bookmarksInFolder () {
-    return this.state.bookmarks.filter((bookmark) => (bookmark.get('parentFolderId') || 0) === this.state.selectedFolderId)
+    const cached = this.state.bookmarkOrder.get(this.state.selectedFolderId.toString())
+
+    if (cached == null) {
+      return Immutable.Map()
+    }
+
+    return cached
+      .filter(item => item.get('type') === siteTags.BOOKMARK)
+      .map(bookmark => this.state.bookmarks.get(bookmark.get('key')))
+  }
+
+  get bookmarkFolders () {
+    return this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)
   }
 
   importBrowserData () {
@@ -104,11 +121,9 @@ class Bookmarks extends React.Component {
   }
 
   addBookmarkFolder () {
-    const newFolder = Immutable.fromJS({
-      parentFolderId: this.state.selectedFolderId,
-      tags: [siteTags.BOOKMARK_FOLDER]
-    })
-    windowActions.addBookmark(newFolder)
+    windowActions.addBookmarkFolder(Immutable.fromJS({
+      parentFolderId: this.state.selectedFolderId
+    }))
   }
 
   clearSelection () {
@@ -121,7 +136,10 @@ class Bookmarks extends React.Component {
 
   render () {
     return <div className='siteDetailsPage bookmarksManager' onClick={this.onClick}>
-      <div className='siteDetailsPageHeader'>
+      <div className={cx({
+        siteDetailsPageHeader: true,
+        [css(styles.bookmarksManager__header)]: true
+      })}>
         <AboutPageSectionTitle data-l10n-id='bookmarkManager' />
         <div className='headerActions'>
           <div className='searchWrapper'>
@@ -146,11 +164,13 @@ class Bookmarks extends React.Component {
           <BookmarkFolderList
             onClearSelection={this.clearSelection}
             onChangeSelectedFolder={this.onChangeSelectedFolder}
-            bookmarkFolders={this.state.bookmarkFolders.filter((bookmark) => bookmark.get('parentFolderId') === -1)}
+            bookmarkFolders={this.bookmarkFolders}
             allBookmarkFolders={this.state.bookmarkFolders}
             isRoot
             selectedFolderId={this.state.selectedFolderId}
-            search={this.state.search} />
+            search={this.state.search}
+            bookmarkOrder={this.state.bookmarkOrder}
+          />
         </div>
         <div className='organizeView'>
           <BookmarksList
@@ -163,11 +183,20 @@ class Bookmarks extends React.Component {
             allBookmarkFolders={this.state.bookmarkFolders}
             sortable={false}
             draggable={!this.state.search}
-            selectedFolderId={this.state.selectedFolderId} />
+            selectedFolderId={this.state.selectedFolderId}
+          />
         </div>
       </div>
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  bookmarksManager__header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  }
+})
 
 module.exports = <Bookmarks />

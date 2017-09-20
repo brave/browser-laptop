@@ -10,17 +10,15 @@ const Immutable = require('immutable')
 const appConstants = require('../../../js/constants/appConstants')
 const windowConstants = require('../../../js/constants/windowConstants')
 const config = require('../../../js/constants/config')
-const siteTags = require('../../../js/constants/siteTags')
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
 
 // Utils
 const frameStateUtil = require('../../../js/state/frameStateUtil')
-const {getCurrentWindowId} = require('../currentWindow')
 const {getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
-const siteUtil = require('../../../js/state/siteUtil')
+const bookmarkUtil = require('../../common/lib/bookmarkUtil')
 
 const setFullScreen = (state, action) => {
   const index = frameStateUtil.getIndexByTabId(state, action.tabId)
@@ -38,18 +36,17 @@ const closeFrame = (state, action) => {
 
   const frameProps = frameStateUtil.getFrameByKey(state, action.frameKey)
   const hoverState = frameStateUtil.getTabHoverState(state, action.frameKey)
+  const previewMode = state.getIn(['ui', 'tabs', 'previewMode'])
 
   state = state.merge(frameStateUtil.removeFrame(
     state,
-    frameProps.set('closedAtIndex', index),
+    frameProps
+      .set('closedAtIndex', index)
+      .delete('openerTabId'),
     index
   ))
   state = frameStateUtil.deleteFrameInternalIndex(state, frameProps)
   state = frameStateUtil.updateFramesInternalIndex(state, index)
-
-  if (state.get('frames', Immutable.List()).size === 0) {
-    appActions.closeWindow(getCurrentWindowId())
-  }
 
   const nextFrame = frameStateUtil.getFrameByIndex(state, index)
 
@@ -58,7 +55,8 @@ const closeFrame = (state, action) => {
     // This allow us to have closeTab button visible for sequential frames closing,
     // until onMouseLeave event happens.
     if (hoverState) {
-      state = frameStateUtil.setTabHoverState(state, nextFrame.get('key'), hoverState)
+      state = frameStateUtil
+        .setTabHoverState(state, nextFrame.get('key'), hoverState, previewMode)
     }
   } else if (hoverState && frameStateUtil.getPreviewFrameKey(state) === action.frameKey) {
     state = frameStateUtil.setPreviewFrameKey(state, null)
@@ -91,12 +89,30 @@ const frameReducer = (state, action, immutableAction) => {
         break
       }
       const tabId = tab.get('tabId')
-      const frame = frameStateUtil.getFrameByTabId(state, tabId)
+      let frame = frameStateUtil.getFrameByTabId(state, tabId)
       if (!frame) {
         break
       }
+      let frames = state.get('frames')
+      const index = tab.get('index')
+      const sourceFrameIndex = frameStateUtil.getIndexByTabId(state, tabId)
+      if (index != null &&
+          sourceFrameIndex !== index) {
+        frame = frame.set('index', index)
+        frames = frames
+          .splice(sourceFrameIndex, 1)
+          .splice(index, 0, frame)
+        state = state.set('frames', frames)
+        // Since the tab could have changed pages, update the tab page as well
+        state = frameStateUtil.updateFramesInternalIndex(state, Math.min(sourceFrameIndex, index))
+        state = frameStateUtil.moveFrame(state, tabId, index)
 
-      const index = frameStateUtil.getIndexByTabId(state, tabId)
+        // Update tab page index to the active tab in case the active tab changed
+        const activeFrame = frameStateUtil.getActiveFrame(state)
+        state = frameStateUtil.updateTabPageIndex(state, activeFrame.get('tabId'))
+        state = frameStateUtil.setPreviewFrameKey(state, null)
+      }
+
       const pinned = immutableAction.getIn(['changeInfo', 'pinned'])
       if (pinned != null) {
         if (pinned) {
@@ -130,10 +146,18 @@ const frameReducer = (state, action, immutableAction) => {
           // see bug #8429
           const isNewTab = changeInfo.isEmpty()
           const activeTabHasUpdated = changeInfo.get('active') != null
+          const hasBeenActivated = frame.get('hasBeenActivated')
 
           if (!isNewTab && activeTabHasUpdated) {
             state = frameStateUtil.updateTabPageIndex(state, tabId)
             state = state.set('previewFrameKey', null)
+            // Show the phishing warning if we are showing a data: tab
+            // for the first time
+            state = state.setIn(['ui', 'siteInfo', 'isVisible'],
+              !hasBeenActivated && isPotentialPhishingUrl(tab.get('url')))
+          }
+          if (!frame.get('hasBeenActivated')) {
+            state = state.setIn(['frames', index, 'hasBeenActivated'], true)
           }
         }
       }
@@ -166,12 +190,9 @@ const frameReducer = (state, action, immutableAction) => {
           fingerprintingProtection: {}
         })
       }
-
       // For potential phishing pages, show a warning
-      if (isPotentialPhishingUrl(action.location)) {
-        state = state.setIn(['ui', 'siteInfo', 'isVisible'], true)
-      }
-
+      state = state.setIn(['ui', 'siteInfo', 'isVisible'],
+        isPotentialPhishingUrl(action.location) && frameStateUtil.isFrameKeyActive(state, action.key))
       break
     case windowConstants.WINDOW_CLOSE_FRAMES:
       let closedFrames = new Immutable.List()
@@ -223,17 +244,28 @@ const frameReducer = (state, action, immutableAction) => {
     case windowConstants.WINDOW_SET_FULL_SCREEN:
       state = setFullScreen(state, action)
       break
-
     case windowConstants.WINDOW_ON_FRAME_BOOKMARK:
       {
         // TODO make this an appAction that gets the bookmark data from tabState
         const frameProps = frameStateUtil.getFrameByTabId(state, action.tabId)
         if (frameProps) {
-          const bookmark = siteUtil.getDetailFromFrame(frameProps, siteTags.BOOKMARK)
-          appActions.addSite(bookmark, siteTags.BOOKMARK)
+          const bookmark = bookmarkUtil.getDetailFromFrame(frameProps)
+          appActions.addBookmark(bookmark)
         }
         break
       }
+    // TODO(bbondy): We should remove this window action completely and just go directly to
+    // the browser process with an app action.
+    case windowConstants.WINDOW_TAB_MOVE: {
+      const sourceFrameIndex = frameStateUtil.getFrameIndex(state, action.sourceFrameKey)
+      let newIndex = frameStateUtil.getFrameIndex(state, action.destinationFrameKey) + (action.prepend ? 0 : 1)
+      if (newIndex > sourceFrameIndex) {
+        newIndex--
+      }
+      const frame = frameStateUtil.getFrameByIndex(state, sourceFrameIndex)
+      appActions.tabIndexChangeRequested(frame.get('tabId'), newIndex)
+      break
+    }
   }
 
   return state

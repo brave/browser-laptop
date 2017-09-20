@@ -41,6 +41,9 @@ html,
 
 .top {
   background: linear-gradient(to bottom, #eaeaea, #f2f2f4);
+  &.allowDragging {
+    -webkit-app-region: drag;
+  }
 }
 
 .mainContainer {
@@ -83,6 +86,7 @@ html,
     height: 100%;
     width: 100%;
     &.isPreview {
+      will-change: opacity;
       opacity: 0.5;
       animation: tabFadeIn 0.75s ease-in-out;
       animation-fill-mode: forwards;
@@ -162,4 +166,13 @@ body.fullScreen .banner.fade {
 // In React we often want to have elements but without href, so force pointer cursor
 a {
   cursor: pointer;
+}
+
+// TODO: Investigate if these are required
+// See PR #10861, Issue #10877
+body {
+  background-color: #000;
+}
+#windowContainer {
+  color: #f00;
 }

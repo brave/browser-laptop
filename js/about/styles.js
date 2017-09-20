@@ -7,14 +7,19 @@ const ImmutableComponent = require('../../app/renderer/components/immutableCompo
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 
-// Stylesheets go here
-require('../../less/button.less')
-require('../../less/forms.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/common/textbox')
 const {TextArea, DefaultTextArea} = require('../../app/renderer/components/common/textbox')
-const {Dropdown, FormDropdown, SettingDropdown, BraveryPanelDropdown} = require('../../app/renderer/components/common/dropdown')
+
+const {
+  Dropdown,
+  FormDropdown,
+  SettingDropdown,
+  PanelDropdown,
+  BraveryPanelDropdown
+} = require('../../app/renderer/components/common/dropdown')
+
 const BrowserButton = require('../../app/renderer/components/common/browserButton')
 
 const {
@@ -229,6 +234,23 @@ class AboutStyle extends ImmutableComponent {
         </Container>
 
         <Container>
+          <h2>Dropdown used on Brave Payments; has 180px width (same as Panel Item button below)</h2>
+          <PanelDropdown>
+            <option>5 USD</option>
+            <option>10 USD</option>
+            <option>15 USD</option>
+          </PanelDropdown>
+          <Pre><Code>
+            const { '{PanelDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            &lt;PanelDropdown>{'\n'}
+            &nbsp;&nbsp;&lt;option>5 USD&lt;/option>{'\n'}
+            &nbsp;&nbsp;&lt;option>10 USD&lt;/option>{'\n'}
+            &nbsp;&nbsp;&lt;option>15 USD&lt;/option>{'\n'}
+            &lt;/PanelDropdown>
+          </Code></Pre>
+        </Container>
+
+        <Container>
           <h2>Dropdown used mostly on Bravery Panel; has 100% width and 13px font size</h2>
           <BraveryPanelDropdown>
             <option>Select Box</option>
@@ -294,8 +316,8 @@ class AboutStyle extends ImmutableComponent {
         <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
         <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
         <Pre><Code>
-          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Yes' onClick={'{this.onEnableAutoplay}'} />{'\n'}
-          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='No' onClick={'{this.onEnableAutoplay}'} />
+          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Allow' onClick={'{this.onEnableAutoplay}'} />{'\n'}
+          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Deny' onClick={'{this.onEnableAutoplay}'} />
         </Code></Pre>
 
         <BrowserButton iconOnly iconClass={globalStyles.appIcons.moreInfo} size='30px' color='rebeccapurple' />

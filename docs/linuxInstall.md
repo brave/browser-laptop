@@ -15,7 +15,7 @@ Installation instructions for `snapd` [can be found here](https://snapcraft.io/d
 
     snap install brave --beta
 
-## Debian (jessie) and Ubuntu (Zesty, Yakkety, Xenial, and Trusty) AMD64:
+## Debian (jessie) and Ubuntu (Artful, Zesty, Yakkety, Xenial, and Trusty) AMD64:
 To install brave using apt and lsb\_release :
 
 ```
@@ -120,6 +120,5 @@ sudo rpm -i ./brave.rpm
 ## Raw x64 binaries:
 
 ```
-wget -O brave.tar.bz2 https://laptop-updates.brave.com/latest/linux64
-tar xvjf brave.tar.bz2
+wget https://laptop-updates.brave.com/latest/linux64 -O- | tar xj
 ```

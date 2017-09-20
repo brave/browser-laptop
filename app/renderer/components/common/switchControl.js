@@ -6,6 +6,8 @@ const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
 const cx = require('../../../../js/lib/classSet')
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+
 /**
  * Represents an on/off switch control
  */
@@ -36,28 +38,49 @@ class SwitchControl extends ImmutableComponent {
     >
       {
         this.props.leftl10nId && this.props.topl10nId
-        ? <div className='switchControlText'><div className='switchControlLeftText'><div className='switchSpacer'>&nbsp;</div><span className='switchControlLeftText' data-l10n-id={this.props.leftl10nId} /></div></div>
+        ? <div className='switchControlText'>
+          <div className='switchControlLeftText'>
+            <div className='switchSpacer'>&nbsp;</div>
+            <label className={cx({
+              [css(styles.switchControlText__label, styles.switchControlText_left__label, this.props.small && styles.switchControlText__label_small)]: true,
+              [this.props.customLeftTextClassName]: !!this.props.customLeftTextClassName
+            })}
+              onClick={this.onClick} data-l10n-id={this.props.leftl10nId}
+            />
+          </div>
+        </div>
         : (this.props.leftl10nId
-          ? <span className='switchControlLeftText' data-l10n-id={this.props.leftl10nId} />
+          ? <label className={cx({
+            [css(styles.switchControlText__label, styles.switchControlText_left__label, this.props.small && styles.switchControlText__label_small)]: true,
+            [this.props.customLeftTextClassName]: !!this.props.customLeftTextClassName
+          })}
+            onClick={this.onClick} data-l10n-id={this.props.leftl10nId}
+          />
           : null)
       }
       <div className='switchMiddle'>
         {
           this.props.topl10nId
-          ? <span className={cx({
+          ? <label className={cx({
             switchControlTopText: true,
+            [css(styles.switchControlText__label, this.props.small && styles.switchControlText__label_small)]: true,
             [this.props.customTopTextClassName]: !!this.props.customTopTextClassName
           })}
+            onClick={this.onClick}
             data-l10n-id={this.props.topl10nId} />
           : null
         }
-        <div data-test-id='switchBackground' className={cx({
+        <div className={cx({
           switchBackground: true,
           switchedOn: this.props.checkedOn,
           [this.props.backgroundClassName]: !!this.props.backgroundClassName
-        })} onClick={this.onClick}>
+        })}
+          data-test-id='switchBackground'
+          onClick={this.onClick}
+        >
           <div className={cx({
             switchIndicator: true,
+            [css(this.props.small && styles.switchControlText__label_small)]: true,
             [this.props.indicatorClassName]: !!this.props.indicatorClassName
           })} />
         </div>
@@ -67,39 +90,48 @@ class SwitchControl extends ImmutableComponent {
         ? <div className='switchControlText'>
           <div className='switchControlRightText'>
             <div className='switchSpacer'>&nbsp;</div>
-            <span className={cx({
-              switchControlRightText: true,
+            <label className={cx({
+              [css(styles.switchControlText__label, styles.switchControlText_right__label, this.props.small && styles.switchControlText__label_small)]: true,
               [this.props.customRightTextClassName]: !!this.props.customRightTextClassName
             })}
+              onClick={this.onClick}
               data-l10n-id={this.props.rightl10nId}
               data-l10n-args={this.props.rightl10nArgs}
-            >{this.props.rightText || ''}</span>
+            >{this.props.rightText || ''}</label>
           </div>
         </div>
         : <div className='switchControlRight'>
           {
             (this.props.rightl10nId || this.props.rightText) && !this.props.onInfoClick
-            ? <span className={cx({
-              switchControlRightText: true,
+            ? <label className={cx({
+              [css(styles.switchControlText__label, styles.switchControlText_right__label, this.props.small && styles.switchControlText__label_small)]: true,
               [this.props.customRightTextClassName]: !!this.props.customRightTextClassName
             })}
+              onClick={this.onClick}
               data-l10n-id={this.props.rightl10nId}
               data-l10n-args={this.props.rightl10nArgs}
-            >{this.props.rightText || ''}</span>
+            >{this.props.rightText || ''}</label>
           : null
         }
           {
             (this.props.rightl10nId || this.props.rightText) && this.props.onInfoClick
-            ? <div className='switchControlRightText'>
-              <span data-l10n-id={this.props.rightl10nId}
-                data-l10n-args={this.props.rightl10nArgs}>
+            ? <div className='switchControlRight'>
+              <label className={cx({
+                [css(styles.switchControlText__label, styles.switchControlText_right__label, this.props.small && styles.switchControlText__label_small)]: true,
+                [this.props.customRightTextClassName]: !!this.props.customRightTextClassName
+              })}
+                onClick={this.onClick}
+                data-l10n-id={this.props.rightl10nId}
+                data-l10n-args={this.props.rightl10nArgs}
+              >
                 {this.props.rightText}
-              </span>
+              </label>
               <span className={cx({
                 fa: true,
                 'fa-question-circle': true,
                 info: true,
                 clickable: true,
+                [css(styles.switchControlText__label, this.props.small && styles.switchControlText__label_small)]: true,
                 [this.props.customInfoButtonClassName]: !!this.props.customInfoButtonClassName
               })}
                 onClick={this.props.onInfoClick}
@@ -113,5 +145,25 @@ class SwitchControl extends ImmutableComponent {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  switchControlText__label: {
+    userSelect: 'none'
+  },
+
+  switchControlText__label_small: {
+    fontSize: 'smaller'
+  },
+
+  switchControlText_right__label: {
+    paddingLeft: '1ch',
+    marginLeft: 0
+  },
+
+  switchControlText_left__label: {
+    paddingRight: '1ch',
+    marginRight: 0
+  }
+})
 
 module.exports = SwitchControl

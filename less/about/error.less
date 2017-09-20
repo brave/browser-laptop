@@ -1,5 +1,10 @@
 @import "./common.less";
 
+// See siteDetails.less
+body {
+  background: @veryLightGray;
+}
+
 #appContainer {
   &.errorPageContainer {
     overflow: auto;
@@ -7,12 +12,11 @@
 
     .errorContent {
       display: flex;
-      width: 40vw;
+      width: 60vw;
       max-width: 600px;
       margin: 20vh auto;
       line-height: 1.6em;
       flex-direction: column;
-      background-color: #FFF;
       padding: 40px;
       height: auto;
 
@@ -23,11 +27,8 @@
       .buttons {
         display: flex;
         flex-flow: row wrap;
-        position: relative;
-        right: .2em; // cancel margin: .2em to align .buttons and .certErrorText
 
         > .browserButton {
-          margin: .2em;
           font-size: 14px;
         }
       }
@@ -67,6 +68,11 @@
 
     &.safeBrowsing {
       background-color: red;
+
+      .errorContent {
+        // See the body property above
+        background: @veryLightGray;
+      }
     }
   }
 }

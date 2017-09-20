@@ -35,6 +35,7 @@ describe('safebrowsing interception', function () {
         })
       })
       .windowByUrl(Brave.browserWindowUrl)
+      .activateURLMode()
       .getAttribute(urlInput, 'value').then((value) => {
         return value === this.safebrowsingUrl
       })

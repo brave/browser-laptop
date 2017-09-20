@@ -18,7 +18,6 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     color: '#5a5a5a',
     display: 'flex',
-    height: globalStyles.spacing.tabHeight,
     marginTop: '0',
     transition: `transform 200ms ease, ${globalStyles.transition.tabBackgroundTransition}`,
     left: '0',
@@ -28,6 +27,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: globalStyles.spacing.defaultTabPadding,
     position: 'relative',
+
+    // globalStyles.spacing.tabHeight has been set to globalStyles.spacing.tabsToolbarHeight,
+    // which is 1px extra due to the border-top of .tabsToolbar
+    height: `calc(${globalStyles.spacing.tabsToolbarHeight} - 1px)`,
 
     ':hover': {
       background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(250, 250, 250, 0.4))'
@@ -68,12 +71,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden'
   },
 
-  // Add extra space for pages that have no icon
-  // such as about:blank and about:newtab
-  noFavicon: {
-    padding: '0 6px'
-  },
-
   alternativePlayIndicator: {
     borderTop: '2px solid lightskyblue'
   },
@@ -83,22 +80,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     display: 'flex',
     flex: '1',
-    minWidth: '0' // @see https://bugzilla.mozilla.org/show_bug.cgi?id=1108514#c5
+
+    // @see https://bugzilla.mozilla.org/show_bug.cgi?id=1108514#c5
+    minWidth: '0',
+
+    // prevent the icons wrapper from being the target of mouse events.
+    pointerEvents: 'none'
   },
 
   isPinned: {
-    paddingLeft: globalStyles.spacing.defaultIconPadding,
-    paddingRight: globalStyles.spacing.defaultIconPadding
+    padding: 0,
+    width: `calc(${globalStyles.spacing.tabsToolbarHeight} * 1.1)`,
+    justifyContent: 'center'
   },
 
   active: {
     background: `rgba(255, 255, 255, 1.0)`,
-    height: globalStyles.spacing.tabHeight,
     marginTop: '0',
     borderWidth: '0 1px 0 0',
     borderStyle: 'solid',
     borderColor: '#bbb',
     color: '#000',
+
     ':hover': {
       background: `linear-gradient(to bottom, #fff, ${globalStyles.color.chromePrimary})`
     }
@@ -136,13 +139,19 @@ const styles = StyleSheet.create({
     fontSize: globalStyles.fontSize.tabIcon,
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
-    display: 'flex',
-    alignSelf: 'center',
-    position: 'relative',
-    textAlign: 'center',
-    justifyContent: 'center',
     paddingLeft: globalStyles.spacing.defaultIconPadding,
     paddingRight: globalStyles.spacing.defaultIconPadding
+  },
+
+  icon_audio: {
+    color: globalStyles.color.highlightBlue,
+
+    // 16px
+    fontSize: `calc(${globalStyles.fontSize.tabIcon} + 2px)`,
+
+    // equal spacing around audio icon (favicon and tabTitle)
+    padding: globalStyles.spacing.defaultTabPadding,
+    paddingRight: '0 !important'
   }
 })
 

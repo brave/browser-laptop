@@ -14,6 +14,7 @@ const {
   CommonFormLarge,
   CommonFormSection,
   CommonFormTitle,
+  CommonFormFullWidthDropdown,
   CommonFormButtonWrapper,
   commonFormStyles
 } = require('../common/commonForm')
@@ -24,9 +25,14 @@ const appActions = require('../../../../js/actions/appActions')
 
 // Constants
 const KeyCodes = require('../../../common/constants/keyCodes')
+const countryCodes = require('../../../common/constants/countryCodes')
 
 // Styles
 const commonStyles = require('../styles/commonStyles')
+
+// Localization
+const locale = require('../../../../js/l10n')
+
 const commonForm = css(
   commonStyles.formControl,
   commonStyles.textbox,
@@ -118,7 +124,16 @@ class AutofillAddressPanel extends React.Component {
   onHide () {
     windowActions.setAutofillAddressDetail()
   }
-
+  get countryList () {
+    const countryList = []
+    countryList.push(<option />)
+    for (let i = 0; i < countryCodes.length; i++) {
+      const countryCode = countryCodes[i]
+      const localizedCountryName = locale.translation(countryCode)
+      countryList.push(<option value={countryCode}>{localizedCountryName}</option>)
+    }
+    return countryList
+  }
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const detail = currentWindow.get('autofillAddressDetail', Immutable.Map())
@@ -226,14 +241,13 @@ class AutofillAddressPanel extends React.Component {
                 />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <input
-                  className={commonForm}
-                  data-test-id='country'
-                  spellCheck='false'
-                  onKeyDown={this.onKeyDown}
+                <CommonFormFullWidthDropdown
+                  value={this.props.country}
                   onChange={this.onCountryChange}
-                  defaultValue={this.props.country}
-                />
+                  data-test-id='country'
+                >
+                  {this.countryList}
+                </CommonFormFullWidthDropdown>
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
                 <input
