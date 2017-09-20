@@ -388,7 +388,7 @@ function registerPermissionHandler (session, partition) {
   const isPrivate = module.exports.isPrivate(partition)
   // Keep track of per-site permissions granted for this session.
   let permissions = null
-  session.setPermissionRequestHandler((origin, mainFrameUrl, permission, cb) => {
+  session.setPermissionRequestHandler((origin, mainFrameUrl, permissionTypes, cb) => {
     if (!permissions) {
       permissions = {
         media: {
@@ -418,34 +418,7 @@ function registerPermissionHandler (session, partition) {
       }
     }
 
-    if (!permissions[permission]) {
-      console.warn('WARNING: got unregistered permission request', permission)
-      cb(false)
-      return
-    }
-
-    // The Torrent Viewer extension is always allowed to show fullscreen media
-    if (permission === 'fullscreen' &&
-      origin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
-      cb(true)
-      return
-    }
-
-    // Always allow fullscreen if setting is ON
-    const alwaysAllowFullscreen = module.exports.alwaysAllowFullscreen() === fullscreenOption.ALWAYS_ALLOW
-    if (permission === 'fullscreen' && alwaysAllowFullscreen) {
-      cb(true)
-      return
-    }
-
-    // The Brave extension and PDFJS are always allowed to open files in an external app
-    if (permission === 'openExternal' && (
-      origin.startsWith('chrome-extension://' + config.PDFJSExtensionId) ||
-      origin.startsWith('chrome-extension://' + config.braveExtensionId))) {
-      cb(true)
-      return
-    }
-
+    // TODO(bridiver) - the permission handling should be converted to an action because we should never call `appStore.getState()`
     // Check whether there is a persistent site setting for this host
     const appState = appStore.getState()
     let settings
@@ -473,51 +446,87 @@ function registerPermissionHandler (session, partition) {
       tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), origin)
     }
 
-    const permissionName = permission + 'Permission'
-    let isAllowed
-    if (settings) {
-      isAllowed = settings.get(permissionName)
-    }
-    // Private tabs inherit settings from normal tabs, but not vice versa.
-    if (isPrivate && tempSettings) {
-      isAllowed = tempSettings.get(permissionName)
-    }
-    if (typeof isAllowed === 'boolean') {
-      cb(isAllowed)
-      return
-    }
-
-    // Display 'Brave Browser' if the origin is null; ex: when a mailto: link
-    // is opened in a new tab via right-click
-    const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, origin || 'Brave Browser').replace(/{{\s*permission\s*}}/, permissions[permission].action)
-
-    // If this is a duplicate, clear the previous callback and use the new one
-    if (permissionCallbacks[message]) {
-      permissionCallbacks[message](0, false)
-    }
-
-    appActions.showNotification({
-      buttons: [
-        {text: locale.translation('deny')},
-        {text: locale.translation('allow')}
-      ],
-      frameOrigin: getOrigin(mainFrameUrl),
-      options: {
-        persist: !!origin
-      },
-      message
-    })
-
-    permissionCallbacks[message] = (buttonIndex, persist) => {
-      permissionCallbacks[message] = null
-      // hide the notification if this was triggered automatically
-      appActions.hideNotification(message)
-      const result = !!(buttonIndex)
-      cb(result)
-      if (persist) {
-        // remember site setting for this host
-        appActions.changeSiteSetting(origin, permission + 'Permission', result, isPrivate)
+    let response = []
+    for (let i = 0; i < permissionTypes.length; i++) {
+      const responseSizeThisIteration = response.length
+      const permission = permissionTypes[i]
+      const alwaysAllowFullscreen = module.exports.alwaysAllowFullscreen() === fullscreenOption.ALWAYS_ALLOW
+      if (!permissions[permission]) {
+        console.warn('WARNING: got unregistered permission request', permission)
+        response.push(false)
+      } else if (permission === 'fullscreen' &&
+        // The Torrent Viewer extension is always allowed to show fullscreen media
+        origin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
+        response.push(true)
+      } else if (permission === 'fullscreen' && alwaysAllowFullscreen) {
+        // Always allow fullscreen if setting is ON
+        response.push(true)
+      } else if (permission === 'openExternal' && (
+        // The Brave extension and PDFJS are always allowed to open files in an external app
+        origin.startsWith('chrome-extension://' + config.PDFJSExtensionId) ||
+        origin.startsWith('chrome-extension://' + config.braveExtensionId))) {
+        response.push(true)
+      } else {
+        const permissionName = permission + 'Permission'
+        let isAllowed
+        if (settings) {
+          isAllowed = settings.get(permissionName)
+        }
+        // Private tabs inherit settings from normal tabs, but not vice versa.
+        if (isPrivate && tempSettings) {
+          isAllowed = tempSettings.get(permissionName)
+        }
+        if (typeof isAllowed === 'boolean') {
+          response.push(isAllowed)
+        }
       }
+
+      // Display 'Brave Browser' if the origin is null; ex: when a mailto: link
+      // is opened in a new tab via right-click
+      const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, origin || 'Brave Browser').replace(/{{\s*permission\s*}}/, permissions[permission].action)
+
+      // If this is a duplicate, clear the previous callback and use the new one
+      if (permissionCallbacks[message]) {
+        permissionCallbacks[message](0, false)
+      }
+
+      const responseAutoAdded = responseSizeThisIteration !== response.length
+      if (!responseAutoAdded) {
+        appActions.showNotification({
+          buttons: [
+            {text: locale.translation('deny')},
+            {text: locale.translation('allow')}
+          ],
+          frameOrigin: getOrigin(mainFrameUrl),
+          options: {
+            persist: !!origin,
+            index: i
+          },
+          message
+        })
+
+        // Use a closure here for the index instead of passing an index to the
+        // function because ipcMain.on(messages.NOTIFICATION_RESPONSE above
+        // calls into the callback without knowing an index.
+        const index = i
+        permissionCallbacks[message] = (buttonIndex, persist) => {
+          // hide the notification if this was triggered automatically
+          appActions.hideNotification(message)
+          const result = !!(buttonIndex)
+          response[index] = result
+          if (persist) {
+            // remember site setting for this host
+            appActions.changeSiteSetting(origin, permission + 'Permission', result, isPrivate)
+          }
+          if (response.length === permissionTypes.length) {
+            permissionCallbacks[message] = null
+            cb(response)
+          }
+        }
+      }
+    }
+    if (response.length === permissionTypes.length) {
+      cb(response)
     }
   })
 }
