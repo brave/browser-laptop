@@ -419,7 +419,7 @@ function registerPermissionHandler (session, partition) {
     }
 
     if (!permissions[permission]) {
-      console.log('WARNING: got unregistered permission request', permission)
+      console.warn('WARNING: got unregistered permission request', permission)
       cb(false)
       return
     }
