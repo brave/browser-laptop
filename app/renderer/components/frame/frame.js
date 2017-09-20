@@ -725,18 +725,6 @@ class Frame extends React.Component {
         windowActions.setNavigated(e.url, this.props.frameKey, false, this.props.tabId)
       }
     }, { passive: true })
-    this.webview.addEventListener('crashed', (e) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      windowActions.setFrameError(this.frame, {
-        event_type: 'crashed',
-        title: 'unexpectedError',
-        url: this.props.location
-      })
-      appActions.loadURLRequested(this.props.tabId, 'about:error')
-      this.webview = false
-    }, { passive: true })
     this.webview.addEventListener('did-fail-provisional-load', (e) => {
       if (e.isMainFrame) {
         loadEnd(false, e.validatedURL, false)
