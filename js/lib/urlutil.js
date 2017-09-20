@@ -354,7 +354,7 @@ const UrlUtil = {
       parsed.hostname = punycode.toASCII(parsed.hostname)
       return urlFormat(parsed)
     } catch (e) {
-      return url
+      return punycode.toASCII(url)
     }
   },
 
