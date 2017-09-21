@@ -223,8 +223,7 @@
   },
   "pre-push": {
     "run": [
-      "lint",
-      "unittest"
+      "lint"
     ]
   },
   "engines": {
