@@ -122,6 +122,16 @@ const styles = StyleSheet.create({
     // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L49
     color: globalStyles.button.color,
 
+    // #9223
+    // Set the common default font-family with common.less and window.less
+    // See:
+    //  - https://github.com/brave/browser-laptop/blob/e1b67c219b64b829cae284717de6ecccb0da8154/less/about/common.less#L11
+    //  - https://github.com/brave/browser-laptop/blob/321281bc2de68f46fed89c87a97dd8c4e35f35c5/less/window.less#L10
+    fontFamily: globalStyles.defaultFontFamily,
+    // Currently -webkit-font-smoothing works only on macOS. See: https://caniuse.com/#search=font-smooth
+    // Set initial to cancel the inherited value
+    WebkitFontSmoothing: 'initial',
+
     // See #11111
     WebkitAppRegion: 'no-drag',
 
@@ -136,9 +146,10 @@ const styles = StyleSheet.create({
     boxShadow: globalStyles.button.default.boxShadow,
     cursor: 'pointer',
 
-    // TODO: #9223
+    // #9223
     height: '32px', // 32px == 1rem * 2
     fontSize: globalStyles.spacing.defaultFontSize,
+    fontWeight: 400,
     lineHeight: 1.25,
 
     // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L92
@@ -176,8 +187,8 @@ const styles = StyleSheet.create({
     borderBottom: `2px solid ${globalStyles.button.primary.gradientColor2}`,
     cursor: 'pointer',
 
-    // https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L115
-    fontWeight: 500,
+    // #9223
+    fontWeight: 300,
 
     ':hover': {
       border: `2px solid ${globalStyles.button.primary.borderHoverColor}`,
@@ -190,7 +201,6 @@ const styles = StyleSheet.create({
     border: '1px solid white',
     color: globalStyles.button.secondary.color,
     cursor: 'pointer',
-    fontWeight: 500,
 
     ':hover': {
       border: `1px solid ${globalStyles.button.secondary.borderHoverColor}`,
