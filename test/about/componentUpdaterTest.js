@@ -42,8 +42,6 @@ describe('component updater', function () {
       const url = Brave.server.url('drm.html')
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
-        .setResourceEnabled(appConfig.resourceNames.WIDEVINE, true)
-        .waitForResourceReady(appConfig.resourceNames.WIDEVINE)
         .tabByIndex(0)
         .url(url)
         .waitForUrl(url)
@@ -51,6 +49,35 @@ describe('component updater', function () {
         .waitForVisible(installButton)
         .click(installButton)
         .waitForResourceReady(appConfig.resourceNames.WIDEVINE)
+        // TODO(bbondy): flashBlock.js should be less aggressive so we can detect this with the drm.html #output div.
+    })
+  })
+  describe('Google Widevine is enabled but disallowed by default', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      yield setup(this.app.client)
+    })
+    it('can be allowed', function * () {
+      const isLinux = process.platform === 'linux'
+      if (isLinux) {
+        this.skip()
+        return
+      }
+      const allowButton = 'button=Allow'
+      const notificationItem = '.notificationItem'
+      const url = Brave.server.url('drm.html')
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .setResourceEnabled(appConfig.resourceNames.WIDEVINE, true)
+        .waitForResourceReady(appConfig.resourceNames.WIDEVINE)
+        .tabByIndex(0)
+        .url(url)
+        .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForElementCount(notificationItem, 1)
+        .waitForElementCount(allowButton, 1)
+        .click(allowButton)
+        .waitForElementCount(notificationItem, 0)
         // TODO(bbondy): flashBlock.js should be less aggressive so we can detect this with the drm.html #output div.
     })
   })
