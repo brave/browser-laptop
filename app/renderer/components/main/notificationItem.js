@@ -32,7 +32,11 @@ class NotificationItem extends React.Component {
 
   clickHandler (buttonIndex) {
     if (this.props.nonce) {
-      ipc.send(
+      // This needs to be changed into an app action but it is
+      // currently ipc.emit on purpose so the message goes to the
+      // renderer.  Listeners for NOTIFICATION_RESPONSE with
+      // a nonce is on the renderer only.
+      ipc.emit(
         messages.NOTIFICATION_RESPONSE + this.props.nonce,
         {},
         this.props.message,
@@ -41,6 +45,9 @@ class NotificationItem extends React.Component {
         this.props.index
       )
     } else {
+      // This needs to be changed into an app action but it is
+      // currently using ipc.send on purpose. The listener without
+      // a nonce is on the browser side.
       ipc.send(
         messages.NOTIFICATION_RESPONSE,
         this.props.message,
