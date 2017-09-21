@@ -14,7 +14,7 @@ const {
   CommonFormLarge,
   CommonFormSection,
   CommonFormTitle,
-  CommonFormFullWidthDropdown,
+  CommonFormDropdown,
   CommonFormButtonWrapper,
   commonFormStyles
 } = require('../common/commonForm')
@@ -241,13 +241,14 @@ class AutofillAddressPanel extends React.Component {
                 />
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
-                <CommonFormFullWidthDropdown
+                <CommonFormDropdown
+                  data-isFullWidth
+                  data-test-id='country'
                   value={this.props.country}
                   onChange={this.onCountryChange}
-                  data-test-id='country'
                 >
                   {this.countryList}
-                </CommonFormFullWidthDropdown>
+                </CommonFormDropdown>
               </div>
               <div className={css(commonFormStyles.input__marginRow)}>
                 <input

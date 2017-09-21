@@ -40,18 +40,6 @@ class SettingDropdown extends ImmutableComponent {
   }
 }
 
-class PanelDropdown extends ImmutableComponent {
-  render () {
-    return <FormDropdown data-isPanel {...this.props} />
-  }
-}
-
-class BraveryPanelDropdown extends ImmutableComponent {
-  render () {
-    return <FormDropdown data-isBraveryPanel {...this.props} />
-  }
-}
-
 const selectPadding = '0.4em'
 
 const styles = StyleSheet.create({
@@ -95,15 +83,12 @@ const styles = StyleSheet.create({
   },
 
   braveryPanel: {
-    fontSize: '13px',
-    width: '100%'
+    fontSize: '13px'
   }
 })
 
 module.exports = {
   Dropdown,
   FormDropdown,
-  SettingDropdown,
-  PanelDropdown,
-  BraveryPanelDropdown
+  SettingDropdown
 }

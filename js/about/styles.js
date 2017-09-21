@@ -15,9 +15,7 @@ const {TextArea, DefaultTextArea} = require('../../app/renderer/components/commo
 const {
   Dropdown,
   FormDropdown,
-  SettingDropdown,
-  PanelDropdown,
-  BraveryPanelDropdown
+  SettingDropdown
 } = require('../../app/renderer/components/common/dropdown')
 
 const BrowserButton = require('../../app/renderer/components/common/browserButton')
@@ -191,6 +189,7 @@ class AboutStyle extends ImmutableComponent {
           </Dropdown>
           <Pre><Code>
             const { '{Dropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            {'\n'}
             &lt;Dropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
@@ -208,10 +207,47 @@ class AboutStyle extends ImmutableComponent {
           </FormDropdown>
           <Pre><Code>
             const { '{FormDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            {'\n'}
             &lt;FormDropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
+            &lt;/FormDropdown>
+          </Code></Pre>
+        </Container>
+
+        <Container>
+          <h2>Dropdown used on Brave Payments; has 180px width (same as Panel Item button below)</h2>
+          <FormDropdown data-isPanel>
+            <option>5 USD</option>
+            <option>10 USD</option>
+            <option>15 USD</option>
+          </FormDropdown>
+          <Pre><Code>
+            const { '{FormDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            {'\n'}
+            &lt;FormDropdown data-isPanel>{'\n'}
+            &nbsp;&nbsp;&lt;option>5 USD&lt;/option>{'\n'}
+            &nbsp;&nbsp;&lt;option>10 USD&lt;/option>{'\n'}
+            &nbsp;&nbsp;&lt;option>15 USD&lt;/option>{'\n'}
+            &lt;/FormDropdown>
+          </Code></Pre>
+        </Container>
+
+        <Container>
+          <h2>Dropdown used on Bravery Panel; has 100% width and 13px font size</h2>
+          <FormDropdown data-isFullWidth data-isBraveryPanel>
+            <option data-l10n-id='adsShowBrave' data-test-id='showBraveAds' value='showBraveAds' />
+            <option data-l10n-id='adsBlock' data-test-id='blockAdsOption' value='blockAds' />
+            <option data-l10n-id='adsAllow' data-test-id='showAdsOption' value='allowAdsAndTracking' />
+          </FormDropdown>
+          <Pre><Code>
+            const { '{FormDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            {'\n'}
+            &lt;FormDropdown data-isFullWidth data-isBraveryPanel>{'\n'}
+            &nbsp;&nbsp;&lt;option data-l10n-id='showBraveAds' data-test-id='showBraveAds' value='showBraveAds' />{'\n'}
+            &nbsp;&nbsp;&lt;option data-l10n-id='blockAds' data-test-id='blockAdsOption' value='blockAds' />{'\n'}
+            &nbsp;&nbsp;&lt;option data-l10n-id='allowAdsAndTracking' data-test-id='showAdsOption' value='allowAdsAndTracking' />{'\n'}
             &lt;/FormDropdown>
           </Code></Pre>
         </Container>
@@ -225,6 +261,7 @@ class AboutStyle extends ImmutableComponent {
           </SettingDropdown>
           <Pre><Code>
             const { '{SettingDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            {'\n'}
             &lt;SettingDropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
@@ -234,36 +271,20 @@ class AboutStyle extends ImmutableComponent {
         </Container>
 
         <Container>
-          <h2>Dropdown used on Brave Payments; has 180px width (same as Panel Item button below)</h2>
-          <PanelDropdown>
-            <option>5 USD</option>
-            <option>10 USD</option>
-            <option>15 USD</option>
-          </PanelDropdown>
-          <Pre><Code>
-            const { '{PanelDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
-            &lt;PanelDropdown>{'\n'}
-            &nbsp;&nbsp;&lt;option>5 USD&lt;/option>{'\n'}
-            &nbsp;&nbsp;&lt;option>10 USD&lt;/option>{'\n'}
-            &nbsp;&nbsp;&lt;option>15 USD&lt;/option>{'\n'}
-            &lt;/PanelDropdown>
-          </Code></Pre>
-        </Container>
-
-        <Container>
-          <h2>Dropdown used mostly on Bravery Panel; has 100% width and 13px font size</h2>
-          <BraveryPanelDropdown>
+          <h2>Dropdown used on CommonForm</h2>
+          <CommonFormDropdown>
             <option>Select Box</option>
             <option>Second Choice</option>
             <option>Third Choice</option>
-          </BraveryPanelDropdown>
+          </CommonFormDropdown>
           <Pre><Code>
-            const { '{BraveryPanelDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
-            &lt;BraveryPanelDropdown>{'\n'}
+            const { '{CommonFormDropdown}' } = require('../../app/renderer/components/common/commonForm'){'\n'}
+            {'\n'}
+            &lt;CommonFormDropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
-            &lt;/BraveryPanelDropdown>
+            &lt;/CommonFormDropdown>
           </Code></Pre>
         </Container>
 
