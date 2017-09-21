@@ -68,15 +68,18 @@ const getDNDBookmarkData = (state, bookmarkKey) => {
 }
 
 let oldBookmarks
+let oldBookmarkOrderCache
 let oldFolders
 let lastValue
 let lastWidth
 const getToolbarBookmarks = (state) => {
   const windowWidth = window.innerWidth
   const allBookmarks = bookmarksState.getBookmarks(state)
+  const bookmarkOrderCache = bookmarksState.getBookmarkOrder(state)
   const allFolders = bookmarkFoldersState.getFolders(state)
   if (
     allBookmarks === oldBookmarks &&
+    bookmarkOrderCache === oldBookmarkOrderCache &&
     allFolders === oldFolders &&
     lastWidth === windowWidth &&
     lastValue
@@ -85,6 +88,7 @@ const getToolbarBookmarks = (state) => {
   }
 
   oldBookmarks = allBookmarks
+  oldBookmarkOrderCache = bookmarkOrderCache
   oldFolders = allFolders
   lastWidth = windowWidth
 

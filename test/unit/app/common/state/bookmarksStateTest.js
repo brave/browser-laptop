@@ -66,6 +66,11 @@ const stateWithData = Immutable.fromJS({
 })
 
 describe('bookmarkState unit test', function () {
+  describe('getBookmarkOrder', function () {
+    it('resturns order state', function () {
+      assert.deepEqual(bookmarksState.getBookmarkOrder(stateWithData), stateWithData.getIn(['cache', 'bookmarkOrder']))
+    })
+  })
   describe('getBookmarksByParentId', function () {
     it('null case', function () {
       const result = bookmarksState.getBookmarksByParentId(stateWithData)
