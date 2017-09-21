@@ -60,7 +60,7 @@ class BookmarksToolbar extends React.Component {
       if (droppedOn.selectedRef) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
         const droppedOnKey = droppedOn.selectedRef.props.bookmarkKey
-        const isDestinationParent = droppedOn.selectedRef.props.isFolder && droppedOn && droppedOn.isDroppedOn
+        const isDestinationParent = droppedOn.selectedRef.state.isFolder && droppedOn && droppedOn.isDroppedOn
         appActions.moveSite(bookmark.get('bookmarkKey'), droppedOnKey, isLeftSide, isDestinationParent)
         dnd.onDragEnd()
       }
