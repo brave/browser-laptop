@@ -220,6 +220,7 @@ const applyReducers = (state, action, immutableAction) => [
   require('../../app/renderer/reducers/urlBarReducer'),
   require('../../app/renderer/reducers/frameReducer'),
   require('../../app/renderer/reducers/contextMenuReducer'),
+  require('../../app/renderer/reducers/tabContentReducer'),
   // This should be included even in production builds since you can use
   // an environment variable to show the Debug menu
   require('../../app/renderer/reducers/debugReducer')
@@ -358,17 +359,6 @@ const doAction = (action) => {
         windowState = frameStateUtil.updateTabPageIndex(windowState, action.frameProps.get('tabId'))
       }
       break
-    case windowConstants.WINDOW_SET_TAB_BREAKPOINT:
-      {
-        if (!action.frameKey) {
-          break
-        }
-        const frameIndex = frameStateUtil.getFrameIndex(windowState, action.frameKey)
-        if (frameIndex !== -1) {
-          windowState = windowState.setIn(['frames', frameIndex, 'breakpoint'], action.breakpoint)
-        }
-        break
-      }
     case windowConstants.WINDOW_TAB_MOUSE_MOVE:
       {
         // previewMode is only triggered if mouse is idle over a tab

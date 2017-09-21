@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
@@ -9,39 +9,47 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
-// Utils
+// State helpers
+const privateState = require('../../../../common/state/tabContentState/privateState')
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
+const {theme} = require('../../styles/theme')
 const globalStyles = require('../../styles/global')
-const tabStyles = require('../../styles/tab')
+const {opacityIncreaseKeyframes} = require('../../styles/animations')
 const privateSvg = require('../../../../extensions/brave/img/tabs/private.svg')
 
 class PrivateIcon extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const frameKey = ownProps.frameKey
+    const tabId = ownProps.tabId
+    const frameKey = frameStateUtil.getFrameKeyByTabId(currentWindow, tabId)
 
     const props = {}
-    // used in renderer
+    props.isPinned = frameStateUtil.isPinned(currentWindow, frameKey)
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
-
-    // used in functions
-    props.frameKey = frameKey
+    props.showPrivateIcon = privateState.showPrivateIcon(currentWindow, frameKey)
+    props.tabId = tabId
 
     return props
   }
 
   render () {
-    const privateStyles = StyleSheet.create({
-      icon: {
-        backgroundColor: this.props.isActive ? globalStyles.color.white100 : globalStyles.color.black100
+    if (this.props.isPinned || !this.props.showPrivateIcon) {
+      return null
+    }
+
+    const privateProps = StyleSheet.create({
+      private__icon_color: {
+        backgroundColor: this.props.isActive
+          ? theme.tab.content.icon.private.background.active
+          : theme.tab.content.icon.private.background.notActive
       }
     })
 
     return <TabIcon
       data-test-id='privateIcon'
-      className={css(tabStyles.icon, styles.secondaryIcon, privateStyles.icon)}
+      className={css(styles.private__icon, privateProps.private__icon_color)}
     />
   }
 }
@@ -49,9 +57,23 @@ class PrivateIcon extends React.Component {
 module.exports = ReduxComponent.connect(PrivateIcon)
 
 const styles = StyleSheet.create({
-  secondaryIcon: {
+  private__icon: {
+    opacity: 0,
+    willChange: 'opacity',
+    animationName: opacityIncreaseKeyframes,
+    animationDelay: '100ms',
+    animationTimingFunction: 'linear',
+    animationDuration: '200ms',
+    animationFillMode: 'forwards',
+
+    zIndex: globalStyles.zindex.zindexTabsThumbnail,
+    boxSizing: 'border-box',
     WebkitMaskRepeat: 'no-repeat',
     WebkitMaskPosition: 'center',
-    WebkitMaskImage: `url(${privateSvg})`
+    WebkitMaskImage: `url(${privateSvg})`,
+    WebkitMaskSize: globalStyles.spacing.sessionIconSize,
+    width: globalStyles.spacing.sessionIconSize,
+    height: globalStyles.spacing.sessionIconSize,
+    marginRight: globalStyles.spacing.defaultTabMargin
   }
 })

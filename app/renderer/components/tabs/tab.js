@@ -1,9 +1,9 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const Immutable = require('immutable')
 
 // Components
@@ -23,15 +23,18 @@ const windowActions = require('../../../../js/actions/windowActions')
 // Store
 const windowStore = require('../../../../js/stores/windowStore')
 
-// State
-const tabContentState = require('../../../common/state/tabContentState')
+// State helpers
+const privateState = require('../../../common/state/tabContentState/privateState')
+const audioState = require('../../../common/state/tabContentState/audioState')
+const tabUIState = require('../../../common/state/tabUIState')
 const tabState = require('../../../common/state/tabState')
 
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
 
 // Styles
-const styles = require('../styles/tab')
+const globalStyles = require('../styles/global')
+const {theme} = require('../styles/theme')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
@@ -39,16 +42,11 @@ const {getTextColorForBackground} = require('../../../../js/lib/color')
 const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 const contextMenus = require('../../../../js/contextMenus')
 const dnd = require('../../../../js/dnd')
-const throttle = require('../../../../js/lib/throttle')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const {
-  getTabBreakpoint,
-  tabUpdateFrameRate,
-  hasBreakpoint,
-  hasTabAsRelatedTarget
-} = require('../../lib/tabUtil')
+const {hasTabAsRelatedTarget} = require('../../lib/tabUtil')
 const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const {getCurrentWindowId} = require('../../currentWindow')
+const {setObserver} = require('../../lib/observerUtil')
 const UrlUtil = require('../../../../js/lib/urlutil')
 
 class Tab extends React.Component {
@@ -57,11 +55,12 @@ class Tab extends React.Component {
     this.onMouseMove = this.onMouseMove.bind(this)
     this.onMouseEnter = this.onMouseEnter.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
-    this.onUpdateTabSize = this.onUpdateTabSize.bind(this)
+    this.onDrag = this.onDrag.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
     this.onDragEnd = this.onDragEnd.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onClickTab = this.onClickTab.bind(this)
+    this.onObserve = this.onObserve.bind(this)
     this.tabNode = null
   }
 
@@ -123,7 +122,19 @@ class Tab extends React.Component {
   }
 
   onDragStart (e) {
+    // showing up the sentinel while dragging leads to show the shadow
+    // of the next tab. See 10691#issuecomment-329854096
+    // this is added back to original size when onDrag event is happening
+    this.tabSentinel.style.width = 0
+
     dnd.onDragStart(dragTypes.TAB, this.frame, e)
+    // cancel tab preview while dragging. see #10103
+    windowActions.setTabHoverState(this.props.frameKey, false, false)
+  }
+
+  onDrag () {
+    // re-enable the tabSentinel while dragging
+    this.tabSentinel.style.width = globalStyles.spacing.sentinelSize
   }
 
   onDragEnd (e) {
@@ -189,34 +200,34 @@ class Tab extends React.Component {
     }
   }
 
-  get tabSize () {
-    const tab = this.tabNode
-    // Avoid TypeError keeping it null until component is mounted
-    return tab && !this.props.isPinnedTab ? tab.getBoundingClientRect().width : null
-  }
-
-  onUpdateTabSize () {
-    const currentSize = getTabBreakpoint(this.tabSize)
-    // Avoid updating breakpoint when user enters fullscreen (see #7301)
-    // Also there can be a race condition for pinned tabs if we update when not needed
-    // since a new tab component with the same key gets created which is not pinned.
-    if (this.props.breakpoint !== currentSize && !this.props.hasTabInFullScreen) {
-      windowActions.setTabBreakpoint(this.props.frameKey, currentSize)
-    }
-  }
-
   componentDidMount () {
-    this.onUpdateTabSize()
-    this.tabNode.addEventListener('auxclick', this.onAuxClick.bind(this))
-    window.addEventListener('resize', throttle(this.onUpdateTabSize, tabUpdateFrameRate), { passive: true })
-  }
+    // unobserve tabs that we don't need. This will
+    // likely be made by onObserve method but added again as
+    // just to double-check
+    if (this.props.isPinned) {
+      this.observer && this.observer.unobserve(this.tabSentinel)
+    }
+    const threshold = Object.values(globalStyles.intersection)
+    // At this moment Chrome can't handle unitless zeroes for rootMargin
+    // see https://github.com/w3c/IntersectionObserver/issues/244
+    const margin = '0px'
+    this.observer = setObserver(this.tabSentinel, threshold, margin, this.onObserve)
+    this.observer.observe(this.tabSentinel)
 
-  componentDidUpdate () {
-    this.onUpdateTabSize()
+    this.tabNode.addEventListener('auxclick', this.onAuxClick.bind(this))
   }
 
   componentWillUnmount () {
-    window.removeEventListener('resize', this.onUpdateTabSize)
+    this.observer.unobserve(this.tabSentinel)
+  }
+
+  onObserve (entries) {
+    if (this.props.isPinnedTab) {
+      return
+    }
+    // we only have one entry
+    const entry = entries[0]
+    windowActions.setTabIntersectionState(this.props.frameKey, entry.intersectionRatio)
   }
 
   get fixTabWidth () {
@@ -231,47 +242,35 @@ class Tab extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
+    const frameKey = ownProps.frameKey
+    const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
+    const isPinned = frameStateUtil.isPinned(currentWindow, frameKey)
+    const partOfFullPageSet = ownProps.partOfFullPageSet
+
+    // TODO: this should have its own method
     const notifications = state.get('notifications')
     const notificationOrigins = notifications ? notifications.map(bar => bar.get('frameOrigin')) : false
     const notificationBarActive = frame.get('location') && notificationOrigins &&
       notificationOrigins.includes(UrlUtil.getUrlOrigin(frame.get('location')))
-    const hasSeconardImage = tabContentState.hasVisibleSecondaryIcon(currentWindow, ownProps.frameKey)
-    const breakpoint = frame.get('breakpoint')
-    const partition = typeof frame.get('partitionNumber') === 'string'
-      ? frame.get('partitionNumber').replace(/^partition-/i, '')
-      : frame.get('partitionNumber')
 
     const props = {}
-    // used in renderer
-    props.frameKey = ownProps.frameKey
-    props.isPrivateTab = frame.get('isPrivate')
-    props.breakpoint = frame.get('breakpoint')
+    // TODO: this should have its own method
     props.notificationBarActive = notificationBarActive
-    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, props.frameKey)
+    props.frameKey = frameKey
+    props.isPinnedTab = isPinned
+    props.isPrivateTab = privateState.isPrivateTab(currentWindow, frameKey)
+    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
     props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
-    props.isPinnedTab = frameStateUtil.isPinned(currentWindow, props.frameKey)
-    props.canPlayAudio = tabContentState.canPlayAudio(currentWindow, props.frameKey)
-    props.themeColor = tabContentState.getThemeColor(currentWindow, props.frameKey)
-    props.isNarrowView = tabContentState.isNarrowView(currentWindow, props.frameKey)
-    props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, props.frameKey)
-    props.isPlayIndicatorBreakpoint = tabContentState.isMediumView(currentWindow, props.frameKey) || props.isNarrowView
+    props.themeColor = tabUIState.getThemeColor(currentWindow, frameKey)
     props.title = frame.get('title')
-    props.showSessionIcon = partition && hasSeconardImage
-    props.showPrivateIcon = props.isPrivateTab && hasSeconardImage
-    props.showFavIcon = !((hasBreakpoint(breakpoint, 'extraSmall') && props.isActive) || frame.get('location') === 'about:newtab')
-    props.showAudioIcon = breakpoint === 'default' && !!frame.get('audioPlaybackActive')
-    props.partOfFullPageSet = ownProps.partOfFullPageSet
-    props.showTitle = !props.isPinnedTab &&
-      !(
-        (hasBreakpoint(breakpoint, ['mediumSmall', 'small']) && props.isActive) ||
-        hasBreakpoint(breakpoint, ['extraSmall', 'smallest'])
-      )
+    props.partOfFullPageSet = partOfFullPageSet
+    props.showAudioTopBorder = audioState.showAudioTopBorder(currentWindow, frameKey, isPinned)
+    props.centralizeTabIcons = tabUIState.centralizeTabIcons(currentWindow, frameKey, isPinned)
+    props.gradientColor = tabUIState.getTabEndIconBackgroundColor(currentWindow, frameKey)
 
     // used in other functions
-    props.totalTabs = state.get('tabs').size
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
-    props.hasTabInFullScreen = tabContentState.hasTabInFullScreen(currentWindow)
-    props.tabId = frame.get('tabId', tabState.TAB_ID_NONE)
+    props.tabId = tabId
     props.previewMode = currentWindow.getIn(['ui', 'tabs', 'previewMode'])
 
     return props
@@ -280,12 +279,19 @@ class Tab extends React.Component {
   render () {
     // we don't want themeColor if tab is private
     const perPageStyles = !this.props.isPrivateTab && StyleSheet.create({
-      themeColor: {
+      tab_themeColor: {
         color: this.props.themeColor ? getTextColorForBackground(this.props.themeColor) : 'inherit',
         background: this.props.themeColor ? this.props.themeColor : 'inherit',
         ':hover': {
           color: this.props.themeColor ? getTextColorForBackground(this.props.themeColor) : 'inherit',
           background: this.props.themeColor ? this.props.themeColor : 'inherit'
+        }
+      }
+    })
+    const perPageGradient = StyleSheet.create({
+      tab_gradient: {
+        '::after': {
+          background: this.props.gradientColor
         }
       }
     })
@@ -313,70 +319,159 @@ class Tab extends React.Component {
         ref={(node) => { this.tabNode = node }}
         className={css(
           styles.tab,
+          !this.props.isPinnedTab && perPageGradient.tab_gradient,
           // Windows specific style
-          isWindows && styles.tabForWindows,
-          this.props.isPinnedTab && styles.isPinned,
-          this.props.isActive && styles.active,
-          this.props.isPlayIndicatorBreakpoint && this.props.canPlayAudio && styles.narrowViewPlayIndicator,
-          this.props.isActive && this.props.themeColor && perPageStyles.themeColor,
+          isWindows && styles.tab_forWindows,
+          this.props.isPinnedTab && styles.tab_pinned,
+          this.props.isActive && styles.tab_active,
+          this.props.isActive && this.props.themeColor && perPageStyles.tab_themeColor,
+          this.props.showAudioTopBorder && styles.tab_audioTopBorder,
           // Private color should override themeColor
-          this.props.isPrivateTab && styles.private,
-          this.props.isActive && this.props.isPrivateTab && styles.activePrivateTab,
-          !this.props.isPinnedTab && this.props.isNarrowView && styles.tabNarrowView,
-          !this.props.isPinnedTab && this.props.isNarrowestView && styles.tabNarrowestView,
-          !this.props.isPinnedTab && this.props.breakpoint === 'smallest' && styles.tabMinAllowedSize
+          this.props.isPrivateTab && styles.tab_private,
+          this.props.isActive && this.props.isPrivateTab && styles.tab_active_private,
+          this.props.centralizeTabIcons && styles.tab__content_centered
         )}
         data-test-id='tab'
-        data-test-active-tab={this.props.isActive}
-        data-test-pinned-tab={this.props.isPinnedTab}
-        data-test-private-tab={this.props.isPrivateTab}
         data-frame-key={this.props.frameKey}
         draggable
         title={this.props.title}
+        onDrag={this.onDrag}
         onDragStart={this.onDragStart}
         onDragEnd={this.onDragEnd}
         onDragOver={this.onDragOver}
         onClick={this.onClickTab}
         onContextMenu={contextMenus.onTabContextMenu.bind(this, this.frame)}
       >
-        <div className={css(
-          styles.tabId,
-          this.props.isNarrowView && styles.tabIdNarrowView,
-          this.props.breakpoint === 'smallest' && styles.tabIdMinAllowedSize
-          )}>
-          {
-            this.props.showFavIcon
-            ? <Favicon frameKey={this.props.frameKey} />
-            : null
-          }
-          {
-            this.props.showAudioIcon
-            ? <AudioTabIcon frameKey={this.props.frameKey} />
-            : null
-          }
-          {
-            this.props.showTitle
-            ? <TabTitle frameKey={this.props.frameKey} />
-            : null
-          }
-        </div>
-        {
-          this.props.showPrivateIcon
-          ? <PrivateIcon frameKey={this.props.frameKey} />
-          : null
-        }
-        {
-          this.props.showSessionIcon
-          ? <NewSessionIcon frameKey={this.props.frameKey} />
-          : null
-        }
-        <CloseTabIcon
-          frameKey={this.props.frameKey}
-          fixTabWidth={this.fixTabWidth}
+        <div
+          ref={(node) => { this.tabSentinel = node }}
+          className={css(styles.tab__sentinel)}
         />
+        <div className={css(
+          styles.tab__identity,
+          this.props.centralizeTabIcons && styles.tab__content_centered
+        )}>
+          <Favicon tabId={this.props.tabId} />
+          <AudioTabIcon tabId={this.props.tabId} />
+          <TabTitle tabId={this.props.tabId} />
+        </div>
+        <PrivateIcon tabId={this.props.tabId} />
+        <NewSessionIcon tabId={this.props.tabId} />
+        <CloseTabIcon tabId={this.props.tabId} fixTabWidth={this.fixTabWidth} />
       </div>
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  tab: {
+    borderWidth: '0 1px 0 0',
+    borderStyle: 'solid',
+    borderColor: '#bbb',
+    boxSizing: 'border-box',
+    color: theme.tab.color,
+    display: 'flex',
+    transition: theme.tab.transition,
+    height: '-webkit-fill-available',
+    width: '-webkit-fill-available',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    position: 'relative',
+
+    ':hover': {
+      background: theme.tab.hover.background
+    },
+
+    // this enable us to have gradient text
+    '::after': {
+      zIndex: globalStyles.zindex.zindexTabs,
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      right: 0,
+      width: '-webkit-fill-available',
+      height: '-webkit-fill-available'
+    }
+  },
+
+  // Windows specific style
+  tab_forWindows: {
+    color: theme.tab.forWindows.color
+  },
+
+  tab_pinned: {
+    padding: 0,
+    width: '28px',
+    justifyContent: 'center'
+  },
+
+  tab_active: {
+    background: theme.tab.active.background,
+
+    ':hover': {
+      background: theme.tab.active.background
+    }
+  },
+
+  tab_audioTopBorder: {
+    '::before': {
+      zIndex: globalStyles.zindex.zindexTabsAudioTopBorder,
+      content: `''`,
+      display: 'block',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: '2px',
+      background: 'lightskyblue'
+    }
+  },
+
+  // The sentinel is responsible to respond to tabs
+  // intersection state. This is an empty hidden element
+  // which `width` value shouldn't be changed unless the intersection
+  // point needs to be edited.
+  tab__sentinel: {
+    position: 'absolute',
+    left: 0,
+    height: '1px',
+    background: 'transparent',
+    width: globalStyles.spacing.sentinelSize
+  },
+
+  tab__identity: {
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    overflow: 'hidden',
+    display: 'flex',
+    flex: '1',
+    minWidth: '0', // @see https://bugzilla.mozilla.org/show_bug.cgi?id=1108514#c5
+    margin: `0 ${globalStyles.spacing.defaultTabMargin}`
+  },
+
+  tab__content_centered: {
+    justifyContent: 'center',
+    flex: 'auto',
+    padding: 0,
+    margin: 0
+  },
+
+  tab_active_private: {
+    background: theme.tab.active.private.background,
+    color: theme.tab.active.private.color,
+
+    ':hover': {
+      background: theme.tab.active.private.background
+    }
+  },
+
+  tab_private: {
+    background: theme.tab.private.background,
+
+    ':hover': {
+      color: theme.tab.active.private.color,
+      background: theme.tab.active.private.background
+    }
+  }
+})
 
 module.exports = ReduxComponent.connect(Tab)

@@ -1,26 +1,18 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const {opacityIncreaseKeyframes} = require('./animations')
 
 /**
- * Historically this file includes styles with no defined criteria.
- * Imagine this file as a future reference for theming, in a way
- * that each component should be an object wrapping all properties
- * that would change in a dark mode, for example.
- *
- * Valid as well for things that needs to be fully global,
- * i.e. breakpoints, icons and zIndexes.
- *
- * Thus said, please take preference for inlined styles in the component itself.
- * If you really feel repetitve writing the same style for a given component,
- * consider including a variable inside component.
- *
- * TODO:
- * remove unnecessary styles properties (as items get refactored)
- * Remove fully global items and take preference for component properties (@see button)
- */
+* Use this file when the style you need
+* is applied in more than one element, or depends on it
+* Use theme.js file to include colors that can be customized
+*
+* TODO:
+* remove unnecessary styles properties (as items get refactored)
+* migrate customizable options to theme.js
+*/
 
 const globalStyles = {
   defaultFontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI"` +
@@ -33,17 +25,18 @@ const globalStyles = {
     breakpointExtensionButtonPadding: '720px',
     breakpointSmallWin32: '650px',
     breakpointTinyWin32: '500px',
-    breakpointNewPrivateTab: '890px',
-    tab: {
-      default: '184px', // match tabArea max-width
-      large: '120px',
-      largeMedium: '83px',
-      medium: '66px',
-      mediumSmall: '53px',
-      small: '46px',
-      extraSmall: '40px',
-      smallest: '19px'
-    }
+    breakpointNewPrivateTab: '890px' // page's breakpoint for the private tab page
+  },
+  intersection: {
+    // whereas 1 === 100%
+    noIntersection: 1,
+    at75: 0.75,
+    at60: 0.6,
+    at45: 0.45,
+    at40: 0.4,
+    at30: 0.3,
+    at20: 0.20,
+    at12: 0.125
   },
   color: {
     commonTextColor: '#3b3b3b',
@@ -126,6 +119,7 @@ const globalStyles = {
     carotRadius: '8px'
   },
   spacing: {
+    sentinelSize: '120px',
     navigatorHeight: '48px',
     defaultSpacing: '12px',
     defaultFontSize: '13px',
@@ -168,9 +162,10 @@ const globalStyles = {
     aboutPageDetailsPageWidth: '704px',
     aboutPageSectionPadding: '24px',
     aboutPageSectionMargin: '10px',
-    defaultTabPadding: '0 4px',
+    defaultTabMargin: '6px',
     defaultIconPadding: '2px',
     iconSize: '16px',
+    sessionIconSize: '15px',
     closeIconSize: '13px',
     narrowIconSize: '12px',
     dialogWidth: '422px',
@@ -219,6 +214,7 @@ const globalStyles = {
     zindexWindowIsPreview: '1100',
     zindexDownloadsBar: '1000',
     zindexTabs: '1000',
+    zindexTabsAudioTopBorder: '1001',
     zindexTabsThumbnail: '1100',
     zindexTabsDragIndicator: '1100',
     zindexNavigationBar: '2000',
