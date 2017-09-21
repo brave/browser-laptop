@@ -32,4 +32,8 @@ describe('muon tests', function () {
       .waitForTextValue('#getOriginNull', 'success')
       .waitForTextValue('#getOriginInvalid', 'success')
   })
+  it('suggestion', function * () {
+    yield this.app.client
+      .waitForTextValue('#suggestionSimpleCheck', 'success')
+  })
 })

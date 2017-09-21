@@ -1,5 +1,6 @@
 const urlParse = require('../app/common/urlParse')
 const urlUtil = require('./lib/urlutil')
+const suggestion = require('../app/common/lib/suggestion')
 const assert = require('assert')
 
 const assertEqual = (actual, expected, name) => {
@@ -70,6 +71,11 @@ const runTests = () => {
   assertEqual(urlUtil.getOrigin('http://http/test'), 'http://http', 'getOriginSchemeHost')
   assertEqual(urlUtil.getOrigin(''), null, 'getOriginNull')
   assertEqual(urlUtil.getOrigin('abc'), null, 'getOriginInvalid')
+  console.log(suggestion.isSimpleDomainNameValue('http://http/test'))
+  assertEqual(suggestion.isSimpleDomainNameValue('http://test.com') &&
+    suggestion.isSimpleDomainNameValue('http://test.com/') &&
+    suggestion.isSimpleDomainNameValue('http://test.com#') &&
+    !suggestion.isSimpleDomainNameValue('http://test.com/test'), true, 'suggestionSimpleCheck')
 }
 
 runTests()
