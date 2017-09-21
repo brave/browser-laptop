@@ -76,6 +76,14 @@ describe('suggestion unit tests', function () {
       assert.ok(suggestion.isSimpleDomainNameValue(siteSimple) === true, 'simple site returns 1')
       assert.ok(suggestion.isSimpleDomainNameValue(siteComplex) === false, 'complex site returns 0')
     })
+    it('URLs that end in a slash are simple', function () {
+      const siteSimple = Immutable.Map({ location: 'http://www.site.com/' })
+      assert.equal(suggestion.isSimpleDomainNameValue(siteSimple), true)
+    })
+    it('URLs that end in a hash are simple', function () {
+      const siteSimple = Immutable.Map({ location: 'http://www.site.com#' })
+      assert.ok(suggestion.isSimpleDomainNameValue(siteSimple), true)
+    })
   })
 
   describe('shouldNormalizeLocation', function () {

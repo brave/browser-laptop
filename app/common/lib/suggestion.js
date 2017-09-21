@@ -109,8 +109,8 @@ const sortByAccessCountWithAgeDecay = (s1, s2) => {
  */
 const isSimpleDomainNameValue = (site) => isParsedUrlSimpleDomainNameValue(urlParse(getURL(site)))
 const isParsedUrlSimpleDomainNameValue = (parsed) => {
-  if ((parsed.hash === null || parsed.hash === '#') &&
-    parsed.search === null && parsed.query === null && parsed.pathname === '/') {
+  if ((!parsed.hash || parsed.hash === '#') &&
+    !parsed.search && !parsed.query && parsed.pathname === '/') {
     return true
   } else {
     return false
@@ -169,7 +169,7 @@ const shouldNormalizeLocation = (input) => {
 var virtualSite = (sites) => {
   // array of sites without paths or query params
   var simple = sites.filter((parsed) => {
-    return (parsed.hash === null && parsed.search === null && parsed.query === null && parsed.pathname === '/')
+    return (!parsed.hash && !parsed.search && !parsed.query && parsed.pathname === '/')
   })
   // if there are no simple locations then we will build and return one
   if (simple.length === 0) {
