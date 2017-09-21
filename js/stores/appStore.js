@@ -10,7 +10,6 @@ const appDispatcher = require('../dispatcher/appDispatcher')
 const settings = require('../constants/settings')
 const {STATE_SITES} = require('../constants/stateConstants')
 const syncUtil = require('../state/syncUtil')
-const siteSettings = require('../state/siteSettings')
 const electron = require('electron')
 const app = electron.app
 const messages = require('../constants/messages')
@@ -204,7 +203,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/bookmarkToolbarReducer'),
       require('../../app/browser/reducers/siteSettingsReducer'),
       require('../../app/browser/reducers/pageDataReducer'),
-      require('../../app/ledger').doAction,
+      require('../../app/browser/reducers/ledgerReducer'),
       require('../../app/browser/menu')
     ]
     initialized = true
@@ -297,15 +296,6 @@ const handleAppAction = (action) => {
         }
         break
       }
-    case appConstants.APP_UPDATE_LEDGER_INFO:
-      appState = appState.set('ledgerInfo', Immutable.fromJS(action.ledgerInfo))
-      break
-    case appConstants.APP_UPDATE_LOCATION_INFO:
-      appState = appState.set('locationInfo', Immutable.fromJS(action.locationInfo))
-      break
-    case appConstants.APP_UPDATE_PUBLISHER_INFO:
-      appState = appState.set('publisherInfo', Immutable.fromJS(action.publisherInfo))
-      break
     case appConstants.APP_SHOW_NOTIFICATION:
       let notifications = appState.get('notifications')
       notifications = notifications.filterNot((notification) => {
@@ -357,13 +347,6 @@ const handleAppAction = (action) => {
             return notification.get('frameOrigin') === origin
           }))
         }
-      }
-      break
-    case appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED:
-      {
-        const date = new Date().getTime()
-        appState = appState.setIn(['about', 'preferences', 'recoverySucceeded'], action.recoverySucceeded)
-        appState = appState.setIn(['about', 'preferences', 'updatedStamp'], date)
       }
       break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
@@ -601,26 +584,6 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_HIDE_DOWNLOAD_DELETE_CONFIRMATION:
       appState = appState.set('deleteConfirmationVisible', false)
-      break
-    case appConstants.APP_ENABLE_UNDEFINED_PUBLISHERS:
-      const sitesObject = appState.get('siteSettings')
-      Object.keys(action.publishers).map((item) => {
-        const pattern = `https?://${item}`
-        const siteSetting = sitesObject.get(pattern)
-        const result = (siteSetting) && (siteSetting.get('ledgerPayments'))
-
-        if (result === undefined) {
-          let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPayments', true)
-          appState = appState.set('siteSettings', newSiteSettings)
-        }
-      })
-      break
-    case appConstants.APP_CHANGE_LEDGER_PINNED_PERCENTAGES:
-      Object.keys(action.publishers).map((item) => {
-        const pattern = `https?://${item}`
-        let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPinPercentage', action.publishers[item].pinPercentage)
-        appState = appState.set('siteSettings', newSiteSettings)
-      })
       break
     case appConstants.APP_DEFAULT_SEARCH_ENGINE_LOADED:
       appState = appState.set('searchDetail', action.searchDetail)

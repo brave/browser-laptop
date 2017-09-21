@@ -537,17 +537,6 @@ const appActions = {
   },
 
   /**
-   * Updates publisher information for the payments pane
-   * @param {object} publisherInfo - the current publisher synopsis
-   */
-  updatePublisherInfo: function (publisherInfo) {
-    dispatch({
-      actionType: appConstants.APP_UPDATE_PUBLISHER_INFO,
-      publisherInfo
-    })
-  },
-
-  /**
    * Shows a message in the notification bar
    * @param {{message: string, buttons: Array.<string>, frameOrigin: string, options: Object}} detail
    */
@@ -1113,30 +1102,6 @@ const appActions = {
   defaultDownloadPath: function () {
     dispatch({
       actionType: appConstants.APP_DOWNLOAD_DEFAULT_PATH
-    })
-  },
-
-  /**
-
-   * Change all undefined publishers in site settings to defined sites
-   * also change all undefined ledgerPayments to value true
-   * @param publishers {Object} publishers from the synopsis
-   */
-  enableUndefinedPublishers: function (publishers) {
-    dispatch({
-      actionType: appConstants.APP_ENABLE_UNDEFINED_PUBLISHERS,
-      publishers
-    })
-  },
-
-  /**
-   * Update ledger publishers pinned percentages according to the new synopsis
-   * @param publishers {Object} updated publishers
-   */
-  changeLedgerPinnedPercentages: function (publishers) {
-    dispatch({
-      actionType: appConstants.APP_CHANGE_LEDGER_PINNED_PERCENTAGES,
-      publishers
     })
   },
 

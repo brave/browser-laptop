@@ -29,7 +29,6 @@ const siteSettingsReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_CHANGE_SITE_SETTING:
       {
-        console.log('appStore')
         let propertyName = action.get('temporary') ? 'temporarySiteSettings' : 'siteSettings'
         let newSiteSettings = siteSettings.mergeSiteSetting(state.get(propertyName), action.get('hostPattern'), action.get('key'), action.get('value'))
         if (action.get('skipSync')) {

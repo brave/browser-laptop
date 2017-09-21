@@ -175,8 +175,70 @@ AppStore
     }
   },
   ledger: {
+    info: {
+      address: string, // the BTC wallet address (in base58)
+      amount: number, // fiat amount to contribute per reconciliation period
+      balance: string, // confirmed balance in BTC.toFixed(4)
+      bravery: {
+        fee: {
+          amount: number, // set from `amount` above
+          currency: string // set from `currency` above
+        }
+      }, // values round-tripped through the ledger-client
+      btc: string, // BTC to contribute per reconciliation period
+      buyURL: string, // URL to buy bitcoin using debit/credit card
+      countryCode: string, // ISO3166 2-letter code for country of browser's location
+      created: boolean, // wallet is created
+      creating: boolean, // wallet is being created
+      currency: string, // fiat currency denominating the amount
+      error: {
+        caller: string, // function in which error was handled
+        error: object  // error object returned
+      }, // non-null if the last updateLedgerInfo happened concurrently with an error
+      exchangeInfo: {
+        exchangeName: string,  // the name of the BTC exchange
+        exchangeURL: string // the URL of the BTC exchange
+      }, // information about the corresponding "friendliest" BTC exchange (suggestions welcome!)
+      hasBitcoinHandler: boolean, // brave browser has a `bitcoin:` URI handler
+      passphrase: string, // the BTC wallet passphrase
+      paymentIMG: string, // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
+      paymentURL: string, // bitcoin:...?amount={btc}&label=Brave%20Software
+      reconcileFrequency: number, // duration between each reconciliation in days
+      reconcileStamp: number, // timestamp for the next reconcilation
+      recoverySucceeded: boolean, // the status of an attempted recovery
+      satoshis: number, // confirmed balance as an integer number of satoshis
+      transactions: [{
+        ballots: {
+          [publisher]: number // e.g., "wikipedia.org": 3
+        }, // number of ballots cast for each publisher
+        contribution: {
+          fee: number, // bitcoin transaction fee
+          fiat: {
+            amount: number, // e.g., 5
+            currency: string // e.g., "USD"
+          }, // roughly-equivalent fiat amount
+          rates: {
+            [currency]: number //e.g., { "USD": 575.45 }
+          },  // exchange rate
+          satoshis: number, // actual number of satoshis transferred
+        },
+        count: number, // total number of ballots allowed to be cast
+        submissionStamp: number, // timestamp for this contribution
+        viewingId: string, // UUIDv4 for this contribution
+      }], // contributions reconciling/reconciled
+      unconfirmed: string // unconfirmed balance in BTC.toFixed(4)
+    },
     isBooting: boolean, // flag which telll us if wallet is still creating or not
     isQuiting: boolan, // flag which tell us if we are closing ledger (because of browser close) 
+    locations: {
+      [url]: {
+        publisher: string, // url of the publisher in question
+        verified: boolean, // wheter or not site is a verified publisher
+        exclude: boolean, // wheter or not site is in the excluded list
+        stickyP: boolean, // wheter or not site was added using addFunds urlbar toggle
+        timestamp: number // timestamp in milliseconds
+      }
+    }
     synopsis: {
       options: {
         emptyScores: {
@@ -207,51 +269,19 @@ AppStore
             visits: number
           },
           visits: number,
-          weight: number
+          weight: number,
+          window: [{
+            timestamp: number,
+            visits: number,
+            duration: number,
+            scores: {
+              concave: number,
+              visits: number
+            }
+          }]
         }
       }
-    },
-    creating: boolean,
-    created: boolan,
-    reconcileFrequency: number,
-    reconcileStamp: number,    
-    address: string, // Bitcoin wallet address
-  
-    // Bitcoin wallet balance (truncated BTC and satoshis)
-    balance: undefined,
-    unconfirmed: undefined,
-    satoshis: undefined,
-  
-    // the desired contribution (the btc value approximates the amount/currency designation)
-    btc: undefined,
-    amount: undefined,
-    currency: undefined,
-  
-    paymentURL: undefined,
-    buyURL: undefined,
-    bravery: undefined,
-  
-    // wallet credentials
-    paymentId: undefined,
-    passphrase: undefined,
-  
-    // advanced ledger settings
-    minPublisherDuration: undefined,
-    minPublisherVisits: undefined,
-    showOnlyVerified: undefined,
-  
-    hasBitcoinHandler: false,
-  
-    // geoIP/exchange information
-    countryCode: undefined,
-    exchangeInfo: undefined,
-  
-    _internal: {
-      exchangeExpiry: 0,
-      exchanges: {},
-      geoipExpiry: 0
-    },
-    error: null // TODO we don't need it anymore
+    }
   },
   menu: {
     template: object // used on Windows and by our tests: template object with Menubar control
@@ -684,59 +714,6 @@ WindowStore
     type: number
   },
   lastAppVersion: string, // version of the last file that was saved
-  ledgerInfo: {
-    address: string, // the BTC wallet address (in base58)
-    amount: number, // fiat amount to contribute per reconciliation period
-    balance: string, // confirmed balance in BTC.toFixed(4)
-    bravery: {
-      fee: {
-        amount: number, // set from `amount` above
-        currency: string // set from `currency` above
-      }
-    }, // values round-tripped through the ledger-client
-    btc: string, // BTC to contribute per reconciliation period
-    buyURL: string, // URL to buy bitcoin using debit/credit card
-    countryCode: string, // ISO3166 2-letter code for country of browser's location
-    created: boolean, // wallet is created
-    creating: boolean, // wallet is being created
-    currency: string, // fiat currency denominating the amount
-    error: {
-      caller: string, // function in which error was handled
-      error: object  // error object returned
-    }, // non-null if the last updateLedgerInfo happened concurrently with an error
-    exchangeInfo: {
-      exchangeName: string,  // the name of the BTC exchange
-      exchangeURL: string // the URL of the BTC exchange
-    }, // information about the corresponding "friendliest" BTC exchange (suggestions welcome!)
-    hasBitcoinHandler: boolean, // brave browser has a `bitcoin:` URI handler
-    passphrase: string, // the BTC wallet passphrase
-    paymentIMG: string, // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
-    paymentURL: string, // bitcoin:...?amount={btc}&label=Brave%20Software
-    reconcileFrequency: number, // duration between each reconciliation in days
-    reconcileStamp: number, // timestamp for the next reconcilation
-    recoverySucceeded: boolean, // the status of an attempted recovery
-    satoshis: number, // confirmed balance as an integer number of satoshis
-    transactions: [{
-      ballots: {
-        [publisher]: number // e.g., "wikipedia.org": 3
-      }, // number of ballots cast for each publisher
-      contribution: {
-        fee: number, // bitcoin transaction fee
-        fiat: {
-          amount: number, // e.g., 5
-          currency: string // e.g., "USD"
-        }, // roughly-equivalent fiat amount
-        rates: {
-          [currency]: number //e.g., { "USD": 575.45 }
-        },  // exchange rate
-        satoshis: number, // actual number of satoshis transferred
-      },
-      count: number, // total number of ballots allowed to be cast
-      submissionStamp: number, // timestamp for this contribution
-      viewingId: string, // UUIDv4 for this contribution
-    }], // contributions reconciling/reconciled
-    unconfirmed: string // unconfirmed balance in BTC.toFixed(4)
-  },
   modalDialogDetail: {
     [className]: {
       object // props
@@ -752,15 +729,6 @@ WindowStore
     top: number // the top position of the popup window
   },
   previewFrameKey: number,
-  locationInfo: {
-    [url]: {
-      publisher: string, // url of the publisher in question
-      verified: boolean, // wheter or not site is a verified publisher
-      exclude: boolean, // wheter or not site is in the excluded list
-      stickyP: boolean, // wheter or not site was added using addFunds urlbar toggle
-      timestamp: number // timestamp in milliseconds
-    }
-  },
   searchResults: array, // autocomplete server results if enabled
   ui: {
     bookmarksToolbar: {
