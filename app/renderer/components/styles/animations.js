@@ -20,7 +20,19 @@ const opacityIncreaseKeyframes = {
   }
 }
 
+// TODO: this could be a function with param included
+// to which property should be changed
+const widthIncreaseKeyframes = (start, end) => ({
+  'from': {
+    width: start
+  },
+  'to': {
+    width: end
+  }
+})
+
 module.exports = {
   spinKeyframes,
-  opacityIncreaseKeyframes
+  opacityIncreaseKeyframes,
+  widthIncreaseKeyframes
 }

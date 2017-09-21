@@ -249,17 +249,11 @@ const windowActions = {
     })
   },
 
-  /**
-   * Dispatches a message to the store to set the tab breakpoint.
-   *
-   * @param {Object} frameKey - the frame key for the webview in question.
-   * @param {string} breakpoint - the tab breakpoint to change to
-   */
-  setTabBreakpoint: function (frameKey, breakpoint) {
+  setTabIntersectionState: function (frameKey, ratio) {
     dispatch({
-      actionType: windowConstants.WINDOW_SET_TAB_BREAKPOINT,
+      actionType: windowConstants.WINDOW_SET_TAB_CONTENT_INTERSECTION_STATE,
       frameKey,
-      breakpoint
+      ratio
     })
   },
 

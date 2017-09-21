@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   notificationBar__notificationItem: {
     backgroundColor: globalStyles.color.notificationItemColor,
     boxSizing: 'border-box',
-    borderTop: `1px solid ${globalStyles.color.tabsToolbarBorderColor}`,
+    boxShadow: `0 -1px 0 ${globalStyles.color.tabsToolbarBorderColor}`,
     lineHeight: '24px',
     padding: '8px 20px'
   },

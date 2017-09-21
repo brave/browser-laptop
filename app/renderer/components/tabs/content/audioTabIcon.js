@@ -3,25 +3,24 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {css} = require('aphrodite/no-important')
-const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
 
-// State
+// State helpers
+const audioState = require('../../../../common/state/tabContentState/audioState')
+const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const tabState = require('../../../../common/state/tabState')
 
 // Actions
 const windowActions = require('../../../../../js/actions/windowActions')
 
-// Utils
-const frameStateUtil = require('../../../../../js/state/frameStateUtil')
-
 // Styles
+const {widthIncreaseKeyframes} = require('../../styles/animations')
 const globalStyles = require('../../styles/global')
-const tabStyles = require('../../styles/tab')
+const {theme} = require('../../styles/theme')
 
 class AudioTabIcon extends React.Component {
   constructor (props) {
@@ -30,42 +29,71 @@ class AudioTabIcon extends React.Component {
   }
 
   get audioIcon () {
-    const isNotMuted = this.props.pageCanPlayAudio && !this.props.audioMuted
-
-    return isNotMuted
+    return this.props.audioPlaying
       ? globalStyles.appIcons.volumeOn
       : globalStyles.appIcons.volumeOff
   }
 
   toggleMute (event) {
     event.stopPropagation()
-    windowActions.setAudioMuted(this.props.frameKey, this.props.tabId, !this.props.audioMuted)
+    windowActions
+      .setAudioMuted(this.props.frameKey, this.props.tabId, this.props.audioPlaying)
   }
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-
-    // AudioIcon will never be created if there is no frameKey, but for consistency
-    // across other components I added teh || Immutable.Map()
-    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
+    const tabId = ownProps.tabId
+    const frameKey = frameStateUtil.getFrameKeyByTabId(currentWindow, tabId)
 
     const props = {}
-    // used in other functions
-    props.frameKey = ownProps.frameKey
-    props.pageCanPlayAudio = !!frame.get('audioPlaybackActive')
-    props.tabId = frame.get('tabId', tabState.TAB_ID_NONE)
-    props.audioMuted = frame.get('audioMuted')
+    props.frameKey = frameKey
+    props.showAudioIcon = audioState.showAudioIcon(currentWindow, frameKey)
+    props.audioPlaying = !audioState.isAudioMuted(currentWindow, frameKey)
+    props.canPlayAudio = audioState.canPlayAudio(currentWindow, frameKey)
+    props.isPinned = tabState.isTabPinned(state, tabId)
+    props.tabId = tabId
 
     return props
   }
 
   render () {
+    if (this.props.isPinned || !this.props.showAudioIcon) {
+      return null
+    }
+
     return <TabIcon
-      className={css(tabStyles.icon, tabStyles.icon_audio)}
+      data-test-id={this.audioIcon}
+      className={css(styles.audioTab__icon)}
       symbol={this.audioIcon}
       onClick={this.toggleMute}
     />
   }
 }
+
+const styles = StyleSheet.create({
+  audioTab__icon: {
+    width: 0,
+    animationName: widthIncreaseKeyframes(0, globalStyles.spacing.iconSize),
+    animationDelay: '50ms',
+    animationTimingFunction: 'linear',
+    animationDuration: '100ms',
+    animationFillMode: 'forwards',
+
+    overflow: 'hidden',
+    margin: '0 -2px 0 2px',
+    zIndex: globalStyles.zindex.zindexTabsAudioTopBorder,
+    color: theme.tab.content.icon.audio.color,
+    fontSize: '13px',
+    height: globalStyles.spacing.iconSize,
+    backgroundSize: globalStyles.spacing.iconSize,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    display: 'flex',
+    alignSelf: 'center',
+    position: 'relative',
+    textAlign: 'center',
+    justifyContent: 'center'
+  }
+})
 
 module.exports = ReduxComponent.connect(AudioTabIcon)
