@@ -72,7 +72,7 @@ class BookmarksToolbar extends React.Component {
       const doc = parser.parseFromString(droppedHTML, 'text/html')
       const a = doc.querySelector('a')
       if (a && a.href) {
-        appActions.addSite({
+        appActions.addBookmark({
           title: a.innerText,
           location: e.dataTransfer.getData('text/plain')
         }, siteTags.BOOKMARK)
@@ -82,7 +82,7 @@ class BookmarksToolbar extends React.Component {
 
     if (e.dataTransfer.files.length > 0) {
       Array.from(e.dataTransfer.items).forEach((item) => {
-        item.getAsString((name) => appActions.addSite({ location: item.type, title: name }, siteTags.BOOKMARK))
+        item.getAsString((name) => appActions.addBookmark({ location: item.type, title: name }, siteTags.BOOKMARK))
       })
       return
     }
@@ -92,7 +92,7 @@ class BookmarksToolbar extends React.Component {
       .map((x) => x.trim())
       .filter((x) => !x.startsWith('#') && x.length > 0)
       .forEach((url) =>
-        appActions.addSite({ location: url }, siteTags.BOOKMARK))
+        appActions.addBookmark({ location: url }, siteTags.BOOKMARK))
   }
 
   onDragEnter (e) {
