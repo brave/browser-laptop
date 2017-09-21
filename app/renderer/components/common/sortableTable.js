@@ -34,9 +34,12 @@ class SortableTable extends React.Component {
     this.sortTable = tableSort(this.table)
     return this.sortTable
   }
-
-  componentDidUpdate () {
-    this.sortTable.refresh()
+  componentDidUpdate (prevProps) {
+    if (this.props.rows &&
+      (!prevProps.rows ||
+      prevProps.rows.length !== this.props.rows.length)) {
+      this.sortTable.refresh()
+    }
   }
   /**
    * If you want multi-select to span multiple tables, you can
@@ -90,14 +93,33 @@ class SortableTable extends React.Component {
     })
   }
   /**
+   * Converts a data-row-index property to an HTML element's rowIndex within the
+   * table. rowIndex changes when the table is sorted.
+   * @param {number} index
+   */
+  rowIndexToHTMLRowIndex (index) {
+    const element = this.table.querySelector(`tr[data-row-index="${index}"]`)
+    return element.rowIndex
+  }
+  /**
+   * Converts an HTML element's rowIndex within the
+   * table to its data-row-index property.
+   * @param {number} index
+   */
+  htmlRowIndexToRowIndex (index) {
+    const element = this.table.rows[index]
+    return parseInt(element.getAttribute('data-row-index'))
+  }
+  /**
    * [Shift + click] can only multi-select within the same table.
+   * @param {number} index - The rowIndex attribute of the row element
    */
   processShiftClick (index) {
     let newSelection = Immutable.Set()
     this.stateOwner.state.selection.forEach((globalIndex) => {
       const tableParts = globalIndex.split('-')
       const tableID = parseInt(tableParts[0])
-      const rowIndex = parseInt(tableParts[1])
+      const rowIndex = this.rowIndexToHTMLRowIndex(parseInt(tableParts[1]))
       if (tableID === this.tableID) {
         let startIndex
         let endIndex
@@ -111,7 +133,7 @@ class SortableTable extends React.Component {
           return
         }
         for (let i = startIndex; i <= endIndex; ++i) {
-          newSelection = newSelection.add(this.getGlobalIndex(i))
+          newSelection = newSelection.add(this.getGlobalIndex(this.htmlRowIndexToRowIndex(i)))
         }
       }
     })
@@ -165,7 +187,7 @@ class SortableTable extends React.Component {
     if (eventUtil.isForSecondaryAction(e)) {
       this.processControlClick(clickedIndex)
     } else if (e.shiftKey) {
-      this.processShiftClick(clickedIndex)
+      this.processShiftClick(targetElement.rowIndex)
     } else {
       this.processClick(clickedIndex)
     }
