@@ -308,7 +308,7 @@ class Main extends React.Component {
   componentWillUpdate (nextProps) {
     if (!this.props.isWidevineReady && nextProps.isWidevineReady) {
       // User may have enabled from preferences and no details are present
-      if (this.props.widevineLocation) {
+      if (!this.props.widevineLocation) {
         return
       }
 

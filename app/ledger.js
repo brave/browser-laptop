@@ -229,6 +229,10 @@ const doAction = (state, action) => {
       break
 
     case appConstants.APP_CHANGE_SITE_SETTING:
+      if (!action.hostPattern) {
+        console.warn('Changing site settings should always have a hostPattern')
+        break
+      }
       i = action.hostPattern.indexOf('://')
       if (i === -1) break
 
