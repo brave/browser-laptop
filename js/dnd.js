@@ -136,7 +136,9 @@ module.exports.prepareBookmarkDataFromCompatible = (dataTransfer) => {
   let bookmark = dndData.getDragData(dataTransfer, dragTypes.BOOKMARK)
   if (!bookmark) {
     const dragData = dndData.getDragData(dataTransfer, dragTypes.TAB)
-    windowActions.onFrameBookmark(dragData.get('tabId'))
+    if (dragData) {
+      windowActions.onFrameBookmark(dragData.get('tabId'))
+    }
   }
   return bookmark
 }
