@@ -190,9 +190,23 @@ app.on('ready', () => {
         appActions.newWindow()
       }
     } else {
-      loadedPerWindowImmutableState.forEach((wndState) => {
-        appActions.newWindow(undefined, undefined, wndState)
-      })
+      loadedPerWindowImmutableState
+        .sort((a, b) => {
+          let comparison = 0
+          const aTime = a.getIn(['windowInfo', 'focusTime'], 0)
+          const bTime = b.getIn(['windowInfo', 'focusTime'], 0)
+
+          if (aTime > bTime) {
+            comparison = 1
+          } else if (aTime < bTime) {
+            comparison = -1
+          }
+
+          return comparison
+        })
+        .forEach((wndState) => {
+          appActions.newWindow(undefined, undefined, wndState)
+        })
     }
     process.emit(messages.APP_INITIALIZED)
 

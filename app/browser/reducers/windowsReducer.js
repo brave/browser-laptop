@@ -278,14 +278,23 @@ const createWindow = (state, action) => {
       const appStore = require('../../../js/stores/appStore')
       win.webContents.setZoomLevel(zoomLevel[toolbarUserInterfaceScale] || 0.0)
 
+      const position = win.getPosition()
+      const size = win.getSize()
+
       const mem = muon.shared_memory.create({
         windowValue: {
           disposition: frameOpts.disposition,
-          id: win.id
+          id: win.id,
+          focused: win.isFocused(),
+          left: position[0],
+          top: position[1],
+          height: size[1],
+          width: size[0]
         },
         appState: appStore.getLastEmittedState().toJS(),
         frames: frames.toJS(),
-        windowState: (restoredImmutableWindowState && restoredImmutableWindowState.toJS()) || undefined})
+        windowState: (restoredImmutableWindowState && restoredImmutableWindowState.toJS()) || undefined
+      })
 
       e.sender.sendShared(messages.INITIALIZE_WINDOW, mem)
       if (action.cb) {
