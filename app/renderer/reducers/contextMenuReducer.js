@@ -95,7 +95,9 @@ const onTabPageMenu = function (state, action) {
   }, {
     label: locale.translation('closeTabPage'),
     click: () => {
-      windowActions.closeFrames(tabPageFrames)
+      tabPageFrames
+        .map((frame) => frame.get('tabId'))
+        .forEach((tabId) => appActions.tabCloseRequested(tabId))
     }
   }]
 
