@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     animationDuration: '200ms',
     animationFillMode: 'forwards',
 
-    zIndex: globalStyles.zindex.zindexWindow,
+    zIndex: globalStyles.zindex.zindexTabsThumbnail,
     boxSizing: 'border-box',
     WebkitMaskRepeat: 'no-repeat',
     WebkitMaskPosition: 'center',

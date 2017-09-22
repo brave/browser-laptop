@@ -10,11 +10,10 @@
   */
   module.exports.theme = {
     tab: {
-      // mimics chrome hover effect
       transition: `
-        background-color 200ms cubic-bezier(0.26, 0.63, 0.39, 0.65),
-        color 200ms cubic-bezier(0.26, 0.63, 0.39, 0.65)
-      `,
+      background-color 150ms cubic-bezier(0.26, 0.63, 0.39, 0.65),
+      color 150ms cubic-bezier(0.26, 0.63, 0.39, 0.65)
+    `,
       background: '#ddd',
       borderColor: '#bbb',
       color: '#5a5a5a',
