@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/* global performance */
+
 const appDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
 const appActions = require('../actions/appActions')
@@ -759,8 +761,17 @@ const doAction = (action) => {
         break
       }
     case windowConstants.WINDOW_ON_WINDOW_UPDATE:
-      windowState = windowState.set('windowInfo', action.windowValue)
-      break
+    case appConstants.APP_WINDOW_READY:
+      {
+        const oldInfo = windowState.get('windowInfo', Immutable.Map())
+        let windowValue = makeImmutable(action.windowValue)
+
+        if (windowValue.get('focused')) {
+          windowValue = windowValue.set('focusTime', performance.timing.navigationStart + performance.now())
+        }
+        windowState = windowState.set('windowInfo', oldInfo.merge(windowValue))
+        break
+      }
     default:
       break
   }

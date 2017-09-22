@@ -182,7 +182,6 @@ const api = {
         LocalShortcuts.register(win)
 
         appActions.windowCreated(windowValue)
-        windowActions.onWindowUpdate(windowId, windowValue)
       })
       win.once('closed', () => {
       })
