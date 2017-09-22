@@ -454,6 +454,10 @@ const tabState = {
     return tabState.getTabPropertyByTabId(state, tabId, 'windowId', windowState.WINDOW_ID_NONE)
   },
 
+  isIncognito: (state, tabId) => {
+    return tabState.getTabPropertyByTabId(state, tabId, 'incognito', false)
+  },
+
   canGoForward: (state, tabId) => {
     try {
       return tabState.getTabPropertyByTabId(state, tabId, 'canGoForward', false)

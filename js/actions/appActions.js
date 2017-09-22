@@ -1631,6 +1631,14 @@ const appActions = {
     })
   },
 
+  enablePepperMenu: function (params, tabId) {
+    dispatch({
+      actionType: appConstants.APP_ENABLE_PEPPER_MENU,
+      params,
+      tabId
+    })
+  },
+
   onPinnedTabReorder: function (siteKey, destinationKey, prepend) {
     dispatch({
       actionType: appConstants.APP_ON_PINNED_TAB_REORDER,

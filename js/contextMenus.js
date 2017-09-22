@@ -425,39 +425,6 @@ function autofillTemplateInit (suggestions, frame) {
   return menuUtil.sanitizeTemplateItems(template)
 }
 
-function flashTemplateInit (frameProps) {
-  const canRunFlash = appStoreRenderer.state.getIn(['flash', 'enabled']) && getSetting(settings.FLASH_INSTALLED)
-  const template = []
-  if (!canRunFlash) {
-    template.push({
-      label: locale.translation('openFlashPreferences'),
-      click: () => {
-        appActions.createTabRequested({
-          url: 'about:preferences#plugins',
-          windowId: frameProps.get('windowId'),
-          active: true
-        })
-      }
-    })
-  } else {
-    template.push({
-      label: locale.translation('allowFlashOnce'),
-      click: () => {
-        appActions.allowFlashOnce(frameProps.get('tabId'), frameProps.get('location'), frameProps.get('isPrivate'))
-      }
-    })
-    if (!frameProps.get('isPrivate')) {
-      template.push({
-        label: locale.translation('allowFlashAlways'),
-        click: () => {
-          appActions.allowFlashAlways(frameProps.get('tabId'), frameProps.get('location'))
-        }
-      })
-    }
-  }
-  return template
-}
-
 function tabTemplateInit (frameProps) {
   const frameKey = frameProps.get('key')
   const tabId = frameProps.get('tabId')
@@ -1305,11 +1272,6 @@ function onMainContextMenu (nodeProps, frame, tab, contextMenuType) {
   }
 }
 
-function onFlashContextMenu (nodeProps, frameProps) {
-  const flashMenu = Menu.buildFromTemplate(flashTemplateInit(frameProps))
-  flashMenu.popup(getCurrentWindow())
-}
-
 function onTabContextMenu (frameProps, e) {
   e.stopPropagation()
   const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
@@ -1405,7 +1367,6 @@ function onReloadContextMenu () {
 
 module.exports = {
   onHamburgerMenu,
-  onFlashContextMenu,
   onMainContextMenu,
   onTabContextMenu,
   onNewTabContextMenu,
