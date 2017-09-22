@@ -142,13 +142,13 @@ const shouldTrackView = (view, responseList) => {
 
 const btcToCurrencyString = (btc, ledgerData) => {
   const balance = Number(btc || 0)
-  const currency = ledgerData.get('currency') || 'USD'
+  const currency = (ledgerData && ledgerData.get('currency')) || 'USD'
 
   if (balance === 0) {
     return `0 ${currency}`
   }
 
-  if (ledgerData.get('btc') && typeof ledgerData.get('amount') === 'number') {
+  if (ledgerData && ledgerData.get('btc') && typeof ledgerData.get('amount') === 'number') {
     const btcValue = ledgerData.get('btc') / ledgerData.get('amount')
     const fiatValue = (balance / btcValue).toFixed(2)
     let roundedValue = Math.floor(fiatValue)
