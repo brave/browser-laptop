@@ -21,6 +21,7 @@ const {getFlashResourceId} = require('../../../js/flash')
 const {l10nErrorText} = require('../../common/lib/httpUtil')
 const Immutable = require('immutable')
 const dragTypes = require('../../../js/constants/dragTypes')
+const flash = require('../../../js/flash')
 const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
 const {isSourceAboutUrl, isTargetAboutUrl, isNavigatableAboutPage} = require('../../../js/lib/appUrlUtil')
 
@@ -340,6 +341,9 @@ const tabsReducer = (state, action, immutableAction) => {
         state = state.setIn(['about', 'welcome', 'showOnLoad'], false)
       }
       break
+    }
+    case appConstants.APP_ENABLE_PEPPER_MENU: {
+      flash.onFlashContextMenu(state, action.get('tabId'))
     }
     case appConstants.APP_DRAG_ENDED: {
       const dragData = state.get('dragData')
