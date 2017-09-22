@@ -160,8 +160,9 @@ const flashMenuTemplateInit = (state, tabId) => {
 
 module.exports.onFlashContextMenu = (state, tabId) => {
   const tab = webContents.fromTabID(tabId)
-  if (!tab)
+  if (!tab) {
     return
+  }
 
   const flashMenu = Menu.buildFromTemplate(flashMenuTemplateInit(state, tabId))
   flashMenu.popup(tab)

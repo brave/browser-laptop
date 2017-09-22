@@ -344,6 +344,7 @@ const tabsReducer = (state, action, immutableAction) => {
     }
     case appConstants.APP_ENABLE_PEPPER_MENU: {
       flash.onFlashContextMenu(state, action.get('tabId'))
+      break
     }
     case appConstants.APP_DRAG_ENDED: {
       const dragData = state.get('dragData')
