@@ -18,18 +18,9 @@ class urlBarFake extends React.Component {
 }
 
 const fakeAppState = Immutable.fromJS({
-  locationInfo: {
-    'https://brave.com': {
-      exclude: false,
-      publisher: 'brave.com',
-      stickyP: false,
-      timestamp: 1496942403068,
-      verified: true
-    }
-  },
-  publisherInfo: {
+  ledger: {
     synopsis: {
-      0: {
+      'brave.com': {
         daysSpent: 0,
         duration: 623405,
         faviconURL: '',
@@ -43,6 +34,15 @@ const fakeAppState = Immutable.fromJS({
         verified: false,
         views: 1,
         weight: 100
+      }
+    },
+    locations: {
+      'https://brave.com': {
+        exclude: false,
+        publisher: 'brave.com',
+        stickyP: false,
+        timestamp: 1496942403068,
+        verified: true
       }
     }
   },

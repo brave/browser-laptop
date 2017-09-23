@@ -338,27 +338,6 @@ const appActions = {
       actionType: appConstants.APP_CLEAR_COMPLETED_DOWNLOADS
     })
   },
-
-  /**
-   * Dispatches a message indicating ledger recovery succeeded
-   */
-  ledgerRecoverySucceeded: function () {
-    dispatch({
-      actionType: appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED,
-      recoverySucceeded: true
-    })
-  },
-
-  /**
-   * Dispatches a message indicating ledger recovery failed
-   */
-  ledgerRecoveryFailed: function () {
-    dispatch({
-      actionType: appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED,
-      recoverySucceeded: false
-    })
-  },
-
   /**
    * Sets the etag value for a downloaded data file.
    * This is used for keeping track of when to re-download adblock and tracking
@@ -511,28 +490,6 @@ const appActions = {
       actionType: appConstants.APP_SET_SKIP_SYNC,
       path,
       skipSync
-    })
-  },
-
-  /**
-   * Updates ledger information for the payments pane
-   * @param {object} ledgerInfo - the current ledger state
-   */
-  updateLedgerInfo: function (ledgerInfo) {
-    dispatch({
-      actionType: appConstants.APP_UPDATE_LEDGER_INFO,
-      ledgerInfo
-    })
-  },
-
-  /**
-   * Updates location information for the URL bar
-   * @param {object} locationInfo - the current location synopsis
-   */
-  updateLocationInfo: function (locationInfo) {
-    dispatch({
-      actionType: appConstants.APP_UPDATE_LOCATION_INFO,
-      locationInfo
     })
   },
 
@@ -1608,6 +1565,130 @@ const appActions = {
       actionType: appConstants.APP_ENABLE_PEPPER_MENU,
       params,
       tabId
+    })
+  },
+
+  onFavIconReceived: function (publisherKey, blob) {
+    dispatch({
+      actionType: appConstants.APP_ON_FAVICON_RECEIVED,
+      publisherKey,
+      blob
+    })
+  },
+
+  onPublisherOptionUpdate: function (publisherKey, prop, value, saveIntoSettings = false) {
+    dispatch({
+      actionType: appConstants.APP_ON_PUBLISHER_OPTION_UPDATE,
+      publisherKey,
+      prop,
+      value,
+      saveIntoSettings
+    })
+  },
+
+  onLedgerLocationUpdate: function (location, prop, value) {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_LOCATION_UPDATE,
+      location,
+      prop,
+      value
+    })
+  },
+
+  onLedgerWalletCreate: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_WALLET_CREATE
+    })
+  },
+
+  onBootStateFile: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_BOOT_STATE_FILE
+    })
+  },
+
+  onLedgerBalanceReceived: function (unconfirmed) {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_BALANCE_RECEIVED,
+      unconfirmed
+    })
+  },
+
+  onWalletProperties: function (body) {
+    dispatch({
+      actionType: appConstants.APP_ON_WALLET_PROPERTIES,
+      body
+    })
+  },
+
+  ledgerPaymentsPresent: function (tabId, present) {
+    dispatch({
+      actionType: appConstants.APP_LEDGER_PAYMENTS_PRESENT,
+      tabId,
+      present
+    })
+  },
+
+  onAddFoundsClosed: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_ADD_FUNDS_CLOSED
+    })
+  },
+
+  onWalletRecovery: function (error, result) {
+    dispatch({
+      actionType: appConstants.APP_ON_WALLET_RECOVERY,
+      error,
+      result
+    })
+  },
+
+  onBraveryProperties: function (error, result) {
+    dispatch({
+      actionType: appConstants.APP_ON_BRAVERY_PROPERTIES,
+      error,
+      result
+    })
+  },
+
+  onLedgerFirstSync: function (parsedData) {
+    dispatch({
+      actionType: appConstants.APP_ON_FIRST_LEDGER_SYNC,
+      parsedData
+    })
+  },
+
+  onLedgerCallback: function (result, delayTime) {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_CALLBACK,
+      result,
+      delayTime
+    })
+  },
+
+  onTimeUntilReconcile: function (stateResult) {
+    dispatch({
+      actionType: appConstants.APP_ON_TIME_UNTIL_RECONCILE,
+      stateResult
+    })
+  },
+
+  onLedgerRun: function (delay) {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_RUN,
+      delay
+    })
+  },
+
+  onNetworkConnected: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_NETWORK_CONNECTED
+    })
+  },
+
+  resetRecoverStatus: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_RESET_RECOVERY_STATUS
     })
   },
 

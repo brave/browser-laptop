@@ -33,21 +33,26 @@ const pageDataState = {
       url,
       tabId
     })
+    state = state.setIn(['pageData', 'last', 'url'], url)
     return state.setIn(['pageData', 'view'], pageViewEvent)
   },
 
   addInfo: (state, data) => {
-    data = makeImmutable(data)
-
     if (data == null) {
       return state
     }
+
+    data = makeImmutable(data)
 
     const key = pageDataUtil.getInfoKey(data.get('url'))
 
     data = data.set('key', key)
     state = state.setIn(['pageData', 'last', 'info'], key)
     return state.setIn(['pageData', 'info', key], data)
+  },
+
+  resetInfo: (state) => {
+    return state.setIn(['pageData', 'last', 'info'], '')
   },
 
   addLoad: (state, data) => {
@@ -64,11 +69,15 @@ const pageDataState = {
     return state.getIn(['pageData', 'view']) || Immutable.Map()
   },
 
+  getLastUrl: (state) => {
+    return state.getIn(['pageData', 'last', 'url'])
+  },
+
   getLastInfo: (state) => {
     const key = state.getIn(['pageData', 'last', 'info'])
 
     if (key == null) {
-      Immutable.Map()
+      return Immutable.Map()
     }
 
     return state.getIn(['pageData', 'info', key], Immutable.Map())
@@ -92,6 +101,16 @@ const pageDataState = {
     }
 
     return state.setIn(['pageData', 'info', key, 'publisher'], publisher)
+  },
+
+  resetPageData: (state) => {
+    return state
+      .setIn(['pageData', 'load'], Immutable.List())
+      .setIn(['pageData', 'info'], Immutable.Map())
+      .setIn(['pageData', 'view'], Immutable.Map())
+      .setIn(['pageData', 'last', 'info'], null)
+      .setIn(['pageData', 'last', 'url'], null)
+      .setIn(['pageData', 'last', 'tabId'], null)
   }
 }
 

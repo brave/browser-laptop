@@ -96,6 +96,7 @@ describe('pageDataReducer unit tests', function () {
 
       const expectedState = state
         .setIn(['pageData', 'last', 'tabId'], 1)
+        .setIn(['pageData', 'last', 'url'], 'https://brave.com')
         .setIn(['pageData', 'view'], Immutable.fromJS({
           timestamp: 0,
           url: 'https://brave.com',
@@ -133,6 +134,7 @@ describe('pageDataReducer unit tests', function () {
 
       const expectedState = state
         .setIn(['pageData', 'last', 'tabId'], null)
+        .setIn(['pageData', 'last', 'url'], null)
         .setIn(['pageData', 'view'], Immutable.fromJS({
           timestamp: 0,
           url: null,
@@ -181,6 +183,7 @@ describe('pageDataReducer unit tests', function () {
 
       const expectedState = state
         .setIn(['pageData', 'last', 'tabId'], null)
+        .setIn(['pageData', 'last', 'url'], null)
         .setIn(['pageData', 'view'], Immutable.fromJS({
           timestamp: 0,
           url: null,
@@ -207,6 +210,7 @@ describe('pageDataReducer unit tests', function () {
 
       const expectedState = state
         .setIn(['pageData', 'last', 'tabId'], null)
+        .setIn(['pageData', 'last', 'url'], null)
         .setIn(['pageData', 'view'], Immutable.fromJS({
           timestamp: 0,
           url: null,
@@ -286,6 +290,7 @@ describe('pageDataReducer unit tests', function () {
 
       const expectedState = state
         .setIn(['pageData', 'last', 'tabId'], 1)
+        .setIn(['pageData', 'last', 'url'], 'https://brave.com')
         .setIn(['pageData', 'view'], Immutable.fromJS({
           timestamp: 0,
           url: 'https://brave.com',
@@ -317,6 +322,7 @@ describe('pageDataReducer unit tests', function () {
 
       const expectedState = newState
         .setIn(['pageData', 'last', 'tabId'], 1)
+        .setIn(['pageData', 'last', 'url'], 'https://brave.com')
         .setIn(['pageData', 'view'], Immutable.fromJS({
           timestamp: 0,
           url: 'https://brave.com',

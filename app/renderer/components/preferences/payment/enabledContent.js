@@ -23,10 +23,12 @@ const globalStyles = require('../../styles/global')
 const {paymentStylesVariables} = require('../../styles/payment')
 const cx = require('../../../../../js/lib/classSet')
 
+// Actions
+const appActions = require('../../../../../js/actions/appActions')
+
 // other
 const getSetting = require('../../../../../js/settings').getSetting
 const settings = require('../../../../../js/constants/settings')
-const aboutActions = require('../../../../../js/about/aboutActions')
 
 // TODO: report when funds are too low
 // TODO: support non-USD currency
@@ -67,7 +69,7 @@ class EnabledContent extends ImmutableComponent {
   createWallet () {
     const ledgerData = this.props.ledgerData
     if (!ledgerData.get('created')) {
-      aboutActions.createWallet()
+      appActions.onLedgerWalletCreate()
     }
 
     return () => {}

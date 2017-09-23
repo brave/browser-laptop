@@ -14,7 +14,7 @@ const pageDataState = require('../../common/state/pageDataState')
 
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
-const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
+const {isSourceAboutUrl, getTargetAboutUrl} = require('../../../js/lib/appUrlUtil')
 const {responseHasContent} = require('../../common/lib/httpUtil')
 
 const pageDataReducer = (state, action, immutableAction) => {
@@ -68,7 +68,8 @@ const pageDataReducer = (state, action, immutableAction) => {
           }
 
           const responseCode = action.getIn(['details', 'httpResponseCode'])
-          if (isSourceAboutUrl(pageUrl) || !responseHasContent(responseCode)) {
+          const isNewTab = getTargetAboutUrl('about:new-tab') === pageUrl
+          if (isSourceAboutUrl(pageUrl) || isNewTab || !responseHasContent(responseCode)) {
             break
           }
 

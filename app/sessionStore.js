@@ -967,6 +967,18 @@ module.exports.defaultAppState = () => {
       },
       load: [],
       view: {}
+    },
+    ledger: {
+      about: {
+        synopsis: [],
+        synopsisOptions: {}
+      },
+      info: {},
+      locations: {},
+      synopsis: {
+        options: {},
+        publishers: {}
+      }
     }
   }
 }

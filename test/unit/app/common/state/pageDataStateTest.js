@@ -88,6 +88,7 @@ describe('pageDataState unit tests', function () {
       const result = pageDataState.addView(state)
       const expectedResult = state
         .setIn(['pageData', 'last', 'tabId'], null)
+        .setIn(['pageData', 'last', 'url'], null)
         .setIn(['pageData', 'view'], Immutable.fromJS({
           timestamp: now.getTime(),
           url: null,
@@ -103,11 +104,11 @@ describe('pageDataState unit tests', function () {
           url: 'https://brave.com',
           tabId: 1
         }))
-      const result = pageDataState.addView(state, 'https://brave.com', 1)
+      const result = pageDataState.addView(newState, 'https://brave.com', 1)
       const expectedResult = newState
         .setIn(['pageData', 'last', 'tabId'], 1)
 
-      assert.deepEqual(result, expectedResult)
+      assert.deepEqual(result.toJS(), expectedResult.toJS())
     })
 
     it('url is private', function () {
@@ -116,6 +117,7 @@ describe('pageDataState unit tests', function () {
       const result = pageDataState.addView(state, 'https://brave.com', 1)
       const expectedResult = state
         .setIn(['pageData', 'last', 'tabId'], 1)
+        .setIn(['pageData', 'last', 'url'], null)
         .setIn(['pageData', 'view'], Immutable.fromJS({
           timestamp: now.getTime(),
           url: null,
@@ -129,6 +131,7 @@ describe('pageDataState unit tests', function () {
       const result = pageDataState.addView(state, 'about:history', 1)
       const expectedResult = state
         .setIn(['pageData', 'last', 'tabId'], 1)
+        .setIn(['pageData', 'last', 'url'], null)
         .setIn(['pageData', 'view'], Immutable.fromJS({
           timestamp: now.getTime(),
           url: null,
@@ -142,6 +145,7 @@ describe('pageDataState unit tests', function () {
       const result = pageDataState.addView(state, 'https://brave.com', 1)
       const expectedResult = state
         .setIn(['pageData', 'last', 'tabId'], 1)
+        .setIn(['pageData', 'last', 'url'], 'https://brave.com')
         .setIn(['pageData', 'view'], Immutable.fromJS({
           timestamp: now.getTime(),
           url: 'https://brave.com',
