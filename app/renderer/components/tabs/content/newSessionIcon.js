@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     animationDuration: '200ms',
     animationFillMode: 'forwards',
 
-    zIndex: globalStyles.zindex.zindexWindow,
+    zIndex: globalStyles.zindex.zindexTabsThumbnail,
     boxSizing: 'border-box',
     display: 'flex',
     alignItems: 'center',
