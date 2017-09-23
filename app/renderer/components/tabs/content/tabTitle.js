@@ -35,6 +35,7 @@ class TabTitle extends React.Component {
     props.displayTitle = titleState.getDisplayTitle(currentWindow, frameKey)
     props.addExtraGutter = tabUIState.addExtraGutterToTitle(currentWindow, frameKey)
     props.isTextWhite = tabUIState.checkIfTextColor(currentWindow, frameKey, 'white')
+    props.gradientColor = tabUIState.getTabEndIconBackgroundColor(currentWindow, frameKey)
     props.tabId = tabId
 
     return props
@@ -44,10 +45,18 @@ class TabTitle extends React.Component {
     if (this.props.isPinned || !this.props.showTabTitle) {
       return null
     }
+    const perPageGradient = StyleSheet.create({
+      tab__title_gradient: {
+        '::after': {
+          background: this.props.gradientColor
+        }
+      }
+    })
 
     return <div data-test-id='tabTitle'
       className={css(
         styles.tab__title,
+        !this.props.isPinned && perPageGradient.tab__title_gradient,
         this.props.addExtraGutter && styles.tab__title_extraGutter,
         (this.props.isDarwin && this.props.isTextWhite) && styles.tab__title_isDarwin,
         // Windows specific style
@@ -71,7 +80,21 @@ const styles = StyleSheet.create({
     lineHeight: '1.6',
     minWidth: 0, // see https://stackoverflow.com/a/36247448/4902448
     marginLeft: '4px',
-    overflow: 'hidden'
+    overflow: 'hidden',
+
+    // this enable us to have gradient text
+    '::after': {
+      zIndex: globalStyles.zindex.zindexTabs,
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      right: 0,
+      width: '-webkit-fill-available',
+      height: '-webkit-fill-available',
+      // add a pixel margin so the box-shadow of the
+      // webview is not covered by the gradient
+      marginBottom: '1px'
+    }
   },
 
   tab__title_isDarwin: {

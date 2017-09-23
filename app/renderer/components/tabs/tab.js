@@ -266,7 +266,6 @@ class Tab extends React.Component {
     props.partOfFullPageSet = partOfFullPageSet
     props.showAudioTopBorder = audioState.showAudioTopBorder(currentWindow, frameKey, isPinned)
     props.centralizeTabIcons = tabUIState.centralizeTabIcons(currentWindow, frameKey, isPinned)
-    props.gradientColor = tabUIState.getTabEndIconBackgroundColor(currentWindow, frameKey)
 
     // used in other functions
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
@@ -285,13 +284,6 @@ class Tab extends React.Component {
         ':hover': {
           color: this.props.themeColor ? getTextColorForBackground(this.props.themeColor) : 'inherit',
           background: this.props.themeColor ? this.props.themeColor : 'inherit'
-        }
-      }
-    })
-    const perPageGradient = StyleSheet.create({
-      tab_gradient: {
-        '::after': {
-          background: this.props.gradientColor
         }
       }
     })
@@ -319,7 +311,6 @@ class Tab extends React.Component {
         ref={(node) => { this.tabNode = node }}
         className={css(
           styles.tab,
-          !this.props.isPinnedTab && perPageGradient.tab_gradient,
           // Windows specific style
           isWindows && styles.tab_forWindows,
           this.props.isPinnedTab && styles.tab_pinned,
@@ -379,17 +370,6 @@ const styles = StyleSheet.create({
 
     ':hover': {
       background: theme.tab.hover.background
-    },
-
-    // this enable us to have gradient text
-    '::after': {
-      zIndex: globalStyles.zindex.zindexTabs,
-      content: '""',
-      position: 'absolute',
-      bottom: 0,
-      right: 0,
-      width: '-webkit-fill-available',
-      height: '-webkit-fill-available'
     }
   },
 
