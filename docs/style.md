@@ -134,10 +134,16 @@ const styles = require('./something')
 
 We make use of BEM for our styles, being the only difference is that we replace `--` (double dash) with `__` (double underline).
 
+[Robin Rendle](https://css-tricks.com/bem-101/#article-header-id-0) points out these reasons why we should consider BEM:
+
+> 1. If we want to make a new style of a component, we can easily see which modifiers and children already exist. We might even realize we don't need to write any CSS in the first place because there is a pre-existing modifier that does what we need.
+> 2. If we are reading the markup instead of CSS, we should be able to quickly get an idea of which element depends on another (in the previous example we can see that .btn__price depends on .btn, even if we don't know what that does just yet.)
+> 3. Designers and developers can consistently name components for easier communication between team members. In other words, BEM gives everyone on a project a declarative syntax that they can share so that they're on the same page.
+
 Decision to make use of BEM took the following considerations:
 
-1. Following BEM should avoid visual regressions nicely;
-2. It follows a simple set of rules that once learned makes code easier to follow and make changes. Turns out that the naming convention adopted by BEM fits very well with parsed names set by Aphrodite, which makes the code easier to follow even after parsed by Aphrodite;
+1. Following BEM should avoid visual regressions nicely.
+2. It follows a simple set of rules that once learned makes code easier to follow and make changes. Turns out that the naming convention adopted by BEM fits very well with parsed names set by Aphrodite, which makes the code easier to follow even after parsed by Aphrodite.
 3. Reduces style conflicts by keeping CSS specificity to a minimum level. Even with Aphrodite, there's a small (but worth considering) chance that some parsed style could conflict with other style with the same name. Naming convention set by BEM can reduce even more the risk.
 
 Below an overview of our practices, given `<BrowserButton>` component:
@@ -185,6 +191,18 @@ styles = StyleSheet.create({
     color: 'blue'
   }
 })
+```
+
+Hint: BEM defines relationship between blocks and elements with `__`, so you do not have to include `Wrapper` or `Component` in the name.
+
+**Bad**
+```js
+component_someModifer__componentBody__componentChild__componentInnerDiv_componentInnerDivText
+```
+
+**Good**
+```js
+component_modifer__body__child__inner_text
 ```
 
 ### Styles are the last thing
