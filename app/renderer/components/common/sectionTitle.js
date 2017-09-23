@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   sectionTitleWrapper: {
     marginBottom: '0.7rem',
     display: 'flex',
-    alignItems: 'flex-end'
+    alignItems: 'baseline'
   },
 
   sectionTitle: {

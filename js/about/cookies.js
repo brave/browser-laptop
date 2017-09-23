@@ -9,6 +9,13 @@ const messages = require('../constants/messages')
 const moment = require('moment')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
+
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
+const {
+  SectionTitleWrapper,
+  AboutPageSectionTitle
+} = require('../../app/renderer/components/common/sectionTitle')
 
 require('../../less/about/common.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
@@ -45,7 +52,6 @@ class AboutCookies extends React.Component {
   get cookiesTable () {
     return <SortableTable
       fillAvailable
-      className={css(styles.cookieTable)}
       headings={COOKIE_FIELDS}
       defaultHeading='domain'
       addHoverClass
@@ -80,20 +86,29 @@ class AboutCookies extends React.Component {
   }
 
   render () {
-    return <div className={css(styles.cookiesPage)}>
-      <div className={css(styles.cookiesTitleWrapper)}>
-        <h1 data-l10n-id='cookiesTitle' className={css(styles.cookiesTitle)} />
-        <span className='fa fa-info-circle infoCircle' onClick={
-          aboutActions.createTabRequested.bind(null, {
-            url: INFO_URL
-          })
-        } />
+    return <section className={css(styles.cookiesPage)}>
+      <div className={css(styles.cookiesPage__header)}>
+        <SectionTitleWrapper>
+          <AboutPageSectionTitle data-l10n-id='cookiesTitle' />
+          <BrowserButton
+            iconOnly
+            iconClass={globalStyles.appIcons.moreInfo}
+            size='16px'
+            custom={styles.cookiesPage__header__info}
+            onClick={
+              aboutActions.createTabRequested.bind(null, {
+                url: INFO_URL
+              })
+            }
+          />
+        </SectionTitleWrapper>
         {
           this.isCookiesEmpty
             ? null
-            : <span className={css(styles.clearCookiesLink)}
+            : <span className={css(styles.cookiesPage__header__clearCookiesLink)}
               data-l10n-id='clearCookies'
-              onClick={aboutActions.removeCookies.bind(null, null)} />
+              onClick={aboutActions.removeCookies.bind(null, null)}
+            />
         }
       </div>
       {
@@ -101,7 +116,7 @@ class AboutCookies extends React.Component {
           ? <div data-l10n-id='noCookiesSaved' />
           : this.cookiesTable
       }
-    </div>
+    </section>
   }
 }
 
@@ -110,26 +125,29 @@ const styles = StyleSheet.create({
     userSelect: 'none',
     margin: '20px'
   },
-  clearCookiesLink: {
+
+  cookiesPage__header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+
+  cookiesPage__header__info: {
+    marginLeft: '.5rem',
+    cursor: 'pointer'
+  },
+
+  cookiesPage__header__clearCookiesLink: {
     color: 'grey',
     cursor: 'pointer',
-    marginTop: '5px',
-    float: 'right',
-    textDecoration: 'underline'
+    textDecoration: 'underline',
+
+    // Add the same margin-bottom as sectionTitleWrapper (See sectionTitle.js)
+    marginBottom: '.7rem'
   },
-  cookiesTitle: {
-    display: 'inline',
-    userSelect: 'text',
-    marginRight: '10px'
-  },
-  cookiesTitleWrapper: {
-    marginBottom: '20px'
-  },
-  cookieTable: {
-    width: '100%'
-  },
+
   cookieColumn: {
-    maxWidth: '350px',
+    maxWidth: '250px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap'
