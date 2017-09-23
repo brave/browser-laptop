@@ -14,7 +14,9 @@ const settings = require('../../../js/constants/settings')
 const ledgerState = require('../../common/state/ledgerState')
 
 // Utils
-const ledgerUtil = require('../../common/lib/ledgerUtil')
+const ledgerApi = require('../../browser/api/ledger')
+const siteSettings = require('../../common/state/siteSettingsState')
+const urlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
 
@@ -26,30 +28,19 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = state.setIn(['ledger', 'info'], action.get('ledgerInfo'))
         break
       }
-    // TODO refactor
-    case appConstants.APP_UPDATE_LOCATION_INFO:
-      {
-        state = state.setIn(['ledger', 'locations'], action.get('locationInfo'))
-        break
-      }
-    case appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED:
-      {
-        state = ledgerState.setRecoveryStatus(state, action.get('recoverySucceeded'))
-        break
-      }
     case appConstants.APP_SET_STATE:
       {
-        state = ledgerUtil.init(state)
+        state = ledgerApi.init(state)
         break
       }
     case appConstants.APP_BACKUP_KEYS:
       {
-        ledgerUtil.backupKeys(state, action.get('backupAction'))
+        ledgerApi.backupKeys(state, action.get('backupAction'))
         break
       }
     case appConstants.APP_RECOVER_WALLET:
       {
-        state = ledgerUtil.recoverKeys(
+        state = ledgerApi.recoverKeys(
           state,
           action.get('useRecoveryKeyFile'),
           action.get('firstRecoveryKey'),
@@ -59,7 +50,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_SHUTTING_DOWN:
       {
-        state = ledgerUtil.quit(state)
+        state = ledgerApi.quit(state)
         break
       }
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
@@ -75,8 +66,8 @@ const ledgerReducer = (state, action, immutableAction) => {
     // TODO not sure that we use APP_IDLE_STATE_CHANGED anymore
     case appConstants.APP_IDLE_STATE_CHANGED:
       {
-        state = ledgerUtil.pageDataChanged(state)
-        ledgerUtil.addVisit('NOOP', underscore.now(), null)
+        state = ledgerApi.pageDataChanged(state)
+        ledgerApi.addVisit('NOOP', underscore.now(), null)
         break
       }
     case appConstants.APP_CHANGE_SETTING:
@@ -84,20 +75,21 @@ const ledgerReducer = (state, action, immutableAction) => {
         switch (action.get('key')) {
           case settings.PAYMENTS_ENABLED:
             {
-              state = ledgerUtil.initialize(state, action.get('value'))
+              state = ledgerApi.initialize(state, action.get('value'))
               break
             }
           case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
             {
-              ledgerUtil.setPaymentInfo(action.get('value'))
+              ledgerApi.setPaymentInfo(action.get('value'))
               break
             }
           case settings.PAYMENTS_MINIMUM_VISIT_TIME:
             {
               const value = action.get('value')
               if (value <= 0) break
-              ledgerUtil.synopsis.options.minPublisherDuration = action.value
+              ledgerApi.saveOptionSynopsis('minPublisherDuration', value)
               state = ledgerState.setSynopsisOption(state, 'minPublisherDuration', value)
+              state = ledgerApi.updatePublisherInfo(state)
               break
             }
           case settings.PAYMENTS_MINIMUM_VISITS:
@@ -105,16 +97,18 @@ const ledgerReducer = (state, action, immutableAction) => {
               const value = action.get('value')
               if (value <= 0) break
 
-              ledgerUtil.synopsis.options.minPublisherVisits = value
+              ledgerApi.saveOptionSynopsis('minPublisherVisits', value)
               state = ledgerState.setSynopsisOption(state, 'minPublisherVisits', value)
+              state = ledgerApi.updatePublisherInfo(state)
               break
             }
 
           case settings.PAYMENTS_ALLOW_NON_VERIFIED:
             {
               const value = action.get('value')
-              ledgerUtil.synopsis.options.showOnlyVerified = value
+              ledgerApi.saveOptionSynopsis('showOnlyVerified', value)
               state = ledgerState.setSynopsisOption(state, 'showOnlyVerified', value)
+              state = ledgerApi.updatePublisherInfo(state)
               break
             }
         }
@@ -135,9 +129,9 @@ const ledgerReducer = (state, action, immutableAction) => {
           case 'ledgerPaymentsShown':
             {
               if (action.get('value') === false) {
-                delete ledgerUtil.synopsis.publishers[publisherKey]
+                ledgerApi.deleteSynopsis(publisherKey)
                 state = ledgerState.deletePublishers(state, publisherKey)
-                state = ledgerUtil.updatePublisherInfo(state)
+                state = ledgerApi.updatePublisherInfo(state)
               }
               break
             }
@@ -147,19 +141,19 @@ const ledgerReducer = (state, action, immutableAction) => {
               if (publisher.isEmpty()) {
                 break
               }
-              state = ledgerUtil.updatePublisherInfo(state)
-              state = ledgerUtil.verifiedP(state, publisherKey)
+              state = ledgerApi.updatePublisherInfo(state)
+              state = ledgerApi.verifiedP(state, publisherKey)
               break
             }
           case 'ledgerPinPercentage':
             {
+              const value = action.get('value')
               const publisher = ledgerState.getPublisher(state, publisherKey)
-              if (publisher.isEmpty()) {
+              if (publisher.isEmpty() || publisher.get('pinPercentage') === value) {
                 break
               }
-
-              ledgerUtil.synopsis.publishers[publisherKey].pinPercentage = action.get('value')
-              state = ledgerUtil.updatePublisherInfo(state, publisherKey)
+              state = ledgerState.setPublishersProp(state, publisherKey, 'pinPercentage', value)
+              state = ledgerApi.updatePublisherInfo(state, publisherKey)
               break
             }
         }
@@ -182,15 +176,13 @@ const ledgerReducer = (state, action, immutableAction) => {
           if (publisher.isEmpty()) {
             break
           }
-          state = ledgerUtil.updatePublisherInfo(state)
+          state = ledgerApi.updatePublisherInfo(state)
         }
         break
       }
     case appConstants.APP_NETWORK_CONNECTED:
       {
-        setTimeout((state) => {
-          ledgerUtil.networkConnected(state)
-        }, 1000, state)
+        ledgerApi.networkConnected(state)
         break
       }
     case appConstants.APP_NAVIGATOR_HANDLER_REGISTERED:
@@ -211,7 +203,110 @@ const ledgerReducer = (state, action, immutableAction) => {
     case windowConstants.WINDOW_SET_FOCUSED_FRAME:
     case windowConstants.WINDOW_GOT_RESPONSE_DETAILS:
       {
-        state = ledgerUtil.pageDataChanged(state)
+        state = ledgerApi.pageDataChanged(state)
+        break
+      }
+    case appConstants.APP_ON_FAVICON_RECEIVED:
+      {
+        state = ledgerState.setPublishersProp(state, action.get('publisherKey'), 'faviconURL', action.get('blob'))
+        state = ledgerApi.updatePublisherInfo(state)
+        break
+      }
+    case appConstants.APP_ON_EXCLUSION_STATUS:
+      {
+        const key = action.get('publisherKey')
+        const pattern = urlUtil.getHostPattern(key)
+        const value = action.get('excluded')
+        ledgerApi.savePublisherOption(key, 'exclude', value)
+        state = siteSettings.setSettingsProp(state, pattern, 'ledgerPayments', value)
+        state = ledgerState.setPublishersProp(state, key, ['options', 'exclude'], value)
+        state = ledgerApi.updatePublisherInfo(state)
+        break
+      }
+    case appConstants.APP_ON_LEDGER_LOCATION_UPDATE:
+      {
+        const location = action.get('location')
+        state = ledgerState.setLocationProp(state, location, action.get('prop'), action.get('value'))
+        break
+      }
+    case appConstants.APP_ON_PUBLISHER_OPTION_UPDATE:
+      {
+        const value = action.get('value')
+        const key = action.get('publisherKey')
+        const prop = action.get('prop')
+        state = ledgerState.setPublisherOption(state, key, prop, value)
+
+        if (action.get('saveIntoSettings')) {
+          const pattern = urlUtil.getHostPattern(key)
+          if (prop === 'exclude') {
+            state = siteSettings.setSettingsProp(state, pattern, 'ledgerPayments', value)
+          }
+        }
+        break
+      }
+    case appConstants.APP_ON_LEDGER_WALLET_CREATE:
+      {
+        ledgerApi.boot()
+        break
+      }
+    case appConstants.APP_ON_BOOT_STATE_FILE:
+      {
+        state = ledgerApi.onBootStateFile(state)
+        break
+      }
+    case appConstants.APP_ON_LEDGER_BALANCE_RECEIVED:
+      {
+        state = ledgerApi.balanceReceived(state, action.get('unconfirmed'))
+        break
+      }
+    case appConstants.APP_ON_WALLET_PROPERTIES:
+      {
+        state = ledgerApi.onWalletProperties(state, action.get('body'))
+        break
+      }
+    case appConstants.APP_LEDGER_PAYMENTS_PRESENT:
+      {
+        ledgerApi.paymentPresent(state, action.get('tabId'), action.get('present'))
+        break
+      }
+    case appConstants.APP_ON_ADD_FUNDS_CLOSED:
+      {
+        ledgerApi.addFoundClosed(state)
+        break
+      }
+    case appConstants.APP_ON_WALLET_RECOVERY:
+      {
+        state = ledgerApi.onWalletRecovery(state, action.get('error'), action.get('result'))
+        break
+      }
+    case appConstants.APP_ON_BRAVERY_PROPERTIES:
+      {
+        state = ledgerApi.onBraveryProperties(state, action.get('error'), action.get('result'))
+        break
+      }
+    case appConstants.APP_ON_FIRST_LEDGER_SYNC:
+      {
+        state = ledgerApi.onLedgerFirstSync(state, action.get('parsedData'))
+        break
+      }
+    case appConstants.APP_ON_LEDGER_CALLBACK:
+      {
+        state = ledgerApi.onCallback(state, action.get('result'), action.get('delayTime'))
+        break
+      }
+    case appConstants.APP_ON_TIME_UNTIL_RECONCILE:
+      {
+        state = ledgerApi.onTimeUntilReconcile(state, action.get('stateResult'))
+        break
+      }
+    case appConstants.APP_ON_LEDGER_RUN:
+      {
+        ledgerApi.run(state, action.get('delay'))
+        break
+      }
+    case appConstants.APP_ON_NETWORK_CONNECTED:
+      {
+        state = ledgerApi.onNetworkConnected(state)
         break
       }
   }

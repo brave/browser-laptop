@@ -142,6 +142,7 @@
 
   var location = document.location.href
   chrome.ipcRenderer.once('ledger-publisher-response-' + location, (e, pubinfo) => {
+    debugger
     if (!pubinfo || !pubinfo.context || !pubinfo.rules) {
       return console.log('no pubinfo available')
     }
@@ -196,6 +197,7 @@
       pageInfo: results
     }]))
   })
+  debugger
   var pubinfo = chrome.ipcRenderer.send('ledger-publisher', location)
 
 } catch (ex) { console.log(ex.toString() + '\n' + ex.stack) } })()

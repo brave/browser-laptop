@@ -27,6 +27,7 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const siteSettings = require('../../../../js/state/siteSettings')
 const tabState = require('../../../common/state/tabState')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
+const ledgerState = require('../../../common/state/ledgerState')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
@@ -422,7 +423,7 @@ class UrlBar extends React.Component {
     const braverySettings = siteSettings.getSiteSettingsForURL(allSiteSettings, location)
 
     // TODO(bridiver) - these definitely needs a helpers
-    const publisherId = state.getIn(['locationInfo', baseUrl, 'publisher'])
+    const publisherId = ledgerState.getLocationPublisher(state, baseUrl)
 
     const activateSearchEngine = urlbar.getIn(['searchDetail', 'activateSearchEngine'])
     const urlbarSearchDetail = urlbar.get('searchDetail')

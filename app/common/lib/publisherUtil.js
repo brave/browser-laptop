@@ -2,10 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Immutable = require('immutable')
-
 // Constants
 const settings = require('../../../js/constants/settings')
+
+// State
+const ledgerState = require('../state/ledgerState')
 const siteSettingsState = require('../state/siteSettingsState')
 
 // Utils
@@ -31,22 +32,19 @@ const visiblePublisher = (state, publisherId) => {
 
 const publisherState = {
   enabledForPaymentsPublisher: (state, locationId) => {
-    const locationInfo = state.get('locationInfo', Immutable.Map())
-    const publisherId = locationInfo.getIn([locationId, 'publisher'])
+    const publisherId = ledgerState.getLocationProp(state, locationId, 'publisher')
 
-    const synopsis = state.getIn(['publisherInfo', 'synopsis'], Immutable.Map())
     const hostSettings = siteSettingsState.getSettingsByHost(state, publisherId)
 
     // All publishers will be enabled by default if AUTO_SUGGEST is ON,
     // excluding publishers defined on ledger's exclusion list
-    const excluded = locationInfo.getIn([locationId, 'exclude'])
+    const excluded = ledgerState.getLocationProp(state, locationId, 'exclude')
     const autoSuggestSites = getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)
 
     // If session is clear then siteSettings is undefined and icon
     // will never be shown, but synopsis may not be empty.
     // In such cases let's check if synopsis matches current publisherId
-    const isValidPublisherSynopsis = !!synopsis.map(entry => entry.get('site'))
-      .includes(publisherId)
+    const isValidPublisherSynopsis = ledgerState.hasPublisher(state, publisherId)
 
     // hostSettings is undefined until user hit addFunds button.
     // For such cases check autoSuggestSites for eligibility.

@@ -15,6 +15,7 @@ const appActions = require('../../../../js/actions/appActions')
 
 // State
 const publisherState = require('../../../common/lib/publisherUtil')
+const ledgerState = require('../../../common/state/ledgerState')
 
 // Utils
 const {getHostPattern} = require('../../../../js/lib/urlutil')
@@ -53,15 +54,14 @@ class PublisherToggle extends React.Component {
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const location = activeFrame.get('location', '')
     const locationId = getBaseUrl(location)
-    const locationInfo = state.get('locationInfo', Immutable.Map())
 
     const props = {}
     // used in renderer
     props.isEnabledForPaymentsPublisher = publisherState.enabledForPaymentsPublisher(state, locationId)
-    props.isVerifiedPublisher = locationInfo.getIn([locationId, 'verified'])
+    props.isVerifiedPublisher = ledgerState.getLocationProp(state, locationId, 'verified')
 
     // used in functions
-    props.publisherId = locationInfo.getIn([locationId, 'publisher'])
+    props.publisherId = ledgerState.getLocationProp(state, locationId, 'publisher')
     props.hostPattern = getHostPattern(props.publisherId)
 
     return props

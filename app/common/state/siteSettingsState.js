@@ -41,8 +41,8 @@ const api = {
   },
 
   setSettingsProp: (state, pattern, prop, value) => {
-    if (prop == null) {
-      return null
+    if (prop == null || pattern == null) {
+      return state
     }
 
     return state.setIn(['siteSettings', pattern, prop], value)

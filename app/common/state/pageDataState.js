@@ -33,6 +33,7 @@ const pageDataState = {
       url,
       tabId
     })
+    state = state.setIn(['pageData', 'last', 'url'], url)
     return state.setIn(['pageData', 'view'], pageViewEvent)
   },
 

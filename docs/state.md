@@ -228,8 +228,6 @@ AppStore
       }], // contributions reconciling/reconciled
       unconfirmed: string // unconfirmed balance in BTC.toFixed(4)
     },
-    isBooting: boolean, // flag which telll us if wallet is still creating or not
-    isQuiting: boolan, // flag which tell us if we are closing ledger (because of browser close) 
     locations: {
       [url]: {
         publisher: string, // url of the publisher in question

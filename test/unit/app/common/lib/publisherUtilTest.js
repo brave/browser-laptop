@@ -71,18 +71,9 @@ describe('publisherUtil test', function () {
 
   describe('enabledForPaymentsPublisher', function () {
     const state = Immutable.fromJS({
-      locationInfo: {
-        'https://brave.com': {
-          exclude: false,
-          publisher: 'brave.com',
-          stickyP: false,
-          timestamp: 1496942403068,
-          verified: false
-        }
-      },
-      publisherInfo: {
+      ledger: {
         synopsis: {
-          0: {
+          'brave.com': {
             daysSpent: 0,
             duration: 623405,
             faviconURL: '',
@@ -92,10 +83,18 @@ describe('publisherUtil test', function () {
             publisherURL: 'http://brave.com',
             score: 9.365888800773842,
             secondsSpent: 23,
-            site: 'brave.com',
             verified: false,
             views: 1,
             weight: 100
+          }
+        },
+        locations: {
+          'https://brave.com': {
+            exclude: false,
+            publisher: 'brave.com',
+            stickyP: false,
+            timestamp: 1496942403068,
+            verified: false
           }
         }
       },
@@ -114,7 +113,7 @@ describe('publisherUtil test', function () {
 
     it('host settings is null, publisher synopsis is null, but auto include is on and exclude on off', function () {
       let newState = state.set('siteSettings', Immutable.fromJS({}))
-      newState = newState.set('publisherInfo', Immutable.fromJS({}))
+      newState = newState.setIn(['ledger', 'locations'], Immutable.fromJS({}))
       const result = publisherUtil.enabledForPaymentsPublisher(newState, 'https://brave.com')
       assert.equal(result, true)
     })
