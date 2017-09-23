@@ -251,11 +251,9 @@ const mergeSiteDetails = (oldSiteDetail, newSiteDetail, tag, folderId, order) =>
   if (newSiteDetail.get('themeColor') || (oldSiteDetail && oldSiteDetail.get('themeColor'))) {
     site = site.set('themeColor', newSiteDetail.get('themeColor') || oldSiteDetail.get('themeColor'))
   }
-  if (site.get('tags').size === 0) {
-    // Increment the visit count for history items
+  if (site.get('tags').size === 0 || (site.get('tags').size === 1 && site.getIn(['tags', 0]) === siteTags.DEFAULT)) {
     site = site.set('count', ((oldSiteDetail || site).get('count') || 0) + 1)
   }
-
   return site
 }
 
