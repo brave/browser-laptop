@@ -558,6 +558,16 @@ describe('siteUtil', function () {
         assert.equal(state.getIn(['sites', oldSiteKey, 'skipSync']), true)
       })
     })
+    it('increments count for default default sites', function () {
+      const site = Immutable.fromJS({
+        location: 'https://brave.com',
+        tags: [siteTags.BOOKMARK_FOLDER]
+      })
+      let newState = siteUtil.addSite(Immutable.fromJS({sites: {}}), site, siteTags.DEFAULT)
+      assert.equal(newState.getIn(['sites', 'https://brave.com|0|0', 'count']), 1)
+      newState = siteUtil.addSite(newState, site, siteTags.DEFAULT)
+      assert.equal(newState.getIn(['sites', 'https://brave.com|0|0', 'count']), 2)
+    })
   })
 
   describe('removeSite', function () {
