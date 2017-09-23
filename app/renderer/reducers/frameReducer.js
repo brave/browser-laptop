@@ -107,9 +107,13 @@ const frameReducer = (state, action, immutableAction) => {
         state = frameStateUtil.updateFramesInternalIndex(state, Math.min(sourceFrameIndex, index))
         state = frameStateUtil.moveFrame(state, tabId, index)
 
-        // Update tab page index to the active tab in case the active tab changed
         const activeFrame = frameStateUtil.getActiveFrame(state)
-        state = frameStateUtil.updateTabPageIndex(state, activeFrame.get('tabId'))
+        // avoid the race-condition of updating the tabPage
+        // while active frame is not yet defined
+        if (activeFrame) {
+          // Update tab page index to the active tab in case the active tab changed
+          state = frameStateUtil.updateTabPageIndex(state, activeFrame.get('tabId'))
+        }
         state = frameStateUtil.setPreviewFrameKey(state, null)
       }
 
