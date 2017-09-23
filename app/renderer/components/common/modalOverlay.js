@@ -182,9 +182,6 @@ const styles = StyleSheet.create({
     background: `url(${closeButton}) center no-repeat`,
     backgroundSize: `${buttonSize} ${buttonSize}`,
 
-    // ref: browserButton_default on browserButton.js
-    cursor: 'pointer',
-
     ':focus': {
       outline: 'none'
     }

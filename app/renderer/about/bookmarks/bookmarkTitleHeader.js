@@ -4,12 +4,17 @@
 
 const React = require('react')
 const Immutable = require('immutable')
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
 const ImmutableComponent = require('../../components/immutableComponent')
+const BrowserButton = require('../../components/common/browserButton')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
+
+const globalStyles = require('../../components/styles/global')
+const addBookmark = require('../../../../img/toolbar/add_bookmark_btn.svg')
 
 class BookmarkTitleHeader extends ImmutableComponent {
   constructor () {
@@ -25,13 +30,25 @@ class BookmarkTitleHeader extends ImmutableComponent {
   render () {
     return <div>
       <span data-l10n-id={this.props.heading} />
-      <span className='addBookmark'
-        data-l10n-id='addBookmark'
-        data-test-id='addBookmark'
+      <BrowserButton
+        isMaskImage
+        custom={styles.header__addBookmark}
+        l10nId='addBookmark'
+        testId='addBookmark'
         onClick={this.addBookmark}
       />
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  header__addBookmark: {
+    backgroundColor: globalStyles.color.buttonColor,
+    width: '20px',
+    height: '20px',
+    WebkitMaskImage: `url(${addBookmark})`,
+    WebkitMaskRepeat: 'no-repeat'
+  }
+})
 
 module.exports = BookmarkTitleHeader

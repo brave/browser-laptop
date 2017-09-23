@@ -24,6 +24,7 @@ class BrowserButton extends ImmutableComponent {
       this.props.groupedItem && styles.browserButton_groupedItem,
       this.props.smallItem && styles.browserButton_smallItem,
       this.props.iconOnly && styles.browserButton_iconOnly,
+      this.props.isMaskImage && styles.browserButton_isMaskImage,
 
       // TODO: These are other button styles app-wise
       // that needs to be refactored and included in this file
@@ -67,8 +68,10 @@ class BrowserButton extends ImmutableComponent {
       data-l10n-id={this.props.l10nId}
       data-test-id={this.props.testId}
       data-test2-id={this.props.test2Id}
+      data-test-pinned={this.props.testPinned}
       data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
       style={this.buttonStyle}
+      title={this.props.title}
       data-button-value={this.props.dataButtonValue}
       onClick={this.props.onClick}
       className={css(this.classNames, this.props.custom)}>
@@ -91,7 +94,6 @@ const styles = StyleSheet.create({
     width: buttonSize,
     whiteSpace: 'nowrap',
     outline: 'none',
-    cursor: 'default',
     display: 'inline-block',
     borderRadius: '2px',
     textAlign: 'center',
@@ -103,6 +105,9 @@ const styles = StyleSheet.create({
     backgroundImage: 'none',
     backgroundColor: globalStyles.button.default.backgroundColor,
     border: 'none',
+
+    // See #11114
+    cursor: 'pointer',
 
     // TODO: #9223
     fontSize: '13px',
@@ -144,7 +149,6 @@ const styles = StyleSheet.create({
   browserButton_default: {
     position: 'relative',
     boxShadow: globalStyles.button.default.boxShadow,
-    cursor: 'pointer',
 
     // #9223
     height: '32px', // 32px == 1rem * 2
@@ -185,7 +189,6 @@ const styles = StyleSheet.create({
     borderRight: '2px solid transparent',
     borderTop: `2px solid ${globalStyles.button.primary.gradientColor1}`,
     borderBottom: `2px solid ${globalStyles.button.primary.gradientColor2}`,
-    cursor: 'pointer',
 
     // #9223
     fontWeight: 300,
@@ -200,7 +203,6 @@ const styles = StyleSheet.create({
     background: globalStyles.button.secondary.background,
     border: '1px solid white',
     color: globalStyles.button.secondary.color,
-    cursor: 'pointer',
 
     ':hover': {
       border: `1px solid ${globalStyles.button.secondary.borderHoverColor}`,
@@ -283,6 +285,14 @@ const styles = StyleSheet.create({
     width: '18px',
     height: '18px',
     fontSize: '24px'
+  },
+
+  // -webkit-mask-image requires background-color instead of color specified above
+  // See bookmarkTitleHeader.js for an example
+  browserButton_isMaskImage: {
+    ':hover': {
+      backgroundColor: globalStyles.button.default.hoverColor
+    }
   },
 
   browserButton_disabled: {

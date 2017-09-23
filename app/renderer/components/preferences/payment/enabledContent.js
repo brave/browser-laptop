@@ -31,6 +31,7 @@ const cx = require('../../../../../js/lib/classSet')
 
 // Actions
 const appActions = require('../../../../../js/actions/appActions')
+const aboutActions = require('../../../../../js/about/aboutActions')
 
 // TODO: report when funds are too low
 // TODO: support non-USD currency
@@ -51,8 +52,9 @@ class EnabledContent extends ImmutableComponent {
       ? this.props.showOverlay.bind(this, 'addFunds')
       : (ledgerData.get('creating') ? () => {} : this.createWallet())
 
-    return <div>
+    return <div className={css(styles.buttons_wallet)}>
       <BrowserButton
+        groupedItem
         primaryColor
         panelItem
         testId={buttonText}
@@ -61,12 +63,15 @@ class EnabledContent extends ImmutableComponent {
         onClick={onButtonClick.bind(this)}
         disabled={!ledgerData.get('created')}
       />
-      <a className={cx({
-        [globalStyles.appIcons.question]: true,
-        [css(styles.iconLink)]: true
-      })}
-        href='https://brave.com/faq-payments/#brave-payments'
-        target='_blank' rel='noopener'
+      <BrowserButton
+        groupedItem
+        iconOnly
+        iconClass={globalStyles.appIcons.question}
+        size='.95rem'
+        l10nId='paymentsFAQLink'
+        onClick={aboutActions.createTabRequested.bind(null, {
+          url: 'https://brave.com/faq-payments/#brave-payments'
+        })}
       />
     </div>
   }
@@ -84,11 +89,9 @@ class EnabledContent extends ImmutableComponent {
     }
 
     return <BrowserButton
-      custom={[
-        styles.claimButton
-      ]}
       secondaryColor
       panelItem
+      custom={styles.claimButton}
       testId={'claimButton'}
       onClick={this.onClaimClick}
       disabled={!ledgerData.get('created')}
@@ -415,15 +418,9 @@ const gridStyles = StyleSheet.create({
 })
 
 const styles = StyleSheet.create({
-  iconLink: {
-    color: globalStyles.color.mediumGray,
-    fontSize: globalStyles.payments.fontSize.regular,
-    marginLeft: '10px',
-    textDecoration: 'none',
-
-    ':hover': {
-      textDecoration: 'none !important'
-    }
+  buttons_wallet: {
+    display: 'flex',
+    alignItems: 'center'
   },
 
   enabledContent__walletBar: {

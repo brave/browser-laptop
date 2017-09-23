@@ -486,13 +486,20 @@ class SyncTab extends ImmutableComponent {
         </SectionTitleLabelWrapper>
 
         <div className={css(styles.settingsListContainerMargin__bottom)}>
-          <span className='settingsListTitle' data-l10n-id='syncTitleMessage' />
-          <a href='https://github.com/brave/sync/wiki/Design' rel='noopener' target='_blank'>
-            <span className={cx({
-              fa: true,
-              'fa-question-circle': true
-            })} />
-          </a>
+          <div className={cx({
+            settingsListTitle: true,
+            [css(styles.settingsListContainerMargin__bottom__subText)]: true
+          })}>
+            <span data-l10n-id='syncTitleMessage' />
+            <BrowserButton
+              iconClass={globalStyles.appIcons.question}
+              iconOnly
+              size='1rem'
+              onClick={aboutActions.createTabRequested.bind(null, {
+                url: 'https://github.com/brave/sync/wiki/Design'
+              })}
+            />
+          </div>
           <div className={cx({
             settingsListTitle: true,
             [css(styles.subText)]: true
@@ -549,6 +556,11 @@ const styles = StyleSheet.create({
   settingsListContainerMargin__bottom: {
     marginBottom: globalStyles.spacing.settingsListContainerMargin
   },
+
+  settingsListContainerMargin__bottom__subText: {
+    display: 'flex'
+  },
+
   passphrase: {
     // See: https://github.com/Khan/aphrodite#object-key-ordering
     fontSize: '18px',

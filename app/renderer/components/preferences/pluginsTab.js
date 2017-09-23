@@ -5,6 +5,7 @@
 const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
 const aboutActions = require('../../../../js/about/aboutActions')
+const cx = require('../../../../js/lib/classSet')
 const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
 const appConfig = require('../../../../js/constants/appConfig')
@@ -17,11 +18,13 @@ const WidevineInfo = require('../main/widevineInfo')
 const flash = appConfig.resourceNames.FLASH
 const widevine = appConfig.resourceNames.WIDEVINE
 
-const {css} = require('aphrodite/no-important')
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
 const commonStyles = require('../styles/commonStyles')
 
 const {SettingsList, SettingCheckbox} = require('../common/settings')
 const {DefaultSectionTitle} = require('../common/sectionTitle')
+const BrowserButton = require('../common/browserButton')
 
 class PluginsTab extends ImmutableComponent {
   get flashInstalled () {
@@ -46,10 +49,15 @@ class PluginsTab extends ImmutableComponent {
   }
 
   infoCircle (url) {
-    return <span className='fa fa-info-circle flashInfoIcon'
+    return <BrowserButton
+      iconClass={globalStyles.appIcons.moreInfo}
+      iconOnly
+      size='1rem'
+      custom={styles.flashText__moreInfo__icon}
       onClick={aboutActions.createTabRequested.bind(null, {
         url
-      })} />
+      })}
+    />
   }
 
   render () {
@@ -59,22 +67,25 @@ class PluginsTab extends ImmutableComponent {
       <DefaultSectionTitle data-l10n-id='pluginSettings' />
       <SettingsList>
         <SettingCheckbox checked={this.flashInstalled ? this.props.braveryDefaults.get('flash') : false} dataL10nId='enableFlash' onChange={this.onToggleFlash} disabled={!this.flashInstalled} />
-        <div className='subtext flashText'>
+        <div className={css(styles.flashText)}>
           {
             isDarwin || isWindows
-            ? <div>
+            ? <div className={css(styles.flashText__moreInfo)}>
               {this.infoCircle(appConfig.flash.installUrl)}
               <span data-l10n-id='enableFlashSubtext' />&nbsp;
               <span className={css(commonStyles.linkText)} onClick={aboutActions.createTabRequested.bind(null, {
                 url: appConfig.flash.installUrl
               })} title={appConfig.flash.installUrl}>{'Adobe'}</span>.
             </div>
-            : <div>
-              <span className='fa fa-info-circle flashInfoIcon' />
+            : <div className={css(styles.flashText__moreInfo)}>
+              <span className={cx({
+                [globalStyles.appIcons.moreInfo]: true,
+                [css(styles.flashText__moreInfo__icon)]: true
+              })} />
               <span data-l10n-id='enableFlashSubtextLinux' />
             </div>
           }
-          <div>
+          <div className={css(styles.flashText__moreInfo)}>
             {this.infoCircle(flashInfoLink)}
             <span data-l10n-id='flashTroubleshooting' />&nbsp;
             <span className={css(commonStyles.linkText)}
@@ -100,5 +111,21 @@ class PluginsTab extends ImmutableComponent {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  flashText: {
+    margin: '0 0 0 5px'
+  },
+
+  flashText__moreInfo: {
+    display: 'flex',
+    fontSize: '.95rem',
+    marginTop: '5px'
+  },
+
+  flashText__moreInfo__icon: {
+    marginRight: '.25rem'
+  }
+})
 
 module.exports = PluginsTab

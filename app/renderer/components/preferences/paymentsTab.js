@@ -7,10 +7,10 @@ const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
-const cx = require('../../../../js/lib/classSet')
 const ImmutableComponent = require('../immutableComponent')
 const ModalOverlay = require('../common/modalOverlay')
 
+const BrowserButton = require('../common/browserButton')
 const {SettingCheckbox} = require('../common/settings')
 const {
   sectionTitleStyles,
@@ -42,6 +42,7 @@ const batIcon = require('../../../extensions/brave/img/ledger/cryptoIcons/BAT_ic
 const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
 const {formatCurrentBalance, batToCurrencyString} = require('../../../common/lib/ledgerUtil')
+const aboutActions = require('../../../../js/about/aboutActions')
 
 class PaymentsTab extends ImmutableComponent {
   constructor () {
@@ -232,14 +233,15 @@ class PaymentsTab extends ImmutableComponent {
                 styles.switch__label_right
               )}
             />
-            <a className={cx({
-              fa: true,
-              'fa-question-circle': true,
-              [css(styles.payments__title__switch__moreInfo)]: true
-            })}
-              href='https://brave.com/Payments_FAQ.html'
-              data-l10n-id='paymentsFAQLink'
-              rel='noopener' target='_blank'
+            <BrowserButton
+              iconOnly
+              iconClass={globalStyles.appIcons.question}
+              size='.95rem'
+              custom={styles.payments__title__switch__moreInfo}
+              l10nId='paymentsFAQLink'
+              onClick={aboutActions.createTabRequested.bind(null, {
+                url: 'https://brave.com/faq-payments/#brave-payments'
+              })}
             />
           </div>
 
@@ -259,22 +261,28 @@ class PaymentsTab extends ImmutableComponent {
                   )}
                 />
                 <div className={css(styles.payments__title__actions__icons)}>
-                  <a className={css(
-                    styles.payments__title__actions__icons__icon,
-                    styles.payments__title__actions__icons__icon_history,
-                    !this.hasWalletTransaction && styles.payments__title__actions__icons__icon_disabled
-                  )}
-                    data-test-id={this.hasWalletTransaction ? 'paymentHistoryButton' : 'disabledPaymentHistoryButton'}
-                    data-l10n-id='paymentHistoryIcon'
+                  <BrowserButton
+                    iconOnly
+                    size='25px'
+                    custom={[
+                      styles.payments__title__actions__icons__icon,
+                      styles.payments__title__actions__icons__icon_history,
+                      !this.hasWalletTransaction && styles.payments__title__actions__icons__icon_disabled
+                    ]}
+                    testId={this.hasWalletTransaction ? 'paymentHistoryButton' : 'disabledPaymentHistoryButton'}
+                    l10nId='paymentHistoryIcon'
                     onClick={(enabled && this.hasWalletTransaction) ? this.props.showOverlay.bind(this, 'paymentHistory') : () => {}}
                   />
-                  <a className={css(
-                    styles.payments__title__actions__icons__icon,
-                    styles.payments__title__actions__icons__icon_settings,
-                    !enableSettings && styles.payments__title__actions__icons__icon_disabled
-                  )}
-                    data-test-id={!enableSettings ? 'advancedSettingsButtonLoading' : 'advancedSettingsButton'}
-                    data-l10n-id='advancedSettingsIcon'
+                  <BrowserButton
+                    iconOnly
+                    size='25px'
+                    custom={[
+                      styles.payments__title__actions__icons__icon,
+                      styles.payments__title__actions__icons__icon_settings,
+                      !enableSettings && styles.payments__title__actions__icons__icon_disabled
+                    ]}
+                    testId={!enableSettings ? 'advancedSettingsButtonLoading' : 'advancedSettingsButton'}
+                    l10nId='advancedSettingsIcon'
                     onClick={enableSettings ? this.props.showOverlay.bind(this, 'advancedSettings') : () => {}}
                   />
                 </div>
@@ -397,18 +405,14 @@ const styles = StyleSheet.create({
   },
 
   payments__title__actions__icons: {
+    display: 'flex',
     position: 'relative',
     top: '3.5px',
-
-    // See: #11580
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap' // See: #11580
   },
 
   payments__title__actions__icons__icon: {
     backgroundColor: globalStyles.color.braveOrange,
-    width: '25px',
-    height: '26px',
-    display: 'inline-block',
     position: 'relative',
 
     ':hover': {

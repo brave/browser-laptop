@@ -12,6 +12,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const {AboutPageSectionTitle} = require('../../components/common/sectionTitle')
+const BrowserButton = require('../../components/common/browserButton')
 const BookmarkFolderList = require('./bookmarkFolderList')
 const BookmarksList = require('./bookmarksList')
 
@@ -26,6 +27,11 @@ const windowActions = require('../../../../js/actions/windowActions')
 // Stylesheets
 require('../../../../less/about/bookmarks.less')
 require('../../../../node_modules/font-awesome/css/font-awesome.css')
+
+const globalStyles = require('../../components/styles/global')
+const addBookmarkFolder = require('../../../../img/toolbar/add_BM_folder_btn.svg')
+const importBrowserData = require('../../../../img/toolbar/bookmarks_import.svg')
+const exportBookmarks = require('../../../../img/toolbar/bookmarks_export.svg')
 
 class Bookmarks extends React.Component {
   constructor (props) {
@@ -142,14 +148,37 @@ class Bookmarks extends React.Component {
       })}>
         <AboutPageSectionTitle data-l10n-id='bookmarkManager' />
         <div className='headerActions'>
-          <span data-l10n-id='importBrowserData' className='importBrowserData' onClick={this.importBrowserData} />
-          <span data-l10n-id='exportBookmarks' className='exportBookmarks' onClick={this.exportBookmarks} />
-          <input type='text' className='searchInput' ref='bookmarkSearch' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
-          {
-            this.state.search
-              ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear' />
+          <div className='searchWrapper'>
+            <BrowserButton
+              isMaskImage
+              custom={[
+                styles.headerActions__search__button,
+                styles.headerActions__search__button_importBrowserData
+              ]}
+              l10nId='importBrowserData'
+              onClick={this.importBrowserData}
+            />
+            <BrowserButton
+              isMaskImage
+              custom={[
+                styles.headerActions__search__button,
+                styles.headerActions__search__button_exportBookmarks
+              ]}
+              l10nId='exportBookmarks'
+              onClick={this.exportBookmarks}
+            />
+            <input type='text' className='searchInput' ref='bookmarkSearch' id='bookmarkSearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='bookmarkSearch' />
+            {
+              this.state.search
+              ? <BrowserButton
+                iconClass={globalStyles.appIcons.remove}
+                iconStyle={{ color: globalStyles.color.gray }}
+                custom={styles.headerActions__search__input__button_clear}
+                onClick={this.onClearSearchText}
+              />
               : <span className='fa fa-search searchInputPlaceholder' />
-          }
+            }
+          </div>
         </div>
       </div>
 
@@ -157,9 +186,11 @@ class Bookmarks extends React.Component {
         <div className='folderView'>
           <div className='columnHeader'>
             <span data-l10n-id='folders' />
-            <span className='addBookmarkFolder'
-              data-l10n-id='addBookmarkFolder'
-              data-test-id='addBookmarkFolder'
+            <BrowserButton
+              isMaskImage
+              custom={styles.columnHeader__addBookmarkFolder}
+              l10nId='addBookmarkFolder'
+              testId='addBookmarkFolder'
               onClick={this.addBookmarkFolder}
             />
           </div>
@@ -198,6 +229,40 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center'
+  },
+
+  headerActions__search__button: {
+    backgroundColor: globalStyles.color.buttonColor,
+    width: '43px',
+    height: '22px',
+    marginRight: '.5rem',
+    WebkitMaskRepeat: 'no-repeat'
+  },
+
+  headerActions__search__button_importBrowserData: {
+    WebkitMaskImage: `url(${importBrowserData})`
+  },
+
+  headerActions__search__button_exportBookmarks: {
+    WebkitMaskImage: `url(${exportBookmarks})`
+  },
+
+  headerActions__search__input__button_clear: {
+    // See siteDetails.less
+    margin: 0,
+    padding: 0,
+    width: 0,
+    position: 'relative',
+    left: '-25px',
+    fontSize: '16px'
+  },
+
+  columnHeader__addBookmarkFolder: {
+    backgroundColor: globalStyles.color.buttonColor,
+    width: '20px',
+    height: '20px',
+    WebkitMaskImage: `url(${addBookmarkFolder})`,
+    WebkitMaskRepeat: 'no-repeat'
   }
 })
 

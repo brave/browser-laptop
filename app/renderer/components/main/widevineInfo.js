@@ -11,10 +11,11 @@
 const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
 const appConfig = require('../../../../js/constants/appConfig')
-const cx = require('../../../../js/lib/classSet')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
+
+const BrowserButton = require('../common/browserButton')
 
 class WidevineInfo extends ImmutableComponent {
   constructor () {
@@ -36,24 +37,22 @@ class WidevineInfo extends ImmutableComponent {
     return <section data-test-id='widevineInfo'>
       <div className={css(styles.widevineInfo__div)}>
         <span data-l10n-id='enableWidevineSubtext' />
-        <span className={cx({
-          fa: true,
-          'fa-info-circle': true,
-          [css(styles.cursor)]: true
-        })}
-          data-test-id='onMoreInfo'
+        <BrowserButton
+          iconClass={globalStyles.appIcons.moreInfo}
+          iconStyle={{ fontSize: '1rem' }}
+          custom={styles.widevineInfo__div__moreInfo}
+          testId='onMoreInfo'
           onClick={this.onMoreInfo}
           title={appConfig.widevine.moreInfoUrl}
         />
       </div>
       <div className={css(styles.widevineInfo__div)}>
         <span data-l10n-id='enableWidevineSubtext2' />
-        <span className={cx({
-          fa: true,
-          'fa-info-circle': true,
-          [css(styles.cursor)]: true
-        })}
-          data-test-id='onViewLicense'
+        <BrowserButton
+          iconClass={globalStyles.appIcons.moreInfo}
+          iconStyle={{ fontSize: '1rem' }}
+          custom={styles.widevineInfo__div__moreInfo}
+          testId='onViewLicense'
           onClick={this.onViewLicense}
           title={appConfig.widevine.licenseUrl}
         />
@@ -66,8 +65,11 @@ const styles = StyleSheet.create({
   widevineInfo__div: {
     marginBottom: globalStyles.spacing.dialogInsideMargin
   },
-  cursor: {
-    cursor: 'pointer'
+
+  widevineInfo__div__moreInfo: {
+    height: 'initial',
+    lineHeight: 'initial',
+    width: 'initial'
   }
 })
 
