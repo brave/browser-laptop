@@ -559,7 +559,6 @@ const styles = StyleSheet.create({
   },
 
   noScriptContainer__button: {
-    WebkitAppRegion: 'no-drag',
     backgroundImage: `url(${iconNoScript})`,
 
     // Override the default value defined by browserButton on browserButton.js

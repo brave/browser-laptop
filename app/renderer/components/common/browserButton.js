@@ -113,6 +113,9 @@ const styles = StyleSheet.create({
     // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L49
     color: globalStyles.button.color,
 
+    // See #11111
+    WebkitAppRegion: 'no-drag',
+
     ':hover': {
       color: globalStyles.button.default.hoverColor
     }
@@ -181,7 +184,6 @@ const styles = StyleSheet.create({
   },
 
   browserButton_extensionItem: {
-    WebkitAppRegion: 'no-drag',
     backgroundSize: 'contain',
     height: '17px',
     margin: '4px 0 0 0',
