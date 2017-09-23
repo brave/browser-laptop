@@ -11,6 +11,7 @@ const ipc = require('electron').ipcRenderer
 const ReduxComponent = require('../reduxComponent')
 const UrlBarSuggestions = require('./urlBarSuggestions')
 const UrlBarIcon = require('./urlBarIcon')
+const BrowserButton = require('../common/browserButton')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -478,14 +479,14 @@ class UrlBar extends React.Component {
   }
 
   render () {
-    return <form
+    return <div
       className={cx({
         urlbarForm: true,
         [css(styles.urlbarForm_wide)]: this.props.isWideURLbarEnabled,
         noBorderRadius: this.props.publisherButtonVisible
       })}
-      action='#'
-      id='urlbar'>
+      id='urlbar'
+    >
       <div className='urlbarIconContainer'>
         <UrlBarIcon
           titleMode={this.props.titleMode}
@@ -531,10 +532,13 @@ class UrlBar extends React.Component {
         ? null
         : <span className={css(styles.noScriptContainer)}
           onClick={this.onNoScript}>
-          <span
-            data-l10n-id='noScriptButton'
-            data-test-id='noScriptButton'
-            className={css(styles.noScriptButton)} />
+          <BrowserButton
+            iconOnly
+            size='14px'
+            l10nId='noScriptButton'
+            testId='noScriptButton'
+            custom={styles.noScriptContainer__button}
+          />
         </span>
       }
       {
@@ -542,7 +546,7 @@ class UrlBar extends React.Component {
           ? <UrlBarSuggestions />
           : null
         }
-    </form>
+    </div>
   }
 }
 
@@ -553,12 +557,13 @@ const styles = StyleSheet.create({
     marginRight: '-8px',
     WebkitAppRegion: 'drag'
   },
-  noScriptButton: {
+
+  noScriptContainer__button: {
     WebkitAppRegion: 'no-drag',
     backgroundImage: `url(${iconNoScript})`,
-    width: '14px',
-    height: '14px',
-    border: '0px'
+
+    // Override the default value defined by browserButton on browserButton.js
+    backgroundSize: '14px'
   },
 
   urlbarForm_wide: {
