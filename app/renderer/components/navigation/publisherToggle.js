@@ -98,7 +98,6 @@ const styles = StyleSheet.create({
     width: globalStyles.spacing.buttonWidth,
     minHeight: globalStyles.spacing.buttonHeight,
     minWidth: globalStyles.spacing.buttonWidth,
-    WebkitAppRegion: 'no-drag',
     borderWidth: '1px 1px 1px 0px',
     borderStyle: 'solid',
     borderColor: globalStyles.color.urlBarOutline,
