@@ -177,7 +177,7 @@ const globalStyles = {
     batIconWidth: '40px',
 
     // about pages
-    aboutPageMargin: '20px',
+    aboutPageMargin: '24px',
     aboutPageDetailsPageWidth: '704px',
     aboutPageSectionPadding: '24px',
     aboutPageSectionMargin: '10px'

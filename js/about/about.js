@@ -10,6 +10,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 
 const {
+  SectionTitleWrapper,
   AboutPageSectionTitle,
   AboutPageSectionSubTitle
 } = require('../../app/renderer/components/common/sectionTitle')
@@ -20,7 +21,9 @@ require('../../node_modules/font-awesome/css/font-awesome.css')
 class AboutAbout extends ImmutableComponent {
   render () {
     return <div className={css(styles.aboutPage)}>
-      <AboutPageSectionTitle data-l10n-id='aboutPages' />
+      <SectionTitleWrapper>
+        <AboutPageSectionTitle data-l10n-id='aboutPages' />
+      </SectionTitleWrapper>
       <AboutPageSectionSubTitle data-l10n-id='listOfAboutPages' />
       <ul className={css(styles.list)}>
         {

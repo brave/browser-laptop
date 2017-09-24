@@ -15,6 +15,11 @@ const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 const { bravifyText } = require('../../app/renderer/lib/extensionsUtil')
 
+const {
+  SectionTitleWrapper,
+  AboutPageSectionTitle
+} = require('../../app/renderer/components/common/sectionTitle')
+
 const ipc = window.chrome.ipcRenderer
 
 // Stylesheets
@@ -146,7 +151,10 @@ class AboutExtensions extends React.Component {
   }
   render () {
     return <div className={css(styles.extensionDetailsPage)}>
-      <h2 data-l10n-id='extensions' />
+      <SectionTitleWrapper>
+        <AboutPageSectionTitle data-l10n-id='extensions' />
+      </SectionTitleWrapper>
+
       <div data-test-id='extensionDetailsPageContent'>
         <ExtensionList extensions={this.state.extensions} />
       </div>

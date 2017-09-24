@@ -13,6 +13,15 @@ const locale = require('../../js/l10n')
 
 const ipc = window.chrome.ipcRenderer
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
+
+const {
+  SectionTitleWrapper,
+  AboutPageSectionTitle,
+  AboutPageSectionSubTitle
+} = require('../../app/renderer/components/common/sectionTitle')
+
 require('../../less/about/common.less')
 require('../../less/about/autofill.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
@@ -212,11 +221,18 @@ class AboutAutofill extends React.Component {
         </tbody>
       </table>
     </div>
-    return <div className='autofillPage' data-test-id='autofillPage'>
-      <h1 data-l10n-id='autofillTitle' />
+    return <div className={cx({
+      autofillPage: true,
+      [css(styles.autofillPage)]: true
+    })}
+      data-test-id='autofillPage'
+    >
+      <SectionTitleWrapper>
+        <AboutPageSectionTitle data-l10n-id='autofillTitle' />
+      </SectionTitleWrapper>
       <div className='autofillPageContent'>
         <div className='autofillPageFooter' />
-        <h2 data-l10n-id='addresses' />
+        <AboutPageSectionSubTitle data-l10n-id='addresses' />
         <div className='autofillPageContent'>
           {savedAddresssPage}
           <Button className='primaryButton'
@@ -226,7 +242,7 @@ class AboutAutofill extends React.Component {
           />
         </div>
         <div className='autofillPageFooter' />
-        <h2 data-l10n-id='creditCards' />
+        <AboutPageSectionSubTitle data-l10n-id='creditCards' />
         <div className='autofillPageContent'>
           {savedCreditCardsPage}
           <Button className='primaryButton'
@@ -239,5 +255,11 @@ class AboutAutofill extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  autofillPage: {
+    margin: globalStyles.spacing.aboutPageMargin
+  }
+})
 
 module.exports = <AboutAutofill />

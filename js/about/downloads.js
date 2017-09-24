@@ -17,6 +17,11 @@ const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 const {DownloadList} = require('../../app/renderer/components/common/list')
 
+const {
+  SectionTitleWrapper,
+  AboutPageSectionTitle
+} = require('../../app/renderer/components/common/sectionTitle')
+
 // Stylesheets
 require('../../less/about/common.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
@@ -52,7 +57,7 @@ class DownloadsList extends ImmutableComponent {
         this.props.downloads.size > 0
         ? this.props.downloads.map((download, downloadId) =>
           <DownloadItem download={download} downloadId={downloadId} />)
-        : <div className={css(styles.downloadList)} data-l10n-id='noDownloads' />
+        : <div data-l10n-id='noDownloads' />
       }
     </DownloadList>
   }
@@ -73,7 +78,10 @@ class AboutDownloads extends React.Component {
   }
   render () {
     return <div className={css(styles.downloadsPage)}>
-      <h2 data-l10n-id='downloads' />
+      <SectionTitleWrapper>
+        <AboutPageSectionTitle data-l10n-id='downloads' />
+      </SectionTitleWrapper>
+
       <div className={css(styles.downloadPageContent)}>
         <DownloadsList downloads={this.state.downloads} />
       </div>
@@ -87,13 +95,7 @@ const styles = StyleSheet.create({
   },
 
   downloadPageContent: {
-    borderTop: `1px solid ${globalStyles.color.chromeBorderColor}`,
     display: 'flex'
-  },
-
-  downloadList: {
-    marginTop: globalStyles.spacing.aboutPageSectionMargin,
-    overflow: 'hidden'
   },
 
   downloadListItem: {

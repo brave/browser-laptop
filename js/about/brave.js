@@ -17,6 +17,7 @@ const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 const {
+  SectionTitleWrapper,
   AboutPageSectionTitle,
   AboutPageSectionSubTitle
 } = require('../../app/renderer/components/common/sectionTitle')
@@ -56,7 +57,9 @@ class AboutBrave extends React.Component {
         [css(styles.aboutPage__header)]: true,
         siteDetailsPageHeader: true
       })}>
-        <AboutPageSectionTitle data-l10n-id='aboutBrave' />
+        <SectionTitleWrapper>
+          <AboutPageSectionTitle data-l10n-id='aboutBrave' />
+        </SectionTitleWrapper>
         <div data-l10n-id='braveInfo' />
       </div>
 
