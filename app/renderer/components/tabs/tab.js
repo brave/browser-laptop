@@ -327,6 +327,9 @@ class Tab extends React.Component {
           this.props.centralizeTabIcons && styles.tab__content_centered
         )}
         data-test-id='tab'
+        data-test-active-tab={this.props.isActive}
+        data-test-pinned-tab={this.props.isPinnedTab}
+        data-test-private-tab={this.props.isPrivateTab}
         data-frame-key={this.props.frameKey}
         draggable
         title={this.props.title}
