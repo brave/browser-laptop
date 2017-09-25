@@ -268,6 +268,26 @@ describe('urlBarReducer', function () {
         assert.equal(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'suggestionList']), suggestionList)
         assert.equal(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
       })
+      describe('when autocompleteEnabled', function () {
+        it('handles a null urlbar location', function () {
+          let testState = windowState.setIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'autocompleteEnabled'], true)
+          testState = testState.setIn(['frames', 1, 'navbar', 'urlbar', 'location'], undefined)
+          const suggestionList = Immutable.fromJS([{location: 'http://example.com'}])
+          urlBarReducer(testState, {actionType: appConstants.APP_URL_BAR_SUGGESTIONS_CHANGED, suggestionList, selectedIndex: null})
+        })
+        it('handles a suggestion that is not immutable', function () {
+          let testState = windowState.setIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'autocompleteEnabled'], true)
+          testState = testState.setIn(['frames', 1, 'navbar', 'urlbar', 'location'], 'http://example.com')
+          const suggestionList = Immutable.fromJS(['test'])
+          urlBarReducer(testState, {actionType: appConstants.APP_URL_BAR_SUGGESTIONS_CHANGED, suggestionList, selectedIndex: null})
+        })
+        it('handles a suggestion without location', function () {
+          let testState = windowState.setIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'autocompleteEnabled'], true)
+          testState = testState.setIn(['frames', 1, 'navbar', 'urlbar', 'location'], 'http://example.com')
+          const suggestionList = Immutable.fromJS([{}])
+          urlBarReducer(testState, {actionType: appConstants.APP_URL_BAR_SUGGESTIONS_CHANGED, suggestionList, selectedIndex: null})
+        })
+      })
     })
 
     describe('WINDOW_SET_URL_BAR_ACTIVE', function () {
