@@ -663,7 +663,7 @@ const doAction = (state, action) => {
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
       {
         if (!lastClosedUrl) {
-          break
+          return state
         }
         closedFrames = closedFrames.delete(lastClosedUrl)
         const nextLastFrame = closedFrames.last()
