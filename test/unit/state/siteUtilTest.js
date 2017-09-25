@@ -1,4 +1,4 @@
-/* global describe, it */
+/* global describe, before, it */
 
 const siteTags = require('../../../js/constants/siteTags')
 const siteUtil = require('../../../js/state/siteUtil')
@@ -1659,6 +1659,45 @@ describe('siteUtil', function () {
   })
 
   describe('filterSitesRelativeTo', function () {
+    let relSite
+    before(function () {
+      relSite = Immutable.fromJS({folderId: 1})
+    })
+    it('matches based on parentFolderId', function () {
+      const sites = Immutable.fromJS({
+        key1: {
+          parentFolderId: 1,
+          title: 'bookmark 2',
+          order: 2
+        },
+        key2: {
+          parentFolderId: 2,
+          title: 'bookmark 1',
+          order: 1
+        }
+      })
+      const result = siteUtil.filterSitesRelativeTo(sites, relSite).toList()
+      assert(result.size === 1)
+      assert(result.getIn([0, 'title']) === 'bookmark 2')
+    })
+    it('sorts the sites which match', function () {
+      const sites = Immutable.fromJS({
+        key1: {
+          parentFolderId: 1,
+          title: 'bookmark 2',
+          order: 2
+        },
+        key2: {
+          parentFolderId: 1,
+          title: 'bookmark 1',
+          order: 1
+        }
+      })
+      const result = siteUtil.filterSitesRelativeTo(sites, relSite).toList()
+      assert(result.size === 2)
+      assert(result.getIn([0, 'title']) === 'bookmark 1')
+      assert(result.getIn([1, 'title']) === 'bookmark 2')
+    })
   })
 
   describe('clearHistory', function () {
