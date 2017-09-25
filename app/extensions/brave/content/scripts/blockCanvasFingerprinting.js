@@ -174,7 +174,7 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
   }
 
   var methods = []
-  var canvasMethods = ['getImageData', 'getLineDash', 'measureText']
+  var canvasMethods = ['getImageData', 'getLineDash', 'measureText', 'isPointInPath']
   canvasMethods.forEach(function (method) {
     var item = {
       type: 'Canvas',
@@ -196,7 +196,8 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
   })
 
   var webglMethods = ['getSupportedExtensions', 'getParameter', 'getContextAttributes',
-    'getShaderPrecisionFormat', 'getExtension', 'readPixels']
+    'getShaderPrecisionFormat', 'getExtension', 'readPixels', 'getUniformLocation',
+    'getAttribLocation']
   webglMethods.forEach(function (method) {
     var item = {
       type: 'WebGL',
@@ -223,6 +224,26 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     var item = {
       type: 'AudioContext',
       objName: 'AnalyserNode',
+      propName: method
+    }
+    methods.push(item)
+  })
+
+  var svgPathMethods = ['getTotalLength']
+  svgPathMethods.forEach(function (method) {
+    var item = {
+      type: 'SVG',
+      objName: 'SVGPathElement',
+      propName: method
+    }
+    methods.push(item)
+  })
+
+  var svgTextContentMethods = ['getComputedTextLength']
+  svgTextContentMethods.forEach(function (method) {
+    var item = {
+      type: 'SVG',
+      objName: 'SVGTextContentElement',
       propName: method
     }
     methods.push(item)
