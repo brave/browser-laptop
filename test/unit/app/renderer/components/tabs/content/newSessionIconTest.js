@@ -73,7 +73,7 @@ describe('Tabs content - NewSessionIcon', function () {
     mockery.registerMock('../../../../extensions/brave/img/tabs/new_session.svg')
     windowStore = require('../../../../../../../js/stores/windowStore')
     appStore = require('../../../../../../../js/stores/appStoreRenderer')
-    NewSessionIcon = require('../../../../../../../app/renderer/components/tabs/content/NewSessionIcon')
+    NewSessionIcon = require('../../../../../../../app/renderer/components/tabs/content/newSessionIcon')
     appStore.state = fakeAppStoreRenderer
   })
 

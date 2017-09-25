@@ -67,7 +67,7 @@ describe('Tabs content - Favicon', function () {
     mockery.registerMock('../../../../extensions/brave/img/tabs/loading.svg')
     windowStore = require('../../../../../../../js/stores/windowStore')
     appStore = require('../../../../../../../js/stores/appStoreRenderer')
-    Favicon = require('../../../../../../../app/renderer/components/tabs/content/favicon')
+    Favicon = require('../../../../../../../app/renderer/components/tabs/content/favIcon')
     appStore.state = fakeAppStoreRenderer
   })
 
