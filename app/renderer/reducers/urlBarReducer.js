@@ -84,7 +84,9 @@ const updateUrlSuffix = (state, suggestionList, framePath) => {
 
     if (autocompleteEnabled) {
       const location = normalizeLocation(state.getIn(framePath.concat(['navbar', 'urlbar', 'location']))) || ''
-      const normalizedSuggestion = normalizeLocation(suggestion.get('location').toLowerCase())
+      const normalizedSuggestion = suggestion && suggestion.get && suggestion.get('location')
+        ? normalizeLocation(suggestion.get('location').toLowerCase())
+        : ''
       const index = normalizedSuggestion.indexOf(location.toLowerCase())
       if (index === 0) {
         suffix = normalizedSuggestion.substring(index + location.length)
