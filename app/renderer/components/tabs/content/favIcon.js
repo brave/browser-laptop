@@ -73,6 +73,7 @@ class Favicon extends React.Component {
     })
 
     return <TabIcon
+      data-test-favicon={this.props.favicon}
       data-test-id={this.testingIcon}
       className={css(
         styles.icon,

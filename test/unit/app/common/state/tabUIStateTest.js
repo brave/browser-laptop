@@ -158,22 +158,15 @@ describe('tabUIState unit tests', function () {
       assert.equal(tabUIState.showTabEndIcon(), false)
     })
 
-    it('returns false for regular tabs', function * () {
+    // if there's no hover and tab is normal-sized always
+    // show the tab end icons
+    it('returns true for regular tabs', function * () {
       const state = defaultState.mergeIn(['frames', index], {
         isPrivate: false,
         partitionNumber: 0
       })
       const result = tabUIState.showTabEndIcon(state, frameKey)
-      assert.equal(result, false)
-    })
-
-    it('returns false for regular tabs', function * () {
-      const state = defaultState.mergeIn(['frames', index], {
-        isPrivate: false,
-        partitionNumber: false
-      })
-      const result = tabUIState.showTabEndIcon(state, frameKey)
-      assert.equal(result, false)
+      assert.equal(result, true)
     })
 
     describe('when tab is partitioned', function () {
