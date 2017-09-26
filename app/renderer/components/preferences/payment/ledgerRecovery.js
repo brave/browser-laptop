@@ -6,7 +6,7 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // util
-const {btcToCurrencyString} = require('../../../../common/lib/ledgerUtil')
+const {batToCurrencyString} = require('../../../../common/lib/ledgerUtil')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
@@ -43,7 +43,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
 
   render () {
     const l10nDataArgs = {
-      balance: btcToCurrencyString(this.props.ledgerData.get('balance'), this.props.ledgerData)
+      balance: batToCurrencyString(this.props.ledgerData.get('balance'), this.props.ledgerData)
     }
     const recoverySucceeded = this.props.ledgerData.get('recoverySucceeded')
     const recoveryError = this.props.ledgerData.getIn(['error', 'error'])

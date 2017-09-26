@@ -9,7 +9,7 @@ require('../../../braveUnit')
 const ledgerExportUtil = require('../../../../../app/common/lib/ledgerExportUtil')
 const base64Encode = require('../../../../../js/lib/base64').encode
 
-const CSV_HEADER_ROW_PREFIX_COLUMNS = ['Publisher', 'Votes', 'Fraction', 'BTC']
+const CSV_HEADER_ROW_PREFIX_COLUMNS = ['Publisher', 'Votes', 'Fraction', 'BAT']
 const CSV_HEADER_ROW_PREFIX = CSV_HEADER_ROW_PREFIX_COLUMNS.join(',')
 const DEFAULT_CSV_HEADER_ROW_COLUMNS = CSV_HEADER_ROW_PREFIX_COLUMNS.concat(['USD'])
 const DEFAULT_CSV_HEADER_ROW = DEFAULT_CSV_HEADER_ROW_COLUMNS.join(',')
