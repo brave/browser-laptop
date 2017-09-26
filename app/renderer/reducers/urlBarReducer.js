@@ -269,9 +269,11 @@ const urlBarReducer = (state, action) => {
     case windowConstants.WINDOW_SET_RENDER_URL_BAR_SUGGESTIONS:
       state = setRenderUrlBarSuggestions(state, action.enabled)
       break
-    case windowConstants.WINDOW_ACTIVE_URL_BAR_SUGGESTION_CLICKED:
-      const selectedIndex = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])) || 0
-      const suggestionList = state.getIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']))
+    case windowConstants.WINDOW_ACTIVE_URL_BAR_SUGGESTION_CLICKED: {
+      const activeFramePath = activeFrameStatePath(state)
+      const selectedIndex = state.getIn(activeFramePath.concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex'])) || 0
+      const suggestionList = state.getIn(activeFramePath.concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']))
+      state = state.setIn(activeFramePath.concat(['navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), false)
       if (suggestionList.size > 0) {
         // It's important this doesn't run sync or else the returned state below will overwrite anything done in the click handler
         setImmediate(() => {
@@ -280,6 +282,7 @@ const urlBarReducer = (state, action) => {
         })
       }
       break
+    }
     case windowConstants.WINDOW_ON_STOP:
       if (action.isFocused) {
         state = setActive(state, false)
