@@ -319,6 +319,11 @@ describe('urlBarReducer', function () {
         urlBarReducer(inputState, {actionType: windowConstants.WINDOW_ACTIVE_URL_BAR_SUGGESTION_CLICKED})
         assert.equal(this.suggestionClickHandlers.navigateSiteClickHandler.callCount, 0)
       })
+      it('sets the urlbar to disabled', function () {
+        const inputState = windowState.setIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'suggestionList', Immutable.fromJS([{location: 'https://www.brave.com'}])])
+        const newState = urlBarReducer(inputState, {actionType: windowConstants.WINDOW_ACTIVE_URL_BAR_SUGGESTION_CLICKED})
+        assert.equal(newState.getIn(['frames', 1, 'navbar', 'urlbar', 'suggestions', 'autocompleteEnabled']), false)
+      })
     })
   })
 })
