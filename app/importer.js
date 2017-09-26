@@ -40,6 +40,14 @@ let isImportingBookmarks = false
 let hasBookmarks
 let bookmarkList
 
+const getCurrentWindowId = () => {
+  if (BrowserWindow.getFocusedWindow()) {
+    return BrowserWindow.getFocusedWindow().webContents.id
+  }
+
+  return -1
+}
+
 exports.init = () => {
   importer.initialize()
 }
@@ -269,6 +277,7 @@ const showImportSuccess = function () {
 }
 
 app.on('show-warning-dialog', (e) => {
+  appActions.setImportBrowserDataDetail(getCurrentWindowId())
   showImportWarning()
 })
 
@@ -279,8 +288,12 @@ importer.on('import-success', (e) => {
       appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
     }
   }
+  setImmediate(() => {
+    appActions.setImportBrowserDataDetail(getCurrentWindowId())
+  })
   showImportSuccess()
 })
 
 importer.on('import-dismiss', (e) => {
+  appActions.setImportBrowserDataDetail(getCurrentWindowId())
 })

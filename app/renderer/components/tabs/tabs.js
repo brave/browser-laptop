@@ -146,7 +146,7 @@ class Tabs extends React.Component {
     props.partOfFullPageSet = currentTabs.size === tabsPerTabPage
     props.onNextPage = currentTabs.size >= tabsPerTabPage && totalPages > pageIndex + 1
     props.onPreviousPage = pageIndex > 0
-    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state))
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, getCurrentWindowId(), activeFrame, isFocused(state))
 
     // used in other functions
     props.fixTabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])

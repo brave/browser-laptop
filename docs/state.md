@@ -394,11 +394,26 @@ AppStore
     focused: boolean,
     height: number,
     left: number,
-    state: string  // "normal", "minimized", "maximized", or "fullscreen"
+    state: string,  // "normal", "minimized", "maximized", or "fullscreen"
     top: number,
     type: string,  // "normal", "popup", or "devtools"
     width: number,
     // session properties
+    importBrowserDataDetail: [{
+      cookies: boolean,
+      favorites: boolean,
+      history: boolean,
+      index: string,
+      name: string,
+      type: number
+    }],
+    importBrowserDataSelected: {
+      cookies: boolean,
+      favorites: boolean,
+      history: boolean,
+      index: string,
+      type: number
+    },
     windowId: number  // the muon id for the window
   }],
   searchDetail: {
@@ -553,21 +568,6 @@ WindowStore
     },
     unloaded: boolean, // true if the tab is unloaded
   }],
-  importBrowserDataDetail: [{
-    cookies: boolean,
-    favorites: boolean,
-    history: boolean,
-    index: string,
-    name: string,
-    type: number
-  }],
-  importBrowserDataSelected: {
-    cookies: boolean,
-    favorites: boolean,
-    history: boolean,
-    index: string,
-    type: number
-  },
   lastAppVersion: string, // version of the last file that was saved
   ledgerInfo: {
     address: string, // the BTC wallet address (in base58)
