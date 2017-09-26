@@ -826,6 +826,7 @@ module.exports.filterSitesRelativeTo = function (sites, relSite) {
     return sites
   }
   return sites.filter((site) => site.get('parentFolderId') === relSite.get('folderId'))
+    .sort(module.exports.siteSort)
 }
 
 /**
