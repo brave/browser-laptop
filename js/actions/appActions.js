@@ -1579,6 +1579,14 @@ const appActions = {
       name,
       version
     })
+  },
+
+  enablePepperMenu: function (params, tabId) {
+    dispatch({
+      actionType: appConstants.APP_ENABLE_PEPPER_MENU,
+      params,
+      tabId
+    })
   }
 }
 
