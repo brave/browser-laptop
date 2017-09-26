@@ -78,7 +78,7 @@ const prepareHistoryEntry = (siteDetail) => {
     objectId: siteDetail.get('objectId', null),
     title: siteDetail.get('title'),
     location: siteDetail.get('location'),
-    partitionNumber: ~~siteDetail.get('partitionNumber', 0),
+    partitionNumber: Number(siteDetail.get('partitionNumber', 0)),
     count: 1,
     themeColor: siteDetail.get('themeColor'),
     favicon: siteDetail.get('favicon', siteDetail.get('icon')),
@@ -98,8 +98,8 @@ const mergeSiteDetails = (oldDetail, newDetail) => {
     objectId,
     title: newDetail.get('title'),
     location: newDetail.get('location'),
-    partitionNumber: ~~newDetail.get('partitionNumber', 0),
-    count: ~~oldDetail.get('count', 0) + 1
+    partitionNumber: Number(newDetail.get('partitionNumber', 0)),
+    count: Number(oldDetail.get('count', 0)) + 1
   })
 
   const themeColor = newDetail.has('themeColor') ? newDetail.get('themeColor') : oldDetail.get('themeColor')

@@ -317,7 +317,7 @@ describe('bookmark tests', function () {
         .activateURLMode()
         .waitForVisible(navigatorBookmarked)
     })
-    it('on new active tabs', function * () {
+    it('on new non-active tabs', function * () {
       yield this.app.client
         .waitForVisible(navigatorNotBookmarked)
         .newTab({ url: this.page1Url, active: false })

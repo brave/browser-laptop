@@ -7,9 +7,15 @@
 const path = require('path')
 const assert = require('assert')
 const Immutable = require('immutable')
+
+// Constants
 const appConstants = require('../../../js/constants/appConstants')
 const windowConstants = require('../../../js/constants/windowConstants')
+
+// State
 const windowState = require('../../common/state/windowState')
+
+// Utils
 const windows = require('../windows')
 const sessionStoreShutdown = require('../../sessionStoreShutdown')
 const {makeImmutable, isImmutable} = require('../../common/state/immutableUtil')
@@ -341,8 +347,14 @@ const windowsReducer = (state, action, immutableAction) => {
       windows.cleanupWindow(windowId)
       break
     case appConstants.APP_WINDOW_CREATED:
-      state = windowState.maybeCreateWindow(state, action)
-      break
+    case appConstants.APP_WINDOW_RESIZED:
+      {
+        const bookmarkToolbarState = require('../../common/state/bookmarkToolbarState')
+        state = windowState.maybeCreateWindow(state, action)
+        const windowId = action.getIn(['windowValue', 'windowId'], windowState.WINDOW_ID_NONE)
+        state = bookmarkToolbarState.setToolbar(state, windowId)
+        break
+      }
     case appConstants.APP_TAB_STRIP_EMPTY:
       windows.closeWindow(action.get('windowId'))
       break

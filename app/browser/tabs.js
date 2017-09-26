@@ -337,6 +337,29 @@ const createNavigationState = (navigationHandle, controller) => {
   })
 }
 
+let backgroundProcess = null
+let backgroundProcessTimer = null
+/**
+ * Execute script in the browser tab
+ * @param win{object} - window in which we want to execute script
+ * @param debug{boolean} - would you like to close window or not
+ * @param script{string} - script that you want to execute
+ * @param cb{function} - function that we call after script is completed
+ */
+const runScript = (win, debug, script, cb) => {
+  win.webContents.executeScriptInTab(config.braveExtensionId, script, {}, (err, url, result) => {
+    cb(err, url, result)
+    if (!debug) {
+      backgroundProcessTimer = setTimeout(() => {
+        if (backgroundProcess) {
+          win.close()
+          backgroundProcess = null
+        }
+      }, 2 * 60 * 1000) // 2 min
+    }
+  })
+}
+
 const api = {
   init: (state, action) => {
     process.on('open-url-from-tab', (e, source, targetUrl, disposition) => {
@@ -765,20 +788,32 @@ const api = {
     })
   },
 
-  executeScriptInBackground: (script, cb) => {
-    const win = new BrowserWindow({
-      show: false,
-      webPreferences: {
-        partition: 'default'
-      }
-    })
-    win.webContents.on('did-finish-load', (e) => {
-      win.webContents.executeScriptInTab(config.braveExtensionId, script, {}, (err, url, result) => {
-        cb(err, url, result)
-        setImmediate(() => win.close())
+  /**
+   * Execute script in the background browser window
+   * @param script{string} - script that we want to run
+   * @param cb{function} - function that we want to call when script is done
+   * @param debug{boolean} - would you like to keep browser window when script is done
+   */
+  executeScriptInBackground: (script, cb, debug = false) => {
+    if (backgroundProcessTimer) {
+      clearTimeout(backgroundProcessTimer)
+    }
+
+    if (backgroundProcess === null) {
+      backgroundProcess = new BrowserWindow({
+        show: debug,
+        webPreferences: {
+          partition: 'default'
+        }
       })
-    })
-    win.loadURL('about:blank')
+
+      backgroundProcess.webContents.on('did-finish-load', () => {
+        runScript(backgroundProcess, debug, script, cb)
+      })
+      backgroundProcess.loadURL('about:blank')
+    } else {
+      runScript(backgroundProcess, debug, script, cb)
+    }
   },
 
   moveTo: (state, tabId, frameOpts, browserOpts, toWindowId) => {

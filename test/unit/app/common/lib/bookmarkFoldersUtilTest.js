@@ -29,7 +29,7 @@ describe('bookmarkFoldersUtil unit test', function () {
   describe('getNextFolderId', function () {
     it('null check', function () {
       const id = bookmarkFoldersUtil.getNextFolderId()
-      assert.equal(id, 0)
+      assert.equal(id, 1)
     })
 
     it('folders list is empty', function () {
@@ -193,6 +193,68 @@ describe('bookmarkFoldersUtil unit test', function () {
       })
       const valid = bookmarkFoldersUtil.isMoveAllowed(sites, source, destination)
       assert.equal(valid, true)
+    })
+  })
+
+  describe('buildFolder', function () {
+    it('uses all default values', function () {
+      const folderDetails = Immutable.fromJS({
+        title: 'Brave'
+      })
+      const folder = bookmarkFoldersUtil.buildFolder(folderDetails)
+      const expectedFolder = {
+        title: 'Brave',
+        folderId: 1,
+        key: '1',
+        parentFolderId: 0,
+        partitionNumber: 0,
+        objectId: null,
+        type: siteTags.BOOKMARK_FOLDER,
+        skipSync: null
+      }
+      assert.deepEqual(folder.toJS(), expectedFolder)
+    })
+
+    it('folderId is provided', function () {
+      const folderDetails = Immutable.fromJS({
+        title: 'Brave',
+        folderId: 3
+      })
+      const folder = bookmarkFoldersUtil.buildFolder(folderDetails)
+      const expectedFolder = {
+        title: 'Brave',
+        folderId: 3,
+        key: '3',
+        parentFolderId: 0,
+        partitionNumber: 0,
+        objectId: null,
+        type: siteTags.BOOKMARK_FOLDER,
+        skipSync: null
+      }
+      assert.deepEqual(folder.toJS(), expectedFolder)
+    })
+
+    it('all values are provided', function () {
+      const folderDetails = Immutable.fromJS({
+        title: 'Brave',
+        folderId: 3,
+        parentFolderId: 1,
+        partitionNumber: 1,
+        objectId: [1],
+        skipSync: true
+      })
+      const folder = bookmarkFoldersUtil.buildFolder(folderDetails)
+      const expectedFolder = {
+        title: 'Brave',
+        folderId: 3,
+        key: '3',
+        parentFolderId: 1,
+        partitionNumber: 1,
+        objectId: [1],
+        type: siteTags.BOOKMARK_FOLDER,
+        skipSync: true
+      }
+      assert.deepEqual(folder.toJS(), expectedFolder)
     })
   })
 })
