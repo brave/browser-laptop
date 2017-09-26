@@ -460,6 +460,10 @@ const api = {
         }
       })
 
+      tab.on('enable-pepper-menu', (e, params) => {
+        appActions.enablePepperMenu(params, tabId)
+      })
+
       tab.on('close', () => {
         tab.forceClose()
       })

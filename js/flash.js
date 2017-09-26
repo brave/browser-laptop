@@ -5,13 +5,15 @@
 
 const fs = require('fs')
 const path = require('path')
-const {app, ipcMain, webContents} = require('electron')
+const {app, ipcMain, webContents, Menu} = require('electron')
 const appActions = require('./actions/appActions')
 const {getOrigin} = require('./lib/urlutil')
 const locale = require('../app/locale')
 const messages = require('./constants/messages')
 const settings = require('./constants/settings')
+const {getSetting} = require('./settings')
 const {memoize} = require('underscore')
+const tabState = require('../app/common/state/tabState')
 
 // set to true if the flash install check has succeeded
 let flashInstalled = false
@@ -117,6 +119,53 @@ module.exports.checkFlashInstalled = (cb) => {
   } catch (e) {
     cb && cb(flashInstalled)
   }
+}
+
+const flashMenuTemplateInit = (state, tabId) => {
+  const windowId = tabState.getWindowId(state, tabId)
+  const location = tabState.getLocation(state, tabId)
+  const isPrivate = tabState.isIncognito(state, tabId)
+
+  const canRunFlash = state.getIn(['flash', 'enabled']) && getSetting(settings.FLASH_INSTALLED)
+  const template = []
+  if (!canRunFlash) {
+    template.push({
+      label: locale.translation('openFlashPreferences'),
+      click: () => {
+        appActions.createTabRequested({
+          url: 'about:preferences#plugins',
+          windowId: windowId,
+          active: true
+        })
+      }
+    })
+  } else {
+    template.push({
+      label: locale.translation('allowFlashOnce'),
+      click: () => {
+        appActions.allowFlashOnce(tabId, location, isPrivate)
+      }
+    })
+    if (!isPrivate) {
+      template.push({
+        label: locale.translation('allowFlashAlways'),
+        click: () => {
+          appActions.allowFlashAlways(tabId, location)
+        }
+      })
+    }
+  }
+  return template
+}
+
+module.exports.onFlashContextMenu = (state, tabId) => {
+  const tab = webContents.fromTabID(tabId)
+  if (!tab) {
+    return
+  }
+
+  const flashMenu = Menu.buildFromTemplate(flashMenuTemplateInit(state, tabId))
+  flashMenu.popup(tab)
 }
 
 module.exports.init = () => {

@@ -459,14 +459,6 @@ class Frame extends React.Component {
       }
       windowActions.setBlockedRunInsecureContent(this.frame, e.details[0])
     }, { passive: true })
-    this.webview.addEventListener('enable-pepper-menu', (e) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      contextMenus.onFlashContextMenu(e.params, this.frame)
-      e.preventDefault()
-      e.stopPropagation()
-    })
     this.webview.addEventListener('context-menu', (e) => {
       if (this.frame.isEmpty()) {
         return
