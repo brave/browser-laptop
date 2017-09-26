@@ -1566,6 +1566,14 @@ const appActions = {
       word,
       tabId
     })
+  },
+
+  enablePepperMenu: function (params, tabId) {
+    dispatch({
+      actionType: appConstants.APP_ENABLE_PEPPER_MENU,
+      params,
+      tabId
+    })
   }
 }
 
