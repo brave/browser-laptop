@@ -8,14 +8,22 @@ const electron = require('electron')
 const config = require('../js/constants/config')
 const BrowserWindow = electron.BrowserWindow
 
-const renderUrlToPdf = (appState, action, testingMode) => {
+const renderUrlToPdf = (appState, action) => {
   let url = action.url
   let savePath = action.savePath
   let openAfterwards = action.openAfterwards
 
   let currentBw = BrowserWindow.getFocusedWindow()
 
-  let bw = new BrowserWindow({show: !!testingMode, backgroundColor: '#ffffff'})
+  let bw = new BrowserWindow({
+    show: false,
+    width: 0,
+    height: 0,
+    backgroundColor: '#ffffff',
+    webPreferences: {
+      partition: 'default'
+    }
+  })
 
   let wv = bw.webContents
 
@@ -45,12 +53,12 @@ const renderUrlToPdf = (appState, action, testingMode) => {
             if (openAfterwards && savePath) {
               currentBw.webContents.loadURL('file://' + finalSavePath)
             }
+          }
 
-            if (bw && !testingMode) {
-              try {
-                bw.close()
-              } catch (exc) {}
-            }
+          if (bw) {
+            try {
+              bw.close()
+            } catch (exc) {}
           }
         })
       })

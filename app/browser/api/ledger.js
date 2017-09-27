@@ -1570,7 +1570,6 @@ const showNotificationPaymentDone = (transactionContributionFiat) => {
 
 const observeTransactions = (state, transactions) => {
   const current = ledgerState.getInfoProp(state, 'transactions')
-  debugger
   if (current && current.size === transactions.length) {
     return
   }
