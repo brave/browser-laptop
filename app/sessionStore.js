@@ -33,6 +33,7 @@ const Channel = require('./channel')
 const {isList, isMap, isImmutable, makeImmutable, deleteImmutablePaths} = require('./common/state/immutableUtil')
 const tabState = require('./common/state/tabState')
 const windowState = require('./common/state/windowState')
+const siteCache = require('./common/state/siteCache')
 
 const platformUtil = require('./common/lib/platformUtil')
 const getSetting = require('../js/settings').getSetting
@@ -559,6 +560,11 @@ module.exports.runPostMigrations = (immutableData) => {
         const site = oldSites.get(key)
         const newKey = siteUtil.getSiteKey(site)
         if (!newKey) {
+          immutableData = immutableData.deleteIn(['sites', key])
+          const location = siteUtil.getLocationFromSiteKey(key)
+          if (location) {
+            immutableData = siteCache.removeLocationSiteKey(immutableData, location, key)
+          }
           continue
         }
         immutableData = immutableData.setIn(['sites', newKey], site)

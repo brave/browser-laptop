@@ -49,6 +49,7 @@ const sitesReducer = (state, action, immutableAction) => {
         const clearData = defaults ? defaults.merge(temp) : temp
         if (clearData.get('browserHistory')) {
           state = state.set('sites', siteUtil.clearHistory(state.get('sites')))
+          state = siteCache.clearLocationSiteKeysCache(state)
           filtering.clearHistory()
         }
         break
