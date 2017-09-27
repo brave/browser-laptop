@@ -1119,6 +1119,17 @@ describe('siteUtil', function () {
       const expectedState = siteUtil.addSite(stateWithInvalidEntries, updatedSiteDetail, siteTags.BOOKMARK)
       assert.deepEqual(processedState.get('sites').toJS(), expectedState.get('sites').toJS())
     })
+    it('returns the object unchanged if the entry does not exist but found in cache', function () {
+      const stateWithNoEntries = Immutable.fromJS({
+        sites: {},
+        locationSiteKeysCache: {
+          'https://brave.com': [testUrl1 + '/|0|0', testUrl1 + '|0|0']
+        }
+      })
+      const processedState = siteUtil.updateSiteFavicon(stateWithNoEntries, testUrl1, 'https://brave.com/favicon.ico')
+      const expectedState = stateWithNoEntries
+      assert.deepEqual(processedState.get('sites').toJS(), expectedState.get('sites').toJS())
+    })
   })
 
   describe('getDetailFromFrame', function () {

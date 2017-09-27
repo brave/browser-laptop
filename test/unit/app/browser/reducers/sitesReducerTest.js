@@ -25,12 +25,16 @@ describe('sitesReducerTest', function () {
     this.fakeFiltering = {
       clearHistory: () => {}
     }
+    this.fakeSiteCache = {
+      clearLocationSiteKeysCache: () => {}
+    }
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
       useCleanCache: true
     })
     mockery.registerMock('../../filtering', this.fakeFiltering)
+    mockery.registerMock('../../common/state/siteCache', this.fakeSiteCache)
     sitesReducer = require('../../../../../app/browser/reducers/sitesReducer')
   })
 
@@ -44,15 +48,21 @@ describe('sitesReducerTest', function () {
       }
       const newState = initState.setIn(['clearBrowsingDataDefaults', 'browserHistory'], true)
       this.clearHistory = sinon.stub(this.fakeFiltering, 'clearHistory')
+      this.clearLocationSiteKeysCache = sinon.stub(this.fakeSiteCache, 'clearLocationSiteKeysCache')
       this.state = sitesReducer(newState, this.action, makeImmutable(this.action))
     })
 
     after(function () {
+      this.clearLocationSiteKeysCache.restore()
       this.clearHistory.restore()
     })
 
     it('calls `filtering.clearHistory`', function () {
       assert.ok(this.clearHistory.calledOnce)
+    })
+
+    it('calls `siteCache.clearLocationSiteKeysCache`', function () {
+      assert.ok(this.clearLocationSiteKeysCache.calledOnce)
     })
   })
 

@@ -657,7 +657,9 @@ module.exports.updateSiteFavicon = function (state, location, favicon) {
     return state
   }
   siteKeys.forEach((siteKey) => {
-    state = state.setIn(['sites', siteKey, 'favicon'], favicon)
+    if (state.getIn(['sites', siteKey])) {
+      state = state.setIn(['sites', siteKey, 'favicon'], favicon)
+    }
   })
   return state
 }
