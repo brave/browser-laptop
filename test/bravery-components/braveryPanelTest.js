@@ -334,7 +334,8 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .waitForVisible(customFiltersInput)
-        .click(customFiltersInput)
+        .setValue(customFiltersInput, '')
+        .waitForInputText(customFiltersInput, '')
         .typeText(customFiltersInput, 'testblock.brave.com')
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
@@ -385,7 +386,8 @@ describe('Bravery Panel', function () {
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
         .waitForVisible(customFiltersInput)
-        .click(customFiltersInput)
+        .setValue(customFiltersInput, '')
+        .waitForInputText(customFiltersInput, '')
         .typeText(customFiltersInput, 'testblock.brave.com')
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
