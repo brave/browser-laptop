@@ -1096,15 +1096,20 @@ describe('siteUtil', function () {
 
       assert.deepEqual(processedState.get('sites').toJS(), expectedState.get('sites').toJS())
     })
-    it('returns the object unchanged if location is not a URL', function () {
+    it('returns the state unchanged if location is not a URL', function () {
       const state = siteUtil.addSite(emptyState, bookmarkMinFields, siteTags.BOOKMARK)
       const processedState = siteUtil.updateSiteFavicon(state, 'not-a-url', 'https://brave.com/favicon.ico')
       assert.deepEqual(processedState.get('sites'), state.get('sites'))
     })
-    it('returns the object unchanged if it is not an Immutable.Map', function () {
+    it('returns the state unchanged if it is not an Immutable.Map', function () {
       const emptyLegacySites = Immutable.fromJS([])
       const processedState = siteUtil.updateSiteFavicon(emptyLegacySites, testUrl1, 'https://brave.com/favicon.ico')
       assert.deepEqual(processedState.get('sites'), emptyLegacySites.get('sites'))
+    })
+    it('returns the state unchanged if key is not found in sites', function () {
+      const state = siteUtil.addSite(emptyState, bookmarkMinFields, siteTags.BOOKMARK)
+      const processedState = siteUtil.updateSiteFavicon(state, 'https://not-in-sites.com', 'https://brave.com/favicon.ico')
+      assert.deepEqual(processedState.get('sites'), state.get('sites'))
     })
     it('works even if null/undefined entries are present', function () {
       const stateWithInvalidEntries = Immutable.fromJS({
