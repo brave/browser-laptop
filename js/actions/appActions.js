@@ -1493,11 +1493,12 @@ const appActions = {
    * @param siteDetail{Immutable.Map|Immutable.List} - Bookmark details that we want to add, this can be a List as well
    * @param closestKey{string} - Key of the sibling where we would like to place this new bookmark
    */
-  addBookmark: function (siteDetail, closestKey) {
+  addBookmark: function (siteDetail, closestKey, isLeftSide = false) {
     dispatch({
       actionType: appConstants.APP_ADD_BOOKMARK,
       siteDetail,
-      closestKey
+      closestKey,
+      isLeftSide
     })
   },
 

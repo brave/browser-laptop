@@ -77,7 +77,7 @@ const bookmarksState = {
     return bookmarks
   },
 
-  addBookmark: (state, bookmarkDetail, destinationKey) => {
+  addBookmark: (state, bookmarkDetail, destinationKey, isLeftSide) => {
     state = validateState(state)
     const key = bookmarkDetail.get('key')
     if (key === null) {
@@ -86,7 +86,7 @@ const bookmarksState = {
 
     if (!state.hasIn([STATE_SITES.BOOKMARKS, key])) {
       state = bookmarkLocationCache.addCacheKey(state, bookmarkDetail.get('location'), key)
-      state = bookmarkOrderCache.addBookmarkToCache(state, bookmarkDetail.get('parentFolderId'), key, destinationKey)
+      state = bookmarkOrderCache.addBookmarkToCache(state, bookmarkDetail.get('parentFolderId'), key, destinationKey, isLeftSide)
     }
 
     state = state.setIn([STATE_SITES.BOOKMARKS, key], bookmarkDetail)

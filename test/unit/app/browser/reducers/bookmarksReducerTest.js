@@ -304,6 +304,122 @@ describe('bookmarksReducer unit test', function () {
       assert.equal(spyCalc.callCount, 1)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
     })
+
+    it('add a bookmark with a close bookmark prepending', function () {
+      const newState = state.set('bookmarks', Immutable.fromJS({
+        'https://www.clifton.io|0|0': {
+          lastAccessedTime: 0,
+          objectId: null,
+          title: 'Brave',
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        },
+        'https://www.bbondy.io|0|0': {
+          lastAccessedTime: 0,
+          objectId: null,
+          title: 'Brave',
+          location: 'https://www.bbondy.io',
+          parentFolderId: 0
+        },
+        'https://www.bridiver.io|0|0': {
+          lastAccessedTime: 0,
+          objectId: null,
+          title: 'Brave',
+          location: 'https://www.bridiver.io',
+          parentFolderId: 0
+        }
+      }))
+      .setIn(['cache', 'bookmarkOrder', '0'], Immutable.fromJS([
+        {
+          key: 'https://clifton.io/|0|0',
+          order: 0,
+          type: siteTags.BOOKMARK
+        },
+        {
+          key: 'https://www.bbondy.io|0|0',
+          order: 1,
+          type: siteTags.BOOKMARK
+        },
+        {
+          key: 'https://www.bridiver.io|0|0',
+          order: 2,
+          type: siteTags.BOOKMARK
+        }
+      ]))
+      const action = {
+        actionType: appConstants.APP_ADD_BOOKMARK,
+        siteDetail: Immutable.fromJS({
+          parentFolderId: 0,
+          title: 'Brave',
+          location: 'https://www.brave.com'
+        }),
+        tag: siteTags.BOOKMARK,
+        closestKey: 'https://www.bbondy.io|0|0',
+        isLeftSide: true
+      }
+
+      const newBookmarks = {
+        'https://www.clifton.io|0|0': {
+          lastAccessedTime: 0,
+          objectId: null,
+          title: 'Brave',
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        },
+        'https://www.bbondy.io|0|0': {
+          lastAccessedTime: 0,
+          objectId: null,
+          title: 'Brave',
+          location: 'https://www.bbondy.io',
+          parentFolderId: 0
+        },
+        'https://www.brave.com|0|0': {
+          favicon: undefined,
+          key: 'https://www.brave.com|0|0',
+          objectId: null,
+          title: 'Brave',
+          location: 'https://www.brave.com',
+          parentFolderId: 0,
+          partitionNumber: 0,
+          skipSync: null,
+          themeColor: undefined,
+          type: 'bookmark',
+          width: 0
+        },
+        'https://www.bridiver.io|0|0': {
+          lastAccessedTime: 0,
+          objectId: null,
+          title: 'Brave',
+          location: 'https://www.bridiver.io',
+          parentFolderId: 0
+        }
+      }
+
+      const newBookmarksOrder = [
+        {
+          key: 'https://clifton.io/|0|0',
+          order: 0,
+          type: siteTags.BOOKMARK
+        },
+        {
+          key: 'https://www.brave.com|0|0',
+          order: 1,
+          type: siteTags.BOOKMARK
+        },
+        {
+          key: 'https://www.bbondy.io|0|0',
+          order: 2,
+          type: siteTags.BOOKMARK
+        },
+        {
+          key: 'https://www.bridiver.io|0|0',
+          order: 3,
+          type: siteTags.BOOKMARK
+        }]
+      const result = bookmarksReducer(newState, action)
+      assert.deepEqual(result.get('bookmarks').toJS(), newBookmarks)
+      assert.deepEqual(result.getIn(['cache', 'bookmarkOrder', '0']).toJS(), newBookmarksOrder)
+    })
   })
 
   describe('APP_EDIT_BOOKMARK', function () {

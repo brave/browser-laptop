@@ -30,6 +30,7 @@ const bookmarksReducer = (state, action, immutableAction) => {
       {
         const closestKey = action.get('closestKey')
         const bookmark = action.get('siteDetail')
+        const isLeftSide = action.get('isLeftSide')
 
         if (bookmark == null) {
           break
@@ -39,14 +40,14 @@ const bookmarksReducer = (state, action, immutableAction) => {
           let bookmarkList = Immutable.List()
           action.get('siteDetail', Immutable.List()).forEach((bookmark) => {
             const bookmarkDetail = bookmarkUtil.buildBookmark(state, bookmark)
-            state = bookmarksState.addBookmark(state, bookmarkDetail, closestKey)
+            state = bookmarksState.addBookmark(state, bookmarkDetail, closestKey, !isLeftSide)
             state = syncUtil.updateObjectCache(state, bookmarkDetail, STATE_SITES.BOOKMARKS)
             bookmarkList = bookmarkList.push(bookmarkDetail)
           })
           textCalc.calcTextList(bookmarkList)
         } else {
           const bookmarkDetail = bookmarkUtil.buildBookmark(state, bookmark)
-          state = bookmarksState.addBookmark(state, bookmarkDetail, closestKey)
+          state = bookmarksState.addBookmark(state, bookmarkDetail, closestKey, !isLeftSide)
           state = syncUtil.updateObjectCache(state, bookmarkDetail, STATE_SITES.BOOKMARKS)
           textCalc.calcText(bookmarkDetail, siteTags.BOOKMARK)
         }

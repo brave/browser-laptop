@@ -51,15 +51,18 @@ class BookmarksToolbar extends React.Component {
 
   onDrop (e) {
     e.preventDefault()
-    const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
-    if (bookmark) {
-      // Figure out the droppedOn element filtering out the source drag item
-      let droppedOn = dnd.closestFromXOffset(this.bookmarkRefs.filter((bookmarkRef) => {
+    const getClosestFromPos = (clientX, sourceKey) =>
+      dnd.closestFromXOffset(this.bookmarkRefs.filter((bookmarkRef) => {
         if (!bookmarkRef) {
           return false
         }
-        return bookmarkRef.props.bookmarkKey !== bookmark.get('key')
+        return bookmarkRef.props.bookmarkKey !== sourceKey
       }), e.clientX)
+    const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
+    if (bookmark) {
+      // Figure out the droppedOn element filtering out the source drag item
+      const bookmarkKey = bookmark.get('key')
+      const droppedOn = getClosestFromPos(e.clientX, bookmarkKey)
       if (droppedOn.selectedRef) {
         const isRightSide = !dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
         const droppedOnKey = droppedOn.selectedRef.props.bookmarkKey
@@ -74,6 +77,14 @@ class BookmarksToolbar extends React.Component {
       return
     }
 
+    const droppedOn = getClosestFromPos(e.clientX, undefined)
+    let isLeftSide = false
+    let closestKey
+    if (droppedOn.selectedRef) {
+      closestKey = droppedOn.selectedRef.props.bookmarkKey
+      isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
+    }
+
     const droppedHTML = e.dataTransfer.getData('text/html')
     if (droppedHTML) {
       const parser = new window.DOMParser()
@@ -83,7 +94,7 @@ class BookmarksToolbar extends React.Component {
         appActions.addBookmark(Immutable.fromJS({
           title: a.innerText,
           location: e.dataTransfer.getData('text/plain')
-        }))
+        }), closestKey, isLeftSide)
         return
       }
     }
@@ -93,7 +104,7 @@ class BookmarksToolbar extends React.Component {
         item.getAsString((name) => appActions.addBookmark(Immutable.fromJS({
           location: item.type,
           title: name
-        })))
+        }), closestKey, isLeftSide))
       })
       return
     }
@@ -103,7 +114,7 @@ class BookmarksToolbar extends React.Component {
       .map((x) => x.trim())
       .filter((x) => !x.startsWith('#') && x.length > 0)
       .forEach((url) =>
-        appActions.addBookmark(Immutable.fromJS({ location: url })))
+        appActions.addBookmark(Immutable.fromJS({ location: url }), closestKey, isLeftSide))
   }
 
   onDragEnter (e) {
