@@ -71,6 +71,59 @@ describe('bookmarkState unit test', function () {
       assert.deepEqual(bookmarksState.getBookmarkOrder(stateWithData), stateWithData.getIn(['cache', 'bookmarkOrder']))
     })
   })
+
+  describe('updateFavicon', function () {
+    it('updates the favicon for all matching entries', function () {
+      const processedState = bookmarksState.updateFavicon(stateWithData, 'https://brave.com/', 'https://brave.com/favicon.ico')
+      assert.equal(processedState.getIn(['bookmarks', 'https://brave.com/|0|0', 'favicon']), 'https://brave.com/favicon.ico')
+    })
+    it('returns the state unchanged if location is not a URL', function () {
+      const processedState = bookmarksState.updateFavicon(stateWithData, 'not-a-url', 'https://brave.com/favicon.ico')
+      assert.deepEqual(processedState.get('bookmarks'), stateWithData.get('bookmarks'))
+    })
+    it('throws an error if bookmarks are not an Immutable.Map', function () {
+      const emptyLegacySites = Immutable.fromJS({
+        bookmarks: []
+      })
+      assert.throws(
+        () => {
+          bookmarksState.updateFavicon(emptyLegacySites, 'https://brave.com/', 'https://brave.com/favicon.ico')
+        },
+        /state must contain an Immutable.Map of bookmarks/,
+        'did not throw with expected message')
+    })
+    it('returns the state unchanged if key is not found in sites', function () {
+      const processedState = bookmarksState.updateFavicon(stateWithData, 'https://not-in-sites.com', 'https://brave.com/favicon.ico')
+      assert.deepEqual(processedState.get('bookmarks'), stateWithData.get('bookmarks'))
+    })
+    it('works even if null/undefined entries are present', function () {
+      const stateWithInvalidEntries = stateWithData.mergeDeep(Immutable.fromJS({
+        'bookmarks': {
+          'null': null,
+          'bubba': 'a'
+        }
+      }))
+      const processedState = bookmarksState.updateFavicon(stateWithInvalidEntries, 'https://brave.com/', 'https://brave.com/favicon.ico')
+      assert.equal(processedState.getIn(['bookmarks', 'https://brave.com/|0|0', 'favicon']), 'https://brave.com/favicon.ico')
+    })
+    it('returns the object unchanged if the entry does not exist but found in cache', function () {
+      const testUrl = 'https://brave.com'
+      const stateWithNoEntries = Immutable.fromJS({
+        bookmarks: {},
+        cache: {
+          bookmarkLocation: {
+            'https://brave.com': [
+              testUrl + '/|0|0', testUrl + '|0|0'
+            ]
+          }
+        }
+      })
+      const processedState = bookmarksState.updateFavicon(stateWithNoEntries, testUrl, 'https://brave.com/favicon.ico')
+      const expectedState = stateWithNoEntries
+      assert.deepEqual(processedState.get('bookmarks').toJS(), expectedState.get('bookmarks').toJS())
+    })
+  })
+
   describe('getBookmarksByParentId', function () {
     it('null case', function () {
       const result = bookmarksState.getBookmarksByParentId(stateWithData)

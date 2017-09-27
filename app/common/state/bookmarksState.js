@@ -187,7 +187,9 @@ const bookmarksState = {
     }
 
     siteKeys.forEach((siteKey) => {
-      state = state.setIn([STATE_SITES.BOOKMARKS, siteKey, 'favicon'], favicon)
+      if (state.getIn([STATE_SITES.BOOKMARKS, siteKey])) {
+        state = state.setIn([STATE_SITES.BOOKMARKS, siteKey, 'favicon'], favicon)
+      }
     })
     return state
   },
