@@ -140,4 +140,13 @@ describe('siteCache', function () {
       assert.deepEqual(cachedKeys, undefined)
     })
   })
+
+  describe('clearLocationSiteKeysCache', function () {
+    it('clear all cached siteKeys', function () {
+      let state = siteCache.loadLocationSiteKeysCache(baseState)
+      const expectedCache = {}
+      state = siteCache.clearLocationSiteKeysCache(state)
+      assert.deepEqual(state.get('locationSiteKeysCache').toJS(), expectedCache)
+    })
+  })
 })

@@ -97,3 +97,8 @@ const removeLocationSiteKey = (state, location, siteKey) => {
   }
 }
 module.exports.removeLocationSiteKey = removeLocationSiteKey
+
+const clearLocationSiteKeysCache = (state) => {
+  return state.set('locationSiteKeysCache', new Immutable.Map())
+}
+module.exports.clearLocationSiteKeysCache = clearLocationSiteKeysCache

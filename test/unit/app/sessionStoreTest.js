@@ -76,6 +76,9 @@ describe('sessionStore unit tests', function () {
     },
     getSiteKey: (siteDetail) => {
       return siteUtil.getSiteKey(siteDetail)
+    },
+    getLocationFromSiteKey: (siteKey) => {
+      return siteUtil.getLocationFromSiteKey(siteKey)
     }
   }
   const fakeLocale = {
@@ -1096,8 +1099,38 @@ describe('sessionStore unit tests', function () {
             }
           }
         })
+        const expectedResult = {
+          sites: {}
+        }
         const result = sessionStore.runPostMigrations(data)
-        assert.deepEqual(result.toJS(), data.toJS())
+        assert.deepEqual(result.toJS(), expectedResult)
+      })
+    })
+    describe('locationSiteKeysCache trailing slash migration', function () {
+      it('triggered by invalid site entry', function () {
+        const data = Immutable.fromJS({
+          sites: {
+            'https://brave.com/|0|0': {
+              favicon: 'https://brave.com/bat.ico'
+            }
+          },
+          locationSiteKeysCache: {
+            'https://brave.com/': [
+              'https://brave.com/|0|0',
+              'https://brave.com|0|0'
+            ]
+          }
+        })
+        const expectedResult = {
+          sites: {},
+          locationSiteKeysCache: {
+            'https://brave.com/': [
+              'https://brave.com|0|0'
+            ]
+          }
+        }
+        const result = sessionStore.runPostMigrations(data)
+        assert.deepEqual(result.toJS(), expectedResult)
       })
     })
   })
