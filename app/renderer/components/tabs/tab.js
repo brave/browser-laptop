@@ -122,14 +122,16 @@ class Tab extends React.Component {
   }
 
   onDragStart (e) {
-    // showing up the sentinel while dragging leads to show the shadow
-    // of the next tab. See 10691#issuecomment-329854096
-    // this is added back to original size when onDrag event is happening
-    this.tabSentinel.style.width = 0
+    if (this.frame) {
+      // showing up the sentinel while dragging leads to show the shadow
+      // of the next tab. See 10691#issuecomment-329854096
+      // this is added back to original size when onDrag event is happening
+      this.tabSentinel.style.width = 0
 
-    dnd.onDragStart(dragTypes.TAB, this.frame, e)
-    // cancel tab preview while dragging. see #10103
-    windowActions.setTabHoverState(this.props.frameKey, false, false)
+      dnd.onDragStart(dragTypes.TAB, this.frame, e)
+      // cancel tab preview while dragging. see #10103
+      windowActions.setTabHoverState(this.props.frameKey, false, false)
+    }
   }
 
   onDrag () {
@@ -138,7 +140,9 @@ class Tab extends React.Component {
   }
 
   onDragEnd (e) {
-    dnd.onDragEnd(dragTypes.TAB, this.frame, e)
+    if (this.frame) {
+      dnd.onDragEnd(dragTypes.TAB, this.frame, e)
+    }
   }
 
   onDragOver (e) {

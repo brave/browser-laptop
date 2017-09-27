@@ -426,6 +426,10 @@ function autofillTemplateInit (suggestions, frame) {
 }
 
 function tabTemplateInit (frameProps) {
+  if (!frameProps) {
+    return null
+  }
+
   const frameKey = frameProps.get('key')
   const tabId = frameProps.get('tabId')
   const template = [CommonMenu.newTabMenuItem(frameProps.get('tabId'))]
@@ -1274,8 +1278,11 @@ function onMainContextMenu (nodeProps, frame, tab, contextMenuType) {
 
 function onTabContextMenu (frameProps, e) {
   e.stopPropagation()
-  const tabMenu = Menu.buildFromTemplate(tabTemplateInit(frameProps))
-  tabMenu.popup(getCurrentWindow())
+  const template = tabTemplateInit(frameProps)
+  if (template) {
+    const tabMenu = Menu.buildFromTemplate(template)
+    tabMenu.popup(getCurrentWindow())
+  }
 }
 
 function onNewTabContextMenu (target) {
