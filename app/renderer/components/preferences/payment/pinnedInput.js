@@ -51,14 +51,16 @@ class PinnedInput extends ImmutableComponent {
 const styles = StyleSheet.create({
   // Ref: tableTd_percentage on ledgetTable.js
   pinnedInput: {
-    width: '5ch',
     border: `1px solid #c4c5c5`,
     borderRadius: globalStyles.radius.borderRadius,
     textAlign: 'right',
     background: 'transparent',
     outline: 'none',
     padding: '0 1ch',
-    fontSize: '16px',
+    fontSize: '1rem',
+
+    // include border width
+    width: 'calc(5ch + 2px)',
 
     // To cancel the global color setting
     color: '#656565',

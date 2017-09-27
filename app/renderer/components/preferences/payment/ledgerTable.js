@@ -114,7 +114,7 @@ class LedgerTable extends ImmutableComponent {
 
   get columnClassNames () {
     return [
-      css(styles.alignRight, styles.verifiedTd), // verified
+      css(styles.column_verified), // verified
       css(styles.column_sites), // sites
       css(styles.alignCenter),  // include
       css(styles.alignRight), // views
@@ -131,14 +131,14 @@ class LedgerTable extends ImmutableComponent {
       pinnedRows.map(item => {
         j++
         return this.enabledForSite(item)
-          ? css(j % 2 && styles.tableTdBg)
-          : css(styles.paymentsDisabled, j % 2 && styles.tableTdBg)
+          ? css(j % 2 && styles.row)
+          : css(j % 2 && styles.row, styles.row_disabled)
       }).toJS(),
       unPinnedRows.map(item => {
         j++
         return this.enabledForSite(item)
-          ? css(j % 2 && styles.tableTdBg)
-          : css(styles.paymentsDisabled, j % 2 && styles.tableTdBg)
+          ? css(j % 2 && styles.row)
+          : css(j % 2 && styles.row, styles.row_disabled)
       }).toJS()
     ]
   }
@@ -170,10 +170,10 @@ class LedgerTable extends ImmutableComponent {
           <a className={css(styles.siteData)} href={publisherURL} rel='noopener' target='_blank' tabIndex={-1}>
             {
               faviconURL
-                ? <img className={css(styles.favicon)} src={faviconURL} alt={siteName} />
-                : <span className={css(styles.defaultIcon)}><span className={globalStyles.appIcons.defaultIcon} /></span>
+                ? <img className={css(styles.siteData__icon_favicon)} src={faviconURL} alt={siteName} />
+                : <span className={css(styles.siteData__icon_default)}><span className={globalStyles.appIcons.defaultIcon} /></span>
             }
-            <span className={css(styles.url)} data-test-id='siteName'>{siteName}</span>
+            <span className={css(styles.siteData__url)} data-test-id='siteName'>{siteName}</span>
           </a>
         </div>,
         value: publisherKey
@@ -188,7 +188,8 @@ class LedgerTable extends ImmutableComponent {
             testId='pinnedDisabled'
             onClick={() => {}}
           />
-          : <SiteSettingCheckbox small
+          : <SiteSettingCheckbox
+            small
             hostPattern={this.getHostPattern(synopsis)}
             defaultValue={defaultAutoInclude}
             prefKey='ledgerPayments'
@@ -203,7 +204,7 @@ class LedgerTable extends ImmutableComponent {
         value: duration
       },
       {
-        html: <span className={css(styles.percentageValue)} data-test-id='percentageValue'>
+        html: <span className={css(styles.column_percentage__percentageValue)} data-test-id='percentageValue'>
           {
             pinned
             ? <PinnedInput
@@ -290,7 +291,7 @@ class LedgerTable extends ImmutableComponent {
         headings={['', 'publisher', 'include', 'views', 'timeSpent', 'percentage', 'actions']}
         defaultHeading='percentage'
         defaultHeadingSortOrder='desc'
-        headerClassNames={css(styles.tableTh)}
+        headerClassNames={css(styles.header)}
         columnClassNames={this.columnClassNames}
         rowClassNames={this.rowClassNames(pinnedRows, unPinnedRows)}
         bodyClassNames={[css(unPinnedRows.size > 0 && styles.pinnedBody), '']}
@@ -317,7 +318,7 @@ class LedgerTable extends ImmutableComponent {
       />
       {
         showButton
-        ? <div className={css(styles.ledgerTable__showAllWrap)}>
+        ? <div className={css(styles.ledgerTable__showAll)}>
           <BrowserButton secondaryColor
             testId={showLess ? 'showAll' : 'showLess'}
             l10nId={showLess ? 'showAll' : 'showLess'}
@@ -354,26 +355,20 @@ const styles = StyleSheet.create({
   verified: verifiedBadge(verifiedGreenIcon),
   disabled: verifiedBadge(verifiedWhiteIcon),
 
-  neverShowSiteIcon: {
-    opacity: 0,
-    fontSize: '20px',
-    textAlign: 'center',
-
-    ':hover': {
-      opacity: 1
-    }
-  },
-
-  tableTh: {
+  header: {
     color: paymentStylesVariables.tableHeader.fontColor,
     fontWeight: paymentStylesVariables.tableHeader.fontWeight
   },
 
-  tableTdBg: {
+  row: {
     background: '#f6f7f7'
   },
 
-  verifiedTd: {
+  row_disabled: {
+    opacity: 0.6
+  },
+
+  column_verified: {
     // Set the same padding with the padding-top and padding-bottom
     paddingRight: `calc(${globalStyles.sortableTable.cell.small.padding} / 2) !important`,
     paddingLeft: `calc(${globalStyles.sortableTable.cell.small.padding} / 2) !important`
@@ -388,8 +383,9 @@ const styles = StyleSheet.create({
     minWidth: '3ch'
   },
 
-  hideTd: {
-    display: 'none'
+  column_percentage__percentageValue: {
+    // To cancel the global color setting
+    color: '#656565'
   },
 
   pinnedBody: {
@@ -403,20 +399,19 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
 
-  defaultIcon: {
+  siteData__icon_favicon: {
+    width: globalStyles.spacing.iconSize,
+    height: globalStyles.spacing.iconSize
+  },
+
+  siteData__icon_default: {
     fontSize: '15px',
     width: globalStyles.spacing.iconSize,
     textAlign: 'center'
   },
 
-  favicon: {
-    width: globalStyles.spacing.iconSize,
-    height: globalStyles.spacing.iconSize
-  },
-
-  url: {
-    padding: '0 6px',
-    textAlign: 'left'
+  siteData__url: {
+    padding: '0 6px'
   },
 
   hideExcludedSites: {
@@ -442,15 +437,6 @@ const styles = StyleSheet.create({
   alignCenter: {
     display: 'flex',
     justifyContent: 'center'
-  },
-
-  paymentsDisabled: {
-    opacity: 0.6
-  },
-
-  percentageValue: {
-    // To cancel the global color setting
-    color: '#656565'
   },
 
   actionIcons: {
@@ -492,7 +478,7 @@ const styles = StyleSheet.create({
     right: '2px'
   },
 
-  ledgerTable__showAllWrap: {
+  ledgerTable__showAll: {
     textAlign: 'center',
     marginTop: globalStyles.spacing.panelMargin
   }
