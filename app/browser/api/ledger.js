@@ -2185,6 +2185,42 @@ const muonWriter = (path, payload) => {
   })
 }
 
+const migration = (state) => {
+  const synopsisPath = 'ledger-synopsis.json'
+
+  const synopsisOptions = ledgerState.getSynopsisOptions(state)
+
+  if (getSetting(settings.PAYMENTS_ENABLED) && synopsisOptions.isEmpty()) {
+    // Move data from synopsis file into appState
+    const fs = require('fs')
+    try {
+      fs.accessSync(pathName(synopsisPath), fs.FF_OK)
+      const data = fs.readFileSync(pathName(synopsisPath))
+      const parsed = JSON.parse(data)
+      state = ledgerState.saveSynopsis(state, parsed.publishers, parsed.options)
+      fs.unlink(pathName(synopsisPath), (err) => {
+        if ((err) && (err.code !== 'ENOENT')) {
+          console.error('error removing file ' + synopsisPath + ': ', err)
+        }
+      })
+    } catch (err) {
+      console.log('Error migrating file', err.toString())
+    }
+
+    // Delete ledgerInfo
+    state = state.delete('ledgerInfo')
+
+    // Move locationInfo into ledger
+    if (state.has('locationInfo')) {
+      const locationInfo = state.get('locationInfo')
+      state = state.setIn(['ledger', 'locations'], locationInfo)
+      state = state.delete('locationInfo')
+    }
+  }
+
+  return state
+}
+
 // for synopsis variable handling only
 const deleteSynopsis = (publisherKey) => {
   delete synopsis.publishers[publisherKey]
@@ -2225,5 +2261,6 @@ module.exports = {
   savePublisherOption,
   onTimeUntilReconcile,
   run,
-  onNetworkConnected
+  onNetworkConnected,
+  migration
 }

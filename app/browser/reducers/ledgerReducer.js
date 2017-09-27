@@ -30,6 +30,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_SET_STATE:
       {
+        state = ledgerApi.migration(state)
         state = ledgerApi.init(state)
         break
       }
