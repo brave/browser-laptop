@@ -7,6 +7,7 @@ const topSites = [
   'google.com',
   'gmail.com',
   'mail.google.com',
+  'maps.google.com',
   'calendar.google.com',
   'facebook.com',
   'youtube.com',
