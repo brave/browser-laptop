@@ -21,7 +21,6 @@ describe('Preferences component unittest', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    mockery.registerMock('../../less/switchControls.less', {})
     mockery.registerMock('../../less/about/preferences.less', {})
     mockery.registerMock('../../less/forms.less', {})
     mockery.registerMock('../../less/button.less', {})

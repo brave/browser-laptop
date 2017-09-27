@@ -23,7 +23,6 @@ describe('PaymentsTab component', function () {
       useCleanCache: true
     })
     mockery.registerMock('../../../../img/toolbar/stoploading_btn.svg')
-    mockery.registerMock('../../less/switchControls.less', {})
     mockery.registerMock('../../less/about/preferences.less', {})
     mockery.registerMock('../../less/forms.less', {})
     mockery.registerMock('../../less/button.less', {})

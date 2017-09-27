@@ -146,7 +146,7 @@ class BraveryPanel extends React.Component {
         />
         <div className={css(styles.braveryPanel_compact__header__top__right)}>
           <SwitchControl
-            customWrapperClassName={css(styles.braveryPanel_compact__header__top__right__switchControl)}
+            customStyleWrapper={styles.braveryPanel_compact__header__top__right__switchControl}
             onClick={this.onToggleShields}
             testId='shields-toggle'
             leftl10nId='shieldsDown'
@@ -177,8 +177,8 @@ class BraveryPanel extends React.Component {
       </div>
       <div className={css(styles.braveryPanel__header__right)}>
         <SwitchControl large
-          customWrapperClassName={css(styles.braveryPanel__header__right__switchControl)}
-          customTopTextClassName={css(styles.braveryPanel__header__right__switchControl__topText)}
+          customStyleWrapper={styles.braveryPanel__header__right__switchControl}
+          customStyleTextTop={styles.braveryPanel__header__right__switchControl__topText}
           onClick={this.onToggleShields}
           testId='shields-toggle'
           leftl10nId='shieldsDown'
@@ -520,11 +520,11 @@ class BraveryPanel extends React.Component {
                   </FormDropdown>
                 </div>
 
-                <SwitchControl className={css(
+                <SwitchControl customStyleWrapper={[
                   !this.props.isCompactBraveryPanel && gridStyles.row5col1,
                   this.props.isCompactBraveryPanel && gridStyles.row7col1,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
-                )}
+                ]}
                   onClick={this.onToggleHTTPSE}
                   rightl10nId='httpsEverywhere'
                   checkedOn={this.props.httpsEnabled}
@@ -532,12 +532,12 @@ class BraveryPanel extends React.Component {
                   testId='httpsEverywhereSwitch'
                 />
 
-                <SwitchControl className={css(
+                <SwitchControl customStyleWrapper={[
                   !this.props.isCompactBraveryPanel && gridStyles.row6col1,
                   this.props.isCompactBraveryPanel && gridStyles.row8col1,
                   !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__switchControl_noScript,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
-                )}
+                ]}
                   onClick={this.onToggleNoScript}
                   rightl10nId='noScript'
                   checkedOn={this.props.noScriptEnabled}
@@ -608,11 +608,11 @@ class BraveryPanel extends React.Component {
                   </FormDropdown>
                 </div>
 
-                <SwitchControl className={css(
+                <SwitchControl customStyleWrapper={[
                   !this.props.isCompactBraveryPanel && gridStyles.row5col2,
                   this.props.isCompactBraveryPanel && gridStyles.row9col1,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
-                )}
+                ]}
                   onClick={this.onToggleSafeBrowsing}
                   rightl10nId='safeBrowsing'
                   checkedOn={this.props.safeBrowsing}

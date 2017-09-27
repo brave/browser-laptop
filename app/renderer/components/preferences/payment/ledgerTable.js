@@ -184,8 +184,7 @@ class LedgerTable extends ImmutableComponent {
             small
             disabled
             checkedOn
-            customWrapperClassName={css(styles.switchControl_center)}
-            indicatorClassName={css(styles.pinnedToggle)}
+            customStyleWrapper={styles.switchControl_center}
             testId='pinnedDisabled'
             onClick={() => {}}
           />
@@ -481,10 +480,6 @@ const styles = StyleSheet.create({
 
   actionIcons__icon_remove: {
     '-webkit-mask-image': `url(${removeIcon})`
-  },
-
-  pinnedToggle: {
-    right: '2px'
   },
 
   ledgerTable__showAll: {

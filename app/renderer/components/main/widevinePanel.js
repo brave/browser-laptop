@@ -96,7 +96,7 @@ class WidevinePanel extends React.Component {
           <div className={css(styles.flexJustifyCenter)}>
             {/* TODO: refactor switchControl.js to remove commonStyles.noPadding */}
             <SwitchControl
-              className={css(commonStyles.noPadding)}
+              customStyleWrapper={commonStyles.noPadding}
               rightl10nId='rememberThisDecision'
               rightl10nArgs={JSON.stringify({origin: this.props.origin})}
               onClick={this.onClickRememberForNetflix}

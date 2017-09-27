@@ -18,7 +18,6 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ipc = window.chrome.ipcRenderer
 
 // Stylesheets
-require('../../less/switchControls.less')
 require('../../less/about/common.less')
 
 class AdBlockItem extends ImmutableComponent {
@@ -33,15 +32,15 @@ class AdBlockItem extends ImmutableComponent {
     return `adblock.${this.props.resource.get('uuid')}.enabled`
   }
   render () {
-    return <div>
-      <SwitchControl id={this.props.resource.get('uuid')}
-        rightText={this.props.resource.get('title')}
-        testId={`switch-${this.props.resource.get('uuid')}`}
-        customRightTextClassName={css(styles.adblockLists__adblockItem__switchControl)}
-        disabled={this.props.disabled}
-        onClick={this.onClick}
-        checkedOn={getSetting(this.prefKey, this.props.settings)} />
-    </div>
+    return <SwitchControl
+      id={this.props.resource.get('uuid')}
+      testId={`switch-${this.props.resource.get('uuid')}`}
+      rightText={this.props.resource.get('title')}
+      customStyleTextRight={styles.adblockLists__adblockItem__switchControl}
+      disabled={this.props.disabled}
+      onClick={this.onClick}
+      checkedOn={getSetting(this.prefKey, this.props.settings)}
+    />
   }
 }
 

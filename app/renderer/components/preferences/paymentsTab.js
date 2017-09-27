@@ -221,16 +221,15 @@ class PaymentsTab extends ImmutableComponent {
               prefKey={settings.PAYMENTS_ENABLED}
               settings={this.props.settings}
               onChangeSetting={this.props.onChangeSetting}
-              switchClassName={css(styles.switch__switchControl)}
-              leftLabelClassName={css(
+              customStyleTextLeft={[
                 styles.switch__label,
                 styles.switch__label_left,
                 styles.switch__label_left_off
-              )}
-              rightLabelClassName={css(
+              ]}
+              customStyleTextRight={[
                 styles.switch__label,
                 styles.switch__label_right
-              )}
+              ]}
             />
             <a className={cx({
               fa: true,
@@ -388,8 +387,6 @@ const styles = StyleSheet.create({
     fontSize: globalStyles.fontSize.settingItemSubtext,
     display: 'flex',
     alignItems: 'center',
-
-    // TODO: Refactor switchControls.less
     position: 'relative',
     top: '1px'
   },
@@ -433,8 +430,7 @@ const styles = StyleSheet.create({
   },
 
   switch__switchControl: {
-    // TODO: Refactor switchControls.less
-    padding: '0 !important'
+    padding: 0
   },
 
   switch__label: {
@@ -443,7 +439,7 @@ const styles = StyleSheet.create({
   },
 
   switch__label_left: {
-    paddingRight: '.75ch !important'
+    paddingRight: '.75ch'
   },
 
   switch__label_left_off: {
@@ -452,7 +448,7 @@ const styles = StyleSheet.create({
 
   switch__label_right: {
     // TODO: Add 'position: relative' and 'bottom: 1px' for macOS (en_US) only.
-    paddingLeft: '.75ch !important',
+    paddingLeft: '.75ch',
     color: globalStyles.color.braveOrange
   }
 })

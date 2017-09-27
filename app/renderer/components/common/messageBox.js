@@ -140,11 +140,10 @@ class MessageBox extends React.Component {
           {
             this.props.showSuppress
               ? <SwitchControl
-                // TODO (Suguru): Refactor SwitchControl to remove the className
-                className={css(
+                customStyleWrapper={[
                   commonStyles.noPaddingLeft,
                   styles.switchControl_marginBottom
-                )}
+                ]}
                 testId='showSuppressSwitch'
                 rightl10nId='preventMoreAlerts'
                 checkedOn={this.props.suppress}
