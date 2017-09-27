@@ -118,11 +118,15 @@ class Tab extends React.Component {
   }
 
   onDragStart (e) {
-    dnd.onDragStart(dragTypes.TAB, this.frame, e)
+    if (this.frame) {
+      dnd.onDragStart(dragTypes.TAB, this.frame, e)
+    }
   }
 
   onDragEnd (e) {
-    dnd.onDragEnd(dragTypes.TAB, this.frame, e)
+    if (this.frame) {
+      dnd.onDragEnd(dragTypes.TAB, this.frame, e)
+    }
   }
 
   onDragOver (e) {
