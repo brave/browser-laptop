@@ -153,4 +153,18 @@ describe('bookmarkLocationCache unit test', function () {
       assert.deepEqual(state.toJS(), baseState.toJS())
     })
   })
+
+  describe('clearCache', function () {
+    it('clears the cache', function () {
+      const stateWithCache = Immutable.fromJS({
+        'cache': {
+          'bookmarkLocation': {
+            [bookmark.get('location')]: [bookmarkKey]
+          }
+        }
+      })
+      const state = bookmarkLocationCache.clearCache(stateWithCache)
+      assert.deepEqual(state.getIn(['cache', 'bookmarkLocation']).toJS(), {})
+    })
+  })
 })

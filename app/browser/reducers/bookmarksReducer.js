@@ -7,6 +7,7 @@ const Immutable = require('immutable')
 // State
 const bookmarksState = require('../../common/state/bookmarksState')
 const bookmarkToolbarState = require('../../common/state/bookmarkToolbarState')
+const clearDataState = require('../../common/state/clearDataState')
 
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
@@ -138,6 +139,14 @@ const bookmarksReducer = (state, action, immutableAction) => {
 
         if (updateToolbar) {
           state = bookmarkToolbarState.setToolbars(state)
+        }
+        break
+      }
+    case appConstants.APP_ON_CLEAR_BROWSING_DATA:
+      {
+        const clearData = clearDataState.getClearDefaults(state)
+        if (clearData.get('browserHistory')) {
+          state = bookmarkLocationCache.clearCache(state)
         }
         break
       }
