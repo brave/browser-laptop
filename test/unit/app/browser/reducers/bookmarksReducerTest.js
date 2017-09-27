@@ -128,14 +128,6 @@ describe('bookmarksReducer unit test', function () {
     calcTextList: () => true
   }
 
-  const fakeClearData = {
-    getClearDefaults: (state) => {
-      return Immutable.fromJS({
-        'browserHistory': true
-      })
-    }
-  }
-
   before(function () {
     mockery.enable({
       warnOnReplace: false,
@@ -145,7 +137,6 @@ describe('bookmarksReducer unit test', function () {
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('../../browser/api/textCalc', fakeTextCalc)
-    mockery.registerMock('../../common/state/clearDataState', fakeClearData)
     bookmarksReducer = require('../../../../../app/browser/reducers/bookmarksReducer')
     bookmarksState = require('../../../../../app/common/state/bookmarksState')
     bookmarkLocationCache = require('../../../../../app/common/cache/bookmarkLocationCache')
@@ -558,23 +549,6 @@ describe('bookmarksReducer unit test', function () {
       const expectedState = stateWithData
         .setIn(['bookmarks', 'https://brianbondy.com/|0|1', 'width'], 20)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
-    })
-  })
-
-  describe('APP_ON_CLEAR_BROWSING_DATA', function () {
-    let spy
-
-    afterEach(function () {
-      spy.restore()
-    })
-
-    it('calls bookmarkLocationCache.clearCache', function () {
-      spy = sinon.spy(bookmarkLocationCache, 'clearCache')
-      const customState = stateWithData.setIn(['cache', 'bookmarkLocation'], Immutable.Map())
-      bookmarksReducer(customState, {
-        actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA
-      })
-      assert.equal(spy.calledOnce, true)
     })
   })
 })

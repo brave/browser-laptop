@@ -119,14 +119,9 @@ const removeCacheKey = (state, location, siteKey) => {
   }
 }
 
-const clearCache = (state) => {
-  return state.setIn(['cache', 'bookmarkLocation'], Immutable.Map())
-}
-
 module.exports = {
   generateCache,
   getCacheKey,
   addCacheKey,
-  removeCacheKey,
-  clearCache
+  removeCacheKey
 }
