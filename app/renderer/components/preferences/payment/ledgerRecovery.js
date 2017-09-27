@@ -37,7 +37,6 @@ class LedgerRecoveryContent extends ImmutableComponent {
   }
 
   clearRecoveryStatus () {
-    aboutActions.clearRecoveryStatus()
     this.props.hideAdvancedOverlays()
   }
 

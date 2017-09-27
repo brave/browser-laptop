@@ -1000,8 +1000,8 @@ const pageDataChanged = (state) => {
 
 const backupKeys = (state, backupAction) => {
   const date = moment().format('L')
-  const paymentId = state.getIn(['ledgerInfo', 'paymentId'])
-  const passphrase = state.getIn(['ledgerInfo', 'passphrase'])
+  const paymentId = ledgerState.getInfoProp(state, 'paymentId')
+  const passphrase = ledgerState.getInfoProp(state, 'passphrase')
 
   const messageLines = [
     locale.translation('ledgerBackupText1'),
@@ -1570,15 +1570,14 @@ const showNotificationPaymentDone = (transactionContributionFiat) => {
 
 const observeTransactions = (state, transactions) => {
   const current = ledgerState.getInfoProp(state, 'transactions')
-  // TODO check what we return in current (is this immutable) and what we get from transactions
-  if (underscore.isEqual(current, transactions)) {
+  debugger
+  if (current && current.size === transactions.length) {
     return
   }
   // Notify the user of new transactions.
-  if (getSetting(settings.PAYMENTS_NOTIFICATIONS) && current !== null) {
-    const newTransactions = underscore.difference(transactions, current)
-    if (newTransactions.length > 0) {
-      const newestTransaction = newTransactions[newTransactions.length - 1]
+  if (getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
+    if (transactions.length > 0) {
+      const newestTransaction = transactions[transactions.length - 1]
       showNotificationPaymentDone(newestTransaction.contribution.fiat)
     }
   }
