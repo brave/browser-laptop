@@ -20,8 +20,8 @@ describe('topSites', function () {
     it('obtains the first site\'s order', function () {
       assert.equal(getSiteOrder('google.com'), 1)
     })
-    it('obtains an arbigrary site\'s order', function () {
-      assert.equal(getSiteOrder('calendar.google.com'), 4)
+    it('obtains an arbitrary site\'s order', function () {
+      assert.equal(getSiteOrder('calendar.google.com'), 5)
     })
     it('orders unknown sites as max int', function () {
       assert.equal(getSiteOrder('bradhatesprimes.com'), 9007199254740991)
