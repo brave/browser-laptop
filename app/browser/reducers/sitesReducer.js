@@ -96,7 +96,7 @@ const sitesReducer = (state, action, immutableAction) => {
 
         if (closestKey != null) {
           const sourceKey = siteUtil.getSiteKey(site)
-          state = siteUtil.moveSite(state, sourceKey, closestKey, false, false, true)
+          state = siteUtil.moveSite(state, sourceKey, closestKey, !!action.isLeftSide, false, true)
         }
 
         if (isSyncEnabled) {

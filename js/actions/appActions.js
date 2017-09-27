@@ -1517,12 +1517,13 @@ const appActions = {
     })
   },
 
-  addBookmark: function (siteDetail, tag, closestKey) {
+  addBookmark: function (siteDetail, tag, closestKey, isLeftSide = false) {
     dispatch({
       actionType: appConstants.APP_ADD_BOOKMARK,
       siteDetail,
       tag,
-      closestKey
+      closestKey,
+      isLeftSide
     })
   },
 

@@ -332,6 +332,92 @@ describe('sitesReducerTest', function () {
       const result = sitesReducer(state, action)
       assert.deepEqual(result.get('sites').toJS(), newSites)
     })
+
+    it('add a bookmark with a close bookmark prepending', function () {
+      const state = initState.set('sites', makeImmutable({
+        'https://www.clifton.io|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 0,
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        },
+        'https://www.bbondy.io|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 1,
+          location: 'https://www.bbondy.io',
+          parentFolderId: 0
+        },
+        'https://www.bridiver.io|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 2,
+          location: 'https://www.bridiver.io',
+          parentFolderId: 0
+        }
+      }))
+
+      const action = {
+        actionType: appConstants.APP_ADD_BOOKMARK,
+        siteDetail: makeImmutable({
+          parentFolderId: 0,
+          title: 'Brave',
+          location: 'https://www.brave.com'
+        }),
+        tag: siteTags.BOOKMARK,
+        closestKey: 'https://www.bbondy.io|0|0',
+        isLeftSide: true
+      }
+
+      const newSites = {
+        'https://www.clifton.io|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 0,
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        },
+        'https://www.bbondy.io|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 2,
+          location: 'https://www.bbondy.io',
+          parentFolderId: 0
+        },
+        'https://www.brave.com|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 1,
+          location: 'https://www.brave.com',
+          parentFolderId: 0
+        },
+        'https://www.bridiver.io|0|0': {
+          lastAccessedTime: 0,
+          tags: [siteTags.BOOKMARK],
+          objectId: undefined,
+          title: 'Brave',
+          order: 3,
+          location: 'https://www.bridiver.io',
+          parentFolderId: 0
+        }
+      }
+
+      const result = sitesReducer(state, action)
+      assert.deepEqual(result.get('sites').toJS(), newSites)
+    })
   })
 
   describe('APP_EDIT_BOOKMARK', function () {
