@@ -291,6 +291,18 @@ describe('frameReducer', function () {
         // Old index 2 moves 1 to the left
         assert.equal(this.newState.toJS().frames[1].tabId, windowState.toJS().frames[2].tabId)
       })
+      it('new frame has not showed up in frames', function () {
+        const action = {
+          actionType: appConstants.APP_TAB_UPDATED,
+          tabValue: {
+            tabId: 13,
+            index: 3,
+            title: 'Bondy Power!'
+          }
+        }
+        this.newState = frameReducer(windowState, action, Immutable.fromJS(action))
+        assert.equal(this.newState.toJS().frames.length, windowState.toJS().frames.length)
+      })
     })
     describe('when pinned status changes', function () {
       // TODO(bbondy): Noticed this is missing while in the context of fixing an unrelated thing.
