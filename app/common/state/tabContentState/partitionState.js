@@ -52,9 +52,6 @@ module.exports.showPartitionIcon = (state, frameKey) => {
   const frame = frameStateUtil.getFrameByKey(state, frameKey)
 
   if (frame == null) {
-    if (process.env.NODE_ENV !== 'test') {
-      console.error('Unable to find frame for showPartitionIcon method')
-    }
     return false
   }
 
