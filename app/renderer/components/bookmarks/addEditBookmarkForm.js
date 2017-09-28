@@ -100,7 +100,7 @@ class AddEditBookmarkForm extends React.Component {
 
   onParentFolderChange (e) {
     this.setState({
-      parentFolderId: ~~e.target.value
+      parentFolderId: Number(e.target.value)
     })
   }
 
@@ -221,6 +221,7 @@ class AddEditBookmarkForm extends React.Component {
               defaultValue={this.state.parentFolderId}
               onChange={this.onParentFolderChange} >
               <option value='0' data-l10n-id='bookmarksToolbar' />
+              <option value='-1' data-l10n-id='otherBookmarks' />
               {
                 this.props.folders.map((folder) => <option value={folder.folderId}>{folder.label}</option>)
               }
