@@ -26,9 +26,6 @@ module.exports.getThemeColor = (state, frameKey) => {
   const frame = frameStateUtil.getFrameByKey(state, frameKey)
 
   if (frame == null) {
-    if (process.env.NODE_ENV !== 'test') {
-      console.error('Unable to find frame for getThemeColor method')
-    }
     return false
   }
 
@@ -42,9 +39,6 @@ module.exports.getTabIconColor = (state, frameKey) => {
   const frame = frameStateUtil.getFrameByKey(state, frameKey)
 
   if (frame == null) {
-    if (process.env.NODE_ENV !== 'test') {
-      console.error('Unable to find frame for getTabIconColor method')
-    }
     return ''
   }
 
@@ -66,9 +60,6 @@ module.exports.checkIfTextColor = (state, frameKey, color) => {
   const frame = frameStateUtil.getFrameByKey(state, frameKey)
 
   if (frame == null) {
-    if (process.env.NODE_ENV !== 'test') {
-      console.error('Unable to find frame for checkIfTextColor method')
-    }
     return false
   }
 
@@ -79,9 +70,6 @@ module.exports.showTabEndIcon = (state, frameKey) => {
   const frame = frameStateUtil.getFrameByKey(state, frameKey)
 
   if (frame == null) {
-    if (process.env.NODE_ENV !== 'test') {
-      console.error('Unable to find frame for showTabEndIcon method')
-    }
     return false
   }
 
@@ -96,9 +84,6 @@ module.exports.addExtraGutterToTitle = (state, frameKey) => {
   const frame = frameStateUtil.getFrameByKey(state, frameKey)
 
   if (frame == null) {
-    if (process.env.NODE_ENV !== 'test') {
-      console.error('Unable to find frame for addExtraGutterToTitle method')
-    }
     return false
   }
 
@@ -109,9 +94,6 @@ module.exports.centralizeTabIcons = (state, frameKey, isPinned) => {
   const frame = frameStateUtil.getFrameByKey(state, frameKey)
 
   if (frame == null) {
-    if (process.env.NODE_ENV !== 'test') {
-      console.error('Unable to find frame for centralizeTabIcons method')
-    }
     return false
   }
 
@@ -122,9 +104,6 @@ module.exports.getTabEndIconBackgroundColor = (state, frameKey) => {
   const frame = frameStateUtil.getFrameByKey(state, frameKey)
 
   if (frame == null) {
-    if (process.env.NODE_ENV !== 'test') {
-      console.error('Unable to find frame for getTabEndIconBackgroundColor method')
-    }
     return false
   }
 
