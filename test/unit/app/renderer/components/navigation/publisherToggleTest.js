@@ -16,20 +16,20 @@ describe('PublisherToggle component', function () {
   const fakeAppState = Immutable.fromJS({
     ledger: {
       synopsis: {
-        0: {
-          daysSpent: 0,
-          duration: 623405,
-          faviconURL: '',
-          hoursSpent: 0,
-          minutesSpent: 10,
-          percentage: 100,
-          publisherURL: 'https://brave.com',
-          score: 9.365888800773842,
-          secondsSpent: 23,
-          site: 'brave.com',
-          verified: false,
-          views: 1,
-          weight: 100
+        publishers: {
+          'brave.com': {
+            duration: 623405,
+            faviconURL: '',
+            percentage: 100,
+            publisherURL: 'https://brave.com',
+            score: 9.365888800773842,
+            site: 'brave.com',
+            options: {
+              verified: true
+            },
+            visits: 1,
+            weight: 100
+          }
         }
       },
       locations: {

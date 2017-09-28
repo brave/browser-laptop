@@ -4,9 +4,21 @@
 
 'use strict'
 
-const {responseHasContent} = require('./httpUtil')
+const Immutable = require('immutable')
 const moment = require('moment')
+
+// State
+const siteSettingsState = require('../state/siteSettingsState')
+const ledgerState = require('../state/ledgerState')
+
+// Constants
+const settings = require('../../../js/constants/settings')
+
+// Utils
+const {responseHasContent} = require('./httpUtil')
+const urlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable} = require('../state/immutableUtil')
+const getSetting = require('../../../js/settings').getSetting
 
 /**
  * Is page an actual page being viewed by the user? (not an error page, etc)
@@ -116,10 +128,89 @@ const walletStatus = (ledgerData) => {
   return status
 }
 
+// TODO rename function
+const blockedP = (state, publisherKey) => {
+  const pattern = urlUtil.getHostPattern(publisherKey)
+  const ledgerPaymentsShown = siteSettingsState.getSettingsProp(state, pattern, 'ledgerPaymentsShown')
+
+  return ledgerPaymentsShown === false
+}
+
+// TODO rename
+const contributeP = (state, publisherKey) => {
+  const publisher = ledgerState.getPublisher(state, publisherKey)
+  return (
+    (stickyP(state, publisherKey) || publisher.getIn(['options', 'exclude']) !== true) &&
+    eligibleP(state, publisherKey) &&
+    !blockedP(state, publisherKey)
+  )
+}
+
+// TODO rename function
+const visibleP = (state, publisherKey) => {
+  const publisher = ledgerState.getPublisher(state, publisherKey)
+  let showOnlyVerified = ledgerState.getSynopsisOption(state, 'showOnlyVerified')
+
+  if (showOnlyVerified == null) {
+    showOnlyVerified = getSetting(settings.PAYMENTS_ALLOW_NON_VERIFIED)
+    state = ledgerState.setSynopsisOption(state, 'showOnlyVerified', showOnlyVerified)
+  }
+
+  const publisherOptions = publisher.get('options', Immutable.Map())
+  const onlyVerified = !showOnlyVerified
+
+  // Publisher Options
+  const deletedByUser = blockedP(state, publisherKey)
+  const includeExclude = stickyP(state, publisherKey)
+  const eligibleByStats = eligibleP(state, publisherKey) // num of visits and time spent
+  const isInExclusionList = publisherOptions.get('exclude')
+  const verifiedPublisher = publisherOptions.get('verified')
+
+  return (
+      eligibleByStats &&
+      (
+        isInExclusionList !== true ||
+        includeExclude
+      ) &&
+      (
+        (onlyVerified && verifiedPublisher) ||
+        !onlyVerified
+      )
+    ) &&
+    !deletedByUser
+}
+
+// TODO rename function
+const eligibleP = (state, publisherKey) => {
+  const scorekeeper = ledgerState.getSynopsisOption(state, 'scorekeeper')
+  const minPublisherDuration = ledgerState.getSynopsisOption(state, 'minPublisherDuration')
+  const minPublisherVisits = ledgerState.getSynopsisOption(state, 'minPublisherVisits')
+  const publisher = ledgerState.getPublisher(state, publisherKey)
+
+  return (
+    publisher.getIn(['scores', scorekeeper]) > 0 &&
+    publisher.get('duration') >= minPublisherDuration &&
+    publisher.get('visits') >= minPublisherVisits
+  )
+}
+
+// TODO rename function
+const stickyP = (state, publisherKey) => {
+  const pattern = urlUtil.getHostPattern(publisherKey)
+  let result = siteSettingsState.getSettingsProp(state, pattern, 'ledgerPayments')
+
+  return (result === undefined || result)
+}
+
 module.exports = {
   shouldTrackView,
   btcToCurrencyString,
   formattedTimeFromNow,
   formattedDateFromTimestamp,
-  walletStatus
+  walletStatus,
+  blockedP,
+  contributeP,
+  visibleP,
+  eligibleP,
+  stickyP
 }

@@ -26,7 +26,6 @@ const appActions = require('../../../js/actions/appActions')
 // State
 const ledgerState = require('../../common/state/ledgerState')
 const pageDataState = require('../../common/state/pageDataState')
-const siteSettingsState = require('../../common/state/siteSettingsState')
 
 // Constants
 const settings = require('../../../js/constants/settings')
@@ -42,7 +41,6 @@ const urlParse = require('../../common/urlParse')
 const ruleSolver = require('../../extensions/brave/content/scripts/pageInformation')
 const request = require('../../../js/lib/request')
 const ledgerUtil = require('../../common/lib/ledgerUtil')
-const urlUtil = require('../../../js/lib/urlutil')
 
 // Caching
 let locationDefault = 'NOOP'
@@ -342,7 +340,7 @@ const getPublisherData = (result, scorekeeper) => {
   }
   // HACK: Protocol is sometimes blank here, so default to http:// so we can
   // still generate publisherURL.
-  data.publisherURL = (result.protocol || 'http:') + '//' + result.publisher
+  data.publisherURL = (result.protocol || 'http:') + '//' + result.publisherKey
 
   if (duration >= miliseconds.day) {
     data.daysSpent = Math.max(Math.round(duration / miliseconds.day), 1)
@@ -390,96 +388,7 @@ const roundToTarget = (l, target, property) => {
     })
 }
 
-// TODO rename function
-const blockedP = (state, publisherKey) => {
-  const pattern = urlUtil.getHostPattern(publisherKey)
-  const ledgerPaymentsShown = siteSettingsState.getSettingsProp(state, pattern, 'ledgerPaymentsShown')
-
-  return ledgerPaymentsShown === false
-}
-
-// TODO rename function
-const stickyP = (state, publisherKey) => {
-  const pattern = urlUtil.getHostPattern(publisherKey)
-  let result = siteSettingsState.getSettingsProp(state, pattern, 'ledgerPayments')
-
-  // NB: legacy clean-up
-  if (
-    typeof result === 'undefined' &&
-    synopsis.publishers[publisherKey] &&
-    typeof synopsis.publishers[publisherKey].options.stickyP !== 'undefined'
-  ) {
-    result = synopsis.publishers[publisherKey].options.stickyP
-    appActions.changeSiteSetting(pattern, 'ledgerPayments', result)
-  }
-  if (synopsis.publishers[publisherKey] &&
-    synopsis.publishers[publisherKey].options &&
-    synopsis.publishers[publisherKey].options.stickyP) {
-    delete synopsis.publishers[publisherKey].options.stickyP
-  }
-
-  return (result === undefined || result)
-}
-
-// TODO rename function
-const eligibleP = (state, publisherKey) => {
-  const scorekeeper = ledgerState.getSynopsisOption(state, 'scorekeeper')
-  const minPublisherDuration = ledgerState.getSynopsisOption(state, 'minPublisherDuration')
-  const minPublisherVisits = ledgerState.getSynopsisOption(state, 'minPublisherVisits')
-  const publisher = ledgerState.getPublisher(state, publisherKey)
-
-  return (
-    publisher.getIn(['scores', scorekeeper]) > 0 &&
-    publisher.get('duration') >= minPublisherDuration &&
-    publisher.get('visits') >= minPublisherVisits
-  )
-}
-
-// TODO rename function
-const visibleP = (state, publisherKey) => {
-  const publisher = ledgerState.getPublisher(state, publisherKey)
-  let showOnlyVerified = ledgerState.getSynopsisOption(state, 'showOnlyVerified')
-  if (showOnlyVerified == null) {
-    showOnlyVerified = getSetting(settings.PAYMENTS_ALLOW_NON_VERIFIED)
-    state = ledgerState.setSynopsisOption(state, 'showOnlyVerified', showOnlyVerified)
-    synopsis.options.showOnlyVerified = showOnlyVerified
-  }
-
-  const publisherOptions = publisher.get('options', Immutable.Map())
-  const onlyVerified = !showOnlyVerified
-
-  // Publisher Options
-  const excludedByUser = blockedP(state, publisherKey)
-  const eligibleByPublisherToggle = stickyP(state, publisherKey)
-  const eligibleByStats = eligibleP(state, publisherKey) // num of visits and time spent
-  const isInExclusionList = publisherOptions.get('exclude')
-  const verifiedPublisher = publisherOptions.get('verified')
-
-  // TODO this is broken, working version is https://github.com/brave/browser-laptop/blob/0.15.x/app/ledger.js#L646
-
-  // websites not included in exclusion list are eligible by number of visits
-  // but can be enabled by user action in the publisher toggle
-  const isEligible = (eligibleByStats && !isInExclusionList) || eligibleByPublisherToggle
-
-  // If user decide to remove the website, don't show it.
-  if (excludedByUser) {
-    return false
-  }
-
-  // Unless user decided to enable publisher with publisherToggle,
-  // do not show exclusion list.
-  if (!eligibleByPublisherToggle && isInExclusionList) {
-    return false
-  }
-
-  // If verified option is set, only show verified publishers
-  if (isEligible && onlyVerified) {
-    return verifiedPublisher
-  }
-
-  return isEligible
-}
-
+// TODO we should convert this function and all related ones into immutable
 // TODO merge publishers and publisherData that is created in getPublisherData
 // so that we don't need to create new Map every single time
 const synopsisNormalizer = (state, changedPublisher) => {
@@ -493,7 +402,7 @@ const synopsisNormalizer = (state, changedPublisher) => {
   for (let item of publishers) {
     const publisherKey = item[0]
     let publisher = item[1]
-    if (!visibleP(state, publisherKey)) {
+    if (!ledgerUtil.visibleP(state, publisherKey)) {
       continue
     }
 
@@ -515,7 +424,7 @@ const synopsisNormalizer = (state, changedPublisher) => {
       // pinned
       pinnedTotal += result.pinPercentage
       dataPinned.push(getPublisherData(result, scorekeeper))
-    } else if (stickyP(state, result.publisherKey)) {
+    } else if (ledgerUtil.stickyP(state, result.publisherKey)) {
       // unpinned
       unPinnedTotal += result.scores[scorekeeper]
       dataUnPinned.push(result)
@@ -604,17 +513,6 @@ const updatePublisherInfo = (state, changedPublisher) => {
   // const options = synopsis.options
   state = synopsisNormalizer(state, changedPublisher)
 
-  /*
-  if (_internal.debugP) {
-    const data = []
-    synopsis.publishers.forEach((entry) => {
-      data.push(underscore.extend(underscore.omit(entry, ['faviconURL']), {faviconURL: entry.faviconURL && '...'}))
-    })
-
-    // console.log('\nupdatePublisherInfo: ' + JSON.stringify({ options: options, synopsis: data }, null, 2))
-  }
-  */
-
   return state
 }
 
@@ -652,7 +550,7 @@ const inspectP = (db, path, publisher, property, key, callback) => {
 
 // TODO rename function name
 const verifiedP = (state, publisherKey, callback) => {
-  inspectP(v2PublishersDB, v2PublishersPath, publisherKey, 'verified', (err, result) => {
+  inspectP(v2PublishersDB, v2PublishersPath, publisherKey, 'verified', null, (err, result) => {
     if (!err) {
       callback(null, result)
     }
@@ -661,7 +559,7 @@ const verifiedP = (state, publisherKey, callback) => {
   if (process.env.NODE_ENV === 'test') {
     ['brianbondy.com', 'clifton.io'].forEach((key) => {
       if (ledgerState.hasPublisher(state, key)) {
-        state = ledgerState.setSynopsisOption(state, 'verified', true)
+        state = ledgerState.setPublisherOption(state, key, 'verified', true)
       }
     })
     state = updatePublisherInfo(state)
@@ -885,7 +783,7 @@ const updateLocation = (state, location, publisherKey) => {
   const locationData = ledgerState.getLocation(state, location)
 
   if (locationData.get('stickyP') == null) {
-    state = ledgerState.setLocationProp(state, location, 'stickyP', stickyP(state, publisherKey))
+    state = ledgerState.setLocationProp(state, location, 'stickyP', ledgerUtil.stickyP(state, publisherKey))
   }
 
   if (locationData.get('verified') != null) {
@@ -949,7 +847,7 @@ const pageDataChanged = (state) => {
   } else {
     try {
       publisherKey = ledgerPublisher.getPublisher(location, _internal.ruleset.raw)
-      if (!publisherKey || (publisherKey && blockedP(state, publisherKey))) {
+      if (!publisherKey || (publisherKey && ledgerUtil.blockedP(state, publisherKey))) {
         publisherKey = null
       }
     } catch (ex) {
@@ -969,7 +867,6 @@ const pageDataChanged = (state) => {
 
     if (initP) {
       excludeP(publisherKey, (unused, exclude) => {
-        console.log('exclude', exclude)
         if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
           exclude = false
         } else {
@@ -1582,6 +1479,7 @@ const observeTransactions = (state, transactions) => {
   }
 }
 
+// TODO convert this function and related ones to immutable
 const getStateInfo = (state, parsedData) => {
   const info = parsedData.paymentInfo
   const then = new Date().getTime() - miliseconds.year
@@ -1831,18 +1729,20 @@ const onCallback = (state, result, delayTime) => {
     return run(state, delayTime)
   }
 
+  const regularResults = result.toJS()
+
   if (client && result.getIn(['properties', 'wallet'])) {
     if (!ledgerState.getInfoProp(state, 'created')) {
       setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
     }
 
-    state = getStateInfo(state, result.toJS()) // TODO optimize if possible
+    state = getStateInfo(state, regularResults) // TODO optimize if possible
     state = getPaymentInfo(state)
   }
 
-  state = cacheRuleSet(state, result.get('ruleset').toJS())
-  if (result.get('rulesetV2')) {
-    results = result.get('rulesetV2').toJS() // TODO optimize if possible
+  state = cacheRuleSet(state, regularResults.ruleset)
+  if (result.has('rulesetV2')) {
+    results = regularResults.rulesetV2 // TODO optimize if possible
     result = result.delete('rulesetV2')
 
     entries = []
@@ -1871,8 +1771,8 @@ const onCallback = (state, result, delayTime) => {
     })
   }
 
-  if (result.get('publishersV2')) {
-    results = result.get('publishersV2').toJS()
+  if (result.has('publishersV2')) {
+    results = regularResults.publishersV2 // TODO optimize if possible
     result = result.delete('publishersV2')
 
     entries = []
@@ -1888,15 +1788,15 @@ const onCallback = (state, result, delayTime) => {
       if (!publisher.isEmpty() && publisher.getIn(['options', 'verified']) !== newValue) {
         synopsis.publishers[publisherKey].options.verified = newValue
         state = ledgerState.setPublisherOption(state, publisherKey, 'verified', newValue)
-        state = updatePublisherInfo(state)
       }
     })
+    state = updatePublisherInfo(state)
     v2PublishersDB.batch(entries, (err) => {
       if (err) return console.error(v2PublishersPath + ' error: ' + JSON.stringify(err, null, 2))
     })
   }
 
-  muonWriter(pathName(statePath), result.toJS())
+  muonWriter(pathName(statePath), regularResults)
   run(state, delayTime)
 
   return state
@@ -2026,16 +1926,6 @@ const init = (state) => {
   return initialize(state, getSetting(settings.PAYMENTS_ENABLED))
 }
 
-// TODO rename
-const contributeP = (state, publisherKey) => {
-  const publisher = ledgerState.getPublisher(state, publisherKey)
-  return (
-    (stickyP(state, publisherKey) || publisher.getIn(['options', 'exclude']) !== true) &&
-    eligibleP(state, publisherKey) &&
-    !blockedP(state, publisherKey)
-  )
-}
-
 const run = (state, delayTime) => {
   if (clientOptions.verboseP) {
     console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
@@ -2071,9 +1961,9 @@ const run = (state, delayTime) => {
       const publisher = ledgerState.getPublisher(state, publisherKey)
 
       line([publisherKey,
-        blockedP(state, publisherKey), stickyP(state, publisherKey), publisher.getIn(['options', 'verified']) === true,
-        publisher.getIn(['options', 'exclude']) === true, eligibleP(state, publisherKey), visibleP(state, publisherKey),
-        contributeP(state, publisherKey),
+        ledgerUtil.blockedP(state, publisherKey), ledgerUtil.stickyP(state, publisherKey), publisher.getIn(['options', 'verified']) === true,
+        publisher.getIn(['options', 'exclude']) === true, ledgerUtil.eligibleP(state, publisherKey), ledgerUtil.visibleP(state, publisherKey),
+        ledgerUtil.contributeP(state, publisherKey),
         Math.round(publisher.get('duration') / 1000), publisher.get('visits')])
     })
   }
@@ -2099,7 +1989,7 @@ const run = (state, delayTime) => {
   try {
     let stateData
     winners.forEach((winner) => {
-      if (!contributeP(state, winner)) return
+      if (!ledgerUtil.contributeP(state, winner)) return
 
       const result = client.vote(winner)
       if (result) stateData = result

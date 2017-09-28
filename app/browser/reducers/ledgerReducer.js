@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-const underscore = require('underscore')
 
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
@@ -64,11 +63,10 @@ const ledgerReducer = (state, action, immutableAction) => {
         }
         break
       }
-    // TODO not sure that we use APP_IDLE_STATE_CHANGED anymore
     case appConstants.APP_IDLE_STATE_CHANGED:
       {
         state = ledgerApi.pageDataChanged(state)
-        ledgerApi.addVisit('NOOP', underscore.now(), null)
+        state = ledgerApi.addVisit(state, 'NOOP', new Date().getTime(), null)
         break
       }
     case appConstants.APP_CHANGE_SETTING:

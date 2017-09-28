@@ -18,24 +18,9 @@ const validateState = function (state) {
 }
 
 const ledgerState = {
-  setRecoveryStatus: (state, status) => {
-    state = validateState(state)
-    const date = new Date().getTime()
-    state = state.setIn(['about', 'preferences', 'recoverySucceeded'], status)
-    return state.setIn(['about', 'preferences', 'updatedStamp'], date)
-  },
-
-  setLedgerError: (state, error, caller) => {
-    state = validateState(state)
-    if (error == null && caller == null) {
-      return state.setIn(['ledger', 'info', 'error'], null)
-    }
-
-    return state
-      .setIn(['ledger', 'info', 'error', 'caller'], caller)
-      .setIn(['ledger', 'info', 'error', 'error'], error)
-  },
-
+  /**
+   * LOCATIONS
+   */
   getLocation: (state, url) => {
     state = validateState(state)
     if (url == null) {
@@ -72,24 +57,9 @@ const ledgerState = {
     return state.getIn(['ledger', 'locations', url])
   },
 
-  changePinnedValues: (state, publishers) => {
-    state = validateState(state)
-    if (publishers == null) {
-      return state
-    }
-
-    publishers = makeImmutable(publishers)
-    publishers.forEach((item) => {
-      const publisherKey = item.get('site')
-      const pattern = urlUtil.getHostPattern(publisherKey)
-      const percentage = item.get('pinPercentage')
-      let newSiteSettings = siteSettings.mergeSiteSetting(state.get('siteSettings'), pattern, 'ledgerPinPercentage', percentage)
-      state = state.set('siteSettings', newSiteSettings)
-    })
-
-    return state
-  },
-
+  /**
+   * SYNOPSIS
+   */
   getSynopsis: (state) => {
     state = validateState(state)
     return state.getIn(['ledger', 'synopsis']) || Immutable.Map()
@@ -108,6 +78,19 @@ const ledgerState = {
     return state
   },
 
+  resetSynopsis: (state) => {
+    state = validateState(state)
+    return state
+      .setIn(['ledger', 'synopsis', 'options'], Immutable.Map())
+      .setIn(['ledger', 'synopsis', 'publishers'], Immutable.Map())
+      .setIn(['ledger', 'locations'], Immutable.Map())
+      .setIn(['ledger', 'about', 'synopsis'], Immutable.Map())
+      .setIn(['ledger', 'about', 'synopsisOptions'], Immutable.Map())
+  },
+
+  /**
+   * SYNOPSIS / PUBLISHERS
+   */
   getPublisher: (state, key) => {
     state = validateState(state)
     if (key == null) {
@@ -117,6 +100,11 @@ const ledgerState = {
     return state.getIn(['ledger', 'synopsis', 'publishers', key]) || Immutable.Map()
   },
 
+  getPublishers: (state) => {
+    state = validateState(state)
+    return state.getIn(['ledger', 'synopsis', 'publishers']) || Immutable.Map()
+  },
+
   hasPublisher: (state, key) => {
     state = validateState(state)
     if (key == null) {
@@ -124,21 +112,6 @@ const ledgerState = {
     }
 
     return state.hasIn(['ledger', 'synopsis', 'publishers', key])
-  },
-
-  getPublishers: (state) => {
-    state = validateState(state)
-    return state.getIn(['ledger', 'synopsis', 'publishers']) || Immutable.Map()
-  },
-
-  setPublishersProp: (state, key, prop, value) => {
-    state = validateState(state)
-    return state.setIn(['ledger', 'synopsis', 'publishers', key, prop], value)
-  },
-
-  setPublisherOption: (state, key, prop, value) => {
-    state = validateState(state)
-    return state.setIn(['ledger', 'synopsis', 'publishers', key, 'options', prop], value)
   },
 
   setPublisher: (state, key, value) => {
@@ -156,6 +129,23 @@ const ledgerState = {
     return state.deleteIn(['ledger', 'synopsis', 'publishers', key])
   },
 
+  setPublishersProp: (state, key, prop, value) => {
+    state = validateState(state)
+    return state.setIn(['ledger', 'synopsis', 'publishers', key, prop], value)
+  },
+
+  /**
+   * SYNOPSIS / PUBLISHER / OPTIONS
+   */
+  setPublisherOption: (state, key, prop, value) => {
+    state = validateState(state)
+    return state.setIn(['ledger', 'synopsis', 'publishers', key, 'options', prop], value)
+  },
+
+  getPublisherOption: (state, key, prop) => {
+    state = validateState(state)
+    return state.getIn(['ledger', 'synopsis', 'publishers', key, 'options', prop])
+  },
   getSynopsisOption: (state, prop) => {
     state = validateState(state)
     if (prop == null) {
@@ -165,6 +155,9 @@ const ledgerState = {
     return state.getIn(['ledger', 'synopsis', 'options', prop], null)
   },
 
+  /**
+   * SYNOPSIS / OPTIONS
+   */
   getSynopsisOptions: (state) => {
     state = validateState(state)
     return state.getIn(['ledger', 'synopsis', 'options'])
@@ -179,28 +172,9 @@ const ledgerState = {
     return state.setIn(['ledger', 'synopsis', 'options', prop], value)
   },
 
-  enableUndefinedPublishers: (state, publishers) => {
-    state = validateState(state)
-    const sitesObject = state.get('siteSettings')
-
-    if (publishers == null) {
-      return state
-    }
-
-    for (let item of publishers) {
-      const key = item[0]
-      const pattern = urlUtil.getHostPattern(key)
-      const result = sitesObject.getIn([pattern, 'ledgerPayments'])
-
-      if (result === undefined) {
-        const newSiteSettings = siteSettings.mergeSiteSetting(state.get('siteSettings'), pattern, 'ledgerPayments', true)
-        state = state.set('siteSettings', newSiteSettings)
-      }
-    }
-
-    return state
-  },
-
+  /**
+   * INFO
+   */
   getInfoProp: (state, prop) => {
     state = validateState(state)
     if (prop == null) {
@@ -232,6 +206,16 @@ const ledgerState = {
 
     data = makeImmutable(data)
 
+    // clean-up
+    if (data.has('publishersV2')) {
+      data = data.set('publishersV2Stamp', data.getIn(['publishersV2', 'publishersV2Stamp']))
+      data = data.delete('publishersV2')
+    }
+    if (data.has('rulesetV2')) {
+      data = data.set('rulesV2Stamp', data.getIn(['rulesetV2', 'rulesV2Stamp']))
+      data = data.delete('rulesetV2')
+    }
+
     const oldData = ledgerState.getInfoProps(state)
     return state.setIn(['ledger', 'info'], oldData.merge(data))
   },
@@ -241,14 +225,65 @@ const ledgerState = {
     return state.setIn(['ledger', 'info'], Immutable.Map())
   },
 
-  resetSynopsis: (state) => {
+  /**
+   * OTHERS
+   */
+  setRecoveryStatus: (state, status) => {
     state = validateState(state)
+    const date = new Date().getTime()
+    state = state.setIn(['about', 'preferences', 'recoverySucceeded'], status)
+    return state.setIn(['about', 'preferences', 'updatedStamp'], date)
+  },
+
+  setLedgerError: (state, error, caller) => {
+    state = validateState(state)
+    if (error == null && caller == null) {
+      return state.setIn(['ledger', 'info', 'error'], null)
+    }
+
     return state
-      .setIn(['ledger', 'synopsis', 'options'], Immutable.Map())
-      .setIn(['ledger', 'synopsis', 'publishers'], Immutable.Map())
-      .setIn(['ledger', 'locations'], Immutable.Map())
-      .setIn(['ledger', 'about', 'synopsis'], Immutable.Map())
-      .setIn(['ledger', 'about', 'synopsisOptions'], Immutable.Map())
+      .setIn(['ledger', 'info', 'error', 'caller'], caller)
+      .setIn(['ledger', 'info', 'error', 'error'], error)
+  },
+
+  changePinnedValues: (state, publishers) => {
+    state = validateState(state)
+    if (publishers == null) {
+      return state
+    }
+
+    publishers = makeImmutable(publishers)
+    publishers.forEach((item) => {
+      const publisherKey = item.get('site')
+      const pattern = urlUtil.getHostPattern(publisherKey)
+      const percentage = item.get('pinPercentage')
+      let newSiteSettings = siteSettings.mergeSiteSetting(state.get('siteSettings'), pattern, 'ledgerPinPercentage', percentage)
+      state = state.set('siteSettings', newSiteSettings)
+    })
+
+    return state
+  },
+
+  enableUndefinedPublishers: (state, publishers) => {
+    state = validateState(state)
+    const sitesObject = state.get('siteSettings')
+
+    if (publishers == null) {
+      return state
+    }
+
+    for (let item of publishers) {
+      const key = item[0]
+      const pattern = urlUtil.getHostPattern(key)
+      const result = sitesObject.getIn([pattern, 'ledgerPayments'])
+
+      if (result === undefined) {
+        const newSiteSettings = siteSettings.mergeSiteSetting(state.get('siteSettings'), pattern, 'ledgerPayments', true)
+        state = state.set('siteSettings', newSiteSettings)
+      }
+    }
+
+    return state
   },
 
   // TODO (optimization) don't have two almost identical object in state (synopsi->publishers and about->synopsis)
