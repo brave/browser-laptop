@@ -120,30 +120,30 @@ const frameReducer = (state, action, immutableAction) => {
       const pinned = immutableAction.getIn(['changeInfo', 'pinned'])
       if (pinned != null) {
         if (pinned) {
-          state = state.setIn(['frames', index, 'pinnedLocation'], tab.get('url'))
+          state = state.setIn(['frames', sourceFrameIndex, 'pinnedLocation'], tab.get('url'))
         } else {
-          state = state.deleteIn(['frames', index, 'pinnedLocation'])
+          state = state.deleteIn(['frames', sourceFrameIndex, 'pinnedLocation'])
         }
       }
       // handle pinned tabs that are created as pinned
       const url = immutableAction.getIn(['changeInfo', 'url'])
       if (url != null && tab.get('pinned') === true) {
-        const pinnedLocation = state.getIn(['frames', index, 'pinnedLocation'])
+        const pinnedLocation = state.getIn(['frames', sourceFrameIndex, 'pinnedLocation'])
         if (!pinnedLocation || pinnedLocation === 'about:blank' || pinnedLocation === '') {
-          state = state.setIn(['frames', index, 'pinnedLocation'], tab.get('url'))
+          state = state.setIn(['frames', sourceFrameIndex, 'pinnedLocation'], tab.get('url'))
         }
       }
 
       const title = tab.get('title')
       if (title != null) {
-        state = state.setIn(['frames', index, 'title'], title)
+        state = state.setIn(['frames', sourceFrameIndex, 'title'], title)
       }
 
       const active = tab.get('active')
       if (active != null) {
         if (active) {
           state = frameStateUtil.setActiveFrameKey(state, frame.get('key'))
-          state = frameStateUtil.setFrameLastAccessedTime(state, index)
+          state = frameStateUtil.setFrameLastAccessedTime(state, sourceFrameIndex)
 
           // Handle tabPage updates and preview cancelation based on tab updated
           // otherwise tabValue will fire those events each time a tab finish loading
