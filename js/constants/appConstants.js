@@ -32,7 +32,6 @@ const appConstants = {
   APP_CLEAR_SITE_SETTINGS: _,
   APP_ON_CLEAR_BROWSING_DATA: _,
   APP_IMPORT_BROWSER_DATA: _,
-  APP_UPDATE_LEDGER_INFO: _,
   APP_SHOW_NOTIFICATION: _, /** @param {Object} detail */
   APP_HIDE_NOTIFICATION: _, /** @param {string} message */
   APP_BACKUP_KEYS: _,

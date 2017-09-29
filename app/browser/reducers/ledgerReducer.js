@@ -11,10 +11,10 @@ const settings = require('../../../js/constants/settings')
 
 // State
 const ledgerState = require('../../common/state/ledgerState')
+const siteSettingsState = require('../../common/state/siteSettingsState')
 
 // Utils
 const ledgerApi = require('../../browser/api/ledger')
-const siteSettings = require('../../common/state/siteSettingsState')
 const urlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
@@ -22,11 +22,6 @@ const getSetting = require('../../../js/settings').getSetting
 const ledgerReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
-    case appConstants.APP_UPDATE_LEDGER_INFO:
-      {
-        state = state.setIn(['ledger', 'info'], action.get('ledgerInfo'))
-        break
-      }
     case appConstants.APP_SET_STATE:
       {
         state = ledgerApi.migration(state)
@@ -217,7 +212,7 @@ const ledgerReducer = (state, action, immutableAction) => {
         const pattern = urlUtil.getHostPattern(key)
         const value = action.get('excluded')
         ledgerApi.savePublisherOption(key, 'exclude', value)
-        state = siteSettings.setSettingsProp(state, pattern, 'ledgerPayments', value)
+        state = siteSettingsState.setSettingsProp(state, pattern, 'ledgerPayments', value)
         state = ledgerState.setPublishersProp(state, key, ['options', 'exclude'], value)
         state = ledgerApi.updatePublisherInfo(state)
         break
@@ -238,7 +233,7 @@ const ledgerReducer = (state, action, immutableAction) => {
         if (action.get('saveIntoSettings')) {
           const pattern = urlUtil.getHostPattern(key)
           if (prop === 'exclude') {
-            state = siteSettings.setSettingsProp(state, pattern, 'ledgerPayments', value)
+            state = siteSettingsState.setSettingsProp(state, pattern, 'ledgerPayments', value)
           }
         }
         break

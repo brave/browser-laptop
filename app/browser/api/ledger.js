@@ -112,7 +112,7 @@ signatureMax = Math.ceil(signatureMax * 1.5)
 // TODO is it ok to have IPC here or is there better place
 if (ipc) {
   ipc.on(messages.LEDGER_PUBLISHER, (event, location) => {
-    if ((!synopsis) || (event.sender.session === electron.session.fromPartition('default')) || (!tldjs.isValid(location))) {
+    if (!synopsis || event.sender.session === electron.session.fromPartition('default') || !tldjs.isValid(location)) {
       event.returnValue = {}
       return
     }
@@ -594,11 +594,11 @@ const excludeP = (publisherKey, callback) => {
 
       const sldP = data.key.indexOf('SLD:') === 0
       const tldP = data.key.indexOf('TLD:') === 0
-      if ((!tldP) && (!sldP)) return
+      if (!tldP && !sldP) return
 
       if (underscore.intersection(data.key.split(''),
           ['^', '$', '*', '+', '?', '[', '(', '{', '|']).length === 0) {
-        if ((data.key !== ('TLD:' + props.TLD)) && (props.SLD && data.key !== ('SLD:' + props.SLD.split('.')[0]))) {
+        if (data.key !== ('TLD:' + props.TLD) && (props.SLD && data.key !== ('SLD:' + props.SLD.split('.')[0]))) {
           return
         }
       } else {
@@ -723,7 +723,7 @@ const fetchFavIcon = (publisherKey, url, redirects) => {
   request.request({url: url, responseType: 'blob'}, (err, response, blob) => {
     let matchP, prefix, tail
 
-    if ((response) && (_internal.verboseP)) {
+    if (response && _internal.verboseP) {
       console.log('[ response for ' + url + ' ]')
       console.log('>>> HTTP/' + response.httpVersionMajor + '.' + response.httpVersionMinor + ' ' + response.statusCode +
         ' ' + (response.statusMessage || ''))
@@ -745,12 +745,12 @@ const fetchFavIcon = (publisherKey, url, redirects) => {
       return null
     }
 
-    if ((response.statusCode === 301) && (response.headers.location)) {
+    if (response.statusCode === 301 && response.headers.location) {
       if (redirects < 3) fetchFavIcon(publisherKey, response.headers.location, redirects++)
       return null
     }
 
-    if ((response.statusCode !== 200) || (response.headers['content-length'] === '0')) {
+    if (response.statusCode !== 200 || response.headers['content-length'] === '0') {
       return null
     }
 
@@ -764,8 +764,12 @@ const fetchFavIcon = (publisherKey, url, redirects) => {
       prefix = new Buffer(blob.substr(tail + 8, signatureMax), 'base64')
       underscore.keys(fileTypes).forEach((fileType) => {
         if (matchP) return
-        if ((prefix.length >= fileTypes[fileType].length) ||
-          (fileTypes[fileType].compare(prefix, 0, fileTypes[fileType].length) !== 0)) return
+        if (
+          prefix.length >= fileTypes[fileType].length ||
+          fileTypes[fileType].compare(prefix, 0, fileTypes[fileType].length) !== 0
+        ) {
+          return
+        }
 
         blob = 'data:image/' + fileType + blob.substr(tail)
         matchP = true
@@ -773,7 +777,7 @@ const fetchFavIcon = (publisherKey, url, redirects) => {
       if (!matchP) {
         return
       }
-    } else if ((tail > 0) && (tail + 8 >= blob.length)) return
+    } else if (tail > 0 && (tail + 8 >= blob.length)) return
 
     appActions.onFavIconReceived(publisherKey, blob)
   })
@@ -796,7 +800,7 @@ const updateLocation = (state, location, publisherKey) => {
     state = ledgerState.setLocationProp(state, location, 'verified', (verified || false))
   } else {
     state = verifiedP(state, publisherKey, (err, result) => {
-      if ((err) && (!err.notFound)) {
+      if (err && !err.notFound) {
         return
       }
 
@@ -810,7 +814,7 @@ const updateLocation = (state, location, publisherKey) => {
     state = ledgerState.setLocationProp(state, location, 'exclude', (exclude || false))
   } else {
     excludeP(publisherKey, (err, result) => {
-      if ((err) && (!err.notFound)) {
+      if (err && !err.notFound) {
         return
       }
 
@@ -1019,7 +1023,7 @@ const initSynopsis = (state) => {
   }
 
   // for earlier versions of the code...
-  if ((value > 0) && (value < 1000)) {
+  if (value > 0 && value < 1000) {
     value = value * 1000
   }
 
@@ -1239,7 +1243,7 @@ const showNotifications = (state) => {
 }
 
 const cacheRuleSet = (state, ruleset) => {
-  if ((!ruleset) || (underscore.isEqual(_internal.ruleset.raw, ruleset))) {
+  if (!ruleset || underscore.isEqual(_internal.ruleset.raw, ruleset)) {
     return state
   }
 
@@ -1295,7 +1299,7 @@ const cacheRuleSet = (state, ruleset) => {
       ctx.QLD = ctx.RLD ? underscore.last(ctx.RLD.split('.')) : ''
 
       stewed.forEach((rule) => {
-        if ((rule.consequent !== null) || (rule.dom)) return
+        if (rule.consequent !== null || rule.dom) return
         if (!ruleSolver.resolve(rule.condition, ctx)) return
 
         if (_internal.verboseP) console.log('\npurging ' + publisherKey)
@@ -1356,7 +1360,7 @@ const roundtrip = (params, options, callback) => {
   request.request(options, (err, response, body) => {
     let payload
 
-    if ((response) && (options.verboseP)) {
+    if (response && options.verboseP) {
       console.log('[ response for ' + params.method + ' ' + parts.protocol + '//' + parts.hostname + params.path + ' ]')
       console.log('>>> HTTP/' + response.httpVersionMajor + '.' + response.httpVersionMinor + ' ' + response.statusCode +
         ' ' + (response.statusMessage || ''))
@@ -1513,7 +1517,7 @@ const getStateInfo = (state, parsedData) => {
     let transaction = parsedData.transactions[i]
     if (transaction.stamp < then) break
 
-    if ((!transaction.ballots) || (transaction.ballots.length < transaction.count)) continue
+    if (!transaction.ballots || transaction.ballots.length < transaction.count) continue
 
     let ballots = underscore.clone(transaction.ballots || {})
     parsedData.ballots.forEach((ballot) => {
@@ -2089,7 +2093,7 @@ const migration = (state) => {
       const parsed = JSON.parse(data)
       state = ledgerState.saveSynopsis(state, parsed.publishers, parsed.options)
       fs.unlink(pathName(synopsisPath), (err) => {
-        if ((err) && (err.code !== 'ENOENT')) {
+        if (err && err.code !== 'ENOENT') {
           console.error('error removing file ' + synopsisPath + ': ', err)
         }
       })

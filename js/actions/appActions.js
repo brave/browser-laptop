@@ -494,17 +494,6 @@ const appActions = {
   },
 
   /**
-   * Updates ledger information for the payments pane
-   * @param {object} ledgerInfo - the current ledger state
-   */
-  updateLedgerInfo: function (ledgerInfo) {
-    dispatch({
-      actionType: appConstants.APP_UPDATE_LEDGER_INFO,
-      ledgerInfo
-    })
-  },
-
-  /**
    * Shows a message in the notification bar
    * @param {{message: string, buttons: Array.<string>, frameOrigin: string, options: Object}} detail
    */

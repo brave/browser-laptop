@@ -116,7 +116,7 @@ const ledgerState = {
 
   setPublisher: (state, key, value) => {
     state = validateState(state)
-    if (value == null) {
+    if (key == null || value == null) {
       return state
     }
 
@@ -126,11 +126,21 @@ const ledgerState = {
 
   deletePublishers: (state, key) => {
     state = validateState(state)
+
+    if (key == null) {
+      return state
+    }
+
     return state.deleteIn(['ledger', 'synopsis', 'publishers', key])
   },
 
   setPublishersProp: (state, key, prop, value) => {
     state = validateState(state)
+
+    if (key == null || prop == null) {
+      return state
+    }
+
     return state.setIn(['ledger', 'synopsis', 'publishers', key, prop], value)
   },
 
@@ -139,11 +149,21 @@ const ledgerState = {
    */
   setPublisherOption: (state, key, prop, value) => {
     state = validateState(state)
+
+    if (key == null || prop == null) {
+      return state
+    }
+
     return state.setIn(['ledger', 'synopsis', 'publishers', key, 'options', prop], value)
   },
 
   getPublisherOption: (state, key, prop) => {
     state = validateState(state)
+
+    if (key == null || prop == null) {
+      return state
+    }
+
     return state.getIn(['ledger', 'synopsis', 'publishers', key, 'options', prop])
   },
   getSynopsisOption: (state, prop) => {
@@ -160,7 +180,7 @@ const ledgerState = {
    */
   getSynopsisOptions: (state) => {
     state = validateState(state)
-    return state.getIn(['ledger', 'synopsis', 'options'])
+    return state.getIn(['ledger', 'synopsis', 'options']) || Immutable.Map()
   },
 
   setSynopsisOption: (state, prop, value) => {

@@ -38,11 +38,11 @@ const pageDataState = {
   },
 
   addInfo: (state, data) => {
-    data = makeImmutable(data)
-
     if (data == null) {
       return state
     }
+
+    data = makeImmutable(data)
 
     const key = pageDataUtil.getInfoKey(data.get('url'))
 
@@ -69,7 +69,7 @@ const pageDataState = {
     const key = state.getIn(['pageData', 'last', 'info'])
 
     if (key == null) {
-      Immutable.Map()
+      return Immutable.Map()
     }
 
     return state.getIn(['pageData', 'info', key], Immutable.Map())
