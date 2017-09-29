@@ -20,6 +20,7 @@ const commonStyles = require('../../styles/commonStyles')
 
 // other
 const aboutActions = require('../../../../../js/about/aboutActions')
+const appActions = require('../../../../../js/actions/appActions')
 
 class LedgerRecoveryContent extends ImmutableComponent {
   constructor () {
@@ -38,6 +39,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
 
   clearRecoveryStatus () {
     this.props.hideAdvancedOverlays()
+    appActions.resetRecoverStatus()
   }
 
   render () {

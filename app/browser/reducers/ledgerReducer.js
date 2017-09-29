@@ -303,6 +303,11 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.onNetworkConnected(state)
         break
       }
+    case appConstants.APP_ON_RESET_RECOVERY_STATUS:
+      {
+        state = ledgerState.setRecoveryStatus(state, null)
+        break
+      }
   }
   return state
 }

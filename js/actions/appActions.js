@@ -1686,6 +1686,12 @@ const appActions = {
     })
   },
 
+  resetRecoverStatus: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_RESET_RECOVERY_STATUS
+    })
+  },
+
   onPinnedTabReorder: function (siteKey, destinationKey, prepend) {
     dispatch({
       actionType: appConstants.APP_ON_PINNED_TAB_REORDER,
