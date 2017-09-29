@@ -237,7 +237,8 @@ const onBootStateFile = (state) => {
   } catch (ex) {
     state = ledgerState.resetInfo(state)
     bootP = false
-    return console.error('ledger client boot error: ', ex)
+    console.error('ledger client boot error: ', ex)
+    return state
   }
 
   if (client.sync(callback) === true) {
@@ -1563,7 +1564,9 @@ const generatePaymentData = (state) => {
 const getPaymentInfo = (state) => {
   let amount, currency
 
-  if (!client) return
+  if (!client) {
+    return state
+  }
 
   try {
     const bravery = client.getBraveryProperties()
@@ -1684,7 +1687,9 @@ const getBalance = (state) => {
 }
 
 const balanceReceived = (state, unconfirmed) => {
-  if (typeof unconfirmed === 'undefined') return
+  if (typeof unconfirmed === 'undefined') {
+    return state
+  }
 
   if (unconfirmed > 0) {
     const result = (unconfirmed / 1e8).toFixed(4)
@@ -1837,6 +1842,7 @@ const initialize = (state, paymentsEnabled) => {
 
   try {
     const fs = require('fs')
+    // TODO change this back to async
     fs.accessSync(pathName(statePath), fs.FF_OK)
     const data = fs.readFileSync(pathName(statePath))
     let parsedData
@@ -1880,7 +1886,8 @@ const initialize = (state, paymentsEnabled) => {
         })
       }
     } catch (ex) {
-      return console.error('ledger client creation error: ', ex)
+      console.error('ledger client creation error: ', ex)
+      return state
     }
 
     // speed-up browser start-up by delaying the first synchronization action
