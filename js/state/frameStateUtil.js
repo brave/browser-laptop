@@ -63,7 +63,7 @@ function getPinnedFrames (state) {
 }
 
 function getNonPinnedFrames (state) {
-  return state.get('frames').filter((frame) => !frame.get('pinnedLocation'))
+  return state.get('frames').filter((frame) => !frame.get('pinnedLocation')) || Immutable.List()
 }
 
 function getFrameIndex (state, frameKey) {
