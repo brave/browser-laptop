@@ -60,7 +60,8 @@ describe('tabs API unit tests', function () {
     })
 
     this.appStore = {
-      getState: () => Immutable.fromJS(this.appState)
+      getState: () => Immutable.fromJS(this.appState),
+      addChangeListener: () => {}
     }
 
     mockery.registerMock('electron', fakeElectron)
