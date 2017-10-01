@@ -66,6 +66,15 @@ describe('tab pages', function () {
       .waitForTextValue(activeTabTitle, 'Untitled')
     })
 
+    it('closes tab page with middle click', function * () {
+      yield this.app.client
+        .click(newFrameButton)
+        .waitForElementCount(tabPage, 2)
+        .waitForExist(tabPage2 + '.active')
+        .middleClick(tabPage1)
+        .waitForElementCount(tabPage, 0)
+    })
+
     it('shows no tab pages when you have only 1 page', function * () {
       yield this.app.client
         .waitForExist('[data-test-id="tab"][data-frame-key="1"]')
