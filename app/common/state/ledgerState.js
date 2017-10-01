@@ -5,6 +5,9 @@
 const Immutable = require('immutable')
 const assert = require('assert')
 
+// State
+const pageDataState = require('./pageDataState')
+
 // Utils
 const siteSettings = require('../../../js/state/siteSettings')
 const urlUtil = require('../../../js/lib/urlutil')
@@ -78,14 +81,21 @@ const ledgerState = {
     return state
   },
 
-  resetSynopsis: (state) => {
+  resetSynopsis: (state, options = false) => {
     state = validateState(state)
+
+    if (options) {
+      state = state
+        .setIn(['ledger', 'synopsis', 'options'], Immutable.Map())
+        .setIn(['ledger', 'about', 'synopsisOptions'], Immutable.Map())
+    }
+
+    state = pageDataState.resetPageData(state)
+
     return state
-      .setIn(['ledger', 'synopsis', 'options'], Immutable.Map())
       .setIn(['ledger', 'synopsis', 'publishers'], Immutable.Map())
       .setIn(['ledger', 'locations'], Immutable.Map())
-      .setIn(['ledger', 'about', 'synopsis'], Immutable.Map())
-      .setIn(['ledger', 'about', 'synopsisOptions'], Immutable.Map())
+      .setIn(['ledger', 'about', 'synopsis'], Immutable.List())
   },
 
   /**
@@ -166,6 +176,10 @@ const ledgerState = {
 
     return state.getIn(['ledger', 'synopsis', 'publishers', key, 'options', prop])
   },
+
+  /**
+   * SYNOPSIS / OPTIONS
+   */
   getSynopsisOption: (state, prop) => {
     state = validateState(state)
     if (prop == null) {
@@ -175,9 +189,6 @@ const ledgerState = {
     return state.getIn(['ledger', 'synopsis', 'options', prop], null)
   },
 
-  /**
-   * SYNOPSIS / OPTIONS
-   */
   getSynopsisOptions: (state) => {
     state = validateState(state)
     return state.getIn(['ledger', 'synopsis', 'options']) || Immutable.Map()
@@ -189,7 +200,10 @@ const ledgerState = {
       return state
     }
 
-    return state.setIn(['ledger', 'synopsis', 'options', prop], value)
+    state = state.setIn(['ledger', 'synopsis', 'options', prop], value)
+    state = ledgerState.setAboutSynopsisOptions(state)
+
+    return state
   },
 
   /**
@@ -311,6 +325,12 @@ const ledgerState = {
     state = validateState(state)
     return state
       .setIn(['ledger', 'about', 'synopsis'], publishers)
+      .setIn(['ledger', 'about', 'synopsisOptions'], ledgerState.getSynopsisOptions(state))
+  },
+
+  setAboutSynopsisOptions: (state) => {
+    state = validateState(state)
+    return state
       .setIn(['ledger', 'about', 'synopsisOptions'], ledgerState.getSynopsisOptions(state))
   }
 }

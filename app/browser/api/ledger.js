@@ -36,7 +36,7 @@ const tabs = require('../../browser/tabs')
 const locale = require('../../locale')
 const appConfig = require('../../../js/constants/appConfig')
 const getSetting = require('../../../js/settings').getSetting
-const {fileUrl} = require('../../../js/lib/appUrlUtil')
+const {fileUrl, getSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 const urlParse = require('../../common/urlParse')
 const ruleSolver = require('../../extensions/brave/content/scripts/pageInformation')
 const request = require('../../../js/lib/request')
@@ -412,7 +412,7 @@ const synopsisNormalizer = (state, changedPublisher) => {
   }
 
   if (results.length === 0) {
-    return state
+    return ledgerState.saveAboutSynopsis(state, Immutable.List())
   }
 
   results = underscore.sortBy(results, (entry) => -entry.scores[scorekeeper])
@@ -497,8 +497,8 @@ const synopsisNormalizer = (state, changedPublisher) => {
     const publisherKey = item.site
     const weight = item.weight
     const pinPercentage = item.pinPercentage
-    synopsis.publishers[publisherKey].weight = weight
-    synopsis.publishers[publisherKey].pinPercentage = pinPercentage
+    savePublisherOption(publisherKey, 'weight', weight)
+    savePublisherOption(publisherKey, 'pinPercentage', pinPercentage)
     state = ledgerState.setPublishersProp(state, publisherKey, 'weight', weight)
     state = ledgerState.setPublishersProp(state, publisherKey, 'pinPercentage', pinPercentage)
   })
@@ -552,7 +552,7 @@ const inspectP = (db, path, publisher, property, key, callback) => {
 // TODO rename function name
 const verifiedP = (state, publisherKey, callback) => {
   inspectP(v2PublishersDB, v2PublishersPath, publisherKey, 'verified', null, (err, result) => {
-    if (!err) {
+    if (!err && callback) {
       callback(null, result)
     }
   })
@@ -561,6 +561,7 @@ const verifiedP = (state, publisherKey, callback) => {
     ['brianbondy.com', 'clifton.io'].forEach((key) => {
       if (ledgerState.hasPublisher(state, key)) {
         state = ledgerState.setPublisherOption(state, key, 'verified', true)
+        savePublisherOption(publisherKey, 'verified', true)
       }
     })
     state = updatePublisherInfo(state)
@@ -677,6 +678,7 @@ const setLocation = (state, timestamp, tabId) => {
   state = verifiedP(state, publisherKey, (error, result) => {
     if (!error) {
       appActions.onPublisherOptionUpdate(publisherKey, 'verified', result)
+      savePublisherOption(publisherKey, 'verified', result)
     }
   })
 
@@ -689,6 +691,14 @@ const addVisit = (state, location, timestamp, tabId) => {
   }
 
   state = setLocation(state, timestamp, tabId)
+
+  const lastUrl = pageDataState.getLastUrl(state)
+  const aboutUrl = getSourceAboutUrl(lastUrl) || lastUrl
+  if (aboutUrl.match(/^about/)) {
+    state = pageDataState.resetInfo(state)
+  }
+
+  location = getSourceAboutUrl(location) || location
 
   currentUrl = location.match(/^about/) ? locationDefault : location
   currentTimestamp = timestamp
@@ -703,7 +713,7 @@ const getFavIcon = (state, publisherKey, page) => {
     state = ledgerState.setPublishersProp(state, publisherKey, 'protocol', protocol)
   }
 
-  if (typeof publisher.get('faviconURL') === 'undefined' && (page.get('faviconURL') || publisher.get('protocol'))) {
+  if (publisher.get('faviconURL') == null && (page.get('faviconURL') || publisher.get('protocol'))) {
     let faviconURL = page.get('faviconURL') || publisher.get('protocol') + '//' + urlParse(page.get('key')).host + '/favicon.ico'
     if (_internal.debugP) {
       console.log('\nrequest: ' + faviconURL)
@@ -781,6 +791,10 @@ const fetchFavIcon = (publisherKey, url, redirects) => {
     } else if (tail > 0 && (tail + 8 >= blob.length)) return
 
     appActions.onFavIconReceived(publisherKey, blob)
+
+    if (synopsis.publishers && synopsis.publishers[publisherKey]) {
+      synopsis.publishers[publisherKey].faviconURL = blob
+    }
   })
 }
 
@@ -1009,7 +1023,7 @@ const quit = (state) => {
   state = addVisit(state, locationDefault, new Date().getTime(), null)
 
   if (!getSetting(settings.PAYMENTS_ENABLED) && getSetting(settings.SHUTDOWN_CLEAR_HISTORY)) {
-    state = ledgerState.resetSynopsis(state)
+    state = ledgerState.resetSynopsis(state, true)
   }
 
   return state
@@ -1070,6 +1084,7 @@ const initSynopsis = (state) => {
     state = verifiedP(state, publisherKey, (error, result) => {
       if (!error) {
         appActions.onPublisherOptionUpdate(publisherKey, 'verified', result)
+        savePublisherOption(publisherKey, 'verified', result)
       }
     })
   }
@@ -1597,8 +1612,11 @@ const onWalletProperties = (state, body) => {
     buyURLExpires: body.get('buyURLExpires'),
     balance: body.get('balance'),
     unconfirmed: body.get('unconfirmed'),
-    satoshis: body.get('satoshis'),
-    address: client.getWalletAddress()
+    satoshis: body.get('satoshis')
+  }
+
+  if (client) {
+    newInfo.address = client.getWalletAddress()
   }
 
   state = ledgerState.mergeInfoProp(state, newInfo)
@@ -2132,7 +2150,9 @@ const saveOptionSynopsis = (prop, value) => {
 }
 
 const savePublisherOption = (publisherKey, prop, value) => {
-  synopsis.publishers[publisherKey].options[prop] = value
+  if (synopsis.publishers && synopsis.publishers[publisherKey]) {
+    synopsis.publishers[publisherKey].options[prop] = value
+  }
 }
 
 module.exports = {

@@ -19,6 +19,7 @@ const renderUrlToPdf = (appState, action) => {
     show: false,
     width: 0,
     height: 0,
+    focusable: false,
     backgroundColor: '#ffffff',
     webPreferences: {
       partition: 'default'
