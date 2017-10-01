@@ -32,6 +32,7 @@ const dndData = require('../../../../js/dndData')
 const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const bookmarkUtil = require('../../../common/lib/bookmarkUtil')
+const siteUtil = require('../../../../js/state/siteUtil')
 
 // Styles
 const globalStyles = require('../styles/global')
@@ -58,13 +59,16 @@ class BookmarksToolbar extends React.Component {
     const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
     if (bookmark) {
       // Figure out the droppedOn element filtering out the source drag item
-      const bookmarkKey = bookmark.get('bookmarkKey')
+      let bookmarkKey = bookmark.get('bookmarkKey')
+      if (bookmarkKey === undefined) {
+        bookmarkKey = siteUtil.getSiteKey(bookmark)
+      }
       const droppedOn = getClosestFromPos(e.clientX, bookmarkKey)
       if (droppedOn.selectedRef) {
         const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
         const droppedOnKey = droppedOn.selectedRef.props.bookmarkKey
         const isDestinationParent = droppedOn.selectedRef.state.isFolder && droppedOn && droppedOn.isDroppedOn
-        appActions.moveSite(bookmark.get('bookmarkKey'), droppedOnKey, isLeftSide, isDestinationParent)
+        appActions.moveSite(bookmarkKey, droppedOnKey, isLeftSide, isDestinationParent)
         dnd.onDragEnd()
       }
       return
