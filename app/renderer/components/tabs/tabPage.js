@@ -75,8 +75,34 @@ class TabPage extends React.Component {
     windowActions.onTabPageContextMenu(this.props.index)
   }
 
-  onClick () {
-    windowActions.setTabPageIndex(this.props.index)
+  onCloseTabPage () {
+    return this.props.tabPageFrames
+      .map(frame => appActions.tabCloseRequested(frame.get('tabId')))
+  }
+
+  onAuxClick (e) {
+    this.onClick(e)
+  }
+
+  onClick (e) {
+    e.stopPropagation()
+    switch (e.button) {
+      case 2:
+        // Ignore right click
+        return
+      case 1:
+        // Close tab page with middle click
+        // and eventually cancel the hover state
+        this.onCloseTabPage()
+        windowActions.setTabPageHoverState(this.props.index, false)
+        break
+      default:
+        windowActions.setTabPageIndex(this.props.index)
+    }
+  }
+
+  componentDidMount () {
+    this.tabPageNode.addEventListener('auxclick', this.onAuxClick.bind(this))
   }
 
   mergeProps (state, ownProps) {
@@ -107,6 +133,7 @@ class TabPage extends React.Component {
 
     // used in other functions
     props.sourceDragFromPageIndex = sourceDragFromPageIndex
+    props.tabPageFrames = tabPageFrames
     props.isPageEmpty = tabPageFrames.isEmpty()
     props.moveToFrameKey = tabPageFrames.getIn([0, 'key'])
 
@@ -115,6 +142,7 @@ class TabPage extends React.Component {
 
   render () {
     return <span
+      ref={(node) => { this.tabPageNode = node }}
       data-tab-page={this.props.index}
       onDragOver={this.onDragOver.bind(this)}
       onMouseEnter={this.props.previewTabPage ? this.onMouseEnter : null}
