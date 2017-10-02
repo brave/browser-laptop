@@ -169,7 +169,8 @@ const appConstants = {
   APP_ON_TIME_UNTIL_RECONCILE: _,
   APP_ON_LEDGER_RUN: _,
   APP_ON_NETWORK_CONNECTED: _,
-  APP_ON_RESET_RECOVERY_STATUS: _
+  APP_ON_RESET_RECOVERY_STATUS: _,
+  APP_ON_LEDGER_INIT_READ: _
 }
 
 module.exports = mapValuesByKeys(appConstants)

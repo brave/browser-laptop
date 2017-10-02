@@ -1576,13 +1576,12 @@ const appActions = {
     })
   },
 
-  onPublisherOptionUpdate: function (publisherKey, prop, value, saveIntoSettings = false) {
+  onPublisherOptionUpdate: function (publisherKey, prop, value) {
     dispatch({
       actionType: appConstants.APP_ON_PUBLISHER_OPTION_UPDATE,
       publisherKey,
       prop,
-      value,
-      saveIntoSettings
+      value
     })
   },
 
@@ -1689,6 +1688,13 @@ const appActions = {
   resetRecoverStatus: function () {
     dispatch({
       actionType: appConstants.APP_ON_RESET_RECOVERY_STATUS
+    })
+  },
+
+  onInitRead: function (parsedData) {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_INIT_READ,
+      parsedData
     })
   },
 

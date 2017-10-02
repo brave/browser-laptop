@@ -15,7 +15,7 @@ const qr = require('qr-image')
 const underscore = require('underscore')
 const tldjs = require('tldjs')
 const urlFormat = require('url').format
-const queryString = require('queryString')
+const queryString = require('querystring')
 const levelUp = require('level')
 const random = require('random-lib')
 const uuid = require('uuid')
@@ -51,8 +51,8 @@ let bootP
 let quitP
 let notificationPaymentDoneMessage
 const _internal = {
-  verboseP: true,
-  debugP: true,
+  verboseP: process.env.LEDGER_VERBOSE || true,
+  debugP: process.env.LEDGER_DEBUG || true,
   ruleset: {
     raw: [],
     cooked: []
@@ -102,6 +102,8 @@ const fileTypes = {
   jpeg: new Buffer([0xff, 0xd8, 0xff]),
   png: new Buffer([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 }
+const minimumVisitTimeDefault = 8 * 1000
+const nextAddFoundsTime = 3 * miliseconds.day
 
 let signatureMax = 0
 underscore.keys(fileTypes).forEach((fileType) => {
@@ -327,6 +329,7 @@ const getPublisherData = (result, scorekeeper) => {
 
   let data = {
     verified: result.options.verified || false,
+    exclude: result.options.exclude || false,
     site: result.publisherKey,
     views: result.visits,
     duration: duration,
@@ -694,13 +697,13 @@ const addVisit = (state, location, timestamp, tabId) => {
 
   const lastUrl = pageDataState.getLastUrl(state)
   const aboutUrl = getSourceAboutUrl(lastUrl) || lastUrl
-  if (aboutUrl.match(/^about/)) {
+  if (aboutUrl && aboutUrl.match(/^about/)) {
     state = pageDataState.resetInfo(state)
   }
 
   location = getSourceAboutUrl(location) || location
 
-  currentUrl = location.match(/^about/) ? locationDefault : location
+  currentUrl = (location && location.match(/^about/)) ? locationDefault : location
   currentTimestamp = timestamp
   return state
 }
@@ -887,11 +890,10 @@ const pageDataChanged = (state) => {
     if (initP) {
       excludeP(publisherKey, (unused, exclude) => {
         if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
-          exclude = false
-        } else {
-          exclude = !exclude
+          exclude = true
         }
-        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude, true)
+        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+        savePublisherOption(publisherKey, 'exclude', exclude)
       })
     }
 
@@ -1033,7 +1035,7 @@ const initSynopsis = (state) => {
   state = ledgerState.saveSynopsis(state, null, synopsis.options)
   let value = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
   if (!value) {
-    value = 8 * 1000
+    value = minimumVisitTimeDefault
     appActions.changeSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME, value)
   }
 
@@ -1079,6 +1081,7 @@ const initSynopsis = (state) => {
     const publisherKey = item[0]
     excludeP(publisherKey, (unused, exclude) => {
       appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+      savePublisherOption(publisherKey, 'exclude', exclude)
     })
 
     state = verifiedP(state, publisherKey, (error, result) => {
@@ -1132,9 +1135,6 @@ const enable = (state, paymentsEnabled) => {
     }
   })
 
-  // change undefined include publishers to include publishers
-  state = ledgerState.enableUndefinedPublishers(state, stateSynopsis.get('publishers'))
-
   return state
 }
 
@@ -1179,7 +1179,7 @@ const showNotificationReviewPublishers = (nextTime) => {
 }
 
 const showNotificationAddFunds = () => {
-  const nextTime = new Date().getTime() + (3 * miliseconds.day)
+  const nextTime = new Date().getTime() + nextAddFoundsTime
   appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
 
   appActions.showNotification({
@@ -1434,32 +1434,6 @@ const updateLedgerInfo = (state) => {
     state = ledgerState.setInfoProp(state, 'buyURL', buyURL)
     state = ledgerState.setInfoProp(state, 'buyMaximumUSD', false)
   }
-
-  // TODO remove when BAT is implemented, we don't need this for BAT
-  /*
-  if ((client) && (now > ledgerInfo._internal.geoipExpiry)) {
-    ledgerInfo._internal.geoipExpiry = now + (5 * miliseconds.minute)
-
-    if (!ledgerGeoIP) ledgerGeoIP = require('ledger-geoip')
-    return ledgerGeoIP.getGeoIP(client.options, (err, provider, result) => {
-      if (err) console.warn('ledger geoip warning: ' + JSON.stringify(err, null, 2))
-      if (result) ledgerInfo.countryCode = result
-
-      ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
-
-      if (now <= ledgerInfo._internal.exchangeExpiry) return updateLedgerInfo()
-
-      ledgerInfo._internal.exchangeExpiry = now + miliseconds.day
-      roundtrip({ path: '/v1/exchange/providers' }, client.options, (err, response, body) => {
-        if (err) console.error('ledger exchange error: ' + JSON.stringify(err, null, 2))
-
-        ledgerInfo._internal.exchanges = body || {}
-        ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
-        updateLedgerInfo()
-      })
-    })
-  }
-  */
 
   return state
 }
@@ -1793,6 +1767,7 @@ const onCallback = (state, result, delayTime) => {
         const publisherKey = item[0]
         excludeP(publisherKey, (unused, exclude) => {
           appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+          savePublisherOption(publisherKey, 'exclude', exclude)
         })
       }
     })
@@ -1860,71 +1835,26 @@ const initialize = (state, paymentsEnabled) => {
 
   try {
     const fs = require('fs')
-    // TODO change this back to async
-    fs.accessSync(pathName(statePath), fs.FF_OK)
-    const data = fs.readFileSync(pathName(statePath))
-    let parsedData
-
-    try {
-      parsedData = JSON.parse(data)
-      if (clientOptions.verboseP) {
-        console.log('\nstarting up ledger client integration')
-      }
-    } catch (ex) {
-      console.error('statePath parse error: ' + ex.toString())
-      return state
-    }
-
-    state = getStateInfo(state, parsedData)
-
-    try {
-      let timeUntilReconcile
-      clientprep()
-      client = ledgerClient(parsedData.personaId,
-        underscore.extend(parsedData.options, {roundtrip: roundtrip}, clientOptions),
-        parsedData)
-
-      // Scenario: User enables Payments, disables it, waits 30+ days, then
-      // enables it again -> reconcileStamp is in the past.
-      // In this case reset reconcileStamp to the future.
-      try {
-        timeUntilReconcile = client.timeUntilReconcile()
-      } catch (ex) {}
-
-      let ledgerWindow = (ledgerState.getSynopsisOption(state, 'numFrames') - 1) * ledgerState.getSynopsisOption(state, 'frameSize')
-      if (typeof timeUntilReconcile === 'number' && timeUntilReconcile < -ledgerWindow) {
-        client.setTimeUntilReconcile(null, (err, stateResult) => {
-          if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
-
-          if (!stateResult) {
-            return
-          }
-
-          appActions.onTimeUntilReconcile(stateResult)
-        })
-      }
-    } catch (ex) {
-      console.error('ledger client creation error: ', ex)
-      return state
-    }
-
-    // speed-up browser start-up by delaying the first synchronization action
-    setTimeout(() => {
-      if (!client) {
+    fs.access(pathName(statePath), fs.FF_OK, (err) => {
+      if (err) {
         return
       }
 
-      appActions.onLedgerFirstSync(parsedData)
-    }, 3 * miliseconds.second)
+      fs.readFile(pathName(statePath), (err, data) => {
+        if (err) {
+          return console.error('read error: ' + err.toString())
+        }
 
-    // Make sure bravery props are up-to-date with user settings
-    const address = ledgerState.getInfoProp(state, 'address')
-    if (address) {
-      state = ledgerState.setInfoProp(state, 'address', client.getWalletAddress())
-    }
-
-    setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
-    getBalance(state)
+        try {
+          appActions.onInitRead(JSON.parse(data))
+          if (clientOptions.verboseP) {
+            console.log('\nstarting up ledger client integration')
+          }
+        } catch (ex) {
+          console.error('statePath parse error: ' + ex.toString())
+        }
+      })
+    })
 
     return state
   } catch (err) {
@@ -1934,6 +1864,62 @@ const initialize = (state, paymentsEnabled) => {
     state = ledgerState.resetInfo(state)
     return state
   }
+}
+
+const onInitRead = (state, parsedData) => {
+  parsedData = parsedData.toJS()
+  state = getStateInfo(state, parsedData)
+
+  try {
+    let timeUntilReconcile
+    clientprep()
+    client = ledgerClient(parsedData.personaId,
+      underscore.extend(parsedData.options, {roundtrip: roundtrip}, clientOptions),
+      parsedData)
+
+    // Scenario: User enables Payments, disables it, waits 30+ days, then
+    // enables it again -> reconcileStamp is in the past.
+    // In this case reset reconcileStamp to the future.
+    try {
+      timeUntilReconcile = client.timeUntilReconcile()
+    } catch (ex) {}
+
+    let ledgerWindow = (ledgerState.getSynopsisOption(state, 'numFrames') - 1) * ledgerState.getSynopsisOption(state, 'frameSize')
+    if (typeof timeUntilReconcile === 'number' && timeUntilReconcile < -ledgerWindow) {
+      client.setTimeUntilReconcile(null, (err, stateResult) => {
+        if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
+
+        if (!stateResult) {
+          return
+        }
+
+        appActions.onTimeUntilReconcile(stateResult)
+      })
+    }
+  } catch (ex) {
+    console.error('ledger client creation error: ', ex)
+    return state
+  }
+
+  // speed-up browser start-up by delaying the first synchronization action
+  setTimeout(() => {
+    if (!client) {
+      return
+    }
+
+    appActions.onLedgerFirstSync(parsedData)
+  }, 3 * miliseconds.second)
+
+  // Make sure bravery props are up-to-date with user settings
+  const address = ledgerState.getInfoProp(state, 'address')
+  if (address) {
+    state = ledgerState.setInfoProp(state, 'address', client.getWalletAddress())
+  }
+
+  setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
+  getBalance(state)
+
+  return state
 }
 
 const onTimeUntilReconcile = (state, stateResult) => {
@@ -2183,5 +2169,6 @@ module.exports = {
   onTimeUntilReconcile,
   run,
   onNetworkConnected,
-  migration
+  migration,
+  onInitRead
 }

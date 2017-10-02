@@ -161,17 +161,11 @@ const visibleP = (state, publisherKey) => {
 
   // Publisher Options
   const deletedByUser = blockedP(state, publisherKey)
-  const includeExclude = stickyP(state, publisherKey)
   const eligibleByStats = eligibleP(state, publisherKey) // num of visits and time spent
-  const isInExclusionList = publisherOptions.get('exclude')
   const verifiedPublisher = publisherOptions.get('verified')
 
   return (
       eligibleByStats &&
-      (
-        isInExclusionList !== true ||
-        includeExclude
-      ) &&
       (
         (onlyVerified && verifiedPublisher) ||
         !onlyVerified
@@ -198,6 +192,14 @@ const eligibleP = (state, publisherKey) => {
 const stickyP = (state, publisherKey) => {
   const pattern = urlUtil.getHostPattern(publisherKey)
   let result = siteSettingsState.getSettingsProp(state, pattern, 'ledgerPayments')
+
+  if (result == null) {
+    const excluded = ledgerState.getPublisherOption(state, publisherKey, 'exclude')
+
+    if (excluded != null) {
+      result = !excluded
+    }
+  }
 
   return (result === undefined || result)
 }

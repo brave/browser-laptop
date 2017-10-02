@@ -171,7 +171,7 @@ const ledgerState = {
     state = validateState(state)
 
     if (key == null || prop == null) {
-      return state
+      return null
     }
 
     return state.getIn(['ledger', 'synopsis', 'publishers', key, 'options', prop])
@@ -294,28 +294,6 @@ const ledgerState = {
       let newSiteSettings = siteSettings.mergeSiteSetting(state.get('siteSettings'), pattern, 'ledgerPinPercentage', percentage)
       state = state.set('siteSettings', newSiteSettings)
     })
-
-    return state
-  },
-
-  enableUndefinedPublishers: (state, publishers) => {
-    state = validateState(state)
-    const sitesObject = state.get('siteSettings')
-
-    if (publishers == null) {
-      return state
-    }
-
-    for (let item of publishers) {
-      const key = item[0]
-      const pattern = urlUtil.getHostPattern(key)
-      const result = sitesObject.getIn([pattern, 'ledgerPayments'])
-
-      if (result === undefined) {
-        const newSiteSettings = siteSettings.mergeSiteSetting(state.get('siteSettings'), pattern, 'ledgerPayments', true)
-        state = state.set('siteSettings', newSiteSettings)
-      }
-    }
 
     return state
   },

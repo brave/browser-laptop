@@ -11,11 +11,9 @@ const settings = require('../../../js/constants/settings')
 
 // State
 const ledgerState = require('../../common/state/ledgerState')
-const siteSettingsState = require('../../common/state/siteSettingsState')
 
 // Utils
 const ledgerApi = require('../../browser/api/ledger')
-const urlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
 
@@ -209,10 +207,8 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_EXCLUSION_STATUS:
       {
         const key = action.get('publisherKey')
-        const pattern = urlUtil.getHostPattern(key)
         const value = action.get('excluded')
         ledgerApi.savePublisherOption(key, 'exclude', value)
-        state = siteSettingsState.setSettingsProp(state, pattern, 'ledgerPayments', value)
         state = ledgerState.setPublishersProp(state, key, ['options', 'exclude'], value)
         state = ledgerApi.updatePublisherInfo(state)
         break
@@ -229,13 +225,6 @@ const ledgerReducer = (state, action, immutableAction) => {
         const key = action.get('publisherKey')
         const prop = action.get('prop')
         state = ledgerState.setPublisherOption(state, key, prop, value)
-
-        if (action.get('saveIntoSettings')) {
-          const pattern = urlUtil.getHostPattern(key)
-          if (prop === 'exclude') {
-            state = siteSettingsState.setSettingsProp(state, pattern, 'ledgerPayments', value)
-          }
-        }
         break
       }
     case appConstants.APP_ON_LEDGER_WALLET_CREATE:
@@ -306,6 +295,11 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_RESET_RECOVERY_STATUS:
       {
         state = ledgerState.setRecoveryStatus(state, null)
+        break
+      }
+    case appConstants.APP_ON_LEDGER_INIT_READ:
+      {
+        state = ledgerApi.onInitRead(state, action.get('parsedData'))
         break
       }
   }

@@ -70,7 +70,8 @@ class LedgerTable extends ImmutableComponent {
         return result
       }
     }
-    return getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST, this.props.settings)
+
+    return !synopsis.get('exclude')
   }
 
   shouldShow (synopsis) {
