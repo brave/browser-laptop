@@ -14,6 +14,7 @@ const {
   tabPage2,
   activeWebview,
   activeTab,
+  activeTabTitle,
   tabsTab,
   closeTab
 } = require('../lib/selectors')
@@ -45,6 +46,24 @@ describe('tab pages', function () {
     it('shows 2 tab pages when there are more than 1 page worth of tabs', function * () {
       yield this.app.client.click(newFrameButton)
         .waitForElementCount(tabPage, 2)
+    })
+
+    it('sets a new active tab when closed tab page includes the last active tab', function * () {
+      yield this.app.client
+      .newTab({ url: 'about:blank', active: false })
+      .waitForElementCount(tabPage, 2)
+      .waitForExist(tabPage1 + '.active')
+      .waitForExist(tabPage2)
+      .moveToObject(tabPage2, 5, 5)
+      .click(tabPage2)
+      .waitForExist(tabPage2 + '.active')
+      .moveToObject(tabPage1, 5, 5)
+      // close first tab page
+      .middleClick(tabPage1)
+      .waitForElementCount(tabPage, 0)
+      .waitForExist(activeTab)
+      .moveToObject(activeTab)
+      .waitForTextValue(activeTabTitle, 'Untitled')
     })
 
     it('shows no tab pages when you have only 1 page', function * () {
