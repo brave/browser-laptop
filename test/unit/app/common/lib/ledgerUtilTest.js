@@ -97,7 +97,7 @@ describe('ledgerUtil test', function () {
     })
   })
 
-  describe('btcToCurrencyString', function () {
+  describe('batToCurrencyString', function () {
     let ledgerData
 
     before(function () {
@@ -123,8 +123,8 @@ describe('ledgerUtil test', function () {
         buyMaximumUSD: 6,
         reconcileFrequency: 30,
         currency: 'USD',
-        btc: '0.00277334',
-        address: 'btc-address-goes-here',
+        bat: '0.00277334',
+        address: 'bat-address-goes-here',
         reconcileStamp: 1405324210587,
         transactions: [],
         amount: 10,
@@ -135,43 +135,43 @@ describe('ledgerUtil test', function () {
     })
 
     it('defaults to 0 as balance and "USD" as currency symbol', function () {
-      const result = ledgerUtil.btcToCurrencyString()
+      const result = ledgerUtil.batToCurrencyString()
       assert.equal(result, '0 USD')
     })
     it('will mark currency with different symbol (if present)', function () {
-      const result = ledgerUtil.btcToCurrencyString(0, ledgerData.set('currency', 'Sealand dollars'))
+      const result = ledgerUtil.batToCurrencyString(0, ledgerData.set('currency', 'Sealand dollars'))
       assert.equal(result, '0 Sealand dollars')
     })
     it('will convert value to USD', function () {
-      const result = ledgerUtil.btcToCurrencyString(1, ledgerData)
+      const result = ledgerUtil.batToCurrencyString(1, ledgerData)
       assert.equal(result, '3605.75 USD')
     })
     describe('when rounding values', function () {
       it('will round 4.97 down to 4.75 (cent values greater than .74)', function () {
-        const ledgerDataCopy = ledgerData.set('btc', '0.00279000')
-        const result = ledgerUtil.btcToCurrencyString(0.00138667, ledgerDataCopy)
+        const ledgerDataCopy = ledgerData.set('bat', '0.00279000')
+        const result = ledgerUtil.batToCurrencyString(0.00138667, ledgerDataCopy)
         assert.equal(result, '4.75 USD')
       })
       it('will round 4.64 down to 4.50 (cent values greater than .49)', function () {
-        const ledgerDataCopy = ledgerData.set('btc', '0.00299000')
-        const result = ledgerUtil.btcToCurrencyString(0.00138667, ledgerDataCopy)
+        const ledgerDataCopy = ledgerData.set('bat', '0.00299000')
+        const result = ledgerUtil.batToCurrencyString(0.00138667, ledgerDataCopy)
         assert.equal(result, '4.50 USD')
       })
       it('will round 4.33 down to 4.25 (cent values greater than .24)', function () {
-        const ledgerDataCopy = ledgerData.set('btc', '0.00320000')
-        const result = ledgerUtil.btcToCurrencyString(0.00138667, ledgerDataCopy)
+        const ledgerDataCopy = ledgerData.set('bat', '0.00320000')
+        const result = ledgerUtil.batToCurrencyString(0.00138667, ledgerDataCopy)
         assert.equal(result, '4.25 USD')
       })
       it('will round 4.08 down to 4.00 (cent values less than .24)', function () {
-        const ledgerDataCopy = ledgerData.set('btc', '0.00340000')
-        const result = ledgerUtil.btcToCurrencyString(0.00138667, ledgerDataCopy)
+        const ledgerDataCopy = ledgerData.set('bat', '0.00340000')
+        const result = ledgerUtil.batToCurrencyString(0.00138667, ledgerDataCopy)
         assert.equal(result, '4.00 USD')
       })
     })
     describe('when ledgerData does not contain exchange information', function () {
-      it('returns the raw balance formatted as BTC', function () {
-        const result = ledgerUtil.btcToCurrencyString(0.00138667, undefined)
-        assert.equal(result, '0.00138667 BTC')
+      it('returns the raw balance formatted as BAT', function () {
+        const result = ledgerUtil.batToCurrencyString(0.00138667, undefined)
+        assert.equal(result, '0.00138667 BAT')
       })
     })
   })
