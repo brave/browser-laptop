@@ -51,8 +51,8 @@ let bootP
 let quitP
 let notificationPaymentDoneMessage
 const _internal = {
-  verboseP: true,
-  debugP: true,
+  verboseP: process.env.LEDGER_VERBOSE || true,
+  debugP: process.env.LEDGER_DEBUG || true,
   ruleset: {
     raw: [],
     cooked: []
@@ -102,6 +102,8 @@ const fileTypes = {
   jpeg: new Buffer([0xff, 0xd8, 0xff]),
   png: new Buffer([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 }
+const minimumVisitTimeDefault = 8 * 1000
+const nextAddFoundsTime = 3 * miliseconds.day
 
 let signatureMax = 0
 underscore.keys(fileTypes).forEach((fileType) => {
@@ -1033,7 +1035,7 @@ const initSynopsis = (state) => {
   state = ledgerState.saveSynopsis(state, null, synopsis.options)
   let value = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
   if (!value) {
-    value = 8 * 1000
+    value = minimumVisitTimeDefault
     appActions.changeSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME, value)
   }
 
@@ -1179,7 +1181,7 @@ const showNotificationReviewPublishers = (nextTime) => {
 }
 
 const showNotificationAddFunds = () => {
-  const nextTime = new Date().getTime() + (3 * miliseconds.day)
+  const nextTime = new Date().getTime() + nextAddFoundsTime
   appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
 
   appActions.showNotification({
@@ -1434,32 +1436,6 @@ const updateLedgerInfo = (state) => {
     state = ledgerState.setInfoProp(state, 'buyURL', buyURL)
     state = ledgerState.setInfoProp(state, 'buyMaximumUSD', false)
   }
-
-  // TODO remove when BAT is implemented, we don't need this for BAT
-  /*
-  if ((client) && (now > ledgerInfo._internal.geoipExpiry)) {
-    ledgerInfo._internal.geoipExpiry = now + (5 * miliseconds.minute)
-
-    if (!ledgerGeoIP) ledgerGeoIP = require('ledger-geoip')
-    return ledgerGeoIP.getGeoIP(client.options, (err, provider, result) => {
-      if (err) console.warn('ledger geoip warning: ' + JSON.stringify(err, null, 2))
-      if (result) ledgerInfo.countryCode = result
-
-      ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
-
-      if (now <= ledgerInfo._internal.exchangeExpiry) return updateLedgerInfo()
-
-      ledgerInfo._internal.exchangeExpiry = now + miliseconds.day
-      roundtrip({ path: '/v1/exchange/providers' }, client.options, (err, response, body) => {
-        if (err) console.error('ledger exchange error: ' + JSON.stringify(err, null, 2))
-
-        ledgerInfo._internal.exchanges = body || {}
-        ledgerInfo.exchangeInfo = ledgerInfo._internal.exchanges[ledgerInfo.countryCode]
-        updateLedgerInfo()
-      })
-    })
-  }
-  */
 
   return state
 }
