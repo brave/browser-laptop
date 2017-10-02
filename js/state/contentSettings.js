@@ -6,7 +6,6 @@ const appDispatcher = require('../dispatcher/appDispatcher')
 const AppStore = require('../stores/appStore')
 const appConstants = require('../constants/appConstants')
 const appConfig = require('../constants/appConfig')
-const config = require('../constants/config')
 const {registerContentSettings} = require('../../app/browser/contentSettings/hostContentSettings')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const Immutable = require('immutable')
@@ -213,12 +212,6 @@ const getDefault3rdPartyStorageSettings = (braveryDefaults, appSettings, appConf
         setting: 'allow',
         primaryPattern: '*',
         secondaryPattern: '[firstParty]'
-      },
-      {
-        // Needed for coinbase widget localStorage to work in about:preferences
-        setting: 'allow',
-        primaryPattern: `chrome-extension://${config.braveExtensionId}`,
-        secondaryPattern: config.coinbaseOrigin
       }
     ]
     contentSettings.push(...localStorageExceptions.map((exceptionPair) => ({
@@ -233,12 +226,6 @@ const getDefault3rdPartyStorageSettings = (braveryDefaults, appSettings, appConf
         setting: 'block',
         primaryPattern: '*',
         secondaryPattern: '*'
-      },
-      {
-        // Needed for coinbase widget localStorage to work in about:preferences
-        setting: 'allow',
-        primaryPattern: `chrome-extension://${config.braveExtensionId}`,
-        secondaryPattern: config.coinbaseOrigin
       }
     ]
   } else {
