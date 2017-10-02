@@ -42,15 +42,24 @@ class EnabledContent extends ImmutableComponent {
       ? this.props.showOverlay.bind(this, 'addFunds')
       : (ledgerData.get('creating') ? () => {} : this.createWallet())
 
-    return <BrowserButton
-      primaryColor
-      panelItem
-      testId={buttonText}
-      test2Id={'addFunds'}
-      l10nId={buttonText}
-      onClick={onButtonClick.bind(this)}
-      disabled={ledgerData.get('creating')}
-    />
+    return <div>
+      <BrowserButton
+        primaryColor
+        panelItem
+        testId={buttonText}
+        test2Id={'addFunds'}
+        l10nId={buttonText}
+        onClick={onButtonClick.bind(this)}
+        disabled={ledgerData.get('creating')}
+      />
+      <a className={cx({
+        [globalStyles.appIcons.question]: true,
+        [css(styles.balance__iconLink)]: true
+      })}
+        href='https://brave.com/'
+        target='_blank' rel='noopener'
+      />
+    </div>
   }
 
   ledgerDataErrorText () {

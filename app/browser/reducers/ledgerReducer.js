@@ -267,6 +267,15 @@ const ledgerReducer = (state, action, immutableAction) => {
         ledgerApi.addFoundClosed(state)
         break
       }
+    case appConstants.APP_ON_CHANGE_ADD_FUNDS_DIALOG_STEP:
+      {
+        // CC Nejc move this to a helper method as needed
+        state = state.mergeIn(['addFunds'], {
+          currentPage: action.get('page'),
+          currency: action.get('currency')
+        })
+        break
+      }
     case appConstants.APP_ON_WALLET_RECOVERY:
       {
         state = ledgerApi.onWalletRecovery(state, action.get('error'), action.get('result'))
