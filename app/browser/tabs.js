@@ -164,6 +164,7 @@ const updateAboutDetails = (tab, tabValue) => {
     allSiteSettings = allSiteSettings.mergeDeep(appState.get('temporarySiteSettings'))
   }
   const extensionsValue = appState.get('extensions')
+  const addFundsDialogState = appState.get('addFunds')
   const sync = appState.get('sync')
   const braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
   const history = aboutHistoryState.getHistory(appState)
@@ -200,6 +201,7 @@ const updateAboutDetails = (tab, tabValue) => {
     tab.send(messages.SYNC_UPDATED, sync.toJS())
     tab.send(messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults)
     tab.send(messages.EXTENSIONS_UPDATED, extensionsValue.toJS())
+    tab.send(messages.ADD_FUNDS_DIALOG_UPDATED, addFundsDialogState.toJS())
   } else if (location === 'about:bookmarks') {
     const bookmarksData = getBookmarksData(appState)
     if (bookmarksData.bookmarks) {

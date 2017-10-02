@@ -21,8 +21,8 @@ const {
 
 const DisabledContent = require('./payment/disabledContent')
 const EnabledContent = require('./payment/enabledContent')
-const AddFounds = require('./payment/addFounds')
-const AddFoundsFooter = require('./payment/addFoundsFooter')
+const AddFundsDialog = require('./payment/addFundsDialog/addFundsDialog')
+const AddFundsDialogFooter = require('./payment/addFundsDialog/addFundsDialogFooter')
 const {AdvancedSettingsContent, AdvancedSettingsFooter} = require('./payment/advancedSettings')
 const {HistoryContent, HistoryFooter} = require('./payment/history')
 const {LedgerBackupContent, LedgerBackupFooter} = require('./payment/ledgerBackup')
@@ -33,6 +33,7 @@ const globalStyles = require('../styles/global')
 const {paymentStylesVariables} = require('../styles/payment')
 const settingsIcon = require('../../../extensions/brave/img/ledger/icon_settings.svg')
 const historyIcon = require('../../../extensions/brave/img/ledger/icon_history.svg')
+const batIcon = require('../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
 
 // other
 const getSetting = require('../../../../js/settings').getSetting
@@ -75,7 +76,16 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get overlayContent () {
-    return <AddFounds />
+    return <AddFundsDialog addFundsDialog={this.props.addFundsDialog} />
+  }
+
+  get overlayFooter () {
+    return (
+      <AddFundsDialogFooter
+        addFundsDialog={this.props.addFundsDialog}
+        onHide={this.props.hideOverlay.bind(this, 'addFunds')}
+      />
+    )
   }
 
   render () {
@@ -87,11 +97,11 @@ class PaymentsTab extends ImmutableComponent {
       {
       this.enabled && this.props.addFundsOverlayVisible
         ? <ModalOverlay
-          title={'addFunds'}
+          title={'addFundsHeader'}
+          subTitle={'balance'}
+          subTitleArgs={'NEJC FEED ME'}
           content={this.overlayContent}
-          footer={
-            <AddFoundsFooter />
-          }
+          footer={this.overlayFooter}
           onHide={this.props.hideOverlay.bind(this, 'addFunds')}
         />
         : null
@@ -172,6 +182,7 @@ class PaymentsTab extends ImmutableComponent {
             styles.titleWrapper__title,
             sectionTitleStyles.beta
           )}>
+            <img className={css(styles.titleWrapper__logo)} src={batIcon} />
             <AboutPageSectionTitle>Brave Payments</AboutPageSectionTitle>
             <SectionLabelTitle>beta</SectionLabelTitle>
           </div>
@@ -301,6 +312,10 @@ const styles = StyleSheet.create({
   titleWrapper__title: {
     position: 'relative',
     right: globalStyles.spacing.panelPadding
+  },
+
+  titleWrapper__logo: {
+    width: '40px'
   },
 
   titleWrapper__switchWrap: {

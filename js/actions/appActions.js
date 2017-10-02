@@ -1673,7 +1673,15 @@ const appActions = {
     })
   },
 
-  onAddFoundsClosed: function () {
+  onChangeAddFundsDialogStep: function (page, currency = 'eth') {
+    dispatch({
+      actionType: appConstants.APP_ON_CHANGE_ADD_FUNDS_DIALOG_STEP,
+      page,
+      currency
+    })
+  },
+
+  onAddFundsClosed: function () {
     dispatch({
       actionType: appConstants.APP_ON_ADD_FUNDS_CLOSED
     })
