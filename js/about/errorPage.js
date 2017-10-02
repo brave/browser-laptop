@@ -38,8 +38,8 @@ class ErrorPage extends React.Component {
         <span className='errorText' data-l10n-id={this.state.message} />
       </div>
       <div className='buttons'>
-        {this.showBackButton ? <BrowserButton actionItem l10nId='back' onClick={this.goBack} /> : null}
-        {this.state.url ? <BrowserButton actionItem groupedItem l10nId='errorReload' l10nArgs={{url: this.state.url}} onClick={this.reload} /> : null}
+        {this.showBackButton ? <BrowserButton actionItem fitContent l10nId='back' onClick={this.goBack} /> : null}
+        {this.state.url ? <BrowserButton actionItem groupedItem fitContent l10nId='errorReload' l10nArgs={{url: this.state.url}} onClick={this.reload} /> : null}
       </div>
     </div>
   }

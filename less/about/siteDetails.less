@@ -18,43 +18,33 @@ body {
     padding: 0 @aboutPageSectionPadding;
 
     .headerActions {
-      .searchWrapper {
-        display: inline-block;
+      display: flex;
+      align-items: center;
 
-        /*overridden from siteDetails.less*/
-        input.searchInput {
-          float: none;
-          padding: 5px;
-          margin-top: 0;
-          margin-right: 12px;
-          font-size: 16px;
-          min-width: 280px;
-          height: 22px;
-        }
-        .searchInputPlaceholder {
-          color: @gray;
-          float: none;
-          font-family: FontAwesome;
-          left: -35px;
-          margin: 0;
-          padding: 0;
-          position: relative;
-          width: 0;
-        }
-        .searchInputClear {
-          float: none;
-          margin: 0;
-          padding: 0;
-          width: 0;
-          position: relative;
-          left: -35px;
-        }
+      /*overridden from siteDetails.less*/
+      input.searchInput {
+        padding: 5px;
+        margin-left: 12px;
+        font-size: 16px;
+        min-width: 280px;
       }
-      /*copied from preferences.less*/
-      span.browserButton.primaryButton.clearBrowsingDataButton {
-        font-size: 0.9em;
-        padding: 5px 20px;
+
+      .searchInputPlaceholder {
+        color: @gray;
+        font-family: FontAwesome;
+        left: -25px;
         margin: 0;
+        padding: 0;
+        position: relative;
+        width: 0;
+      }
+
+      .searchInputClear {
+        margin: 0;
+        padding: 0;
+        width: 0;
+        position: relative;
+        left: -25px;
       }
     }
   }

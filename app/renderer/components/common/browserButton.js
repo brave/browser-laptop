@@ -20,8 +20,9 @@ class BrowserButton extends ImmutableComponent {
       this.props.extensionItem && styles.browserButton_extensionItem,
       this.props.groupedItem && styles.browserButton_groupedItem,
       this.props.notificationItem && styles.browserButton_notificationItem,
-      this.props.iconOnly && styles.browserButton_iconOnly,
       this.props.panelItem && styles.browserButton_panelItem,
+      this.props.iconOnly && styles.browserButton_iconOnly,
+      this.props.fitContent && styles.browserButton_fitContent,
       // TODO: These are other button styles app-wise
       // that needs to be refactored and included in this file
       // .............................................
@@ -143,14 +144,20 @@ const styles = StyleSheet.create({
     paddingRight: '16px',
     paddingLeft: '16px',
 
-    // Ensure that the button label does not overflow
-    width: `calc(${globalStyles.spacing.defaultFontSize} * 6)`, // issue #6384
-    minWidth: 'fit-content',
+    width: 'auto',
+    minWidth: `calc(${globalStyles.spacing.defaultFontSize} * 6)`, // issue #6384
 
     ':active': {
       // push the button down when active
       bottom: '-1px'
     }
+  },
+
+  browserButton_fitContent: {
+    // See: 11021
+    // Ensure that the button label does not overflow
+    width: `calc(${globalStyles.spacing.defaultFontSize} * 6)`, // issue #6384
+    minWidth: 'fit-content'
   },
 
   browserButton_primaryColor: {
