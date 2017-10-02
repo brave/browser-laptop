@@ -21,8 +21,8 @@ const {
 
 const DisabledContent = require('./payment/disabledContent')
 const EnabledContent = require('./payment/enabledContent')
-const AddFounds = require('./payment/addFounds')
-const AddFoundsFooter = require('./payment/addFoundsFooter')
+const AddFundsDialog = require('./payment/addFundsDialog')
+const AddFundsDialogFooter = require('./payment/addFundsDialogFooter')
 const {AdvancedSettingsContent, AdvancedSettingsFooter} = require('./payment/advancedSettings')
 const {HistoryContent, HistoryFooter} = require('./payment/history')
 const {LedgerBackupContent, LedgerBackupFooter} = require('./payment/ledgerBackup')
@@ -33,6 +33,7 @@ const globalStyles = require('../styles/global')
 const {paymentStylesVariables} = require('../styles/payment')
 const settingsIcon = require('../../../extensions/brave/img/ledger/icon_settings.svg')
 const historyIcon = require('../../../extensions/brave/img/ledger/icon_history.svg')
+const batIcon = require('../../../extensions/brave/img/ledger/crypto_icons/BAT_icon.svg')
 
 // other
 const getSetting = require('../../../../js/settings').getSetting
@@ -75,7 +76,7 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get overlayContent () {
-    return <AddFounds />
+    return <AddFundsDialog />
   }
 
   render () {
@@ -90,7 +91,7 @@ class PaymentsTab extends ImmutableComponent {
           title={'addFunds'}
           content={this.overlayContent}
           footer={
-            <AddFoundsFooter />
+            <AddFundsDialogFooter />
           }
           onHide={this.props.hideOverlay.bind(this, 'addFunds')}
         />

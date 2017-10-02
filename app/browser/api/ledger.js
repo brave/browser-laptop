@@ -103,7 +103,7 @@ const fileTypes = {
   png: new Buffer([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 }
 const minimumVisitTimeDefault = 8 * 1000
-const nextAddFoundsTime = 3 * miliseconds.day
+const nextAddFundsTime = 3 * miliseconds.day
 
 let signatureMax = 0
 underscore.keys(fileTypes).forEach((fileType) => {
@@ -1181,7 +1181,7 @@ const showNotificationReviewPublishers = (nextTime) => {
 }
 
 const showNotificationAddFunds = () => {
-  const nextTime = new Date().getTime() + nextAddFoundsTime
+  const nextTime = new Date().getTime() + nextAddFundsTime
   appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
 
   appActions.showNotification({

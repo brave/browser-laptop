@@ -7,12 +7,12 @@ const React = require('react')
 // Components
 const ImmutableComponent = require('../../immutableComponent')
 
-class AddFoundsFooter extends ImmutableComponent {
+class AddFundsDialog extends ImmutableComponent {
   render () {
-    return <section data-test-id='addFoundsFooter'>
-      Add founds footer
+    return <section data-test-id='addFundsDialog'>
+      Add founds
     </section>
   }
 }
 
-module.exports = AddFoundsFooter
+module.exports = AddFundsDialog

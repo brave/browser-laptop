@@ -1629,7 +1629,7 @@ const appActions = {
     })
   },
 
-  onAddFoundsClosed: function () {
+  onAddFundsClosed: function () {
     dispatch({
       actionType: appConstants.APP_ON_ADD_FUNDS_CLOSED
     })
