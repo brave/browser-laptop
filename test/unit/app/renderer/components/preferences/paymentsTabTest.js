@@ -9,7 +9,7 @@ const assert = require('assert')
 const Immutable = require('immutable')
 const fakeElectron = require('../../../../lib/fakeElectron')
 const fakeSettings = require('../../../../lib/fakeSettings')
-const {btcToCurrencyString} = require('../../../../../../app/common/lib/ledgerUtil')
+const {batToCurrencyString} = require('../../../../../../app/common/lib/ledgerUtil')
 const {advancedSettingsDialog} = require('../../../../../lib/selectors')
 
 let PaymentsTab, EnabledContent
@@ -197,20 +197,20 @@ describe('PaymentsTab component', function () {
         <PaymentsTab
           showOverlay={function () {}}
           hideOverlay={function () {}}
-          ledgerData={Immutable.Map({created: false, btc: 10, amount: 10})} />
+          ledgerData={Immutable.Map({created: false, bat: 10, amount: 10})} />
       )
       const inst = wrapper.instance()
-      assert.equal(btcToCurrencyString(10, inst.props.ledgerData), '10.00 USD')
+      assert.equal(batToCurrencyString(10, inst.props.ledgerData), '10.00 USD')
     })
 
     it('renders partial balance correctly', function () {
       fakeSettings.mockReturnValue = true
       const wrapper = mount(
         <EnabledContent
-          ledgerData={Immutable.Map({created: false, btc: 10, amount: 2})} />
+          ledgerData={Immutable.Map({created: false, bat: 10, amount: 2})} />
       )
       const inst = wrapper.instance()
-      assert.equal(btcToCurrencyString(10, inst.props.ledgerData), '2.00 USD')
+      assert.equal(batToCurrencyString(10, inst.props.ledgerData), '2.00 USD')
     })
   })
 

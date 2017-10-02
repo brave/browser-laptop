@@ -15,7 +15,6 @@ const qr = require('qr-image')
 const underscore = require('underscore')
 const tldjs = require('tldjs')
 const urlFormat = require('url').format
-const queryString = require('queryString')
 const levelUp = require('level')
 const random = require('random-lib')
 const uuid = require('uuid')
@@ -93,7 +92,8 @@ const clientOptions = {
   rulesTestP: process.env.LEDGER_RULES_TESTING,
   verboseP: process.env.LEDGER_VERBOSE,
   server: process.env.LEDGER_SERVER_URL,
-  createWorker: electron.app.createWorker
+  createWorker: electron.app.createWorker,
+  version: 'v2'
 }
 const fileTypes = {
   bmp: new Buffer([0x42, 0x4d]),
@@ -1106,7 +1106,7 @@ const enable = (state, paymentsEnabled) => {
   }
 
   if (!ledgerPublisher) {
-    ledgerPublisher = require('ledger-publisher')
+    ledgerPublisher = require('bat-publisher')
   }
   synopsis = new (ledgerPublisher.Synopsis)()
   const stateSynopsis = ledgerState.getSynopsis(state)
@@ -1148,8 +1148,8 @@ const pathName = (name) => {
 const sufficientBalanceToReconcile = (state) => {
   const balance = Number(ledgerState.getInfoProp(state, 'balance') || 0)
   const unconfirmed = Number(ledgerState.getInfoProp(state, 'unconfirmed') || 0)
-  const btc = ledgerState.getInfoProp(state, 'btc')
-  return btc && (balance + unconfirmed > 0.9 * Number(btc))
+  const bat = ledgerState.getInfoProp(state, 'bat')
+  return bat && (balance + unconfirmed > 0.9 * Number(bat))
 }
 
 const shouldShowNotificationReviewPublishers = () => {
@@ -1339,7 +1339,7 @@ const cacheRuleSet = (state, ruleset) => {
 }
 
 const clientprep = () => {
-  if (!ledgerClient) ledgerClient = require('ledger-client')
+  if (!ledgerClient) ledgerClient = require('bat-client')
   _internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_DEBUG)
   _internal.verboseP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_VERBOSE)
 }
@@ -1418,28 +1418,6 @@ const roundtrip = (params, options, callback) => {
   if (options.payload) console.log('<<< ' + JSON.stringify(params.payload, null, 2).split('\n').join('\n<<< '))
 }
 
-const updateLedgerInfo = (state) => {
-  const ledgerInfo = ledgerState.getInfoProps(state)
-  const now = new Date().getTime()
-
-  if (ledgerInfo.get('buyURLExpires') > now) {
-    state = ledgerState.setInfoProp(state, 'buyMaximumUSD', 6)
-  }
-  if (typeof process.env.ADDFUNDS_URL !== 'undefined') {
-    state = ledgerState.setInfoProp(state, 'buyURLFrame', true)
-    const buyURL = process.env.ADDFUNDS_URL + '?' +
-      queryString.stringify({
-        currency: ledgerInfo.get('currency'),
-        amount: getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT),
-        address: ledgerInfo.get('address')
-      })
-    state = ledgerState.setInfoProp(state, 'buyURL', buyURL)
-    state = ledgerState.setInfoProp(state, 'buyMaximumUSD', false)
-  }
-
-  return state
-}
-
 // Called from observeTransactions() when we see a new payment (transaction).
 const showNotificationPaymentDone = (transactionContributionFiat) => {
   notificationPaymentDoneMessage = locale.translation('notificationPaymentDone')
@@ -1484,9 +1462,10 @@ const getStateInfo = (state, parsedData) => {
     return state
   }
 
+  if (!ledgerClient) ledgerClient = require('bat-client')
   const newInfo = {
     paymentId: parsedData.properties.wallet.paymentId,
-    passphrase: parsedData.properties.wallet.keychains.passphrase,
+    passphrase: ledgerClient.prototype.getWalletPassphrase(parsedData),
     created: !!parsedData.properties.wallet,
     creating: !parsedData.properties.wallet,
     reconcileFrequency: parsedData.properties.days,
@@ -1502,7 +1481,7 @@ const getStateInfo = (state, parsedData) => {
 
   let transactions = []
   if (!parsedData.transactions) {
-    return updateLedgerInfo(state)
+    return state
   }
 
   for (let i = parsedData.transactions.length - 1; i >= 0; i--) {
@@ -1525,13 +1504,12 @@ const getStateInfo = (state, parsedData) => {
   }
 
   observeTransactions(state, transactions)
-  state = ledgerState.setInfoProp(state, 'transactions', Immutable.fromJS(transactions))
-  return updateLedgerInfo(state)
+  return ledgerState.setInfoProp(state, 'transactions', Immutable.fromJS(transactions))
 }
 
 const generatePaymentData = (state) => {
   const ledgerInfo = ledgerState.getInfoProps(state)
-  const paymentURL = `bitcoin:${ledgerInfo.get('address')}?amount=${ledgerInfo.get('btc')}&label=${encodeURI('Brave Software')}`
+  const paymentURL = `bitcoin:${ledgerInfo.get('address')}?amount=${ledgerInfo.get('bat')}&label=${encodeURI('Brave Software')}`
   if (ledgerInfo.get('paymentURL') !== paymentURL) {
     state = ledgerState.setInfoProp(state, 'paymentURL', paymentURL)
     try {
@@ -1605,8 +1583,8 @@ const onWalletProperties = (state, body) => {
   if (amount && currency) {
     const bodyCurrency = body.getIn(['rates', 'currency'])
     if (bodyCurrency) {
-      const btc = (amount / bodyCurrency).toFixed(8)
-      state = ledgerState.setInfoProp(state, 'btc', btc)
+      const bat = (amount / bodyCurrency).toFixed(8)
+      state = ledgerState.setInfoProp(state, 'bat', bat)
     }
   }
 
@@ -1670,7 +1648,7 @@ const getBalance = (state) => {
     return
   }
 
-  if (!ledgerBalance) ledgerBalance = require('ledger-balance')
+  if (!ledgerBalance) ledgerBalance = require('bat-balance')
   ledgerBalance.getBalance(address, underscore.extend({balancesP: true}, client.options),
     (err, provider, result) => {
       if (err) {
@@ -1695,7 +1673,7 @@ const balanceReceived = (state, unconfirmed) => {
     if (clientOptions.verboseP) {
       console.log('\ngetBalance refreshes ledger info: ' + ledgerState.getInfoProp(state, 'unconfirmed'))
     }
-    return updateLedgerInfo(state)
+    return state
   }
 
   if (ledgerState.getInfoProp(state, 'unconfirmed') === '0.0000') {
@@ -1827,7 +1805,7 @@ const initialize = (state, paymentsEnabled) => {
     return state
   }
 
-  if (!ledgerPublisher) ledgerPublisher = require('ledger-publisher')
+  if (!ledgerPublisher) ledgerPublisher = require('bat-publisher')
   let ruleset = []
   ledgerPublisher.ruleset.forEach(rule => {
     if (rule.consequent) ruleset.push(rule)

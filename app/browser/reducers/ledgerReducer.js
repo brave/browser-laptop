@@ -181,6 +181,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_NAVIGATOR_HANDLER_REGISTERED:
       {
+        // TODO will this be changed when switching to BAT
         const hasBitcoinHandler = (action.get('protocol') === 'bitcoin')
         state = ledgerState.setInfoProp(state, 'hasBitcoinHandler', hasBitcoinHandler)
         break

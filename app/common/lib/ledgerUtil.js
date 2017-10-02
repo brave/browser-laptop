@@ -62,17 +62,24 @@ const shouldTrackView = (view, responseList) => {
   return false
 }
 
-const btcToCurrencyString = (btc, ledgerData) => {
-  const balance = Number(btc || 0)
+const batToCurrencyString = (bat, ledgerData) => {
+  const balance = Number(bat || 0)
   const currency = (ledgerData && ledgerData.get('currency')) || 'USD'
 
   if (balance === 0) {
     return `0 ${currency}`
   }
 
-  if (ledgerData && ledgerData.get('btc') && typeof ledgerData.get('amount') === 'number') {
-    const btcValue = ledgerData.get('btc') / ledgerData.get('amount')
-    const fiatValue = (balance / btcValue).toFixed(2)
+  if (ledgerData == null) {
+    return `${balance} BAT`
+  }
+
+  const ledgerBat = ledgerData.get('bat')
+  const amount = ledgerData.get('amount')
+
+  if (ledgerBat && typeof amount === 'number') {
+    const batValue = ledgerBat / amount
+    const fiatValue = (balance / batValue).toFixed(2)
     let roundedValue = Math.floor(fiatValue)
     const diff = fiatValue - roundedValue
 
@@ -87,7 +94,7 @@ const btcToCurrencyString = (btc, ledgerData) => {
     return `${roundedValue.toFixed(2)} ${currency}`
   }
 
-  return `${balance} BTC`
+  return `${balance} BAT`
 }
 
 const formattedTimeFromNow = (timestamp) => {
@@ -110,11 +117,11 @@ const walletStatus = (ledgerData) => {
     const pendingFunds = Number(ledgerData.get('unconfirmed') || 0)
 
     if (pendingFunds + Number(ledgerData.get('balance') || 0) <
-      0.9 * Number(ledgerData.get('btc') || 0)) {
+      0.9 * Number(ledgerData.get('bat') || 0)) {
       status.id = 'insufficientFundsStatus'
     } else if (pendingFunds > 0) {
       status.id = 'pendingFundsStatus'
-      status.args = {funds: btcToCurrencyString(pendingFunds, ledgerData)}
+      status.args = {funds: batToCurrencyString(pendingFunds, ledgerData)}
     } else if (transactions && transactions.size > 0) {
       status.id = 'defaultWalletStatus'
     } else {
@@ -204,7 +211,7 @@ const stickyP = (state, publisherKey) => {
 
 module.exports = {
   shouldTrackView,
-  btcToCurrencyString,
+  batToCurrencyString,
   formattedTimeFromNow,
   formattedDateFromTimestamp,
   walletStatus,

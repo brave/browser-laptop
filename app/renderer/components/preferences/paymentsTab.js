@@ -21,7 +21,8 @@ const {
 
 const DisabledContent = require('./payment/disabledContent')
 const EnabledContent = require('./payment/enabledContent')
-const {BitcoinDashboard, BitcoinDashboardFooter} = require('./payment/bitcoinDashboard')
+const AddFounds = require('./payment/addFounds')
+const AddFoundsFooter = require('./payment/addFoundsFooter')
 const {AdvancedSettingsContent, AdvancedSettingsFooter} = require('./payment/advancedSettings')
 const {HistoryContent, HistoryFooter} = require('./payment/history')
 const {LedgerBackupContent, LedgerBackupFooter} = require('./payment/ledgerBackup')
@@ -36,7 +37,6 @@ const historyIcon = require('../../../extensions/brave/img/ledger/icon_history.s
 // other
 const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
-const coinbaseCountries = require('../../../../js/constants/coinbaseCountries')
 
 class PaymentsTab extends ImmutableComponent {
   constructor () {
@@ -74,24 +74,8 @@ class PaymentsTab extends ImmutableComponent {
     return getSetting(settings.PAYMENTS_ENABLED, this.props.settings)
   }
 
-  get overlayTitle () {
-    if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return 'addFunds'
-    } else {
-      return 'addFundsAlternate'
-    }
-  }
-
   get overlayContent () {
-    return <BitcoinDashboard ledgerData={this.props.ledgerData}
-      settings={this.props.settings}
-      bitcoinOverlayVisible={this.props.bitcoinOverlayVisible}
-      qrcodeOverlayVisible={this.props.qrcodeOverlayVisible}
-      showOverlay={this.props.showOverlay.bind(this, 'bitcoin')}
-      hideOverlay={this.props.hideOverlay.bind(this, 'bitcoin')}
-      showQRcode={this.props.showOverlay.bind(this, 'qrcode')}
-      hideQRcode={this.props.hideOverlay.bind(this, 'qrcode')}
-      hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
+    return <AddFounds />
   }
 
   render () {
@@ -103,12 +87,10 @@ class PaymentsTab extends ImmutableComponent {
       {
       this.enabled && this.props.addFundsOverlayVisible
         ? <ModalOverlay
-          title={this.overlayTitle}
+          title={'addFunds'}
           content={this.overlayContent}
           footer={
-            <BitcoinDashboardFooter
-              ledgerData={this.props.ledgerData}
-              hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
+            <AddFoundsFooter />
           }
           onHide={this.props.hideOverlay.bind(this, 'addFunds')}
         />

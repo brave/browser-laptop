@@ -213,7 +213,6 @@ var rendererIdentifiers = function () {
     'turnOffNotifications',
     'copyToClipboard',
     'smartphoneTitle',
-    'displayQRCode',
     'updateLater',
     'updateHello',
     'notificationPasswordWithUserName',

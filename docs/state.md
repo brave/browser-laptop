@@ -206,7 +206,7 @@ AppStore
       reconcileFrequency: number, // duration between each reconciliation in days
       reconcileStamp: number, // timestamp for the next reconcilation
       recoverySucceeded: boolean, // the status of an attempted recovery
-      satoshis: number, // confirmed balance as an integer number of satoshis
+      probi: number, // confirmed balance as an integer number of probi
       transactions: [{
         ballots: {
           [publisher]: number // e.g., "wikipedia.org": 3
@@ -220,7 +220,7 @@ AppStore
           rates: {
             [currency]: number //e.g., { "USD": 575.45 }
           },  // exchange rate
-          satoshis: number, // actual number of satoshis transferred
+          probi: number, // actual number of probi transferred
         },
         count: number, // total number of ballots allowed to be cast
         submissionStamp: number, // timestamp for this contribution

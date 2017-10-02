@@ -7,7 +7,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const moment = require('moment')
 
 // util
-const {btcToCurrencyString, formattedDateFromTimestamp, walletStatus} = require('../../../../common/lib/ledgerUtil')
+const {batToCurrencyString, formattedDateFromTimestamp, walletStatus} = require('../../../../common/lib/ledgerUtil')
 const {l10nErrorText} = require('../../../../common/lib/httpUtil')
 const {changeSetting} = require('../../../lib/settingsUtil')
 
@@ -84,7 +84,7 @@ class EnabledContent extends ImmutableComponent {
     }
 
     return <section className={css(styles.balance)}>
-      <FormTextbox data-test-id='fundsAmount' readOnly value={btcToCurrencyString(value, ledgerData)} />
+      <FormTextbox data-test-id='fundsAmount' readOnly value={batToCurrencyString(value, ledgerData)} />
       <a className={cx({
         [globalStyles.appIcons.question]: true,
         [css(styles.balance__iconLink)]: true

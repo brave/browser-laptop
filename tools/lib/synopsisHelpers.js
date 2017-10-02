@@ -2,7 +2,7 @@ const fs = require('fs')
 
 const randomHostname = require('./randomHostname')
 
-const Synopsis = require('ledger-publisher').Synopsis
+const Synopsis = require('bat-publisher').Synopsis
 
 const PROTOCOL_PREFIXES = ['http://', 'https://']
 
