@@ -62,7 +62,10 @@ describe('about:extensions', function () {
         .waitForVisible('[data-extension-id="bmnlcjabgnpnenekpadlanbbkooimhnj"]', extensionDownloadWaitTime)
     })
   })
-  describe('Vimium', function () {
+
+  // Remove skip when https://github.com/brave/browser-laptop/issues/9531 is resolved
+  // See: https://github.com/brave/browser-laptop/issues/11234
+  describe.skip('Vimium', function () {
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)
@@ -117,7 +120,10 @@ describe('about:extensions', function () {
         .waitForVisible(`[data-extension-id="${extensionIds[passwordManagers.LAST_PASS]}"]`, extensionDownloadWaitTime)
     })
   })
-  describe('Enpass installs when enabled', function () {
+
+  // Remove skip when https://github.com/brave/browser-laptop/issues/7778 is resolved
+  // See: https://github.com/brave/browser-laptop/issues/11234
+  describe.skip('Enpass installs when enabled', function () {
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)
