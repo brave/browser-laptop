@@ -254,10 +254,6 @@ class SortableTable extends React.Component {
     return this.props.columnClassNames &&
       this.props.columnClassNames.length === this.props.headings.length
   }
-  get hasBodyClassNames () {
-    return this.props.bodyClassNames &&
-      this.props.bodyClassNames.length === this.props.rows.length
-  }
   get hasContextMenu () {
     return typeof this.props.onContextMenu === 'function' &&
       typeof this.props.contextMenuName === 'string'
@@ -389,12 +385,10 @@ class SortableTable extends React.Component {
         const cell = typeof item === 'object' ? item.cell : item
 
         let hasColumnClassNames = (this.hasColumnClassNames ? this.props.columnClassNames[j] : '')
-        let customCellClassesStr = (this.props.customCellClasses ? this.props.customCellClasses : '')
 
         return <td className={cx({
           [hasColumnClassNames]: true,
-          [customCellClassesStr]: true,
-          [css(styles.table__tbody__tr__td, this.props.smallRow && styles.table__tbody__tr_smallRow__td)]: true
+          [css(styles.table__tbody__tr__td, this.props.smallRow && styles.table__tbody__tr_smallRow__td, this.props.columnStyles && this.props.columnStyles[j])]: true
         })}
           data-sort={value}
           data-td-index={`${j}`}
@@ -442,7 +436,7 @@ class SortableTable extends React.Component {
       return this.props.rows.map((rows, i) => {
         const content = this.generateTableRows(rows, i)
         return (content.length > 0)
-          ? <tbody className={this.hasBodyClassNames ? this.props.bodyClassNames[i] : undefined} data-tbody-index={`${i}`}>
+          ? <tbody className={css(this.props.bodyStyles && this.props.bodyStyles[i])} data-tbody-index={`${i}`}>
             {content}
           </tbody>
         : null
@@ -487,6 +481,7 @@ class SortableTable extends React.Component {
             const isString = typeof heading === 'string'
             const sortMethod = this.sortingDisabled ? 'none' : (dataType === 'number' ? 'number' : undefined)
             if (isString) headerClasses['heading-' + heading] = true
+
             return <th className={cx(headerClasses)}
               data-sort-method={sortMethod}
               data-sort-order={this.props.defaultHeadingSortOrder}
@@ -497,11 +492,11 @@ class SortableTable extends React.Component {
             >
               {
                 isString
-                  ? <div className={cx({
-                    'th-inner': true,
-                    [css(styles.table__th__inner, this.props.smallRow && styles.table__th__inner_smallRow)]: true,
-                    [this.props.headerClassNames]: !!this.props.headerClassNames
-                  })} data-l10n-id={heading} />
+                  ? <div className={css(
+                    styles.table__th__inner,
+                    this.props.smallRow && styles.table__th__inner_smallRow,
+                    this.props.headerStyles
+                  )} data-l10n-id={heading} />
                   : heading
               }
             </th>
@@ -585,12 +580,18 @@ const styles = StyleSheet.create({
 
   table__tbody__tr__td: {
     boxSizing: 'border-box',
-    padding: `calc(${globalStyles.sortableTable.cell.normal.padding} / 2.25) ${globalStyles.sortableTable.cell.normal.padding}`
+    paddingTop: `calc(${globalStyles.sortableTable.cell.normal.padding} / 2.25)`,
+    paddingBottom: `calc(${globalStyles.sortableTable.cell.normal.padding} / 2.25)`,
+    paddingRight: `${globalStyles.sortableTable.cell.normal.padding}`,
+    paddingLeft: `${globalStyles.sortableTable.cell.normal.padding}`
   },
 
   // Add 'smallRow' to SortableTable to decrease padding values.
   table__tbody__tr_smallRow__td: {
-    padding: `calc(${globalStyles.sortableTable.cell.small.padding} / 2.25) ${globalStyles.sortableTable.cell.small.padding}`,
+    paddingTop: `calc(${globalStyles.sortableTable.cell.small.padding} / 2.25)`,
+    paddingBottom: `calc(${globalStyles.sortableTable.cell.small.padding} / 2.25)`,
+    paddingRight: `${globalStyles.sortableTable.cell.small.padding}`,
+    paddingLeft: `${globalStyles.sortableTable.cell.small.padding}`,
     height: '1.5rem'
   }
 })

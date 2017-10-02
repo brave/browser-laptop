@@ -62,9 +62,6 @@ const styles = StyleSheet.create({
     // include border width
     width: 'calc(5ch + 2px)',
 
-    // To cancel the global color setting
-    color: '#656565',
-
     ':focus': {
       background: '#fff',
       borderColor: globalStyles.color.highlightBlue

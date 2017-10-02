@@ -112,15 +112,15 @@ class LedgerTable extends ImmutableComponent {
     }
   }
 
-  get columnClassNames () {
+  get columnStyles () {
     return [
-      css(styles.column_verified), // verified
-      css(styles.column_sites), // sites
-      css(styles.alignCenter),  // include
-      css(styles.alignRight), // views
-      css(styles.alignRight), // time spent
-      css(styles.alignRight, styles.column_percentage), // percentage
-      css(styles.alignCenter)   // actions
+      styles.column_verified,
+      styles.column_sites,
+      null,  // include
+      [styles.column_nowrap, styles.alignRight], // views
+      [styles.column_nowrap, styles.alignRight], // time spent
+      [styles.alignRight, styles.column_percentage],
+      styles.alignCenter // actions
     ]
   }
 
@@ -184,12 +184,14 @@ class LedgerTable extends ImmutableComponent {
             small
             disabled
             checkedOn
+            switchClassName={css(styles.switchControl_center)}
             indicatorClassName={css(styles.pinnedToggle)}
             testId='pinnedDisabled'
             onClick={() => {}}
           />
           : <SiteSettingCheckbox
             small
+            switchClassName={css(styles.switchControl_center)}
             hostPattern={this.getHostPattern(synopsis)}
             defaultValue={defaultAutoInclude}
             prefKey='ledgerPayments'
@@ -204,7 +206,7 @@ class LedgerTable extends ImmutableComponent {
         value: duration
       },
       {
-        html: <span className={css(styles.column_percentage__percentageValue)} data-test-id='percentageValue'>
+        html: <span data-test-id='percentageValue'>
           {
             pinned
             ? <PinnedInput
@@ -291,10 +293,10 @@ class LedgerTable extends ImmutableComponent {
         headings={['', 'publisher', 'include', 'views', 'timeSpent', 'percentage', 'actions']}
         defaultHeading='percentage'
         defaultHeadingSortOrder='desc'
-        headerClassNames={css(styles.header)}
-        columnClassNames={this.columnClassNames}
+        headerStyles={styles.header}
+        columnStyles={this.columnStyles}
         rowClassNames={this.rowClassNames(pinnedRows, unPinnedRows)}
-        bodyClassNames={[css(unPinnedRows.size > 0 && styles.pinnedBody), '']}
+        bodyStyles={[unPinnedRows.size > 0 && styles.pinnedBody, '']}
         onContextMenu={aboutActions.contextMenu}
         contextMenuName='synopsis'
         rowObjects={[
@@ -369,9 +371,12 @@ const styles = StyleSheet.create({
   },
 
   column_verified: {
-    // Set the same padding with the padding-top and padding-bottom
-    paddingRight: `calc(${globalStyles.sortableTable.cell.small.padding} / 2) !important`,
-    paddingLeft: `calc(${globalStyles.sortableTable.cell.small.padding} / 2) !important`
+    paddingRight: 0,
+    paddingLeft: 0
+  },
+
+  column_nowrap: {
+    whiteSpace: 'nowrap'
   },
 
   column_sites: {
@@ -380,12 +385,9 @@ const styles = StyleSheet.create({
   },
 
   column_percentage: {
-    minWidth: '3ch'
-  },
-
-  column_percentage__percentageValue: {
-    // To cancel the global color setting
-    color: '#656565'
+    minWidth: '3ch',
+    paddingRight: `calc(${globalStyles.sortableTable.cell.small.padding} + .2rem)`,
+    paddingLeft: `calc(${globalStyles.sortableTable.cell.small.padding} + .2rem)`
   },
 
   pinnedBody: {
@@ -414,6 +416,10 @@ const styles = StyleSheet.create({
     padding: '0 6px'
   },
 
+  switchControl_center: {
+    justifyContent: 'center'
+  },
+
   hideExcludedSites: {
     display: 'grid',
     alignItems: 'center',
@@ -435,8 +441,7 @@ const styles = StyleSheet.create({
   },
 
   alignCenter: {
-    display: 'flex',
-    justifyContent: 'center'
+    textAlign: 'center'
   },
 
   actionIcons: {
