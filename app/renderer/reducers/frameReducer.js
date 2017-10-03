@@ -96,9 +96,12 @@ const frameReducer = (state, action, immutableAction) => {
       }
       let frames = state.get('frames')
       const index = tab.get('index')
-      const sourceFrameIndex = frameStateUtil.getIndexByTabId(state, tabId)
+      let sourceFrameIndex = frameStateUtil.getIndexByTabId(state, tabId)
       if (index != null &&
-          sourceFrameIndex !== index) {
+          sourceFrameIndex !== index &&
+          // Only update the index once the frame is known.
+          // If it is not known, it will just happen later on the next update.
+          index < frameStateUtil.getFrames(state).size) {
         frame = frame.set('index', index)
         frames = frames
           .splice(sourceFrameIndex, 1)
@@ -119,6 +122,7 @@ const frameReducer = (state, action, immutableAction) => {
             .updateFramesInternalIndex(state, Math.min(sourceFrameIndex, index))
         }
         state = frameStateUtil.setPreviewFrameKey(state, null)
+        sourceFrameIndex = index
       }
 
       const pinned = immutableAction.getIn(['changeInfo', 'pinned'])
