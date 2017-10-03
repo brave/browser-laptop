@@ -4,6 +4,7 @@
 
 // Note that these are webpack requires, not CommonJS node requiring requires
 const React = require('react')
+const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
@@ -38,6 +39,7 @@ const batIcon = require('../../../extensions/brave/img/ledger/cryptoIcons/BAT_ic
 // other
 const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
+const {formatCurrentBalance} = require('../../../common/lib/ledgerUtil')
 
 class PaymentsTab extends ImmutableComponent {
   constructor () {
@@ -76,16 +78,33 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get overlayContent () {
-    return <AddFundsDialog addFundsDialog={this.props.addFundsDialog} />
+    const ledgerData = this.props.ledgerData || Immutable.Map()
+    const addresses = ledgerData.get('addresses') || Immutable.List()
+    const walletQR = ledgerData.get('walletQR') || Immutable.List()
+    const wizardData = ledgerData.get('addFunds') || Immutable.Map()
+
+    return <AddFundsDialog
+      addFundsDialog={wizardData}
+      addresses={addresses}
+      walletQR={walletQR}
+    />
   }
 
   get overlayFooter () {
+    const ledgerData = this.props.ledgerData || Immutable.Map()
+    const wizardData = ledgerData.get('addFunds') || Immutable.Map()
+
     return (
       <AddFundsDialogFooter
-        addFundsDialog={this.props.addFundsDialog}
+        addFundsDialog={wizardData}
         onHide={this.props.hideOverlay.bind(this, 'addFunds')}
       />
     )
+  }
+
+  get getOverlayFounds () {
+    const ledgerData = this.props.ledgerData || Immutable.Map()
+    return formatCurrentBalance(ledgerData)
   }
 
   render () {
@@ -99,7 +118,7 @@ class PaymentsTab extends ImmutableComponent {
         ? <ModalOverlay
           title={'addFundsHeader'}
           subTitle={'balance'}
-          subTitleArgs={'NEJC FEED ME'}
+          subTitleArgs={this.getOverlayFounds}
           content={this.overlayContent}
           footer={this.overlayFooter}
           onHide={this.props.hideOverlay.bind(this, 'addFunds')}

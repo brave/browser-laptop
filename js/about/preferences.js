@@ -733,9 +733,6 @@ class AboutPreferences extends React.Component {
       const extensions = populateDefaultExtensions(extensionsData)
       this.setState({ extensions: Immutable.fromJS(extensions || {}) })
     })
-    ipc.on(messages.ADD_FUNDS_DIALOG_UPDATED, (e, addFundsDialogData) => {
-      this.setState({ addFundsDialog: Immutable.fromJS(addFundsDialogData || {}) })
-    })
     ipc.on(messages.LANGUAGE, (e, {langCode, languageCodes}) => {
       this.setState({ languageCodes })
     })
@@ -960,7 +957,6 @@ class AboutPreferences extends React.Component {
           addFundsOverlayVisible={this.state.addFundsOverlayVisible}
           showOverlay={this.setOverlayVisible.bind(this, true)}
           hideOverlay={this.setOverlayVisible.bind(this, false)}
-          addFundsDialog={this.state.addFundsDialog}
           hideAdvancedOverlays={this.hideAdvancedOverlays.bind(this)} />
         break
       case preferenceTabs.EXTENSIONS:

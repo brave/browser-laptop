@@ -28,19 +28,19 @@ class AddFundsWizardMain extends React.Component {
   }
 
   onClickETH () {
-    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'eth')
+    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'ETH')
   }
 
   onClickBTC () {
-    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'btc')
+    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'BTC')
   }
 
   onClickLTC () {
-    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'ltc')
+    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'LTC')
   }
 
   onClickBAT () {
-    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'bat')
+    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'BAT')
   }
 
   render () {

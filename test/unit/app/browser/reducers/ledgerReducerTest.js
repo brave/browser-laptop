@@ -42,7 +42,6 @@ describe('ledgerReducer unit tests', function () {
 
       boot: () => {},
       onBootStateFile: dummyModifyState,
-      balanceReceived: dummyModifyState,
       onWalletProperties: dummyModifyState,
       paymentPresent: dummyModifyState,
       addFoundClosed: dummyModifyState,
@@ -275,26 +274,6 @@ describe('ledgerReducer unit tests', function () {
     })
     it('calls ledgerApi.onBootStateFile', function () {
       assert(onBootStateFileSpy.withArgs(appState).calledOnce)
-    })
-    it('returns a modified state', function () {
-      assert.notDeepEqual(returnedState, appState)
-    })
-  })
-
-  describe('APP_ON_LEDGER_BALANCE_RECEIVED', function () {
-    let balanceReceivedSpy
-    before(function () {
-      balanceReceivedSpy = sinon.spy(fakeLedgerApi, 'balanceReceived')
-      returnedState = ledgerReducer(appState, Immutable.fromJS({
-        actionType: appConstants.APP_ON_LEDGER_BALANCE_RECEIVED,
-        unconfirmed: true
-      }))
-    })
-    after(function () {
-      balanceReceivedSpy.restore()
-    })
-    it('calls ledgerApi.balanceReceived', function () {
-      assert(balanceReceivedSpy.withArgs(appState, true).calledOnce)
     })
     it('returns a modified state', function () {
       assert.notDeepEqual(returnedState, appState)

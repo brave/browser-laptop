@@ -414,6 +414,16 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
       immutableData = immutableData.deleteIn(['extensions', extensionId, 'tabs'])
     })
   }
+
+  // Leader cleanup
+  if (immutableData.has('pageData')) {
+    immutableData = immutableData.delete('pageData')
+  }
+
+  if (immutableData.hasIn(['ledger', 'locations'])) {
+    immutableData = immutableData.deleteIn(['ledger', 'locations'])
+  }
+
   return immutableData
 }
 

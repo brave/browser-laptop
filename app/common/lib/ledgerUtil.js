@@ -6,6 +6,7 @@
 
 const Immutable = require('immutable')
 const moment = require('moment')
+const BigNumber = require('bignumber.js')
 
 // State
 const siteSettingsState = require('../state/siteSettingsState')
@@ -66,35 +67,30 @@ const batToCurrencyString = (bat, ledgerData) => {
   const balance = Number(bat || 0)
   const currency = (ledgerData && ledgerData.get('currency')) || 'USD'
 
-  if (balance === 0) {
+  if (balance === 0 || ledgerData == null) {
     return `0 ${currency}`
   }
 
-  if (ledgerData == null) {
-    return `${balance} BAT`
+  const rate = ledgerData.get('currentRate') || 0
+  const converted = new BigNumber(new BigNumber(rate.toString())).times(balance).toFixed(2)
+  return `${converted} ${currency}`
+}
+
+const formatCurrentBalance = (ledgerData) => {
+  let currency = 'USD'
+  let balance = 0
+  let converted = 0
+
+  if (ledgerData != null) {
+    currency = ledgerData.get('currency') || 'USD'
+    balance = ledgerData.get('balance') || 0
+    converted = Number.parseFloat(ledgerData.get('converted')) || 0
   }
 
-  const ledgerBat = ledgerData.get('bat')
-  const amount = ledgerData.get('amount')
+  balance = balance.toFixed(2)
+  converted = converted.toFixed(2)
 
-  if (ledgerBat && typeof amount === 'number') {
-    const batValue = ledgerBat / amount
-    const fiatValue = (balance / batValue).toFixed(2)
-    let roundedValue = Math.floor(fiatValue)
-    const diff = fiatValue - roundedValue
-
-    if (diff > 0.74) {
-      roundedValue += 0.75
-    } else if (diff > 0.49) {
-      roundedValue += 0.50
-    } else if (diff > 0.24) {
-      roundedValue += 0.25
-    }
-
-    return `${roundedValue.toFixed(2)} ${currency}`
-  }
-
-  return `${balance} BAT`
+  return `${balance} BAT (${converted} ${currency})`
 }
 
 const formattedTimeFromNow = (timestamp) => {
@@ -221,5 +217,6 @@ module.exports = {
   contributeP,
   visibleP,
   eligibleP,
-  stickyP
+  stickyP,
+  formatCurrentBalance
 }

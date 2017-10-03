@@ -4,6 +4,11 @@ const globalStyles = require('../styles/global')
 
 class PreferenceNavigationButton extends ImmutableComponent {
   render () {
+    let customIcon = false
+    if (this.props.iconOn && this.props.iconOff) {
+      customIcon = true
+    }
+
     return <div className={css(
       styles.prefNavItem,
       this.props.selected && styles.topBarButtonSelected,
@@ -12,8 +17,10 @@ class PreferenceNavigationButton extends ImmutableComponent {
       <div onClick={this.props.onClick} className={css(styles.topBarButton)}>
         <div className={css(
           styles.icon,
-          this.props.selected && styles.iconActive,
-          this.props.icon)} />
+          customIcon && !this.props.selected && this.props.iconOff,
+          customIcon && this.props.selected && this.props.iconOn,
+          !customIcon && this.props.selected && styles.iconActive,
+          !customIcon && this.props.icon)} />
         <div className={css(styles.text)} data-l10n-id={this.props.dataL10nId} />
       </div>
     </div>

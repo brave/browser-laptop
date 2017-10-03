@@ -247,11 +247,6 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.onBootStateFile(state)
         break
       }
-    case appConstants.APP_ON_LEDGER_BALANCE_RECEIVED:
-      {
-        state = ledgerApi.balanceReceived(state, action.get('unconfirmed'))
-        break
-      }
     case appConstants.APP_ON_WALLET_PROPERTIES:
       {
         state = ledgerApi.onWalletProperties(state, action.get('body'))
@@ -324,6 +319,11 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_BTC_TO_BAT_NOTIFIED:
       {
         state = state.setIn(['migrations', 'btcToBatNotifiedTimestamp'], new Date().getTime())
+        break
+      }
+    case appConstants.APP_ON_LEDGER_QR_GENERATED:
+      {
+        state = ledgerState.saveQRCode(state, action.get('currency'), action.get('image'))
         break
       }
   }
