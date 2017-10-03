@@ -965,10 +965,11 @@ var exports = {
 
     // get synopsis from the store
     this.app.client.addCommand('waitUntilSynopsis', function (cb) {
+      logVerbose(`waitUntilSynopsis()`)
       return this.waitUntil(function () {
         return this.getAppState().then((val) => {
           val = Immutable.fromJS(val)
-          let synopsis = val.getIn(['value', 'publisherInfo', 'synopsis'])
+          let synopsis = val.getIn(['value', 'ledger', 'synopsis'])
           if (synopsis !== undefined) {
             return cb(synopsis)
           }
