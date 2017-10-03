@@ -393,6 +393,7 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
   }
 
   immutableData = immutableData.delete('menu')
+  immutableData = immutableData.delete('pageData')
 
   try {
     immutableData = tabState.getPersistentState(immutableData)
@@ -956,7 +957,29 @@ module.exports.defaultAppState = () => {
       count: 0
     },
     defaultWindowParams: {},
-    searchDetail: null
+    searchDetail: null,
+    pageData: {
+      info: {},
+      last: {
+        info: '',
+        url: '',
+        tabId: -1
+      },
+      load: [],
+      view: {}
+    },
+    ledger: {
+      about: {
+        synopsis: [],
+        synopsisOptions: {}
+      },
+      info: {},
+      locations: {},
+      synopsis: {
+        options: {},
+        publishers: {}
+      }
+    }
   }
 }
 

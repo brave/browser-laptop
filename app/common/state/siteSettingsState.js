@@ -28,8 +28,24 @@ const api = {
     return siteSettings ? siteSettings.get(hostPattern) : Immutable.Map()
   },
 
-  isNoScriptEnabled (state, settings) {
+  isNoScriptEnabled: (state, settings) => {
     return siteSettings.activeSettings(settings, state, appConfig).noScript === true
+  },
+
+  getSettingsProp: (state, pattern, prop) => {
+    if (prop == null) {
+      return null
+    }
+
+    return state.getIn(['siteSettings', pattern, prop])
+  },
+
+  setSettingsProp: (state, pattern, prop, value) => {
+    if (prop == null || pattern == null) {
+      return state
+    }
+
+    return state.setIn(['siteSettings', pattern, prop], value)
   }
 }
 

@@ -10,7 +10,6 @@ const appDispatcher = require('../dispatcher/appDispatcher')
 const settings = require('../constants/settings')
 const {STATE_SITES} = require('../constants/stateConstants')
 const syncUtil = require('../state/syncUtil')
-const siteSettings = require('../state/siteSettings')
 const electron = require('electron')
 const app = electron.app
 const messages = require('../constants/messages')
@@ -174,6 +173,7 @@ const applyReducers = (state, action, immutableAction) => reducers.reduce(
     }, appState)
 
 const handleAppAction = (action) => {
+  const ledgerReducer = require('../../app/browser/reducers/ledgerReducer')
   const timeStart = process.hrtime()
   if (action.actionType === appConstants.APP_SET_STATE) {
     reducers = [
@@ -202,7 +202,9 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/topSitesReducer'),
       require('../../app/browser/reducers/braverySettingsReducer'),
       require('../../app/browser/reducers/bookmarkToolbarReducer'),
-      require('../../app/ledger').doAction,
+      require('../../app/browser/reducers/siteSettingsReducer'),
+      require('../../app/browser/reducers/pageDataReducer'),
+      ledgerReducer,
       require('../../app/browser/menu')
     ]
     initialized = true
@@ -214,9 +216,19 @@ const handleAppAction = (action) => {
     return
   }
 
-  // maintain backwards compatibility for now by adding an additional param for immutableAction
-  const immutableAction = makeImmutable(action)
-  appState = applyReducers(appState, action, immutableAction)
+  let immutableAction = Immutable.Map()
+  // exclude big chucks that have regular JS in it
+  if (
+    action.actionType === appConstants.APP_ON_FIRST_LEDGER_SYNC ||
+    action.actionType === appConstants.APP_ON_BRAVERY_PROPERTIES ||
+    action.actionType === appConstants.APP_ON_LEDGER_INIT_READ
+  ) {
+    appState = ledgerReducer(appState, action, immutableAction)
+  } else {
+    // maintain backwards compatibility for now by adding an additional param for immutableAction
+    immutableAction = makeImmutable(action)
+    appState = applyReducers(appState, action, immutableAction)
+  }
 
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:
@@ -288,56 +300,6 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['settings', action.key], action.value)
       appState = handleChangeSettingAction(appState, action.key, action.value)
       break
-    case appConstants.APP_ALLOW_FLASH_ONCE:
-      {
-        const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
-        appState = appState.set(propertyName,
-          siteSettings.mergeSiteSetting(appState.get(propertyName), urlUtil.getOrigin(action.url), 'flash', 1))
-        break
-      }
-    case appConstants.APP_ALLOW_FLASH_ALWAYS:
-      {
-        const propertyName = action.isPrivate ? 'temporarySiteSettings' : 'siteSettings'
-        const expirationTime = Date.now() + (7 * 24 * 3600 * 1000)
-        appState = appState.set(propertyName,
-          siteSettings.mergeSiteSetting(appState.get(propertyName), urlUtil.getOrigin(action.url), 'flash', expirationTime))
-        break
-      }
-    case appConstants.APP_CHANGE_SITE_SETTING:
-      {
-        let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
-        let newSiteSettings = siteSettings.mergeSiteSetting(appState.get(propertyName), action.hostPattern, action.key, action.value)
-        if (action.skipSync) {
-          newSiteSettings = newSiteSettings.setIn([action.hostPattern, 'skipSync'], true)
-        }
-        appState = appState.set(propertyName, newSiteSettings)
-        break
-      }
-    case appConstants.APP_REMOVE_SITE_SETTING:
-      {
-        let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
-        let newSiteSettings = siteSettings.removeSiteSetting(appState.get(propertyName),
-          action.hostPattern, action.key)
-        if (action.skipSync) {
-          newSiteSettings = newSiteSettings.setIn([action.hostPattern, 'skipSync'], true)
-        }
-        appState = appState.set(propertyName, newSiteSettings)
-        break
-      }
-    case appConstants.APP_CLEAR_SITE_SETTINGS:
-      {
-        let propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
-        let newSiteSettings = new Immutable.Map()
-        appState.get(propertyName).map((entry, hostPattern) => {
-          let newEntry = entry.delete(action.key)
-          if (action.skipSync) {
-            newEntry = newEntry.set('skipSync', true)
-          }
-          newSiteSettings = newSiteSettings.set(hostPattern, newEntry)
-        })
-        appState = appState.set(propertyName, newSiteSettings)
-        break
-      }
     case appConstants.APP_SET_SKIP_SYNC:
       {
         if (appState.getIn(action.path)) {
@@ -345,30 +307,6 @@ const handleAppAction = (action) => {
         }
         break
       }
-    case appConstants.APP_ADD_NOSCRIPT_EXCEPTIONS:
-      {
-        const propertyName = action.temporary ? 'temporarySiteSettings' : 'siteSettings'
-        // Note that this is always cleared on restart or reload, so should not
-        // be synced or persisted.
-        const key = 'noScriptExceptions'
-        if (!action.origins || !action.origins.size) {
-          // Clear the exceptions
-          appState = appState.setIn([propertyName, action.hostPattern, key], new Immutable.Map())
-        } else {
-          const currentExceptions = appState.getIn([propertyName, action.hostPattern, key]) || new Immutable.Map()
-          appState = appState.setIn([propertyName, action.hostPattern, key], currentExceptions.merge(action.origins))
-        }
-      }
-      break
-    case appConstants.APP_UPDATE_LEDGER_INFO:
-      appState = appState.set('ledgerInfo', Immutable.fromJS(action.ledgerInfo))
-      break
-    case appConstants.APP_UPDATE_LOCATION_INFO:
-      appState = appState.set('locationInfo', Immutable.fromJS(action.locationInfo))
-      break
-    case appConstants.APP_UPDATE_PUBLISHER_INFO:
-      appState = appState.set('publisherInfo', Immutable.fromJS(action.publisherInfo))
-      break
     case appConstants.APP_SHOW_NOTIFICATION:
       let notifications = appState.get('notifications')
       notifications = notifications.filterNot((notification) => {
@@ -420,13 +358,6 @@ const handleAppAction = (action) => {
             return notification.get('frameOrigin') === origin
           }))
         }
-      }
-      break
-    case appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED:
-      {
-        const date = new Date().getTime()
-        appState = appState.setIn(['about', 'preferences', 'recoverySucceeded'], action.recoverySucceeded)
-        appState = appState.setIn(['about', 'preferences', 'updatedStamp'], date)
       }
       break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
@@ -664,26 +595,6 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_HIDE_DOWNLOAD_DELETE_CONFIRMATION:
       appState = appState.set('deleteConfirmationVisible', false)
-      break
-    case appConstants.APP_ENABLE_UNDEFINED_PUBLISHERS:
-      const sitesObject = appState.get('siteSettings')
-      Object.keys(action.publishers).map((item) => {
-        const pattern = `https?://${item}`
-        const siteSetting = sitesObject.get(pattern)
-        const result = (siteSetting) && (siteSetting.get('ledgerPayments'))
-
-        if (result === undefined) {
-          let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPayments', true)
-          appState = appState.set('siteSettings', newSiteSettings)
-        }
-      })
-      break
-    case appConstants.APP_CHANGE_LEDGER_PINNED_PERCENTAGES:
-      Object.keys(action.publishers).map((item) => {
-        const pattern = `https?://${item}`
-        let newSiteSettings = siteSettings.mergeSiteSetting(appState.get('siteSettings'), pattern, 'ledgerPinPercentage', action.publishers[item].pinPercentage)
-        appState = appState.set('siteSettings', newSiteSettings)
-      })
       break
     case appConstants.APP_DEFAULT_SEARCH_ENGINE_LOADED:
       appState = appState.set('searchDetail', action.searchDetail)

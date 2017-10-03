@@ -156,16 +156,6 @@ const aboutActions = {
   },
 
   /**
-   * Clear wallet recovery status
-   */
-  clearRecoveryStatus: function () {
-    aboutActions.dispatchAction({
-      actionType: appConstants.APP_LEDGER_RECOVERY_STATUS_CHANGED,
-      recoverySucceeded: undefined
-    })
-  },
-
-  /**
    * Click through a certificate error.
    *
    * @param {string} url - The URL with the cert error
@@ -252,10 +242,6 @@ const aboutActions = {
    */
   exportBookmarks: function () {
     ipc.send(messages.EXPORT_BOOKMARKS)
-  },
-
-  createWallet: function () {
-    ipc.send(messages.LEDGER_CREATE_WALLET)
   },
 
   setLedgerEnabled: function (enabled) {
