@@ -96,6 +96,18 @@ describe('Preferences component', function () {
       assert.equal(this.result.find('[data-test-id="generalSettings"]').length, 0)
       assert.equal(this.result.find('[data-test-id="searchSettings"]').length, 1)
     })
+
+    it('Allows state change from query string in hash', function () {
+      this.result = mount(Preferences)
+      assert.equal(this.result.find('[data-test-id="generalSettings"]').length, 1)
+      assert.equal(this.result.find('[data-test-id="paymentsContainer"]').length, 0)
+      assert.equal(this.result.node.state.ledgerBackupOverlayVisible, false)
+      window.location.hash = 'payments?ledgerBackupOverlayVisible'
+      this.result = mount(Preferences)
+      assert.equal(this.result.find('[data-test-id="generalSettings"]').length, 0)
+      assert.equal(this.result.find('[data-test-id="paymentsContainer"]').length, 1)
+      assert.equal(this.result.node.state.ledgerBackupOverlayVisible, true)
+    })
   })
 
   describe('General', function () {

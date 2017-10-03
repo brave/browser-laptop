@@ -216,6 +216,7 @@ var rendererIdentifiers = function () {
     'displayQRCode',
     'updateLater',
     'updateHello',
+    // notifications
     'notificationPasswordWithUserName',
     'notificationUpdatePasswordWithUserName',
     'notificationUpdatePassword',
@@ -231,6 +232,11 @@ var rendererIdentifiers = function () {
     'no',
     'noThanks',
     'neverForThisSite',
+    'walletConvertedBackup',
+    'walletConvertedDismiss',
+    'walletConvertedLearnMore',
+    'walletConvertedToBat',
+    // other
     'passwordsManager',
     'extensionsManager',
     'downloadItemPause',

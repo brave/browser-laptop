@@ -311,6 +311,11 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.onInitRead(state, action.parsedData)
         break
       }
+    case appConstants.APP_ON_BTC_TO_BAT_NOTIFIED:
+      {
+        state = state.setIn(['migrations', 'btcToBatNotifiedTimestamp'], new Date().getTime())
+        break
+      }
   }
   return state
 }
