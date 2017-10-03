@@ -41,10 +41,6 @@ const bookmarksState = {
     return state.getIn([STATE_SITES.BOOKMARKS, key], Immutable.Map())
   },
 
-  getBookmarkOrder: (state) => {
-    return state.getIn(STATE_SITES.BOOKMARK_ORDER_PATH)
-  },
-
   /**
    * Use this function if you only have a key and don't know if key is for folder or regular bookmark
    * @param state

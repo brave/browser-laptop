@@ -6,8 +6,7 @@ const STATE_SITES = {
   BOOKMARKS: 'bookmarks',
   BOOKMARK_FOLDERS: 'bookmarkFolders',
   HISTORY_SITES: 'historySites',
-  PINNED_SITES: 'pinnedSites',
-  BOOKMARK_ORDER_PATH: ['cache', 'bookmarkOrder']
+  PINNED_SITES: 'pinnedSites'
 }
 
 module.exports = {

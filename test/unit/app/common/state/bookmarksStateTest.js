@@ -66,12 +66,6 @@ const stateWithData = Immutable.fromJS({
 })
 
 describe('bookmarkState unit test', function () {
-  describe('getBookmarkOrder', function () {
-    it('resturns order state', function () {
-      assert.deepEqual(bookmarksState.getBookmarkOrder(stateWithData), stateWithData.getIn(['cache', 'bookmarkOrder']))
-    })
-  })
-
   describe('updateFavicon', function () {
     it('updates the favicon for all matching entries', function () {
       const processedState = bookmarksState.updateFavicon(stateWithData, 'https://brave.com/', 'https://brave.com/favicon.ico')
