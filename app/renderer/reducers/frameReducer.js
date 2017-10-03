@@ -96,7 +96,10 @@ const frameReducer = (state, action, immutableAction) => {
       const index = tab.get('index')
       let sourceFrameIndex = frameStateUtil.getIndexByTabId(state, tabId)
       if (index != null &&
-          sourceFrameIndex !== index) {
+          sourceFrameIndex !== index &&
+          // Only update the index once the frame is known.
+          // If it is not known, it will just happen later on the next update.
+          index < frameStateUtil.getFrames(state).size) {
         frame = frame.set('index', index)
         frames = frames
           .splice(sourceFrameIndex, 1)
