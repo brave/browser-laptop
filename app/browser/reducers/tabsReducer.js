@@ -147,6 +147,12 @@ const tabsReducer = (state, action, immutableAction) => {
               tabs.toggleDevTools(tabId)
             })
           } else {
+            // This check is only needed because sometimes front end can try to close
+            // a tabId it thinks exists but doesn't actually exist anymore.
+            const tabValue = tabState.getByTabId(state, tabId)
+            if (!tabValue) {
+              break
+            }
             const windowId = tabState.getWindowId(state, tabId)
             const nonPinnedTabs = tabState.getNonPinnedTabsByWindowId(state, windowId)
             const pinnedTabs = tabState.getPinnedTabsByWindowId(state, windowId)
