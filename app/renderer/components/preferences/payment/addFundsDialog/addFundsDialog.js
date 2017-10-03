@@ -26,9 +26,9 @@ class AddFundsDialog extends React.Component {
 
   get currencyAddress () {
     const fakeETH = 'ETH FOR THE ETH GOD'
-    const fakeBTC = 'ETH FOR THE BTC GOD'
-    const fakeLTC = 'ETH FOR THE ADVENTUROUS'
-    const fakeBAT = 'ETH FOR THE BRAVE GOD'
+    const fakeBTC = 'BTC FOR THE BTC GOD'
+    const fakeLTC = 'LTC FOR THE ADVENTUROUS'
+    const fakeBAT = 'BAT FOR THE BRAVE GOD'
 
     switch (this.currency) {
       case 'eth':
