@@ -26,6 +26,7 @@ const settings = require('../../../../js/constants/settings')
 const tabState = require('../../../common/state/tabState')
 const publisherState = require('../../../common/lib/publisherUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const ledgerState = require('../../../common/state/ledgerState')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
@@ -93,7 +94,7 @@ class NavigationBar extends React.Component {
     const loading = activeFrame.get('loading')
     const location = activeFrame.get('location', '')
     const locationId = getBaseUrl(location)
-    const publisherId = state.getIn(['locationInfo', locationId, 'publisher'])
+    const publisherId = ledgerState.getLocationProp(state, locationId, 'publisher')
     const navbar = activeFrame.get('navbar', Immutable.Map())
 
     const hasTitle = title && location && title !== location.replace(/^https?:\/\//, '')

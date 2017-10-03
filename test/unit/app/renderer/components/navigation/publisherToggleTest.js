@@ -14,31 +14,31 @@ describe('PublisherToggle component', function () {
   let PublisherToggle, windowStore, appStore
 
   const fakeAppState = Immutable.fromJS({
-    locationInfo: {
-      'https://brave.com': {
-        exclude: false,
-        publisher: 'brave.com',
-        stickyP: false,
-        timestamp: 1496942403068,
-        verified: true
-      }
-    },
-    publisherInfo: {
+    ledger: {
       synopsis: {
-        0: {
-          daysSpent: 0,
-          duration: 623405,
-          faviconURL: '',
-          hoursSpent: 0,
-          minutesSpent: 10,
-          percentage: 100,
-          publisherURL: 'https://brave.com',
-          score: 9.365888800773842,
-          secondsSpent: 23,
-          site: 'brave.com',
-          verified: false,
-          views: 1,
-          weight: 100
+        publishers: {
+          'brave.com': {
+            duration: 623405,
+            faviconURL: '',
+            percentage: 100,
+            publisherURL: 'https://brave.com',
+            score: 9.365888800773842,
+            site: 'brave.com',
+            options: {
+              verified: true
+            },
+            visits: 1,
+            weight: 100
+          }
+        }
+      },
+      locations: {
+        'https://brave.com': {
+          exclude: false,
+          publisher: 'brave.com',
+          stickyP: false,
+          timestamp: 1496942403068,
+          verified: true
         }
       }
     },
@@ -89,14 +89,14 @@ describe('PublisherToggle component', function () {
   describe('default behaviour (when autoSuggest is ON)', function () {
     it('Show as disabled if publisher is on exclusion list', function () {
       windowStore.state = defaultWindowStore
-      appStore.state = fakeAppState.setIn(['locationInfo', 'https://brave.com', 'exclude'], true)
+      appStore.state = fakeAppState.setIn(['ledger', 'locations', 'https://brave.com', 'exclude'], true)
 
       const wrapper = mount(<PublisherToggle />)
       assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
       assert.equal(wrapper.find('span').props()['data-test-authorized'], false)
     })
 
-    it('Show as verified if publisher is shown as verified on locationInfo list', function () {
+    it('Show as verified if publisher is shown as verified on ledger locations list', function () {
       windowStore.state = defaultWindowStore
       appStore.state = fakeAppState
       const wrapper = mount(<PublisherToggle />)

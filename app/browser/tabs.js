@@ -30,6 +30,7 @@ const {cleanupWebContents, currentWebContents, getWebContents, updateWebContents
 const {FilterOptions} = require('ad-block')
 const {isResourceEnabled} = require('../filtering')
 const autofill = require('../autofill')
+const ledgerState = require('../common/state/ledgerState')
 const {getWindow} = require('./windows')
 
 let currentPartitionNumber = 0
@@ -162,8 +163,8 @@ const updateAboutDetails = (tab, tabValue) => {
   let location = getBaseUrl(url)
 
   // TODO(bridiver) - refactor these to use state helpers
-  const ledgerInfo = appState.get('ledgerInfo')
-  const publisherInfo = appState.get('publisherInfo')
+  const ledgerInfo = ledgerState.getInfoProps(appState)
+  const synopsis = appState.getIn(['ledger', 'about'])
   const preferencesData = appState.getIn(['about', 'preferences'])
   const appSettings = appState.get('settings')
   let allSiteSettings = appState.get('siteSettings')
@@ -184,17 +185,23 @@ const updateAboutDetails = (tab, tabValue) => {
   const autofillAddresses = appState.getIn(['autofill', 'addresses'])
   const versionInformation = appState.getIn(['about', 'brave', 'versionInformation'])
   const aboutDetails = tabValue.get('aboutDetails')
-  // TODO(bridiver) - convert this to an action
+
+  // TODO save this into values into the sate so that we don't call this app action on every state change
+  // this should be saved in app state when windows will be refactored #11151
+  /*
   if (url === 'about:preferences#payments') {
     tab.on('destroyed', () => {
-      process.emit(messages.LEDGER_PAYMENTS_PRESENT, tabValue.get('tabId'), false)
+      appActions.ledgerPaymentsPresent(tabValue.get('tabId'), false)
     })
-    process.emit(messages.LEDGER_PAYMENTS_PRESENT, tabValue.get('tabId'), true)
+    appActions.ledgerPaymentsPresent(tabValue.get('tabId'), false)
   } else {
-    process.emit(messages.LEDGER_PAYMENTS_PRESENT, tabValue.get('tabId'), false)
+    appActions.ledgerPaymentsPresent(tabValue.get('tabId'), false)
   }
+  */
   if (location === 'about:preferences' || location === 'about:contributions' || location === aboutUrls.get('about:contributions')) {
-    const ledgerData = ledgerInfo.merge(publisherInfo).merge(preferencesData)
+    const ledgerData = ledgerInfo
+      .merge(synopsis)
+      .merge(preferencesData)
     tab.send(messages.LEDGER_UPDATED, ledgerData.toJS())
     tab.send(messages.SETTINGS_UPDATED, appSettings.toJS())
     tab.send(messages.SITE_SETTINGS_UPDATED, allSiteSettings.toJS())
@@ -523,7 +530,7 @@ const api = {
 
       tab.on('did-get-response-details', (evt, status, newURL, originalURL, httpResponseCode, requestMethod, referrer, headers, resourceType) => {
         if (resourceType === 'mainFrame') {
-          windowActions.gotResponseDetails(tabId, {status, newURL, originalURL, httpResponseCode, requestMethod, referrer, headers, resourceType})
+          windowActions.gotResponseDetails(tabId, {status, newURL, originalURL, httpResponseCode, requestMethod, referrer, resourceType})
         }
       })
     })

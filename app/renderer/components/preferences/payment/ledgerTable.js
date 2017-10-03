@@ -24,6 +24,7 @@ const pinIcon = require('../../../../extensions/brave/img/ledger/icon_pin.svg')
 const settings = require('../../../../../js/constants/settings')
 const getSetting = require('../../../../../js/settings').getSetting
 const aboutActions = require('../../../../../js/about/aboutActions')
+const urlUtil = require('../../../../../js/lib/urlutil')
 const {SettingCheckbox, SiteSettingCheckbox} = require('../../common/settings')
 
 class LedgerTable extends ImmutableComponent {
@@ -51,7 +52,7 @@ class LedgerTable extends ImmutableComponent {
   }
 
   getHostPattern (synopsis) {
-    return `https?://${synopsis.get('site')}`
+    return urlUtil.getHostPattern(synopsis.get('site'))
   }
 
   getVerifiedIcon (synopsis) {
@@ -69,7 +70,8 @@ class LedgerTable extends ImmutableComponent {
         return result
       }
     }
-    return getSetting(settings.AUTO_SUGGEST_SITES, this.props.settings)
+
+    return !synopsis.get('exclude')
   }
 
   shouldShow (synopsis) {

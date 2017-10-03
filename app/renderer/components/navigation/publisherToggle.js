@@ -14,12 +14,13 @@ const BrowserButton = require('../common/browserButton')
 const appActions = require('../../../../js/actions/appActions')
 
 // State
-const publisherState = require('../../../common/lib/publisherUtil')
+const ledgerState = require('../../../common/state/ledgerState')
 
 // Utils
 const {getHostPattern} = require('../../../../js/lib/urlutil')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const ledgerUtil = require('../../../common/lib/ledgerUtil')
 
 // Style
 const globalStyles = require('../styles/global')
@@ -36,7 +37,10 @@ class PublisherToggle extends React.Component {
 
   get l10nString () {
     let l10nData = 'disabledPublisher'
-    if (this.props.isVerifiedPublisher && !this.props.isEnabledForPaymentsPublisher) {
+
+    if (!this.props.isVisibleInLedger) {
+      l10nData = 'notVisiblePublisher'
+    } else if (this.props.isVerifiedPublisher && !this.props.isEnabledForPaymentsPublisher) {
       l10nData = 'verifiedPublisher'
     } else if (this.props.isEnabledForPaymentsPublisher) {
       l10nData = 'enabledPublisher'
@@ -45,7 +49,9 @@ class PublisherToggle extends React.Component {
   }
 
   onAuthorizePublisher () {
-    appActions.changeSiteSetting(this.props.hostPattern, 'ledgerPayments', !this.props.isEnabledForPaymentsPublisher)
+    if (this.props.isVisibleInLedger) {
+      appActions.changeSiteSetting(this.props.hostPattern, 'ledgerPayments', !this.props.isEnabledForPaymentsPublisher)
+    }
   }
 
   mergeProps (state, ownProps) {
@@ -53,16 +59,17 @@ class PublisherToggle extends React.Component {
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const location = activeFrame.get('location', '')
     const locationId = getBaseUrl(location)
-    const locationInfo = state.get('locationInfo', Immutable.Map())
+    const publisherId = ledgerState.getLocationProp(state, locationId, 'publisher')
 
     const props = {}
     // used in renderer
-    props.isEnabledForPaymentsPublisher = publisherState.enabledForPaymentsPublisher(state, locationId)
-    props.isVerifiedPublisher = locationInfo.getIn([locationId, 'verified'])
+    props.isVisibleInLedger = ledgerUtil.visibleP(state, publisherId)
+    props.isEnabledForPaymentsPublisher = ledgerUtil.stickyP(state, publisherId)
+    props.isVerifiedPublisher = ledgerState.getPublisherOption(state, publisherId, 'verified')
 
     // used in functions
-    props.publisherId = locationInfo.getIn([locationId, 'publisher'])
-    props.hostPattern = getHostPattern(props.publisherId)
+    props.publisherId = publisherId
+    props.hostPattern = getHostPattern(publisherId)
 
     return props
   }
@@ -75,12 +82,15 @@ class PublisherToggle extends React.Component {
       className={css(styles.addPublisherButtonContainer)}>
       <BrowserButton
         custom={[
-          !this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.noFundVerified,
-          this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.fundVerified,
-          !this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher && styles.noFundUnverified,
-          this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher && styles.fundUnverified
+          !this.props.isVisibleInLedger && styles.notVisible,
+          !this.props.isVisibleInLedger && this.props.isVerifiedPublisher && styles.noFundVerified,
+          !this.props.isVisibleInLedger && !this.props.isVerifiedPublisher && styles.noFundUnverified,
+          this.props.isVisibleInLedger && !this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.noFundVerified,
+          this.props.isVisibleInLedger && !this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher && styles.noFundUnverified,
+          this.props.isVisibleInLedger && this.props.isEnabledForPaymentsPublisher && this.props.isVerifiedPublisher && styles.fundVerified,
+          this.props.isVisibleInLedger && this.props.isEnabledForPaymentsPublisher && !this.props.isVerifiedPublisher && styles.fundUnverified
         ]}
-        data-l10n-id={this.l10nString}
+        l10nId={this.l10nString}
         onClick={this.onAuthorizePublisher}
       />
     </span>
@@ -127,5 +137,9 @@ const styles = StyleSheet.create({
   fundUnverified: {
     backgroundImage: `url(${fundUnverifiedPublisherImage})`,
     backgroundSize: '18px'
+  },
+
+  notVisible: {
+    opacity: 0.3
   }
 })

@@ -827,13 +827,13 @@ class AboutPreferences extends React.Component {
     this.setState(stateDiff)
     // Tell ledger when Add Funds overlay is closed
     if (isVisible === false && overlayName === 'addFunds') {
-      ipc.send(messages.ADD_FUNDS_CLOSED)
+      appActions.onAddFoundsClosed()
     }
   }
 
   createWallet () {
     if (this.state.ledgerData && !this.state.ledgerData.get('created')) {
-      aboutActions.createWallet()
+      appActions.onLedgerWalletCreate()
     }
   }
 

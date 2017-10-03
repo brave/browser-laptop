@@ -99,11 +99,13 @@ describe('Ledger table', function () {
           return true
         })
         .tabByIndex(0)
+        .waitForVisible(`${firstTableFirstRow} [data-test-id="siteName"]`)
         .waitUntil(function () {
           return this.getText(`${firstTableFirstRow} [data-test-id="siteName"]`).then((value) => {
             return value === topPublisher.get('site')
           })
         }, 5000)
+        .waitForVisible(`${firstTableFirstRow} [data-test-id="pinnedInput"]`)
         .waitUntil(function () {
           return this.getValue(`${firstTableFirstRow} [data-test-id="pinnedInput"]`).then((value) => {
             return Number(value) === topPublisher.get('pinPercentage')
@@ -149,6 +151,7 @@ describe('Ledger table', function () {
           return true
         })
         .tabByIndex(0)
+        .waitForVisible(`${firstTableFirstRow} [data-test-id="siteName"]`)
         .waitUntil(function () {
           return this.getText(`${firstTableFirstRow} [data-test-id="siteName"]`).then((value) => {
             return value === topPublisher.get('site')

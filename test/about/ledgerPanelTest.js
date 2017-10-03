@@ -309,12 +309,12 @@ describe('Regular payment panel tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.siteSettings['https?://example.com'].ledgerPayments === true
+            return val.value.ledger.synopsis.publishers['example.com'].options.exclude === false
           })
         })
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.siteSettings['https?://eff.org'].ledgerPayments === true
+            return val.value.ledger.synopsis.publishers['eff.org'].options.exclude === false
           })
         })
     })
@@ -339,12 +339,12 @@ describe('Regular payment panel tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.siteSettings['https?://example.com'].ledgerPayments === false
+            return val.value.ledger.synopsis.publishers['example.com'].options.exclude === true
           })
         })
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.siteSettings['https?://eff.org'].ledgerPayments === false
+            return val.value.ledger.synopsis.publishers['eff.org'].options.exclude === true
           })
         })
     })
@@ -370,12 +370,12 @@ describe('Regular payment panel tests', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.siteSettings['https?://example.com'].ledgerPayments === true
+            return val.value.ledger.synopsis.publishers['example.com'].options.exclude === false
           })
         })
         .waitUntil(function () {
           return this.getAppState().then((val) => {
-            return val.value.siteSettings['https?://eff.org'].ledgerPayments === false
+            return val.value.ledger.synopsis.publishers['eff.org'].options.exclude === true
           })
         })
     })
