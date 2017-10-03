@@ -13,10 +13,8 @@ const globalStyles = require('../../styles/global')
 const commonStyles = require('../../styles/commonStyles')
 const PIA = require('../../../../extensions/brave/img/private_internet_access.png')
 const PIA2 = require('../../../../extensions/brave/img/private_internet_access_2x.png')
-const BitGo = require('../../../../extensions/brave/img/bitgo.png')
-const BitGo2 = require('../../../../extensions/brave/img/bitgo_2x.png')
-const CoinBase = require('../../../../extensions/brave/img/coinbase.png')
-const CoinBase2 = require('../../../../extensions/brave/img/coinbase_2x.png')
+const uphold = require('../../../../extensions/brave/img/ledger/uphold_logo_small.png')
+const uphold2 = require('../../../../extensions/brave/img/ledger/uphold_logo_medium.png')
 
 class DisabledContent extends ImmutableComponent {
   render () {
@@ -39,9 +37,7 @@ class DisabledContent extends ImmutableComponent {
         <div className={css(styles.disabledContent__sidebar__text)} data-l10n-id='paymentsSidebarText2' />
         <a href='https://www.privateinternetaccess.com/' rel='noopener' target='_blank'><span className={css(styles.disabledContent__sidebar__logo, styles.disabledContent__sidebar__logo_PIA)} /></a>
         <div className={css(styles.disabledContent__sidebar__text)} data-l10n-id='paymentsSidebarText3' />
-        <a href='https://www.bitgo.com/' rel='noopener' target='_blank'><span className={css(styles.disabledContent__sidebar__logo, styles.disabledContent__sidebar__logo_bitgo)} /></a>
-        <div className={css(styles.disabledContent__sidebar__text)} data-l10n-id='paymentsSidebarText4' />
-        <a href='https://www.coinbase.com/' rel='noopener' target='_blank'><span className={css(styles.disabledContent__sidebar__logo, styles.disabledContent__sidebar__logo_coinbase)} /></a>
+        <a href='https://uphold.com/' rel='noopener' target='_blank'><span className={css(styles.disabledContent__sidebar__logo, styles.disabledContent__sidebar__logo_uphold)} /></a>
       </div>
     </section>
   }
@@ -105,16 +101,11 @@ const styles = StyleSheet.create({
     height: '20px'
   },
 
-  disabledContent__sidebar__logo_bitgo: {
-    backgroundImage: `-webkit-image-set(url(${BitGo}) 1x, url(${BitGo2}) 2x)`,
-    width: '100px',
-    height: '25px'
-  },
-
-  disabledContent__sidebar__logo_coinbase: {
-    backgroundImage: `-webkit-image-set(url(${CoinBase}) 1x, url(${CoinBase2}) 2x)`,
-    width: '100px',
-    height: '35px'
+  disabledContent__sidebar__logo_uphold: {
+    backgroundImage: `-webkit-image-set(url(${uphold}) 1x, url(${uphold2}) 2x)`,
+    backgroundSize: 'contain',
+    backgroundRepeat: 'no-repeat',
+    height: '50px'
   }
 })
 
