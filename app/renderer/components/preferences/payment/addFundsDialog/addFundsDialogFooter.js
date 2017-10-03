@@ -11,7 +11,7 @@ const appActions = require('../../../../../../js/actions/appActions')
 
 // Styles
 const {StyleSheet, css} = require('aphrodite')
-const upholdLogo = require('../../../../../extensions/brave/img/ledger/uphold-logo.png')
+const upholdLogo = require('../../../../../extensions/brave/img/ledger/uphold_logo_medium.png')
 
 class AddFundsDialogFooter extends React.Component {
   constructor (props) {
