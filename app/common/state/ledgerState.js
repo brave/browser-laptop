@@ -259,6 +259,15 @@ const ledgerState = {
     return state.setIn(['ledger', 'info'], Immutable.Map())
   },
 
+  saveQRCode: (state, currency, image) => {
+    state = validateState(state)
+    if (currency == null) {
+      return state
+    }
+
+    return state.setIn(['ledger', 'info', 'walletQR', currency], image)
+  },
+
   /**
    * OTHERS
    */

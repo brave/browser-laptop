@@ -18,6 +18,7 @@ const urlFormat = require('url').format
 const levelUp = require('level')
 const random = require('random-lib')
 const uuid = require('uuid')
+const BigNumber = require('bignumber.js')
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
@@ -62,7 +63,6 @@ let ledgerPublisher
 let ledgerClient
 let client
 let synopsis
-let ledgerBalance
 
 // Timers
 let balanceTimeoutId = false
@@ -101,7 +101,7 @@ const fileTypes = {
   png: new Buffer([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 }
 const minimumVisitTimeDefault = 8 * 1000
-const nextAddFoundsTime = 3 * miliseconds.day
+const nextAddFundsTime = 3 * miliseconds.day
 let signatureMax = 0
 underscore.keys(fileTypes).forEach((fileType) => {
   if (signatureMax < fileTypes[fileType].length) signatureMax = fileTypes[fileType].length
@@ -112,8 +112,8 @@ signatureMax = Math.ceil(signatureMax * 1.5)
 const sufficientBalanceToReconcile = (state) => {
   const balance = Number(ledgerState.getInfoProp(state, 'balance') || 0)
   const unconfirmed = Number(ledgerState.getInfoProp(state, 'unconfirmed') || 0)
-  const btc = ledgerState.getInfoProp(state, 'btc')
-  return btc && (balance + unconfirmed > 0.9 * Number(btc))
+  const bat = ledgerState.getInfoProp(state, 'bat')
+  return bat && (balance + unconfirmed > 0.9 * Number(bat))
 }
 const hasFunds = (state) => {
   const balance = getSetting(settings.PAYMENTS_ENABLED)
@@ -307,7 +307,7 @@ const notifications = {
     })
   },
   showAddFunds: () => {
-    const nextTime = new Date().getTime() + nextAddFoundsTime
+    const nextTime = new Date().getTime() + nextAddFundsTime
     appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
 
     appActions.showNotification({
@@ -607,7 +607,7 @@ const roundToTarget = (l, target, property) => {
 // TODO we should convert this function and all related ones into immutable
 // TODO merge publishers and publisherData that is created in getPublisherData
 // so that we don't need to create new Map every single time
-const synopsisNormalizer = (state, changedPublisher) => {
+const synopsisNormalizer = (state, changedPublisher, returnState) => {
   let dataPinned = [] // change to list
   let dataUnPinned = [] // change to list
   let dataExcluded = [] // change to list
@@ -627,7 +627,11 @@ const synopsisNormalizer = (state, changedPublisher) => {
   }
 
   if (results.length === 0) {
-    return ledgerState.saveAboutSynopsis(state, Immutable.List())
+    if (returnState) {
+      return ledgerState.saveAboutSynopsis(state, Immutable.List())
+    }
+
+    return []
   }
 
   results = underscore.sortBy(results, (entry) => -entry.scores[scorekeeper])
@@ -718,7 +722,11 @@ const synopsisNormalizer = (state, changedPublisher) => {
     state = ledgerState.setPublishersProp(state, publisherKey, 'pinPercentage', pinPercentage)
   })
 
-  return ledgerState.saveAboutSynopsis(state, newData)
+  if (returnState) {
+    return ledgerState.saveAboutSynopsis(state, newData)
+  }
+
+  return newData
 }
 
 const updatePublisherInfo = (state, changedPublisher) => {
@@ -727,7 +735,7 @@ const updatePublisherInfo = (state, changedPublisher) => {
   }
 
   // const options = synopsis.options
-  state = synopsisNormalizer(state, changedPublisher)
+  state = synopsisNormalizer(state, changedPublisher, true)
 
   return state
 }
@@ -1216,7 +1224,7 @@ const onWalletRecovery = (state, error, result) => {
     // we reset ledgerInfo.error to what it was before (likely null)
     // if ledgerInfo.error is not null, the wallet info will not display in UI
     // logError sets ledgerInfo.error, so we must we clear it or UI will show an error
-    state = logError(error, 'recoveryWallet')
+    state = logError(state, error, 'recoveryWallet')
     state = ledgerState.setInfoProp(state, 'error', existingLedgerError)
     state = ledgerState.setRecoveryStatus(state, false)
   } else {
@@ -1450,8 +1458,12 @@ const roundtrip = (params, options, callback) => {
     underscore.omit(params, ['headers', 'payload', 'timeout']))
 
 // TBD: let the user configure this via preferences [MTR]
-  if (parts.hostname === 'ledger.brave.com' && params.useProxy) {
-    parts.hostname = 'ledger-proxy.privateinternetaccess.com'
+  if (params.useProxy) {
+    if (parts.hostname === 'ledger.brave.com') {
+      parts.hostname = 'ledger-proxy.privateinternetaccess.com'
+    } else if (parts.hostname === 'ledger.mercury.basicattentiontoken.org') {
+      parts.hostname = 'mercury-proxy.privateinternetaccess.com'
+    }
   }
 
   const i = parts.path.indexOf('?')
@@ -1583,23 +1595,42 @@ const getStateInfo = (state, parsedData) => {
 
 const generatePaymentData = (state) => {
   const ledgerInfo = ledgerState.getInfoProps(state)
-  const paymentURL = `bitcoin:${ledgerInfo.get('address')}?amount=${ledgerInfo.get('bat')}&label=${encodeURI('Brave Software')}`
-  if (ledgerInfo.get('paymentURL') !== paymentURL) {
-    state = ledgerState.setInfoProp(state, 'paymentURL', paymentURL)
+
+  ledgerInfo.get('addresses', Immutable.List()).forEach((address, index) => {
+    if (ledgerInfo.hasIn(['walletQR', index])) {
+      return
+    }
+
+    let url = null
+    switch (index) {
+      case 'BAT':
+      case 'ETH':
+        url = `ethereum:${address}`
+        break
+      case 'BTC':
+        url = `bitcoin:${address}`
+        break
+      case 'LTC':
+        url = `litecoin:${address}`
+        break
+      default:
+        return
+    }
+
     try {
       let chunks = []
-      qr.image(paymentURL, {type: 'png'})
+      qr.image(url, {type: 'png'})
         .on('data', (chunk) => {
           chunks.push(chunk)
         })
         .on('end', () => {
           const paymentIMG = 'data:image/png;base64,' + Buffer.concat(chunks).toString('base64')
-          state = ledgerState.setInfoProp(state, 'paymentIMG', paymentIMG)
+          appActions.onLedgerQRGenerated(index, paymentIMG)
         })
     } catch (ex) {
-      console.error('qr.imageSync error: ' + ex.toString())
+      console.error('qr.imageSync (for url ' + url + ') error: ' + ex.toString())
     }
-  }
+  })
 
   return state
 }
@@ -1621,7 +1652,6 @@ const getPaymentInfo = (state) => {
 
     client.getWalletProperties(amount, currency, function (err, body) {
       if (err) {
-        logError(err, 'getWalletProperties')
         return
       }
 
@@ -1635,33 +1665,66 @@ const getPaymentInfo = (state) => {
 }
 
 const onWalletProperties = (state, body) => {
-  let newInfo = {
-    buyURL: body.get('buyURL'),
-    buyURLExpires: body.get('buyURLExpires'),
-    balance: body.get('balance'),
-    unconfirmed: body.get('unconfirmed'),
-    satoshis: body.get('satoshis')
+  // Addresses
+  state = ledgerState.setInfoProp(state, 'addresses', body.get('addresses'))
+
+  // Balance
+  const balance = parseFloat(body.get('balance'))
+  if (balance > 0) {
+    state = ledgerState.setInfoProp(state, 'balance', balance)
   }
 
-  if (client) {
-    newInfo.address = client.getWalletAddress()
+  // Rates
+  const rates = body.get('rates')
+  if (rates != null) {
+    state = ledgerState.setInfoProp(state, 'rates', rates)
   }
 
-  state = ledgerState.mergeInfoProp(state, newInfo)
+  // Probi
+  const probi = parseFloat(body.get('probi'))
+  if (probi > 0) {
+    state = ledgerState.setInfoProp(state, 'probi', probi)
 
-  const info = ledgerState.getInfoProps(state)
+    const info = ledgerState.getInfoProps(state)
+    const amount = info.get('balance')
+    const infoRates = info.get('rates')
+    const currency = info.getIn(['bravery', 'fee', 'currency'])
 
-  const amount = info.getIn(['bravery', 'fee', 'amount'])
-  const currency = info.getIn(['bravery', 'fee', 'currency'])
+    if (currency) {
+      const rate = infoRates.get(currency)
+      state = ledgerState.setInfoProp(state, 'currentRate', rate)
 
-  if (amount && currency) {
-    const bodyCurrency = body.getIn(['rates', 'currency'])
-    if (bodyCurrency) {
-      const bat = (amount / bodyCurrency).toFixed(8)
-      state = ledgerState.setInfoProp(state, 'bat', bat)
+      if (amount && rate) {
+        const bigProbi = new BigNumber(probi.toString()).dividedBy('1e18')
+        const bigRate = new BigNumber(rate.toString())
+        const converted = bigProbi.times(bigRate).toFormat(2)
+        state = ledgerState.setInfoProp(state, 'converted', converted)
+      }
     }
   }
 
+  // unconfirmed amount
+  const unconfirmed = parseFloat(body.get('unconfirmed'))
+  if (unconfirmed > 0) {
+    const result = (unconfirmed / 1e8).toFixed(4)
+    if (ledgerState.getInfoProp(state, 'unconfirmed') === result) {
+      return state
+    }
+
+    state = ledgerState.setInfoProp(state, 'unconfirmed', result)
+    if (clientOptions.verboseP) {
+      console.log('\ngetBalance refreshes ledger info: ' + ledgerState.getInfoProp(state, 'unconfirmed'))
+    }
+    return state
+  }
+
+  if (ledgerState.getInfoProp(state, 'unconfirmed') === '0.0000') {
+    return state
+  }
+
+  if (clientOptions.verboseP) {
+    console.log('\nWalletProperties refreshes payment info')
+  }
   state = generatePaymentData(state)
 
   return state
@@ -1706,7 +1769,7 @@ const onBraveryProperties = (state, error, result) => {
   }
 
   if (result) {
-    muonWriter(pathName(statePath), result)
+    muonWriter(result)
   }
 
   return state
@@ -1715,46 +1778,8 @@ const onBraveryProperties = (state, error, result) => {
 const getBalance = (state) => {
   if (!client) return
 
-  const address = ledgerState.getInfoProp(state, 'address')
   const balanceFn = getBalance.bind(null, state)
   balanceTimeoutId = setTimeout(balanceFn, 1 * miliseconds.minute)
-  if (!address) {
-    return
-  }
-
-  if (!ledgerBalance) ledgerBalance = require('bat-balance')
-  ledgerBalance.getBalance(address, underscore.extend({balancesP: true}, client.options),
-    (err, provider, result) => {
-      if (err) {
-        return console.warn('ledger balance warning: ' + JSON.stringify(err, null, 2))
-      }
-      appActions.onLedgerBalanceReceived(result.unconfirmed)
-    })
-}
-
-const balanceReceived = (state, unconfirmed) => {
-  if (typeof unconfirmed === 'undefined') {
-    return state
-  }
-
-  if (unconfirmed > 0) {
-    const result = (unconfirmed / 1e8).toFixed(4)
-    if (ledgerState.getInfoProp(state, 'unconfirmed') === result) {
-      return state
-    }
-
-    state = ledgerState.setInfoProp(state, 'unconfirmed', result)
-    if (clientOptions.verboseP) {
-      console.log('\ngetBalance refreshes ledger info: ' + ledgerState.getInfoProp(state, 'unconfirmed'))
-    }
-    return state
-  }
-
-  if (ledgerState.getInfoProp(state, 'unconfirmed') === '0.0000') {
-    return state
-  }
-
-  if (clientOptions.verboseP) console.log('\ngetBalance refreshes payment info')
   return getPaymentInfo(state)
 }
 
@@ -1781,7 +1806,8 @@ const onCallback = (state, result, delayTime) => {
   let entries = client && client.report()
 
   if (!result) {
-    return run(state, delayTime)
+    run(state, delayTime)
+    return state
   }
 
   const regularResults = result.toJS()
@@ -1798,7 +1824,7 @@ const onCallback = (state, result, delayTime) => {
   state = cacheRuleSet(state, regularResults.ruleset)
   if (result.has('rulesetV2')) {
     results = regularResults.rulesetV2 // TODO optimize if possible
-    result = result.delete('rulesetV2')
+    delete regularResults.rulesetV2
 
     entries = []
     results.forEach((entry) => {
@@ -1829,7 +1855,7 @@ const onCallback = (state, result, delayTime) => {
 
   if (result.has('publishersV2')) {
     results = regularResults.publishersV2 // TODO optimize if possible
-    result = result.delete('publishersV2')
+    delete regularResults.publishersV2
 
     entries = []
     results.forEach((entry) => {
@@ -1852,7 +1878,7 @@ const onCallback = (state, result, delayTime) => {
     })
   }
 
-  muonWriter(pathName(statePath), regularResults)
+  muonWriter(regularResults)
   run(state, delayTime)
 
   return state
@@ -1970,8 +1996,8 @@ const onInitRead = (state, parsedData) => {
 }
 
 const onTimeUntilReconcile = (state, stateResult) => {
-  state = getStateInfo(stateResult)
-  muonWriter(pathName(statePath), stateResult)
+  state = getStateInfo(state, stateResult.toJS()) // TODO optimize
+  muonWriter(stateResult)
 
   return state
 }
@@ -2056,7 +2082,7 @@ const run = (state, delayTime) => {
       const result = client.vote(winner)
       if (result) stateData = result
     })
-    if (stateData) muonWriter(pathName(statePath), stateData)
+    if (stateData) muonWriter(stateData)
   } catch (ex) {
     console.log('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
   }
@@ -2124,7 +2150,8 @@ const onNetworkConnected = (state) => {
   balanceTimeoutId = setTimeout(newBalance, 5 * miliseconds.second)
 }
 
-const muonWriter = (path, payload) => {
+const muonWriter = (payload) => {
+  const path = pathName(statePath)
   muon.file.writeImportant(path, JSON.stringify(payload, null, 2), (success) => {
     if (!success) return console.error('write error: ' + path)
 
@@ -2202,7 +2229,6 @@ module.exports = {
   verifiedP,
   boot,
   onBootStateFile,
-  balanceReceived,
   onWalletProperties,
   paymentPresent,
   addFoundClosed,

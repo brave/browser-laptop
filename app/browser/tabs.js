@@ -181,27 +181,29 @@ const updateAboutDetails = (tab, tabValue) => {
 
   // TODO save this into values into the sate so that we don't call this app action on every state change
   // this should be saved in app state when windows will be refactored #11151
+
   /*
   if (url === 'about:preferences#payments') {
     tab.on('destroyed', () => {
       appActions.ledgerPaymentsPresent(tabValue.get('tabId'), false)
     })
-    appActions.ledgerPaymentsPresent(tabValue.get('tabId'), false)
+    appActions.ledgerPaymentsPresent(tabValue.get('tabId'), true)
   } else {
     appActions.ledgerPaymentsPresent(tabValue.get('tabId'), false)
   }
   */
+
   if (location === 'about:preferences' || location === 'about:contributions' || location === aboutUrls.get('about:contributions')) {
     const ledgerData = ledgerInfo
       .merge(synopsis)
       .merge(preferencesData)
+      .set('addFunds', addFundsDialogState)
     tab.send(messages.LEDGER_UPDATED, ledgerData.toJS())
     tab.send(messages.SETTINGS_UPDATED, appSettings.toJS())
     tab.send(messages.SITE_SETTINGS_UPDATED, allSiteSettings.toJS())
     tab.send(messages.SYNC_UPDATED, sync.toJS())
     tab.send(messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults)
     tab.send(messages.EXTENSIONS_UPDATED, extensionsValue.toJS())
-    tab.send(messages.ADD_FUNDS_DIALOG_UPDATED, addFundsDialogState.toJS())
   } else if (location === 'about:bookmarks') {
     const bookmarksData = getBookmarksData(appState)
     if (bookmarksData.bookmarks) {

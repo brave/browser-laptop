@@ -7,7 +7,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const moment = require('moment')
 
 // util
-const {batToCurrencyString, formattedDateFromTimestamp, walletStatus} = require('../../../../common/lib/ledgerUtil')
+const {batToCurrencyString, formatCurrentBalance, formattedDateFromTimestamp, walletStatus} = require('../../../../common/lib/ledgerUtil')
 const {l10nErrorText} = require('../../../../common/lib/httpUtil')
 const {changeSetting} = require('../../../lib/settingsUtil')
 
@@ -56,7 +56,7 @@ class EnabledContent extends ImmutableComponent {
         [globalStyles.appIcons.question]: true,
         [css(styles.balance__iconLink)]: true
       })}
-        href='https://brave.com/'
+        href='https://brave.com/faq-payments/#brave-payments'
         target='_blank' rel='noopener'
       />
     </div>
@@ -86,14 +86,9 @@ class EnabledContent extends ImmutableComponent {
 
   fundsAmount () {
     const ledgerData = this.props.ledgerData
-    let value = 0
-
-    if (!(ledgerData.get('balance') === undefined || ledgerData.get('balance') === null)) {
-      value = ledgerData.get('balance')
-    }
 
     return <section className={css(styles.balance)}>
-      <FormTextbox data-test-id='fundsAmount' readOnly value={batToCurrencyString(value, ledgerData)} />
+      <FormTextbox data-test-id='fundsAmount' readOnly value={formatCurrentBalance(ledgerData)} />
       <a className={cx({
         [globalStyles.appIcons.question]: true,
         [css(styles.balance__iconLink)]: true
@@ -188,9 +183,13 @@ class EnabledContent extends ImmutableComponent {
             value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}>
             {
-              [5, 10, 15, 20].map((amount) =>
-                <option value={amount}>{amount} {ledgerData.get('currency') || 'USD'}</option>
-              )
+              [25, 50, 75, 100].map((amount) => {
+                let alternative = ''
+                if (ledgerData.has('currentRate')) {
+                  alternative = `(${batToCurrencyString(amount, ledgerData)})`
+                }
+                return <option value={amount}>{amount} BAT {alternative}</option>
+              })
             }
           </PanelDropdown>
         </div>

@@ -14,7 +14,8 @@ const iconExtensions = require('../../../extensions/brave/img/preferences/browse
 const iconPlugins = require('../../../extensions/brave/img/preferences/browser_prefs_plugins.svg')
 const iconSecurity = require('../../../extensions/brave/img/preferences/browser_prefs_security.svg')
 const iconShields = require('../../../extensions/brave/img/preferences/browser_prefs_shields.svg')
-const iconPayments = require('../../../extensions/brave/img/preferences/browser_prefs_payments.svg')
+const iconPaymentsOn = require('../../../extensions/brave/img/preferences/browser_prefs_payments_on.svg')
+const iconPaymentsOff = require('../../../extensions/brave/img/preferences/browser_prefs_payments_off.svg')
 // sync TBD
 const iconSync = require('../../../extensions/brave/img/preferences/browser_prefs_sync.svg')
 const iconAdvanced = require('../../../extensions/brave/img/preferences/browser_prefs_advanced.svg')
@@ -48,7 +49,9 @@ class PreferenceNavigation extends ImmutableComponent {
           onClick={this.props.changeTab.bind(null, preferenceTabs.SYNC)}
           selected={this.props.preferenceTab === preferenceTabs.SYNC}
         />
-        <PreferenceNavigationButton icon={styles.payments}
+        <PreferenceNavigationButton
+          iconOn={styles.paymentsOn}
+          iconOff={styles.paymentsOff}
           dataL10nId='payments'
           onClick={this.props.changeTab.bind(null, preferenceTabs.PAYMENTS)}
           selected={this.props.preferenceTab === preferenceTabs.PAYMENTS}
@@ -106,7 +109,8 @@ const styles = StyleSheet.create({
   plugins: navIcon(iconPlugins),
   security: navIcon(iconSecurity),
   shields: navIcon(iconShields),
-  payments: navIcon(iconPayments),
+  paymentsOn: {background: `url(${iconPaymentsOn}) no-repeat 0 0`},
+  paymentsOff: navIcon(iconPaymentsOff),
   sync: navIcon(iconSync),
   extensions: navIcon(iconExtensions),
   advanced: navIcon(iconAdvanced)

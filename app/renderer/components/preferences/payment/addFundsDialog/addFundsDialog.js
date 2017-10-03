@@ -2,14 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// Components
 const React = require('react')
+
+// Components
 const {BatWelcomeScreen, BatContribMatching} = require('./steps/addFundsBatScreen')
 const AddFundsWizardMain = require('./steps/addFundsWizardMain')
 const AddFundsWizardAddress = require('./steps/addFundsWizardAddress')
-
-// NEJC EXCLUDE ME
-const qrCode = require('../../../../../extensions/brave/img/ledger/fakeQRCode.png')
 
 class AddFundsDialog extends React.Component {
   get currentPage () {
@@ -21,26 +19,18 @@ class AddFundsDialog extends React.Component {
   }
 
   get currencyQRCode () {
-    return qrCode
+    const walletQR = this.props.walletQR
+
+    if (walletQR != null) {
+      return walletQR.get(this.currency)
+    }
   }
 
   get currencyAddress () {
-    const fakeETH = 'ETH FOR THE ETH GOD'
-    const fakeBTC = 'BTC FOR THE BTC GOD'
-    const fakeLTC = 'LTC FOR THE ADVENTUROUS'
-    const fakeBAT = 'BAT FOR THE BRAVE GOD'
+    const addresses = this.props.addresses
 
-    switch (this.currency) {
-      case 'eth':
-        return fakeETH
-      case 'btc':
-        return fakeBTC
-      case 'ltc':
-        return fakeLTC
-      case 'bat':
-        return fakeBAT
-      default:
-        return 'MONEY TALKS'
+    if (addresses != null) {
+      return addresses.get(this.currency)
     }
   }
 
