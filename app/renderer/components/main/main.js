@@ -73,6 +73,9 @@ const isDarwin = platformUtil.isDarwin()
 const isWindows = platformUtil.isWindows()
 const isLinux = platformUtil.isLinux()
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
+
 class Main extends React.Component {
   constructor (props) {
     super(props)
@@ -702,11 +705,10 @@ class Main extends React.Component {
         {
           this.props.isSinglePage
           ? null
-          : <div className={cx({
-            tabPages: true,
-            allowDragging: this.props.shouldAllowWindowDrag,
-            singlePage: this.props.isSinglePage
-          })}
+          : <div className={css(
+            styles.tabPagesWrap,
+            this.props.shouldAllowWindowDrag && styles.tabPagesWrap_allowDragging
+          )}
             onContextMenu={this.onTabContextMenu}>
             {
               this.props.showTabPages
@@ -746,5 +748,21 @@ class Main extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  tabPagesWrap: {
+    background: 'none',
+    display: 'flex',
+    justifyContent: 'center',
+    height: globalStyles.spacing.tabPagesHeight,
+    margin: `${globalStyles.spacing.navbarMenubarMargin} 0 ${globalStyles.spacing.navbarMenubarMargin} 0`,
+    position: 'relative',
+    zIndex: globalStyles.zindex.zindexTabs
+  },
+
+  tabPagesWrap_allowDragging: {
+    WebkitAppRegion: 'drag'
+  }
+})
 
 module.exports = ReduxComponent.connect(Main)

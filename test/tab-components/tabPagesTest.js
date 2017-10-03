@@ -51,11 +51,11 @@ describe('tab pages', function () {
       yield this.app.client
       .newTab({ url: 'about:blank', active: false })
       .waitForElementCount(tabPage, 2)
-      .waitForExist(tabPage1 + '.active')
+      .waitForExist(tabPage1 + '[data-test-active-tabPage="true"]')
       .waitForExist(tabPage2)
       .moveToObject(tabPage2, 5, 5)
       .click(tabPage2)
-      .waitForExist(tabPage2 + '.active')
+      .waitForExist(tabPage2 + '[data-test-active-tabPage="true"]')
       .moveToObject(tabPage1, 5, 5)
       // close first tab page
       .middleClick(tabPage1)
@@ -69,7 +69,7 @@ describe('tab pages', function () {
       yield this.app.client
         .click(newFrameButton)
         .waitForElementCount(tabPage, 2)
-        .waitForExist(tabPage2 + '.active')
+        .waitForExist(tabPage2 + '[data-test-active-tabPage="true"]')
         .middleClick(tabPage1)
         .waitForElementCount(tabPage, 0)
     })
@@ -128,14 +128,14 @@ describe('tab pages', function () {
 
       it('clicking tab page changes', function * () {
         yield this.app.client.click(tabPage1)
-          .waitForElementCount(tabPage1 + '.active', 1)
+          .waitForElementCount(tabPage1 + '[data-test-active-tabPage="true"]', 1)
       })
 
       it('clicking on webview resets tab page selection', function * () {
         yield this.app.client
-          .waitForElementCount(tabPage2 + '.active', 1)
+          .waitForElementCount(tabPage2 + '[data-test-active-tabPage="true"]', 1)
           .click(activeWebview)
-          .waitForElementCount(tabPage2 + '.active', 1)
+          .waitForElementCount(tabPage2 + '[data-test-active-tabPage="true"]', 1)
       })
     })
 
@@ -155,7 +155,7 @@ describe('tab pages', function () {
           .click(`option[value="${newValue}"]`)
           .waitForBrowserWindow()
           .waitForElementCount(tabPage, numberOfPages)
-          .waitForElementCount('.tabArea', numberOfTabs)
+          .waitForElementCount('[data-test-id="tab-area"]', numberOfTabs)
       })
     })
   })
@@ -220,9 +220,9 @@ describe('tab pages', function () {
 
     it('hovering over a tab page changes it', function * () {
       yield this.app.client
-        .waitForExist(tabPage2 + '.active')
+        .waitForExist(tabPage2 + '[data-test-active-tabPage="true"]')
         .moveToObject(tabPage1, 5, 5)
-        .waitForExist('.tabStripContainer.isPreview')
+        .waitForExist('[data-test-preview-tab="true"]')
         .waitForElementCount(tabsTabs, appConfig.defaultSettings[settings.TABS_PER_PAGE])
     })
   })

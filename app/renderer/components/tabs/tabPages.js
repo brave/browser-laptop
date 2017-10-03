@@ -11,6 +11,8 @@ const TabPage = require('./tabPage')
 // Utils
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+
 class TabPages extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
@@ -22,7 +24,7 @@ class TabPages extends React.Component {
   }
 
   render () {
-    return <div className='tabPageWrap'>
+    return <div className={css(styles.tabPages)}>
       {
         this.props.tabPageCount > 1 &&
         Array.from(new Array(this.props.tabPageCount)).map((x, i) =>
@@ -34,5 +36,11 @@ class TabPages extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  tabPages: {
+    display: 'flex'
+  }
+})
 
 module.exports = ReduxComponent.connect(TabPages)

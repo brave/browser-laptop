@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const {StyleSheet, css} = require('aphrodite/no-important')
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
@@ -19,9 +19,9 @@ const tabState = require('../../../../common/state/tabState')
 const windowActions = require('../../../../../js/actions/windowActions')
 
 // Styles
-const {widthIncreaseElementKeyframes} = require('../../styles/animations')
 const globalStyles = require('../../styles/global')
 const {theme} = require('../../styles/theme')
+const {widthIncreaseElementKeyframes} = require('../../styles/animations')
 
 class AudioTabIcon extends React.Component {
   constructor (props) {
@@ -105,7 +105,7 @@ class AudioTabIcon extends React.Component {
 
     return <TabIcon
       data-test-id={this.audioIcon}
-      className={css(styles.audioTab__icon)}
+      className={styles.icon_audio}
       symbol={this.audioIcon}
       onClick={this.toggleMute}
       ref={this.setRef}
@@ -114,22 +114,14 @@ class AudioTabIcon extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  audioTab__icon: {
-    width: globalStyles.spacing.iconSize,
+  icon_audio: {
     overflow: 'hidden',
     margin: '0 -2px 0 2px',
-    zIndex: globalStyles.zindex.zindexTabsAudioTopBorder,
-    color: theme.tab.content.icon.audio.color,
+    color: theme.tab.icon.audio.color,
     fontSize: '13px',
-    height: globalStyles.spacing.iconSize,
-    backgroundSize: globalStyles.spacing.iconSize,
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    display: 'flex',
-    alignSelf: 'center',
-    position: 'relative',
-    textAlign: 'center',
-    justifyContent: 'center'
+
+    // Override default properties
+    zIndex: globalStyles.zindex.zindexTabsAudioTopBorder
   }
 })
 
