@@ -11,6 +11,9 @@ const {GroupedFormTextbox} = require('../../../common/textbox')
 const ClipboardButton = require('../../../common/clipboardButton')
 const BrowserButton = require('../../../common/browserButton')
 
+// Actions
+const appActions = require('../../../../../../js/actions/appActions')
+
 // Styles
 const {StyleSheet, css} = require('aphrodite')
 const globalStyles = require('../../../styles/global')
@@ -129,16 +132,18 @@ class AddFundsDialog extends ImmutableComponent {
     )
   }
 
-  onCopy () {
-    // TODO
-    // if (!this.addFundsInputNode) {
-    //   return
-    // }
+  onCopy (e) {
+    if (!this.addressInputNode) {
+      return
+    }
+
+    appActions.clipboardTextCopied(this.addressInputNode.value)
   }
 
   get copyToClipboardButton () {
     return (
       <ClipboardButton
+        bottomTooltip
         className={globalStyles.appIcons.clipboard}
         copyAction={this.onCopy}
       />
@@ -152,6 +157,7 @@ class AddFundsDialog extends ImmutableComponent {
         <div className={css(styles.addFundsWizardAddress)}>
           <main className={css(styles.addFundsWizardAddress__address)}>
             <GroupedFormTextbox type='text'
+              inputRef={(node) => { this.addressInputNode = node }}
               value='NEJC VALUE GOES HERE'
               placeholder='NEJC ADD PLACEHOLDER HERE'
               groupedItem={this.copyToClipboardButton}
