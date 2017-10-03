@@ -6,8 +6,12 @@
 const React = require('react')
 const BrowserButton = require('../../../../common/browserButton')
 
+// Actions
+const appActions = require('../../../../../../../js/actions/appActions')
+
 // Styles
 const {StyleSheet, css} = require('aphrodite')
+const {addFundsDialogMinHeight} = require('../../../../styles/global').spacing
 const walletIcon = require('../../../../../../extensions/brave/img/ledger/walletIcon.png')
 const ethIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/ETH_icon.svg')
 const btcIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/BTC_icon.svg')
@@ -24,15 +28,19 @@ class AddFundsWizardMain extends React.Component {
   }
 
   onClickETH () {
+    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'eth')
   }
 
   onClickBTC () {
+    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'btc')
   }
 
   onClickLTC () {
+    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'ltc')
   }
 
   onClickBAT () {
+    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'bat')
   }
 
   render () {
@@ -87,7 +95,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-between',
     paddingLeft: '60px',
-    minHeight: '250px',
+    minHeight: addFundsDialogMinHeight,
 
     '::before': {
       position: 'absolute',

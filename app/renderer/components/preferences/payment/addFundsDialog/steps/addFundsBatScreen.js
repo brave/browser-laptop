@@ -8,6 +8,7 @@ const {AboutPageSectionTitle} = require('../../../../common/sectionTitle')
 
 // Styles
 const {StyleSheet, css} = require('aphrodite')
+const {addFundsDialogMinHeight} = require('../../../../styles/global').spacing
 const batIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
 
 class BatWelcomeScreen extends React.Component {
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-between',
     paddingLeft: '60px',
-    minHeight: '250px',
+    minHeight: addFundsDialogMinHeight,
 
     '::before': {
       position: 'absolute',

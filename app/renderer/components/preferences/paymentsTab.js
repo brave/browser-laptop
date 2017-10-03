@@ -76,7 +76,16 @@ class PaymentsTab extends ImmutableComponent {
   }
 
   get overlayContent () {
-    return <AddFundsDialog />
+    return <AddFundsDialog addFundsDialog={this.props.addFundsDialog} />
+  }
+
+  get overlayFooter () {
+    return (
+      <AddFundsDialogFooter
+        addFundsDialog={this.props.addFundsDialog}
+        onHide={this.props.hideOverlay.bind(this, 'addFunds')}
+      />
+    )
   }
 
   render () {
@@ -92,9 +101,7 @@ class PaymentsTab extends ImmutableComponent {
           subTitle={'balance'}
           subTitleArgs={'NEJC FEED ME'}
           content={this.overlayContent}
-          footer={
-            <AddFundsDialogFooter />
-          }
+          footer={this.overlayFooter}
           onHide={this.props.hideOverlay.bind(this, 'addFunds')}
         />
         : null

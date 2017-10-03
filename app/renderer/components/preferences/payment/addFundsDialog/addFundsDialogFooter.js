@@ -6,6 +6,9 @@
 const React = require('react')
 const BrowserButton = require('../../../common/browserButton')
 
+// Actions
+const appActions = require('../../../../../../js/actions/appActions')
+
 // Styles
 const {StyleSheet, css} = require('aphrodite')
 const upholdLogo = require('../../../../../extensions/brave/img/ledger/uphold-logo.png')
@@ -18,25 +21,67 @@ class AddFundsDialogFooter extends React.Component {
     this.onDone = this.onDone.bind(this)
   }
 
+  get currentPage () {
+    return this.props.addFundsDialog.get('currentPage')
+  }
+
   onBack () {
+    switch (this.currentPage) {
+      case 'batContribMatching':
+        appActions.onChangeAddFundsDialogStep('batWelcomeScreen')
+        break
+      case 'addFundsWizardMain':
+        appActions.onChangeAddFundsDialogStep('batContribMatching')
+        break
+      case 'addFundsWizardAddress':
+        appActions.onChangeAddFundsDialogStep('addFundsWizardMain')
+        break
+      default:
+        break
+    }
   }
 
   onNext () {
+    switch (this.currentPage) {
+      case 'batContribMatching':
+        appActions.onChangeAddFundsDialogStep('addFundsWizardMain')
+        break
+      case 'addFundsWizardMain':
+        appActions.onChangeAddFundsDialogStep('addFundsWizardAddress')
+        break
+      default:
+        appActions.onChangeAddFundsDialogStep('batContribMatching')
+        break
+    }
   }
 
   onDone () {
+    // close the dialog and set default page
+    // to add funds wizard to avoid
+    // user seeing welcome greetings all the time
+    this.props.onHide()
+    appActions.onChangeAddFundsDialogStep('addFundsWizardMain')
   }
 
   get showBackButton () {
-    return true
+    return (
+      this.currentPage != null &&
+      this.currentPage !== 'batWelcomeScreen'
+    )
   }
 
   get showNextButton () {
-    return true
+    return (
+      this.currentPage !== 'addFundsWizardMain' &&
+      this.currentPage !== 'addFundsWizardAddress'
+    )
   }
 
   get showDoneButton () {
-    return false
+    return (
+      this.currentPage === 'addFundsWizardMain' ||
+      this.currentPage === 'addFundsWizardAddress'
+    )
   }
 
   render () {

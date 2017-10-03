@@ -13,6 +13,7 @@ const appActions = require('../../../../../../../js/actions/appActions')
 // Styles
 const {StyleSheet, css} = require('aphrodite')
 const globalStyles = require('../../../../styles/global')
+const {addFundsDialogMinHeight} = require('../../../../styles/global').spacing
 const ethIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/ETH_icon.svg')
 const btcIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/BTC_icon.svg')
 const ltcIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/LTC_icon.svg')
@@ -22,6 +23,10 @@ class AddFundsWizardAddress extends React.Component {
   constructor (props) {
     super(props)
     this.onCopy = this.onCopy.bind(this)
+  }
+
+  get currency () {
+    return this.props.currency
   }
 
   onCopy () {
@@ -46,10 +51,10 @@ class AddFundsWizardAddress extends React.Component {
       <div
         className={css(
           styles.addFundsWizardAddress,
-          this.props.currency === 'eth' && styles.addFundsWizardAddress_eth,
-          this.props.currency === 'btc' && styles.addFundsWizardAddress_btc,
-          this.props.currency === 'ltc' && styles.addFundsWizardAddress_ltc,
-          this.props.currency === 'bat' && styles.addFundsWizardAddress_bat
+          this.currency === 'eth' && styles.addFundsWizardAddress_eth,
+          this.currency === 'btc' && styles.addFundsWizardAddress_btc,
+          this.currency === 'ltc' && styles.addFundsWizardAddress_ltc,
+          this.currency === 'bat' && styles.addFundsWizardAddress_bat
       )}>
         <header data-l10n-id='addFundsWizardAddressHeader' />
         <div className={css(styles.addFundsWizardAddress__main)}>
@@ -93,7 +98,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-between',
     paddingLeft: '60px',
-    minHeight: '250px',
+    minHeight: addFundsDialogMinHeight,
 
     '::before': {
       position: 'absolute',
@@ -189,7 +194,7 @@ const styles = StyleSheet.create({
   },
 
   addFundsWizardAddress__qrCode__image: {
-    maxWidth: '150px'
+    maxWidth: '100px'
   }
 })
 
