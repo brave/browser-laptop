@@ -173,6 +173,7 @@ const applyReducers = (state, action, immutableAction) => reducers.reduce(
     }, appState)
 
 const handleAppAction = (action) => {
+  const ledgerReducer = require('../../app/browser/reducers/ledgerReducer')
   const timeStart = process.hrtime()
   if (action.actionType === appConstants.APP_SET_STATE) {
     reducers = [
@@ -203,7 +204,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/bookmarkToolbarReducer'),
       require('../../app/browser/reducers/siteSettingsReducer'),
       require('../../app/browser/reducers/pageDataReducer'),
-      require('../../app/browser/reducers/ledgerReducer'),
+      ledgerReducer,
       require('../../app/browser/menu')
     ]
     initialized = true
@@ -215,9 +216,19 @@ const handleAppAction = (action) => {
     return
   }
 
-  // maintain backwards compatibility for now by adding an additional param for immutableAction
-  const immutableAction = makeImmutable(action)
-  appState = applyReducers(appState, action, immutableAction)
+  let immutableAction = Immutable.Map()
+  // exclude big chucks that have regular JS in it
+  if (
+    action.actionType === appConstants.APP_ON_FIRST_LEDGER_SYNC ||
+    action.actionType === appConstants.APP_ON_BRAVERY_PROPERTIES ||
+    action.actionType === appConstants.APP_ON_LEDGER_INIT_READ
+  ) {
+    appState = ledgerReducer(appState, action, immutableAction)
+  } else {
+    // maintain backwards compatibility for now by adding an additional param for immutableAction
+    immutableAction = makeImmutable(action)
+    appState = applyReducers(appState, action, immutableAction)
+  }
 
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:

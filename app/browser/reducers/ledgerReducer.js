@@ -18,8 +18,17 @@ const {makeImmutable} = require('../../common/state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
 
 const ledgerReducer = (state, action, immutableAction) => {
-  action = immutableAction || makeImmutable(action)
-  switch (action.get('actionType')) {
+  let actionType = action.actionType
+  if (
+    action.actionType !== appConstants.APP_ON_FIRST_LEDGER_SYNC &&
+    action.actionType !== appConstants.APP_ON_BRAVERY_PROPERTIES &&
+    action.actionType !== appConstants.APP_ON_LEDGER_INIT_READ
+  ) {
+    action = immutableAction || makeImmutable(action)
+    actionType = action.get('actionType')
+  }
+
+  switch (actionType) {
     case appConstants.APP_SET_STATE:
       {
         state = ledgerApi.migration(state)
@@ -264,12 +273,12 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_BRAVERY_PROPERTIES:
       {
-        state = ledgerApi.onBraveryProperties(state, action.get('error'), action.get('result'))
+        state = ledgerApi.onBraveryProperties(state, action.error, action.result)
         break
       }
     case appConstants.APP_ON_FIRST_LEDGER_SYNC:
       {
-        state = ledgerApi.onLedgerFirstSync(state, action.get('parsedData'))
+        state = ledgerApi.onLedgerFirstSync(state, action.parsedData)
         break
       }
     case appConstants.APP_ON_LEDGER_CALLBACK:
@@ -299,7 +308,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_LEDGER_INIT_READ:
       {
-        state = ledgerApi.onInitRead(state, action.get('parsedData'))
+        state = ledgerApi.onInitRead(state, action.parsedData)
         break
       }
   }

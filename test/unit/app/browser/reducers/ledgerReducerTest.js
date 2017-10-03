@@ -386,11 +386,11 @@ describe('ledgerReducer unit tests', function () {
     let onBraveryPropertiesSpy
     before(function () {
       onBraveryPropertiesSpy = sinon.spy(fakeLedgerApi, 'onBraveryProperties')
-      returnedState = ledgerReducer(appState, Immutable.fromJS({
+      returnedState = ledgerReducer(appState, {
         actionType: appConstants.APP_ON_BRAVERY_PROPERTIES,
         error: 'error-goes-here',
         result: 'result-goes-here'
-      }))
+      })
     })
     after(function () {
       onBraveryPropertiesSpy.restore()
@@ -407,10 +407,10 @@ describe('ledgerReducer unit tests', function () {
     let onLedgerFirstSyncSpy
     before(function () {
       onLedgerFirstSyncSpy = sinon.spy(fakeLedgerApi, 'onLedgerFirstSync')
-      returnedState = ledgerReducer(appState, Immutable.fromJS({
+      returnedState = ledgerReducer(appState, {
         actionType: appConstants.APP_ON_FIRST_LEDGER_SYNC,
         parsedData: 'parsed-data-goes-here'
-      }))
+      })
     })
     after(function () {
       onLedgerFirstSyncSpy.restore()

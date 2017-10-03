@@ -1867,7 +1867,6 @@ const initialize = (state, paymentsEnabled) => {
 }
 
 const onInitRead = (state, parsedData) => {
-  parsedData = parsedData.toJS()
   state = getStateInfo(state, parsedData)
 
   try {
