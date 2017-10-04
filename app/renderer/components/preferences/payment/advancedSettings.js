@@ -48,7 +48,7 @@ class AdvancedSettingsContent extends ImmutableComponent {
             <SettingDropdown
               data-test-id='visitSelector'
               defaultValue={minPublisherVisits || 1}
-              onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.MINIMUM_VISITS)}>
+              onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_MINIMUM_VISITS)}>
               <option data-l10n-id='minimumVisitsLow' value='1' />
               <option data-l10n-id='minimumVisitsMedium' value='5' />
               <option data-l10n-id='minimumVisitsHigh' value='10' />
