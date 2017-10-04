@@ -225,6 +225,10 @@ AppStore
       }
     }
   },
+  migrations: {
+    btcToBatTimestamp: integer, // when btcToBat code was first ran (where session is upgraded)
+    btcToBatNotifiedTimestamp: integer, // when user was shown wallet upgraded notification
+  },
   menu: {
     template: object // used on Windows and by our tests: template object with Menubar control
   },

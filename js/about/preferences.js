@@ -700,6 +700,13 @@ class AboutPreferences extends React.Component {
       secondRecoveryKey: ''
     }
 
+    // Similar to tabFromCurrentHash, this allows to set
+    // state via a query string inside the hash.
+    const params = this.hashParams
+    if (params && typeof this.state[params] === 'boolean') {
+      this.state[params] = true
+    }
+
     ipc.on(messages.SETTINGS_UPDATED, (e, settings) => {
       this.setState({ settings: Immutable.fromJS(settings || {}) })
     })
@@ -752,13 +759,42 @@ class AboutPreferences extends React.Component {
   }
 
   updateTabFromAnchor () {
-    this.setState({
+    const newState = {
       preferenceTab: this.tabFromCurrentHash
-    })
+    }
+    // first attempt at solving https://github.com/brave/browser-laptop/issues/8966
+    // only handles one param and sets it to true
+    const params = this.hashParams
+    if (params && typeof this.state[params] === 'boolean') {
+      newState[params] = true
+    }
+    this.setState(newState)
   }
 
+  /**
+   * Parses a query string like:
+   * about:preferences#payments?ledgerBackupOverlayVisible
+   * and returns the part:
+   * `payments`
+   */
   get hash () {
-    return window.location.hash ? window.location.hash.slice(1) : ''
+    const hash = window.location.hash ? window.location.hash.slice(1) : ''
+    return hash.split('?', 2)[0]
+  }
+
+  /**
+   * Parses a query string like:
+   * about:preferences#payments?ledgerBackupOverlayVisible
+   * and returns the part:
+   * `ledgerBackupOverlayVisible`
+   */
+  get hashParams () {
+    const hash = window.location.hash ? window.location.hash.slice(1) : ''
+    const splitHash = hash.split('?', 2)
+    if (splitHash.length === 2) {
+      return splitHash[1]
+    }
+    return undefined
   }
 
   get tabFromCurrentHash () {
