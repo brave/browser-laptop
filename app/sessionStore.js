@@ -979,6 +979,10 @@ module.exports.defaultAppState = () => {
         options: {},
         publishers: {}
       }
+    },
+    migrations: {
+      btcToBatTimestamp: new Date().getTime(),
+      btcToBatNotifiedTimestamp: new Date().getTime()
     }
   }
 }

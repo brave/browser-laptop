@@ -521,4 +521,16 @@ describe('ledgerReducer unit tests', function () {
       assert.notDeepEqual(returnedState, appState)
     })
   })
+
+  describe('APP_ON_BTC_TO_BAT_NOTIFIED', function () {
+    before(function () {
+      returnedState = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_BTC_TO_BAT_NOTIFIED
+      }))
+    })
+    it('sets the notification timestamp', function () {
+      assert.notDeepEqual(returnedState, appState)
+      assert(returnedState.getIn(['migrations', 'btcToBatNotifiedTimestamp']))
+    })
+  })
 })

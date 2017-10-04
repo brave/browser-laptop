@@ -1742,6 +1742,12 @@ const appActions = {
         windowId
       }
     })
+  },
+
+  onBitcoinToBatNotified: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_BTC_TO_BAT_NOTIFIED
+    })
   }
 }
 
