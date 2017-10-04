@@ -127,7 +127,7 @@ const styles = require('./something')
 #### How we name styles
 
 * BEM-like pattern
-* Always camelCased
+* Always camelCased, avoiding longCamelCasedStyleName
 * Never quoted
 
 #### Defining our blocks, elements, and modifiers
@@ -204,6 +204,73 @@ component_someModifer__componentBody__componentChild__componentInnerDiv_componen
 ```js
 component_modifer__body__child__inner_text
 ```
+
+#### Avoid longCamelCasedStyleName
+
+camelCased style names often suggest that the component can be divided into multiple elements. Avoiding camelCased long names lets you create components which share common styles. It will make it possible to maintain style consistency easily.
+
+**Bad**
+
+```js
+
+<footer className={css(styles.footer)}>
+  <button className={css(styles.footer__blueCommonButtonOnFooter)} />
+  <button className={css(styles.footer__redCommonButtonOnFooter)} />
+</footer>
+
+...
+
+styles = StyleSheet.create({
+  footer: {
+    display: 'flex'
+  },
+
+  footer__blueCommonButtonOnFooter: {
+    color: 'blue',
+    height: '25px', // dupe
+    width: '30px' // dupe
+  },
+
+  footer__redCommonButtonOnFooter: {
+    color: 'red',
+    height: '25px', // dupe
+    width: '30px' // dupe
+  },
+})
+```
+
+**Good**
+
+```js
+
+<footer className={css(styles.footer)}>
+  <button className={css(styles.footer__commonButton, styles.footer__commonButton_red)} />
+  <button className={css(styles.footer__commonButton, styles.footer__commonButton_blue)} />
+</footer>
+
+...
+
+styles = StyleSheet.create({
+  footer: {
+    display: 'flex'
+  },
+
+  footer__commonButton: {
+    height: '25px', // deduped
+    width: '30px' // deduped
+  },
+
+  footer__commonButton_red: {
+    color: 'red'
+  },
+
+  footer__commonButton_blue: {
+    color: 'blue'
+  },
+})
+```
+
+It is **always** good to reduce duplicates.
 
 ### Styles are the last thing
 
