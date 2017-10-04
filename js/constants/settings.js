@@ -112,13 +112,13 @@ const settings = {
   SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON: 'bookmarks.toolbar.showOnlyFavicon',
   // END - DEPRECATED WITH 0.12.6
 
-  // START - DEPRECATED WITH 0.21.0
+  // START - DEPRECATED WITH 0.19
   HIDE_EXCLUDED_SITES: 'advanced.hide-excluded-sites',
   HIDE_LOWER_SITES: 'advanced.hide-lower-sites',
   MINIMUM_VISIT_TIME: 'advanced.minimum-visit-time',
   MINIMUM_VISITS: 'advanced.minimum-visits',
   AUTO_SUGGEST_SITES: 'advanced.auto-suggest-sites'
-  // END - DEPRECATED WITH 0.21.0
+  // END - DEPRECATED WITH 0.19
 }
 
 module.exports = settings
