@@ -101,7 +101,8 @@ const styles = StyleSheet.create({
   ledgerBackupContent: {
     // Align the buttons and keys even when the width of the strings is not equal
     width: 'max-content',
-    margin: 'auto'
+    margin: 'auto',
+    maxWidth: '100%'
   },
 
   ledgerBackupContent__copyKey: {

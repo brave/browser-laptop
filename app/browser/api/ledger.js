@@ -1680,26 +1680,29 @@ const onWalletProperties = (state, body) => {
     state = ledgerState.setInfoProp(state, 'rates', rates)
   }
 
+  // Current currency
+  const info = ledgerState.getInfoProps(state)
+  const infoRates = info.get('rates')
+  const currency = info.getIn(['bravery', 'fee', 'currency'])
+  let rate = null
+
+  if (currency) {
+    rate = infoRates.get(currency)
+    state = ledgerState.setInfoProp(state, 'currentRate', rate)
+  }
+
   // Probi
   const probi = parseFloat(body.get('probi'))
   if (probi > 0) {
     state = ledgerState.setInfoProp(state, 'probi', probi)
 
-    const info = ledgerState.getInfoProps(state)
     const amount = info.get('balance')
-    const infoRates = info.get('rates')
-    const currency = info.getIn(['bravery', 'fee', 'currency'])
 
-    if (currency) {
-      const rate = infoRates.get(currency)
-      state = ledgerState.setInfoProp(state, 'currentRate', rate)
-
-      if (amount && rate) {
-        const bigProbi = new BigNumber(probi.toString()).dividedBy('1e18')
-        const bigRate = new BigNumber(rate.toString())
-        const converted = bigProbi.times(bigRate).toFormat(2)
-        state = ledgerState.setInfoProp(state, 'converted', converted)
-      }
+    if (currency && amount && rate) {
+      const bigProbi = new BigNumber(probi.toString()).dividedBy('1e18')
+      const bigRate = new BigNumber(rate.toString())
+      const converted = bigProbi.times(bigRate).toFormat(2)
+      state = ledgerState.setInfoProp(state, 'converted', converted)
     }
   }
 
