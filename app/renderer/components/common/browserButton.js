@@ -108,8 +108,14 @@ const styles = StyleSheet.create({
 
     // The buttons as such do not require margin.
     // They are expected to have margin only if they are grouped.
-    // Also see note on browserButton_groupedItem below.
-    margin: 0,
+    //
+    // Avoid using shorthand properties to override the values
+    // with browserButton_groupedItem below, without declaring !important.
+    // See: https://github.com/Khan/aphrodite#object-key-ordering
+    marginTop: 0,
+    marginRight: 0,
+    marginBottom: 0,
+    marginLeft: 0,
 
     // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L49
     color: globalStyles.button.color,
@@ -155,7 +161,7 @@ const styles = StyleSheet.create({
 
   browserButton_fitContent: {
     // See: 11021
-    // Ensure that the button label does not overflow
+    // Ensure that the button label does not overflow.
     width: `calc(${globalStyles.spacing.defaultFontSize} * 6)`, // issue #6384
     minWidth: 'fit-content'
   },
@@ -199,22 +205,23 @@ const styles = StyleSheet.create({
   },
 
   browserButton_groupedItem: {
-    // Legacy LESS inside ledger is too nested
-    // and this style won't have effect without using !important
-    //
-    // TODO: remove !important and check advancedSettings.js
-    // once preferences is fully refactored
-
-    // 7.5px = 1/12 inch
-    marginLeft: '7.5px !important',
-
     // Issue #9252
     // Because the grouped buttons are *by design* aligned to the right
-    // with flex/grid, margin-right of each one should be null.
-    // If you set margin-right to those buttons, it is expected to lead
-    // to the alignment inconsistency.
+    // with flex/grid, margin-right of each one should be set to zero.
+    // If you set margin-right to those buttons, it is expected to lead to style inconsistency.
+    //
     // Before making a change, please consult with Brad on your proposal.
-    marginRight: 0
+    marginRight: 0,
+
+    // 7.5px = 1/12 inch
+    marginLeft: '7.5px',
+
+    // Issue #11288
+    // Cancel the margin-left of the first element.
+    // The buttons have to have a parent. Beginning with Selectors Level 4, that is no longer required.
+    ':first-child': {
+      marginLeft: '0'
+    }
   },
 
   browserButton_notificationItem: {
@@ -228,14 +235,14 @@ const styles = StyleSheet.create({
     // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L152
     fontSize: '14px',
 
-    // Adding box-shadow:none to cancel the box-shadow specified on browserButton_default
+    // Adding box-shadow:none to cancel the box-shadow specified on browserButton_default.
     // On button.less, box-shadow is only speficied to .primaryButton and .whiteButton
     // cf:
     //  https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L114
     //  https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L137
     boxShadow: 'none',
 
-    // Cancel pushing down the button to make the button subtle
+    // Cancel pushing down the button to make the button subtle.
     ':active': {
       bottom: 0
     }
