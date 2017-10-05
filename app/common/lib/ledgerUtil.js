@@ -80,17 +80,19 @@ const formatCurrentBalance = (ledgerData) => {
   let currency = 'USD'
   let balance = 0
   let converted = 0
+  let hasRate = false
 
   if (ledgerData != null) {
     currency = ledgerData.get('currency') || 'USD'
     balance = Number(ledgerData.get('balance') || 0)
     converted = Number.parseFloat(ledgerData.get('converted')) || 0
+    hasRate = ledgerData.has('currentRate')
   }
 
   balance = balance.toFixed(2)
   converted = converted.toFixed(2)
 
-  return `${balance} BAT (${converted} ${currency})`
+  return `${balance} BAT${hasRate ? ` (${converted} ${currency})` : ''}`
 }
 
 const formattedTimeFromNow = (timestamp) => {

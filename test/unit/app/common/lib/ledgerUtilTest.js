@@ -117,6 +117,7 @@ describe('ledgerUtil test', function () {
             amount: 10
           }
         },
+        currentRate: '1',
         error: null,
         created: true,
         converted: 1.1234,
@@ -137,9 +138,9 @@ describe('ledgerUtil test', function () {
       })
     })
 
-    it('defaults to 0 as balance and "USD" as currency symbol', function () {
+    it('defaults to 0 as balance when currency is not present', function () {
       const result = ledgerUtil.formatCurrentBalance()
-      assert.equal(result, '0.00 BAT (0.00 USD)')
+      assert.equal(result, '0.00 BAT')
     })
     it('formats `balance` and `converted` values to two decimal places', function () {
       const result = ledgerUtil.formatCurrentBalance(ledgerData)
