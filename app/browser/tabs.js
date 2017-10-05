@@ -156,7 +156,8 @@ const updateAboutDetails = (tab, tabValue) => {
 
   // TODO(bridiver) - refactor these to use state helpers
   const ledgerInfo = ledgerState.getInfoProps(appState)
-  const synopsis = appState.getIn(['ledger', 'about'])
+  const synopsis = ledgerState.getAboutData(appState)
+  const wizardData = ledgerState.geWizardData(appState)
   const preferencesData = appState.getIn(['about', 'preferences'])
   const appSettings = appState.get('settings')
   let allSiteSettings = appState.get('siteSettings')
@@ -164,7 +165,6 @@ const updateAboutDetails = (tab, tabValue) => {
     allSiteSettings = allSiteSettings.mergeDeep(appState.get('temporarySiteSettings'))
   }
   const extensionsValue = appState.get('extensions')
-  const addFundsDialogState = appState.get('addFunds')
   const sync = appState.get('sync')
   const braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
   const history = aboutHistoryState.getHistory(appState)
@@ -197,7 +197,7 @@ const updateAboutDetails = (tab, tabValue) => {
     const ledgerData = ledgerInfo
       .merge(synopsis)
       .merge(preferencesData)
-      .set('addFunds', addFundsDialogState)
+      .set('wizardData', wizardData)
     tab.send(messages.LEDGER_UPDATED, ledgerData.toJS())
     tab.send(messages.SETTINGS_UPDATED, appSettings.toJS())
     tab.send(messages.SITE_SETTINGS_UPDATED, allSiteSettings.toJS())

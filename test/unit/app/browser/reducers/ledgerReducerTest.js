@@ -39,7 +39,7 @@ describe('ledgerReducer unit tests', function () {
       quit: dummyModifyState,
       pageDataChanged: dummyModifyState,
       addVisit: dummyModifyState,
-
+      deleteSynopsis: () => {},
       boot: () => {},
       onBootStateFile: dummyModifyState,
       onWalletProperties: dummyModifyState,

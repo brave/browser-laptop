@@ -182,7 +182,7 @@ module.exports = {
     'general.disable-title-mode': process.platform === 'linux' || process.platform === 'win32',
     // payments
     'payments.allow-non-verified-publishers': true,
-    'payments.contribution-amount': 5, // USD
+    'payments.contribution-amount': 25, // BAT
     'payments.enabled': false,
     'payments.minimum-visit-time': 8000,
     'payments.minimum-visits': 1,

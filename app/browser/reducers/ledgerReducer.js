@@ -62,6 +62,7 @@ const ledgerReducer = (state, action, immutableAction) => {
         const clearData = defaults ? defaults.merge(temp) : temp
         if (clearData.get('browserHistory') && !getSetting(settings.PAYMENTS_ENABLED)) {
           state = ledgerState.resetSynopsis(state)
+          ledgerApi.deleteSynopsis()
         }
         break
       }
@@ -130,7 +131,7 @@ const ledgerReducer = (state, action, immutableAction) => {
           case 'ledgerPaymentsShown':
             {
               if (action.get('value') === false) {
-                ledgerApi.deleteSynopsis(publisherKey)
+                ledgerApi.deleteSynopsisPublisher(publisherKey)
                 state = ledgerState.deletePublishers(state, publisherKey)
                 state = ledgerApi.updatePublisherInfo(state)
               }
@@ -264,11 +265,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_CHANGE_ADD_FUNDS_DIALOG_STEP:
       {
-        // CC Nejc move this to a helper method as needed
-        state = state.mergeIn(['addFunds'], {
-          currentPage: action.get('page'),
-          currency: action.get('currency')
-        })
+        state = ledgerState.saveWizardData(state, action.get('page'), action.get('currency'))
         break
       }
     case appConstants.APP_ON_WALLET_RECOVERY:

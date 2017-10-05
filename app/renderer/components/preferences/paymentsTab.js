@@ -81,7 +81,7 @@ class PaymentsTab extends ImmutableComponent {
     const ledgerData = this.props.ledgerData || Immutable.Map()
     const addresses = ledgerData.get('addresses') || Immutable.List()
     const walletQR = ledgerData.get('walletQR') || Immutable.List()
-    const wizardData = ledgerData.get('addFunds') || Immutable.Map()
+    const wizardData = ledgerData.get('wizardData') || Immutable.Map()
     const funds = formatCurrentBalance(ledgerData)
 
     return <AddFundsDialog
@@ -94,7 +94,7 @@ class PaymentsTab extends ImmutableComponent {
 
   get overlayFooter () {
     const ledgerData = this.props.ledgerData || Immutable.Map()
-    const wizardData = ledgerData.get('addFunds') || Immutable.Map()
+    const wizardData = ledgerData.get('wizardData') || Immutable.Map()
 
     return (
       <AddFundsDialogFooter

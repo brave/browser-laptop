@@ -1666,7 +1666,7 @@ const appActions = {
     })
   },
 
-  onChangeAddFundsDialogStep: function (page, currency = 'bat') {
+  onChangeAddFundsDialogStep: function (page, currency = 'BAT') {
     dispatch({
       actionType: appConstants.APP_ON_CHANGE_ADD_FUNDS_DIALOG_STEP,
       page,

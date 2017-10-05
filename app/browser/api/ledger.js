@@ -1201,8 +1201,7 @@ const recoverKeys = (state, useRecoveryKeyFile, firstKey, secondKey) => {
   if (
     typeof firstRecoveryKey !== 'string' ||
     !firstRecoveryKey.match(UUID_REGEX) ||
-    typeof secondRecoveryKey !== 'string' ||
-    !secondRecoveryKey.match(UUID_REGEX)
+    typeof secondRecoveryKey !== 'string'
   ) {
     // calling logError sets the error object
     state = logError(state, true, 'recoverKeys')
@@ -1224,7 +1223,7 @@ const onWalletRecovery = (state, error, result) => {
     // we reset ledgerInfo.error to what it was before (likely null)
     // if ledgerInfo.error is not null, the wallet info will not display in UI
     // logError sets ledgerInfo.error, so we must we clear it or UI will show an error
-    state = logError(state, error, 'recoveryWallet')
+    state = logError(state, error.toString(), 'recoveryWallet')
     state = ledgerState.setInfoProp(state, 'error', existingLedgerError)
     state = ledgerState.setRecoveryStatus(state, false)
   } else {
@@ -1683,11 +1682,10 @@ const onWalletProperties = (state, body) => {
   // Current currency
   const info = ledgerState.getInfoProps(state)
   const infoRates = info.get('rates')
-  const currency = info.getIn(['bravery', 'fee', 'currency'])
-  let rate = null
+  const currency = 'USD' // TODO for now it's fixed
+  let rate = infoRates.get(currency)
 
-  if (currency) {
-    rate = infoRates.get(currency)
+  if (rate) {
     state = ledgerState.setInfoProp(state, 'currentRate', rate)
   }
 
@@ -1698,7 +1696,7 @@ const onWalletProperties = (state, body) => {
 
     const amount = info.get('balance')
 
-    if (currency && amount && rate) {
+    if (amount && rate) {
       const bigProbi = new BigNumber(probi.toString()).dividedBy('1e18')
       const bigRate = new BigNumber(rate.toString())
       const converted = bigProbi.times(bigRate).toFormat(2)
@@ -2204,7 +2202,7 @@ const migration = (state) => {
 }
 
 // for synopsis variable handling only
-const deleteSynopsis = (publisherKey) => {
+const deleteSynopsisPublisher = (publisherKey) => {
   delete synopsis.publishers[publisherKey]
 }
 
@@ -2216,6 +2214,10 @@ const savePublisherOption = (publisherKey, prop, value) => {
   if (synopsis.publishers && synopsis.publishers[publisherKey]) {
     synopsis.publishers[publisherKey].options[prop] = value
   }
+}
+
+const deleteSynopsis = () => {
+  synopsis.publishers = {}
 }
 
 module.exports = {
@@ -2239,7 +2241,7 @@ module.exports = {
   onBraveryProperties,
   onLedgerFirstSync,
   onCallback,
-  deleteSynopsis,
+  deleteSynopsisPublisher,
   saveOptionSynopsis,
   savePublisherOption,
   onTimeUntilReconcile,
@@ -2247,5 +2249,6 @@ module.exports = {
   onNetworkConnected,
   migration,
   onInitRead,
-  notifications
+  notifications,
+  deleteSynopsis
 }
