@@ -82,9 +82,11 @@ class PaymentsTab extends ImmutableComponent {
     const addresses = ledgerData.get('addresses') || Immutable.List()
     const walletQR = ledgerData.get('walletQR') || Immutable.List()
     const wizardData = ledgerData.get('addFunds') || Immutable.Map()
+    const funds = formatCurrentBalance(ledgerData)
 
     return <AddFundsDialog
       addFundsDialog={wizardData}
+      funds={funds}
       addresses={addresses}
       walletQR={walletQR}
     />

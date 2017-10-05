@@ -30,11 +30,18 @@ class AddFundsWizardAddress extends React.Component {
     return this.props.currency
   }
 
-  onCopy () {
-    if (!this.addressInputNode) {
-      return
+  get currencyName () {
+    switch (this.currency) {
+      case 'ETH':
+        return 'Ethereum'
+      case 'BTC':
+        return 'Bitcoin'
+      case 'LTC':
+        return 'Litecoin'
+      // defaults to BAT
+      default:
+        return this.currency
     }
-    appActions.clipboardTextCopied(this.addressInputNode.value)
   }
 
   get copyToClipboardButton () {
@@ -47,6 +54,28 @@ class AddFundsWizardAddress extends React.Component {
     )
   }
 
+  // Input note for BAT is different to avoid repetition
+  get footerNote () {
+    return this.currency === 'BAT'
+      ? 'addFundsWizardAddressFooterBAT'
+      : 'addFundsWizardAddressFooter'
+  }
+
+  onCopy () {
+    if (!this.addressInputNode) {
+      return
+    }
+    appActions.clipboardTextCopied(this.addressInputNode.value)
+  }
+
+  componentDidMount () {
+    if (!this.addressInputNode) {
+      return
+    }
+    this.addressInputNode.focus()
+    this.addressInputNode.select()
+  }
+
   render () {
     return (
       <div
@@ -57,16 +86,34 @@ class AddFundsWizardAddress extends React.Component {
           this.currency === 'LTC' && styles.wizardAddress_ltc,
           this.currency === 'BAT' && styles.wizardAddress_bat
       )}>
-        <header data-l10n-id='addFundsWizardAddressHeader' />
+        <header data-l10n-id='addFundsWizardAddressHeader'
+          data-l10n-args={JSON.stringify({
+            currencyName: this.currencyName,
+            currency: this.currency
+          } || {})}
+        />
         <div className={css(styles.wizardAddress__main)}>
           <main className={css(styles.wizardAddress__inputBox)}>
-            <GroupedFormTextbox type='text'
-              inputRef={(node) => { this.addressInputNode = node }}
-              value={this.props.address}
-              placeholder=''
-              groupedItem={this.copyToClipboardButton}
-              groupedItemTitle='copyToClipboard'
-            />
+            <div>
+              <GroupedFormTextbox readOnly
+                type='text'
+                inputRef={(node) => { this.addressInputNode = node }}
+                value={this.props.address}
+                groupedItem={this.copyToClipboardButton}
+                groupedItemTitle='copyToClipboard'
+              />
+              <p data-l10n-id='addFundsWizardAddressInputNote'
+                data-l10n-args={JSON.stringify({
+                  currency: this.currency,
+                  funds: this.props.funds
+                } || {})}
+                className={css(styles.wizardAddress__text_note)}
+              />
+              <p data-l10n-id={this.footerNote}
+                data-l10n-args={JSON.stringify({currency: this.currency} || {})}
+                className={css(styles.wizardAddress__text_note)}
+              />
+            </div>
             <div className={css(styles.wizardAddress__fancyDivider)}>
               <span data-l10n-id='or'
                 className={css(styles.wizardAddress__fancyDivider__text)}
@@ -84,9 +131,6 @@ class AddFundsWizardAddress extends React.Component {
             />
           </aside>
         </div>
-        <footer data-l10n-id='addFundsWizardAddressNote'
-          className={css(styles.wizardAddress__text_small)}
-        />
       </div>
     )
   }
@@ -142,6 +186,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     margin: '15px 0'
+  },
+
+  wizardAddress__text_note: {
+    fontSize: 'small',
+    margin: '10px 0'
   },
 
   wizardAddress__text_small: {

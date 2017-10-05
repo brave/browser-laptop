@@ -27,20 +27,20 @@ class AddFundsWizardMain extends React.Component {
     this.onClickBAT = this.onClickBAT.bind(this)
   }
 
-  onClickETH () {
-    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'ETH')
-  }
-
   onClickBTC () {
     appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'BTC')
   }
 
-  onClickLTC () {
-    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'LTC')
+  onClickETH () {
+    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'ETH')
   }
 
   onClickBAT () {
     appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'BAT')
+  }
+
+  onClickLTC () {
+    appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'LTC')
   }
 
   render () {
@@ -56,28 +56,28 @@ class AddFundsWizardMain extends React.Component {
             )}
           />
           <BrowserButton groupedItem secondaryColor
-            onClick={this.onClickETH}
-            custom={[
-              styles.wizardMain__currencyIcon,
-              styles.wizardMain__currencyIcon_eth
-            ]} />
-          <BrowserButton groupedItem secondaryColor
             onClick={this.onClickBTC}
             custom={[
               styles.wizardMain__currencyIcon,
               styles.wizardMain__currencyIcon_btc
             ]} />
           <BrowserButton groupedItem secondaryColor
-            onClick={this.onClickLTC}
+            onClick={this.onClickETH}
             custom={[
               styles.wizardMain__currencyIcon,
-              styles.wizardMain__currencyIcon_ltc
+              styles.wizardMain__currencyIcon_eth
             ]} />
           <BrowserButton groupedItem secondaryColor
             onClick={this.onClickBAT}
             custom={[
               styles.wizardMain__currencyIcon,
               styles.wizardMain__currencyIcon_bat
+            ]} />
+          <BrowserButton groupedItem secondaryColor
+            onClick={this.onClickLTC}
+            custom={[
+              styles.wizardMain__currencyIcon,
+              styles.wizardMain__currencyIcon_ltc
             ]} />
         </div>
         <p>
@@ -166,16 +166,6 @@ const styles = StyleSheet.create({
     }
   },
 
-  wizardMain__currencyIcon_eth: {
-    '::before': {
-      backgroundImage: `url(${ethIcon})`
-    },
-
-    '::after': {
-      content: '"eth"'
-    }
-  },
-
   wizardMain__currencyIcon_btc: {
     '::before': {
       backgroundImage: `url(${btcIcon})`
@@ -186,13 +176,13 @@ const styles = StyleSheet.create({
     }
   },
 
-  wizardMain__currencyIcon_ltc: {
+  wizardMain__currencyIcon_eth: {
     '::before': {
-      backgroundImage: `url(${ltcIcon})`
+      backgroundImage: `url(${ethIcon})`
     },
 
     '::after': {
-      content: '"ltc"'
+      content: '"eth"'
     }
   },
 
@@ -203,6 +193,16 @@ const styles = StyleSheet.create({
 
     '::after': {
       content: '"bat"'
+    }
+  },
+
+  wizardMain__currencyIcon_ltc: {
+    '::before': {
+      backgroundImage: `url(${ltcIcon})`
+    },
+
+    '::after': {
+      content: '"ltc"'
     }
   }
 })

@@ -38,6 +38,7 @@ class GroupedFormTextbox extends ImmutableComponent {
         <input
           ref={this.props.inputRef}
           type={this.props.type}
+          readOnly={this.props.readOnly}
           placeholder={this.props.placeholder}
           defaultValue={this.props.value}
           className={css(
