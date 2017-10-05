@@ -153,10 +153,6 @@ class ContributionStatement extends React.Component {
     return this.state.synopsis
   }
 
-  get publisherSynopsisMap () {
-    return this.state.publisherSynopsisMap
-  }
-
   get timestamp () {
     if (!this.transaction) {
       return null
@@ -341,7 +337,7 @@ class ContributionStatement extends React.Component {
                 let verified = publisherSynopsis.verified
                 let site = row[0]
                 let fractionStr = (parseFloat(row[2]) * 100).toFixed(2)
-                let fiatStr = row[4]
+                let fiatStr = row[3]
 
                 return (
                   <tr className={css(styles.textAlignRight, styles.table__tr)}>
