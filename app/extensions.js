@@ -1,5 +1,4 @@
 const browserActions = require('./browser/extensions/browserActions')
-const windows = require('./browser/extensions/windows')
 const contextMenus = require('./browser/extensions/contextMenus')
 const extensionActions = require('./common/actions/extensionActions')
 const config = require('../js/constants/config')
@@ -337,7 +336,6 @@ module.exports.reloadExtension = (extensionId) => {
 
 module.exports.init = () => {
   browserActions.init()
-  windows.init()
   contextMenus.init()
 
   componentUpdater.on('component-checking-for-updates', () => {

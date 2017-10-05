@@ -16,6 +16,7 @@ const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const windowState = require('../common/state/windowState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
+const Immutable = require('immutable')
 
 // TODO(bridiver) - set window uuid
 let currentWindows = {}
@@ -108,6 +109,30 @@ const updatePinnedTabs = (win) => {
 
 const api = {
   init: (state, action) => {
+    process.on('chrome-windows-create-action', function(responseId, createData, evt) {
+
+      var data = Immutable.fromJS(createData) || {}
+
+//TODO: KCL]] we're duping the data here, but obviously that's
+//      not what we want in release
+
+      var win = appActions.newWindow(data, data)
+
+      var winData = win;
+      //newWindow: function (frameOpts, browserOpts, restoredState, cb) {
+console.log('KCL]] win: ' + win)
+
+      var response = {
+        id: -1,
+        focused: false,
+        incognito: false // TODO(bridiver)
+      }
+
+      if (!evt.sender.isDestroyed()) {
+        evt.sender.send('chrome-windows-create-response-' + responseId, winData)
+      }
+    })
+
     app.on('browser-window-created', function (event, win) {
       let windowId = -1
       const updateWindowMove = debounce(updateWindow, 100)
