@@ -120,14 +120,15 @@ class NotificationItem extends React.Component {
               : null
           }
           {
-            this.props.buttons.map((button, i) =>
-              <BrowserButton groupedItem secondaryColor notificationItem
-                iconClass={button.get('className')}
-                testId='notificationButton'
-                label={button.get('text')}
-                onClick={this.clickHandler.bind(this, i)}
-              />
-            )
+            this.props.buttons
+              ? this.props.buttons.map((button, i) =>
+                <BrowserButton groupedItem secondaryColor notificationItem
+                  iconClass={button.get('className')}
+                  testId='notificationButton'
+                  label={button.get('text')}
+                  onClick={this.clickHandler.bind(this, i)}
+                />)
+              : null
           }
         </span>
       </div>
