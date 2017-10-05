@@ -58,10 +58,6 @@ class HistoryRow extends ImmutableComponent {
     return formattedDateFromTimestamp(timestamp, 'YYYY-MM-DD')
   }
 
-  get satoshis () {
-    return this.transaction.getIn(['contribution', 'satoshis'])
-  }
-
   get currency () {
     return this.transaction.getIn(['contribution', 'fiat', 'currency'])
   }
@@ -86,7 +82,7 @@ class HistoryRow extends ImmutableComponent {
   render () {
     return <tr className={css(styles.flex, styles.rowData)}>
       <td className={css(styles.flexAlignCenter, styles.column, styles.leftRow, styles.column__narrow)} data-sort={this.timestamp}>{this.formattedDate}</td>
-      <td className={css(styles.flexAlignCenter, styles.column, styles.column__amount, styles.column__narrow)} data-sort={this.satoshis}>{this.totalAmountStr}</td>
+      <td className={css(styles.flexAlignCenter, styles.column, styles.column__amount, styles.column__narrow)} data-sort={this.totalAmountStr}>{this.totalAmountStr}</td>
       <td className={css(styles.flexAlignCenter, styles.column, styles.column__wide)}>
         <a href={`${aboutContributionsUrl}#${this.viewingId}`} target='_blank'>{this.receiptFileName}</a>
       </td>
