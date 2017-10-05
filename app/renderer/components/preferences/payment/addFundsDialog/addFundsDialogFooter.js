@@ -104,7 +104,8 @@ class AddFundsDialogFooter extends React.Component {
           />
           <div className={css(styles.footer__start__uphold_text)}>
             <span data-l10n-id='uphold' />
-            <a data-l10n-id='learnMore'
+            <a className={css(styles.footer__start__uphold_text__link)}
+              data-l10n-id='learnMore'
               href='https://uphold.com/signup'
               target='_blank'
               rel='noreferrer noopener'
@@ -169,6 +170,11 @@ const styles = StyleSheet.create({
     fontSize: 'small',
     fontStyle: 'italic',
     margin: '0 10px'
+  },
+
+  footer__start__uphold_text__link: {
+    // TODO: Refactor preferences.less to remove !important
+    textDecoration: 'underline !important'
   }
 })
 

@@ -14,7 +14,6 @@ const appActions = require('../../../../../../../js/actions/appActions')
 
 // Styles
 const globalStyles = require('../../../../styles/global')
-const {addFundsDialogMinHeight} = require('../../../../styles/global').spacing
 const ethIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/ETH_icon.svg')
 const btcIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/BTC_icon.svg')
 const ltcIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/LTC_icon.svg')
@@ -50,6 +49,7 @@ class AddFundsWizardAddress extends React.Component {
         bottomTooltip
         className={globalStyles.appIcons.clipboard}
         copyAction={this.onCopy}
+        custom={styles.doneLabel_bottom_addFunds}
       />
     )
   }
@@ -92,9 +92,9 @@ class AddFundsWizardAddress extends React.Component {
             currency: this.currency
           } || {})}
         />
-        <div className={css(styles.wizardAddress__main)}>
-          <main className={css(styles.wizardAddress__inputBox)}>
-            <div>
+        <section className={css(styles.wizardAddress__main)}>
+          <main className={css(styles.wizardAddress__main__address)}>
+            <div className={css(styles.wizardAddress__main__address__textbox)}>
               <GroupedFormTextbox readOnly
                 type='text'
                 inputRef={(node) => { this.addressInputNode = node }}
@@ -102,48 +102,61 @@ class AddFundsWizardAddress extends React.Component {
                 groupedItem={this.copyToClipboardButton}
                 groupedItemTitle='copyToClipboard'
               />
-              <p data-l10n-id='addFundsWizardAddressInputNote'
-                data-l10n-args={JSON.stringify({
-                  currency: this.currency,
-                  funds: this.props.funds
-                } || {})}
-                className={css(styles.wizardAddress__text_note)}
-              />
-              <p data-l10n-id={this.footerNote}
-                data-l10n-args={JSON.stringify({currency: this.currency} || {})}
-                className={css(styles.wizardAddress__text_note)}
-              />
             </div>
-            <div className={css(styles.wizardAddress__fancyDivider)}>
+            <div className={css(styles.wizardAddress__main__address__fancyDivider)}>
               <span data-l10n-id='or'
-                className={css(styles.wizardAddress__fancyDivider__text)}
+                className={css(styles.wizardAddress__main__address__fancyDivider__text)}
               />
             </div>
+            <aside className={css(styles.wizardAddress__main__address__qrCode)}>
+              <span data-l10n-id='qrCodeVersion'
+                className={css(
+                  styles.wizardAddress__text,
+                  styles.wizardAddress__main__address__qrCode__text
+                )} />
+              <img src={this.props.qrCode}
+                className={css(styles.wizardAddress__main__address__qrCode__image)}
+              />
+            </aside>
           </main>
-          <aside className={css(styles.wizardAddress__qrCode)}>
-            <span data-l10n-id='qrCodeVersion'
-              className={css(
-                styles.wizardAddress__qrCode__text,
-                styles.wizardAddress__text_small
-              )} />
-            <img src={this.props.qrCode}
-              className={css(styles.wizardAddress__qrCode__image)}
+          <div className={css(styles.wizardAddress__text)}>
+            <p data-l10n-id='addFundsWizardAddressInputNote'
+              data-l10n-args={JSON.stringify({
+                currency: this.currency,
+                funds: this.props.funds
+              } || {})}
+              className={css(styles.wizardAddress__text__note)}
             />
-          </aside>
-        </div>
+            <p data-l10n-id={this.footerNote}
+              data-l10n-args={JSON.stringify({currency: this.currency} || {})}
+              className={css(styles.wizardAddress__text__note)}
+            />
+          </div>
+        </section>
       </div>
     )
   }
 }
 
 const styles = StyleSheet.create({
+  doneLabel_bottom_addFunds: {
+    color: globalStyles.payments.addFunds.info.color,
+
+    // magic number
+    right: '25px',
+    top: '2rem',
+
+    // See: wizardAddress__text below
+    fontSize: 'small'
+  },
+
   wizardAddress: {
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
     paddingLeft: '60px',
-    minHeight: addFundsDialogMinHeight,
+    minHeight: globalStyles.payments.addFunds.dialog.minHeight,
 
     '::before': {
       position: 'absolute',
@@ -181,32 +194,37 @@ const styles = StyleSheet.create({
     }
   },
 
-  wizardAddress__main: {
-    display: 'flex',
-    flex: 1,
-    justifyContent: 'space-between',
-    margin: '15px 0'
-  },
-
-  wizardAddress__text_note: {
-    fontSize: 'small',
-    margin: '10px 0'
-  },
-
-  wizardAddress__text_small: {
+  wizardAddress__text: {
     fontSize: 'small'
   },
 
-  wizardAddress__inputBox: {
+  wizardAddress__text__note: {
+    marginTop: '10px',
+    color: globalStyles.payments.addFunds.info.color
+  },
+
+  wizardAddress__main: {
+    display: 'flex',
+    flex: 1,
+    flexFlow: 'column nowrap',
+    justifyContent: 'space-between',
+    margin: '15px 0 0'
+  },
+
+  wizardAddress__main__address: {
     display: 'flex',
     flex: 1,
     alignItems: 'center',
-    alignSelf: 'center',
-    justifyContent: 'space-between',
-    height: '120px'
+    justifyContent: 'space-evenly',
+    height: '120px',
+    width: '-webkit-fill-available'
   },
 
-  wizardAddress__fancyDivider: {
+  wizardAddress__main__address__textbox: {
+    width: '100%'
+  },
+
+  wizardAddress__main__address__fancyDivider: {
     display: 'flex',
     width: '40px',
     height: '100%',
@@ -219,28 +237,28 @@ const styles = StyleSheet.create({
     backgroundRepeat: 'repeat-y'
   },
 
-  wizardAddress__fancyDivider__text: {
+  wizardAddress__main__address__fancyDivider__text: {
     display: 'flex',
-    background: 'white',
+    background: '#fff',
     margin: 'auto',
     padding: '8px',
     color: '#000'
   },
 
-  wizardAddress__qrCode: {
+  wizardAddress__main__address__qrCode: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    padding: '15px 0'
+    alignItems: 'center'
   },
 
-  wizardAddress__qrCode__text: {
-    color: '#777',
-    margin: '5px 0'
+  wizardAddress__main__address__qrCode__text: {
+    color: '#777'
   },
 
-  wizardAddress__qrCode__image: {
-    maxWidth: '100px'
+  wizardAddress__main__address__qrCode__image: {
+    // magic number
+    // TODO: investigate from a viewpoint of l10n
+    maxWidth: '120px'
   }
 })
 
