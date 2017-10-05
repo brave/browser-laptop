@@ -7,20 +7,14 @@ const moment = require('moment')
 require('../../../braveUnit')
 
 const ledgerExportUtil = require('../../../../../app/common/lib/ledgerExportUtil')
-const base64Encode = require('../../../../../js/lib/base64').encode
 
-const CSV_HEADER_ROW_PREFIX_COLUMNS = ['Publisher', 'Votes', 'Fraction', 'BTC']
+const CSV_HEADER_ROW_PREFIX_COLUMNS = ['Publisher', 'Votes', 'Fraction']
 const CSV_HEADER_ROW_PREFIX = CSV_HEADER_ROW_PREFIX_COLUMNS.join(',')
 const DEFAULT_CSV_HEADER_ROW_COLUMNS = CSV_HEADER_ROW_PREFIX_COLUMNS.concat(['USD'])
 const DEFAULT_CSV_HEADER_ROW = DEFAULT_CSV_HEADER_ROW_COLUMNS.join(',')
 const CSV_COLUMN_COUNT = DEFAULT_CSV_HEADER_ROW.split(',').length
-const EMPTY_CSV = DEFAULT_CSV_HEADER_ROW
 // N.B. the expected datatype for the 'USD'/fiat column is a 'string' because it is of form '5.00 USD'
-const CSV_EXPECTED_COLUMN_DATATYPES = ['string', 'number', 'number', 'number', 'string']
-
-const CSV_CONTENT_TYPE = 'text/csv'
-const CSV_DATA_URI_PREFIX = 'data:' + CSV_CONTENT_TYPE + ';base64,'
-const EMPTY_CSV_DATA_URL = CSV_DATA_URI_PREFIX + base64Encode(EMPTY_CSV)
+const CSV_EXPECTED_COLUMN_DATATYPES = ['string', 'number', 'number', 'string']
 
 const EXPORT_FILENAME_CONST_PREFIX_PART = 'Brave_Payments_'
 const EXPORT_FILENAME_PREFIX_EXPECTED_FORM = `${EXPORT_FILENAME_CONST_PREFIX_PART}\${YYYY-MM-DD}`
@@ -46,131 +40,6 @@ describe('ledger export utilities test', function () {
       assert(NUM_PUBLISHERS > 0)
       assert.equal(typeof PUBLISHERS[0], 'string')
       assert.equal(typeof exampleTransaction.ballots[PUBLISHERS[0]], 'number')
-    })
-  })
-
-  describe('transactionsToCSVDataURL', function () {
-    it(`returns a properly formatted data URL string with expected content-type (${CSV_CONTENT_TYPE})`, function () {
-      let output = ledgerExportUtil.transactionsToCSVDataURL(exampleTransactions)
-
-      assert.equal(!!output, true)
-      assert.equal(typeof output, 'string')
-      assert(output.length > CSV_DATA_URI_PREFIX.length)
-      assert.equal(output.slice(0, 'data:'.length), 'data:')
-      assert.equal(output.slice('data:'.length, 'data:'.length + CSV_CONTENT_TYPE.length), CSV_CONTENT_TYPE)
-      assert.equal(output.slice('data:'.length + CSV_CONTENT_TYPE.length, 'data:'.length + CSV_CONTENT_TYPE.length + ';base64,'.length), ';base64,')
-    })
-
-    it('for empty input, returns a CSV data URL containing only a header row', function () {
-      let output
-
-      output = ledgerExportUtil.transactionsToCSVDataURL(undefined)
-      assert.equal(output, EMPTY_CSV_DATA_URL)
-
-      output = ledgerExportUtil.transactionsToCSVDataURL(null)
-      assert.equal(output, EMPTY_CSV_DATA_URL)
-
-      output = ledgerExportUtil.transactionsToCSVDataURL([])
-      assert.equal(output, EMPTY_CSV_DATA_URL)
-    })
-
-    it('given transactions, it returns a data URL containing the expected CSV', function () {
-      const ADD_TOTAL_ROW = true
-      const EXPECTED_CSV_TEXT = ledgerExportUtil.getTransactionCSVText(exampleTransactions, null, ADD_TOTAL_ROW)
-
-      let output = ledgerExportUtil.transactionsToCSVDataURL(exampleTransactions)
-
-      assert.equal(output, CSV_DATA_URI_PREFIX + base64Encode(EXPECTED_CSV_TEXT))
-    })
-  })
-
-  describe('getTransactionCSVText', function () {
-    it('for empty input, returns a CSV string containing only the expected header row', function () {
-      let output
-
-      output = ledgerExportUtil.getTransactionCSVText(undefined)
-      assert.equal(output, EMPTY_CSV)
-
-      output = ledgerExportUtil.getTransactionCSVText(null)
-      assert.equal(output, EMPTY_CSV)
-
-      output = ledgerExportUtil.getTransactionCSVText([])
-      assert.equal(output, EMPTY_CSV)
-    })
-
-    it('returns a CSV with the expected header row up to variable currency column', function () {
-      let output = ledgerExportUtil.getTransactionCSVText(exampleTransactions)
-      assert(!!output, 'expected CsV output to exist')
-
-      let rows = output.split('\n')
-
-      checkHeaderRowPrefixForRows(rows)
-    })
-
-    it('returns a CSV with the same number of columns in every row', function () {
-      let output = ledgerExportUtil.getTransactionCSVText(exampleTransactions)
-
-      let rows = output.split('\n')
-
-      checkColumnCountsForRows(rows)
-    })
-
-    it('returns a CSV with expected data types for each column in every row', function () {
-      let ADD_TOTAL_ROW = true
-      let output = ledgerExportUtil.getTransactionCSVText(exampleTransactions, null, ADD_TOTAL_ROW)
-
-      let rows = output.split('\n')
-
-      checkColumnDatatypesForRows(rows)
-    })
-
-    it('returns same CSV for an array containing one transaction and a single transaction object', function () {
-      let singleTxOutput = ledgerExportUtil.getTransactionCSVText(exampleTransaction)
-      let arrayWithSingleTxOutput = ledgerExportUtil.getTransactionCSVText(exampleTransactions)
-
-      assert.equal(singleTxOutput, arrayWithSingleTxOutput)
-    })
-
-    it('given a transaction, returns a CSV containing the right number of rows: 1 header row, 1 row per publisher, and if addTotalRow===true, 1 row with totals', function () {
-      const EXPECTED_CSV_ROW_COUNT_NO_TOTAL = 1 + NUM_PUBLISHERS
-      const EXPECTED_CSV_ROW_COUNT_WITH_TOTAL = 1 + NUM_PUBLISHERS + 1
-
-      // output with NO TOTAL ROW
-      var output = ledgerExportUtil.getTransactionCSVText(exampleTransaction)
-
-      var rows = output.split('\n')
-      assert.equal(rows.length, EXPECTED_CSV_ROW_COUNT_NO_TOTAL)
-
-      let ADD_TOTAL_ROW = true
-      output = ledgerExportUtil.getTransactionCSVText(exampleTransaction, null, ADD_TOTAL_ROW)
-      rows = output.split('\n')
-      assert.equal(rows.length, EXPECTED_CSV_ROW_COUNT_WITH_TOTAL)
-    })
-
-    it('returns CSV text matching the CSV rows returned by getTransactionCSVRows', function () {
-      let ADD_TOTAL_ROW = true
-      let output = ledgerExportUtil.getTransactionCSVText(exampleTransactions, null, ADD_TOTAL_ROW)
-
-      let rows = output.split('\n')
-
-      let expectedOutputRows = ledgerExportUtil.getTransactionCSVRows(exampleTransactions, null, ADD_TOTAL_ROW)
-      assert.deepEqual(rows, expectedOutputRows)
-    })
-
-    it('when argument addTotalRow===true, there should be a total row with correct totals for each numeric column', function () {
-      let ADD_TOTAL_ROW = true
-      let output = ledgerExportUtil.getTransactionCSVText(exampleTransaction, null, ADD_TOTAL_ROW)
-
-      let rows = output.split('\n')
-
-      checkTotalRow(rows)
-    })
-
-    it('returns the same output for a single transaction input as an array of 1 element and a plain transaction object', function () {
-      let singleTxRows = ledgerExportUtil.getTransactionCSVText(exampleTransaction)
-      let arrayWithSingleTxRows = ledgerExportUtil.getTransactionCSVText(exampleTransactions)
-
-      assert.deepEqual(singleTxRows, arrayWithSingleTxRows)
     })
   })
 
@@ -328,14 +197,6 @@ describe('ledger export utilities test', function () {
       })
 
       describe('each publisher->contribution entry', function () {
-        it('should have "satoshis" (type number, >= 0) defined', function () {
-          publishers.forEach(function (publisher) {
-            let publisherContributionEntry = publisherData[publisher].contribution
-            assert(typeof publisherContributionEntry.satoshis, 'number')
-            assert(publisherContributionEntry.satoshis >= 0)
-          })
-        })
-
         it('should have "fiat" (type number, >= 0) defined', function () {
           publishers.forEach(function (publisher) {
             let publisherContributionEntry = publisherData[publisher].contribution
@@ -402,7 +263,6 @@ describe('ledger export utilities test', function () {
   describe('getTotalContribution', function () {
     /**
       var totalContribution = {
-        satoshis: 0,
         fiat: { amount: 0, currency: null },
         fee: 0
       }
@@ -418,11 +278,6 @@ describe('ledger export utilities test', function () {
     })
 
     describe('total contribution object', function () {
-      it('has a key "satoshis" with value of type number (>= 0)', function () {
-        assert.equal(typeof contributionData.satoshis, 'number')
-        assert(contributionData.satoshis >= 0)
-      })
-
       it('has a key "fiat" associated with an object containing two subkeys, "amount" (number) and "currency" (string)', function () {
         assert.equal(typeof contributionData.fiat, 'object', 'should have a key "fiat" with an object associated')
         assert.equal(typeof contributionData.fiat.amount, 'number', 'should have a key "amount" with value of type "number"')
