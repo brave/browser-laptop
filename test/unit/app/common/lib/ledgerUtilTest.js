@@ -100,6 +100,73 @@ describe('ledgerUtil test', function () {
   describe('batToCurrencyString', function () {
   })
 
+  describe('formatCurrentBalance', function () {
+    let ledgerData
+
+    before(function () {
+      ledgerData = Immutable.fromJS({
+        paymentId: 'f5240e31-7df6-466d-9606-adc759298731',
+        countryCode: 'US',
+        unconfirmed: '0.0000',
+        hasBitcoinHandler: false,
+        bravery: {
+          setting: 'adFree',
+          days: 30,
+          fee: {
+            currency: 'USD',
+            amount: 10
+          }
+        },
+        error: null,
+        created: true,
+        converted: 1.1234,
+        buyURL: undefined,
+        paymentURL: 'bitcoin:btc-address-goes-here?amount=5&label=Brave%20Software',
+        passphrase: 'd588b7e3-352d-49ce-8d0f-a4cae1fa4c76',
+        buyMaximumUSD: 6,
+        reconcileFrequency: 30,
+        currency: 'USD',
+        btc: '0.00277334',
+        address: 'btc-address-goes-here',
+        reconcileStamp: 1405324210587,
+        transactions: [],
+        amount: 10,
+        creating: false,
+        balance: 5.00003,
+        paymentIMG: undefined
+      })
+    })
+
+    it('defaults to 0 as balance and "USD" as currency symbol', function () {
+      const result = ledgerUtil.formatCurrentBalance()
+      assert.equal(result, '0.00 BAT (0.00 USD)')
+    })
+    it('formats `balance` and `converted` values to two decimal places', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData)
+      assert.equal(result, '5.00 BAT (1.12 USD)')
+    })
+    it('will mark currency with different symbol (if present)', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('currency', 'Sealand dollars'))
+      assert.equal(result, '5.00 BAT (1.12 Sealand dollars)')
+    })
+    it('defaults `balance` to 0 if not found', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.delete('balance'))
+      assert.equal(result, '0.00 BAT (1.12 USD)')
+    })
+    it('defaults `converted` to 0 if not found', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.delete('converted'))
+      assert.equal(result, '5.00 BAT (0.00 USD)')
+    })
+    it('handles `balance` being a string', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('balance', '5'))
+      assert.equal(result, '5.00 BAT (1.12 USD)')
+    })
+    it('handles `converted` being a string', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('converted', '1.1234'))
+      assert.equal(result, '5.00 BAT (1.12 USD)')
+    })
+  })
+
   describe('formattedTimeFromNow', function () {
   })
 

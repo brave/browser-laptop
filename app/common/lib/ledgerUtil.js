@@ -83,7 +83,7 @@ const formatCurrentBalance = (ledgerData) => {
 
   if (ledgerData != null) {
     currency = ledgerData.get('currency') || 'USD'
-    balance = ledgerData.get('balance') || 0
+    balance = Number(ledgerData.get('balance') || 0)
     converted = Number.parseFloat(ledgerData.get('converted')) || 0
   }
 
