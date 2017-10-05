@@ -1750,7 +1750,7 @@ const setPaymentInfo = (amount) => {
   amount = parseInt(amount, 10)
   if (isNaN(amount) || (amount <= 0)) return
 
-  underscore.extend(bravery.fee, {amount: amount})
+  underscore.extend(bravery.fee, { amount: amount, currency: client.getWalletAddresses().BAT ? 'BAT' : 'USD' })
   client.setBraveryProperties(bravery, (err, result) => {
     if (err) {
       err = err.toString()
