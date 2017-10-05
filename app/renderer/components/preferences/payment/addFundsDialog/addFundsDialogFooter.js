@@ -28,10 +28,12 @@ class AddFundsDialogFooter extends React.Component {
   onBack () {
     switch (this.currentPage) {
       case 'batContribMatching':
-        appActions.onChangeAddFundsDialogStep('batWelcomeScreen')
-        break
       case 'addFundsWizardMain':
-        appActions.onChangeAddFundsDialogStep('batContribMatching')
+        // TODO: add the below comment under 'batContribMatching'
+        // when it is publicly available
+        // appActions.onChangeAddFundsDialogStep('batContribMatching')
+        // break
+        appActions.onChangeAddFundsDialogStep('batWelcomeScreen')
         break
       case 'addFundsWizardAddress':
         appActions.onChangeAddFundsDialogStep('addFundsWizardMain')
@@ -43,14 +45,20 @@ class AddFundsDialogFooter extends React.Component {
 
   onNext () {
     switch (this.currentPage) {
-      case 'batContribMatching':
+      // TODO: replace 'batWelcomeScreen' with 'batContribMatching'
+      // once latter is available
+      case 'batWelcomeScreen':
+      // case 'batContribMatching':
         appActions.onChangeAddFundsDialogStep('addFundsWizardMain')
         break
       case 'addFundsWizardMain':
         appActions.onChangeAddFundsDialogStep('addFundsWizardAddress')
         break
       default:
-        appActions.onChangeAddFundsDialogStep('batContribMatching')
+        // TODO: enable again once 'batContribMatching' is available
+        // and remove the current
+        // appActions.onChangeAddFundsDialogStep('batContribMatching')
+        appActions.onChangeAddFundsDialogStep('addFundsWizardMain')
         break
     }
   }
@@ -66,7 +74,10 @@ class AddFundsDialogFooter extends React.Component {
   get showBackButton () {
     return (
       this.currentPage != null &&
-      this.currentPage !== 'batWelcomeScreen'
+      this.currentPage !== 'batWelcomeScreen' &&
+      // Should users be allowed to go back once in the wizard?
+      // for now they can't
+      this.currentPage !== 'addFundsWizardMain'
     )
   }
 
