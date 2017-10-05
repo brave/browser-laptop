@@ -36,6 +36,7 @@ class ClipboardButton extends React.Component {
     return <span className={css(styles.clipboardButton)}>
       <span className={css(
         styles.doneLabel,
+        this.props.topTooltip && styles.doneLabelTop,
         this.props.bottomTooltip && styles.doneLabelBottom,
         this.state.visibleLabel && styles.visible
       )} onAnimationEnd={this.onAnimationEnd} data-l10n-id='copied' />
@@ -80,6 +81,14 @@ const styles = StyleSheet.create({
   doneLabelBottom: {
     position: 'absolute',
     top: '35px',
+    right: '30px',
+    width: '-webkit-fill-available',
+    opacity: 0,
+    display: 'none'
+  },
+  doneLabelTop: {
+    position: 'absolute',
+    bottom: '35px',
     right: '30px',
     width: '-webkit-fill-available',
     opacity: 0,

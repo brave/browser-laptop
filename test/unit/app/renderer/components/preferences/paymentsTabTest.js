@@ -15,7 +15,7 @@ const {advancedSettingsDialog} = require('../../../../../lib/selectors')
 let PaymentsTab, EnabledContent
 require('../../../../braveUnit')
 
-describe.skip('PaymentsTab component', function () {
+describe('PaymentsTab component', function () {
   before(function () {
     mockery.enable({
       warnOnReplace: false,
@@ -54,10 +54,16 @@ describe.skip('PaymentsTab component', function () {
     mockery.registerMock('../../../../extensions/brave/img/coinbase_logo.png')
     mockery.registerMock('../../../../extensions/brave/img/android_download.svg')
     mockery.registerMock('../../../../extensions/brave/img/ios_download.svg')
-    mockery.registerMock('../../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
-    mockery.registerMock('../../../../extensions/brave/img/ledger/cryptoIcons/BTC_icon.svg')
-    mockery.registerMock('../../../../extensions/brave/img/ledger/cryptoIcons/ETH_icon.svg')
-    mockery.registerMock('../../../../extensions/brave/img/ledger/cryptoIcons/LTC_icon.svg')
+    // Mocks the icon used in payments tab
+    mockery.registerMock('../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
+    // Mocks the icons used in addFundsDialog and its steps
+    mockery.registerMock('../../../../../../extensions/brave/img/ledger/wallet_icon.svg')
+    mockery.registerMock('../../../../../../extensions/brave/img/ledger/cryptoIcons/ETH_icon.svg')
+    mockery.registerMock('../../../../../../extensions/brave/img/ledger/cryptoIcons/BTC_icon.svg')
+    mockery.registerMock('../../../../../../extensions/brave/img/ledger/cryptoIcons/LTC_icon.svg')
+    mockery.registerMock('../../../../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
+    // Mock image from addFundsDialogFooter
+    mockery.registerMock('../../../../../extensions/brave/img/ledger/uphold-logo.png')
 
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('../../../../js/settings', fakeSettings)
@@ -195,7 +201,7 @@ describe.skip('PaymentsTab component', function () {
       assert.equal(wrapper.find('[data-test-id="fundsAmount"]').length, 1)
     })
 
-    it('renders full balance correctly', function () {
+    it.skip('renders full balance correctly', function () {
       fakeSettings.mockReturnValue = true
       const wrapper = mount(
         <PaymentsTab
@@ -207,7 +213,7 @@ describe.skip('PaymentsTab component', function () {
       assert.equal(batToCurrencyString(10, inst.props.ledgerData), '10.00 USD')
     })
 
-    it('renders partial balance correctly', function () {
+    it.skip('renders partial balance correctly', function () {
       fakeSettings.mockReturnValue = true
       const wrapper = mount(
         <EnabledContent

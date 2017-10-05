@@ -47,7 +47,7 @@ class AddFundsWizardAddress extends React.Component {
   get copyToClipboardButton () {
     return (
       <ClipboardButton
-        bottomTooltip
+        topTooltip
         className={globalStyles.appIcons.clipboard}
         copyAction={this.onCopy}
       />
