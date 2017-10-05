@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     width: 'auto'
   },
+
   outlineable: {
     ':focus': {
       outlineColor: globalStyles.color.statsBlue,
@@ -98,24 +99,19 @@ const styles = StyleSheet.create({
       outlineWidth: '1px'
     }
   },
+
   isSettings: {
     width: '280px'
   },
+
   readOnly: {
     background: globalStyles.color.lightGray,
     boxShadow: 'none',
     outline: 'none'
   },
+
   recoveryKeys: {
     marginBottom: '20px'
-  },
-
-  // TextArea
-  textArea: {
-    padding: '5px'
-  },
-  isDefault: {
-    fontSize: globalStyles.spacing.textAreaFontSize  // Issue #6851
   },
 
   groupedFormTextBox: {
@@ -142,15 +138,30 @@ const styles = StyleSheet.create({
   },
 
   groupedFormTextBox__lastGroupedItem: {
-    border: 'solid 1px rgba(0, 0, 0, 0.2)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderTopLeftRadius: 0,
     borderBottomLeftRadius: 0,
     borderTopRightRadius: '4px',
     borderBottomRightRadius: '4px',
-    width: '30px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
+    borderStyle: 'solid',
+    borderColor: 'rgba(0, 0, 0, 0.2)',
+
+    // Cancel the duping left border
+    borderWidth: '1px 1px 1px 0',
+
+    // magic number
+    width: '30px'
+  },
+
+  // TextArea
+  textArea: {
+    padding: '5px'
+  },
+
+  isDefault: {
+    fontSize: globalStyles.spacing.textAreaFontSize  // Issue #6851
   }
 })
 

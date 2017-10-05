@@ -11,7 +11,7 @@ const appActions = require('../../../../../../../js/actions/appActions')
 
 // Styles
 const {StyleSheet, css} = require('aphrodite')
-const {addFundsDialogMinHeight} = require('../../../../styles/global').spacing
+const globalStyles = require('../../../../styles/global')
 const walletIcon = require('../../../../../../extensions/brave/img/ledger/wallet_icon.svg')
 const ethIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/ETH_icon.svg')
 const btcIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/BTC_icon.svg')
@@ -80,12 +80,12 @@ class AddFundsWizardMain extends React.Component {
               styles.wizardMain__currencyIcon_ltc
             ]} />
         </div>
-        <p>
+        <p className={css(styles.wizardMain__text_small)}>
           <span data-l10n-id='addFundsWizardMainReminder'
-            className={css(styles.wizardMain__text_small)}
+            className={css(styles.wizardMain__text__note)}
           />&nbsp;
           <a data-l10n-id='theFAQ'
-            className={css(styles.wizardMain__text_small)}
+            className={css(styles.wizardMain__text__link)}
             href='https://brave.com/faq-payments/#brave-payments'
             target='_blank'
             rel='noreferrer noopener'
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-between',
     paddingLeft: '60px',
-    minHeight: addFundsDialogMinHeight,
+    minHeight: globalStyles.payments.addFunds.dialog.minHeight,
 
     '::before': {
       position: 'absolute',
@@ -128,6 +128,17 @@ const styles = StyleSheet.create({
 
   wizardMain__text_small: {
     fontSize: 'small'
+  },
+
+  wizardMain__text__note: {
+    color: globalStyles.payments.addFunds.info.color
+  },
+
+  wizardMain__text__link: {
+    color: globalStyles.payments.addFunds.info.color,
+
+    // TODO: refactor preferences.less to remove !important
+    textDecoration: 'underline !important'
   },
 
   // but this inside a pseudo-state

@@ -182,8 +182,7 @@ const globalStyles = {
     overlayButtonMargin: '8px',
     panelMargin: '15px',
     panelItemMargin: '12px',
-    panelPadding: '18px',
-    addFundsDialogMinHeight: '250px'
+    panelPadding: '18px'
   },
   shadow: {
     switchShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.35)',
@@ -334,10 +333,19 @@ const globalStyles = {
     }
   },
 
-  // TODO (Suguru): move them to payment.js after style refactoring is done
   payments: {
     fontSize: {
       regular: '14.5px'
+    },
+
+    addFunds: {
+      dialog: {
+        minHeight: '250px'
+      },
+
+      info: {
+        color: '#666'
+      }
     }
   }
 }
