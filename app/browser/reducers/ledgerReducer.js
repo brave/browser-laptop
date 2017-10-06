@@ -318,6 +318,11 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = state.setIn(['migrations', 'btcToBatNotifiedTimestamp'], new Date().getTime())
         break
       }
+    case appConstants.APP_ON_BTC_TO_BAT_TRANSITIONED:
+      {
+        state = state.setIn(['migrations', 'btcToBatTimestamp'], new Date().getTime())
+        break
+      }
     case appConstants.APP_ON_LEDGER_QR_GENERATED:
       {
         state = ledgerState.saveQRCode(state, action.get('currency'), action.get('image'))

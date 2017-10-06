@@ -152,24 +152,30 @@ const notifications = {
     notifications.timeout = setInterval((state) => {
       notifications.onInterval(state)
     }, notifications.pollingInterval, state)
-
-    // Show relevant browser notifications on launch
-    notifications.onLaunch(state)
   },
   onLaunch: (state) => {
-    if (!getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
-      return
-    }
-    // Show one-time BAT conversion message:
-    // - if payments are enabled
-    // - user has a positive balance
-    // - this is an existing profile (new profiles will have firstRunTimestamp matching btcToBatTimestamp)
-    // - notification has not already been shown yet
-    // (see https://github.com/brave/browser-laptop/issues/11021)
     if (hasFunds(state)) {
-      const isNewInstall = state.get('firstRunTimestamp') === state.getIn(['migrations', 'btcToBatTimestamp'])
-      const hasBeenNotified = state.getIn(['migrations', 'btcToBatTimestamp']) !== state.getIn(['migrations', 'btcToBatNotifiedTimestamp'])
-      if (!isNewInstall && !hasBeenNotified) {
+      // One time conversion of funds
+      const isNewInstall = state.get('firstRunTimestamp') === state.getIn(['migrations', 'batMercuryTimestamp'])
+      const hasUpgradedWallet = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btcToBatTimestamp'])
+      if (!isNewInstall && !hasUpgradedWallet) {
+        module.exports.transitionWalletToBat(state)
+      }
+
+      // Don't bother processing the rest, which are only notifications.
+      if (!getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
+        return
+      }
+
+      // Show one-time BAT conversion message:
+      // - if payments are enabled
+      // - user has a positive balance
+      // - this is an existing profile (new profiles will have firstRunTimestamp matching batMercuryTimestamp)
+      // - wallet has been transitioned
+      // - notification has not already been shown yet
+      // (see https://github.com/brave/browser-laptop/issues/11021)
+      const hasBeenNotified = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btcToBatNotifiedTimestamp'])
+      if (!isNewInstall && hasUpgradedWallet && !hasBeenNotified) {
         notifications.showBraveWalletUpdated()
       }
     }
@@ -1993,6 +1999,9 @@ const onInitRead = (state, parsedData) => {
   setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
   getBalance(state)
 
+  // Show relevant browser notifications on launch
+  notifications.onLaunch(state)
+
   return state
 }
 
@@ -2220,6 +2229,36 @@ const deleteSynopsis = () => {
   synopsis.publishers = {}
 }
 
+const transitionWalletToBat = (state) => {
+  let newClient
+
+  try {
+    clientprep()
+    newClient = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
+  } catch (ex) {
+    console.error('exception during ledger client creation: ', ex)
+    return
+  }
+
+  try {
+    // TODO: this line is breaking
+    // exception during ledger client transition:  TypeError: Cannot read property 'wallet' of undefined
+    client.transition(newClient.properties.wallet.paymentId, (err) => {
+      if (err) {
+        console.error('ledger client transition error: ', err)
+      } else {
+        // save previous client transactions
+        newClient.state.transactions = client.state.transactions
+        // persist client's state, overwriting the old state
+        client = newClient
+        appActions.onBitcoinToBatTransitioned()
+      }
+    })
+  } catch (ex) {
+    console.error('exception during ledger client transition: ', ex)
+  }
+}
+
 module.exports = {
   backupKeys,
   recoverKeys,
@@ -2250,5 +2289,6 @@ module.exports = {
   migration,
   onInitRead,
   notifications,
-  deleteSynopsis
+  deleteSynopsis,
+  transitionWalletToBat
 }
