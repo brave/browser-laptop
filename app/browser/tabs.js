@@ -430,11 +430,6 @@ const api = {
       updateTab(tabId, changeInfo)
     })
 
-    process.on('chrome-tabs-removed', (tabId, windowId) => {
-      appActions.tabClosed(tabId, windowId)
-      cleanupWebContents(tabId)
-    })
-
     app.on('web-contents-created', function (event, tab) {
       if (tab.isBackgroundPage() || !tab.isGuest()) {
         return
@@ -524,6 +519,14 @@ const api = {
       tab.on('did-get-response-details', (evt, status, newURL, originalURL, httpResponseCode, requestMethod, referrer, headers, resourceType) => {
         if (resourceType === 'mainFrame') {
           windowActions.gotResponseDetails(tabId, {status, newURL, originalURL, httpResponseCode, requestMethod, referrer, headers, resourceType})
+        }
+      })
+
+      tab.once('will-destroy', () => {
+        const tabValue = getTabValue(tabId)
+        if (tabValue) {
+          const windowId = tabValue.get('windowId')
+          appActions.tabClosed(tabId, windowId)
         }
       })
     })
@@ -985,6 +988,86 @@ const api = {
 
     return nextTabId
   },
+
+  closeTabPage: (state, windowId, tabPageIndex) => {
+    const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
+    const startTabIndex = tabPageIndex * tabsPerPage
+    const pinnedTabsCount = tabState.getPinnedTabsByWindowId(state, windowId).size
+    tabState.getTabsByWindowId(state, windowId)
+      .sort((tab1, tab2) => tab1.get('index') - tab2.get('index'))
+      .filter((tabValue) => !tabValue.get('pinned'))
+      .slice(startTabIndex + pinnedTabsCount, startTabIndex + tabsPerPage + pinnedTabsCount)
+      .forEach((tabValue) => {
+        const tab = getWebContents(tabValue.get('tabId'))
+        if (tab && !tab.isDestroyed()) {
+          tab.forceClose()
+        }
+      })
+    state = api.updateTabsStateForWindow(state, windowId)
+    return state
+  },
+
+  closeTabsToLeft: (state, tabId) => {
+    const tabValue = tabState.getByTabId(state, tabId)
+    if (!tabValue) {
+      return state
+    }
+    const index = tabValue.get('index')
+    const windowId = tabValue.get('windowId')
+    const pinnedTabsCount = tabState.getPinnedTabsByWindowId(state, windowId).size
+    tabState.getTabsByWindowId(state, windowId)
+      .sort((tab1, tab2) => tab1.get('index') - tab2.get('index'))
+      .filter((tabValue) => !tabValue.get('pinned'))
+      .slice(0, index - pinnedTabsCount)
+      .forEach((tabValue) => {
+        const tab = getWebContents(tabValue.get('tabId'))
+        if (tab && !tab.isDestroyed()) {
+          tab.forceClose()
+        }
+      })
+    state = api.updateTabsStateForWindow(state, windowId)
+    return state
+  },
+
+  closeTabsToRight: (state, tabId) => {
+    const tabValue = tabState.getByTabId(state, tabId)
+    if (!tabValue) {
+      return state
+    }
+    const index = tabValue.get('index')
+    const windowId = tabValue.get('windowId')
+    const pinnedTabsCount = tabState.getPinnedTabsByWindowId(state, windowId).size
+    tabState.getTabsByWindowId(state, windowId)
+      .sort((tab1, tab2) => tab1.get('index') - tab2.get('index'))
+      .filter((tabValue) => !tabValue.get('pinned'))
+      .slice(index + 1 - pinnedTabsCount)
+      .forEach((tabValue) => {
+        const tab = getWebContents(tabValue.get('tabId'))
+        if (tab && !tab.isDestroyed()) {
+          tab.forceClose()
+        }
+      })
+    state = api.updateTabsStateForWindow(state, windowId)
+    return state
+  },
+
+  closeOtherTabs: (state, tabId) => {
+    const tabValue = tabState.getByTabId(state, tabId)
+    if (!tabValue) {
+      return state
+    }
+    const windowId = tabValue.get('windowId')
+    tabState.getTabsByWindowId(state, windowId)
+      .forEach((tabValue) => {
+        const tab = getWebContents(tabValue.get('tabId'))
+        if (tab && !tab.isDestroyed() && tabValue.get('tabId') !== tabId && !tabValue.get('pinned')) {
+          tab.forceClose()
+        }
+      })
+    state = api.updateTabsStateForWindow(state, windowId)
+    return state
+  },
+
   debugTabs: (state) => {
     console.log(tabState.getTabs(state)
       .toJS()
@@ -1042,6 +1125,9 @@ const api = {
       }
     })
     return state
+  },
+  forgetTab: (tabId) => {
+    cleanupWebContents(tabId)
   }
 }
 

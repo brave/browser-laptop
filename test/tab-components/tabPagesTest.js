@@ -3,7 +3,6 @@
 const Brave = require('../lib/brave')
 const appConfig = require('../../js/constants/appConfig')
 const settings = require('../../js/constants/settings')
-const messages = require('../../js/constants/messages')
 const {
   urlInput,
   newFrameButton,
@@ -97,23 +96,25 @@ describe('tab pages', function () {
         .waitForElementCount(tabsTabs, numTabsPerPage)
     })
 
-    it('closing tabs with close-to-left option', function * () {
-      let tabId = 0
+    it('closing tab page option for non active tab page', function * () {
       yield this.app.client
         .click(newFrameButton)
         .waitForElementCount(tabPage, 2)
-        .waitUntil(function () {
-          return this.getAppState().then((state) => {
-            const length = state.value.tabs.length
-            tabId = state.value.tabs[length - 1].id
-            return true
-          })
-        })
-        .waitUntil(function () {
-          return this.ipcSend(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabId, false, true)
-        })
+        .closeTabPageByIndex(0, 1)
         .waitForElementCount(tabPage, 0)
-        .waitForElementCount(tabsTabs, 1)
+        .waitForElementCount('[data-test-id="tab"]', 1)
+        .waitForVisible('[data-test-active-tab]')
+    })
+
+    it('closing tab page option for active tab page', function * () {
+      const numTabsPerPage = appConfig.defaultSettings[settings.TABS_PER_PAGE]
+      yield this.app.client
+        .click(newFrameButton)
+        .waitForElementCount(tabPage, 2)
+        .closeTabPageByIndex(1, 1)
+        .waitForElementCount(tabPage, 0)
+        .waitForElementCount('[data-test-id="tab"]', numTabsPerPage)
+        .waitForVisible('[data-test-active-tab]')
     })
 
     describe('allows changing to tab pages', function () {
