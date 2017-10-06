@@ -8,6 +8,7 @@ const Immutable = require('immutable')
 const appActions = require('../../../js/actions/appActions')
 const debounce = require('../../../js/lib/debounce')
 const historyState = require('../../common/state/historyState')
+const aboutNewTabState = require('../../common/state/aboutNewTabState')
 const bookmarkLocationCache = require('../../common/cache/bookmarkLocationCache')
 const newTabData = require('../../../js/data/newTabData')
 const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
@@ -18,20 +19,12 @@ let minCountOfTopSites
 let minAccessOfTopSites
 const staticData = Immutable.fromJS(newTabData.topSites)
 
-const pinnedTopSites = (state) => {
-  return state.getIn(['about', 'newtab', 'pinnedTopSites'], Immutable.List())
-}
-
-const ignoredTopSites = (state) => {
-  return state.getIn(['about', 'newtab', 'ignoredTopSites'], Immutable.List())
-}
-
 const isPinned = (state, siteKey) => {
-  return pinnedTopSites(state).find(site => site.get('key') === siteKey)
+  return aboutNewTabState.getPinnedTopSites(state).find(site => site.get('key') === siteKey)
 }
 
 const isIgnored = (state, siteKey) => {
-  return ignoredTopSites(state).includes(siteKey)
+  return aboutNewTabState.getIgnoredTopSites(state).includes(siteKey)
 }
 
 const sortCountDescending = (left, right) => {

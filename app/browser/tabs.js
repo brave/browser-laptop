@@ -22,6 +22,7 @@ const siteSettings = require('../../js/state/siteSettings')
 const messages = require('../../js/constants/messages')
 const debounce = require('../../js/lib/debounce')
 const aboutHistoryState = require('../common/state/aboutHistoryState')
+const aboutNewTabState = require('../common/state/aboutNewTabState')
 const appStore = require('../../js/stores/appStore')
 const appConfig = require('../../js/constants/appConfig')
 const {newTabMode} = require('../common/constants/settingsEnums')
@@ -287,7 +288,7 @@ const updateAboutDetails = (tabId) => {
   } else if (location === 'about:flash') {
     sendAboutDetails(tabId, messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults.toJS())
   } else if (location === 'about:newtab') {
-    const newTabDetail = appState.getIn(['about', 'newtab'], Immutable.Map())
+    const newTabDetail = aboutNewTabState.getData(appState)
     const showEmptyPage = getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB
     const showImages = getSetting(settings.SHOW_DASHBOARD_IMAGES) && !showEmptyPage
     const trackedBlockersCount = appState.getIn(['trackingProtection', 'count'], 0)

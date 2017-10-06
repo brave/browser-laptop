@@ -305,6 +305,10 @@ class SearchTab extends ImmutableComponent {
         onClick={this.hoverCallback.bind(this)}
         tableClassNames={css(styles.sortableTable_searchTab)}
       />
+      <SettingsList>
+        <DefaultSectionTitle data-l10n-id='privateTabsSearchSettingsTitle' />
+        <SettingCheckbox dataL10nId='useDuckDuckGoForPrivateSearch' prefKey={settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      </SettingsList>
       <DefaultSectionTitle data-l10n-id='locationBarSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='showOpenedTabMatches' prefKey={settings.OPENED_TAB_SUGGESTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />

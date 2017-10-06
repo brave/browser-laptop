@@ -25,8 +25,7 @@ const globalStyles = {
     breakpointNarrowViewport: '600px',
     breakpointExtensionButtonPadding: '720px',
     breakpointSmallWin32: '650px',
-    breakpointTinyWin32: '500px',
-    breakpointNewPrivateTab: '890px' // page's breakpoint for the private tab page
+    breakpointTinyWin32: '500px'
   },
   intersection: {
     // whereas 1 === 100%

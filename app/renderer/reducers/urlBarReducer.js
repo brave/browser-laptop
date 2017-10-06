@@ -15,24 +15,49 @@ const navigationBarState = require('../../common/state/navigationBarState')
 const tabState = require('../../common/state/tabState')
 const {normalizeLocation} = require('../../common/lib/suggestion')
 const tabActions = require('../../common/actions/tabActions')
+const { getSetting } = require('../../../js/settings')
+const settings = require('../../../js/constants/settings')
 
 const updateSearchEngineInfoFromInput = (state, frameProps) => {
   const input = frameProps.getIn(['navbar', 'urlbar', 'location'])
   const frameSearchDetail = frameProps.getIn(['navbar', 'urlbar', 'searchDetail'])
   const searchDetailPath = frameStatePath(state, frameProps.get('key')).concat(['navbar', 'urlbar', 'searchDetail'])
-  if (!input || !input.length || isURL(input) || !input.startsWith(':')) {
+  if (!input || !input.length || isURL(input)) {
+    // handle not a search
     state = state.deleteIn(searchDetailPath)
   } else if (!frameSearchDetail || !input.startsWith(frameSearchDetail.get('shortcut') + ' ')) {
+    // handle no existing search engine chosen, or there is and user is asking for a different one
     let entries = searchProviders.providers
-    for (let i = 0; i < entries.length; i++) {
-      const entry = entries[i]
-      if (input.startsWith(entry.shortcut + ' ')) {
-        state = state.setIn(
-          searchDetailPath,
-          Immutable.fromJS(Object.assign({}, entry, { activateSearchEngine: true })))
-        return state
+    // handle user-requested search engine by shortcut
+    if (input.startsWith(':')) {
+      for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i]
+        if (input.startsWith(entry.shortcut + ' ')) {
+          state = state.setIn(
+            searchDetailPath,
+            Immutable.fromJS(Object.assign({}, entry, { activateSearchEngine: true })))
+          return state
+        }
       }
     }
+    if (frameProps.get('isPrivate')) {
+      // handle private tab search with default search provider
+      const useAlternateDefaultPrivateSearchProvider = getSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE)
+      if (useAlternateDefaultPrivateSearchProvider === true) {
+        // DuckDuckGo hard-coded as Private Tab default provider
+        // if asked to use a privacy-centric 'alternative'
+        const privateProviderName = 'DuckDuckGo'
+        const privateTabSearchProvider = searchProviders.providers.find(provider => provider.name === privateProviderName)
+        if (privateTabSearchProvider) {
+          state = state.setIn(
+            searchDetailPath,
+            Immutable.fromJS(Object.assign({}, privateTabSearchProvider, { activateSearchEngine: true }))
+          )
+          return state
+        }
+      }
+    }
+    // handle no custom search provider (use default)
     state = state.deleteIn(searchDetailPath)
   }
   return state

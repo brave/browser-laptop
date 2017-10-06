@@ -7,6 +7,7 @@ const fakeElectron = require('../../../lib/fakeElectron')
 
 const windowConstants = require('../../../../../js/constants/windowConstants')
 const appConstants = require('../../../../../js/constants/appConstants')
+const settings = require('../../../../../js/constants/settings')
 const tabActions = require('../../../../../app/common/actions/tabActions')
 
 require('../../../braveUnit')
@@ -109,6 +110,7 @@ describe('urlBarReducer', function () {
     })
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('../../../js/stores/appStoreRenderer', fakeAppStoreRenderer)
+    mockery.registerMock('./stores/appStoreRenderer', fakeAppStoreRenderer)
     urlBarReducer = require('../../../../../app/renderer/reducers/urlBarReducer')
   })
   after(function () {
@@ -252,6 +254,38 @@ describe('urlBarReducer', function () {
 
     describe('APP_URL_BAR_TEXT_CHANGED', function () {
       // TODO
+      const action = {
+        actionType: appConstants.APP_URL_BAR_TEXT_CHANGED,
+        input: 'I am Commander Data and my cat is named Spot'
+      }
+      const stateWithPrivateTab = windowState.setIn(['frames', 1, 'isPrivate'], true)
+      it('does not set a custom search provider for default session tabs', () => {
+        const newState = urlBarReducer(windowState, action)
+        const hasCustomSearchProvider = newState.hasIn(['frames', 1, 'navbar', 'urlbar', 'searchDetail'])
+        assert.equal(hasCustomSearchProvider, false)
+      })
+      it('searches using default search provider in Private Tabs', () => {
+        const newState = urlBarReducer(stateWithPrivateTab, action)
+        const hasCustomSearchProvider = newState.hasIn(['frames', 1, 'navbar', 'urlbar', 'searchDetail'])
+        assert.equal(hasCustomSearchProvider, false)
+      })
+
+      it('searches using Private Search provider in Private Tabs, with relevant setting value', () => {
+        // due to the urlbarreducer only dealing with window state but reading from appState settings,
+        // we must mutate appState and then change it back after
+        const oldAppState = fakeAppStoreRenderer.state
+        fakeAppStoreRenderer.state = oldAppState.set('settings', Immutable.fromJS({
+          [settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE]: true
+        }))
+        after(() => {
+          fakeAppStoreRenderer.state = oldAppState
+        })
+        const newState = urlBarReducer(stateWithPrivateTab, action)
+        const actualSearchInfo = newState.getIn(['frames', 1, 'navbar', 'urlbar', 'searchDetail'])
+        assert.ok(actualSearchInfo, 'custom search provider was set')
+        assert.equal(actualSearchInfo.get('name'), 'DuckDuckGo', 'uses duck duck go as default private search')
+        assert.equal(actualSearchInfo.get('activateSearchEngine'), true)
+      })
     })
 
     describe('WINDOW_URL_BAR_AUTOCOMPLETE_ENABLED', function () {
