@@ -77,8 +77,10 @@ class AddFundsWizardAddress extends React.Component {
   }
 
   render () {
+    const testId = ['addFundsWizardAddress', this.currency].join('')
     return (
       <div
+        data-test-id={testId}
         className={css(
           styles.wizardAddress,
           this.currency === 'ETH' && styles.wizardAddress_eth,

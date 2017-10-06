@@ -122,7 +122,7 @@ class ModalOverlay extends ImmutableComponent {
   }
 
   render () {
-    return <div className={cx({
+    return <div data-test-id='modalOverlay' className={cx({
       [css(styles.dialog__wrapper_modal)]: true,
       [css(styles.dialog__wrapper_last)]: this.state.last,
       [css(styles.dialog__wrapper_transparentBackground)]: this.props.transparentBackground

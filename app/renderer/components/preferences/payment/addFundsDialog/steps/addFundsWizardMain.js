@@ -57,24 +57,28 @@ class AddFundsWizardMain extends React.Component {
           />
           <BrowserButton groupedItem secondaryColor
             onClick={this.onClickBTC}
+            testId='btcButton'
             custom={[
               styles.wizardMain__currencyIcon,
               styles.wizardMain__currencyIcon_btc
             ]} />
           <BrowserButton groupedItem secondaryColor
             onClick={this.onClickETH}
+            testId='ethButton'
             custom={[
               styles.wizardMain__currencyIcon,
               styles.wizardMain__currencyIcon_eth
             ]} />
           <BrowserButton groupedItem secondaryColor
             onClick={this.onClickBAT}
+            testId='batButton'
             custom={[
               styles.wizardMain__currencyIcon,
               styles.wizardMain__currencyIcon_bat
             ]} />
           <BrowserButton groupedItem secondaryColor
             onClick={this.onClickLTC}
+            testId='ltcButton'
             custom={[
               styles.wizardMain__currencyIcon,
               styles.wizardMain__currencyIcon_ltc

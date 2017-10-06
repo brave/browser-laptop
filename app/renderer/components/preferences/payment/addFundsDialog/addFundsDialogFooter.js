@@ -97,7 +97,7 @@ class AddFundsDialogFooter extends React.Component {
 
   render () {
     return (
-      <section className={css(styles.footer)} data-test-id='AddFundsDialogFooter'>
+      <section className={css(styles.footer)} data-test-id='addFundsDialogFooter'>
         <div className={css(styles.footer__start)}>
           <img src={upholdLogo}
             className={css(styles.footer__start__uphold_logo)}
@@ -115,6 +115,7 @@ class AddFundsDialogFooter extends React.Component {
           {
             this.showBackButton
               ? <BrowserButton l10nId='backWithArrow'
+                testId='previousButton'
                 groupedItem
                 secondaryColor
                 onClick={this.onBack}
@@ -124,6 +125,7 @@ class AddFundsDialogFooter extends React.Component {
           {
             this.showNextButton
             ? <BrowserButton l10nId='nextWithArrow'
+              testId='nextButton'
               groupedItem
               secondaryColor
               onClick={this.onNext}
@@ -133,6 +135,7 @@ class AddFundsDialogFooter extends React.Component {
           {
             this.showDoneButton
             ? <BrowserButton l10nId='done'
+              testId='doneButton'
               groupedItem
               secondaryColor
               onClick={this.onDone}
