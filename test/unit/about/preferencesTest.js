@@ -11,7 +11,7 @@ const fakeElectron = require('../lib/fakeElectron')
 let Preferences, appActions, SettingItemIcon
 require('../braveUnit')
 
-describe('Preferences component', function () {
+describe('Preferences component unittest', function () {
   before(function () {
     mockery.enable({
       warnOnReplace: false,
@@ -51,6 +51,18 @@ describe('Preferences component', function () {
     mockery.registerMock('../../../../extensions/brave/img/ios_download.svg')
     mockery.registerMock('../../img/icon_pencil.svg')
     mockery.registerMock('../../../../img/toolbar/stoploading_btn.svg')
+    mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_payments_on.svg')
+    mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_payments_off.svg')
+    // Mocks the icon used in payments tab
+    mockery.registerMock('../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
+    // Mocks the icons used in addFundsDialog and its steps
+    mockery.registerMock('../../../../../../extensions/brave/img/ledger/wallet_icon.svg')
+    mockery.registerMock('../../../../../../extensions/brave/img/ledger/cryptoIcons/ETH_icon.svg')
+    mockery.registerMock('../../../../../../extensions/brave/img/ledger/cryptoIcons/BTC_icon.svg')
+    mockery.registerMock('../../../../../../extensions/brave/img/ledger/cryptoIcons/LTC_icon.svg')
+    mockery.registerMock('../../../../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
+    // Mock image from addFundsDialogFooter
+    mockery.registerMock('../../../../../extensions/brave/img/ledger/uphold-logo.png')
 
     window.chrome = fakeElectron
     window.CustomEvent = {}

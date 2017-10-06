@@ -45,8 +45,7 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.recoverKeys(
           state,
           action.get('useRecoveryKeyFile'),
-          action.get('firstRecoveryKey'),
-          action.get('secondRecoveryKey')
+          action.get('recoveryKey')
         )
         break
       }
@@ -62,6 +61,7 @@ const ledgerReducer = (state, action, immutableAction) => {
         const clearData = defaults ? defaults.merge(temp) : temp
         if (clearData.get('browserHistory') && !getSetting(settings.PAYMENTS_ENABLED)) {
           state = ledgerState.resetSynopsis(state)
+          ledgerApi.deleteSynopsis()
         }
         break
       }
@@ -130,7 +130,7 @@ const ledgerReducer = (state, action, immutableAction) => {
           case 'ledgerPaymentsShown':
             {
               if (action.get('value') === false) {
-                ledgerApi.deleteSynopsis(publisherKey)
+                ledgerApi.deleteSynopsisPublisher(publisherKey)
                 state = ledgerState.deletePublishers(state, publisherKey)
                 state = ledgerApi.updatePublisherInfo(state)
               }
@@ -246,11 +246,6 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.onBootStateFile(state)
         break
       }
-    case appConstants.APP_ON_LEDGER_BALANCE_RECEIVED:
-      {
-        state = ledgerApi.balanceReceived(state, action.get('unconfirmed'))
-        break
-      }
     case appConstants.APP_ON_WALLET_PROPERTIES:
       {
         state = ledgerApi.onWalletProperties(state, action.get('body'))
@@ -264,6 +259,11 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_ADD_FUNDS_CLOSED:
       {
         ledgerApi.addFoundClosed(state)
+        break
+      }
+    case appConstants.APP_ON_CHANGE_ADD_FUNDS_DIALOG_STEP:
+      {
+        state = ledgerState.saveWizardData(state, action.get('page'), action.get('currency'))
         break
       }
     case appConstants.APP_ON_WALLET_RECOVERY:
@@ -304,6 +304,7 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_RESET_RECOVERY_STATUS:
       {
         state = ledgerState.setRecoveryStatus(state, null)
+        state = ledgerState.setInfoProp(state, 'error', null)
         break
       }
     case appConstants.APP_ON_LEDGER_INIT_READ:
@@ -314,6 +315,16 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_BTC_TO_BAT_NOTIFIED:
       {
         state = state.setIn(['migrations', 'btcToBatNotifiedTimestamp'], new Date().getTime())
+        break
+      }
+    case appConstants.APP_ON_BTC_TO_BAT_TRANSITIONED:
+      {
+        state = state.setIn(['migrations', 'btcToBatTimestamp'], new Date().getTime())
+        break
+      }
+    case appConstants.APP_ON_LEDGER_QR_GENERATED:
+      {
+        state = ledgerState.saveQRCode(state, action.get('currency'), action.get('image'))
         break
       }
   }

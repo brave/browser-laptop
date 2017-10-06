@@ -6,12 +6,11 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // util
-const {btcToCurrencyString} = require('../../../../common/lib/ledgerUtil')
+const {batToCurrencyString} = require('../../../../common/lib/ledgerUtil')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
 const BrowserButton = require('../../common/browserButton')
-const {RecoveryKeyTextbox} = require('../../common/textbox')
 const {SettingsList, SettingItem} = require('../../common/settings')
 
 // style
@@ -25,16 +24,11 @@ const appActions = require('../../../../../js/actions/appActions')
 class LedgerRecoveryContent extends ImmutableComponent {
   constructor () {
     super()
-    this.handleFirstRecoveryKeyChange = this.handleFirstRecoveryKeyChange.bind(this)
-    this.handleSecondRecoveryKeyChange = this.handleSecondRecoveryKeyChange.bind(this)
+    this.handleRecoveryKeyChange = this.handleRecoveryKeyChange.bind(this)
   }
 
-  handleFirstRecoveryKeyChange (e) {
-    this.props.handleFirstRecoveryKeyChange(e.target.value)
-  }
-
-  handleSecondRecoveryKeyChange (e) {
-    this.props.handleSecondRecoveryKeyChange(e.target.value)
+  handleRecoveryKeyChange (e) {
+    this.props.handleRecoveryKeyChange(e.target.value)
   }
 
   clearRecoveryStatus () {
@@ -44,7 +38,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
 
   render () {
     const l10nDataArgs = {
-      balance: btcToCurrencyString(this.props.ledgerData.get('balance'), this.props.ledgerData)
+      balance: batToCurrencyString(this.props.ledgerData.get('balance'), this.props.ledgerData)
     }
     const recoverySucceeded = this.props.ledgerData.get('recoverySucceeded')
     const recoveryError = this.props.ledgerData.getIn(['error', 'error'])
@@ -101,10 +95,16 @@ class LedgerRecoveryContent extends ImmutableComponent {
       <div className={css(styles.ledgerRecoveryContent)} data-l10n-id='ledgerRecoveryContent' />
       <SettingsList className={css(commonStyles.noMarginBottom)}>
         <SettingItem>
-          <h3 data-l10n-id='firstRecoveryKey' />
-          <RecoveryKeyTextbox id='firstRecoveryKey' onChange={this.handleFirstRecoveryKeyChange} />
-          <h3 className={css(styles.recoveryContent__h3)} data-l10n-id='secondRecoveryKey' />
-          <RecoveryKeyTextbox id='secondRecoveryKey' onChange={this.handleSecondRecoveryKeyChange} />
+          <h3 data-l10n-id='recoveryKey' />
+          <textarea className={css(
+            commonStyles.formControl,
+            commonStyles.textArea,
+            styles.recoveryContent__recoveryKey
+          )}
+            id='recoveryKey'
+            spellCheck='false'
+            onChange={this.handleRecoveryKeyChange}
+          />
         </SettingItem>
       </SettingsList>
     </section>
@@ -118,7 +118,7 @@ class LedgerRecoveryFooter extends ImmutableComponent {
   }
 
   recoverWallet () {
-    aboutActions.ledgerRecoverWallet(this.props.state.FirstRecoveryKey, this.props.state.SecondRecoveryKey)
+    aboutActions.ledgerRecoverWallet(this.props.state.recoveryKey)
   }
 
   recoverWalletFromFile () {
@@ -152,6 +152,9 @@ const styles = StyleSheet.create({
   },
   recoveryContent__h3: {
     marginBottom: globalStyles.spacing.modalPanelHeaderMarginBottom
+  },
+  recoveryContent__recoveryKey: {
+    height: '65px'
   },
   ledgerRecoveryContent: {
     marginBottom: globalStyles.spacing.dialogInsideMargin

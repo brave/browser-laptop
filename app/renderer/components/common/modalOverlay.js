@@ -51,6 +51,7 @@ class ModalOverlay extends ImmutableComponent {
   get dialogContent () {
     var close = null
     var title = null
+    var subTitle = null
 
     const customDialogClassesStr = this.props.customDialogClasses ? this.props.customDialogClasses : ''
     const customDialogHeaderClassesStr = this.props.customDialogHeaderClasses ? this.props.customDialogHeaderClasses : ''
@@ -71,6 +72,18 @@ class ModalOverlay extends ImmutableComponent {
           [customTitleClassesStr]: true
         })} data-l10n-id={this.props.title}
         /> : null)
+      subTitle = (this.props.subTitle
+        ? <aside className={css(styles.dialog__header__subTitle)}>
+          <div className={cx({
+            [css(styles.dialog__header__subTitle_text)]: true,
+            [customTitleClassesStr]: true
+          })} data-l10n-id={this.props.subTitle}
+          />&nbsp;
+          <div className={css(
+            styles.dialog__header__subTitle_args
+          )} data-l10n-id={this.props.subTitleArgs}
+          />
+        </aside> : null)
     }
 
     return <section className={cx({
@@ -83,6 +96,7 @@ class ModalOverlay extends ImmutableComponent {
         [customDialogHeaderClassesStr]: true
       })}>
         {title}
+        {subTitle}
         {close}
       </header>
 
@@ -108,7 +122,7 @@ class ModalOverlay extends ImmutableComponent {
   }
 
   render () {
-    return <div className={cx({
+    return <div data-test-id='modalOverlay' className={cx({
       [css(styles.dialog__wrapper_modal)]: true,
       [css(styles.dialog__wrapper_last)]: this.state.last,
       [css(styles.dialog__wrapper_transparentBackground)]: this.props.transparentBackground
@@ -154,7 +168,10 @@ const styles = StyleSheet.create({
   },
 
   dialog__header: {
-    padding: `25px ${globalStyles.spacing.modalDialogPaddingHorizontal}`
+    padding: `25px ${globalStyles.spacing.modalDialogPaddingHorizontal}`,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
   dialog__header__close: {
     display: 'inline-block',
@@ -178,6 +195,22 @@ const styles = StyleSheet.create({
     fontSize: '22px',
     color: globalStyles.color.darkGray,
     marginBottom: 0
+  },
+
+  dialog__header__subTitle: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  },
+
+  dialog__header__subTitle_text: {
+    fontSize: '14px',
+    color: globalStyles.color.darkGray
+  },
+
+  dialog__header__subTitle_args: {
+    fontSize: '14px',
+    color: globalStyles.color.braveOrange
   },
 
   dialog__body__wrapper: {

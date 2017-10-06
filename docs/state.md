@@ -150,7 +150,7 @@ AppStore
       reconcileFrequency: number, // duration between each reconciliation in days
       reconcileStamp: number, // timestamp for the next reconcilation
       recoverySucceeded: boolean, // the status of an attempted recovery
-      satoshis: number, // confirmed balance as an integer number of satoshis
+      probi: number, // confirmed balance as an integer number of probi
       transactions: [{
         ballots: {
           [publisher]: number // e.g., "wikipedia.org": 3
@@ -164,7 +164,7 @@ AppStore
           rates: {
             [currency]: number //e.g., { "USD": 575.45 }
           },  // exchange rate
-          satoshis: number, // actual number of satoshis transferred
+          probi: number, // actual number of probi transferred
         },
         count: number, // total number of ballots allowed to be cast
         submissionStamp: number, // timestamp for this contribution
@@ -193,7 +193,7 @@ AppStore
         numFrames: number,
         scorekeeper: string, // concave or visits
         scorekeepers: Array<string>, // concave and visits
-        showOnlyVerified: boolean        
+        showOnlyVerified: boolean
       },
       publishers: {
         [publisherId]: {
@@ -226,8 +226,9 @@ AppStore
     }
   },
   migrations: {
-    btcToBatTimestamp: integer, // when btcToBat code was first ran (where session is upgraded)
-    btcToBatNotifiedTimestamp: integer, // when user was shown wallet upgraded notification
+    batMercuryTimestamp: integer, // when session is upgraded (and this new schema added)
+    btcToBatTimestamp: integer, // when call was made to backend to convert BTC => BAT
+    btcToBatNotifiedTimestamp: integer, // when user was shown "wallet upgraded" notification
   },
   menu: {
     template: object // used on Windows and by our tests: template object with Menubar control
@@ -274,7 +275,7 @@ AppStore
        requestMethod: string,
        referrer: string,
        resourceType: string
-     }   
+     }
     }],
     view: {
       timestamp: number,
