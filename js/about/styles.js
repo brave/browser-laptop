@@ -9,7 +9,7 @@ const globalStyles = require('../../app/renderer/components/styles/global')
 
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
-const {Textbox, FormTextbox, SettingTextbox, RecoveryKeyTextbox} = require('../../app/renderer/components/common/textbox')
+const {Textbox, FormTextbox, SettingTextbox} = require('../../app/renderer/components/common/textbox')
 const {TextArea, DefaultTextArea} = require('../../app/renderer/components/common/textbox')
 
 const {
@@ -145,15 +145,6 @@ class AboutStyle extends ImmutableComponent {
           <Pre><Code>
             const { '{SettingTextbox}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;SettingTextbox />
-          </Code></Pre>
-        </Container>
-
-        <Container>
-          <h2>Textbox used on wallet recovery screen in Brave Payments</h2>
-          <RecoveryKeyTextbox placeholder='RecoveryKeyTextbox' />
-          <Pre><Code>
-            const { '{RecoveryKeyTextbox}' } = require('../../app/renderer/components/common/textbox'){'\n'}
-            &lt;RecoveryKeyTextbox />
           </Code></Pre>
         </Container>
 

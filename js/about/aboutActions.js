@@ -140,11 +140,10 @@ const aboutActions = {
   /**
    * Recover wallet by merging old wallet into new one
    */
-  ledgerRecoverWallet: function (firstRecoveryKey, secondRecoveryKey) {
+  ledgerRecoverWallet: function (recoveryKey) {
     aboutActions.dispatchAction({
       actionType: appConstants.APP_RECOVER_WALLET,
-      firstRecoveryKey,
-      secondRecoveryKey
+      recoveryKey
     })
   },
 

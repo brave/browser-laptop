@@ -182,7 +182,8 @@ const globalStyles = {
     overlayButtonMargin: '8px',
     panelMargin: '15px',
     panelItemMargin: '12px',
-    panelPadding: '18px'
+    panelPadding: '18px',
+    addFundsDialogMinHeight: '250px'
   },
   shadow: {
     switchShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.35)',

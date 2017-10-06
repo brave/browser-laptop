@@ -259,6 +259,15 @@ const ledgerState = {
     return state.setIn(['ledger', 'info'], Immutable.Map())
   },
 
+  saveQRCode: (state, currency, image) => {
+    state = validateState(state)
+    if (currency == null) {
+      return state
+    }
+
+    return state.setIn(['ledger', 'info', 'walletQR', currency], image)
+  },
+
   /**
    * OTHERS
    */
@@ -275,9 +284,10 @@ const ledgerState = {
       return state.setIn(['ledger', 'info', 'error'], null)
     }
 
-    return state
-      .setIn(['ledger', 'info', 'error', 'caller'], caller)
-      .setIn(['ledger', 'info', 'error', 'error'], error)
+    return state.setIn(['ledger', 'info', 'error'], Immutable.fromJS({
+      caller: caller,
+      error: error
+    }))
   },
 
   changePinnedValues: (state, publishers) => {
@@ -298,6 +308,7 @@ const ledgerState = {
     return state
   },
 
+  // About page
   // TODO (optimization) don't have two almost identical object in state (synopsi->publishers and about->synopsis)
   saveAboutSynopsis: (state, publishers) => {
     state = validateState(state)
@@ -310,6 +321,23 @@ const ledgerState = {
     state = validateState(state)
     return state
       .setIn(['ledger', 'about', 'synopsisOptions'], ledgerState.getSynopsisOptions(state))
+  },
+
+  getAboutData: (state) => {
+    return state.getIn(['ledger', 'about']) || Immutable.Map()
+  },
+
+  saveWizardData: (state, page, currency) => {
+    state = validateState(state)
+    return state.mergeIn(['ledger', 'wizardData'], {
+      currentPage: page,
+      currency: currency
+    })
+  },
+
+  geWizardData: (state) => {
+    state = validateState(state)
+    return state.getIn(['ledger', 'wizardData']) || Immutable.Map()
   }
 }
 

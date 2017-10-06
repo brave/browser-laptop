@@ -21,23 +21,11 @@ class LedgerBackupContent extends ImmutableComponent {
   }
 
   render () {
-    const paymentId = this.props.ledgerData.get('paymentId')
     const passphrase = this.props.ledgerData.get('passphrase')
 
     return <section>
       <span data-l10n-id='ledgerBackupContent' />
       <div className={css(styles.ledgerBackupContent)}>
-        <div className={css(styles.ledgerBackupContent__copyKey)}>
-          <BrowserButton secondaryColor
-            l10nId='copy'
-            testId='copyButtonFirst'
-            onClick={this.copyToClipboard.bind(this, paymentId)}
-          />
-          <div className={css(styles.ledgerBackupContent__copyKey__key)}>
-            <h3 className={css(styles.ledgerBackupContent__copyKey__key__header)} data-l10n-id='firstKey' />
-            <span className={css(styles.ledgerBackupContent__copyKey__key__phrase)}>{paymentId}</span>
-          </div>
-        </div>
         <div className={css(
           styles.ledgerBackupContent__copyKey,
           styles.ledgerBackupContent__copyKey_second
@@ -48,7 +36,6 @@ class LedgerBackupContent extends ImmutableComponent {
             onClick={this.copyToClipboard.bind(this, passphrase)}
           />
           <div className={css(styles.ledgerBackupContent__copyKey__key)}>
-            <h3 className={css(styles.ledgerBackupContent__copyKey__key__header)} data-l10n-id='secondKey' />
             <span className={css(styles.ledgerBackupContent__copyKey__key__phrase)}>{passphrase}</span>
           </div>
         </div>
@@ -101,7 +88,8 @@ const styles = StyleSheet.create({
   ledgerBackupContent: {
     // Align the buttons and keys even when the width of the strings is not equal
     width: 'max-content',
-    margin: 'auto'
+    margin: 'auto',
+    maxWidth: '100%'
   },
 
   ledgerBackupContent__copyKey: {
@@ -124,7 +112,9 @@ const styles = StyleSheet.create({
 
   ledgerBackupContent__copyKey__key__phrase: {
     userSelect: 'initial',
-    cursor: 'initial'
+    cursor: 'initial',
+    color: '#D44600',
+    font: '18px monospace'
   }
 })
 

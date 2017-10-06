@@ -4,6 +4,7 @@
 
 // Note that these are webpack requires, not CommonJS node requiring requires
 const React = require('react')
+const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
@@ -21,7 +22,8 @@ const {
 
 const DisabledContent = require('./payment/disabledContent')
 const EnabledContent = require('./payment/enabledContent')
-const {BitcoinDashboard, BitcoinDashboardFooter} = require('./payment/bitcoinDashboard')
+const AddFundsDialog = require('./payment/addFundsDialog/addFundsDialog')
+const AddFundsDialogFooter = require('./payment/addFundsDialog/addFundsDialogFooter')
 const {AdvancedSettingsContent, AdvancedSettingsFooter} = require('./payment/advancedSettings')
 const {HistoryContent, HistoryFooter} = require('./payment/history')
 const {LedgerBackupContent, LedgerBackupFooter} = require('./payment/ledgerBackup')
@@ -32,31 +34,25 @@ const globalStyles = require('../styles/global')
 const {paymentStylesVariables} = require('../styles/payment')
 const settingsIcon = require('../../../extensions/brave/img/ledger/icon_settings.svg')
 const historyIcon = require('../../../extensions/brave/img/ledger/icon_history.svg')
+const batIcon = require('../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
 
 // other
 const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
-const coinbaseCountries = require('../../../../js/constants/coinbaseCountries')
+const {formatCurrentBalance, batToCurrencyString} = require('../../../common/lib/ledgerUtil')
 
 class PaymentsTab extends ImmutableComponent {
   constructor () {
     super()
     this.state = {
-      FirstRecoveryKey: '',
-      SecondRecoveryKey: ''
+      recoveryKey: ''
     }
 
-    this.handleFirstRecoveryKeyChange = this.handleFirstRecoveryKeyChange.bind(this)
-    this.handleSecondRecoveryKeyChange = this.handleSecondRecoveryKeyChange.bind(this)
+    this.handleRecoveryKeyChange = this.handleRecoveryKeyChange.bind(this)
   }
 
-  handleFirstRecoveryKeyChange (key) {
-    this.setState({FirstRecoveryKey: key})
-    this.forceUpdate()
-  }
-
-  handleSecondRecoveryKeyChange (key) {
-    this.setState({SecondRecoveryKey: key})
+  handleRecoveryKeyChange (key) {
+    this.setState({recoveryKey: key})
     this.forceUpdate()
   }
 
@@ -74,24 +70,39 @@ class PaymentsTab extends ImmutableComponent {
     return getSetting(settings.PAYMENTS_ENABLED, this.props.settings)
   }
 
-  get overlayTitle () {
-    if (coinbaseCountries.indexOf(this.props.ledgerData.get('countryCode')) > -1) {
-      return 'addFunds'
-    } else {
-      return 'addFundsAlternate'
-    }
+  get overlayContent () {
+    const ledgerData = this.props.ledgerData || Immutable.Map()
+    const addresses = ledgerData.get('addresses') || Immutable.List()
+    const walletQR = ledgerData.get('walletQR') || Immutable.List()
+    const wizardData = ledgerData.get('wizardData') || Immutable.Map()
+    const funds = formatCurrentBalance(ledgerData)
+    const budget = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings)
+    const minAmount = batToCurrencyString(budget, ledgerData)
+
+    return <AddFundsDialog
+      addFundsDialog={wizardData}
+      funds={funds}
+      minAmount={minAmount}
+      addresses={addresses}
+      walletQR={walletQR}
+    />
   }
 
-  get overlayContent () {
-    return <BitcoinDashboard ledgerData={this.props.ledgerData}
-      settings={this.props.settings}
-      bitcoinOverlayVisible={this.props.bitcoinOverlayVisible}
-      qrcodeOverlayVisible={this.props.qrcodeOverlayVisible}
-      showOverlay={this.props.showOverlay.bind(this, 'bitcoin')}
-      hideOverlay={this.props.hideOverlay.bind(this, 'bitcoin')}
-      showQRcode={this.props.showOverlay.bind(this, 'qrcode')}
-      hideQRcode={this.props.hideOverlay.bind(this, 'qrcode')}
-      hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
+  get overlayFooter () {
+    const ledgerData = this.props.ledgerData || Immutable.Map()
+    const wizardData = ledgerData.get('wizardData') || Immutable.Map()
+
+    return (
+      <AddFundsDialogFooter
+        addFundsDialog={wizardData}
+        onHide={this.props.hideOverlay.bind(this, 'addFunds')}
+      />
+    )
+  }
+
+  get getOverlayFounds () {
+    const ledgerData = this.props.ledgerData || Immutable.Map()
+    return formatCurrentBalance(ledgerData)
   }
 
   render () {
@@ -103,13 +114,11 @@ class PaymentsTab extends ImmutableComponent {
       {
       this.enabled && this.props.addFundsOverlayVisible
         ? <ModalOverlay
-          title={this.overlayTitle}
+          title={'addFundsHeader'}
+          subTitle={'balance'}
+          subTitleArgs={this.getOverlayFounds}
           content={this.overlayContent}
-          footer={
-            <BitcoinDashboardFooter
-              ledgerData={this.props.ledgerData}
-              hideParentOverlay={this.props.hideOverlay.bind(this, 'addFunds')} />
-          }
+          footer={this.overlayFooter}
           onHide={this.props.hideOverlay.bind(this, 'addFunds')}
         />
         : null
@@ -170,8 +179,7 @@ class PaymentsTab extends ImmutableComponent {
           content={<LedgerRecoveryContent
             ledgerData={this.props.ledgerData}
             hideAdvancedOverlays={this.props.hideAdvancedOverlays.bind(this)}
-            handleFirstRecoveryKeyChange={this.handleFirstRecoveryKeyChange.bind(this)}
-            handleSecondRecoveryKeyChange={this.handleSecondRecoveryKeyChange.bind(this)}
+            handleRecoveryKeyChange={this.handleRecoveryKeyChange.bind(this)}
           />}
           footer={<LedgerRecoveryFooter
             state={this.state}
@@ -190,6 +198,7 @@ class PaymentsTab extends ImmutableComponent {
             styles.titleWrapper__title,
             sectionTitleStyles.beta
           )}>
+            <img className={css(styles.titleWrapper__logo)} src={batIcon} />
             <AboutPageSectionTitle>Brave Payments</AboutPageSectionTitle>
             <SectionLabelTitle>beta</SectionLabelTitle>
           </div>
@@ -319,6 +328,10 @@ const styles = StyleSheet.create({
   titleWrapper__title: {
     position: 'relative',
     right: globalStyles.spacing.panelPadding
+  },
+
+  titleWrapper__logo: {
+    width: '40px'
   },
 
   titleWrapper__switchWrap: {

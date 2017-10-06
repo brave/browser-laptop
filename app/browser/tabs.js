@@ -156,7 +156,8 @@ const updateAboutDetails = (tab, tabValue) => {
 
   // TODO(bridiver) - refactor these to use state helpers
   const ledgerInfo = ledgerState.getInfoProps(appState)
-  const synopsis = appState.getIn(['ledger', 'about'])
+  const synopsis = ledgerState.getAboutData(appState)
+  const wizardData = ledgerState.geWizardData(appState)
   const preferencesData = appState.getIn(['about', 'preferences'])
   const appSettings = appState.get('settings')
   let allSiteSettings = appState.get('siteSettings')
@@ -180,20 +181,23 @@ const updateAboutDetails = (tab, tabValue) => {
 
   // TODO save this into values into the sate so that we don't call this app action on every state change
   // this should be saved in app state when windows will be refactored #11151
+
   /*
   if (url === 'about:preferences#payments') {
     tab.on('destroyed', () => {
       appActions.ledgerPaymentsPresent(tabValue.get('tabId'), false)
     })
-    appActions.ledgerPaymentsPresent(tabValue.get('tabId'), false)
+    appActions.ledgerPaymentsPresent(tabValue.get('tabId'), true)
   } else {
     appActions.ledgerPaymentsPresent(tabValue.get('tabId'), false)
   }
   */
+
   if (location === 'about:preferences' || location === 'about:contributions' || location === aboutUrls.get('about:contributions')) {
     const ledgerData = ledgerInfo
       .merge(synopsis)
       .merge(preferencesData)
+      .set('wizardData', wizardData)
     tab.send(messages.LEDGER_UPDATED, ledgerData.toJS())
     tab.send(messages.SETTINGS_UPDATED, appSettings.toJS())
     tab.send(messages.SITE_SETTINGS_UPDATED, allSiteSettings.toJS())

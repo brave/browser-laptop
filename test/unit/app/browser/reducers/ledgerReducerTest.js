@@ -39,10 +39,9 @@ describe('ledgerReducer unit tests', function () {
       quit: dummyModifyState,
       pageDataChanged: dummyModifyState,
       addVisit: dummyModifyState,
-
+      deleteSynopsis: () => {},
       boot: () => {},
       onBootStateFile: dummyModifyState,
-      balanceReceived: dummyModifyState,
       onWalletProperties: dummyModifyState,
       paymentPresent: dummyModifyState,
       addFoundClosed: dummyModifyState,
@@ -56,7 +55,8 @@ describe('ledgerReducer unit tests', function () {
     }
     fakeLedgerState = {
       resetSynopsis: dummyModifyState,
-      setRecoveryStatus: dummyModifyState
+      setRecoveryStatus: dummyModifyState,
+      setInfoProp: dummyModifyState
     }
     mockery.registerMock('../../browser/api/ledger', fakeLedgerApi)
     mockery.registerMock('../../common/state/ledgerState', fakeLedgerState)
@@ -131,15 +131,14 @@ describe('ledgerReducer unit tests', function () {
       returnedState = ledgerReducer(appState, Immutable.fromJS({
         actionType: appConstants.APP_RECOVER_WALLET,
         useRecoveryKeyFile: 'useKeyFile',
-        firstRecoveryKey: 'firstKey',
-        secondRecoveryKey: 'secondKey'
+        recoveryKey: 'firstKey'
       }))
     })
     after(function () {
       recoverKeysSpy.restore()
     })
     it('calls ledgerApi.recoverKeys', function () {
-      assert(recoverKeysSpy.withArgs(appState, 'useKeyFile', 'firstKey', 'secondKey').calledOnce)
+      assert(recoverKeysSpy.withArgs(appState, 'useKeyFile', 'firstKey').calledOnce)
     })
     it('returns a modified state', function () {
       assert.notDeepEqual(returnedState, appState)
@@ -275,26 +274,6 @@ describe('ledgerReducer unit tests', function () {
     })
     it('calls ledgerApi.onBootStateFile', function () {
       assert(onBootStateFileSpy.withArgs(appState).calledOnce)
-    })
-    it('returns a modified state', function () {
-      assert.notDeepEqual(returnedState, appState)
-    })
-  })
-
-  describe('APP_ON_LEDGER_BALANCE_RECEIVED', function () {
-    let balanceReceivedSpy
-    before(function () {
-      balanceReceivedSpy = sinon.spy(fakeLedgerApi, 'balanceReceived')
-      returnedState = ledgerReducer(appState, Immutable.fromJS({
-        actionType: appConstants.APP_ON_LEDGER_BALANCE_RECEIVED,
-        unconfirmed: true
-      }))
-    })
-    after(function () {
-      balanceReceivedSpy.restore()
-    })
-    it('calls ledgerApi.balanceReceived', function () {
-      assert(balanceReceivedSpy.withArgs(appState, true).calledOnce)
     })
     it('returns a modified state', function () {
       assert.notDeepEqual(returnedState, appState)
@@ -531,6 +510,18 @@ describe('ledgerReducer unit tests', function () {
     it('sets the notification timestamp', function () {
       assert.notDeepEqual(returnedState, appState)
       assert(returnedState.getIn(['migrations', 'btcToBatNotifiedTimestamp']))
+    })
+  })
+
+  describe('APP_ON_BTC_TO_BAT_TRANSITIONED', function () {
+    before(function () {
+      returnedState = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_BTC_TO_BAT_TRANSITIONED
+      }))
+    })
+    it('sets the timestamp', function () {
+      assert.notDeepEqual(returnedState, appState)
+      assert(returnedState.getIn(['migrations', 'btcToBatTimestamp']))
     })
   })
 })
