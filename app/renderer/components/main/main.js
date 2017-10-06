@@ -392,10 +392,6 @@ class Main extends React.Component {
 
     ipc.on(messages.SHORTCUT_UNDO_CLOSED_FRAME, () => windowActions.undoClosedFrame())
 
-    ipc.on(messages.SHORTCUT_CLOSE_OTHER_FRAMES, (e, tabId, isCloseRight, isCloseLeft) => {
-      windowActions.closeOtherFrames(tabId, isCloseRight, isCloseLeft)
-    })
-
     ipc.on(messages.SHOW_DOWNLOADS_TOOLBAR, () => {
       windowActions.setDownloadsToolbarVisible(true)
     })

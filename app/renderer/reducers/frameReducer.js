@@ -81,22 +81,40 @@ const getLocation = (location) => {
 
 const frameReducer = (state, action, immutableAction) => {
   switch (action.actionType) {
+    case appConstants.APP_TAB_CLOSED: {
+      const tabId = immutableAction.get('tabId')
+      const frame = frameStateUtil.getFrameByTabId(state, tabId)
+      if (frame) {
+        action.frameKey = frame.get('key')
+        state = closeFrame(state, action)
+        const activeFrame = frameStateUtil.getActiveFrame(state)
+        if (activeFrame) {
+          state = frameStateUtil.updateTabPageIndex(state, activeFrame.get('tabId'))
+        }
+      }
+      break
+    }
     case appConstants.APP_TAB_UPDATED:
       // This case will be fired for both tab creation and tab update.
-      // being `tabValue` set for tab creation and `changeInfo` set for tab update
       const tab = immutableAction.get('tabValue')
-      const changeInfo = immutableAction.get('changeInfo')
       if (!tab) {
         break
       }
       const tabId = tab.get('tabId')
+      if (tabId === -1) {
+        break
+      }
       let frame = frameStateUtil.getFrameByTabId(state, tabId)
       if (!frame) {
         break
       }
       let frames = state.get('frames')
       const index = tab.get('index')
+      // If front end doesn't know about this tabId, then do nothing!
       let sourceFrameIndex = frameStateUtil.getIndexByTabId(state, tabId)
+      if (sourceFrameIndex == null) {
+        break
+      }
       if (index != null &&
           sourceFrameIndex !== index &&
           // Only update the index once the frame is known.
@@ -158,22 +176,10 @@ const frameReducer = (state, action, immutableAction) => {
       }
 
       const active = tab.get('active')
-      if (active != null) {
-        if (active) {
-          state = frameStateUtil.setActiveFrameKey(state, frame.get('key'))
-          state = frameStateUtil.setFrameLastAccessedTime(state, sourceFrameIndex)
-
-          // Handle tabPage updates and preview cancelation based on tab updated
-          // otherwise tabValue will fire those events each time a tab finish loading
-          // see bug #8429
-          const isNewTab = changeInfo.isEmpty()
-          const activeTabHasUpdated = changeInfo.get('active') != null
-
-          if (!isNewTab && activeTabHasUpdated) {
-            state = frameStateUtil.updateTabPageIndex(state, tabId)
-            state = state.set('previewFrameKey', null)
-          }
-        }
+      if (active && state.get('activeFrameKey') !== frame.get('key')) {
+        state = frameStateUtil.setActiveFrameKey(state, frame.get('key'))
+        state = frameStateUtil.setFrameLastAccessedTime(state, sourceFrameIndex)
+        state = state.set('previewFrameKey', null)
       }
       break
     case windowConstants.WINDOW_SET_NAVIGATED:
@@ -222,34 +228,6 @@ const frameReducer = (state, action, immutableAction) => {
         appActions.tabCloseRequested(frame.get('tabId'))
       })
       break
-    case windowConstants.WINDOW_CLOSE_OTHER_FRAMES:
-      {
-        const currentIndex = frameStateUtil.getIndexByTabId(state, action.tabId)
-        if (currentIndex === -1) {
-          break
-        }
-
-        let tabs = []
-
-        state.get('frames').forEach((frame, i) => {
-          if (!frame.get('pinnedLocation') &&
-            ((i < currentIndex && action.isCloseLeft) || (i > currentIndex && action.isCloseRight))) {
-            if (frame) {
-              tabs.push(frame.get('tabId'))
-              appActions.tabCloseRequested(frame.get('tabId'))
-            }
-          }
-        })
-
-        // TODO(nejc) this can be simplified when states are merged
-        const newFrames = state.get('frames').filter(frame => !tabs.includes(frame.get('tabId')))
-        let newState = state.set('frames', newFrames)
-        newState = frameStateUtil.updateTabPageIndex(newState, action.tabId)
-        const index = newState.getIn(['ui', 'tabs', 'tabPageIndex'], 0)
-        state = state.setIn(['ui', 'tabs', 'tabPageIndex'], index)
-      }
-      break
-
     case windowConstants.WINDOW_CLOSE_FRAME:
       state = closeFrame(state, action)
       const activeFrame = frameStateUtil.getActiveFrame(state)
