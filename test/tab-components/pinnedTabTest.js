@@ -127,6 +127,40 @@ describe('pinnedTabs', function () {
     })
   })
 
+  describe('close groups of tab with some pinned', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      this.page1 = Brave.server.url('page1.html')
+      yield setup(this.app.client)
+      this.app.client
+        .newTab({pinned: true})
+        .waitForElementCount('[data-test-id="tab"]', 2)
+        .newTab()
+        .waitForElementCount('[data-test-id="tab"]', 3)
+    })
+    describe('closeTabsToRightMenuItemClicked', function () {
+      it('can close tabs to the right', function * () {
+        yield this.app.client
+          .closeTabsToRight(1)
+          .waitForElementCount('[data-test-id="tab"]', 2)
+      })
+    })
+    describe('closeTabsToLeftMenuItemClicked', function () {
+      it('can close tabs to the left', function * () {
+        yield this.app.client
+          .closeTabsToLeft(2)
+          .waitForElementCount('[data-test-id="tab"]', 2)
+      })
+    })
+    describe('closeOtherTabsMenuItemClicked', function () {
+      it('can close other tabs', function * () {
+        yield this.app.client
+          .closeOtherTabs(2)
+          .waitForElementCount('[data-test-id="tab"]', 2)
+      })
+    })
+  })
+
   describe('gets pins from external windows', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
@@ -231,6 +265,7 @@ describe('pinnedTabs', function () {
     it('navigating to a different origin opens a new tab', function * () {
       const page2 = Brave.server.url('page2.html').replace('localhost', '127.0.0.1')
       yield this.app.client
+        .activateURLMode()
         .click(urlInput)
         .setValue(urlInput, page2)
         .keys(Brave.keys.ENTER)

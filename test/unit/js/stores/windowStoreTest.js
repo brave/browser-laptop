@@ -267,10 +267,6 @@ describe('Window store unit tests', function () {
           windowStore = require('../../../../js/stores/windowStore.js')
           windowState = windowStore.getState()
         })
-
-        it('sets activeFrameKey', function () {
-          assert(windowState.get('activeFrameKey'))
-        })
       })
 
       describe('when tab being opened is not active', function () {

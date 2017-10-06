@@ -592,6 +592,43 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('closeTabPageByIndex', function (tabPageIndex, windowId = -1) {
+      logVerbose('closeTabPageByIndex("' + windowId + '", "' + tabPageIndex + '")')
+      return this.execute(function (windowId, tabPageIndex) {
+        return devTools('appActions').tabPageCloseMenuItemClicked(windowId, tabPageIndex)
+      }, windowId, tabPageIndex).then((response) => response.value)
+    })
+
+    this.app.client.addCommand('closeTabsToLeft', function (index) {
+      logVerbose('closeTabsToLeft(' + index + ')')
+      return this.waitForTab({index}).getAppState().then((val) => {
+        const tab = val.value.tabs.find((tab) => tab.index === index)
+        return this.execute(function (tabId) {
+          devTools('appActions').closeTabsToLeftMenuItemClicked(tabId)
+        }, tab.tabId)
+      })
+    })
+
+    this.app.client.addCommand('closeTabsToRight', function (index) {
+      logVerbose('closeTabsToRight(' + index + ')')
+      return this.waitForTab({index}).getAppState().then((val) => {
+        const tab = val.value.tabs.find((tab) => tab.index === index)
+        return this.execute(function (tabId) {
+          devTools('appActions').closeTabsToRightMenuItemClicked(tabId)
+        }, tab.tabId)
+      })
+    })
+
+    this.app.client.addCommand('closeOtherTabs', function (index) {
+      logVerbose('closeOtherTabs(' + index + ')')
+      return this.waitForTab({index}).getAppState().then((val) => {
+        const tab = val.value.tabs.find((tab) => tab.index === index)
+        return this.execute(function (tabId) {
+          devTools('appActions').closeOtherTabsMenuItemClicked(tabId)
+        }, tab.tabId)
+      })
+    })
+
     this.app.client.addCommand('closeTabByIndex', function (index) {
       return this.waitForTab({index}).getAppState().then((val) => {
         const tab = val.value.tabs.find((tab) => tab.index === index)

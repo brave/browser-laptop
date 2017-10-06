@@ -531,24 +531,18 @@ function tabTemplateInit (frameProps) {
 
   template.push({
     label: locale.translation('closeOtherTabs'),
-    click: (item, focusedWindow) => {
-      if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabId, true, true)
-      }
+    click: (item) => {
+      appActions.closeOtherTabsMenuItemClicked(tabId)
     }
   }, {
     label: locale.translation('closeTabsToRight'),
     click: (item, focusedWindow) => {
-      if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabId, true, false)
-      }
+      appActions.closeTabsToRightMenuItemClicked(tabId)
     }
   }, {
     label: locale.translation('closeTabsToLeft'),
     click: (item, focusedWindow) => {
-      if (focusedWindow) {
-        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_OTHER_FRAMES, tabId, false, true)
-      }
+      appActions.closeTabsToLeftMenuItemClicked(tabId)
     }
   }, CommonMenu.separatorMenuItem)
 

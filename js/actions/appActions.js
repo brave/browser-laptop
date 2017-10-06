@@ -167,6 +167,51 @@ const appActions = {
   },
 
   /**
+   * Menu item for closing a tab page has been clicked.
+   * @param {Number} tabPageIndex The index of the tab page to close
+   */
+  tabPageCloseMenuItemClicked: function (windowId, tabPageIndex) {
+    dispatch({
+      actionType: appConstants.APP_TAB_PAGE_CLOSE_MENU_ITEM_CLICKED,
+      tabPageIndex,
+      windowId
+    })
+  },
+
+  /**
+   * Menu item for closing tabs to the left has been clicked.
+   * @param {Number} tabId The tabId woh's tabs to the left should be closed.
+   */
+  closeTabsToLeftMenuItemClicked: function (tabId) {
+    dispatch({
+      actionType: appConstants.APP_CLOSE_TABS_TO_LEFT_MENU_ITEM_CLICKED,
+      tabId
+    })
+  },
+
+  /**
+   * Menu item for closing tabs to the right has been clicked.
+   * @param {Number} tabId The tabId woh's tabs to the right should be closed.
+   */
+  closeTabsToRightMenuItemClicked: function (tabId) {
+    dispatch({
+      actionType: appConstants.APP_CLOSE_TABS_TO_RIGHT_MENU_ITEM_CLICKED,
+      tabId
+    })
+  },
+
+  /**
+   * Menu item for closing other tabs than the specified tab.
+   * @param {Number} tabId The tabId woh's tabs to the left should be closed.
+   */
+  closeOtherTabsMenuItemClicked: function (tabId) {
+    dispatch({
+      actionType: appConstants.APP_CLOSE_OTHER_TABS_MENU_ITEM_CLICKED,
+      tabId
+    })
+  },
+
+  /**
    * A request for a new tab has been made with the specified createProperties
    * @param {Object} createProperties
    */

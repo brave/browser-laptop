@@ -188,21 +188,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to close multiple frames
-   * @param {string} tabId - Frame that we want to ignore when closing all tabs
-   * @param {boolean} isCloseRight - Close frames to the right of the frame provided
-   * @param {boolean} isCloseLeft - Close frames to the left of the frame provided
-   */
-  closeOtherFrames: function (tabId, isCloseRight, isCloseLeft) {
-    dispatch({
-      actionType: windowConstants.WINDOW_CLOSE_OTHER_FRAMES,
-      tabId,
-      isCloseRight,
-      isCloseLeft
-    })
-  },
-
-  /**
    * Dispatches a message to the store to undo a closed frame
    * The new frame is expected to appear at the index it was last closed at
    */
