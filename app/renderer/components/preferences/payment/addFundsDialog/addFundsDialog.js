@@ -18,10 +18,6 @@ class AddFundsDialog extends React.Component {
     return this.props.addFundsDialog.get('currency')
   }
 
-  get funds () {
-    return this.props.funds
-  }
-
   get currencyQRCode () {
     const walletQR = this.props.walletQR
 
@@ -47,7 +43,8 @@ class AddFundsDialog extends React.Component {
       case 'addFundsWizardAddress':
         return (
           <AddFundsWizardAddress
-            funds={this.funds}
+            funds={this.props.funds}
+            minAmount={this.props.minAmount}
             currency={this.currency}
             qrCode={this.currencyQRCode}
             address={this.currencyAddress}

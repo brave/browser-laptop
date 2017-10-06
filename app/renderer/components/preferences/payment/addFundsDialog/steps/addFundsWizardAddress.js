@@ -105,7 +105,7 @@ class AddFundsWizardAddress extends React.Component {
               <p data-l10n-id='addFundsWizardAddressInputNote'
                 data-l10n-args={JSON.stringify({
                   currency: this.currency,
-                  funds: this.props.funds
+                  funds: this.props.minAmount
                 } || {})}
                 className={css(styles.wizardAddress__text_note)}
               />

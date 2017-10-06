@@ -506,7 +506,7 @@ const logError = (state, err, caller) => {
 }
 
 const loadKeysFromBackupFile = (state, filePath) => {
-  let keys = null
+  let recoveryKey = null
   const fs = require('fs')
   let data = fs.readFileSync(filePath)
 
@@ -518,19 +518,10 @@ const loadKeysFromBackupFile = (state, filePath) => {
 
       let messageLines = recoveryFileContents.split(os.EOL)
 
-      let paymentIdLine = '' || messageLines[3]
-      let passphraseLine = '' || messageLines[4]
-
-      const paymentIdPattern = new RegExp([locale.translation('ledgerBackupText3'), '([^ ]+)'].join(' '))
-      const paymentId = (paymentIdLine.match(paymentIdPattern) || [])[1]
+      let passphraseLine = '' || messageLines[3]
 
       const passphrasePattern = new RegExp([locale.translation('ledgerBackupText4'), '(.+)$'].join(' '))
-      const passphrase = (passphraseLine.match(passphrasePattern) || [])[1]
-
-      keys = {
-        paymentId,
-        passphrase
-      }
+      recoveryKey = (passphraseLine.match(passphrasePattern) || [])[1]
     } catch (exc) {
       state = logError(state, exc, 'recoveryWallet')
     }
@@ -538,7 +529,7 @@ const loadKeysFromBackupFile = (state, filePath) => {
 
   return {
     state,
-    keys
+    recoveryKey
   }
 }
 
@@ -1144,14 +1135,12 @@ const pageDataChanged = (state) => {
 
 const backupKeys = (state, backupAction) => {
   const date = moment().format('L')
-  const paymentId = ledgerState.getInfoProp(state, 'paymentId')
   const passphrase = ledgerState.getInfoProp(state, 'passphrase')
 
   const messageLines = [
     locale.translation('ledgerBackupText1'),
     [locale.translation('ledgerBackupText2'), date].join(' '),
     '',
-    [locale.translation('ledgerBackupText3'), paymentId].join(' '),
     [locale.translation('ledgerBackupText4'), passphrase].join(' '),
     '',
     locale.translation('ledgerBackupText5')
@@ -1176,8 +1165,8 @@ const backupKeys = (state, backupAction) => {
   })
 }
 
-const recoverKeys = (state, useRecoveryKeyFile, firstKey, secondKey) => {
-  let firstRecoveryKey, secondRecoveryKey
+const recoverKeys = (state, useRecoveryKeyFile, key) => {
+  let recoveryKey
 
   if (useRecoveryKeyFile) {
     let recoveryKeyFile = promptForRecoveryKeyFile()
@@ -1188,34 +1177,23 @@ const recoverKeys = (state, useRecoveryKeyFile, firstKey, secondKey) => {
 
     if (recoveryKeyFile) {
       const result = loadKeysFromBackupFile(state, recoveryKeyFile)
-      const keys = result.keys || {}
+      recoveryKey = result.recoveryKey || ''
       state = result.state
-
-      if (keys) {
-        firstRecoveryKey = keys.paymentId
-        secondRecoveryKey = keys.passphrase
-      }
     }
   }
 
-  if (!firstRecoveryKey || !secondRecoveryKey) {
-    firstRecoveryKey = firstKey
-    secondRecoveryKey = secondKey
+  if (!recoveryKey) {
+    recoveryKey = key
   }
 
-  const UUID_REGEX = /^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$/
-  if (
-    typeof firstRecoveryKey !== 'string' ||
-    !firstRecoveryKey.match(UUID_REGEX) ||
-    typeof secondRecoveryKey !== 'string'
-  ) {
+  if (typeof recoveryKey !== 'string') {
     // calling logError sets the error object
     state = logError(state, true, 'recoverKeys')
     state = ledgerState.setRecoveryStatus(state, false)
     return state
   }
 
-  client.recoverWallet(firstRecoveryKey, secondRecoveryKey, (err, result) => {
+  client.recoverWallet(null, recoveryKey, (err, result) => {
     appActions.onWalletRecovery(err, result)
   })
 
@@ -1223,14 +1201,11 @@ const recoverKeys = (state, useRecoveryKeyFile, firstKey, secondKey) => {
 }
 
 const onWalletRecovery = (state, error, result) => {
-  let existingLedgerError = ledgerState.getInfoProp(state, 'error')
-
   if (error) {
     // we reset ledgerInfo.error to what it was before (likely null)
     // if ledgerInfo.error is not null, the wallet info will not display in UI
     // logError sets ledgerInfo.error, so we must we clear it or UI will show an error
     state = logError(state, error.toString(), 'recoveryWallet')
-    state = ledgerState.setInfoProp(state, 'error', existingLedgerError)
     state = ledgerState.setRecoveryStatus(state, false)
   } else {
     callback(error, result)
@@ -1553,10 +1528,27 @@ const getStateInfo = (state, parsedData) => {
     return state
   }
 
-  if (!ledgerClient) ledgerClient = require('bat-client')
+  if (!ledgerClient) {
+    ledgerClient = require('bat-client')
+  }
+
+  if (parsedData.properties && parsedData.properties.wallet && parsedData.properties.wallet.keyinfo) {
+    let seed = parsedData.properties.wallet.keyinfo.seed
+    if (!(seed instanceof Uint8Array)) {
+      seed = new Uint8Array(Object.values(seed))
+    }
+
+    parsedData.properties.wallet.keyinfo.seed = seed
+  }
+
+  let passphrase = ledgerClient.prototype.getWalletPassphrase(parsedData)
+  if (passphrase) {
+    passphrase = passphrase.join(' ')
+  }
+
   const newInfo = {
     paymentId: parsedData.properties.wallet.paymentId,
-    passphrase: ledgerClient.prototype.getWalletPassphrase(parsedData),
+    passphrase: passphrase,
     created: !!parsedData.properties.wallet,
     creating: !parsedData.properties.wallet,
     reconcileFrequency: parsedData.properties.days,
@@ -1600,8 +1592,9 @@ const getStateInfo = (state, parsedData) => {
 
 const generatePaymentData = (state) => {
   const ledgerInfo = ledgerState.getInfoProps(state)
+  const addresses = ledgerInfo.get('addresses') || Immutable.List()
 
-  ledgerInfo.get('addresses', Immutable.List()).forEach((address, index) => {
+  addresses.forEach((address, index) => {
     if (ledgerInfo.hasIn(['walletQR', index])) {
       return
     }

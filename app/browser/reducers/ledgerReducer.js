@@ -45,8 +45,7 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.recoverKeys(
           state,
           action.get('useRecoveryKeyFile'),
-          action.get('firstRecoveryKey'),
-          action.get('secondRecoveryKey')
+          action.get('recoveryKey')
         )
         break
       }
@@ -189,7 +188,6 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_NAVIGATOR_HANDLER_REGISTERED:
       {
-        // TODO will this be changed when switching to BAT
         const hasBitcoinHandler = (action.get('protocol') === 'bitcoin')
         state = ledgerState.setInfoProp(state, 'hasBitcoinHandler', hasBitcoinHandler)
         break
@@ -306,6 +304,7 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_RESET_RECOVERY_STATUS:
       {
         state = ledgerState.setRecoveryStatus(state, null)
+        state = ledgerState.setInfoProp(state, 'error', null)
         break
       }
     case appConstants.APP_ON_LEDGER_INIT_READ:

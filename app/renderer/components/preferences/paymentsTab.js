@@ -39,27 +39,20 @@ const batIcon = require('../../../extensions/brave/img/ledger/cryptoIcons/BAT_ic
 // other
 const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
-const {formatCurrentBalance} = require('../../../common/lib/ledgerUtil')
+const {formatCurrentBalance, batToCurrencyString} = require('../../../common/lib/ledgerUtil')
 
 class PaymentsTab extends ImmutableComponent {
   constructor () {
     super()
     this.state = {
-      FirstRecoveryKey: '',
-      SecondRecoveryKey: ''
+      recoveryKey: ''
     }
 
-    this.handleFirstRecoveryKeyChange = this.handleFirstRecoveryKeyChange.bind(this)
-    this.handleSecondRecoveryKeyChange = this.handleSecondRecoveryKeyChange.bind(this)
+    this.handleRecoveryKeyChange = this.handleRecoveryKeyChange.bind(this)
   }
 
-  handleFirstRecoveryKeyChange (key) {
-    this.setState({FirstRecoveryKey: key})
-    this.forceUpdate()
-  }
-
-  handleSecondRecoveryKeyChange (key) {
-    this.setState({SecondRecoveryKey: key})
+  handleRecoveryKeyChange (key) {
+    this.setState({recoveryKey: key})
     this.forceUpdate()
   }
 
@@ -83,10 +76,13 @@ class PaymentsTab extends ImmutableComponent {
     const walletQR = ledgerData.get('walletQR') || Immutable.List()
     const wizardData = ledgerData.get('wizardData') || Immutable.Map()
     const funds = formatCurrentBalance(ledgerData)
+    const budget = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings)
+    const minAmount = batToCurrencyString(budget, ledgerData)
 
     return <AddFundsDialog
       addFundsDialog={wizardData}
       funds={funds}
+      minAmount={minAmount}
       addresses={addresses}
       walletQR={walletQR}
     />
@@ -183,8 +179,7 @@ class PaymentsTab extends ImmutableComponent {
           content={<LedgerRecoveryContent
             ledgerData={this.props.ledgerData}
             hideAdvancedOverlays={this.props.hideAdvancedOverlays.bind(this)}
-            handleFirstRecoveryKeyChange={this.handleFirstRecoveryKeyChange.bind(this)}
-            handleSecondRecoveryKeyChange={this.handleSecondRecoveryKeyChange.bind(this)}
+            handleRecoveryKeyChange={this.handleRecoveryKeyChange.bind(this)}
           />}
           footer={<LedgerRecoveryFooter
             state={this.state}

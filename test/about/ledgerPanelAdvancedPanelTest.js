@@ -13,10 +13,8 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const urlParse = require('url').parse
-const uuid = require('uuid')
 
 const WALLET_RECOVERY_FILE_BASENAME = 'brave_wallet_recovery.txt'
-const PAYMENT_ID_TRANSLATION_KEY = 'ledgerBackupText3'
 const PASSPHRASE_TRANSLATION_KEY = 'ledgerBackupText4'
 
 const moment = require('moment')
@@ -56,8 +54,7 @@ function * setupPaymentsTabAndOpenAdvancedSettings (client, tabAlreadyLoaded) {
 }
 
 function validateRecoveryFile (recoveryFileContents) {
-  const UUID_LENGTH = 36
-  const RECOVERY_FILE_EXPECTED_NUM_LINES = 7
+  const RECOVERY_FILE_EXPECTED_NUM_LINES = 6
 
   assert.equal(typeof recoveryFileContents, 'string', 'recovery file should contain a string')
 
@@ -65,34 +62,16 @@ function validateRecoveryFile (recoveryFileContents) {
 
   assert.equal(messageLines.length, RECOVERY_FILE_EXPECTED_NUM_LINES, 'recovery file should have the expected number of lines')
 
-  const paymentIdPrefixText = translationsCache[PAYMENT_ID_TRANSLATION_KEY]
-  assert.equal(typeof paymentIdPrefixText, 'string', `payment ID prefix text ("${PAYMENT_ID_TRANSLATION_KEY}") should exist in translation cache`)
-
   const passphrasePrefixText = translationsCache[PASSPHRASE_TRANSLATION_KEY]
   assert.equal(typeof passphrasePrefixText, 'string', `passphrase prefix text ("${PASSPHRASE_TRANSLATION_KEY}") should exist in translation cache`)
 
-  let paymentIdLine = '' || messageLines[3]
-  assert.equal(typeof paymentIdLine === 'string' && paymentIdLine.length >= paymentIdPrefixText.length + UUID_LENGTH, true)
-
-  let passphraseLine = '' || messageLines[4]
-  assert.equal(typeof passphraseLine === 'string' && passphraseLine.length >= passphrasePrefixText.length + UUID_LENGTH, true)
-
-  const paymentIdPattern = new RegExp([paymentIdPrefixText, '([^ ]+)'].join(' '))
-  const paymentId = (paymentIdLine.match(paymentIdPattern) || [])[1]
-  assert.ok(paymentId)
-  assert.equal(typeof paymentId, 'string')
-  console.log(`recovered paymentId: ${paymentId}`)
+  let passphraseLine = '' || messageLines[3]
 
   const passphrasePattern = new RegExp([passphrasePrefixText, '(.+)$'].join(' '))
   const passphrase = (passphraseLine.match(passphrasePattern) || [])[1]
   assert.ok(passphrase)
   assert.equal(typeof passphrase, 'string')
   console.log(`recovered passphrase: ${passphrase}`)
-
-  // validate that paymentId and passphrase are uuids here
-  const UUID_REGEX = /^[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}$/
-  assert.ok(paymentId.match(UUID_REGEX), 'paymentId should be a valid UUID')
-  assert.ok(passphrase.match(UUID_REGEX), 'passphrase should be a valid UUID')
 
   return true
 }
@@ -108,17 +87,16 @@ let recoverWalletFromFile = function * (client) {
     .click(recoverWalletFromFileButton)
 }
 
-let generateAndSaveRecoveryFile = function (recoveryFilePath, paymentId, passphrase) {
+let generateAndSaveRecoveryFile = function (recoveryFilePath, passphrase) {
   let recoveryFileContents = ''
 
-  if (typeof paymentId === 'string' || typeof passphrase === 'string') {
+  if (typeof passphrase === 'string') {
     const date = moment().format('L')
 
     const messageLines = [
       translationsCache['ledgerBackupText1'],
       [translationsCache['ledgerBackupText2'], date].join(' '),
       '',
-      [translationsCache['ledgerBackupText3'], paymentId].join(' '),
       [translationsCache['ledgerBackupText4'], passphrase].join(' '),
       '',
       translationsCache['ledgerBackupText5']
@@ -194,24 +172,8 @@ describe.skip('Advanced payment panel tests', function () {
       .pause(1000)
   })
 
-  let randomPaymentId = uuid.v4().toLowerCase()
-
-  it('shows an error popover if one recovery key is missing', function * () {
-    generateAndSaveRecoveryFile(context.recoveryFilePathname, randomPaymentId, '')
-    yield recoverWalletFromFile(this.app.client)
-    yield this.app.client
-      .waitForVisible(balanceNotRecovered, ledgerAPIWaitTimeout)
-  })
-
-  it('shows an error popover if a recovery key is not a UUID', function * () {
-    generateAndSaveRecoveryFile(context.recoveryFilePathname, randomPaymentId, 'not-a-uuid')
-    yield recoverWalletFromFile(this.app.client)
-    yield this.app.client
-      .waitForVisible(balanceNotRecovered, ledgerAPIWaitTimeout)
-  })
-
-  it('shows an error popover if both recovery keys are missing', function * () {
-    generateAndSaveRecoveryFile(context.recoveryFilePathname, '', '')
+  it('shows an error popover if recovery key is missing', function * () {
+    generateAndSaveRecoveryFile(context.recoveryFilePathname, '')
     yield recoverWalletFromFile(this.app.client)
     yield this.app.client
       .waitForVisible(balanceNotRecovered, ledgerAPIWaitTimeout)

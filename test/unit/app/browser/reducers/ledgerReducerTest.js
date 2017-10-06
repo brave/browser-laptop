@@ -55,7 +55,8 @@ describe('ledgerReducer unit tests', function () {
     }
     fakeLedgerState = {
       resetSynopsis: dummyModifyState,
-      setRecoveryStatus: dummyModifyState
+      setRecoveryStatus: dummyModifyState,
+      setInfoProp: dummyModifyState
     }
     mockery.registerMock('../../browser/api/ledger', fakeLedgerApi)
     mockery.registerMock('../../common/state/ledgerState', fakeLedgerState)
@@ -130,15 +131,14 @@ describe('ledgerReducer unit tests', function () {
       returnedState = ledgerReducer(appState, Immutable.fromJS({
         actionType: appConstants.APP_RECOVER_WALLET,
         useRecoveryKeyFile: 'useKeyFile',
-        firstRecoveryKey: 'firstKey',
-        secondRecoveryKey: 'secondKey'
+        recoveryKey: 'firstKey'
       }))
     })
     after(function () {
       recoverKeysSpy.restore()
     })
     it('calls ledgerApi.recoverKeys', function () {
-      assert(recoverKeysSpy.withArgs(appState, 'useKeyFile', 'firstKey', 'secondKey').calledOnce)
+      assert(recoverKeysSpy.withArgs(appState, 'useKeyFile', 'firstKey').calledOnce)
     })
     it('returns a modified state', function () {
       assert.notDeepEqual(returnedState, appState)

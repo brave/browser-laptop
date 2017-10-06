@@ -17,8 +17,7 @@ class Textbox extends ImmutableComponent {
       styles.textbox,
       (this.props.readonly || this.props.readOnly) ? styles.readOnly : styles.outlineable,
       this.props['data-isCommonForm'] && commonStyles.isCommonForm,
-      this.props['data-isSettings'] && styles.isSettings,
-      this.props['data-isRecoveryKeyTextbox'] && styles.recoveryKeys
+      this.props['data-isSettings'] && styles.isSettings
     )
 
     return <input type='text' className={className} {...this.props} />
@@ -57,12 +56,6 @@ class GroupedFormTextbox extends ImmutableComponent {
 class SettingTextbox extends ImmutableComponent {
   render () {
     return <FormTextbox data-isSettings='true' {...this.props} />
-  }
-}
-
-class RecoveryKeyTextbox extends ImmutableComponent {
-  render () {
-    return <SettingTextbox data-isRecoveryKey='true' {...this.props} />
   }
 }
 
@@ -159,7 +152,6 @@ module.exports = {
   FormTextbox,
   GroupedFormTextbox,
   SettingTextbox,
-  RecoveryKeyTextbox,
   TextArea,
   DefaultTextArea
 }
