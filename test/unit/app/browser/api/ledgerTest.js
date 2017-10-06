@@ -20,8 +20,12 @@ describe('ledger api unit tests', function () {
   let paymentsEnabled
   let paymentsNotifications
   let ledgerClient
+
+  // spies
   let ledgerTransitionSpy
+  let ledgerTransitionedSpy
   let onBitcoinToBatTransitionedSpy
+  let onLedgerCallbackSpy
 
   before(function () {
     this.clock = sinon.useFakeTimers()
@@ -49,6 +53,7 @@ describe('ledger api unit tests', function () {
     })
     mockery.registerMock('../../../js/actions/appActions', appActions)
     onBitcoinToBatTransitionedSpy = sinon.spy(appActions, 'onBitcoinToBatTransitioned')
+    onLedgerCallbackSpy = sinon.spy(appActions, 'onLedgerCallback')
 
     // ledger client stubbing
     ledgerClient = sinon.stub()
@@ -68,10 +73,16 @@ describe('ledger api unit tests', function () {
       transition: function (paymentId, callback) {
         callback()
       },
+      getPaymentId: function () {
+        return 'payementIdGoesHere'
+      },
       properties: {
         wallet: {
           paymentId: 12345
         }
+      },
+      transitioned: function () {
+        return {}
       },
       state: {
         transactions: []
@@ -80,6 +91,7 @@ describe('ledger api unit tests', function () {
     ledgerClient.prototype.boolion = function (value) { return false }
     ledgerClient.prototype.getWalletPassphrase = function (state) {}
     ledgerTransitionSpy = sinon.spy(lc, 'transition')
+    ledgerTransitionedSpy = sinon.spy(lc, 'transitioned')
     ledgerClient.returns(lc)
     mockery.registerMock('bat-client', ledgerClient)
 
@@ -134,6 +146,8 @@ describe('ledger api unit tests', function () {
       const batState = ledgerApi.onBootStateFile(defaultAppState)
       ledgerTransitionSpy.reset()
       onBitcoinToBatTransitionedSpy.reset()
+      onLedgerCallbackSpy.reset()
+      ledgerTransitionedSpy.reset()
       ledgerClient.reset()
       ledgerApi.transitionWalletToBat(batState)
     })
@@ -143,8 +157,16 @@ describe('ledger api unit tests', function () {
     it('calls client.transition', function () {
       assert(ledgerTransitionSpy.calledOnce)
     })
-    it('calls AppActions.onBitcoinToBatTransitioned', function () {
-      assert(onBitcoinToBatTransitionedSpy.calledOnce)
+    describe('when transition completes', function () {
+      it('calls client.transitioned', function () {
+        assert(ledgerTransitionedSpy.calledOnce)
+      })
+      it('calls AppActions.onLedgerCallback', function () {
+        assert(onLedgerCallbackSpy.calledOnce)
+      })
+      it('calls AppActions.onBitcoinToBatTransitioned', function () {
+        assert(onBitcoinToBatTransitionedSpy.calledOnce)
+      })
     })
   })
 
@@ -340,13 +362,13 @@ describe('ledger api unit tests', function () {
               paymentsEnabled = true
               paymentsNotifications = true
             })
-            it('does not call ledger.transitionWalletToBat', function () {
+            it('calls ledger.transitionWalletToBat', function () {
               const ledgerStateWithoutBalance = ledgerStateWithBalance
                 .setIn(['ledger', 'info', 'balance'], 0)
                 .setIn(['migrations', 'batMercuryTimestamp'], 32145)
                 .setIn(['migrations', 'btcToBatTimestamp'], 32145)
               ledgerApi.notifications.onLaunch(ledgerStateWithoutBalance)
-              assert(transitionWalletToBatSpy.notCalled)
+              assert(transitionWalletToBatSpy.calledOnce)
             })
           })
 
@@ -375,7 +397,7 @@ describe('ledger api unit tests', function () {
             })
           })
 
-          describe('when payment notifications are enabled, payments are enabled, user has funds, user had wallet before BAT Mercury, and user not been shown message yet', function () {
+          describe('when payments are enabled and user had wallet before BAT Mercury', function () {
             before(function () {
               paymentsEnabled = true
               paymentsNotifications = true

@@ -50,8 +50,8 @@ let visitsByPublisher = {}
 let bootP
 let quitP
 const _internal = {
-  verboseP: process.env.LEDGER_VERBOSE || true,
-  debugP: process.env.LEDGER_DEBUG || true,
+  verboseP: process.env.LEDGER_VERBOSE || false,
+  debugP: process.env.LEDGER_DEBUG || false,
   ruleset: {
     raw: [],
     cooked: []
@@ -154,14 +154,18 @@ const notifications = {
     }, notifications.pollingInterval, state)
   },
   onLaunch: (state) => {
-    if (hasFunds(state)) {
-      // One time conversion of funds
-      const isNewInstall = state.get('firstRunTimestamp') === state.getIn(['migrations', 'batMercuryTimestamp'])
-      const hasUpgradedWallet = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btcToBatTimestamp'])
-      if (!isNewInstall && !hasUpgradedWallet) {
-        module.exports.transitionWalletToBat(state)
-      }
+    if (!getSetting(settings.PAYMENTS_ENABLED)) {
+      return
+    }
 
+    // One time conversion of wallet
+    const isNewInstall = state.get('firstRunTimestamp') === state.getIn(['migrations', 'batMercuryTimestamp'])
+    const hasUpgradedWallet = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btcToBatTimestamp'])
+    if (!isNewInstall && !hasUpgradedWallet) {
+      module.exports.transitionWalletToBat(state)
+    }
+
+    if (hasFunds(state)) {
       // Don't bother processing the rest, which are only notifications.
       if (!getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
         return
@@ -1476,16 +1480,18 @@ const roundtrip = (params, options, callback) => {
       console.log('>>> ' + (body || '').split('\n').join('\n>>> '))
     }
 
-    if (err) return callback(err)
+    if (err) return callback(err, response)
 
     if (Math.floor(response.statusCode / 100) !== 2) {
-      return callback(new Error('HTTP response ' + response.statusCode) + ' for ' + params.method + ' ' + params.path)
+      return callback(
+        new Error('HTTP response ' + response.statusCode + ' for ' + params.method + ' ' + params.path),
+        response)
     }
 
     try {
       payload = rawP ? body : (response.statusCode !== 204) ? JSON.parse(body) : null
     } catch (err) {
-      return callback(err)
+      return callback(err, response)
     }
 
     try {
@@ -1668,7 +1674,7 @@ const onWalletProperties = (state, body) => {
 
   // Balance
   const balance = parseFloat(body.get('balance'))
-  if (balance > 0) {
+  if (balance >= 0) {
     state = ledgerState.setInfoProp(state, 'balance', balance)
   }
 
@@ -1946,8 +1952,16 @@ const onInitRead = (state, parsedData) => {
   try {
     let timeUntilReconcile
     clientprep()
+
+    const options = Object.assign({}, clientOptions)
+    try {
+      if (parsedData.properties.wallet.keychains.user) {
+        options.version = 'v1'
+      }
+    } catch (ex) {}
+
     client = ledgerClient(parsedData.personaId,
-      underscore.extend(parsedData.options, {roundtrip: roundtrip}, clientOptions),
+      underscore.extend(parsedData.options, {roundtrip: roundtrip}, options),
       parsedData)
 
     // Scenario: User enables Payments, disables it, waits 30+ days, then
@@ -1970,7 +1984,7 @@ const onInitRead = (state, parsedData) => {
       })
     }
   } catch (ex) {
-    console.error('ledger client creation error: ', ex)
+    console.error('ledger client creation error(1): ', ex)
     return state
   }
 
@@ -2222,28 +2236,44 @@ const deleteSynopsis = () => {
   synopsis.publishers = {}
 }
 
+let newClient = null
 const transitionWalletToBat = (state) => {
-  let newClient
+  let newPaymentId, result
 
-  try {
-    clientprep()
-    newClient = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
-  } catch (ex) {
-    console.error('exception during ledger client creation: ', ex)
+  if (newClient === true) return
+
+  if (!newClient) {
+    try {
+      clientprep()
+      newClient = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
+    } catch (ex) {
+      return console.error('ledger client creation error(2): ', ex)
+    }
+  }
+
+  newPaymentId = newClient.getPaymentId()
+  if (!newPaymentId) {
+    newClient.sync((err, result, delayTime) => {
+      if (err) {
+        return console.log('ledger client error(3): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
+      }
+
+      if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1, max: 500 })
+
+      setTimeout(() => transitionWalletToBat(state), delayTime)
+    })
     return
   }
 
   try {
-    // TODO: this line is breaking
-    // exception during ledger client transition:  TypeError: Cannot read property 'wallet' of undefined
-    client.transition(newClient.properties.wallet.paymentId, (err) => {
+    client.transition(newPaymentId, (err, properties) => {
       if (err) {
         console.error('ledger client transition error: ', err)
       } else {
-        // save previous client transactions
-        newClient.state.transactions = client.state.transactions
-        // persist client's state, overwriting the old state
+        result = newClient.transitioned(properties)
         client = newClient
+        newClient = true
+        appActions.onLedgerCallback(result, random.randomInt({ min: miliseconds.minute, max: 10 * miliseconds.minute }))
         appActions.onBitcoinToBatTransitioned()
       }
     })
