@@ -6,6 +6,7 @@
 
 const Immutable = require('immutable')
 const moment = require('moment')
+const BigNumber = require('bignumber.js')
 
 // State
 const siteSettingsState = require('../state/siteSettingsState')
@@ -62,32 +63,36 @@ const shouldTrackView = (view, responseList) => {
   return false
 }
 
-const btcToCurrencyString = (btc, ledgerData) => {
-  const balance = Number(btc || 0)
+const batToCurrencyString = (bat, ledgerData) => {
+  const balance = Number(bat || 0)
   const currency = (ledgerData && ledgerData.get('currency')) || 'USD'
 
-  if (balance === 0) {
+  if (balance === 0 || ledgerData == null) {
     return `0 ${currency}`
   }
 
-  if (ledgerData && ledgerData.get('btc') && typeof ledgerData.get('amount') === 'number') {
-    const btcValue = ledgerData.get('btc') / ledgerData.get('amount')
-    const fiatValue = (balance / btcValue).toFixed(2)
-    let roundedValue = Math.floor(fiatValue)
-    const diff = fiatValue - roundedValue
+  const rate = ledgerData.get('currentRate') || 0
+  const converted = new BigNumber(new BigNumber(rate.toString())).times(balance).toFixed(2)
+  return `${converted} ${currency}`
+}
 
-    if (diff > 0.74) {
-      roundedValue += 0.75
-    } else if (diff > 0.49) {
-      roundedValue += 0.50
-    } else if (diff > 0.24) {
-      roundedValue += 0.25
-    }
+const formatCurrentBalance = (ledgerData) => {
+  let currency = 'USD'
+  let balance = 0
+  let converted = 0
+  let hasRate = false
 
-    return `${roundedValue.toFixed(2)} ${currency}`
+  if (ledgerData != null) {
+    currency = ledgerData.get('currency') || 'USD'
+    balance = Number(ledgerData.get('balance') || 0)
+    converted = Number.parseFloat(ledgerData.get('converted')) || 0
+    hasRate = ledgerData.has('currentRate')
   }
 
-  return `${balance} BTC`
+  balance = balance.toFixed(2)
+  converted = converted.toFixed(2)
+
+  return `${balance} BAT${hasRate ? ` (${converted} ${currency})` : ''}`
 }
 
 const formattedTimeFromNow = (timestamp) => {
@@ -110,11 +115,11 @@ const walletStatus = (ledgerData) => {
     const pendingFunds = Number(ledgerData.get('unconfirmed') || 0)
 
     if (pendingFunds + Number(ledgerData.get('balance') || 0) <
-      0.9 * Number(ledgerData.get('btc') || 0)) {
+      0.9 * Number(ledgerData.get('bat') || 0)) {
       status.id = 'insufficientFundsStatus'
     } else if (pendingFunds > 0) {
       status.id = 'pendingFundsStatus'
-      status.args = {funds: btcToCurrencyString(pendingFunds, ledgerData)}
+      status.args = {funds: batToCurrencyString(pendingFunds, ledgerData)}
     } else if (transactions && transactions.size > 0) {
       status.id = 'defaultWalletStatus'
     } else {
@@ -206,7 +211,7 @@ const stickyP = (state, publisherKey) => {
 
 module.exports = {
   shouldTrackView,
-  btcToCurrencyString,
+  batToCurrencyString,
   formattedTimeFromNow,
   formattedDateFromTimestamp,
   walletStatus,
@@ -214,5 +219,6 @@ module.exports = {
   contributeP,
   visibleP,
   eligibleP,
-  stickyP
+  stickyP,
+  formatCurrentBalance
 }

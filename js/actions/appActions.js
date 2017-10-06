@@ -1580,13 +1580,6 @@ const appActions = {
     })
   },
 
-  onLedgerBalanceReceived: function (unconfirmed) {
-    dispatch({
-      actionType: appConstants.APP_ON_LEDGER_BALANCE_RECEIVED,
-      unconfirmed
-    })
-  },
-
   onWalletProperties: function (body) {
     dispatch({
       actionType: appConstants.APP_ON_WALLET_PROPERTIES,
@@ -1602,7 +1595,15 @@ const appActions = {
     })
   },
 
-  onAddFoundsClosed: function () {
+  onChangeAddFundsDialogStep: function (page, currency = 'BAT') {
+    dispatch({
+      actionType: appConstants.APP_ON_CHANGE_ADD_FUNDS_DIALOG_STEP,
+      page,
+      currency
+    })
+  },
+
+  onAddFundsClosed: function () {
     dispatch({
       actionType: appConstants.APP_ON_ADD_FUNDS_CLOSED
     })
@@ -1672,9 +1673,23 @@ const appActions = {
     })
   },
 
+  onLedgerQRGenerated: function (currency, image) {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_QR_GENERATED,
+      currency,
+      image
+    })
+  },
+
   onBitcoinToBatNotified: function () {
     dispatch({
       actionType: appConstants.APP_ON_BTC_TO_BAT_NOTIFIED
+    })
+  },
+
+  onBitcoinToBatTransitioned: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_BTC_TO_BAT_TRANSITIONED
     })
   }
 }

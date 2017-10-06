@@ -170,7 +170,7 @@ let generateBraveManifest = () => {
     'form-action': '\'none\'',
     'style-src': '\'self\' \'unsafe-inline\'',
     'img-src': '* data: file://*',
-    'frame-src': '\'self\' https://buy.coinbase.com https://brave.com'
+    'frame-src': '\'self\' https://brave.com'
   }
 
   if (process.env.NODE_ENV === 'development') {

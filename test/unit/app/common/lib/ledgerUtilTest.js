@@ -97,7 +97,10 @@ describe('ledgerUtil test', function () {
     })
   })
 
-  describe('btcToCurrencyString', function () {
+  describe('batToCurrencyString', function () {
+  })
+
+  describe('formatCurrentBalance', function () {
     let ledgerData
 
     before(function () {
@@ -114,11 +117,12 @@ describe('ledgerUtil test', function () {
             amount: 10
           }
         },
+        currentRate: '1',
         error: null,
         created: true,
-        satoshis: 2097027,
+        converted: 1.1234,
         buyURL: undefined,
-        paymentURL: 'bitcoin:btc-address-goes-here?amount=0.00277334&label=Brave%20Software',
+        paymentURL: 'bitcoin:btc-address-goes-here?amount=5&label=Brave%20Software',
         passphrase: 'd588b7e3-352d-49ce-8d0f-a4cae1fa4c76',
         buyMaximumUSD: 6,
         reconcileFrequency: 30,
@@ -129,50 +133,38 @@ describe('ledgerUtil test', function () {
         transactions: [],
         amount: 10,
         creating: false,
-        balance: 0.0210,
+        balance: 5.00003,
         paymentIMG: undefined
       })
     })
 
-    it('defaults to 0 as balance and "USD" as currency symbol', function () {
-      const result = ledgerUtil.btcToCurrencyString()
-      assert.equal(result, '0 USD')
+    it('defaults to 0 as balance when currency is not present', function () {
+      const result = ledgerUtil.formatCurrentBalance()
+      assert.equal(result, '0.00 BAT')
+    })
+    it('formats `balance` and `converted` values to two decimal places', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData)
+      assert.equal(result, '5.00 BAT (1.12 USD)')
     })
     it('will mark currency with different symbol (if present)', function () {
-      const result = ledgerUtil.btcToCurrencyString(0, ledgerData.set('currency', 'Sealand dollars'))
-      assert.equal(result, '0 Sealand dollars')
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('currency', 'Sealand dollars'))
+      assert.equal(result, '5.00 BAT (1.12 Sealand dollars)')
     })
-    it('will convert value to USD', function () {
-      const result = ledgerUtil.btcToCurrencyString(1, ledgerData)
-      assert.equal(result, '3605.75 USD')
+    it('defaults `balance` to 0 if not found', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.delete('balance'))
+      assert.equal(result, '0.00 BAT (1.12 USD)')
     })
-    describe('when rounding values', function () {
-      it('will round 4.97 down to 4.75 (cent values greater than .74)', function () {
-        const ledgerDataCopy = ledgerData.set('btc', '0.00279000')
-        const result = ledgerUtil.btcToCurrencyString(0.00138667, ledgerDataCopy)
-        assert.equal(result, '4.75 USD')
-      })
-      it('will round 4.64 down to 4.50 (cent values greater than .49)', function () {
-        const ledgerDataCopy = ledgerData.set('btc', '0.00299000')
-        const result = ledgerUtil.btcToCurrencyString(0.00138667, ledgerDataCopy)
-        assert.equal(result, '4.50 USD')
-      })
-      it('will round 4.33 down to 4.25 (cent values greater than .24)', function () {
-        const ledgerDataCopy = ledgerData.set('btc', '0.00320000')
-        const result = ledgerUtil.btcToCurrencyString(0.00138667, ledgerDataCopy)
-        assert.equal(result, '4.25 USD')
-      })
-      it('will round 4.08 down to 4.00 (cent values less than .24)', function () {
-        const ledgerDataCopy = ledgerData.set('btc', '0.00340000')
-        const result = ledgerUtil.btcToCurrencyString(0.00138667, ledgerDataCopy)
-        assert.equal(result, '4.00 USD')
-      })
+    it('defaults `converted` to 0 if not found', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.delete('converted'))
+      assert.equal(result, '5.00 BAT (0.00 USD)')
     })
-    describe('when ledgerData does not contain exchange information', function () {
-      it('returns the raw balance formatted as BTC', function () {
-        const result = ledgerUtil.btcToCurrencyString(0.00138667, undefined)
-        assert.equal(result, '0.00138667 BTC')
-      })
+    it('handles `balance` being a string', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('balance', '5'))
+      assert.equal(result, '5.00 BAT (1.12 USD)')
+    })
+    it('handles `converted` being a string', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('converted', '1.1234'))
+      assert.equal(result, '5.00 BAT (1.12 USD)')
     })
   })
 

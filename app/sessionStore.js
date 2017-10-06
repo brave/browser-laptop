@@ -417,6 +417,16 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
       immutableData = immutableData.deleteIn(['extensions', extensionId, 'tabs'])
     })
   }
+
+  // Leader cleanup
+  if (immutableData.has('pageData')) {
+    immutableData = immutableData.delete('pageData')
+  }
+
+  if (immutableData.hasIn(['ledger', 'locations'])) {
+    immutableData = immutableData.deleteIn(['ledger', 'locations'])
+  }
+
   return immutableData
 }
 
@@ -736,8 +746,9 @@ module.exports.backupSession = () => {
  * Obtains the default application level state
  */
 module.exports.defaultAppState = () => {
+  const now = new Date().getTime()
   return {
-    firstRunTimestamp: new Date().getTime(),
+    firstRunTimestamp: now,
     sync: {
       devices: {},
       lastFetchTimestamp: 0,
@@ -812,8 +823,9 @@ module.exports.defaultAppState = () => {
       }
     },
     migrations: {
-      btcToBatTimestamp: new Date().getTime(),
-      btcToBatNotifiedTimestamp: new Date().getTime()
+      batMercuryTimestamp: now,
+      btcToBatTimestamp: now,
+      btcToBatNotifiedTimestamp: now
     }
   }
 }

@@ -43,6 +43,7 @@ class AboutPageSectionTitle extends ImmutableComponent {
       styles.sectionTitle,
       styles.prefSectionTitle,
       styles.aboutPageSectionTitle,
+      this.props['data-canWrap'] && styles.aboutPageSectionTitle_canWrap,
       this.props['data-subTitle'] && styles.aboutPageSectionSubTitle
     )} {...this.props} />
   }
@@ -90,7 +91,11 @@ const styles = StyleSheet.create({
   },
 
   aboutPageSectionTitle: {
-    display: 'inline-block'
+    display: 'inline-block',
+    whiteSpace: 'nowrap'
+  },
+  aboutPageSectionTitle_canWrap: {
+    whiteSpace: 'normal'
   },
   aboutPageSectionSubTitle: {
     fontSize: '16px',

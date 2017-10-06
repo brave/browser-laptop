@@ -1,4 +1,4 @@
-/* global describe, it, beforeEach, before */
+/* global describe, it, beforeEach, before, afterEach */
 
 const Brave = require('../lib/brave')
 const {
@@ -10,7 +10,14 @@ const {
   walletSwitch,
   siteSettingItem,
   ledgerTable,
-  securityTab
+  nextButton,
+  previousButton,
+  securityTab,
+  addFundsDialog,
+  addFundsWizard,
+  addFundsWelcome,
+  modalOverlay,
+  modalOverlayCloseButton
 } = require('../lib/selectors')
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
@@ -378,6 +385,130 @@ describe('Regular payment panel tests', function () {
             return val.value.ledger.synopsis.publishers['eff.org'].options.exclude === true
           })
         })
+    })
+  })
+
+  describe('add funds welcome screen', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      yield setup(this.app.client)
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(prefsUrl)
+        .waitForVisible(paymentsTab)
+        .click(paymentsTab)
+        .waitForVisible(paymentsWelcomePage)
+        .waitForVisible(walletSwitch)
+        .click(walletSwitch)
+        .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
+        .waitForExist(addFundsButton)
+    })
+
+    afterEach(function * () {
+      yield this.app.client
+        .waitForExist(modalOverlayCloseButton)
+        .moveToObject(modalOverlayCloseButton)
+        .click(modalOverlayCloseButton)
+        .waitForExist(addFundsButton)
+    })
+
+    it('opens the modal dialog when you click the add funds button', function * () {
+      yield this.app.client
+        .click(addFundsButton)
+        .waitForExist(modalOverlay)
+        .waitForElementCount(modalOverlay, 1)
+    })
+
+    it('renders the welcome screen', function * () {
+      yield this.app.client
+        .click(addFundsButton)
+        .waitForExist(modalOverlay)
+        .waitForExist(addFundsDialog)
+        .waitForExist(addFundsWelcome)
+        .waitForElementCount(addFundsWelcome, 1)
+    })
+
+    it('renders the wizard when you click next button', function * () {
+      yield this.app.client
+        .click(addFundsButton)
+        .waitForExist(modalOverlay)
+        .waitForExist(addFundsDialog)
+        .waitForExist(addFundsWelcome)
+        .waitForElementCount(addFundsWelcome, 1)
+        .waitForExist(nextButton)
+        .click(nextButton)
+        .waitForExist(addFundsWizard)
+        .waitForElementCount(addFundsWizard, 1)
+    })
+  })
+
+  describe('add funds wizard screen', function () {
+    Brave.beforeAll(this)
+
+    before(function * () {
+      yield setup(this.app.client)
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(prefsUrl)
+        .waitForVisible(paymentsTab)
+        .click(paymentsTab)
+        .waitForVisible(paymentsWelcomePage)
+        .waitForVisible(walletSwitch)
+        .click(walletSwitch)
+        .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
+        .waitForExist(addFundsButton)
+        .click(addFundsButton)
+        .waitForExist(modalOverlay)
+        .waitForExist(addFundsDialog)
+        .waitForExist(nextButton)
+        .click(nextButton)
+        .waitForExist(addFundsWizard)
+        .waitForElementCount(addFundsWizard, 1)
+        .waitForExist(modalOverlayCloseButton)
+        .click(modalOverlayCloseButton)
+    })
+
+    beforeEach(function * () {
+      yield this.app.client
+        .waitForExist(addFundsButton)
+        .click(addFundsButton)
+    })
+
+    afterEach(function * () {
+      yield this.app.client
+        .waitForExist(previousButton)
+        .click(previousButton)
+        .waitForExist(modalOverlayCloseButton)
+        .click(modalOverlayCloseButton)
+    })
+
+    it('opens the BTC address screen when you click BTC button', function * () {
+      yield this.app.client
+        .waitForExist('[data-test-id="btcButton"]')
+        .click('[data-test-id="btcButton"]')
+        .waitForElementCount('[data-test-id="addFundsWizardAddressBTC"]', 1)
+    })
+
+    it('opens the ETH address screen when you click ETH button', function * () {
+      yield this.app.client
+        .waitForExist('[data-test-id="ethButton"]')
+        .click('[data-test-id="ethButton"]')
+        .waitForElementCount('[data-test-id="addFundsWizardAddressETH"]', 1)
+    })
+
+    it('opens the BAT address screen when you click BAT button', function * () {
+      yield this.app.client
+        .waitForExist('[data-test-id="batButton"]')
+        .click('[data-test-id="batButton"]')
+        .waitForElementCount('[data-test-id="addFundsWizardAddressBAT"]', 1)
+    })
+
+    it('opens the LTC address screen when you click LTC button', function * () {
+      yield this.app.client
+        .waitForExist('[data-test-id="ltcButton"]')
+        .click('[data-test-id="ltcButton"]')
+        .waitForElementCount('[data-test-id="addFundsWizardAddressLTC"]', 1)
     })
   })
 })
