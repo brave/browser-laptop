@@ -32,9 +32,9 @@ var env = {
   CHANNEL: process.env.CHANNEL
 }
 
-var channels = { dev: true, beta: true, stable: true }
+var channels = { dev: true, beta: true, stable: true, nightly: true, developer: true }
 if (!channels[env.CHANNEL]) {
-  throw new Error('CHANNEL environment variable must be set to dev, beta or stable')
+  throw new Error('CHANNEL environment variable must be set to dev, beta, stable, nightly, or developer')
 }
 
 console.log('Writing buildConfig.js...')
