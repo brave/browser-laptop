@@ -158,10 +158,7 @@ const newFrame = (state, frameOpts) => {
     const tabId = frameOpts.tabId
     const frame = frameStateUtil.getFrameByTabId(state, tabId)
     state = frameStateUtil.updateTabPageIndex(state, tabId)
-    if (active && frame) {
-      // only set the activeFrameKey if the tab is already active
-      state = state.set('activeFrameKey', frame.get('key'))
-    } else {
+    if (!active || !frame) {
       appActions.tabActivateRequested(tabId)
     }
   }

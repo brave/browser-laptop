@@ -98,6 +98,27 @@ const tabsReducer = (state, action, immutableAction) => {
       })
       break
     }
+    case appConstants.APP_TAB_PAGE_CLOSE_MENU_ITEM_CLICKED: {
+      const windowId = action.get('windowId')
+      const tabPageIndex = action.get('tabPageIndex')
+      state = tabs.closeTabPage(state, windowId, tabPageIndex)
+      break
+    }
+    case appConstants.APP_CLOSE_TABS_TO_LEFT_MENU_ITEM_CLICKED: {
+      const tabId = action.get('tabId')
+      state = tabs.closeTabsToLeft(state, tabId)
+      break
+    }
+    case appConstants.APP_CLOSE_TABS_TO_RIGHT_MENU_ITEM_CLICKED: {
+      const tabId = action.get('tabId')
+      state = tabs.closeTabsToRight(state, tabId)
+      break
+    }
+    case appConstants.APP_CLOSE_OTHER_TABS_MENU_ITEM_CLICKED: {
+      const tabId = action.get('tabId')
+      state = tabs.closeOtherTabs(state, tabId)
+      break
+    }
     case appConstants.APP_CREATE_TAB_REQUESTED:
       if (action.getIn(['createProperties', 'windowId']) == null) {
         const senderWindowId = action.getIn(['senderWindowId'])
@@ -147,6 +168,12 @@ const tabsReducer = (state, action, immutableAction) => {
               tabs.toggleDevTools(tabId)
             })
           } else {
+            // This check is only needed in case front end tries to close
+            // a tabId it thinks exists but doesn't actually exist anymore.
+            const tabValue = tabState.getByTabId(state, tabId)
+            if (!tabValue) {
+              break
+            }
             const windowId = tabState.getWindowId(state, tabId)
             const nonPinnedTabs = tabState.getNonPinnedTabsByWindowId(state, windowId)
             const pinnedTabs = tabState.getPinnedTabsByWindowId(state, windowId)
@@ -184,6 +211,7 @@ const tabsReducer = (state, action, immutableAction) => {
             tabs.setActive(nextActiveTabId)
           }
         })
+        tabs.forgetTab(tabId)
       }
       break
     case appConstants.APP_ALLOW_FLASH_ONCE:

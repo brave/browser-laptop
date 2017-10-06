@@ -38,7 +38,7 @@ const urlUtil = require('../../../js/lib/urlutil')
 const frameStateUtil = require('../../../js/state/frameStateUtil')
 const dndData = require('../../../js/dndData')
 const {makeImmutable, isMap} = require('../../common/state/immutableUtil')
-const {getCurrentWindow} = require('../../renderer/currentWindow')
+const {getCurrentWindow, getCurrentWindowId} = require('../../renderer/currentWindow')
 const {getSetting} = require('../../../js/settings')
 
 const validateAction = function (action) {
@@ -93,9 +93,7 @@ const onTabPageMenu = function (state, action) {
   }, {
     label: locale.translation('closeTabPage'),
     click: () => {
-      tabPageFrames
-        .map((frame) => frame.get('tabId'))
-        .forEach((tabId) => appActions.tabCloseRequested(tabId))
+      appActions.tabPageCloseMenuItemClicked(getCurrentWindowId(), index)
     }
   }]
 

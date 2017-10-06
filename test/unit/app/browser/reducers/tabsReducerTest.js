@@ -90,7 +90,8 @@ describe('tabsReducer unit tests', function () {
       moveTo: sinon.mock(),
       reload: sinon.mock(),
       updateTabsStateForWindow: sinon.mock(),
-      create: sinon.mock()
+      create: sinon.mock(),
+      forgetTab: sinon.spy()
     }
 
     this.windowsAPI = require('../../../../../app/browser/windows')
@@ -267,6 +268,7 @@ describe('tabsReducer unit tests', function () {
     beforeEach(function () {
       this.removeTabByTabIdSpy = sinon.stub(this.tabStateAPI, 'removeTabByTabId', (state) => state)
       this.tabsAPI.setActive.reset()
+      this.tabsAPI.forgetTab.reset()
     })
 
     afterEach(function () {
@@ -278,6 +280,7 @@ describe('tabsReducer unit tests', function () {
       tabsReducer(this.state, action)
       assert.equal(this.tabStateAPI.removeTabByTabId.getCall(0).args[1], action.tabId)
       assert.equal(this.tabsAPI.updateTabsStateForWindow.getCall(0).args[1], 2)
+      assert(this.tabsAPI.forgetTab.withArgs(5).calledOnce)
     })
 
     it('does nothing if tabId is TAB_ID_NONE', function () {
@@ -303,6 +306,7 @@ describe('tabsReducer unit tests', function () {
           this.clock.tick(1510)
           assert(this.tabsAPI.setActive.withArgs(3).calledOnce)
           assert.equal(this.tabsAPI.updateTabsStateForWindow.getCall(0).args[1], 2)
+          assert(this.tabsAPI.forgetTab.withArgs(5).calledOnce)
         })
       })
 
@@ -327,6 +331,7 @@ describe('tabsReducer unit tests', function () {
           this.clock.tick(1510)
           assert(this.tabsAPI.setActive.withArgs(4).calledOnce)
           assert.equal(this.tabsAPI.updateTabsStateForWindow.getCall(0).args[1], 2)
+          assert(this.tabsAPI.forgetTab.withArgs(3).calledOnce)
         })
 
         it('chooses next unpinned tab', function () {
@@ -342,6 +347,7 @@ describe('tabsReducer unit tests', function () {
           this.clock.tick(1510)
           assert(this.tabsAPI.setActive.withArgs(5).calledOnce)
           assert.equal(this.tabsAPI.updateTabsStateForWindow.getCall(0).args[1], 2)
+          assert(this.tabsAPI.forgetTab.withArgs(3).calledOnce)
         })
 
         it('chooses previous unpinned tab', function () {
@@ -353,6 +359,7 @@ describe('tabsReducer unit tests', function () {
           this.clock.tick(1510)
           assert(this.tabsAPI.setActive.withArgs(3).calledOnce)
           assert.equal(this.tabsAPI.updateTabsStateForWindow.getCall(0).args[1], 2)
+          assert(this.tabsAPI.forgetTab.withArgs(5).calledOnce)
         })
 
         describe('if no unpinned tabs come after this', function () {
@@ -370,6 +377,7 @@ describe('tabsReducer unit tests', function () {
             this.clock.tick(1510)
             assert(this.tabsAPI.setActive.withArgs(4).calledOnce)
             assert.equal(this.tabsAPI.updateTabsStateForWindow.getCall(0).args[1], 2)
+            assert(this.tabsAPI.forgetTab.withArgs(3).calledOnce)
           })
         })
       })
@@ -380,6 +388,7 @@ describe('tabsReducer unit tests', function () {
           this.clock.tick(1510)
           assert(this.tabsAPI.setActive.withArgs(4).calledOnce)
           assert.equal(this.tabsAPI.updateTabsStateForWindow.getCall(0).args[1], 2)
+          assert(this.tabsAPI.forgetTab.withArgs(5).calledOnce)
         })
 
         it('chooses parent tab id (even if parent tab was NOT last active)', function () {
@@ -390,6 +399,7 @@ describe('tabsReducer unit tests', function () {
           this.clock.tick(1510)
           assert(this.tabsAPI.setActive.withArgs(3).calledOnce)
           assert.equal(this.tabsAPI.updateTabsStateForWindow.getCall(0).args[1], 2)
+          assert(this.tabsAPI.forgetTab.withArgs(5).calledOnce)
         })
       })
     })

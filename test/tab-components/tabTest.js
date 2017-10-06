@@ -266,6 +266,43 @@ describe('tab tests', function () {
     })
   })
 
+  describe('close group of tabs', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      this.page1 = Brave.server.url('page1.html')
+      yield setup(this.app.client)
+      this.app.client
+        .newTab()
+        .waitForElementCount('[data-test-id="tab"]', 2)
+        .newTab()
+        .waitForElementCount('[data-test-id="tab"]', 3)
+    })
+    describe('closeTabsToRightMenuItemClicked', function () {
+      it('can close tabs to the right', function * () {
+        yield this.app.client
+          .closeTabsToRight(0)
+          .waitForElementCount('[data-test-id="tab"]', 1)
+          .waitForExist('[data-test-active-tab][data-frame-key="1"]')
+      })
+    })
+    describe('closeTabsToLeftMenuItemClicked', function () {
+      it('can close tabs to the left', function * () {
+        yield this.app.client
+          .closeTabsToLeft(2)
+          .waitForElementCount('[data-test-id="tab"]', 1)
+          .waitForExist('[data-test-active-tab][data-frame-key="3"]')
+      })
+    })
+    describe('closeOtherTabsMenuItemClicked', function () {
+      it('can close other tabs', function * () {
+        yield this.app.client
+          .closeOtherTabs(0)
+          .waitForElementCount('[data-test-id="tab"]', 1)
+          .waitForExist('[data-test-active-tab][data-frame-key="1"]')
+      })
+    })
+  })
+
   describe('close tab', function () {
     const tabCountBeforeTabClose = 2
     const tabCountAfterTabClose = 1
@@ -304,7 +341,7 @@ describe('tab tests', function () {
         // This ensures it's actually unloaded
         .waitForTabCount(1)
         .windowByUrl(Brave.browserWindowUrl)
-        .ipcSend(messages.SHORTCUT_CLOSE_OTHER_FRAMES, 1, true, true)
+        .closeOtherTabs(0)
         .waitForTabCount(tabCountAfterTabClose)
     })
     it('should undo last closed tab', function * () {
