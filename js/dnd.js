@@ -138,7 +138,7 @@ module.exports.prepareBookmarkDataFromCompatible = (dataTransfer) => {
   if (!bookmark) {
     bookmark = dndData.getDragData(dataTransfer, dragTypes.TAB)
     if (bookmark) {
-      appActions.addSite(bookmark, siteTags.BOOKMARK)
+      appActions.addBookmark(bookmark, siteTags.BOOKMARK)
     }
   }
   return bookmark
