@@ -309,7 +309,6 @@ const styles = StyleSheet.create({
 
   titleWrapper: {
     position: 'relative',
-    marginRight: '49px',
     minWidth: '240px'
   },
 
