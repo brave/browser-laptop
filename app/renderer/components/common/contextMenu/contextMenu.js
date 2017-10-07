@@ -16,10 +16,13 @@ const windowActions = require('../../../../../js/actions/windowActions')
 const keyCodes = require('../../../../common/constants/keyCodes')
 
 // Utils
-const cx = require('../../../../../js/lib/classSet')
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const {separatorMenuItem} = require('../../../../common/commonMenu')
 const {wrappingClamp} = require('../../../../common/lib/formatUtil')
+
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../styles/global')
+// const {theme} = require('../../styles/theme')
 
 /**
  * Represents a context menu including all submenus
@@ -185,7 +188,7 @@ class ContextMenu extends React.Component {
   }
 
   getContextMenuItemBounds () {
-    const selected = document.querySelectorAll('.contextMenuItem.selectedByKeyboard')
+    const selected = document.querySelectorAll('[data-context-menu-item-selected-by-keyboard="true"]')
     if (selected.length > 0) {
       return selected.item(selected.length - 1).getBoundingClientRect()
     }
@@ -243,37 +246,37 @@ class ContextMenu extends React.Component {
   }
 
   render () {
-    const styles = {}
+    const contextStyles = {}
     if (this.props.left !== undefined) {
-      styles.left = this.props.left
+      contextStyles.left = this.props.left
     }
     if (this.props.right !== undefined) {
-      styles.right = this.props.right
+      contextStyles.right = this.props.right
     }
     if (this.props.top !== undefined) {
-      styles.marginTop = this.props.top
+      contextStyles.marginTop = this.props.top
     }
     if (this.props.bottom !== undefined) {
-      styles.bottom = this.props.bottom
+      contextStyles.bottom = this.props.bottom
     }
     if (this.props.width !== undefined) {
-      styles.width = this.props.width
+      contextStyles.width = this.props.width
     }
     if (this.props.maxHeight) {
-      styles.maxHeight = this.props.maxHeight
+      contextStyles.maxHeight = this.props.maxHeight
     }
 
-    return <div
+    return <div className={css(
+      styles.contextMenu,
+      (this.props.right !== undefined) && styles.contextMenu_reverseExpand,
+      (this.props.maxHeight !== undefined) && styles.contextMenu_scrollable
+    )}
       data-context-menu
       data-test-id='contextMenu'
       ref={(node) => { this.node = node }}
-      className={cx({
-        contextMenu: true,
-        reverseExpand: this.props.right !== undefined,
-        contextMenuScrollable: this.props.maxHeight !== undefined
-      })}
       onClick={this.onClick}
-      style={styles}>
+      style={contextStyles}
+    >
       <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
         submenuIndex={0}
         lastZoomPercentage={this.props.lastZoomPercentage}
@@ -294,5 +297,41 @@ class ContextMenu extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  contextMenu: {
+    borderRadius: globalStyles.radius.borderRadius,
+    boxSizing: 'border-box',
+    color: 'black',
+    cursor: 'default',
+    display: 'flex',
+    fontSize: globalStyles.spacing.contextMenuFontSize,
+    overflow: 'auto',
+    position: 'absolute',
+    zIndex: globalStyles.zindex.zindexContextMenu,
+    paddingRight: '10px',
+    paddingBottom: '10px',
+    userSelect: 'none',
+    minWidth: '225px',
+
+    // This is a reasonable max height and also solves problems for bookmarks menu
+    // and bookmarks overflow menu reaching down too low.
+    maxHeight: `calc(100% - ${globalStyles.spacing.navbarHeight} + ${globalStyles.spacing.bookmarksToolbarWithFaviconsHeight})`,
+
+    '::-webkit-scrollbar': {
+      backgroundColor: 'transparent'
+    }
+  },
+
+  contextMenu_reverseExpand: {
+    flexDirection: 'row-reverse',
+    paddingRight: 0,
+    paddingLeft: '10px'
+  },
+
+  contextMenu_scrollable: {
+    overflowY: 'scroll'
+  }
+})
 
 module.exports = ReduxComponent.connect(ContextMenu)
