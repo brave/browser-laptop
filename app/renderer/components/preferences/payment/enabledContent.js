@@ -53,7 +53,7 @@ class EnabledContent extends ImmutableComponent {
       />
       <a className={cx({
         [globalStyles.appIcons.question]: true,
-        [css(styles.balance__iconLink)]: true
+        [css(styles.iconLink)]: true
       })}
         href='https://brave.com/faq-payments/#brave-payments'
         target='_blank' rel='noopener'
@@ -86,16 +86,11 @@ class EnabledContent extends ImmutableComponent {
   fundsAmount () {
     const ledgerData = this.props.ledgerData
 
-    return <section className={css(styles.balance)}>
-      <FormTextbox data-test-id='fundsAmount' readOnly value={formatCurrentBalance(ledgerData)} />
-      <a className={cx({
-        [globalStyles.appIcons.question]: true,
-        [css(styles.balance__iconLink)]: true
-      })}
-        href='https://brave.com/Payments_FAQ.html'
-        target='_blank' rel='noopener'
-      />
-    </section>
+    return <FormTextbox
+      readOnly
+      data-test-id='fundsAmount'
+      value={formatCurrentBalance(ledgerData)}
+    />
   }
 
   lastReconcileMessage () {
@@ -254,57 +249,84 @@ class EnabledContent extends ImmutableComponent {
 const gridStyles = StyleSheet.create({
   row1col1: {
     gridRow: 1,
-    gridColumn: 1
+    gridColumn: 1,
+    marginTop: globalStyles.spacing.panelPadding,
+    marginLeft: globalStyles.spacing.panelPadding
   },
 
   row1col2: {
     gridRow: 1,
-    gridColumn: 2
+    gridColumn: 2,
+    marginTop: globalStyles.spacing.panelPadding,
+    marginRight: `calc(${globalStyles.spacing.panelPadding} / 2)`,
+    marginLeft: `calc(${globalStyles.spacing.panelPadding} / 2)`
   },
 
   row1col3: {
     gridRow: 1,
-    gridColumn: 3
+    gridColumn: 3,
+    marginRight: globalStyles.spacing.panelPadding
   },
 
   row2col1: {
     gridRow: 2,
-    gridColumn: 1
+    gridColumn: 1,
+    marginLeft: globalStyles.spacing.panelPadding
   },
 
   row2col2: {
     gridRow: 2,
-    gridColumn: 2
+    gridColumn: 2,
+    marginRight: `calc(${globalStyles.spacing.panelPadding} / 2)`,
+    marginLeft: `calc(${globalStyles.spacing.panelPadding} / 2)`
   },
 
   row2col3: {
     gridRow: 2,
-    gridColumn: 3
+    gridColumn: 3,
+    marginRight: globalStyles.spacing.panelPadding
   },
 
   row3col1: {
     gridRow: 3,
-    gridColumn: 1
+    gridColumn: 1,
+    marginBottom: globalStyles.spacing.panelPadding,
+    marginLeft: globalStyles.spacing.panelPadding
   },
 
   row3col2: {
     gridRow: 3,
-    gridColumn: 2
+    gridColumn: 2,
+    marginRight: `calc(${globalStyles.spacing.panelPadding} / 2)`,
+    marginBottom: globalStyles.spacing.panelPadding,
+    marginLeft: `calc(${globalStyles.spacing.panelPadding} / 2)`
   },
 
   row3col3: {
     gridRow: 3,
-    gridColumn: 3
+    gridColumn: 3,
+    marginRight: globalStyles.spacing.panelPadding,
+    marginBottom: globalStyles.spacing.panelPadding
   }
 })
 
 const styles = StyleSheet.create({
+  iconLink: {
+    color: globalStyles.color.mediumGray,
+    fontSize: globalStyles.payments.fontSize.regular,
+    marginLeft: '10px',
+    textDecoration: 'none',
+
+    ':hover': {
+      textDecoration: 'none !important'
+    }
+  },
+
   enabledContent__walletBar: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr 1fr',
     background: globalStyles.color.lightGray,
     borderRadius: globalStyles.radius.borderRadiusUIbox,
-    padding: globalStyles.spacing.panelPadding,
     margin: `${globalStyles.spacing.panelMargin} 0`
   },
 
@@ -318,22 +340,6 @@ const styles = StyleSheet.create({
     fontSize: globalStyles.payments.fontSize.regular,
     lineHeight: 1.5,
     marginTop: globalStyles.spacing.panelPadding
-  },
-
-  balance: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-
-  balance__iconLink: {
-    color: globalStyles.color.mediumGray,
-    fontSize: globalStyles.payments.fontSize.regular,
-    marginLeft: '5px',
-    textDecoration: 'none',
-
-    ':hover': {
-      textDecoration: 'none !important'
-    }
   },
 
   enabledContent: {
