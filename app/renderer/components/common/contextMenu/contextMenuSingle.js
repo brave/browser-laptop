@@ -10,17 +10,19 @@ const ImmutableComponent = require('../../immutableComponent')
 const ContextMenuItem = require('./contextMenuItem')
 
 // Utils
-const cx = require('../../../../../js/lib/classSet')
 const {separatorMenuItem} = require('../../../../common/commonMenu')
+
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../styles/global')
 
 /**
  * Represents a single popup menu (not including submenu)
  */
 class ContextMenuSingle extends ImmutableComponent {
   render () {
-    const styles = {}
+    const contextStyles = {}
     if (this.props.y) {
-      styles.marginTop = this.props.y
+      contextStyles.marginTop = this.props.y
     }
     const visibleMenuItems = this.props.template ? this.props.template.filter((element) => {
       return element.has('visible')
@@ -29,10 +31,13 @@ class ContextMenuSingle extends ImmutableComponent {
     }) : new Immutable.List()
 
     let index = 0
-    return <div role='list' className={cx({
-      contextMenuSingle: true,
-      isSubmenu: this.props.submenuIndex !== 0
-    })} style={styles}>
+    return <div className={css(
+      styles.contextMenuSingle,
+      (this.props.submenuIndex !== 0) && styles.contextMenuSingle_isSubmenu
+    )}
+      style={contextStyles}
+      role='list'
+    >
       {
         visibleMenuItems.map((contextMenuItem) => {
           let props = {
@@ -54,5 +59,22 @@ class ContextMenuSingle extends ImmutableComponent {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  contextMenuSingle: {
+    backgroundColor: 'rgba(238, 238, 238, 1)',
+    border: '1px solid rgba(204, 204, 204, 0.54)',
+    boxShadow: '1px 4px 8px -3px rgba(0, 0, 0, 0.5)',
+    borderRadius: globalStyles.radius.borderRadius,
+    boxSizing: 'border-box',
+    display: 'table',
+    minWidth: '220px',
+    maxWidth: '400px'
+  },
+
+  contextMenuSingle_isSubmenu: {
+    position: 'relative'
+  }
+})
 
 module.exports = ContextMenuSingle

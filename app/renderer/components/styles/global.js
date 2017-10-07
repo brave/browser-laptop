@@ -231,6 +231,7 @@ const globalStyles = {
   },
   appIcons: {
     angleDoubleRight: 'fa fa-angle-double-right',
+    check: 'fa fa-check',
     clipboard: 'fa fa-clipboard',
     closeTab: 'fa fa-times-circle',
     defaultIcon: 'fa fa-file-o',

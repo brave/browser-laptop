@@ -5,7 +5,6 @@
 // Stylesheets are included here for webpack live reloading
 require('../less/window.less')
 require('../less/button.less')
-require('../less/contextMenu.less')
 require('../less/navigationBar.less')
 require('../less/forms.less')
 require('../less/switchControls.less')

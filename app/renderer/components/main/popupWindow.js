@@ -122,7 +122,7 @@ class PopupWindow extends React.Component {
       data-popup-window
       className={css(
         styles.popupWindow,
-        style.right !== undefined && styles.reverseExpand
+        style.right !== undefined && styles.popupWindow_reverseExpand
       )}
       style={style} />
   }
@@ -144,7 +144,8 @@ const styles = StyleSheet.create({
     userSelect: 'none',
     zIndex: globalStyles.zindex.zindexPopupWindow
   },
-  reverseExpand: {
+
+  popupWindow_reverseExpand: {
     flexDirection: 'row-reverse'
   }
 })
