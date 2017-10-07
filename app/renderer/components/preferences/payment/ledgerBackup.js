@@ -24,21 +24,15 @@ class LedgerBackupContent extends ImmutableComponent {
     const passphrase = this.props.ledgerData.get('passphrase')
 
     return <section>
-      <span data-l10n-id='ledgerBackupContent' />
+      <div data-l10n-id='ledgerBackupText1' />
+      <div className={css(styles.ledgerBackupText_bottom)} data-l10n-id='ledgerBackupText2' />
       <div className={css(styles.ledgerBackupContent)}>
-        <div className={css(
-          styles.ledgerBackupContent__copyKey,
-          styles.ledgerBackupContent__copyKey_second
-        )}>
-          <BrowserButton secondaryColor
-            l10nId='copy'
-            testId='copyButtonSecond'
-            onClick={this.copyToClipboard.bind(this, passphrase)}
-          />
-          <div className={css(styles.ledgerBackupContent__copyKey__key)}>
-            <span className={css(styles.ledgerBackupContent__copyKey__key__phrase)}>{passphrase}</span>
-          </div>
-        </div>
+        <BrowserButton secondaryColor
+          l10nId='copy'
+          testId='copyButtonSecond'
+          onClick={this.copyToClipboard.bind(this, passphrase)}
+        />
+        <div className={css(styles.ledgerBackupContent__key)}>{passphrase}</div>
       </div>
     </section>
   }
@@ -85,36 +79,28 @@ class LedgerBackupFooter extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
-  ledgerBackupContent: {
-    // Align the buttons and keys even when the width of the strings is not equal
-    width: 'max-content',
-    margin: 'auto',
-    maxWidth: '100%'
+  ledgerBackupText_bottom: {
+    fontWeight: '600',
+    marginTop: globalStyles.spacing.dialogInsideMargin
   },
 
-  ledgerBackupContent__copyKey: {
+  ledgerBackupContent: {
     display: 'flex',
     alignItems: 'center',
     margin: `${globalStyles.spacing.dialogInsideMargin} auto`
   },
 
-  ledgerBackupContent__copyKey_second: {
-    marginBottom: 0
-  },
+  ledgerBackupContent__key: {
+    marginLeft: `calc(${globalStyles.spacing.dialogInsideMargin} * 2)`,
 
-  ledgerBackupContent__copyKey__key: {
-    marginLeft: `calc(${globalStyles.spacing.dialogInsideMargin} * 2)`
-  },
-
-  ledgerBackupContent__copyKey__key__header: {
-    marginBottom: globalStyles.spacing.modalPanelHeaderMarginBottom
-  },
-
-  ledgerBackupContent__copyKey__key__phrase: {
+    // See syncTab.js
+    cursor: 'text',
     userSelect: 'initial',
-    cursor: 'initial',
-    color: '#D44600',
-    font: '18px monospace'
+    color: globalStyles.color.braveDarkOrange,
+
+    // See: https://github.com/Khan/aphrodite#object-key-ordering
+    fontSize: '18px',
+    fontFamily: 'monospace'
   }
 })
 
