@@ -160,7 +160,7 @@ const notifications = {
 
     // One time conversion of wallet
     const isNewInstall = state.get('firstRunTimestamp') === state.getIn(['migrations', 'batMercuryTimestamp'])
-    const hasUpgradedWallet = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btcToBatTimestamp'])
+    const hasUpgradedWallet = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatTimestamp'])
     if (!isNewInstall && !hasUpgradedWallet) {
       module.exports.transitionWalletToBat(state)
     }
@@ -178,7 +178,7 @@ const notifications = {
       // - wallet has been transitioned
       // - notification has not already been shown yet
       // (see https://github.com/brave/browser-laptop/issues/11021)
-      const hasBeenNotified = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btcToBatNotifiedTimestamp'])
+      const hasBeenNotified = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatNotifiedTimestamp'])
       if (!isNewInstall && hasUpgradedWallet && !hasBeenNotified) {
         notifications.showBraveWalletUpdated()
       }

@@ -221,8 +221,8 @@ describe('ledger api unit tests', function () {
             firstRunTimestamp: 12345,
             migrations: {
               batMercuryTimestamp: 12345,
-              btcToBatTimestamp: 12345,
-              btcToBatNotifiedTimestamp: 12345
+              btc2BatTimestamp: 12345,
+              btc2BatNotifiedTimestamp: 12345
             }
           }))
         })
@@ -236,8 +236,8 @@ describe('ledger api unit tests', function () {
             it('does not notify the user', function () {
               const targetSession = ledgerStateWithBalance
                 .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btcToBatTimestamp'], 54321)
-                .setIn(['migrations', 'btcToBatNotifiedTimestamp'], 32145)
+                .setIn(['migrations', 'btc2BatTimestamp'], 54321)
+                .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
               ledgerApi.notifications.onLaunch(targetSession)
               assert(showBraveWalletUpdatedSpy.notCalled)
             })
@@ -251,8 +251,8 @@ describe('ledger api unit tests', function () {
             it('does not notify the user', function () {
               const targetSession = ledgerStateWithBalance
                 .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btcToBatTimestamp'], 54321)
-                .setIn(['migrations', 'btcToBatNotifiedTimestamp'], 32145)
+                .setIn(['migrations', 'btc2BatTimestamp'], 54321)
+                .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
               ledgerApi.notifications.onLaunch(targetSession)
               assert(showBraveWalletUpdatedSpy.notCalled)
             })
@@ -267,8 +267,8 @@ describe('ledger api unit tests', function () {
               const targetSession = ledgerStateWithBalance
                 .setIn(['ledger', 'info', 'balance'], 0)
                 .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btcToBatTimestamp'], 54321)
-                .setIn(['migrations', 'btcToBatNotifiedTimestamp'], 32145)
+                .setIn(['migrations', 'btc2BatTimestamp'], 54321)
+                .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
               ledgerApi.notifications.onLaunch(targetSession)
               assert(showBraveWalletUpdatedSpy.notCalled)
             })
@@ -293,8 +293,8 @@ describe('ledger api unit tests', function () {
             it('does not notify the user', function () {
               const targetSession = ledgerStateWithBalance
                 .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btcToBatTimestamp'], 32145)
-                .setIn(['migrations', 'btcToBatNotifiedTimestamp'], 32145)
+                .setIn(['migrations', 'btc2BatTimestamp'], 32145)
+                .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
               ledgerApi.notifications.onLaunch(targetSession)
               assert(showBraveWalletUpdatedSpy.notCalled)
             })
@@ -308,8 +308,8 @@ describe('ledger api unit tests', function () {
             it('does not notify the user', function () {
               const targetSession = ledgerStateWithBalance
                 .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btcToBatTimestamp'], 54321)
-                .setIn(['migrations', 'btcToBatNotifiedTimestamp'], 54321)
+                .setIn(['migrations', 'btc2BatTimestamp'], 54321)
+                .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 54321)
               ledgerApi.notifications.onLaunch(targetSession)
               assert(showBraveWalletUpdatedSpy.notCalled)
             })
@@ -323,8 +323,8 @@ describe('ledger api unit tests', function () {
             it('notifies the user', function () {
               const targetSession = ledgerStateWithBalance
                 .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btcToBatTimestamp'], 54321)
-                .setIn(['migrations', 'btcToBatNotifiedTimestamp'], 32145)
+                .setIn(['migrations', 'btc2BatTimestamp'], 54321)
+                .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
               ledgerApi.notifications.onLaunch(targetSession)
               assert(showBraveWalletUpdatedSpy.calledOnce)
             })
@@ -340,7 +340,7 @@ describe('ledger api unit tests', function () {
             it('calls ledger.transitionWalletToBat', function () {
               const targetSession = ledgerStateWithBalance
                 .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btcToBatTimestamp'], 32145)
+                .setIn(['migrations', 'btc2BatTimestamp'], 32145)
               ledgerApi.notifications.onLaunch(targetSession)
               assert(transitionWalletToBatSpy.calledOnce)
             })
@@ -366,7 +366,7 @@ describe('ledger api unit tests', function () {
               const ledgerStateWithoutBalance = ledgerStateWithBalance
                 .setIn(['ledger', 'info', 'balance'], 0)
                 .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btcToBatTimestamp'], 32145)
+                .setIn(['migrations', 'btc2BatTimestamp'], 32145)
               ledgerApi.notifications.onLaunch(ledgerStateWithoutBalance)
               assert(transitionWalletToBatSpy.calledOnce)
             })
@@ -391,7 +391,7 @@ describe('ledger api unit tests', function () {
             it('does not call ledger.transitionWalletToBat', function () {
               const ledgerStateSeenNotification = ledgerStateWithBalance
                 .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btcToBatTimestamp'], 54321)
+                .setIn(['migrations', 'btc2BatTimestamp'], 54321)
               ledgerApi.notifications.onLaunch(ledgerStateSeenNotification)
               assert(transitionWalletToBatSpy.notCalled)
             })
@@ -405,7 +405,7 @@ describe('ledger api unit tests', function () {
             it('calls ledger.transitionWalletToBat', function () {
               const targetSession = ledgerStateWithBalance
                 .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btcToBatTimestamp'], 32145)
+                .setIn(['migrations', 'btc2BatTimestamp'], 32145)
               ledgerApi.notifications.onLaunch(targetSession)
               assert(transitionWalletToBatSpy.calledOnce)
             })
