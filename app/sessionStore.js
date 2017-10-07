@@ -993,8 +993,8 @@ module.exports.defaultAppState = () => {
     },
     migrations: {
       batMercuryTimestamp: now,
-      btcToBatTimestamp: now,
-      btcToBatNotifiedTimestamp: now
+      btc2BatTimestamp: now,
+      btc2BatNotifiedTimestamp: now
     }
   }
 }

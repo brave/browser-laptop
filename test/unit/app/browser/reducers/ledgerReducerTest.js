@@ -509,7 +509,7 @@ describe('ledgerReducer unit tests', function () {
     })
     it('sets the notification timestamp', function () {
       assert.notDeepEqual(returnedState, appState)
-      assert(returnedState.getIn(['migrations', 'btcToBatNotifiedTimestamp']))
+      assert(returnedState.getIn(['migrations', 'btc2BatNotifiedTimestamp']))
     })
   })
 
@@ -521,7 +521,7 @@ describe('ledgerReducer unit tests', function () {
     })
     it('sets the timestamp', function () {
       assert.notDeepEqual(returnedState, appState)
-      assert(returnedState.getIn(['migrations', 'btcToBatTimestamp']))
+      assert(returnedState.getIn(['migrations', 'btc2BatTimestamp']))
     })
   })
 })
