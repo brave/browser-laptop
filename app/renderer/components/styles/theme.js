@@ -72,6 +72,53 @@
       }
     },
 
+    contextMenu: {
+      color: '#000',
+
+      scrollBar: {
+        backgroundColor: 'transparent'
+      },
+
+      item: {
+        separator: {
+          hr: {
+            backgroundColor: '#bbb'
+          }
+        },
+
+        selected: {
+          color: '#fff',
+          backgroundColor: '#488afb'
+        },
+
+        disabled: {
+          color: '#bbb'
+        },
+
+        icon: {
+          hasFaIcon: {
+            color: globalStyles.color.darkGray
+          }
+        },
+
+        isMulti: {
+          borderColor: '#aaa',
+          backgroundColor: '#fbfbfb',
+          color: '#000'
+        },
+
+        submenuIndicator: {
+          color: '#676767'
+        }
+      },
+
+      single: {
+        backgroundColor: 'rgba(238, 238, 238, 1)',
+        borderColor: 'rgba(204, 204, 204, 0.54)',
+        boxShadowColor: 'rgba(0, 0, 0, 0.5)'
+      }
+    },
+
     tab: {
       transition: `
       background-color 150ms cubic-bezier(0.26, 0.63, 0.39, 0.65),

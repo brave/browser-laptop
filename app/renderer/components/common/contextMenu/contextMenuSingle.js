@@ -14,6 +14,7 @@ const {separatorMenuItem} = require('../../../../common/commonMenu')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../styles/global')
+const {theme} = require('../../styles/theme')
 
 /**
  * Represents a single popup menu (not including submenu)
@@ -62,9 +63,11 @@ class ContextMenuSingle extends ImmutableComponent {
 
 const styles = StyleSheet.create({
   contextMenuSingle: {
-    backgroundColor: 'rgba(238, 238, 238, 1)',
-    border: '1px solid rgba(204, 204, 204, 0.54)',
-    boxShadow: '1px 4px 8px -3px rgba(0, 0, 0, 0.5)',
+    backgroundColor: theme.contextMenu.single.backgroundColor,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: theme.contextMenu.single.borderColor,
+    boxShadow: `1px 4px 8px -3px ${theme.contextMenu.single.boxShadowColor}`,
     borderRadius: globalStyles.radius.borderRadius,
     boxSizing: 'border-box',
     display: 'table',
