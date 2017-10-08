@@ -71,11 +71,7 @@ class AboutBrave extends React.Component {
 
         <div className={css(styles.versionInformationWrapper)}>
           <AboutPageSectionSubTitle data-l10n-id='versionInformation' />
-          <ClipboardButton
-            dataL10nId='copyToClipboard'
-            className='fa fa-clipboard'
-            copyAction={this.onCopy}
-          />
+          <ClipboardButton copyAction={this.onCopy} />
         </div>
 
         <SortableTable

@@ -3,7 +3,10 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
+
+const BrowserButton = require('./browserButton')
 
 /**
  * Represents a 'Copy to clipboard' button
@@ -35,21 +38,24 @@ class ClipboardButton extends React.Component {
   render () {
     return <span className={css(styles.clipboardButton)}>
       <span className={css(
-        styles.doneLabel,
-        this.props.topTooltip && styles.doneLabelTop,
-        this.props.bottomTooltip && styles.doneLabelBottom,
-        this.state.visibleLabel && styles.visible
-      )} onAnimationEnd={this.onAnimationEnd} data-l10n-id='copied' />
-      <span
-        className={this.props.className}
-        data-l10n-id={this.props.dataL10nId}
-        onClick={this.onClick}>
-        {
-          this.props.textContext
-          ? this.props.textContext
-          : ''
-        }
-      </span>
+        styles.clipboardButton__label,
+        this.state.visibleLabel && styles.clipboardButton__label_visible,
+        (this.props.bottomTooltip || this.props.topTooltip) && styles.clipboardButton__label_vertical,
+        (this.props.bottomTooltip && !this.props.topTooltip) && styles.clipboardButton__label_bottom,
+
+        // Applied on add funds panel
+        (!this.props.bottomTooltip && this.props.topTooltip) && styles.clipboardButton__label_top
+      )}
+        onAnimationEnd={this.onAnimationEnd}
+        data-l10n-id='copied'
+      />
+      <BrowserButton
+        iconClass={globalStyles.appIcons.clipboard}
+        custom={styles.clipboardButton__browserButton}
+        l10nId={this.props.dataL10nId ? this.props.dataL10nId : 'copyToClipboard'}
+        testId={this.props.testId}
+        onClick={this.onClick}
+      />
     </span>
   }
 }
@@ -73,32 +79,37 @@ const styles = StyleSheet.create({
     position: 'relative',
     cursor: 'pointer'
   },
-  doneLabel: {
-    marginRight: '15px',
-    opacity: 0,
-    display: 'none'
+
+  clipboardButton__browserButton: {
+    fontSize: '1rem'
   },
-  doneLabelBottom: {
-    position: 'absolute',
-    top: '35px',
-    right: '30px',
+
+  clipboardButton__label: {
     width: '-webkit-fill-available',
-    opacity: 0,
-    display: 'none'
+    marginRight: '1ch',
+    display: 'none',
+    willChange: 'opacity',
+    opacity: 0
   },
-  doneLabelTop: {
-    position: 'absolute',
-    bottom: '35px',
-    right: '30px',
-    width: '-webkit-fill-available',
-    opacity: 0,
-    display: 'none'
-  },
-  visible: {
+
+  clipboardButton__label_visible: {
     display: 'inline',
     animationName: animation,
     animationDuration: '2s',
     animationTimingFunction: 'cubic-bezier(0.23, 1, 0.32, 1)'
+  },
+
+  clipboardButton__label_vertical: {
+    position: 'absolute',
+    right: '30px'
+  },
+
+  clipboardButton__label_bottom: {
+    top: '35px'
+  },
+
+  clipboardButton__label_top: {
+    bottom: '35px'
   }
 })
 
