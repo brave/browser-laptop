@@ -90,6 +90,7 @@ describe('tab pages', function () {
       yield this.app.client.click(newFrameButton)
         .waitForElementCount(tabPage, 2)
         .moveToObject(activeTab)
+        .waitForExist('[data-test-id="tab"][data-frame-key="21"]')
         .click(closeTab)
         // No tab page indicator elements when 1 page
         .waitForElementCount(tabPage, 0)
