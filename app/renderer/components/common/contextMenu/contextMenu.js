@@ -22,7 +22,7 @@ const {wrappingClamp} = require('../../../../common/lib/formatUtil')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../styles/global')
-// const {theme} = require('../../styles/theme')
+const {theme} = require('../../styles/theme')
 
 /**
  * Represents a context menu including all submenus
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   contextMenu: {
     borderRadius: globalStyles.radius.borderRadius,
     boxSizing: 'border-box',
-    color: 'black',
+    color: theme.contextMenu.color,
     cursor: 'default',
     display: 'flex',
     fontSize: globalStyles.spacing.contextMenuFontSize,
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     maxHeight: `calc(100% - ${globalStyles.spacing.navbarHeight} + ${globalStyles.spacing.bookmarksToolbarWithFaviconsHeight})`,
 
     '::-webkit-scrollbar': {
-      backgroundColor: 'transparent'
+      backgroundColor: theme.contextMenu.scrollBar.backgroundColor
     }
   },
 

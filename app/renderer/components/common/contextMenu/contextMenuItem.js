@@ -19,7 +19,7 @@ const isWindows = require('../../../../common/lib/platformUtil').isWindows()
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../styles/global')
-// const {theme} = require('../../styles/theme')
+const {theme} = require('../../styles/theme')
 
 class SubmenuIndicatorContainer extends React.Component {
   render () {
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   },
 
   item_separator__hr: {
-    backgroundColor: '#bbb',
+    backgroundColor: theme.contextMenu.item.separator.hr.backgroundColor,
     border: 'none',
     height: '1px',
     width: '100%'
@@ -296,8 +296,8 @@ const styles = StyleSheet.create({
     userSelect: 'none',
 
     ':hover': {
-      color: '#fff',
-      backgroundColor: '#488afb'
+      color: theme.contextMenu.item.selected.color,
+      backgroundColor: theme.contextMenu.item.selected.backgroundColor
     }
   },
 
@@ -308,8 +308,8 @@ const styles = StyleSheet.create({
   },
 
   item_selectedByKeyboard: {
-    backgroundColor: '#488afb',
-    color: '#fff'
+    backgroundColor: theme.contextMenu.item.selected.backgroundColor,
+    color: theme.contextMenu.item.selected.color
   },
 
   item_isMulti: {
@@ -331,13 +331,13 @@ const styles = StyleSheet.create({
 
   item_item: {
     ':hover': {
-      color: '#fff',
-      backgroundColor: '#488afb'
+      color: theme.contextMenu.item.selected.color,
+      backgroundColor: theme.contextMenu.item.selected.backgroundColor
     }
   },
 
   item_isDisabled: {
-    color: '#bbb'
+    color: theme.contextMenu.item.disabled.color
   },
 
   item__checkIndicator: {
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   },
 
   item__icon_hasFa: {
-    color: globalStyles.color.darkGray
+    color: theme.contextMenu.item.icon.hasFaIcon.color
   },
 
   item__text: {
@@ -364,10 +364,10 @@ const styles = StyleSheet.create({
   item__isMulti: {
     borderWidth: '1px',
     borderStyle: 'solid',
-    borderColor: '#aaa',
+    borderColor: theme.contextMenu.item.isMulti.borderColor,
     borderRadius: globalStyles.radius.borderRadius,
-    backgroundColor: '#fbfbfb',
-    color: '#000',
+    backgroundColor: theme.contextMenu.item.isMulti.backgroundColor,
+    color: theme.contextMenu.item.isMulti.color,
     display: 'flex',
     flexGrow: 1,
     justifyContent: 'center',
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
   },
 
   item__submenuIndicator: {
-    color: '#676767'
+    color: theme.contextMenu.item.submenuIndicator.color
   },
 
   item__submenuIndicator_next: {
