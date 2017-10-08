@@ -13,7 +13,6 @@ const ClipboardButton = require('../../../../common/clipboardButton')
 const appActions = require('../../../../../../../js/actions/appActions')
 
 // Styles
-const globalStyles = require('../../../../styles/global')
 const {addFundsDialogMinHeight} = require('../../../../styles/global').spacing
 const ethIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/ETH_icon.svg')
 const btcIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/BTC_icon.svg')
@@ -48,7 +47,6 @@ class AddFundsWizardAddress extends React.Component {
     return (
       <ClipboardButton
         topTooltip
-        className={globalStyles.appIcons.clipboard}
         copyAction={this.onCopy}
       />
     )
