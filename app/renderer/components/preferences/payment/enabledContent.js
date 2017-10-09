@@ -50,7 +50,7 @@ class EnabledContent extends ImmutableComponent {
         test2Id={'addFunds'}
         l10nId={buttonText}
         onClick={onButtonClick.bind(this)}
-        disabled={ledgerData.get('creating')}
+        disabled={!ledgerData.get('created')}
       />
       <a className={cx({
         [globalStyles.appIcons.question]: true,
