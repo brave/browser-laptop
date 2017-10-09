@@ -717,8 +717,8 @@ const synopsisNormalizer = (state, changedPublisher, returnState) => {
     const publisherKey = item.site
     const weight = item.weight
     const pinPercentage = item.pinPercentage
-    savePublisherOption(publisherKey, 'weight', weight)
-    savePublisherOption(publisherKey, 'pinPercentage', pinPercentage)
+    savePublisherData(publisherKey, 'weight', weight)
+    savePublisherData(publisherKey, 'pinPercentage', pinPercentage)
     state = ledgerState.setPublishersProp(state, publisherKey, 'weight', weight)
     state = ledgerState.setPublishersProp(state, publisherKey, 'pinPercentage', pinPercentage)
   })
@@ -2224,6 +2224,12 @@ const saveOptionSynopsis = (prop, value) => {
 const savePublisherOption = (publisherKey, prop, value) => {
   if (synopsis.publishers && synopsis.publishers[publisherKey]) {
     synopsis.publishers[publisherKey].options[prop] = value
+  }
+}
+
+const savePublisherData = (publisherKey, prop, value) => {
+  if (synopsis.publishers && synopsis.publishers[publisherKey]) {
+    synopsis.publishers[publisherKey][prop] = value
   }
 }
 
