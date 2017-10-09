@@ -317,7 +317,11 @@ const styles = StyleSheet.create({
   },
 
   switchWrap: {
-    width: paymentStyles.width.tableCell
+    width: paymentStyles.width.tableCell,
+
+    // TODO: Remove this when #10913 is merged to master
+    position: 'relative',
+    left: '1rem'
   },
   switchWrap__switchControl: {
     // TODO: Refactor switchControls.less
@@ -365,8 +369,10 @@ const styles = StyleSheet.create({
   // History and settings icons
   switchWrap__mainIconsRight: {
     position: 'relative',
-    right: '12px',
-    top: '3.5px'
+    top: '3.5px',
+
+    // See: #11367
+    right: '1rem'
   },
   switchWrap__mainIcons: {
     backgroundColor: globalStyles.color.braveOrange,
