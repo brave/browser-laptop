@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const {GroupedFormTextbox} = require('../../../../common/textbox')
@@ -82,11 +82,11 @@ class AddFundsWizardAddress extends React.Component {
       <div
         data-test-id={testId}
         className={css(
-          styles.wizardAddress,
-          this.currency === 'ETH' && styles.wizardAddress_eth,
-          this.currency === 'BTC' && styles.wizardAddress_btc,
-          this.currency === 'LTC' && styles.wizardAddress_ltc,
-          this.currency === 'BAT' && styles.wizardAddress_bat
+          styles.address,
+          this.currency === 'ETH' && styles.address_eth,
+          this.currency === 'BTC' && styles.address_btc,
+          this.currency === 'LTC' && styles.address_ltc,
+          this.currency === 'BAT' && styles.address_bat
       )}>
         <header data-l10n-id='addFundsWizardAddressHeader'
           data-l10n-args={JSON.stringify({
@@ -94,8 +94,8 @@ class AddFundsWizardAddress extends React.Component {
             currency: this.currency
           } || {})}
         />
-        <div className={css(styles.wizardAddress__main)}>
-          <main className={css(styles.wizardAddress__inputBox)}>
+        <div className={css(styles.address__main)}>
+          <main className={css(styles.address__main__inputBox)}>
             <div>
               <GroupedFormTextbox readOnly
                 l10nId='loadingWalletAddress'
@@ -110,27 +110,33 @@ class AddFundsWizardAddress extends React.Component {
                   currency: this.currency,
                   funds: this.props.minAmount
                 } || {})}
-                className={css(styles.wizardAddress__text_note)}
+                className={css(
+                  styles.address__main__text_small,
+                  styles.address__main__inputBox__text
+                )}
               />
               <p data-l10n-id={this.footerNote}
                 data-l10n-args={JSON.stringify({currency: this.currency} || {})}
-                className={css(styles.wizardAddress__text_note)}
+                className={css(
+                  styles.address__main__text_small,
+                  styles.address__main__inputBox__text
+                )}
               />
             </div>
-            <div className={css(styles.wizardAddress__fancyDivider)}>
+            <div className={css(styles.address__main__inputBox__fancyDivider)}>
               <span data-l10n-id='or'
-                className={css(styles.wizardAddress__fancyDivider__text)}
+                className={css(styles.address__main__inputBox__fancyDivider__text)}
               />
             </div>
           </main>
-          <aside className={css(styles.wizardAddress__qrCode)}>
+          <aside className={css(styles.address__main__qrCode)}>
             <span data-l10n-id='qrCodeVersion'
               className={css(
-                styles.wizardAddress__qrCode__text,
-                styles.wizardAddress__text_small
+                styles.address__main__text_small,
+                styles.address__main__qrCode__text
               )} />
             <img src={this.props.qrCode}
-              className={css(styles.wizardAddress__qrCode__image)}
+              className={css(styles.address__main__qrCode__image)}
             />
           </aside>
         </div>
@@ -140,7 +146,7 @@ class AddFundsWizardAddress extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  wizardAddress: {
+  address: {
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
@@ -160,47 +166,42 @@ const styles = StyleSheet.create({
     }
   },
 
-  wizardAddress_bat: {
+  address_bat: {
     '::before': {
       backgroundImage: `url(${batIcon})`
     }
   },
 
-  wizardAddress_eth: {
+  address_eth: {
     '::before': {
       backgroundImage: `url(${ethIcon})`
     }
   },
 
-  wizardAddress_btc: {
+  address_btc: {
     '::before': {
       backgroundImage: `url(${btcIcon})`
     }
   },
 
-  wizardAddress_ltc: {
+  address_ltc: {
     '::before': {
       backgroundImage: `url(${ltcIcon})`
     }
   },
 
-  wizardAddress__main: {
+  address__main: {
     display: 'flex',
     flex: 1,
     justifyContent: 'space-between',
     margin: '15px 0'
   },
 
-  wizardAddress__text_note: {
-    fontSize: 'small',
-    margin: '10px 0'
-  },
-
-  wizardAddress__text_small: {
+  address__main__text_small: {
     fontSize: 'small'
   },
 
-  wizardAddress__inputBox: {
+  address__main__inputBox: {
     display: 'flex',
     flex: 1,
     alignItems: 'center',
@@ -209,7 +210,11 @@ const styles = StyleSheet.create({
     height: '120px'
   },
 
-  wizardAddress__fancyDivider: {
+  address__main__inputBox__text: {
+    margin: '10px 0'
+  },
+
+  address__main__inputBox__fancyDivider: {
     display: 'flex',
     width: '40px',
     height: '100%',
@@ -222,7 +227,7 @@ const styles = StyleSheet.create({
     backgroundRepeat: 'repeat-y'
   },
 
-  wizardAddress__fancyDivider__text: {
+  address__main__inputBox__fancyDivider__text: {
     display: 'flex',
     background: 'white',
     margin: 'auto',
@@ -230,19 +235,19 @@ const styles = StyleSheet.create({
     color: '#000'
   },
 
-  wizardAddress__qrCode: {
+  address__main__qrCode: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     padding: '15px 0'
   },
 
-  wizardAddress__qrCode__text: {
+  address__main__qrCode__text: {
     color: '#777',
     margin: '5px 0'
   },
 
-  wizardAddress__qrCode__image: {
+  address__main__qrCode__image: {
     maxWidth: '100px'
   }
 })
