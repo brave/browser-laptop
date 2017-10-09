@@ -24,6 +24,9 @@ class BatWelcomeScreen extends React.Component {
         <p data-l10n-id='helloBatText2'
           className={css(styles.batScreen__text)}
         />
+        <p data-l10n-id='helloBatText3'
+          className={css(styles.batScreen__text)}
+        />
       </div>
     )
   }
