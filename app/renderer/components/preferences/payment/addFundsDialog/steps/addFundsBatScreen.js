@@ -9,6 +9,7 @@ const {AboutPageSectionTitle} = require('../../../../common/sectionTitle')
 // Styles
 const {StyleSheet, css} = require('aphrodite')
 const {addFundsDialogMinHeight} = require('../../../../styles/global').spacing
+const globalStyles = require('../../../../styles/global')
 const batIcon = require('../../../../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
 
 class BatWelcomeScreen extends React.Component {
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
   },
 
   batScreen__text: {
-    margin: '20px 0'
+    marginTop: globalStyles.spacing.dialogInsideMargin
   },
 
   batScreen__text_small: {
