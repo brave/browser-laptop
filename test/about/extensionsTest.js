@@ -131,7 +131,7 @@ describe('about:extensions', function () {
         .waitForVisible(`[data-extension-id="${extensionIds[passwordManagers.ENPASS]}"]`, extensionDownloadWaitTime)
     })
   })
-  describe.skip('bitwarden installs when enabled', function () {
+  describe('bitwarden installs when enabled', function () {
     Brave.beforeAll(this)
     before(function * () {
       yield setup(this.app.client)
