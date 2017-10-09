@@ -50,7 +50,7 @@ class EnabledContent extends ImmutableComponent {
         l10nId={buttonText}
         custom={styles.addFunds}
         onClick={onButtonClick.bind(this)}
-        disabled={ledgerData.get('creating')}
+        disabled={!ledgerData.get('created')}
       />
       <a className={cx({
         fa: true,
