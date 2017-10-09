@@ -551,7 +551,9 @@ const styles = StyleSheet.create({
     marginBottom: globalStyles.spacing.settingsListContainerMargin
   },
   passphrase: {
-    font: '18px monospace'
+    // See: https://github.com/Khan/aphrodite#object-key-ordering
+    fontSize: '18px',
+    fontFamily: 'monospace'
   },
   subText: {
     color: globalStyles.color.gray,
@@ -606,9 +608,11 @@ const styles = StyleSheet.create({
 
   listItem__passphrase: {
     margin: `${globalStyles.spacing.dialogInsideMargin} 0`,
-    color: globalStyles.color.braveDarkOrange,
+
+    // See ledgerBackup.js
+    cursor: 'text',
     userSelect: 'initial',
-    cursor: 'initial'
+    color: globalStyles.color.braveDarkOrange
   },
 
   syncOverlayBody__listWrapper: {
