@@ -1712,19 +1712,14 @@ const onWalletProperties = (state, body) => {
   // unconfirmed amount
   const unconfirmed = parseFloat(body.get('unconfirmed'))
   if (unconfirmed > 0) {
-    const result = (unconfirmed / 1e8).toFixed(4)
-    if (ledgerState.getInfoProp(state, 'unconfirmed') === result) {
+    if (ledgerState.getInfoProp(state, 'unconfirmed') === unconfirmed) {
       return state
     }
 
-    state = ledgerState.setInfoProp(state, 'unconfirmed', result)
+    state = ledgerState.setInfoProp(state, 'unconfirmed', unconfirmed)
     if (clientOptions.verboseP) {
       console.log('\ngetBalance refreshes ledger info: ' + ledgerState.getInfoProp(state, 'unconfirmed'))
     }
-    return state
-  }
-
-  if (ledgerState.getInfoProp(state, 'unconfirmed') === '0.0000') {
     return state
   }
 
