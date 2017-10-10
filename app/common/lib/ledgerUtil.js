@@ -65,7 +65,7 @@ const shouldTrackView = (view, responseList) => {
 
 const batToCurrencyString = (bat, ledgerData) => {
   const balance = Number(bat || 0)
-  const currency = (ledgerData && ledgerData.get('currency')) || 'USD'
+  const currency = 'USD'
 
   if (balance === 0 || ledgerData == null) {
     return `0 ${currency}`
@@ -83,7 +83,6 @@ const formatCurrentBalance = (ledgerData) => {
   let hasRate = false
 
   if (ledgerData != null) {
-    currency = ledgerData.get('currency') || 'USD'
     balance = Number(ledgerData.get('balance') || 0)
     converted = Number.parseFloat(ledgerData.get('converted')) || 0
     hasRate = ledgerData.has('currentRate')
