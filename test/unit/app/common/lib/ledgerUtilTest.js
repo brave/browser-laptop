@@ -146,10 +146,6 @@ describe('ledgerUtil test', function () {
       const result = ledgerUtil.formatCurrentBalance(ledgerData)
       assert.equal(result, '5.00 BAT (1.12 USD)')
     })
-    it('will mark currency with different symbol (if present)', function () {
-      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('currency', 'Sealand dollars'))
-      assert.equal(result, '5.00 BAT (1.12 Sealand dollars)')
-    })
     it('defaults `balance` to 0 if not found', function () {
       const result = ledgerUtil.formatCurrentBalance(ledgerData.delete('balance'))
       assert.equal(result, '0.00 BAT (1.12 USD)')
