@@ -10,6 +10,8 @@ const moment = require('moment')
 const {batToCurrencyString, formatCurrentBalance, formattedDateFromTimestamp, walletStatus} = require('../../../../common/lib/ledgerUtil')
 const {l10nErrorText} = require('../../../../common/lib/httpUtil')
 const {changeSetting} = require('../../../lib/settingsUtil')
+const getSetting = require('../../../../../js/settings').getSetting
+const settings = require('../../../../../js/constants/settings')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
@@ -22,14 +24,11 @@ const LedgerTable = require('./ledgerTable')
 // style
 const globalStyles = require('../../styles/global')
 const {paymentStyles, paymentStylesVariables} = require('../../styles/payment')
+const {loaderAnimation} = require('../../styles/animations')
 const cx = require('../../../../../js/lib/classSet')
 
 // Actions
 const appActions = require('../../../../../js/actions/appActions')
-
-// other
-const getSetting = require('../../../../../js/settings').getSetting
-const settings = require('../../../../../js/constants/settings')
 
 // TODO: report when funds are too low
 // TODO: support non-USD currency
@@ -172,8 +171,22 @@ class EnabledContent extends ImmutableComponent {
   render () {
     const ledgerData = this.props.ledgerData
     const walletStatusText = walletStatus(ledgerData)
+    const inTransition = !(ledgerData.getIn(['migration', 'btc2BatTransitionDone']))
 
-    return <section>
+    return <section className={css(styles.enabledContent)}>
+      <div className={css(styles.enabledContent__loader, inTransition && styles.enabledContent__loader_show)}>
+        <p className={css(styles.loader__text)}>
+          <p data-l10n-id='leaderLoaderText1' />
+          <p data-l10n-id='leaderLoaderText2' />
+        </p>
+        <div className={css(styles.leader__wrap)}>
+          <div>
+            <div className={css(styles.loader__line, styles.loader__line_1, !inTransition && styles.loader__line_off)} />
+            <div className={css(styles.loader__line, styles.loader__line_2, !inTransition && styles.loader__line_off)} />
+            <div className={css(styles.loader__line, styles.loader__line_3, !inTransition && styles.loader__line_off)} />
+          </div>
+        </div>
+      </div>
       <div className={css(styles.walletBar)} data-test-id='walletBar'>
         <table>
           <thead>
@@ -345,6 +358,74 @@ const styles = StyleSheet.create({
     ':hover': {
       textDecoration: 'none !important'
     }
+  },
+
+  enabledContent: {
+    position: 'relative',
+    zIndex: 2
+  },
+
+  enabledContent__loader: {
+    background: '#fafafa',
+    zIndex: 3,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width: '100%',
+    height: '100%',
+    margin: 0,
+    opacity: 0,
+    transform: 'translateX(-1000%)',
+    transition: 'opacity .4s ease-out, transform .1s .4s ease'
+  },
+
+  enabledContent__loader_show: {
+    opacity: 1,
+    transform: 'translateX(0)',
+    transition: 'opacity .4s ease-out'
+  },
+
+  loader__text: {
+    textAlign: 'center',
+    padding: '50px 0 20px',
+    display: 'block',
+    color: '#444'
+  },
+
+  leader__wrap: {
+    width: '45px',
+    left: 0,
+    right: 0,
+    margin: '50px auto 0'
+  },
+
+  loader__line: {
+    display: 'inline-block',
+    width: '15px',
+    height: '15px',
+    borderRadius: '15px',
+    animationName: [loaderAnimation],
+    animationDuration: '.6s',
+    animationIterationCount: 'infinite'
+  },
+
+  loader__line_1: {
+    backgroundColor: '#FF5000',
+    animationDelay: '.1s'
+  },
+
+  loader__line_2: {
+    backgroundColor: '#9E1F63',
+    animationDelay: '.2s'
+  },
+
+  loader__line_3: {
+    backgroundColor: '#662D91',
+    animationDelay: '.3s'
+  },
+
+  loader__line_off: {
+    animationName: 'none'
   }
 })
 

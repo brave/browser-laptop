@@ -155,7 +155,7 @@ const notifications = {
   },
   onLaunch: (state) => {
     if (!getSetting(settings.PAYMENTS_ENABLED)) {
-      return
+      return state
     }
 
     // One time conversion of wallet
@@ -163,12 +163,14 @@ const notifications = {
     const hasUpgradedWallet = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatTimestamp'])
     if (!isNewInstall && !hasUpgradedWallet) {
       module.exports.transitionWalletToBat(state)
+    } else {
+      state = state.setIn(['migrations', 'btc2BatTransitionDone'], true)
     }
 
     if (hasFunds(state)) {
       // Don't bother processing the rest, which are only notifications.
       if (!getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
-        return
+        return state
       }
 
       // Show one-time BAT conversion message:
@@ -183,6 +185,8 @@ const notifications = {
         notifications.showBraveWalletUpdated()
       }
     }
+
+    return state
   },
   onInterval: (state) => {
     if (getSetting(settings.PAYMENTS_ENABLED)) {
@@ -2002,7 +2006,7 @@ const onInitRead = (state, parsedData) => {
   getBalance(state)
 
   // Show relevant browser notifications on launch
-  notifications.onLaunch(state)
+  state = notifications.onLaunch(state)
 
   return state
 }
@@ -2276,6 +2280,7 @@ const transitionWalletToBat = (state) => {
         newClient = true
         appActions.onLedgerCallback(result, random.randomInt({ min: miliseconds.minute, max: 10 * miliseconds.minute }))
         appActions.onBitcoinToBatTransitioned()
+        notifications.showBraveWalletUpdated()
       }
     })
   } catch (ex) {
