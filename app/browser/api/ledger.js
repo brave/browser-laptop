@@ -162,7 +162,7 @@ const notifications = {
     const isNewInstall = state.get('firstRunTimestamp') === state.getIn(['migrations', 'batMercuryTimestamp'])
     const hasUpgradedWallet = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatTimestamp'])
     if (!isNewInstall && !hasUpgradedWallet) {
-      module.exports.transitionWalletToBat(state)
+      module.exports.transitionWalletToBat()
     }
 
     if (hasFunds(state)) {
@@ -1770,7 +1770,7 @@ const onBraveryProperties = (state, error, result) => {
   }
 
   if (result) {
-    muonWriter(result)
+    muonWriter(statePath, result)
   }
 
   return state
@@ -1879,7 +1879,7 @@ const onCallback = (state, result, delayTime) => {
     })
   }
 
-  muonWriter(regularResults)
+  muonWriter(statePath, regularResults)
   run(state, delayTime)
 
   return state
@@ -2009,7 +2009,7 @@ const onInitRead = (state, parsedData) => {
 
 const onTimeUntilReconcile = (state, stateResult) => {
   state = getStateInfo(state, stateResult.toJS()) // TODO optimize
-  muonWriter(stateResult)
+  muonWriter(statePath, stateResult)
 
   return state
 }
@@ -2094,7 +2094,7 @@ const run = (state, delayTime) => {
       const result = client.vote(winner)
       if (result) stateData = result
     })
-    if (stateData) muonWriter(stateData)
+    if (stateData) muonWriter(statePath, stateData)
   } catch (ex) {
     console.log('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
   }
@@ -2162,8 +2162,8 @@ const onNetworkConnected = (state) => {
   balanceTimeoutId = setTimeout(newBalance, 5 * miliseconds.second)
 }
 
-const muonWriter = (payload) => {
-  const path = pathName(statePath)
+const muonWriter = (fileName, payload) => {
+  const path = pathName(fileName)
   muon.file.writeImportant(path, JSON.stringify(payload, null, 2), (success) => {
     if (!success) return console.error('write error: ' + path)
 
@@ -2238,21 +2238,46 @@ const deleteSynopsis = () => {
 }
 
 let newClient = null
-const transitionWalletToBat = (state) => {
+const transitionWalletToBat = () => {
   let newPaymentId, result
+  const newClientPath = 'ledger-newstate.json'
 
   if (newClient === true) return
+  // Restore newClient from the file
+  if (!newClient) {
+    const fs = require('fs')
+    try {
+      fs.accessSync(pathName(newClientPath), fs.FF_OK)
+      fs.readFile(pathName(newClientPath), (error, data) => {
+        if (error) {
+          console.log(`ledger client: can't read ${newClientPath} to restore newClient`)
+          return
+        }
+        const parsedData = JSON.parse(data)
+        newClient = ledgerClient(parsedData.state.personaId,
+          underscore.extend(parsedData.options, {roundtrip: roundtrip}, clientOptions),
+          parsedData)
+        transitionWalletToBat()
+      })
+      return
+    } catch (err) {
+      console.log(err.toString())
+    }
+  }
 
+  // Create new client
   if (!newClient) {
     try {
       clientprep()
       newClient = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
+      muonWriter(newClientPath, newClient)
     } catch (ex) {
       return console.error('ledger client creation error(2): ', ex)
     }
   }
 
   newPaymentId = newClient.getPaymentId()
+  console.log(newPaymentId)
   if (!newPaymentId) {
     newClient.sync((err, result, delayTime) => {
       if (err) {
@@ -2261,7 +2286,7 @@ const transitionWalletToBat = (state) => {
 
       if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1, max: 500 })
 
-      setTimeout(() => transitionWalletToBat(state), delayTime)
+      setTimeout(() => transitionWalletToBat(), delayTime)
     })
     return
   }
@@ -2276,6 +2301,10 @@ const transitionWalletToBat = (state) => {
         newClient = true
         appActions.onLedgerCallback(result, random.randomInt({ min: miliseconds.minute, max: 10 * miliseconds.minute }))
         appActions.onBitcoinToBatTransitioned()
+        const fs = require('fs')
+        fs.unlink(pathName(newClientPath), (err) => {
+          if (err) console.error('unlink error: ' + err.toString())
+        })
       }
     })
   } catch (ex) {
