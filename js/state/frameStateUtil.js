@@ -487,7 +487,7 @@ const getTabPageIndex = (state) => {
   const tabPageIndex = state.getIn(['ui', 'tabs', 'tabPageIndex'], 0)
   const previewTabPageIndex = state.getIn(['ui', 'tabs', 'previewTabPageIndex'])
 
-  return previewTabPageIndex || tabPageIndex
+  return previewTabPageIndex != null ? previewTabPageIndex : tabPageIndex
 }
 
 /**
