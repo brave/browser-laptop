@@ -231,6 +231,7 @@ const shouldSkipCookie = (cookie) => {
   }
   return false
 }
+module.exports.shouldSkipCookie = shouldSkipCookie
 
 importer.on('add-cookies', (e, cookies) => {
   for (let i = 0; i < cookies.length; ++i) {
