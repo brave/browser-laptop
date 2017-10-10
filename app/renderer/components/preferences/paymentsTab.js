@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// Note that these are webpack requires, not CommonJS node requiring requires
 const React = require('react')
 const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite/no-important')
@@ -29,14 +28,17 @@ const {HistoryContent, HistoryFooter} = require('./payment/history')
 const {LedgerBackupContent, LedgerBackupFooter} = require('./payment/ledgerBackup')
 const {LedgerRecoveryContent, LedgerRecoveryFooter} = require('./payment/ledgerRecovery')
 
-// style
+// Actions
+const appActions = require('../../../../js/actions/appActions')
+
+// Style
 const globalStyles = require('../styles/global')
 const {paymentStyles, paymentStylesVariables} = require('../styles/payment')
 const settingsIcon = require('../../../extensions/brave/img/ledger/icon_settings.svg')
 const historyIcon = require('../../../extensions/brave/img/ledger/icon_history.svg')
 const batIcon = require('../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
 
-// other
+// Other
 const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
 const {formatCurrentBalance, batToCurrencyString} = require('../../../common/lib/ledgerUtil')
@@ -49,6 +51,7 @@ class PaymentsTab extends ImmutableComponent {
     }
 
     this.handleRecoveryKeyChange = this.handleRecoveryKeyChange.bind(this)
+    this.hideOverlay = this.hideOverlay.bind(this)
   }
 
   handleRecoveryKeyChange (key) {
@@ -105,6 +108,11 @@ class PaymentsTab extends ImmutableComponent {
     return formatCurrentBalance(ledgerData)
   }
 
+  hideOverlay () {
+    this.props.hideOverlay('addFunds')
+    appActions.onChangeAddFundsDialogStep('addFundsWizardMain')
+  }
+
   render () {
     const enabled = this.props.ledgerData.get('created')
     return <div className={cx({
@@ -119,7 +127,7 @@ class PaymentsTab extends ImmutableComponent {
           subTitleArgs={this.getOverlayFounds}
           content={this.overlayContent}
           footer={this.overlayFooter}
-          onHide={this.props.hideOverlay.bind(this, 'addFunds')}
+          onHide={this.hideOverlay}
         />
         : null
       }
