@@ -82,7 +82,9 @@ const updatePinnedTabs = (win) => {
       })
 
   const sitesToAdd = pinnedSites.filter((site) =>
-    !win.__alreadyPinnedSites.find((pinned) => pinned.equals(site)))
+    !win.__alreadyPinnedSites.find((pinned) =>
+      pinned.get('location') === site.get('location') &&
+      pinned.get('partitionNumber') === site.get('partitionNumber')))
 
   sitesToAdd.forEach((site) => {
     win.__alreadyPinnedSites = win.__alreadyPinnedSites.add(site)
@@ -96,7 +98,9 @@ const updatePinnedTabs = (win) => {
   })
 
   const sitesToClose = win.__alreadyPinnedSites.filter((pinned) =>
-    !pinnedSites.find((site) => pinned.equals(site)))
+    !pinnedSites.find((site) =>
+      pinned.get('location') === site.get('location') &&
+      pinned.get('partitionNumber') === site.get('partitionNumber')))
 
   sitesToClose
     .forEach((site) => {
