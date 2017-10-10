@@ -31,8 +31,21 @@ const widthIncreaseKeyframes = (start, end) => ({
   }
 })
 
+const loaderAnimation = {
+  '0': {
+    transform: 'translate(0,0)'
+  },
+  '50%': {
+    transform: 'translate(0,15px)'
+  },
+  '100%': {
+    transform: 'translate(0,0)'
+  }
+}
+
 module.exports = {
   spinKeyframes,
   opacityIncreaseKeyframes,
-  widthIncreaseKeyframes
+  widthIncreaseKeyframes,
+  loaderAnimation
 }
