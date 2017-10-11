@@ -41,6 +41,7 @@ const updateSearchEngineInfoFromInput = (state, frameProps) => {
 const setUrlSuggestions = (state, suggestionList) => {
   if (suggestionList !== undefined) {
     state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'suggestionList']), suggestionList)
+    state = state.setIn(activeFrameStatePath(state).concat(['navbar', 'urlbar', 'suggestions', 'selectedIndex']), null)
   }
   state = updateUrlSuffix(state, suggestionList)
   return state
