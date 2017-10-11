@@ -58,6 +58,19 @@ describe('Bravery Panel', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForTextValue('[data-test-id="lionBadge"]', '2')
     })
+    it('lion badge does not update for background loads', function * () {
+      const url = Brave.server.url('tracking.html')
+      yield this.app.client
+        .waitForDataFile('trackingProtection')
+        .newTab({ url })
+        .waitForTabCount(2)
+        .windowByUrl(Brave.browserWindowUrl)
+        .newTab({ url })
+        .waitForTabCount(3)
+        .windowByUrl(Brave.browserWindowUrl)
+        .ipcSend('blocked-resource', 'adblock', { url, tabId: 5 })
+        .waitForTextValue('[data-test-id="lionBadge"]', '2')
+    })
   })
   describe('Tracking Protection stats', function () {
     Brave.beforeEach(this)

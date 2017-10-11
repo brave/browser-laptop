@@ -382,7 +382,7 @@ class Main extends React.Component {
     })
 
     ipc.on(messages.BLOCKED_RESOURCE, (e, blockType, details) => {
-      windowActions.setBlockedBy(this.props.tabId, blockType, details.url)
+      windowActions.setBlockedBy(details.tabId, blockType, details.url)
     })
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
