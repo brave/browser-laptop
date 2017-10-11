@@ -320,7 +320,7 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_BTC_TO_BAT_TRANSITIONED:
       {
         state = state.setIn(['migrations', 'btc2BatTimestamp'], new Date().getTime())
-        state = state.setIn(['migrations', 'btc2BatTransitionDone'], true)
+        state = state.setIn(['migrations', 'btc2BatTransitionPending'], false)
         break
       }
     case appConstants.APP_ON_LEDGER_QR_GENERATED:

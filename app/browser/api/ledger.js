@@ -162,9 +162,8 @@ const notifications = {
     const isNewInstall = state.get('firstRunTimestamp') === state.getIn(['migrations', 'batMercuryTimestamp'])
     const hasUpgradedWallet = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatTimestamp'])
     if (!isNewInstall && !hasUpgradedWallet) {
+      state = state.setIn(['migrations', 'btc2BatTransitionPending'], true)
       module.exports.transitionWalletToBat(state)
-    } else {
-      state = state.setIn(['migrations', 'btc2BatTransitionDone'], true)
     }
 
     if (hasFunds(state)) {
