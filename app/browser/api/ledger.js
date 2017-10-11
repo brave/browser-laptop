@@ -1691,7 +1691,10 @@ const onWalletProperties = (state, body) => {
   const info = ledgerState.getInfoProps(state)
   const infoRates = info.get('rates')
   const currency = 'USD' // TODO for now it's fixed
-  let rate = infoRates.get(currency)
+  let rate
+  if (infoRates) {
+    rate = infoRates.get(currency)
+  }
 
   if (rate) {
     state = ledgerState.setInfoProp(state, 'currentRate', rate)
