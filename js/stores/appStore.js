@@ -517,9 +517,9 @@ const handleAppAction = (action) => {
         calculateTopSites(false)
       }
       break
-    case appConstants.APP_RENDER_URL_TO_PDF:
+    case appConstants.APP_RENDER_TO_PDF:
       const pdf = require('../../app/pdf')
-      appState = pdf.renderUrlToPdf(appState, action)
+      appState = pdf.renderToPdf(appState, action)
       break
     case appConstants.APP_SET_OBJECT_ID:
       let obj = appState.getIn(action.objectPath)

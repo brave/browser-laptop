@@ -4,83 +4,50 @@
 
 'use strict'
 
-const electron = require('electron')
-const config = require('../js/constants/config')
-const BrowserWindow = electron.BrowserWindow
+const tabs = require('./browser/tabs')
+const {fileUrl} = require('../../js/lib/appUrlUtil')
+const {getWebContents} = require('./browser/webContentsCache')
 
-const renderUrlToPdf = (appState, action) => {
-  let url = action.url
-  let savePath = action.savePath
-  let openAfterwards = action.openAfterwards
+const renderToPdf = (appState, action) => {
+  const tab = getWebContents(action.tabId)
+  if (!tab || tab.isDestroyed()) {
+    return
+  }
 
-  let currentBw = BrowserWindow.getFocusedWindow()
+  const savePath = action.savePath
+  const openAfterwards = action.openAfterwards
 
-  let bw = new BrowserWindow({
-    show: false,
-    width: 0,
-    height: 0,
-    focusable: false,
-    backgroundColor: '#ffffff',
-    webPreferences: {
-      partition: 'default'
+  tab.printToPDF({}, function (err, data) {
+    if (err) {
+      throw err
     }
-  })
 
-  let wv = bw.webContents
+    if (tab.isDestroyed()) {
+      return
+    }
 
-  let whenReadyToGeneratePDF = () => {
-    wv.printToPDF({}, function (err, data) {
-      if (err) {
-        throw err
-      }
+    let pdfDataURI = 'data:application/pdf;base64,' + data.toString('base64')
+    tab.downloadURL(pdfDataURI, true, savePath, (downloadItem) => {
+      downloadItem.once('done', function (event, state) {
+        if (state === 'completed') {
+          let finalSavePath = downloadItem.getSavePath()
 
-      let pdfDataURI = 'data:application/pdf;base64,' + data.toString('base64')
-
-      // need to put our event handler first so we can set filename
-      //   specifically, needs to execute ahead of app/filtering.js:registerForDownloadListener (which opens the dialog box)
-      let listeners = wv.session.listeners('will-download')
-      wv.session.removeAllListeners('will-download')
-
-      wv.downloadURL(pdfDataURI, true)
-      wv.session.once('will-download', function (event, item) {
-        if (savePath) {
-          item.setSavePath(savePath)
-        }
-
-        item.once('done', function (event, state) {
-          if (state === 'completed') {
-            let finalSavePath = item && item.getSavePath()
-
-            if (openAfterwards && savePath) {
-              currentBw.webContents.loadURL('file://' + finalSavePath)
+          if (openAfterwards && finalSavePath) {
+            let createProperties = {
+              url: fileUrl(finalSavePath)
             }
+            if (tab && !tab.isDestoyed()) {
+              createProperties.openerTabId = tab.getId()
+            }
+            tabs.create(createProperties)
           }
-
-          if (bw) {
-            try {
-              bw.close()
-            } catch (exc) {}
-          }
-        })
-      })
-      // add back other event handlers (esp. add/filtering.js:registerForDownloadListener which opens the dialog box)
-      listeners.forEach(function (listener) {
-        wv.session.on('will-download', listener)
+        }
       })
     })
-  }
-
-  let afterLoaded = () => {
-    let removeCharEncodingArtifactJS = 'document.body.outerHTML = document.body.outerHTML.replace(/Â/g, "")'
-    wv.executeScriptInTab(config.braveExtensionId, removeCharEncodingArtifactJS, {}, whenReadyToGeneratePDF)
-  }
-
-  bw.loadURL(url)
-  wv.on('did-finish-load', afterLoaded)
-
+  })
   return appState
 }
 
 module.exports = {
-  renderUrlToPdf
+  renderToPdf
 }

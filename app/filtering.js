@@ -23,9 +23,7 @@ const config = require('../js/constants/config')
 const locale = require('./locale')
 const {isSessionPartition} = require('../js/state/frameStateUtil')
 const ipcMain = electron.ipcMain
-const dialog = electron.dialog
 const app = electron.app
-const uuid = require('uuid')
 const path = require('path')
 const fs = require('fs')
 const getOrigin = require('../js/lib/urlutil').getOrigin
@@ -553,6 +551,10 @@ function updateDownloadState (win, downloadId, item, state) {
 }
 
 function registerForDownloadListener (session) {
+  session.on('default-download-directory-changed', (e, newPath) => {
+    appActions.changeSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH, newPath)
+  })
+
   session.on('will-download', function (event, item, webContents) {
     if (webContents.isDestroyed()) {
       event.preventDefault()
@@ -568,51 +570,30 @@ function registerForDownloadListener (session) {
       webContents.forceClose()
     }
 
-    // special handling for data URLs where another 'will-download' event handler is trying to suggest a filename via item.setSavePath
-    // see the IPC handler for RENDER_URL_TO_PDF in app/index.js for example
-    let itemFilename
-    if (item.getURL().match(/^data:/) && item.getSavePath()) {
-      itemFilename = path.basename(item.getSavePath())
-    } else {
-      itemFilename = item.getFilename()
+    if (getSetting(settings.DOWNLOAD_ALWAYS_ASK)) {
+      item.setPrompt(true)
     }
 
-    const defaultDir = (getSetting(settings.DOWNLOAD_DEFAULT_PATH) || getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'))
-    let savePath
-    if (process.env.SPECTRON || (!getSetting(settings.DOWNLOAD_ALWAYS_ASK) && !item.promptForSaveLocation())) {
-      let willOverwrite = true
-      let matchedFilenames = 0
-      while (willOverwrite) {
-        savePath = path.join(defaultDir, (matchedFilenames ? `${itemFilename.replace(new RegExp(`${path.extname(itemFilename)}$`), '')} (${matchedFilenames})${path.extname(itemFilename)}` : itemFilename))
-        if (!fs.existsSync(savePath)) {
-          willOverwrite = false
-        } else {
-          matchedFilenames++
-        }
+    const downloadId = item.getGuid()
+    item.on('updated', function (e, st) {
+      if (!item.getSavePath()) {
+        return
       }
-    } else {
-      savePath = dialog.showSaveDialog(win, { defaultPath: path.join(defaultDir, itemFilename) })
-    }
-
-    // User cancelled out of save dialog prompt
-    if (!savePath) {
-      event.preventDefault()
-      return
-    }
-
-    item.setSavePath(savePath)
-    appActions.changeSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH, path.dirname(savePath))
-
-    const downloadId = uuid.v4()
-    updateDownloadState(win, downloadId, item, downloadStates.PENDING)
-    if (win) {
-      win.webContents.send(messages.SHOW_DOWNLOADS_TOOLBAR)
-    }
-    item.on('updated', function () {
       const state = item.isPaused() ? downloadStates.PAUSED : downloadStates.IN_PROGRESS
       updateDownloadState(win, downloadId, item, state)
+      if (win) {
+        win.webContents.send(messages.SHOW_DOWNLOADS_TOOLBAR)
+      }
+      item.on('removed', function () {
+        updateElectronDownloadItem(downloadId, item, downloadStates.CANCELLED)
+        appActions.mergeDownloadDetail(downloadId)
+      })
     })
+
     item.on('done', function (e, state) {
+      if (!item.getSavePath()) {
+        return
+      }
       updateDownloadState(win, downloadId, item, state)
     })
   })
