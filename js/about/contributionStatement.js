@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ReactDOM = require('react-dom')
 const Immutable = require('immutable')
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const {getBase64FromImageUrl} = require('../lib/imageUtil')
@@ -129,20 +128,13 @@ class ContributionStatement extends React.Component {
     getBase64FromImageUrl(verifiedIcon).then(src => this.setState({verifiedIcon: src}))
   }
 
-  get htmlDataURL () {
-    let generatedStylesheet = document.head.querySelector('style').outerHTML
-    let dataURL = 'data:text/html,' + encodeURIComponent('<html><head><meta charset="utf-8">' + generatedStylesheet + '</head><body>' + ReactDOM.findDOMNode(this).outerHTML + '</body></html>')
-
-    return dataURL
-  }
-
   receiptFileName (transaction) {
     transaction = makeImmutable(transaction || this.transaction)
     return `${transaction.get('exportFilenamePrefix')}.pdf`
   }
 
   renderPdf () {
-    aboutActions.renderUrlToPdf(this.htmlDataURL, this.receiptFileName())
+    aboutActions.renderToPdf(this.receiptFileName())
   }
 
   get transaction () {

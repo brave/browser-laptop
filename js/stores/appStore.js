@@ -531,7 +531,7 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_CHANGE_SETTING:
       appState = appState.setIn(['settings', action.key], action.value)
-      handleChangeSettingAction(action.key, action.value)
+      setImmediate(handleChangeSettingAction.bind(null, action.key, action.value))
       break
     case appConstants.APP_SET_SKIP_SYNC:
       {
@@ -749,9 +749,9 @@ const handleAppAction = (action) => {
         calculateTopSites(false)
       }
       break
-    case appConstants.APP_RENDER_URL_TO_PDF:
+    case appConstants.APP_RENDER_TO_PDF:
       const pdf = require('../../app/pdf')
-      appState = pdf.renderUrlToPdf(appState, action)
+      appState = pdf.renderToPdf(appState, action)
       break
     case appConstants.APP_SET_OBJECT_ID:
       let obj = appState.getIn(action.objectPath)
