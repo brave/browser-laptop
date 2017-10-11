@@ -282,16 +282,12 @@ class Tab extends React.Component {
 
   render () {
     // we don't want themeColor if tab is private
-    const perPageStyles = !this.props.isPrivateTab && StyleSheet.create({
-      tab_themeColor: {
-        color: this.props.themeColor ? getTextColorForBackground(this.props.themeColor) : 'inherit',
-        background: this.props.themeColor ? this.props.themeColor : 'inherit',
-        ':hover': {
-          color: this.props.themeColor ? getTextColorForBackground(this.props.themeColor) : 'inherit',
-          background: this.props.themeColor ? this.props.themeColor : 'inherit'
-        }
-      }
-    })
+    const isThemed = !this.props.isPrivateTab && this.props.isActive && this.props.themeColor
+    const instanceStyles = { }
+    if (isThemed) {
+      instanceStyles['--theme-color-fg'] = getTextColorForBackground(this.props.themeColor)
+      instanceStyles['--theme-color-bg'] = this.props.themeColor
+    }
     return <div
       data-tab-area
       className={cx({
@@ -322,13 +318,14 @@ class Tab extends React.Component {
           isWindows && styles.tab_forWindows,
           this.props.isPinnedTab && styles.tab_pinned,
           this.props.isActive && styles.tab_active,
-          this.props.isActive && this.props.themeColor && perPageStyles.tab_themeColor,
           this.props.showAudioTopBorder && styles.tab_audioTopBorder,
           // Private color should override themeColor
           this.props.isPrivateTab && styles.tab_private,
           this.props.isActive && this.props.isPrivateTab && styles.tab_active_private,
-          this.props.centralizeTabIcons && styles.tab__content_centered
+          this.props.centralizeTabIcons && styles.tab__content_centered,
+          isThemed && styles.tab_themed
         )}
+        style={instanceStyles}
         data-test-id='tab'
         data-test-active-tab={this.props.isActive}
         data-test-pinned-tab={this.props.isPinnedTab}
@@ -380,6 +377,15 @@ const styles = StyleSheet.create({
 
     ':hover': {
       background: theme.tab.hover.background
+    }
+  },
+
+  tab_themed: {
+    color: `var(--theme-color-fg, inherit)`,
+    background: `var(--theme-color-bg, inherit)`,
+    ':hover': {
+      color: `var(--theme-color-fg, inherit)`,
+      background: `var(--theme-color-bg, inherit)`,
     }
   },
 

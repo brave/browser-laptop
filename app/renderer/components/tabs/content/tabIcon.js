@@ -16,19 +16,6 @@ const globalStyles = require('../../styles/global')
 
 class TabIcon extends ImmutableComponent {
   render () {
-    const styles = StyleSheet.create({
-      tabIcon: {
-        fontSize: this.props.symbolContent ? '8px' : 'inherit',
-        display: 'flex',
-        width: globalStyles.spacing.iconSize,
-        height: globalStyles.spacing.iconSize,
-        alignItems: 'center',
-        justifyContent: this.props.symbolContent ? 'flex-end' : 'center',
-        fontWeight: this.props.symbolContent ? 'bold' : 'normal',
-        color: this.props.symbolContent ? globalStyles.color.black100 : 'inherit'
-      }
-    })
-
     let altProps
     if (!this.props.symbol) {
       altProps = {
@@ -43,6 +30,7 @@ class TabIcon extends ImmutableComponent {
       onDragStart={this.props.onDragStart}
       draggable={this.props.draggable}
       onClick={this.props.onClick}
+      style={this.props.style}
       {...altProps}
     >
       {
@@ -50,7 +38,7 @@ class TabIcon extends ImmutableComponent {
           ? <span
             className={cx({
               [this.props.symbol]: true,
-              [css(styles.tabIcon)]: true
+              [css(styles.tabIcon, this.props.symbolContent && styles.tabIcon_hasSymbol)]: true
             })}
             data-test-id={this.props['data-test-id']}
             data-test2-id={this.props['data-test2-id']}
@@ -62,5 +50,25 @@ class TabIcon extends ImmutableComponent {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  tabIcon: {
+    fontSize: 'inherit',
+    display: 'flex',
+    width: globalStyles.spacing.iconSize,
+    height: globalStyles.spacing.iconSize,
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'normal',
+    color: 'inherit'
+  },
+
+  tabIcon_hasSymbol: {
+    fontSize: '8px',
+    justifyContent: 'flex-end',
+    fontWeight: 'bold',
+    color: globalStyles.color.black100
+  }
+})
 
 module.exports = TabIcon
