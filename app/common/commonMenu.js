@@ -21,11 +21,15 @@ if (process.type === 'browser') {
   BrowserWindow = electron.remote.BrowserWindow
 }
 
-const ensureAtLeastOneWindow = (frameOpts = {}) => {
+const ensureAtLeastOneWindow = (frameOpts) => {
   if (process.type === 'browser') {
     if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow(frameOpts)
+      appActions.newWindow(frameOpts || {})
+      return
     }
+  }
+
+  if (!frameOpts) {
     return
   }
 

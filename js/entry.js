@@ -100,7 +100,7 @@ const generateTabs = (windowState, frames, windowId) => {
       appActions.newWebContentsAdded(windowId, frame)
     } else {
       appActions.createTabRequested({
-        url: frame.location || frame.src || frame.provisionalLocation,
+        url: frame.location || frame.src || frame.provisionalLocation || frame.url,
         partitionNumber: frame.partitionNumber,
         isPrivate: frame.isPrivate,
         active: activeFrameKey ? frame.key === activeFrameKey : true,
