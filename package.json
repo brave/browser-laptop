@@ -106,7 +106,7 @@
     "immutablepatch": "brave/immutable-js-patch",
     "l20n": "^3.5.1",
     "lru-cache": "^1.0.0",
-    "moment": "^2.15.1",
+    "moment": "~2.18.1",
     "niceware": "^1.0.4",
     "parse-torrent": "^5.8.1",
     "prettier-bytes": "^1.0.3",
