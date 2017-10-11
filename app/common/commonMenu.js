@@ -25,9 +25,10 @@ const ensureAtLeastOneWindow = (frameOpts = {}) => {
   if (process.type === 'browser') {
     if (BrowserWindow.getAllWindows().length === 0) {
       appActions.newWindow(frameOpts)
-      return
     }
+    return
   }
+
   appActions.createTabRequested(frameOpts)
 }
 
