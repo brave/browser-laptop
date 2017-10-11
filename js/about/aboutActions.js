@@ -351,12 +351,11 @@ const aboutActions = {
   },
 
   /**
-   * Dispatches a message to render a URL into a PDF file
+   * Dispatches a message to render the tab into a PDF file
    */
-  renderUrlToPdf: function (url, savePath) {
+  renderToPdf: function (savePath) {
     aboutActions.dispatchAction({
-      actionType: appConstants.APP_RENDER_URL_TO_PDF,
-      url: url,
+      actionType: appConstants.APP_RENDER_TO_PDF,
       savePath: savePath
     })
   }
