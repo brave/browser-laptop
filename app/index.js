@@ -7,6 +7,7 @@
 
 let ready = false
 
+// Setup the crash handling
 const CrashHerald = require('./crash-herald')
 const telemetry = require('./telemetry')
 
@@ -19,8 +20,7 @@ const handleUncaughtError = (error) => {
   message = 'Uncaught Exception:\n' + stack
   console.error('An uncaught exception occurred in the main process ' + message)
 
-  muon.crashReporter.setCrashKeyValue('javascript-info', JSON.stringify({stack}))
-  muon.crashReporter.dumpWithoutCrashing()
+  // TODO(bridiver) - this should also send a notification to Brave
 
   if (!ready) {
     console.error('Waiting 60 seconds for process to load')
@@ -71,7 +71,6 @@ const locale = require('./locale')
 const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const settings = require('../js/constants/settings')
-const {getSetting} = require('../js/settings')
 const BookmarksExporter = require('./browser/bookmarksExporter')
 const siteUtil = require('../js/state/siteUtil')
 
@@ -97,15 +96,18 @@ let loadAppStatePromise = SessionStore.loadAppState()
 
 // Some settings must be set right away on startup, those settings should be handled here.
 loadAppStatePromise.then((initialImmutableState) => {
-  const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED, SEND_CRASH_REPORTS} = require('../js/constants/settings')
-  CrashHerald.init(getSetting(SEND_CRASH_REPORTS, initialImmutableState.get('settings')))
-
   telemetry.setCheckpointAndReport('state-loaded')
-  if (getSetting(HARDWARE_ACCELERATION_ENABLED, initialImmutableState.get('settings')) === false) {
+  const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED, SEND_CRASH_REPORTS} = require('../js/constants/settings')
+  if (initialImmutableState.getIn(['settings', HARDWARE_ACCELERATION_ENABLED]) === false) {
     app.disableHardwareAcceleration()
   }
-
-  if (getSetting(SMOOTH_SCROLL_ENABLED, initialImmutableState.get('settings')) === false) {
+  if (initialImmutableState.getIn(['settings', SEND_CRASH_REPORTS]) !== false) {
+    console.log('Crash reporting enabled')
+    CrashHerald.init()
+  } else {
+    console.log('Crash reporting disabled')
+  }
+  if (initialImmutableState.getIn(['settings', SMOOTH_SCROLL_ENABLED]) === false) {
     app.commandLine.appendSwitch('disable-smooth-scrolling')
   }
 })
