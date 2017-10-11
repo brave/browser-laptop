@@ -1702,12 +1702,12 @@ const onWalletProperties = (state, body) => {
 
   // Probi
   const probi = parseFloat(body.get('probi'))
-  if (probi > 0) {
+  if (probi >= 0) {
     state = ledgerState.setInfoProp(state, 'probi', probi)
 
     const amount = info.get('balance')
 
-    if (amount && rate) {
+    if (amount != null && rate) {
       const bigProbi = new BigNumber(probi.toString()).dividedBy('1e18')
       const bigRate = new BigNumber(rate.toString())
       const converted = bigProbi.times(bigRate).toFormat(2)
@@ -1717,7 +1717,7 @@ const onWalletProperties = (state, body) => {
 
   // unconfirmed amount
   const unconfirmed = parseFloat(body.get('unconfirmed'))
-  if (unconfirmed > 0) {
+  if (unconfirmed >= 0) {
     if (ledgerState.getInfoProp(state, 'unconfirmed') === unconfirmed) {
       return state
     }
