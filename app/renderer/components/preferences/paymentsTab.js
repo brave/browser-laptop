@@ -115,7 +115,7 @@ class PaymentsTab extends ImmutableComponent {
 
   render () {
     const enabled = this.props.ledgerData.get('created')
-    const inTransition = !(this.props.ledgerData.getIn(['migration', 'btc2BatTransitionDone']))
+    const inTransition = this.props.ledgerData.getIn(['migration', 'btc2BatTransitionPending']) === true
     const enableSettings = enabled && !inTransition
 
     return <div className={cx({

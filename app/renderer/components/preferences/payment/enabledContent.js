@@ -171,7 +171,7 @@ class EnabledContent extends ImmutableComponent {
   render () {
     const ledgerData = this.props.ledgerData
     const walletStatusText = walletStatus(ledgerData)
-    const inTransition = !(ledgerData.getIn(['migration', 'btc2BatTransitionDone']))
+    const inTransition = ledgerData.getIn(['migration', 'btc2BatTransitionPending']) === true
 
     return <section className={css(styles.enabledContent)}>
       <div className={css(styles.enabledContent__loader, inTransition && styles.enabledContent__loader_show)}>
