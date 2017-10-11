@@ -240,7 +240,7 @@ class Tab extends React.Component {
       return 0
     }
 
-    const rect = this.tabNode.parentNode.getBoundingClientRect()
+    const rect = this.elementRef.getBoundingClientRect()
     return rect && rect.width
   }
 
@@ -280,6 +280,29 @@ class Tab extends React.Component {
     return props
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (this.props.tabWidth && !nextProps.tabWidth) {
+      // remember the width so we can transition from it
+      this.originalWidth = this.elementRef.getBoundingClientRect().width
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.tabWidth && !this.props.tabWidth) {
+      window.requestAnimationFrame(() => {
+        const newWidth = this.elementRef.getBoundingClientRect().width
+        this.elementRef.animate([
+          { flexBasis: `${this.originalWidth}px`, flexGrow: 0, flexShrink: 0 },
+          { flexBasis: `${newWidth}px`, flexGrow: 0, flexShrink: 0 }
+        ], {
+          duration: 250,
+          iterations: 1,
+          easing: 'ease-in-out'
+        })
+      })
+    }
+  }
+
   render () {
     // we don't want themeColor if tab is private
     const perPageStyles = !this.props.isPrivateTab && StyleSheet.create({
@@ -307,7 +330,9 @@ class Tab extends React.Component {
       onMouseEnter={this.onMouseEnter}
       onMouseLeave={this.onMouseLeave}
       data-test-id='tab-area'
-      data-frame-key={this.props.frameKey}>
+      data-frame-key={this.props.frameKey}
+      ref={elementRef => { this.elementRef = elementRef }}
+      >
       {
         this.props.isActive && this.props.notificationBarActive
           ? <NotificationBarCaret />
