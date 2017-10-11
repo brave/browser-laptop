@@ -87,7 +87,10 @@ const fakeElectron = {
   extensions: {
     createTab: function () {}
   },
-  autoUpdater: new EventEmitter()
+  autoUpdater: new EventEmitter(),
+  importer: {
+    on: () => {}
+  }
 }
 
 module.exports = fakeElectron

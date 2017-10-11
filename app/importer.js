@@ -187,6 +187,17 @@ importer.on('add-keywords', (e, templateUrls, uniqueOnHostAndPath) => {
 importer.on('add-autofill-form-data-entries', (e, detail) => {
 })
 
+const shouldSkipCookie = (cookie) => {
+  // Bypassing cookie mismatch error in
+  // https://github.com/brave/browser-laptop/issues/11401
+  if (cookie.domain === '.google.com' &&
+      ['https://notifications.google.com', 'https://accounts.google.com'].includes(cookie.url)) {
+    return true
+  }
+  return false
+}
+module.exports.shouldSkipCookie = shouldSkipCookie
+
 importer.on('add-cookies', (e, cookies) => {
   for (let i = 0; i < cookies.length; ++i) {
     const cookie = {
@@ -199,9 +210,13 @@ importer.on('add-cookies', (e, cookies) => {
       httpOnly: cookies[i].httponly,
       expirationDate: cookies[i].expiry_date
     }
+    if (shouldSkipCookie(cookie)) {
+      continue
+    }
     session.defaultSession.cookies.set(cookie, (error) => {
       if (error) {
         console.error(error)
+        console.error(cookie)
       }
     })
   }
