@@ -524,4 +524,16 @@ describe('ledgerReducer unit tests', function () {
       assert(returnedState.getIn(['migrations', 'btc2BatTimestamp']))
     })
   })
+
+  describe('APP_ON_BTC_TO_BAT_BEGIN_TRANSITION', function () {
+    before(function () {
+      returnedState = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_BTC_TO_BAT_BEGIN_TRANSITION
+      }))
+    })
+    it('sets the state variable', function () {
+      assert.notDeepEqual(returnedState, appState)
+      assert.equal(returnedState.getIn(['migrations', 'btc2BatTransitionPending']), true)
+    })
+  })
 })

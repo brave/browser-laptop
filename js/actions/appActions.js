@@ -1808,6 +1808,12 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_ON_BTC_TO_BAT_TRANSITIONED
     })
+  },
+
+  onBitcoinToBatBeginTransition: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_BTC_TO_BAT_BEGIN_TRANSITION
+    })
   }
 }
 

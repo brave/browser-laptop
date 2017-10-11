@@ -2296,6 +2296,13 @@ const transitionWalletToBat = () => {
     return
   }
 
+  if (client.busyP()) {
+    console.log('ledger client is currently busy; transition will be retried on next launch')
+    return
+  }
+
+  appActions.onBitcoinToBatBeginTransition()
+
   try {
     client.transition(newPaymentId, (err, properties) => {
       if (err) {

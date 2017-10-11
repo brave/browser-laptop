@@ -177,7 +177,8 @@ const appConstants = {
   APP_ON_LEDGER_INIT_READ: _,
   APP_ON_BTC_TO_BAT_NOTIFIED: _,
   APP_ON_BTC_TO_BAT_TRANSITIONED: _,
-  APP_ON_LEDGER_QR_GENERATED: _
+  APP_ON_LEDGER_QR_GENERATED: _,
+  APP_ON_BTC_TO_BAT_BEGIN_TRANSITION: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
