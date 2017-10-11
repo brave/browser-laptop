@@ -19,6 +19,7 @@ describe('ledger api unit tests', function () {
   let ledgerApi
   let paymentsEnabled
   let paymentsNotifications
+  let isBusy = false
   let ledgerClient
 
   // spies
@@ -26,6 +27,7 @@ describe('ledger api unit tests', function () {
   let ledgerTransitionedSpy
   let onBitcoinToBatTransitionedSpy
   let onLedgerCallbackSpy
+  let onBitcoinToBatBeginTransitionSpy
 
   before(function () {
     this.clock = sinon.useFakeTimers()
@@ -54,6 +56,7 @@ describe('ledger api unit tests', function () {
     mockery.registerMock('../../../js/actions/appActions', appActions)
     onBitcoinToBatTransitionedSpy = sinon.spy(appActions, 'onBitcoinToBatTransitioned')
     onLedgerCallbackSpy = sinon.spy(appActions, 'onLedgerCallback')
+    onBitcoinToBatBeginTransitionSpy = sinon.spy(appActions, 'onBitcoinToBatBeginTransition')
 
     // ledger client stubbing
     ledgerClient = sinon.stub()
@@ -86,6 +89,9 @@ describe('ledger api unit tests', function () {
       },
       state: {
         transactions: []
+      },
+      busyP: function () {
+        return isBusy
       }
     }
     ledgerClient.prototype.boolion = function (value) { return false }
@@ -142,30 +148,56 @@ describe('ledger api unit tests', function () {
   })
 
   describe('transitionWalletToBat', function () {
-    before(function () {
-      const batState = ledgerApi.onBootStateFile(defaultAppState)
-      ledgerTransitionSpy.reset()
-      onBitcoinToBatTransitionedSpy.reset()
-      onLedgerCallbackSpy.reset()
-      ledgerTransitionedSpy.reset()
-      ledgerClient.reset()
-      ledgerApi.transitionWalletToBat(batState)
-    })
-    it('creates a new instance of ledgerClient', function () {
-      assert(ledgerClient.calledOnce)
-    })
-    it('calls client.transition', function () {
-      assert(ledgerTransitionSpy.calledOnce)
-    })
-    describe('when transition completes', function () {
-      it('calls client.transitioned', function () {
-        assert(ledgerTransitionedSpy.calledOnce)
+    describe('when client is not busy', function () {
+      before(function () {
+        const batState = ledgerApi.onBootStateFile(defaultAppState)
+        ledgerTransitionSpy.reset()
+        onBitcoinToBatTransitionedSpy.reset()
+        onLedgerCallbackSpy.reset()
+        ledgerTransitionedSpy.reset()
+        onBitcoinToBatBeginTransitionSpy.reset()
+        ledgerClient.reset()
+        isBusy = false
+        ledgerApi.transitionWalletToBat(batState)
       })
-      it('calls AppActions.onLedgerCallback', function () {
-        assert(onLedgerCallbackSpy.calledOnce)
+      it('creates a new instance of ledgerClient', function () {
+        assert(ledgerClient.calledOnce)
       })
-      it('calls AppActions.onBitcoinToBatTransitioned', function () {
-        assert(onBitcoinToBatTransitionedSpy.calledOnce)
+      it('calls AppActions.onBitcoinToBatBeginTransition', function () {
+        assert(onBitcoinToBatBeginTransitionSpy.calledOnce)
+      })
+      it('calls client.transition', function () {
+        assert(ledgerTransitionSpy.calledOnce)
+      })
+      describe('when transition completes', function () {
+        it('calls client.transitioned', function () {
+          assert(ledgerTransitionedSpy.calledOnce)
+        })
+        it('calls AppActions.onLedgerCallback', function () {
+          assert(onLedgerCallbackSpy.calledOnce)
+        })
+        it('calls AppActions.onBitcoinToBatTransitioned', function () {
+          assert(onBitcoinToBatTransitionedSpy.calledOnce)
+        })
+      })
+    })
+    describe('when client is busy', function () {
+      before(function () {
+        const batState = ledgerApi.onBootStateFile(defaultAppState)
+        ledgerTransitionSpy.reset()
+        onBitcoinToBatTransitionedSpy.reset()
+        onLedgerCallbackSpy.reset()
+        ledgerTransitionedSpy.reset()
+        onBitcoinToBatBeginTransitionSpy.reset()
+        ledgerClient.reset()
+        isBusy = true
+        ledgerApi.transitionWalletToBat(batState)
+      })
+      it('does not call AppActions.onBitcoinToBatBeginTransition', function () {
+        assert(onBitcoinToBatBeginTransitionSpy.notCalled)
+      })
+      it('does not call client.transition', function () {
+        assert(ledgerTransitionSpy.notCalled)
       })
     })
   })
