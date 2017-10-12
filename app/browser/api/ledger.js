@@ -1717,7 +1717,7 @@ const onWalletProperties = (state, body) => {
 
   // unconfirmed amount
   const unconfirmed = parseFloat(body.get('unconfirmed'))
-  if (unconfirmed >= 0) {
+  if (unconfirmed > 0) {
     if (ledgerState.getInfoProp(state, 'unconfirmed') === unconfirmed) {
       return state
     }
