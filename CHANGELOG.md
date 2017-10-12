@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.19.46](https://github.com/brave/browser-laptop/releases/tag/v0.19.46dev)
+## [0.19.48](https://github.com/brave/browser-laptop/releases/tag/v0.19.48dev)
 
  - Added BAT payments. ([#10945](https://github.com/brave/browser-laptop/issues/10945))
  - Added new add-funds wizard UI to support BAT. ([#11193](https://github.com/brave/browser-laptop/issues/11193))
