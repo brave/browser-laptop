@@ -103,7 +103,8 @@ class AddFundsDialogFooter extends React.Component {
             className={css(styles.footer__start__uphold_logo)}
           />
           <div className={css(styles.footer__start__uphold_text)}>
-            <span data-l10n-id='uphold' />
+            <span data-l10n-id='upholdFooterText1' />
+            <span data-l10n-id='upholdFooterText2' />
             <a data-l10n-id='learnMore'
               href='https://uphold.com/en/brave'
               target='_blank'
