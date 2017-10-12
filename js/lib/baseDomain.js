@@ -5,19 +5,38 @@
 const punycode = require('punycode')
 const publicSuffixes = require('./psl')
 
-const LRUCache = require('lru_cache/core').LRUCache
+const LRUCache = require('lru-cache')
 
 let cachedBaseDomain = new LRUCache(50)
 
+const checkASCII = function (str) {
+  if (typeof str !== 'string') {
+    return false
+  }
+  for (let i = 0; i < str.length; i++) {
+    if (str.charCodeAt(i) > 127) {
+      return false
+    }
+  }
+  return true
+}
+
 /**
  * Returns base domain for specified host based on Public Suffix List.
+ * Derived from Privacy Badger Chrome <https://github.com/EFForg/privacybadger>,
+ * Copyright (C) 2015 Electronic Frontier Foundation and other contributors
  * @param {string} hostname The name of the host to get the base domain for
  */
 
 module.exports.getBaseDomain = function (hostname) {
   // decode punycode if exists
-  if (hostname.indexOf('xn--') >= 0) {
-    hostname = punycode.toUnicode(hostname)
+  if (hostname.indexOf('xn--') >= 0 &&
+    checkASCII(hostname)) {
+    try {
+      hostname = punycode.toUnicode(hostname)
+    } catch (e) {
+      console.error('punnycode.toUnicode() failure:', e)
+    }
   }
 
   let baseDomain = cachedBaseDomain.get(hostname)
@@ -54,7 +73,7 @@ module.exports.getBaseDomain = function (hostname) {
     tld--
   }
 
-  cachedBaseDomain.put(curDomain)
+  cachedBaseDomain.set(curDomain)
 
   return curDomain
 }

@@ -136,37 +136,18 @@ document.addEventListener('keydown', (e /*: Event*/) => {
     case KeyEvent.DOM_VK_ESCAPE:
       if (document.readyState !== 'complete') {
         e.preventDefault()
-        chrome.ipc.sendToHost('stop-load')
-      }
-      break
-    case KeyEvent.DOM_VK_BACK_SPACE:
-      if (!isEditable(document.activeElement)) {
-        e.shiftKey ?chrome.ipc.sendToHost('go-forward') :chrome.ipc.sendToHost('go-back')
+        chrome.ipcRenderer.sendToHost('stop-load')
       }
       break
     case KeyEvent.DOM_VK_LEFT:
       if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
-        chrome.ipc.sendToHost('go-back')
+        chrome.ipcRenderer.sendToHost('go-back')
       }
       break
     case KeyEvent.DOM_VK_RIGHT:
       if (e.metaKey && !isEditable(document.activeElement) && isPlatformOSX()) {
-        chrome.ipc.sendToHost('go-forward')
+        chrome.ipcRenderer.sendToHost('go-forward')
       }
       break
-  }
-})
-
-chrome.ipc.on('check-swipe-back', (e) => {
-  if (document.scrollingElement.scrollLeft === 0) {
-    chrome.ipc.sendToHost('can-swipe-back')
-  }
-})
-
-chrome.ipc.on('check-swipe-forward', (e) => {
-  const scrollEle = document.scrollingElement
-  if (scrollEle.scrollLeft === 0 ||
-    scrollEle.scrollLeft === (scrollEle.scrollWidth - scrollEle.clientWidth)) {
-    chrome.ipc.sendToHost('can-swipe-forward')
   }
 })

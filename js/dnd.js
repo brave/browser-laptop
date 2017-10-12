@@ -7,49 +7,63 @@ const appActions = require('./actions/appActions')
 const ReactDOM = require('react-dom')
 const dndData = require('./dndData')
 const dragTypes = require('./constants/dragTypes')
-const siteTags = require('./constants/siteTags')
-const siteUtil = require('./state/siteUtil')
+const appStoreRenderer = require('./stores/appStoreRenderer')
+const {getCurrentWindowId} = require('../app/renderer/currentWindow')
+const {ESC} = require('../app/common/constants/keyCodes.js')
 
-let inProcessDragData
-let inProcessDragType
-
-module.exports.getInProcessDragData = () => {
-  return inProcessDragData
+module.exports.getInterBraveDragData = () => {
+  return appStoreRenderer.state.getIn(['dragData', 'data'])
 }
 
-module.exports.getInProcessDragType = () => {
-  return inProcessDragType
+module.exports.getInterBraveDragType = () => {
+  return appStoreRenderer.state.getIn(['dragData', 'type'])
 }
 
 module.exports.onDragStart = (dragType, data, e) => {
   e.dataTransfer.effectAllowed = 'all'
   dndData.setupDataTransferBraveData(e.dataTransfer, dragType, data)
   if (dragType === dragTypes.BOOKMARK) {
-    dndData.setupDataTransferURL(e.dataTransfer, data.get('location'), data.get('customTitle') || data.get('title'))
+    dndData.setupDataTransferURL(e.dataTransfer, data.get('location'), data.get('title'))
   }
-  inProcessDragData = data
-  inProcessDragType = dragType
+  appActions.dragStarted(getCurrentWindowId(), dragType, data)
 }
 
-module.exports.onDragEnd = (dragType, key) => {
-  windowActions.setIsBeingDraggedOverDetail(dragType)
+document.addEventListener('keyup', (e) => {
+  if (e.keyCode === ESC) {
+    appActions.dragCancelled()
+  }
+}, true)
+
+module.exports.onDragEnd = () => {
   windowActions.setContextMenuDetail()
-  inProcessDragData = undefined
-  inProcessDragType = undefined
+  // TODO: This timeout is a hack to give time for the keyup event to fire.
+  // The keydown event is not fired currently for dragend events that
+  // are canceled with Escape because Chromium calls stopPropagation
+  // on the event.  We should patch chromium, then we can remove
+  // the hack below and allow keydown Escape to be propagated during a drag.
+  // This hack can lead to a user sometimes getting an accidental detached
+  // tab when they press escape if they hold down escape. But it works
+  // most of the time and that's not commonly done.
+  setTimeout(() => {
+    appActions.dragEnded()
+  }, 100)
 }
 
 module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, draggingOverDetail, e) => {
-  if (inProcessDragType !== dragType) {
+  if (module.exports.getInterBraveDragType() !== dragType) {
     return
   }
 
   e.preventDefault()
   e.dataTransfer.dropEffect = 'move'
-  // Otherise, only accept it if we have some frameProps
+  // Otherwise, only accept it if we have some frameProps
   if (!dndData.hasDragData(e.dataTransfer, dragType)) {
-    windowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
+    appActions.draggedOver({
+      draggingOverKey,
+      draggingOverType: dragType,
       draggingOverLeftHalf: false,
-      draggingOverRightHalf: false
+      draggingOverRightHalf: false,
+      draggingOverWindowId: getCurrentWindowId()
     })
     return
   }
@@ -58,18 +72,24 @@ module.exports.onDragOver = (dragType, sourceBoundingRect, draggingOverKey, drag
     return
   }
 
-  if (e.clientX > sourceBoundingRect.left && e.clientX < sourceBoundingRect.left + sourceBoundingRect.width / 5 &&
+  if (e.clientX > sourceBoundingRect.left && e.clientX < sourceBoundingRect.left + (sourceBoundingRect.width / 5) &&
     (!draggingOverDetail || !draggingOverDetail.get('draggingOverLeftHalf'))) {
-    windowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
+    appActions.draggedOver({
+      draggingOverKey,
+      draggingOverType: dragType,
       draggingOverLeftHalf: true,
-      draggingOverRightHalf: false
+      draggingOverRightHalf: false,
+      draggingOverWindowId: getCurrentWindowId()
     })
     windowActions.setContextMenuDetail()
-  } else if (e.clientX < sourceBoundingRect.right && e.clientX >= sourceBoundingRect.left + sourceBoundingRect.width / 5 &&
+  } else if (e.clientX < sourceBoundingRect.right && e.clientX >= sourceBoundingRect.left + (sourceBoundingRect.width / 5) &&
     (!draggingOverDetail || !draggingOverDetail.get('draggingOverRightHalf'))) {
-    windowActions.setIsBeingDraggedOverDetail(dragType, draggingOverKey, {
+    appActions.draggedOver({
+      draggingOverKey,
+      draggingOverType: dragType,
       draggingOverLeftHalf: false,
-      draggingOverRightHalf: true
+      draggingOverRightHalf: true,
+      draggingOverWindowId: getCurrentWindowId()
     })
     windowActions.setContextMenuDetail()
   }
@@ -88,7 +108,7 @@ module.exports.closestFromXOffset = (refs, x) => {
       }
     }
     const rect = refNode.getBoundingClientRect()
-    let currentDistance = Math.abs(x - rect.left + (rect.right - rect.left) / 2)
+    let currentDistance = Math.abs(x - rect.left + ((rect.right - rect.left) / 2))
     if (currentDistance < smallestValue) {
       smallestValue = currentDistance
       selectedRef = ref
@@ -102,23 +122,22 @@ module.exports.closestFromXOffset = (refs, x) => {
 
 module.exports.isLeftSide = (domNode, clientX) => {
   const boundingRect = domNode.getBoundingClientRect()
-  return clientX < boundingRect.left + (boundingRect.right - boundingRect.left) / 2
+  return clientX < boundingRect.left + ((boundingRect.right - boundingRect.left) / 2)
 }
 
 module.exports.isMiddle = (domNode, clientX) => {
   const boundingRect = domNode.getBoundingClientRect()
-  const isLeft = clientX < boundingRect.left + (boundingRect.right - boundingRect.left) / 3
-  const isRight = clientX > boundingRect.right - (boundingRect.right - boundingRect.left) / 3
+  const isLeft = clientX < boundingRect.left + ((boundingRect.right - boundingRect.left) / 3)
+  const isRight = clientX > boundingRect.right - ((boundingRect.right - boundingRect.left) / 3)
   return !isLeft && !isRight
 }
 
 module.exports.prepareBookmarkDataFromCompatible = (dataTransfer) => {
   let bookmark = dndData.getDragData(dataTransfer, dragTypes.BOOKMARK)
   if (!bookmark) {
-    const frameProps = dndData.getDragData(dataTransfer, dragTypes.TAB)
-    if (frameProps) {
-      bookmark = siteUtil.getDetailFromFrame(frameProps, siteTags.BOOKMARK)
-      appActions.addSite(bookmark, siteTags.BOOKMARK)
+    const dragData = dndData.getDragData(dataTransfer, dragTypes.TAB)
+    if (dragData) {
+      windowActions.onFrameBookmark(dragData.get('tabId'))
     }
   }
   return bookmark

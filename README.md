@@ -1,4 +1,15 @@
-[![Build Status](https://travis-ci.org/brave/browser-laptop.svg?branch=master)](https://travis-ci.org/brave/browser-laptop)
+[![Lint](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=lint&label=lint)](https://travis-ci.org/brave/browser-laptop)
+[![Unit Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=unit&label=unit-tests)](https://travis-ci.org/brave/browser-laptop)
+[![About Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=about&label=about-tests)](https://travis-ci.org/brave/browser-laptop)
+[![App Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=app&label=app-tests)](https://travis-ci.org/brave/browser-laptop)
+[![Bookmark Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=bookmark-components&label=bookmark-component-tests)](https://travis-ci.org/brave/browser-laptop)
+[![Bravery Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=bravery-components&label=bravery-component-tests)](https://travis-ci.org/brave/browser-laptop)
+[![Contents Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=contents&label=contents-tests)](https://travis-ci.org/brave/browser-laptop)
+[![Misc Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=misc-components&label=misc-components-tests)](https://travis-ci.org/brave/browser-laptop)
+[![Navbar Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=navbar-components&label=navbar-components-tests)](https://travis-ci.org/brave/browser-laptop)
+[![Tab Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=tab-components&label=tab-components-tests)](https://travis-ci.org/brave/browser-laptop)
+[![codecov.io](https://codecov.io/github/brave/browser-laptop/coverage.svg?branch=master)](https://codecov.io/gh/brave/browser-laptop?branch=master)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 # Brave Browser
 
@@ -8,43 +19,58 @@ Follow [@brave](https://twitter.com/brave) on Twitter for important news and ann
 
 For other versions of our browser, please see:
 * iPhone - [brave/browser-ios](https://github.com/brave/browser-ios)
-* Android - [brave/browser-android](https://github.com/brave/browser-android)
+* Android - [brave/browser-android-tabs](https://github.com/brave/browser-android-tabs)
 
 ## Downloads
 
 To download the latest release, [see our releases page](https://github.com/brave/browser-laptop/releases).
 
-For a more user-friendly download page, [please visit our website](https://brave.com/downloads.html).
+You can also [visit our website](https://brave.com/downloads.html) to get the latest stable release (along with a more user-friendly download page).
+
+Brave supports 4 [release channels](https://github.com/brave/browser-laptop/wiki/Release-channels): Release, Beta, Developer, and Nightly.
+
+## Community
+
+[Join the Q&A community](https://community.brave.com/) if you'd like to get more involved with Brave. You can [ask for help](https://community.brave.com/c/help-me),
+[discuss features you'd like to see](https://community.brave.com/c/feature-requests), and a lot more. We'd love to have your help so that we can continue improving Brave.
+
+Join our [Discord community chat](https://discordapp.com/invite/k57tYrS) for higher bandwidth discussions.
 
 ## Useful documentation
 
 * See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for tips and guidelines about contributing.
+* See [docs/style.md](docs/style.md) for information on styling.
 * See [docs/tests.md](docs/tests.md) for information on testing, including how to run a subset of the tests.
 * See [docs/debugging.md](docs/debugging.md) for information on debugging.
+* See [docs/translations.md](docs/translations.md) to learn how you can help us with translations (localization).
+* See [docs/linuxInstall.md](docs/linuxInstall.md) for information on installing the browser on Linux distributions.
 
-## Build prerequisites
+## Running from source
 
-You'll need certain packages installed before you can build and run Brave locally.
+If you're setting up using Windows, please see the [Building on Windows wiki entry](https://github.com/brave/browser-laptop/wiki/(setup)-Windows-build-guide) for a full walkthrough.
 
-### Windows
+For other platforms (macOS, Linux) You'll need certain packages installed before you can build and run Brave locally.
 
-Please see the [Building on Windows wiki entry](https://github.com/brave/browser-laptop/wiki/Building-on-Windows)
+### Prerequisites
 
-### All other platforms
-
-1. `nodejs` **`>= 6.1`**
+1. `nodejs` **`>= 7.9.0`**
 
     Install from your package manager or download from https://nodejs.org
 
-2. `node-gyp` **`3.3.1`**
+#### On Debian / Ubuntu /Mint
 
-        sudo npm install -g node-gyp@3.3.1
+````
+apt-get install build-essential rpm ninja-build
+````
 
-###  Linux
+#### On Fedora
 
-* `apt-get install libgnome-keyring-dev build-essential`
+````
+dnf install rpm-build
+dnf group install "Development Tools" "C Development Tools and Libraries"
+````
 
-## Installation
+### Installation
 
 After installing the prerequisites:
 
@@ -63,11 +89,11 @@ After installing the prerequisites:
 
         cd browser-laptop
 
-3. Install the Node (v5+) dependencies:
+3. Install the Node dependencies:
 
         npm install
 
-If this fails on Linux with an error related to `abp-filter-parser-cpp`, try updating to Node 6.1 and `node-gyp` 3.3.1 (see discussion at https://github.com/brave/browser-laptop/issues/214)
+Instead of `npm install` you may also install with [yarn](https://github.com/yarnpkg/yarn).
 
 ### Troubleshooting
 
@@ -77,21 +103,16 @@ Additional notes on troubleshooting installation issues are in the [Troubleshoot
 
 Some platforms are available as pre-configured VMs. See the [readme](https://github.com/brave/browser-laptop/blob/master/test/vms/vagrant/README.md) for details.
 
-## Development
+### Running Brave
 
-You will also have to have two terminal tabs up to run Brave. One for Brave to watch for changes to the code, and one to run Brave.
-
-To run a development version of the browser, run the following on the command line:
+To run a development version of the browser requires a few steps. The easiest way is just to use two
+terminals. One terminal can be used just to watch for changes to the code
 
     npm run watch
 
+Now actually run Brave in another terminal
+
     npm start
-
-To run the tests:
-
-    npm run watch-test  or  npm run watch-all
-
-    npm test
 
 Some errors related to [brave/electron](https://github.com/brave/electron) update can be fixed by doing a clean install:
 
@@ -99,6 +120,18 @@ Some errors related to [brave/electron](https://github.com/brave/electron) updat
     npm install
 
 If this does not work, please clear out your ~/.electron first and try again.
+
+### Running webdriver tests
+
+To run the webdriver tests
+
+    npm run watch-test  or  npm run watch-all
+
+Now run tests in another terminal
+
+    npm test
+
+See [docs/tests.md](docs/tests.md) for more information.
 
 ### Port
 
@@ -109,77 +142,14 @@ npm config set brave:port 9001
 
 Additional notes on troubleshooting development issues are in the [Troubleshooting](https://github.com/brave/browser-laptop/wiki/Troubleshooting) page in the Wiki.
 
-### Running inside of a development version of Brave's Electron fork
-
-We are using a [fork of Electron with some minor modifications](https://github.com/brave/electron). We try to upstream everything to [electron/electron](https://github.com/electron/electron) but forking allows us to take patches before upstreaming.
+## Running inside of a development version of [Muon](https://github.com/brave/muon)
 
 By default, we provide pre-built binaries when you `npm install` with our own fork of [electron-prebuilt](https://github.com/brave/electron-prebuilt).
 
-If you want to modify the code to Electron itself, then you'll need to build it.  An example of why you might do that would be exposing a new event to the webview from Electron.
+If you want to modify the code to [Muon](https://github.com/brave/muon) (Brave's Electron fork), then you'll need to build it. An example of why you might do that would be exposing a new event to the webview (from Muon).
 
-Build instructions:
-- [macOS build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-osx.md)
-- [Windows build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-windows.md)
-- [Linux build instructions](https://github.com/brave/electron/blob/master/docs/development/build-instructions-linux.md)
-
-Once you're happy with the changes you've made in the electron fork, you can test the changes locally by building and then copying the output files over the `node_modules/electron-prebuilt` for browser-laptop.
-
-Assuming you have your directories in a structure such as this:
-
-    projects/
-        electron/
-        browser-laptop/
-
-You can simply run an npm task to build and install your local electron instance:
-
-    npm run install
-
-If your directory structure isn't side by side, you can run the following (altering the rsync as needed):
-
-    npm run build
-    rsync -avz --delete out/D/Brave.app {{path-to-browser-laptop}}/node_modules/electron-prebuilt/dist/
-
+To start this process, you'll want to check out our [browser-laptop-bootstrap](https://github.com/brave/browser-laptop-bootstrap) repo. From there, [you can follow the steps in our wiki](https://github.com/brave/browser-laptop-bootstrap/wiki) to get up and running.
 
 ## Packaging for bundles, installers, and updates
 
-In order do run any build commands, you'll need an environment variable set for `CHANNEL` (set to `'dev'`, `'beta'`, or `'stable'`).
-
-For more information, see [docs/buildingReleases.md](docs/buildingReleases.md) which has a more detailed overview of our release process.
-
-### macOS:
-
-From within brave-browser you can create a .app file for distribution:
-
-    CHANNEL=dev npm run build-package
-
-After the .app file is built you can create a dmg and update zip with:
-
-    IDENTIFIER=XYZ npm run build-installer
-
-Where XYZ is your signing identifier.
-
-### Windows 7,8,10 x64:
-
-You'll also need to set the `CERT` and `CERT_PASSWORD` environment variables with your [authenticode signing cert and password](https://blogs.msdn.microsoft.com/ieinternals/2011/03/22/everything-you-need-to-know-about-authenticode-code-signing/) if you want to build an installer.
-
-To set these values, you can either set the environment on a per-session basis (`$env:CHANNEL="dev"`) or update your [system/user environment variables](http://www.computerhope.com/issues/ch000549.htm).
-
-You must also have NSIS 3.0rc2 or later installed and `makensis`'s folder must be in your PATH.
-
-To create a folder with the app .exe and all dependencies you can run:
-
-    CHANNEL=dev npm run build-package
-
-After the above folder is created, you can create a setup (exe, msi, RELEASES file and update nupkg) with:
-
-    npm run build-installer
-
-### Linux:
-
-To create a package:
-
-    CHANNEL=dev npm run build-package
-
-To create a dev package:
-
-    CHANNEL=dev npm run build-package
+Please [see our wiki entry](https://github.com/brave/browser-laptop/wiki/Packaging-for-bundles,-installers,-and-updates) for more information about packaging.

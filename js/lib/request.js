@@ -8,7 +8,7 @@ const electron = require('electron')
 const session = electron.session
 const underscore = require('underscore')
 const util = require('util')
-const urlParse = require('url').parse
+const urlParse = require('../../app/common/urlParse')
 
 /**
  * Sends a network request using Chromium's networks stack instead of Node's.
@@ -27,9 +27,10 @@ module.exports.request = (options, callback) => {
   params = underscore.defaults(underscore.pick(options, [ 'method', 'headers' ]), { headers: {} })
   params.headers['accept-encoding'] = ''
   if (options.payload) {
-    underscore.extend(params, { payload: JSON.stringify(options.payload),
-                                payload_content_type: params.headers['content-type'] || 'application/json; charset=utf-8'
-                              })
+    underscore.extend(params, {
+      payload: JSON.stringify(options.payload),
+      payload_content_type: params.headers['content-type'] || 'application/json; charset=utf-8'
+    })
   }
 
   if (process.env.NODE_ENV === 'development' &&

@@ -37,7 +37,9 @@ public/built
 
 # Temp files
 .DS_Store
+.DS-Store
 temp.VisualElementsManifest.xml
+app/extensions/gen/
 
 # electron-packager output dirs
 *-darwin-x64
@@ -50,7 +52,9 @@ dist-ia32
 win64-dist
 Brave.tar.bz2
 
+app/extensions/gen
 app/extensions/brave/gen
+app/extensions/torrent/gen
 *.pfx
 buildConfig.js
 
@@ -62,3 +66,12 @@ httpse.leveldb
 
 # vim swap files
 *.swp
+
+# webstrom
+.idea
+
+# sync bundle file should be built and copied from the brave/sync repo for now
+app/extensions/brave/content/scripts/sync.js
+
+# script used for signing for widevine
+signature_generator.py

@@ -3,22 +3,21 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 let registeredCallbacks = []
-let registeredSessions = []
-let registeredPrivateSessions = []
-
-const isPrivate = (partition) => !partition.startsWith('persist:') && partition !== 'main-1'
+let registeredSessions = {}
+let registeredPrivateSessions = {}
 
 // TODO(bridiver) move this to electron so we can call a simpler api
 const setUserPrefType = (ses, path, value) => {
   switch (typeof value) {
     case 'object':
-      ses.userPrefs.setDictionaryPref(path, value)
+      if (Array.isArray(value)) {
+        ses.userPrefs.setListPref(path, value)
+      } else {
+        ses.userPrefs.setDictionaryPref(path, value)
+      }
       break
     case 'string':
       ses.userPrefs.setStringPref(path, value)
-      break
-    case 'array':
-      ses.userPrefs.setListPref(path, value)
       break
     case 'number':
       if ((/^(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i).test(value.to_s())) {
@@ -35,41 +34,38 @@ const setUserPrefType = (ses, path, value) => {
   }
 }
 
-const runCallback = (cb, name, incognito) => {
-  let prefs = cb()
+const runCallback = (cb, incognito) => {
+  let prefs = cb(incognito)
 
   if (typeof prefs !== 'object') {
     console.warn('userPrefs callback did not return an object:', prefs)
     return
   }
 
-  if (name) {
-    if (prefs[name]) {
-      setUserPref(name, prefs[name], incognito)
-      return true
-    }
-    return false
+  for (let name in prefs) {
+    module.exports.setUserPref(name, prefs[name], incognito)
   }
 
-  for (name in prefs) {
-    setUserPref(name, prefs[name], incognito)
-  }
   return true
 }
 
-const setUserPref = (path, value, incognito = false) => {
-  let partitions = incognito ? Object.keys(registeredPrivateSessions) : Object.keys(registeredSessions)
-  partitions.forEach((partition) => {
-    setUserPrefType(registeredSessions[partition], path, value)
-  })
+module.exports.setUserPref = (path, value, incognito = false) => {
+  value = value.toJS ? value.toJS() : value
+
+  const partitions = incognito ? registeredPrivateSessions : registeredSessions
+  for (let partition in partitions) {
+    const ses = partitions[partition]
+    setUserPrefType(ses, path, value)
+    ses.webRequest.handleBehaviorChanged()
+  }
 }
 
-module.exports.init = (ses, partition) => {
-  if (isPrivate(partition)) {
+module.exports.init = (ses, partition, isPrivate) => {
+  if (isPrivate) {
     registeredPrivateSessions[partition] = ses
   }
   registeredSessions[partition] = ses
-  registeredCallbacks.forEach((fn) => fn())
+  registeredCallbacks.forEach((fn) => fn(isPrivate))
 }
 
 module.exports.registerUserPrefs = (cb) => {

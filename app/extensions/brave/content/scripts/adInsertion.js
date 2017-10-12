@@ -158,12 +158,12 @@ if (chrome.contentSettings.adInsertion == 'allow') {
   var host = document.location.hostname
   if (host) {
     host = host.replace('www.', '')
-    chrome.ipc.on('set-ad-div-candidates', (e, divHost, adDivCandidates, placeholderUrl) => {
+    chrome.ipcRenderer.on('set-ad-div-candidates', (e, divHost, adDivCandidates, placeholderUrl) => {
       // don't accidentally intercept messages not intended for this host
       if (host === divHost) {
         setAdDivCandidates(adDivCandidates, placeholderUrl)
       }
     })
-    chrome.ipc.send('get-ad-div-candidates', host)
+    chrome.ipcRenderer.send('get-ad-div-candidates', host)
   }
 }

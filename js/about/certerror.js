@@ -3,11 +3,11 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Button = require('../components/button')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
 const aboutActions = require('./aboutActions')
-const WindowConstants = require('../constants/windowConstants')
 const messages = require('../constants/messages')
-const ipc = window.chrome.ipc
+const ipc = window.chrome.ipcRenderer
+const {isSourceAboutUrl, getTargetAboutUrl} = require('../lib/appUrlUtil')
 
 require('../../less/button.less')
 require('../../less/window.less')
@@ -39,8 +39,8 @@ function seperateHex (hexStr) {
 }
 
 class CertErrorPage extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
       advanced: false,
       certDetail: false,
@@ -57,6 +57,8 @@ class CertErrorPage extends React.Component {
       var validExpiry = new Date()
       validStart.setTime(detail.validStart * 1000)
       validExpiry.setTime(detail.validExpiry * 1000)
+      var fingerprint = detail.fingerprint.split('/')
+      var algorithm = fingerprint.shift()
       this.setState({
         certDetail: true,
         certIssuerName: detail.issuerName,
@@ -64,26 +66,25 @@ class CertErrorPage extends React.Component {
         certSerialNumber: seperateHex(detail.serialNumber),
         certValidStart: validStart.toString(),
         certValidExpiry: validExpiry.toString(),
-        certFingerprint: detail.fingerprint.split('/')
+        certFingerprint: [algorithm, fingerprint.join('/')]
       })
     })
   }
 
+  loadUrl (url) {
+    if (isSourceAboutUrl(url)) {
+      url = getTargetAboutUrl(url)
+    }
+    window.location = url
+  }
+
   onAccept () {
     aboutActions.acceptCertError(this.state.url)
-    aboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_URL,
-      location: this.state.url,
-      key: this.state.frameKey
-    })
+    this.loadUrl(this.state.url)
   }
 
   onSafety () {
-    aboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_URL,
-      location: this.state.previousLocation,
-      key: this.state.frameKey
-    })
+    this.loadUrl(this.state.previousLocation)
   }
 
   onAdvanced () {
@@ -136,13 +137,12 @@ class CertErrorPage extends React.Component {
           </div>) : null}
       </div>
       <div className='buttons'>
-        <Button l10nId='certErrorSafety' className='actionButton' onClick={this.onSafety.bind(this)} />
+        <BrowserButton actionItem fitContent l10nId='certErrorSafety' onClick={this.onSafety.bind(this)} />
         {this.state.url ? (this.state.advanced
-          ? (<div>
-            <Button l10nId='certErrorButtonText' className='subtleButton' onClick={this.onAccept.bind(this)} />
-            <Button l10nId='certErrorShowCertificate' className='subtleButton' onClick={this.onDetail.bind(this)} />
-          </div>)
-          : <Button l10nId='certErrorAdvanced' className='subtleButton' onClick={this.onAdvanced.bind(this)} />) : null}
+          ? (<BrowserButton subtleItem groupedItem fitContent l10nId='certErrorButtonText' onClick={this.onAccept.bind(this)} />) : null) : null}
+        {this.state.url ? (this.state.advanced
+          ? (<BrowserButton subtleItem groupedItem fitContent l10nId='certErrorShowCertificate' onClick={this.onDetail.bind(this)} />)
+          : <BrowserButton subtleItem groupedItem fitContent l10nId='certErrorAdvanced' onClick={this.onAdvanced.bind(this)} />) : null}
       </div>
     </div>
   }

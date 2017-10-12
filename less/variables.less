@@ -2,14 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+@commonTextColor: #3b3b3b;
+
 @linkColor: #0099CC;
 @highlightBlue: #37A9FD;
-@borderRadius: 4px;
-@borderRadiusTabs: 4px;
+@borderRadius: 2px;
+@borderRadiusTabs: 0;
 @borderRadiusURL: 4px;
 @borderRadiusUIbox: 8px;
+@borderRadiusModal: 8px;
 @bigBorderRadius: 14px;
 @privateTabBackground: #392e54;
+@dialogTopOffset: 30px;
 
 @bitcoinOrange: #f7931a;
 
@@ -18,15 +22,15 @@
 @chromeTertiary: #c7c7c7;
 @chromeText: #555555;
 
-@tabsBackground: #ccc;
-@navigationBarBackground: @chromeSecondary;
-@navigationBarBackground: white;
+@tabsBackground: #ddd;
+@tabsBackgroundInactive: #ddd;
+@tabsToolbarBorderColor: #bbb;
 @chromeBorderColor: @chromePrimary;
 @chromeControlsBackground: #bbb;
 @chromeControlsWarningBackground: @chromePrimary;
 //@chromeControlsBackground2: @chromeSecondary;
 @chromeControlsBackground2: white;
-@toolbarBackground: #eee;
+@toolbarBackground: #f5f5f5;
 @toolbarBorderColor: #ccc;
 @menuSelectionColor: #2F7AFB;
 @errorTextColor: #999;
@@ -36,45 +40,60 @@
 @progressBarColor: #3498DB;
 @defaultFontSize: 13px;
 @contextMenuFontSize: 14px;
+@settingItemSubtextFontSize: 0.95rem;
 @audioColor: @highlightBlue;
-@focusUrlbarOutline: @highlightBlue;
+@focusUrlbarOutline: rgba(55, 169, 253, 0.4);
+@siteSecureColor: @buttonColor;
+@siteInsecureColor: #C63626;
+@siteEVColor: green;
 @loadTimeColor: @highlightBlue;
 @activeTabDefaultColor: @chromePrimary;
 @buttonColor: #5a5a5a;
-@braveOrange: rgb(255, 80, 0);
+@braveOrange: rgb(255, 85, 0);
 @braveLightOrange: #FF7A1D;
 @braveMediumOrange: rgb(232, 72, 0);
 @braveDarkOrange: #D44600;
 @dragSpacing: 50px;
+@urlBarOutline: #bbb;
 
-@switchBG_on: @braveOrange;
-@switchBG_off: #d3d3d3;
+@switchBG_on: #ff6000;
+@switchBG_off: #ccc;
 @switchBG_off_lrg: #adadad;
 @switchBG_dis: #e8e8e8;
+@switchBGTransition: background-color 100ms;
 @switchHeight: 16px;
+@smallSwitchHeight: 12px;
+@smallSwitchWidth: 30px;
 @switchWidth: 45px;
 @switchRadius: 10px;
 @switchShadow: inset 0 1px 4px rgba(0, 0, 0, 0.35);
+@smallSwitchNubDiameter: 10px;
 @switchNubDiameter: 12px;
 @switchNubTopMargin: 2px;
 @switchNubLeftMargin: 2px;
 @switchNubRightMargin: 2px;
 @switchNubColor: white;
 @switchNubShadow: 1px 1px 5px -2px black;
+@switchNubTransition: right 100ms;
 
 @navbarHeight: 36px;
-@tabsToolbarHeight: 23px;
-@tabPagesHeight: 12px;
-@bookmarksToolbarHeight: 23px;
-@bookmarksToolbarWithFaviconsHeight: 28px;
+@downloadsBarHeight: 60px;
+@tabsToolbarHeight: 26px;
+@tabHeight: @tabsToolbarHeight;
+@tabPagesHeight: 7px;
+@bookmarksToolbarHeight: 24px;
+@bookmarksToolbarWithFaviconsHeight: 24px;
 @bookmarksFileIconSize: 13px;
 @bookmarksFolderIconSize: 15px;
 
+@settingsListContainerMargin: 2rem;
+
+@navbarMenubarMargin: 7px;
 @navbarButtonSpacing: 4px;
-@navbarButtonWidth: 35px;
+@navbarButtonWidth: 20px;
 @navbarBraveButtonWidth: 23px;
 @navbarBraveButtonMarginLeft: 80px;
-@navbarLeftMarginDarwin: 70px;
+@navbarLeftMarginDarwin: 76px;
 
 @findbarBackground: #F7F7F7;
 
@@ -87,16 +106,22 @@
 @mediumGray: rgb(101, 101, 101);
 @darkGray: rgb(68, 68, 68);
 
+@modalVeryLightGray: rgb(247, 247, 247);
+@modalLightGray: rgb(231, 231, 231);
+
 @white25: rgba(255, 255, 255, 0.25);
 @white50: rgba(255, 255, 255, 0.5);
+@white75: rgba(255, 255, 255, 0.75);
 @gray25: rgba(116, 116, 130, 0.25);
 @gray50: rgba(116, 116, 130, 0.5);
 @black10: rgba(0, 0, 0, 0.1);
 @black25: rgba(0, 0, 0, 0.25);
 @black50: rgba(0, 0, 0, 0.5);
+@black75: rgba(0, 0, 0, 0.75);
 
-@buttonShadow: 0px 1px 5px -1px rgba(0, 0, 0, 1.0);
+@buttonShadow: 0px 1px 5px -1px rgba(0, 0, 0, 0.5);
 @dialogShadow: 0px 8px 22px 0px rgba(0, 0, 0, .5);
+@flyoutDialogBoxShadow: 2px 2px 8px rgba(59, 59, 59, 1.0);
 @softBoxShadow: 0 4px 8px @lightGray;
 @lightBoxShadow: 0 2px 2px @lightGray;
 @insetShadow: inset -5px 0 15px @black25;
@@ -121,16 +146,21 @@
 @zindexDialogs: 3000;
 @zindexPopupWindow: 3000;
 @zindexForms: 3000;
+@zindexNavigationBarElements: 3100;
 @zindexSuggestionText: 3100;
 
 @zindexWindowFullScreen: 4000;
 @zindexWindowFullScreenBanner: 4100;
 
+@breakpointWideViewport: 1000px;
 @breakpointNarrowViewport: 600px;
+@breakpointForBookmarksPage: 565px;
 @breakpointExtensionButtonPadding: 720px;
 @breakpointSmallWin32: 650px;
 @breakpointTinyWin32: 500px;
 @transitionDuration: 100ms;
+
+@aboutPageSectionPadding: 24px;
 
 @transition: all 600ms linear;
 @transitionFast: all 100ms linear;
@@ -139,6 +169,21 @@
 @transitionFastEase: all 100ms ease;
 @transitionSlowEase: all 1s ease;
 
+// Colors used for stats on:
+// - Bravery panel
+// - about:newtab
+@statsYellow: #ffc000;
+@statsOrange: #f39030;
+@statsRed: #fe521d;
+@statsBlue: #0796fa;
+@statsLightGray: #999999;
+
+@defaultIconBackground: #F7F7F7;
+
+// Variables can be exposed to (and read from) our JavaScript code
+// (for more info, search MDN for CSSStyleDeclaration)
+// If updating update app/common/constants/styleValues.js as well and vice-versa
 :root {
   --navbar-height: @navbarHeight;
+  --downloads-bar-height: @downloadsBarHeight;
 }

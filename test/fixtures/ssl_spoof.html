@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html class="">
+<head>
+    <script type="text/javascript" language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> 
+</head>
+<body onLoad="sslEverywhere();">
+    <script>
+        var sslEverywhere = function(){
+            document.location = "https://example.com:1234";
+            setTimeout(function(){
+                window.stop();
+            },1000);
+        };
+    </script>
+
+    test Content1
+    <br />
+    test Content2
+</body>
+</html>

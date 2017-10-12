@@ -4,7 +4,7 @@
 
 const Immutable = require('immutable')
 const EventEmitter = require('events').EventEmitter
-const debounce = require('../lib/debounce.js')
+const debounce = require('../lib/debounce')
 
 let lastEmittedState
 const CHANGE_EVENT = 'app-state-change'

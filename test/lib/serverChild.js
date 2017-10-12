@@ -41,7 +41,7 @@ Server.prototype = {
       try {
         this.http.kill()
       } catch (e) {
-        console.log('Could not kill http server', e)
+        console.error('Could not kill http server', e)
       }
     }
   },
@@ -119,7 +119,7 @@ server = new Server()
 // figure out which port we are on
 emptyPort({}, function (err, port) {
   if (err) {
-    console.log(err.stack)
+    console.error(err.stack)
   }
   server.start(port)
   process.send(['start', port])

@@ -32,15 +32,17 @@ var env = {
   CHANNEL: process.env.CHANNEL
 }
 
-var channels = { dev: true, beta: true, stable: true }
+var channels = { dev: true, beta: true, stable: true, nightly: true, developer: true }
 if (!channels[env.CHANNEL]) {
-  throw new Error('CHANNEL environment variable must be set to dev, beta or stable')
+  throw new Error('CHANNEL environment variable must be set to dev, beta, stable, nightly, or developer')
 }
 
 console.log('Writing buildConfig.js...')
 config.writeBuildConfig(
   {
-    channel: env.CHANNEL
+    channel: env.CHANNEL,
+    BROWSER_LAPTOP_REV: require('git-rev-sync').long(),
+    nodeEnv: env.NODE_ENV
   },
   'buildConfig.js'
 )
@@ -93,9 +95,9 @@ cmds = cmds.concat([
     ' --build-version=' + VersionInfo.electronVersion +
     ' --protocol="http" --protocol-name="HTTP Handler"' +
     ' --protocol="https" --protocol-name="HTTPS Handler"' +
-    ' --version-string.CompanyName="Brave Inc."' +
+    ' --version-string.CompanyName="Brave Software"' +
     ' --version-string.ProductName="Brave"' +
-    ' --version-string.Copyright="Copyright 2016, Brave Inc."' +
+    ' --version-string.Copyright="Copyright 2017, Brave Software"' +
     ' --version-string.FileDescription="Brave"'
 ])
 
@@ -118,10 +120,9 @@ if (isLinux) {
   cmds.push('copy .\\res\\start-tile-150.png "' + path.join(buildDir, 'resources', 'start-tile-150.png') + '"')
   cmds.push('makensis.exe -DARCH=' + arch + ' res/braveDefaults.nsi')
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
+  // Make sure the Brave.exe binary is squirrel aware so we get squirrel events and so that Squirrel doesn't auto create shortcuts.
+  cmds.push('"node_modules/rcedit/bin/rcedit.exe" ./Brave-win32-' + arch + '/Brave.exe --set-version-string "SquirrelAwareVersion" "1"')
 }
-
-cmds.push('mkdirp ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'spellchecker', 'vendor', 'hunspell_dictionaries'))
-cmds.push('ncp ' + path.join('node_modules', 'spellchecker', 'vendor', 'hunspell_dictionaries') + ' ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'spellchecker', 'vendor', 'hunspell_dictionaries'))
 
 if (isDarwin) {
   cmds.push('mkdirp ' + path.join(buildDir, 'Brave.app', 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten'))
@@ -131,4 +132,12 @@ if (isDarwin) {
   cmds.push('ncp ' + path.join('node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem') + ' ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem'))
 }
 
-execute(cmds, env, console.log.bind(null, 'done'))
+execute(cmds, env, (err) => {
+  if (err) {
+    console.error('buildPackage failed', err)
+    process.exit(1)
+    return
+  }
+  config.clearBuildConfig()
+  console.log('done')
+})

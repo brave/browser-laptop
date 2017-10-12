@@ -5,6 +5,7 @@
 @import "variables.less";
 
 .findBar {
+  -webkit-app-region: no-drag;
   background: @findbarBackground;
   border-bottom: 1px solid @lightGray;
   color: @highlightBlue;
@@ -14,6 +15,11 @@
   justify-content: center;
   padding: 5px 10px;
   animation: slideIn 25ms;
+  cursor: default;
+
+  * {
+    user-select: none;
+  }
 
   .findMatchText {
     margin: 0 10px;
@@ -25,13 +31,13 @@
     color: @mediumGray;
   }
 
-  span.findButton {
-    color: @gray;
-    cursor: pointer;
+  .closeButton {
     border: 1px solid transparent;
-    font-size: 18px;
-    margin: 0 2px;
+    color: @gray;
+    cursor: default;
+    font-size: 22px;
     opacity: 0.5;
+    transform: rotate(45deg);
 
     &:not([disabled]):hover {
       opacity: 1;
@@ -40,14 +46,6 @@
     &.hideButton:not([disabled]):hover {
       background: @chromeControlsWarningBackground;
     }
-  }
-
-  .closeButton {
-    color: white;
-    font-size: 22px;
-    margin-right: 0;
-    opacity: 0.5;
-    transform: rotate(45deg);
   }
 
   .searchContainer {
@@ -89,16 +87,16 @@
     line-height: 24px;
 
     &.fa-times {
-      cursor: pointer;
       right: 10px;
     }
   }
 
   .caseSensitivityContainer {
+    color: @gray;
+    margin-top: 6px;
+
     input {
       margin-right: 6px;
     }
-    color: @gray;
-    margin-top: 6px;
   }
 }

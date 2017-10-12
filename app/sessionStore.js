@@ -11,24 +11,47 @@
 // - When all state is collected save it to a JSON file and close the app
 // - NODE_ENV of ‘test’ bypassing session state or else they all fail.
 
-const Immutable = require('immutable')
-const fs = require('fs')
 const path = require('path')
 const electron = require('electron')
+const os = require('os')
+const assert = require('assert')
+const Immutable = require('immutable')
 const app = electron.app
-const locale = require('./locale')
+const compareVersions = require('compare-versions')
+
+// Constants
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
+const siteTags = require('../js/constants/siteTags')
 const downloadStates = require('../js/constants/downloadStates')
-const {tabFromFrame} = require('../js/state/frameStateUtil')
-const siteUtil = require('../js/state/siteUtil')
-const sessionStorageVersion = 1
-const filtering = require('./filtering')
-// const tabState = require('./common/state/tabState')
 
-const getSetting = require('../js/settings').getSetting
-const promisify = require('../js/lib/promisify')
+// State
+const tabState = require('./common/state/tabState')
+const windowState = require('./common/state/windowState')
+
+// Utils
+const locale = require('./locale')
+const {pinnedTopSites} = require('../js/data/newTabData')
+const {defaultSiteSettingsList} = require('../js/data/siteSettingsList')
+const filtering = require('./filtering')
+const autofill = require('./autofill')
+const {navigatableTypes} = require('../js/lib/appUrlUtil')
+const Channel = require('./channel')
+const {isImmutable, makeImmutable, deleteImmutablePaths} = require('./common/state/immutableUtil')
+const {getSetting} = require('../js/settings')
+const platformUtil = require('./common/lib/platformUtil')
+const historyUtil = require('./common/lib/historyUtil')
+
+const sessionStorageVersion = 1
 const sessionStorageName = `session-store-${sessionStorageVersion}`
+
+const getTempStoragePath = (filename) => {
+  const epochTimestamp = (new Date()).getTime().toString()
+  filename = filename || 'tmp'
+  return process.env.NODE_ENV !== 'test'
+    ? path.join(app.getPath('userData'), 'session-store-' + filename + '-' + epochTimestamp)
+    : path.join(process.env.HOME, '.brave-test-session-store-' + filename + '-' + epochTimestamp)
+}
 
 const getStoragePath = () => {
   return path.join(app.getPath('userData'), sessionStorageName)
@@ -36,264 +59,372 @@ const getStoragePath = () => {
 /**
  * Saves the specified immutable browser state to storage.
  *
- * @param {object} payload - Application state as per
+ * @param {object} immutablePayload - Application immutable state as per
  *   https://github.com/brave/browser/wiki/Application-State
  *   (not immutable data)
  * @return a promise which resolves when the state is saved
  */
-module.exports.saveAppState = (payload, isShutdown) => {
+module.exports.saveAppState = (immutablePayload, isShutdown) => {
+  assert(isImmutable(immutablePayload))
+
   return new Promise((resolve, reject) => {
-    // Don't persist private frames
-    let startupModeSettingValue
-    if (require('../js/stores/appStore').getState()) {
-      startupModeSettingValue = getSetting(settings.STARTUP_MODE)
-    }
-    const savePerWindowState = startupModeSettingValue === undefined ||
+    let startupModeSettingValue = getSetting(settings.STARTUP_MODE)
+    const savePerWindowState = startupModeSettingValue == null ||
       startupModeSettingValue === 'lastTime'
-    if (payload.perWindowState && savePerWindowState) {
-      payload.perWindowState.forEach((wndPayload) => {
-        wndPayload.frames = wndPayload.frames.filter((frame) => !frame.isPrivate)
-      })
-      // tabs will be auto-reset to what the frame is in cleanAppData but just in
-      // case clean fails we don't want to save private tabs.
-      payload.perWindowState.forEach((wndPayload) => {
-        wndPayload.tabs = wndPayload.tabs.filter((tab) => !tab.isPrivate)
-      })
-    } else {
-      delete payload.perWindowState
+
+    // Don't persist private frames
+    if (immutablePayload.get('perWindowState')) {
+      if (savePerWindowState) {
+        immutablePayload.get('perWindowState').forEach((immutableWndPayload, i) => {
+          const frames = immutableWndPayload.get('frames').filter((frame) => !frame.get('isPrivate'))
+          immutableWndPayload = immutableWndPayload.set('frames', frames)
+          immutablePayload = immutablePayload.setIn(['perWindowState', i], immutableWndPayload)
+        })
+      } else {
+        // we still need to preserve window position/size info
+        immutablePayload.get('perWindowState').forEach((immutableWndPayload, i) => {
+          let windowInfo = Immutable.Map()
+          windowInfo = windowInfo.set('windowInfo', immutableWndPayload.get('windowInfo'))
+          immutablePayload = immutablePayload.setIn(['perWindowState', i], windowInfo)
+        })
+      }
     }
 
     try {
-      module.exports.cleanAppData(payload, isShutdown)
-      payload.cleanedOnShutdown = isShutdown
+      immutablePayload = module.exports.cleanAppData(immutablePayload, isShutdown)
+      immutablePayload = immutablePayload.set('cleanedOnShutdown', isShutdown)
     } catch (e) {
-      payload.cleanedOnShutdown = false
+      immutablePayload = immutablePayload.set('cleanedOnShutdown', false)
     }
-    payload.lastAppVersion = app.getVersion()
+    immutablePayload = immutablePayload.set('lastAppVersion', app.getVersion())
 
-    const epochTimestamp = (new Date()).getTime().toString()
-    const tmpStoragePath = process.env.NODE_ENV !== 'test'
-      ? path.join(app.getPath('userData'), 'session-store-tmp-' + epochTimestamp)
-      : path.join(process.env.HOME, '.brave-test-session-store-tmp-' + epochTimestamp)
-
-    let p = promisify(fs.writeFile, tmpStoragePath, JSON.stringify(payload))
-      .then(() => promisify(fs.rename, tmpStoragePath, getStoragePath()))
     if (isShutdown) {
-      p = p.then(module.exports.cleanSessionDataOnShutdown())
+      module.exports.cleanSessionDataOnShutdown()
     }
-    p.then(resolve)
-      .catch(reject)
+
+    const storagePath = getStoragePath()
+    const json = JSON.stringify(immutablePayload)
+    muon.file.writeImportant(storagePath, json, (success) => {
+      if (success) {
+        resolve()
+      } else {
+        reject(new Error('Could not save app state to ' + getStoragePath()))
+      }
+    })
   })
 }
 
 /**
  * Cleans session data from unwanted values.
+ * @param immutablePerWindowData - Per window data in ImmutableJS format
+ * @return ImmutableJS cleaned window data
  */
-module.exports.cleanPerWindowData = (perWindowData, isShutdown) => {
-  if (!perWindowData) {
-    perWindowData = {}
+module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
+  if (!immutablePerWindowData) {
+    immutablePerWindowData = Immutable.Map()
   }
-  // Hide the context menu when we restore.
-  delete perWindowData.contextMenuDetail
-  // Don't save preview frame since they are only related to hovering on a tab
-  delete perWindowData.previewFrameKey
-  // Don't save preview tab pages
-  if (perWindowData.ui && perWindowData.ui.tabs) {
-    delete perWindowData.ui.tabs.previewTabPageIndex
+
+  assert(isImmutable(immutablePerWindowData))
+
+  // delete the frame index because tabId is per-session
+  immutablePerWindowData = immutablePerWindowData.delete('framesInternal')
+
+  immutablePerWindowData = deleteImmutablePaths(immutablePerWindowData, [
+    // Hide the context menu when we restore.
+    'contextMenuDetail',
+    // Don't save preview frame since they are only related to hovering on a tab
+    'previewFrameKey',
+    // Don't save widevine panel detail
+    'widevinePanelDetail',
+    // Don't save preview tab pages
+    ['ui', 'tabs', 'previewTabPageIndex'],
+    // Don't restore add/edit dialog
+    'bookmarkDetail',
+    // Don't restore bravery panel
+    'braveryPanelDetail',
+    // Don't restore drag data and clearBrowsingDataPanel's visibility
+    // This is no longer stored, we can remove this line eventually
+    ['ui', 'mouseInTitlebar'],
+    ['ui', 'mouseInFrame'],
+    ['ui', 'dragging'],
+    ['ui', 'isClearBrowsingDataPanelVisible']
+  ])
+
+  if (!immutablePerWindowData.get('frames')) {
+    immutablePerWindowData = immutablePerWindowData.set('frames', Immutable.List())
   }
-  // Don't restore add/edit dialog
-  delete perWindowData.bookmarkDetail
-  // Don't restore bravery panel
-  delete perWindowData.braveryPanelDetail
-  // Don't restore cache clearing popup
-  delete perWindowData.clearBrowsingDataDetail
-  // Don't restore drag data
-  if (perWindowData.ui) {
-    delete perWindowData.ui.dragging
-  }
-  perWindowData.frames = perWindowData.frames || []
+
   let newKey = 0
-  const cleanFrame = (frame) => {
+  let activeFrameKey = immutablePerWindowData.get('activeFrameKey')
+  // If adjustActive is set to true then activeFrameKey will be set to the new frame key.
+  // We re-use this function for both closedFrames and frames, and we only want to adjust the active for frames.
+  const cleanFrame = (immutableFrame, adjustActive) => {
     newKey++
     // Reset the ids back to sequential numbers
-    if (frame.key === perWindowData.activeFrameKey) {
-      perWindowData.activeFrameKey = newKey
+    if (adjustActive &&
+        immutableFrame.get('key') === immutablePerWindowData.get('activeFrameKey')) {
+      activeFrameKey = newKey
     } else {
       // For now just set everything to unloaded unless it's the active frame
-      frame.unloaded = true
+      immutableFrame = immutableFrame.set('unloaded', true)
     }
-    frame.key = newKey
-    // Full history is not saved yet
-    frame.canGoBack = false
-    frame.canGoForward = false
+    immutableFrame = immutableFrame.set('key', newKey)
 
     // Set the frame src to the last visited location
     // or else users will see the first visited URL.
     // Pinned location always get reset to what they are
-    frame.src = frame.pinnedLocation || frame.location
+    immutableFrame = immutableFrame.set('src', immutableFrame.get('pinnedLocation') || immutableFrame.get('location'))
 
     // If a blob is present for the thumbnail, create the object URL
-    if (frame.thumbnailBlob) {
+    if (immutableFrame.get('thumbnailBlob')) {
       try {
-        frame.thumbnailUrl = window.URL.createObjectURL(frame.thumbnailBlob)
+        immutableFrame = immutableFrame.set('thumbnailUrl', window.URL.createObjectURL(immutableFrame.get('thumbnailBlob')))
       } catch (e) {
-        delete frame.thumbnailUrl
+        immutableFrame = immutableFrame.delete('thumbnailUrl')
       }
     }
 
-    // Delete lists of blocked sites
-    delete frame.trackingProtection
-    delete frame.httpsEverywhere
-    delete frame.adblock
-    delete frame.noScript
-    delete frame.trackingProtection
+    immutableFrame = deleteImmutablePaths(immutableFrame, [
+      // Delete lists of blocked sites
+      'trackingProtection',
+      'httpsEverywhere',
+      'adblock',
+      'noScript',
+      // clean up any legacy frame opening props
+      'openInForeground',
+      'disposition',
+      // Guest instance ID's are not valid after restarting.
+      // Electron won't know about them.
+      'guestInstanceId',
+      // Tab ids are per-session and should not be persisted
+      'tabId',
+      'openerTabId',
+      // Do not show the audio indicator until audio starts playing
+      'audioMuted',
+      'audioPlaybackActive',
+      // Let's not assume wknow anything about loading
+      'loading',
+      // Always re-determine the security data
+      'security',
+      // Value is only used for local storage
+      'isActive',
+      // Hide modal prompts.
+      'modalPromptDetail',
+      // Remove HTTP basic authentication requests.
+      'basicAuthDetail',
+      // Remove open search details
+      'searchDetail',
+      // Remove find in page details
+      ['findDetail', 'numberOfMatches'],
+      ['findDetail', 'activeMatchOrdinal'],
+      ['findDetail', 'internalFindStatePresent'],
+      'findbarShown',
+      // Don't restore full screen state
+      'isFullScreen',
+      'showFullScreenWarning',
+      // Don't store child tab open ordering since keys
+      // currently get re-generated when session store is
+      // restored.  We will be able to keep this once we
+      // don't regenerate new frame keys when opening storage.
+      'parentFrameKey',
+      // Delete the active shortcut details
+      'activeShortcut',
+      'activeShortcutDetails'
+    ])
 
-    // Guest instance ID's are not valid after restarting.
-    // Electron won't know about them.
-    delete frame.guestInstanceId
-
-    // Tab ids are per-session and should not be persisted
-    delete frame.tabId
-
-    // Do not show the audio indicator until audio starts playing
-    delete frame.audioMuted
-    delete frame.audioPlaybackActive
-    // Let's not assume wknow anything about loading
-    delete frame.loading
-    // Always re-determine the security data
-    delete frame.security
-    // Value is only used for local storage
-    delete frame.isActive
-    // Hide modal prompts.
-    delete frame.modalPromptDetail
-    // Remove HTTP basic authentication requests.
-    delete frame.basicAuthDetail
-    // Remove open search details
-    delete frame.searchDetail
-    // Remove find in page details
-    if (frame.findDetail) {
-      delete frame.findDetail.numberOfMatches
-      delete frame.findDetail.activeMatchOrdinal
-    }
-    delete frame.findbarShown
-    // Don't restore full screen state
-    delete frame.isFullScreen
-    delete frame.showFullScreenWarning
-    // Don't store child tab open ordering since keys
-    // currently get re-generated when session store is
-    // restored.  We will be able to keep this once we
-    // don't regenerate new frame keys when opening storage.
-    delete frame.parentFrameKey
-    // Delete the active shortcut details
-    delete frame.activeShortcutDetails
-
-    if (frame.navbar && frame.navbar.urlbar) {
-      frame.navbar.urlbar.urlPreview = null
-      if (frame.navbar.urlbar.suggestions) {
-        frame.navbar.urlbar.suggestions.selectedIndex = null
-        frame.navbar.urlbar.suggestions.suggestionList = null
+    if (immutableFrame.get('navbar') && immutableFrame.getIn(['navbar', 'urlbar'])) {
+      if (immutableFrame.getIn(['navbar', 'urlbar', 'suggestions'])) {
+        immutableFrame = immutableFrame.setIn(['navbar', 'urlbar', 'suggestions', 'selectedIndex'], null)
+        immutableFrame = immutableFrame.setIn(['navbar', 'urlbar', 'suggestions', 'suggestionList'], null)
       }
+      immutableFrame = immutableFrame.deleteIn(['navbar', 'urlbar', 'searchDetail'])
     }
+    return immutableFrame
   }
   const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
   if (clearHistory) {
-    perWindowData.closedFrames = []
-  }
-  const clearAutocompleteData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA) === true
-  if (clearAutocompleteData) {
-    filtering.clearAutocompleteData()
-  }
-  const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
-  if (clearAutofillData) {
-    filtering.clearAutofillData()
+    immutablePerWindowData = immutablePerWindowData.set('closedFrames', Immutable.List())
   }
 
   // Clean closed frame data before frames because the keys are re-ordered
   // and the new next key is calculated in windowStore.js based on
   // the max frame key ID.
-  if (perWindowData.closedFrames) {
-    perWindowData.closedFrames.forEach(cleanFrame)
+  if (immutablePerWindowData.get('closedFrames')) {
+    immutablePerWindowData =
+      immutablePerWindowData.get('closedFrames').reduce((immutablePerWindowData, immutableFrame, index) => {
+        const cleanImmutableFrame = cleanFrame(immutableFrame, false)
+        return immutablePerWindowData.setIn(['closedFrames', index], cleanImmutableFrame)
+      }, immutablePerWindowData)
   }
-  if (perWindowData.frames) {
+  let immutableFrames = immutablePerWindowData.get('frames')
+  if (immutableFrames) {
     // Don't restore pinned locations because they will be auto created by the app state change event
-    perWindowData.frames = perWindowData.frames
-      .filter((frame) => !frame.pinnedLocation)
-    perWindowData.frames.forEach(cleanFrame)
+    immutableFrames = immutableFrames
+        .filter((frame) => !frame.get('pinnedLocation'))
+    immutablePerWindowData = immutablePerWindowData.set('frames', immutableFrames)
+    immutablePerWindowData =
+      immutableFrames.reduce((immutablePerWindowData, immutableFrame, index) => {
+        const cleanImmutableFrame = cleanFrame(immutableFrame, true)
+        return immutablePerWindowData.setIn(['frames', index], cleanImmutableFrame)
+      }, immutablePerWindowData)
+    if (activeFrameKey !== undefined) {
+      immutablePerWindowData = immutablePerWindowData.set('activeFrameKey', activeFrameKey)
+    }
   }
-  // Always recalculate tab data from frame data
-  perWindowData.tabs = perWindowData.frames.map((frame) => tabFromFrame(frame))
+  return immutablePerWindowData
 }
 
 /**
  * Cleans app data before it's written to disk.
- * @param {Object} data - top-level app data
+ * @param {Object} data - top-level app data in ImmutableJS format
  * @param {Object} isShutdown - true if the data is being cleared for a shutdown
  * WARNING: getPrefs is only available in this function when isShutdown is true
+ * @return Immutable JS cleaned up data
  */
-module.exports.cleanAppData = (data, isShutdown) => {
-  if (data.settings) {
-    // useragent value gets recalculated on restart
-    data.settings[settings.USERAGENT] = undefined
-  }
+module.exports.cleanAppData = (immutableData, isShutdown) => {
+  assert(isImmutable(immutableData))
+
   // Don't show notifications from the last session
-  data.notifications = []
+  immutableData = immutableData.set('notifications', Immutable.List())
   // Delete temp site settings
-  data.temporarySiteSettings = {}
-  // Delete Flash state since this is checked on startup
-  delete data.flashInitialized
-  // We used to store a huge list of IDs but we didn't use them.
-  // Get rid of them here.
-  delete data.windows
-  if (data.perWindowState) {
-    data.perWindowState.forEach((perWindowState) =>
-      module.exports.cleanPerWindowData(perWindowState, isShutdown))
+  immutableData = immutableData.set('temporarySiteSettings', Immutable.Map())
+
+  if (immutableData.getIn(['settings', settings.CHECK_DEFAULT_ON_STARTUP]) === true) {
+    // Delete defaultBrowserCheckComplete state since this is checked on startup
+    immutableData = immutableData.delete('defaultBrowserCheckComplete')
   }
-  // Delete expired Flash approvals
-  let now = Date.now()
-  for (var host in data.siteSettings) {
-    let expireTime = data.siteSettings[host].flash
-    if (typeof expireTime === 'number' && expireTime < now) {
-      delete data.siteSettings[host].flash
+  // Delete Recovery status on shut down
+  try {
+    immutableData = immutableData.deleteIn(['ui', 'about', 'preferences', 'recoverySucceeded'])
+  } catch (e) {}
+
+  const perWindowStateList = immutableData.get('perWindowState')
+  if (perWindowStateList) {
+    perWindowStateList.forEach((immutablePerWindowState, i) => {
+      const cleanedImmutablePerWindowState = module.exports.cleanPerWindowData(immutablePerWindowState, isShutdown)
+      immutableData = immutableData.setIn(['perWindowState', i], cleanedImmutablePerWindowState)
+    })
+  }
+  const clearAutocompleteData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA) === true
+  if (clearAutocompleteData) {
+    try {
+      autofill.clearAutocompleteData()
+    } catch (e) {
+      console.error('cleanAppData: error calling autofill.clearAutocompleteData: ', e)
     }
-    // Don't write runInsecureContent to session
-    delete data.siteSettings[host].runInsecureContent
   }
-  if (data.sites) {
+  const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
+  if (clearAutofillData) {
+    autofill.clearAutofillData()
+    const date = new Date().getTime()
+    immutableData = immutableData.set('autofill', Immutable.fromJS({
+      addresses: {
+        guid: [],
+        timestamp: date
+      },
+      creditCards: {
+        guid: [],
+        timestamp: date
+      }
+    }))
+  }
+  immutableData = immutableData.delete('dragData')
+
+  if (immutableData.get('sync')) {
+    // clear sync site cache
+    immutableData = immutableData.deleteIn(['sync', 'objectsById'], Immutable.Map())
+  }
+  const clearSiteSettings = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_SITE_SETTINGS) === true
+  if (clearSiteSettings) {
+    immutableData = immutableData.set('siteSettings', Immutable.Map())
+  }
+  // Delete expired Flash and NoScript allow-once approvals
+  let now = Date.now()
+
+  immutableData.get('siteSettings', Immutable.Map()).forEach((value, host) => {
+    let expireTime = value.get('flash')
+    if (typeof expireTime === 'number' && expireTime < now) {
+      immutableData = immutableData.deleteIn(['siteSettings', host, 'flash'])
+    }
+    let noScript = immutableData.getIn(['siteSettings', host, 'noScript'])
+    if (typeof noScript === 'number') {
+      immutableData = immutableData.deleteIn(['siteSettings', host, 'noScript'])
+    }
+    // Don't persist any noScript exceptions
+    immutableData = immutableData.deleteIn(['siteSettings', host, 'noScriptExceptions'])
+    // Don't write runInsecureContent to session
+    immutableData = immutableData.deleteIn(['siteSettings', host, 'runInsecureContent'])
+    // If the site setting is empty, delete it for privacy
+    if (Array.from(immutableData.getIn(['siteSettings', host]).keys()).length === 0) {
+      immutableData = immutableData.deleteIn(['siteSettings', host])
+    }
+  })
+
+  if (immutableData.get('sites')) {
     const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
     if (clearHistory) {
-      data.sites = siteUtil.clearHistory(Immutable.fromJS(data.sites)).toJS()
+      immutableData = immutableData.set('historySites', Immutable.Map())
+      immutableData = deleteImmutablePaths(immutableData, [
+        ['about', 'history'],
+        ['about', 'newtab']
+      ])
     }
   }
-  if (data.downloads) {
+
+  if (immutableData.get('downloads')) {
     const clearDownloads = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_DOWNLOADS) === true
     if (clearDownloads) {
-      delete data.downloads
+      immutableData = immutableData.delete('downloads')
     } else {
       // Always at least delete downloaded items older than a week
       const dateOffset = 7 * 24 * 60 * 60 * 1000
       const lastWeek = new Date().getTime() - dateOffset
-      Object.keys(data.downloads).forEach((downloadId) => {
-        if (data.downloads[downloadId].startTime < lastWeek) {
-          delete data.downloads[downloadId]
+      Array.from(immutableData.get('downloads').keys()).forEach((downloadId) => {
+        if (immutableData.getIn(['downloads', downloadId, 'startTime']) < lastWeek) {
+          immutableData = immutableData.deleteIn(['downloads', downloadId])
         } else {
-          const state = data.downloads[downloadId].state
+          const state = immutableData.getIn(['downloads', downloadId, 'state'])
           if (state === downloadStates.IN_PROGRESS || state === downloadStates.PAUSED) {
-            data.downloads[downloadId].state = downloadStates.INTERRUPTED
+            immutableData = immutableData.setIn(['downloads', downloadId, 'state'], downloadStates.INTERRUPTED)
           }
         }
       })
     }
   }
-  // all data in tabs is transient while we make the transition from window to app state
-  delete data.tabs
-  // if (data.tabs) {
-  //   data.tabs = data.tabs.map((tab) => tabState.getPersistentTabState(tab).toJS())
-  // }
-  if (data.extensions) {
-    Object.keys(data.extensions).forEach((extensionId) => {
-      delete data.extensions[extensionId].tabs
+
+  immutableData = immutableData.delete('menu')
+  immutableData = immutableData.delete('pageData')
+
+  try {
+    immutableData = tabState.getPersistentState(immutableData)
+  } catch (e) {
+    console.error('cleanAppData: error calling tabState.getPersistentState: ', e)
+    immutableData = immutableData.set('tabs', Immutable.List())
+  }
+
+  try {
+    immutableData = windowState.getPersistentState(immutableData)
+  } catch (e) {
+    console.error('cleanAppData: error calling windowState.getPersistentState: ', e)
+    immutableData = immutableData.set('windows', Immutable.List())
+  }
+
+  if (immutableData.get('extensions')) {
+    Array.from(immutableData.get('extensions').keys()).forEach((extensionId) => {
+      immutableData = immutableData.deleteIn(['extensions', extensionId, 'tabs'])
     })
   }
+
+  // Leader cleanup
+  if (immutableData.has('pageData')) {
+    immutableData = immutableData.delete('pageData')
+  }
+
+  if (immutableData.hasIn(['ledger', 'locations'])) {
+    immutableData = immutableData.deleteIn(['ledger', 'locations'])
+  }
+
+  return immutableData
 }
 
 /**
@@ -301,14 +432,387 @@ module.exports.cleanAppData = (data, isShutdown) => {
  * @return a promise which resolve when the work is done.
  */
 module.exports.cleanSessionDataOnShutdown = () => {
-  let p = Promise.resolve()
   if (getSetting(settings.SHUTDOWN_CLEAR_ALL_SITE_COOKIES) === true) {
-    p = p.then(filtering.clearStorageData())
+    filtering.clearStorageData()
   }
   if (getSetting(settings.SHUTDOWN_CLEAR_CACHE) === true) {
-    p = p.then(filtering.clearCache())
+    filtering.clearCache()
   }
-  return p
+  if (getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true) {
+    filtering.clearHistory()
+  }
+}
+
+const safeGetVersion = (fieldName, getFieldVersion) => {
+  const versionField = {
+    name: fieldName,
+    version: undefined
+  }
+  try {
+    if (typeof getFieldVersion === 'function') {
+      versionField.version = getFieldVersion()
+      return versionField
+    }
+    console.error('ERROR getting value for field ' + fieldName + ' in sessionStore::setVersionInformation(): ', getFieldVersion, ' is not a function')
+  } catch (e) {
+    console.error('ERROR getting value for field ' + fieldName + ' in sessionStore::setVersionInformation(): ', e)
+  }
+  return versionField
+}
+
+/**
+ * version information (shown on about:brave)
+ */
+const setVersionInformation = (immutableData) => {
+  const versionFields = [
+    ['Brave', app.getVersion],
+    ['rev', Channel.browserLaptopRev],
+    ['Muon', () => { return process.versions['atom-shell'] }],
+    ['libchromiumcontent', () => { return process.versions['chrome'] }],
+    ['V8', () => { return process.versions.v8 }],
+    ['Node.js', () => { return process.versions.node }],
+    ['Update Channel', Channel.formattedChannel],
+    ['OS Platform', () => platformUtil.formatOsPlatform(os.platform())],
+    ['OS Release', os.release],
+    ['OS Architecture', os.arch]
+  ]
+  const versionInformation = {}
+
+  versionFields.forEach((field) => {
+    const versionField = safeGetVersion(field[0], field[1])
+    versionInformation[versionField.name] = versionField.version
+  })
+
+  if (!immutableData.get('about')) {
+    immutableData = immutableData.set('about', Immutable.Map())
+  }
+  immutableData = immutableData.setIn(['about', 'brave', 'versionInformation'], Immutable.fromJS(versionInformation))
+  return immutableData
+}
+
+const sortBookmarkOrder = (bookmarkOrder) => {
+  const newOrder = {}
+  for (let key of Object.keys(bookmarkOrder)) {
+    let i = 0
+    const order = bookmarkOrder[key].sort((x, y) => {
+      if (x.order < y.order) {
+        return -1
+      } else if (x.order > y.order) {
+        return 1
+      } else {
+        return 0
+      }
+    }).map(item => {
+      item.order = i
+      i++
+      return item
+    })
+
+    newOrder[key] = order
+  }
+
+  return newOrder
+}
+
+module.exports.runPreMigrations = (data) => {
+  // autofill data migration
+  if (data.autofill) {
+    if (Array.isArray(data.autofill.addresses)) {
+      let addresses = exports.defaultAppState().autofill.addresses
+      data.autofill.addresses.forEach((guid) => {
+        addresses.guid.push(guid)
+        addresses.timestamp = new Date().getTime()
+      })
+      data.autofill.addresses = addresses
+    }
+    if (Array.isArray(data.autofill.creditCards)) {
+      let creditCards = exports.defaultAppState().autofill.creditCards
+      data.autofill.creditCards.forEach((guid) => {
+        creditCards.guid.push(guid)
+        creditCards.timestamp = new Date().getTime()
+      })
+      data.autofill.creditCards = creditCards
+    }
+    if (data.autofill.addresses && data.autofill.addresses.guid) {
+      let guids = []
+      data.autofill.addresses.guid.forEach((guid) => {
+        if (typeof guid === 'object') {
+          guids.push(guid['persist:default'])
+        } else {
+          guids.push(guid)
+        }
+      })
+      data.autofill.addresses.guid = guids
+    }
+    if (data.autofill.creditCards && data.autofill.creditCards.guid) {
+      let guids = []
+      data.autofill.creditCards.guid.forEach((guid) => {
+        if (typeof guid === 'object') {
+          guids.push(guid['persist:default'])
+        } else {
+          guids.push(guid)
+        }
+      })
+      data.autofill.creditCards.guid = guids
+    }
+  }
+  if (data.settings) {
+    // xml migration
+    if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/google.xml') {
+      data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'Google'
+    }
+    if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/duckduckgo.xml') {
+      data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'DuckDuckGo'
+    }
+    // ledger payments migration. see PR #10164
+    // changes was introduced in 0.21.x.
+    // if legacy setting exist, make sure the new setting inherits the legacy value
+    if (data.settings[settings.AUTO_SUGGEST_SITES] != null) {
+      data.settings[settings.PAYMENTS_SITES_AUTO_SUGGEST] = data.settings[settings.AUTO_SUGGEST_SITES]
+      delete data.settings[settings.AUTO_SUGGEST_SITES]
+    }
+    if (data.settings[settings.MINIMUM_VISIT_TIME] != null) {
+      data.settings[settings.PAYMENTS_MINIMUM_VISIT_TIME] = data.settings[settings.MINIMUM_VISIT_TIME]
+      delete data.settings[settings.MINIMUM_VISIT_TIME]
+    }
+    if (data.settings[settings.MINIMUM_VISITS] != null) {
+      data.settings[settings.PAYMENTS_MINIMUM_VISITS] = data.settings[settings.MINIMUM_VISITS]
+      delete data.settings[settings.MINIMUM_VISITS]
+    }
+    if (data.settings[settings.HIDE_LOWER_SITES] != null) {
+      data.settings[settings.PAYMENTS_SITES_SHOW_LESS] = data.settings[settings.HIDE_LOWER_SITES]
+      delete data.settings[settings.HIDE_LOWER_SITES]
+    }
+    if (data.settings[settings.HIDE_EXCLUDED_SITES] != null) {
+      data.settings[settings.PAYMENTS_SITES_HIDE_EXCLUDED] = data.settings[settings.HIDE_EXCLUDED_SITES]
+      delete data.settings[settings.HIDE_EXCLUDED_SITES]
+    }
+    // PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED kept the same
+    // constant but has its value changed.
+    if (data.settings['payments.notificationTryPaymentsDismissed'] != null) {
+      data.settings[settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED] = data.settings['payments.notificationTryPaymentsDismissed']
+      delete data.settings['payments.notificationTryPaymentsDismissed']
+    }
+  }
+
+  if (data.sites) {
+    // pinned sites
+    data.pinnedSites = data.pinnedSites || {}
+    for (let key of Object.keys(data.sites)) {
+      const site = data.sites[key]
+      if (site.tags && site.tags.includes('pinned')) {
+        delete site.tags
+        data.pinnedSites[key] = site
+      }
+    }
+
+    // default sites
+    let newTab = data.about.newtab
+
+    if (newTab) {
+      const ignoredSites = []
+      const pinnedSites = []
+
+      if (newTab.ignoredTopSites) {
+        for (let site of newTab.ignoredTopSites) {
+          if (site) {
+            ignoredSites.push(`${site.location}|0|0`)
+          }
+        }
+        data.about.newtab.ignoredTopSites = ignoredSites
+      }
+
+      if (newTab.pinnedTopSites) {
+        for (let site of newTab.pinnedTopSites) {
+          if (site) {
+            site.key = `${site.location}|0|0`
+            pinnedSites.push(site)
+          }
+        }
+        data.about.newtab.pinnedTopSites = pinnedSites
+      }
+
+      data.about.newtab.sites = []
+    }
+
+    // bookmark order
+    let bookmarkOrder = {}
+
+    // bookmark folders
+    if (!data.bookmarkFolders) {
+      data.bookmarkFolders = {}
+
+      for (let key of Object.keys(data.sites)) {
+        const oldFolder = data.sites[key]
+        if (oldFolder.tags && oldFolder.tags.includes(siteTags.BOOKMARK_FOLDER)) {
+          let folder = {}
+          key = key.toString()
+
+          if (oldFolder.customTitle) {
+            folder.title = oldFolder.customTitle
+          } else {
+            folder.title = oldFolder.title
+          }
+
+          if (oldFolder.parentFolderId == null) {
+            folder.parentFolderId = 0
+          } else {
+            folder.parentFolderId = oldFolder.parentFolderId
+          }
+
+          folder.folderId = oldFolder.folderId
+          folder.partitionNumber = oldFolder.partitionNumber
+          folder.objectId = oldFolder.objectId
+          folder.type = siteTags.BOOKMARK_FOLDER
+          folder.key = key
+          data.bookmarkFolders[key] = folder
+
+          // bookmark order
+          const id = folder.parentFolderId.toString()
+          if (!bookmarkOrder[id]) {
+            bookmarkOrder[id] = []
+          }
+
+          bookmarkOrder[id].push({
+            key: key,
+            order: oldFolder.order,
+            type: siteTags.BOOKMARK_FOLDER
+          })
+        }
+      }
+    }
+
+    // bookmarks
+    if (!data.bookmarks) {
+      data.bookmarks = {}
+
+      for (let key of Object.keys(data.sites)) {
+        const oldBookmark = data.sites[key]
+        if (oldBookmark.tags && oldBookmark.tags.includes(siteTags.BOOKMARK)) {
+          let bookmark = {}
+
+          if (oldBookmark.customTitle && oldBookmark.customTitle.length > 0) {
+            bookmark.title = oldBookmark.customTitle
+          } else {
+            bookmark.title = oldBookmark.title
+          }
+
+          if (oldBookmark.parentFolderId == null) {
+            bookmark.parentFolderId = 0
+          } else {
+            bookmark.parentFolderId = oldBookmark.parentFolderId
+          }
+
+          bookmark.location = oldBookmark.location
+          bookmark.partitionNumber = oldBookmark.partitionNumber
+          bookmark.objectId = oldBookmark.objectId
+          bookmark.favicon = oldBookmark.favicon
+          bookmark.themeColor = oldBookmark.themeColor
+          bookmark.type = siteTags.BOOKMARK
+          bookmark.key = key
+          data.bookmarks[key] = bookmark
+
+          // bookmark order
+          const id = bookmark.parentFolderId.toString()
+          if (!bookmarkOrder[id]) {
+            bookmarkOrder[id] = []
+          }
+
+          bookmarkOrder[id].push({
+            key: key,
+            order: oldBookmark.order,
+            type: siteTags.BOOKMARK
+          })
+        }
+      }
+    }
+
+    // Add cache to the state
+    if (!data.cache) {
+      data.cache = {}
+      data.cache.bookmarkLocation = data.locationSiteKeysCache
+      data.cache.bookmarkOrder = sortBookmarkOrder(bookmarkOrder)
+    }
+
+    // history
+    if (!data.historySites) {
+      data.historySites = {}
+
+      for (let key of Object.keys(data.sites)) {
+        const site = data.sites[key]
+        const newKey = historyUtil.getKey(makeImmutable(site))
+        if (site.lastAccessedTime || !site.tags || site.tags.length === 0) {
+          data.historySites[newKey] = site
+        }
+      }
+    }
+
+    delete data.sites
+  }
+
+  if (data.lastAppVersion) {
+    // Force WidevineCdm to be upgraded when last app version <= 0.18.25
+    let runWidevineCleanup = false
+
+    try { runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1 } catch (e) {}
+
+    if (runWidevineCleanup) {
+      const fs = require('fs-extra')
+      const wvExtPath = path.join(app.getPath('userData'), 'Extensions', 'WidevineCdm')
+      fs.remove(wvExtPath, (err) => {
+        if (err) {
+          console.error(`Could not remove ${wvExtPath}`)
+        }
+      })
+    }
+  }
+
+  return data
+}
+
+module.exports.runPostMigrations = (immutableData) => {
+  const globalFpSetting = immutableData.getIn(['settings', 'privacy.block-canvas-fingerprinting'])
+  // fingerprinting protection migration
+  if (typeof globalFpSetting !== 'boolean') {
+    return immutableData
+  }
+  try {
+    const siteSettings = immutableData.get('siteSettings', Immutable.Map())
+      .map((setting) => {
+        const fpSetting = setting.get('fingerprintingProtection')
+        if (fpSetting === true) {
+          return setting.set('fingerprintingProtection', 'blockAllFingerprinting')
+        } else if (fpSetting === false) {
+          return setting.set('fingerprintingProtection', 'allowAllFingerprinting')
+        }
+        return setting
+      })
+    immutableData = immutableData.set('siteSettings', siteSettings)
+    immutableData = immutableData.setIn(['fingerprintingProtectionAll', 'enabled'],
+      globalFpSetting).deleteIn(['settings', 'privacy.block-canvas-fingerprinting'])
+  } catch (e) {
+    console.error('fingerprinting protection migration failed', e)
+  }
+  return immutableData
+}
+
+module.exports.runImportDefaultSettings = (data) => {
+  // import default site settings list
+  if (!data.defaultSiteSettingsListImported) {
+    for (var i = 0; i < defaultSiteSettingsList.length; ++i) {
+      let setting = defaultSiteSettingsList[i]
+      if (!data.siteSettings[setting.pattern]) {
+        data.siteSettings[setting.pattern] = {}
+      }
+      let targetSetting = data.siteSettings[setting.pattern]
+      if (!targetSetting.hasOwnProperty[setting.name]) {
+        targetSetting[setting.name] = setting.value
+      }
+    }
+    data.defaultSiteSettingsListImported = true
+  }
+
+  return data
 }
 
 /**
@@ -319,77 +823,51 @@ module.exports.cleanSessionDataOnShutdown = () => {
  */
 module.exports.loadAppState = () => {
   return new Promise((resolve, reject) => {
+    const fs = require('fs')
+
     let data
+
     try {
       data = fs.readFileSync(getStoragePath())
     } catch (e) {}
 
+    let loaded = false
     try {
       data = JSON.parse(data)
-      // autofill data migration
-      if (data.autofill) {
-        if (Array.isArray(data.autofill.addresses)) {
-          let addresses = exports.defaultAppState().autofill.addresses
-          data.autofill.addresses.forEach((guid) => {
-            addresses.guid.push(guid)
-            addresses.timestamp = new Date().getTime()
-          })
-          data.autofill.addresses = addresses
-        }
-        if (Array.isArray(data.autofill.creditCards)) {
-          let creditCards = exports.defaultAppState().autofill.creditCards
-          data.autofill.creditCards.forEach((guid) => {
-            creditCards.guid.push(guid)
-            creditCards.timestamp = new Date().getTime()
-          })
-          data.autofill.creditCards = creditCards
-        }
-        if (data.autofill.addresses.guid) {
-          let guids = []
-          data.autofill.addresses.guid.forEach((guid) => {
-            if (typeof guid === 'object') {
-              guids.push(guid['persist:default'])
-            } else {
-              guids.push(guid)
-            }
-          })
-          data.autofill.addresses.guid = guids
-        }
-        if (data.autofill.creditCards.guid) {
-          let guids = []
-          data.autofill.creditCards.guid.forEach((guid) => {
-            if (typeof guid === 'object') {
-              guids.push(guid['persist:default'])
-            } else {
-              guids.push(guid)
-            }
-          })
-          data.autofill.creditCards.guid = guids
-        }
+      loaded = true
+    } catch (e) {
+      // Session state might be corrupted; let's backup this
+      // corrupted value for people to report into support.
+      module.exports.backupSession()
+      if (data) {
+        console.error('could not parse data: ', data, e)
       }
-      // xml migration
-      if (data.settings) {
-        if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/google.xml') {
-          data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'Google'
-        }
-        if (data.settings[settings.DEFAULT_SEARCH_ENGINE] === 'content/search/duckduckgo.xml') {
-          data.settings[settings.DEFAULT_SEARCH_ENGINE] = 'DuckDuckGo'
-        }
-      }
+      data = {}
+    }
+
+    data = Object.assign({}, module.exports.defaultAppState(), data)
+    data = module.exports.runImportDefaultSettings(data)
+    if (loaded) {
+      data = module.exports.runPreMigrations(data)
+    }
+
+    let immutableData = makeImmutable(data)
+    if (loaded) {
       // Clean app data here if it wasn't cleared on shutdown
-      if (data.cleanedOnShutdown !== true || data.lastAppVersion !== app.getVersion()) {
-        module.exports.cleanAppData(data, false)
+      if (immutableData.get('cleanedOnShutdown') !== true || immutableData.get('lastAppVersion') !== app.getVersion()) {
+        immutableData = module.exports.cleanAppData(immutableData, false)
       }
-      data = Object.assign(module.exports.defaultAppState(), data)
-      data.cleanedOnShutdown = false
+
+      immutableData = immutableData.set('cleanedOnShutdown', false)
+
       // Always recalculate the update status
-      if (data.updates) {
-        const updateStatus = data.updates.status
-        delete data.updates.status
+      if (immutableData.get('updates')) {
+        const updateStatus = immutableData.getIn(['updates', 'status'])
+        immutableData = immutableData.deleteIn(['updates', 'status'])
         // The process always restarts after an update so if the state
         // indicates that a restart isn't wanted, close right away.
         if (updateStatus === UpdateStatus.UPDATE_APPLYING_NO_RESTART) {
-          module.exports.saveAppState(data, true).then(() => {
+          module.exports.saveAppState(immutableData, true).then(() => {
             // Exit immediately without doing the session store saving stuff
             // since we want the same state saved except for the update status
             app.exit(0)
@@ -397,27 +875,60 @@ module.exports.loadAppState = () => {
           return
         }
       }
-    } catch (e) {
-      // TODO: Session state is corrupted, maybe we should backup this
-      // corrupted value for people to report into support.
-      console.log('could not parse data: ', data)
-      data = exports.defaultAppState()
+
+      immutableData = module.exports.runPostMigrations(immutableData)
     }
-    locale.init(data.settings[settings.LANGUAGE]).then((locale) => {
+
+    locale.init(immutableData.getIn(['settings', settings.LANGUAGE])).then((locale) => {
+      immutableData = setVersionInformation(immutableData)
       app.setLocale(locale)
-      resolve(data)
+      resolve(immutableData)
     })
   })
+}
+
+/**
+ * Called when session is suspected for corruption; this will move it out of the way
+ */
+module.exports.backupSession = () => {
+  const fs = require('fs-extra')
+  const src = getStoragePath()
+  const dest = getTempStoragePath('backup')
+
+  if (fs.existsSync(src)) {
+    try {
+      fs.copySync(src, dest)
+      console.error('An error occurred. For support purposes, file "' + src + '" has been copied to "' + dest + '".')
+    } catch (e) {
+      console.error('backupSession: error making copy of session file: ', e)
+    }
+  }
 }
 
 /**
  * Obtains the default application level state
  */
 module.exports.defaultAppState = () => {
+  const now = new Date().getTime()
   return {
-    firstRunTimestamp: new Date().getTime(),
-    sites: [],
+    firstRunTimestamp: now,
+    sync: {
+      devices: {},
+      lastFetchTimestamp: 0,
+      objectsById: {},
+      pendingRecords: {},
+      lastConfirmedRecordTimestamp: 0
+    },
+    cache: {
+      bookmarkLocation: undefined,
+      bookmarkOrder: {}
+    },
+    pinnedSites: {},
+    bookmarks: {},
+    bookmarkFolders: {},
+    historySites: {},
     tabs: [],
+    windows: [],
     extensions: {},
     visits: [],
     settings: {},
@@ -425,10 +936,6 @@ module.exports.defaultAppState = () => {
     passwords: [],
     notifications: [],
     temporarySiteSettings: {},
-    dictionary: {
-      addedWords: [],
-      ignoredWords: []
-    },
     autofill: {
       addresses: {
         guid: [],
@@ -439,6 +946,66 @@ module.exports.defaultAppState = () => {
         timestamp: 0
       }
     },
-    menubar: {}
+    menubar: {},
+    about: {
+      newtab: {
+        gridLayoutSize: 'small',
+        sites: [],
+        ignoredTopSites: [],
+        pinnedTopSites: pinnedTopSites
+      },
+      welcome: {
+        showOnLoad: !['test', 'development'].includes(process.env.NODE_ENV)
+      }
+    },
+    trackingProtection: {
+      count: 0
+    },
+    adblock: {
+      count: 0
+    },
+    httpsEverywhere: {
+      count: 0
+    },
+    defaultWindowParams: {},
+    searchDetail: null,
+    pageData: {
+      info: {},
+      last: {
+        info: '',
+        url: '',
+        tabId: -1
+      },
+      load: [],
+      view: {}
+    },
+    ledger: {
+      about: {
+        synopsis: [],
+        synopsisOptions: {}
+      },
+      info: {},
+      locations: {},
+      synopsis: {
+        options: {},
+        publishers: {}
+      }
+    },
+    migrations: {
+      batMercuryTimestamp: now,
+      btc2BatTimestamp: now,
+      btc2BatNotifiedTimestamp: now,
+      btc2BatTransitionPending: false
+    }
   }
+}
+
+/**
+ * Determines if a protocol is handled.
+ * app.on('ready') must have been fired before this is called.
+ */
+module.exports.isProtocolHandled = (protocol) => {
+  protocol = (protocol || '').split(':')[0]
+  return navigatableTypes.includes(`${protocol}:`) ||
+      electron.session.defaultSession.protocol.isNavigatorProtocolHandled(protocol)
 }

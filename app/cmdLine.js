@@ -10,10 +10,14 @@ const app = electron.app
 const messages = require('../js/constants/messages')
 const BrowserWindow = electron.BrowserWindow
 const appActions = require('../js/actions/appActions')
-const urlParse = require('url').parse
-const { navigatableTypes } = require('../js/lib/appUrlUtil')
+const urlParse = require('./common/urlParse')
+const {fileUrl} = require('../js/lib/appUrlUtil')
+const sessionStore = require('./sessionStore')
 const isDarwin = process.platform === 'darwin'
+const fs = require('fs')
+const path = require('path')
 let appInitialized = false
+let newWindowURL
 
 const focusOrOpenWindow = function (url) {
   // don't try to do anything if the app hasn't been initialized
@@ -23,7 +27,7 @@ const focusOrOpenWindow = function (url) {
 
   let win = BrowserWindow.getFocusedWindow()
   if (!win) {
-    win = BrowserWindow.getAllWindows()[0]
+    win = BrowserWindow.getActiveWindow() || BrowserWindow.getAllWindows()[0]
     if (win) {
       if (win.isMinimized()) {
         win.restore()
@@ -37,7 +41,10 @@ const focusOrOpenWindow = function (url) {
       location: url
     }))
   } else if (url) {
-    win.webContents.send(messages.SHORTCUT_NEW_FRAME, url)
+    appActions.createTabRequested({
+      url,
+      windowId: win.id
+    })
   }
 
   return true
@@ -48,30 +55,27 @@ const getUrlFromCommandLine = (argv) => {
   if (argv) {
     if (argv.length === 2 && !argv[1].startsWith('-')) {
       const parsedUrl = urlParse(argv[1])
-      if (navigatableTypes.includes(parsedUrl.protocol)) {
+      if (sessionStore.isProtocolHandled(parsedUrl.protocol)) {
         return argv[1]
+      }
+      const filePath = path.resolve(argv[1])
+      if (fs.existsSync(filePath)) {
+        return fileUrl(filePath)
       }
     }
     const index = argv.indexOf('--')
     if (index !== -1 && index + 1 < argv.length && !argv[index + 1].startsWith('-')) {
       const parsedUrl = urlParse(argv[index + 1])
-      if (navigatableTypes.includes(parsedUrl.protocol)) {
+      if (sessionStore.isProtocolHandled(parsedUrl.protocol)) {
         return argv[index + 1]
+      }
+      const filePath = path.resolve(argv[index + 1])
+      if (fs.existsSync(filePath)) {
+        return fileUrl(filePath)
       }
     }
   }
   return undefined
-}
-
-// For macOS, there are events like open-url instead
-if (!isDarwin) {
-  const openUrl = getUrlFromCommandLine(process.argv)
-  if (openUrl) {
-    const parsedUrl = urlParse(openUrl)
-    if (navigatableTypes.includes(parsedUrl.protocol)) {
-      module.exports.newWindowURL = openUrl
-    }
-  }
 }
 
 app.on('ready', () => {
@@ -100,10 +104,12 @@ app.on('will-finish-launching', () => {
   // open -a Brave http://www.brave.com
   app.on('open-url', (event, path) => {
     event.preventDefault()
-    const parsedUrl = urlParse(path)
-    if (navigatableTypes.includes(parsedUrl.protocol)) {
-      if (!focusOrOpenWindow(path)) {
-        module.exports.newWindowURL = path
+    if (!appInitialized) {
+      newWindowURL = path
+    } else {
+      const parsedUrl = urlParse(path)
+      if (sessionStore.isProtocolHandled(parsedUrl.protocol)) {
+        focusOrOpenWindow(path)
       }
     }
   })
@@ -111,11 +117,22 @@ app.on('will-finish-launching', () => {
   // User clicked on a file or dragged a file to the dock on macOS
   app.on('open-file', (event, path) => {
     event.preventDefault()
-
+    path = encodeURI(path)
     if (!focusOrOpenWindow(path)) {
-      module.exports.newWindowURL = path
+      newWindowURL = path
     }
   })
 })
 
 process.on(messages.APP_INITIALIZED, () => { appInitialized = true })
+
+module.exports.newWindowURL = () => {
+  const openUrl = newWindowURL || getUrlFromCommandLine(process.argv)
+  if (openUrl) {
+    const parsedUrl = urlParse(openUrl)
+    if (sessionStore.isProtocolHandled(parsedUrl.protocol)) {
+      newWindowURL = openUrl
+    }
+  }
+  return newWindowURL
+}

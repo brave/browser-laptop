@@ -2,8 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const urlParse = require('url').parse
+const urlParse = require('../../app/common/urlParse')
 const base64Encode = require('../lib/base64').encode
+const appConfig = require('../constants/appConfig')
 
 // Polyfill similar to this: https://github.com/gorhill/uBlock/blob/de1ed89f62bf041416d2a721ec00741667bf3fa8/assets/ublock/resources.txt#L385
 const googleTagManagerRedirect = 'data:application/javascript;base64,' + base64Encode(`(function() { var noopfn = function() { ; }; window.ga = window.ga || noopfn; })();`)
@@ -13,7 +14,7 @@ const googleTagServicesRedirect = 'data:application/javascript;base64,' + base64
 const emptyDataURI = {
   enableForAdblock: true,
   enableForTrackingProtection: true,
-  onBeforeRequest: function(details) {
+  onBeforeRequest: function (details) {
     return {
       redirectURL: 'data:application/javascript;base64,MA=='
     }
@@ -21,13 +22,17 @@ const emptyDataURI = {
 }
 
 /**
- * Holds an array of [Primary URL, subresource URL] to allow 3rd party cookies.
+ * Holds an map of {Primary URL: subresource URL} to allow 3rd party cookies.
  * Subresource URL can be '*' or undefined to indicate all.
  */
-module.exports.cookieExceptions = [
-  ['https://inbox.google.com', 'https://hangouts.google.com'],
-  ['https://mail.google.com', 'https://hangouts.google.com']
-]
+module.exports.cookieExceptions = {
+  'https://inbox.google.com': ['https://hangouts.google.com'],
+  'https://mail.google.com': ['https://hangouts.google.com'],
+  'https://drive.google.com': ['https://doc-*-docs.googleusercontent.com']
+}
+
+// Third party domains that require a valid referer to work
+module.exports.refererExceptions = ['use.typekit.net', 'cloud.typography.com', 'www.moremorewin.net']
 
 /**
  * Holds an array of [Primary URL, subresource URL] to allow 3rd party localstorage.
@@ -38,45 +43,30 @@ module.exports.localStorageExceptions = [
   ['https://mail.google.com', 'https://hangouts.google.com']
 ]
 
+const braveUAWhitelist = ['adobe.com', 'duckduckgo.com', 'brave.com', 'netflix.com']
+
 module.exports.siteHacks = {
   'sp1.nypost.com': emptyDataURI,
   'sp.nasdaq.com': emptyDataURI,
+  'www.lesechos.fr': {
+    enableForAdblock: true,
+    enableForTrackingProtection: true,
+    onBeforeRequest: function (details) {
+      if (urlParse(details.url).pathname === '/xtcore.js') {
+        return { cancel: true }
+      }
+    }
+  },
   'forbes.com': {
-    onBeforeSendHeaders: function(details) {
+    onBeforeSendHeaders: function (details) {
       return {
         customCookie: details.requestHeaders.Cookie + `; forbes_ab=true; welcomeAd=true; adblock_session=Off; dailyWelcomeCookie=true`
       }
-    },
-  },
-  'www.cityam.com': {
-    userAgent: 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36 Googlebot'
+    }
   },
   // For links like: https://player.twitch.tv/?channel=iwilldominate
   'player.twitch.tv': {
     enableForAll: true
-  },
-  'www.wired.com': {
-    // Site hack from
-    // https://github.com/gorhill/uBlock/blob/ce2d235e4fd2ade2be101fa7030870044b30fd3c/assets/ublock/resources.txt#L699
-    pageLoadEndScript: `(function() {
-      var sto = window.setTimeout,
-        re = /^function n\(\)/;
-      window.setTimeout = function(a, b) {
-          if ( b !== 50 || !re.test(a.toString()) ) {
-                sto(a, b);
-              }
-        };
-    })();`
-  },
-  'www.extremetech.com': {
-    pageLoadStartScript: `(function() {
-      var sto = window.setTimeout;
-      window.setTimeout = function(a, b) {
-          if ( b !== 250 ) {
-                sto(a, b);
-              }
-        };
-    })();`
   },
   'imasdk.googleapis.com': {
     enableForAdblock: true,
@@ -93,7 +83,7 @@ module.exports.siteHacks = {
   'www.googletagmanager.com': {
     enableForAdblock: true,
     enableForTrackingProtection: true,
-    onBeforeRequest: function(details) {
+    onBeforeRequest: function (details) {
       if (urlParse(details.url).pathname !== '/gtm.js') {
         return
       }
@@ -105,20 +95,20 @@ module.exports.siteHacks = {
   'www.googletagservices.com': {
     enableForAdblock: true,
     enableForTrackingProtection: true,
-    onBeforeRequest: function(details) {
+    onBeforeRequest: function (details) {
       if (urlParse(details.url).pathname !== '/tag/js/gpt.js') {
         return
       }
       return {
         redirectURL: googleTagServicesRedirect
-       }
+      }
     }
   },
   'twitter.com': {
-    onBeforeSendHeaders: function(details) {
+    onBeforeSendHeaders: function (details) {
       if (details.requestHeaders.Referer &&
         details.requestHeaders.Referer.startsWith('https://twitter.com/') &&
-        details.url.startsWith('https://mobile.twitter.com/')) {
+        details.url.startsWith(appConfig.noScript.twitterRedirectUrl)) {
         return {
           cancel: true
         }
@@ -128,8 +118,24 @@ module.exports.siteHacks = {
   'play.spotify.com': {
     enableFlashCTP: true
   },
+  'www.espn.com': {
+    enableFlashCTP: true
+  },
   'player.siriusxm.com': {
     enableFlashCTP: true,
     redirectURL: 'https://player.siriusxm.com'
   }
 }
+
+braveUAWhitelist.forEach((domain) => {
+  module.exports.siteHacks[domain] = {
+    onBeforeSendHeaders: function (details) {
+      let userAgent = details.requestHeaders['User-Agent']
+      userAgent = [userAgent.split('Chrome')[0], 'Brave Chrome', userAgent.split('Chrome')[1]].join('')
+      details.requestHeaders['User-Agent'] = userAgent
+      return {
+        requestHeaders: details.requestHeaders
+      }
+    }
+  }
+})

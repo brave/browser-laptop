@@ -17,10 +17,9 @@
 
   &:not(.disabled) {
     .switchBackground.switchedOn {
-      background-color: @braveOrange;
+      background-color: @switchBG_on;
       .switchIndicator {
-        left: auto;
-        right: @switchNubRightMargin;
+        right: 2px;
       }
     }
   }
@@ -29,24 +28,30 @@
     .switchBackground {
       height: 26px;
       width: 60px;
-        background-color: @switchBG_off_lrg;
+      background-color: @switchBG_off_lrg;
       .switchIndicator {
         height: 22px;
         width: 22px;
+        right: calc(60px - 22px - @switchNubRightMargin);
+      }
+    }
+  }
+
+  &.small {
+    .switchBackground {
+      height: @smallSwitchHeight;
+      width: @smallSwitchWidth;
+      .switchIndicator {
+        height: @smallSwitchNubDiameter;
+        width: @smallSwitchNubDiameter;
+        top: 1px;
+        right: calc(@smallSwitchWidth - @smallSwitchNubDiameter - @switchNubRightMargin);
       }
     }
   }
 
   .switchControlText {
     margin: auto 0;
-  }
-
-  .switchControlLeftText {
-    margin: auto 5px auto 0;
-  }
-
-  .switchControlRightText {
-    margin: auto 0 auto 5px;
   }
 
   .switchControlTopText {
@@ -70,16 +75,18 @@
     position: relative;
     width: @switchWidth;
     box-shadow: @switchShadow;
+    transition: @switchBGTransition;
 
     .switchIndicator {
       background-color: white;
       border-radius: 100%;
       height: @switchNubDiameter;
-      left: @switchNubLeftMargin;
+      right: calc(@switchWidth - @switchNubDiameter - @switchNubRightMargin);
       position: absolute;
       top: @switchNubTopMargin;
       width: @switchNubDiameter;
       box-shadow: @switchNubShadow;
+      transition: @switchNubTransition;
     }
   }
 }

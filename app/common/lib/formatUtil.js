@@ -47,7 +47,7 @@ const defaultOrderLookup = (value) => {
  * Accelerator reference: https://github.com/electron/electron/blob/master/docs/api/accelerator.md
  */
 module.exports.formatAccelerator = (accelerator) => {
-  let result = accelerator
+  let result
   let splitResult = accelerator.split('+')
   // sort in proper order, based on OS
   // also, replace w/ name or symbol
@@ -84,6 +84,20 @@ module.exports.formatAccelerator = (accelerator) => {
   return result
 }
 
+module.exports.toLocaleString = (epoch, defaultValue) => {
+  if (epoch && typeof epoch === 'number') {
+    try {
+      const date = new Date(epoch).toLocaleString()
+      if (date !== 'Invalid Date') {
+        return date
+      }
+    } catch (e) {
+      console.error('Error parsing date: ', e)
+    }
+  }
+  return defaultValue || ''
+}
+
 /**
  * Clamp values down to a given range (min/max).
  * Value is wrapped when out of bounds. ex:
@@ -92,5 +106,5 @@ module.exports.formatAccelerator = (accelerator) => {
  */
 module.exports.wrappingClamp = (value, min, max) => {
   const range = (max - min) + 1
-  return value - Math.floor((value - min) / range) * range
+  return value - (Math.floor((value - min) / range) * range)
 }

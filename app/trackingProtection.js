@@ -4,11 +4,12 @@
 
 'use strict'
 
-const URL = require('url')
+const urlParse = require('./common/urlParse')
 const TrackingProtection = require('tracking-protection').CTPParser
-const DataFile = require('./dataFile')
+const dataFile = require('./dataFile')
 const Filtering = require('./filtering')
-const LRUCache = require('lru_cache/core').LRUCache
+const isThirdPartyHost = require('./browser/isThirdPartyHost')
+const LRUCache = require('lru-cache')
 
 module.exports.resourceName = 'trackingProtection'
 
@@ -28,7 +29,7 @@ const startTrackingProtection = (wnd) => {
         resourceName: module.exports.resourceName
       }
     }
-    const firstPartyUrl = URL.parse(mainFrameUrl)
+    const firstPartyUrl = urlParse(mainFrameUrl)
     let firstPartyUrlHost = firstPartyUrl.hostname || ''
     if (firstPartyUrlHost.startsWith('www.')) {
       firstPartyUrlHost = firstPartyUrlHost.substring(4)
@@ -36,10 +37,10 @@ const startTrackingProtection = (wnd) => {
     if (firstPartyUrl.protocol && firstPartyUrl.protocol.startsWith('http')) {
       if (!cachedFirstParty.get(firstPartyUrlHost)) {
         let firstPartyHosts = trackingProtection.findFirstPartyHosts(firstPartyUrlHost)
-        cachedFirstParty.put(firstPartyUrlHost, firstPartyHosts && firstPartyHosts.split(',') || [])
+        cachedFirstParty.set(firstPartyUrlHost, (firstPartyHosts && firstPartyHosts.split(',')) || [])
       }
     }
-    const urlHost = URL.parse(details.url).hostname
+    const urlHost = urlParse(details.url).hostname
     const cancel = firstPartyUrl.protocol &&
       details.resourceType !== 'mainFrame' &&
       firstPartyUrl.protocol.startsWith('http') &&
@@ -48,9 +49,9 @@ const startTrackingProtection = (wnd) => {
       trackingProtection.matchesTracker(firstPartyUrlHost, urlHost) &&
       urlHost !== firstPartyUrl.hostname &&
       !cachedFirstParty.get(firstPartyUrlHost).find((baseHost) =>
-        !Filtering.isThirdPartyHost(baseHost, urlHost))
+        !isThirdPartyHost(baseHost, urlHost))
 
-    DataFile.debug(module.exports.resourceName, details, cancel)
+    dataFile.debug(module.exports.resourceName, details, cancel)
     return {
       cancel,
       resourceName: module.exports.resourceName
@@ -60,6 +61,6 @@ const startTrackingProtection = (wnd) => {
 
 module.exports.init = () => {
   trackingProtection = new TrackingProtection()
-  DataFile.init(module.exports.resourceName, startTrackingProtection,
+  dataFile.init(module.exports.resourceName, undefined, startTrackingProtection,
                 (data) => trackingProtection.deserialize(data))
 }

@@ -3,34 +3,27 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Button = require('../components/button')
-const aboutActions = require('./aboutActions')
-const WindowConstants = require('../constants/windowConstants')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
+
+const appActions = require('../../js/actions/appActions')
+const tabActions = require('../../app/common/actions/tabActions')
 
 require('../../less/button.less')
 require('../../less/window.less')
 require('../../less/about/error.less')
 
 class ErrorPage extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {}
   }
 
-  reloadPrevious () {
-    aboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_URL,
-      location: this.state.previousLocation,
-      key: this.state.frameKey
-    })
+  goBack () {
+    appActions.onGoBack()
   }
 
   reload () {
-    aboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_URL,
-      location: this.state.url,
-      key: this.state.frameKey
-    })
+    tabActions.reload(null, true)
   }
 
   get showBackButton () {
@@ -45,8 +38,8 @@ class ErrorPage extends React.Component {
         <span className='errorText' data-l10n-id={this.state.message} />
       </div>
       <div className='buttons'>
-        {this.showBackButton ? <Button l10nId='back' className='actionButton' onClick={this.reloadPrevious.bind(this)} /> : null}
-        {this.state.url ? <Button l10nId='errorReload' l10nArgs={{url: this.state.url}} className='actionButton' onClick={this.reload.bind(this)} /> : null}
+        {this.showBackButton ? <BrowserButton actionItem fitContent l10nId='back' onClick={this.goBack} /> : null}
+        {this.state.url ? <BrowserButton actionItem groupedItem fitContent l10nId='errorReload' l10nArgs={{url: this.state.url}} onClick={this.reload} /> : null}
       </div>
     </div>
   }

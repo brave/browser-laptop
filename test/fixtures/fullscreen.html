@@ -1,0 +1,18 @@
+<html>
+<head>
+  <title>fullscreenPage</title>
+  <link rel="shortcut icon" href="img/test.ico">
+</head>
+<body>
+  <img id="fullscreenImg" src="img/test.ico">
+  <script>
+    const elm = document.getElementById('fullscreenImg')
+    const toggleFullscreen = () => {
+      !document.webkitFullscreenElement
+        ? elm.webkitRequestFullscreen()
+        : document.webkitExitFullscreen()
+    }
+    elm.addEventListener('click', () => toggleFullscreen())
+  </script>
+</body>
+</html>

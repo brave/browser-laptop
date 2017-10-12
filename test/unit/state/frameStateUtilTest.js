@@ -1,87 +1,117 @@
-/* global describe, before, it, beforeEach */
-const frameStateUtil = require('../../../js/state/frameStateUtil')
+/* global describe, before, it, beforeEach, after */
 const Immutable = require('immutable')
+const mockery = require('mockery')
 const assert = require('assert')
+const fakeElectron = require('../lib/fakeElectron')
 
 require('../braveUnit')
 
 const defaultWindowStore = Immutable.fromJS({
   activeFrameKey: null,
   frames: [],
-  tabs: [],
   closedFrames: []
 })
 
 describe('frameStateUtil', function () {
+  let frameStateUtil, getSettingsValue
+
   before(function () {
+    getSettingsValue = 20
+    mockery.enable({
+      warnOnReplace: false,
+      warnOnUnregistered: false,
+      useCleanCache: true
+    })
+    mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('../settings', {
+      getSetting: () => getSettingsValue
+    })
+    frameStateUtil = require('../../../js/state/frameStateUtil')
     this.windowState = Immutable.fromJS(Object.assign({}, defaultWindowStore.toJS()))
   })
 
-  describe('cloneFrame', function () {
+  after(function () {
+    mockery.disable()
+  })
+
+  describe('getFrameIndex', function () {
     before(function () {
-      this.frameOpts = {
-        key: 1,
-        tabId: 2,
-        parentFrameKey: 3,
-        audioMuted: true,
-        canGoBack: true,
-        canGoForward: true,
-        icon: 'icon',
-        title: 'title',
-        isPrivate: true,
-        partitionNumber: 4,
-        themeColor: 'ffffff',
-        computedThemeColor: 'aaaaaa',
-        history: ['http://brave.com'],
-        location: 'http://brave.com/about'
-      }
-      this.clonedFrame = frameStateUtil.cloneFrame(this.frameOpts, 4)
+      this.frames = Immutable.fromJS([
+        {
+          key: 1
+        },
+        {
+          key: 2
+        }
+      ])
+      this.framesInternal = Immutable.fromJS({
+        index: {
+          1: 0,
+          2: 1
+        }
+      })
+      this.windowState = this.windowState.set('frames', this.frames)
+      this.windowState = this.windowState.set('framesInternal', this.framesInternal)
     })
 
-    it('does not copy the key', function () {
-      assert.equal(this.frameOpts.key, 1)
-      assert.equal(this.clonedFrame.key, undefined)
+    it('returns the index by frame key', function () {
+      assert.equal(0, frameStateUtil.getFrameIndex(this.windowState, 1))
+      assert.equal(1, frameStateUtil.getFrameIndex(this.windowState, 2))
+      assert.equal(-1, frameStateUtil.getFrameIndex(this.windowState, 3))
+    })
+  })
+
+  describe('frameStatePath', function () {
+    before(function () {
+      this.frames = Immutable.fromJS([
+        {
+          key: 1
+        },
+        {
+          key: 2
+        }
+      ])
+      this.framesInternal = Immutable.fromJS({
+        index: {
+          1: 0,
+          2: 1
+        }
+      })
+      this.windowState = this.windowState.set('frames', this.frames)
+      this.windowState = this.windowState.set('framesInternal', this.framesInternal)
     })
 
-    it('does not copy the tabId', function () {
-      assert.equal(this.frameOpts.tabId, 2)
-      assert.equal(this.clonedFrame.tabId, undefined)
+    it('returns the index by frame key', function () {
+      assert.deepEqual(['frames', 0], frameStateUtil.frameStatePath(this.windowState, 1))
+      assert.deepEqual(['frames', 1], frameStateUtil.frameStatePath(this.windowState, 2))
+      assert.equal(null, frameStateUtil.frameStatePath(this.windowState, 3))
+    })
+  })
+
+  describe('getIndexByTabId', function () {
+    before(function () {
+      this.frames = Immutable.fromJS([
+        {
+          tabId: 2
+        },
+        {
+          tabId: 3
+        }
+      ])
+      this.framesInternal = Immutable.fromJS({
+        tabIndex: {
+          2: 0,
+          3: 1
+        }
+      })
+      this.windowState = this.windowState.set('frames', this.frames)
+      this.windowState = this.windowState.set('framesInternal', this.framesInternal)
     })
 
-    it('sets the parentFrameKey to frameOpts.key', function () {
-      assert.equal(this.frameOpts.parentFrameKey, 3)
-      assert.equal(this.clonedFrame.parentFrameKey, 1)
-    })
-
-    it('sets the delayedLoadUrl to frameOpts.location', function () {
-      assert.equal(this.clonedFrame.delayedLoadUrl, 'http://brave.com/about')
-    })
-
-    it('sets the location to about:blank', function () {
-      assert.equal(this.clonedFrame.location, 'about:blank')
-    })
-
-    it('sets the src to about:blank', function () {
-      assert.equal(this.clonedFrame.src, 'about:blank')
-    })
-
-    it('sets the guestInstanceId', function () {
-      assert.equal(this.clonedFrame.guestInstanceId, 4)
-    })
-
-    it('copies audioMuted, canGoBack, canGoForward, icon, title, isPrivate, partitionNumber, themeColor, computere and history', function () {
-      // attributes that should be copied
-      assert.equal(this.clonedFrame.audioMuted, true)
-      assert.equal(this.clonedFrame.canGoBack, true)
-      assert.equal(this.clonedFrame.canGoForward, true)
-      assert.equal(this.clonedFrame.icon, 'icon')
-      assert.equal(this.clonedFrame.title, 'title')
-      assert.equal(this.clonedFrame.isPrivate, true)
-      assert.equal(this.clonedFrame.partitionNumber, 4)
-      assert.equal(this.clonedFrame.themeColor, 'ffffff')
-      assert.equal(this.clonedFrame.computedThemeColor, 'aaaaaa')
-      assert.deepEqual(this.clonedFrame.history, ['http://brave.com'])
-      assert(this.clonedFrame.history !== this.frameOpts.history)
+    it('returns the index by frame key', function () {
+      assert.equal(0, frameStateUtil.getIndexByTabId(this.windowState, 2))
+      assert.equal(1, frameStateUtil.getIndexByTabId(this.windowState, 3))
+      assert.equal(-1, frameStateUtil.getIndexByTabId(this.windowState, 4))
     })
   })
 
@@ -162,118 +192,256 @@ describe('frameStateUtil', function () {
   })
 
   describe('removeFrame', function () {
-    let frames, tabs, closedFrames, frameProps, activeFrameKey
+    let state, frameProps, activeFrameKey, framePropsIndex
 
     beforeEach(function () {
-      frames = Immutable.fromJS([
-        { key: 2 },
-        { key: 3, parentFrameKey: 2 },
-        { key: 4 },
-        { key: 4, pinnedLocation: 'https://www.facebook.com/' },
-        { key: 5, pinnedLocation: 'https://twitter.com/' }
-      ])
-      tabs = Immutable.fromJS([
-        { key: 2 },
-        { key: 3 },
-        { key: 4 },
-        { key: 4, pinnedLocation: 'https://www.facebook.com/' },
-        { key: 5, pinnedLocation: 'https://twitter.com/' }
-      ])
-      closedFrames = Immutable.fromJS([{ key: 1 }])
       frameProps = Immutable.fromJS({ key: 2 })
       activeFrameKey = 2
+      framePropsIndex = 0
+
+      state = Immutable.fromJS({
+        activeFrameKey: activeFrameKey,
+        frames: [
+          { key: 2 },
+          { key: 3, parentFrameKey: 2 },
+          { key: 4, pinnedLocation: 'https://www.facebook.com/' },
+          { key: 5, pinnedLocation: 'https://twitter.com/' }
+        ],
+        closedFrames: [
+          { key: 1 }
+        ],
+        framesInternal: {
+          index: {
+            2: 0,
+            3: 1,
+            4: 2,
+            5: 3
+          }
+        }
+      })
     })
 
     it('removed frame is added to `closedFrames`', function () {
-      const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
+      const result = frameStateUtil.removeFrame(state, frameProps, framePropsIndex)
       const inClosedFrames = result.closedFrames.find((frame) => frame.get('key') === frameProps.get('key'))
       assert.equal(false, inClosedFrames === undefined)
     })
 
     it('sets isFullScreen=false for the removed frame', function () {
       frameProps = Immutable.fromJS({ key: 2, isFullScreen: true })
-      const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
+      const result = frameStateUtil.removeFrame(state, frameProps, framePropsIndex)
       const inClosedFrames = result.closedFrames.find((frame) => frame.get('key') === frameProps.get('key'))
       assert.equal(false, inClosedFrames.get('isFullScreen'))
     })
 
     it('removed frame is NOT added to `closedFrames` if private', function () {
-      frames = Immutable.fromJS([{ key: 2 }])
+      let data = Immutable.fromJS({
+        frames: [
+          { key: 2 }
+        ],
+        framesInternal: {
+          index: {2: 0}
+        }
+      })
+
+      const newState = state.merge(data)
       frameProps = Immutable.fromJS({ isPrivate: true, key: 2 })
-      const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
+      const result = frameStateUtil.removeFrame(newState, frameProps, activeFrameKey, framePropsIndex)
       const inClosedFrames = result.closedFrames.find((frame) => frame.get('key') === frameProps.get('key'))
       assert.equal(true, inClosedFrames === undefined)
     })
 
     it('removes the frame from `frames`', function () {
-      const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
+      const result = frameStateUtil.removeFrame(state, frameProps, framePropsIndex)
       const inFrames = result.frames.find((frame) => frame.get('key') === frameProps.get('key'))
       assert.equal(true, inFrames === undefined)
     })
+  })
 
-    describe('does not change `activeFrameKey`', function () {
-      it('if frame removed is not active and has parentFrameKey set', function () {
-        frameProps = Immutable.fromJS({ key: 3 })
-        const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
-        assert.equal(activeFrameKey, result.activeFrameKey)
+  describe('getTotalBlocks', function () {
+    it('returns false if there are no units blocked', function () {
+      const frames = Immutable.fromJS({
+        adblock: { blocked: [] },
+        trackingProtection: { blocked: [] },
+        noScript: { blocked: [] },
+        fingerprintingProtection: { blocked: [] }
       })
-
-      it('if frame removed is not active and does NOT have parentFrameKey set', function () {
-        frameProps = Immutable.fromJS({ key: 4 })
-        const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
-        assert.equal(activeFrameKey, result.activeFrameKey)
-      })
-
-      it('if there are no frames left', function () {
-        frames = Immutable.fromJS([{ key: 2 }])
-        tabs = Immutable.fromJS([{ key: 2 }])
-        const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
-        assert.equal(activeFrameKey, result.activeFrameKey)
-      })
+      const result = frameStateUtil.getTotalBlocks(frames)
+      assert.equal(result, false)
     })
 
-    describe('when active frame is removed', function () {
-      it('returns the next *non-pinned* active frame key', function () {
-        const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
-        assert.equal(3, result.activeFrameKey)
+    it('returns total of items (ads / trackers / scripts / fingerprints) blocked', function () {
+      const frames = Immutable.fromJS({
+        adblock: { blocked: [1] },
+        trackingProtection: { blocked: [1, 2] },
+        noScript: { blocked: [1, 2, 3, 4] },
+        fingerprintingProtection: { blocked: [1, 2, 3, 4, 5, 6, 7, 8] }
       })
+      const result = frameStateUtil.getTotalBlocks(frames)
+      assert.equal(result, 15)
+    })
 
-      it('returns the previous *non-pinned* frame key (if none found for next and no parent association)', function () {
-        frames = Immutable.fromJS([
+    it('defaults values to 0 if element is not a list or is not present', function () {
+      const frames = Immutable.fromJS({
+        adblock: { blocked: 'not a list' },
+        trackingProtection: {},
+        noScript: { blocked: [1] },
+        fingerprintingProtection: { blocked: {} }
+      })
+      const result = frameStateUtil.getTotalBlocks(frames)
+      assert.equal(result, 1)
+    })
+
+    it('returns false if the input is falsey', function () {
+      assert.equal(frameStateUtil.getTotalBlocks(), false)
+      assert.equal(frameStateUtil.getTotalBlocks(undefined), false)
+      assert.equal(frameStateUtil.getTotalBlocks(null), false)
+      assert.equal(frameStateUtil.getTotalBlocks(false), false)
+    })
+
+    it('converts the input to an immutable object', function () {
+      const mutableFrames = {
+        adblock: { blocked: [1] },
+        trackingProtection: { blocked: [1, 2] },
+        noScript: { blocked: [1, 2, 3, 4] },
+        fingerprintingProtection: { blocked: [1, 2, 3, 4, 5, 6, 7, 8] }
+      }
+      const result = frameStateUtil.getTotalBlocks(mutableFrames)
+      assert.equal(result, 15)
+    })
+
+    it('returns "99+" if tracker count is > 99', function () {
+      const mutableFrames = {
+        adblock: { blocked: [] }
+      }
+
+      for (let i = 1; i < 101; i++) {
+        mutableFrames.adblock.blocked.push(i)
+      }
+
+      const result = frameStateUtil.getTotalBlocks(mutableFrames)
+      assert.equal(result, '99+')
+    })
+  })
+
+  describe('getTabPageCount', function () {
+    before(function () {
+      getSettingsValue = 6
+    })
+
+    it('returns two pages when we have more tabs then the tab page limit', function () {
+      let state = Immutable.fromJS({
+        activeFrameKey: 1,
+        frames: [
+          { key: 1 },
           { key: 2 },
           { key: 3 },
-          { key: 4, pinnedLocation: 'https://www.facebook.com/' },
-          { key: 5, pinnedLocation: 'https://twitter.com/' }
-        ])
-        frameProps = Immutable.fromJS({
-          isFullScreen: false,
-          isPrivate: false,
-          key: 3
-        })
-        activeFrameKey = 3
-        const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
-        assert.equal(2, result.activeFrameKey)
+          { key: 4 },
+          { key: 5 },
+          { key: 6 },
+          { key: 7 },
+          { key: 8 }
+        ],
+        framesInternal: {
+          index: {
+            1: 0,
+            2: 1,
+            3: 2,
+            4: 3,
+            5: 4,
+            6: 5,
+            7: 6,
+            8: 7
+          }
+        }
       })
+      const result = frameStateUtil.getTabPageCount(state)
+      assert.equal(result, 2)
+    })
 
-      describe('when only pinned tabs remaining', function () {
-        it('defaults to next index if there are tabs to right', function () {
-          frames = Immutable.fromJS([
-            { key: 2 },
-            { pinnedLocation: 'https://www.facebook.com/', key: 4 }
-          ])
-          const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
-          assert.equal(4, result.activeFrameKey)
-        })
-
-        it('defaults to previous if no tabs to right', function () {
-          frames = Immutable.fromJS([
-            { pinnedLocation: 'https://www.facebook.com/', key: 6 },
-            { key: 2 }
-          ])
-          const result = frameStateUtil.removeFrame(frames, tabs, closedFrames, frameProps, activeFrameKey)
-          assert.equal(6, result.activeFrameKey)
-        })
+    it('returns one pages when we have exactly the same tabs as the tab page limit', function () {
+      let state = Immutable.fromJS({
+        activeFrameKey: 1,
+        frames: [
+          { key: 1 },
+          { key: 2 },
+          { key: 3 },
+          { key: 4 },
+          { key: 5 },
+          { key: 6 }
+        ],
+        framesInternal: {
+          index: {
+            1: 0,
+            2: 1,
+            3: 2,
+            4: 3,
+            5: 4,
+            6: 5
+          }
+        }
       })
+      const result = frameStateUtil.getTabPageCount(state)
+      assert.equal(result, 1)
+    })
+
+    it('returns one pages when we have less tabs then the tab page limit', function () {
+      let state = Immutable.fromJS({
+        activeFrameKey: 1,
+        frames: [
+          { key: 1 },
+          { key: 2 },
+          { key: 3 },
+          { key: 4 },
+          { key: 5 },
+          { key: 6 }
+        ],
+        framesInternal: {
+          index: {
+            1: 0,
+            2: 1,
+            3: 2,
+            4: 3,
+            5: 4,
+            6: 5
+          }
+        }
+      })
+      const result = frameStateUtil.getTabPageCount(state)
+      assert.equal(result, 1)
+    })
+  })
+
+  describe('frameLocationMatch', function () {
+    before(function () {
+      this.frameKey = 1
+      this.location = 'nespresso.com'
+      this.state = defaultWindowStore.mergeIn(['frames', 0], {
+        location: this.location,
+        frameKey: this.frameKey
+      })
+      this.frame = this.state.getIn(['frames', 0])
+    })
+
+    it('returns false if frame is empty', function () {
+      const result = frameStateUtil.frameLocationMatch(null, this.location)
+      assert.equal(result, false)
+    })
+    it('returns false if frame is not an Immutable map', function () {
+      const result = frameStateUtil.frameLocationMatch(this.frame.toJS(), this.location)
+      assert.equal(result, false)
+    })
+    it('returns false if location is empty', function () {
+      const result = frameStateUtil.frameLocationMatch(this.frame, '')
+      assert.equal(result, false)
+    })
+    it('returns false if location is a partial match', function () {
+      const result = frameStateUtil.frameLocationMatch(this.frame, 'nespresso.co.uk')
+      assert.equal(result, false)
+    })
+    it('returns true if location match', function () {
+      const result = frameStateUtil.frameLocationMatch(this.frame, this.location)
+      assert.equal(result, true)
     })
   })
 })

@@ -1,4 +1,4 @@
-#Debugging
+# Debugging
 
 ## Debugging the renderer processes
 
@@ -13,9 +13,28 @@ Calls to `console.log` and related functions go into the dev tools console menti
 
 If you're running `npm run watch`, then webpack dev server will ensure that changes to source code will reload the app.
 
-## Debugging the browser process in JS
+## Debugging and profiling the browser process with the Chromium developer tools
 
-The browser process can be debugged with remote developer tools.
+The browser process can be debugged and profiled with remote developer tools via Node Inspector.
+
+Pass the `--inspect` command line argument to the start script to enable node inspector.
+
+`npm run start -- --inspect`
+
+You can also break on startup with:
+
+`npm run start -- --inspect --debug-brk`
+
+On startup you'll see a message like this:
+
+> To start debugging, open the following URL in Chrome:
+>     chrome-devtools://devtools/bundled/inspector.html?experiments=true&v8only=true&ws=127.0.0.1:9229/1cfd06a0-c36a-4d98-85ad-d357ca6bebc6
+
+Start up Chrome and load that URL to see the developer tools that you're familiar with.
+
+If your console or terminal has trouble copying text for the URL, you can also load `chrome://inspect` and click the link you see which brings you to the same place.
+
+## Debugging the browser process with VS Code
 
 One easy way to start debugging the browser process to `Attach` to, or `Launch` the process using [Visual Studio Code](https://code.visualstudio.com/) which works for macOS, Windows, and Linux.
 Project configurations are already inside the subdirectory `.vscode`, and have been tested with macOS.  It may need tweaking for other platforms.
@@ -79,14 +98,15 @@ See [tests.md](https://github.com/brave/browser-laptop/blob/master/docs/tests.md
 
 ## Debugging Electron / Chromium C++
 
+NOTE: this section references an out of date library (libchromiumcontent). For more info about our new structure, please see [browser-laptop-bootstrap](https://github.com/brave/browser-laptop-bootstrap/wiki).
 
 ### Logging
 
-Enable Chrome logging (same as `—enable-logging`, but set at the right time)
+Enable Chromium and electron logging using:
 
-```
-export ELECTRON_ENABLE_LOGGING=stderr
-```
+`npm run start-log`
+
+This will pass `--enable-logging=stderr` and set the log level to `--v=1` to `start.js`.
 
 https://www.chromium.org/for-testers/enable-logging
 [docs/api/chrome-command-line-switches.md](https://github.com/brave/electron/blob/master/docs/api/chrome-command-line-switches.md) from electron docs.
@@ -111,6 +131,7 @@ index 78a80c6..dfa9f03 100755
 
 -  env['GYP_GENERATORS'] = 'ninja'
 +  env['GYP_GENERATORS'] = 'ninja,xcode-ninja'
++  # For Visual Studio on Windows, use msvs-ninja instead
 
    if sys.platform in ['win32', 'cygwin']:
      # Do not let Chromium download their own toolchains.

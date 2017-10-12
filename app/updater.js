@@ -27,20 +27,24 @@ const os = require('os')
 // in prod mode we pipe to a file
 var debug = function (contents) {
   const updateLogPath = path.join(app.getPath('userData'), 'updateLog.log')
-  fs.appendFile(updateLogPath, new Date().toISOString() + ' - ' + contents + os.EOL)
+  fs.appendFile(updateLogPath, new Date().toISOString() + ' - ' + contents + os.EOL, (err) => {
+    if (err) console.error(err)
+  })
 }
 
 // this maps the result of a call to process.platform to an update API identifier
 var platforms = {
   'darwin': 'osx',
   'win32x64': 'winx64',
-  'win32ia32': 'winia32'
+  'win32ia32': 'winia32',
+  'linux': 'linux'
 }
 
 // We are storing this as a package variable because a number of functions need access
 // It is set in the init function
 var platformBaseUrl = null
 var version = null
+var updateToPreviewReleases = false
 
 // build the complete update url from the base, platform and version
 exports.updateUrl = function (updates, platform, arch) {
@@ -50,7 +54,7 @@ exports.updateUrl = function (updates, platform, arch) {
   }
   platformBaseUrl = `${updates.baseUrl}/${Channel.channel()}/${version}/${platforms[platform]}`
   debug(`platformBaseUrl = ${platformBaseUrl}`)
-  if (platform === 'darwin') {
+  if (platform === 'darwin' || platform === 'linux') {
     return platformBaseUrl
   } else {
     if (platform.match(/^win32/)) {
@@ -81,23 +85,28 @@ var scheduleUpdates = () => {
 }
 
 // set the feed url for the auto-update system
-exports.init = (platform, arch, ver) => {
+exports.init = (platform, arch, ver, updateToPreview) => {
   // When starting up we should not expect an update to be available
   appActions.setUpdateStatus(UpdateStatus.UPDATE_NONE)
 
   // Browser version X.X.X
   version = ver
 
+  // Flag controlling whether preview releases are accepted
+  updateToPreviewReleases = updateToPreview
+
   var baseUrl = exports.updateUrl(appConfig.updates, platform, arch)
+  var query = { accept_preview: updateToPreviewReleases ? 'true' : 'false' }
 
   if (baseUrl) {
     debug(`updateUrl = ${baseUrl}`)
     scheduleUpdates()
     // This will fail if we are in dev
     try {
-      autoUpdater.setFeedURL(baseUrl)
+      // add the preview flag to the base feed url
+      autoUpdater.setFeedURL(`${baseUrl}?${querystring.stringify(query)}`)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   } else {
     debug('No updateUrl, not scheduling updates.')
@@ -122,27 +131,27 @@ var requestVersionInfo = (done, pingOnly) => {
   if (!platformBaseUrl) throw new Error('platformBaseUrl not set')
 
   // Get the daily, week of year and month update checks
-  var lastCheckYMD = AppStore.getState().toJS().updates['lastCheckYMD'] || null
+  const state = AppStore.getState()
+  const lastCheckYMD = state.getIn(['updates', 'lastCheckYMD'], null)
   debug(`lastCheckYMD = ${lastCheckYMD}`)
-
-  var lastCheckWOY = AppStore.getState().toJS().updates['lastCheckWOY'] || null
+  const lastCheckWOY = state.getIn(['updates', 'lastCheckWOY'], null)
   debug(`lastCheckWOY = ${lastCheckWOY}`)
-
-  var lastCheckMonth = AppStore.getState().toJS().updates['lastCheckMonth'] || null
+  const lastCheckMonth = state.getIn(['updates', 'lastCheckMonth'], null)
   debug(`lastCheckMonth = ${lastCheckMonth}`)
 
   // Has the browser ever asked for an update
-  var firstCheckMade = AppStore.getState().toJS().updates['firstCheckMade'] || false
+  const firstCheckMade = state.getIn(['updates', 'firstCheckMade'], false)
   debug(`firstCheckMade = ${firstCheckMade}`)
 
   // Build query string based on the last date an update request was made
-  var query = paramsFromLastCheckDelta(
+  const query = paramsFromLastCheckDelta(
     lastCheckYMD,
     lastCheckWOY,
     lastCheckMonth,
     firstCheckMade
   )
-  var queryString = `${platformBaseUrl}?${querystring.stringify(query)}`
+  query.accept_preview = updateToPreviewReleases ? 'true' : 'false'
+  const queryString = `${platformBaseUrl}?${querystring.stringify(query)}`
   debug(queryString)
 
   request(queryString, (err, response, body) => {

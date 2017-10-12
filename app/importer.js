@@ -5,27 +5,50 @@
 'strict mode'
 
 const electron = require('electron')
+const app = electron.app
 const importer = electron.importer
 const dialog = electron.dialog
 const BrowserWindow = electron.BrowserWindow
 const session = electron.session
-const Immutable = require('immutable')
-const { showImportWarning, showImportSuccess } = require('./aboutDialog')
-const siteUtil = require('../js/state/siteUtil')
-const AppStore = require('../js/stores/appStore')
-const siteTags = require('../js/constants/siteTags')
-const appActions = require('../js/actions/appActions')
-const messages = require('../js/constants/messages')
 
-var isMergeFavorites = false
+// Store
+const appStore = require('../js/stores/appStore')
+
+// State
+const tabState = require('./common/state/tabState')
+const bookmarksState = require('./common/state/bookmarksState')
+const bookmarkFoldersState = require('./common/state/bookmarkFoldersState')
+
+// Constants
+const messages = require('../js/constants/messages')
+const settings = require('../js/constants/settings')
+
+// Actions
+const appActions = require('../js/actions/appActions')
+const syncActions = require('../js/actions/syncActions')
+
+// Utils
+const {getSetting} = require('../js/settings')
+const {syncEnabled} = require('../js/state/syncUtil')
+const locale = require('./locale')
+const tabMessageBox = require('./browser/tabMessageBox')
+const {makeImmutable} = require('./common/state/immutableUtil')
+const bookmarkFoldersUtil = require('./common/lib/bookmarkFoldersUtil')
+const FunctionBuffer = require('../js/lib/functionBuffer')
+
+let isImportingBookmarks = false
+let hasBookmarks
+let bookmarkList
 
 exports.init = () => {
   importer.initialize()
 }
 
 exports.importData = (selected) => {
-  if (selected.get('mergeFavorites')) {
-    isMergeFavorites = true
+  if (selected.get('favorites')) {
+    isImportingBookmarks = true
+    const state = appStore.getState()
+    hasBookmarks = bookmarksState.getBookmarks(state).size > 0 || bookmarkFoldersState.getFolders(state).size > 0
   }
   if (selected !== undefined) {
     importer.importData(selected.toJS())
@@ -33,9 +56,9 @@ exports.importData = (selected) => {
 }
 
 exports.importHTML = (selected) => {
-  if (selected.get('mergeFavorites')) {
-    isMergeFavorites = true
-  }
+  isImportingBookmarks = true
+  const state = appStore.getState()
+  hasBookmarks = bookmarksState.getBookmarks(state).size > 0 || bookmarkFoldersState.getFolders(state).size > 0
   const files = dialog.showOpenDialog({
     properties: ['openFile'],
     filters: [{
@@ -50,16 +73,13 @@ exports.importHTML = (selected) => {
 }
 
 importer.on('update-supported-browsers', (e, detail) => {
-  isMergeFavorites = false
+  isImportingBookmarks = false
   if (BrowserWindow.getFocusedWindow()) {
     BrowserWindow.getFocusedWindow().webContents.send(messages.IMPORTER_LIST, detail)
   }
 })
 
-importer.on('add-password-form', (e, detail) => {
-})
-
-importer.on('add-history-page', (e, history, visitSource) => {
+importer.on('add-history-page', (e, history) => {
   let sites = []
   for (let i = 0; i < history.length; ++i) {
     const site = {
@@ -69,103 +89,131 @@ importer.on('add-history-page', (e, history, visitSource) => {
     }
     sites.push(site)
   }
-  appActions.addSite(Immutable.fromJS(sites))
+  appActions.addHistorySite(makeImmutable(sites))
 })
 
 importer.on('add-homepage', (e, detail) => {
 })
 
-const getParentFolderId = (path, pathMap, sites, topLevelFolderId, nextFolderIdObject) => {
+const getParentFolderId = (path, pathMap, addFolderFunction, topLevelFolderId, nextFolderIdObject) => {
   const pathLen = path.length
   if (!pathLen) {
     return topLevelFolderId
   }
+
   const parentFolder = path.pop()
   let parentFolderId = pathMap[parentFolder]
   if (parentFolderId === undefined) {
     parentFolderId = nextFolderIdObject.id++
     pathMap[parentFolder] = parentFolderId
     const folder = {
-      customTitle: parentFolder,
+      title: parentFolder,
       folderId: parentFolderId,
-      parentFolderId: getParentFolderId(path, pathMap, sites, topLevelFolderId, nextFolderIdObject),
-      lastAccessedTime: (new Date()).getTime(),
-      tags: [siteTags.BOOKMARK_FOLDER]
+      parentFolderId: getParentFolderId(path, pathMap, addFolderFunction, topLevelFolderId, nextFolderIdObject)
     }
-    sites.push(folder)
+    addFolderFunction(folder)
   }
   return parentFolderId
 }
 
-importer.on('add-bookmarks', (e, bookmarks, topLevelFolder) => {
-  let nextFolderId = siteUtil.getNextFolderId(AppStore.getState().get('sites'))
+importer.on('add-bookmarks', (e, importedBookmarks, topLevelFolder) => {
+  const state = appStore.getState()
+  const bookmarkFolders = bookmarkFoldersState.getFolders(state)
+  let nextFolderId = bookmarkFoldersUtil.getNextFolderId(bookmarkFolders)
   let nextFolderIdObject = { id: nextFolderId }
   let pathMap = {}
-  let sites = []
-  let topLevelFolderId = 0
-  if (!isMergeFavorites) {
-    topLevelFolderId = nextFolderIdObject.id++
-    sites.push({
-      customTitle: topLevelFolder,
-      folderId: topLevelFolderId,
-      parentFolderId: 0,
-      lastAccessedTime: (new Date()).getTime(),
-      tags: [siteTags.BOOKMARK_FOLDER]
-    })
-  } else {
-    // Merge into existing bookmark toolbar
-    pathMap[topLevelFolder] = topLevelFolderId
-    pathMap['Bookmarks Toolbar'] = 0 // Firefox
-    pathMap['Bookmarks Bar'] = 0 // Chrome on mac
-    pathMap['Other Bookmarks'] = -1 // Chrome on mac
-    pathMap['Bookmarks bar'] = 0 // Chrome on win/linux
-    pathMap['Other bookmarks'] = -1 // Chrome on win/linux
-    pathMap['Bookmark Bar'] = 0 // Safari
-    pathMap['Links'] = 0 // Edge, IE
+  let folders = []
+  let bookmarks = []
+  let topLevelFolderId = nextFolderIdObject.id++
+  const isSyncEnabled = syncEnabled()
+  const syncRecords = []
+  const functionBuffer = new FunctionBuffer((args) => makeImmutable(args), this)
+  const bufferedAddBookmark = (bookmark) => {
+    if (isSyncEnabled) {
+      bookmark.skipSync = true
+      syncRecords.push(bookmark)
+    }
+    functionBuffer.buffer(appActions.addBookmark, bookmark)
+    bookmarks.push(bookmark)
   }
-  for (let i = 0; i < bookmarks.length; ++i) {
-    let path = bookmarks[i].path
-    let parentFolderId = getParentFolderId(path, pathMap, sites, topLevelFolderId, nextFolderIdObject)
-    if (bookmarks[i].is_folder) {
+  const bufferedAddFolder = (folder) => {
+    if (isSyncEnabled) {
+      folder.skipSync = true
+      syncRecords.push(folder)
+    }
+    functionBuffer.buffer(appActions.addBookmarkFolder, folder)
+    folders.push(folder)
+  }
+
+  const importTopLevelFolder = {
+    title: bookmarkFoldersUtil.getNextFolderName(bookmarkFolders, topLevelFolder),
+    folderId: topLevelFolderId,
+    parentFolderId: 0
+  }
+  bufferedAddFolder(importTopLevelFolder)
+
+  for (let i = 0; i < importedBookmarks.length; ++i) {
+    const importedBookmark = importedBookmarks[i]
+    const path = importedBookmark.path
+    const title = importedBookmark.title
+    const parentFolderId = getParentFolderId(path, pathMap, bufferedAddFolder, topLevelFolderId, nextFolderIdObject)
+    if (importedBookmark.is_folder) {
       const folderId = nextFolderIdObject.id++
-      pathMap[bookmarks[i].title] = folderId
+      pathMap[title] = folderId
       const folder = {
-        customTitle: bookmarks[i].title,
-        folderId: folderId,
-        parentFolderId: parentFolderId,
-        lastAccessedTime: bookmarks[i].creation_time * 1000,
-        tags: [siteTags.BOOKMARK_FOLDER]
+        title,
+        folderId,
+        parentFolderId
       }
-      sites.push(folder)
+      bufferedAddFolder(folder)
     } else {
-      const site = {
-        title: bookmarks[i].title,
-        location: bookmarks[i].url,
-        parentFolderId: parentFolderId,
-        lastAccessedTime: bookmarks[i].creation_time * 1000,
-        tags: [siteTags.BOOKMARK]
+      const location = importedBookmark.url
+      const bookmark = {
+        title,
+        location,
+        parentFolderId
       }
-      sites.push(site)
+      bufferedAddBookmark(bookmark)
     }
   }
-  appActions.addSite(Immutable.fromJS(sites))
+  functionBuffer.flush()
+  bookmarkList = makeImmutable(bookmarks)
+  if (isSyncEnabled && syncRecords.length) {
+    syncActions.addSites(syncRecords)
+  }
 })
 
 importer.on('add-favicons', (e, detail) => {
   let faviconMap = {}
   detail.forEach((entry) => {
-    faviconMap[entry.urls[0]] = entry.favicon_url
+    if (entry.favicon_url.includes('made-up-favicon')) {
+      for (let url of entry.urls) {
+        faviconMap[url] = entry.png_data
+      }
+    } else {
+      for (let url of entry.urls) {
+        faviconMap[url] = entry.favicon_url
+      }
+    }
   })
-  let sites = AppStore.getState().get('sites')
-  sites = sites.map((site) => {
-    if (site.get('favicon') === undefined && site.get('location') !== undefined &&
-      faviconMap[site.get('location')] !== undefined) {
+  let updatedSites = bookmarkList.map((site) => {
+    if (
+      (
+        site.get('favicon') === undefined &&
+        site.get('location') !== undefined &&
+        faviconMap[site.get('location')] !== undefined
+      ) ||
+      (
+        site.get('favicon') !== undefined &&
+        site.get('favicon').includes('made-up-favicon'))
+    ) {
       return site.set('favicon', faviconMap[site.get('location')])
     } else {
       return site
     }
   })
-  appActions.addSite(sites)
+  // TODO can we call addBookmark only once? we need to create a new functions addFavicons
+  appActions.addBookmark(updatedSites)
 })
 
 importer.on('add-keywords', (e, templateUrls, uniqueOnHostAndPath) => {
@@ -173,6 +221,17 @@ importer.on('add-keywords', (e, templateUrls, uniqueOnHostAndPath) => {
 
 importer.on('add-autofill-form-data-entries', (e, detail) => {
 })
+
+const shouldSkipCookie = (cookie) => {
+  // Bypassing cookie mismatch error in
+  // https://github.com/brave/browser-laptop/issues/11401
+  if (cookie.domain === '.google.com' &&
+      ['https://notifications.google.com', 'https://accounts.google.com'].includes(cookie.url)) {
+    return true
+  }
+  return false
+}
+module.exports.shouldSkipCookie = shouldSkipCookie
 
 importer.on('add-cookies', (e, cookies) => {
   for (let i = 0; i < cookies.length; ++i) {
@@ -186,19 +245,55 @@ importer.on('add-cookies', (e, cookies) => {
       httpOnly: cookies[i].httponly,
       expirationDate: cookies[i].expiry_date
     }
+    if (shouldSkipCookie(cookie)) {
+      continue
+    }
     session.defaultSession.cookies.set(cookie, (error) => {
       if (error) {
         console.error(error)
+        console.error(cookie)
       }
     })
   }
 })
 
-importer.on('show-warning-dialog', (e) => {
+const getActiveTabId = () => {
+  return tabState.getActiveTabId(appStore.getState())
+}
+
+const showImportWarning = function () {
+  const tabId = getActiveTabId()
+  if (tabId) {
+    tabMessageBox.show(tabId, {
+      message: `${locale.translation('closeFirefoxWarning')}`,
+      title: 'Brave',
+      buttons: [locale.translation('closeFirefoxWarningOk')]
+    })
+  }
+}
+
+const showImportSuccess = function () {
+  const tabId = getActiveTabId()
+  if (tabId) {
+    tabMessageBox.show(tabId, {
+      message: `${locale.translation('importSuccess')}`,
+      title: 'Brave',
+      buttons: [locale.translation('importSuccessOk')]
+    })
+  }
+}
+
+app.on('show-warning-dialog', (e) => {
   showImportWarning()
 })
 
 importer.on('import-success', (e) => {
+  if (isImportingBookmarks) {
+    const showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
+    if (!showBookmarksToolbar && !hasBookmarks) {
+      appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, true)
+    }
+  }
   showImportSuccess()
 })
 

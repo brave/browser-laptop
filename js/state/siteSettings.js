@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-const urlParse = require('url').parse
+const urlParse = require('../../app/common/urlParse')
 
 module.exports.braveryDefaults = (appState, appConfig) => {
   let defaults = {}
@@ -16,6 +16,10 @@ module.exports.braveryDefaults = (appState, appConfig) => {
   let blockAds = defaults[appConfig.resourceNames.ADBLOCK] || false
   let blockTracking = defaults[appConfig.resourceNames.TRACKING_PROTECTION] || false
   let blockCookies = defaults[appConfig.resourceNames.COOKIEBLOCK] || false
+  let blockCookiesAll = defaults[appConfig.resourceNames.COOKIEBLOCK_ALL] || false
+  let blockFingerprinting = defaults[appConfig.resourceNames.FINGERPRINTING_PROTECTION] || false
+  let blockFingerprintingAll = defaults[appConfig.resourceNames.FINGERPRINTING_PROTECTION_ALL] || false
+
   defaults.adControl = 'allowAdsAndTracking'
   if (blockAds && replaceAds && blockTracking) {
     defaults.adControl = 'showBraveAds'
@@ -23,13 +27,13 @@ module.exports.braveryDefaults = (appState, appConfig) => {
     defaults.adControl = 'blockAds'
   }
   defaults.cookieControl = blockCookies ? 'block3rdPartyCookie' : 'allowAllCookies'
-
-  // TODO(bridiver) this should work just like the other bravery settings
-  let fingerprintingProtection = appState.get('settings').get('privacy.block-canvas-fingerprinting')
-  if (typeof fingerprintingProtection !== 'boolean') {
-    fingerprintingProtection = appConfig.defaultSettings['privacy.block-canvas-fingerprinting']
+  if (blockCookiesAll) {
+    defaults.cookieControl = 'blockAllCookies'
   }
-  defaults.fingerprintingProtection = fingerprintingProtection
+  defaults.fingerprintingProtection = blockFingerprinting ? 'block3rdPartyFingerprinting' : 'allowAllFingerprinting'
+  if (blockFingerprintingAll) {
+    defaults.fingerprintingProtection = 'blockAllFingerprinting'
+  }
   return defaults
 }
 
@@ -50,7 +54,7 @@ module.exports.activeSettings = (siteSettings, appState, appConfig) => {
   Object.keys(appConfig.resourceNames).forEach((resourceName) => {
     let name = appConfig.resourceNames[resourceName]
     settings[name] = (() => {
-      if (settings.shieldsUp === false) {
+      if (settings.shieldsUp === false && appConfig[name].shields !== false) {
         return false
       }
 
@@ -92,10 +96,10 @@ module.exports.activeSettings = (siteSettings, appState, appConfig) => {
 
   settings.fingerprintingProtection = (() => {
     if (settings.shieldsUp === false) {
-      return false
+      return 'allowAllFingerprinting'
     }
     if (siteSettings) {
-      if (typeof siteSettings.get('fingerprintingProtection') === 'boolean') {
+      if (typeof siteSettings.get('fingerprintingProtection') === 'string') {
         return siteSettings.get('fingerprintingProtection')
       }
     }

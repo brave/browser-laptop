@@ -4,23 +4,10 @@
 
 'use strict'
 
-const AppDispatcher = require('../dispatcher/appDispatcher')
-const WindowConstants = require('../constants/windowConstants')
-const appActions = require('../actions/appActions')
-const webviewActions = require('../actions/webviewActions')
-const messages = require('../constants/messages')
-const siteTags = require('../constants/siteTags')
-const siteUtil = require('../state/siteUtil')
-const UrlUtil = require('../lib/urlutil')
-const currentWindow = require('../../app/renderer/currentWindow')
-const windowStore = require('../stores/windowStore')
-
-function dispatch (action) {
-  AppDispatcher.dispatch(action)
-}
+const {dispatch} = require('../dispatcher/appDispatcher')
+const windowConstants = require('../constants/windowConstants')
 
 const windowActions = {
-
   /**
    * Dispatches an event to the main process to replace the window state
    *
@@ -28,66 +15,8 @@ const windowActions = {
    */
   setState: function (windowState) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_STATE,
+      actionType: windowConstants.WINDOW_SET_STATE,
       windowState
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to load a new URL.
-   * Both the frame's src and location properties will be updated accordingly.
-   *
-   * If the frame is a pinned site and the origin of the pinned site does
-   * not match the origin of the passed in location, then a new frame will be
-   * created for the load.
-   *
-   * In general, an iframe's src should not be updated when navigating within the frame to a new page,
-   * but the location should. For user entered new URLs, both should be updated.
-   *
-   * @param {object} frame - The frame props
-   * @param {string} location - The URL of the page to load
-   */
-  loadUrl: function (frame, location) {
-    location = location.trim()
-    let newFrame = false
-    if (frame.get('pinnedLocation') && location !== 'about:certerror' &&
-        frame.get('location') !== 'about:certerror' &&
-        location !== 'about:error' &&
-        frame.get('location') !== 'about:error') {
-      try {
-        const origin1 = new window.URL(frame.get('location')).origin
-        const origin2 = new window.URL(location).origin
-        if (origin1 !== origin2) {
-          newFrame = true
-        }
-      } catch (e) {
-        newFrame = true
-      }
-    }
-
-    if (UrlUtil.isURL(location)) {
-      location = UrlUtil.getUrlFromInput(location)
-    }
-
-    if (newFrame) {
-      this.newFrame({
-        location
-      }, true)
-    } else {
-      this.setUrl(location, frame.get('key'))
-    }
-  },
-
-  /**
-   * Dispatches a message to the store to set the new URL.
-   * @param {string} location
-   * @param {number} key
-   */
-  setUrl: function (location, key) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_URL,
-      location,
-      key
     })
   },
 
@@ -97,40 +26,59 @@ const windowActions = {
    * @param {string} location - The URL of the page that was navigated to.
    * @param {number} key - The frame key to modify.
    * @param {boolean} isNavigatedInPage - true if it was a navigation within the same page.
+   * @param {number} tabId - the tab id
    */
-  setNavigated: function (location, key, isNavigatedInPage) {
+  setNavigated: function (location, key, isNavigatedInPage, tabId) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_NAVIGATED,
+      actionType: windowConstants.WINDOW_SET_NAVIGATED,
       location,
       key,
-      isNavigatedInPage
+      isNavigatedInPage,
+      tabId
     })
   },
 
   /**
    * Dispatches a message to set the security state.
-   * @param {Object} frameProps - The frame properties to modify.
+   * @param {Object} tabId - Tab id of the frame properties to modify.
    * @param {Object} securityState - The security state properties that have
    *   changed.
    */
-  setSecurityState: function (frameProps, securityState) {
+  setSecurityState: function (tabId, securityState) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_SECURITY_STATE,
-      securityState,
-      frameProps
+      actionType: windowConstants.WINDOW_SET_SECURITY_STATE,
+      tabId,
+      securityState
     })
   },
 
   /**
-   * Dispatches a message to set the frame tab id
+   * Dispatches a message to change the frame tabId
    * @param {Object} frameProps - The frame properties
-   * @param {Number} tabId - the tab id to set
+   * @param {Number} oldTabId - the current tabId
+   * @param {Number} newTabId - the new tabId
    */
-  setFrameTabId: function (frameProps, tabId) {
+  frameTabIdChanged: function (frameProps, oldTabId, newTabId) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_FRAME_TAB_ID,
+      actionType: windowConstants.WINDOW_FRAME_TAB_ID_CHANGED,
       frameProps,
-      tabId
+      oldTabId,
+      newTabId
+    })
+  },
+
+  /**
+   * Dispatches a message when the guestInstanceId changes for a frame
+   * @param {Object} frameProps - The frame properties
+   * @param {Number} oldGuestInstanceId - the current guestInstanceId
+   * @param {Number} newGuestInstanceId - the new guestInstanceId
+   */
+  frameGuestInstanceIdChanged: function (frameProps, oldGuestInstanceId, newGuestInstanceId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_FRAME_GUEST_INSTANCE_ID_CHANGED,
+      frameProps,
+      oldGuestInstanceId,
+      newGuestInstanceId
     })
   },
 
@@ -142,83 +90,36 @@ const windowActions = {
    */
   setFrameError: function (frameProps, errorDetails) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_FRAME_ERROR,
+      actionType: windowConstants.WINDOW_SET_FRAME_ERROR,
       frameProps,
       errorDetails
     })
   },
 
   /**
-   * Dispatches a message to the store to set the user entered text for the URL bar.
-   * Unlike setLocation and loadUrl, this does not modify the state of src and location.
-   *
-   * @param {string} location - The text to set as the new navbar URL input
-   */
-  setNavBarUserInput: function (location) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_NAVBAR_INPUT,
-      location
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to set the current frame's title.
-   * This should be called in response to the webview encountering a `<title>` tag.
-   *
-   * @param {Object} frameProps - The frame properties to modify
-   * @param {string} title - The title to set for the frame
-   */
-  setFrameTitle: function (frameProps, title) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_FRAME_TITLE,
-      frameProps,
-      title
-    })
-  },
-
-  /**
    * Shows/hides the find-in-page bar.
-   * @param {Object} frameProps - The frame properties to modify
-   * @param {boolean} shown - Whether to show the findbar
+   * @param {number} frameKey - Key of the frame that we want to modify
+   * @param {boolean} shown - Whether to show the find bar
    */
-  setFindbarShown: function (frameProps, shown) {
+  setFindbarShown: function (frameKey, shown) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_FINDBAR_SHOWN,
-      frameProps,
+      actionType: windowConstants.WINDOW_SET_FINDBAR_SHOWN,
+      frameKey,
       shown
     })
   },
 
   /**
-   * Highlight text in the findbar
-   * @param {Object} frameProps - The frame properties to modify
-   * @param {boolean} selected - Whether to select the findbar search text
+   * Highlight text in the find bar
+   * @param {Object} frameKey - The frame key to modify
+   * @param {boolean} selected - Whether to select the find bar search text
    */
-  setFindbarSelected: function (frameProps, selected) {
+  setFindbarSelected: function (frameKey, selected) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_FINDBAR_SELECTED,
-      frameProps,
+      actionType: windowConstants.WINDOW_SET_FINDBAR_SELECTED,
+      frameKey,
       selected
     })
-  },
-
-  /**
-   * Sets a frame as pinned
-   * @param {Object} frameProps - The frame properties to modify
-   * @param {boolean} isPinned - Whether to pin or not
-   */
-  setPinned: function (frameProps, isPinned) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_PINNED,
-      frameProps,
-      isPinned
-    })
-    const siteDetail = siteUtil.getDetailFromFrame(frameProps, siteTags.PINNED)
-    if (isPinned) {
-      appActions.addSite(siteDetail, siteTags.PINNED)
-    } else {
-      appActions.removeSite(siteDetail, siteTags.PINNED)
-    }
   },
 
   /**
@@ -229,7 +130,7 @@ const windowActions = {
    */
   onWebviewLoadStart: function (frameProps, location) {
     dispatch({
-      actionType: WindowConstants.WINDOW_WEBVIEW_LOAD_START,
+      actionType: windowConstants.WINDOW_WEBVIEW_LOAD_START,
       frameProps,
       location
     })
@@ -242,7 +143,7 @@ const windowActions = {
    */
   onWebviewLoadEnd: function (frameProps) {
     dispatch({
-      actionType: WindowConstants.WINDOW_WEBVIEW_LOAD_END,
+      actionType: windowConstants.WINDOW_WEBVIEW_LOAD_END,
       frameProps
     })
   },
@@ -250,113 +151,40 @@ const windowActions = {
   /**
    * Dispatches a message to the store to indicate that the webview entered full screen mode.
    *
-   * @param {Object} frameProps - The frame properties to put in full screen
+   * @param {Object} tabId - Tab id of the frame to put in full screen
    * @param {boolean} isFullScreen - true if the webview is entering full screen mode.
    * @param {boolean} showFullScreenWarning - true if a warning about entering full screen should be shown.
    */
-  setFullScreen: function (frameProps, isFullScreen, showFullScreenWarning) {
+  setFullScreen: function (tabId, isFullScreen, showFullScreenWarning) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_FULL_SCREEN,
-      frameProps,
+      actionType: windowConstants.WINDOW_SET_FULL_SCREEN,
+      tabId,
       isFullScreen,
       showFullScreenWarning
     })
   },
 
   /**
-   * Dispatches a message to the store to indicate if the navigation bar is focused.
-   *
-   * @param {boolean} focused - true if the navigation bar should be considered as focused
-   */
-  setNavBarFocused: function (focused) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_NAVBAR_FOCUSED,
-      focused
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to create a new frame
-   *
-   * @param {Object} frameOpts - An object of frame options such as isPrivate, element, and tab features.
-   *                  These may not all be hooked up in Electron yet.
-   * @param {boolean} openInForeground - true if the new frame should become the new active frame
-   */
-  newFrame: function (frameOpts, openInForeground) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_NEW_FRAME,
-      frameOpts: frameOpts,
-      openInForeground
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to clone an existing frame
-   *
-   * @param {Object} frameProps - The properties of the frame to clone
-   * @param {number} guestInstanceId - The guestInstanceId of the cloned webcontents
-   */
-  cloneFrame: function (frameProps, guestInstanceId, openInForeground) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_CLONE_FRAME,
-      frameOpts: frameProps.toJS ? frameProps.toJS() : frameProps,
-      guestInstanceId,
-      openInForeground
-    })
-  },
-
-  /**
    * Dispatches a message to close a frame
    *
-   * @param {Object[]} frames - Immutable list of of all the frames
-   * @param {Object} frameProps - The properties of the frame to close
+   * @param {Object} frameKey - Frame key of the frame to close
    */
-  closeFrame: function (frames, frameProps, forceClosePinned) {
-    const ipc = global.require('electron').ipcRenderer
-    const origin = siteUtil.getOrigin(frameProps.get('location'))
-    if (origin) {
-      appActions.clearMessageBoxes(origin)
-    }
-    // If the frame was full screen, exit
-    if (frameProps && frameProps.get('isFullScreen')) {
-      webviewActions.setFullScreen(false)
-      this.setFullScreen(frameProps, false)
-    }
-    // Unless a caller explicitly specifies to close a pinned frame, then
-    // ignore the call.
-    const nonPinnedFrames = frames.filter((frame) => !frame.get('pinnedLocation'))
-    if (frameProps && frameProps.get('pinnedLocation')) {
-      // Check for no frames at all, and if that's the case the user
-      // only has pinned frames and tried to close, so close the
-      // whole app.
-      if (nonPinnedFrames.size === 0) {
-        appActions.closeWindow(currentWindow.id)
-        return
-      }
+  closeFrame: function (frameKey) {
+    dispatch({
+      actionType: windowConstants.WINDOW_CLOSE_FRAME,
+      frameKey
+    })
+  },
 
-      const frameKey = frameProps ? frameProps.get('key') : null
-      const activeFrameKey = windowStore.getState().get('activeFrameKey')
-      const isActiveFrame = frameKey === activeFrameKey
-
-      if (!forceClosePinned && isActiveFrame) {
-        // Go to next frame if the user tries to close a pinned tab
-        ipc.emit(messages.SHORTCUT_NEXT_TAB)
-        return
-      }
-    }
-
-    const pinnedFrames = frames.filter((frame) => frame.get('pinnedLocation'))
-
-    // If there is at least 1 pinned frame don't close the window until subsequent
-    // close attempts
-    if (nonPinnedFrames.size > 1 || pinnedFrames.size > 0) {
-      dispatch({
-        actionType: WindowConstants.WINDOW_CLOSE_FRAME,
-        frameProps
-      })
-    } else {
-      appActions.closeWindow(currentWindow.id)
-    }
+  /**
+   * Dispatches a message to close multiple frames
+   * @param {Object[]} framePropsList - The properties of all frames to close
+   */
+  closeFrames: function (framePropsList) {
+    dispatch({
+      actionType: windowConstants.WINDOW_CLOSE_FRAMES,
+      framePropsList
+    })
   },
 
   /**
@@ -365,55 +193,32 @@ const windowActions = {
    */
   undoClosedFrame: function () {
     dispatch({
-      actionType: WindowConstants.WINDOW_UNDO_CLOSED_FRAME
+      actionType: windowConstants.WINDOW_UNDO_CLOSED_FRAME
     })
   },
 
   /**
    * Dispatches a message to the store to clear closed frames
+   * @param {string=} location - only clear frames with this location
    */
-  clearClosedFrames: function () {
+  clearClosedFrames: function (location) {
     dispatch({
-      actionType: WindowConstants.WINDOW_CLEAR_CLOSED_FRAMES
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to set a new frame as the active frame.
-   *
-   * @param {Object} frameProps - the frame properties for the webview in question.
-   */
-  setActiveFrame: function (frameProps) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_ACTIVE_FRAME,
-      frameProps: frameProps
+      actionType: windowConstants.WINDOW_CLEAR_CLOSED_FRAMES,
+      location
     })
   },
 
   /**
    * Dispatches a message to the store when the frame is active and the window is focused
    *
-   * @param {Object} frameProps - the frame properties for the webview in question.
+   * @param {Object} location - location for the webview in question.
+   * @param {Object} tabId - tabId for the webview in question.
    */
-  setFocusedFrame: function (frameProps) {
-    if (frameProps) {
-      dispatch({
-        actionType: WindowConstants.WINDOW_SET_FOCUSED_FRAME,
-        frameProps: frameProps
-      })
-    }
-  },
-
-  /**
-   * Dispatches a message to the store to set a preview frame.
-   * This is done when hovering over a tab.
-   *
-   * @param {Object} frameProps - the frame properties for the webview in question.
-   */
-  setPreviewFrame: function (frameProps) {
+  setFocusedFrame: function (location, tabId) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_PREVIEW_FRAME,
-      frameProps: frameProps
+      actionType: windowConstants.WINDOW_SET_FOCUSED_FRAME,
+      location,
+      tabId
     })
   },
 
@@ -424,8 +229,47 @@ const windowActions = {
    */
   setTabPageIndex: function (index) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_TAB_PAGE_INDEX,
+      actionType: windowConstants.WINDOW_SET_TAB_PAGE_INDEX,
       index
+    })
+  },
+
+  setTabIntersectionState: function (frameKey, ratio) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_TAB_CONTENT_INTERSECTION_STATE,
+      frameKey,
+      ratio
+    })
+  },
+
+  /**
+   * Dispatches a message to the store to set the current tab hover state.
+   *
+   * @param {Object} frameKey - the frame key for the webview in question.
+   * @param {boolean} hoverState - whether or not mouse is over tab
+   * @param {boolean} previewMode - whether or not the next tab should be previewed
+   * based on mouse idle time
+   */
+  setTabHoverState: function (frameKey, hoverState, previewMode) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_TAB_HOVER_STATE,
+      frameKey,
+      hoverState,
+      previewMode
+    })
+  },
+
+  /**
+   * Dispatches a message to the store to set the current tab hover state.
+   *
+   * @param {Object} tabPageIndex - the frame key for the webview in question.
+   * @param {boolean} hoverState - whether or not mouse is over tabPage
+   */
+  setTabPageHoverState: function (tabPageIndex, hoverState) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_TAB_PAGE_HOVER_STATE,
+      tabPageIndex,
+      hoverState
     })
   },
 
@@ -436,7 +280,7 @@ const windowActions = {
    */
   setPreviewTabPageIndex: function (previewTabPageIndex) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX,
+      actionType: windowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX,
       previewTabPageIndex
     })
   },
@@ -448,75 +292,61 @@ const windowActions = {
    */
   setTabPageIndexByFrame: function (frameProps) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_TAB_PAGE_INDEX,
+      actionType: windowConstants.WINDOW_SET_TAB_PAGE_INDEX,
       frameProps
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to update the back-forward information.
-   *
-   * @param {Object} frameProps - the frame properties for the webview in question.
-   * @param {boolean} canGoBack - Specifies if the active frame has previous entries in its history
-   * @param {boolean} canGoForward - Specifies if the active frame has next entries in its history (i.e. the user pressed back at least once)
-   */
-  updateBackForwardState: function (frameProps, canGoBack, canGoForward) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_UPDATE_BACK_FORWARD,
-      frameProps,
-      canGoBack,
-      canGoForward
-    })
-  },
-
-  /**
-   * Dispatches a message to the store to indicate that something is dragging over this item.
-   *
-   * @param {string} dragType - The type of drag operation being performed
-   * @param {Object} dragOverKey - A unique identifier for the storage for the item being dragged over
-   * @param {Object} dragDetail - detail about the item drag operation
-   */
-  setIsBeingDraggedOverDetail: function (dragType, dragOverKey, dragDetail) {
-    dispatch({
-      dragType,
-      actionType: WindowConstants.WINDOW_SET_IS_BEING_DRAGGED_OVER_DETAIL,
-      dragOverKey,
-      dragDetail
     })
   },
 
   /**
    * Dispatches a message to the store to indicate that the specified frame should move locations.
    *
-   * @param {Object} sourceFrameProps - the frame properties for the webview to move.
-   * @param {Object} destinationFrameProps - the frame properties for the webview to move to.
+   * @param {Object} sourceFrameKey - the frame key for the webview to move.
+   * @param {Object} destinationFrameKey - the frame key for the webview to move to.
    * @param {boolean} prepend - Whether or not to prepend to the destinationFrameProps
    */
-  moveTab: function (sourceFrameProps, destinationFrameProps, prepend) {
+  moveTab: function (sourceFrameKey, destinationFrameKey, prepend) {
     dispatch({
-      actionType: WindowConstants.WINDOW_TAB_MOVE,
-      sourceFrameProps,
-      destinationFrameProps,
+      actionType: windowConstants.WINDOW_TAB_MOVE,
+      sourceFrameKey,
+      destinationFrameKey,
       prepend
     })
   },
 
   /**
-   * Sets the URL bar suggestions and selected index.
-   *
-   * @param {Object[]} suggestionList - The list of suggestions for the entered URL bar text. This can be generated from history, bookmarks, etc.
-   * @param {number} selectedIndex - The index for the selected item (users can select items with down arrow on their keyboard)
+   * The active URL bar suggestion was clicked
+   * @param {boolean} isForSecondaryAction - Whether the secondary action is expected
+   *  which happens when a modifier key is pressed.
+   * @param {boolean} shiftKey - Whether the shift key is being pressed
    */
-  setUrlBarSuggestions: function (suggestionList, selectedIndex) {
+  activeSuggestionClicked: function (isForSecondaryAction, shiftKey) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_URL_BAR_SUGGESTIONS,
-      suggestionList,
-      selectedIndex
+      actionType: windowConstants.WINDOW_ACTIVE_URL_BAR_SUGGESTION_CLICKED,
+      isForSecondaryAction,
+      shiftKey
     })
   },
 
   /**
-   * Enables or disables the urlbar autocomplete.
+   * The previous suggestion is being selected
+   */
+  previousUrlBarSuggestionSelected: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_PREVIOUS_URL_BAR_SUGGESTION_SELECTED
+    })
+  },
+
+  /**
+   * The next suggestion is being selected
+   */
+  nextUrlBarSuggestionSelected: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_NEXT_URL_BAR_SUGGESTION_SELECTED
+    })
+  },
+
+  /**
+   * autocomplete for urlbar is being enabled or disabled.
    * Autocomplete is defined to be the action of inserting text into the urlbar itself
    * to the first item's URL match if possible.  The inserted text is auto selected so
    * that the next character inserted will replace it.
@@ -524,49 +354,31 @@ const windowActions = {
    *
    * @param {boolean} enabled - true if the urlbar should autocomplete
    */
-  setUrlBarAutocompleteEnabled: function (enabled) {
+  urlBarAutocompleteEnabled: function (enabled) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_URL_BAR_AUTCOMPLETE_ENABLED,
+      actionType: windowConstants.WINDOW_URL_BAR_AUTOCOMPLETE_ENABLED,
       enabled
     })
   },
 
   /*
-   * Sets the URL bar preview value.
-   * TODO: name this something better.
+   * Sets if we should render URL bar suggestions.
    *
-   * @param value If false URL bar previews will not be set.
+   * @param enabled If false URL bar suggestions will not be rendered.
    */
-  setUrlBarPreview: function (value) {
+  setRenderUrlBarSuggestions: function (enabled) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_URL_BAR_PREVIEW,
-      value
+      actionType: windowConstants.WINDOW_SET_RENDER_URL_BAR_SUGGESTIONS,
+      enabled
     })
   },
 
   /**
-   * Sets the URL bar suggestion search results.
-   * This is typically from a service like Duck Duck Go auto complete for the portion of text that the user typed in.
-   * Note: This should eventually be refactored outside of the component doing XHR and into a store.
-   *
-   * @param searchResults The search results to set for the currently entered URL bar text.
+   * Indicates the URLbar has been selected
    */
-  setUrlBarSuggestionSearchResults: function (searchResults) {
+  urlBarSelected: function (selected) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_URL_BAR_SUGGESTION_SEARCH_RESULTS,
-      searchResults
-    })
-  },
-
-  /**
-   * Marks the URL bar text as selected or not
-   *
-   * @param {boolean} isSelected - Whether or not the URL bar text input should be selected
-   */
-  setUrlBarSelected: function (selected) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_URL_BAR_SELECTED,
-      selected
+      actionType: windowConstants.WINDOW_URL_BAR_SELECTED
     })
   },
 
@@ -580,22 +392,35 @@ const windowActions = {
    */
   setUrlBarActive: function (isActive) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_URL_BAR_ACTIVE,
+      actionType: windowConstants.WINDOW_SET_URL_BAR_ACTIVE,
       isActive
     })
   },
 
-  /**
-   * Marks the URL bar as focused or not.
-   *
-   * @param {boolean} isFocused - Whether or not the URL bar should be marked as focused
-   */
-  setUrlBarFocused: function (isFocused) {
+  urlBarOnFocus: function (windowId) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_URL_BAR_FOCUSED,
-      isFocused
+      actionType: windowConstants.WINDOW_URL_BAR_ON_FOCUS,
+      windowId
     })
   },
+
+  urlBarOnBlur: function (windowId, targetValue, locationValue, fromSuggestion) {
+    dispatch({
+      actionType: windowConstants.WINDOW_URL_BAR_ON_BLUR,
+      windowId,
+      targetValue,
+      locationValue,
+      fromSuggestion
+    })
+  },
+
+  tabOnFocus: function (tabId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_ON_FOCUS,
+      tabId
+    })
+  },
+
   /**
    * Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
    *
@@ -604,9 +429,9 @@ const windowActions = {
    * set from an IPC call.
    * @param {string} activeShortcutDetails - Parameters for the shortcut action
    */
-  setActiveFrameShortcut: function (frameProps, activeShortcut, activeShortcutDetails) {
+  frameShortcutChanged: function (frameProps, activeShortcut, activeShortcutDetails) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_ACTIVE_FRAME_SHORTCUT,
+      actionType: windowConstants.WINDOW_FRAME_SHORTCUT_CHANGED,
       frameProps,
       activeShortcut,
       activeShortcutDetails
@@ -614,42 +439,94 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to set the search engine details.
-   * @param {Object} searchDetail - the search details
-   */
-  setSearchDetail: function (searchDetail) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_SEARCH_DETAIL,
-      searchDetail
-    })
-  },
-
-  /**
    * Dispatches a message to set the find-in-page details.
-   * @param {Object} frameProps - Properties of the frame in question
+   * @param {Object} frameKey - Frame key of the frame in question
    * @param {Object} findDetail - the find details
    */
-  setFindDetail: function (frameProps, findDetail) {
+  setFindDetail: function (frameKey, findDetail) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_FIND_DETAIL,
-      frameProps,
+      actionType: windowConstants.WINDOW_SET_FIND_DETAIL,
+      frameKey,
       findDetail
     })
   },
 
   /**
-   * Dispatches a message to set add/edit bookmark details
-   * If set, also indicates that add/edit is shown
-   * @param {Object} currentDetail - Properties of the bookmark to change to
-   * @param {Object} originalDetail - Properties of the bookmark to edit
-   * @param {Object} destinationDetail - Will move the added bookmark to the specified position
+   * Used for displaying bookmark hanger
+   * when adding bookmark site or folder
    */
-  setBookmarkDetail: function (currentDetail, originalDetail, destinationDetail) {
+  addBookmark: function (siteDetail, closestKey) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_BOOKMARK_DETAIL,
-      currentDetail,
-      originalDetail,
-      destinationDetail
+      actionType: windowConstants.WINDOW_ON_ADD_BOOKMARK,
+      siteDetail,
+      closestKey
+    })
+  },
+
+  /**
+   * Used for displaying bookmark hanger
+   * when editing bookmark site or folder
+   */
+  editBookmark: function (editKey, isHanger) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_EDIT_BOOKMARK,
+      editKey,
+      isHanger
+    })
+  },
+
+  /**
+   * Used for adding bookmark site directly and then allowing to
+   * edit it right afterwords
+   * @param isHanger
+   * @param bookmarkDetail - bookmark data, if empty active frame will be used
+   */
+  onBookmarkAdded: function (isHanger, bookmarkDetail) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_BOOKMARK_ADDED,
+      bookmarkDetail,
+      isHanger
+    })
+  },
+
+  /**
+   * Used for closing a bookmark dialog
+   */
+  onBookmarkClose: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_BOOKMARK_CLOSE
+    })
+  },
+
+  /**
+   * Used for displaying bookmark folder dialog
+   * when adding bookmark site or folder
+   */
+  addBookmarkFolder: function (folderDetails, closestKey) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_ADD_BOOKMARK_FOLDER,
+      folderDetails,
+      closestKey
+    })
+  },
+
+  /**
+   * Used for displaying bookmark folder dialog
+   * when editing bookmark site or folder
+   */
+  editBookmarkFolder: function (editKey) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_EDIT_BOOKMARK_FOLDER,
+      editKey
+    })
+  },
+
+  /**
+   * Used for closing a bookmark dialog
+   */
+  onBookmarkFolderClose: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_BOOKMARK_FOLDER_CLOSE
     })
   },
 
@@ -660,7 +537,7 @@ const windowActions = {
    */
   setContextMenuDetail: function (detail) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL,
+      actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL,
       detail
     })
   },
@@ -672,7 +549,7 @@ const windowActions = {
    */
   setPopupWindowDetail: function (detail) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL,
+      actionType: windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL,
       detail
     })
   },
@@ -680,48 +557,28 @@ const windowActions = {
   /**
    * Dispatches a message to indicate that the frame should be muted
    *
-   * @param {Object} frameProps - Properties of the frame in question
+   * @param {number} frameKey - Key of the frame in question
+   * @param {number} tabId - Id of the tab in question
    * @param {boolean} muted - true if the frame is muted
    */
-  setAudioMuted: function (frameProps, muted) {
+  setAudioMuted: function (frameKey, tabId, muted) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_AUDIO_MUTED,
-      frameProps,
+      actionType: windowConstants.WINDOW_SET_AUDIO_MUTED,
+      frameKey,
+      tabId,
       muted
     })
   },
 
   /**
-   * Dispatches a mute/unmute call to all frames in a provided list (used by TabList).
+   * Dispatches a mute/unmute call to all frames in a provided list.
    *
-   * @param {Object} framePropsList - List of frame properties to consider
-   * @param {boolean} muted - true if the frames should be muted
+   * @param {Object} frameList - List of frames to consider (frameKey and tabId)
    */
-  muteAllAudio: function (framePropsList, mute) {
-    framePropsList.forEach((frameProps) => {
-      if (mute && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
-        this.setAudioMuted(frameProps, true)
-      } else if (!mute && frameProps.get('audioMuted')) {
-        this.setAudioMuted(frameProps, false)
-      }
-    })
-  },
-
-  /**
-   * Dispatches a mute call to all frames except the one provided.
-   * The provided frame will have its audio unmuted.
-   *
-   * @param {Object} frameToSkip - Properties of the frame to keep audio
-   */
-  muteAllAudioExcept: function (frameToSkip) {
-    let framePropsList = windowStore.getState().get('frames')
-
-    framePropsList.forEach((frameProps) => {
-      if (frameProps.get('key') !== frameToSkip.get('key') && frameProps.get('audioPlaybackActive') && !frameProps.get('audioMuted')) {
-        this.setAudioMuted(frameProps, true)
-      } else {
-        this.setAudioMuted(frameProps, false)
-      }
+  muteAllAudio: function (frameList) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_ALL_AUDIO_MUTED,
+      frameList
     })
   },
 
@@ -733,7 +590,7 @@ const windowActions = {
    */
   setAudioPlaybackActive: function (frameProps, audioPlaybackActive) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE,
+      actionType: windowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE,
       frameProps,
       audioPlaybackActive
     })
@@ -749,7 +606,7 @@ const windowActions = {
    */
   setThemeColor: function (frameProps, themeColor, computedThemeColor) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_THEME_COLOR,
+      actionType: windowConstants.WINDOW_SET_THEME_COLOR,
       frameProps,
       themeColor,
       computedThemeColor
@@ -764,7 +621,7 @@ const windowActions = {
    */
   setFavicon: function (frameProps, favicon) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_FAVICON,
+      actionType: windowConstants.WINDOW_SET_FAVICON,
       frameProps,
       favicon
     })
@@ -779,20 +636,9 @@ const windowActions = {
    */
   setLastZoomPercentage: function (frameProps, percentage) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_LAST_ZOOM_PERCENTAGE,
+      actionType: windowConstants.WINDOW_SET_LAST_ZOOM_PERCENTAGE,
       frameProps,
       percentage
-    })
-  },
-
-  /**
-   * Sets the maximize state of the window
-   * @param {boolean} isMaximized - true if window is maximized
-   */
-  setMaximizeState: function (isMaximized) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_MAXIMIZE_STATE,
-      isMaximized
     })
   },
 
@@ -802,19 +648,8 @@ const windowActions = {
    */
   savePosition: function (position) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SAVE_POSITION,
+      actionType: windowConstants.WINDOW_SAVE_POSITION,
       position
-    })
-  },
-
-  /**
-   * Sets the fullscreen state of the window
-   * @param {boolean} isFullScreen - true if window is fullscreen
-   */
-  setWindowFullScreen: function (isFullScreen) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_FULLSCREEN_STATE,
-      isFullScreen
     })
   },
 
@@ -825,7 +660,7 @@ const windowActions = {
    */
   setMouseInTitlebar: function (mouseInTitlebar) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR,
+      actionType: windowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR,
       mouseInTitlebar
     })
   },
@@ -837,7 +672,7 @@ const windowActions = {
    */
   setSiteInfoVisible: function (isVisible) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_SITE_INFO_VISIBLE,
+      actionType: windowConstants.WINDOW_SET_SITE_INFO_VISIBLE,
       isVisible
     })
   },
@@ -850,7 +685,7 @@ const windowActions = {
    */
   setBraveryPanelDetail: function (braveryPanelDetail) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_BRAVERY_PANEL_DETAIL,
+      actionType: windowConstants.WINDOW_SET_BRAVERY_PANEL_DETAIL,
       braveryPanelDetail
     })
   },
@@ -862,7 +697,7 @@ const windowActions = {
    */
   setDownloadsToolbarVisible: function (isVisible) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE,
+      actionType: windowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE,
       isVisible
     })
   },
@@ -874,7 +709,7 @@ const windowActions = {
    */
   setReleaseNotesVisible: function (isVisible) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_RELEASE_NOTES_VISIBLE,
+      actionType: windowConstants.WINDOW_SET_RELEASE_NOTES_VISIBLE,
       isVisible
     })
   },
@@ -887,7 +722,7 @@ const windowActions = {
    */
   setLinkHoverPreview: function (href, showOnRight) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_LINK_HOVER_PREVIEW,
+      actionType: windowConstants.WINDOW_SET_LINK_HOVER_PREVIEW,
       href,
       showOnRight
     })
@@ -896,14 +731,14 @@ const windowActions = {
   /**
    * Dispatches a message to indicate the site info, such as # of blocked ads, should be shown
    *
-   * @param {object} frameProps - The frame to set blocked info on
+   * @param {object} tabId - Tab id for the frame to set blocked info on
    * @param {string} blockType - type of the block
    * @param {string} location - URL that was blocked
    */
-  setBlockedBy: function (frameProps, blockType, location) {
+  setBlockedBy: function (tabId, blockType, location) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_BLOCKED_BY,
-      frameProps,
+      actionType: windowConstants.WINDOW_SET_BLOCKED_BY,
+      tabId,
       blockType,
       location
     })
@@ -911,39 +746,26 @@ const windowActions = {
 
   /**
    * Similar to setBlockedBy but for httpse redirects
-   * @param {Object} frameProps - The frame to set blocked info on
+   * @param {Object} tabId - Tab id of the frame to set blocked info on
    * @param {string} ruleset - Name of the HTTPS Everywhere ruleset XML file
    * @param {string} location - URL that was redirected
    */
-  setRedirectedBy: function (frameProps, ruleset, location) {
+  setRedirectedBy: function (tabId, ruleset, location) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_REDIRECTED_BY,
-      frameProps,
+      actionType: windowConstants.WINDOW_SET_REDIRECTED_BY,
+      tabId,
       ruleset,
       location
     })
   },
 
   /**
-   * Sets which scripts were blocked on a page.
-   * @param {Object} frameProps - The frame to set blocked info on
-   * @param {string} source - Source of blocked js
-   */
-  setNoScript: function (frameProps, source) {
-    dispatch({
-      actionType: WindowConstants.WINDOW_SET_NOSCRIPT,
-      frameProps,
-      source
-    })
-  },
-
-  /**
-   * Sets whether the noscript icon is visible.
-   * @param {boolean} isVisible
+   * Sets/toggles whether the noscriptinfo dialog is visible.
+   * @param {boolean=} isVisible - if undefined, toggle the current state
    */
   setNoScriptVisible: function (isVisible) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_NOSCRIPT_VISIBLE,
+      actionType: windowConstants.WINDOW_SET_NOSCRIPT_VISIBLE,
       isVisible
     })
   },
@@ -954,18 +776,19 @@ const windowActions = {
    */
   addHistory: function (frameProps) {
     dispatch({
-      actionType: WindowConstants.WINDOW_ADD_HISTORY,
+      actionType: windowConstants.WINDOW_ADD_HISTORY,
       frameProps
     })
   },
 
   /**
-   * Sets the clear browsing data popup detail
+   * Sets whether the clear browsing data popup is visible
+   * @param {boolean} isVisible
    */
-  setClearBrowsingDataDetail: function (clearBrowsingDataDetail) {
+  setClearBrowsingDataPanelVisible: function (isVisible) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_DETAIL,
-      clearBrowsingDataDetail
+      actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE,
+      isVisible
     })
   },
 
@@ -975,7 +798,7 @@ const windowActions = {
    */
   setImportBrowserDataDetail: function (importBrowserDataDetail) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL,
+      actionType: windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_DETAIL,
       importBrowserDataDetail
     })
   },
@@ -986,34 +809,55 @@ const windowActions = {
    */
   setImportBrowserDataSelected: function (selected) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_SELECTED,
+      actionType: windowConstants.WINDOW_SET_IMPORT_BROWSER_DATA_SELECTED,
       selected
+    })
+  },
+
+  widevineSiteAccessedWithoutInstall: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_WIDEVINE_SITE_ACCESSED_WITHOUT_INSTALL
+    })
+  },
+
+  /**
+   * Widevine popup detail changed
+   * @param {Object} widevinePanelDetail - detail of the widevine panel
+   */
+  widevinePanelDetailChanged: function (widevinePanelDetail) {
+    dispatch({
+      actionType: windowConstants.WINDOW_WIDEVINE_PANEL_DETAIL_CHANGED,
+      widevinePanelDetail
     })
   },
 
   /**
    * Sets the manage autofill address popup detail
-   * @param {Object} currentDetail - Properties of the address to change to
-   * @param {Object} originalDetail - Properties of the address to edit
+   * @param {string} property - Property that we want change
+   * @param {string} newValue - New value for this property
+   * @param {Object} wholeObject - Whole object of address detail
    */
-  setAutofillAddressDetail: function (currentDetail, originalDetail) {
+  setAutofillAddressDetail: function (property, newValue, wholeObject) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
-      currentDetail,
-      originalDetail
+      actionType: windowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
+      property,
+      newValue,
+      wholeObject
     })
   },
 
   /**
    * Sets the manage autofill credit card popup detail
-   * @param {Object} currentDetail - Properties of the credit card to change to
-   * @param {Object} originalDetail - Properties of the credit card to edit
+   * @param {string} property - Property that we want change
+   * @param {string} newValue - New value for this property
+   * @param {Object} wholeObject -  Whole object of credit card detail
    */
-  setAutofillCreditCardDetail: function (currentDetail, originalDetail) {
+  setAutofillCreditCardDetail: function (property, newValue, wholeObject) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
-      currentDetail,
-      originalDetail
+      actionType: windowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
+      property,
+      newValue,
+      wholeObject
     })
   },
 
@@ -1025,7 +869,7 @@ const windowActions = {
    */
   setBlockedRunInsecureContent: function (frameProps, source) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_BLOCKED_RUN_INSECURE_CONTENT,
+      actionType: windowConstants.WINDOW_SET_BLOCKED_RUN_INSECURE_CONTENT,
       frameProps,
       source
     })
@@ -1038,7 +882,7 @@ const windowActions = {
    */
   toggleMenubarVisible: function (isVisible) {
     dispatch({
-      actionType: WindowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE,
+      actionType: windowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE,
       isVisible
     })
   },
@@ -1051,7 +895,7 @@ const windowActions = {
    */
   clickMenubarSubmenu: function (label) {
     dispatch({
-      actionType: WindowConstants.WINDOW_CLICK_MENUBAR_SUBMENU,
+      actionType: windowConstants.WINDOW_CLICK_MENUBAR_SUBMENU,
       label
     })
   },
@@ -1065,20 +909,33 @@ const windowActions = {
    */
   resetMenuState: function () {
     dispatch({
-      actionType: WindowConstants.WINDOW_RESET_MENU_STATE
+      actionType: windowConstants.WINDOW_RESET_MENU_STATE
     })
   },
 
   /**
    * (Windows only)
-   * Used to track selected index of a context menu
+   * Used to track selected index of a menu bar
    * Needed because arrow keys can be used to navigate the custom menu
    * @param {number} index - zero based index of the item.
    *   Index excludes menu separators and hidden items.
    */
-  setSubmenuSelectedIndex: function (index) {
+  setMenuBarSelectedIndex: function (index) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_SUBMENU_SELECTED_INDEX,
+      actionType: windowConstants.WINDOW_SET_MENUBAR_SELECTED_INDEX,
+      index
+    })
+  },
+
+  /**
+   * Used to track selected index of a context menu
+   * Needed because arrow keys can be used to navigate the context menu
+   * @param {number} index - zero based index of the item.
+   *   Index excludes menu separators and hidden items.
+   */
+  setContextMenuSelectedIndex: function (index) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_SELECTED_INDEX,
       index
     })
   },
@@ -1093,7 +950,7 @@ const windowActions = {
    */
   setLastFocusedSelector: function (selector) {
     dispatch({
-      actionType: WindowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR,
+      actionType: windowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR,
       selector
     })
   },
@@ -1106,9 +963,216 @@ const windowActions = {
    */
   gotResponseDetails: function (tabId, details) {
     dispatch({
-      actionType: WindowConstants.WINDOW_GOT_RESPONSE_DETAILS,
+      actionType: windowConstants.WINDOW_GOT_RESPONSE_DETAILS,
       tabId,
       details
+    })
+  },
+
+  /**
+   * Fired when the mouse clicks or hovers over a bookmark folder in the bookmarks toolbar
+   * @param {number} folderId - from the siteDetail for the bookmark folder
+   *   If set to null, no menu is open. If set to -1, mouse is over a bookmark, not a folder
+   */
+  setBookmarksToolbarSelectedFolderId: function (folderId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_BOOKMARKS_TOOLBAR_SELECTED_FOLDER_ID,
+      folderId
+    })
+  },
+
+  /**
+   * Set Modal Dialog detail
+   * @param {string} className - name of modal dialog
+   * @param {Object} props - properties of the modal dialog
+   */
+  setModalDialogDetail: function (className, props) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_MODAL_DIALOG_DETAIL,
+      className,
+      props
+    })
+  },
+
+  autofillSelectionClicked: function (tabId, value, frontEndId, index) {
+    dispatch({
+      actionType: windowConstants.WINDOW_AUTOFILL_SELECTION_CLICKED,
+      tabId,
+      value,
+      frontEndId,
+      index
+    })
+  },
+
+  autofillPopupHidden: function (tabId, notify = false) {
+    dispatch({
+      actionType: windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN,
+      tabId,
+      notify
+    })
+  },
+
+  onTabClosedWithMouse: function (data) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_CLOSED_WITH_MOUSE,
+      data
+    })
+  },
+
+  onTabMouseMove: function (data) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_MOUSE_MOVE,
+      data
+    })
+  },
+
+  onTabMouseLeave: function (data) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_MOUSE_LEAVE,
+      data
+    })
+  },
+
+  onFrameMouseEnter: function (tabId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_FRAME_MOUSE_ENTER,
+      tabId
+    })
+  },
+
+  onFrameMouseLeave: function (tabId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_FRAME_MOUSE_LEAVE,
+      tabId
+    })
+  },
+
+  // TODO(bridiver) - refactor these as declarative
+  shouldSetTitle: function (windowId, title) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOULD_SET_TITLE,
+      windowId,
+      title
+    })
+  },
+
+  shouldMinimize: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOULD_MINIMIZE,
+      windowId
+    })
+  },
+
+  shouldMaximize: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOULD_MAXIMIZE,
+      windowId
+    })
+  },
+
+  shouldUnmaximize: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOULD_UNMAXIMIZE,
+      windowId
+    })
+  },
+
+  shouldExitFullScreen: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOULD_EXIT_FULL_SCREEN,
+      windowId
+    })
+  },
+
+  shouldOpenDevTools: function (windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOULD_OPEN_DEV_TOOLS,
+      windowId
+    })
+  },
+
+  onLongBackHistory: function (history, left, top, partition, tabId, windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_GO_BACK_LONG,
+      queryInfo: {
+        windowId
+      },
+      history,
+      left,
+      top,
+      partition,
+      tabId
+    })
+  },
+
+  onLongForwardHistory: function (history, left, top, partition, tabId, windowId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_GO_FORWARD_LONG,
+      queryInfo: {
+        windowId
+      },
+      history,
+      left,
+      top,
+      partition,
+      tabId
+    })
+  },
+
+  onCertError: function (tabId, url, error) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_CERT_ERROR,
+      tabId,
+      url,
+      error
+    })
+  },
+
+  onTabPageContextMenu: function (index) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_TAB_PAGE_CONTEXT_MENU,
+      index
+    })
+  },
+
+  onFrameBookmark: function (tabId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_FRAME_BOOKMARK,
+      tabId
+    })
+  },
+
+  onStop: function (isFocused, shouldRender) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_STOP,
+      isFocused,
+      shouldRender
+    })
+  },
+
+  onMoreBookmarksMenu: function (bookmarks, top) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_MORE_BOOKMARKS_MENU,
+      bookmarks,
+      top
+    })
+  },
+
+  onShowBookmarkFolderMenu: function (bookmarkKey, left, top, submenuIndex) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_SHOW_BOOKMARK_FOLDER_MENU,
+      bookmarkKey,
+      left,
+      top,
+      submenuIndex
+    })
+  },
+
+  onSiteDetailMenu: function (bookmarkKey, type) {
+    dispatch({
+      actionType: windowConstants.WINDOW_ON_SITE_DETAIL_MENU,
+      bookmarkKey,
+      type
     })
   }
 }

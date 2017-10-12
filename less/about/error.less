@@ -1,5 +1,10 @@
 @import "./common.less";
 
+// See siteDetails.less
+body {
+  background: @veryLightGray;
+}
+
 #appContainer {
   &.errorPageContainer {
     overflow: auto;
@@ -7,17 +12,25 @@
 
     .errorContent {
       display: flex;
-      width: 40vw;
+      width: 60vw;
       max-width: 600px;
       margin: 20vh auto;
       line-height: 1.6em;
       flex-direction: column;
-      background-color: #FFF;
       padding: 40px;
       height: auto;
 
       .certErrorText, .errorTitle {
         padding-bottom: 1rem;
+      }
+
+      .buttons {
+        display: flex;
+        flex-flow: row wrap;
+
+        > .browserButton {
+          font-size: 14px;
+        }
       }
 
       .errorLogo {
@@ -56,8 +69,9 @@
     &.safeBrowsing {
       background-color: red;
 
-     .safebrowsingErrorText {
-        padding-bottom: 2rem;
+      .errorContent {
+        // See the body property above
+        background: @veryLightGray;
       }
     }
   }

@@ -4,10 +4,10 @@
 
 'use strict'
 
-const messages = require('../constants/messages.js')
-
-const getWebview = () =>
-  document.querySelector('.frameWrapper.isActive webview')
+const getWebview = (key) =>
+  key
+  ? document.querySelector(`webview[data-frame-key="${key}"]`)
+  : document.querySelector('.frameWrapper.isActive webview')
 
 const webviewActions = {
   /**
@@ -21,25 +21,12 @@ const webviewActions = {
   },
 
   /**
-   * Inspect the element for the active webview at the x, y content position
-   * @param {number} x - horizontal position of the element to inspect
-   * @param {number} y - vertical position of the element to inspect
+   * Shows the certificate infomation
    */
-  inspectElement: function (x, y) {
+  showCertificate: function () {
     const webview = getWebview()
     if (webview) {
-      webview.inspectElement(x, y)
-    }
-  },
-
-  /**
-   * Replaces the selected text in an editable
-   * @param {string} text - The text to replace with
-   */
-  replace: function (text) {
-    const webview = getWebview()
-    if (webview) {
-      webview.replaceMisspelling(text)
+      webview.showCertificate()
     }
   },
 
@@ -50,36 +37,6 @@ const webviewActions = {
     const webview = getWebview()
     if (webview) {
       webview.showDefinitionForSelection()
-    }
-  },
-
-  /**
-   * Check two-finger gesture swipe back/forward ability
-   * @param {bool} back - true for back, false for forward
-   */
-  checkSwipe: function (back) {
-    const webview = getWebview()
-    if (webview) {
-      if (back) {
-        webview.send(messages.CHECK_SWIPE_BACK)
-      } else {
-        webview.send(messages.CHECK_SWIPE_FORWARD)
-      }
-    }
-  },
-
-  /**
-   * Set/unset webkit fullscreen status
-   * @param {Boolean} isFullScreen - fullscreen state to go to
-   */
-  setFullScreen: function (isFullScreen) {
-    const webview = getWebview()
-    if (webview) {
-      if (!isFullScreen) {
-        webview.executeJavaScript('document.webkitExitFullscreen()')
-      } else {
-        webview.executeJavaScript('document.webkitRequestFullscreen()')
-      }
     }
   },
 

@@ -1,0 +1,14 @@
+<body>
+<div id='results'></div>
+<script>
+let results = document.getElementById('results')
+navigator.mediaDevices.enumerateDevices()
+.then(function(devices) {
+  devices.forEach(function(device) {
+    let li = document.createElement('li')
+    li.textContent = [device.label, device.deviceId].join(': ')
+    results.appendChild(li)
+  });
+})
+</script>
+</body>

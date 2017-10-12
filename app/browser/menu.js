@@ -6,30 +6,43 @@
 
 const Immutable = require('immutable')
 const electron = require('electron')
-const appConfig = require('../../js/constants/appConfig')
-const appActions = require('../../js/actions/appActions')
-const appConstants = require('../../js/constants/appConstants')
-const appDispatcher = require('../../js/dispatcher/appDispatcher')
-const appStore = require('../../js/stores/appStore')
-const windowConstants = require('../../js/constants/windowConstants')
 const Menu = electron.Menu
-const CommonMenu = require('../common/commonMenu')
+const dialog = electron.dialog
+const app = electron.app
+const BrowserWindow = electron.BrowserWindow
+
+// Constants
+const appConfig = require('../../js/constants/appConfig')
+const appConstants = require('../../js/constants/appConstants')
+const windowConstants = require('../../js/constants/windowConstants')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
-const siteTags = require('../../js/constants/siteTags')
-const dialog = electron.dialog
-const BrowserWindow = electron.BrowserWindow
-const { fileUrl } = require('../../js/lib/appUrlUtil')
-const menuUtil = require('./lib/menuUtil')
-const getSetting = require('../../js/settings').getSetting
+
+// State
+const {getByTabId} = require('../common/state/tabState')
+const tabState = require('../../app/common/state/tabState')
+const appStore = require('../../js/stores/appStore')
+
+// Actions
+const appActions = require('../../js/actions/appActions')
+
+// Util
+const CommonMenu = require('../common/commonMenu')
+const {makeImmutable} = require('../common/state/immutableUtil')
+const {fileUrl} = require('../../js/lib/appUrlUtil')
+const frameStateUtil = require('../../js/state/frameStateUtil')
+const menuUtil = require('../common/lib/menuUtil')
+const {getSetting} = require('../../js/settings')
 const locale = require('../locale')
-const {isSiteBookmarked} = require('../../js/state/siteUtil')
-const isDarwin = process.platform === 'darwin'
-const aboutUrl = 'https://brave.com/'
+const platformUtil = require('../common/lib/platformUtil')
+const bookmarkUtil = require('../common/lib/bookmarkUtil')
+const isDarwin = platformUtil.isDarwin()
+const isLinux = platformUtil.isLinux()
+const isWindows = platformUtil.isWindows()
 
 let appMenu = null
-// TODO(bridiver) - these should be handled in the appStore
-let closedFrames = {}
+let closedFrames = new Immutable.OrderedMap()
+let lastClosedUrl = null
 let currentLocation = null
 
 // Submenu initialization
@@ -49,7 +62,10 @@ const createFileSubmenu = () => {
         }, (paths) => {
           if (paths) {
             paths.forEach((path) => {
-              CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_NEW_FRAME, fileUrl(path)])
+              appActions.createTabRequested({
+                url: fileUrl(path),
+                windowId: focusedWindow.id
+              })
             })
           }
         })
@@ -63,16 +79,14 @@ const createFileSubmenu = () => {
     },
     CommonMenu.separatorMenuItem,
     {
-      // this should be disabled when
-      // no windows are active
+      // This should be disabled when no windows are active.
       label: locale.translation('closeTab'),
       accelerator: 'CmdOrCtrl+W',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_CLOSE_FRAME])
+      click: function () {
+        appActions.tabCloseRequested(tabState.TAB_ID_ACTIVE)
       }
     }, {
-      // this should be disabled when
-      // no windows are active
+      // This should be disabled when no windows are active.
       label: locale.translation('closeWindow'),
       accelerator: 'CmdOrCtrl+Shift+W',
       click: function (item, focusedWindow) {
@@ -90,17 +104,19 @@ const createFileSubmenu = () => {
       }
     }, {
       label: locale.translation('share'),
-      visible: false
-      /*
       submenu: [
-        {label: 'Email Page Link...'},
+        CommonMenu.simpleShareActiveTabMenuItem('emailPageLink', 'email'),
         CommonMenu.separatorMenuItem,
-        {label: 'Tweet Page...'},
-        {label: 'Share on Facebook...'},
-        {label: 'More...'}
+        CommonMenu.simpleShareActiveTabMenuItem('tweetPageLink', 'twitter'),
+        CommonMenu.simpleShareActiveTabMenuItem('facebookPageLink', 'facebook'),
+        CommonMenu.simpleShareActiveTabMenuItem('pinterestPageLink', 'pinterest'),
+        CommonMenu.simpleShareActiveTabMenuItem('googlePlusPageLink', 'googlePlus'),
+        CommonMenu.simpleShareActiveTabMenuItem('linkedInPageLink', 'linkedIn'),
+        CommonMenu.simpleShareActiveTabMenuItem('bufferPageLink', 'buffer'),
+        CommonMenu.simpleShareActiveTabMenuItem('redditPageLink', 'reddit')
       ]
-      */
     },
+    // Move inside share menu when it's enabled
     CommonMenu.separatorMenuItem,
     CommonMenu.printMenuItem()
   ]
@@ -219,19 +235,9 @@ const createViewSubmenu = () => {
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_STOP])
       }
-    }, {
-      label: locale.translation('reloadPage'),
-      accelerator: 'CmdOrCtrl+R',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_RELOAD])
-      }
-    }, {
-      label: locale.translation('cleanReload'),
-      accelerator: 'CmdOrCtrl+Shift+R',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD])
-      }
     },
+    CommonMenu.reloadPageMenuItem(),
+    CommonMenu.cleanReloadMenuItem(),
     CommonMenu.separatorMenuItem,
     /*
     {
@@ -261,8 +267,14 @@ const createViewSubmenu = () => {
     {
       label: locale.translation('toggleDeveloperTools'),
       accelerator: isDarwin ? 'Cmd+Alt+I' : 'Ctrl+Shift+I',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS])
+      click: function () {
+        const win = BrowserWindow.getActiveWindow()
+        const activeTab = tabState.getActiveTab(appStore.getState(), win.id)
+        if (activeTab) {
+          appActions.toggleDevTools(activeTab.get('tabId'))
+        } else {
+          console.warn('Unable to open developer tools; activeTab is null or undefined')
+        }
       }
     },
     CommonMenu.separatorMenuItem,
@@ -286,8 +298,14 @@ const createHistorySubmenu = () => {
       accelerator: 'CmdOrCtrl+Shift+H',
       click: function (item, focusedWindow) {
         getSetting(settings.HOMEPAGE).split('|').forEach((homepage, i) => {
-          CommonMenu.sendToFocusedWindow(focusedWindow,
-              [i === 0 ? messages.SHORTCUT_ACTIVE_FRAME_LOAD_URL : messages.SHORTCUT_NEW_FRAME, homepage])
+          if (i === 0) {
+            appActions.loadURLInActiveTabRequested(focusedWindow.id, homepage)
+          } else {
+            appActions.createTabRequested({
+              url: homepage,
+              windowId: focusedWindow.id
+            })
+          }
         })
       }
     }, {
@@ -322,51 +340,57 @@ const createHistorySubmenu = () => {
     CommonMenu.separatorMenuItem,
     */
     {
-      label: locale.translation('clearHistory'),
+      label: locale.translation('clearBrowsingData'),
       accelerator: 'Shift+CmdOrCtrl+Delete',
       click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, {browserHistory: true}])
-      }
-    }, {
-      label: locale.translation('clearCache'),
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, {cachedImagesAndFiles: true}])
-      }
-    }, {
-      label: locale.translation('clearSiteData'),
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, {allSiteCookies: true, cachedImagesAndFiles: true}])
+        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL])
       }
     }
   ]
-  submenu = submenu.concat(menuUtil.createRecentlyClosedMenuItems(Immutable.fromJS(Object.keys(closedFrames).map(key => closedFrames[key]))))
+  const recentlyClosedItems = menuUtil.createRecentlyClosedTemplateItems(closedFrames)
+  submenu = submenu.concat(recentlyClosedItems)
 
   submenu.push(
-    // TODO: recently visited
-    // CommonMenu.separatorMenuItem,
-    // {
-    //   label: locale.translation('recentlyVisited'),
-    //   enabled: false
-    // },
     CommonMenu.separatorMenuItem,
-    CommonMenu.historyMenuItem())
+    CommonMenu.historyMenuItem()
+  )
 
   return submenu
 }
 
-const isCurrentLocationBookmarked = () => {
-  return isSiteBookmarked(appStore.getState().get('sites'), Immutable.fromJS({location: currentLocation}))
+const updateRecentlyClosedMenuItems = (state) => {
+  // Update electron menu (Mac / Linux)
+  menuUtil.updateRecentlyClosedMenuItems(appMenu, closedFrames)
+  Menu.setApplicationMenu(appMenu)
+
+  // Update in-memory menu template (Windows)
+  if (isWindows) {
+    const oldTemplate = state.getIn(['menu', 'template'])
+    if (oldTemplate) {
+      const historyMenuKey = oldTemplate.findKey(value =>
+        value.get('label') === locale.translation('history')
+      )
+      const newSubmenuTemplate = createHistorySubmenu()
+      const newSubmenu = JSON.parse(JSON.stringify(newSubmenuTemplate))
+      const newTemplate = oldTemplate.setIn([historyMenuKey, 'submenu'], newSubmenu)
+      appActions.setMenubarTemplate(newTemplate)
+    }
+  }
 }
 
-const createBookmarksSubmenu = () => {
+const isCurrentLocationBookmarked = (state) => {
+  return bookmarkUtil.isLocationBookmarked(state, currentLocation)
+}
+
+const createBookmarksSubmenu = (state) => {
   let submenu = [
     {
       label: locale.translation('bookmarkPage'),
       type: 'checkbox',
       accelerator: 'CmdOrCtrl+D',
-      checked: isCurrentLocationBookmarked(),
+      checked: isCurrentLocationBookmarked(state),
       click: function (item, focusedWindow) {
-        var msg = item.checked
+        const msg = item.checked
           ? messages.SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK
           : messages.SHORTCUT_ACTIVE_FRAME_BOOKMARK
         CommonMenu.sendToFocusedWindow(focusedWindow, [msg])
@@ -381,10 +405,11 @@ const createBookmarksSubmenu = () => {
     CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
-    CommonMenu.importBrowserDataMenuItem()
+    CommonMenu.importBrowserDataMenuItem(),
+    CommonMenu.exportBookmarksMenuItem()
   ]
 
-  const bookmarks = menuUtil.createBookmarkMenuItems(appStore.getState().get('sites'))
+  const bookmarks = menuUtil.createBookmarkTemplateItems(state)
   if (bookmarks.length > 0) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu = submenu.concat(bookmarks)
@@ -427,6 +452,7 @@ const createWindowSubmenu = () => {
     CommonMenu.separatorMenuItem,
     CommonMenu.bookmarksManagerMenuItem(),
     CommonMenu.downloadsMenuItem(),
+    CommonMenu.extensionsMenuItem(),
     CommonMenu.passwordsMenuItem()
   ]
 
@@ -445,21 +471,14 @@ const createWindowSubmenu = () => {
 
 const createHelpSubmenu = () => {
   const submenu = [
-    CommonMenu.reportAnIssueMenuItem(),
-    CommonMenu.separatorMenuItem,
-    CommonMenu.submitFeedbackMenuItem(),
-    {
-      label: locale.translation('spreadTheWord'),
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow,
-                            [messages.SHORTCUT_NEW_FRAME, aboutUrl])
-      }
-    }
+    CommonMenu.submitFeedbackMenuItem()
   ]
 
-  if (!isDarwin) {
+  if (!isDarwin && !isLinux) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu.push(CommonMenu.checkForUpdateMenuItem())
+  }
+  if (!isDarwin) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu.push(CommonMenu.aboutBraveMenuItem())
   }
@@ -474,9 +493,9 @@ const createDebugSubmenu = () => {
       // The console will print a message like: [84790:0710/201431:ERROR:child_process.cc(136)] Renderer (84790) paused waiting for debugger to attach. Send SIGUSR1 to unpause.
       // And this means you should attach Xcode or whatever your debugger is to PID 84790 to unpause.
       // To debug all renderer processes then add the appendSwitch call to app/index.js
-      label: 'append wait renderer switch',
+      label: 'Append wait renderer switch',
       click: function () {
-        electron.app.commandLine.appendSwitch('renderer-startup-dialog')
+        app.commandLine.appendSwitch('renderer-startup-dialog')
       }
     }, {
       label: 'Crash main process',
@@ -484,11 +503,16 @@ const createDebugSubmenu = () => {
         process.crash()
       }
     }, {
+      label: 'Send memory pressure alert',
+      click: function () {
+        app.sendMemoryPressureAlert()
+      }
+    }, {
       label: 'Relaunch',
       accelerator: 'Command+Alt+R',
       click: function () {
-        electron.app.relaunch({args: process.argv.slice(1) + ['--relaunch']})
-        electron.app.quit()
+        app.relaunch({args: process.argv.slice(1) + ['--relaunch']})
+        app.quit()
       }
     }, {
       label: locale.translation('toggleBrowserConsole'),
@@ -499,11 +523,26 @@ const createDebugSubmenu = () => {
         }
       }
     }, {
-      label: 'Toggle React Profiling',
+      label: 'Toggle React profiling',
       accelerator: 'Alt+P',
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.DEBUG_REACT_PROFILE])
       }
+    }, {
+      label: 'Stop reporting window state',
+      click: function () {
+        const win = BrowserWindow.getActiveWindow()
+        appActions.noReportStateModeClicked(win.id)
+      }
+    }
+  ]
+}
+
+const createDockSubmenu = () => {
+  return [
+    {
+      label: locale.translation('newWindow'),
+      click: () => appActions.newWindow()
     }
   ]
 }
@@ -512,18 +551,18 @@ const createDebugSubmenu = () => {
  * Will only build the initial menu, which is mostly static items
  * Dynamic items (Bookmarks, History) get updated w/ updateMenu
  */
-const createMenu = () => {
+const createMenu = (state) => {
   const template = [
     { label: locale.translation('file'), submenu: createFileSubmenu() },
     { label: locale.translation('edit'), submenu: createEditSubmenu() },
     { label: locale.translation('view'), submenu: createViewSubmenu() },
     { label: locale.translation('history'), submenu: createHistorySubmenu() },
-    { label: locale.translation('bookmarks'), submenu: createBookmarksSubmenu() },
+    { label: locale.translation('bookmarks'), submenu: createBookmarksSubmenu(state) },
     {
       label: locale.translation('bravery'),
       submenu: [
-        CommonMenu.braveryGlobalMenuItem(),
         CommonMenu.braverySiteMenuItem(),
+        CommonMenu.separatorMenuItem,
         CommonMenu.braveryPaymentsMenuItem()
       ]
     },
@@ -531,7 +570,7 @@ const createMenu = () => {
     { label: locale.translation('help'), submenu: createHelpSubmenu(), role: 'help' }
   ]
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' || process.env.BRAVE_ENABLE_DEBUG_MENU !== undefined) {
     template.push({ label: 'Debug', submenu: createDebugSubmenu() })
   }
 
@@ -541,18 +580,11 @@ const createMenu = () => {
       submenu: [
         CommonMenu.aboutBraveMenuItem(),
         CommonMenu.separatorMenuItem,
-        CommonMenu.checkForUpdateMenuItem(),
-        CommonMenu.separatorMenuItem,
-        CommonMenu.importBrowserDataMenuItem(),
-        CommonMenu.separatorMenuItem,
         CommonMenu.preferencesMenuItem(),
         CommonMenu.separatorMenuItem,
-        {
-          label: locale.translation('sendUsFeedback'),
-          click: function () {
-            electron.shell.openExternal(appConfig.contactUrl)
-          }
-        },
+        CommonMenu.importBrowserDataMenuItem(),
+        CommonMenu.checkForUpdateMenuItem(),
+        CommonMenu.submitFeedbackMenuItem(),
         CommonMenu.separatorMenuItem,
         {
           label: locale.translation('services'),
@@ -577,7 +609,10 @@ const createMenu = () => {
     })
   }
 
-  appActions.setMenubarTemplate(Immutable.fromJS(template))
+  if (isWindows) {
+    const menuTemplate = JSON.parse(JSON.stringify(template))
+    appActions.setMenubarTemplate(Immutable.fromJS(menuTemplate))
+  }
 
   let oldMenu = appMenu
   appMenu = Menu.buildFromTemplate(template)
@@ -585,75 +620,127 @@ const createMenu = () => {
   if (oldMenu) {
     oldMenu.destroy()
   }
+
+  if (app.dock) {
+    const dockMenu = Menu.buildFromTemplate(createDockSubmenu())
+    app.dock.setMenu(dockMenu)
+  }
 }
 
-const doAction = (action) => {
+const setMenuItemChecked = (state, label, checked) => {
+  // Update electron menu (Mac / Linux)
+  const systemMenuItem = menuUtil.getMenuItem(appMenu, label)
+  systemMenuItem.checked = checked
+
+  // Update in-memory menu template (Windows)
+  if (isWindows) {
+    const oldTemplate = state.getIn(['menu', 'template'])
+    const newTemplate = menuUtil.setTemplateItemChecked(oldTemplate, label, checked)
+    if (newTemplate) {
+      appActions.setMenubarTemplate(newTemplate)
+    }
+  }
+}
+
+const doAction = (state, action) => {
   switch (action.actionType) {
+    case appConstants.APP_SET_STATE:
+      createMenu(state)
+      break
     case windowConstants.WINDOW_SET_FOCUSED_FRAME:
-      // TODO check/uncheck menu item instead of recreating menu
-      currentLocation = action.frameProps.get('location')
-      let menuItem = menuUtil.getMenuItem(appMenu, locale.translation('bookmarkPage'))
-      menuItem.checked = isCurrentLocationBookmarked()
+      {
+        // Update the checkbox next to "Bookmark Page" (Bookmarks menu)
+        const frame = frameStateUtil.getFrameByTabId(state, action.tabId)
+        if (frame) {
+          currentLocation = frame.location
+          setMenuItemChecked(state, locale.translation('bookmarkPage'), isCurrentLocationBookmarked(state))
+        }
+        break
+      }
+    case appConstants.APP_CHANGE_SETTING:
+      if (action.key === settings.SHOW_BOOKMARKS_TOOLBAR) {
+        // Update the checkbox next to "Bookmarks Toolbar" (Bookmarks menu)
+        setMenuItemChecked(state, locale.translation('bookmarksToolbar'), action.value)
+      }
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
-      appDispatcher.waitFor([appStore.dispatchToken], () => {
-        delete closedFrames[action.frameProps.get('location')]
-        createMenu()
-      })
-      break
-    case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
-      appDispatcher.waitFor([appStore.dispatchToken], () => {
-        closedFrames = {}
-        createMenu()
-      })
-      break
-    case windowConstants.WINDOW_CLOSE_FRAME:
-      appDispatcher.waitFor([appStore.dispatchToken], () => {
-        if (!action.frameProps.get('isPrivate') && action.frameProps.get('location') !== 'about:newtab') {
-          closedFrames[action.frameProps.get('location')] = action.frameProps
-          createMenu()
+      {
+        if (!lastClosedUrl) {
+          break
         }
-      })
-      break
-    case appConstants.APP_ADD_SITE:
-      if (action.tag === siteTags.BOOKMARK) {
-        appDispatcher.waitFor([appStore.dispatchToken], () => {
-          createMenu()
-        })
+        closedFrames = closedFrames.delete(lastClosedUrl)
+        const nextLastFrame = closedFrames.last()
+        lastClosedUrl = nextLastFrame ? nextLastFrame.get('location') : null
+        updateRecentlyClosedMenuItems(state)
+        break
       }
-      break
-    case appConstants.APP_REMOVE_SITE:
-      if (action.tag === siteTags.BOOKMARK) {
-        appDispatcher.waitFor([appStore.dispatchToken], () => {
-          createMenu()
-        })
+    case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
+      {
+        if (!action.location) {
+          closedFrames = new Immutable.OrderedMap()
+          lastClosedUrl = null
+        } else {
+          closedFrames = closedFrames.delete(action.location)
+          if (lastClosedUrl === action.location) {
+            lastClosedUrl = null
+          }
+        }
+        updateRecentlyClosedMenuItems(state)
+        break
       }
-      break
-    case appConstants.APP_CLEAR_HISTORY:
-      if (action.tag === siteTags.BOOKMARK) {
-        appDispatcher.waitFor([appStore.dispatchToken], () => {
-          createMenu()
-        })
+    case appConstants.APP_TAB_CLOSE_REQUESTED:
+      {
+        action = makeImmutable(action)
+        const tabId = action.get('tabId')
+        if (tabId) {
+          const tab = getByTabId(state, tabId)
+          const frame = tab && tab.get('frame')
+          if (tab && !tab.get('incognito') && frame && frameStateUtil.isValidClosedFrame(frame)) {
+            lastClosedUrl = tab.get('url')
+            closedFrames = closedFrames.set(tab.get('url'), tab.get('frame'))
+            updateRecentlyClosedMenuItems(state)
+          }
+        }
+        break
       }
+    case appConstants.APP_ADD_BOOKMARK:
+    case appConstants.APP_EDIT_BOOKMARK:
+    case appConstants.APP_MOVE_BOOKMARK:
+    case appConstants.APP_REMOVE_BOOKMARK:
+    case appConstants.APP_ADD_BOOKMARK_FOLDER:
+    case appConstants.APP_MOVE_BOOKMARK_FOLDER:
+    case appConstants.APP_EDIT_BOOKMARK_FOLDER:
+    case appConstants.APP_REMOVE_BOOKMARK_FOLDER:
+      createMenu(state)
       break
+    case appConstants.APP_ON_CLEAR_BROWSING_DATA:
+      {
+        const defaults = state.get('clearBrowsingDataDefaults')
+        const temp = state.get('tempClearBrowsingData', Immutable.Map())
+        const clearData = defaults ? defaults.merge(temp) : temp
+        if (clearData.get('browserHistory')) {
+          createMenu(state)
+        }
+        break
+      }
     case windowConstants.WINDOW_CLICK_MENUBAR_SUBMENU:
-      appDispatcher.waitFor([appStore.dispatchToken], () => {
+      {
         const clickedMenuItem = menuUtil.getMenuItem(appMenu, action.label)
         if (clickedMenuItem) {
           const focusedWindow = BrowserWindow.getFocusedWindow()
           clickedMenuItem.click(clickedMenuItem, focusedWindow, focusedWindow.webContents)
         }
-      })
-      break
+        break
+      }
     default:
   }
+
+  return state
 }
 
 /**
  * Sets up the menu.
  * @param {Object} appState - Application state. Used to fetch bookmarks and settings (like homepage)
  */
-module.exports.init = (appState) => {
-  createMenu()
-  appDispatcher.register(doAction)
-}
+
+module.exports = doAction

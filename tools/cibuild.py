@@ -4,9 +4,8 @@ import os
 import subprocess
 import sys
 import os.path
-
-BRAVE_ELECTRON = '1.4.4'
-UPSTREAM_ELECTRON = '1.4.0'
+MUON_VERSION = '4.4.28'
+CHROMEDRIVER_VERSION = '2.30'
 SOURCE_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 TARGET_ARCH= os.environ['TARGET_ARCH'] if os.environ.has_key('TARGET_ARCH') else 'x64'
 os.environ['npm_config_arch'] = TARGET_ARCH
@@ -21,13 +20,14 @@ def execute(argv, env=os.environ):
     print e.output
     raise e
 
-
 def write_npmrc():
   data = 'runtime = electron\n' \
-  'target = %s\n' \
   'target_arch = %s\n' \
   'brave_electron_version = %s\n' \
-  'disturl = https://atom.io/download/atom-shell\n' % (UPSTREAM_ELECTRON, TARGET_ARCH, BRAVE_ELECTRON)
+  'chromedriver_version = %s\n' \
+  'target = v%s\n' \
+  'disturl=https://brave-laptop-binaries.s3.amazonaws.com/atom-shell/dist/\n' \
+  'build_from_source = true\n' % (TARGET_ARCH, MUON_VERSION, CHROMEDRIVER_VERSION, MUON_VERSION)
   f = open('.npmrc','wb')
   f.write(data)
   f.close()
@@ -73,10 +73,10 @@ write_npmrc()
 npm = 'npm.cmd' if is_windows else 'npm'
 execute([npm, 'install'])
 
-if is_darwin:
-  execute(['node', './tools/electronBuilderHack.js'])
+execute(['node', './tools/electronBuilderHack.js'])
+
 # For whatever reason on linux pstinstall webpack isn't running
-elif is_linux:
+if is_linux:
   execute([npm, 'run', 'webpack'])
 
 execute([npm, 'run', 'build-package'])

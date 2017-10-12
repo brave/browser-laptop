@@ -6,10 +6,14 @@
 
 // characters, then : with optional //
 const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)(?!\d)/i
-const defaultScheme = 'http://'
+const httpScheme = 'http://'
+const httpsScheme = 'https://'
 const fileScheme = 'file://'
+const defaultScheme = httpScheme
 const os = require('os')
-const urlParse = require('url').parse
+const punycode = require('punycode')
+const urlParse = require('../../app/common/urlParse')
+const urlFormat = require('url').format
 const pdfjsExtensionId = require('../constants/config').PDFJSExtensionId
 
 /**
@@ -38,7 +42,7 @@ const UrlUtil = {
    * @returns {Boolean} Whether or not the input has a scheme.
    */
   hasScheme: function (input) {
-    return !!this.getScheme(input)
+    return !!UrlUtil.getScheme(input)
   },
 
   /**
@@ -62,7 +66,7 @@ const UrlUtil = {
     }
 
     // If there's no scheme, prepend the default scheme
-    if (!this.hasScheme(input)) {
+    if (!UrlUtil.hasScheme(input)) {
       input = defaultScheme + input
     }
 
@@ -85,10 +89,6 @@ const UrlUtil = {
     return (url.match(/\.(jpeg|jpg|gif|png|bmp)$/))
   },
 
-  isHttpAddress (url) {
-    return (url.match(/^https?:\/\/(.*)/))
-  },
-
   /**
    * Checks if a string is not a URL.
    * @param {String} input The input value.
@@ -98,43 +98,44 @@ const UrlUtil = {
     if (input === undefined || input === null) {
       return true
     }
-
+    if (typeof input !== 'string') {
+      return true
+    }
     // for cases where we have scheme and we dont want spaces in domain names
-    const caseDomain = /^[\w]{2,5}:\/\/[^\s\/]+\//
+    const caseDomain = /^[\w]{2,5}:\/\/[^\s/]+\//
     // for cases, quoted strings
     const case1Reg = /^".*"$/
-    // for cases, ?abc and "a? b" which should searching query
-    const case2Reg = /^(\?)|(\?.+\s)/
+    // for cases:
+    // - starts with "?" or "."
+    // - contains "? "
+    // - ends with "." (and was not preceded by a domain or /)
+    const case2Reg = /(^\?)|(\?.+\s)|(^\.)|(^[^.+]*[^/]*\.$)/
     // for cases, pure string
-    const case3Reg = /[\?\.\/\s:]/
+    const case3Reg = /[?./\s:]/
     // for cases, data:uri, view-source:uri and about
-    const case4Reg = /^data|view-source|about|chrome-extension:.*/
+    const case4Reg = /^(data|view-source|mailto|about|chrome-extension|chrome-devtools|magnet|chrome):.*/
 
     let str = input.trim()
-    let scheme = this.getScheme(str)
+    const scheme = UrlUtil.getScheme(str)
 
     if (str.toLowerCase() === 'localhost') {
       return false
     }
-
     if (case1Reg.test(str)) {
       return true
     }
-
     if (case2Reg.test(str) || !case3Reg.test(str) ||
         (scheme === undefined && /\s/g.test(str))) {
       return true
     }
     if (case4Reg.test(str)) {
-      return !this.canParseURL(str)
+      return !UrlUtil.canParseURL(str)
     }
-
-    if (scheme && (scheme !== 'file://')) {
+    if (scheme && (scheme !== fileScheme)) {
       return !caseDomain.test(str + '/')
     }
-
-    str = this.prependScheme(str)
-    return !this.canParseURL(str)
+    str = UrlUtil.prependScheme(str)
+    return !UrlUtil.canParseURL(str)
   },
 
   /**
@@ -149,13 +150,17 @@ const UrlUtil = {
 
     input = input.trim()
 
-    input = this.prependScheme(input)
+    input = UrlUtil.prependScheme(input)
 
-    if (this.isNotURL(input)) {
+    if (UrlUtil.isNotURL(input)) {
       return input
     }
 
-    return new window.URL(input).href
+    try {
+      return new window.URL(input).href
+    } catch (e) {
+      return input
+    }
   },
 
   /**
@@ -164,7 +169,8 @@ const UrlUtil = {
    * @returns {Boolean} Whether or not this is a valid URL.
    */
   isURL: function (input) {
-    return !this.isNotURL(input)
+    input = input.trim()
+    return !UrlUtil.isNotURL(input)
   },
 
   /**
@@ -196,7 +202,18 @@ const UrlUtil = {
    * @returns {Boolean} Whether or not this is a data url.
    */
   isDataUrl: function (url) {
-    return url.toLowerCase().startsWith('data:')
+    return typeof url === 'string' && url.toLowerCase().startsWith('data:')
+  },
+
+  /**
+   * Checks if a url is a phishable url.
+   * @param {String} input The input url.
+   * @returns {Boolean}
+   */
+  isPotentialPhishingUrl: function (url) {
+    if (typeof url !== 'string') { return false }
+    const protocol = urlParse(url.trim().toLowerCase()).protocol
+    return ['data:', 'blob:'].includes(protocol)
   },
 
   /**
@@ -214,10 +231,10 @@ const UrlUtil = {
    * @returns {String} A normal url.
    */
   getUrlFromViewSourceUrl: function (input) {
-    if (!this.isViewSourceUrl(input)) {
+    if (!UrlUtil.isViewSourceUrl(input)) {
       return input
     }
-    return this.getUrlFromInput(input.substring('view-source:'.length))
+    return UrlUtil.getUrlFromInput(input.substring('view-source:'.length))
   },
 
   /**
@@ -226,15 +243,15 @@ const UrlUtil = {
    * @returns {String} The view-source URL.
    */
   getViewSourceUrlFromUrl: function (input) {
-    if (this.isImageAddress(input) || !this.isHttpAddress(input)) {
+    if ((!UrlUtil.isHttpOrHttps(input) && !UrlUtil.isFileScheme(input)) || UrlUtil.isImageAddress(input)) {
       return null
     }
-    if (this.isViewSourceUrl(input)) {
+    if (UrlUtil.isViewSourceUrl(input)) {
       return input
     }
 
     // Normalizes the actual URL before the view-source: scheme like prefix.
-    return 'view-source:' + this.getUrlFromViewSourceUrl(input)
+    return 'view-source:' + UrlUtil.getUrlFromViewSourceUrl(input)
   },
 
   /**
@@ -285,44 +302,37 @@ const UrlUtil = {
   },
 
   /**
-   * Checks whether a link is an Flash installer URL.
-   * @param {string} url
-   * @return {boolean}
-   */
-  isFlashInstallUrl: function (url) {
-    const adobeRegex = new RegExp('//(get\\.adobe\\.com/([a-z_-]+/)*flashplayer|www\\.macromedia\\.com/go/getflash|www\\.adobe\\.com/go/getflash)', 'i')
-    return adobeRegex.test(url)
-  },
-
-  /**
-   * Checks whether the first-party page is one that should have Flash install
-   * URL interception.
-   * @param {string} url
-   * @return {boolean}
-   */
-  shouldInterceptFlash: function (url) {
-    if (!url) {
-      return false
-    }
-    const parsed = urlParse(url)
-    const exemptHostPattern = new RegExp('(\\.adobe\\.com|www\\.google(\\.\\w+){1,2}|^duckduckgo\\.com|^search\\.yahoo\\.com)$')
-    return parsed.hostname &&
-      ['http:', 'https:'].includes(parsed.protocol) &&
-      !exemptHostPattern.test(parsed.hostname) &&
-      !['/search', '/search/'].includes(parsed.pathname)
-  },
-
-  /**
    * Gets PDF location from a potential PDFJS URL
    * @param {string} url
    * @return {string}
    */
   getLocationIfPDF: function (url) {
-    if (url && url.startsWith(`chrome-extension://${pdfjsExtensionId}/`)) {
-      return url.replace(/^chrome-extension:\/\/.+\/(\w+:\/\/.+)/, '$1')
-    } else {
+    if (!url || url.indexOf(`chrome-extension://${pdfjsExtensionId}/`) === -1) {
       return url
     }
+
+    if (url.indexOf('content/web/viewer.html?file=') !== -1) {
+      const querystring = require('querystring')
+      const parsedUrl = urlParse(url)
+      const query = querystring.parse(parsedUrl.query)
+      if (query && query.file) {
+        return query.file
+      }
+    }
+    return url.replace(`chrome-extension://${pdfjsExtensionId}/`, '')
+  },
+
+  /**
+   * Converts a potential PDF URL to the PDFJS URL.
+   * XXX: This only looks at the URL file extension, not MIME types.
+   * @param {string} url
+   * @return {string}
+   */
+  toPDFJSLocation: function (url) {
+    if (url && UrlUtil.isHttpOrHttps(url) && UrlUtil.isFileType(url, 'pdf')) {
+      return `chrome-extension://${pdfjsExtensionId}/${url}`
+    }
+    return url
   },
 
   /**
@@ -331,11 +341,116 @@ const UrlUtil = {
    * @return {string} url The base favicon URL
    */
   getDefaultFaviconUrl: function (url) {
-    if (this.isURL(url)) {
-      const loc = new window.URL(url)
+    if (UrlUtil.isURL(url)) {
+      const loc = urlParse(url)
       return loc.protocol + '//' + loc.host + '/favicon.ico'
     }
     return ''
+  },
+
+  getPunycodeUrl: function (url) {
+    try {
+      const parsed = urlParse(url)
+      parsed.hostname = punycode.toASCII(parsed.hostname)
+      return urlFormat(parsed)
+    } catch (e) {
+      return punycode.toASCII(url)
+    }
+  },
+
+  /**
+   * Gets the hostPattern from an URL.
+   * @param {string} url The URL to get the hostPattern from
+   * @return {string} url The URL formmatted as an hostPattern
+   */
+  getHostPattern: function (url) {
+    return `https?://${url}`
+  },
+
+  /**
+   * Checks if URL is based on http protocol.
+   * @param {string} url - URL to check
+   * @return {boolean}
+   */
+  isHttpOrHttps: function (url) {
+    return url.startsWith(httpScheme) || url.startsWith(httpsScheme)
+  },
+
+  /**
+   * Checks if URL is based on file protocol.
+   * @param {string} url - URL to check
+   * @return {boolean}
+   */
+  isFileScheme: function (url) {
+    return this.getScheme(url) === fileScheme
+  },
+
+  /**
+   * Gets the origin of a given URL
+   * @param {string} url The URL to get the origin from
+   * @return {string} url The origin of the given URL
+   */
+  getUrlOrigin: function (url) {
+    return new window.URL(url).origin
+  },
+
+  isLocalFile: function (origin) {
+    if (!origin) {
+      return false
+    }
+
+    const localFileOrigins = ['file:', 'blob:', 'data:', 'chrome-extension:', 'chrome:']
+    return origin && localFileOrigins.some((localFileOrigin) => origin.startsWith(localFileOrigin))
+  },
+
+  getDisplayHost: (url) => {
+    const parsedUrl = urlParse(url)
+    if (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:') {
+      return parsedUrl.host
+    }
+
+    return url
+  },
+
+  /**
+   * Gets a site origin (scheme + hostname + port) from a URL or null if not available.
+   * Warning: For unit tests, this currently runs as node without the parsed.origin
+   * branch of code, but in muon this runs through the parsed.origin branch of code.
+   * @param {string} location
+   * @return {string|null}
+   */
+  getOrigin: (location) => {
+    // Returns scheme + hostname + port
+    if (typeof location !== 'string') {
+      return null
+    }
+
+    if (location.startsWith('file://')) {
+      return 'file:///'
+    }
+
+    let parsed = urlParse(location)
+    // parsed.origin is specific to muon.url.parse
+    if (parsed.origin !== undefined) {
+      if (parsed.protocol === 'about:') {
+        return [parsed.protocol, parsed.path].join('')
+      }
+      return parsed.origin.replace(/\/+$/, '')
+    }
+    if (parsed.host && parsed.protocol) {
+      return parsed.slashes ? [parsed.protocol, parsed.host].join('//') : [parsed.protocol, parsed.host].join('')
+    }
+    return null
+  },
+
+  stripLocation: (url) => {
+    if (!url) {
+      return ''
+    }
+
+    return url
+      .replace(/((#?\/?)|(\/#?))$/, '') // remove trailing # and /
+      .trim() // remove whitespaces
   }
 }
 

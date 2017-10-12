@@ -6,45 +6,68 @@ const appConfig = require('./constants/appConfig')
 const Immutable = require('immutable')
 const settings = require('./constants/settings')
 const {passwordManagers, defaultPasswordManager, extensionIds, displayNames} = require('./constants/passwordManagers')
+const {bookmarksToolbarMode} = require('../app/common/constants/settingsEnums')
 
-// Retrofit the new single setting; we don't want to erase values set by the user.
+// individual settings were deprecated with 0.11.4
+// DO NOT ADD TO THIS LIST
 const passwordManagerDefault = (settingKey, settingsCollection) => {
   const onePasswordEnabled = resolveValue(settings.ONE_PASSWORD_ENABLED, settingsCollection) === true
-  if (onePasswordEnabled) { return passwordManagers.ONE_PASSWORD }
+  if (onePasswordEnabled) return passwordManagers.ONE_PASSWORD
 
   const dashlaneEnabled = resolveValue(settings.DASHLANE_ENABLED, settingsCollection) === true
-  if (dashlaneEnabled) { return passwordManagers.DASHLANE }
+  if (dashlaneEnabled) return passwordManagers.DASHLANE
 
   const lastPassEnabled = resolveValue(settings.LAST_PASS_ENABLED, settingsCollection) === true
-  if (lastPassEnabled) { return passwordManagers.LAST_PASS }
+  if (lastPassEnabled) return passwordManagers.LAST_PASS
 
   const disabled = resolveValue(settings.PASSWORD_MANAGER_ENABLED, settingsCollection) === false
-  if (disabled) { return passwordManagers.UNMANAGED }
+  if (disabled) return passwordManagers.UNMANAGED
 
   return defaultPasswordManager
 }
 
+// individual settings were deprecated with 0.12.6
+// DO NOT ADD TO THIS LIST
+const bookmarksBarDefault = (settingKey, settingsCollection) => {
+  const faviconsOnly = resolveValue(settings.SHOW_BOOKMARKS_TOOLBAR_ONLY_FAVICON, settingsCollection) === true
+  if (faviconsOnly) return bookmarksToolbarMode.FAVICONS_ONLY
+
+  const favicons = resolveValue(settings.SHOW_BOOKMARKS_TOOLBAR_FAVICON, settingsCollection) === true
+  if (favicons) return bookmarksToolbarMode.TEXT_AND_FAVICONS
+
+  return bookmarksToolbarMode.TEXT_ONLY
+}
+
+// Retrofit a new setting based on old values; we don't want to lose existing user settings.
+const getDefaultSetting = (settingKey, settingsCollection) => {
+  switch (settingKey) {
+    case settings.ACTIVE_PASSWORD_MANAGER:
+      return passwordManagerDefault(settingKey, settingsCollection)
+    case settings.BOOKMARKS_TOOLBAR_MODE:
+      return bookmarksBarDefault(settingKey, settingsCollection)
+  }
+  return undefined
+}
+
 const resolveValue = (settingKey, settingsCollection) => {
-  const appSettings = (process.type === 'browser'
-      ? require('./stores/appStore').getState().get('settings')
-      : require('./stores/appStoreRenderer').state.get('settings')) || Immutable.Map()
-  if (settingsCollection && settingsCollection.constructor === Immutable.Map) {
-    return settingsCollection.get(settingKey) !== undefined ? settingsCollection.get(settingKey) : appConfig.defaultSettings[settingKey]
+  if (settingsCollection && settingsCollection.constructor === Immutable.Map &&
+    settingsCollection.get(settingKey) !== undefined) {
+    return settingsCollection.get(settingKey)
   }
-  if (settingsCollection) {
-    return settingsCollection[settingKey] !== undefined ? settingsCollection[settingKey] : appConfig.defaultSettings[settingKey]
+  if (settingsCollection && settingsCollection[settingKey] !== undefined) {
+    return settingsCollection[settingKey]
   }
+  const appStore = (process.type === 'browser'
+      ? require('./stores/appStore').getState()
+      : require('./stores/appStoreRenderer').state) || Immutable.Map()
+  const appSettings = appStore.get('settings') || Immutable.Map()
   return appSettings.get(settingKey) !== undefined ? appSettings.get(settingKey) : appConfig.defaultSettings[settingKey]
 }
 
 module.exports.getSetting = (settingKey, settingsCollection) => {
-  if (settingKey === settings.ACTIVE_PASSWORD_MANAGER) {
-    const currentValue = resolveValue(settingKey, settingsCollection)
-    return !currentValue
-      ? passwordManagerDefault(settingKey, settingsCollection)
-      : currentValue
-  }
-  return resolveValue(settingKey, settingsCollection)
+  const setting = resolveValue(settingKey, settingsCollection)
+  if (typeof setting !== 'undefined' && setting !== null) return setting
+  return getDefaultSetting(settingKey, settingsCollection)
 }
 
 module.exports.getActivePasswordManager = (settingsCollection) => {

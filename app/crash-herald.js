@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const appConfig = require('../js/constants/appConfig')
+const buildConfig = require('../js/constants/buildConfig')
 const crashReporter = require('electron').crashReporter
 
 exports.init = () => {
@@ -11,7 +12,10 @@ exports.init = () => {
     companyName: 'Brave.com',
     submitURL: appConfig.crashes.crashSubmitUrl,
     autoSubmit: true,
-    ignoreSystemCrashHandler: true
+    extra: {
+      node_env: process.env.NODE_ENV,
+      rev: buildConfig.BROWSER_LAPTOP_REV || 'unknown'
+    }
   }
   crashReporter.start(options)
 }

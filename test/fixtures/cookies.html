@@ -1,0 +1,71 @@
+<body>
+local storage:
+<div id='localstorage'>
+</div>
+session storage:
+<div id='sessionstorage'>
+</div>
+indexeddb:
+<div id='idb'>
+</div>
+cookies:
+<div id='cookies'>
+</div>
+websql:
+<div id='websql'>
+</div>
+filesystem API:
+<div id='fs'>
+</div>
+
+<script>
+function setText (id, result) {
+    document.getElementById(id).innerText = JSON.stringify(result)
+}
+
+// If storage is not blocked, these item values change on every page load.
+// Otherwise they stay at 0.
+try {
+  localStorage['a'] = localStorage['a'] ? localStorage['a'] + 0 : 0
+    setText('localstorage', localStorage.getItem('a'))
+} catch (e) {}
+try {
+  sessionStorage.setItem('b', sessionStorage['b'] ? sessionStorage['b'] + 0 : 0)
+  setText('sessionstorage', sessionStorage['b'])
+} catch (e) {}
+try {
+    document.cookie = 'abc=123'
+    setText('cookies', document.cookie)
+} catch (e) {}
+
+try {
+var idb = indexedDB.open('idb', 1)
+idb.onsuccess = function () {
+   indexedDB.webkitGetDatabaseNames().onsuccess = (sender) => {
+      setText('idb', sender.target.result)
+   }
+}
+} catch (e) {}
+
+try {
+var wdb = openDatabase("wdb", "0.1", "test", 1024 * 1024)
+if (wdb.transaction) {
+wdb.transaction(function (tx) {
+  tx.executeSql("CREATE TABLE IF NOT EXISTS " +
+                "todo(ID INTEGER PRIMARY KEY ASC, todo TEXT, added_on DATETIME)", [])
+});
+wdb.transaction(function(tx) {
+  tx.executeSql("SELECT tbl_name from sqlite_master WHERE type = 'table'", [], function (t, rs) {
+    setText('websql', rs.rows)
+  });
+});
+}
+} catch (e) {}
+
+try {
+webkitRequestFileSystem(PERSISTENT, 1024*1024, (fs) => {
+    setText('fs', fs.name)
+})
+} catch (e) {}
+</script>
+</body>

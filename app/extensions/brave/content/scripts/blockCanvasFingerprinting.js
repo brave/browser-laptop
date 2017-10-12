@@ -2,6 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/**
+ * Some parts of this file are derived from:
+ * Chameleon <https://github.com/ghostwords/chameleon>, Copyright (C) 2015 ghostwords
+ * Privacy Badger Chrome <https://github.com/EFForg/privacybadger>, Copyright (C) 2015 Electronic Frontier Foundation and other contributors
+ */
+
 if (chrome.contentSettings.canvasFingerprinting == 'block') {
   Error.stackTraceLimit = Infinity // collect all frames
 
@@ -67,17 +73,92 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     return script_url.replace(/:\d+:\d+$/, '')
   }
 
-  function reportBlock (item) {
+  // To avoid throwing hard errors on code that expects a fingerprinting feature
+  // to be in place, create a method that can be called as if it were most
+  // other types of objects (ie can be called like a function, can be indexed
+  // into like an array, can have properties looked up, etc).
+  //
+  // This is done in two steps.  First, create a default, no-op function
+  // (`defaultFunc` below), and then second, wrap it in a Proxy that traps
+  // on all these operations, and yields itself.  This allows for long
+  // chains of no-op operations like
+  //    AnalyserNode.prototype.getFloatFrequencyData().bort.alsoBort,
+  // even though AnalyserNode.prototype.getFloatFrequencyData has been replaced.
+  var defaultFunc = function () {}
+
+  // In order to avoid deeply borking things, we need to make sure we don't
+  // prevent access to builtin object properties and functions (things
+  // like (Object.prototype.constructor).  So, build a list of those below,
+  // and then special case those in the allPurposeProxy object's traps.
+  var funcPropNames = Object.getOwnPropertyNames(defaultFunc)
+  var unconfigurablePropNames = funcPropNames.filter(function (propName) {
+    var possiblePropDesc = Object.getOwnPropertyDescriptor(defaultFunc, propName)
+    return (possiblePropDesc && !possiblePropDesc.configurable)
+  })
+
+  var valueOfCoercionFunc = function (hint) {
+    if (hint === 'string') {
+      return ''
+    }
+    if (hint === 'number' || hint === 'default') {
+      return 0
+    }
+    return undefined
+  }
+
+  var allPurposeProxy = new Proxy(defaultFunc, {
+    get: function (target, property) {
+
+      if (property === Symbol.toPrimitive) {
+        return valueOfCoercionFunc
+      }
+
+      if (property === 'toString') {
+        return ''
+      }
+
+      if (property === 'valueOf') {
+        return 0
+      }
+
+      return allPurposeProxy
+    },
+    set: function () {
+      return allPurposeProxy
+    },
+    apply: function () {
+      return allPurposeProxy
+    },
+    ownKeys: function () {
+      return unconfigurablePropNames
+    },
+    has: function (target, property) {
+      return (unconfigurablePropNames.indexOf(property) > -1)
+    },
+    getOwnPropertyDescriptor: function (target, property) {
+      if (unconfigurablePropNames.indexOf(property) === -1) {
+        return undefined
+      }
+      return Object.getOwnPropertyDescriptor(defaultFunc, property)
+    }
+  })
+
+  function reportBlock (type) {
     var script_url = getOriginatingScriptUrl()
+    if (script_url) {
+      script_url = stripLineAndColumnNumbers(script_url)
+    } else {
+      script_url = window.location.href
+    }
     var msg = {
-      type: item.type,
-      obj: item.objName,
-      prop: item.propName,
+      type,
       scriptUrl: stripLineAndColumnNumbers(script_url)
     }
 
     // Block the read from occuring; send info to background page instead
-    chrome.ipc.sendToHost('got-canvas-fingerprinting', msg)
+    chrome.ipcRenderer.sendToHost('got-canvas-fingerprinting', msg)
+
+    return allPurposeProxy
   }
 
   /**
@@ -85,17 +166,20 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
    * @param item special item objects
    */
   function trapInstanceMethod (item) {
-    chrome.webFrame.setGlobal(item.objName + ".prototype." + item.propName, reportBlock.bind(null, item))
+    if (!item.methodName) {
+      chrome.webFrame.setGlobal(item.objName + ".prototype." + item.propName, reportBlock.bind(null, item.type))
+    } else {
+      chrome.webFrame.setGlobal(item.methodName, reportBlock.bind(null, item.type))
+    }
   }
 
   var methods = []
-  var canvasMethods = ['getImageData', 'getLineDash', 'measureText']
+  var canvasMethods = ['getImageData', 'getLineDash', 'measureText', 'isPointInPath']
   canvasMethods.forEach(function (method) {
     var item = {
       type: 'Canvas',
       objName: 'CanvasRenderingContext2D',
-      propName: method,
-      obj: CanvasRenderingContext2D
+      propName: method
     }
 
     methods.push(item)
@@ -106,22 +190,22 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     var item = {
       type: 'Canvas',
       objName: 'HTMLCanvasElement',
-      propName: method,
-      obj: HTMLCanvasElement
+      propName: method
     }
     methods.push(item)
   })
 
   var webglMethods = ['getSupportedExtensions', 'getParameter', 'getContextAttributes',
-    'getShaderPrecisionFormat', 'getExtension']
+    'getShaderPrecisionFormat', 'getExtension', 'readPixels', 'getUniformLocation',
+    'getAttribLocation']
   webglMethods.forEach(function (method) {
     var item = {
       type: 'WebGL',
       objName: 'WebGLRenderingContext',
-      propName: method,
-      obj: WebGLRenderingContext
+      propName: method
     }
     methods.push(item)
+    methods.push(Object.assign({}, item, {objName: 'WebGL2RenderingContext'}))
   })
 
   var audioBufferMethods = ['copyFromChannel', 'getChannelData']
@@ -129,8 +213,7 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     var item = {
       type: 'AudioContext',
       objName: 'AudioBuffer',
-      propName: method,
-      obj: AudioBuffer
+      propName: method
     }
     methods.push(item)
   })
@@ -141,8 +224,27 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     var item = {
       type: 'AudioContext',
       objName: 'AnalyserNode',
-      propName: method,
-      obj: AnalyserNode
+      propName: method
+    }
+    methods.push(item)
+  })
+
+  var svgPathMethods = ['getTotalLength']
+  svgPathMethods.forEach(function (method) {
+    var item = {
+      type: 'SVG',
+      objName: 'SVGPathElement',
+      propName: method
+    }
+    methods.push(item)
+  })
+
+  var svgTextContentMethods = ['getComputedTextLength']
+  svgTextContentMethods.forEach(function (method) {
+    var item = {
+      type: 'SVG',
+      objName: 'SVGTextContentElement',
+      propName: method
     }
     methods.push(item)
   })
@@ -153,11 +255,16 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     var item = {
       type: 'WebRTC',
       objName: 'webkitRTCPeerConnection',
-      propName: method,
-      obj: webkitRTCPeerConnection
+      propName: method
     }
     methods.push(item)
   })
 
   methods.forEach(trapInstanceMethod)
+
+  // Block WebRTC device enumeration
+  trapInstanceMethod({
+    type: 'WebRTC',
+    methodName: 'navigator.mediaDevices.enumerateDevices'
+  })
 }

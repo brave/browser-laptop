@@ -39,6 +39,7 @@ Function .onInit
 
   Push $EXEDIR
   Call GetParent
+  Call GetParent
   POP $0
 
   StrCpy $BraveEXEPath "$0\Brave.exe"

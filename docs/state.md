@@ -9,217 +9,550 @@ AppStore
 
 ```javascript
 {
-  firstRunTimestamp: integer,
+  // resourceIdentifier is one of: `adblock`, `safeBrowsing`, `trackingProtection`,
+  // `httpsEverywhere`, or another additional resource by name such as
+  // adblock regional resource files.
+  [resourceIdentifier]: {
+    count: number, // number of blocked ads application wide
+    enabled: boolean, // enable the resource
+    etag: string, // last downloaded data file etag
+    lastCheckDate: number, // last checked data file date.getTime()
+    lastCheckVersion: string, // last checked data file version
+  },
+  about: {
+    brave: {
+      versionInformation: {
+        [name]: string
+      } // map of property name to version. used on about:brave. not persisted (removed on save)
+    },
+    history: {
+      entries: [object] // used on about:history. not persisted (removed on save)
+    },
+    newtab: {
+      gridLayoutSize: string, // 'small', 'medium', 'large'
+      ignoredTopSites: [string], // list of ignored sites
+      pinnedTopSites: [string], // list of pinned sites to be used on gridLayout. Defaults to 1 Brave-related site; see data/newTabData.js => pinnedTopSites
+      sites: [string], // list of sites to be used on gridLayout. Defaults to 6 Brave-related sites; see data/newTabData.js => topSites
+      updatedStamp: number // timestamp for when the data was last updated
+    },
+    preferences: {
+      recoverySucceeded: (boolean|undefined),
+      updatedStamp: number
+    }
+  },
+  adInsertion: {
+    enabled: boolean // enable ad insertion
+  },
+  autofill: {
+    addresses: {
+      guid: Array<string>, // list of id used to access the autofill entry in database
+      timestamp: number
+    },
+    creditCards: {
+      guid: Array<string>, // list of id used to access the autofill entry in database
+      timestamp: number
+    }
+  },
+  bookmarks: {
+    [bookmarkKey]: {
+      favicon: string, // URL of the favicon
+      key: string, // key is duplication of bookmarkKey
+      location: string,
+      objectId: Array.<number>,
+      originalSeed: Array.<number>, // bookmarks that have been synced before a sync profile reset
+      parentFolderId: number,
+      partitionNumber: number, // optionally specifies a specific session
+      skipSync: boolean,
+      title: string,
+      width: float // bookmark text width
+    }
+  },
+  bookmarkFolders: {
+    [folderKey]: {
+      folderId: number,
+      key: string, // key is duplication of folderKey
+      objectId: Array.<number>,
+      originalSeed: Array.<number>, // only set for bookmarks that have been synced before a sync profile reset
+      parentFolderId: number, // set for bookmarks and bookmark folders only
+      skipSync: boolean, // Set for objects FETCHed by sync
+      title: string,
+      width: float // bookmark folder text width
+    }
+  },
+  cache: {
+    bookmarLocation: {
+      [location]: Array<string> // array of bookmark keys
+    },
+    bookmarkOrder: {
+      [parentId]: [{
+        key: string, // bookmark or folder key
+        order: number,
+        type: string // siteTags.BOOKMARK or siteTags.BOOKMARK_FOLDER
+      }]
+    }
+  }
+  clearBrowsingDataDefaults: {
+    allSiteCookies: boolean,
+    autocompleteData: boolean,
+    autofillData: boolean,
+    browserHistory: boolean,
+    cachedImagesAndFiles: boolean,
+    downloadHistory: boolean,
+    savedPasswords: boolean,
+    savedSiteSettings: boolean
+  },
+  cookieblock: {
+    enabled: boolean // enable 3p cookie/referer blocking
+  },
+  cookieblockAll: {
+    enabled: boolean // enable all cookie/referer blocking
+  },
+  defaultBrowserCheckComplete: boolean, // true to indicate default browser check is complete
+  defaultWindowHeight: number, // DEPRECATED (0.12.7); replaced w/ defaultWindowParams.height
+  defaultWindowParams: {
+    height: number,
+    width: number,
+    x: number,
+    y: number
+  },
+  defaultWindowWidth: number, // DEPRECATED (0.12.7); replaced w/ defaultWindowParams.width
+  downloads: [{
+    [downloadId]: {
+      filename: string,
+      receivedBytes: Number,
+      savePath: string,
+      startTime: number, // datetime.getTime()
+      state: string, // one of: 'pending', 'in-progress', 'completed', 'cancelled', 'interrupted'
+      totalBytes: Number,
+      url: string
+    }
+  }],
   extensions: {
-    [id]: { // the unique id of the extension
-      id: string,
+    [id]: {
+      excluded: boolean, // true if extension was excluded by the user
       base_path: string,
+      browserAction: {
+        icon: (string|object),
+        popup: string,
+        title: string
+      },
+      contextMenus: {
+        extensionId: string,
+        menuItemId: string,
+        properties: object
+      },
       description: string,
       enabled: boolean,
+      id: string,
       manifest: object,
-      browserAction: {
-        title: string,
-        popup: string,
-        icon: string/object
-      },
       tabs: {
         [tabId]: {
-          browserAction: {} // tab specific browser action properties
+          browserAction: object // tab specific browser action properties
+        }
+      }
+    } // the unique id of the extension
+  },
+  fingerprintingProtection: {
+    enabled: boolean // enable 3p fingerprinting blocking. default true.
+  },
+  fingerprintingProtectionAll: {
+    enabled: boolean // enable all fingerprinting blocking. default false.
+  },
+  firstRunTimestamp: integer,
+  flash: {
+    enabled: boolean // enable flash
+  },
+  historySites: {
+    [siteKey]: {
+      favicon: string, // URL of the favicon
+      lastAccessedTime: number, // datetime.getTime()
+      location: string,
+      objectId: Array.<number>,
+      partitionNumber: number, // optionally specifies a specific session
+      skipSync: boolean, // Set for objects FETCHed by sync
+      title: string,
+      themeColor: string
+    }
+  },
+  ledger: {
+    info: {
+      address: string, // the BTC wallet address (in base58)
+      amount: number, // fiat amount to contribute per reconciliation period
+      balance: string, // confirmed balance in BTC.toFixed(4)
+      bravery: {
+        fee: {
+          amount: number, // set from `amount` above
+          currency: string // set from `currency` above
+        }
+      }, // values round-tripped through the ledger-client
+      btc: string, // BTC to contribute per reconciliation period
+      buyURL: string, // URL to buy bitcoin using debit/credit card
+      countryCode: string, // ISO3166 2-letter code for country of browser's location
+      created: boolean, // wallet is created
+      creating: boolean, // wallet is being created
+      currency: string, // fiat currency denominating the amount
+      error: {
+        caller: string, // function in which error was handled
+        error: object  // error object returned
+      }, // non-null if the last updateLedgerInfo happened concurrently with an error
+      exchangeInfo: {
+        exchangeName: string,  // the name of the BTC exchange
+        exchangeURL: string // the URL of the BTC exchange
+      }, // information about the corresponding "friendliest" BTC exchange (suggestions welcome!)
+      hasBitcoinHandler: boolean, // brave browser has a `bitcoin:` URI handler
+      passphrase: string, // the BTC wallet passphrase
+      paymentIMG: string, // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
+      paymentURL: string, // bitcoin:...?amount={btc}&label=Brave%20Software
+      reconcileFrequency: number, // duration between each reconciliation in days
+      reconcileStamp: number, // timestamp for the next reconcilation
+      recoverySucceeded: boolean, // the status of an attempted recovery
+      probi: number, // confirmed balance as an integer number of probi
+      transactions: [{
+        ballots: {
+          [publisher]: number // e.g., "wikipedia.org": 3
+        }, // number of ballots cast for each publisher
+        contribution: {
+          fee: number, // bitcoin transaction fee
+          fiat: {
+            amount: number, // e.g., 5
+            currency: string // e.g., "USD"
+          }, // roughly-equivalent fiat amount
+          rates: {
+            [currency]: number //e.g., { "USD": 575.45 }
+          },  // exchange rate
+          probi: number, // actual number of probi transferred
+        },
+        count: number, // total number of ballots allowed to be cast
+        submissionStamp: number, // timestamp for this contribution
+        viewingId: string, // UUIDv4 for this contribution
+      }], // contributions reconciling/reconciled
+      unconfirmed: string // unconfirmed balance in BTC.toFixed(4)
+    },
+    locations: {
+      [url]: {
+        publisher: string, // url of the publisher in question
+        verified: boolean, // wheter or not site is a verified publisher
+        exclude: boolean, // wheter or not site is in the excluded list
+        stickyP: boolean, // wheter or not site was added using addFunds urlbar toggle
+        timestamp: number // timestamp in milliseconds
+      }
+    }
+    synopsis: {
+      options: {
+        emptyScores: {
+          concave: number,
+          visits: number
+        },
+        frameSize: number,
+        minPublisherDuration: number,
+        minPublisherVisits: number,
+        numFrames: number,
+        scorekeeper: string, // concave or visits
+        scorekeepers: Array<string>, // concave and visits
+        showOnlyVerified: boolean
+      },
+      publishers: {
+        [publisherId]: {
+          duration: number,
+          faviconUrl: string,
+          options: {
+            exclude: boolean,
+            verified: boolean,
+            stickyP: boolean
+          },
+          pinPercentage: number,
+          protocol: string,
+          scores: {
+            concave: number,
+            visits: number
+          },
+          visits: number,
+          weight: number,
+          window: [{
+            timestamp: number,
+            visits: number,
+            duration: number,
+            scores: {
+              concave: number,
+              visits: number
+            }
+          }]
         }
       }
     }
   },
-  sites: [{
-    location: string,
-    title: string,
-    customTitle: string, // User provided title for bookmark; overrides title
-    tags: [string], // empty, 'bookmark', 'bookmark-folder', 'pinned', or 'reader'
-    favicon: string, // URL of the favicon
-    themeColor: string, // css compatible color string
-    lastAccessedTime: number, // datetime.getTime()
-    partitionNumber: number, // Optionally specifies a specific session
-    folderId: number, // Set for bookmark folders only
-    parentFolderId: number // Set for bookmarks and bookmark folders only
-  }],
-  downloads: [{
-    [downloadId]: {
-      startTime: number, // datetime.getTime()
-      filename: string,
-      savePath: string,
-      url: string,
-      totalBytes: Number,
-      receivedBytes: Number,
-      state: string // One of: 'pending', 'in-progress', 'completed', 'cancelled', 'interrupted'
-    }
-  }],
-  siteSettings: {
-    [hostPattern]: {
-      zoomLevel: number,
-      mediaPermission: boolean,
-      geolocationPermission: boolean,
-      notificationsPermission: boolean,
-      midiSysexPermission: boolean,
-      pointerLockPermission: boolean,
-      fullscreenPermission: boolean,
-      openExternalPermission: boolean,
-      protocolRegistrationPermission: boolean,
-      savePasswords: boolean, // Only false or undefined/null
-      shieldsUp: boolean,
-      adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)
-      cookieControl: string, // (block3rdPartyCookie | allowAllCookies)
-      safeBrowsing: boolean,
-      noScript: boolean,
-      httpsEverywhere: boolean,
-      fingerprintingProtection: boolean,
-      flash: (number|boolean), // approval expiration time if allowed, false if never allow
-      ledgerPayments: boolean, // False if site should not be paid by the ledger. Defaults to true.
-      ledgerPaymentsShown: boolean, // False if site should not be paid by the ledger and should not be shown in the UI. Defaults to true.
-      runInsecureContent: boolean // Allow active mixed content
-    }
+  migrations: {
+    batMercuryTimestamp: integer, // when session is upgraded (and this new schema added)
+    btc2BatTimestamp: integer, // when call was made to backend to convert BTC => BAT
+    btc2BatNotifiedTimestamp: integer, // when user was shown "wallet upgraded" notification
   },
-  temporarySiteSettings: {
-    // Same as above but never gets written to disk
-  },
-  visits: [{
-    location: string,
-    startTime: number, // datetime.getTime()
-    endTime: number // datetime.getTime()
-  }],
-  passwords: [{
-    origin: string, // origin of the form
-    action: string, // URL of the form action
-    username: string,
-    encryptedPassword: string, // encrypted by master password, binary-encoded
-    authTag: string, // AES-GCM authentication data, binary-encoded
-    iv: string // AES-GCM initialization vector, binary-encoded
-  }],
-  adblock: {
-    etag: string, // last downloaded data file etag
-    lastCheckVersion: string, // last checked data file version
-    lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean, // Enable adblocking
-    count: number // Number of blocked ads application wide
-  },
-  safeBrowsing: {
-    etag: string, // last downloaded data file etag
-    lastCheckVersion: string, // last checked data file version
-    lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean // Enable adblocking
-  },
-  trackingProtection: {
-    etag: string, // last downloaded data file etag
-    lastCheckVersion: string, // last checked data file version
-    lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean, // Enable tracking protection
-    count: number // Number of blocked trackers application wide
-  },
-  httpsEverywhere: {
-    etag: string, // last downloaded data file etag
-    lastCheckVersion: string, // last checked data file version
-    lastCheckDate: number, // last checked data file date.getTime()
-    enabled: boolean, // Enable HTTPS Everywhere
-    count: number // Number of HTTPS Everywhere upgrades application wide
-  },
-  adInsertion: {
-    enabled: boolean // Enable ad insertion
-  },
-  cookieblock: {
-    enabled: boolean // Enable 3p cookie/referer blocking
-  },
-  noScript: {
-    enabled: boolean // Enable noscript
-  },
-  flash: {
-    enabled: boolean // Enable flash
-  },
-  defaultWindowHeight: number,
-  defaultWindowWidth: number,
-  updates: {
-    status: string, // UpdateStatus from js/constants/updateStatus.js
-    metadata: {
-      name: string, // Name of the update
-      notes: string, // Release notes for the active update
-    },
-    verbose: boolean, // Whether to show update UI for checking, downloading, and errors
-    lastCheckTimestamp: boolean
+  menu: {
+    template: object // used on Windows and by our tests: template object with Menubar control
   },
   notifications: [{
-    message: string,
     buttons: [{
-      text: string, // button text
       className: string, // button class e.g. 'primary'. see notificationBar.less
+      text: string // button text
     }],
     frameOrigin: (string|undefined), // origin that the notification is from, or undefined if not applicable.
+    message: string,
     options: {
-      advancedText: string, // more info text
       advancedLink: string, // more info link URL
+      advancedText: string, // more info text
       persist: boolean, // whether to show a 'Remember this decision' checkbox
       style: string // css class for notification bar. See notificationBar.less
     }
   }], // the notifications for the frame. not preserved across restart.
-  settings: [{
+  noScript: {
+    enabled: boolean // enable noscript
+  },
+  pageData: {
+    info: [{
+      faviconURL: string,
+      protocol: string,
+      publisher: string,
+      timestamp: number,
+      url: string,
+    }],
+    last: {
+      info: string, // last added info
+      tabId: number, // last active tabId
+      url: string // last active URL
+    },
+    load: [{
+     timestamp: number,
+     url: string,
+     tabId: number,
+     details: {
+       status: boolean,
+       newURL: string,
+       originalURL: string,
+       httpResponseCode: number,
+       requestMethod: string,
+       referrer: string,
+       resourceType: string
+     }
+    }],
+    view: {
+      timestamp: number,
+      url: string,
+      tabId: number
+    } // we save only the last view
+  },
+  pinnedSites: {
+    [siteKey]: {
+      location: string,
+      title: string,
+      order: number
+    }
+  },
+  settings: {
     // See defaults in js/constants/appConfig.js
-    'general.startup-mode': string, // One of: lastTime, homePage, newTabPage
-    'general.homepage': string, // URL of the user's homepage
-    'general.show-home-button': boolean, // true if the home button should be shown
-    'general.useragent.value': (undefined|string), // custom user agent value
-    'general.downloads.default-save-path': string, // default path for saving files
+    'adblock.customRules': string, // custom rules in ABP filter syntax
+    'advanced.default-zoom-level': number, // the default zoom level for sites that have no specific setting
+    'advanced.hardware-acceleration-enabled': boolean, // false if hardware acceleration should be explicitly disabled
+    'advanced.pdfjs-enabled': boolean, // whether or not to render PDF documents in the browser
+    'advanced.send-crash-reports': boolean, // true or undefined if crash reports should be sent
+    'advanced.send-usage-statistics': boolean, // true or undefined if usage reports should be sent
+    'advanced.smooth-scroll-enabled': boolean, // false if smooth scrolling should be explicitly disabled
+    'advanced.torrent-viewer-enabled': boolean, // whether to render magnet links in the browser
+    'bookmarks.toolbar.show': boolean, // true if the bookmakrs toolbar should be shown
+    'extensions.pocket.enabled': boolean, // true if pocket is enabled
+    'extensions.vimium.enabled': boolean, // true if vimium is enabled
+    'extensions.honey.enabled': boolean, // true if Honey is enabled
     'general.autohide-menu': boolean, // true if the Windows menu should be autohidden
+    'general.wide-url-bar': boolean, // true to use wide URL bar
+    'general.bookmarks-toolbar-mode': boolean, // true to show bookmarks toolbar
+    'general.check-default-on-startup': boolean, // true to check whether brave is default browser on startup
     'general.disable-title-mode': boolean, // true if title mode should always be disabled
+    'general.downloads.default-save-path': string, // default path for saving files
+    'general.homepage': string, // URL of the user's homepage
+    'general.is-default-browser': boolean, // true if brave is default browser
+    'general.language': string, // the language code to use for localization and spell check or null to use the system default
+    'general.newtab-mode': string,  // one of: newTabPage, homePage, defaultSearchEngine
+    'general.show-home-button': boolean, // true if the home button should be shown
+    'general.startup-mode': string, // one of: lastTime, homePage, newTabPage
+    'notification-add-funds-timestamp': number, // timestamp on which we decide if we will show notification Add founds
+    'notification-reconcile-soon-timestamp': number, // timestamp
+    'payments.allow-non-verified-publishers': boolean,
+    'payments.contribution-amount': number, // in USD
+    'payments.enabled': boolean, // true if the Payments pane is active
+    'payments.minimum-visit-time': number,
+    'payments.minimum-visits': number,
+    'payments.notification-add-funds-timestamp': number,
+    'payments.notification-reconcile-soon-timestamp': number,
+    'payments.notification-try-payments-dismissed': boolean, // true if you dismiss the message or enable Payments
+    'payments.notifications': boolean, // true to show payment notifications
+    'payments.sites-auto-suggest': boolean, // show auto suggestion
+    'payments.sites-hide-excluded': boolean, // whether to hide excluded sites in the payments list
+    'payments.sites-show-less': boolean, // whether to show less sites in the payments list
+    'privacy.autocomplete.history-size': number, // number of autocomplete entries to keep
+    'privacy.autofill-enabled': boolean, // true to enable autofill
+    'privacy.bookmark-suggestions': boolean, // auto suggest for bookmarks enabled
+    'privacy.do-not-track': boolean, // whether DNT is 1
+    'privacy.history-suggestions': boolean, // auto suggest for history enabled
+    'privacy.opened-tab-suggestions': boolean, // auto suggest for opened tabs enabled
+    'privacy.topsite-suggestions': boolean, // auto suggest for top site enabled
     'search.default-search-engine': string, // name of search engine, from js/data/searchProviders.js
     'search.offer-search-suggestions': boolean, // true if suggestions should be offered from the default search engine when available.
-    'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
+    'security.flash.installed': boolean,
+    'shields.blocked-count-badge': boolean, // true if blocked counts on the shield button should be enabled
+    'shields.compact-bravery-panel': boolean, // true if the compact Bravery panel should be enabled
+    'security.passwords.active-password-manager': string, // name of active password manager
+    'security.fullscreen.content': string, // whether or not user choose to allow fullscreen content by default
+    'shutdown.clear-all-site-cookies': boolean, // true to clear all site cookies on shutdown
+    'shutdown.clear-autocomplete-data': boolean, // true to clear all autocomplete data on shutdown
+    'shutdown.clear-autofill-data': boolean, // true to clear all autofill data on shutdown
+    'shutdown.clear-cache': boolean, // true to clear cache on shutdown
+    'shutdown.clear-downloads': boolean, // true to clear downloads on shutdown
+    'shutdown.clear-history': boolean, // true to clear history on shutdown
+    'shutdown.clear-site-settings': boolean, // true to clear site settings on shutdown
+    'tabs.close-action': string, // one of: parent, lastActive, next
     'tabs.paint-tabs': boolean, // true if the page theme color and favicon color should be used for tabs
-    'tabs.tabs-per-page': number, // Number of tabs per tab page
-    'tabs.show-tab-previews': boolean, // True to show tab previews
-    'privacy.history-suggestions': boolean, // Auto suggest for history enabled
-    'privacy.bookmark-suggestions': boolean, // Auto suggest for bookmarks enabled
-    'privacy.opened-tab-suggestions': boolean, // Auto suggest for opened tabs enabled
-    'privacy.autocomplete.history-size': number, // Number of autocomplete entries to keep
-    'privacy.do-not-track': boolean, // whether DNT is 1
-    'privacy.block-canvas-fingerprinting': boolean, // Canvas fingerprinting defense
-    'privacy.autofill-enabled': boolean, // true to enable autofill
+    'tabs.show-tab-previews': boolean, // true to show tab previews
+    'tabs.switch-to-new-tabs': boolean, // true if newly opened tabs should be focused immediately
+    'tabs.tabs-per-page': number, // number of tabs per tab page
+
+    // DEPRECATED with 0.11.4
+    'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
+    'security.passwords.last-pass-enabled': boolean, // true if the Last password extension should be enabled
     'security.passwords.manager-enabled': boolean, // whether to use default password manager
     'security.passwords.one-password-enabled': boolean, // true if the 1Password extension should be enabled
-    'security.passwords.dashlane-enabled': boolean, // true if the Dashlane extension should be enabled
-    'bookmarks.toolbar.show': boolean, // true if the bookmakrs toolbar should be shown
+
+    // DEPRECATED with 0.12.6
     'bookmarks.toolbar.showFavicon': boolean, // true if bookmark favicons should be shown on the bookmarks toolbar
     'bookmarks.toolbar.showOnlyFavicon': boolean, // true if only favicons should be shown on the bookmarks toolbar
-    'general.language': string, // The language code to use for localization and spell check or null to use the system default
-    'payments.enabled': boolean, // true if the Payments pane is active
-    'payments.contribution-amount': number, // in USD
-    'advanced.hardware-acceleration-enabled': boolean, // false if hardware acceleration should be explicitly disabled
-    'advanced.default-zoom-level': number, // the default zoom level for sites that have no specific setting
-    'advanced.pdfjs-enabled': boolean, // Whether or not to render PDF documents in the browser
-    'advanced.smooth-scroll-enabled': boolean, // false if smooth scrolling should be explicitly disabled
-    'shutdown.clear-history': boolean, // true to clear history on shutdown
-    'shutdown.clear-downloads': boolean, // true to clear downloads on shutdown
-    'shutdown.clear-cache': boolean, // true to clear cache on shutdown
-    'shutdown.clear-all-site-cookies': boolean, // true to clear all site cookies on shutdown
-  }],
-  dictionary: {
-    locale: string, // en_US, en, or any other locale string
-    ignoredWords: Array<string>, // List of words to ignore
-    addedWords: Array<string> // List of words to add to the dictionary
+
+    // DEPRECATED with 0.21.0
+    'advanced.hide-excluded-sites': boolean, // whether to hide excluded sites in the payments list
+    'advanced.hide-lower-sites': boolean,
+    'advanced.minimum-visit-time': number,
+    'advanced.minimum-visits': number,
+    'advanced.auto-suggest-sites': boolean // show auto suggestion
   },
-  autofill: {
-    addresses: {
-      guid: Array<string>, // List of id used to access the autofill entry in database
-      timestamp: number
+  siteSettings: {
+    [hostPattern]: {
+      adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)
+      cookieControl: string, // (block3rdPartyCookie | allowAllCookies | blockAllCookies)
+      fingerprintingProtection: string, // (block3rdPartyFingerprinting | allowAllFingerprinting | blockAllFingerprinting)
+      flash: (number|boolean), // approval expiration time if allowed, false if never allow
+      fullscreenPermission: boolean,
+      geolocationPermission: boolean,
+      httpsEverywhere: boolean,
+      ledgerPayments: boolean, // false if site should not be paid by the ledger. Defaults to true.
+      ledgerPaymentsShown: boolean, // false if site should not be paid by the ledger and should not be shown in the UI. Defaults to true.
+      ledgerPinPercentage: number, // 0 if not pinned, otherwise is pinned with defined percentage
+      mediaPermission: boolean,
+      midiSysexPermission: boolean,
+      notificationsPermission: boolean,
+      noScript: (number|boolean), // true = block scripts, false = allow, 0 = allow once, 1 = allow until restart
+      noScriptExceptions: {[hostPattern]: (number|boolean)}, // hosts where scripts are allowed once (0) or until restart (1). false = block
+      objectId: Array.<number>,
+      openExternalPermission: boolean,
+      pointerLockPermission: boolean,
+      protocolRegistrationPermission: boolean,
+      skipSync: boolean, // Set for objects FETCHed by sync
+      runInsecureContent: boolean, // allow active mixed content
+      safeBrowsing: boolean,
+      savePasswords: boolean, // only false or undefined/null
+      shieldsUp: boolean,
+      widevine: (number|boolean), // false = block widevine, 0 = allow once, 1 = allow always
+      zoomLevel: number,
+      autoplay: boolean,
+    }
+  },
+  defaultSiteSettingsListImported: boolean,
+  sync: {
+    lastFetchTimestamp: integer // the last time new sync records were fetched in seconds
+    deviceId: Array.<number>,
+    devices: {
+      [deviceId]: {
+        name: string,
+        lastRecordTimestamp: number // last seen Sync record from this device
+      }
     },
-    creditCards: {
-      guid: Array<string>, // List of id used to access the autofill entry in database
-      timestamp: number
-    }
+    objectId: Array.<number>, // objectId for this sync device
+    objectsById: {
+      [string of objectId joined by pipes |]: Array.<string> // array key path within appState, so we can do appState.getIn({key path})
+    },
+    pendingRecords: { // OrderedMap of unconfirmed (not yet downloaded) sync records.
+      [objectId]: {
+        enqueueTimestamp: number // new Date().getTime() when record was submitted
+        record: object, // Sync record sent with SEND_SYNC_RECORDS
+      }
+    },
+    seed: Array.<number>,
+    seedQr: string, // data URL of QR code representing the seed
+    setupError: string? // indicates that an error occurred during sync setup
   },
-  about: {
-    newtab: {
-      gridLayout: string // 'small', 'medium', 'large'
-    }
+  tabs: [{
+    // persistent properties
+    active: boolean,  // whether the tab is selected
+    favIconUrl: string,
+    id: number,
+    index: number,  // the position of the tab in the window
+    title: string,
+    url: string,
+    windowUUID: string,  // the permanent identifier for the window
+    // session properties
+    audible: boolean, // is audio playing (muted or not)
+    canGoBack: boolean, // the tab can be navigated back
+    canGoForward: boolean, // the tab can be navigated forward
+    messageBoxDetail: { // fields used if showing a message box for a tab
+      buttons: [string], // array of buttons as string; code only handles 1 or 2
+      cancelId: number // optional: used for a confirm message box
+      message: string,
+      showSuppress: boolean, // final result of the suppress checkbox
+      suppress: boolean, // if true, show a suppress checkbox (defaulted to not checked)
+      title: string, // title is the source; ex: "brave.com says:"
+    },
+    muted: boolean, // is the tab muted
+    windowId: number // the windowId that contains the tab
+    guestInstanceId: number,
+    tabId: number
+  }],
+  temporarySiteSettings: {
+    // Same as siteSettings but never gets written to disk
+    // XXX: This was intended for Private Browsing but is currently unused.
   },
-  menubar: {
-    template: object // windows only: template object with Menubar control
-  }
+  updates: {
+    lastCheckTimestamp: boolean,
+    metadata: {
+      name: string, // name of the update
+      notes: string // release notes for the active update
+    },
+    status: string, // updateStatus from js/constants/updateStatus.js
+    verbose: boolean // whether to show update UI for checking, downloading, and errors
+  },
+  visits: [{
+    endTime: number, // datetime.getTime()
+    location: string,
+    startTime: number // datetime.getTime()
+  }],
+  widevine: {
+    enabled: boolean, // true if widevine is installed and enabled
+    ready: boolean // true if widevine is in a ready state
+  },
+  windows: [{
+    // persistent properties
+    bookmarksToolbar: {
+      toolbar: Array<string>, // bookmark and folder keys that we want to display
+      other: Array<string> // bookmark and folder keys that we display in more menu (limited to 100)
+    },
+    focused: boolean,
+    height: number,
+    left: number,
+    state: string  // "normal", "minimized", "maximized", or "fullscreen"
+    top: number,
+    type: string,  // "normal", "popup", or "devtools"
+    width: number,
+    // session properties
+    windowId: number  // the muon id for the window
+  }],
+  searchDetail: {
+    autocompleteURL: string, // ditto re: {searchTerms}
+    searchURL: string // with replacement var in string: {searchTerms}
+  },
 }
 ```
 
@@ -228,308 +561,231 @@ WindowStore
 ```javascript
 {
   activeFrameKey: number,
-  previewFrameKey: number,
-  tabs: [{
-    themeColor: string, // css compatible color string
-    computedThemeColor: string, // css computed theme color from the favicon
-    icon: string, // favicon url
-    audioPlaybackActive: boolean, // frame is playing audio
-    audioMuted: boolean, // frame is muted
-    title: string, // page title
-    isPrivate: boolean, // private browsing tab
-    partitionNumber: number, // the session partition to use
-    pinnedLocation: string, // Indicates if a frame is pinned and its pin location
-    provisionalLocation: string,
-    icon: string, // favicon url
-    location: string, // The currently navigated location
-    loading: boolean,
-    frameKey: number
-  }],
+  autofillAddressDetail: {
+    city: string,
+    country: string,
+    email: string,
+    guid: string, // id used to access the autofill entry in database
+    name: string,
+    organization: string,
+    phone: string,
+    postalCode: string,
+    state: string,
+    streetAddress: string
+  },
+  autofillCreditCardDetail: {
+    card: string,
+    guid: string, // id used to access the autofill entry in database
+    month: string,
+    name: string,
+    year: string
+  },
+  bookmarkDetail: {
+    currentDetail: object, // detail of the current bookmark which is in add/edit mode
+    originalDetails: object, // detail of the original bookmark to edit
+    shouldShowLocation: boolean // whether or not to show the URL input
+  },
+  braveryPanelDetail: {
+    advancedControls: boolean, // if specified, indicates if advanced controls should be shown
+    expandAdblock: boolean, // if specified, indicates if the tracking protection and adblock section should be expanded
+    expandFp: boolean, // whether fingerprinting protection should be expanded
+    expandHttpse: boolean, // if specified, indicates if the httpse section should be expanded
+    expandNoScript: boolean // whether noscript section should be expanded
+  },
+  cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
+  closedFrames: [], // holds the same type of frame objects as frames
+  contextMenuDetail: {
+    bottom: number, // the bottom position of the context menu
+    left: number, // the left position of the context menu
+    maxHeight: number, // the maximum height of the context menu
+    openedSubmenuDetails: [{
+      template: [], // same as template in contextMenuDetail
+      y: number // the relative y position
+    }],
+    right: number, // the right position of the context menu
+    template: [{
+      click: function, // callback for the context menu to call when clicked
+      dragOver: function, // callback for when something is dragged over this item
+      drop: function, // callback for when something is dropped on this item
+      label: string // label of context menu item
+    }],
+    top: number // the top position of the context menu
+  },
   frames: [{
-    audioMuted: boolean, // frame is muted
-    audioPlaybackActive: boolean, // frame is playing audio
-    canGoBack: boolean,
-    canGoForward: boolean,
-    icon: string, // favicon url
-    location: string, // The currently navigated location
-    src: string, // The iframe src attribute
-    pinnedLocation: string, // Indicates if a frame is pinned and its pin location
-    title: string, // page title
-    findbarShown: boolean, // whether the findbar is shown
-    findbarSelected: boolean,  // findbar text input is selected
-    hrefPreview: string, // show hovered link preview
-    key: number,
-    isPrivate: boolean, // private browsing tab
-    partitionNumber: number, // the session partition to use
-    loading: boolean,
-    themeColor: string, // css compatible color string
-    computedThemeColor: string, // css computed theme color from the favicon
-    isFullScreen: boolean, // true if the frame should be shown as full screen
-    showFullScreenWarning: boolean, // true if a warning should be shown about full screen
-    startLoadTime: datetime,
-    endtLoadTime: datetime,
-    guestInstanceId: string, // not persisted
-    tabId: number, // session tab id not persisted
-    closedAtIndex: number, // Index the frame was last closed at, cleared unless the frame is inside of closedFrames
-    activeShortcut: string, // Set by the application store when the component should react to a shortcut
-    activeShortcutDetails: object, // Additional parameters for the active shortcut action if any
-    lastZoomPercentage: number, // Last value that was used for zooming
+    aboutDetails: object, // details for about pages
+    activeShortcut: string, // set by the application store when the component should react to a shortcut
+    activeShortcutDetails: object, // additional parameters for the active shortcut action if any
     adblock: {
       blocked: Array<string>
     },
-    trackingProtection: {
-      blocked: Array<string>
-    },
-    httpsEverywhere: Object.<string, Array.<string>>, // map of XML rulesets name to redirected resources
-    noScript: {
-      blocked: Array<string>
-    },
+    audioMuted: boolean, // frame is muted
+    audioPlaybackActive: boolean, // frame is playing audio
+    basicAuthDetail: object,
+    closedAtIndex: number, // index the frame was last closed at, cleared unless the frame is inside of closedFrames
+    computedThemeColor: string, // CSS computed theme color from the favicon
+    endtLoadTime: datetime,
+    findbarShown: boolean, // whether the findbar is shown
+    findbarSelected: boolean,  // findbar text input is selected
     fingerprintingProtection: {
       blocked: Array<string>
     },
+    findDetail: {
+      searchString: string, // the string being searched
+      caseSensitivity: boolean, // whether we are doing a case sensitive search
+      numberOfMatches: number, // total number of matches on the page
+      activeMatchOrdinal: number, // the current ordinal of the match
+      internalFindStatePresent: boolean // true if a find-first (ie findNext: false) call has been made
+    }
+    guestInstanceId: string, // not persisted
+    hasBeenActivated: boolean, // whether this frame has ever been the active frame
+    history: array, // navigation history
+    hrefPreview: string, // show hovered link preview
+    httpsEverywhere: Object<string, Array<string>>, // map of XML rulesets name to redirected resources
+    icon: string, // favicon url
+    isFullScreen: boolean, // true if the frame should be shown as full screen
+    isPrivate: boolean, // private browsing tab
+    key: number,
+    lastAccessedTime: datetime,
+    lastZoomPercentage: number, // last value that was used for zooming
+    loading: boolean,
+    location: string, // the currently navigated location
+    modalPromptDetail: object,
+    navbar: {
+      urlbar: {
+        active: boolean, // whether the user is typing in the urlbar
+        focused: boolean, // whether the urlbar should be focused instead of the webview
+        location: string, // the string displayed in the urlbar
+        searchDetail: object,
+        selected: boolean, // is the urlbar text selected
+        suggestions: {
+          autocompleteEnabled: boolean, // used to enable or disable autocomplete
+          selectedIndex: number, // index of the item in focus
+          shouldRender: boolean, // if the suggestions should render
+          suggestionList: {
+            location: string, // the location represented by the autocomplete entry
+            onClick: function, // the onClick handler for suggestion clicks (e.g. URL load or tab switch)
+            title: string, // the title of the autocomplete entry
+            type: string // the type of suggestion (one of js/constants/suggestionTypes.js)
+          },
+          urlSuffix: string // autocomplete suffix
+        }
+      }
+    },
+    noScript: {
+      blocked: Array<string>
+    },
+    openerTabId: number, // web contents tabId that opened this tab
+    partitionNumber: number, // the session partition to use
+    parentFrameKey: number, // the key of the frame this frame was opened from
+    pinnedLocation: string, // indicates if a frame is pinned and its pin location
     provisionalLocation: string,
+    showFullScreenWarning: boolean, // true if a warning should be shown about full screen
     security: {
-      isSecure: boolean, // is using https
+      blockedRunInsecureContent: Array<string>, // sources of blocked active mixed content
+      isSecure: (boolean|number), // true = fully secure, false = fully insecure, 1 = partially secure, 2 = cert error
       loginRequiredDetail: {
         isProxy: boolean,
         host: string,
         port: number,
         realm: string
       },
-      isExtendedValidation: boolean, // is using https ev
-      runInsecureContent: boolean, // has active mixed content
-      blockedRunInsecureContent: Array<string> // sources of blocked active mixed content
+      runInsecureContent: boolean // has active mixed content
     },
-    parentFrameKey: number, // the key of the frame this frame was opened from
-    modalPromptDetail: {...},
-    basicAuthDetail: {...},
-    findDetail: {
-      searchString: string, // the string being searched
-      caseSensitivity: boolean, // whether we are doing a case sensitive search
-      numberOfMatches: number, // Total number of matches on the page
-      activeMatchOrdinal: number, // The current ordinal of the match
-      internalFindStatePresent: boolean // true if a find-first (ie findNext: false) call has been made
-    }
+    src: string, // the iframe src attribute
+    startLoadTime: datetime,
+    tabId: number, // session tab id not persisted
+    themeColor: string, // CSS compatible color string
+    title: string, // page title
+    trackingProtection: {
+      blocked: Array<string>
+    },
     unloaded: boolean, // true if the tab is unloaded
-
-    navbar: {
-      focused: boolean, // whether the navbar is focused
-      urlbar: {
-        location: string, // the string displayed in the urlbar
-        urlPreview: string,
-        suggestions: {
-          selectedIndex: number, // index of the item in focus
-          searchResults: array, // autocomplete server results if enabled
-          suggestionList: {
-            title: string, // The title of the autocomplete entry
-            location: string, // The location represented by the autocomplete entry
-            onClick: function, // The onClick handler for suggestion clicks (e.g. URL load or tab switch)
-            type: string // The type of suggestion (one of js/constants/suggestionTypes.js)
-          },
-          urlSuffix: string, // autocomplete suffix
-          autocompleteEnabled: boolean // used to enable or disable autocomplete
-        },
-        focused: boolean, // whether the urlbar is focused
-        active: boolean, // whether the user is typing in the urlbar
-        selected: boolean // is the urlbar text selected
-      }
-    },
-    aboutDetails: object, // details for about pages
-    history: array // navigation history
   }],
-  closedFrames: [], // holds the same type of frame objects as above
-  ui: {
-    isMaximized: boolean, // true if window is maximized
-    position: array, // last known window position
-    isFullScreen: boolean, // true if window is fullscreen
-    mouseInTitlebar: boolean, //Whether or not the mouse is in the titlebar
-    dragging: {
-      dragType: string, // tab, bookmark
-      draggingOver: {
-        draggingOverLeft: boolean,
-        draggingOverRight: boolean,
-        dragKey: any,
-        dragType: string
-      }
-    },
-    tabs: {
-      tabPageIndex: number, // Index of the current tab page
-      previewTabPageIndex: number // Index of the tab being previewed
-    },
-    siteInfo: {
-      isVisible: boolean // Whether or not to show site info like # of blocked ads
-    },
-    noScriptInfo: {
-      isVisible: boolean, // Whether the noscript infobox is visible
-    },
-    downloadsToolbar: {
-      isVisible: boolean, // Whether or not the downloads toolbar is visible
-    },
-    releaseNotes: {
-      isVisible: boolean, // Whether or not to show release notes
-    },
-    menubar: { // windows only
-      isVisible: boolean, // true if Menubar control is visible
-      selectedIndex: Array<number>, // indices of the selected menu item(s) (or null for none selected)
-      lastFocusedSelector: string // selector for the last selected element (browser ui, not frame content)
+  importBrowserDataDetail: [{
+    cookies: boolean,
+    favorites: boolean,
+    history: boolean,
+    index: string,
+    name: string,
+    type: number
+  }],
+  importBrowserDataSelected: {
+    cookies: boolean,
+    favorites: boolean,
+    history: boolean,
+    index: string,
+    type: number
+  },
+  lastAppVersion: string, // version of the last file that was saved
+  modalDialogDetail: {
+    [className]: {
+      object // props
     }
-  },
-  searchDetail: {
-    searchURL: string, // with replacement var in string: {searchTerms}
-    autocompleteURL: string, // ditto re: {searchTerms}
-  },
-  bookmarkDetail: {
-    currentDetail: Object, // Detail of the current bookmark which is in add/edit mode
-    originalDetails: Object // Detail of the original bookmark to edit
-  },
-  braveryPanelDetail: {
-    advancedControls: boolean, // If specified, indicates if advanced controls should be shown
-    expandAdblock: boolean, // If specified, indicates if the tracking protection and adblock section should be expanded
-    expandHttpse: boolean, // If specified, indicates if the httpse section should be expanded
-    expandNoScript: boolean, // Whether noscript section should be expanded
-    expandFp: boolean // Whether fingerprinting protection should be expanded
-  },
-  clearBrowsingDataDetail: {
-    browserHistory: boolean,
-    downloadHistory: boolean,
-    cachedImagesAndFiles: boolean,
-    savedPasswords: boolean,
-    allSiteCookies: boolean
-  },
-  contextMenuDetail: {
-    left: number, // the left position of the context menu
-    right: number, // the right position of the context menu
-    top: number, // the top position of the context menu
-    bottom: number, // the bottom position of the context menu
-    maxHeight: number, // the maximum height of the context menu
-    template: [{
-      label: string, // label of context menu item
-      click: function, // callback for the context menu to call when clicked
-      dragOver: function, // callback for when something is dragged over this item
-      drop: function, // callback for when something is dropped on this item
-    }],
-    openedSubmenuDetails: [{
-      y: number, // the relative y position
-      template: [
-        // per above
-      ]
-    }]
+    ...
   },
   popupWindowDetail: {
-    left: number, // the left position of the popup window
-    right: number, // the right position of the popup window
-    top: number, // the top position of the popup window
     bottom: number, // the bottom position of the popup window
+    left: number, // the left position of the popup window
     maxHeight: number, // the maximum height of the popup window
+    right: number, // the right position of the popup window
     src: string, // the src for the popup window webview
+    top: number // the top position of the popup window
   },
-  flashInitialized: boolean, // Whether flash was initialized successfully. Cleared on shutdown.
-  cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
-  lastAppVersion: string, // Version of the last file that was saved
-  ledgerInfo: {
-    creating: boolean,          // wallet is being created
-    created: boolean,           // wallet is created
-    reconcileStamp: number,     // timestamp for the next reconcilation
-    transactions: [ {           // contributions reconciling/reconciled
-      viewingId: string,        // UUIDv4 for this contribution
-      contribution: {           //
-        fiat: {                 // roughly-equivalent fiat amount
-          amount: number,       //   e.g., 5
-          currency: string      //   e.g., "USD"
-        },
-        rates: {                // exchange rate
-          [currency]: number    //   e.g., { "USD": 575.45 }
-        },
-        satoshis: number,       // actual number of satoshis transferred
-        fee: number             // bitcoin transaction fee
-      },
-      submissionStamp: number,  // timestamp for this contribution
-      count: number,            // total number of ballots allowed to be cast
-      ballots: {                // number of ballots cast for each publisher
-        [publisher]: number     //   e.g., "wikipedia.org": 3
-      }
-    } ],
-    address: string,             // the BTC wallet address (in base58)
-    passphrase: string,          // the BTC wallet passphrase
-    balance: string,             // confirmed balance in BTC.toFixed(4)
-    unconfirmed: string,         // unconfirmed balance in BTC.toFixed(4)
-    satoshis: number,            // confirmed balance as an integer number of satoshis
-    btc: string,                 // BTC to contribute per reconciliation period
-    amount: number,              // fiat amount to contribute per reconciliation period
-    currency: string,            // fiat currency denominating the amount
-    paymentURL: string,          // bitcoin:...?amount={btc}&label=Brave%20Software
-    buyURL: string,              // URL to buy bitcoin using debit/credit card
-    bravery: {                   // values round-tripped through the ledger-client
-      fee: {
-        amount: number,          //   set from `amount` above
-        currency: string         //   set from `currency` above
-      }
+  previewFrameKey: number,
+  searchResults: array, // autocomplete server results if enabled
+  ui: {
+    bookmarksToolbar: {
+      selectedFolderId: number // folderId from the siteDetail of the currently expanded folder
     },
-    hasBitcoinHandler: boolean,  // brave browser has a `bitcoin:` URI handler
-    countryCode: string,         // ISO3166 2-letter code for country of browser's location
-    exchangeInfo: {              // information about the corresponding "friendliest" BTC exchange (suggestions welcome!)
-      exchangeName: string,      // the name of the BTC exchange
-      exchangeURL: string        // the URL of the BTC exchange
+    downloadsToolbar: {
+      isVisible: boolean // whether or not the downloads toolbar is visible
     },
-    paymentIMG: string,          // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
-    error: {                     // non-null if the last updateLedgerInfo happened concurrently with an error
-      caller: string             // function in which error was handled
-      error: object              // error object returned
+    isClearBrowsingDataPanelVisible: boolean, // true if the Clear Browsing Data panel is visible
+    menubar: {
+      isVisible: boolean, // true if Menubar control is visible
+      lastFocusedSelector: string, // selector for the last selected element (browser ui, not frame content)
+      selectedIndex: Array<number> // indices of the selected menu item(s) (or null for none selected)
+    }, // windows only
+    mouseInTitlebar: boolean, // whether or not the mouse is in the titlebar
+    noScriptInfo: {
+      isVisible: boolean // Whether the noscript infobox is visible
+    },
+    releaseNotes: {
+      isVisible: boolean // whether or not to show release notes
+    },
+    siteInfo: {
+      isVisible: boolean // whether or not to show site info like # of blocked ads
+    },
+    tabs: {
+      hoverTabIndex: number, // index of the current hovered tab
+      intersectionRatio: number, // at which tab size position the tab sentinel is being intersected
+      previewMode: boolean, // whether or not tab preview should be fired based on mouse idle time
+      previewTabPageIndex: number, // index of the tab being previewed
+      tabPageIndex: number // index of the current tab page
+    },
+  },
+  widevinePanelDetail: {
+    alsoAddRememberSiteSetting: boolean, // true if an allow always rule should be added for the acitve frame as well if installed
+    location: string, // location this dialog is for
+    shown: boolean // true if the panel is shown
+  },
+  windowInfo: {
+    focused: boolean,
+    height: number,
+    left: number,
+    state: string  // "normal", "minimized", "maximized", or "fullscreen"
+    top: number,
+    type: string,  // "normal", "popup", or "devtools"
+    width: number,
+  },
+  // framesInternal is the same as index in the frames list, it's just a cache by frameKey and tabId
+  framesInternal: {
+    index: {
+      [frameKey]: [index]
+    },
+    tabIndex: {
+      [tabId]: [index]
     }
   },
-  publisherInfo: [               // one entry for each publisher having a non-zero `score`
-    {
-      rank: number,              // i.e., 1, 2, 3, ...
-      verified: boolean,         // there is a verified wallet for this publisher
-      site: string,              // publisher name, e.g., "wikipedia.org"
-      views: number,             // total page-views
-      duration: number,          // total millisecond-views, e.g., 93784000 = 1 day, 2 hours, 3 minutes, 4 seconds
-      daysSpent: number,         //   e.g., 1
-      hoursSpent: number,        //   e.g., 2
-      minutesSpent: number,      //   e.g., 3
-      secondsSpent: number,      //   e.g., 4
-      score: number,             // float indicating the current score
-      percentage: number,        // i.e., 0, 1, ... 100
-      publisherURL: string,      // publisher site, e.g., "https://wikipedia.org/"
-      faviconURL: string         // i.e., "data:image/...;base64,..."
-    }
-  ],
-  autofillAddressDetail: {
-    name: string,
-    organization: string,
-    streetAddress: string,
-    city: string,
-    state: string,
-    postalCode: string,
-    country: string,
-    phone: string,
-    email: string,
-    guid: string // id used to access the autofill entry in database
-  },
-  autofillCreditCardDetail: {
-    name: string,
-    card: string,
-    month: string,
-    year: string,
-    guid: string // id used to access the autofill entry in database
-  },
-  importBrowserDataDetail: [
-    {
-      index: string,
-      type: number,
-      name: string,
-      history: boolean,
-      favorites: boolean,
-      cookies: boolean
-    }
-  ],
-  importBrowserDataSelected: {
-    index: string,
-    type: number,
-    history: boolean,
-    favorites: boolean,
-    mergeFavorites: boolean,
-    cookies: boolean
-  }
 }
 ```

@@ -1,0 +1,21 @@
+<body>
+  <script>
+      window.onload = window.setTimeout(function () {
+          if (!document.querySelector('#password').value) {
+              document.querySelector('#password').value = 'secret'
+              document.querySelector('#old-password').value = 'secret'
+              document.querySelector('#new-password').value = 'secret2'
+              document.querySelector('#submit').click()
+          }
+      }, 200)
+  </script>
+<form action="/login4.html" name="ChangePassForm" id="ChangePassForm">
+    <input type="hidden" id="countryId" name="countryId" value="1" />
+    <input type="hidden" name="MfcISAPICommand" value="HandleNewPassword">
+    <input type="hidden" name="srt" value="01"><div class="rclSir"></div>
+    <input id='password' type="password" name="user" />
+    <input id='old-password' type="password" autocomplete="current-password" />
+    <input id='new-password' type="password" autocomplete="new-password" />
+    <input id="submit" type="submit" value="Change password" />
+</form>
+</body>

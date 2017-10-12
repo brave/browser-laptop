@@ -1,12 +1,19 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/**
+ * Some parts of this file are derived from:
+ * HTTPS Everywhere <https://github.com/EFForg/https-everywhere>
+ * Copyright (C) 2010-2017 Electronic Frontier Foundation and others
+ */
+
 'use strict'
 
-const urlParse = require('url').parse
-const DataFile = require('./dataFile')
+const urlParse = require('./common/urlParse')
+const dataFile = require('./dataFile')
 const Filtering = require('./filtering')
-const LRUCache = require('lru_cache/core').LRUCache
+const LRUCache = require('lru-cache')
 const getHostnamePatterns = require('../js/lib/urlutil').getHostnamePatterns
 
 // Map of ruleset ID to ruleset content
@@ -28,6 +35,7 @@ function loadRulesets (data) {
   var parsedData = JSON.parse(data)
   targets = parsedData.targets
   db = parsedData.rulesetStrings
+  return true
 }
 
 /**
@@ -55,7 +63,7 @@ function getRewrittenUrl (url) {
       // Try applying each ruleset
       let result = applyRuleset(url, db[rulesetIds[i]])
       if (result) {
-        cachedRewrites.put(url, result)
+        cachedRewrites.set(url, result)
         // Redirect to the first rewritten URL
         return result
       }
@@ -112,11 +120,11 @@ function startHttpsEverywhere () {
   Filtering.registerBeforeRedirectFilteringCB(onBeforeRedirect)
 }
 
-function onBeforeHTTPRequest (details) {
+function onBeforeHTTPRequest (details, isPrivate) {
   let result = { resourceName: module.exports.resourceName }
 
   const mainFrameUrl = Filtering.getMainFrameUrl(details)
-  if (!mainFrameUrl || !Filtering.isResourceEnabled(module.exports.resourceName, mainFrameUrl)) {
+  if (!mainFrameUrl || !Filtering.isResourceEnabled(module.exports.resourceName, mainFrameUrl, isPrivate)) {
     return result
   }
   // Ignore URLs that are not HTTP
@@ -137,9 +145,13 @@ function onBeforeHTTPRequest (details) {
   return result
 }
 
-function onBeforeRedirect (details) {
+function onBeforeRedirect (details, isPrivate) {
   const mainFrameUrl = Filtering.getMainFrameUrl(details)
-  if (!mainFrameUrl || !Filtering.isResourceEnabled(module.exports.resourceName, mainFrameUrl)) {
+  if (!mainFrameUrl || !Filtering.isResourceEnabled(module.exports.resourceName, mainFrameUrl, isPrivate)) {
+    return
+  }
+  // Ignore URLs that are not HTTP
+  if (!['http:', 'https:'].includes(urlParse(details.url).protocol)) {
     return
   }
 
@@ -174,7 +186,6 @@ function onBeforeRedirect (details) {
         console.log('blacklisting url from HTTPS Everywhere for too many 307s',
                     canonicalUrl)
         redirectBlacklist.push(canonicalUrl)
-        return
       }
     } else {
       recent307Counter[canonicalUrl] = 1
@@ -199,5 +210,5 @@ function canonicalizeUrl (url) {
  * Loads HTTPS Everywhere
  */
 module.exports.init = () => {
-  DataFile.init(module.exports.resourceName, startHttpsEverywhere, loadRulesets)
+  dataFile.init(module.exports.resourceName, undefined, startHttpsEverywhere, loadRulesets)
 }

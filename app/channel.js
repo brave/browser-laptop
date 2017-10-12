@@ -5,17 +5,12 @@
 'use strict'
 
 // The package npm task builds this module
-let config = {}
-try {
-  config = require('../js/constants/buildConfig')
-} catch (e) {
-  // noop here - the buildConfig may not exist in dev mode
-}
+const config = require('../js/constants/buildConfig')
 
-// The current channel is retrieved first from the environment,
-// then the buildConfig constants file and finally defaults to dev
-var channel = process.env.CHANNEL || config.channel || 'dev'
-let channels = new Set(['dev', 'beta', 'stable'])
+// The current channel is retrieved first from the buildConfig constants file,
+// then the environments and finally defaults to dev
+var channel = config.channel || process.env.CHANNEL || 'dev'
+let channels = new Set(['dev', 'beta', 'stable', 'developer', 'nightly'])
 
 if (!channels.has(channel)) {
   throw new Error(`Invalid channel ${channel}`)
@@ -24,3 +19,17 @@ if (!channels.has(channel)) {
 exports.channel = () => {
   return channel
 }
+
+exports.formattedChannel = () => {
+  const locale = require('./locale')
+
+  const channelMapping = {
+    'dev': locale.translation('channelDev'),
+    'beta': locale.translation('channelBeta')
+  }
+  return Object.keys(channelMapping).includes(channel) ? channelMapping[channel] : channel
+}
+
+exports.browserLaptopRev = () => process.env.NODE_ENV === 'development'
+  ? require('git-rev-sync').long()
+  : config.BROWSER_LAPTOP_REV

@@ -3,19 +3,24 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const messages = require('../constants/messages')
-const serializer = require('../dispatcher/serializer')
-const WindowConstants = require('../constants/windowConstants')
-const AppConstants = require('../constants/appConstants')
-const ipc = window.chrome.ipc
+const appDispatcher = require('../dispatcher/appDispatcher')
+const appConstants = require('../constants/appConstants')
+const ExtensionConstants = require('../../app/common/constants/extensionConstants')
+const ipc = window.chrome.ipcRenderer
 
-const AboutActions = {
+// aboutActions should only contain actions that are relevant to about pages,
+// it should not contain duplicates of actions from appActions, etc... because
+// you can just require and call those directly
+// using ipc.send for actions is also deprecated and dispatchAction should
+// be used along with an appropriate reducer for handling the action
+const aboutActions = {
   /**
    * Dispatches a window action
    * @param {string} key - The settings key to change the value on
    * @param {string} value - The value of the setting to set
    */
   dispatchAction: function (action) {
-    ipc.send(messages.DISPATCH_ACTION, serializer.serialize(action))
+    appDispatcher.dispatch(action)
   },
 
   /**
@@ -25,8 +30,8 @@ const AboutActions = {
    * @param {string} value - The value of the setting to set
    */
   changeSetting: function (key, value) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CHANGE_SETTING,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CHANGE_SETTING,
       key,
       value
     })
@@ -40,8 +45,8 @@ const AboutActions = {
    * @param {string} value - The value of the setting to set
    */
   changeSiteSetting: function (hostPattern, key, value) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CHANGE_SITE_SETTING,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CHANGE_SITE_SETTING,
       hostPattern,
       key,
       value
@@ -55,10 +60,57 @@ const AboutActions = {
    * @param {string} key - The settings key to change the value on
    */
   removeSiteSetting: function (hostPattern, key) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_REMOVE_SITE_SETTING,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_SITE_SETTING,
       hostPattern,
       key
+    })
+  },
+
+  /**
+   * Dispatches an event to the renderer process to remove all site settings
+   *
+   * @param {string} key - The settings key to remove
+   */
+  clearSiteSettings: function (key) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CLEAR_SITE_SETTINGS,
+      key
+    })
+  },
+
+  /**
+   * Dispatches a message when sync init data needs to be saved
+   * @param {Array.<number>|null} seed
+   */
+  saveSyncInitData: function (seed) {
+    ipc.send(messages.SAVE_INIT_DATA, seed)
+  },
+
+  /**
+   * Dispatches a message when sync needs to be restarted
+   * @param {Array.<number>|null} seed
+   */
+  reloadSyncExtension: function () {
+    ipc.send(messages.RELOAD_SYNC_EXTENSION)
+  },
+
+  /**
+   * Dispatches a message to reset Sync data on this device and the cloud.
+   */
+  resetSync: function () {
+    ipc.send(messages.RESET_SYNC)
+  },
+
+  /**
+   * Dispatched when an extension has been uninstalled
+   *
+   * @param {string} extensionId - the extension id
+   */
+  extensionUninstalled: function (extensionId) {
+    aboutActions.dispatchAction({
+      actionType: ExtensionConstants.EXTENSION_UNINSTALLED,
+      extensionId
     })
   },
 
@@ -66,12 +118,39 @@ const AboutActions = {
    * Loads a URL in a new frame in a safe way.
    * It is important that it is not a simple anchor because it should not
    * preserve the about preload script. See #672
+   * Opens a new tab and loads the specified URL.
    */
-  newFrame: function (frameOpts, openInForeground = true) {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_NEW_FRAME,
-      frameOpts,
-      openInForeground
+  createTabRequested: function (createProperties) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CREATE_TAB_REQUESTED,
+      createProperties
+    })
+  },
+
+  /**
+   * Generates a file with the users backup keys
+   */
+  ledgerGenerateKeyFile: function (backupAction) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_BACKUP_KEYS,
+      backupAction
+    })
+  },
+
+  /**
+   * Recover wallet by merging old wallet into new one
+   */
+  ledgerRecoverWallet: function (recoveryKey) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_RECOVER_WALLET,
+      recoveryKey
+    })
+  },
+
+  ledgerRecoverWalletFromFile: function () {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_RECOVER_WALLET,
+      useRecoveryKeyFile: true
     })
   },
 
@@ -102,82 +181,66 @@ const AboutActions = {
     ipc.sendToHost(messages.CONTEXT_MENU_OPENED, nodeProps, contextMenuType)
   },
 
-  moveSite: function (sourceDetail, destinationDetail, prepend, destinationIsParent) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_MOVE_SITE,
-      sourceDetail,
-      destinationDetail,
-      prepend,
-      destinationIsParent
+  downloadRevealed: function (downloadId) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_DOWNLOAD_REVEALED,
+      downloadId
     })
-  },
-
-  openDownloadPath: function (download) {
-    ipc.send(messages.OPEN_DOWNLOAD_PATH, download.toJS())
-  },
-
-  decryptPassword: function (encryptedPassword, authTag, iv, id) {
-    ipc.send(messages.DECRYPT_PASSWORD, encryptedPassword, authTag, iv, id)
   },
 
   setClipboard: function (text) {
     ipc.send(messages.SET_CLIPBOARD, text)
   },
 
-  setNewTabDetail: function (newTabPageDetail) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CHANGE_NEW_TAB_DETAIL,
-      newTabPageDetail
+  setNewTabDetail: function (newTabPageDetail, refresh) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CHANGE_NEW_TAB_DETAIL,
+      newTabPageDetail,
+      refresh
     })
   },
 
   deletePassword: function (password) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_REMOVE_PASSWORD,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_PASSWORD,
       passwordDetail: password
     })
   },
 
-  deletePasswordSite: function (origin) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CHANGE_SITE_SETTING,
-      hostPattern: origin,
-      key: 'savePasswords'
+  deletePasswordSite: function (password) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_PASSWORD_SITE,
+      passwordDetail: password
     })
   },
 
   clearPasswords: function () {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_CLEAR_PASSWORDS
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_CLEAR_PASSWORDS
     })
   },
 
-  checkFlashInstalled: function () {
-    ipc.send(messages.CHECK_FLASH_INSTALLED)
-  },
-
   setResourceEnabled: function (resourceName, enabled) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_SET_RESOURCE_ENABLED,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_SET_RESOURCE_ENABLED,
       resourceName,
       enabled
     })
   },
 
-  clearBrowsingDataNow: function (clearBrowsingDataDetail) {
-    ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW, clearBrowsingDataDetail)
+  clearBrowsingDataNow: function () {
+    ipc.sendToHost(messages.CLEAR_BROWSING_DATA_NOW)
   },
 
-  importBrowerDataNow: function () {
+  importBrowserDataNow: function () {
     ipc.send(messages.IMPORT_BROWSER_DATA_NOW)
   },
 
-  createWallet: function () {
-    ipc.send(messages.LEDGER_CREATE_WALLET)
-  },
-
-  receiptLinkClick: function (viewingId, receiptFileName) {
-    ipc.send(messages.OPEN_LEDGER_TRANSACTION_CSV, viewingId, receiptFileName)
+  /**
+   * Export bookmarks
+   */
+  exportBookmarks: function () {
+    ipc.send(messages.EXPORT_BOOKMARKS)
   },
 
   setLedgerEnabled: function (enabled) {
@@ -188,11 +251,7 @@ const AboutActions = {
    * Open a adding address dialog
    */
   addAutofillAddress: function () {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
-      currentDetail: {},
-      originalDetail: {}
-    })
+    ipc.sendToHost(messages.AUTOFILL_SET_ADDRESS, {}, {})
   },
 
   /**
@@ -201,8 +260,8 @@ const AboutActions = {
    * @param {object} address - address to remove as per doc/state.md's autofillAddressDetail
    */
   removeAutofillAddress: function (address) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_REMOVE_AUTOFILL_ADDRESS,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_AUTOFILL_ADDRESS,
       detail: address
     })
   },
@@ -213,22 +272,15 @@ const AboutActions = {
    * @param {object} address - address to edit as per doc/state.md's autofillAddressDetail
    */
   editAutofillAddress: function (address) {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_ADDRESS_DETAIL,
-      currentDetail: address,
-      originalDetail: address
-    })
+    ipc.sendToHost(messages.AUTOFILL_SET_ADDRESS, address.toJS(), address.toJS())
   },
 
   /**
    * Open a adding credit card dialog
    */
   addAutofillCreditCard: function () {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
-      currentDetail: {month: '01', year: new Date().getFullYear().toString()},
-      originalDetail: {}
-    })
+    ipc.sendToHost(messages.AUTOFILL_SET_CREDIT_CARD,
+      {month: '01', year: new Date().getFullYear().toString()}, {})
   },
 
   /**
@@ -237,8 +289,8 @@ const AboutActions = {
    * @param {object} card - credit card to remove as per doc/state.md's autofillCreditCardDetail
    */
   removeAutofillCreditCard: function (card) {
-    AboutActions.dispatchAction({
-      actionType: AppConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_REMOVE_AUTOFILL_CREDIT_CARD,
       detail: card
     })
   },
@@ -249,11 +301,54 @@ const AboutActions = {
    * @param {object} card - credit card to edit as per doc/state.md's autofillCreditCardDetail
    */
   editAutofillCreditCard: function (card) {
-    AboutActions.dispatchAction({
-      actionType: WindowConstants.WINDOW_SET_AUTOFILL_CREDIT_CARD_DETAIL,
-      currentDetail: card,
-      originalDetail: card
+    ipc.sendToHost(messages.AUTOFILL_SET_CREDIT_CARD, card.toJS(), card.toJS())
+  },
+
+  /**
+   * Dispatches an event to the browser process to register or deregister a datafile
+   *
+   * @param {uuid} The unique ID of the adblock datafile
+   * @param {enable} true if the adBlock data file should be used
+   */
+  updateAdblockDataFiles: function (uuid, enable) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_UPDATE_ADBLOCK_DATAFILES,
+      uuid,
+      enable
+    })
+  },
+
+  /**
+   * Dispatches an event to the renderer process to update custom adblock rules.
+   *
+   * @param {rules} ABP filter syntax rule string
+   */
+  updateCustomAdblockRules: function (rules) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_UPDATE_ADBLOCK_CUSTOM_RULES,
+      rules
+    })
+  },
+
+  /**
+   * Dispatch a message to set default browser
+   */
+  setAsDefaultBrowser: function () {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_DEFAULT_BROWSER_UPDATED,
+      useBrave: true
+    })
+  },
+
+  /**
+   * Dispatches a message to render a URL into a PDF file
+   */
+  renderUrlToPdf: function (url, savePath) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_RENDER_URL_TO_PDF,
+      url: url,
+      savePath: savePath
     })
   }
 }
-module.exports = AboutActions
+module.exports = aboutActions

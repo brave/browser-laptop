@@ -1,0 +1,8 @@
+#!/bin/sh
+set -exu
+/usr/bin/expect <<EOD
+spawn bash -c "rpm --resign dist/*.rpm"
+expect "Enter pass phrase:"
+send "${GPG_PASS}\r"
+expect eof
+EOD

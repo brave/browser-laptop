@@ -13,6 +13,8 @@ const {LANGUAGE, REQUEST_LANGUAGE} = require('../js/constants/messages')
 
 // Exhaustive list of identifiers used by top and context menus
 var rendererIdentifiers = function () {
+  const countryCodes = require('./common/constants/countryCodes')
+
   return [
     'downloadsManager',
     'confirmClearPasswords',
@@ -21,6 +23,7 @@ var rendererIdentifiers = function () {
     'goToPrefs',
     'goToAdobe',
     'allowFlashPlayer',
+    'allowWidevine',
     'about',
     'aboutApp',
     'quit',
@@ -37,10 +40,14 @@ var rendererIdentifiers = function () {
     'saveLinkAs',
     'allowFlashOnce',
     'allowFlashAlways',
+    'openFlashPreferences',
     'openInNewWindow',
     'openInNewSessionTab',
+    'openInNewSessionTabs',
     'openInNewPrivateTab',
+    'openInNewPrivateTabs',
     'openInNewTab',
+    'openInNewTabs',
     'openAllInTabs',
     'disableAdBlock',
     'disableTrackingProtection',
@@ -50,8 +57,15 @@ var rendererIdentifiers = function () {
     'unpinTab',
     'deleteFolder',
     'deleteBookmark',
+    'deleteBookmarks',
     'deleteHistoryEntry',
+    'deleteHistoryEntries',
     'deleteLedgerEntry',
+    'ledgerBackupText1',
+    'ledgerBackupText2',
+    'ledgerBackupText3',
+    'ledgerBackupText4',
+    'ledgerBackupText5',
     'editFolder',
     'editBookmark',
     'unmuteTabs',
@@ -64,6 +78,7 @@ var rendererIdentifiers = function () {
     'closeOtherTabs',
     'closeTabsToRight',
     'closeTabsToLeft',
+    'closeTabPage',
     'bookmarkPage',
     'bookmarkLink',
     'openFile',
@@ -72,7 +87,6 @@ var rendererIdentifiers = function () {
     'importFrom',
     'closeWindow',
     'savePageAs',
-    'spreadTheWord',
     'share',
     'undo',
     'redo',
@@ -99,6 +113,7 @@ var rendererIdentifiers = function () {
     'cleanReload',
     'reload',
     'clone',
+    'detach',
     'readingView',
     'tabManager',
     'textEncoding',
@@ -114,6 +129,7 @@ var rendererIdentifiers = function () {
     'clearCache',
     'clearHistory',
     'clearSiteData',
+    'clearBrowsingData',
     'recentlyClosed',
     'recentlyVisited',
     'bookmarks',
@@ -139,6 +155,14 @@ var rendererIdentifiers = function () {
     'newWindow',
     'reopenLastClosedTab',
     'print',
+    'emailPageLink',
+    'tweetPageLink',
+    'facebookPageLink',
+    'pinterestPageLink',
+    'googlePlusPageLink',
+    'linkedInPageLink',
+    'bufferPageLink',
+    'redditPageLink',
     'findOnPage',
     'find',
     'checkForUpdates',
@@ -146,7 +170,7 @@ var rendererIdentifiers = function () {
     'settings',
     'bookmarksManager',
     'importBrowserData',
-    'reportAnIssue',
+    'exportBookmarks',
     'submitFeedback',
     'bookmarksToolbar',
     'bravery',
@@ -156,9 +180,10 @@ var rendererIdentifiers = function () {
     'braveryStartUsingPayments',
     'blockPopups',
     'learnSpelling',
-    'ignoreSpelling',
+    'forgetLearnedSpelling',
     'lookupSelection',
     // Other identifiers
+    'aboutBlankTitle',
     'urlCopied',
     'autoHideMenuBar',
     'unexpectedErrorWindowReload',
@@ -185,23 +210,34 @@ var rendererIdentifiers = function () {
     'reconciliationNotification',
     'reviewSites',
     'addFunds',
+    'turnOffNotifications',
     'copyToClipboard',
     'smartphoneTitle',
-    'displayQRCode',
     'updateLater',
     'updateHello',
+    // notifications
     'notificationPasswordWithUserName',
+    'notificationUpdatePasswordWithUserName',
+    'notificationUpdatePassword',
     'notificationPassword',
     'notificationPasswordSettings',
     'notificationPaymentDone',
     'notificationTryPayments',
     'notificationTryPaymentsYes',
     'prefsRestart',
+    'areYouSure',
+    'dismiss',
     'yes',
     'no',
     'noThanks',
     'neverForThisSite',
+    'walletConvertedBackup',
+    'walletConvertedDismiss',
+    'walletConvertedLearnMore',
+    'walletConvertedToBat',
+    // other
     'passwordsManager',
+    'extensionsManager',
     'downloadItemPause',
     'downloadItemResume',
     'downloadItemCancel',
@@ -212,6 +248,7 @@ var rendererIdentifiers = function () {
     'downloadItemClear',
     'downloadToolbarHide',
     'downloadItemClearCompleted',
+    'torrentDesc',
     // Caption buttons in titlebar (min/max/close - Windows only)
     'windowCaptionButtonMinimize',
     'windowCaptionButtonMaximize',
@@ -221,19 +258,36 @@ var rendererIdentifiers = function () {
     'importSuccess',
     'licenseTextOk',
     'closeFirefoxWarningOk',
-    'importSuccessOk'
-  ]
+    'importSuccessOk',
+    'connectionError',
+    'unknownError',
+    'allowAutoplay',
+    'autoplayMedia',
+    // Release channels
+    'channelDev',
+    'channelBeta'
+  ].concat(countryCodes)
 }
 
 var ctx = null
 var translations = {}
 var lang = 'en-US'
 
+// todo: FSI/PDI stripping can probably be replaced once
+// https://github.com/l20n/l20n.js/commit/2fea50bf43c43a8e930a519a37f0f64f3626e885
+// is released
+const FSI = '\u2068'
+const PDI = '\u2069'
+
 // Return a translate token from cache or a placeholder
 // indicating that no translation is available
-exports.translation = function (token) {
+exports.translation = function (token, replacements = {}) {
   if (translations[token]) {
-    return translations[token]
+    let returnVal = translations[token]
+    for (var key in replacements) {
+      returnVal = returnVal.replace(new RegExp(FSI + '{{\\s*' + key + '\\s*}}' + PDI), replacements[key])
+    }
+    return returnVal
   } else {
     // This will return an identifier in upper case useful for determining if a translation was not requested in the menu
     // identifiers above.
@@ -252,6 +306,7 @@ const availableLanguages = [
   'cs',
   'nl-NL',
   'en-US',
+  'en-GB',
   'fr-FR',
   'de-DE',
   'hi-IN',
@@ -264,6 +319,7 @@ const availableLanguages = [
   'pt-BR',
   'ru',
   'sl',
+  'sv-SE',
   'es',
   'ta',
   'te',
@@ -552,10 +608,14 @@ exports.init = function (language) {
   const propertyFiles = []
   const appendLangProperties = function (lang) {
     // Property files to parse (only ones containing menu specific identifiers)
-    propertyFiles.push(path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'menu.properties'),
+    propertyFiles.push(
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'menu.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'app.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'error.properties'),
-      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'passwords.properties'))
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'passwords.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'common.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'countries.properties')
+      )
   }
 
   appendLangProperties(lang)

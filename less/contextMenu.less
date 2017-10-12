@@ -4,6 +4,10 @@
 
 @import "variables.less";
 
+:root {
+  --context-menu-single-max-width: 400px;
+}
+
 .contextMenu {
   border-radius: @borderRadius;
   box-sizing: border-box;
@@ -16,27 +20,35 @@
   }
   // This is a reasonable max height and also solves problems for bookmarks menu
   // and bookmarks overflow menu reaching down too low.
-  height: 100%;
-  width: 100%;
+  min-width: 225px;
   @usedUpChrome: @navbarHeight + @bookmarksToolbarWithFaviconsHeight;
   max-height: calc(~'100% - @{usedUpChrome}');
   overflow: auto;
   position: absolute;
   z-index: @zindexContextMenu;
-  -webkit-user-select: none;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  user-select: none;
+
+  &::-webkit-scrollbar {
+    background-color: transparent;
+  }
+
   &.reverseExpand {
     flex-direction: row-reverse;
+    padding-right: 0;
+    padding-left: 10px;
   }
 
   .contextMenuSingle {
-    background-color: rgba(238, 238, 238, 0.97);
+    background-color: rgba(238, 238, 238, 1);
     border: 1px solid rgba(204, 204, 204, 0.54);
     box-shadow: 1px 4px 8px -3px rgba(0, 0, 0, 0.5);
     border-radius: @borderRadius;
     box-sizing: border-box;
     display: table;
     min-width: 220px;
-    max-width: 400px;
+    max-width: var(--context-menu-single-max-width);
 
     &.isSubmenu {
       position: relative;
@@ -79,7 +91,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  -webkit-user-select: none;
+  user-select: none;
 
   &.multiContextMenuItem {
     display: flex;
@@ -95,7 +107,7 @@
       text-align: center;
     }
 
-    .multiItemTitle {
+    .contextMenuItemText {
       margin-top: auto;
       margin-bottom: auto;
       padding-right: 10px;
@@ -118,6 +130,11 @@
       &:hover {
         background-color: lighten(@menuSelectionColor, 5%);
         color: white;
+
+        .accelerator,
+        .submenuIndicator {
+          color: #fff;
+        }
       }
     }
   }

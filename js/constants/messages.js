@@ -5,6 +5,11 @@
 const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 
 const _ = null
+
+// DO NOT ADD TO THIS LIST
+// If you are adding an ipc message you should probably be using an action instead
+// If you think you have a really good reason for adding something please check
+// with @bbondy or @bridiver first to see if there is an alternative
 const messages = {
   // URL bar shortcuts
   SHORTCUT_FOCUS_URL: _,
@@ -12,7 +17,6 @@ const messages = {
   SHORTCUT_ACTIVE_FRAME_STOP: _,
   SHORTCUT_ACTIVE_FRAME_RELOAD: _,
   SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD: _,
-  SHORTCUT_ACTIVE_FRAME_CLONE: _,
   SHORTCUT_ACTIVE_FRAME_ZOOM_IN: _,
   SHORTCUT_ACTIVE_FRAME_ZOOM_OUT: _,
   SHORTCUT_ACTIVE_FRAME_ZOOM_RESET: _,
@@ -27,18 +31,13 @@ const messages = {
   SHORTCUT_ACTIVE_FRAME_FORWARD: _,
   SHORTCUT_ACTIVE_FRAME_BOOKMARK: _,
   SHORTCUT_ACTIVE_FRAME_REMOVE_BOOKMARK: _,
-  SHORTCUT_ACTIVE_FRAME_LOAD_URL: _, /** @arg {string} url to load */
-  SHORTCUT_ACTIVE_FRAME_COPY: _,
   SHORTCUT_ACTIVE_FRAME_FIND_NEXT: _,
   SHORTCUT_ACTIVE_FRAME_FIND_PREV: _,
   // Frame management shortcuts
-  SHORTCUT_NEW_FRAME: _, /** @arg {string} opt_url to load if any */
   SHORTCUT_CLOSE_FRAME: _, /** @arg {number} opt_key of frame, defaults to active frame */
-  SHORTCUT_CLOSE_OTHER_FRAMES: _, /** @arg {boolean} close to the right, @arg {boolean} close to the left */
   SHORTCUT_UNDO_CLOSED_FRAME: _,
   SHORTCUT_FRAME_MUTE: _,
   SHORTCUT_FRAME_RELOAD: _, /** @arg {number} key of frame */
-  SHORTCUT_FRAME_CLONE: _, /** @arg {number} key of frame, @arg {object} options such as openInForeground */
   SHORTCUT_NEXT_TAB: _,
   SHORTCUT_PREV_TAB: _,
   SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL: _,
@@ -57,7 +56,6 @@ const messages = {
   UPDATE_AVAILABLE: _,
   UPDATE_NOT_AVAILABLE: _,
   CHECK_FOR_UPDATE: _,
-  SHOW_ABOUT: _,
   UPDATE_META_DATA_RETRIEVED: _,
   // App state
   APP_INITIALIZED: _,
@@ -75,28 +73,11 @@ const messages = {
   GO_BACK: _,
   GO_FORWARD: _,
   RELOAD: _,
-  CAN_SWIPE_BACK: _,
-  CAN_SWIPE_FORWARD: _,
-  CHECK_SWIPE_BACK: _,
-  CHECK_SWIPE_FORWARD: _,
-  ENABLE_SWIPE_GESTURE: _,
-  DISABLE_SWIPE_GESTURE: _,
-  SHOW_FLASH_NOTIFICATION: _,
-  // Password manager
-  GET_PASSWORDS: _, /** @arg {string} formOrigin, @arg {string} action */
-  GOT_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action, @arg {boolean} isUnique */
-  SAVE_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} formOrigin, @arg {string} action */
-  IS_MISSPELLED: _, /** @arg {string} word, the word to check */
-  GET_MISSPELLING_INFO: _, /** @arg {string} word, the word to lookup */
-  SHOW_USERNAME_LIST: _, /** @arg {string} formOrigin, @arg {string} action, @arg {Object} boundingRect, @arg {string} usernameValue */
-  FILL_PASSWORD: _, /** @arg {string} username, @arg {string} password, @arg {string} origin, @arg {string} action */
+  DETACH: _,
   PASSWORD_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
   PASSWORD_SITE_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
-  DECRYPT_PASSWORD: _, /** @arg {string} encrypted pw, @arg {string} iv, @arg {string} authTag, @arg {number} id */
-  DECRYPTED_PASSWORD: _, /** @arg {number} decrypted pw, @arg {number} id */
   // Init
   INITIALIZE_WINDOW: _,
-  INITIALIZE_PARTITION: _, /** @arg {string} name of partition */
   // Session restore
   REQUEST_WINDOW_STATE: _,
   RESPONSE_WINDOW_STATE: _,
@@ -115,17 +96,18 @@ const messages = {
   EXTENSIONS_UPDATED: _,
   ADBLOCK_UPDATED: _,
   DOWNLOADS_UPDATED: _,
-  FLASH_UPDATED: _,
+  NEWTAB_DATA_UPDATED: _,
+  VERSION_INFORMATION_UPDATED: _,
   // About pages from contentScript
-  OPEN_DOWNLOAD_PATH: _,
-  RELOAD_URL: _,
   DISPATCH_ACTION: _,
-  CHECK_FLASH_INSTALLED: _,
   ABOUT_COMPONENT_INITIALIZED: _,
   CLEAR_BROWSING_DATA_NOW: _,
   IMPORT_BROWSER_DATA_NOW: _,
+  EXPORT_BOOKMARKS: _,
   IMPORTER_LIST: _,
   // Autofill
+  AUTOFILL_SET_ADDRESS: _,
+  AUTOFILL_SET_CREDIT_CARD: _,
   AUTOFILL_ADDRESSES_UPDATED: _,
   AUTOFILL_CREDIT_CARDS_UPDATED: _,
   // HTTPS
@@ -135,10 +117,10 @@ const messages = {
   SET_CERT_ERROR_DETAIL: _,
   SET_SECURITY_STATE: _, /** @arg {number} key of frame, @arg {Object} security state */
   HTTPSE_RULE_APPLIED: _, /** @arg {string} name of ruleset file, @arg {Object} details of rewritten request */
+  // Dispatch related message
+  WINDOW_RENDERER_READY: _,
   // Extensions
   NEW_POPUP_WINDOW: _,
-  // NoScript
-  TEMPORARY_ALLOW_SCRIPTS: _, /** @arg {string} origin to allow scripts on */
   // Localization
   LANGUAGE: _, /** @arg {string} langCode, @arg {Array} availableLanguages */
   REQUEST_LANGUAGE: _,
@@ -150,11 +132,19 @@ const messages = {
   DEBUG_REACT_PROFILE: _,
   // Ledger
   LEDGER_PUBLISHER: _,
+  LEDGER_PUBLISHER_RESPONSE: _,
   LEDGER_UPDATED: _,
-  LEDGER_CREATE_WALLET: _,
-  OPEN_LEDGER_TRANSACTION_CSV: _,
-  CHECK_BITCOIN_HANDLER: _,
-  ADD_FUNDS_CLOSED: _
+  RENDER_URL_TO_PDF: _,
+  // Sync
+  SYNC_UPDATED: _,
+  SAVE_INIT_DATA: _,
+  RELOAD_SYNC_EXTENSION: _,
+  RESET_SYNC: _,
+  // PDFJS
+  LOAD_URL_REQUESTED: _,
+  // Torrent
+  TORRENT_MESSAGE: _
+  // DO NOT ADD TO THIS LIST - see above
 }
 
 module.exports = mapValuesByKeys(messages)
