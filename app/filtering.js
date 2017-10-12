@@ -23,7 +23,6 @@ const config = require('../js/constants/config')
 const locale = require('./locale')
 const {isSessionPartition} = require('../js/state/frameStateUtil')
 const ipcMain = electron.ipcMain
-const dialog = electron.dialog
 const app = electron.app
 const uuid = require('uuid')
 const path = require('path')
@@ -578,8 +577,8 @@ function registerForDownloadListener (session) {
     }
 
     const defaultDir = (getSetting(settings.DOWNLOAD_DEFAULT_PATH) || getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'))
-    let savePath
     if (process.env.SPECTRON || (!getSetting(settings.DOWNLOAD_ALWAYS_ASK) && !item.promptForSaveLocation())) {
+      let savePath = path.join(defaultDir, itemFilename)
       let willOverwrite = true
       let matchedFilenames = 0
       while (willOverwrite) {
@@ -590,19 +589,8 @@ function registerForDownloadListener (session) {
           matchedFilenames++
         }
       }
-    } else {
-      savePath = dialog.showSaveDialog(win, { defaultPath: path.join(defaultDir, itemFilename) })
+      item.setSavePath(savePath)
     }
-
-    // User cancelled out of save dialog prompt
-    if (!savePath) {
-      event.preventDefault()
-      return
-    }
-
-    item.setSavePath(savePath)
-    appActions.changeSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH, path.dirname(savePath))
-
     const downloadId = uuid.v4()
     updateDownloadState(win, downloadId, item, downloadStates.PENDING)
     if (win) {
