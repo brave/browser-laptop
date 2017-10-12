@@ -74,6 +74,7 @@ const v2RulesetPath = 'ledger-rulesV2.leveldb'
 let v2PublishersDB
 const v2PublishersPath = 'ledger-publishersV2.leveldb'
 const statePath = 'ledger-state.json'
+const newClientPath = 'ledger-newstate.json'
 
 // Definitions
 const miliseconds = {
@@ -1885,7 +1886,22 @@ const onCallback = (state, result, delayTime) => {
     })
   }
 
+  // persist the new ledger state
   muonWriter(statePath, regularResults)
+
+  // delete the temp file used during transition (if it still exists)
+  if (client && client.options && client.options.version === 'v2') {
+    const fs = require('fs')
+    fs.access(pathName(newClientPath), fs.FF_OK, (err) => {
+      if (err) {
+        return
+      }
+      fs.unlink(pathName(newClientPath), (err) => {
+        if (err) console.error('unlink error: ' + err.toString())
+      })
+    })
+  }
+
   run(state, delayTime)
 
   return state
@@ -2246,9 +2262,9 @@ const deleteSynopsis = () => {
 let newClient = null
 const transitionWalletToBat = () => {
   let newPaymentId, result
-  const newClientPath = 'ledger-newstate.json'
 
   if (newClient === true) return
+
   // Restore newClient from the file
   if (!newClient) {
     const fs = require('fs')
@@ -2291,6 +2307,8 @@ const transitionWalletToBat = () => {
 
       if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1, max: 500 })
 
+      muonWriter(newClientPath, newClient)
+
       setTimeout(() => transitionWalletToBat(), delayTime)
     })
     return
@@ -2311,13 +2329,10 @@ const transitionWalletToBat = () => {
         result = newClient.transitioned(properties)
         client = newClient
         newClient = true
+        // NOTE: onLedgerCallback will save latest client to disk as ledger-state.json
         appActions.onLedgerCallback(result, random.randomInt({ min: miliseconds.minute, max: 10 * miliseconds.minute }))
         appActions.onBitcoinToBatTransitioned()
         notifications.showBraveWalletUpdated()
-        const fs = require('fs')
-        fs.unlink(pathName(newClientPath), (err) => {
-          if (err) console.error('unlink error: ' + err.toString())
-        })
       }
     })
   } catch (ex) {
