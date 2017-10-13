@@ -151,7 +151,8 @@ class Navigator extends React.Component {
   render () {
     return <div className={cx({
       navbarCaptionButtonContainer: true,
-      allowDragging: this.props.shouldAllowWindowDrag
+      allowDragging: this.props.shouldAllowWindowDrag,
+      [css(this.props.activeTabShowingMessageBox && styles.navigatorWrapper_activeTabShowingMessageBox)]: true
     })}>
       <div className='navbarMenubarFlexContainer'>
         {
@@ -251,6 +252,9 @@ class Navigator extends React.Component {
 module.exports = ReduxComponent.connect(Navigator)
 
 const styles = StyleSheet.create({
+  navigatorWrapper_activeTabShowingMessageBox: {
+    pointerEvents: 'none'
+  },
   lionBadge: {
     left: 'calc(50% - 1px)',
     top: '14px',
