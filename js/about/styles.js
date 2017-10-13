@@ -290,13 +290,17 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton subtleItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <BrowserButton groupedItem primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
-        <BrowserButton groupedItem secondaryColor l10nId='secondaryColor' onClick={this.onRemoveBookmark} />
-        <BrowserButton groupedItem primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
+        <div>
+          <BrowserButton groupedItem primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
+          <BrowserButton groupedItem secondaryColor l10nId='secondaryColor' onClick={this.onRemoveBookmark} />
+          <BrowserButton groupedItem primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
+        </div>
         <Pre><Code>
-          &lt;BrowserButton groupedItem primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}
-          &lt;BrowserButton groupedItem secondaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}
-          &lt;BrowserButton groupedItem primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+          &lt;div>
+          <Tab>&lt;BrowserButton groupedItem primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}</Tab>
+          <Tab>&lt;BrowserButton groupedItem secondaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}</Tab>
+          <Tab>&lt;BrowserButton groupedItem primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} /></Tab>
+          &lt;/div>
         </Code></Pre>
 
         <BrowserButton extensionItem l10nId='extensionItem' onClick={this.onRemoveBookmark} />
@@ -304,11 +308,15 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton extensionItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
-        <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
+        <div>
+          <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
+          <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
+        </div>
         <Pre><Code>
-          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Allow' onClick={'{this.onEnableAutoplay}'} />{'\n'}
-          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Deny' onClick={'{this.onEnableAutoplay}'} />
+          &lt;div>
+          <Tab>&lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Allow' onClick={'{this.onEnableAutoplay}'} />{'\n'}</Tab>
+          <Tab>&lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Deny' onClick={'{this.onEnableAutoplay}'} /></Tab>
+          &lt;/div>
         </Code></Pre>
 
         <BrowserButton iconOnly iconClass={globalStyles.appIcons.moreInfo} size='30px' color='rebeccapurple' />
