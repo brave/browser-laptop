@@ -15,10 +15,6 @@ const tabUIState = require('../../../../common/state/tabUIState')
 const closeState = require('../../../../common/state/tabContentState/closeState')
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
-// Actions
-const windowActions = require('../../../../../js/actions/windowActions')
-const appActions = require('../../../../../js/actions/appActions')
-
 // Styles
 const {theme} = require('../../styles/theme')
 const {spacing, zindex} = require('../../styles/global')
@@ -28,18 +24,7 @@ const closeTabSvg = require('../../../../extensions/brave/img/tabs/close_btn.svg
 class CloseTabIcon extends React.Component {
   constructor (props) {
     super(props)
-    this.onClick = this.onClick.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
-  }
-
-  onClick (event) {
-    event.stopPropagation()
-    if (this.props.hasFrame) {
-      windowActions.onTabClosedWithMouse({
-        fixTabWidth: this.props.fixTabWidth
-      })
-      appActions.tabCloseRequested(this.props.tabId)
-    }
   }
 
   onDragStart (event) {
@@ -54,12 +39,10 @@ class CloseTabIcon extends React.Component {
 
     const props = {}
     props.isPinned = isPinned
-    props.fixTabWidth = ownProps.fixTabWidth
+    props.onClick = ownProps.onClick
     props.hasFrame = frameStateUtil.hasFrame(currentWindow, frameKey)
     props.centralizeTabIcons = tabUIState.centralizeTabIcons(currentWindow, frameKey, isPinned)
     props.showCloseIcon = closeState.showCloseTabIcon(currentWindow, frameKey)
-    props.tabId = tabId
-
     return props
   }
 
@@ -76,7 +59,7 @@ class CloseTabIcon extends React.Component {
         this.props.centralizeTabIcons && styles.closeTab__icon_centered
       )}
       l10nId='closeTabButton'
-      onClick={this.onClick}
+      onClick={this.props.onClick}
       onDragStart={this.onDragStart}
       draggable='true'
     />

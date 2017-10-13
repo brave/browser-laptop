@@ -61,6 +61,7 @@ class Tab extends React.Component {
     this.onDragOver = this.onDragOver.bind(this)
     this.onClickTab = this.onClickTab.bind(this)
     this.onObserve = this.onObserve.bind(this)
+    this.onTabClosedWithMouse = this.onTabClosedWithMouse.bind(this)
     this.tabNode = null
   }
 
@@ -356,7 +357,7 @@ class Tab extends React.Component {
         </div>
         <PrivateIcon tabId={this.props.tabId} />
         <NewSessionIcon tabId={this.props.tabId} />
-        <CloseTabIcon tabId={this.props.tabId} fixTabWidth={this.fixTabWidth} />
+        <CloseTabIcon tabId={this.props.tabId} onClick={this.onTabClosedWithMouse} />
       </div>
     </div>
   }
