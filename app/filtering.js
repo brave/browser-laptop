@@ -25,7 +25,6 @@ const {isSessionPartition} = require('../js/state/frameStateUtil')
 const ipcMain = electron.ipcMain
 const app = electron.app
 const path = require('path')
-const fs = require('fs')
 const getOrigin = require('../js/lib/urlutil').getOrigin
 const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
