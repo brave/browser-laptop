@@ -3,6 +3,7 @@
 * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const ReactDOM = require('react-dom')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
@@ -17,10 +18,15 @@ const tabState = require('../../../../common/state/tabState')
 // Styles
 const {theme} = require('../../styles/theme')
 const globalStyles = require('../../styles/global')
-const {opacityIncreaseKeyframes} = require('../../styles/animations')
+const {opacityIncreaseElementKeyframes} = require('../../styles/animations')
 const privateSvg = require('../../../../extensions/brave/img/tabs/private.svg')
 
 class PrivateIcon extends React.Component {
+  constructor (props) {
+    super(props)
+    this.setRef = this.setRef.bind(this)
+  }
+
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const tabId = ownProps.tabId
@@ -33,6 +39,35 @@ class PrivateIcon extends React.Component {
     props.tabId = tabId
 
     return props
+  }
+
+  componentDidMount (props) {
+    this.transitionInIfRequired()
+  }
+
+  componentDidUpdate (prevProps) {
+    this.transitionInIfRequired(prevProps)
+  }
+
+  transitionInIfRequired (prevProps) {
+    const shouldTransitionIn = (
+      // need to have the element created already
+      this.element &&
+      // should show the icon
+      this.props.showPrivateIcon &&
+      // state has changed
+      (!prevProps || !prevProps.showPrivateIcon)
+    )
+    if (shouldTransitionIn) {
+      this.element.animate(opacityIncreaseElementKeyframes, {
+        duration: 200,
+        easing: 'linear'
+      })
+    }
+  }
+
+  setRef (ref) {
+    this.element = ReactDOM.findDOMNode(ref)
   }
 
   render () {
@@ -51,6 +86,7 @@ class PrivateIcon extends React.Component {
     return <TabIcon
       data-test-id='privateIcon'
       className={css(styles.private__icon, privateProps.private__icon_color)}
+      ref={this.setRef}
     />
   }
 }
@@ -59,14 +95,7 @@ module.exports = ReduxComponent.connect(PrivateIcon)
 
 const styles = StyleSheet.create({
   private__icon: {
-    opacity: 0,
     willChange: 'opacity',
-    animationName: opacityIncreaseKeyframes,
-    animationDelay: '100ms',
-    animationTimingFunction: 'linear',
-    animationDuration: '200ms',
-    animationFillMode: 'forwards',
-
     zIndex: globalStyles.zindex.zindexTabsThumbnail,
     boxSizing: 'border-box',
     WebkitMaskRepeat: 'no-repeat',
