@@ -5,7 +5,7 @@
 'use strict'
 
 const tabs = require('./browser/tabs')
-const {fileUrl} = require('../../js/lib/appUrlUtil')
+const {fileUrl} = require('../js/lib/appUrlUtil')
 const {getWebContents} = require('./browser/webContentsCache')
 
 const renderToPdf = (appState, action) => {
