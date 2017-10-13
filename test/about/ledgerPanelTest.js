@@ -53,6 +53,7 @@ describe('Regular payment panel tests', function () {
         .waitForVisible(paymentsTab)
         .click(paymentsTab)
         .waitForVisible(paymentsWelcomePage)
+        .waitForVisible(walletSwitch)
       let background = yield this.app.client.getCssProperty(walletSwitch, 'background-color')
       assert.equal(background.value, 'rgba(204,204,204,1)')
     })
