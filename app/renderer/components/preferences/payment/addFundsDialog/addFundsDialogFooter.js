@@ -112,7 +112,7 @@ class AddFundsDialogFooter extends React.Component {
             />
           </div>
         </div>
-        <div>
+        <div className={css(styles.footer__wrapper)}>
           {
             this.showBackButton
               ? <BrowserButton l10nId='backWithArrow'
@@ -173,6 +173,10 @@ const styles = StyleSheet.create({
     fontSize: 'small',
     fontStyle: 'italic',
     margin: '0 10px'
+  },
+
+  footer__wrapper: {
+    display: 'flex'
   }
 })
 
