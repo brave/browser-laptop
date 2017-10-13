@@ -53,12 +53,10 @@
   }
 }
 
-.tabArea {
-  box-sizing: border-box;
-  display: inline-block;
+.tabDragArea {
+  overflow: visible;
   position: relative;
-  vertical-align: top;
-  overflow: hidden;
+
   height: -webkit-fill-available;
   // There's a special case that tabs should span the full width
   // if there are a full set of them.
@@ -68,10 +66,20 @@
 
   &:not(.isPinned) {
     flex: 1;
-    &:first-child {
-      //padding-left: 6px;
-    }
   }
+
+}
+
+.tabArea {
+  box-sizing: border-box;
+  width: 100%;
+  display: inline-block;
+  position: absolute;
+  top: 0;right: 0;
+  left: 0; bottom: 0;
+  vertical-align: top;
+  overflow: hidden;
+  transition: transform .1s;
 
   &.isPinned {
     .tabIcon {
@@ -80,20 +88,19 @@
     }
   }
 
-  &.draggingOverLeft {
-    &:not(.isDragging) {
-      padding-left: @dragSpacing;
-    }
+  &.insertingPrevious {
+    transform: translateX(100%);
+    pointer-events: none;
   }
 
-  &.draggingOverRight {
-    &:not(.isDragging) {
-      padding-right: @dragSpacing;
-    }
+  &.insertingNext {
+    transform: translateX(-100%);
+    pointer-events: none;
   }
 
   &.isDragging {
     opacity: 0.2;
+    visibility: hidden;
   }
 
   hr.dragIndicator {
