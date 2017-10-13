@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+  const globalStyles = require('./global')
+
  /**
   * Includes color options for theming
   * This should be used as a boilerplate for all
@@ -61,6 +63,33 @@
           close: {
             filter: 'invert(100%) grayscale(1) contrast(0.5) brightness(160%)'
           }
+        }
+      }
+    },
+
+    findBar: {
+      backgroundColor: '#F7F7F7',
+      color: globalStyles.color.highlightBlue,
+
+      border: {
+        bottom: {
+          color: globalStyles.color.lightGray
+        }
+      },
+
+      string: {
+        icon: {
+          color: globalStyles.color.gray
+        }
+      },
+
+      find: {
+        color: '#555'
+      },
+
+      close: {
+        onHover: {
+          color: 'inherit'
         }
       }
     }

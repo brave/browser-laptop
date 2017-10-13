@@ -4,7 +4,7 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -29,6 +29,9 @@ const cx = require('../../../../js/lib/classSet')
 
 // Styles
 const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
+const {theme} = require('../styles/theme')
+const {commonFormStyles} = require('../common/commonForm')
 
 class FindBar extends React.Component {
   constructor (props) {
@@ -183,18 +186,22 @@ class FindBar extends React.Component {
         numberOfMatches: this.props.numberOfMatches
       }
 
-      return <div className='foundResults'
+      return <div
         data-l10n-args={JSON.stringify(l10nArgs)}
-        data-l10n-id='findResults' />
+        data-l10n-id='findResults'
+        data-test-id='foundResults'
+      />
     } else if (this.props.numberOfMatches === 0 && this.props.searchString) {
       const l10nArgs = {
         activeMatchOrdinal: this.props.activeMatchOrdinal,
         numberOfMatches: this.props.numberOfMatches
       }
 
-      return <div className='foundResults'
+      return <div
         data-l10n-args={JSON.stringify(l10nArgs)}
-        data-l10n-id='findResultMatches' />
+        data-l10n-id='findResultMatches'
+        data-test-id='foundResults'
+      />
     }
 
     return null
@@ -240,58 +247,146 @@ class FindBar extends React.Component {
       }
     }
 
-    return <div className='findBar' style={findBarStyle} onBlur={this.onBlur}>
-      <div className='searchContainer'>
-        <div className='searchStringContainer'>
-          <span className='searchStringContainerIcon fa fa-search' />
-          <input
-            ref={(node) => { this.searchInput = node }}
-            type='text'
-            spellCheck='false'
-            onContextMenu={this.onContextMenu}
-            onFocus={this.onInputFocus}
-            onKeyDown={this.onKeyDown}
-            onInput={this.onInput}
-          />
-          <span
-            className='searchStringContainerIcon fa fa-times findClear'
-            onClick={this.onClear}
-          />
-        </div>
-        <span className='findMatchText'>{this.findTextMatch}</span>
-        <BrowserButton
-          iconOnly
-          iconClass={globalStyles.appIcons.findPrev}
-          inlineStyles={findBarStyle}
-          testId='findBarPrevButton'
-          disabled={this.props.numberOfMatches <= 0}
-          onClick={this.onFindPrev}
+    // See autofillAddressPanel.js
+    // Ref: https://github.com/brave/browser-laptop/pull/7164#discussion_r100586892
+    const commonForm = css(
+      commonStyles.formControl,
+      commonStyles.textbox,
+      commonStyles.textbox__outlineable,
+      commonStyles.isCommonForm,
+      commonFormStyles.input__box,
+      styles.findBar__string__input
+    )
+
+    return <div className={css(styles.findBar)} style={findBarStyle} data-test-id='findBar' onBlur={this.onBlur}>
+      <div className={css(styles.findBar__string)}>
+        <span className={cx({
+          [globalStyles.appIcons.search]: true,
+          [css(styles.findBar__string__icon, styles.findBar__string__icon_search)]: true
+        })} />
+        <input
+          className={commonForm}
+          ref={(node) => { this.searchInput = node }}
+          type='text'
+          spellCheck='false'
+          onContextMenu={this.onContextMenu}
+          onFocus={this.onInputFocus}
+          onKeyDown={this.onKeyDown}
+          onInput={this.onInput}
+          data-test-id='findBarInput'
         />
         <BrowserButton
-          iconOnly
-          iconClass={globalStyles.appIcons.findNext}
-          inlineStyles={findBarStyle}
-          testId='findBarNextButton'
-          disabled={this.props.numberOfMatches <= 0}
-          onClick={this.onFindNext}
-        />
-        <SwitchControl
-          id='caseSensitivityCheckbox'
-          checkedOn={this.props.isCaseSensitive}
-          onClick={this.onCaseSensitivityChange}
-          customRightTextClassName={css(findBarTextStyles.matchingTextColor)}
-          rightl10nId='caseSensitivity'
+          iconClass={globalStyles.appIcons.remove}
+          custom={[
+            styles.findBar__string__icon,
+            styles.findBar__string__icon_clear
+          ]}
+          onClick={this.onClear}
+          testId='findBarClearButton'
         />
       </div>
-      <span
-        className={cx({
-          closeButton: true,
-          [css(findBarTextStyles.matchingTextColor)]: true
-        })}
+      <span className={css(
+        styles.findBar__find,
+        findBarTextStyles.matchingTextColor
+      )}>
+        {this.findTextMatch}
+      </span>
+      <BrowserButton
+        iconOnly
+        iconClass={globalStyles.appIcons.findPrev}
+        inlineStyles={findBarStyle}
+        testId='findBarPrevButton'
+        disabled={this.props.numberOfMatches <= 0}
+        onClick={this.onFindPrev}
+      />
+      <BrowserButton
+        iconOnly
+        iconClass={globalStyles.appIcons.findNext}
+        inlineStyles={findBarStyle}
+        testId='findBarNextButton'
+        disabled={this.props.numberOfMatches <= 0}
+        onClick={this.onFindNext}
+      />
+      <SwitchControl
+        checkedOn={this.props.isCaseSensitive}
+        onClick={this.onCaseSensitivityChange}
+        customRightTextClassName={css(findBarTextStyles.matchingTextColor)}
+        rightl10nId='caseSensitivity'
+        testId='caseSensitivityCheckbox'
+      />
+      <BrowserButton
+        iconOnly
+        iconClass={globalStyles.appIcons.remove}
+        size='.8rem'
+        custom={[
+          findBarTextStyles.matchingTextColor,
+          styles.findBar__close
+        ]}
         onClick={this.onFindHide}
-      >+</span>
+        testId='findBarClearButton'
+      />
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  findBar: {
+    background: theme.findBar.backgroundColor,
+    borderBottom: `1px solid ${theme.findBar.border.bottom.color}`,
+    color: theme.findBar.color,
+    fontSize: '.7rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '.4rem .8rem',
+    animation: 'slideIn 25ms',
+    cursor: 'default',
+    WebkitAppRegion: 'no-drag'
+  },
+
+  findBar__string: {
+    display: 'flex',
+    alignItems: 'center',
+    position: 'relative'
+  },
+
+  findBar__string__icon: {
+    position: 'relative',
+    margin: 0,
+    padding: 0,
+    width: 0,
+    color: theme.findBar.string.icon.color
+  },
+
+  findBar__string__icon_search: {
+    left: '8px'
+  },
+
+  findBar__string__icon_clear: {
+    left: '-20px'
+  },
+
+  findBar__string__input: {
+    height: '25px',
+    width: '200px',
+    padding: '0 25px'
+  },
+
+  findBar__find: {
+    minWidth: '60px',
+    margin: '0 10px',
+    color: theme.findBar.find.color,
+    textAlign: 'center'
+  },
+
+  findBar__close: {
+    position: 'absolute',
+    right: '.8rem',
+
+    ':hover': {
+      color: theme.findBar.close.onHover.color
+    }
+  }
+})
 
 module.exports = ReduxComponent.connect(FindBar)
