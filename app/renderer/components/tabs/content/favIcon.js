@@ -52,45 +52,40 @@ class Favicon extends React.Component {
       return null
     }
 
-    const iconStyles = StyleSheet.create({
-      icon__loading_color: {
-        filter: this.props.tabIconColor === 'white'
-          ? filter.makeWhite
-          : 'none'
-      },
-      icon__favicon: {
-        backgroundImage: `url(${this.props.favicon})`,
-        filter: this.props.tabIconColor === 'white'
-          ? filter.whiteShadow
-          : 'none'
-      },
-      icon__default_sizeAndColor: {
-        WebkitMaskSize: this.props.showIconAtReducedSize ? '10px' : '12px',
-        backgroundColor: this.props.tabIconColor === 'white'
-          ? color.white100
-          : color.mediumGray
-      }
-    })
+    const themeLight = this.props.tabIconColor === 'white'
+    const instanceStyles = { }
+    if (this.props.favicon) {
+      instanceStyles['--faviconsrc'] = `url(${this.props.favicon})`
+    }
 
     return <TabIcon
       data-test-favicon={this.props.favicon}
       data-test-id={this.testingIcon}
       className={css(
         styles.icon,
-        this.props.favicon && iconStyles.icon__favicon,
+        this.props.favicon && styles.icon_favicon,
+        this.props.favicon && themeLight && styles.icon_faviconLight,
         !this.props.isPinned && this.props.showIconWithLessMargin && styles.icon_lessMargin,
         !this.props.isPinned && this.props.showIconAtReducedSize && styles.icon_reducedSize
       )}
+      style={instanceStyles}
       symbol={
         this.props.tabLoading
           ? (
             // no loading icon if there's no room for the icon
             !this.props.showIconAtReducedSize &&
-            css(styles.icon__loading, iconStyles.icon__loading_color)
+            css(
+              styles.icon__loading,
+              themeLight && styles.icon__loading_colorLight
+            )
           )
           : (
             !this.props.favicon &&
-            css(styles.icon__default, iconStyles.icon__default_sizeAndColor)
+            css(
+              styles.icon__defaultIcon,
+              this.props.showIconAtReducedSize && styles.icon__defaultIcon_reducedSize,
+              themeLight && styles.icon__defaultIcon_colorLight
+            )
           )
       } />
   }
@@ -119,6 +114,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
 
+  icon_favicon: {
+    backgroundImage: 'var(--faviconsrc)'
+  },
+
+  icon_faviconLight: {
+    filter: filter.whiteShadow
+  },
+
   icon_lessMargin: {
     margin: 0
   },
@@ -143,9 +146,23 @@ const styles = StyleSheet.create({
     animationIterationCount: 'infinite'
   },
 
-  icon__default: {
+  icon__loading_colorLight: {
+    filter: filter.makeWhite
+  },
+
+  icon__defaultIcon: {
     WebkitMaskRepeat: 'no-repeat',
     WebkitMaskPosition: 'center',
-    WebkitMaskImage: `url(${defaultIconSvg})`
+    WebkitMaskImage: `url(${defaultIconSvg})`,
+    WebkitMaskSize: '12px',
+    backgroundColor: color.mediumGray
+  },
+
+  icon__defaultIcon_reducedSize: {
+    WebkitMaskSize: '10px'
+  },
+
+  icon__defaultIcon_colorLight: {
+    backgroundColor: color.white100
   }
 })
