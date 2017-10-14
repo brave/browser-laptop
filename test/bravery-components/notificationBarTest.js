@@ -4,6 +4,7 @@ const Brave = require('../lib/brave')
 const {notificationBar, titleBar, urlInput, reloadButton} = require('../lib/selectors')
 const {autoplayOption} = require('../../app/common/constants/settingsEnums')
 const {AUTOPLAY_MEDIA} = require('../../js/constants/settings')
+const settings = require('../../js/constants/settings')
 
 describe('notificationBar permissions', function () {
   function * setup (client) {
@@ -34,6 +35,42 @@ describe('notificationBar permissions', function () {
       .waitUntil(function () {
         return this.getText(notificationBar).then((val) => val.includes('location'))
       }).click('button=Deny')
+  })
+
+  describe('Dapps', function () {
+    it('shows notification bar for Dapps', function * () {
+      let notificationUrl = Brave.server.url('Dapps.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(notificationUrl)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(notificationBar)
+        .waitUntil(function () {
+          return this.getText(notificationBar).then((val) => {
+            return val.includes('Dapp')
+          })
+        }).click('button=No thanks')
+    })
+
+    it('does not show when prompt is dismissed', function * () {
+      let notificationUrl = Brave.server.url('Dapps.html')
+      yield this.app.client
+        .changeSetting(settings.METAMASK_PROMPT_DISMISSED, true)
+        .tabByIndex(0)
+        .loadUrl(notificationUrl)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForElementCount(notificationBar, 0)
+    })
+
+    it('does not show when MetaMask is enabled', function * () {
+      let notificationUrl = Brave.server.url('Dapps.html')
+      yield this.app.client
+        .changeSetting(settings.METAMASK_ENABLED, true)
+        .tabByIndex(0)
+        .loadUrl(notificationUrl)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForElementCount(notificationBar, 0)
+    })
   })
 
   it('can deny permission request', function * () {

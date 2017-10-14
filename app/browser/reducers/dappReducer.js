@@ -17,7 +17,7 @@ const dappReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_DAPP_AVAILABLE:
-      if (!getSetting(settings.METAMASK_PROMPT_DISMISSED)) {
+      if (!getSetting(settings.METAMASK_PROMPT_DISMISSED) && !getSetting(settings.METAMASK_ENABLED)) {
         showDappNotification()
       }
       break
