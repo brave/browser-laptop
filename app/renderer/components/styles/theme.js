@@ -11,6 +11,15 @@
   * Note: If an element is not color-related, it should go into global.js
   */
   module.exports.theme = {
+    navigator: {
+      braveMenu: {
+        counter: {
+          backgroundColor: '#555',
+          color: '#fff'
+        }
+      }
+    },
+
     tab: {
       transition: `
       background-color 150ms cubic-bezier(0.26, 0.63, 0.39, 0.65),

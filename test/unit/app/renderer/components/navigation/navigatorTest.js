@@ -159,7 +159,7 @@ describe('Navigator component unit tests', function () {
     })
 
     it('disables the lion icon', function () {
-      const node = wrapper.find('[data-test-id="braveShieldButton"]').getDOMNode()
+      const node = wrapper.find('[data-test-id="braveMenu"]').getDOMNode()
       assert.equal(node.disabled, true)
     })
   })
@@ -172,7 +172,7 @@ describe('Navigator component unit tests', function () {
 
     it('lion icon is shown by default', function () {
       const wrapper = mount(<Navigator />)
-      const node = wrapper.find('[data-test-id="braveShieldButton"]').getDOMNode()
+      const node = wrapper.find('[data-test-id="braveMenu"]').getDOMNode()
       assert.equal(node.disabled, false)
     })
 

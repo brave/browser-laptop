@@ -28,6 +28,10 @@ module.exports = {
   errorContent: '.errorContent',
   errorUrl: '.errorUrl',
   errorText: '.errorText',
+  braveMenu: '[data-test-id="braveMenu"]',
+  braveMenuDisabled: '[data-test-id="braveMenuDisabled"]',
+
+  // findBar
   findBar: '[data-test-id="findBar"]',
   findBarInput: '[data-test-id="findBarInput"]',
   findBarMatches: '[data-test-id="foundResults"]',
@@ -35,8 +39,6 @@ module.exports = {
   findBarNextButton: '[data-test-id="findBarNextButton"]',
   findBarPrevButton: '[data-test-id="findBarPrevButton"]',
   findBarClearButton: '[data-test-id="findBarClearButton"]',
-  braveMenu: '.braveMenu:not(.braveShieldsDisabled)',
-  braveMenuDisabled: '.braveMenu.braveShieldsDisabled',
 
   // braveryPanelTest.js
   braveryPanel: '[data-test-id="braveryPanel"]',

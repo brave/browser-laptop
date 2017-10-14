@@ -14,7 +14,7 @@ const ReduxComponent = require('../reduxComponent')
 const NavigationBar = require('./navigationBar')
 const MenuBar = require('./menuBar')
 const WindowCaptionButtons = require('./buttons/windowCaptionButtons')
-const Button = require('../common/button')
+const BrowserButton = require('../common/browserButton')
 const BrowserAction = require('./browserAction')
 const BackButton = require('./buttons/backButton')
 const ForwardButton = require('./buttons/forwardButton')
@@ -40,8 +40,9 @@ const appConfig = require('../../../../js/constants/appConfig')
 const settings = require('../../../../js/constants/settings')
 
 // Styles
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
+const {theme} = require('../styles/theme')
 
 class Navigator extends React.Component {
   constructor (props) {
@@ -198,30 +199,47 @@ class Navigator extends React.Component {
                 ? this.extensionButtons
                 : null
             }
-            <div className={css(styles.braveMenuContainer)}>
-              <Button iconClass='braveMenu'
+            <div className={css(
+              styles.braveMenu,
+
+              // See #9696
+              this.props.activeTabShowingMessageBox && styles.braveMenu_disabled
+            )}>
+              <BrowserButton
+                iconOnly
+                size={globalStyles.spacing.navbarBraveButtonWidth}
+                custom={[
+                  this.props.shieldsDown && styles.braveMenu__braveShield_down,
+                  !this.props.shieldEnabled && styles.braveMenu__braveShield_disabled,
+                  this.props.isCaptionButton && styles.braveMenu__braveShield_isCaptionButton,
+
+                  // See #9696: Cancel the opacity of browserButton_disabled
+                  // to inherit the value set by braveMenu_disabled above.
+                  this.props.activeTabShowingMessageBox && styles.braveMenu__braveShield_cancelOpacity
+                ]}
+                iconClass='braveMenu'
                 l10nId='braveMenu'
-                testId='braveShieldButton'
-                test2Id={`shield-down-${this.props.shieldsDown}`}
-                className={cx({
-                  braveShieldsDisabled: !this.props.shieldEnabled,
-                  braveShieldsDown: this.props.shieldsDown,
-                  leftOfCaptionButton: this.props.isCaptionButton
+                testId={cx({
+                  braveMenu: this.props.shieldEnabled,
+                  braveMenuDisabled: !this.props.shieldEnabled
                 })}
+                test2Id={`shield-down-${this.props.shieldsDown}`}
                 disabled={this.props.activeTabShowingMessageBox}
                 onClick={this.onBraveMenu}
               />
               {
                 this.props.isCounterEnabled
                   ? <div className={css(
-                      styles.lionBadge,
-                      (this.props.menuBarVisible || !isWindows) && styles.lionBadgeRight,
+                      styles.braveMenu__counter,
+                      (this.props.menuBarVisible || !isWindows) && styles.braveMenu__counter_right,
+
                       // delay badge show-up.
                       // this is also set for extension badge
                       // in a way that both can appear at the same time.
-                      styles.subtleShowUp
+                      styles.braveMenu__counter_subtleShowUp
                     )}
-                    data-test-id='lionBadge'>
+                    data-test-id='lionBadge'
+                  >
                     {this.props.totalBlocks}
                   </div>
                   : null
@@ -249,41 +267,70 @@ class Navigator extends React.Component {
   }
 }
 
-module.exports = ReduxComponent.connect(Navigator)
-
 const styles = StyleSheet.create({
   navigatorWrapper_activeTabShowingMessageBox: {
     pointerEvents: 'none'
   },
-  lionBadge: {
-    left: 'calc(50% - 1px)',
-    top: '14px',
-    position: 'absolute',
-    color: '#FFF',
-    borderRadius: '2.5px',
-    padding: '1px 2px',
-    pointerEvents: 'none',
-    font: '6pt "Arial Narrow"',
-    textAlign: 'center',
-    border: '0px solid #FFF',
-    background: '#555555',
-    minWidth: '10px',
-    WebkitUserSelect: 'none'
-  },
-  lionBadgeRight: {
-    left: 'auto',
-    right: '2px'
-  },
-  braveMenuContainer: {
-    position: 'relative'
-  },
-  subtleShowUp: globalStyles.animations.subtleShowUp,
 
   // TODO: Refactor navigator.js with Aphrodite to remove !important
   navigatorWrapper__topLevelEndButtons_isWideURLbarEnabled: {
     marginLeft: '6px !important'
   },
+
   navigatorWrapper__topLevelEndButtons__extraDragArea_disabled: {
     display: 'none'
-  }
+  },
+
+  braveMenu: {
+    position: 'relative'
+  },
+
+  braveMenu_disabled: {
+    // See: browserButton_disabled
+    pointerEvents: 'none',
+    animation: 'none',
+    opacity: 0.25
+  },
+
+  braveMenu__braveShield_down: {
+    filter: 'grayscale(100%)'
+  },
+
+  braveMenu__braveShield_disabled: {
+    filter: 'grayscale(100%)',
+    opacity: 0.4
+  },
+
+  braveMenu__braveShield_isCaptionButton: {
+    marginRight: '3px'
+  },
+
+  braveMenu__braveShield_cancelOpacity: {
+    // Without this the disabled lion icon gets lighter than it should be.
+    opacity: 1
+  },
+
+  braveMenu__counter: {
+    left: 'calc(50% - 1px)',
+    top: '14px',
+    position: 'absolute',
+    color: theme.navigator.braveMenu.counter.color,
+    borderRadius: '2.5px',
+    padding: '1px 2px',
+    pointerEvents: 'none',
+    font: '6pt "Arial Narrow"',
+    textAlign: 'center',
+    background: theme.navigator.braveMenu.counter.backgroundColor,
+    minWidth: '10px',
+    WebkitUserSelect: 'none'
+  },
+
+  braveMenu__counter_right: {
+    left: 'auto',
+    right: '2px'
+  },
+
+  braveMenu__counter_subtleShowUp: globalStyles.animations.subtleShowUp
 })
+
+module.exports = ReduxComponent.connect(Navigator)
