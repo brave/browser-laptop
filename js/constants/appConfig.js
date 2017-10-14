@@ -211,6 +211,7 @@ module.exports = {
     'extensions.honey.enabled': false,
     'extensions.pinterest.enabled': false,
     'extensions.metamask.enabled': false,
+    'extensions.metamask.promptDismissed': false,
     'general.bookmarks-toolbar-mode': null,
     'general.is-default-browser': null,
     'notification-add-funds-timestamp': null,
