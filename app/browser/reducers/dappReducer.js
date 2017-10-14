@@ -12,6 +12,9 @@ const {ipcMain} = require('electron')
 const messages = require('../../../js/constants/messages')
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
+const tabActions = require('../../common/actions/tabActions')
+const tabState = require('../../common/state/tabState')
+const config = require('../../../js/constants/config')
 
 const dappReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -44,6 +47,12 @@ const notifications = {
     appActions.hideNotification(message)
   }
 }
+
+process.on('extension-ready', (installInfo) => {
+  if (installInfo.id === config.metamaskExtensionId) {
+    tabActions.reload(tabState.TAB_ID_ACTIVE, true)
+  }
+})
 
 const showDappNotification = () => {
   appActions.showNotification({
