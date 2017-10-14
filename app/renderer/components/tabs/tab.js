@@ -314,7 +314,6 @@ class Tab extends React.Component {
         ref={(node) => { this.tabNode = node }}
         className={css(
           styles.tab,
-          isThemed && styles.tab_themed,
           // Windows specific style
           isWindows && styles.tab_forWindows,
           this.props.isPinnedTab && styles.tab_pinned,
@@ -323,7 +322,8 @@ class Tab extends React.Component {
           // Private color should override themeColor
           this.props.isPrivateTab && styles.tab_private,
           this.props.isActive && this.props.isPrivateTab && styles.tab_active_private,
-          this.props.centralizeTabIcons && styles.tab__content_centered
+          this.props.centralizeTabIcons && styles.tab__content_centered,
+          isThemed && styles.tab_themed
         )}
         style={instanceStyles}
         data-test-id='tab'
@@ -377,16 +377,6 @@ const styles = StyleSheet.create({
 
     ':hover': {
       background: theme.tab.hover.background
-    }
-  },
-
-  tab_themed: {
-    color: `var(--theme-color-fg, inherit)`,
-    background: `var(--theme-color-bg, inherit)`,
-
-    ':hover': {
-      color: `var(--theme-color-fg, inherit)`,
-      background: `var(--theme-color-bg, inherit)`
     }
   },
 
@@ -468,7 +458,18 @@ const styles = StyleSheet.create({
       color: theme.tab.active.private.color,
       background: theme.tab.active.private.background
     }
+  },
+
+  tab_themed: {
+    color: `var(--theme-color-fg, inherit)`,
+    background: `var(--theme-color-bg, inherit)`,
+
+    ':hover': {
+      color: `var(--theme-color-fg, inherit)`,
+      background: `var(--theme-color-bg, inherit)`
+    }
   }
+
 })
 
 module.exports = ReduxComponent.connect(Tab)
