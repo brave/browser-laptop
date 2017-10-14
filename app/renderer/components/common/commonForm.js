@@ -69,12 +69,6 @@ class CommonFormDropdown extends ImmutableComponent {
   }
 }
 
-class CommonFormFullWidthDropdown extends ImmutableComponent {
-  render () {
-    return <FormDropdown data-isCommonForm='true' data-isFullWidth='true' {...this.props} />
-  }
-}
-
 class CommonFormTextbox extends ImmutableComponent {
   render () {
     return <FormTextbox data-isCommonForm='true' {...this.props} />
@@ -240,7 +234,6 @@ module.exports = {
   CommonFormLarge,
   CommonFormBookmarkHanger,
   CommonFormDropdown,
-  CommonFormFullWidthDropdown,
   CommonFormTextbox,
   CommonFormClickable,
   CommonFormSection,

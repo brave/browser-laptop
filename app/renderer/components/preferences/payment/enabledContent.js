@@ -17,7 +17,7 @@ const settings = require('../../../../../js/constants/settings')
 const ImmutableComponent = require('../../immutableComponent')
 const BrowserButton = require('../../common/browserButton')
 const {FormTextbox} = require('../../common/textbox')
-const {PanelDropdown} = require('../../common/dropdown')
+const {FormDropdown} = require('../../common/dropdown')
 const LedgerTable = require('./ledgerTable')
 
 // style
@@ -191,7 +191,8 @@ class EnabledContent extends ImmutableComponent {
         <div className={css(gridStyles.row1col2, styles.enabledContent__walletBar__title)} data-l10n-id='accountBalance' />
         <div className={css(gridStyles.row1col3)} />
         <div className={css(gridStyles.row2col1)}>
-          <PanelDropdown
+          <FormDropdown
+            data-isPanel
             data-test-id='fundsSelectBox'
             value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}>
@@ -204,7 +205,7 @@ class EnabledContent extends ImmutableComponent {
                 return <option value={amount}>{amount} BAT {alternative}</option>
               })
             }
-          </PanelDropdown>
+          </FormDropdown>
         </div>
         <div className={css(gridStyles.row2col2)}>
           {
