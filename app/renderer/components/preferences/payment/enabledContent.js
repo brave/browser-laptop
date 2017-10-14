@@ -269,17 +269,30 @@ class EnabledContent extends ImmutableComponent {
     const inTransition = ledgerData.getIn(['migration', 'btc2BatTransitionPending']) === true
 
     return <section className={css(styles.enabledContent)}>
-      <div className={css(styles.enabledContent__loader, inTransition && styles.enabledContent__loader_show)}>
-        <div className={css(styles.loader__text)}>
+      <div className={css(
+        styles.enabledContent__loader,
+        inTransition && styles.enabledContent__loader_show
+      )}>
+        <div className={css(styles.enabledContent__loader__text)}>
           <p data-l10n-id='leaderLoaderText1' />
           <p data-l10n-id='leaderLoaderText2' />
         </div>
-        <div className={css(styles.leader__wrap)}>
-          <div>
-            <div className={css(styles.loader__line, styles.loader__line_1, !inTransition && styles.loader__line_off)} />
-            <div className={css(styles.loader__line, styles.loader__line_2, !inTransition && styles.loader__line_off)} />
-            <div className={css(styles.loader__line, styles.loader__line_3, !inTransition && styles.loader__line_off)} />
-          </div>
+        <div className={css(styles.enabledContent__loader__wrap)}>
+          <div className={css(
+            styles.enabledContent__loader__wrap__line,
+            styles.enabledContent__loader__wrap__line_1,
+            !inTransition && styles.enabledContent__loader__wrap__line_off
+          )} />
+          <div className={css(
+            styles.enabledContent__loader__wrap__line,
+            styles.enabledContent__loader__wrap__line_2,
+            !inTransition && styles.enabledContent__loader__wrap__line_off
+          )} />
+          <div className={css(
+            styles.enabledContent__loader__wrap__line,
+            styles.enabledContent__loader__wrap__line_3,
+            !inTransition && styles.enabledContent__loader__wrap__line_off
+          )} />
         </div>
       </div>
       <div className={css(styles.enabledContent__walletBar)} data-test-id='walletBar'>
@@ -418,6 +431,10 @@ const gridStyles = StyleSheet.create({
 })
 
 const styles = StyleSheet.create({
+  claimButton: {
+    marginTop: '10px'
+  },
+
   iconLink: {
     color: globalStyles.color.mediumGray,
     fontSize: globalStyles.payments.fontSize.regular,
@@ -427,27 +444,6 @@ const styles = StyleSheet.create({
     ':hover': {
       textDecoration: 'none !important'
     }
-  },
-
-  enabledContent__walletBar: {
-    position: 'relative',
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr',
-    background: globalStyles.color.lightGray,
-    borderRadius: globalStyles.radius.borderRadiusUIbox,
-    margin: `${globalStyles.spacing.panelMargin} 0`
-  },
-
-  enabledContent__walletBar__title: {
-    color: paymentStylesVariables.tableHeader.fontColor,
-    fontWeight: paymentStylesVariables.tableHeader.fontWeight,
-    marginBottom: `calc(${globalStyles.spacing.panelPadding} / 1.5)`
-  },
-
-  enabledContent__walletBar__message: {
-    fontSize: globalStyles.payments.fontSize.regular,
-    lineHeight: 1.5,
-    marginTop: globalStyles.spacing.panelPadding
   },
 
   enabledContent: {
@@ -485,21 +481,21 @@ const styles = StyleSheet.create({
     transition: 'opacity .4s ease-out'
   },
 
-  loader__text: {
+  enabledContent__loader__text: {
     textAlign: 'center',
     padding: '50px 0 20px',
     display: 'block',
     color: '#444'
   },
 
-  leader__wrap: {
+  enabledContent__loader__wrap: {
     width: '45px',
     left: 0,
     right: 0,
     margin: '50px auto 0'
   },
 
-  loader__line: {
+  enabledContent__loader__wrap__line: {
     display: 'inline-block',
     width: '15px',
     height: '15px',
@@ -509,27 +505,23 @@ const styles = StyleSheet.create({
     animationIterationCount: 'infinite'
   },
 
-  loader__line_1: {
+  enabledContent__loader__wrap__line_1: {
     backgroundColor: '#FF5000',
     animationDelay: '.1s'
   },
 
-  loader__line_2: {
+  enabledContent__loader__wrap__line_2: {
     backgroundColor: '#9E1F63',
     animationDelay: '.2s'
   },
 
-  loader__line_3: {
+  enabledContent__loader__wrap__line_3: {
     backgroundColor: '#662D91',
     animationDelay: '.3s'
   },
 
-  loader__line_off: {
+  enabledContent__loader__wrap__line_off: {
     animationName: 'none'
-  },
-
-  claimButton: {
-    marginTop: '10px'
   },
 
   enabledContent__grant: {
@@ -581,6 +573,26 @@ const styles = StyleSheet.create({
 
   enabledContent__grant_button: {
     float: 'right'
+  },
+
+  enabledContent__walletBar: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr 1fr',
+    background: globalStyles.color.lightGray,
+    borderRadius: globalStyles.radius.borderRadiusUIbox,
+    margin: `${globalStyles.spacing.panelMargin} 0`
+  },
+
+  enabledContent__walletBar__title: {
+    color: paymentStylesVariables.tableHeader.fontColor,
+    fontWeight: paymentStylesVariables.tableHeader.fontWeight,
+    marginBottom: `calc(${globalStyles.spacing.panelPadding} / 1.5)`
+  },
+
+  enabledContent__walletBar__message: {
+    fontSize: globalStyles.payments.fontSize.regular,
+    lineHeight: 1.5,
+    marginTop: globalStyles.spacing.panelPadding
   }
 })
 
