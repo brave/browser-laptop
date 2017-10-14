@@ -92,16 +92,30 @@ class AboutStyle extends ImmutableComponent {
   render () {
     return <div className={css(styles.wrapper)}>
       <h1 data-l10n-id='introTitle' />
-      <p className={css(styles.fontSizeInitial)} data-l10n-id='intro' />
+      <div className={css(styles.wrapper__header)}>
+        <p data-l10n-id='intro' />
 
-      <ul className={css(styles.fontSizeInitial)}>
-        <li className={css(styles.toc__marginBottom)}><a href='#typography'>typography</a></li>
-        <li className={css(styles.toc__marginBottom)}><a href='#textboxes'>textboxes</a></li>
-        <li className={css(styles.toc__marginBottom)}><a href='#dropdowns'>dropdowns</a></li>
-        <li className={css(styles.toc__marginBottom)}><a href='#buttons'>buttons</a></li>
-        <li className={css(styles.toc__marginBottom)}><a href='#commonForm'>commonForm</a></li>
-        <li className={css(styles.toc__marginBottom)}><a href='#sectionTitle'>sectionTitle</a></li>
-      </ul>
+        <ul>
+          <li className={css(styles.wrapper__header__toc)}><a href='#typography'>typography</a></li>
+          <li className={css(styles.wrapper__header__toc)}><a href='#textboxes'>textboxes</a></li>
+          <li className={css(styles.wrapper__header__toc)}><a href='#dropdowns'>dropdowns</a></li>
+          <li className={css(styles.wrapper__header__toc)}><a href='#buttons'>buttons</a></li>
+          <li className={css(styles.wrapper__header__toc)}><a href='#commonForm'>commonForm</a></li>
+          <li className={css(styles.wrapper__header__toc)}><a href='#sectionTitle'>sectionTitle</a></li>
+        </ul>
+
+        <div>
+          <span data-l10n-id='IntroLinkToDocument' />
+          <a className={css(styles.wrapper__header__link)}
+            href='https://github.com/brave/browser-laptop/blob/master/docs/style.md'
+            rel='noopener' target='_blank'
+          >
+            docs/style.md
+          </a>
+        </div>
+
+        <p data-l10n-id='intro' />
+      </div>
 
       <hr />
 
@@ -316,6 +330,15 @@ class AboutStyle extends ImmutableComponent {
           <BrowserButton groupedItem secondaryColor l10nId='secondaryColor' onClick={this.onRemoveBookmark} />
           <BrowserButton groupedItem primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
         </div>
+        <div className={css(styles.info)}>
+          <BrowserButton
+            iconOnly
+            iconClass={globalStyles.appIcons.moreInfo}
+            size='1.5rem'
+            color={globalStyles.color.braveOrange}
+          />
+          <span className={css(styles.info__content)} data-l10n-id='InfoBrowserButtonGrouped' />
+        </div>
         <Pre><Code>
           &lt;div>
           <Tab>&lt;BrowserButton groupedItem primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}</Tab>
@@ -447,6 +470,16 @@ class AboutStyle extends ImmutableComponent {
             <Tab>&lt;/CommonFormBottomWrapper&gt;{'\n'}</Tab>
             &lt;/CommonForm&gt;{'\n'}
           </Code></Pre>
+
+          <div className={css(styles.info)}>
+            <BrowserButton
+              iconOnly
+              iconClass={globalStyles.appIcons.moreInfo}
+              size='1.5rem'
+              color={globalStyles.color.braveOrange}
+            />
+            <span className={css(styles.info__content)} data-l10n-id='InfoCommonFormCustom' />
+          </div>
         </Container>
 
         <Container>
@@ -738,14 +771,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'flex-end'
   },
-  fontSizeInitial: {
-    fontSize: 'initial'
-  },
-  toc__marginBottom: {
-    marginBottom: '.25rem'
-  },
 
-  wrapper: common,
   container: common,
 
   pre: {
@@ -756,7 +782,8 @@ const styles = StyleSheet.create({
     borderRadius: globalStyles.radius.borderRadius,
     tabSize: '2',
     wordBreak: 'normal',
-    overflowX: 'scroll'
+    overflowX: 'scroll',
+    margin: '1rem auto'
   },
 
   code: {
@@ -772,14 +799,43 @@ const styles = StyleSheet.create({
   tab: {
     textIndent: tabWidth
   },
+
   tab2: {
     textIndent: `calc(${tabWidth} * 2)`
   },
+
   tab3: {
     textIndent: `calc(${tabWidth} * 3)`
   },
+
   tab4: {
     textIndent: `calc(${tabWidth} * 4)`
+  },
+
+  info: {
+    display: 'flex',
+    alignItems: 'center',
+    margin: '1rem auto'
+  },
+
+  info__content: {
+    marginLeft: '.5ch',
+    fontSize: '.95rem',
+    color: globalStyles.color.commonTextColor
+  },
+
+  wrapper: common,
+
+  wrapper__header: {
+    fontSize: 'initial'
+  },
+
+  wrapper__header__toc: {
+    marginBottom: '.25rem'
+  },
+
+  wrapper__header__link: {
+    marginLeft: '.5ch'
   }
 })
 
