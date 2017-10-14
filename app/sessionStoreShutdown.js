@@ -4,7 +4,7 @@
 
 'use strict'
 
-const {BrowserWindow, app, ipcMain} = require('electron')
+const {BrowserWindow, app, ipcMain, dialog} = require('electron')
 const sessionStore = require('./sessionStore')
 const updateStatus = require('../js/constants/updateStatus')
 const updater = require('./updater')
@@ -14,6 +14,8 @@ const messages = require('../js/constants/messages')
 const appActions = require('../js/actions/appActions')
 const platformUtil = require('./common/lib/platformUtil')
 const Immutable = require('immutable')
+const downloadUtil = require('../js/state/downloadUtil')
+const locale = require('./locale')
 const {makeImmutable} = require('./common/state/immutableUtil')
 
 // Used to collect the per window state when shutting down the application
@@ -31,6 +33,7 @@ let sessionStateSaveInterval
 let immutableWindowStateCache
 let sessionStoreQueue
 let appStore
+let downloadWarningIsOpened = false
 
 // Useful for automated tests
 const reset = () => {
@@ -170,13 +173,7 @@ const initWindowCacheState = (windowId, immutableWindowState) => {
   immutableWindowStateCache = immutableWindowStateCache.set(windowId, immutableWindowState)
 }
 
-app.on('before-quit', (e) => {
-  if (shuttingDown && sessionStateStoreComplete) {
-    return
-  }
-
-  e.preventDefault()
-
+const beforeQuit = () => {
   // before-quit can be triggered multiple times because of the preventDefault call
   if (shuttingDown) {
     return
@@ -189,6 +186,39 @@ app.on('before-quit', (e) => {
     clearInterval(sessionStateSaveInterval)
   }
   module.exports.initiateSessionStateSave()
+}
+
+app.on('before-quit', (e) => {
+  if (shuttingDown && sessionStateStoreComplete) {
+    return
+  }
+  e.preventDefault()
+
+  if (!appStore) {
+    appStore = require('../js/stores/appStore')
+  }
+
+  // prevent dialog that is displayed when you have active downloads
+  const downloads = downloadUtil.getActiveDownloads(appStore.getState())
+  let downloading = downloads.size > 0
+
+  if (downloading && !shuttingDown && !downloadWarningIsOpened) {
+    downloadWarningIsOpened = true
+    dialog.showMessageBox({
+      type: 'warning',
+      message: locale.translation('downloadNotificationTitle'),
+      detail: locale.translation('downloadNotificationMessage'),
+      defaultId: 0,
+      buttons: [locale.translation('downloadNotificationContinue'), locale.translation('downloadNotificationQuit')]
+    }, (response) => {
+      downloadWarningIsOpened = false
+      if (response === 1) {
+        beforeQuit()
+      }
+    })
+  } else {
+    beforeQuit()
+  }
 })
 
 const startSessionSaveInterval = () => {

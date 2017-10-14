@@ -116,7 +116,7 @@ AppStore
     y: number
   },
   defaultWindowWidth: number, // DEPRECATED (0.12.7); replaced w/ defaultWindowParams.width
-  downloads: [{
+  downloads: {
     [downloadId]: {
       filename: string,
       receivedBytes: Number,
@@ -126,7 +126,7 @@ AppStore
       totalBytes: Number,
       url: string
     }
-  }],
+  },
   extensions: {
     [id]: {
       excluded: boolean, // true if extension was excluded by the user
