@@ -16,14 +16,13 @@ try {
 
 let cachedUrlParse = new LRUCache(config.cache.urlParse)
 
-module.exports = (url, ...args) => {
+module.exports = (url) => {
   let parsedUrl = cachedUrlParse.get(url)
-  if (parsedUrl) {
-    // make a copy so we don't alter the cached object with any changes
-    return Object.assign({}, parsedUrl)
+  if (parsedUrl == null) {
+    parsedUrl = urlParse(url)
+    cachedUrlParse.set(url, parsedUrl)
   }
 
-  parsedUrl = urlParse(url, ...args)
-  cachedUrlParse.set(url, parsedUrl)
-  return parsedUrl
+  // make a copy so we don't alter the cached object with any changes
+  return Object.assign({}, parsedUrl)
 }
