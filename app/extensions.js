@@ -95,7 +95,8 @@ let generateBraveManifest = () => {
         js: [
           'content/scripts/adInsertion.js',
           'content/scripts/pageInformation.js',
-          'content/scripts/flashListener.js'
+          'content/scripts/flashListener.js',
+          'content/scripts/dappListener.js'
         ]
       },
       {
@@ -549,6 +550,12 @@ module.exports.init = () => {
     // } else {
     //   disableExtension(config.pinterestExtensionId)
     // }
+
+    if (getSetting(settings.METAMASK_ENABLED)) {
+      registerComponent(config.metamaskExtensionId, config.metamaskPublicKey)
+    } else {
+      disableExtension(config.metamaskExtensionId)
+    }
 
     if (getSetting(settings.METAMASK_ENABLED)) {
       registerComponent(config.metamaskExtensionId, config.metamaskPublicKey)
