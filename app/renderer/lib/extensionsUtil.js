@@ -73,6 +73,12 @@ const dummyData = [
     name: 'honey',
     description: 'honeyDesc',
     icon: 'img/extensions/honey-128.png'
+  },
+  {
+    id: metamask,
+    name: 'MetaMask',
+    description: 'metamaskDesc',
+    icon: 'img/extensions/metamask-128.png'
   }
   // {
   //   id: metamask,

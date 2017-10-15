@@ -92,6 +92,7 @@ const settings = {
   HONEY_ENABLED: 'extensions.honey.enabled',
   PINTEREST_ENABLED: 'extensions.pinterest.enabled',
   METAMASK_ENABLED: 'extensions.metamask.enabled',
+  METAMASK_PROMPT_DISMISSED: 'extensions.metamask.promptDismissed',
 
   // DEPRECATED settings
   // DO NOT REMOVE OR CHANGE THESE VALUES

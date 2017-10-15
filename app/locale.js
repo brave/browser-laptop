@@ -235,6 +235,9 @@ var rendererIdentifiers = function () {
     'walletConvertedDismiss',
     'walletConvertedLearnMore',
     'walletConvertedToBat',
+    'dappDetected',
+    'dappDismiss',
+    'dappEnableExtension',
     // other
     'passwordsManager',
     'extensionsManager',
