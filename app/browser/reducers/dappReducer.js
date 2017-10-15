@@ -15,13 +15,16 @@ const getSetting = require('../../../js/settings').getSetting
 const tabActions = require('../../common/actions/tabActions')
 const tabState = require('../../common/state/tabState')
 const config = require('../../../js/constants/config')
+const {getOrigin} = require('../../../js/state/siteUtil')
+
+let notificationCallbacks = []
 
 const dappReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_DAPP_AVAILABLE:
-      if (!getSetting(settings.METAMASK_PROMPT_DISMISSED) && !getSetting(settings.METAMASK_ENABLED)) {
-        showDappNotification()
+      if (!getSetting(settings.METAMASK_ENABLED)) {
+        showDappNotification(action.get('location'))
       }
       break
   }
@@ -31,20 +34,8 @@ const dappReducer = (state, action, immutableAction) => {
 const notifications = {
   text: {
     greeting: locale.translation('updateHello'),
-    message: locale.translation('dappDetected'),
     enable: locale.translation('dappEnableExtension'),
     dismiss: locale.translation('dappDismiss')
-  },
-  onResponse: (message, buttonIndex) => {
-    // Index 0 is for dismiss
-    if (buttonIndex === 0) {
-      appActions.changeSetting(settings.METAMASK_PROMPT_DISMISSED, true)
-    }
-    // Index 1 is for enable
-    if (buttonIndex === 1) {
-      appActions.changeSetting(settings.METAMASK_ENABLED, true)
-    }
-    appActions.hideNotification(message)
   }
 }
 
@@ -54,28 +45,52 @@ process.on('extension-ready', (installInfo) => {
   }
 })
 
-const showDappNotification = () => {
+const showDappNotification = (location) => {
+  const origin = getOrigin(location)
+  if (!origin || getSetting(settings.METAMASK_PROMPT_DISMISSED)) {
+    return
+  }
+
+  const message = locale.translation('dappDetected').replace(/{{\s*origin\s*}}/, origin)
+
   appActions.showNotification({
     greeting: notifications.text.greeting,
-    message: notifications.text.message,
+    message: message,
     buttons: [
       {text: notifications.text.dismiss},
       {text: notifications.text.enable}
     ],
+    frameOrigin: origin,
     options: {
-      persist: false
+      persist: true
     }
   })
-}
 
-if (ipcMain) {
-  ipcMain.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
-    switch (message) {
-      case notifications.text.message:
-        notifications.onResponse(message, buttonIndex)
-        break
+  if (!notificationCallbacks[message]) {
+    notificationCallbacks[message] = (e, msg, buttonIndex, persist) => {
+      if (msg === message) {
+        appActions.hideNotification(message)
+        // Index 0 is for dismiss
+        if (buttonIndex === 0) {
+          if (persist) {
+            appActions.changeSetting(settings.METAMASK_PROMPT_DISMISSED, true)
+          }
+        }
+
+        // Index 1 is for enable
+        if (buttonIndex === 1) {
+          appActions.changeSetting(settings.METAMASK_ENABLED, true)
+        }
+
+        if (notificationCallbacks[message]) {
+          ipcMain.removeListener(messages.NOTIFICATION_RESPONSE, notificationCallbacks[message])
+          delete notificationCallbacks[message]
+        }
+      }
     }
-  })
+  }
+
+  ipcMain.on(messages.NOTIFICATION_RESPONSE, notificationCallbacks[message])
 }
 
 module.exports = dappReducer

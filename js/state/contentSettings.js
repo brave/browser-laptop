@@ -114,6 +114,10 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
       setting: 'block',
       primaryPattern: '*'
     }],
+    dappDetection: [{
+      setting: getSetting(settings.METAMASK_PROMPT_DISMISSED) ? 'block' : 'allow',
+      primaryPattern: '*'
+    }],
     popups: [{
       setting: 'block',
       primaryPattern: '*'

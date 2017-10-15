@@ -95,8 +95,7 @@ let generateBraveManifest = () => {
         js: [
           'content/scripts/adInsertion.js',
           'content/scripts/pageInformation.js',
-          'content/scripts/flashListener.js',
-          'content/scripts/dappListener.js'
+          'content/scripts/flashListener.js'
         ]
       },
       {
@@ -140,7 +139,8 @@ let generateBraveManifest = () => {
         run_at: 'document_start',
         all_frames: true,
         js: [
-          'content/scripts/dndHandler.js'
+          'content/scripts/dndHandler.js',
+          'content/scripts/dappListener.js'
         ],
         matches: [
           '<all_urls>'
