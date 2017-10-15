@@ -517,25 +517,6 @@
     margin-left: 3px;
     position: relative;
 
-    .braveMenu {
-      width: @navbarBraveButtonWidth;
-      margin-right: @navbarButtonSpacing;
-      -webkit-app-region: no-drag;
-      user-select: none;
-
-      &.braveShieldsDown {
-        -webkit-filter: grayscale(100%);
-      }
-
-      &.braveShieldsDisabled {
-        -webkit-filter: grayscale(100%);
-        opacity: 0.4;
-      }
-      &.leftOfCaptionButton {
-        margin-right: 3px;
-      }
-    }
-
     @media (max-width: @breakpointWideViewport) {
       .extraDragArea {
         display: flex;
@@ -926,7 +907,6 @@
                                       url(../app/extensions/brave/img/braveBtn2x.png) 2x,
                                       url(../app/extensions/brave/img/braveBtn3x.png) 3x);
   background-repeat: no-repeat;
-  height: 24px;
 
   &:hover {
     background-image: -webkit-image-set(url(../app/extensions/brave/img/braveBtn_hover.png) 1x,
