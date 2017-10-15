@@ -15,7 +15,7 @@ const getSetting = require('../../../js/settings').getSetting
 const tabActions = require('../../common/actions/tabActions')
 const tabState = require('../../common/state/tabState')
 const config = require('../../../js/constants/config')
-const {getOrigin} = require('../../../js/lib/urlutil')
+const {getOrigin} = require('../../../js/state/siteUtil')
 
 let notificationCallbacks = []
 
