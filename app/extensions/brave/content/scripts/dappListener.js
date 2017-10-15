@@ -31,7 +31,10 @@ const script =
     })
   }`
 
-executeScript(script)
+if (chrome.contentSettings.dappDetection == 'allow') {
+  executeScript(script)
+}
+
 setTimeout(function () {
   console.log('checking now for toolbar')
   const isDapp = document.querySelector('meta[name="web3-installed"]')
