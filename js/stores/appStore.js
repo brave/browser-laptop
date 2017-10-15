@@ -179,6 +179,7 @@ const handleAppAction = (action) => {
     reducers = [
       require('../../app/browser/reducers/downloadsReducer'),
       require('../../app/browser/reducers/flashReducer'),
+      require('../../app/browser/reducers/dappReducer'),
       require('../../app/browser/reducers/autoplayReducer'),
       // tabs, sites and windows reducers need to stay in that order
       // until we have a better way to manage dependencies.
