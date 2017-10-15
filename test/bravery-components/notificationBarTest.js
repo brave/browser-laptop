@@ -38,8 +38,22 @@ describe('notificationBar permissions', function () {
   })
 
   describe('Dapps', function () {
-    it('shows notification bar for Dapps', function * () {
+    it('shows notification bar for Dapps that define web3', function * () {
       let notificationUrl = Brave.server.url('Dapps.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(notificationUrl)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForExist(notificationBar)
+        .waitUntil(function () {
+          return this.getText(notificationBar).then((val) => {
+            return val.includes('Dapp')
+          })
+        }).click('button=No thanks')
+    })
+
+    it('shows notification bar for Dapps that use web3 without defining', function * () {
+      let notificationUrl = Brave.server.url('DappsNoDefine.html')
       yield this.app.client
         .tabByIndex(0)
         .loadUrl(notificationUrl)
