@@ -144,7 +144,7 @@ module.exports = {
   downloadPause: '[data-test-id="pauseButton"]',
   downloadResume: '[data-test-id="resumeButton"]',
   downloadCancel: '[data-test-id="cancelButton"]',
-  downloadComplete: '[data-test-id="downloadItem"][data-test2-id="completed"]',
+  downloadComplete: '[data-test-id="downloadItem"][data-test2-id="downloadItemCompleted"]',
   downloadReDownload: '[data-test-id="redownloadButton"]',
   downloadDelete: '[data-test-id="deleteButton"]',
   downloadDeleteConfirm: '[data-test-id="confirmDeleteButton"]',

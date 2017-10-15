@@ -18,11 +18,12 @@ class BrowserButton extends ImmutableComponent {
       this.props.actionItem &&
         [styles.browserButton_default, styles.browserButton_subtleItem, styles.browserButton_actionItem],
       this.props.extensionItem && styles.browserButton_extensionItem,
-      this.props.groupedItem && styles.browserButton_groupedItem,
       this.props.notificationItem && styles.browserButton_notificationItem,
       this.props.panelItem && styles.browserButton_panelItem,
-      this.props.iconOnly && styles.browserButton_iconOnly,
       this.props.fitContent && styles.browserButton_fitContent,
+      this.props.groupedItem && styles.browserButton_groupedItem,
+      this.props.smallItem && styles.browserButton_smallItem,
+      this.props.iconOnly && styles.browserButton_iconOnly,
       // TODO: These are other button styles app-wise
       // that needs to be refactored and included in this file
       // .............................................
@@ -222,6 +223,14 @@ const styles = StyleSheet.create({
     ':first-child': {
       marginLeft: '0'
     }
+  },
+
+  browserButton_smallItem: {
+    fontSize: '12px',
+    minWidth: 'fit-content',
+    height: 'auto',
+    paddingTop: '3px',
+    paddingBottom: '3px'
   },
 
   browserButton_notificationItem: {

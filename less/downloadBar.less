@@ -2,188 +2,47 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-@import "variables.less";
+.downloadItem {
+  &:hover {
+    height: calc(
+      // 15px == fa icons, 6px == margin
+      15px + 6px +
 
-// If updating update app/common/constants/styleValues.js as well and vice-versa
-:root {
-  --download-item-width: 200px;
-  --download-item-margin: 10px;
-  --download-bar-padding: 20px;
-  --download-bar-buttons: 140px;
-}
+      // 36px == downloadInfo
+      36px + 6px + 6px +
 
-@downloadItemHeight: 50px;
+      // 1px == border
+      1px + 1px);
 
-.downloadsBar {
-  user-select: none;
-  box-sizing: border-box;
-  cursor: default;
-  background-color: #e6e6e6;
-  border-top: 1px solid #888;
-  color: black;
-  display: flex;
-  height: @downloadsBarHeight;
-  padding: 5px var(--download-bar-padding);
-  width: 100%;
-  z-index: @zindexDownloadsBar;
+    // 15px == fa icons, 6px == margin
+    bottom: calc(15px + 6px);
 
-  .downloadItems {
-    display: flex;
-    flex-grow: 1;
-    position: relative;
-
-    .downloadItem {
-      background-color: white;
-      border: 1px solid @chromeTertiary;
-      border-radius: @borderRadius;
-      box-sizing: border-box;
-      display: flex;
-      font-size: 11px;
-      flex-direction: column;
-      height: @downloadItemHeight;
-      padding: 0 14px;
-      position: relative;
-      margin: auto var(--download-item-margin) auto 0;
-      max-width: var(--download-item-width);
-      min-width: var(--download-item-width);
-
-      &:hover {
-        height: 73px;
-        top: -23px;
-
-        .downloadInfo .downloadArrow {
-          display: none;
-        }
-
-        .downloadProgress {
-          bottom: 0;
-          height: 47px;
-        }
+    .downloadInfo {
+      .downloadArrow {
+        display: none;
       }
+    }
 
-      &:not(:hover) {
-        .downloadActions {
-          display: none;
-        }
-
-        .deleteConfirmation {
-          display: none;
-        }
-      }
-
-      &.paused {
-        .downloadProgress {
-          border-right: 1px solid black;
-        }
-      }
-
-      &.completed, &.interrupted, &.cancelled, &.unauthorized {
-        background-color: #e6e6e6;
-        .downloadState {
-          font-weight: bold;
-        }
-      }
-
-      &.deleteConfirmationVisible:hover {
-        height: 108px;
-        top: -58px;
-      }
-
-      .downloadProgress {
-        background-color: @highlightBlue;
-        transition: width 0.5s;
-        left: 0;
-        opacity: 0.5;
-        position: absolute;
-        width: 100%;
-        height: 100%;
-      }
-
-      .downloadInfo {
-        display: flex;
-        margin: auto 0;
-        .downloadFilename, .downloadState, .downloadOrigin {
-          margin: auto 0;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          width: 150px;
-        }
-
-        .downloadArrow {
-          width: 14px;
-          margin: auto 0 auto auto;
-        }
-
-        .isInsecure {
-          color: @siteInsecureColor;
-          margin-right: 2px;
-        }
-
-        >span {
-          width: 150px;
-          margin-right: 12px;
-        }
-      }
-
-      .downloadActions {
-        margin: 8px 0 0;
-
-        .browserButton {
-          font-size: 14px;
-          height: auto;
-          line-height: inherit;
-          margin: auto 15px auto auto;
-          width: auto;
-
-          &.removeDownloadFromList {
-            float: right;
-            margin-right: 0;
-          }
-
-          &:hover {
-            color: @highlightBlue;
-          }
-        }
-      }
-
-      .deleteConfirmation {
-        line-height: 2;
-        border-bottom: 1px solid #CCC;
-        padding: 5px 0;
-        margin-bottom: auto 0 10px 0;
-        font-size: 12px;
-
-        .confirmDeleteButton {
-          font-weight: normal;
-          padding: 1px;
-          min-width: 50px;
-          float: right;
-          margin-right: -5px;
-        }
-      }
+    .downloadProgress {
+      bottom: 0;
+      height: 47px;
     }
   }
 
-  .downloadBarButtons {
-    margin: auto 0;
-
-    .downloadButton {
-      background: url('../img/toolbar/close_download_btn.svg') center no-repeat;
-      background-size: 14px 14px;
-      height: 18px;
-      width: 18px;
-
-      &:hover {
-        background: url('../img/toolbar/close_download_btn_hover.svg') center no-repeat;
-        background-size: 14px 14px;
-        height: 18px;
-        width: 18px;
-      }
-
-      &.hideButton:not([disabled]):hover {
-        background: @chromeControlsWarningBackground;
-      }
+  &:not(:hover) {
+    .downloadActions {
+      display: none;
     }
+
+    .deleteConfirmation {
+      display: none;
+    }
+  }
+
+  &.deleteConfirmationVisible:hover {
+    // magic numbers.
+    // TODO: Replace with calc
+    height: 110px;
+    bottom: 60px;
   }
 }
