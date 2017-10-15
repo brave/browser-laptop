@@ -9,14 +9,33 @@ const script =
       meta.name = 'web3-installed'
       document.head.appendChild(meta)
     }
+  } else {
+    var oldWeb3 = window.web3
+    Object.defineProperty(window, 'web3', {
+      set: function (val) {
+        oldWeb3 = val
+      },
+      get: function () {
+        if (window.alreadyInserted) {
+          return oldWeb3
+        }
+        window.alreadyInserted = true
+        const meta = document.createElement('meta')
+        meta.name = 'web3-installed'
+        document.head.appendChild(meta)
+        return oldWeb3
+      }
+    })
   }`
 
 executeScript(script)
-const isDapp = document.querySelector('meta[name="web3-installed"]')
+setTimeout(function () {
+  const isDapp = document.querySelector('meta[name="web3-installed"]')
 
-if (isDapp) {
-  chrome.ipcRenderer.send('dispatch-action', JSON.stringify([{
-    actionType: 'app-dapp-available',
-    location: window.location.href
-  }]))
-}
+  if (isDapp) {
+    chrome.ipcRenderer.send('dispatch-action', JSON.stringify([{
+      actionType: 'app-dapp-available',
+      location: window.location.href
+    }]))
+  }
+}, 1000)
