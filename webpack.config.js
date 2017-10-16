@@ -106,9 +106,7 @@ function production () {  // eslint-disable-line
   if (env !== 'test') {
     prod.plugins.push(new UglifyJsPlugin({
       uglifyOptions: {
-        compress: {
-          warnings: false
-        },
+        compress: false,
         mangle: {
           reserved: ['module', 'exports', 'require']
         }
