@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.19.53](https://github.com/brave/browser-laptop/releases/tag/v0.19.53dev)
+
+ - Added support for MetaMask. ([#8671](https://github.com/brave/browser-laptop/issues/8671))
+ - Added detection of visiting a Dapp to prompt to install MetaMask. ([#11532](https://github.com/brave/browser-laptop/issues/11532))
+ - Fixed QR codes not being displayed when creating a new wallet. ([#11492](https://github.com/brave/browser-laptop/issues/11492))
+ - Fixed transition overlay displayed when wallet was created in previous version. ([#11506](https://github.com/brave/browser-laptop/issues/11506))
+ - Fixed chance of losing wallet on BAT upgrade. ([#11494](https://github.com/brave/browser-laptop/issues/11494))
+ - Fixed additional footer text causes button misalignment. ([#11489](https://github.com/brave/browser-laptop/issues/11489))
+ - Upgraded to muon 4.4.29. ([#11543](https://github.com/brave/browser-laptop/issues/11543))
+
 ## [0.19.48](https://github.com/brave/browser-laptop/releases/tag/v0.19.48dev)
 
  - Added BAT payments. ([#10945](https://github.com/brave/browser-laptop/issues/10945))
