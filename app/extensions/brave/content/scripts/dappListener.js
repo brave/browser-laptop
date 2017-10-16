@@ -36,9 +36,7 @@ if (chrome.contentSettings.dappDetection == 'allow') {
 }
 
 setTimeout(function () {
-  console.log('checking now for toolbar')
   const isDapp = document.querySelector('meta[name="web3-installed"]')
-
   if (isDapp) {
     chrome.ipcRenderer.send('dispatch-action', JSON.stringify([{
       actionType: 'app-dapp-available',
