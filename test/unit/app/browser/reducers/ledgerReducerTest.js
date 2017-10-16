@@ -256,8 +256,8 @@ describe('ledgerReducer unit tests', function () {
     it('calls ledgerApi.boot', function () {
       assert(bootSpy.calledOnce)
     })
-    it('returns an ununmodified state', function () {
-      assert.deepEqual(returnedState, appState)
+    it('returns a modified state', function () {
+      assert.notDeepEqual(returnedState, appState)
     })
   })
 
