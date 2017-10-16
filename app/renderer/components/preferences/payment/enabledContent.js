@@ -175,10 +175,10 @@ class EnabledContent extends ImmutableComponent {
 
     return <section className={css(styles.enabledContent)}>
       <div className={css(styles.enabledContent__loader, inTransition && styles.enabledContent__loader_show)}>
-        <p className={css(styles.loader__text)}>
+        <div className={css(styles.loader__text)}>
           <p data-l10n-id='leaderLoaderText1' />
           <p data-l10n-id='leaderLoaderText2' />
-        </p>
+        </div>
         <div className={css(styles.leader__wrap)}>
           <div>
             <div className={css(styles.loader__line, styles.loader__line_1, !inTransition && styles.loader__line_off)} />
