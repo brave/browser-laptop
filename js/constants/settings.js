@@ -97,6 +97,8 @@ const settings = {
   PINTEREST_ENABLED: 'extensions.pinterest.enabled',
   METAMASK_ENABLED: 'extensions.metamask.enabled',
   METAMASK_PROMPT_DISMISSED: 'extensions.metamask.promptDismissed',
+  // View Menu
+  SHOW_TOOLBAR_DOWNLOADS: 'toolbar.downloads',
 
   // DEPRECATED settings
   // DO NOT REMOVE OR CHANGE THESE VALUES

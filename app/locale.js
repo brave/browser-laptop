@@ -270,12 +270,16 @@ var rendererIdentifiers = function () {
     'unknownError',
     'allowAutoplay',
     'autoplayMedia',
+    'spellCheckLanguages',
+    // View - > Toolbar
+    'toolbar',
+    'toolbarBookmarks',
+    'toolbarDownloads',
     // Release channels
     'channelRelease',
     'channelBeta',
     'channelDeveloper',
     'channelNightly',
-    'spellCheckLanguages',
     // Ledger
     'promotionGeneralErrorTitle',
     'promotionGeneralErrorMessage',

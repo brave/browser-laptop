@@ -288,11 +288,22 @@ module.exports.submitFeedbackMenuItem = () => {
 
 module.exports.bookmarksToolbarMenuItem = () => {
   return {
-    label: locale.translation('bookmarksToolbar'),
+    label: locale.translation('toolbarBookmarks'),
     type: 'checkbox',
     checked: getSetting(settings.SHOW_BOOKMARKS_TOOLBAR),
     click: (item, focusedWindow) => {
       appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, !getSetting(settings.SHOW_BOOKMARKS_TOOLBAR))
+    }
+  }
+}
+
+module.exports.downloadsToolbarMenuItem = () => {
+  return {
+    label: locale.translation('toolbarDownloads'),
+    type: 'checkbox',
+    checked: getSetting(settings.SHOW_TOOLBAR_DOWNLOADS),
+    click: (item, focusedWindow) => {
+      appActions.changeSetting(settings.SHOW_TOOLBAR_DOWNLOADS, !getSetting(settings.SHOW_TOOLBAR_DOWNLOADS))
     }
   }
 }

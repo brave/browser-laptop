@@ -196,6 +196,14 @@ const createEditSubmenu = () => {
 const createViewSubmenu = () => {
   return [
     {
+      label: locale.translation('toolbar'),
+      submenu: [
+        CommonMenu.bookmarksToolbarMenuItem(),
+        CommonMenu.downloadsToolbarMenuItem()
+      ]
+    },
+    CommonMenu.separatorMenuItem,
+    {
       label: locale.translation('actualSize'),
       accelerator: 'CmdOrCtrl+0',
       click: function (item, focusedWindow) {
@@ -400,9 +408,7 @@ const createBookmarksSubmenu = (state) => {
       visible: false,
       accelerator: 'Shift+CmdOrCtrl+D'
     },
-    CommonMenu.separatorMenuItem,
     CommonMenu.bookmarksManagerMenuItem(),
-    CommonMenu.bookmarksToolbarMenuItem(),
     CommonMenu.separatorMenuItem,
     CommonMenu.importBrowserDataMenuItem(),
     CommonMenu.exportBookmarksMenuItem()

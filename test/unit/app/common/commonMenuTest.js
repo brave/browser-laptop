@@ -188,6 +188,12 @@ describe('Common menu module unit tests', function () {
     })
   })
 
+  describe('downloadsToolbarMenuItem', function () {
+    it('has the expected defaults set', function () {
+      checkExpectedDefaults(commonMenu.downloadsToolbarMenuItem, false)
+    })
+  })
+
   describe('autoHideMenuBarMenuItem', function () {
     it('has the expected defaults set', function () {
       checkExpectedDefaults(commonMenu.autoHideMenuBarMenuItem, false)

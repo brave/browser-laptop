@@ -20,6 +20,9 @@ const appActions = require('../../../../js/actions/appActions')
 const contextMenus = require('../../../../js/contextMenus')
 const downloadUtil = require('../../../../js/state/downloadUtil')
 const cx = require('../../../../js/lib/classSet')
+const {getSetting} = require('../../../../js/settings')
+
+const settings = require('../../../../js/constants/settings')
 
 const globalStyles = require('../styles/global')
 const {theme} = require('../styles/theme')
@@ -48,6 +51,7 @@ class DownloadsBar extends React.Component {
   mergeProps (state, ownProps) {
     const props = {}
     // used in renderer
+    props.isToolbarDownloads = getSetting(settings.SHOW_TOOLBAR_DOWNLOADS)
     props.downloads = downloadUtil.getDownloadItems(state) || Immutable.List()
 
     return props
@@ -55,7 +59,7 @@ class DownloadsBar extends React.Component {
 
   render () {
     return <div className={cx({
-      [css(styles.downloadsBar)]: true,
+      [css(styles.downloadsBar, !this.props.isToolbarDownloads && styles.downloadBar_hidden)]: true,
 
       // Required for isFullScreen on window.less
       // TODO: css(isFullScreen && styles.downloadsBar_isFullScreen)
@@ -104,6 +108,11 @@ const styles = StyleSheet.create({
     width: '100%',
     zIndex: globalStyles.zindex.zindexDownloadsBar,
     userSelect: 'none'
+  },
+
+  // #10548
+  downloadBar_hidden: {
+    display: 'none'
   },
 
   downloadsBar__items: {
