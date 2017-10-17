@@ -361,7 +361,7 @@ const configuredLanguages = {
 
 // Dynamic filling of the  array of locale
 for (var local in configuredLanguages) {
-	if (availableLanguages.indexOf(configuredLanguages[local]) == -1) {
+	if (availableLanguages.indexOf(configuredLanguages[local]) === -1) {
 		availableLanguages.push(configuredLanguages[local])
     }
 }
