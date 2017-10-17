@@ -11,7 +11,6 @@ const {
   siteSettingItem,
   ledgerTable,
   nextButton,
-  previousButton,
   securityTab,
   addFundsDialog,
   addFundsWizard,
@@ -19,7 +18,6 @@ const {
   modalOverlay,
   modalOverlayCloseButton
 } = require('../lib/selectors')
-const assert = require('assert')
 const settings = require('../../js/constants/settings')
 
 const prefsUrl = 'about:preferences'
@@ -39,33 +37,35 @@ function * setup (client) {
     .waitForVisible(urlInput)
 }
 
+function * steppedSetup (client, isPaymentsEnabled = false) {
+  yield client
+    .waitForUrl(Brave.newTabUrl)
+    .waitForBrowserWindow()
+    .waitForVisible(urlInput)
+    .changeSetting(settings.PAYMENTS_ENABLED, isPaymentsEnabled)
+    .tabByIndex(0)
+    .loadUrl(prefsUrl)
+    .waitForVisible(paymentsTab)
+    .click(paymentsTab)
+    // there's no welcome page if payments are enabled
+    .waitForElementCount(paymentsWelcomePage, Number(!isPaymentsEnabled))
+    .waitForVisible(walletSwitch)
+}
+
 describe('Regular payment panel tests', function () {
-  describe('can setup payments', function () {
+  describe('payments setup', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
-      yield setup(this.app.client)
+      yield steppedSetup(this.app.client)
     })
 
     it('shows welcome page', function * () {
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(prefsUrl)
-        .waitForVisible(paymentsTab)
-        .click(paymentsTab)
-        .waitForVisible(paymentsWelcomePage)
-        .waitForVisible(walletSwitch)
-      let background = yield this.app.client.getCssProperty(walletSwitch, 'background-color')
-      assert.equal(background.value, 'rgba(204,204,204,1)')
+        .waitForElementCount(paymentsWelcomePage, 1)
     })
 
     it('payments can be enabled', function * () {
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(prefsUrl)
-        .waitForVisible(paymentsTab)
-        .click(paymentsTab)
-        .waitForVisible(paymentsWelcomePage)
-        .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
@@ -78,12 +78,6 @@ describe('Regular payment panel tests', function () {
 
     it('payments can be disabled', function * () {
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(prefsUrl)
-        .waitForVisible(paymentsTab)
-        .click(paymentsTab)
-        .waitForVisible(paymentsWelcomePage)
-        .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
@@ -106,41 +100,23 @@ describe('Regular payment panel tests', function () {
 
     it('advanced settings is hidden by default', function * () {
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(prefsUrl)
-        .waitForVisible(paymentsTab)
-        .click(paymentsTab)
-        .waitForVisible(paymentsWelcomePage)
-        .waitForVisible(walletSwitch)
         .waitForElementCount(advancedSettingsButton, 0)
     })
 
     it('advanced settings is visible when payments are enabled', function * () {
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(prefsUrl)
-        .waitForVisible(paymentsTab)
-        .click(paymentsTab)
-        .waitForVisible(paymentsWelcomePage)
-        .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .waitForVisible(advancedSettingsButton, ledgerAPIWaitTimeout)
     })
 
     it('can create wallet', function * () {
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(prefsUrl)
-        .waitForVisible(paymentsTab)
-        .click(paymentsTab)
-        .waitForVisible(paymentsWelcomePage)
-        .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .waitForEnabled(addFundsButton)
     })
   })
 
-  describe('ledger history', function () {
+  describe.skip('ledger history', function () {
     Brave.beforeAllServerSetup(this)
 
     beforeEach(function * () {
@@ -287,17 +263,7 @@ describe('Regular payment panel tests', function () {
     Brave.beforeEach(this)
 
     beforeEach(function * () {
-      yield setup(this.app.client)
-      yield this.app.client
-        .changeSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST, true)
-        .tabByIndex(0)
-        .loadUrl(prefsUrl)
-        .waitForVisible(paymentsTab)
-        .click(paymentsTab)
-        .waitForVisible(paymentsWelcomePage)
-        .waitForVisible(walletSwitch)
-        .click(walletSwitch)
-        .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
+      yield steppedSetup(this.app.client, true)
     })
 
     it('site is added automatically', function * () {
@@ -390,41 +356,23 @@ describe('Regular payment panel tests', function () {
   })
 
   describe('add funds welcome screen', function () {
-    Brave.beforeAll(this)
+    Brave.beforeEach(this)
 
-    before(function * () {
-      yield setup(this.app.client)
+    beforeEach(function * () {
+      yield steppedSetup(this.app.client, true)
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(prefsUrl)
-        .waitForVisible(paymentsTab)
-        .click(paymentsTab)
-        .waitForVisible(paymentsWelcomePage)
-        .waitForVisible(walletSwitch)
-        .click(walletSwitch)
-        .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
-        .waitForExist(addFundsButton)
-    })
-
-    afterEach(function * () {
-      yield this.app.client
-        .waitForExist(modalOverlayCloseButton)
-        .moveToObject(modalOverlayCloseButton)
-        .click(modalOverlayCloseButton)
-        .waitForExist(addFundsButton)
+        .waitForVisible(advancedSettingsButton, ledgerAPIWaitTimeout)
+        .click(addFundsButton)
+        .waitForExist(modalOverlay)
     })
 
     it('opens the modal dialog when you click the add funds button', function * () {
       yield this.app.client
-        .click(addFundsButton)
-        .waitForExist(modalOverlay)
         .waitForElementCount(modalOverlay, 1)
     })
 
     it('renders the welcome screen', function * () {
       yield this.app.client
-        .click(addFundsButton)
-        .waitForExist(modalOverlay)
         .waitForExist(addFundsDialog)
         .waitForExist(addFundsWelcome)
         .waitForElementCount(addFundsWelcome, 1)
@@ -432,8 +380,6 @@ describe('Regular payment panel tests', function () {
 
     it('renders the wizard when you click next button', function * () {
       yield this.app.client
-        .click(addFundsButton)
-        .waitForExist(modalOverlay)
         .waitForExist(addFundsDialog)
         .waitForExist(addFundsWelcome)
         .waitForElementCount(addFundsWelcome, 1)
@@ -448,25 +394,13 @@ describe('Regular payment panel tests', function () {
     Brave.beforeAll(this)
 
     before(function * () {
-      yield setup(this.app.client)
+      yield steppedSetup(this.app.client, true)
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(prefsUrl)
-        .waitForVisible(paymentsTab)
-        .click(paymentsTab)
-        .waitForVisible(paymentsWelcomePage)
-        .waitForVisible(walletSwitch)
-        .click(walletSwitch)
         .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
         .waitForExist(addFundsButton)
         .click(addFundsButton)
         .waitForExist(modalOverlay)
         .waitForExist(addFundsDialog)
-        .waitForExist(nextButton)
-        .click(nextButton)
-        .waitForExist(addFundsWizard)
-        .waitForElementCount(addFundsWizard, 1)
-        .waitForExist(modalOverlayCloseButton)
         .click(modalOverlayCloseButton)
     })
 
@@ -478,8 +412,6 @@ describe('Regular payment panel tests', function () {
 
     afterEach(function * () {
       yield this.app.client
-        .waitForExist(previousButton)
-        .click(previousButton)
         .waitForExist(modalOverlayCloseButton)
         .click(modalOverlayCloseButton)
     })
@@ -518,16 +450,9 @@ describe('synopsis', function () {
   Brave.beforeAll(this)
 
   before(function * () {
-    yield setup(this.app.client)
+    yield steppedSetup(this.app.client, true)
     yield this.app.client
-      .tabByIndex(0)
-      .loadUrl(prefsUrl)
-      .waitForVisible(paymentsTab)
-      .click(paymentsTab)
-      .waitForVisible(paymentsWelcomePage)
-      .waitForVisible(walletSwitch)
-      .click(walletSwitch)
-      .waitForEnabled(addFundsButton)
+      .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
   })
 
   it('no table if empty synopsis', function * () {
