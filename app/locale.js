@@ -298,36 +298,11 @@ exports.translation = function (token, replacements = {}) {
 // Default language locale identifier
 const DEFAULT_LANGUAGE = lang
 
-const availableLanguages = [
-  'eu',
-  'bn-BD',
-  'bn-IN',
-  'zh-CN',
-  'cs',
-  'nl-NL',
-  'en-US',
-  'en-GB',
-  'fr-FR',
-  'de-DE',
-  'hi-IN',
-  'id-ID',
-  'it-IT',
-  'ja-JP',
-  'ko-KR',
-  'ms-MY',
-  'pl-PL',
-  'pt-BR',
-  'ru',
-  'sl',
-  'sv-SE',
-  'es',
-  'ta',
-  'te',
-  'tr-TR',
-  'uk'
-]
+// locale brave
+var availableLanguages = []
 
 const configuredLanguages = {
+  // locale electron : locale brave
   'eu':'eu',
   'bn':'bn-BD',
   'bn-BD':'bn-BD',
@@ -382,6 +357,13 @@ const configuredLanguages = {
   'tr':'tr-TR',
   'tr-TR':'tr-TR',
   'uk':'uk'
+}
+
+// Dynamic filling of the  array of locale
+for (var local in configuredLanguages) {
+	if (availableLanguages.indexOf(configuredLanguages[local]) == -1) {
+		availableLanguages.push(configuredLanguages[local])
+    }
 }
 
 // Return the default locale in xx-XX format I.e. pt-BR
