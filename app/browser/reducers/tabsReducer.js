@@ -396,6 +396,28 @@ const tabsReducer = (state, action, immutableAction) => {
       }
       break
     }
+    case appConstants.SHORTCUT_ACTIVE_FRAME_FORWARD: {
+      const tabId = tabState.resolveTabId(state, action.get('tabId'))
+      const canGoForward = tabState.canGoForward(state, tabId)
+
+      if (!canGoForward) {
+        break
+      }
+
+      setImmediate(() => tabs.goForward(tabId))
+      break
+    }
+    case appConstants.SHORTCUT_ACTIVE_FRAME_BACK: {
+      const tabId = tabState.resolveTabId(state, action.get('tabId'))
+      const canGoBack = tabState.canGoBack(state, tabId)
+
+      if (!canGoBack) {
+        break
+      }
+
+      setImmediate(() => tabs.goBack(tabId))
+      break
+    }
   }
   return state
 }

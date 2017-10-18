@@ -246,9 +246,9 @@ class Main extends React.Component {
       const timeThreshold = 80
       if (trackingFingers && time > timeThreshold && Math.abs(deltaY) < distanceThreshold) {
         if (deltaX > distanceThreshold && isSwipeOnRightEdge) {
-          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+          appActions.onShortcutActiveFrameForward(tabState.TAB_ID_ACTIVE)
         } else if (deltaX < -distanceThreshold && isSwipeOnLeftEdge) {
-          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+          appActions.onShortcutActiveFrameBack(tabState.TAB_ID_ACTIVE)
         }
       }
       appActions.swipedLeft(0)
@@ -278,9 +278,9 @@ class Main extends React.Component {
     const throttledSwipe = _.throttle(direction => {
       if (this.props.mouseInFrame) {
         if (direction === 'left') {
-          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+          appActions.onShortcutActiveFrameBack(tabState.TAB_ID_ACTIVE)
         } else if (direction === 'right') {
-          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+          appActions.onShortcutActiveFrameForward(tabState.TAB_ID_ACTIVE)
         }
       }
     }, 500, {leading: true, trailing: false})

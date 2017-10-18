@@ -312,13 +312,13 @@ const createHistorySubmenu = () => {
       label: locale.translation('back'),
       accelerator: 'CmdOrCtrl+[',
       click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_BACK])
+        appActions.onShortcutActiveFrameBack(tabState.TAB_ID_ACTIVE)
       }
     }, {
       label: locale.translation('forward'),
       accelerator: 'CmdOrCtrl+]',
       click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
+        appActions.onShortcutActiveFrameForward(tabState.TAB_ID_ACTIVE)
       }
     },
     CommonMenu.separatorMenuItem,

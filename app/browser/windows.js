@@ -15,6 +15,7 @@ const {getPinnedTabsByWindowId} = require('../common/state/tabState')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const windowState = require('../common/state/windowState')
+const tabState = require('../common/state/tabState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
 
 // TODO(bridiver) - set window uuid
@@ -157,10 +158,10 @@ const api = {
         win.on('app-command', function (e, cmd) {
           switch (cmd) {
             case 'browser-backward':
-              win.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+              appActions.onShortcutActiveFrameBack(tabState.TAB_ID_ACTIVE)
               return
             case 'browser-forward':
-              win.webContents.send(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
+              appActions.onShortcutActiveFrameForward(tabState.TAB_ID_ACTIVE)
           }
         })
         win.webContents.on('crashed', (e) => {

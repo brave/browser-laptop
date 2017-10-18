@@ -7,6 +7,7 @@ const BrowserWindow = electron.BrowserWindow
 const electronLocalshortcut = require('electron-localshortcut')
 const messages = require('../js/constants/messages')
 const appActions = require('../js/actions/appActions')
+const appConstants = require('../js/constants/appConstants')
 const isDarwin = process.platform === 'darwin'
 
 module.exports.register = (win) => {
@@ -37,8 +38,8 @@ module.exports.register = (win) => {
       ['Ctrl+F4', messages.SHORTCUT_CLOSE_FRAME],
       ['Ctrl+U', messages.SHORTCUT_ACTIVE_FRAME_VIEW_SOURCE],
       ['Alt+D', messages.SHORTCUT_FOCUS_URL],
-      ['Alt+Left', messages.SHORTCUT_ACTIVE_FRAME_BACK],
-      ['Alt+Right', messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
+      ['Alt+Left', appConstants.SHORTCUT_ACTIVE_FRAME_BACK],
+      ['Alt+Right', appConstants.SHORTCUT_ACTIVE_FRAME_FORWARD])
   } else {
     // Different shorcut for View Source as is common for Chrome/Safari on macOS
     // See #7702
