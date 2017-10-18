@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -50,7 +51,7 @@ class MenuBar extends React.Component {
       index = this.props.selectedIndex
     }
 
-    const selected = document.querySelectorAll('.menubar .menubarItem[data-index=\'' + index + '\']')
+    const selected = document.querySelectorAll('[data-menubar-item][data-index=\'' + index + '\']')
     if (selected.length === 1) {
       return selected.item(0).getBoundingClientRect()
     }
@@ -136,7 +137,7 @@ class MenuBar extends React.Component {
   }
 
   render () {
-    return <div className='menubar'>
+    return <div className={css(styles.menubar)}>
       {
         this.props.template.map((item, i) => {
           return <MenuBarItem index={i} />
@@ -145,5 +146,17 @@ class MenuBar extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  menubar: {
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexGrow: 1,
+    cursor: 'default',
+    userSelect: 'none',
+    marginTop: '2px',
+    height: '19px'
+  }
+})
 
 module.exports = ReduxComponent.connect(MenuBar)

@@ -13,6 +13,23 @@
 
   module.exports.theme = {
     navigator: {
+      menuBar: {
+        item: {
+          borderColor: 'transparent',
+          color: '#000',
+
+          onHover: {
+            backgroundColor: '#e5f3ff',
+            borderColor: '#cce8ff'
+          },
+
+          selected: {
+            backgroundColor: '#cce8ff',
+            borderColor: '#99d1ff'
+          }
+        }
+      },
+
       braveMenu: {
         counter: {
           backgroundColor: '#555',
