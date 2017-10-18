@@ -32,68 +32,67 @@ describe('ledgerUtil test', function () {
   })
 
   describe('shouldTrackView', function () {
-    const validView = Immutable.fromJS({
-      tabId: 1,
-      url: 'https://brave.com/'
-    })
-    const validResponseList = Immutable.fromJS([
-      {
-        tabId: validView.get('tabId'),
-        details: {
-          newURL: validView.get('url'),
-          httpResponseCode: 200
-        }
-      }
-    ])
-    const noMatchResponseList = Immutable.fromJS([
-      {
-        tabId: 3,
-        details: {
-          newURL: 'https://not-brave.com'
-        }
-      }
-    ])
-    const matchButErrored = Immutable.fromJS([
-      {
-        tabId: validView.get('tabId'),
-        details: {
-          newURL: validView.get('url'),
-          httpResponseCode: 404
-        }
-      }
-    ])
-
-    describe('input validation', function () {
-      it('returns false if view is falsey', function () {
-        assert.equal(ledgerUtil.shouldTrackView(null, validResponseList), false)
-      })
-      it('returns false if view.url is falsey', function () {
-        assert.equal(ledgerUtil.shouldTrackView({tabId: 1}, validResponseList), false)
-      })
-      it('returns false if view.tabId is falsey', function () {
-        assert.equal(ledgerUtil.shouldTrackView({url: 'https://brave.com/'}, validResponseList), false)
-      })
-      it('returns false if responseList is falsey', function () {
-        assert.equal(ledgerUtil.shouldTrackView(validView, null), false)
-      })
-      it('returns false if responseList is not an array', function () {
-        assert.equal(ledgerUtil.shouldTrackView(validView, {}), false)
-      })
-      it('returns false if responseList is a 0 length array', function () {
-        assert.equal(ledgerUtil.shouldTrackView(validView, []), false)
-      })
+    it('null case', function () {
+      assert.equal(ledgerUtil.shouldTrackView(), false)
     })
 
-    describe('when finding a matching response based on tabId and url', function () {
-      it('returns false if no match found', function () {
-        assert.equal(ledgerUtil.shouldTrackView(validView, noMatchResponseList), false)
+    it('we have about error, but dont have tab navigationState', function () {
+      const param = Immutable.fromJS({
+        aboutDetails: {
+          title: 'error'
+        }
       })
-      it('returns false if match is found BUT response code is a failure (ex: 404)', function () {
-        assert.equal(ledgerUtil.shouldTrackView(validView, matchButErrored), false)
+      assert.equal(ledgerUtil.shouldTrackView(param), false)
+    })
+
+    it('we have tab, but dont have active entry', function () {
+      const param = Immutable.fromJS({
+        navigationState: {}
       })
-      it('returns true when match is found AND response code is a success (ex: 200)', function () {
-        assert.equal(ledgerUtil.shouldTrackView(validView, validResponseList), true)
+      assert.equal(ledgerUtil.shouldTrackView(param), false)
+    })
+
+    it('we have tab, but active entry dont have httpStatusCode', function () {
+      const param = Immutable.fromJS({
+        navigationState: {
+          activeEntry: {}
+        }
       })
+      assert.equal(ledgerUtil.shouldTrackView(param), false)
+    })
+
+    it('we have tab, but httpStatusCode is 500', function () {
+      let param = Immutable.fromJS({
+        navigationState: {}
+      })
+
+      param = param.setIn(['navigationState', 'activeEntry'], {
+        httpStatusCode: 500
+      })
+      assert.equal(ledgerUtil.shouldTrackView(param), false)
+    })
+
+    it('we have tab and httpStatusCode is 200', function () {
+      let param = Immutable.fromJS({
+        navigationState: {}
+      })
+      param = param.setIn(['navigationState', 'activeEntry'], {
+        httpStatusCode: 200
+      })
+      assert.equal(ledgerUtil.shouldTrackView(param), true)
+    })
+
+    it('we have tab and httpStatusCode is 200, but we have aboutDetails', function () {
+      let param = Immutable.fromJS({
+        aboutDetails: {
+          title: 'error'
+        },
+        navigationState: {}
+      })
+      param = param.setIn(['navigationState', 'activeEntry'], {
+        httpStatusCode: 200
+      })
+      assert.equal(ledgerUtil.shouldTrackView(param), false)
     })
   })
 
