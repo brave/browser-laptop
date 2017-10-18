@@ -2,6 +2,8 @@
 logs
 *.log
 npm-debug.log.*
+cpu-profiles
+*.cpuprofile
 
 # Runtime data
 pids

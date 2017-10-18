@@ -9,6 +9,7 @@ before_install:
   - sh -e /etc/init.d/xvfb start
 before_script:
   - npm run download-sync-client
+  - curl -sL https://raw.githubusercontent.com/travis-ci/artifacts/master/install | bash
 script:
   - npm run testsuite
 branches:
@@ -30,6 +31,7 @@ env:
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=misc-components
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=navbar-components
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=tab-components
+  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=performance ARTIFACTS_REGION=us-east-1
 addons:
   apt:
     sources:
