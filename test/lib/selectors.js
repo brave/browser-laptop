@@ -93,6 +93,8 @@ module.exports = {
   paymentsStatus: '[data-test-id="walletStatus"]',
   siteSettingItem: '.siteSettingItem',
   ledgerTable: '[data-test-id="ledgerTable"]',
+  pinnedPublisher: '[data-test-pinned="true"]',
+  unpinnedPublisher: '[data-test-pinned="false"]',
   bitcoinDashboard: '[data-test-id="bitcoinDashboard"]',
   advancedSettingsDialog: '[data-test-id="advancedSettings"]',
   advancedSettingsButton: '[data-test-id="advancedSettingsButton"]',
