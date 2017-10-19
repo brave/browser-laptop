@@ -39,7 +39,6 @@ const domUtil = require('../../lib/domUtil')
 const {
   aboutUrls,
   isSourceMagnetUrl,
-  isTargetAboutUrl,
   getTargetAboutUrl,
   getBaseUrl,
   isIntermediateAboutPage
@@ -639,26 +638,6 @@ class Frame extends React.Component {
         return
       }
       if (isFrameError(e.errorCode)) {
-        // temporary workaround for https://github.com/brave/browser-laptop/issues/1817
-        if (e.validatedURL === aboutUrls.get('about:newtab') ||
-            e.validatedURL === aboutUrls.get('about:blank') ||
-            e.validatedURL === aboutUrls.get('about:certerror') ||
-            e.validatedURL === aboutUrls.get('about:error') ||
-            e.validatedURL === aboutUrls.get('about:safebrowsing')) {
-          // this will just display a blank page for errors
-          // but we don't want to take the user out of the private tab
-          return
-        } else if (isTargetAboutUrl(e.validatedURL)) {
-          // open a new tab for other about urls
-          // and send this tab back to wherever it came from
-          appActions.onGoBack(this.props.tabId)
-          appActions.createTabRequested({
-            url: e.validatedURL,
-            active: true
-          })
-          return
-        }
-
         windowActions.setFrameError(this.frame, {
           event_type: 'did-fail-load',
           errorCode: e.errorCode,
