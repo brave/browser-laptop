@@ -34,6 +34,9 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
   case 'about:certerror':
     element = require('./certerror')
     break
+  case 'about:cookies':
+    element = require('./cookies')
+    break
   case 'about:downloads':
     element = require('./downloads')
     break

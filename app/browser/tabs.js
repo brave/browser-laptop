@@ -35,6 +35,7 @@ const historyState = require('../common/state/historyState')
 const bookmarkOrderCache = require('../common/cache/bookmarkOrderCache')
 const ledgerState = require('../common/state/ledgerState')
 const {getWindow} = require('./windows')
+const filtering = require('../filtering')
 
 let currentPartitionNumber = 0
 const incrementPartitionNumber = () => ++currentPartitionNumber
@@ -291,6 +292,12 @@ const updateAboutDetails = (tab, tabValue) => {
     }
   } else if (location === 'about:brave') {
     tab.send(messages.VERSION_INFORMATION_UPDATED, versionInformation.toJS())
+  } else if (location === 'about:cookies') {
+    filtering.cookies.getAll((cookies) => {
+      if (!tab.isDestroyed()) {
+        tab.send(messages.COOKIES_UPDATED, cookies)
+      }
+    })
   }
   // send state to about pages
   if (aboutUrls.get(location) && aboutDetails) {

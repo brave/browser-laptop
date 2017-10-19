@@ -345,6 +345,15 @@ const createHistorySubmenu = () => {
       click: function (item, focusedWindow) {
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL])
       }
+    },
+    {
+      label: locale.translation('manageCookies'),
+      click: function (item, focusedWindow) {
+        appActions.createTabRequested({
+          url: 'about:cookies',
+          windowId: focusedWindow.id
+        })
+      }
     }
   ]
   const recentlyClosedItems = menuUtil.createRecentlyClosedTemplateItems(closedFrames)

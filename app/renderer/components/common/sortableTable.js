@@ -5,6 +5,7 @@
 const React = require('react')
 const Immutable = require('immutable')
 const tableSort = require('tablesort')
+const KeyCodes = require('../../../common/constants/keyCodes')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
@@ -26,6 +27,7 @@ class SortableTable extends React.Component {
     super(props)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
+    this.onKeyDown = this.onKeyDown.bind(this)
     this.onTableDragStart = this.onTableDragStart.bind(this)
     this.state = {
       selection: Immutable.Set()
@@ -41,6 +43,7 @@ class SortableTable extends React.Component {
     if (this.props.rows &&
       (!prevProps.rows ||
       prevProps.rows.length !== this.props.rows.length)) {
+      this.clearSelection()
       this.sortTable.refresh()
     }
   }
@@ -228,7 +231,17 @@ class SortableTable extends React.Component {
       } else {
         this.props.onContextMenu(handlerInputs, this.props.contextMenuName, e)
       }
-      this.clearSelection()
+    }
+  }
+  /**
+   * Handle keydown
+   */
+  onKeyDown (e) {
+    if (e.keyCode === KeyCodes.BACKSPACE && this.props.onDelete) {
+      const handlerInputs = this.getSelectedRowObjects()
+      if (handlerInputs) {
+        this.props.onDelete(handlerInputs)
+      }
     }
   }
   /**
@@ -300,6 +313,8 @@ class SortableTable extends React.Component {
         tableAttributes.draggable = true
       }
     }
+    tableAttributes.tabIndex = 0
+    tableAttributes.onKeyDown = this.onKeyDown
     return tableAttributes
   }
   getRowAttributes (row, index, bodyIndex) {
@@ -508,6 +523,7 @@ const styles = StyleSheet.create({
   // It can be specified by setting css to tableClassNames.
   // See 'styles.devices__devicesList' on syncTab.js for example.
   table: {
+    outline: 'none',
     boxSizing: 'border-box',
     cursor: 'default',
     borderSpacing: 0,
