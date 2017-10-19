@@ -350,6 +350,7 @@ module.exports.init = () => {
   })
   componentUpdater.on('component-update-updated', (e, extensionId, version) => {
     // console.log('update-updated', extensionId, version)
+    session.defaultSession.extensions.notifyInstalled(extensionId)
   })
   componentUpdater.on('component-ready', (e, componentId, extensionPath) => {
     // console.log('component-ready', componentId, extensionPath)
