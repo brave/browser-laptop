@@ -2254,6 +2254,14 @@ const deleteSynopsis = () => {
   synopsis.publishers = {}
 }
 
+// fix for incorrectly persisted state (see #11585)
+const yoDawg = (stateState) => {
+  while (stateState.hasOwnProperty('state') && stateState.state.persona) {
+    stateState = stateState.state
+  }
+  return stateState
+}
+
 let newClient = null
 const transitionWalletToBat = () => {
   let newPaymentId, result
@@ -2271,9 +2279,10 @@ const transitionWalletToBat = () => {
           return
         }
         const parsedData = JSON.parse(data)
-        newClient = ledgerClient(parsedData.state.personaId,
-          underscore.extend(parsedData.options, {roundtrip: roundtrip}, clientOptions),
-          parsedData)
+        const state = yoDawg(parsedData)
+        newClient = ledgerClient(state.personaId,
+          underscore.extend(state.options, {roundtrip: roundtrip}, clientOptions),
+          state)
         transitionWalletToBat()
       })
       return
@@ -2287,7 +2296,7 @@ const transitionWalletToBat = () => {
     try {
       clientprep()
       newClient = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
-      muonWriter(newClientPath, newClient)
+      muonWriter(newClientPath, newClient.state)
     } catch (ex) {
       return console.error('ledger client creation error(2): ', ex)
     }
@@ -2302,7 +2311,7 @@ const transitionWalletToBat = () => {
 
       if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1, max: 500 })
 
-      muonWriter(newClientPath, newClient)
+      muonWriter(newClientPath, newClient.state)
 
       setTimeout(() => transitionWalletToBat(), delayTime)
     })
