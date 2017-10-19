@@ -2254,6 +2254,7 @@ const deleteSynopsis = () => {
   synopsis.publishers = {}
 }
 
+// fix for incorrectly persisted state (see #11585)
 const yoDawg = (stateState) => {
   while (stateState.hasOwnProperty('state') && stateState.state.persona) {
     stateState = stateState.state
