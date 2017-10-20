@@ -10,16 +10,17 @@ const Immutable = require('immutable')
 const tabState = require('../common/state/tabState')
 const windowState = require('../common/state/windowState')
 const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
-const {makeImmutable} = require('../common/state/immutableUtil')
+const {makeImmutable, makeJS} = require('../common/state/immutableUtil')
 const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
 const {isSessionPartition} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/state/siteUtil')
 const {getSetting} = require('../../js/settings')
 const settings = require('../../js/constants/settings')
-const {getBaseUrl, aboutUrls} = require('../../js/lib/appUrlUtil')
+const {getBaseUrl} = require('../../js/lib/appUrlUtil')
 const siteSettings = require('../../js/state/siteSettings')
 const messages = require('../../js/constants/messages')
+const debounce = require('../../js/lib/debounce')
 const aboutHistoryState = require('../common/state/aboutHistoryState')
 const appStore = require('../../js/stores/appStore')
 const appConfig = require('../../js/constants/appConfig')
@@ -30,6 +31,7 @@ const {cleanupWebContents, currentWebContents, getWebContents, updateWebContents
 const {FilterOptions} = require('ad-block')
 const {isResourceEnabled} = require('../filtering')
 const autofill = require('../autofill')
+const siteSettingsState = require('../common/state/siteSettingsState')
 const ledgerState = require('../common/state/ledgerState')
 const {getWindow} = require('./windows')
 
@@ -109,33 +111,57 @@ const isAutoDiscardable = (createProperties) => {
   return isHttpOrHttps(createProperties.url)
 }
 
-// TODO(bridiver) - refactor this into an action
-ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
-  const tab = e.sender
-  const listener = (_diffs) => {
-    if (!tab.isDestroyed()) {
-      const tabValue = tabState.getByTabId(appStore.getState(), tab.getId())
-      if (tabValue && tabValue.get('active') === true) {
-        updateAboutDetails(tab, tabValue)
-      }
+const aboutTabs = {}
+const aboutTabUpdateListener = (tabId) => {
+  if (parseInt(tabId)) {
+    updateAboutDetails(tabId)
+    return
+  }
+
+  for (let tabId in aboutTabs) {
+    let tab = getWebContents(tabId)
+    if (!tab || tab.isDestroyed()) {
+      delete aboutTabs[tabId]
     } else {
-      appStore.removeChangeListener(listener)
+      const tabValue = getTabValue(tabId)
+      if (tabValue && tabValue.get('active') === true) {
+        updateAboutDetails(tabId)
+      }
     }
   }
-  listener()
+}
 
-  appStore.addChangeListener(listener)
-  tab.on('set-active', (evt, active) => {
-    if (active) {
-      listener()
+appStore.addChangeListener(debounce(aboutTabUpdateListener, 100))
+
+ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
+  const tab = e.sender
+  const tabId = tab.getId()
+  aboutTabs[tabId] = {}
+
+  const url = getSourceAboutUrl(tab.getURL())
+  const location = getBaseUrl(url)
+  if (location === 'about:preferences') {
+    if (url === 'about:preferences#payments') {
+      appActions.ledgerPaymentsPresent(tabId, true)
+    } else {
+      appActions.ledgerPaymentsPresent(tabId, false)
     }
-  })
-  tab.on('destroyed', () => {
-    appStore.removeChangeListener(listener)
-  })
-  tab.on('did-navigate', () => {
-    appStore.removeChangeListener(listener)
-  })
+
+    tab.on('will-destroy', () => {
+      appActions.ledgerPaymentsPresent(tabId, false)
+    })
+    tab.once('did-navigate', () => {
+      appActions.ledgerPaymentsPresent(tabId, false)
+    })
+    tab.on('did-navigate-in-page', (e, newUrl) => {
+      updateAboutDetails(tabId)
+      if (getSourceAboutUrl(newUrl) === 'about:preferences#payments') {
+        appActions.ledgerPaymentsPresent(tabId, true)
+      } else {
+        appActions.ledgerPaymentsPresent(tabId, false)
+      }
+    })
+  }
 })
 
 const getBookmarksData = function (state) {
@@ -152,113 +178,127 @@ const getBookmarksData = function (state) {
       }
     }
   })
-  const bookmarks = bookmarkSites.toList().toJS()
-  const bookmarkFolders = bookmarkFolderSites.toList().toJS()
-  return {bookmarks, bookmarkFolders}
+  const bookmarks = bookmarkSites.toList()
+  const bookmarkFolders = bookmarkFolderSites.toList()
+  return Immutable.Map()
+    .set('bookmarks', bookmarks)
+    .set('bookmarkFolders', bookmarkFolders)
 }
 
-const updateAboutDetails = (tab, tabValue) => {
+const sendAboutDetails = (tabId, type, value, shared = false) => {
+  // use a weak map to avoid holding references to large objects that will never be equal to anything
+  aboutTabs[tabId][type] = aboutTabs[tabId][type] || new WeakMap()
+  if (aboutTabs[tabId] && !aboutTabs[tabId][type].get(value)) {
+    const tab = getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      if (shared) {
+        const handle = muon.shared_memory.create(makeJS(value))
+        tab.sendShared(type, handle)
+      } else {
+        tab.send(type, makeJS(value))
+      }
+      aboutTabs[tabId][type] = new WeakMap()
+      aboutTabs[tabId][type].set(value, true)
+    }
+  }
+}
+
+const updateAboutDetails = (tabId) => {
   const appState = appStore.getState()
-  const url = getSourceAboutUrl(tab.getURL())
-  let location = getBaseUrl(url)
+  const tabValue = tabState.getByTabId(appState, tabId)
+  if (!tabValue) {
+    return
+  }
 
-  // TODO(bridiver) - refactor these to use state helpers
-  const ledgerInfo = ledgerState.getInfoProps(appState)
-  const synopsis = ledgerState.getAboutData(appState)
-  const wizardData = ledgerState.geWizardData(appState)
-  const migration = appState.get('migrations')
-  const preferencesData = appState.getIn(['about', 'preferences'])
+  let url = tabValue.get('url')
+  if (isTargetAboutUrl(url)) {
+    url = getSourceAboutUrl(url)
+  } else if (!isSourceAboutUrl(url)) {
+    return
+  }
+
+  const location = getBaseUrl(url)
+
   const appSettings = appState.get('settings')
-  let allSiteSettings = appState.get('siteSettings')
-  if (tabValue.get('incognito') === true) {
-    allSiteSettings = allSiteSettings.mergeDeep(appState.get('temporarySiteSettings'))
-  }
-  const extensionsValue = appState.get('extensions')
-  const sync = appState.get('sync')
   const braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
-  const history = aboutHistoryState.getHistory(appState)
-  const adblock = appState.get('adblock')
-  const downloads = appState.get('downloads')
-  const trackedBlockersCount = appState.getIn(['trackingProtection', 'count'])
-  const adblockCount = appState.getIn(['adblock', 'count'])
-  const httpsUpgradedCount = appState.getIn(['httpsEverywhere', 'count'])
-  const newTabDetail = appState.getIn(['about', 'newtab'])
-  const autofillCreditCards = appState.getIn(['autofill', 'creditCards'])
-  const autofillAddresses = appState.getIn(['autofill', 'addresses'])
-  const versionInformation = appState.getIn(['about', 'brave', 'versionInformation'])
-  const aboutDetails = tabValue.get('aboutDetails')
 
-  // TODO save this into values into the sate so that we don't call this app action on every state change
-  // this should be saved in app state when windows will be refactored #11151
-
-  /*
-  if (url === 'about:preferences#payments') {
-    tab.on('destroyed', () => {
-      appActions.ledgerPaymentsPresent(tabValue.get('tabId'), false)
-    })
-    appActions.ledgerPaymentsPresent(tabValue.get('tabId'), true)
-  } else {
-    appActions.ledgerPaymentsPresent(tabValue.get('tabId'), false)
+  // DO NOT ADD TO THIS LIST - use aboutDetails and send only the data necessary to render the page
+  if (location === 'about:preferences') {
+    const allSiteSettings = siteSettingsState.getAllSiteSettings(appState, tabValue.get('incognito') === true)
+    sendAboutDetails(tabId, messages.SITE_SETTINGS_UPDATED, allSiteSettings)
+    sendAboutDetails(tabId, messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults)
+    sendAboutDetails(tabId, messages.SETTINGS_UPDATED, appSettings)
   }
-  */
-
-  if (location === 'about:preferences' || location === 'about:contributions' || location === aboutUrls.get('about:contributions')) {
+  if (location === 'about:contributions' || url === 'about:preferences#payments') {
+    const ledgerInfo = ledgerState.getInfoProps(appState)
+    const preferencesData = appState.getIn(['about', 'preferences'], Immutable.Map())
+    const synopsis = appState.getIn(['ledger', 'about'])
+    const migration = appState.get('migrations')
+    const wizardData = ledgerState.geWizardData(appState)
     const ledgerData = ledgerInfo
       .merge(synopsis)
       .merge(preferencesData)
       .set('wizardData', wizardData)
       .set('migration', migration)
-    tab.send(messages.LEDGER_UPDATED, ledgerData.toJS())
-    tab.send(messages.SETTINGS_UPDATED, appSettings.toJS())
-    tab.send(messages.SITE_SETTINGS_UPDATED, allSiteSettings.toJS())
-    tab.send(messages.SYNC_UPDATED, sync.toJS())
-    tab.send(messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults)
-    tab.send(messages.EXTENSIONS_UPDATED, extensionsValue.toJS())
+    sendAboutDetails(tabId, messages.LEDGER_UPDATED, ledgerData)
+  } else if (url === 'about:preferences#sync' || location === 'about:contributions' || url === 'about:preferences#payments') {
+    const sync = appState.get('sync', Immutable.Map())
+    sendAboutDetails(tabId, messages.SYNC_UPDATED, sync)
+  } else if (location === 'about:extensions' || url === 'about:preferences#extensions') {
+    const extensionsValue = appState.get('extensions', Immutable.Map())
+    sendAboutDetails(tabId, messages.EXTENSIONS_UPDATED, extensionsValue)
   } else if (location === 'about:bookmarks') {
     const bookmarksData = getBookmarksData(appState)
-    if (bookmarksData.bookmarks) {
-      const handle = muon.shared_memory.create(bookmarksData)
-      tab.sendShared(messages.BOOKMARKS_UPDATED, handle)
+    if (bookmarksData.get('bookmarks')) {
+      sendAboutDetails(tabId, messages.BOOKMARKS_UPDATED, bookmarksData, true)
     }
   } else if (location === 'about:history') {
+    const history = aboutHistoryState.getHistory(appState)
     if (!history) {
       appActions.populateHistory()
     } else {
-      const handle = muon.shared_memory.create(history.toJS())
-      tab.sendShared(messages.HISTORY_UPDATED, handle)
+      sendAboutDetails(tabId, messages.HISTORY_UPDATED, history, true)
     }
-    tab.send(messages.SETTINGS_UPDATED, appSettings.toJS())
-  } else if (location === 'about:extensions' && extensions) {
-    tab.send(messages.EXTENSIONS_UPDATED, extensionsValue.toJS())
-  } else if (location === 'about:adblock' && adblock) {
-    tab.send(messages.ADBLOCK_UPDATED, {
+    sendAboutDetails(tabId, messages.SETTINGS_UPDATED, appSettings)
+  } else if (location === 'about:adblock') {
+    const adblock = appState.get('adblock', Immutable.Map())
+    sendAboutDetails(tabId, messages.ADBLOCK_UPDATED, {
       adblock: adblock.toJS(),
       settings: appSettings.toJS(),
       resources: require('ad-block/lib/regions')
     })
-  } else if (location === 'about:downloads' && downloads) {
-    tab.send(messages.DOWNLOADS_UPDATED, {
+  } else if (location === 'about:downloads') {
+    const downloads = appState.get('downloads', Immutable.Map())
+    sendAboutDetails(tabId, messages.DOWNLOADS_UPDATED, {
       downloads: downloads.toJS()
     })
   } else if (location === 'about:passwords') {
-    autofill.getAutofillableLogins(tab)
-    autofill.getBlackedlistLogins(tab)
+    autofill.getAutofillableLogins((result) => {
+      sendAboutDetails(tabId, messages.PASSWORD_DETAILS_UPDATED, result)
+    })
+    autofill.getBlackedlistLogins((result) => {
+      sendAboutDetails(tabId, messages.PASSWORD_SITE_DETAILS_UPDATED, result)
+    })
   } else if (location === 'about:flash') {
-    tab.send(messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults.toJS())
+    sendAboutDetails(tabId, messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults.toJS())
   } else if (location === 'about:newtab') {
-    const showEmptyPage = getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB ||
-          // TODO: This can be removed once we're on muon 2.57.8 or above
-          tabValue.get('incognito') === true
+    const newTabDetail = appState.getIn(['about', 'newtab'], Immutable.Map())
+    const showEmptyPage = getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB
     const showImages = getSetting(settings.SHOW_DASHBOARD_IMAGES) && !showEmptyPage
-    tab.send(messages.NEWTAB_DATA_UPDATED, {
+    const trackedBlockersCount = appState.getIn(['trackingProtection', 'count'], 0)
+    const httpsUpgradedCount = appState.getIn(['httpsEverywhere', 'count'], 0)
+    const adblockCount = appState.getIn(['adblock', 'count'], 0)
+    sendAboutDetails(tabId, messages.NEWTAB_DATA_UPDATED, {
       showEmptyPage,
       showImages,
       trackedBlockersCount,
       adblockCount,
       httpsUpgradedCount,
-      newTabDetail: newTabDetail && newTabDetail.toJS()
+      newTabDetail: newTabDetail.toJS()
     })
   } else if (location === 'about:autofill') {
+    const autofillCreditCards = appState.getIn(['autofill', 'creditCards'], Immutable.Map())
+    const autofillAddresses = appState.getIn(['autofill', 'addresses'], Immutable.Map())
     const defaultSession = session.defaultSession
     {
       const guids = autofillAddresses.get('guid')
@@ -279,7 +319,7 @@ const updateAboutDetails = (tab, tabValue) => {
         }
         list.push(addressDetail)
       })
-      tab.send(messages.AUTOFILL_ADDRESSES_UPDATED, list)
+      sendAboutDetails(tabId, messages.AUTOFILL_ADDRESSES_UPDATED, list)
     }
     {
       const guids = autofillCreditCards.get('guid')
@@ -295,15 +335,15 @@ const updateAboutDetails = (tab, tabValue) => {
         }
         list.push(creditCardDetail)
       })
-      tab.send(messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
+      sendAboutDetails(tabId, messages.AUTOFILL_CREDIT_CARDS_UPDATED, list)
     }
   } else if (location === 'about:brave') {
-    tab.send(messages.VERSION_INFORMATION_UPDATED, versionInformation.toJS())
+    const versionInformation = appState.getIn(['about', 'brave', 'versionInformation'], Immutable.Map())
+    sendAboutDetails(tabId, messages.VERSION_INFORMATION_UPDATED, versionInformation)
   }
-  // send state to about pages
-  if (aboutUrls.get(location) && aboutDetails) {
-    tab.send(messages.STATE_UPDATED, aboutDetails.toJS())
-  }
+
+  const aboutDetails = tabValue.get('aboutDetails', Immutable.Map())
+  sendAboutDetails(tabId, messages.STATE_UPDATED, aboutDetails)
 }
 
 // hack to deal with about:* pages
