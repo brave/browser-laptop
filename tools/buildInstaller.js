@@ -85,7 +85,14 @@ if (isDarwin) {
     // Create an update zip
     'ditto -c -k --sequesterRsrc --keepParent ' + buildDir + '/Brave.app dist/Brave-' + VersionInfo.braveVersion + '.zip'
   ]
-  execute(cmds, {}, console.log.bind(null, 'done'))
+  execute(cmds, {}, (err) => {
+    if (err) {
+      raiseError('building installer failed: ' + JSON.stringify(err))
+      return
+    }
+
+    console.log.bind(null, 'done')
+  })
 } else if (isWindows) {
   // a cert file must be present to sign the created package
   // a password MUST be passed as the CERT_PASSWORD environment variable
@@ -113,7 +120,7 @@ if (isDarwin) {
   ]
   execute(cmds, {}, (err) => {
     if (err) {
-      raiseError('signing for widevine failed' + JSON.stringify(err))
+      raiseError('signing for widevine failed: ' + JSON.stringify(err))
       return
     }
 
