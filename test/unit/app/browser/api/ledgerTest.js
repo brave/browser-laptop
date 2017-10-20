@@ -11,8 +11,8 @@ const settings = require('../../../../../js/constants/settings')
 const appActions = require('../../../../../js/actions/appActions')
 
 const defaultAppState = Immutable.fromJS({
-  ledger: {
-  }
+  ledger: {},
+  migrations: {}
 })
 
 describe('ledger api unit tests', function () {

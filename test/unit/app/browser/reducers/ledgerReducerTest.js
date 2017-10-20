@@ -71,7 +71,8 @@ describe('ledgerReducer unit tests', function () {
     ledgerReducer = require('../../../../../app/browser/reducers/ledgerReducer')
 
     appState = Immutable.fromJS({
-      ledger: {}
+      ledger: {},
+      migrations: {}
     })
   })
 

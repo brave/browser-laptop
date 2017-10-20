@@ -26,6 +26,7 @@ const appActions = require('../../../js/actions/appActions')
 // State
 const ledgerState = require('../../common/state/ledgerState')
 const pageDataState = require('../../common/state/pageDataState')
+const migrationState = require('../../common/state/migrationState')
 
 // Constants
 const settings = require('../../../js/constants/settings')
@@ -158,17 +159,12 @@ const notifications = {
     }, notifications.pollingInterval, state)
   },
   onLaunch: (state) => {
-    if (!getSetting(settings.PAYMENTS_ENABLED)) {
+    const enabled = getSetting(settings.PAYMENTS_ENABLED)
+    if (!enabled) {
       return state
     }
 
-    // One time conversion of wallet
-    const isNewInstall = state.get('firstRunTimestamp') === state.getIn(['migrations', 'batMercuryTimestamp'])
-    const hasUpgradedWallet = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatTimestamp'])
-    if (!isNewInstall && !hasUpgradedWallet) {
-      state = state.setIn(['migrations', 'btc2BatTransitionPending'], true)
-      module.exports.transitionWalletToBat()
-    }
+    state = checkBtcBatMigrated(state, enabled)
 
     if (hasFunds(state)) {
       // Don't bother processing the rest, which are only notifications.
@@ -183,7 +179,9 @@ const notifications = {
       // - wallet has been transitioned
       // - notification has not already been shown yet
       // (see https://github.com/brave/browser-laptop/issues/11021)
-      const hasBeenNotified = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatNotifiedTimestamp'])
+      const isNewInstall = migrationState.isNewInstall(state)
+      const hasUpgradedWallet = migrationState.hasUpgradedWallet(state)
+      const hasBeenNotified = migrationState.hasBeenNotified(state)
       if (!isNewInstall && hasUpgradedWallet && !hasBeenNotified) {
         notifications.showBraveWalletUpdated()
       }
@@ -1342,8 +1340,12 @@ const initSynopsis = (state) => {
 }
 
 const enable = (state, paymentsEnabled) => {
-  if (paymentsEnabled && !getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
-    appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
+  if (paymentsEnabled) {
+    state = checkBtcBatMigrated(state, paymentsEnabled)
+
+    if (!getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
+      appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
+    }
   }
 
   if (synopsis) {
@@ -2301,6 +2303,22 @@ const yoDawg = (stateState) => {
     stateState = stateState.state
   }
   return stateState
+}
+
+const checkBtcBatMigrated = (state, status) => {
+  if (!status) {
+    return state
+  }
+
+  // One time conversion of wallet
+  const isNewInstall = migrationState.isNewInstall(state)
+  const hasUpgradedWallet = migrationState.hasUpgradedWallet(state)
+  if (!isNewInstall && !hasUpgradedWallet) {
+    state = migrationState.setTransitionStatus(state, true)
+    module.exports.transitionWalletToBat()
+  }
+
+  return state
 }
 
 let newClient = null
