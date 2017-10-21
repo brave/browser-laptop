@@ -250,21 +250,25 @@ module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
   // Clean closed frame data before frames because the keys are re-ordered
   // and the new next key is calculated in windowStore.js based on
   // the max frame key ID.
-  if (immutablePerWindowData.get('closedFrames')) {
+  let closedFrames = immutablePerWindowData.get('closedFrames')
+  if (closedFrames) {
+    closedFrames = closedFrames.filter((frame) => frame)
+    immutablePerWindowData = immutablePerWindowData.set('closedFrames', closedFrames)
+    // clean each frame
     immutablePerWindowData =
-      immutablePerWindowData.get('closedFrames').reduce((immutablePerWindowData, immutableFrame, index) => {
+      closedFrames.reduce((immutablePerWindowData, immutableFrame, index) => {
         const cleanImmutableFrame = cleanFrame(immutableFrame, false)
         return immutablePerWindowData.setIn(['closedFrames', index], cleanImmutableFrame)
       }, immutablePerWindowData)
   }
-  let immutableFrames = immutablePerWindowData.get('frames')
-  if (immutableFrames) {
+  let frames = immutablePerWindowData.get('frames')
+  if (frames) {
     // Don't restore pinned locations because they will be auto created by the app state change event
-    immutableFrames = immutableFrames
-        .filter((frame) => !frame.get('pinnedLocation'))
-    immutablePerWindowData = immutablePerWindowData.set('frames', immutableFrames)
+    frames = frames.filter((frame) => frame && !frame.get('pinnedLocation'))
+    immutablePerWindowData = immutablePerWindowData.set('frames', frames)
+    // clean each frame
     immutablePerWindowData =
-      immutableFrames.reduce((immutablePerWindowData, immutableFrame, index) => {
+      frames.reduce((immutablePerWindowData, immutableFrame, index) => {
         const cleanImmutableFrame = cleanFrame(immutableFrame, true)
         return immutablePerWindowData.setIn(['frames', index], cleanImmutableFrame)
       }, immutablePerWindowData)

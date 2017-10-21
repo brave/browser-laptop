@@ -13,6 +13,10 @@ require('../braveUnit')
 
 describe('sessionStore unit tests', function () {
   let sessionStore
+  let shutdownClearHistory = false
+  let shutdownClearAutocompleteData = false
+  let shutdownClearAutofillData = false
+  let shutdownClearSiteSettings = false
   const fakeElectron = require('../lib/fakeElectron')
   const fakeAutofill = {
     init: () => {},
@@ -82,11 +86,21 @@ describe('sessionStore unit tests', function () {
     mockery.registerMock('./autofill', fakeAutofill)
     mockery.registerMock('./common/state/tabState', fakeTabState)
     mockery.registerMock('./common/state/windowState', fakeWindowState)
-    mockery.registerMock('../js/settings', { getSetting: (settingKey, settingsCollection, value) => {
-      switch (settingKey) {
-        default: return true
+    mockery.registerMock('../js/settings', {
+      getSetting: (settingKey, settingsCollection, value) => {
+        switch (settingKey) {
+          case settings.SHUTDOWN_CLEAR_HISTORY:
+            return shutdownClearHistory
+          case settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA:
+            return shutdownClearAutocompleteData
+          case settings.SHUTDOWN_CLEAR_AUTOFILL_DATA:
+            return shutdownClearAutofillData
+          case settings.SHUTDOWN_CLEAR_SITE_SETTINGS:
+            return shutdownClearSiteSettings
+          default: return true
+        }
       }
-    }})
+    })
     mockery.registerMock('./filtering', fakeFiltering)
     sessionStore = require('../../../app/sessionStore')
   })
@@ -172,6 +186,139 @@ describe('sessionStore unit tests', function () {
   })
 
   describe('cleanPerWindowData', function () {
+    const withClosedFrames = Immutable.fromJS({
+      activeFrameKey: 1,
+      closedFrames: [
+        {key: 1, location: 'http://example.com'},
+        {key: 2, location: 'https://brave.com'}
+      ]
+    })
+    const cleanedWithClosedFrames = {
+      activeFrameKey: 1,
+      closedFrames: [
+        {key: 1, location: 'http://example.com', unloaded: true, src: 'http://example.com'},
+        {key: 2, location: 'https://brave.com', unloaded: true, src: 'https://brave.com'}
+      ],
+      frames: []
+    }
+
+    it('handles being passed falsey input (adding frames)', function () {
+      const result = sessionStore.cleanPerWindowData()
+      assert.deepEqual(result.toJS(), {frames: []})
+    })
+    it('throws an error when input is mutable', function () {
+      assert.throws(() => {
+        sessionStore.cleanPerWindowData({windowStuff: 'demo'})
+      },
+      /undefined == true/,
+      'did not throw with expected message')
+    })
+    describe('when SHUTDOWN_CLEAR_HISTORY is true', function () {
+      before(function () {
+        shutdownClearHistory = true
+      })
+      after(function () {
+        shutdownClearHistory = false
+      })
+      describe('when isShutdown is true', function () {
+        it('clears closedFrames', function () {
+          const result = sessionStore.cleanPerWindowData(withClosedFrames, true)
+          assert.deepEqual(result.toJS(), {
+            activeFrameKey: 1,
+            closedFrames: [],
+            frames: []
+          })
+        })
+      })
+      describe('when isShutdown is false', function () {
+        it('does not modify closedFrames', function () {
+          const result = sessionStore.cleanPerWindowData(withClosedFrames, false)
+          assert.deepEqual(result.toJS(), cleanedWithClosedFrames)
+        })
+      })
+    })
+    describe('when closedFrames exists', function () {
+      it('works when closedFrames is empty', function () {
+        const result = sessionStore.cleanPerWindowData(
+          Immutable.fromJS({
+            closedFrames: []
+          })
+        )
+        assert.deepEqual(result.toJS(), {
+          closedFrames: [],
+          frames: []
+        })
+      })
+      it('works when closedFrames contains a null entry', function () {
+        const result = sessionStore.cleanPerWindowData(
+          Immutable.fromJS({
+            activeFrameKey: 1,
+            closedFrames: [
+              {key: 1, location: 'http://example.com'},
+              null,
+              {key: 2, location: 'https://brave.com'}
+            ]
+          })
+        )
+        assert.deepEqual(result.toJS(), cleanedWithClosedFrames)
+      })
+      it('re-assigns the key for each item in closedFrames', function () {
+        const result = sessionStore.cleanPerWindowData(
+          Immutable.fromJS({
+            activeFrameKey: 1,
+            closedFrames: [
+              {key: 22, location: 'http://example.com'},
+              {key: 23, location: 'https://brave.com'}
+            ]
+          })
+        )
+        assert.deepEqual(result.toJS(), {
+          activeFrameKey: 1,
+          closedFrames: [
+            {key: 1, location: 'http://example.com', unloaded: true, src: 'http://example.com'},
+            {key: 2, location: 'https://brave.com', unloaded: true, src: 'https://brave.com'}
+          ],
+          frames: []
+        })
+      })
+    })
+    it('works when frames contains a null entry', function () {
+      const result = sessionStore.cleanPerWindowData(
+        Immutable.fromJS({
+          activeFrameKey: 1,
+          frames: [
+            {key: 1, location: 'http://example.com'},
+            null,
+            {key: 2, location: 'https://brave.com'}
+          ]
+        })
+      )
+      assert.deepEqual(result.toJS(), {
+        activeFrameKey: 1,
+        frames: [
+          {key: 1, location: 'http://example.com', src: 'http://example.com'},
+          {key: 2, location: 'https://brave.com', unloaded: true, src: 'https://brave.com'}
+        ]
+      })
+    })
+    it('re-assigns the key for each item in frames', function () {
+      const result = sessionStore.cleanPerWindowData(
+        Immutable.fromJS({
+          activeFrameKey: 22,
+          frames: [
+            {key: 22, location: 'http://example.com'},
+            {key: 23, location: 'https://brave.com'}
+          ]
+        })
+      )
+      assert.deepEqual(result.toJS(), {
+        activeFrameKey: 1,
+        frames: [
+          {key: 1, location: 'http://example.com', src: 'http://example.com'},
+          {key: 2, location: 'https://brave.com', unloaded: true, src: 'https://brave.com'}
+        ]
+      })
+    })
     it('clears pinned frames', function () {
       const data = Immutable.fromJS({frames: [
         {
@@ -256,7 +403,13 @@ describe('sessionStore unit tests', function () {
       })
     })
 
-    describe('when clearAutocompleteData is true', function () {
+    describe('when SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA is true', function () {
+      before(function () {
+        shutdownClearAutocompleteData = true
+      })
+      after(function () {
+        shutdownClearAutocompleteData = false
+      })
       it('calls autofill.clearAutocompleteData', function () {
         const clearAutocompleteDataSpy = sinon.spy(fakeAutofill, 'clearAutocompleteData')
         const data = Immutable.Map()
@@ -265,7 +418,7 @@ describe('sessionStore unit tests', function () {
         clearAutocompleteDataSpy.restore()
       })
 
-      describe('exception is thrown', function () {
+      describe('when an exception is thrown', function () {
         let clearAutocompleteDataStub
         before(function () {
           clearAutocompleteDataStub = sinon.stub(fakeAutofill, 'clearAutocompleteData').throws('lame error')
@@ -281,8 +434,28 @@ describe('sessionStore unit tests', function () {
         })
       })
     })
+    describe('when SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA is false', function () {
+      let clearAutocompleteDataSpy
+      before(function () {
+        clearAutocompleteDataSpy = sinon.spy(fakeAutofill, 'clearAutocompleteData')
+      })
+      after(function () {
+        clearAutocompleteDataSpy.restore()
+      })
+      it('does not call autofill.clearAutocompleteData', function () {
+        const data = Immutable.Map()
+        sessionStore.cleanAppData(data, true)
+        assert.equal(clearAutocompleteDataSpy.notCalled, true)
+      })
+    })
 
-    describe('when clearAutofillData is true', function () {
+    describe('when SHUTDOWN_CLEAR_AUTOFILL_DATA is true', function () {
+      before(function () {
+        shutdownClearAutofillData = true
+      })
+      after(function () {
+        shutdownClearAutofillData = false
+      })
       describe('happy path', function () {
         let clearAutofillDataSpy
         let result
@@ -344,12 +517,51 @@ describe('sessionStore unit tests', function () {
         })
       })
     })
+    describe('when SHUTDOWN_CLEAR_AUTOFILL_DATA is false', function () {
+      let clearAutofillDataSpy
+      before(function () {
+        clearAutofillDataSpy = sinon.spy(fakeAutofill, 'clearAutofillData')
+        const data = Immutable.fromJS({
+          autofill: {
+            addresses: {
+              guid: ['value1', 'value2'],
+              timestamp: 'time1'
+            },
+            creditCards: {
+              guid: ['value3', 'value4'],
+              timestamp: 'time2'
+            }
+          }
+        })
+        sessionStore.cleanAppData(data, true)
+      })
+      after(function () {
+        clearAutofillDataSpy.restore()
+      })
+      it('does not call autofill.clearAutofillData', function () {
+        assert.equal(clearAutofillDataSpy.notCalled, true)
+      })
+    })
 
-    describe('when clearSiteSettings is true', function () {
+    describe('when SHUTDOWN_CLEAR_SITE_SETTINGS is true', function () {
+      before(function () {
+        shutdownClearSiteSettings = true
+      })
+      after(function () {
+        shutdownClearSiteSettings = false
+      })
       it('clears siteSettings', function () {
         const data = Immutable.fromJS({siteSettings: {site1: {setting1: 'value1'}}})
         const result = sessionStore.cleanAppData(data, true)
         assert.deepEqual(result.get('siteSettings').toJS(), {})
+      })
+    })
+
+    describe('when SHUTDOWN_CLEAR_SITE_SETTINGS is false', function () {
+      it('does not clear siteSettings', function () {
+        const data = Immutable.fromJS({siteSettings: {site1: {setting1: 'value1'}}})
+        const result = sessionStore.cleanAppData(data, true)
+        assert.deepEqual(result.get('siteSettings').toJS(), data.get('siteSettings').toJS())
       })
     })
 
@@ -415,7 +627,14 @@ describe('sessionStore unit tests', function () {
       })
     })
 
-    describe('when sites and clearHistory are truthy', function () {
+    describe('when sites and SHUTDOWN_CLEAR_HISTORY are truthy', function () {
+      before(function () {
+        shutdownClearHistory = true
+      })
+      after(function () {
+        shutdownClearHistory = false
+      })
+
       it('calls siteUtil.clearHistory', function () {
         const clearHistorySpy = sinon.spy(siteUtil, 'clearHistory')
         const data = Immutable.fromJS({
