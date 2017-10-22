@@ -1,4 +1,4 @@
-#Component Structure
+# Component Structure
 
 The UI is made up of a tree like structure of React components.
 
