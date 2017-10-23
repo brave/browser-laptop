@@ -18,49 +18,24 @@ const settings = require('../../../js/constants/settings')
 // Utils
 const {responseHasContent} = require('./httpUtil')
 const urlUtil = require('../../../js/lib/urlutil')
-const {makeImmutable} = require('../state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
 
 /**
  * Is page an actual page being viewed by the user? (not an error page, etc)
  * If the page is invalid, we don't want to collect usage info.
- * @param {Map} view - an entry from ['pageData', 'view']
- * @param {List} responseList - full ['pageData', 'load'] List
+ * @param {Map} tabValue - data about provided tab
  * @return {boolean} true if page should have usage collected, false if not
  */
-const shouldTrackView = (view, responseList) => {
-  if (view == null) {
+const shouldTrackView = (tabValue) => {
+  if (tabValue == null) {
     return false
   }
 
-  view = makeImmutable(view)
-  const tabId = view.get('tabId')
-  const url = view.get('url')
+  const aboutError = tabValue.has('aboutDetails')
+  const activeEntry = tabValue.getIn(['navigationState', 'activeEntry']) || {}
+  const response = activeEntry.httpStatusCode === 0 || responseHasContent(activeEntry.httpStatusCode)
 
-  if (!url || !tabId) {
-    return false
-  }
-
-  responseList = makeImmutable(responseList)
-  if (!responseList || responseList.size === 0) {
-    return false
-  }
-
-  for (let i = (responseList.size - 1); i > -1; i--) {
-    const response = responseList.get(i)
-
-    if (!response) {
-      continue
-    }
-
-    const responseUrl = response.getIn(['details', 'newURL'], null)
-
-    if (url === responseUrl && response.get('tabId') === tabId) {
-      return responseHasContent(response.getIn(['details', 'httpResponseCode']))
-    }
-  }
-
-  return false
+  return !aboutError && response
 }
 
 const batToCurrencyString = (bat, ledgerData) => {
