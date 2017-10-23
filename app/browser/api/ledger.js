@@ -26,6 +26,7 @@ const appActions = require('../../../js/actions/appActions')
 // State
 const ledgerState = require('../../common/state/ledgerState')
 const pageDataState = require('../../common/state/pageDataState')
+const migrationState = require('../../common/state/migrationState')
 
 // Constants
 const settings = require('../../../js/constants/settings')
@@ -158,17 +159,12 @@ const notifications = {
     }, notifications.pollingInterval, state)
   },
   onLaunch: (state) => {
-    if (!getSetting(settings.PAYMENTS_ENABLED)) {
+    const enabled = getSetting(settings.PAYMENTS_ENABLED)
+    if (!enabled) {
       return state
     }
 
-    // One time conversion of wallet
-    const isNewInstall = state.get('firstRunTimestamp') === state.getIn(['migrations', 'batMercuryTimestamp'])
-    const hasUpgradedWallet = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatTimestamp'])
-    if (!isNewInstall && !hasUpgradedWallet) {
-      state = state.setIn(['migrations', 'btc2BatTransitionPending'], true)
-      module.exports.transitionWalletToBat()
-    }
+    state = checkBtcBatMigrated(state, enabled)
 
     if (hasFunds(state)) {
       // Don't bother processing the rest, which are only notifications.
@@ -183,7 +179,9 @@ const notifications = {
       // - wallet has been transitioned
       // - notification has not already been shown yet
       // (see https://github.com/brave/browser-laptop/issues/11021)
-      const hasBeenNotified = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatNotifiedTimestamp'])
+      const isNewInstall = migrationState.isNewInstall(state)
+      const hasUpgradedWallet = migrationState.hasUpgradedWallet(state)
+      const hasBeenNotified = migrationState.hasBeenNotified(state)
       if (!isNewInstall && hasUpgradedWallet && !hasBeenNotified) {
         notifications.showBraveWalletUpdated()
       }
@@ -1342,8 +1340,12 @@ const initSynopsis = (state) => {
 }
 
 const enable = (state, paymentsEnabled) => {
-  if (paymentsEnabled && !getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
-    appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
+  if (paymentsEnabled) {
+    state = checkBtcBatMigrated(state, paymentsEnabled)
+
+    if (!getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
+      appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
+    }
   }
 
   if (synopsis) {
@@ -1378,6 +1380,10 @@ const enable = (state, paymentsEnabled) => {
       delete synopsis.publishers[publisher].faviconURL
     }
   })
+
+  if (!ledgerState.getPublishers(state).isEmpty()) {
+    state = synopsisNormalizer(state, null, true)
+  }
 
   return state
 }
@@ -1786,7 +1792,14 @@ const setPaymentInfo = (amount) => {
   amount = parseInt(amount, 10)
   if (isNaN(amount) || (amount <= 0)) return
 
-  underscore.extend(bravery.fee, { amount: amount, currency: client.getWalletAddresses().BAT ? 'BAT' : 'USD' })
+  let currency = 'USD'
+  const addresses = client.getWalletAddresses()
+
+  if (addresses && addresses.BAT) {
+    currency = 'BAT'
+  }
+
+  underscore.extend(bravery.fee, { amount: amount, currency: currency })
   client.setBraveryProperties(bravery, (err, result) => {
     if (err) {
       err = err.toString()
@@ -1829,7 +1842,7 @@ const callback = (err, result, delayTime) => {
   }
 
   if (err) {
-    console.log('ledger client error(1): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
+    console.error('ledger client error(1): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
     if (!client) return
 
     if (typeof delayTime === 'undefined') {
@@ -1952,6 +1965,7 @@ const initialize = (state, paymentsEnabled) => {
 
   if (!paymentsEnabled) {
     client = null
+    newClient = false
     return ledgerState.resetInfo(state)
   }
 
@@ -2154,7 +2168,7 @@ const run = (state, delayTime) => {
     })
     if (stateData) muonWriter(statePath, stateData)
   } catch (ex) {
-    console.log('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
+    console.error('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
   }
 
   if (delayTime === 0) {
@@ -2181,7 +2195,7 @@ const run = (state, delayTime) => {
       if (active !== client) return
 
       if (!client) {
-        return console.log('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
+        return console.error('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
       }
 
       if (client.sync(callback) === true) {
@@ -2239,7 +2253,7 @@ const migration = (state) => {
 
   const synopsisOptions = ledgerState.getSynopsisOptions(state)
 
-  if (getSetting(settings.PAYMENTS_ENABLED) && synopsisOptions.isEmpty()) {
+  if (synopsisOptions.isEmpty()) {
     // Move data from synopsis file into appState
     const fs = require('fs')
     try {
@@ -2253,7 +2267,7 @@ const migration = (state) => {
         }
       })
     } catch (err) {
-      console.log('Error migrating file', err.toString())
+      console.error(err.toString())
     }
 
     // Delete ledgerInfo
@@ -2303,7 +2317,27 @@ const yoDawg = (stateState) => {
   return stateState
 }
 
+const checkBtcBatMigrated = (state, status) => {
+  if (!status) {
+    return state
+  }
+
+  // One time conversion of wallet
+  const isNewInstall = migrationState.isNewInstall(state)
+  const hasUpgradedWallet = migrationState.hasUpgradedWallet(state)
+  if (!isNewInstall && !hasUpgradedWallet) {
+    state = migrationState.setTransitionStatus(state, true)
+    module.exports.transitionWalletToBat()
+  }
+
+  return state
+}
+
 let newClient = null
+const getNewClient = () => {
+  return newClient
+}
+
 const transitionWalletToBat = () => {
   let newPaymentId, result
 
@@ -2316,7 +2350,7 @@ const transitionWalletToBat = () => {
       fs.accessSync(pathName(newClientPath), fs.FF_OK)
       fs.readFile(pathName(newClientPath), (error, data) => {
         if (error) {
-          console.log(`ledger client: can't read ${newClientPath} to restore newClient`)
+          console.error(`ledger client: can't read ${newClientPath} to restore newClient`)
           return
         }
         const parsedData = JSON.parse(data)
@@ -2328,7 +2362,7 @@ const transitionWalletToBat = () => {
       })
       return
     } catch (err) {
-      console.log(err.toString())
+      console.error(err.toString())
     }
   }
 
@@ -2339,7 +2373,8 @@ const transitionWalletToBat = () => {
       newClient = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
       muonWriter(newClientPath, newClient.state)
     } catch (ex) {
-      return console.error('ledger client creation error(2): ', ex)
+      console.error('ledger client creation error(2): ', ex)
+      return
     }
   }
 
@@ -2347,12 +2382,14 @@ const transitionWalletToBat = () => {
   if (!newPaymentId) {
     newClient.sync((err, result, delayTime) => {
       if (err) {
-        return console.log('ledger client error(3): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
+        return console.error('ledger client error(3): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
       }
 
       if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1, max: 500 })
 
-      muonWriter(newClientPath, newClient.state)
+      if (newClient) {
+        muonWriter(newClientPath, newClient.state)
+      }
 
       setTimeout(() => transitionWalletToBat(), delayTime)
     })
@@ -2368,7 +2405,7 @@ const transitionWalletToBat = () => {
 
   try {
     client.transition(newPaymentId, (err, properties) => {
-      if (err) {
+      if (err || !newClient) {
         console.error('ledger client transition error: ', err)
       } else {
         result = newClient.transitioned(properties)
@@ -2415,5 +2452,6 @@ module.exports = {
   onInitRead,
   notifications,
   deleteSynopsis,
-  transitionWalletToBat
+  transitionWalletToBat,
+  getNewClient
 }
