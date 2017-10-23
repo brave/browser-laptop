@@ -200,7 +200,6 @@ module.exports = {
     'advanced.smooth-scroll-enabled': false,
     'advanced.send-crash-reports': true,
     'advanced.send-usage-statistics': false,
-    'advanced.update-to-preview-releases': false,
     'advanced.toolbar-ui-scale': 'normal',
     'advanced.swipe-nav-distance': 101,
     'shutdown.clear-history': false,

@@ -26,17 +26,6 @@ const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
 
 class AdvancedTab extends ImmutableComponent {
-  previewReleases () {
-    return isLinux
-      ? null
-      : <SettingCheckbox
-        dataL10nId='updateToPreviewReleases'
-        data-test-id='update-to-preview-releases'
-        prefKey={settings.UPDATE_TO_PREVIEW_RELEASES}
-        settings={this.props.settings}
-        onChangeSetting={this.props.onChangeSetting} />
-  }
-
   get swipeNavigationDistanceSetting () {
     if (isDarwin) {
       return <div>
@@ -66,7 +55,6 @@ class AdvancedTab extends ImmutableComponent {
       <main className={css(styles.advancedTabMain)}>
         <DefaultSectionTitle data-l10n-id='contentSettings' />
         <SettingsList>
-          {this.previewReleases()}
           <SettingCheckbox dataL10nId='useHardwareAcceleration' prefKey={settings.HARDWARE_ACCELERATION_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           <SettingCheckbox dataL10nId='useSmoothScroll' prefKey={settings.SMOOTH_SCROLL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           <SettingCheckbox dataL10nId='sendCrashReports' prefKey={settings.SEND_CRASH_REPORTS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
