@@ -139,11 +139,27 @@ let generateBraveManifest = () => {
         run_at: 'document_start',
         all_frames: true,
         js: [
-          'content/scripts/dndHandler.js',
+          'content/scripts/dndHandler.js'
+        ],
+        matches: [
+          '<all_urls>'
+        ],
+        exclude_globs: [
+          indexHTML,
+          getBraveExtUrl('*')
+        ]
+      },
+      {
+        run_at: 'document_start',
+        all_frames: true,
+        js: [
           'content/scripts/dappListener.js'
         ],
         matches: [
           '<all_urls>'
+        ],
+        include_globs: [
+          'http://*/*', 'https://*/*', 'file://*'
         ],
         exclude_globs: [
           indexHTML,
