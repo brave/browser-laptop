@@ -36,11 +36,14 @@ const tabs = require('../../browser/tabs')
 const locale = require('../../locale')
 const appConfig = require('../../../js/constants/appConfig')
 const getSetting = require('../../../js/settings').getSetting
-const {fileUrl, getSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
+const {fileUrl, getSourceAboutUrl, isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 const urlParse = require('../../common/urlParse')
 const ruleSolver = require('../../extensions/brave/content/scripts/pageInformation')
 const request = require('../../../js/lib/request')
 const ledgerUtil = require('../../common/lib/ledgerUtil')
+const tabState = require('../../common/state/tabState')
+const pageDataUtil = require('../../common/lib/pageDataUtil')
+const {getWebContents} = require('../../browser/webContentsCache')
 
 // Caching
 let locationDefault = 'NOOP'
@@ -734,12 +737,11 @@ const synopsisNormalizer = (state, changedPublisher, returnState) => {
   return newData
 }
 
-const updatePublisherInfo = (state, changedPublisher) => {
-  if (!getSetting(settings.PAYMENTS_ENABLED)) {
+const updatePublisherInfo = (state, changedPublisher, refresh = false) => {
+  if (!refresh && !getSetting(settings.PAYMENTS_ENABLED)) {
     return state
   }
 
-  // const options = synopsis.options
   state = synopsisNormalizer(state, changedPublisher, true)
 
   return state
@@ -857,16 +859,18 @@ const excludeP = (publisherKey, callback) => {
   })
 }
 
-const setLocation = (state, timestamp, tabId) => {
+const addVisit = (state, startTimestamp, location, tabId) => {
   if (!synopsis) {
     return state
   }
 
-  const locationData = ledgerState.getLocation(state, currentUrl)
+  location = pageDataUtil.getInfoKey(location)
+  const locationData = ledgerState.getLocation(state, location)
+  const timestamp = new Date().getTime()
   if (_internal.verboseP) {
     console.log(
-      `locations[${currentUrl}]=${JSON.stringify(locationData, null, 2)} ` +
-      `duration=${(timestamp - currentTimestamp)} msec tabId= ${tabId}`
+      `locations[${location}]=${JSON.stringify(locationData, null, 2)} ` +
+      `duration=${(timestamp - startTimestamp)} msec tabId= ${tabId}`
     )
   }
   if (locationData.isEmpty() || !tabId) {
@@ -882,21 +886,21 @@ const setLocation = (state, timestamp, tabId) => {
     visitsByPublisher[publisherKey] = {}
   }
 
-  if (!visitsByPublisher[publisherKey][currentUrl]) {
-    visitsByPublisher[publisherKey][currentUrl] = {
+  if (!visitsByPublisher[publisherKey][location]) {
+    visitsByPublisher[publisherKey][location] = {
       tabIds: []
     }
   }
 
-  const revisitP = visitsByPublisher[publisherKey][currentUrl].tabIds.indexOf(tabId) !== -1
+  const revisitP = visitsByPublisher[publisherKey][location].tabIds.indexOf(tabId) !== -1
   if (!revisitP) {
-    visitsByPublisher[publisherKey][currentUrl].tabIds.push(tabId)
+    visitsByPublisher[publisherKey][location].tabIds.push(tabId)
   }
 
-  let duration = timestamp - currentTimestamp
+  let duration = timestamp - startTimestamp
   if (_internal.verboseP) {
-    console.log('\nadd publisher ' + publisherKey + ': ' + duration + ' msec' + ' revisitP=' + revisitP + ' state=' +
-      JSON.stringify(underscore.extend({location: currentUrl}, visitsByPublisher[publisherKey][currentUrl]),
+    console.log('\nadd publisher ' + publisherKey + ': ' + (duration / 1000) + ' sec' + ' revisitP=' + revisitP + ' state=' +
+      JSON.stringify(underscore.extend({location: location}, visitsByPublisher[publisherKey][location]),
         null, 2))
   }
 
@@ -913,23 +917,36 @@ const setLocation = (state, timestamp, tabId) => {
   return state
 }
 
-const addVisit = (state, location, timestamp, tabId) => {
+const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo = false) => {
+  // We always want to have the latest active tabId
+  const currentTabId = pageDataState.getLastActiveTabId(state)
+  state = pageDataState.setLastActiveTabId(state, tabId)
   if (location === currentUrl) {
     return state
   }
 
-  state = setLocation(state, timestamp, tabId)
+  // Save previous recorder page
+  if (currentUrl !== locationDefault && currentTabId != null && currentTabId !== tabState.TAB_ID_NONE) {
+    const tab = getWebContents(currentTabId)
+    const isPrivate = !tab ||
+      tab.isDestroyed() ||
+      !tab.session.partition.startsWith('persist:')
 
-  const lastUrl = pageDataState.getLastUrl(state)
-  const aboutUrl = getSourceAboutUrl(lastUrl) || lastUrl
-  if (aboutUrl && aboutUrl.match(/^about/)) {
+    const tabFromState = tabState.getByTabId(state, currentTabId)
+
+    // Add visit to the ledger when we are not in a private tab
+    if (!isPrivate && tabFromState != null && ledgerUtil.shouldTrackView(tabFromState)) {
+      state = addVisit(state, currentTimestamp, currentUrl, currentTabId)
+    }
+  }
+
+  if (location === locationDefault && !keepInfo) {
     state = pageDataState.resetInfo(state)
   }
 
-  location = getSourceAboutUrl(location) || location
-
-  currentUrl = (location && location.match(/^about/)) ? locationDefault : location
-  currentTimestamp = timestamp
+  // Update to the latest view
+  currentUrl = location
+  currentTimestamp = new Date().getTime()
   return state
 }
 
@@ -1069,20 +1086,39 @@ const updateLocation = (state, location, publisherKey) => {
   return state
 }
 
-const pageDataChanged = (state) => {
-  // NB: in theory we have already seen every element in info except for (perhaps) the last one...
+const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
+  if (!getSetting(settings.PAYMENTS_ENABLED)) {
+    return state
+  }
+
   let info = pageDataState.getLastInfo(state)
+  const tabId = viewData.tabId || pageDataState.getLastActiveTabId(state)
+  const location = viewData.location || locationDefault
 
-  if (!synopsis || info.isEmpty()) {
+  if (!synopsis) {
+    state = addNewLocation(state, locationDefault, tabId)
     return state
   }
 
-  if (info.get('url', '').match(/^about/)) {
+  const realUrl = getSourceAboutUrl(location) || location
+  if (
+    info.isEmpty() &&
+    !isSourceAboutUrl(realUrl) &&
+    viewData &&
+    viewData.tabId != null &&
+    viewData.location != null
+  ) {
+    // we need to add visit even when you switch from about page to a normal site
+    state = addNewLocation(state, location, tabId)
+    return state
+  } else if (info.isEmpty() || isSourceAboutUrl(realUrl)) {
+    // we need to log empty visit
+    state = addNewLocation(state, locationDefault, tabId, keepInfo)
     return state
   }
 
-  const location = info.get('key')
-  const locationData = ledgerState.getLocation(state, location)
+  let locationKey = info.get('key')
+  const locationData = ledgerState.getLocation(state, locationKey)
   let publisherKey = locationData.get('publisher')
   let publisher = ledgerState.getPublisher(state, publisherKey)
   if (!publisher.isEmpty()) {
@@ -1090,15 +1126,23 @@ const pageDataChanged = (state) => {
       state = getFavIcon(state, publisherKey, info)
     }
 
-    state = updateLocation(state, location, publisherKey)
+    state = updateLocation(state, locationKey, publisherKey)
   } else {
-    try {
-      publisherKey = ledgerPublisher.getPublisher(location, _internal.ruleset.raw)
-      if (!publisherKey || (publisherKey && ledgerUtil.blockedP(state, publisherKey))) {
-        publisherKey = null
+    const infoPublisher = info.get('publisher')
+    if (infoPublisher != null) {
+      publisherKey = infoPublisher
+    } else {
+      try {
+        // TODO this is only filled when you have ledger on, which means that this whole pageDataChanged
+        // can be ignored if ledger is disabled?
+        publisherKey = ledgerPublisher.getPublisher(locationKey, _internal.ruleset.raw)
+      } catch (ex) {
+        console.error('getPublisher error for ' + locationKey + ': ' + ex.toString())
       }
-    } catch (ex) {
-      console.error('getPublisher error for ' + location + ': ' + ex.toString())
+    }
+
+    if (!publisherKey || (publisherKey && ledgerUtil.blockedP(state, publisherKey))) {
+      publisherKey = null
     }
 
     state = ledgerState.setLocationProp(state, info.get('key'), 'publisher', publisherKey)
@@ -1113,30 +1157,22 @@ const pageDataChanged = (state) => {
     }
 
     if (initP) {
-      excludeP(publisherKey, (unused, exclude) => {
-        if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
-          exclude = true
-        }
-        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
-        savePublisherOption(publisherKey, 'exclude', exclude)
-      })
+      if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
+        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', true)
+        savePublisherOption(publisherKey, 'exclude', true)
+      } else {
+        excludeP(publisherKey, (unused, exclude) => {
+          appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+          savePublisherOption(publisherKey, 'exclude', exclude)
+        })
+      }
     }
 
-    state = updateLocation(state, location, publisherKey)
+    state = updateLocation(state, locationKey, publisherKey)
     state = getFavIcon(state, publisherKey, info)
   }
 
-  const pageLoad = pageDataState.getLoad(state)
-  const view = pageDataState.getView(state)
-
-  if (ledgerUtil.shouldTrackView(view, pageLoad)) {
-    state = addVisit(
-      state,
-      view.get('url', locationDefault),
-      view.get('timestamp', new Date().getTime()),
-      view.get('tabId')
-    )
-  }
+  state = addNewLocation(state, location, tabId, keepInfo)
 
   return state
 }
@@ -1230,7 +1266,7 @@ const onWalletRecovery = (state, error, result) => {
 
 const quit = (state) => {
   quitP = true
-  state = addVisit(state, locationDefault, new Date().getTime(), null)
+  state = addNewLocation(state, locationDefault)
 
   if (!getSetting(settings.PAYMENTS_ENABLED) && getSetting(settings.SHUTDOWN_CLEAR_HISTORY)) {
     state = ledgerState.resetSynopsis(state, true)
@@ -1311,7 +1347,7 @@ const enable = (state, paymentsEnabled) => {
   }
 
   if (synopsis) {
-    return updatePublisherInfo(state)
+    return updatePublisherInfo(state, null, true)
   }
 
   if (!ledgerPublisher) {
@@ -1848,10 +1884,15 @@ const onCallback = (state, result, delayTime) => {
       const publishers = ledgerState.getPublishers(state)
       for (let item of publishers) {
         const publisherKey = item[0]
-        excludeP(publisherKey, (unused, exclude) => {
-          appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
-          savePublisherOption(publisherKey, 'exclude', exclude)
-        })
+        if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
+          appActions.onPublisherOptionUpdate(publisherKey, 'exclude', true)
+          savePublisherOption(publisherKey, 'exclude', true)
+        } else {
+          excludeP(publisherKey, (unused, exclude) => {
+            appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+            savePublisherOption(publisherKey, 'exclude', exclude)
+          })
+        }
       }
     })
   }
@@ -2348,7 +2389,6 @@ module.exports = {
   backupKeys,
   recoverKeys,
   quit,
-  addVisit,
   pageDataChanged,
   init,
   initialize,

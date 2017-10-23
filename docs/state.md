@@ -307,37 +307,19 @@ AppStore
     enabled: boolean // enable noscript
   },
   pageData: {
-    info: [{
-      faviconURL: string,
-      protocol: string,
-      publisher: string,
-      timestamp: number,
-      url: string,
-    }],
+    info: {
+      [urlKey]: {
+        faviconURL: string,
+        protocol: string,
+        publisher: string,
+        timestamp: number,
+        url: string
+      }
+    },
     last: {
       info: string, // last added info
-      tabId: number, // last active tabId
-      url: string // last active URL
-    },
-    load: [{
-     timestamp: number,
-     url: string,
-     tabId: number,
-     details: {
-       status: boolean,
-       newURL: string,
-       originalURL: string,
-       httpResponseCode: number,
-       requestMethod: string,
-       referrer: string,
-       resourceType: string
-     }
-    }],
-    view: {
-      timestamp: number,
-      url: string,
-      tabId: number
-    } // we save only the last view
+      tabId: number // last active tabId
+    }
   },
   pinnedSites: {
     [siteKey]: {

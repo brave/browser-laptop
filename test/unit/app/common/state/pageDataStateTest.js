@@ -83,79 +83,6 @@ describe('pageDataState unit tests', function () {
     clock.restore()
   })
 
-  describe('addView', function () {
-    it('null case', function () {
-      const result = pageDataState.addView(state)
-      const expectedResult = state
-        .setIn(['pageData', 'last', 'tabId'], null)
-        .setIn(['pageData', 'last', 'url'], null)
-        .setIn(['pageData', 'view'], Immutable.fromJS({
-          timestamp: now.getTime(),
-          url: null,
-          tabId: null
-        }))
-      assert.deepEqual(result.toJS(), expectedResult.toJS())
-    })
-
-    it('url is the same as last one', function () {
-      const newState = state
-        .setIn(['pageData', 'view'], Immutable.fromJS({
-          timestamp: now.getTime(),
-          url: 'https://brave.com',
-          tabId: 1
-        }))
-      const result = pageDataState.addView(newState, 'https://brave.com', 1)
-      const expectedResult = newState
-        .setIn(['pageData', 'last', 'tabId'], 1)
-
-      assert.deepEqual(result.toJS(), expectedResult.toJS())
-    })
-
-    it('url is private', function () {
-      isPrivate = true
-
-      const result = pageDataState.addView(state, 'https://brave.com', 1)
-      const expectedResult = state
-        .setIn(['pageData', 'last', 'tabId'], 1)
-        .setIn(['pageData', 'last', 'url'], null)
-        .setIn(['pageData', 'view'], Immutable.fromJS({
-          timestamp: now.getTime(),
-          url: null,
-          tabId: 1
-        }))
-
-      assert.deepEqual(result.toJS(), expectedResult.toJS())
-    })
-
-    it('url is about page', function () {
-      const result = pageDataState.addView(state, 'about:history', 1)
-      const expectedResult = state
-        .setIn(['pageData', 'last', 'tabId'], 1)
-        .setIn(['pageData', 'last', 'url'], null)
-        .setIn(['pageData', 'view'], Immutable.fromJS({
-          timestamp: now.getTime(),
-          url: null,
-          tabId: 1
-        }))
-
-      assert.deepEqual(result.toJS(), expectedResult.toJS())
-    })
-
-    it('url is ok', function () {
-      const result = pageDataState.addView(state, 'https://brave.com', 1)
-      const expectedResult = state
-        .setIn(['pageData', 'last', 'tabId'], 1)
-        .setIn(['pageData', 'last', 'url'], 'https://brave.com')
-        .setIn(['pageData', 'view'], Immutable.fromJS({
-          timestamp: now.getTime(),
-          url: 'https://brave.com',
-          tabId: 1
-        }))
-
-      assert.deepEqual(result.toJS(), expectedResult.toJS())
-    })
-  })
-
   describe('addInfo', function () {
     it('null case', function () {
       const result = pageDataState.addInfo(state)
@@ -173,56 +100,6 @@ describe('pageDataState unit tests', function () {
         .setIn(['pageData', 'info', 'https://brave.com/'], data.set('key', 'https://brave.com/'))
         .setIn(['pageData', 'last', 'info'], 'https://brave.com/')
       assert.deepEqual(result.toJS(), expectedResult.toJS())
-    })
-  })
-
-  describe('addLoad', function () {
-    it('null case', function () {
-      const result = pageDataState.addLoad(state)
-      assert.deepEqual(result.toJS(), state.toJS())
-    })
-
-    it('data is ok', function () {
-      const result = pageDataState.addLoad(state)
-      assert.deepEqual(result.toJS(), state.toJS())
-    })
-
-    it('we only take last 100 views', function () {
-      let newState = state
-
-      for (let i = 0; i < 100; i++) {
-        const data = Immutable.fromJS([{
-          timestamp: now.getTime(),
-          url: `https://page${i}.com`,
-          tabId: 1
-        }])
-        newState = newState.setIn(['pageData', 'load'], newState.getIn(['pageData', 'load']).push(data))
-      }
-
-      const newLoad = Immutable.fromJS({
-        timestamp: now.getTime(),
-        url: 'https://brave.com',
-        tabId: 1
-      })
-
-      const result = pageDataState.addLoad(newState, newLoad)
-      const expectedResult = newState
-        .setIn(['pageData', 'load'], newState.getIn(['pageData', 'load']).shift())
-        .setIn(['pageData', 'load'], newState.getIn(['pageData', 'load']).push(newLoad))
-
-      assert.deepEqual(result.toJS(), expectedResult.toJS())
-    })
-  })
-
-  describe('getView', function () {
-    it('null case', function () {
-      const result = pageDataState.getView(state)
-      assert.deepEqual(result, Immutable.Map())
-    })
-
-    it('data is ok', function () {
-      const result = pageDataState.getView(stateWithData)
-      assert.deepEqual(result.toJS(), stateWithData.getIn(['pageData', 'view']).toJS())
     })
   })
 
@@ -261,18 +138,6 @@ describe('pageDataState unit tests', function () {
     })
   })
 
-  describe('getLoad', function () {
-    it('null case', function () {
-      const result = pageDataState.getLoad(state)
-      assert.deepEqual(result, Immutable.List())
-    })
-
-    it('data is there', function () {
-      const result = pageDataState.getLoad(stateWithData)
-      assert.deepEqual(result.toJS(), stateWithData.getIn(['pageData', 'load']).toJS())
-    })
-  })
-
   describe('getLastActiveTabId', function () {
     it('null case', function () {
       const result = pageDataState.getLastActiveTabId(state)
@@ -289,19 +154,6 @@ describe('pageDataState unit tests', function () {
     it('id is saved', function () {
       const result = pageDataState.setLastActiveTabId(state, 10)
       const expectedState = state.setIn(['pageData', 'last', 'tabId'], 10)
-      assert.deepEqual(result.toJS(), expectedState.toJS())
-    })
-  })
-
-  describe('setPublisher', function () {
-    it('null case', function () {
-      const result = pageDataState.setPublisher(state)
-      assert.deepEqual(result.toJS(), state.toJS())
-    })
-
-    it('data is ok', function () {
-      const result = pageDataState.setPublisher(stateWithData, 'https://brave.com/', 'https://brave.com')
-      const expectedState = stateWithData.setIn(['pageData', 'info', 'https://brave.com/', 'publisher'], 'https://brave.com')
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
   })

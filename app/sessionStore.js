@@ -977,11 +977,8 @@ module.exports.defaultAppState = () => {
       info: {},
       last: {
         info: '',
-        url: '',
         tabId: -1
-      },
-      load: [],
-      view: {}
+      }
     },
     ledger: {
       about: {
