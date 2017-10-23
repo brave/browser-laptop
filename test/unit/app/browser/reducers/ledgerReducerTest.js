@@ -222,7 +222,7 @@ describe('ledgerReducer unit tests', function () {
     afterEach(function () {
       pageDataChangedSpy.restore()
     })
-    it('doesnt calls ledgerApi.pageDataChanged when no idle state is provided', function () {
+    it('does not calls ledgerApi.pageDataChanged when no idle state is provided', function () {
       returnedState = ledgerReducer(appState, Immutable.fromJS({
         actionType: appConstants.APP_IDLE_STATE_CHANGED
       }))
@@ -235,7 +235,7 @@ describe('ledgerReducer unit tests', function () {
       }))
       assert(pageDataChangedSpy.withArgs(appState).calledOnce)
     })
-    it('doesnt calls ledgerApi.pageDataChanged when in idleState', function () {
+    it('does not calls ledgerApi.pageDataChanged when in idleState', function () {
       returnedState = ledgerReducer(appState, Immutable.fromJS({
         actionType: appConstants.APP_IDLE_STATE_CHANGED,
         idleState: 'active'

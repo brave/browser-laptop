@@ -925,9 +925,7 @@ const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo 
     return state
   }
 
-  /*
-    Save previous recorder page
-   */
+  // Save previous recorder page
   if (currentUrl !== locationDefault && currentTabId != null && currentTabId !== tabState.TAB_ID_NONE) {
     const tab = getWebContents(currentTabId)
     const isPrivate = !tab ||
@@ -936,7 +934,7 @@ const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo 
 
     const tabFromState = tabState.getByTabId(state, currentTabId)
 
-    // add visit to the ledger when we are not in a private tab
+    // Add visit to the ledger when we are not in a private tab
     if (!isPrivate && tabFromState != null && ledgerUtil.shouldTrackView(tabFromState)) {
       state = addVisit(state, currentTimestamp, currentUrl, currentTabId)
     }
@@ -946,7 +944,7 @@ const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo 
     state = pageDataState.resetInfo(state)
   }
 
-  // update to the latest view
+  // Update to the latest view
   currentUrl = location
   currentTimestamp = new Date().getTime()
   return state
@@ -1089,6 +1087,10 @@ const updateLocation = (state, location, publisherKey) => {
 }
 
 const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
+  if (!getSetting(settings.PAYMENTS_ENABLED)) {
+    return state
+  }
+
   let info = pageDataState.getLastInfo(state)
   const tabId = viewData.tabId || pageDataState.getLastActiveTabId(state)
   const location = viewData.location || locationDefault

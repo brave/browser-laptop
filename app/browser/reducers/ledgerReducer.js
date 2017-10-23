@@ -3,8 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-const electron = require('electron')
-const BrowserWindow = electron.BrowserWindow
+const {BrowserWindow} = require('electron')
 
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
@@ -325,7 +324,10 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_IDLE_STATE_CHANGED:
       {
-        console.log('APP_IDLE_STATE_CHANGED', action.get('idleState'))
+        if (!getSetting(settings.PAYMENTS_ENABLED)) {
+          break
+        }
+
         if (action.has('idleState') && action.get('idleState') !== 'active') {
           state = ledgerApi.pageDataChanged(state)
         }
@@ -333,7 +335,10 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case windowConstants.WINDOW_SET_FOCUSED_FRAME:
       {
-        console.log('WINDOW_SET_FOCUSED_FRAME', action.get('location'))
+        if (!getSetting(settings.PAYMENTS_ENABLED)) {
+          break
+        }
+
         if (action.get('location')) {
           state = ledgerApi.pageDataChanged(state, {
             location: action.get('location'),
@@ -344,6 +349,10 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_WINDOW_BLURRED:
       {
+        if (!getSetting(settings.PAYMENTS_ENABLED)) {
+          break
+        }
+
         let windowCount = BrowserWindow.getAllWindows().filter((win) => win.isFocused()).length
         if (windowCount === 0) {
           state = ledgerApi.pageDataChanged(state, {}, true)
@@ -352,7 +361,10 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case 'event-set-page-info':
       {
-        console.log('event-set-page-info')
+        if (!getSetting(settings.PAYMENTS_ENABLED)) {
+          break
+        }
+
         state = ledgerApi.pageDataChanged(state, {
           location: action.getIn(['pageInfo', 'url'])
         })
@@ -360,12 +372,19 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_CLOSE_WINDOW:
       {
+        if (!getSetting(settings.PAYMENTS_ENABLED)) {
+          break
+        }
+
         state = ledgerApi.pageDataChanged(state)
         break
       }
     case windowConstants.WINDOW_GOT_RESPONSE_DETAILS:
       {
-        console.log('WINDOW_GOT_RESPONSE_DETAILS')
+        if (!getSetting(settings.PAYMENTS_ENABLED)) {
+          break
+        }
+
         // Only capture response for the page (not sub resources, like images, JavaScript, etc)
         if (action.getIn(['details', 'resourceType']) === 'mainFrame') {
           const pageUrl = action.getIn(['details', 'newURL'])
@@ -376,7 +395,7 @@ const ledgerReducer = (state, action, immutableAction) => {
           if (!lastActiveTabId || tabId === lastActiveTabId) {
             state = ledgerApi.pageDataChanged(state, {
               location: pageUrl,
-              tabId: tabId
+              tabId
             })
           }
         }

@@ -23,16 +23,16 @@ const getSetting = require('../../../js/settings').getSetting
 /**
  * Is page an actual page being viewed by the user? (not an error page, etc)
  * If the page is invalid, we don't want to collect usage info.
- * @param {Map} tab - data about provided tab
+ * @param {Map} tabValue - data about provided tab
  * @return {boolean} true if page should have usage collected, false if not
  */
-const shouldTrackView = (tab) => {
-  if (tab == null) {
+const shouldTrackView = (tabValue) => {
+  if (tabValue == null) {
     return false
   }
 
-  const aboutError = tab.has('aboutDetails')
-  const activeEntry = tab.getIn(['navigationState', 'activeEntry']) || {}
+  const aboutError = tabValue.has('aboutDetails')
+  const activeEntry = tabValue.getIn(['navigationState', 'activeEntry']) || {}
   const response = activeEntry.httpStatusCode === 0 || responseHasContent(activeEntry.httpStatusCode)
 
   return !aboutError && response
