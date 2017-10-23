@@ -75,7 +75,6 @@ const settings = {
   SMOOTH_SCROLL_ENABLED: 'advanced.smooth-scroll-enabled',
   SEND_CRASH_REPORTS: 'advanced.send-crash-reports',
   SEND_USAGE_STATISTICS: 'advanced.send-usage-statistics',
-  UPDATE_TO_PREVIEW_RELEASES: 'advanced.update-to-preview-releases',
   ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
   TOOLBAR_UI_SCALE: 'advanced.toolbar-ui-scale',
   SWIPE_NAV_DISTANCE: 'advanced.swipe-nav-distance',

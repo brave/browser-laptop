@@ -321,13 +321,12 @@ app.on('ready', () => {
     })
     // DO NOT TO THIS LIST - see above
 
-    // We need the initial state to read the UPDATE_TO_PREVIEW_RELEASES preference
     loadAppStatePromise.then((initialImmutableState) => {
       updater.init(
         process.platform,
         process.arch,
         process.env.BRAVE_UPDATE_VERSION || app.getVersion(),
-        initialImmutableState.getIn(['settings', settings.UPDATE_TO_PREVIEW_RELEASES])
+        process.env.BRAVE_ENABLE_PREVIEW_UPDATES !== undefined
       )
 
       // This is fired by a menu entry
