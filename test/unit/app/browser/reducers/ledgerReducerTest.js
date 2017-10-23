@@ -51,7 +51,8 @@ describe('ledgerReducer unit tests', function () {
       onCallback: dummyModifyState,
       onTimeUntilReconcile: dummyModifyState,
       run: () => {},
-      onNetworkConnected: dummyModifyState
+      onNetworkConnected: dummyModifyState,
+      getNewClient: () => {}
     }
     fakeLedgerState = {
       resetSynopsis: dummyModifyState,
@@ -71,7 +72,8 @@ describe('ledgerReducer unit tests', function () {
     ledgerReducer = require('../../../../../app/browser/reducers/ledgerReducer')
 
     appState = Immutable.fromJS({
-      ledger: {}
+      ledger: {},
+      migrations: {}
     })
   })
 
@@ -269,8 +271,8 @@ describe('ledgerReducer unit tests', function () {
     it('calls ledgerApi.boot', function () {
       assert(bootSpy.calledOnce)
     })
-    it('returns a modified state', function () {
-      assert.notDeepEqual(returnedState, appState)
+    it('returns a non-modified state, if no transition in progress', function () {
+      assert.deepEqual(returnedState, appState)
     })
   })
 
