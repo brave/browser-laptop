@@ -838,8 +838,7 @@ class AboutPreferences extends React.Component {
       settings.PDFJS_ENABLED,
       settings.TORRENT_VIEWER_ENABLED,
       settings.SMOOTH_SCROLL_ENABLED,
-      settings.SEND_CRASH_REPORTS,
-      settings.UPDATE_TO_PREVIEW_RELEASES
+      settings.SEND_CRASH_REPORTS
     ]
     if (settingsRequiringRestart.includes(key)) {
       ipc.send(messages.PREFS_RESTART, key, value)
