@@ -46,11 +46,15 @@ const migrationState = {
     return state.get('firstRunTimestamp') === state.getIn(['migrations', 'batMercuryTimestamp'])
   },
 
+  // we set this values when we initialize 0.19 state and this will be only true when transition is done
+  // or when you create wallet on 0.19+ version
   hasUpgradedWallet: (state) => {
     state = validateState(state)
     return state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatTimestamp'])
   },
 
+  // we set this values when we initialize 0.19 state and this will be only true when transition is done
+  // or when you create wallet on 0.19+ version
   hasBeenNotified: (state) => {
     state = validateState(state)
     return state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatNotifiedTimestamp'])

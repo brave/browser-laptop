@@ -227,8 +227,10 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_LEDGER_WALLET_CREATE:
       {
         ledgerApi.boot()
-        state = migrationState.setConversionTimestamp(state, new Date().getTime())
-        state = migrationState.setTransitionStatus(state, false)
+        if (ledgerApi.getNewClient() === null) {
+          state = migrationState.setConversionTimestamp(state, new Date().getTime())
+          state = migrationState.setTransitionStatus(state, false)
+        }
         break
       }
     case appConstants.APP_ON_BOOT_STATE_FILE:
