@@ -1381,6 +1381,10 @@ const enable = (state, paymentsEnabled) => {
     }
   })
 
+  if (!ledgerState.getPublishers(state).isEmpty()) {
+    state = synopsisNormalizer(state, null, true)
+  }
+
   return state
 }
 
@@ -2241,7 +2245,7 @@ const migration = (state) => {
 
   const synopsisOptions = ledgerState.getSynopsisOptions(state)
 
-  if (getSetting(settings.PAYMENTS_ENABLED) && synopsisOptions.isEmpty()) {
+  if (synopsisOptions.isEmpty()) {
     // Move data from synopsis file into appState
     const fs = require('fs')
     try {
@@ -2357,7 +2361,8 @@ const transitionWalletToBat = () => {
       newClient = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
       muonWriter(newClientPath, newClient.state)
     } catch (ex) {
-      return console.error('ledger client creation error(2): ', ex)
+      console.error('ledger client creation error(2): ', ex)
+      return
     }
   }
 
