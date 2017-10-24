@@ -190,8 +190,8 @@ importer.on('add-autofill-form-data-entries', (e, detail) => {
 const shouldSkipCookie = (cookie) => {
   // Bypassing cookie mismatch error in
   // https://github.com/brave/browser-laptop/issues/11401
-  if (cookie.domain === '.google.com' &&
-      ['https://notifications.google.com', 'https://accounts.google.com'].includes(cookie.url)) {
+  if (['https://notifications.google.com', 'https://myaccount.google.com',
+    'https://accounts.google.com'].includes(cookie.url)) {
     return true
   }
   return false
