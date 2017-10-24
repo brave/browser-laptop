@@ -3,6 +3,7 @@
 * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const ReactDOM = require('react-dom')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
@@ -18,13 +19,14 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 // Styles
 const {theme} = require('../../styles/theme')
 const {spacing, zindex} = require('../../styles/global')
-const {opacityIncreaseKeyframes} = require('../../styles/animations')
+const {opacityIncreaseElementKeyframes} = require('../../styles/animations')
 const closeTabSvg = require('../../../../extensions/brave/img/tabs/close_btn.svg')
 
 class CloseTabIcon extends React.Component {
   constructor (props) {
     super(props)
     this.onDragStart = this.onDragStart.bind(this)
+    this.setRef = this.setRef.bind(this)
   }
 
   onDragStart (event) {
@@ -46,6 +48,41 @@ class CloseTabIcon extends React.Component {
     return props
   }
 
+  componentDidMount (props) {
+    this.transitionIfRequired()
+  }
+
+  componentDidUpdate (prevProps) {
+    this.transitionIfRequired(prevProps)
+  }
+
+  transitionIfRequired (prevProps) {
+    const shouldTransitionIn = (
+      // need to have the element created already
+      this.element &&
+      // no icon is showing if pinned tab
+      !this.props.isPinned &&
+      // should show the icon
+      // TODO: if we want to animate the unmounting of the component (when
+      // tab is unhovered), then we should use https://github.com/reactjs/react-transition-group
+      // For now, we'll just not do anything since we can't - the element
+      // will have already been removed
+      this.props.showCloseIcon &&
+      // state has changed
+      (!prevProps || this.props.showCloseIcon !== prevProps.showCloseIcon)
+    )
+    if (shouldTransitionIn) {
+      this.element.animate(opacityIncreaseElementKeyframes, {
+        duration: 200,
+        easing: 'linear'
+      })
+    }
+  }
+
+  setRef (ref) {
+    this.element = ReactDOM.findDOMNode(ref)
+  }
+
   render () {
     if (this.props.isPinned || !this.props.showCloseIcon) {
       return null
@@ -62,6 +99,7 @@ class CloseTabIcon extends React.Component {
       onClick={this.props.onClick}
       onDragStart={this.onDragStart}
       draggable='true'
+      ref={this.setRef}
     />
   }
 }
@@ -70,13 +108,7 @@ module.exports = ReduxComponent.connect(CloseTabIcon)
 
 const styles = StyleSheet.create({
   closeTab__icon: {
-    opacity: 0,
     willChange: 'opacity',
-    animationName: opacityIncreaseKeyframes,
-    animationTimingFunction: 'linear',
-    animationDuration: '200ms',
-    animationDelay: '25ms',
-    animationFillMode: 'forwards',
 
     boxSizing: 'border-box',
     zIndex: zindex.zindexTabsThumbnail,
