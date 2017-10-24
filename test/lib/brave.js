@@ -1073,7 +1073,7 @@ var exports = {
           logVerbose('waitForDataFile("' + dataFile + '") => ' + JSON.stringify(val.value[dataFile]))
           return val.value[dataFile] && val.value[dataFile].etag && val.value[dataFile].etag.length > 0
         })
-      }, 10000)
+      }, 30000)
     })
 
     // retrieve a map of all the translations per existing IPC message 'translations'
