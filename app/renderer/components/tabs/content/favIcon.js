@@ -3,6 +3,7 @@
 * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const ReactDOM = require('react-dom')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
@@ -19,9 +20,14 @@ const tabState = require('../../../../common/state/tabState')
 const defaultIconSvg = require('../../../../extensions/brave/img/tabs/default.svg')
 const loadingIconSvg = require('../../../../extensions/brave/img/tabs/loading.svg')
 const {filter, color, spacing} = require('../../styles/global')
-const {spinKeyframes, opacityIncreaseKeyframes} = require('../../styles/animations')
+const {spinKeyframes, opacityIncreaseElementKeyframes} = require('../../styles/animations')
 
 class Favicon extends React.Component {
+  constructor (props) {
+    super(props)
+    this.setRef = this.setRef.bind(this)
+  }
+
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const tabId = ownProps.tabId
@@ -47,6 +53,35 @@ class Favicon extends React.Component {
       : this.props.favicon || 'defaultIcon'
   }
 
+  componentDidMount (props) {
+    this.transitionInIfRequired()
+  }
+
+  componentDidUpdate (prevProps) {
+    this.transitionInIfRequired(prevProps)
+  }
+
+  transitionInIfRequired (prevProps) {
+    const shouldTransitionIn = (
+      // need to have the element created already
+      this.element &&
+      // we do not transition the loading animation
+      !this.props.tabLoading &&
+      // only if the icon changes (or is new)
+      (!prevProps || this.props.favicon !== prevProps.favicon)
+    )
+    if (shouldTransitionIn) {
+      this.element.animate(opacityIncreaseElementKeyframes, {
+        duration: 200,
+        easing: 'linear'
+      })
+    }
+  }
+
+  setRef (ref) {
+    this.element = ReactDOM.findDOMNode(ref)
+  }
+
   render () {
     if (!this.props.isPinned && !this.props.showIcon) {
       return null
@@ -69,6 +104,7 @@ class Favicon extends React.Component {
         !this.props.isPinned && this.props.showIconAtReducedSize && styles.icon_reducedSize
       )}
       style={instanceStyles}
+      ref={this.setRef}
       symbol={
         this.props.tabLoading
           ? (
@@ -95,14 +131,7 @@ module.exports = ReduxComponent.connect(Favicon)
 
 const styles = StyleSheet.create({
   icon: {
-    opacity: 0,
     willChange: 'opacity',
-    animationName: opacityIncreaseKeyframes,
-    animationDelay: '50ms',
-    animationTimingFunction: 'linear',
-    animationDuration: '200ms',
-    animationFillMode: 'forwards',
-
     position: 'relative',
     boxSizing: 'border-box',
     width: spacing.iconSize,

@@ -3,6 +3,7 @@
 * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const ReactDOM = require('react-dom')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
@@ -17,10 +18,15 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
-const {opacityIncreaseKeyframes} = require('../../styles/animations')
+const {opacityIncreaseElementKeyframes} = require('../../styles/animations')
 const newSessionSvg = require('../../../../extensions/brave/img/tabs/new_session.svg')
 
 class NewSessionIcon extends React.Component {
+  constructor (props) {
+    super(props)
+    this.setRef = this.setRef.bind(this)
+  }
+
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const tabId = ownProps.tabId
@@ -35,6 +41,41 @@ class NewSessionIcon extends React.Component {
     props.tabId = tabId
 
     return props
+  }
+
+  componentDidMount (props) {
+    this.transitionInIfRequired()
+  }
+
+  componentDidUpdate (prevProps) {
+    this.transitionInIfRequired(prevProps)
+  }
+
+  transitionInIfRequired (prevProps) {
+    const shouldTransitionIn = (
+      // need to have the element created already
+      this.element &&
+      // no icon is showing if pinned tab
+      !this.props.isPinned &&
+      // make sure icon should show
+      this.props.showPartitionIcon && this.props.partitionNumber !== 0 &&
+      // only if the icon showing is a new state
+      // check the previous state to see if it was not showing
+      (!prevProps || !prevProps.showPartitionIcon || prevProps.partitionNumber === 0)
+    )
+    if (prevProps) {
+      console.log({shouldTransitionIn, prevProps, props: this.props, element: this.element})
+    }
+    if (shouldTransitionIn) {
+      this.element.animate(opacityIncreaseElementKeyframes, {
+        duration: 200,
+        easing: 'linear'
+      })
+    }
+  }
+
+  setRef (ref) {
+    this.element = ReactDOM.findDOMNode(ref)
   }
 
   render () {
@@ -60,6 +101,7 @@ class NewSessionIcon extends React.Component {
       symbolContent={this.props.partitionNumber}
       l10nArgs={{partitionNumber: this.props.partitionNumber}}
       l10nId='sessionInfoTab'
+      ref={this.setRef}
     />
   }
 }
@@ -68,14 +110,7 @@ module.exports = ReduxComponent.connect(NewSessionIcon)
 
 const styles = StyleSheet.create({
   newSession__icon: {
-    opacity: 0,
     willChange: 'opacity',
-    animationName: opacityIncreaseKeyframes,
-    animationDelay: '100ms',
-    animationTimingFunction: 'linear',
-    animationDuration: '200ms',
-    animationFillMode: 'forwards',
-
     zIndex: globalStyles.zindex.zindexTabsThumbnail,
     boxSizing: 'border-box',
     display: 'flex',
