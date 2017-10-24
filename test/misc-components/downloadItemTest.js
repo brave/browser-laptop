@@ -42,6 +42,8 @@ describe('Downloads', function () {
       yield setup(this.app.client)
 
       yield this.app.client
+        .changeSetting(settingsConst.DOWNLOAD_ALWAYS_ASK, false)
+        .waitForSettingValue(settingsConst.DOWNLOAD_ALWAYS_ASK, false)
         .waitForUrl(Brave.newTabUrl)
     })
 
@@ -56,10 +58,10 @@ describe('Downloads', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .changeSetting(settingsConst.DOWNLOAD_DEFAULT_PATH, tempDownloadPath)
         .url(this.downloadSite)
-        .waitForElementCount(downloadComplete, 1)
+        .waitForElementCount(downloadComplete, 0)
 
       yield new Promise((resolve, reject) => {
-        return fs.exists(path.join(tempDownloadPath, this.downloadFile), (res) => res ? resolve(res) : reject(res))
+        return fs.access(path.join(tempDownloadPath, this.downloadFile), fs.constants.R_OK, (res) => res ? resolve(res) : reject(res))
       }).should.eventually.be.true
     })
 
@@ -71,7 +73,7 @@ describe('Downloads', function () {
         .waitForElementCount(downloadComplete, 2)
 
       yield new Promise((resolve, reject) => {
-        return fs.exists(path.join(tempDownloadPath, this.renamedFile), (res) => res ? resolve(res) : reject(res))
+        return fs.access(path.join(tempDownloadPath, this.renamedFile), fs.constants.R_OK, (res) => res ? resolve(res) : reject(res))
       }).should.eventually.be.true
     })
   })
@@ -83,6 +85,8 @@ describe('Downloads', function () {
       yield setup(this.app.client)
 
       yield this.app.client
+        .changeSetting(settingsConst.DOWNLOAD_ALWAYS_ASK, false)
+        .waitForSettingValue(settingsConst.DOWNLOAD_ALWAYS_ASK, false)
         .waitForUrl(Brave.newTabUrl)
         .url(this.downloadSite)
     })
