@@ -63,9 +63,6 @@ class NewSessionIcon extends React.Component {
       // check the previous state to see if it was not showing
       (!prevProps || !prevProps.showPartitionIcon || prevProps.partitionNumber === 0)
     )
-    if (prevProps) {
-      console.log({shouldTransitionIn, prevProps, props: this.props, element: this.element})
-    }
     if (shouldTransitionIn) {
       this.element.animate(opacityIncreaseElementKeyframes, {
         duration: 200,
