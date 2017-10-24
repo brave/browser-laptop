@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const buildConfig = require('../js/constants/buildConfig')
 const Channel = require('./channel')
+const {app} = require('electron')
 
-const version = buildConfig.BROWSER_LAPTOP_REV || 'unknown'
+const version = app.getVersion()
 const channel = Channel.channel()
 
 const crashKeys = {
@@ -15,6 +15,10 @@ const crashKeys = {
 }
 
 const initCrashKeys = () => {
+  // set muon-app-version switch to pass version to renderer processes
+  app.commandLine.appendSwitch('muon-app-version', version)
+  app.commandLine.appendSwitch('muon-app-channel', channel)
+
   for (let key in crashKeys) {
     muon.crashReporter.setCrashKeyValue(key, crashKeys[key])
   }
@@ -22,10 +26,6 @@ const initCrashKeys = () => {
 
 exports.init = (enabled) => {
   initCrashKeys()
-  const {app} = require('electron')
-  // set muon-app-version switch to pass version to renderer processes
-  app.commandLine.appendSwitch('muon-app-version', version)
-  app.commandLine.appendSwitch('muon-app-channel', channel)
   muon.crashReporter.setEnabled(enabled)
   if (enabled) {
     console.log('Crash reporting enabled')
