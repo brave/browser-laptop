@@ -551,7 +551,9 @@ function updateDownloadState (win, downloadId, item, state) {
 
 function registerForDownloadListener (session) {
   session.on('default-download-directory-changed', (e, newPath) => {
-    appActions.changeSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH, newPath)
+    if (newPath !== getSetting(settings.DOWNLOAD_DEFAULT_PATH)) {
+      appActions.changeSetting(settings.DOWNLOAD_DEFAULT_PATH, newPath)
+    }
   })
 
   session.on('will-download', function (event, item, webContents) {

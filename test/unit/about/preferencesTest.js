@@ -122,17 +122,17 @@ describe('Preferences component unittest', function () {
 
   describe('General', function () {
     describe('Default path', function () {
-      it('call appActions.defaultDownloadPath when pencil is clicked', function () {
-        const spy = sinon.spy(appActions, 'defaultDownloadPath')
+      it('call appActions.selectDefaultDownloadPath when pencil is clicked', function () {
+        const spy = sinon.spy(appActions, 'selectDefaultDownloadPath')
         const wrapper = mount(
           <SettingItemIcon
-            clickAction={appActions.defaultDownloadPath()}
+            clickAction={appActions.selectDefaultDownloadPath()}
             position='right'
           />
         )
         wrapper.find('span[data-icon-position="right"]').simulate('click')
         assert.equal(spy.calledOnce, true)
-        appActions.defaultDownloadPath.restore()
+        appActions.selectDefaultDownloadPath.restore()
       })
     })
   })
