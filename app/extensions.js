@@ -227,7 +227,7 @@ let generateSyncManifest = () => {
     'default-src': '\'self\'',
     'form-action': '\'none\''
   }
-  const connectSources = ['\'self\'', appConfig.sync.serverUrl, appConfig.sync.s3Url]
+  const connectSources = ['\'self\'', appConfig.sync.serverUrl, appConfig.sync.s3Url, appConfig.sync.snsUrl, appConfig.sync.sqsUrl]
   if (process.env.NODE_ENV === 'development') {
     connectSources.push(appConfig.sync.testS3Url)
   }

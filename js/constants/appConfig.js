@@ -112,6 +112,8 @@ module.exports = {
     serverUrl: isProduction ? 'https://sync.brave.com' : 'https://sync-staging.brave.com',
     debug: !isProduction,
     testS3Url: 'https://brave-sync-test.s3.dualstack.us-west-2.amazonaws.com/',
+    snsUrl: 'https://sns.us-west-2.amazonaws.com/',
+    sqsUrl: 'https://sqs.us-west-2.amazonaws.com/',
     s3Url: isProduction ? 'https://brave-sync.s3.dualstack.us-west-2.amazonaws.com' : 'https://brave-sync-staging.s3.dualstack.us-west-2.amazonaws.com',
     fetchInterval: isProduction ? 1000 * 60 * 3 : 1000 * 60
   },
