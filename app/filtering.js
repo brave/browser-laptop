@@ -569,9 +569,7 @@ function registerForDownloadListener (session) {
       webContents.forceClose()
     }
 
-    if (getSetting(settings.DOWNLOAD_ALWAYS_ASK)) {
-      item.setPrompt(true)
-    }
+    item.setPrompt(getSetting(settings.DOWNLOAD_ALWAYS_ASK) || false)
 
     const downloadId = item.getGuid()
     item.on('updated', function (e, st) {
