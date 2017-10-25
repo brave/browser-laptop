@@ -23,7 +23,6 @@ const {scaleSize} = require('../../../common/constants/toolbarUserInterfaceScale
 const {changeSetting} = require('../../lib/settingsUtil')
 const platformUtil = require('../../../common/lib/platformUtil')
 const isDarwin = platformUtil.isDarwin()
-const isLinux = platformUtil.isLinux()
 
 class AdvancedTab extends ImmutableComponent {
   get swipeNavigationDistanceSetting () {
