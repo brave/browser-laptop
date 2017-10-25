@@ -16,6 +16,7 @@ const {
   downloadDelete,
   downloadDeleteConfirm
 } = require('../lib/selectors')
+const settingsConst = require('../../js/constants/settings')
 
 function * setup (client) {
   yield client
@@ -31,8 +32,7 @@ describe('downloadItem test', function () {
     yield setup(this.app.client)
 
     yield this.app.client
-      .changeSetting('general.download-always-ask', false)
-      .waitForSettingValue('general.download-always-ask', false)
+      .changeSetting(settingsConst.DOWNLOAD_ALWAYS_ASK, false)
       .waitForUrl(Brave.newTabUrl)
       .url(this.downloadSite)
   })

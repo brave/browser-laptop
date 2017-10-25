@@ -13,13 +13,15 @@ const path = require('path')
 const {cancelDownload, pauseDownload, resumeDownload} = require('../electronDownloadItem')
 const {CANCEL, PAUSE, RESUME} = require('../../common/constants/electronDownloadItemActions')
 const appActions = require('../../../js/actions/appActions')
+const userPrefs = require('../../../js/state/userPrefs')
 
 const downloadsReducer = (state, action) => {
   const download = action.downloadId ? state.getIn(['downloads', action.downloadId]) : undefined
   if (!download &&
       ![appConstants.APP_MERGE_DOWNLOAD_DETAIL,
         appConstants.APP_CLEAR_COMPLETED_DOWNLOADS,
-        appConstants.APP_DOWNLOAD_DEFAULT_PATH].includes(action.actionType)) {
+        appConstants.APP_SELECT_DEFAULT_DOWNLOAD_PATH,
+        appConstants.APP_CHANGE_SETTING].includes(action.actionType)) {
     return state
   }
   switch (action.actionType) {
@@ -90,7 +92,7 @@ const downloadsReducer = (state, action) => {
         state = state.set('downloads', downloads)
       }
       break
-    case appConstants.APP_DOWNLOAD_DEFAULT_PATH:
+    case appConstants.APP_SELECT_DEFAULT_DOWNLOAD_PATH:
       const focusedWindow = BrowserWindow.getFocusedWindow()
 
       dialog.showOpenDialog(focusedWindow, {
@@ -101,6 +103,11 @@ const downloadsReducer = (state, action) => {
           appActions.changeSetting(settings.DOWNLOAD_DEFAULT_PATH, folder[0])
         }
       })
+      break
+    case appConstants.APP_CHANGE_SETTING:
+      if (action.key === settings.DOWNLOAD_DEFAULT_PATH) {
+        userPrefs.setUserPref('download.default_directory', action.value)
+      }
       break
   }
   return state

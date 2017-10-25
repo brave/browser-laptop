@@ -124,7 +124,7 @@ class GeneralTab extends ImmutableComponent {
   }
 
   openDownloadDialog () {
-    appActions.defaultDownloadPath()
+    appActions.selectDefaultDownloadPath()
   }
 
   render () {

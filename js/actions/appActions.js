@@ -1154,9 +1154,9 @@ const appActions = {
   /**
    * Open dialog for default download path setting
    */
-  defaultDownloadPath: function () {
+  selectDefaultDownloadPath: function () {
     dispatch({
-      actionType: appConstants.APP_DOWNLOAD_DEFAULT_PATH
+      actionType: appConstants.APP_SELECT_DEFAULT_DOWNLOAD_PATH
     })
   },
 

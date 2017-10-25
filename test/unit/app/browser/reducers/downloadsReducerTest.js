@@ -222,7 +222,7 @@ describe('downloadsReducer', function () {
     })
   })
 
-  describe('APP_DOWNLOAD_DEFAULT_PATH', function () {
+  describe('APP_SELECT_DEFAULT_DOWNLOAD_PATH', function () {
     describe('when showing folder selection dialog', function () {
       let stub
       let options
@@ -231,7 +231,7 @@ describe('downloadsReducer', function () {
         stub = sinon.stub(fakeElectron.dialog, 'showOpenDialog', function (arg1, arg2) {
           options = arg2
         })
-        downloadsReducer({}, {actionType: appConstants.APP_DOWNLOAD_DEFAULT_PATH})
+        downloadsReducer({}, {actionType: appConstants.APP_SELECT_DEFAULT_DOWNLOAD_PATH})
       })
 
       after(function () {

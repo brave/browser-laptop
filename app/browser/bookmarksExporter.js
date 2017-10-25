@@ -22,7 +22,7 @@ const indentType = ' '
 function showDialog (sites) {
   const focusedWindow = BrowserWindow.getFocusedWindow()
   const fileName = moment().format('DD_MM_YYYY') + '.html'
-  const defaultPath = path.join(getSetting(settings.DEFAULT_DOWNLOAD_SAVE_PATH) || app.getPath('downloads'), fileName)
+  const defaultPath = path.join(getSetting(settings.DOWNLOAD_DEFAULT_PATH) || app.getPath('downloads'), fileName)
   let personal = []
   let other = []
 
