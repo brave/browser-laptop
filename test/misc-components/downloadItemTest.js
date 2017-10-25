@@ -31,19 +31,19 @@ function * setup (client) {
 
 describe('Downloads', function () {
   describe('Location and file naming tests', function () {
-    let tempDownloadPath
+    let tempDownloadPath, downloadFile, downloadSite, renamedFile
     Brave.beforeAll(this)
     before(function * () {
       tempDownloadPath = path.join(os.tmpdir(), 'brave-test', 'downloads')
-      this.downloadFile = 'Brave_proudly-partner_badges.zip'
-      this.downloadSite = `https://brave.com/about/${this.downloadFile}`
-      this.renamedFile = this.downloadFile.slice(0, this.downloadFile.indexOf('.')) + ' (1)' + this.downloadFile.slice(this.downloadFile.indexOf('.'))
+      downloadFile = 'Brave_proudly-partner_badges.zip'
+      downloadSite = `https://brave.com/about/${downloadFile}`
+      renamedFile = downloadFile.slice(0, downloadFile.indexOf('.')) + ' (1)' + downloadFile.slice(downloadFile.indexOf('.'))
 
       yield setup(this.app.client)
 
       yield this.app.client
         .changeSetting(settingsConst.DOWNLOAD_ALWAYS_ASK, false)
-        .waitForSettingValue(settingsConst.DOWNLOAD_ALWAYS_ASK, false)
+        .changeSetting(settingsConst.DOWNLOAD_DEFAULT_PATH, tempDownloadPath)
         .waitForUrl(Brave.newTabUrl)
     })
 
@@ -56,24 +56,26 @@ describe('Downloads', function () {
     it('check if first download completes', function * () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
-        .changeSetting(settingsConst.DOWNLOAD_DEFAULT_PATH, tempDownloadPath)
-        .url(this.downloadSite)
-        .waitForElementCount(downloadComplete, 0)
+        .url(downloadSite)
+        .waitForElementCount(downloadComplete, 1)
 
       yield new Promise((resolve, reject) => {
-        return fs.access(path.join(tempDownloadPath, this.downloadFile), fs.constants.R_OK, (res) => res ? resolve(res) : reject(res))
+        return fs.access(path.join(tempDownloadPath, downloadFile), fs.constants.F_OK, (err) => {
+          return err ? reject(err) : resolve(true)
+        })
       }).should.eventually.be.true
     })
 
     it('check if second download completes and is renamed', function * () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
-        .changeSetting(settingsConst.DOWNLOAD_DEFAULT_PATH, tempDownloadPath)
-        .url(this.downloadSite)
+        .url(downloadSite)
         .waitForElementCount(downloadComplete, 2)
 
       yield new Promise((resolve, reject) => {
-        return fs.access(path.join(tempDownloadPath, this.renamedFile), fs.constants.R_OK, (res) => res ? resolve(res) : reject(res))
+        return fs.access(path.join(tempDownloadPath, renamedFile), fs.constants.F_OK, (err) => {
+          return err ? reject(err) : resolve(true)
+        })
       }).should.eventually.be.true
     })
   })
