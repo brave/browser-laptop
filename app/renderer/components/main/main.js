@@ -84,6 +84,12 @@ class Main extends React.Component {
   registerWindowLevelShortcuts () {
     // For window level shortcuts that don't work as local shortcuts
     document.addEventListener('keydown', (e) => {
+      // TODO: This Alt+F4 check should not be needed but something
+      // is going on in muon causing it to not work when there's a webview.
+      if (e.key === 'F4' && e.altKey && isWindows) {
+        appActions.closeWindow(getCurrentWindowId())
+        return
+      }
       switch (e.which) {
         case keyCodes.ESC:
           this.exitFullScreen()
