@@ -570,7 +570,7 @@ const getPublisherData = (result, scorekeeper) => {
     data.hoursSpent = Math.max(Math.floor(duration / miliseconds.hour), 1)
     data.minutesSpent = Math.round((duration % miliseconds.hour) / miliseconds.minute)
   } else if (duration >= miliseconds.minute) {
-    data.minutesSpent = Math.max(Math.round(duration / miliseconds.minute), 1)
+    data.minutesSpent = Math.max(Math.floor(duration / miliseconds.minute), 1)
     data.secondsSpent = Math.round((duration % miliseconds.minute) / miliseconds.second)
   } else {
     data.secondsSpent = Math.max(Math.round(duration / miliseconds.second), 1)
