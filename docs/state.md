@@ -318,7 +318,8 @@ AppStore
     },
     last: {
       info: string, // last added info
-      tabId: number // last active tabId
+      tabId: number, // last active tabId,
+      closedTabValue: object // last closed tab data
     }
   },
   pinnedSites: {
