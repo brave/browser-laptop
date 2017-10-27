@@ -1,5 +1,19 @@
 # Changelog
 
+Release Notes:
+## [0.19.70](https://github.com/brave/browser-laptop/releases/tag/v0.19.70dev)
+
+ - Fixed ledger time is not displayed correctly. ([#11675](https://github.com/brave/browser-laptop/issues/11675))
+ - Fixed publishers lost if upgrading from 0.18 with wallet disabled. ([#11614](https://github.com/brave/browser-laptop/issues/11614))
+ - Fixed removing "update to preview release" in preparation for channel builds. ([#11638](https://github.com/brave/browser-laptop/issues/11638))
+ - Fixed extension page opens with each browser launch. ([#11578](https://github.com/brave/browser-laptop/issues/11578))
+ - Fixed publishers auto-included even with auto-include switch disabled. ([#11553](https://github.com/brave/browser-laptop/issues/11553))
+ - Fixed sometimes a site is not added to publisher list. ([#11274](https://github.com/brave/browser-laptop/issues/11274))
+ - Fixed ledger table doesn't auto populate the publishers. ([#11273](https://github.com/brave/browser-laptop/issues/11273))
+ - Fixed MetaMask contentscript is injected on about pages when it should not be. ([#11596](https://github.com/brave/browser-laptop/issues/11596))
+ - Upgraded to muon 4.5.9. ([#11498](https://github.com/brave/browser-laptop/issues/11498))
+ - Upgraded to Chromium 62.0.3202.62. ([#11139](https://github.com/brave/browser-laptop/issues/11139))
+
 ## [0.19.53](https://github.com/brave/browser-laptop/releases/tag/v0.19.53dev)
 
  - Added support for MetaMask. ([#8671](https://github.com/brave/browser-laptop/issues/8671))
