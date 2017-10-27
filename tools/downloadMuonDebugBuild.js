@@ -24,7 +24,6 @@ request
       if (err) {
         console.error('failed', err)
         process.exit(1)
-        return
       }
       console.log('done')
     })

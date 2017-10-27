@@ -7,7 +7,7 @@ const addBookmarksN = function (total) {
   }
   return function * (client) {
     const data = []
-    const buffer = new Buffer(2)
+    const buffer = Buffer.from(2)
     for (let n = 0; n < total; n++) {
       buffer.writeUInt16BE(n)
       const string = niceware.bytesToPassphrase(buffer)[0]
@@ -29,7 +29,7 @@ const addBookmarks4000 = addBookmarksN(4000)
 const addTabsN = function (total) {
   return function * (client) {
     const data = []
-    const buffer = new Buffer(2)
+    const buffer = Buffer.from(2)
     for (let n = 0; n < total; n++) {
       buffer.writeUInt16BE(n)
       const string = niceware.bytesToPassphrase(buffer)[0]

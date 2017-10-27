@@ -92,7 +92,6 @@ const uploadTravisArtifacts = function * () {
       if (err) {
         console.error('Failed to upload artifacts', err)
         process.exit(1)
-        return reject(err)
       }
       resolve()
     })
