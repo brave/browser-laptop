@@ -2266,9 +2266,7 @@ const migration = (state) => {
           console.error('error removing file ' + synopsisPath + ': ', err)
         }
       })
-    } catch (err) {
-      console.error(err.toString())
-    }
+    } catch (err) {}
 
     // Delete ledgerInfo
     state = state.delete('ledgerInfo')
