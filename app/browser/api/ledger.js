@@ -99,11 +99,11 @@ const clientOptions = {
   version: 'v2'
 }
 const fileTypes = {
-  bmp: new Buffer([0x42, 0x4d]),
-  gif: new Buffer([0x47, 0x49, 0x46, 0x38, [0x37, 0x39], 0x61]),
-  ico: new Buffer([0x00, 0x00, 0x01, 0x00]),
-  jpeg: new Buffer([0xff, 0xd8, 0xff]),
-  png: new Buffer([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+  bmp: Buffer.from([0x42, 0x4d]),
+  gif: Buffer.from([0x47, 0x49, 0x46, 0x38, [0x37, 0x39], 0x61]),
+  ico: Buffer.from([0x00, 0x00, 0x01, 0x00]),
+  jpeg: Buffer.from([0xff, 0xd8, 0xff]),
+  png: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 }
 const minimumVisitTimeDefault = 8 * 1000
 const nextAddFundsTime = 3 * miliseconds.day
@@ -1015,7 +1015,7 @@ const fetchFavIcon = (publisherKey, url, redirects) => {
         return null
       }
 
-      prefix = new Buffer(blob.substr(tail + 8, signatureMax), 'base64')
+      prefix = Buffer.from(blob.substr(tail + 8, signatureMax), 'base64')
       underscore.keys(fileTypes).forEach((fileType) => {
         if (matchP) return
         if (

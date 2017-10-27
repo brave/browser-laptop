@@ -26,20 +26,20 @@ const downloadsReducer = (state, action) => {
   }
   switch (action.actionType) {
     case appConstants.APP_DOWNLOAD_REVEALED:
-      fs.exists(download.get('savePath'), (exists) => {
-        if (exists) {
-          shell.showItemInFolder(download.get('savePath'))
-        } else {
+      fs.access(download.get('savePath'), fs.constants.F_OK, (err) => {
+        if (err) {
           shell.openItem(path.dirname(download.get('savePath')))
+        } else {
+          shell.showItemInFolder(download.get('savePath'))
         }
       })
       break
     case appConstants.APP_DOWNLOAD_OPENED:
-      fs.exists(download.get('savePath'), (exists) => {
-        if (exists) {
-          shell.openItem(download.get('savePath'))
-        } else {
+      fs.access(download.get('savePath'), fs.constants.F_OK, (err) => {
+        if (err) {
           shell.beep()
+        } else {
+          shell.openItem(download.get('savePath'))
         }
       })
       break

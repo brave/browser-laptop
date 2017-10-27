@@ -96,12 +96,12 @@ module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
  */
 function registerForBeforeRequest (session, partition) {
   const isPrivate = module.exports.isPrivate(partition)
-  session.webRequest.onBeforeRequest((details, cb) => {
+  session.webRequest.onBeforeRequest((details, muonCb) => {
     if (process.env.NODE_ENV === 'development') {
       let page = appUrlUtil.getGenDir(details.url)
       if (page) {
         let redirectURL = 'http://localhost:' + (process.env.BRAVE_PORT || process.env.npm_package_config_port) + '/' + page
-        cb({
+        muonCb({
           redirectURL
         })
         return
@@ -109,14 +109,14 @@ function registerForBeforeRequest (session, partition) {
     }
 
     if (shouldIgnoreUrl(details)) {
-      cb({})
+      muonCb({})
       return
     }
 
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
     // this can happen if the tab is closed and the webContents is no longer available
     if (!firstPartyUrl) {
-      cb({ cancel: true })
+      muonCb({ cancel: true })
       return
     }
 
@@ -162,17 +162,17 @@ function registerForBeforeRequest (session, partition) {
 
         if (parentResourceName === appConfig.resourceNames.SAFE_BROWSING) {
           let redirectURL = appUrlUtil.getTargetAboutUrl('about:safebrowsing#' + details.url)
-          cb({ redirectURL })
+          muonCb({ redirectURL })
           // Workaround #8905
           appActions.loadURLRequested(details.tabId, redirectURL)
         } else if (details.resourceType === 'image') {
-          cb({ redirectURL: transparent1pxGif })
+          muonCb({ redirectURL: transparent1pxGif })
         } else {
-          cb({ cancel: true })
+          muonCb({ cancel: true })
         }
         return
       } else if (results.resourceName === 'siteHacks' && results.cancel === false) {
-        cb({})
+        muonCb({})
         return
       }
 
@@ -195,7 +195,7 @@ function registerForBeforeRequest (session, partition) {
             }
           })
         }
-        cb({redirectURL: results.redirectURL})
+        muonCb({redirectURL: results.redirectURL})
         return
       }
     }
@@ -205,9 +205,9 @@ function registerForBeforeRequest (session, partition) {
       url.startsWith('https://duckduckgo.com/?q') &&
     module.exports.isResourceEnabled('noScript', url, isPrivate)) {
       url = url.replace('?q=', 'html?q=')
-      cb({redirectURL: url})
+      muonCb({redirectURL: url})
     } else {
-      cb({})
+      muonCb({})
     }
   })
 }
@@ -292,10 +292,10 @@ function registerForBeforeSendHeaders (session, partition) {
   const sendDNT = getSetting(settings.DO_NOT_TRACK)
   const isPrivate = module.exports.isPrivate(partition)
 
-  session.webRequest.onBeforeSendHeaders(function (details, cb) {
+  session.webRequest.onBeforeSendHeaders(function (details, muonCb) {
     // Using an electron binary which isn't from Brave
     if (shouldIgnoreUrl(details)) {
-      cb({})
+      muonCb({})
       return
     }
 
@@ -304,7 +304,7 @@ function registerForBeforeSendHeaders (session, partition) {
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
     // this can happen if the tab is closed and the webContents is no longer available
     if (!firstPartyUrl) {
-      cb({ cancel: true })
+      muonCb({ cancel: true })
       return
     }
 
@@ -314,7 +314,7 @@ function registerForBeforeSendHeaders (session, partition) {
         continue
       }
       if (results.cancel) {
-        cb({cancel: true})
+        muonCb({cancel: true})
         return
       }
 
@@ -333,7 +333,7 @@ function registerForBeforeSendHeaders (session, partition) {
       requestHeaders['DNT'] = '1'
     }
 
-    cb({ requestHeaders })
+    muonCb({ requestHeaders })
   })
 }
 
@@ -344,16 +344,16 @@ function registerForBeforeSendHeaders (session, partition) {
  */
 function registerForHeadersReceived (session, partition) {
   const isPrivate = module.exports.isPrivate(partition)
-  session.webRequest.onHeadersReceived(function (details, cb) {
+  session.webRequest.onHeadersReceived(function (details, muonCb) {
     // Using an electron binary which isn't from Brave
     if (shouldIgnoreUrl(details)) {
-      cb({})
+      muonCb({})
       return
     }
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
     // this can happen if the tab is closed and the webContents is no longer available
     if (!firstPartyUrl) {
-      cb({ cancel: true })
+      muonCb({ cancel: true })
       return
     }
     for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
@@ -362,18 +362,18 @@ function registerForHeadersReceived (session, partition) {
         continue
       }
       if (results.cancel) {
-        cb({ cancel: true })
+        muonCb({ cancel: true })
         return
       }
       if (results.responseHeaders) {
-        cb({
+        muonCb({
           responseHeaders: results.responseHeaders,
           statusLine: results.statusLine
         })
         return
       }
     }
-    cb({})
+    muonCb({})
   })
 }
 
@@ -386,7 +386,7 @@ function registerPermissionHandler (session, partition) {
   const isPrivate = module.exports.isPrivate(partition)
   // Keep track of per-site permissions granted for this session.
   let permissions = null
-  session.setPermissionRequestHandler((origin, mainFrameUrl, permissionTypes, cb) => {
+  session.setPermissionRequestHandler((origin, mainFrameUrl, permissionTypes, muonCb) => {
     if (!permissions) {
       permissions = {
         media: {
@@ -518,13 +518,13 @@ function registerPermissionHandler (session, partition) {
           }
           if (response.length === permissionTypes.length) {
             permissionCallbacks[message] = null
-            cb(response)
+            muonCb(response)
           }
         }
       }
     }
     if (response.length === permissionTypes.length) {
-      cb(response)
+      muonCb(response)
     }
   })
 }
