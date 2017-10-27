@@ -350,23 +350,6 @@ class Main extends React.Component {
     // ipc.on is deprecated and should be replaced by actions/reducers
     ipc.on(messages.LEAVE_FULL_SCREEN, this.exitFullScreen.bind(this))
 
-    ipc.on(messages.DEBUG_REACT_PROFILE, (e, args) => {
-      window.perf = require('react-addons-perf')
-      if (!window.perf.isRunning()) {
-        if (!window.isFirstProfiling) {
-          window.isFirstProfiling = true
-          console.info('See this blog post for more information on profiling: http://benchling.engineering/performance-engineering-with-react/')
-        }
-        windowActions.shouldOpenDevTools()
-        console.log('starting to profile...')
-        window.perf.start()
-      } else {
-        window.perf.stop()
-        console.log('profiling stopped. Wasted:')
-        window.perf.printWasted()
-      }
-    })
-
     ipc.on(messages.OPEN_BRAVERY_PANEL, () => {
       if (this.props.braveShieldEnabled) {
         windowActions.setBraveryPanelDetail({})

@@ -128,8 +128,6 @@ const messages = {
   // Ads
   GET_AD_DIV_CANDIDATES: _,
   SET_AD_DIV_CANDIDATES: _,
-  // Debugging
-  DEBUG_REACT_PROFILE: _,
   // Ledger
   LEDGER_PUBLISHER: _,
   LEDGER_PUBLISHER_RESPONSE: _,

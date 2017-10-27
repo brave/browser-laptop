@@ -523,12 +523,6 @@ const createDebugSubmenu = () => {
         }
       }
     }, {
-      label: 'Toggle React profiling',
-      accelerator: 'Alt+P',
-      click: function (item, focusedWindow) {
-        CommonMenu.sendToFocusedWindow(focusedWindow, [messages.DEBUG_REACT_PROFILE])
-      }
-    }, {
       label: 'Stop reporting window state',
       click: function () {
         const win = BrowserWindow.getActiveWindow()
