@@ -2361,9 +2361,7 @@ const transitionWalletToBat = () => {
         transitionWalletToBat()
       })
       return
-    } catch (err) {
-      console.error(err.toString())
-    }
+    } catch (err) {}
   }
 
   // Create new client
