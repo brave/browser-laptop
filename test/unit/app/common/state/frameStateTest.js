@@ -8,23 +8,23 @@ const defaultWindowState = Immutable.fromJS({
   frames: []
 })
 
-const shouldValidateId = function (name, cb) {
+const shouldValidateId = function (name, check) {
   it('throws an AssertionError if ' + name + ' is not a number', function () {
     assert.throws(
       () => {
-        cb(null)
+        check(null)
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb('b')
+        check('b')
       },
       AssertionError
     )
     assert.doesNotThrow(
       () => {
-        cb('1')
+        check('1')
       },
       AssertionError
     )
@@ -33,19 +33,19 @@ const shouldValidateId = function (name, cb) {
   it('throws an AssertionError if ' + name + ' < 1 and !== -1', function () {
     assert.throws(
       () => {
-        cb(0)
+        check(0)
       },
       AssertionError
     )
     assert.doesNotThrow(
       () => {
-        cb(-1)
+        check(-1)
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(-2)
+        check(-2)
       },
       AssertionError
     )
