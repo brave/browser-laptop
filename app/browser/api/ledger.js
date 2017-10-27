@@ -44,7 +44,6 @@ const request = require('../../../js/lib/request')
 const ledgerUtil = require('../../common/lib/ledgerUtil')
 const tabState = require('../../common/state/tabState')
 const pageDataUtil = require('../../common/lib/pageDataUtil')
-const {getWebContents} = require('../../browser/webContentsCache')
 
 // Caching
 let locationDefault = 'NOOP'
@@ -925,15 +924,17 @@ const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo 
 
   // Save previous recorder page
   if (currentUrl !== locationDefault && currentTabId != null && currentTabId !== tabState.TAB_ID_NONE) {
-    const tab = getWebContents(currentTabId)
-    const isPrivate = !tab ||
-      tab.isDestroyed() ||
-      !tab.session.partition.startsWith('persist:')
+    let tabFromState = tabState.getByTabId(state, currentTabId)
 
-    const tabFromState = tabState.getByTabId(state, currentTabId)
+    if (tabFromState == null) {
+      tabFromState = pageDataState.getLastClosedTab(state, currentTabId)
+    }
+
+    const isPrivate = !tabFromState.get('partition', '').startsWith('persist:') ||
+      tabFromState.get('incognito')
 
     // Add visit to the ledger when we are not in a private tab
-    if (!isPrivate && tabFromState != null && ledgerUtil.shouldTrackView(tabFromState)) {
+    if (!isPrivate && !tabFromState.isEmpty() && ledgerUtil.shouldTrackView(tabFromState)) {
       state = addVisit(state, currentTimestamp, currentUrl, currentTabId)
     }
   }

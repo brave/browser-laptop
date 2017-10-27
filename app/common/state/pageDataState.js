@@ -52,6 +52,32 @@ const pageDataState = {
     return state.setIn(['pageData', 'last', 'tabId'], tabId)
   },
 
+  saveLastClosedTab: (state, tabValue) => {
+    if (tabValue == null) {
+      return state
+    }
+
+    if (tabValue.get('incognito')) {
+      return state
+    }
+
+    return state.setIn(['pageData', 'last', 'closedTabValue'], tabValue)
+  },
+
+  getLastClosedTab: (state, tabId) => {
+    if (tabId == null) {
+      return Immutable.Map()
+    }
+
+    const lastTab = state.getIn(['pageData', 'last', 'closedTabValue']) || Immutable.Map()
+
+    if (lastTab.get('id') === tabId) {
+      return lastTab
+    }
+
+    return Immutable.Map()
+  },
+
   resetPageData: (state) => {
     return state
       .setIn(['pageData', 'info'], Immutable.Map())
