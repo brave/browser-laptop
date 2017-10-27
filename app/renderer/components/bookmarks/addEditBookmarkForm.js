@@ -172,7 +172,7 @@ class AddEditBookmarkForm extends React.Component {
                   commonStyles.formControl,
                   commonStyles.textbox,
                   commonStyles.textbox__outlineable,
-                  commonFormStyles.input__box,
+                  commonFormStyles.input__box
                 )}
                 data-test-id='bookmarkNameInput'
                 spellCheck='false'
@@ -209,7 +209,7 @@ class AddEditBookmarkForm extends React.Component {
           <div className={css(
             commonFormStyles.inputWrapper,
             commonFormStyles.inputWrapper__input,
-            styles.bookmarkHanger__marginRow,
+            styles.bookmarkHanger__marginRow
           )}>
             <label
               className={css(styles.bookmarkHanger__label)}

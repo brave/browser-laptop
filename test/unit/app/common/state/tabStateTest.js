@@ -24,25 +24,25 @@ const twoTabsAppState = defaultAppState
   }))
 
 // NOTE: null check can be optional since resolveTabId sets a default if null
-const shouldValidateId = function (cb, skipNullCheck) {
+const shouldValidateId = function (check, skipNullCheck) {
   it('throws an AssertionError if tabId is not a number', function () {
     if (!skipNullCheck) {
       assert.throws(
         () => {
-          cb(null)
+          check(null)
         },
         AssertionError
       )
     }
     assert.throws(
       () => {
-        cb('b')
+        check('b')
       },
       AssertionError
     )
     assert.doesNotThrow(
       () => {
-        cb('1')
+        check('1')
       },
       AssertionError
     )
@@ -51,42 +51,42 @@ const shouldValidateId = function (cb, skipNullCheck) {
   it('throws an AssertionError if tabId < 1 and !== -1 and !== -2', function () {
     assert.throws(
       () => {
-        cb(0)
+        check(0)
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(-3)
+        check(-3)
       },
       AssertionError
     )
     assert.doesNotThrow(
       () => {
-        cb(-2)
+        check(-2)
       },
       AssertionError
     )
     assert.doesNotThrow(
       () => {
-        cb(-1)
+        check(-1)
       },
       AssertionError
     )
   })
 }
 
-const shouldValidateTabState = function (cb) {
+const shouldValidateTabState = function (check) {
   it('throws an AssertionError if state does not contain a `tabs` array', function () {
     assert.doesNotThrow(
       () => {
-        cb(Immutable.fromJS({ tabs: [] }))
+        check(Immutable.fromJS({ tabs: [] }))
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(Immutable.Map({}))
+        check(Immutable.Map({}))
       },
       AssertionError
     )
@@ -95,72 +95,72 @@ const shouldValidateTabState = function (cb) {
   it('throws an AssertionError if state is not convertable to an Immutable.Map', function () {
     assert.doesNotThrow(
       () => {
-        cb({ tabs: [] })
+        check({ tabs: [] })
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb([])
+        check([])
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb('test')
+        check('test')
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(null)
+        check(null)
       },
       AssertionError
     )
   })
 }
 
-const shouldValidateTabValue = function (cb) {
+const shouldValidateTabValue = function (check) {
   it('throws an AssertionError if `tabValue` does not contain a valid `tabId`', function () {
     assert.doesNotThrow(
       () => {
-        cb({ tabId: 1, index: 0, windowId: 1 })
+        check({ tabId: 1, index: 0, windowId: 1 })
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb({})
+        check({})
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb({ tabId: 'a' })
+        check({ tabId: 'a' })
       },
       AssertionError
     )
   })
 }
 
-const shouldValidateAction = function (cb) {
+const shouldValidateAction = function (check) {
   it('throws an AssertionError if action does not contain a `tabValue` that is convertable to an Immutable.Map', function () {
     assert.doesNotThrow(
       () => {
-        cb(Immutable.fromJS({ tabValue: { tabId: 1, index: 0, windowId: 1 } }))
-        cb({ tabValue: { tabId: 1, index: 0, windowId: 1 } })
+        check(Immutable.fromJS({ tabValue: { tabId: 1, index: 0, windowId: 1 } }))
+        check({ tabValue: { tabId: 1, index: 0, windowId: 1 } })
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(Immutable.Map({ blah: {} }))
+        check(Immutable.Map({ blah: {} }))
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(Immutable.Map({}))
+        check(Immutable.Map({}))
       },
       AssertionError
     )
@@ -169,25 +169,25 @@ const shouldValidateAction = function (cb) {
   it('throws an AssertionError if `action` is not convertable to an Immutable.Map', function () {
     assert.doesNotThrow(
       () => {
-        cb({ tabValue: { tabId: 1, index: 0, windowId: 1 } })
+        check({ tabValue: { tabId: 1, index: 0, windowId: 1 } })
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb([])
+        check([])
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb('test')
+        check('test')
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(null)
+        check(null)
       },
       AssertionError
     )

@@ -45,11 +45,11 @@ describe('sessionStoreShutdown unit tests', function () {
     })
     global.muon = {
       file: {
-        writeImportant: (path, data, cb) => {
+        writeImportant: (path, data, fn) => {
           // simulate running on another thread
-          setTimeout(() => {
-            cb(true)
-          }, 0)
+          setImmediate(() => {
+            fn(true)
+          })
         }
       }
     }
