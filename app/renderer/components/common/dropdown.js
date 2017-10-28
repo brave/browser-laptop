@@ -53,7 +53,10 @@ const styles = StyleSheet.create({
     // right padding is larger, to account for the down arrow SVG
     padding: `${selectPadding} 2em ${selectPadding} ${selectPadding}`,
     '-webkit-appearance': 'none',
-    width: 'auto'
+    width: 'auto',
+
+    // See: #11646
+    maxWidth: '100%'
   },
 
   outlineable: {
