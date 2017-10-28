@@ -209,6 +209,7 @@ class Navigator extends React.Component {
                 iconOnly
                 size={globalStyles.spacing.navbarBraveButtonWidth}
                 custom={[
+                  styles.braveMenu__braveShield,
                   this.props.shieldsDown && styles.braveMenu__braveShield_down,
                   !this.props.shieldEnabled && styles.braveMenu__braveShield_disabled,
                   this.props.isCaptionButton && styles.braveMenu__braveShield_isCaptionButton,
@@ -290,6 +291,10 @@ const styles = StyleSheet.create({
     pointerEvents: 'none',
     animation: 'none',
     opacity: 0.25
+  },
+
+  braveMenu__braveShield: {
+    marginRight: globalStyles.spacing.navbarButtonSpacing
   },
 
   braveMenu__braveShield_down: {
