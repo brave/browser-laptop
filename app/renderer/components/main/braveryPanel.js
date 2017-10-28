@@ -904,7 +904,9 @@ const styles = StyleSheet.create({
     overflowY: 'auto',
     marginTop: '-20px',
     padding: '10px',
-    userSelect: 'initial'
+
+    // #11641
+    userSelect: 'text'
   },
   braveryPanel__body__ul__li: {
     listStyleType: 'none',
