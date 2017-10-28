@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
 
     // See syncTab.js
     cursor: 'text',
-    userSelect: 'initial',
+    userSelect: 'text', // #11641
     color: globalStyles.color.braveDarkOrange,
 
     // See: https://github.com/Khan/aphrodite#object-key-ordering

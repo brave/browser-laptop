@@ -132,8 +132,10 @@ const styles = StyleSheet.create({
 
   // User select
   userSelect: {
-    userSelect: 'initial',
-    cursor: 'text'
+    cursor: 'text',
+
+    // #11641
+    userSelect: 'text'
   },
   userSelectNone: {
     userSelect: 'none',
