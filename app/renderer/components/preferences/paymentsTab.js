@@ -396,7 +396,12 @@ const styles = StyleSheet.create({
   // History and settings icons
   switchWrap__mainIconsRight: {
     position: 'relative',
-    top: '3.5px'
+    top: '3.5px',
+
+    // See: #11367
+    right: '1rem',
+
+    whiteSpace: 'nowrap'
   },
   switchWrap__mainIcons: {
     backgroundColor: globalStyles.color.braveOrange,
