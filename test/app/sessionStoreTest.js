@@ -30,7 +30,8 @@ describe('sessionStore test', function () {
         .waitForExist(navigatorNotBookmarked)
         .addBookmark(site, siteTags.BOOKMARK)
         .waitForExist(navigatorBookmarked)
-      yield Brave.stopApp(false)
+      // See: #10490
+      yield Brave.stopApp(false, 10000)
       yield Brave.startApp()
       yield setup(Brave.app.client)
     })
@@ -76,8 +77,8 @@ describe('sessionStore test', function () {
         .waitForExist(navigatorNotBookmarked)
         .addBookmark(site, siteTags.BOOKMARK)
         .waitForExist(navigatorBookmarked)
-
-      yield Brave.stopApp(false)
+      // See: #10490
+      yield Brave.stopApp(false, 10000)
       yield Brave.startApp()
       yield setup(Brave.app.client)
 
@@ -90,7 +91,7 @@ describe('sessionStore test', function () {
         .newTab({active: false})
         .waitForTabCount(2)
         .waitForBrowserWindow()
-
+      // See: #10490
       yield Brave.stopApp(false, 10000)
       yield Brave.startApp()
       yield setup(Brave.app.client)
@@ -149,7 +150,8 @@ describe('sessionStore test', function () {
           .waitForElementCount(tabsTabs, 2)
           .activateTabByIndex(1)
           .waitForExist(this.activeTabSelector, 30000)
-        yield Brave.stopApp(false)
+        // See: #10490
+        yield Brave.stopApp(false, 10000)
         yield Brave.startApp()
         yield setup(Brave.app.client)
       })
@@ -188,7 +190,8 @@ describe('sessionStore test', function () {
           .waitForElementCount(pinnedTabsTabs, 1)
           .waitForElementCount(tabsTabs, 1)
           .waitForExist(this.activeTabSelector)
-        yield Brave.stopApp(false)
+        // See: #10490
+        yield Brave.stopApp(false, 10000)
         yield Brave.startApp()
         yield setup(Brave.app.client)
       })
@@ -234,7 +237,8 @@ describe('sessionStore test', function () {
           })
         })
 
-      yield Brave.stopApp(false)
+      // See: #10490
+      yield Brave.stopApp(false, 10000)
       yield Brave.startApp()
       yield setup(Brave.app.client)
       yield Brave.app.client

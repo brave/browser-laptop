@@ -570,7 +570,7 @@ describe('Syncing bookmarks from an existing profile', function () {
     yield Brave.app.client.pause(1000)
 
     // Finally start a fresh profile and setup sync
-    yield Brave.stopApp()
+    yield Brave.stopApp(false, 10000)
     yield Brave.startApp()
     yield setupBrave(Brave.app.client)
     yield setupSync(Brave.app.client, this.seed)
