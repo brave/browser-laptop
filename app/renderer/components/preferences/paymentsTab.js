@@ -383,7 +383,9 @@ const styles = StyleSheet.create({
     top: '3.5px',
 
     // See: #11367
-    right: '1rem'
+    right: '1rem',
+
+    whiteSpace: 'nowrap'
   },
   switchWrap__mainIcons: {
     backgroundColor: globalStyles.color.braveOrange,
