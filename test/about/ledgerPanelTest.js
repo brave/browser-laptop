@@ -173,7 +173,8 @@ describe('Regular payment panel tests', function () {
         .waitForElementCount('[data-tbody-index="1"] tr', 2)
         .click(walletSwitch)
         .waitForElementCount(addFundsButton, 0)
-      yield Brave.stopApp(false)
+      // See: #10490
+      yield Brave.stopApp(false, 10000)
 
       yield Brave.startApp()
       yield setupBrave(Brave.app.client)
@@ -217,7 +218,7 @@ describe('Regular payment panel tests', function () {
         .click(securityTab)
         .waitForVisible('[data-test-id="clearBrowsingHistory"]')
         .click('[data-test-id="clearBrowsingHistory"] .switchBackground')
-      yield Brave.stopApp(false)
+      yield Brave.stopApp(false, 10000)
 
       yield Brave.startApp()
       yield setupBrave(Brave.app.client)
@@ -262,7 +263,7 @@ describe('Regular payment panel tests', function () {
         .click(securityTab)
         .waitForVisible('[data-test-id="clearBrowsingHistory"]')
         .click('[data-test-id="clearBrowsingHistory"] .switchBackground')
-      yield Brave.stopApp(false)
+      yield Brave.stopApp(false, 10000)
 
       yield Brave.startApp()
       yield setupBrave(Brave.app.client)
