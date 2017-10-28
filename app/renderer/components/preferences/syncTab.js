@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
 
     // See ledgerBackup.js
     cursor: 'text',
-    userSelect: 'initial',
+    userSelect: 'text', // #11641
     color: globalStyles.color.braveDarkOrange
   },
 
