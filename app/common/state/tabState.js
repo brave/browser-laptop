@@ -8,6 +8,7 @@ const assert = require('assert')
 // State
 const frameState = require('./frameState')
 const windowState = require('./windowState')
+const tabDraggingState = require('./tabDraggingState')
 
 // utils
 const { makeImmutable, isMap, isList } = require('./immutableUtil')
@@ -228,6 +229,22 @@ const tabState = {
     tabId = validateId('tabId', tabId)
     const tab = tabState.getByTabId(state, tabId)
     return tab != null ? !!tab.get('pinned') : false
+  },
+
+  isTabDragging: (state, tabId) => {
+    state = validateState(state)
+    tabId = validateId('tabId', tabId)
+    return tabDraggingState.app.getSourceTabId(state) === tabId
+  },
+
+  draggingTabId: (state) => {
+    state = validateState(state)
+    return state.getIn(['tabDragData', 'sourceTabId'])
+  },
+
+  draggingTabKey: (state) => {
+    state = validateState(state)
+    return state.getIn(['tabDragData', 'sourceTabKey'])
   },
 
   getNonPinnedTabs: (state) => {

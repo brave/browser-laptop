@@ -1074,6 +1074,27 @@ const windowActions = {
       bookmarkKey,
       type
     })
+  },
+
+  tabDragChangeGroupDisplayIndex: function (isPinned, destinationIndex) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_DRAG_CHANGE_GROUP_DISPLAY_INDEX,
+      isPinned,
+      destinationIndex
+    })
+  },
+
+  tabDragPausingForPageChange: function (pageIndex) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_DRAG_PAUSING_FOR_PAGE_CHANGE,
+      pageIndex
+    })
+  },
+
+  tabDragNotPausingForPageChange: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_DRAG_NOT_PAUSING_FOR_PAGE_CHANGE
+    })
   }
 }
 
