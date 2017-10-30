@@ -115,7 +115,7 @@ describe('Window store unit tests', function () {
             Immutable.fromJS({
               isSecure: null,
               runInsecureContent: false,
-              evString: undefined
+              evCert: undefined
             }))
         })
       })

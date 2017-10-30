@@ -586,6 +586,7 @@
   display: flex;
   flex-grow: 1;
   min-width: 0%; // allow the navigator to shrink
+  margin-left: 1px;
 
   *:not(legend) {
     z-index: @zindexUrlbarNotLegend;
@@ -823,6 +824,7 @@
       align-items: center;
       justify-content: center;
       height: @urlbarFormHeight;
+      // width: @urlbarFormHeight;
       min-height: @urlbarFormHeight;
 
       .urlbarIcon {
@@ -832,8 +834,7 @@
         background-position: center;
         position: relative;
         bottom: -1px;
-        width: @urlbarFormHeight;
-        min-width: @urlbarFormHeight;
+        margin-left: 3px;
 
         // about:newtab
         &.fa-search {
@@ -859,11 +860,13 @@
         }
       }
 
-      .evString {
-        font-size: 16px;
-        color: green;
-        max-width: 150px;
-        padding-right: 0.5em;
+      .evCert {
+        font-size: 12px;
+        color: forestgreen;
+        margin-left: 3px;
+        margin-right: 3px;
+        padding: 3px;
+        border-right: 1px solid #ccc;
       }
     }
   }

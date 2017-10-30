@@ -298,7 +298,7 @@ const doAction = (action) => {
           windowState.deleteIn(statePath('frames').concat(['security', 'blockedRunInsecureContent']))
         windowState = windowState.mergeIn(statePath('frames').concat(['security']), {
           isSecure: null,
-          evString: undefined,
+          evCert: undefined,
           runInsecureContent: false
         })
         // Update loading UI
@@ -604,13 +604,13 @@ const doAction = (action) => {
           windowState = windowState.setIn(path.concat(['security', 'isSecure']),
             action.securityState.secure)
         }
-        if (action.securityState.evString !== undefined) {
-          windowState = windowState.setIn(path.concat(['security', 'evString']),
-            action.securityState.evString)
-        }
         if (action.securityState.runInsecureContent !== undefined) {
           windowState = windowState.setIn(path.concat(['security', 'runInsecureContent']),
             action.securityState.runInsecureContent)
+        }
+        if (action.securityState.evCert !== undefined) {
+          windowState = windowState.setIn(path.concat(['security', 'evCert']),
+            action.securityState.evCert)
         }
         break
       }
