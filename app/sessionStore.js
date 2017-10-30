@@ -926,7 +926,8 @@ module.exports.defaultAppState = () => {
     },
     cache: {
       bookmarkLocation: undefined,
-      bookmarkOrder: {}
+      bookmarkOrder: {},
+      ledgerVideos: {}
     },
     pinnedSites: {},
     bookmarks: {},
