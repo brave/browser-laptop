@@ -10,7 +10,7 @@ const {getWebContents} = require('../webContentsCache')
 const spellChecker = require('../../spellChecker')
 
 const migrate = (state) => {
-  if (state.get('dictionary')) {
+  if (state && state.get('dictionary')) {
     const addedWords = state.getIn(['dictionary', 'addedWords'])
     const ignoredWords = state.getIn(['dictionary', 'ignoredWords'])
     if (addedWords.size) {

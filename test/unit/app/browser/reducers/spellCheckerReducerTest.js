@@ -62,6 +62,17 @@ describe('spellCheckerReducer unit tests', function () {
     mockery.disable()
   })
 
+  describe('APP_SET_STATE', function () {
+    it('does not crash', function () {
+      assert.doesNotThrow(
+        () => {
+          spellCheckerReducer(null, Immutable.fromJS({
+            actionType: appConstants.APP_SET_STATE
+          }))
+        })
+    })
+  })
+
   describe('APP_SPELLING_SUGGESTED', function () {
     before(function () {
       getWebContentsSpy.reset()
