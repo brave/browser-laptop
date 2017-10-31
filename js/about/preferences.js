@@ -11,8 +11,6 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 const locale = require('../../js/l10n')
-// TODO(cezaraugusto): replace this with our own style
-import 'react-select/dist/react-select.css'
 
 // Components
 const PreferenceNavigation = require('../../app/renderer/components/preferences/preferenceNavigation')
@@ -72,6 +70,7 @@ require('../../less/about/preferences.less')
 require('../../less/forms.less')
 require('../../less/button.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
+require('../../less/react-select.less')
 
 const permissionNames = {
   'mediaPermission': ['boolean'],
