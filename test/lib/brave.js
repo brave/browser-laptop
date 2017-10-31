@@ -675,6 +675,13 @@ var exports = {
       }, sourcePinKey, destinationPinKey, prepend)
     })
 
+    this.app.client.addCommand('moveTabIncrementally', function (moveNext, windowId = 1) {
+      logVerbose(`moveTabIncrementally(${moveNext}, ${windowId}`)
+      return this.execute(function (moveNext, windowId) {
+        return devTools('electron').testData.windowActions.tabMoveIncrementalRequested(windowId, moveNext)
+      }, moveNext, windowId)
+    })
+
     this.app.client.addCommand('ipcOn', function (message, fn) {
       logVerbose('ipcOn("' + message + '")')
       return this.execute(function (message, fn) {
@@ -713,6 +720,15 @@ var exports = {
     this.app.client.addCommand('activateTabByIndex', function (index) {
       return this.waitForTab({index}).getAppState().then((val) => {
         const tab = val.value.tabs.find((tab) => tab.index === index)
+        return this.execute(function (tabId) {
+          devTools('appActions').tabActivateRequested(tabId)
+        }, tab.tabId)
+      })
+    })
+
+    this.app.client.addCommand('activateTabByFrameKey', function (key) {
+      return this.getAppState().then((val) => {
+        const tab = val.value.tabs.find((tab) => tab.frame.key === key)
         return this.execute(function (tabId) {
           devTools('appActions').tabActivateRequested(tabId)
         }, tab.tabId)

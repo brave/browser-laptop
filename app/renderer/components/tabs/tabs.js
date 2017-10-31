@@ -159,7 +159,9 @@ class Tabs extends React.Component {
 
   render () {
     this.tabRefs = []
-    return <div className='tabs'
+    return <div
+      data-test-tabs
+      className='tabs'
       onMouseLeave={this.onMouseLeave}>
       <span className={cx({
         tabStripContainer: true,
