@@ -1867,7 +1867,7 @@ const onCallback = (state, result, delayTime) => {
 
   if (client && result.getIn(['properties', 'wallet'])) {
     if (!ledgerState.getInfoProp(state, 'created')) {
-      setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
+      module.exports.setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
     }
 
     state = getStateInfo(state, regularResults) // TODO optimize if possible
@@ -2014,6 +2014,24 @@ const initialize = (state, paymentsEnabled) => {
   }
 }
 
+const getContributionAmount = () => {
+  const amount = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT)
+  // if amount is 5, 10, 15, or 20... the amount wasn't updated when changing
+  // from BTC to BAT (see https://github.com/brave/browser-laptop/issues/11719)
+  let updatedAmount
+  switch (amount) {
+    case 5: updatedAmount = 25; break
+    case 10: updatedAmount = 50; break
+    case 15: updatedAmount = 75; break
+    case 20: updatedAmount = 100; break
+  }
+  if (updatedAmount) {
+    appActions.changeSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, updatedAmount)
+    return updatedAmount
+  }
+  return amount
+}
+
 const onInitRead = (state, parsedData) => {
   state = getStateInfo(state, parsedData)
 
@@ -2071,7 +2089,8 @@ const onInitRead = (state, parsedData) => {
     state = ledgerState.setInfoProp(state, 'address', client.getWalletAddress())
   }
 
-  setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
+  const contributionAmount = getContributionAmount()
+  module.exports.setPaymentInfo(contributionAmount)
   getBalance(state)
 
   // Show relevant browser notifications on launch
