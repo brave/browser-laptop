@@ -17,10 +17,14 @@ const defaultAppState = Immutable.fromJS({
 
 describe('ledger api unit tests', function () {
   let ledgerApi
-  let paymentsEnabled
-  let paymentsNotifications
   let isBusy = false
   let ledgerClient
+  let privateMethods
+
+  // settings
+  let paymentsEnabled
+  let paymentsNotifications
+  let paymentsMinVisitTime = 5000
   let contributionAmount = 25
 
   // spies
@@ -32,13 +36,21 @@ describe('ledger api unit tests', function () {
   let onChangeSettingSpy
 
   before(function () {
-    this.clock = sinon.useFakeTimers()
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    const fakeLevel = () => {}
+    const fakeLevel = (pathName) => {
+      return {
+        batch: function (entries, cb) {
+          if (typeof cb === 'function') cb()
+        },
+        get: function (key, cb) {
+          if (typeof cb === 'function') cb(null, '{"' + key + '": "value-goes-here"}')
+        }
+      }
+    }
     const fakeElectron = require('../../../lib/fakeElectron')
     const fakeAdBlock = require('../../../lib/fakeAdBlock')
     mockery.registerMock('electron', fakeElectron)
@@ -53,6 +65,8 @@ describe('ledger api unit tests', function () {
             return paymentsNotifications
           case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
             return contributionAmount
+          case settings.PAYMENTS_MINIMUM_VISIT_TIME:
+            return paymentsMinVisitTime
         }
         return false
       }
@@ -124,13 +138,13 @@ describe('ledger api unit tests', function () {
 
     // once everything is stubbed, load the ledger
     ledgerApi = require('../../../../../app/browser/api/ledger')
+    privateMethods = ledgerApi.privateMethods()
   })
   after(function () {
     onBitcoinToBatTransitionedSpy.restore()
     onLedgerCallbackSpy.restore()
     onBitcoinToBatBeginTransitionSpy.restore()
     onChangeSettingSpy.restore()
-    this.clock.restore()
     mockery.deregisterAll()
     mockery.disable()
   })
@@ -247,6 +261,67 @@ describe('ledger api unit tests', function () {
     })
   })
 
+  describe('addVisit', function () {
+    const fakeTabId = 7
+    let stateWithLocation
+    let fakeClock
+    before(function () {
+      const locationData = Immutable.fromJS({
+        publisher: 'clifton.io',
+        stickyP: true,
+        exclude: false
+      })
+      stateWithLocation = defaultAppState.setIn(['ledger', 'locations', 'https://clifton.io/'], locationData)
+    })
+    beforeEach(function () {
+      fakeClock = sinon.useFakeTimers()
+      privateMethods.clearVisitsByPublisher()
+    })
+    afterEach(function () {
+      fakeClock.restore()
+    })
+    it('records a visit when over the PAYMENTS_MINIMUM_VISIT_TIME threshold', function () {
+      const state = ledgerApi.initialize(stateWithLocation, true)
+
+      fakeClock.tick(6000)
+
+      const result = privateMethods.addVisit(state, 0, 'https://clifton.io', fakeTabId)
+      const visitsByPublisher = privateMethods.getVisitsByPublisher()
+
+      // Assert state WAS modified AND publisher was recorded
+      assert.notDeepEqual(result, state)
+      assert(visitsByPublisher['clifton.io'])
+    })
+    it('does not record a visit when under the PAYMENTS_MINIMUM_VISIT_TIME threshold', function () {
+      const state = ledgerApi.initialize(stateWithLocation, true)
+
+      fakeClock.tick(0)
+
+      const result = privateMethods.addVisit(state, 0, 'https://clifton.io', fakeTabId)
+      const visitsByPublisher = privateMethods.getVisitsByPublisher()
+
+      // Assert state WAS modified but publisher wasn NOT recorded
+      assert.notDeepEqual(result, state)
+      assert.equal(visitsByPublisher['clifton.io'], undefined)
+    })
+    it('records time spent on the page when revisited', function () {
+      const state = ledgerApi.initialize(stateWithLocation, true)
+
+      fakeClock.tick(2000)
+      const result1 = privateMethods.addVisit(state, 0, 'https://clifton.io', fakeTabId)
+
+      fakeClock.tick(15000)
+      const result2 = privateMethods.addVisit(result1, 0, 'https://clifton.io', fakeTabId)
+
+      const visitsByPublisher = privateMethods.getVisitsByPublisher()
+
+      // Assert state WAS modified AND publisher was recorded
+      assert.notDeepEqual(result1, state)
+      assert.notDeepEqual(result2, result1)
+      assert(visitsByPublisher['clifton.io'])
+    })
+  })
+
   describe('transitionWalletToBat', function () {
     describe('when client is not busy', function () {
       before(function () {
@@ -303,6 +378,13 @@ describe('ledger api unit tests', function () {
   })
 
   describe('notifications', function () {
+    let fakeClock
+    before(function () {
+      fakeClock = sinon.useFakeTimers()
+    })
+    after(function () {
+      fakeClock.restore()
+    })
     describe('init', function () {
       let onIntervalSpy
       beforeEach(function () {
@@ -316,9 +398,9 @@ describe('ledger api unit tests', function () {
         assert(onIntervalSpy.notCalled)
       })
       it('calls notifications.onInterval after interval', function () {
-        this.clock.tick(0)
+        fakeClock.tick(0)
         ledgerApi.notifications.init(defaultAppState)
-        this.clock.tick(ledgerApi.notifications.pollingInterval)
+        fakeClock.tick(ledgerApi.notifications.pollingInterval)
         assert(onIntervalSpy.calledOnce)
       })
       it('assigns a value to notifications.timeout', function () {
