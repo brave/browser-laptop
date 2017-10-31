@@ -149,10 +149,13 @@ describe('ledger api unit tests', function () {
 
   describe('initialize', function () {
     let notificationsInitSpy
+    let fakeClock
     beforeEach(function () {
       notificationsInitSpy = sinon.spy(ledgerApi.notifications, 'init')
+      fakeClock = sinon.useFakeTimers()
     })
     afterEach(function () {
+      fakeClock.restore()
       notificationsInitSpy.restore()
     })
     it('calls notifications.init', function () {
