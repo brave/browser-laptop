@@ -2442,6 +2442,21 @@ const transitionWalletToBat = () => {
   }
 }
 
+const privateMethods = () => {
+  return process.env.NODE_ENV === 'test'
+  ? {
+    enable,
+    addVisit,
+    clearVisitsByPublisher: function () {
+      visitsByPublisher = {}
+    },
+    getVisitsByPublisher: function () {
+      return visitsByPublisher
+    }
+  }
+  : {}
+}
+
 module.exports = {
   backupKeys,
   recoverKeys,
@@ -2473,5 +2488,6 @@ module.exports = {
   notifications,
   deleteSynopsis,
   transitionWalletToBat,
-  getNewClient
+  getNewClient,
+  privateMethods
 }
