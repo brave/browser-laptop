@@ -132,6 +132,15 @@ const aboutTabUpdateListener = (tabId) => {
   }
 }
 
+const isOnAboutLocation = (url, search) => {
+  if (url == null) {
+    return false
+  }
+
+  const path = url.split('?')
+  return Array.isArray(path) && path[0] === search
+}
+
 appStore.addChangeListener(debounce(aboutTabUpdateListener, 100))
 
 ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
@@ -142,7 +151,7 @@ ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
   const url = getSourceAboutUrl(tab.getURL())
   const location = getBaseUrl(url)
   if (location === 'about:preferences') {
-    if (url === 'about:preferences#payments') {
+    if (isOnAboutLocation(url, 'about:preferences#payments')) {
       appActions.ledgerPaymentsPresent(tabId, true)
     } else {
       appActions.ledgerPaymentsPresent(tabId, false)
@@ -156,7 +165,8 @@ ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
     })
     tab.on('did-navigate-in-page', (e, newUrl) => {
       updateAboutDetails(tabId)
-      if (getSourceAboutUrl(newUrl) === 'about:preferences#payments') {
+      const url = getSourceAboutUrl(newUrl)
+      if (isOnAboutLocation(url, 'about:preferences#payments')) {
         appActions.ledgerPaymentsPresent(tabId, true)
       } else {
         appActions.ledgerPaymentsPresent(tabId, false)
@@ -219,6 +229,7 @@ const updateAboutDetails = (tabId) => {
   }
 
   const location = getBaseUrl(url)
+  const onPaymentsPage = isOnAboutLocation(url, 'about:preferences#payments')
 
   const appSettings = appState.get('settings')
   const braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
@@ -230,7 +241,7 @@ const updateAboutDetails = (tabId) => {
     sendAboutDetails(tabId, messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults)
     sendAboutDetails(tabId, messages.SETTINGS_UPDATED, appSettings)
   }
-  if (location === 'about:contributions' || url === 'about:preferences#payments') {
+  if (location === 'about:contributions' || onPaymentsPage) {
     const ledgerInfo = ledgerState.getInfoProps(appState)
     const preferencesData = appState.getIn(['about', 'preferences'], Immutable.Map())
     const synopsis = appState.getIn(['ledger', 'about'])
@@ -242,7 +253,7 @@ const updateAboutDetails = (tabId) => {
       .set('wizardData', wizardData)
       .set('migration', migration)
     sendAboutDetails(tabId, messages.LEDGER_UPDATED, ledgerData)
-  } else if (url === 'about:preferences#sync' || location === 'about:contributions' || url === 'about:preferences#payments') {
+  } else if (url === 'about:preferences#sync' || location === 'about:contributions' || onPaymentsPage) {
     const sync = appState.get('sync', Immutable.Map())
     sendAboutDetails(tabId, messages.SYNC_UPDATED, sync)
   } else if (location === 'about:extensions' || url === 'about:preferences#extensions') {
