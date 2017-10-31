@@ -609,14 +609,32 @@ const roundToTarget = (l, target, property) => {
     })
 }
 
+// Removes entries older entries and entries that have 0 visits across windows
+const pruneSynopsis = (state) => {
+  if (!synopsis) {
+    return state
+  }
+
+  const json = synopsis.toJSON()
+  if (!json || !json.publishers) {
+    return state
+  }
+
+  return ledgerState.saveSynopsis(state, json.publishers)
+}
+
 // TODO we should convert this function and all related ones into immutable
 // TODO merge publishers and publisherData that is created in getPublisherData
 // so that we don't need to create new Map every single time
-const synopsisNormalizer = (state, changedPublisher, returnState) => {
+const synopsisNormalizer = (state, changedPublisher, returnState = true, prune = false) => {
   let dataPinned = [] // change to list
   let dataUnPinned = [] // change to list
   let dataExcluded = [] // change to list
   const scorekeeper = ledgerState.getSynopsisOption(state, 'scorekeeper')
+
+  if (prune) {
+    state = module.exports.pruneSynopsis(state)
+  }
 
   let results = []
   let publishers = ledgerState.getPublishers(state)
@@ -739,7 +757,7 @@ const updatePublisherInfo = (state, changedPublisher, refresh = false) => {
     return state
   }
 
-  state = synopsisNormalizer(state, changedPublisher, true)
+  state = synopsisNormalizer(state, changedPublisher)
 
   return state
 }
@@ -1387,7 +1405,7 @@ const enable = (state, paymentsEnabled) => {
   })
 
   if (!ledgerState.getPublishers(state).isEmpty()) {
-    state = synopsisNormalizer(state, null, true)
+    state = synopsisNormalizer(state)
   }
 
   return state
@@ -2170,7 +2188,7 @@ const run = (state, delayTime) => {
 
   let winners
   const ballots = client.ballots()
-  const data = (synopsis) && (ballots > 0) && synopsisNormalizer(state)
+  const data = (synopsis) && (ballots > 0) && synopsisNormalizer(state, null, false, true)
 
   if (data) {
     let weights = []
@@ -2442,52 +2460,64 @@ const transitionWalletToBat = () => {
   }
 }
 
-const privateMethods = () => {
-  return process.env.NODE_ENV === 'test'
-  ? {
-    enable,
-    addVisit,
-    clearVisitsByPublisher: function () {
-      visitsByPublisher = {}
-    },
-    getVisitsByPublisher: function () {
-      return visitsByPublisher
+const getMethods = () => {
+  const publicMethods = {
+    backupKeys,
+    recoverKeys,
+    quit,
+    pageDataChanged,
+    init,
+    initialize,
+    setPaymentInfo,
+    updatePublisherInfo,
+    networkConnected,
+    verifiedP,
+    boot,
+    onBootStateFile,
+    onWalletProperties,
+    paymentPresent,
+    addFoundClosed,
+    onWalletRecovery,
+    onBraveryProperties,
+    onLedgerFirstSync,
+    onCallback,
+    deleteSynopsisPublisher,
+    saveOptionSynopsis,
+    savePublisherOption,
+    onTimeUntilReconcile,
+    run,
+    onNetworkConnected,
+    migration,
+    onInitRead,
+    notifications,
+    deleteSynopsis,
+    transitionWalletToBat,
+    getNewClient,
+    savePublisherData
+  }
+
+  let privateMethods = {}
+
+  if (process.env.NODE_ENV === 'test') {
+    privateMethods = {
+      enable,
+      addVisit,
+      clearVisitsByPublisher: function () {
+        visitsByPublisher = {}
+      },
+      getVisitsByPublisher: function () {
+        return visitsByPublisher
+      },
+      getSynopsis: () => synopsis,
+      setSynopsis: (data) => {
+        synopsis = data
+      },
+      synopsisNormalizer,
+      pruneSynopsis
     }
   }
-  : {}
+
+  return Object.assign({}, publicMethods, privateMethods)
 }
 
-module.exports = {
-  backupKeys,
-  recoverKeys,
-  quit,
-  pageDataChanged,
-  init,
-  initialize,
-  setPaymentInfo,
-  updatePublisherInfo,
-  networkConnected,
-  verifiedP,
-  boot,
-  onBootStateFile,
-  onWalletProperties,
-  paymentPresent,
-  addFoundClosed,
-  onWalletRecovery,
-  onBraveryProperties,
-  onLedgerFirstSync,
-  onCallback,
-  deleteSynopsisPublisher,
-  saveOptionSynopsis,
-  savePublisherOption,
-  onTimeUntilReconcile,
-  run,
-  onNetworkConnected,
-  migration,
-  onInitRead,
-  notifications,
-  deleteSynopsis,
-  transitionWalletToBat,
-  getNewClient,
-  privateMethods
-}
+module.exports = getMethods()

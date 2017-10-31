@@ -151,6 +151,7 @@ const ledgerReducer = (state, action, immutableAction) => {
                 break
               }
               state = ledgerState.setPublishersProp(state, publisherKey, 'pinPercentage', value)
+              ledgerApi.savePublisherData(publisherKey, 'pinPercentage', value)
               state = ledgerApi.updatePublisherInfo(state, publisherKey)
               break
             }
