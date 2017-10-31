@@ -19,7 +19,6 @@ describe('ledger api unit tests', function () {
   let ledgerApi
   let isBusy = false
   let ledgerClient
-  let privateMethods
 
   // settings
   let paymentsEnabled
@@ -138,7 +137,6 @@ describe('ledger api unit tests', function () {
 
     // once everything is stubbed, load the ledger
     ledgerApi = require('../../../../../app/browser/api/ledger')
-    privateMethods = ledgerApi.privateMethods()
   })
   after(function () {
     onBitcoinToBatTransitionedSpy.restore()
@@ -186,6 +184,7 @@ describe('ledger api unit tests', function () {
     after(function () {
       onLaunchSpy.restore()
       setPaymentInfoSpy.restore()
+      ledgerApi.setSynopsis(undefined)
     })
     it('calls notifications.onLaunch', function () {
       onLaunchSpy.reset()
@@ -275,18 +274,19 @@ describe('ledger api unit tests', function () {
     })
     beforeEach(function () {
       fakeClock = sinon.useFakeTimers()
-      privateMethods.clearVisitsByPublisher()
+      ledgerApi.clearVisitsByPublisher()
     })
     afterEach(function () {
       fakeClock.restore()
+      ledgerApi.setSynopsis(undefined)
     })
     it('records a visit when over the PAYMENTS_MINIMUM_VISIT_TIME threshold', function () {
       const state = ledgerApi.initialize(stateWithLocation, true)
 
       fakeClock.tick(6000)
 
-      const result = privateMethods.addVisit(state, 0, 'https://clifton.io', fakeTabId)
-      const visitsByPublisher = privateMethods.getVisitsByPublisher()
+      const result = ledgerApi.addVisit(state, 0, 'https://clifton.io', fakeTabId)
+      const visitsByPublisher = ledgerApi.getVisitsByPublisher()
 
       // Assert state WAS modified AND publisher was recorded
       assert.notDeepEqual(result, state)
@@ -297,8 +297,8 @@ describe('ledger api unit tests', function () {
 
       fakeClock.tick(0)
 
-      const result = privateMethods.addVisit(state, 0, 'https://clifton.io', fakeTabId)
-      const visitsByPublisher = privateMethods.getVisitsByPublisher()
+      const result = ledgerApi.addVisit(state, 0, 'https://clifton.io', fakeTabId)
+      const visitsByPublisher = ledgerApi.getVisitsByPublisher()
 
       // Assert state WAS modified but publisher wasn NOT recorded
       assert.notDeepEqual(result, state)
@@ -308,12 +308,12 @@ describe('ledger api unit tests', function () {
       const state = ledgerApi.initialize(stateWithLocation, true)
 
       fakeClock.tick(2000)
-      const result1 = privateMethods.addVisit(state, 0, 'https://clifton.io', fakeTabId)
+      const result1 = ledgerApi.addVisit(state, 0, 'https://clifton.io', fakeTabId)
 
       fakeClock.tick(15000)
-      const result2 = privateMethods.addVisit(result1, 0, 'https://clifton.io', fakeTabId)
+      const result2 = ledgerApi.addVisit(result1, 0, 'https://clifton.io', fakeTabId)
 
-      const visitsByPublisher = privateMethods.getVisitsByPublisher()
+      const visitsByPublisher = ledgerApi.getVisitsByPublisher()
 
       // Assert state WAS modified AND publisher was recorded
       assert.notDeepEqual(result1, state)
@@ -626,6 +626,75 @@ describe('ledger api unit tests', function () {
           })
         })
       })
+    })
+  })
+
+  describe('synopsisNormalizer', function () {
+    describe('prune synopsis', function () {
+      let pruneSynopsisSpy
+
+      before(function () {
+        pruneSynopsisSpy = sinon.spy(ledgerApi, 'pruneSynopsis')
+      })
+
+      after(function () {
+        pruneSynopsisSpy.restore()
+      })
+
+      it('do not call prune', function () {
+        ledgerApi.synopsisNormalizer(defaultAppState)
+        assert(pruneSynopsisSpy.notCalled)
+      })
+
+      it('call prune', function () {
+        ledgerApi.synopsisNormalizer(defaultAppState, null, false, true)
+        assert(pruneSynopsisSpy.calledOnce)
+      })
+    })
+  })
+
+  describe('pruneSynopsis', function () {
+    it('null case', function () {
+      const result = ledgerApi.pruneSynopsis(defaultAppState)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+    })
+
+    it('toJSON return is empty', function () {
+      ledgerApi.setSynopsis({
+        toJSON: () => {}
+      })
+      const result = ledgerApi.pruneSynopsis(defaultAppState)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+    })
+
+    it('toJSON returns publishers', function () {
+      ledgerApi.setSynopsis({
+        toJSON: () => {
+          return {
+            publishers: {
+              'clifton.io': {
+                visits: 1
+              }
+            }
+          }
+        }
+      })
+
+      const expectedResult = {
+        ledger: {
+          synopsis: {
+            publishers: {
+              'clifton.io': {
+                visits: 1
+              }
+            }
+          }
+        },
+        migrations: {}
+      }
+
+      const result = ledgerApi.pruneSynopsis(defaultAppState)
+      assert.deepEqual(result.toJS(), expectedResult)
     })
   })
 })
