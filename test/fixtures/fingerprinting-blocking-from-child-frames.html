@@ -1,0 +1,28 @@
+<html>
+<head>
+</head>
+<body>
+<div id="target">
+proxy blocking being tested
+</div>
+<script>
+(function () {
+
+    let parentFrameMethod = window.HTMLCanvasElement.prototype.toDataURL
+
+    let iframe = document.createElement("iframe")
+    iframe.src = "https://www.brave.com/"
+    document.body.appendChild(iframe)
+
+    // Not blocked
+    let childFrameMethod = iframe.contentWindow.HTMLCanvasElement.prototype.toDataURL;
+
+    if (parentFrameMethod() === childFrameMethod()) {
+        // If an exception is thrown in the above code, the below line will never
+        // run, and the text in the div will never be changed (ie test fails).
+        document.getElementById('target').innerHTML = 'proxy blocking works'
+    }
+}())
+</script>
+</body>
+</html>
