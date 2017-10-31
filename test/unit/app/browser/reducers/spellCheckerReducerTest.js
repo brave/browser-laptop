@@ -159,7 +159,7 @@ describe('spellCheckerReducer unit tests', function () {
         setUserPrefSpy.reset()
         spellCheckEnabled = true
         spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
-          actionType: appConstants.APP_WINDOW_CREATED,
+          actionType: appConstants.APP_WINDOW_CREATED
         }))
       })
       it('calls setUserPref to set enabledPref to true', function () {
@@ -175,7 +175,7 @@ describe('spellCheckerReducer unit tests', function () {
         setUserPrefSpy.reset()
         spellCheckEnabled = false
         spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
-          actionType: appConstants.APP_WINDOW_CREATED,
+          actionType: appConstants.APP_WINDOW_CREATED
         }))
       })
       it('calls setUserPref to set enabledPref to true', function () {
@@ -186,7 +186,6 @@ describe('spellCheckerReducer unit tests', function () {
       })
     })
   })
-
 
   describe('APP_CHANGE_SETTING', function () {
     describe('SPELLCHECK_ENABLED with enabled', function () {
