@@ -879,22 +879,26 @@ const addVisit = (state, startTimestamp, location, tabId) => {
     return state
   }
 
-  if (!visitsByPublisher[publisherKey]) {
-    visitsByPublisher[publisherKey] = {}
-  }
+  let duration = timestamp - startTimestamp
+  let revisitP = false
 
-  if (!visitsByPublisher[publisherKey][location]) {
-    visitsByPublisher[publisherKey][location] = {
-      tabIds: []
+  if (duration >= getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)) {
+    if (!visitsByPublisher[publisherKey]) {
+      visitsByPublisher[publisherKey] = {}
+    }
+
+    if (!visitsByPublisher[publisherKey][location]) {
+      visitsByPublisher[publisherKey][location] = {
+        tabIds: []
+      }
+    }
+
+    revisitP = visitsByPublisher[publisherKey][location].tabIds.indexOf(tabId) !== -1
+    if (!revisitP) {
+      visitsByPublisher[publisherKey][location].tabIds.push(tabId)
     }
   }
 
-  const revisitP = visitsByPublisher[publisherKey][location].tabIds.indexOf(tabId) !== -1
-  if (!revisitP) {
-    visitsByPublisher[publisherKey][location].tabIds.push(tabId)
-  }
-
-  let duration = timestamp - startTimestamp
   if (_internal.verboseP) {
     console.log('\nadd publisher ' + publisherKey + ': ' + (duration / 1000) + ' sec' + ' revisitP=' + revisitP + ' state=' +
       JSON.stringify(underscore.extend({location: location}, visitsByPublisher[publisherKey][location]),
@@ -2438,6 +2442,21 @@ const transitionWalletToBat = () => {
   }
 }
 
+const privateMethods = () => {
+  return process.env.NODE_ENV === 'test'
+  ? {
+    enable,
+    addVisit,
+    clearVisitsByPublisher: function () {
+      visitsByPublisher = {}
+    },
+    getVisitsByPublisher: function () {
+      return visitsByPublisher
+    }
+  }
+  : {}
+}
+
 module.exports = {
   backupKeys,
   recoverKeys,
@@ -2469,5 +2488,6 @@ module.exports = {
   notifications,
   deleteSynopsis,
   transitionWalletToBat,
-  getNewClient
+  getNewClient,
+  privateMethods
 }
