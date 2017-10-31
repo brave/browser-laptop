@@ -89,6 +89,7 @@ class PinnedTabs extends React.Component {
   render () {
     this.tabRefs = []
     return <div
+      data-test-pinnedTabs
       className='pinnedTabs'
       onDragOver={this.onDragOver}
       onDrop={this.onDrop}>

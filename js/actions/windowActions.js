@@ -314,6 +314,20 @@ const windowActions = {
   },
 
   /**
+   * A request to increase or decrease the display order of the active tab relative to other tabs in its window
+   * @param {Boolean} moveNext
+   */
+  tabMoveIncrementalRequested: function (windowId, moveNext = true) {
+    dispatch({
+      actionType: windowConstants.WINDOW_TAB_MOVE_INCREMENTAL_REQUESTED,
+      moveNext,
+      queryInfo: {
+        windowId
+      }
+    })
+  },
+
+  /**
    * The active URL bar suggestion was clicked
    * @param {boolean} isForSecondaryAction - Whether the secondary action is expected
    *  which happens when a modifier key is pressed.

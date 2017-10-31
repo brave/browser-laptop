@@ -7,6 +7,7 @@ const BrowserWindow = electron.BrowserWindow
 const electronLocalshortcut = require('electron-localshortcut')
 const messages = require('../js/constants/messages')
 const appActions = require('../js/actions/appActions')
+const windowActions = require('../js/actions/windowActions')
 const isDarwin = process.platform === 'darwin'
 
 module.exports.register = (win) => {
@@ -72,6 +73,20 @@ module.exports.register = (win) => {
     appActions.createTabRequested({
       isPartitioned: true
     })
+  })
+
+  electronLocalshortcut.register(win, 'Ctrl+Shift+PageUp', () => {
+    const win = BrowserWindow.getFocusedWindow()
+    if (win) {
+      windowActions.tabMoveIncrementalRequested(win.id, false)
+    }
+  })
+
+  electronLocalshortcut.register(win, 'Ctrl+Shift+PageDown', () => {
+    const win = BrowserWindow.getFocusedWindow()
+    if (win) {
+      windowActions.tabMoveIncrementalRequested(win.id)
+    }
   })
 }
 
