@@ -169,4 +169,29 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     type: 'WebRTC',
     methodName: 'navigator.mediaDevices.enumerateDevices'
   })
+
+  // Prevent access to frames' contentDocument / contentWindow
+  // properties, to prevent the parent frame from pulling unblocked
+  // references to blocked standards from injected frames.
+  // This may break some sites, but, fingers crossed, its not too much.
+  var pageScriptToInject = `
+    (function () {
+        var frameTypesToModify = [window.HTMLIFrameElement, window.HTMLFrameElement]
+        var propertiesToBlock = ["contentDocument", "contentWindow"]
+        var proxyObject = window.HTMLCanvasElement.prototype.toDataURL
+        var returnProxyGetter = {
+          get: function () {
+            return proxyObject()
+          }
+        }
+
+        frameTypesToModify.forEach(function (frameType) {
+          propertiesToBlock.forEach(function (propertyName) {
+            Object.defineProperty(frameType.prototype, propertyName, returnProxyGetter)
+          })
+        })
+    }())
+  `
+
+  chrome.webFrame.executeJavaScript(pageScriptToInject)
 }
