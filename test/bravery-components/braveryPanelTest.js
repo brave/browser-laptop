@@ -895,6 +895,19 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .waitUntil(verifyProxyBlocking)
     })
+    it('blocking access to fingerprinting methods on iframe.contentWindow', function * () {
+      const url = Brave.server.url('fingerprinting-blocking-from-child-frames.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitForUrl(url)
+        .openBraveMenu(braveMenu, braveryPanel)
+      yield changeFpSetting(this.app.client, blockFpOption)
+      yield this.app.client
+        .keys(Brave.keys.ESCAPE)
+        .tabByIndex(0)
+        .waitUntil(verifyProxyBlocking)
+    })
     it('block device enumeration', function * () {
       const url = Brave.server.url('enumerate_devices.html')
       yield this.app.client
