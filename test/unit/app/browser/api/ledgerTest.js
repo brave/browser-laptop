@@ -21,6 +21,7 @@ describe('ledger api unit tests', function () {
   let paymentsNotifications
   let isBusy = false
   let ledgerClient
+  let contributionAmount = 25
 
   // spies
   let ledgerTransitionSpy
@@ -28,6 +29,7 @@ describe('ledger api unit tests', function () {
   let onBitcoinToBatTransitionedSpy
   let onLedgerCallbackSpy
   let onBitcoinToBatBeginTransitionSpy
+  let onChangeSettingSpy
 
   before(function () {
     this.clock = sinon.useFakeTimers()
@@ -44,11 +46,13 @@ describe('ledger api unit tests', function () {
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('../../../js/settings', {
       getSetting: (settingKey, settingsCollection, value) => {
-        if (settingKey === settings.PAYMENTS_ENABLED) {
-          return paymentsEnabled
-        }
-        if (settingKey === settings.PAYMENTS_NOTIFICATIONS) {
-          return paymentsNotifications
+        switch (settingKey) {
+          case settings.PAYMENTS_ENABLED:
+            return paymentsEnabled
+          case settings.PAYMENTS_NOTIFICATIONS:
+            return paymentsNotifications
+          case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
+            return contributionAmount
         }
         return false
       }
@@ -57,6 +61,7 @@ describe('ledger api unit tests', function () {
     onBitcoinToBatTransitionedSpy = sinon.spy(appActions, 'onBitcoinToBatTransitioned')
     onLedgerCallbackSpy = sinon.spy(appActions, 'onLedgerCallback')
     onBitcoinToBatBeginTransitionSpy = sinon.spy(appActions, 'onBitcoinToBatBeginTransition')
+    onChangeSettingSpy = sinon.spy(appActions, 'changeSetting')
 
     // ledger client stubbing
     ledgerClient = sinon.stub()
@@ -68,6 +73,15 @@ describe('ledger api unit tests', function () {
             amount: 1,
             currency: 'USD'
           }
+        }
+      },
+      getWalletAddresses: function () {
+        return {
+          'BAT': '0xADDRESS_HERE',
+          'BTC': 'ADDRESS_HERE',
+          'CARD_ID': 'ADDRESS-GUID-GOES-IN-HERE',
+          'ETH': '0xADDRESS_HERE',
+          'LTC': 'ADDRESS_HERE'
         }
       },
       getWalletProperties: function (amount, currency, callback) {
@@ -86,6 +100,13 @@ describe('ledger api unit tests', function () {
       },
       transitioned: function () {
         return {}
+      },
+      setBraveryProperties: function (clientProperties, callback) {
+        if (typeof callback === 'function') {
+          const err = undefined
+          const result = {}
+          callback(err, result)
+        }
       },
       state: {
         transactions: []
@@ -106,6 +127,9 @@ describe('ledger api unit tests', function () {
   })
   after(function () {
     onBitcoinToBatTransitionedSpy.restore()
+    onLedgerCallbackSpy.restore()
+    onBitcoinToBatBeginTransitionSpy.restore()
+    onChangeSettingSpy.restore()
     this.clock.restore()
     mockery.deregisterAll()
     mockery.disable()
@@ -126,15 +150,11 @@ describe('ledger api unit tests', function () {
   })
 
   describe('onInitRead', function () {
+    let parsedLedgerData
     let onLaunchSpy
-    beforeEach(function () {
-      onLaunchSpy = sinon.spy(ledgerApi.notifications, 'onLaunch')
-    })
-    afterEach(function () {
-      onLaunchSpy.restore()
-    })
-    it('calls notifications.onLaunch', function () {
-      ledgerApi.onInitRead(defaultAppState, {
+    let setPaymentInfoSpy
+    before(function () {
+      parsedLedgerData = {
         paymentInfo: {
         },
         properties: {
@@ -142,8 +162,88 @@ describe('ledger api unit tests', function () {
             paymentId: 12345
           }
         }
-      })
+      }
+      contributionAmount = 25
+    })
+    before(function () {
+      onLaunchSpy = sinon.spy(ledgerApi.notifications, 'onLaunch')
+      setPaymentInfoSpy = sinon.spy(ledgerApi, 'setPaymentInfo')
+    })
+    after(function () {
+      onLaunchSpy.restore()
+      setPaymentInfoSpy.restore()
+    })
+    it('calls notifications.onLaunch', function () {
+      onLaunchSpy.reset()
+      ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
       assert(onLaunchSpy.calledOnce)
+    })
+    it('calls setPaymentInfo with contribution amount', function () {
+      setPaymentInfoSpy.reset()
+      ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
+      assert(setPaymentInfoSpy.withArgs(25).calledOnce)
+    })
+
+    describe('when contribution amount is still set to the USD amount (before BAT Mercury)', function () {
+      after(function () {
+        contributionAmount = 25
+      })
+      describe('when set to 5 USD', function () {
+        before(function () {
+          setPaymentInfoSpy.reset()
+          onChangeSettingSpy.reset()
+          contributionAmount = 5
+          ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
+        })
+        it('converts to 25 BAT', function () {
+          assert(setPaymentInfoSpy.withArgs(25).calledOnce)
+        })
+        it('updates the setting', function () {
+          assert(onChangeSettingSpy.withArgs(settings.PAYMENTS_CONTRIBUTION_AMOUNT, 25).calledOnce)
+        })
+      })
+      describe('when set to 10 USD', function () {
+        before(function () {
+          setPaymentInfoSpy.reset()
+          onChangeSettingSpy.reset()
+          contributionAmount = 10
+          ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
+        })
+        it('converts to 50 BAT', function () {
+          assert(setPaymentInfoSpy.withArgs(50).calledOnce)
+        })
+        it('updates the setting', function () {
+          assert(onChangeSettingSpy.withArgs(settings.PAYMENTS_CONTRIBUTION_AMOUNT, 50).calledOnce)
+        })
+      })
+      describe('when set to 15 USD', function () {
+        before(function () {
+          setPaymentInfoSpy.reset()
+          onChangeSettingSpy.reset()
+          contributionAmount = 15
+          ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
+        })
+        it('converts to 75 BAT', function () {
+          assert(setPaymentInfoSpy.withArgs(75).calledOnce)
+        })
+        it('updates the setting', function () {
+          assert(onChangeSettingSpy.withArgs(settings.PAYMENTS_CONTRIBUTION_AMOUNT, 75).calledOnce)
+        })
+      })
+      describe('when set to 20 USD', function () {
+        before(function () {
+          setPaymentInfoSpy.reset()
+          onChangeSettingSpy.reset()
+          contributionAmount = 20
+          ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
+        })
+        it('converts to 100 BAT', function () {
+          assert(setPaymentInfoSpy.withArgs(100).calledOnce)
+        })
+        it('updates the setting', function () {
+          assert(onChangeSettingSpy.withArgs(settings.PAYMENTS_CONTRIBUTION_AMOUNT, 100).calledOnce)
+        })
+      })
     })
   })
 
