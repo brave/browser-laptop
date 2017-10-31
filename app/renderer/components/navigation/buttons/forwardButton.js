@@ -4,7 +4,6 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const ipc = require('electron').ipcRenderer
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
@@ -16,9 +15,6 @@ const appActions = require('../../../../../js/actions/appActions')
 // State
 const tabState = require('../../../../common/state/tabState')
 
-// Constants
-const messages = require('../../../../../js/constants/messages')
-
 // Utils
 const eventUtil = require('../../../../../js/lib/eventUtil')
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
@@ -29,14 +25,6 @@ class ForwardButton extends React.Component {
     super(props)
     this.onForward = this.onForward.bind(this)
     this.onForwardLongPress = this.onForwardLongPress.bind(this)
-  }
-
-  componentDidMount () {
-    ipc.on(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
-  }
-
-  componentWillUnmount () {
-    ipc.off(messages.SHORTCUT_ACTIVE_FRAME_FORWARD, this.onForward)
   }
 
   onForward (e) {

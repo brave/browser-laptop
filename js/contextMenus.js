@@ -34,6 +34,7 @@ const extensionActions = require('../app/common/actions/extensionActions')
 const bookmarkUtil = require('../app/common/lib/bookmarkUtil')
 const bookmarksState = require('../app/common/state/bookmarksState')
 const historyState = require('../app/common/state/historyState')
+const tabState = require('../app/common/state/tabState')
 const frameStateUtil = require('./state/frameStateUtil')
 const platformUtil = require('../app/common/lib/platformUtil')
 const bookmarkFoldersUtil = require('../app/common/lib/bookmarkFoldersUtil')
@@ -1048,7 +1049,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
             enabled: tab.get('canGoBack'),
             click: (item, focusedWindow) => {
               if (focusedWindow) {
-                CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_BACK])
+                appActions.onShortcutActiveFrameBack(tabState.TAB_ID_ACTIVE)
               }
             }
           }, {
@@ -1056,7 +1057,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
             enabled: tab.get('canGoForward'),
             click: (item, focusedWindow) => {
               if (focusedWindow) {
-                CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_FORWARD])
+                appActions.onShortcutActiveFrameForward(tabState.TAB_ID_ACTIVE)
               }
             }
           }, {

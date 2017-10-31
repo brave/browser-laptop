@@ -1814,6 +1814,20 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_ON_BTC_TO_BAT_BEGIN_TRANSITION
     })
+  },
+
+  onShortcutActiveFrameForward: function (tabId) {
+    dispatch({
+      actionType: appConstants.SHORTCUT_ACTIVE_FRAME_FORWARD,
+      tabId
+    })
+  },
+
+  onShortcutActiveFrameBack: function (tabId) {
+    dispatch({
+      actionType: appConstants.SHORTCUT_ACTIVE_FRAME_BACK,
+      tabId
+    })
   }
 }
 
