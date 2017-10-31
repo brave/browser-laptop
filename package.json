@@ -85,7 +85,6 @@
   "homepage": "https://www.brave.com/",
   "dependencies": {
     "acorn": "3.2.0",
-    "ad-block": "3.0.5",
     "aphrodite": "1.1.0",
     "async": "^2.0.1",
     "bat-balance": "^1.0.3",
@@ -124,7 +123,6 @@
     "string.prototype.startswith": "^0.2.0",
     "tablesort": "5.0.0",
     "tldjs": "1.6.2",
-    "tracking-protection": "1.1.x",
     "underscore": "1.8.3",
     "url-loader": "^0.5.7",
     "webtorrent-remote": "^2.0.2"

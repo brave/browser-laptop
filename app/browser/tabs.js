@@ -35,6 +35,7 @@ const siteSettingsState = require('../common/state/siteSettingsState')
 const ledgerState = require('../common/state/ledgerState')
 const {getWindow} = require('./windows')
 
+let adBlockRegions
 let currentPartitionNumber = 0
 const incrementPartitionNumber = () => ++currentPartitionNumber
 
@@ -261,11 +262,14 @@ const updateAboutDetails = (tabId) => {
     }
     sendAboutDetails(tabId, messages.SETTINGS_UPDATED, appSettings)
   } else if (location === 'about:adblock') {
+    if (!adBlockRegions) {
+      adBlockRegions = require('ad-block').adBlockLists.regions
+    }
     const adblock = appState.get('adblock', Immutable.Map())
     sendAboutDetails(tabId, messages.ADBLOCK_UPDATED, {
       adblock: adblock.toJS(),
       settings: appSettings.toJS(),
-      resources: require('ad-block/lib/regions')
+      resources: adBlockRegions
     })
   } else if (location === 'about:downloads') {
     const downloads = appState.get('downloads', Immutable.Map())

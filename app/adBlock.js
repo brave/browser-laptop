@@ -14,7 +14,7 @@ const debounce = require('../js/lib/debounce')
 const adblockInstances = new Map()
 const defaultAdblock = new AdBlockClient()
 const defaultSafeBrowsing = new AdBlockClient()
-const regions = require('ad-block/lib/regions')
+const {adBlockLists} = require('ad-block')
 const getSetting = require('../js/settings').getSetting
 const {ADBLOCK_CUSTOM_RULES} = require('../js/constants/settings')
 const customFilterRulesUUID = 'CE61F035-9F0A-4999-9A5A-D4E46AF676F7'
@@ -67,7 +67,7 @@ module.exports.init = () => {
     .initInstance(defaultAdblock, module.exports.adBlockResourceName, false)
     .initInstance(defaultSafeBrowsing, module.exports.safeBrowsingResourceName, true)
   // Initialize the regional adblock files that are enabled
-  regions
+  adBlockLists.regions
     .filter((region) => getSetting(`adblock.${region.uuid}.enabled`))
     .forEach((region) => module.exports.updateAdblockDataFiles(region.uuid, true))
   const customRules = getSetting(ADBLOCK_CUSTOM_RULES)
