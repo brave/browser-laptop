@@ -219,7 +219,9 @@ class UrlBar extends React.Component {
     if (this.props.normalizedSuggestion.startsWith(newValueNormalized) && this.props.normalizedSuggestion.length > 0) {
       const newSuffix = this.props.normalizedSuggestion.substring(newValueNormalized.length)
       this.setValue(newValue, newSuffix)
-      this.urlInput.setSelectionRange(newValue.length, newValue.length + newSuffix.length + 1)
+      if (this.urlInput) {
+        this.urlInput.setSelectionRange(newValue.length, newValue.length + newSuffix.length + 1)
+      }
       return true
     } else {
       this.setValue(newValue, '')
