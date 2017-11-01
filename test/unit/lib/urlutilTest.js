@@ -417,4 +417,59 @@ describe('urlutil', function () {
       assert.equal(result, 'https://brave.com')
     })
   })
+
+  describe('parseFaviconDataUrl', function () {
+    it('null scenario', function () {
+      const result = urlUtil.parseFaviconDataUrl(null)
+      assert.equal(result, null)
+    })
+    it('empty string', function () {
+      const result = urlUtil.parseFaviconDataUrl('')
+      assert.equal(result, null)
+    })
+    it('regular URL', function () {
+      const result = urlUtil.parseFaviconDataUrl('http://example.com')
+      assert.equal(result, null)
+    })
+    it('non-image data URL', function () {
+      const result = urlUtil.parseFaviconDataUrl('data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678')
+      assert.equal(result, null)
+    })
+    it('non-base64 data URL', function () {
+      const result = urlUtil.parseFaviconDataUrl('data:image/jpg,foo')
+      assert.equal(result, null)
+    })
+    it('no-extension data URL', function () {
+      const result = urlUtil.parseFaviconDataUrl('data:image/;base64,foo')
+      assert.equal(result, null)
+    })
+    it('valid jpg', function () {
+      const jpg = 'data:image/jpeg;base64,' +
+        '/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDADIiJSwlHzIsKSw4NTI7S31RS0VFS5ltc1p9tZ++u7Kf' +
+        'r6zI4f/zyNT/16yv+v/9////////wfD/////////////2wBDATU4OEtCS5NRUZP/zq/O////////' +
+        '////////////////////////////////////////////////////////////wAARCAAYAEADAREA' +
+        '//AhEBAxEB/8QAGQAAAgMBAAAAAAAAAAAAAAAAAQMAAgQF/8QAJRABAAIBBAEEAgMAAAAAAAAAAQIR' +
+        '//AAMSITEEEyJBgTORUWFx/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAA' +
+        '//AAD/2gAMAwEAAhEDEQA/AOgM52xQDrjvAV5Xv0vfKUALlTQfeBm0HThMNHXkL0Lw/swN5qgA8yT4' +
+        '//MCS1OEOJV8mBz9Z05yfW8iSx7p4j+jA1aD6Wj7ZMzstsfvAas4UyRHvjrAkC9KhpLMClQntlqFc2' +
+        '//X1gUj4viwVObKrddH9YDoHvuujAEuNV+bLwFS8XxdSr+Cq3Vf+4F5RgQl6ZR2p1eAzU/HX80YBYy' +
+        '//JLCuexwJCO2O1bwCRidAfWBSctswbI12GAJT3yiwFR7+MBjGK2g/WAJR3FdF84E2rK5VR0YH/9k='
+      const expected = '/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDADIiJSwlHzIsKSw4NTI7S31RS0VFS5ltc1p9tZ++u7Kf' +
+        'r6zI4f/zyNT/16yv+v/9////////wfD/////////////2wBDATU4OEtCS5NRUZP/zq/O////////' +
+        '////////////////////////////////////////////////////////////wAARCAAYAEADAREA' +
+        '//AhEBAxEB/8QAGQAAAgMBAAAAAAAAAAAAAAAAAQMAAgQF/8QAJRABAAIBBAEEAgMAAAAAAAAAAQIR' +
+        '//AAMSITEEEyJBgTORUWFx/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAA' +
+        '//AAD/2gAMAwEAAhEDEQA/AOgM52xQDrjvAV5Xv0vfKUALlTQfeBm0HThMNHXkL0Lw/swN5qgA8yT4' +
+        '//MCS1OEOJV8mBz9Z05yfW8iSx7p4j+jA1aD6Wj7ZMzstsfvAas4UyRHvjrAkC9KhpLMClQntlqFc2' +
+        '//X1gUj4viwVObKrddH9YDoHvuujAEuNV+bLwFS8XxdSr+Cq3Vf+4F5RgQl6ZR2p1eAzU/HX80YBYy' +
+        '//JLCuexwJCO2O1bwCRidAfWBSctswbI12GAJT3yiwFR7+MBjGK2g/WAJR3FdF84E2rK5VR0YH/9k='
+      const result = urlUtil.parseFaviconDataUrl(jpg)
+      assert.deepEqual(result, {data: expected, ext: 'jpeg'})
+    })
+    it('valid png', function () {
+      const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU//5ErkJggg=='
+      const result = urlUtil.parseFaviconDataUrl(png)
+      assert.deepEqual(result, {data: 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU//5ErkJggg==', ext: 'png'})
+    })
+  })
 })
