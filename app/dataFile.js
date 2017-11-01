@@ -19,14 +19,15 @@ const downloadPath = (url) => `${storagePath(url)}.temp`
 
 function downloadSingleFile (resourceName, url, version, force, resolve, reject) {
   // console.log('downloading file for: ', resourceName, url)
-  let headers = {}
+  let headers = {
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    Pragma: 'no-cache',
+    Expires: '0'
+  }
   const AppStore = require('../js/stores/appStore')
   const etag = AppStore.getState().getIn([resourceName, 'etag'])
   if (!force && etag) {
-    // console.log('setting etag: ', etag)
-    headers = {
-      'If-None-Match': etag
-    }
+    headers['If-None-Match'] = etag
   }
   const tmpPath = downloadPath(url)
 
