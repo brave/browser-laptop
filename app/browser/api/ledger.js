@@ -2037,7 +2037,8 @@ const initialize = (state, paymentsEnabled) => {
 }
 
 const getContributionAmount = () => {
-  const amount = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT)
+  let amount = parseInt(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT), 10)
+
   // if amount is 5, 10, 15, or 20... the amount wasn't updated when changing
   // from BTC to BAT (see https://github.com/brave/browser-laptop/issues/11719)
   let updatedAmount
@@ -2047,7 +2048,11 @@ const getContributionAmount = () => {
     case 15: updatedAmount = 75; break
     case 20: updatedAmount = 100; break
   }
+
   if (updatedAmount) {
+    if (clientOptions.verboseP) {
+      console.log('\nmigrating contribution amount of ' + amount + ' from USD to BAT (new amount is ' + updatedAmount + ')')
+    }
     appActions.changeSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, updatedAmount)
     return updatedAmount
   }
@@ -2387,6 +2392,7 @@ const transitionWalletToBat = () => {
   if (!newClient) {
     const fs = require('fs')
     try {
+      clientprep()
       fs.accessSync(pathName(newClientPath), fs.FF_OK)
       fs.readFile(pathName(newClientPath), (error, data) => {
         if (error) {
