@@ -1,15 +1,12 @@
 <!--
-Have you searched for similar issues? We have received a lot of feedback and bug reports that we have closed as duplicates.
-Before submitting this issue, please visit our wiki for common ones: https://github.com/brave/browser-laptop/wiki
-By using search engines along with GitHub search function, you would be able to find duplicates more efficiently.
-
-For more, check out our community site: https://community.brave.com/
+Have you searched for similar issues? We have received a lot of feedback and bug reports that we have closed as duplicates. Before submitting this issue, please visit our community site for common ones: https://community.brave.com/c/common-issues
 -->
 
 ### Description
 <!--
 [Description of the issue]
 -->
+
 
 ### Steps to Reproduce
 <!--
@@ -20,14 +17,21 @@ Please add a series of steps to reproduce the problem. See https://stackoverflow
   2.
   3.
 
+
 **Actual result:**
 <!--
-Add screenshots if needed
+Please add screenshots if needed.
 -->
+
 
 **Expected result:**
 
-**Reproduces how often:** [What percentage of the time does it reproduce?]
+
+**Reproduces how often:**
+<!--
+What percentage of the time does it reproduce?
+-->
+
 
 ### Brave Version
 
@@ -36,10 +40,12 @@ Add screenshots if needed
 Please open about:brave, copy the version information, and paste it.
 -->
 
+
 **Reproducible on current live release:**
 <!--
 Is this a problem with the live build? It matters for triage reasons.
 -->
+
 
 ### Additional Information
 <!--
