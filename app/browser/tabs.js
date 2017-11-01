@@ -37,6 +37,7 @@ const siteSettingsState = require('../common/state/siteSettingsState')
 const bookmarkOrderCache = require('../common/cache/bookmarkOrderCache')
 const ledgerState = require('../common/state/ledgerState')
 const {getWindow} = require('./windows')
+const util = require('util')
 
 let adBlockRegions
 let currentPartitionNumber = 0
@@ -243,12 +244,16 @@ const updateAboutDetails = (tabId) => {
       sendAboutDetails(tabId, messages.BOOKMARKS_UPDATED, bookmarksData, true)
     }
   } else if (location === 'about:history') {
-    const history = aboutHistoryState.getHistory(appState)
-    if (!history) {
-      appActions.populateHistory()
-    } else {
-      sendAboutDetails(tabId, messages.HISTORY_UPDATED, history, true)
-    }
+    process.once('arrived-history-results', (e, history) => {
+      try {
+        const tab = getWebContents(tabId)
+        const handle = muon.shared_memory.create(history)
+        tab.sendShared(messages.HISTORY_UPDATED, handle)
+      } catch (e) {
+        // ignore
+      }
+    })
+    session.defaultSession.getHistory()
     sendAboutDetails(tabId, messages.SETTINGS_UPDATED, appSettings)
   } else if (location === 'about:adblock') {
     if (!adBlockRegions) {
