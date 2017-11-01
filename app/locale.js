@@ -268,8 +268,9 @@ var rendererIdentifiers = function () {
     'autoplayMedia',
     // Release channels
     'channelDev',
-    'channelBeta'
-  ].concat(countryCodes)
+    'channelBeta',
+    'spellCheckLanguages'
+  ].concat(countryCodes).concat(availableLanguages)
 }
 
 var ctx = null
@@ -302,32 +303,32 @@ exports.translation = function (token, replacements = {}) {
 const DEFAULT_LANGUAGE = 'en-US'
 
 const availableLanguages = [
-  'eu',
   'bn-BD',
   'bn-IN',
-  'zh-CN',
   'cs',
-  'nl-NL',
-  'en-US',
-  'en-GB',
-  'fr-FR',
   'de-DE',
+  'en-GB',
+  'en-US',
+  'es',
+  'eu',
+  'fr-FR',
   'hi-IN',
   'id-ID',
   'it-IT',
   'ja-JP',
   'ko-KR',
   'ms-MY',
+  'nl-NL',
   'pl-PL',
   'pt-BR',
   'ru',
   'sl',
   'sv-SE',
-  'es',
   'ta',
   'te',
   'tr-TR',
-  'uk'
+  'uk',
+  'zh-CN'
 ]
 
 // Currently configured languages
@@ -394,7 +395,9 @@ exports.init = function (language) {
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'error.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'passwords.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'common.properties'),
-      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'countries.properties')
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'countries.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'locales.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'preferences.properties')
       )
   }
 
