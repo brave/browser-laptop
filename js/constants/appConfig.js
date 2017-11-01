@@ -138,6 +138,8 @@ module.exports = {
     'general.check-default-on-startup': true,
     'general.download-default-path': '',
     'general.download-always-ask': true,
+    'general.spellcheck-enabled': true,
+    'general.spellcheck-languages': ['en-US'],
     'search.default-search-engine': 'Google',
     'search.offer-search-suggestions': false, // false by default for privacy reasons
     'tabs.switch-to-new-tabs': false,

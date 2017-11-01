@@ -8,10 +8,13 @@ const {mount} = require('enzyme')
 const sinon = require('sinon')
 const assert = require('assert')
 const fakeElectron = require('../lib/fakeElectron')
+const fakeComponent = require('../lib/fakeComponent')
 let Preferences, appActions, SettingItemIcon
 require('../braveUnit')
 
 describe('Preferences component unittest', function () {
+  let translationSpy
+  let fakeLocale
   before(function () {
     mockery.enable({
       warnOnReplace: false,
@@ -22,6 +25,7 @@ describe('Preferences component unittest', function () {
     mockery.registerMock('../../less/about/preferences.less', {})
     mockery.registerMock('../../less/forms.less', {})
     mockery.registerMock('../../less/button.less', {})
+    mockery.registerMock('../../less/react-select.less', {})
     mockery.registerMock('../../node_modules/font-awesome/css/font-awesome.css', {})
     mockery.registerMock('../../../extensions/brave/img/caret_down_grey.svg')
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_general.svg', 'browser_prefs_general.svg')
@@ -62,6 +66,24 @@ describe('Preferences component unittest', function () {
     // Mock image from addFundsDialogFooter
     mockery.registerMock('../../../../../extensions/brave/img/ledger/uphold_logo_medium.png')
 
+    mockery.registerMock('electron', fakeElectron)
+
+    fakeLocale = {
+      translation: (msg, arg) => {
+        let retMsg = ''
+        switch (msg) {
+          case 'spellCheckLanguages':
+            retMsg += 'spellCheckLanguages'
+            break
+        }
+        return retMsg
+      }
+    }
+    translationSpy = sinon.spy(fakeLocale, 'translation')
+    mockery.registerMock('../../js/l10n', fakeLocale)
+
+    mockery.registerMock('react-select', fakeComponent)
+
     window.chrome = fakeElectron
     window.CustomEvent = {}
 
@@ -70,6 +92,7 @@ describe('Preferences component unittest', function () {
     appActions = require('../../../js/actions/appActions')
   })
   after(function () {
+    translationSpy.restore()
     mockery.disable()
   })
 

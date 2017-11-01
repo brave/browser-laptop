@@ -8,6 +8,9 @@ const appConstants = require('../../../js/constants/appConstants')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {getWebContents} = require('../webContentsCache')
 const spellChecker = require('../../spellChecker')
+const settings = require('../../../js/constants/settings')
+const {setUserPref} = require('../../../js/state/userPrefs')
+const getSetting = require('../../../js/settings').getSetting
 
 const migrate = (state) => {
   if (state.get('dictionary')) {
@@ -28,11 +31,31 @@ const migrate = (state) => {
   return state
 }
 
+const setSpellCheckerSettings = () => {
+  const enabled = getSetting(settings.SPELLCHECK_ENABLED)
+  setUserPref('browser.enable_spellchecking', enabled)
+  if (enabled) {
+    setUserPref('spellcheck.dictionaries',
+                getSetting(settings.SPELLCHECK_LANGUAGES))
+  }
+}
+
 const spellCheckerReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_SET_STATE:
       state = migrate(state)
+      break
+    // TODO(darkdh): APP_SET_STATE is too early for startup setting so we use
+    // APP_WINDOW_CREATED here
+    case appConstants.APP_WINDOW_CREATED:
+      setSpellCheckerSettings()
+      break
+    case appConstants.APP_CHANGE_SETTING:
+      if ([settings.SPELLCHECK_ENABLED, settings.SPELLCHECK_LANGUAGES]
+        .includes(action.get('key'))) {
+        setSpellCheckerSettings()
+      }
       break
     case appConstants.APP_SPELLING_SUGGESTED:
       if (typeof action.get('suggestion') === 'string') {
