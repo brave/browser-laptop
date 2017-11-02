@@ -23,14 +23,10 @@ const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const firstDefinedValue = require('../../../js/lib/functional').firstDefinedValue
 const appConfig = require('../../../js/constants/appConfig')
-const messages = require('../../../js/constants/messages')
-const appUrlUtil = require('../../../js/lib/appUrlUtil')
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
-const {zoomLevel} = require('../../common/constants/toolbarUserInterfaceScale')
+
 const platformUtil = require('../../common/lib/platformUtil')
-const {initWindowCacheState} = require('../../sessionStoreShutdown')
-const appDispatcher = require('../../../js/dispatcher/appDispatcher')
 
 const isDarwin = platformUtil.isDarwin()
 const isWindows = platformUtil.isWindows()
@@ -43,7 +39,32 @@ function isModal (browserOpts) {
 
 const navbarHeight = () => {
   // TODO there has to be a better way to get this or at least add a test
+  // TODO try creating a window and measuring the difference between window and content area
+  // and updating this number with that value once the first window is created
   return 75
+}
+
+function clearFramesFromWindowState (windowState) {
+  return windowState
+    .set('frames', Immutable.List())
+    .set('tabs', Immutable.List())
+}
+
+/**
+ * Determine the frame(s) to be loaded in a new window
+ * based on user preferences
+ */
+function getFramesForNewWindow () {
+  const startupSetting = getSetting(settings.STARTUP_MODE)
+  const homepageSetting = getSetting(settings.HOMEPAGE)
+  if (startupSetting === 'homePage' && homepageSetting) {
+    return homepageSetting
+      .split('|')
+      .map((homepage) => ({
+        location: homepage
+      }))
+  }
+  return [ { } ]
 }
 
 /**
@@ -51,9 +72,10 @@ const navbarHeight = () => {
  */
 const setWindowDimensions = (browserOpts, defaults, immutableWindowState) => {
   assert(isImmutable(immutableWindowState))
-  if (immutableWindowState.getIn(['windowInfo'])) {
-    browserOpts.width = firstDefinedValue(browserOpts.width, immutableWindowState.getIn(['windowInfo', 'width']))
-    browserOpts.height = firstDefinedValue(browserOpts.height, immutableWindowState.getIn(['windowInfo', 'height']))
+  const windowInfoState = immutableWindowState.get('windowInfo')
+  if (windowInfoState) {
+    browserOpts.width = firstDefinedValue(browserOpts.width, windowInfoState.get('width'))
+    browserOpts.height = firstDefinedValue(browserOpts.height, windowInfoState.get('windowInfo'))
   } else {
     browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
     // height and innerHeight are the frame webview size
@@ -108,7 +130,6 @@ const setMaximized = (state, browserOpts, immutableWindowState) => {
 
 function windowDefaults (state) {
   return {
-    show: false,
     width: state.getIn(['defaultWindowParams', 'width']) || state.get('defaultWindowWidth'),
     height: state.getIn(['defaultWindowParams', 'height']) || state.get('defaultWindowHeight'),
     x: state.getIn(['defaultWindowParams', 'x']) || undefined,
@@ -146,10 +167,10 @@ function setDefaultWindowSize (state) {
   return state
 }
 
-const createWindow = (state, action) => {
+const handleCreateWindowAction = (state, action) => {
   const frameOpts = (action.get('frameOpts') || Immutable.Map()).toJS()
   let browserOpts = (action.get('browserOpts') || Immutable.Map()).toJS()
-  const immutableWindowState = action.get('restoredState') || Immutable.Map()
+  let immutableWindowState = action.get('restoredState') || Immutable.Map()
   state = setDefaultWindowSize(state)
   const defaults = windowDefaults(state)
   const isMaximized = setMaximized(state, browserOpts, immutableWindowState)
@@ -160,21 +181,30 @@ const createWindow = (state, action) => {
   delete browserOpts.left
   delete browserOpts.top
 
+  // decide which bounds to restrict new window to
   const screen = electron.screen
+  // use primary display by default
   let primaryDisplay = screen.getPrimaryDisplay()
-  const parentWindowKey = browserOpts.parentWindowKey
-  if (browserOpts.x != null && browserOpts.y != null) {
-    const matchingDisplay = screen.getDisplayMatching(browserOpts)
+  // can override with provided x, y coords
+  if (browserOpts.x != null && browserOpts.y != null && browserOpts.width != null && browserOpts.height != null) {
+    const matchingDisplay = screen.getDisplayMatching({
+      x: browserOpts.x,
+      y: browserOpts.y,
+      width: browserOpts.width,
+      height: browserOpts.height
+    })
     if (matchingDisplay != null) {
       primaryDisplay = matchingDisplay
     }
   }
-
+  // always override with parent window if present
+  const parentWindowKey = browserOpts.parentWindowKey
   const parentWindow = parentWindowKey
     ? BrowserWindow.fromId(parentWindowKey)
     : BrowserWindow.getFocusedWindow()
   const bounds = parentWindow ? parentWindow.getBounds() : primaryDisplay.bounds
 
+  // decide which screen to position on
   // position on screen should be relative to focused window
   // or the primary display if there is no focused window
   const display = screen.getDisplayNearestPoint(bounds)
@@ -229,7 +259,8 @@ const createWindow = (state, action) => {
     autoHideMenuBar: autoHideMenuBarSetting,
     title: appConfig.name,
     webPreferences: defaults.webPreferences,
-    frame: !isWindows
+    frame: !isWindows,
+    disposition: frameOpts.disposition
   }
 
   if (process.platform === 'linux') {
@@ -239,82 +270,35 @@ const createWindow = (state, action) => {
   if (immutableWindowState.getIn(['windowInfo', 'state']) === 'fullscreen') {
     windowProps.fullscreen = true
   }
-
-  const homepageSetting = getSetting(settings.HOMEPAGE)
-  const startupSetting = getSetting(settings.STARTUP_MODE)
-  const toolbarUserInterfaceScale = getSetting(settings.TOOLBAR_UI_SCALE)
-
+  // continue with window creation process outside of store action handler
   setImmediate(() => {
-    const win = new BrowserWindow(Object.assign(windowProps, browserOpts, {disposition: frameOpts.disposition}))
-    let restoredImmutableWindowState = action.get('restoredState')
-    initWindowCacheState(win.id, restoredImmutableWindowState)
-
-    // initialize frames state
-    let frames = Immutable.List()
-    if (restoredImmutableWindowState && restoredImmutableWindowState.get('frames', Immutable.List()).size > 0) {
-      frames = restoredImmutableWindowState.get('frames')
-      restoredImmutableWindowState = restoredImmutableWindowState.set('frames', Immutable.List())
-      restoredImmutableWindowState = restoredImmutableWindowState.set('tabs', Immutable.List())
+    // decide which frames to load in the window
+    let frames
+    // handle frames from restored state
+    const immutableFrames = immutableWindowState.get('frames')
+    if (Immutable.List.isList(immutableFrames) && immutableFrames.count()) {
+      frames = immutableFrames.toJS()
     } else {
-      if (frameOpts && Object.keys(frameOpts).length > 0) {
-        if (frameOpts.forEach) {
-          frames = Immutable.fromJS(frameOpts)
+      // handle frames from action
+      // can be single object or multiple in array
+      if (frameOpts && Object.keys(frameOpts).length) {
+        if (Array.isArray(frameOpts)) {
+          frames = frameOpts
         } else {
-          frames = frames.push(Immutable.fromJS(frameOpts))
+          frames = [ frameOpts ]
         }
-      } else if (startupSetting === 'homePage' && homepageSetting) {
-        frames = Immutable.fromJS(homepageSetting.split('|').map((homepage) => {
-          return {
-            location: homepage
-          }
-        }))
+      } else {
+        // handle nothing provided, so follow 'new tab' preferences
+        frames = getFramesForNewWindow()
       }
     }
-
-    if (frames.size === 0) {
-      frames = Immutable.fromJS([{}])
-    }
-
-    if (isMaximized) {
-      win.maximize()
-    }
-
-    appDispatcher.registerWindow(win, win.webContents)
-    win.webContents.on('did-finish-load', (e) => {
-      const appStore = require('../../../js/stores/appStore')
-      win.webContents.setZoomLevel(zoomLevel[toolbarUserInterfaceScale] || 0.0)
-
-      const position = win.getPosition()
-      const size = win.getSize()
-
-      const mem = muon.shared_memory.create({
-        windowValue: {
-          disposition: frameOpts.disposition,
-          id: win.id,
-          focused: win.isFocused(),
-          left: position[0],
-          top: position[1],
-          height: size[1],
-          width: size[0]
-        },
-        appState: appStore.getLastEmittedState().toJS(),
-        frames: frames.toJS(),
-        windowState: (restoredImmutableWindowState && restoredImmutableWindowState.toJS()) || undefined
-      })
-
-      e.sender.sendShared(messages.INITIALIZE_WINDOW, mem)
-      if (action.cb) {
-        action.cb()
-      }
-    })
-
-    win.on('ready-to-show', () => {
-      win.show()
-    })
-
-    win.loadURL(appUrlUtil.getBraveExtIndexHTML())
+    // window does not need to receive frames as part of initial state
+    immutableWindowState = clearFramesFromWindowState(immutableWindowState)
+    // allow override of defaults with incoming action argument
+    const windowOptions = Object.assign(windowProps, browserOpts)
+    // instruct muon to create window
+    windows.createWindow(windowOptions, parentWindow, isMaximized, frames, immutableWindowState, true, action.cb)
   })
-
   return state
 }
 
@@ -325,10 +309,13 @@ const windowsReducer = (state, action, immutableAction) => {
       state = windows.init(state, action)
       break
     case appConstants.APP_NEW_WINDOW:
-      state = createWindow(state, action)
+      state = handleCreateWindowAction(state, action)
       break
     case appConstants.APP_WINDOW_READY:
       windows.windowReady(action.get('windowId'))
+      break
+    case appConstants.APP_WINDOW_RENDERED:
+      windows.windowRendered(action.get('windowId'))
       break
     case appConstants.APP_TAB_UPDATED:
       if (immutableAction.getIn(['changeInfo', 'pinned']) != null) {

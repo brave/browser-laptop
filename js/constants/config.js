@@ -97,5 +97,8 @@ module.exports = {
   tabs: {
     maxAllowedNewSessions: 9
   },
+  windows: {
+    timeoutToShowWindowMs: 5000
+  },
   iconSize: 16
 }
