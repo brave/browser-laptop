@@ -7,13 +7,11 @@ import requests
 
 BROWSER_LAPTOP_REPO = 'brave/browser-laptop'
 TARGET_ARCH= os.environ['TARGET_ARCH'] if os.environ.has_key('TARGET_ARCH') else 'x64'
-RELEASE_NAME = 'Dev Channel Beta'
 
 def main():
   github = GitHub(auth_token())
   releases = github.repos(BROWSER_LAPTOP_REPO).releases.get()
-  tag = ('v' + json.load(open('package.json'))['version'] +
-    release_channel())
+  tag = 'v' + json.load(open('package.json'))['version']
   tag_exists = False
   for release in releases:
     if not release['draft'] and release['tag_name'] == tag:
@@ -24,6 +22,9 @@ def main():
   for f in get_files_to_upload():
     upload_browser_laptop(github,release, f)
 
+def get_channel_display_name():
+  d = {'dev': 'Release', 'beta': 'Beta', 'development': 'Development', 'nightly': 'Nightly'}
+  return d[release_channel()]
 
 def get_files_to_upload():
   matches = []
@@ -49,9 +50,11 @@ def upload_browser_laptop(github, release, file_path):
     upload_io_to_github(github, release,
         filename, f, 'application/octet-stream')
 
+def release_name():
+  return '{0} Channel'.format(get_channel_display_name())
 
 def create_release_draft(github, tag):
-  name = '{0} {1}'.format(RELEASE_NAME, tag)
+  name = '{0} {1}'.format(release_name(), tag)
   # TODO: Parse release notes from CHANGELOG.md
   body = '(placeholder)'
   if body == '':
