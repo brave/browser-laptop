@@ -26,7 +26,7 @@ const logVerbose = (string, ...rest) => {
 }
 
 const generateUserDataDir = () => {
-  return path.join(os.tmpdir(), 'brave-test', (new Date().getTime()) + Math.floor(Math.random() * 1000).toString())
+  return process.env.BRAVE_USER_DATA_DIR || path.join(os.tmpdir(), 'brave-test', (new Date().getTime()) + Math.floor(Math.random() * 1000).toString())
 }
 
 const rmDir = (dirPath) => {
@@ -1064,7 +1064,7 @@ var exports = {
     }
     let env = {
       NODE_ENV: 'test',
-      BRAVE_USER_DATA_DIR: userDataDir,
+      CHROME_USER_DATA_DIR: userDataDir,
       SPECTRON: true
     }
     this.app = new Application({
