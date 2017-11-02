@@ -2367,8 +2367,8 @@ const yoDawg = (stateState) => {
   return stateState
 }
 
-const checkBtcBatMigrated = (state, status) => {
-  if (!status) {
+const checkBtcBatMigrated = (state, paymentsEnabled) => {
+  if (!paymentsEnabled) {
     return state
   }
 
@@ -2378,6 +2378,8 @@ const checkBtcBatMigrated = (state, status) => {
   if (!isNewInstall && !hasUpgradedWallet) {
     state = migrationState.setTransitionStatus(state, true)
     module.exports.transitionWalletToBat()
+  } else {
+    state = migrationState.setTransitionStatus(state, false)
   }
 
   return state
@@ -2513,6 +2515,7 @@ const getMethods = () => {
     privateMethods = {
       enable,
       addVisit,
+      checkBtcBatMigrated,
       clearVisitsByPublisher: function () {
         visitsByPublisher = {}
       },

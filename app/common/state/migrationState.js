@@ -23,6 +23,11 @@ const migrationState = {
     return state.setIn(['migrations', 'btc2BatTransitionPending'], value)
   },
 
+  inTransition: (state) => {
+    state = validateState(state)
+    return state.getIn(['migrations', 'btc2BatTransitionPending']) === true
+  },
+
   setConversionTimestamp: (state, value) => {
     state = validateState(state)
     if (value == null) {
