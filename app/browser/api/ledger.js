@@ -293,6 +293,7 @@ const notifications = {
       }
 
       appActions.showNotification({
+        from: 'ledger',
         greeting: locale.translation('updateHello'),
         message: notifications.text.tryPayments,
         buttons: [
@@ -310,6 +311,7 @@ const notifications = {
     appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP, nextTime)
 
     appActions.showNotification({
+      from: 'ledger',
       greeting: notifications.text.hello,
       message: notifications.text.reconciliation,
       buttons: [
@@ -325,6 +327,7 @@ const notifications = {
     appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
 
     appActions.showNotification({
+      from: 'ledger',
       greeting: notifications.text.hello,
       message: notifications.text.addFunds,
       buttons: [
@@ -343,6 +346,7 @@ const notifications = {
     // Hide the 'waiting for deposit' message box if it exists
     appActions.hideNotification(notifications.text.addFunds)
     appActions.showNotification({
+      from: 'ledger',
       greeting: locale.translation('updateHello'),
       message: notifications.text.paymentDone,
       buttons: [
@@ -356,6 +360,7 @@ const notifications = {
     appActions.onBitcoinToBatNotified()
 
     appActions.showNotification({
+      from: 'ledger',
       greeting: notifications.text.hello,
       message: notifications.text.walletConvertedToBat,
       // Learn More.
