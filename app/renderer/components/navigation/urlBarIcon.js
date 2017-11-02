@@ -42,7 +42,9 @@ class UrlBarIcon extends React.Component {
     } else if (this.props.isAboutPage && !this.props.titleMode) {
       return ['fa-list']
     } else if (this.props.isHTTPPage && !this.props.active) {
-      if (this.props.isSecure === true) {
+      if (this.props.isSecure && this.props.evString) {
+        return ['fa-lock', 'extendedValidation']
+      } else if (this.props.isSecure === true) {
         return ['fa-lock']
       } else if (this.props.isSecure === false || this.props.isSecure === 2) {
         return ['fa-unlock', 'insecure-color']
@@ -150,6 +152,7 @@ class UrlBarIcon extends React.Component {
     props.activateSearchEngine = urlBar.getIn(['searchDetail', 'activateSearchEngine'])
     props.active = urlBar.get('active')
     props.isSecure = activeFrame.getIn(['security', 'isSecure'])
+    props.evString = activeFrame.getIn(['security', 'evString'])
     props.location = displayURL
     props.isHTTPPage = UrlUtil.isHttpOrHttps(props.location)
     props.searchSelectImage = urlBar.getIn(['searchDetail', 'image'], '')
@@ -174,12 +177,19 @@ class UrlBarIcon extends React.Component {
       props.onDragStart = this.onDragStart
     }
 
-    return <span
-      data-test-id='urlBarIcon'
-      data-test2-id={this.dataTestId}
-      {...props}
-      className={this.iconClasses}
-      style={this.iconStyles} />
+    return <span>
+      <span
+        data-test-id='urlBarIcon'
+        data-test2-id={this.dataTestId}
+        {...props}
+        className={this.iconClasses}
+        style={this.iconStyles} />
+      {
+        this.props.evString
+        ? <span data-test-id='evString' className='evString'>{this.props.evString}</span>
+        : null
+      }
+    </span>
   }
 }
 

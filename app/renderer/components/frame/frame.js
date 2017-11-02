@@ -679,8 +679,12 @@ class Frame extends React.Component {
       }
       let isSecure = null
       let runInsecureContent = this.props.runInsecureContent
+      let evString
       if (e.securityState === 'secure') {
         isSecure = true
+        if (e.evString) {
+          evString = e.evString
+        }
       } else if (e.securityState === 'insecure') {
         // Passive mixed content should not upgrade an insecure connection to a
         // partially-secure connection. It can only downgrade a secure
@@ -696,7 +700,8 @@ class Frame extends React.Component {
       }
       windowActions.setSecurityState(this.props.tabId, {
         secure: runInsecureContent ? false : isSecure,
-        runInsecureContent
+        runInsecureContent,
+        evString
       })
     }, { passive: true })
     this.webview.addEventListener('load-start', (e) => {

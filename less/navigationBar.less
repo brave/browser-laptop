@@ -823,9 +823,7 @@
       align-items: center;
       justify-content: center;
       height: @urlbarFormHeight;
-      width: @urlbarFormHeight;
       min-height: @urlbarFormHeight;
-      min-width: @urlbarFormHeight;
 
       .urlbarIcon {
         color: @siteSecureColor;
@@ -834,6 +832,8 @@
         background-position: center;
         position: relative;
         bottom: -1px;
+        width: @urlbarFormHeight;
+        min-width: @urlbarFormHeight;
 
         // about:newtab
         &.fa-search {
@@ -857,6 +857,13 @@
         &.extendedValidation {
           color: @siteEVColor;
         }
+      }
+
+      .evString {
+        font-size: 16px;
+        color: green;
+        max-width: 150px;
+        padding-right: 0.5em;
       }
     }
   }
