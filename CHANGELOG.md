@@ -1,6 +1,22 @@
 # Changelog
 
 Release Notes:
+## [0.19.80](https://github.com/brave/browser-laptop/releases/tag/v0.19.80dev)
+
+ - Added spell check and the ability to select multiple languages. ([#2183](https://github.com/brave/browser-laptop/issues/2183))
+ - Fixed contribution amounts not being updated during the BTC => BAT conversion. ([#11719](https://github.com/brave/browser-laptop/issues/11719))
+ - Fixed websockets connection issues. ([#11716](https://github.com/brave/browser-laptop/issues/11716))
+ - Fixed unable to highlight sync words for copying. ([#11641](https://github.com/brave/browser-laptop/issues/11641))
+ - Fixed error: ENOENT: no such file or directory, access ledger-synopsis.json. ([#11674](https://github.com/brave/browser-laptop/issues/11674))
+ - Fixed error: Seed must be Uint8Array. when toggling payment on/off during wallet transition. ([#11673](https://github.com/brave/browser-laptop/issues/11673))
+ - Fixed error: ENOENT: no such file or directory, access ledger-newstate.json while upgrading. ([#11669](https://github.com/brave/browser-laptop/issues/11669))
+ - Fixed publisher not added if revisit happens. ([#11633](https://github.com/brave/browser-laptop/issues/11633))
+ - Fixed button wrap on about:preferences#payments (l10n). ([#11580](https://github.com/brave/browser-laptop/issues/11580))
+ - Fixed PDF printing for contribution statements on Windows. ([#11471](https://github.com/brave/browser-laptop/issues/11471))
+ - Moved brave/ad-block and brave/tracking-protection deps to muon. ([#11352](https://github.com/brave/browser-laptop/issues/11352))
+ - Upgraded to muon 4.5.x. ([#11712](https://github.com/brave/browser-laptop/issues/11712))
+ - Upgraded to Chromium 62.0.3202.75. ([#11711](https://github.com/brave/browser-laptop/issues/11711))
+
 ## [0.19.70](https://github.com/brave/browser-laptop/releases/tag/v0.19.70dev)
 
  - Fixed ledger time is not displayed correctly. ([#11675](https://github.com/brave/browser-laptop/issues/11675))
