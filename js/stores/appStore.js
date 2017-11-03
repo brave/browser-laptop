@@ -493,7 +493,8 @@ const handleAppAction = (action) => {
       if (action.useBrave) {
         let isDefaultBrowser
         if (platformUtil.isLinux()) {
-          const desktopName = 'brave.desktop'
+          const Channel = require('../../app/channel')
+          const desktopName = Channel.getLinuxDesktopName()
           for (const p of defaultProtocols) {
             app.setAsDefaultProtocolClient(p, desktopName)
             app.setAsDefaultProtocolClient('', desktopName)
