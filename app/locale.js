@@ -267,8 +267,10 @@ var rendererIdentifiers = function () {
     'allowAutoplay',
     'autoplayMedia',
     // Release channels
-    'channelDev',
+    'channelRelease',
     'channelBeta',
+    'channelDeveloper',
+    'channelNightly',
     'spellCheckLanguages'
   ].concat(countryCodes).concat(availableLanguages)
 }

@@ -218,7 +218,8 @@ app.on('ready', () => {
       if (['development', 'test'].includes(process.env.NODE_ENV)) {
         isDefaultBrowser = true
       } else if (process.platform === 'linux') {
-        const desktopName = 'brave.desktop'
+        const Channel = require('./channel')
+        const desktopName = Channel.getLinuxDesktopName()
         isDefaultBrowser = app.isDefaultProtocolClient('', desktopName)
       } else {
         isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
