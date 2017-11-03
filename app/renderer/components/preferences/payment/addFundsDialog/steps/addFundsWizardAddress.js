@@ -98,6 +98,7 @@ class AddFundsWizardAddress extends React.Component {
           <main className={css(styles.wizardAddress__inputBox)}>
             <div>
               <GroupedFormTextbox readOnly
+                l10nId='loadingWalletAddress'
                 type='text'
                 inputRef={(node) => { this.addressInputNode = node }}
                 value={this.props.address}

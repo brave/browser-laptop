@@ -35,10 +35,10 @@ class GroupedFormTextbox extends ImmutableComponent {
     return (
       <div className={css(styles.groupedFormTextBox)}>
         <input
+          data-l10n-id={this.props.l10nId}
           ref={this.props.inputRef}
           type={this.props.type}
           readOnly={this.props.readOnly}
-          placeholder={this.props.placeholder}
           defaultValue={this.props.value}
           className={css(
             styles.groupedFormTextBox__firstGroupedItem,
