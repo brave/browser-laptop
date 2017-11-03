@@ -15,12 +15,12 @@ describe('spellCheckerReducer unit tests', function () {
   let getWebContentsSpy, replaceMisspellingSpy, replaceSpy, addWordSpy, removeWordSpy,
     setUserPrefSpy, getSettingSpy
   let spellCheckEnabled
+  let dicts
   const dictionaryWord = 'braave'
   const dictionarySuggestion = 'brave'
   const tabId = 111
   const enabledPref = 'browser.enable_spellchecking'
   const dictsPref = 'spellcheck.dictionaries'
-  const dicts = ['en-US', 'fr-FR']
 
   before(function () {
     mockery.enable({
@@ -158,6 +158,7 @@ describe('spellCheckerReducer unit tests', function () {
         getSettingSpy.reset()
         setUserPrefSpy.reset()
         spellCheckEnabled = true
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
         spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
           actionType: appConstants.APP_WINDOW_CREATED
         }))
@@ -174,6 +175,7 @@ describe('spellCheckerReducer unit tests', function () {
         getSettingSpy.reset()
         setUserPrefSpy.reset()
         spellCheckEnabled = false
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
         spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
           actionType: appConstants.APP_WINDOW_CREATED
         }))
@@ -193,6 +195,7 @@ describe('spellCheckerReducer unit tests', function () {
         getSettingSpy.reset()
         setUserPrefSpy.reset()
         spellCheckEnabled = true
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
         spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
           actionType: appConstants.APP_CHANGE_SETTING,
           key: settings.SPELLCHECK_ENABLED
@@ -210,6 +213,7 @@ describe('spellCheckerReducer unit tests', function () {
         getSettingSpy.reset()
         setUserPrefSpy.reset()
         spellCheckEnabled = false
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
         spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
           actionType: appConstants.APP_CHANGE_SETTING,
           key: settings.SPELLCHECK_ENABLED
@@ -227,6 +231,7 @@ describe('spellCheckerReducer unit tests', function () {
         getSettingSpy.reset()
         setUserPrefSpy.reset()
         spellCheckEnabled = true
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
         spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
           actionType: appConstants.APP_CHANGE_SETTING,
           key: settings.SPELLCHECK_LANGUAGES
@@ -239,11 +244,30 @@ describe('spellCheckerReducer unit tests', function () {
         assert(setUserPrefSpy.withArgs(dictsPref, dicts).calledOnce)
       })
     })
+    describe('empty SPELLCHECK_LANGUAGES with enabled', function () {
+      before(function () {
+        getSettingSpy.reset()
+        setUserPrefSpy.reset()
+        spellCheckEnabled = true
+        dicts = Immutable.fromJS([])
+        spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
+          actionType: appConstants.APP_CHANGE_SETTING,
+          key: settings.SPELLCHECK_LANGUAGES
+        }))
+      })
+      it('not calls setUserPref to set enabledPref to true', function () {
+        assert(setUserPrefSpy.withArgs(enabledPref, true).notCalled)
+      })
+      it('not calls setUserPref to set dictionaries', function () {
+        assert(setUserPrefSpy.withArgs(dictsPref, dicts).notCalled)
+      })
+    })
     describe('SPELLCHECK_LANGUAGES with disabled', function () {
       before(function () {
         getSettingSpy.reset()
         setUserPrefSpy.reset()
         spellCheckEnabled = false
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
         spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
           actionType: appConstants.APP_CHANGE_SETTING,
           key: settings.SPELLCHECK_LANGUAGES
@@ -261,6 +285,7 @@ describe('spellCheckerReducer unit tests', function () {
         getSettingSpy.reset()
         setUserPrefSpy.reset()
         spellCheckEnabled = false
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
         spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
           actionType: appConstants.APP_CHANGE_SETTING,
           key: 'other-settings'

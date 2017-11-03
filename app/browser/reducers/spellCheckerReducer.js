@@ -32,11 +32,12 @@ const migrate = (state) => {
 }
 
 const setSpellCheckerSettings = () => {
-  const enabled = getSetting(settings.SPELLCHECK_ENABLED)
+  const langs = getSetting(settings.SPELLCHECK_LANGUAGES)
+  const enabled = getSetting(settings.SPELLCHECK_ENABLED) && !!langs.size
+
   setUserPref('browser.enable_spellchecking', enabled)
   if (enabled) {
-    setUserPref('spellcheck.dictionaries',
-                getSetting(settings.SPELLCHECK_LANGUAGES))
+    setUserPref('spellcheck.dictionaries', langs)
   }
 }
 
