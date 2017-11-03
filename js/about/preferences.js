@@ -120,7 +120,11 @@ class GeneralTab extends ImmutableComponent {
   }
 
   onSpellCheckLangsChange (value) {
-    this.props.onChangeSetting(settings.SPELLCHECK_LANGUAGES, value.split(','))
+    if (!value) {
+      this.props.onChangeSetting(settings.SPELLCHECK_LANGUAGES, [])
+    } else {
+      this.props.onChangeSetting(settings.SPELLCHECK_LANGUAGES, value.split(','))
+    }
   }
 
   setAsDefaultBrowser () {
