@@ -1,0 +1,28 @@
+{
+  "name": "brave",
+  "bin": "brave",
+  "userDataDir": "brave",
+  "productName": "Brave",
+  "genericName": "Web Browser",
+  "homepage": "https://brave.com/",
+  "icon": "res/dev/app.png",
+  "section": "web",
+  "categories": [
+    "Network",
+    "WebBrowser"
+  ],
+  "mimeType": [
+    "text/html",
+    "text/xml",
+    "application/xhtml_xml",
+    "image/webp",
+    "x-scheme-handler/http",
+    "x-scheme-handler/https",
+    "x-scheme-handler/ftp"
+  ],
+  "requires": [
+    "gconf2",
+    "libXss1",
+    "lsb"
+  ]
+}
