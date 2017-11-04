@@ -23,7 +23,7 @@ const TabPages = require('../tabs/tabPages')
 const TabsToolbar = require('../tabs/tabsToolbar')
 const FindBar = require('./findbar')
 const UpdateBar = require('./updateBar')
-const {NotificationBar} = require('./notificationBar')
+const {NotificationBar, BraveNotificationBar} = require('./notificationBar')
 const DownloadsBar = require('../download/downloadsBar')
 const SiteInfo = require('./siteInfo')
 const BraveryPanel = require('./braveryPanel')
@@ -660,6 +660,9 @@ class Main extends React.Component {
           this.props.showCheckDefault
             ? <CheckDefaultBrowserDialog />
             : null
+        }
+        {
+          <BraveNotificationBar />
         }
         {
           this.props.showUpdate

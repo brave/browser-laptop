@@ -13,6 +13,7 @@ const NotificationItem = require('./notificationItem')
 // Utils
 const {getOrigin} = require('../../../../js/state/siteUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const notificationBarState = require('../../../common/state/notificationBarState')
 
 // Styles
 const commonStyles = require('../styles/commonStyles')
@@ -23,29 +24,64 @@ class NotificationBar extends React.Component {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const activeOrigin = getOrigin(activeFrame.get('location'))
-    const notifications = state.get('notifications', Immutable.List())
+    const notifications = notificationBarState.getNotifications(state)
 
     const props = {}
     props.activeNotifications = notifications
       .filter((item) => {
         return item.get('frameOrigin')
           ? activeOrigin === item.get('frameOrigin')
-          : true
+          // TODO: this should filter all cases
+          // for notifications that are not per-tab
+          // and not only ledger
+          : item.get('from') !== 'ledger'
       })
       .takeLast(3)
-      .map((notification) => notification.get('message'))
-
+    props.showNotifications = !props.activeNotifications.isEmpty()
     return props
   }
 
   render () {
+    // Avoid rendering an empty notification wrapper
+    if (!this.props.showNotifications) {
+      return null
+    }
     return <div className={css(commonStyles.notificationBar)} data-test-id='notificationBar'>
       {
-        this.props.activeNotifications.map((message) =>
-          <NotificationItem message={message} />
+        this.props.activeNotifications.map((notification) =>
+          <NotificationItem message={notification.get('message')} />
         )
       }
     </div>
+  }
+}
+
+// TODO maybe this should be merged in <NotificationBar /> and defined
+// per conditional prop such as isGlobal={conditional}
+class BraveNotificationBar extends React.Component {
+  mergeProps (state, ownProps) {
+    const props = {}
+    // TODO: for now we cover only ledger notifications in this method
+    // this should cover all notifications that are global
+    props.notifications = notificationBarState.getLedgerNotifications(state)
+    props.showNotifications = !props.notifications.isEmpty()
+    return props
+  }
+
+  render () {
+    // Avoid rendering an empty notification wrapper
+    if (!this.props.showNotifications) {
+      return null
+    }
+    return (
+      <div className={css(commonStyles.notificationBar)} data-test-id='braveNotificationBar'>
+        {
+          this.props.notifications.map((notification) =>
+            <NotificationItem message={notification.get('message')} />
+          )
+        }
+      </div>
+    )
   }
 }
 
@@ -86,5 +122,6 @@ const styles = StyleSheet.create({
 
 module.exports = {
   NotificationBar: ReduxComponent.connect(NotificationBar),
+  BraveNotificationBar: ReduxComponent.connect(BraveNotificationBar),
   NotificationBarCaret
 }
