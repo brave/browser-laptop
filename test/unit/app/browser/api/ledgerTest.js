@@ -126,6 +126,9 @@ describe('ledger api unit tests', function () {
       },
       busyP: function () {
         return isBusy
+      },
+      publisherTimestamp: function () {
+        return 0
       }
     }
     ledgerClient.prototype.boolion = function (value) { return false }
@@ -695,6 +698,52 @@ describe('ledger api unit tests', function () {
 
       const result = ledgerApi.pruneSynopsis(defaultAppState)
       assert.deepEqual(result.toJS(), expectedResult)
+    })
+  })
+
+  describe('checkVerifiedStatus', function () {
+    let verifiedPSpy
+
+    before(function () {
+      verifiedPSpy = sinon.spy(ledgerApi, 'verifiedP')
+      ledgerApi.setClient({
+        publisherInfo: function () {
+          return false
+        }
+      })
+    })
+
+    after(function () {
+      verifiedPSpy.restore()
+    })
+
+    it('null case', function () {
+      const result = ledgerApi.checkVerifiedStatus(defaultAppState)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      assert(verifiedPSpy.notCalled)
+    })
+
+    it('only update if timestamp is older then current', function () {
+      const newState = defaultAppState
+        .setIn(['ledger', 'publisherTimestamp'], 20)
+        .setIn(['ledger', 'synopsis', 'publishers', 'clifton.io', 'options', 'verifiedTimestamp'], 20)
+      const result = ledgerApi.checkVerifiedStatus(newState, 'clifton.io')
+      assert.deepEqual(result.toJS(), newState.toJS())
+      assert(verifiedPSpy.notCalled)
+    })
+
+    it('update when timestamp is older', function () {
+      const newState = defaultAppState
+        .setIn(['ledger', 'publisherTimestamp'], 20)
+        .setIn(['ledger', 'synopsis', 'publishers', 'clifton.io', 'options', 'verifiedTimestamp'], 10)
+
+      const expectedState = newState
+        .setIn(['ledger', 'about', 'synopsis'], [])
+        .setIn(['ledger', 'about', 'synopsisOptions'], {})
+        .setIn(['ledger', 'synopsis', 'publishers', 'clifton.io', 'options', 'verified'], true)
+      const result = ledgerApi.checkVerifiedStatus(newState, 'clifton.io')
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+      assert(verifiedPSpy.calledOnce)
     })
   })
 })

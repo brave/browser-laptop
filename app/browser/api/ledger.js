@@ -813,9 +813,9 @@ const verifiedP = (state, publisherKey, callback) => {
     }
 
     if (callback) {
-      let data = {}
-      if (result && result.properties && result.properties) {
-        data = result.properties
+      let data = false
+      if (result && result.properties && result.properties.verified) {
+        data = result.properties.verified
       }
 
       callback(null, data)
@@ -952,19 +952,20 @@ const addVisit = (state, startTimestamp, location, tabId) => {
 }
 
 const checkVerifiedStatus = (state, publisherKey) => {
+  if (publisherKey == null) {
+    return state
+  }
+
   const lastUpdate = parseInt(ledgerState.getLedgerValue(state, 'publisherTimestamp'))
   const lastPublisherUpdate = parseInt(ledgerState.getPublisherOption(state, publisherKey, 'verifiedTimestamp') || 0)
 
   if (lastUpdate > lastPublisherUpdate) {
-    state = verifiedP(state, publisherKey, (error, result) => {
+    state = module.exports.verifiedP(state, publisherKey, (error, result) => {
       if (!error) {
-        const verified = result.verified || false
-        const timestamp = result.timestamp || 0
-
-        appActions.onPublisherOptionUpdate(publisherKey, 'verified', verified)
-        appActions.onPublisherOptionUpdate(publisherKey, 'verifiedTimestamp', timestamp)
-        savePublisherOption(publisherKey, 'verified', verified)
-        savePublisherOption(publisherKey, 'verifiedTimestamp', timestamp)
+        appActions.onPublisherOptionUpdate(publisherKey, 'verified', result)
+        appActions.onPublisherOptionUpdate(publisherKey, 'verifiedTimestamp', lastUpdate)
+        savePublisherOption(publisherKey, 'verified', result)
+        savePublisherOption(publisherKey, 'verifiedTimestamp', lastUpdate)
       }
     })
   }
@@ -2316,13 +2317,13 @@ const saveOptionSynopsis = (prop, value) => {
 }
 
 const savePublisherOption = (publisherKey, prop, value) => {
-  if (synopsis.publishers && synopsis.publishers[publisherKey]) {
+  if (synopsis && synopsis.publishers && synopsis.publishers[publisherKey] && synopsis.publishers[publisherKey].options) {
     synopsis.publishers[publisherKey].options[prop] = value
   }
 }
 
 const savePublisherData = (publisherKey, prop, value) => {
-  if (synopsis.publishers && synopsis.publishers[publisherKey]) {
+  if (synopsis && synopsis.publishers && synopsis.publishers[publisherKey]) {
     synopsis.publishers[publisherKey][prop] = value
   }
 }
@@ -2502,8 +2503,12 @@ const getMethods = () => {
       setSynopsis: (data) => {
         synopsis = data
       },
+      setClient: (data) => {
+        client = data
+      },
       synopsisNormalizer,
-      pruneSynopsis
+      pruneSynopsis,
+      checkVerifiedStatus
     }
   }
 
