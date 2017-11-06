@@ -467,7 +467,7 @@ const onBootStateFile = (state) => {
     client = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
     client.publisherTimestamp((err, result) => {
       if (err) {
-        console.error('Error while retreving publisher timestamp', err.toString())
+        console.error('Error while retrieving publisher timestamp', err.toString())
         return
       }
       appActions.onPublisherTimestamp(result.timestamp)
@@ -2037,6 +2037,13 @@ const onInitRead = (state, parsedData) => {
     client = ledgerClient(parsedData.personaId,
       underscore.extend(parsedData.options, {roundtrip: roundtrip}, options),
       parsedData)
+    client.publisherTimestamp((err, result) => {
+      if (err) {
+        console.error('Error while retrieving publisher timestamp', err.toString())
+        return
+      }
+      appActions.onPublisherTimestamp(result.timestamp)
+    })
 
     // Scenario: User enables Payments, disables it, waits 30+ days, then
     // enables it again -> reconcileStamp is in the past.
@@ -2429,6 +2436,13 @@ const transitionWalletToBat = () => {
         appActions.onLedgerCallback(result, random.randomInt({ min: miliseconds.minute, max: 10 * miliseconds.minute }))
         appActions.onBitcoinToBatTransitioned()
         notifications.showBraveWalletUpdated()
+        client.publisherTimestamp((err, result) => {
+          if (err) {
+            console.error('Error while retrieving publisher timestamp', err.toString())
+            return
+          }
+          appActions.onPublisherTimestamp(result.timestamp)
+        })
       }
     })
   } catch (ex) {
