@@ -23,7 +23,7 @@ def main():
     upload_browser_laptop(github,release, f)
 
 def get_channel_display_name():
-  d = {'dev': 'Release', 'beta': 'Beta', 'development': 'Development', 'nightly': 'Nightly'}
+  d = {'dev': 'Release', 'beta': 'Beta', 'developer': 'Developer', 'nightly': 'Nightly'}
   return d[release_channel()]
 
 def get_files_to_upload():
