@@ -230,13 +230,10 @@ AppStore
     },
     locations: {
       [url]: {
-        publisher: string, // url of the publisher in question
-        verified: boolean, // wheter or not site is a verified publisher
-        exclude: boolean, // wheter or not site is in the excluded list
-        stickyP: boolean, // wheter or not site was added using addFunds urlbar toggle
-        timestamp: number // timestamp in milliseconds
+        publisher: string // url of the publisher in question
       }
-    }
+    },
+    publisherTimestamp: number, // timestamp of last publisher update in the database
     synopsis: {
       options: {
         emptyScores: {
@@ -258,6 +255,7 @@ AppStore
           options: {
             exclude: boolean,
             verified: boolean,
+            verifiedTimestamp: number, // timestamp of the last change 
             stickyP: boolean
           },
           pinPercentage: number,

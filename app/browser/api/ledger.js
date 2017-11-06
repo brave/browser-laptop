@@ -74,8 +74,6 @@ let runTimeoutId
 // Database
 let v2RulesetDB
 const v2RulesetPath = 'ledger-rulesV2.leveldb'
-let v2PublishersDB
-const v2PublishersPath = 'ledger-publishersV2.leveldb'
 const statePath = 'ledger-state.json'
 const newClientPath = 'ledger-newstate.json'
 
@@ -467,6 +465,13 @@ const onBootStateFile = (state) => {
   try {
     clientprep()
     client = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
+    client.publisherTimestamp((err, result) => {
+      if (err) {
+        console.error('Error while retreving publisher timestamp', err.toString())
+        return
+      }
+      appActions.onPublisherTimestamp(result.timestamp)
+    })
   } catch (ex) {
     state = ledgerState.resetInfo(state)
     bootP = false
@@ -801,9 +806,19 @@ const inspectP = (db, path, publisher, property, key, callback) => {
 
 // TODO rename function name
 const verifiedP = (state, publisherKey, callback) => {
-  inspectP(v2PublishersDB, v2PublishersPath, publisherKey, 'verified', null, (err, result) => {
-    if (!err && callback) {
-      callback(null, result)
+  client.publisherInfo(publisherKey, (err, result) => {
+    if (err) {
+      console.error(`Error verifying publisher ${publisherKey}: `, err.toString())
+      return
+    }
+
+    if (callback) {
+      let data = {}
+      if (result && result.properties && result.properties) {
+        data = result.properties
+      }
+
+      callback(null, data)
     }
   })
 
@@ -931,12 +946,28 @@ const addVisit = (state, startTimestamp, location, tabId) => {
   synopsis.addPublisher(publisherKey, {duration: duration, revisitP: revisitP})
   state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
   state = updatePublisherInfo(state)
-  state = verifiedP(state, publisherKey, (error, result) => {
-    if (!error) {
-      appActions.onPublisherOptionUpdate(publisherKey, 'verified', result)
-      savePublisherOption(publisherKey, 'verified', result)
-    }
-  })
+  state = checkVerifiedStatus(state, publisherKey)
+
+  return state
+}
+
+const checkVerifiedStatus = (state, publisherKey) => {
+  const lastUpdate = parseInt(ledgerState.getLedgerValue(state, 'publisherTimestamp'))
+  const lastPublisherUpdate = parseInt(ledgerState.getPublisherOption(state, publisherKey, 'verifiedTimestamp') || 0)
+
+  if (lastUpdate > lastPublisherUpdate) {
+    state = verifiedP(state, publisherKey, (error, result) => {
+      if (!error) {
+        const verified = result.verified || false
+        const timestamp = result.timestamp || 0
+
+        appActions.onPublisherOptionUpdate(publisherKey, 'verified', verified)
+        appActions.onPublisherOptionUpdate(publisherKey, 'verifiedTimestamp', timestamp)
+        savePublisherOption(publisherKey, 'verified', verified)
+        savePublisherOption(publisherKey, 'verifiedTimestamp', timestamp)
+      }
+    })
+  }
 
   return state
 }
@@ -1069,49 +1100,6 @@ const fetchFavIcon = (publisherKey, url, redirects) => {
   })
 }
 
-const updateLocation = (state, location, publisherKey) => {
-  const locationData = ledgerState.getLocation(state, location)
-
-  if (locationData.get('stickyP') == null) {
-    state = ledgerState.setLocationProp(state, location, 'stickyP', ledgerUtil.stickyP(state, publisherKey))
-  }
-
-  if (locationData.get('verified') != null) {
-    return state
-  }
-
-  const publisher = ledgerState.getPublisher(state, publisherKey)
-  const verified = publisher.getIn(['options', 'verified'])
-  if (verified != null) {
-    state = ledgerState.setLocationProp(state, location, 'verified', (verified || false))
-  } else {
-    state = verifiedP(state, publisherKey, (err, result) => {
-      if (err && !err.notFound) {
-        return
-      }
-
-      const value = (result && result.verified) || false
-      appActions.onLedgerLocationUpdate(location, 'verified', value)
-    })
-  }
-
-  const exclude = publisher.getIn(['options', 'exclude'])
-  if (exclude != null) {
-    state = ledgerState.setLocationProp(state, location, 'exclude', (exclude || false))
-  } else {
-    excludeP(publisherKey, (err, result) => {
-      if (err && !err.notFound) {
-        return
-      }
-
-      const value = (result && result.exclude) || false
-      appActions.onLedgerLocationUpdate(location, 'exclude', value)
-    })
-  }
-
-  return state
-}
-
 const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
   if (!getSetting(settings.PAYMENTS_ENABLED)) {
     return state
@@ -1151,8 +1139,6 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
     if (publisher.get('faviconURL') == null) {
       state = getFavIcon(state, publisherKey, info)
     }
-
-    state = updateLocation(state, locationKey, publisherKey)
   } else {
     const infoPublisher = info.get('publisher')
     if (infoPublisher != null) {
@@ -1194,7 +1180,6 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
       }
     }
 
-    state = updateLocation(state, locationKey, publisherKey)
     state = getFavIcon(state, publisherKey, info)
   }
 
@@ -1352,13 +1337,6 @@ const initSynopsis = (state) => {
     excludeP(publisherKey, (unused, exclude) => {
       appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
       savePublisherOption(publisherKey, 'exclude', exclude)
-    })
-
-    state = verifiedP(state, publisherKey, (error, result) => {
-      if (!error) {
-        appActions.onPublisherOptionUpdate(publisherKey, 'verified', result)
-        savePublisherOption(publisherKey, 'verified', result)
-      }
     })
   }
 
@@ -1939,28 +1917,7 @@ const onCallback = (state, result, delayTime) => {
   }
 
   if (result.has('publishersV2')) {
-    results = regularResults.publishersV2 // TODO optimize if possible
     delete regularResults.publishersV2
-
-    entries = []
-    results.forEach((entry) => {
-      const publisherKey = entry.publisher
-      entries.push({
-        type: 'put',
-        key: publisherKey,
-        value: JSON.stringify(underscore.omit(entry, ['publisher']))
-      })
-      const publisher = ledgerState.getPublisher(state, publisherKey)
-      const newValue = entry.verified
-      if (!publisher.isEmpty() && publisher.getIn(['options', 'verified']) !== newValue) {
-        synopsis.publishers[publisherKey].options.verified = newValue
-        state = ledgerState.setPublisherOption(state, publisherKey, 'verified', newValue)
-      }
-    })
-    state = updatePublisherInfo(state)
-    v2PublishersDB.batch(entries, (err) => {
-      if (err) return console.error(v2PublishersPath + ' error: ' + JSON.stringify(err, null, 2))
-    })
   }
 
   // persist the new ledger state
@@ -1986,7 +1943,6 @@ const onCallback = (state, result, delayTime) => {
 
 const initialize = (state, paymentsEnabled) => {
   if (!v2RulesetDB) v2RulesetDB = levelUp(pathName(v2RulesetPath))
-  if (!v2PublishersDB) v2PublishersDB = levelUp(pathName(v2PublishersPath))
   state = enable(state, paymentsEnabled)
 
   notifications.init(state)

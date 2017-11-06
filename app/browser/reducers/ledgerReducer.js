@@ -211,12 +211,6 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.updatePublisherInfo(state)
         break
       }
-    case appConstants.APP_ON_LEDGER_LOCATION_UPDATE:
-      {
-        const location = action.get('location')
-        state = ledgerState.setLocationProp(state, location, action.get('prop'), action.get('value'))
-        break
-      }
     case appConstants.APP_ON_PUBLISHER_OPTION_UPDATE:
       {
         const value = action.get('value')
@@ -403,6 +397,11 @@ const ledgerReducer = (state, action, immutableAction) => {
             })
           }
         }
+        break
+      }
+    case appConstants.APP_ON_PUBLISHER_TIMESTAMP:
+      {
+        state = ledgerState.setLedgerValue(state, 'publisherTimestamp', action.get('timestamp'))
         break
       }
   }

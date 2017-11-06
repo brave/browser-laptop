@@ -45,7 +45,7 @@ class NavigationBar extends React.Component {
     const loading = activeFrame.get('loading')
     const location = activeFrame.get('location', '')
     const locationId = getBaseUrl(location)
-    const publisherId = ledgerState.getLocationProp(state, locationId, 'publisher')
+    const publisherKey = ledgerState.getLocationProp(state, locationId, 'publisher')
     const navbar = activeFrame.get('navbar', Immutable.Map())
     const locationCache = bookmarkLocationCache.getCacheKey(state, location)
 
@@ -73,7 +73,7 @@ class NavigationBar extends React.Component {
     props.isFocused = navbar.getIn(['urlbar', 'focused'], false)
     props.shouldRenderSuggestions = navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
-    props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherId)
+    props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherKey)
     props.activeTabId = activeTabId
     props.bookmarkKey = locationCache.get(0, false)
 

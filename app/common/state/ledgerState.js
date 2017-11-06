@@ -22,6 +22,24 @@ const validateState = function (state) {
 
 const ledgerState = {
   /**
+   * LEDGER
+   */
+  setLedgerValue: (state, key, value) => {
+    state = validateState(state)
+    if (key == null) {
+      return state
+    }
+
+    return state.setIn(['ledger', key], value)
+  },
+
+  getLedgerValue: (state, key) => {
+    state = validateState(state)
+
+    return state.getIn(['ledger', key])
+  },
+
+  /**
    * LOCATIONS
    */
   getLocation: (state, url) => {
