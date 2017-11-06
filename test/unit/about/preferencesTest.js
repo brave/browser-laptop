@@ -25,7 +25,7 @@ describe('Preferences component unittest', function () {
     mockery.registerMock('../../less/about/preferences.less', {})
     mockery.registerMock('../../less/forms.less', {})
     mockery.registerMock('../../less/button.less', {})
-    mockery.registerMock('../../less/react-select.less', {})
+    mockery.registerMock('../../../../less/react-select.less', {})
     mockery.registerMock('../../node_modules/font-awesome/css/font-awesome.css', {})
     mockery.registerMock('../../../extensions/brave/img/caret_down_grey.svg')
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_general.svg', 'browser_prefs_general.svg')
