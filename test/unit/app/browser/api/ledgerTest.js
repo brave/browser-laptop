@@ -9,6 +9,8 @@ const sinon = require('sinon')
 const mockery = require('mockery')
 const settings = require('../../../../../js/constants/settings')
 const appActions = require('../../../../../js/actions/appActions')
+const migrationState = require('../../../../../app/common/state/migrationState')
+const batPublisher = require('bat-publisher')
 
 const defaultAppState = Immutable.fromJS({
   ledger: {},
@@ -135,6 +137,16 @@ describe('ledger api unit tests', function () {
     ledgerClient.returns(lc)
     mockery.registerMock('bat-client', ledgerClient)
 
+    // ledger publisher stubbing
+    const lp = {
+      ruleset: [],
+      getPublisherProps: function (publisher) {
+        return null
+      },
+      Synopsis: batPublisher.Synopsis
+    }
+    mockery.registerMock('bat-publisher', lp)
+
     // once everything is stubbed, load the ledger
     ledgerApi = require('../../../../../app/browser/api/ledger')
   })
@@ -148,16 +160,16 @@ describe('ledger api unit tests', function () {
   })
 
   describe('initialize', function () {
-    let notificationsInitSpy
+    let notificationsInitStub
     beforeEach(function () {
-      notificationsInitSpy = sinon.spy(ledgerApi.notifications, 'init')
+      notificationsInitStub = sinon.stub(ledgerApi.notifications, 'init')
     })
     afterEach(function () {
-      notificationsInitSpy.restore()
+      notificationsInitStub.restore()
     })
     it('calls notifications.init', function () {
       ledgerApi.initialize(defaultAppState, true)
-      assert(notificationsInitSpy.calledOnce)
+      assert(notificationsInitStub.calledOnce)
     })
   })
 
@@ -277,8 +289,8 @@ describe('ledger api unit tests', function () {
       ledgerApi.clearVisitsByPublisher()
     })
     afterEach(function () {
-      fakeClock.restore()
       ledgerApi.setSynopsis(undefined)
+      fakeClock.restore()
     })
     it('records a visit when over the PAYMENTS_MINIMUM_VISIT_TIME threshold', function () {
       const state = ledgerApi.initialize(stateWithLocation, true)
@@ -319,6 +331,76 @@ describe('ledger api unit tests', function () {
       assert.notDeepEqual(result1, state)
       assert.notDeepEqual(result2, result1)
       assert(visitsByPublisher['clifton.io'])
+    })
+  })
+
+  describe('checkBtcBatMigrated', function () {
+    let transitionWalletToBatStub
+    before(function () {
+      transitionWalletToBatStub = sinon.stub(ledgerApi, 'transitionWalletToBat')
+    })
+    after(function () {
+      transitionWalletToBatStub.restore()
+    })
+    describe('when not a new install and wallet has not been upgraded', function () {
+      let result
+      before(function () {
+        const notMigratedYet = defaultAppState.merge(Immutable.fromJS({
+          firstRunTimestamp: 12345,
+          migrations: {
+            batMercuryTimestamp: 34512,
+            btc2BatTimestamp: 34512,
+            btc2BatNotifiedTimestamp: 34512,
+            btc2BatTransitionPending: false
+          }
+        }))
+        assert.equal(migrationState.inTransition(notMigratedYet), false)
+        transitionWalletToBatStub.reset()
+        result = ledgerApi.checkBtcBatMigrated(notMigratedYet, true)
+      })
+      it('sets transition status to true', function () {
+        assert(migrationState.inTransition(result))
+      })
+      it('calls transitionWalletToBat', function () {
+        assert(transitionWalletToBatStub.calledOnce)
+      })
+    })
+
+    describe('when a transition is already being shown', function () {
+      it('sets transition to false if new install', function () {
+        const stuckOnMigrate = defaultAppState.merge(Immutable.fromJS({
+          firstRunTimestamp: 12345,
+          migrations: {
+            batMercuryTimestamp: 12345,
+            btc2BatTimestamp: 12345,
+            btc2BatNotifiedTimestamp: 12345,
+            btc2BatTransitionPending: true
+          }
+        }))
+        assert(migrationState.isNewInstall(stuckOnMigrate))
+        assert.equal(migrationState.hasUpgradedWallet(stuckOnMigrate), false)
+        assert(migrationState.inTransition(stuckOnMigrate))
+
+        const result = ledgerApi.checkBtcBatMigrated(stuckOnMigrate, true)
+        assert.equal(migrationState.inTransition(result), false)
+      })
+      it('sets transition to false if wallet has been upgraded', function () {
+        const stuckOnMigrate = defaultAppState.merge(Immutable.fromJS({
+          firstRunTimestamp: 12345,
+          migrations: {
+            batMercuryTimestamp: 34512,
+            btc2BatTimestamp: 54321,
+            btc2BatNotifiedTimestamp: 34512,
+            btc2BatTransitionPending: true
+          }
+        }))
+        assert.equal(migrationState.isNewInstall(stuckOnMigrate), false)
+        assert(migrationState.hasUpgradedWallet(stuckOnMigrate))
+        assert(migrationState.inTransition(stuckOnMigrate))
+
+        const result = ledgerApi.checkBtcBatMigrated(stuckOnMigrate, true)
+        assert.equal(migrationState.inTransition(result), false)
+      })
     })
   })
 
