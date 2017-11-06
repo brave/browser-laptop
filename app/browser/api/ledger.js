@@ -2258,12 +2258,11 @@ const muonWriter = (fileName, payload) => {
 
 const migration = (state) => {
   const synopsisPath = 'ledger-synopsis.json'
-
+  const fs = require('fs')
   const synopsisOptions = ledgerState.getSynopsisOptions(state)
 
   if (synopsisOptions.isEmpty()) {
     // Move data from synopsis file into appState
-    const fs = require('fs')
     try {
       fs.accessSync(pathName(synopsisPath), fs.FF_OK)
       const data = fs.readFileSync(pathName(synopsisPath))
@@ -2286,6 +2285,16 @@ const migration = (state) => {
       state = state.delete('locationInfo')
     }
   }
+
+  const oldDb = pathName('ledger-publishersV2.leveldb')
+  fs.access(oldDb, fs.FF_OK, (err, result) => {
+    if (err) {
+      return
+    }
+
+    const fsExtra = require('fs-extra')
+    fsExtra.remove(oldDb)
+  })
 
   return state
 }
