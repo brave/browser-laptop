@@ -130,15 +130,8 @@ class GeneralTab extends ImmutableComponent {
   }
 
   render () {
-    const languageOptions = this.props.languageCodes.map(function (lc) {
-      return (
-        <option data-l10n-id={lc} value={lc} />
-      )
-    })
-
     const homepage = getSetting(settings.HOMEPAGE, this.props.settings)
     const disableShowHomeButton = !homepage || !homepage.length
-    const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const defaultBrowser = getSetting(settings.IS_DEFAULT_BROWSER, this.props.settings)
       ? <SettingItem dataL10nId='defaultBrowser' />
       : <SettingItem dataL10nId='notDefaultBrowser' >
@@ -210,12 +203,6 @@ class GeneralTab extends ImmutableComponent {
           <SettingCheckbox id='bookmarksBarSwitch' dataL10nId='bookmarkToolbar'
             prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting} />
-        </SettingItem>
-        <SettingItem dataL10nId='selectedLanguage'>
-          <SettingDropdown value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)}>
-            {languageOptions}
-          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='defaultZoomLevel'>
           <SettingDropdown

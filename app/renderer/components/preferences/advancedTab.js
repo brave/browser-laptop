@@ -62,6 +62,11 @@ class AdvancedTab extends ImmutableComponent {
       : null
   }
 
+  get defaultLanguage () {
+    return this.props.languageCodes
+      .find((lang) => lang.includes(navigator.language)) || 'en-US'
+  }
+
   get swipeNavigationDistanceSetting () {
     if (isDarwin) {
       return <div>
@@ -118,6 +123,24 @@ class AdvancedTab extends ImmutableComponent {
         <SettingsList>
           <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           <SettingCheckbox dataL10nId='wideURLbar' prefKey={settings.WIDE_URL_BAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        </SettingsList>
+        <DefaultSectionTitle data-l10n-id='selectedLanguage' />
+        <SettingsList>
+          <SettingDropdown
+            value={(
+              getSetting(settings.LANGUAGE, this.props.settings) ||
+              this.defaultLanguage
+            )}
+            onChange={changeSetting.bind(
+              null,
+              this.props.onChangeSetting,
+              settings.LANGUAGE
+            )}>
+            {
+              this.props.languageCodes
+                .map((lc) => <option data-l10n-id={lc} value={lc} />)
+            }
+          </SettingDropdown>
         </SettingsList>
         <DefaultSectionTitle data-l10n-id='spellcheck' />
         <SettingsList>
