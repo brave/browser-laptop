@@ -163,5 +163,12 @@
           color: 'inherit'
         }
       }
+    },
+
+    frame: {
+      defaultBackground: '#fff',
+      newTabBackground: '#222',
+      privateTabBackground: globalStyles.color.privateTabBackgroundActive,
+      privateTabBackground2: '#000'
     }
   }
