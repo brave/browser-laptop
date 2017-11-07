@@ -6,11 +6,9 @@
 const React = require('react')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const Immutable = require('immutable')
-const Select = require('react-select')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
-const locale = require('../../js/l10n')
 
 // Components
 const PreferenceNavigation = require('../../app/renderer/components/preferences/preferenceNavigation')
@@ -70,7 +68,6 @@ require('../../less/about/preferences.less')
 require('../../less/forms.less')
 require('../../less/button.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
-require('../../less/react-select.less')
 
 const permissionNames = {
   'mediaPermission': ['boolean'],
@@ -103,7 +100,6 @@ class GeneralTab extends ImmutableComponent {
     this.importBrowserDataNow = this.importBrowserDataNow.bind(this)
     this.onChangeSetting = this.onChangeSetting.bind(this)
     this.setAsDefaultBrowser = this.setAsDefaultBrowser.bind(this)
-    this.onSpellCheckLangsChange = this.onSpellCheckLangsChange.bind(this)
   }
 
   importBrowserDataNow () {
@@ -121,14 +117,6 @@ class GeneralTab extends ImmutableComponent {
     this.props.onChangeSetting(key, value)
   }
 
-  onSpellCheckLangsChange (value) {
-    if (!value) {
-      this.props.onChangeSetting(settings.SPELLCHECK_LANGUAGES, [])
-    } else {
-      this.props.onChangeSetting(settings.SPELLCHECK_LANGUAGES, value.split(','))
-    }
-  }
-
   setAsDefaultBrowser () {
     aboutActions.setAsDefaultBrowser()
   }
@@ -142,21 +130,8 @@ class GeneralTab extends ImmutableComponent {
   }
 
   render () {
-    const languageOptions = this.props.languageCodes.map(function (lc) {
-      return (
-        <option data-l10n-id={lc} value={lc} />
-      )
-    })
-
-    const spellCheckLangOptions = this.props.languageCodes.map(function (lc) {
-      return (
-        { value: lc, label: locale.translation(lc) }
-      )
-    })
-
     const homepage = getSetting(settings.HOMEPAGE, this.props.settings)
     const disableShowHomeButton = !homepage || !homepage.length
-    const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const defaultBrowser = getSetting(settings.IS_DEFAULT_BROWSER, this.props.settings)
       ? <SettingItem dataL10nId='defaultBrowser' />
       : <SettingItem dataL10nId='notDefaultBrowser' >
@@ -166,19 +141,6 @@ class GeneralTab extends ImmutableComponent {
           onClick={this.setAsDefaultBrowser}
         />
       </SettingItem>
-    const spellCheckLanguages = getSetting(settings.SPELLCHECK_ENABLED, this.props.settings)
-      ? <SettingItem dataL10nId='spellCheckLanguages'>
-        <Select
-          name='spellCheckLanguages'
-          value={getSetting(settings.SPELLCHECK_LANGUAGES, this.props.settings).join(',')}
-          multi='true'
-          options={spellCheckLangOptions}
-          onChange={this.onSpellCheckLangsChange}
-          placeholder={locale.translation('spellCheckLanguages')}
-        />
-      </SettingItem>
-      : null
-
     const defaultZoomSetting = getSetting(settings.DEFAULT_ZOOM_LEVEL, this.props.settings)
     return <SettingsList>
       <DefaultSectionTitle data-test-id='generalSettings' data-l10n-id='generalSettings' />
@@ -242,15 +204,6 @@ class GeneralTab extends ImmutableComponent {
             prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting} />
         </SettingItem>
-        <SettingItem dataL10nId='selectedLanguage'>
-          <SettingDropdown value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)}>
-            {languageOptions}
-          </SettingDropdown>
-        </SettingItem>
-        <SettingCheckbox dataL10nId='enableSpellCheck' prefKey={settings.SPELLCHECK_ENABLED}
-          settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        {spellCheckLanguages}
         <SettingItem dataL10nId='defaultZoomLevel'>
           <SettingDropdown
             value={defaultZoomSetting === undefined || defaultZoomSetting === null ? config.zoom.defaultValue : defaultZoomSetting}
@@ -1000,7 +953,10 @@ class AboutPreferences extends React.Component {
         tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.ADVANCED:
-        tab = <AdvancedTab settings={settings} onChangeSetting={this.onChangeSetting} />
+        tab = <AdvancedTab
+          settings={settings}
+          languageCodes={languageCodes}
+          onChangeSetting={this.onChangeSetting} />
         break
     }
     return <div>
