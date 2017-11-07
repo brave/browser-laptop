@@ -6,6 +6,8 @@ const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const commonStyles = require('../styles/commonStyles')
+const Select = require('react-select')
+const locale = require('../../../../js/l10n')
 
 // Actions
 const {getSetting} = require('../../../../js/settings')
@@ -23,8 +25,48 @@ const {scaleSize} = require('../../../common/constants/toolbarUserInterfaceScale
 const {changeSetting} = require('../../lib/settingsUtil')
 const platformUtil = require('../../../common/lib/platformUtil')
 const isDarwin = platformUtil.isDarwin()
+require('../../../../less/react-select.less')
 
 class AdvancedTab extends ImmutableComponent {
+  constructor (e) {
+    super()
+    this.onSpellCheckLangsChange = this.onSpellCheckLangsChange.bind(this)
+  }
+
+  onSpellCheckLangsChange (value) {
+    if (!value) {
+      this.props.onChangeSetting(settings.SPELLCHECK_LANGUAGES, [])
+    } else {
+      this.props.onChangeSetting(settings.SPELLCHECK_LANGUAGES, value.split(','))
+    }
+  }
+
+  get spellCheckLanguages () {
+    const spellCheckLangOptions = this.props.languageCodes.map(function (lc) {
+      return (
+        { value: lc, label: locale.translation(lc) }
+      )
+    })
+
+    return getSetting(settings.SPELLCHECK_ENABLED, this.props.settings)
+      ? <SettingItem dataL10nId='spellCheckLanguages'>
+        <Select
+          name='spellCheckLanguages'
+          value={getSetting(settings.SPELLCHECK_LANGUAGES, this.props.settings).join(',')}
+          multi='true'
+          options={spellCheckLangOptions}
+          onChange={this.onSpellCheckLangsChange}
+          placeholder={locale.translation('spellCheckLanguages')}
+        />
+      </SettingItem>
+      : null
+  }
+
+  get defaultLanguage () {
+    return this.props.languageCodes
+      .find((lang) => lang.includes(navigator.language)) || 'en-US'
+  }
+
   get swipeNavigationDistanceSetting () {
     if (isDarwin) {
       return <div>
@@ -81,6 +123,34 @@ class AdvancedTab extends ImmutableComponent {
         <SettingsList>
           <SettingCheckbox dataL10nId='disableTitleMode' prefKey={settings.DISABLE_TITLE_MODE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           <SettingCheckbox dataL10nId='wideURLbar' prefKey={settings.WIDE_URL_BAR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        </SettingsList>
+        <DefaultSectionTitle data-l10n-id='selectedLanguage' />
+        <SettingsList>
+          <SettingDropdown
+            value={(
+              getSetting(settings.LANGUAGE, this.props.settings) ||
+              this.defaultLanguage
+            )}
+            onChange={changeSetting.bind(
+              null,
+              this.props.onChangeSetting,
+              settings.LANGUAGE
+            )}>
+            {
+              this.props.languageCodes
+                .map((lc) => <option data-l10n-id={lc} value={lc} />)
+            }
+          </SettingDropdown>
+        </SettingsList>
+        <DefaultSectionTitle data-l10n-id='spellcheck' />
+        <SettingsList>
+          <SettingCheckbox
+            dataL10nId='enableSpellCheck'
+            prefKey={settings.SPELLCHECK_ENABLED}
+            settings={this.props.settings}
+            onChangeSetting={this.props.onChangeSetting}
+          />
+          {this.spellCheckLanguages}
         </SettingsList>
       </main>
       <footer className={css(styles.moreInfo)}>
