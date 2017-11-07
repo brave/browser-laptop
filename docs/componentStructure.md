@@ -20,7 +20,6 @@ All [React](https://facebook.github.io/react/) components (with the exception of
     - TabsToolbar
       - Tabs
         - [Tab]
-          - DragIndicator
       - TabsToolbarButtons
         - [Button]
     - [Frame]

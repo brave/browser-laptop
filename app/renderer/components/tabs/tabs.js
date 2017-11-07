@@ -5,9 +5,11 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
+const BrowserButton = require('../common/browserButton')
 const LongPressButton = require('../common/longPressButton')
 const Tab = require('./tab')
 
@@ -30,6 +32,11 @@ const dnd = require('../../../../js/dnd')
 const dndData = require('../../../../js/dndData')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {getSetting} = require('../../../../js/settings')
+
+const globalStyles = require('../styles/global')
+const {theme} = require('../styles/theme')
+
+const newTabButton = require('../../../../img/toolbar/newtab_btn.svg')
 
 class Tabs extends React.Component {
   constructor (props) {
@@ -159,22 +166,26 @@ class Tabs extends React.Component {
 
   render () {
     this.tabRefs = []
-    return <div
-      data-test-tabs
-      className='tabs'
-      onMouseLeave={this.onMouseLeave}>
-      <span className={cx({
-        tabStripContainer: true,
-        isPreview: this.props.previewTabPageIndex != null,
-        allowDragging: this.props.shouldAllowWindowDrag
-      })}
+    return <div className={css(styles.tabs)}
+      data-test-id='tabs'
+      onMouseLeave={this.onMouseLeave}
+    >
+      <span className={css(
+        styles.tabs__tabStrip,
+        (this.props.previewTabPageIndex != null) && styles.tabs__tabStrip_isPreview,
+        this.props.shouldAllowWindowDrag && styles.tabs__tabStrip_allowDragging
+      )}
+        data-test-preview-tab={this.props.previewTabPageIndex != null}
         onDragOver={this.onDragOver}
         onDrop={this.onDrop}>
         {
           this.props.onPreviousPage
-            ? <span
-              className='prevTab fa fa-caret-left'
-              onClick={this.onPrevPage} />
+            ? <BrowserButton
+              iconClass={globalStyles.appIcons.prev}
+              size='21px'
+              custom={[styles.tabs__tabStrip__navigation, styles.tabs__tabStrip__navigation_prev]}
+              onClick={this.onPrevPage}
+            />
             : null
         }
         {
@@ -184,20 +195,29 @@ class Tabs extends React.Component {
                 key={'tab-' + frameKey}
                 ref={(node) => this.tabRefs.push(node)}
                 frameKey={frameKey}
-                partOfFullPageSet={this.props.partOfFullPageSet} />
+                partOfFullPageSet={this.props.partOfFullPageSet}
+              />
             )
         }
         {
           this.props.onNextPage
-            ? <span
-              className='nextTab fa fa-caret-right'
-              onClick={this.onNextPage} />
+            ? <BrowserButton
+              iconClass={globalStyles.appIcons.next}
+              size='21px'
+              custom={[styles.tabs__tabStrip__navigation, styles.tabs__tabStrip__navigation_next]}
+              onClick={this.onNextPage}
+            />
             : null
         }
         <LongPressButton
           label='+'
           l10nId='newTabButton'
-          className='browserButton navbutton newFrameButton'
+          testId='newTabButton'
+          className={cx({
+            browserButton: true,
+            navbutton: true,
+            [css(styles.tabs__tabStrip__newTabButton)]: true
+          })}
           disabled={false}
           onClick={this.newTab}
           onLongPress={this.onNewTabLongPress}
@@ -206,5 +226,71 @@ class Tabs extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  tabs: {
+    boxSizing: 'border-box',
+    display: 'flex',
+    flex: 1,
+    overflow: 'auto',
+    padding: 0,
+    height: '-webkit-fill-available',
+    position: 'relative',
+    whiteSpace: 'nowrap',
+    zIndex: globalStyles.zindex.zindexTabs
+  },
+
+  tabs__tabStrip: {
+    display: 'flex',
+    flex: 1,
+    zIndex: globalStyles.zindex.zindexTabs,
+    overflow: 'hidden'
+  },
+
+  tabs__tabStrip_isPreview: globalStyles.animations.tabFadeIn,
+
+  tabs__tabStrip_allowDragging: {
+    WebkitAppRegion: 'drag'
+  },
+
+  tabs__tabStrip__navigation: {
+    fontSize: '21px',
+    height: globalStyles.spacing.tabsToolbarHeight,
+    lineHeight: globalStyles.spacing.tabsToolbarHeight
+  },
+
+  tabs__tabStrip__navigation_prev: {
+    paddingRight: '2px',
+
+    // Override border:none specified with browserButton
+    borderWidth: '0 1px 0 0',
+    borderStyle: 'solid',
+    borderColor: theme.tabsToolbar.tabs.navigation.borderColor
+  },
+
+  tabs__tabStrip__navigation_next: {
+    paddingLeft: '2px'
+  },
+
+  tabs__tabStrip__newTabButton: {
+    background: theme.tabsToolbar.button.backgroundColor,
+    minWidth: globalStyles.spacing.tabsToolbarHeight,
+    minHeight: globalStyles.spacing.tabsToolbarHeight,
+    lineHeight: globalStyles.spacing.tabsToolbarHeight,
+    WebkitMaskImage: `url(${newTabButton})`,
+    WebkitMaskRepeat: 'no-repeat',
+    WebkitMaskPosition: 'center',
+    WebkitMaskSize: '12px 12px',
+    WebkitMaskOrigin: 'border',
+
+    // no-drag is applied to the button and tab area
+    WebkitAppRegion: 'no-drag',
+
+    ':hover': {
+      opacity: 1.0,
+      backgroundColor: theme.tabsToolbar.button.onHover.backgroundColor
+    }
+  }
+})
 
 module.exports = ReduxComponent.connect(Tabs)

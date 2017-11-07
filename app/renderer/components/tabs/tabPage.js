@@ -18,11 +18,14 @@ const settings = require('../../../../js/constants/settings')
 
 // Utils
 const {getSetting} = require('../../../../js/settings')
-const cx = require('../../../../js/lib/classSet')
 const {getCurrentWindowId} = require('../../currentWindow')
 const dndData = require('../../../../js/dndData')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const dnd = require('../../../../js/dnd')
+
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
+const {theme} = require('../styles/theme')
 
 class TabPage extends React.Component {
   constructor (props) {
@@ -148,19 +151,59 @@ class TabPage extends React.Component {
     return <span
       ref={(node) => { this.tabPageNode = node }}
       data-tab-page={this.props.index}
+      data-test-id='tabPage'
+      data-test2-id={this.props.index}
+      data-test-active-tabPage={this.props.active}
       onDragOver={this.onDragOver.bind(this)}
       onMouseEnter={this.props.previewTabPage ? this.onMouseEnter : null}
       onMouseLeave={this.props.previewTabPage ? this.onMouseLeave : null}
       onDrop={this.onDrop.bind(this)}
-      className={cx({
-        tabPage: true,
-        audioPlaybackActive: this.props.isAudioPlaybackActive,
-        active: this.props.active
-      })}
+      className={css(
+        styles.tabPage,
+        this.props.isAudioPlaybackActive && styles.tabPage_audio,
+        this.props.active && styles.tabPage_active
+      )}
       onContextMenu={this.onContextMenu}
       onClick={this.onClick}
     />
   }
 }
+
+const styles = StyleSheet.create({
+  tabPage: {
+    backgroundColor: theme.tabPage.backgroundColor,
+    boxSizing: 'border-box',
+    display: 'inline-block',
+    margin: 'auto 2.5px',
+    height: '7px',
+    width: '35px',
+    WebkitAppRegion: 'no-drag',
+
+    // Default border styles
+    borderRadius: globalStyles.radius.borderRadius,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: theme.tabPage.borderColor,
+
+    ':hover': {
+      backgroundColor: theme.tabPage.hover.backgroundColor,
+      borderColor: theme.tabPage.hover.borderColor
+    }
+  },
+
+  tabPage_audio: {
+    borderColor: theme.audio.color
+  },
+
+  tabPage_active: {
+    backgroundColor: theme.tabPage.active.backgroundColor,
+    borderColor: theme.tabPage.active.borderColor,
+
+    ':hover': {
+      backgroundColor: theme.tabPage.active.hover.backgroundColor,
+      borderColor: theme.tabPage.active.hover.borderColor
+    }
+  }
+})
 
 module.exports = ReduxComponent.connect(TabPage)

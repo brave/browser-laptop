@@ -150,7 +150,7 @@ describe('tab tests', function () {
         this.page2 = Brave.server.url('page2.html')
         yield setup(this.app.client)
         yield this.app.client
-          .waitForExist('.tabArea:nth-of-type(1) [data-frame-key="1"]') // original newtab
+          .waitForExist('[data-test-id="tab-area"]:nth-of-type(1) [data-frame-key="1"]') // original newtab
           .newTab({ url: this.page1, pinned: true })
           .waitForExist(pinnedTabsTabs + '[data-frame-key="2"]')
           .newTab({ url: this.page1 })
@@ -161,9 +161,9 @@ describe('tab tests', function () {
 
       it('sequentially by default', function * () {
         yield this.app.client
-          .waitForExist('.tabArea:nth-of-type(2) [data-frame-key="3"]')
+          .waitForExist('[data-test-id="tab-area"]:nth-of-type(2) [data-frame-key="3"]')
           .waitForExist('webview[data-frame-key="3"][src="' + this.page1 + '"]')
-          .waitForExist('.tabArea:nth-of-type(3) [data-frame-key="4"]')
+          .waitForExist('[data-test-id="tab-area"]:nth-of-type(3) [data-frame-key="4"]')
           .waitForExist('.frameWrapper.isActive webview[data-frame-key="4"][src="' + this.page2 + '"]')
       })
     })
@@ -178,7 +178,7 @@ describe('tab tests', function () {
           .newTab({ url: 'about:blank', active: false })
           .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
           .newTab({ url: 'about:blank' })
-          .waitForExist('.tabArea + .tabArea + .tabArea [data-test-id="tab"][data-frame-key="3"]')
+          .waitForExist('[data-test-id="tab-area"] + [data-test-id="tab-area"] + [data-test-id="tab-area"] [data-test-id="tab"][data-frame-key="3"]')
       })
     })
     describe('new tabs with openerTabId', function () {
@@ -202,7 +202,7 @@ describe('tab tests', function () {
           .newTab({ url: 'about:blank', openerTabId: data.tabId })
           .waitForTabCount(3)
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist('.tabArea:nth-child(2) [data-test-id="tab"][data-frame-key="3"]')
+          .waitForExist('[data-test-id="tab-area"]:nth-child(2) [data-test-id="tab"][data-frame-key="3"]')
       })
     })
   })
@@ -214,7 +214,7 @@ describe('tab tests', function () {
       this.page2 = Brave.server.url('page2.html')
       yield setup(this.app.client)
       yield this.app.client
-        .waitForExist('.tabArea:nth-of-type(1) [data-frame-key="1"]') // original newtab
+        .waitForExist('[data-test-id="tab-area"]:nth-of-type(1) [data-frame-key="1"]') // original newtab
         .newTab({ url: this.page1, pinned: true })
         .waitForExist(pinnedTabs + ' [data-frame-key="2"]')
         .newTab({ url: this.page2, pinned: true })

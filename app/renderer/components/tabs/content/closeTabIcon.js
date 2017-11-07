@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const {StyleSheet, css} = require('aphrodite/no-important')
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
@@ -17,9 +17,10 @@ const closeState = require('../../../../common/state/tabContentState/closeState'
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
+const globalStyles = require('../../styles/global')
 const {theme} = require('../../styles/theme')
-const {spacing, zindex} = require('../../styles/global')
 const {opacityIncreaseElementKeyframes} = require('../../styles/animations')
+
 const closeTabSvg = require('../../../../extensions/brave/img/tabs/close_btn.svg')
 
 class CloseTabIcon extends React.Component {
@@ -91,10 +92,10 @@ class CloseTabIcon extends React.Component {
     return <TabIcon
       data-test-id='closeTabIcon'
       data-test2-id={this.props.showCloseIcon ? 'close-icon-on' : 'close-icon-off'}
-      className={css(
-        styles.closeTab__icon,
-        this.props.centralizeTabIcons && styles.closeTab__icon_centered
-      )}
+      className={[
+        styles.icon_close,
+        this.props.centralizeTabIcons && styles.icon_close_centered
+      ]}
       l10nId='closeTabButton'
       onClick={this.props.onClick}
       onDragStart={this.onDragStart}
@@ -104,36 +105,33 @@ class CloseTabIcon extends React.Component {
   }
 }
 
-module.exports = ReduxComponent.connect(CloseTabIcon)
-
 const styles = StyleSheet.create({
-  closeTab__icon: {
-    willChange: 'opacity',
-
-    boxSizing: 'border-box',
-    zIndex: zindex.zindexTabsThumbnail,
+  icon_close: {
+    marginRight: globalStyles.spacing.defaultTabMargin,
     backgroundImage: `url(${closeTabSvg})`,
-    backgroundSize: spacing.closeIconSize,
+
+    // Override default properties
+    backgroundSize: globalStyles.spacing.closeIconSize,
+    width: globalStyles.spacing.closeIconSize,
+    height: globalStyles.spacing.closeIconSize,
+
     // mask icon to gray to avoid calling another icon on hover
     transition: 'filter 150ms linear',
-    filter: theme.tab.content.icon.close.filter,
-    backgroundPosition: 'center center',
-    backgroundRepeat: 'no-repeat',
-    width: spacing.closeIconSize,
-    height: spacing.closeIconSize,
-    marginRight: spacing.defaultTabMargin,
+    filter: theme.tab.icon.close.filter,
 
     ':hover': {
       filter: 'none'
     }
   },
 
-  closeTab__icon_centered: {
+  icon_close_centered: {
     position: 'absolute',
-    margin: 'auto',
     left: 0,
     right: 0,
     top: 0,
-    bottom: 0
+    bottom: 0,
+    margin: 'auto'
   }
 })
+
+module.exports = ReduxComponent.connect(CloseTabIcon)

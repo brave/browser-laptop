@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const {StyleSheet, css} = require('aphrodite/no-important')
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
@@ -19,6 +19,7 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 // Styles
 const globalStyles = require('../../styles/global')
 const {opacityIncreaseElementKeyframes} = require('../../styles/animations')
+
 const newSessionSvg = require('../../../../extensions/brave/img/tabs/new_session.svg')
 
 class NewSessionIcon extends React.Component {
@@ -97,7 +98,10 @@ class NewSessionIcon extends React.Component {
 
     return <TabIcon symbol
       data-test-id='newSessionIcon'
-      className={css(styles.newSession__icon, newSessionProps.newSession__indicator)}
+      className={[
+        styles.icon_newSession,
+        newSessionProps.newSession__indicator
+      ]}
       symbolContent={this.props.partitionNumber}
       l10nArgs={{partitionNumber: this.props.partitionNumber}}
       l10nId='sessionInfoTab'
@@ -106,21 +110,15 @@ class NewSessionIcon extends React.Component {
   }
 }
 
-module.exports = ReduxComponent.connect(NewSessionIcon)
-
 const styles = StyleSheet.create({
-  newSession__icon: {
-    willChange: 'opacity',
-    zIndex: globalStyles.zindex.zindexTabsThumbnail,
-    boxSizing: 'border-box',
-    display: 'flex',
-    alignItems: 'center',
+  icon_newSession: {
     backgroundImage: `url(${newSessionSvg})`,
     backgroundPosition: 'center left',
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: '13px',
-    width: globalStyles.spacing.iconSize,
-    height: globalStyles.spacing.iconSize,
-    marginRight: globalStyles.spacing.defaultTabMargin
+    marginRight: globalStyles.spacing.defaultTabMargin,
+
+    // Override default properties
+    backgroundSize: globalStyles.spacing.newSessionIconSize
   }
 })
+
+module.exports = ReduxComponent.connect(NewSessionIcon)

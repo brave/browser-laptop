@@ -3,17 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 div[class^='bookmarksToolbar'] {
-  // PR #7740
-  + .tabPages {
-    &.singlePage {
-      height: 0;
-    }
-
-    &:not(.singlePage) {
-      padding-top: 0;
-    }
-  }
-
   // Issue #7920
   // TODO: refactor.button.less
   button[class*='overflowIndicator']{
