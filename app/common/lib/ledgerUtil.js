@@ -42,8 +42,13 @@ const batToCurrencyString = (bat, ledgerData) => {
   const balance = Number(bat || 0)
   const currency = 'USD'
 
-  if (balance === 0 || ledgerData == null) {
-    return `0 ${currency}`
+  if (balance === 0) {
+    return `0.00 ${currency}`
+  }
+
+  const hasBeenUpgraded = ledgerData && ledgerData.hasIn(['rates', 'BTC'])
+  if (ledgerData == null || !hasBeenUpgraded) {
+    return ''
   }
 
   const rate = ledgerData.get('currentRate') || 0
@@ -60,7 +65,7 @@ const formatCurrentBalance = (ledgerData) => {
   if (ledgerData != null) {
     balance = Number(ledgerData.get('balance') || 0)
     converted = Number.parseFloat(ledgerData.get('converted')) || 0
-    hasRate = ledgerData.has('currentRate')
+    hasRate = ledgerData.has('currentRate') && ledgerData.hasIn(['rates', 'BTC'])
   }
 
   balance = balance.toFixed(2)

@@ -97,6 +97,36 @@ describe('ledgerUtil test', function () {
   })
 
   describe('batToCurrencyString', function () {
+    let ledgerData
+
+    before(function () {
+      ledgerData = Immutable.fromJS({
+        currentRate: '2',
+        rates: {
+          'BTC': 0.2222
+        }
+      })
+    })
+    it('null case', function () {
+      const result = ledgerUtil.batToCurrencyString()
+      assert.equal(result, '0.00 USD')
+    })
+
+    it('ledgerData is missing', function () {
+      const result = ledgerUtil.batToCurrencyString(1)
+      assert.equal(result, '')
+    })
+
+    it('rates are not defined yet', function () {
+      const data = ledgerData.delete('rates')
+      const result = ledgerUtil.batToCurrencyString(1, data)
+      assert.equal(result, '')
+    })
+
+    it('bat is converted', function () {
+      const result = ledgerUtil.batToCurrencyString(5, ledgerData)
+      assert.equal(result, '10.00 USD')
+    })
   })
 
   describe('formatCurrentBalance', function () {
@@ -133,7 +163,10 @@ describe('ledgerUtil test', function () {
         amount: 10,
         creating: false,
         balance: 5.00003,
-        paymentIMG: undefined
+        paymentIMG: undefined,
+        rates: {
+          'BTC': 0.2222
+        }
       })
     })
 
@@ -141,6 +174,13 @@ describe('ledgerUtil test', function () {
       const result = ledgerUtil.formatCurrentBalance()
       assert.equal(result, '0.00 BAT')
     })
+
+    it('defaults to 0 as balance when rate is not present', function () {
+      const data = ledgerData.delete('rates')
+      const result = ledgerUtil.formatCurrentBalance(data)
+      assert.equal(result, '5.00 BAT')
+    })
+
     it('formats `balance` and `converted` values to two decimal places', function () {
       const result = ledgerUtil.formatCurrentBalance(ledgerData)
       assert.equal(result, '5.00 BAT (1.12 USD)')
