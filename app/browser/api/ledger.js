@@ -2367,12 +2367,12 @@ const transitionWalletToBat = () => {
   let newPaymentId, result
 
   if (newClient === true) return
+  clientprep()
 
   // Restore newClient from the file
   if (!newClient) {
     const fs = require('fs')
     try {
-      clientprep()
       fs.accessSync(pathName(newClientPath), fs.FF_OK)
       fs.readFile(pathName(newClientPath), (error, data) => {
         if (error) {
@@ -2393,7 +2393,6 @@ const transitionWalletToBat = () => {
   // Create new client
   if (!newClient) {
     try {
-      clientprep()
       newClient = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
       muonWriter(newClientPath, newClient.state)
     } catch (ex) {
@@ -2417,6 +2416,11 @@ const transitionWalletToBat = () => {
 
       setTimeout(() => transitionWalletToBat(), delayTime)
     })
+    return
+  }
+
+  if (!client) {
+    console.log('Client is not initialized, will try again')
     return
   }
 
