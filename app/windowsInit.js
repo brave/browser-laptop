@@ -75,8 +75,8 @@ if (process.platform === 'win32') {
     process.exit(0)
   }
 
-  const userDataDirSwitch = '--user-data-dir=brave-' + channel
-  if (channel !== 'dev' && !process.argv.includes(userDataDirSwitch)) {
+  const userDataDirSwitch = '--user-data-dir-name=brave-' + channel
+  if (channel && channel !== 'dev' && !process.argv.includes(userDataDirSwitch)) {
     if (cmd === '--squirrel-firstrun') {
       app.relaunch({args: [userDataDirSwitch, '--relaunch']})
     } else {
