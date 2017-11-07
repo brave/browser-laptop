@@ -4,15 +4,22 @@
 
 const React = require('react')
 const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Tabs = require('./tabs')
 const PinnedTabs = require('./pinnedTabs')
+const BrowserButton = require('../common/browserButton')
 
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
+
+const globalStyles = require('../styles/global')
+const {theme} = require('../styles/theme')
+
+const menuButton = require('../../../../img/toolbar/menu_btn.svg')
 
 class TabsToolbar extends React.Component {
   constructor (props) {
@@ -57,23 +64,62 @@ class TabsToolbar extends React.Component {
   }
 
   render () {
-    return <div
-      className='tabsToolbar'
-      onContextMenu={this.onContextMenu}>
+    return <div className={css(styles.tabsToolbar)}
+      data-test-id='tabsToolbar'
+      onContextMenu={this.onContextMenu}
+    >
       {
         this.props.hasPinnedTabs
         ? <PinnedTabs />
         : null
       }
       <Tabs />
-      <div className='tabsToolbarButtons'>
-        <span data-l10n-id='menuButton'
-          className='navbutton menuButton'
-          onClick={this.onHamburgerMenu}
-        />
-      </div>
+      <BrowserButton
+        iconOnly
+        isMaskImage
+        size={globalStyles.spacing.tabsToolbarHeight}
+        custom={styles.tabsToolbar__button_menu}
+        l10nId='menuButton'
+        testId='menuButton'
+        onClick={this.onHamburgerMenu}
+      />
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  tabsToolbar: {
+    boxSizing: 'border-box',
+    backgroundColor: theme.tabsToolbar.backgroundColor,
+    display: 'flex',
+    userSelect: 'none',
+    WebkitAppRegion: 'no-drag',
+
+    // Default border styles
+    borderWidth: '1px 0 0 0',
+    borderStyle: 'solid',
+    borderColor: theme.tabsToolbar.border.color,
+
+    // This element is set as border-box so it does not
+    // take into account the borders as width gutter, so we
+    // increase its size by 1px to include the top border
+    height: `calc(${globalStyles.spacing.tabsToolbarHeight} + 1px)`
+  },
+
+  tabsToolbar__button_menu: {
+    backgroundColor: theme.tabsToolbar.button.backgroundColor,
+    WebkitMaskImage: `url(${menuButton})`,
+    WebkitMaskRepeat: 'no-repeat',
+    WebkitMaskPosition: 'center',
+    WebkitMaskSize: '12px 12px',
+    WebkitMaskOrigin: 'border',
+    marginRight: '5px',
+
+    ':hover': {
+      opacity: 1.0,
+      backgroundColor: theme.tabsToolbar.button.onHover.backgroundColor
+    }
+  }
+})
 
 module.exports = ReduxComponent.connect(TabsToolbar)

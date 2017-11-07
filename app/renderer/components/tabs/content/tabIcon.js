@@ -13,6 +13,7 @@ const cx = require('../../../../../js/lib/classSet')
 
 // Styles
 const globalStyles = require('../../styles/global')
+const {theme} = require('../../styles/theme')
 
 class TabIcon extends ImmutableComponent {
   render () {
@@ -25,7 +26,7 @@ class TabIcon extends ImmutableComponent {
     }
 
     return <div
-      className={this.props.className}
+      className={css(styles.tabIcon, this.props.className)}
       data-test-favicon={this.props['data-test-favicon']}
       onDragStart={this.props.onDragStart}
       draggable={this.props.draggable}
@@ -38,7 +39,7 @@ class TabIcon extends ImmutableComponent {
           ? <span
             className={cx({
               [this.props.symbol]: true,
-              [css(styles.tabIcon, this.props.symbolContent && styles.tabIcon_hasSymbol)]: true
+              [css(styles.tabIcon, styles.tabIcon_symbol, this.props.symbolContent && styles.tabIcon_symbol_content)]: true
             })}
             data-test-id={this.props['data-test-id']}
             data-test2-id={this.props['data-test2-id']}
@@ -53,21 +54,41 @@ class TabIcon extends ImmutableComponent {
 
 const styles = StyleSheet.create({
   tabIcon: {
-    fontSize: 'inherit',
-    display: 'flex',
-    width: globalStyles.spacing.iconSize,
+    boxSizing: 'border-box',
+    position: 'relative',
+    zIndex: globalStyles.zindex.zindexTabsThumbnail,
+
+    // Default spacing properties
     height: globalStyles.spacing.iconSize,
+    width: globalStyles.spacing.iconSize,
+
+    // Default flex properties
+    display: 'flex',
+    alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center',
+
+    // Default background properties
+    backgroundSize: globalStyles.spacing.iconSize,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+
+    // Default animation properties
+    willChange: 'opacity',
+    animationFillMode: 'forwards'
+  },
+
+  tabIcon_symbol: {
+    fontSize: 'inherit',
     fontWeight: 'normal',
     color: 'inherit'
   },
 
-  tabIcon_hasSymbol: {
+  tabIcon_symbol_content: {
     fontSize: '8px',
-    justifyContent: 'flex-end',
     fontWeight: 'bold',
-    color: globalStyles.color.black100
+    justifyContent: 'flex-end',
+    color: theme.tab.icon.symbol.color
   }
 })
 

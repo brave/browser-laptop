@@ -685,7 +685,7 @@ describe('application window', function () {
         let clickWithTargetPage = this.clickWithTargetPage
         yield this.app.client
           .windowByIndex(0)
-          .click('.tabArea:nth-child(1)')
+          .click('[data-test-id="tab-area"]:nth-child(1)')
           .tabByIndex(0)
           .waitForVisible('#name2')
           .click('#name2')

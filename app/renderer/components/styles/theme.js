@@ -10,12 +10,64 @@
   * future theming, including darkUI.
   * Note: If an element is not color-related, it should go into global.js
   */
+
   module.exports.theme = {
     navigator: {
       braveMenu: {
         counter: {
           backgroundColor: '#555',
           color: '#fff'
+        }
+      }
+    },
+
+    audio: {
+      color: globalStyles.color.audioColor
+    },
+
+    filter: {
+      makeWhite: 'brightness(0) invert(1)',
+      whiteShadow: 'drop-shadow(0px 0px 2px rgb(255, 255, 255))'
+    },
+
+    tabsToolbar: {
+      backgroundColor: '#ddd',
+
+      border: {
+        color: '#bbb'
+      },
+
+      button: {
+        backgroundColor: globalStyles.color.buttonColor,
+
+        onHover: {
+          backgroundColor: '#000'
+        }
+      },
+
+      tabs: {
+        navigation: {
+          borderColor: '#bbb'
+        }
+      }
+    },
+
+    tabPage: {
+      backgroundColor: '#fff',
+      borderColor: '#bbb',
+
+      hover: {
+        backgroundColor: globalStyles.color.braveOrange,
+        borderColor: globalStyles.color.braveOrange
+      },
+
+      active: {
+        backgroundColor: globalStyles.color.braveOrange,
+        borderColor: globalStyles.color.braveOrange,
+
+        hover: {
+          backgroundColor: globalStyles.color.braveOrange,
+          borderColor: globalStyles.color.braveOrange
         }
       }
     },
@@ -51,26 +103,36 @@
         color: '#4b3c6e'
       },
 
-      content: {
-        icon: {
+      icon: {
+        default: {
+          primary: '#fff',
+          secondary: 'rgb(101, 101, 101)'
+        },
+
+        private: {
+          background: {
+            active: '#fff',
+            notActive: '#000'
+          }
+        },
+
+        audio: {
+          color: '#69B9F9'
+        },
+
+        close: {
+          filter: 'invert(100%) grayscale(1) contrast(0.5) brightness(160%)'
+        },
+
+        symbol: {
+          color: globalStyles.color.black100,
+
           default: {
-            primary: '#fff',
-            secondary: 'rgb(101, 101, 101)'
-          },
+            backgroundColor: globalStyles.color.mediumGray,
 
-          private: {
-            background: {
-              active: '#fff',
-              notActive: '#000'
+            light: {
+              backgroundColor: globalStyles.color.white100
             }
-          },
-
-          audio: {
-            color: '#69B9F9'
-          },
-
-          close: {
-            filter: 'invert(100%) grayscale(1) contrast(0.5) brightness(160%)'
           }
         }
       }

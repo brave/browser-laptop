@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this file,
 * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const {opacityIncreaseKeyframes} = require('./animations')
+const {opacityIncreaseKeyframes, tabFadeInKeyframes} = require('./animations')
 
 /**
 * Use this file when the style you need
@@ -52,9 +52,6 @@ const globalStyles = {
     navigationBarBackground: 'white',
     chromeControlsBackground: '#bbb',
     chromeControlsBackground2: 'white',
-    tabsToolbarBorderColor: '#bbb',
-    tabsBackground: '#ddd',
-    tabsBackgroundInactive: '#ddd',
     commonFormBottomWrapperBackground: '#ddd',
     commonFormBackgroundColor: '#f7f7f7',
     toolbarBackground: '#eee',
@@ -102,10 +99,6 @@ const globalStyles = {
     almostInvisible: 'rgba(255,255,255,0.01)',
     urlBarOutline: '#bbb',
     alphaWhite: 'rgba(255,255,255,0.8)'
-  },
-  filter: {
-    makeWhite: 'brightness(0) invert(1)',
-    whiteShadow: 'drop-shadow(0px 0px 2px rgb(255, 255, 255))'
   },
   radius: {
     borderRadius: '4px',
@@ -166,6 +159,7 @@ const globalStyles = {
     iconSize: '16px',
     sessionIconSize: '15px',
     closeIconSize: '13px',
+    newSessionIconSize: '13px',
     narrowIconSize: '12px',
     dialogWidth: '422px',
     dialogSmallWidth: '350px',
@@ -216,7 +210,6 @@ const globalStyles = {
     zindexTabs: '1000',
     zindexTabsAudioTopBorder: '1001',
     zindexTabsThumbnail: '1100',
-    zindexTabsDragIndicator: '1100',
     zindexNavigationBar: '2000',
     zindexUrlbarNotLegend: '2100',
     zindexPopUp: '3000',
@@ -247,6 +240,10 @@ const globalStyles = {
     loading: 'fa fa-spinner fa-spin',
     lock: 'fa fa-lock',
     moreInfo: 'fa fa-info-circle',
+    next: 'fa fa-caret-right',
+    openLocation: 'fa fa-folder-open-o',
+    pause: 'fa fa-pause',
+    prev: 'fa fa-caret-left',
     private: 'fa fa-eye',
     question: 'fa fa-question-circle',
     refresh: 'fa fa-refresh',
@@ -263,10 +260,20 @@ const globalStyles = {
   animations: {
     subtleShowUp: {
       opacity: 0,
+      willChange: 'opacity',
       animationName: opacityIncreaseKeyframes,
       animationDelay: '120ms',
       animationTimingFunction: 'linear',
       animationDuration: '120ms',
+      animationFillMode: 'forwards'
+    },
+
+    tabFadeIn: {
+      opacity: 0.5,
+      willChange: 'opacity',
+      animationName: tabFadeInKeyframes,
+      animationDuration: '0.75s',
+      animationTimingFunction: 'ease-in-out',
       animationFillMode: 'forwards'
     }
   },
