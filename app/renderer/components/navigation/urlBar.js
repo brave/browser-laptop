@@ -425,7 +425,7 @@ class UrlBar extends React.Component {
     const braverySettings = siteSettings.getSiteSettingsForURL(allSiteSettings, location)
 
     // TODO(bridiver) - these definitely needs a helpers
-    const publisherId = ledgerState.getLocationPublisher(state, baseUrl)
+    const publisherKey = ledgerState.getLocationProp(state, baseUrl, 'publisher')
 
     const activateSearchEngine = urlbar.getIn(['searchDetail', 'activateSearchEngine'])
     const urlbarSearchDetail = urlbar.get('searchDetail')
@@ -445,7 +445,7 @@ class UrlBar extends React.Component {
     const props = {}
     // used in renderer
     props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
-    props.publisherButtonVisible = publisherUtil.shouldShowAddPublisherButton(state, location, publisherId)
+    props.publisherButtonVisible = publisherUtil.shouldShowAddPublisherButton(state, location, publisherKey)
     props.titleMode = ownProps.titleMode
     props.hostValue = hostValue
     props.urlbarLocation = urlbarLocation
