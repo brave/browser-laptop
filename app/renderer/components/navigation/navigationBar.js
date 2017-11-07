@@ -94,7 +94,7 @@ class NavigationBar extends React.Component {
     const loading = activeFrame.get('loading')
     const location = activeFrame.get('location', '')
     const locationId = getBaseUrl(location)
-    const publisherId = ledgerState.getLocationProp(state, locationId, 'publisher')
+    const publisherKey = ledgerState.getLocationProp(state, locationId, 'publisher')
     const navbar = activeFrame.get('navbar', Immutable.Map())
 
     const hasTitle = title && location && title !== location.replace(/^https?:\/\//, '')
@@ -119,7 +119,7 @@ class NavigationBar extends React.Component {
     props.isWideUrlBarEnabled = getSetting(settings.WIDE_URL_BAR)
     props.showBookmarkHanger = bookmarkDetail.get('isBookmarkHanger', false)
     props.isLoading = loading
-    props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherId)
+    props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherKey)
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
 
     // used in other functions

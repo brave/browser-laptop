@@ -1559,15 +1559,6 @@ const appActions = {
     })
   },
 
-  onLedgerLocationUpdate: function (location, prop, value) {
-    dispatch({
-      actionType: appConstants.APP_ON_LEDGER_LOCATION_UPDATE,
-      location,
-      prop,
-      value
-    })
-  },
-
   onLedgerWalletCreate: function () {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_WALLET_CREATE
@@ -1696,6 +1687,13 @@ const appActions = {
   onBitcoinToBatBeginTransition: function () {
     dispatch({
       actionType: appConstants.APP_ON_BTC_TO_BAT_BEGIN_TRANSITION
+    })
+  },
+
+  onPublisherTimestamp: function (timestamp) {
+    dispatch({
+      actionType: appConstants.APP_ON_PUBLISHER_TIMESTAMP,
+      timestamp
     })
   }
 }
