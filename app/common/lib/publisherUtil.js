@@ -12,12 +12,12 @@ const {isHttpOrHttps} = require('../../../js/lib/urlutil')
 const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 
 const publisherState = {
-  shouldShowAddPublisherButton: (state, location, publisherId) => {
+  shouldShowAddPublisherButton: (state, location, publisherKey) => {
     return location &&
       !isSourceAboutUrl(location) &&
       getSetting(settings.PAYMENTS_ENABLED) &&
       isHttpOrHttps(location) &&
-      !ledgerUtil.blockedP(state, publisherId)
+      !ledgerUtil.blockedP(state, publisherKey)
   }
 }
 
