@@ -200,8 +200,13 @@ class EnabledContent extends ImmutableComponent {
               [25, 50, 75, 100].map((amount) => {
                 let alternative = ''
                 if (ledgerData.has('currentRate')) {
-                  alternative = `(${batToCurrencyString(amount, ledgerData)})`
+                  const converted = batToCurrencyString(amount, ledgerData)
+
+                  if (converted) {
+                    alternative = `(${converted})`
+                  }
                 }
+
                 return <option value={amount}>{amount} BAT {alternative}</option>
               })
             }
