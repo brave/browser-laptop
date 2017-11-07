@@ -480,7 +480,7 @@ const isFirstFrameKeyInTabPage = (state, frameKey) => {
   const firstFrame = unpinnedTabs
     .slice(startingFrameIndex, startingFrameIndex + tabsPerTabPage).first()
 
-  return firstFrame.get('key') === frameKey
+  return firstFrame && firstFrame.get('key') === frameKey
 }
 
 const getTabPageIndex = (state) => {
