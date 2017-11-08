@@ -76,13 +76,16 @@ if (process.platform === 'win32') {
   }
 
   const userDataDirSwitch = '--user-data-dir-name=brave-' + channel
-  if (channel && channel !== 'dev' && !process.argv.includes(userDataDirSwitch)) {
+  if (channel !== 'dev' && !process.argv.includes(userDataDirSwitch) &&
+      !process.argv.includes('--relaunch') &&
+      !process.argv.includes('--user-data-dir-name=brave-development')) {
+    delete process.env.CHROME_USER_DATA_DIR
     if (cmd === '--squirrel-firstrun') {
       app.relaunch({args: [userDataDirSwitch, '--relaunch']})
     } else {
-      app.relaunch({args: process.argv.slice(1) + [userDataDirSwitch, '--relaunch']})
+      app.relaunch({args: process.argv.slice(1).concat([userDataDirSwitch, '--relaunch'])})
     }
-    app.quit()
+    app.exit()
   }
 }
 
