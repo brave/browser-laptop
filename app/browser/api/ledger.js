@@ -2490,7 +2490,8 @@ const getMethods = () => {
     deleteSynopsis,
     transitionWalletToBat,
     getNewClient,
-    savePublisherData
+    savePublisherData,
+    pruneSynopsis
   }
 
   let privateMethods = {}
@@ -2514,7 +2515,6 @@ const getMethods = () => {
         client = data
       },
       synopsisNormalizer,
-      pruneSynopsis,
       checkVerifiedStatus
     }
   }
