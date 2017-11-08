@@ -347,7 +347,7 @@ const doAction = (action) => {
       windowState = frameStateUtil.setPreviewFrameKey(windowState, action.frameKey, true)
       break
     case windowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX:
-      windowState = frameStateUtil.setPreviewTabPageIndex(windowState, action.previewTabPageIndex, true)
+      windowState = frameStateUtil.setPreviewTabPageIndex(windowState, action.previewTabPageIndex)
       break
     case windowConstants.WINDOW_SET_TAB_PAGE_INDEX:
       if (action.index != null) {
