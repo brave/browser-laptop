@@ -57,7 +57,12 @@ const updateWindow = (windowId) => {
 }
 
 const updatePinnedTabs = (win) => {
-  if (win.webContents.browserWindowOptions.disposition === 'new-popup') {
+  // don't continue if window won't need pinned tabs updated
+  if (
+    !win ||
+    win.isDestroyed() ||
+    win.webContents.browserWindowOptions.disposition === 'new-popup'
+  ) {
     return
   }
 
