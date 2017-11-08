@@ -2369,7 +2369,20 @@ const transitionWalletToBat = () => {
   if (newClient === true) return
   clientprep()
 
-  // Restore newClient from the file
+  if (!client) {
+    console.log('Client is not initialized, will try again')
+    return
+  }
+
+  // only attempt this transition if the wallet is v1
+  if (client && client.options && client.options.version !== 'v1') {
+    // older versions incorrectly marked this for transition
+    // this will clean them up (no more bouncy ball)
+    appActions.onBitcoinToBatTransitioned()
+    return
+  }
+
+  // Restore newClient from the file (if one exists)
   if (!newClient) {
     const fs = require('fs')
     try {
@@ -2416,11 +2429,6 @@ const transitionWalletToBat = () => {
 
       setTimeout(() => transitionWalletToBat(), delayTime)
     })
-    return
-  }
-
-  if (!client) {
-    console.log('Client is not initialized, will try again')
     return
   }
 
@@ -2510,6 +2518,12 @@ const getMethods = () => {
       getSynopsis: () => synopsis,
       setSynopsis: (data) => {
         synopsis = data
+      },
+      resetNewClient: () => {
+        newClient = false
+      },
+      getClient: () => {
+        return client
       },
       setClient: (data) => {
         client = data
