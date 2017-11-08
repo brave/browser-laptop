@@ -176,7 +176,7 @@ const api = {
 
           ipcMain.on(messages.NOTIFICATION_RESPONSE, function notificationResponseCallback (e, message, buttonIndex, persist) {
             if (message === locale.translation('unexpectedErrorWindowReload')) {
-              appActions.hideMessageBox(message)
+              appActions.hideNotification(message)
               ipcMain.removeListener(messages.NOTIFICATION_RESPONSE, notificationResponseCallback)
             }
           })
