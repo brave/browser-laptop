@@ -18,6 +18,7 @@ const assert = require('assert')
 const Immutable = require('immutable')
 const app = electron.app
 const compareVersions = require('compare-versions')
+const merge = require('deepmerge')
 
 // Constants
 const UpdateStatus = require('../js/constants/updateStatus')
@@ -850,7 +851,7 @@ module.exports.loadAppState = () => {
       data = {}
     }
 
-    data = Object.assign({}, module.exports.defaultAppState(), data)
+    data = merge(module.exports.defaultAppState(), data)
     data = module.exports.runImportDefaultSettings(data)
     if (loaded) {
       data = module.exports.runPreMigrations(data)
