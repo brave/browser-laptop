@@ -345,6 +345,7 @@ describe('ledger api unit tests', function () {
     after(function () {
       transitionWalletToBatStub.restore()
     })
+
     describe('when not a new install and wallet has not been upgraded', function () {
       let result
       before(function () {
@@ -410,15 +411,16 @@ describe('ledger api unit tests', function () {
   describe('transitionWalletToBat', function () {
     describe('when client is not busy', function () {
       before(function () {
-        const batState = ledgerApi.onBootStateFile(defaultAppState)
+        ledgerApi.onBootStateFile(defaultAppState)
         ledgerTransitionSpy.reset()
         onBitcoinToBatTransitionedSpy.reset()
         onLedgerCallbackSpy.reset()
         ledgerTransitionedSpy.reset()
         onBitcoinToBatBeginTransitionSpy.reset()
         ledgerClient.reset()
+        ledgerApi.resetNewClient()
         isBusy = false
-        ledgerApi.transitionWalletToBat(batState)
+        ledgerApi.transitionWalletToBat()
       })
       it('creates a new instance of ledgerClient', function () {
         assert(ledgerClient.calledOnce)
@@ -443,6 +445,30 @@ describe('ledger api unit tests', function () {
     })
     describe('when client is busy', function () {
       before(function () {
+        ledgerApi.onBootStateFile(defaultAppState)
+        ledgerTransitionSpy.reset()
+        onBitcoinToBatTransitionedSpy.reset()
+        onLedgerCallbackSpy.reset()
+        ledgerTransitionedSpy.reset()
+        onBitcoinToBatBeginTransitionSpy.reset()
+        ledgerClient.reset()
+        ledgerApi.resetNewClient()
+        isBusy = true
+        ledgerApi.transitionWalletToBat()
+      })
+      after(function () {
+        isBusy = false
+      })
+      it('does not call AppActions.onBitcoinToBatBeginTransition', function () {
+        assert(onBitcoinToBatBeginTransitionSpy.notCalled)
+      })
+      it('does not call client.transition', function () {
+        assert(ledgerTransitionSpy.notCalled)
+      })
+    })
+    describe('when client is not v1', function () {
+      let oldClient
+      before(function () {
         const batState = ledgerApi.onBootStateFile(defaultAppState)
         ledgerTransitionSpy.reset()
         onBitcoinToBatTransitionedSpy.reset()
@@ -450,11 +476,20 @@ describe('ledger api unit tests', function () {
         ledgerTransitionedSpy.reset()
         onBitcoinToBatBeginTransitionSpy.reset()
         ledgerClient.reset()
-        isBusy = true
+        oldClient = ledgerApi.getClient()
+        ledgerApi.setClient({
+          options: {
+            version: 'v2'
+          }
+        })
+        ledgerApi.resetNewClient()
         ledgerApi.transitionWalletToBat(batState)
       })
-      it('does not call AppActions.onBitcoinToBatBeginTransition', function () {
-        assert(onBitcoinToBatBeginTransitionSpy.notCalled)
+      after(function () {
+        ledgerApi.setClient(oldClient)
+      })
+      it('calls AppActions.onBitcoinToBatTransitioned', function () {
+        assert(onBitcoinToBatTransitionedSpy.calledOnce)
       })
       it('does not call client.transition', function () {
         assert(ledgerTransitionSpy.notCalled)
