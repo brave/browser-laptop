@@ -21,7 +21,6 @@ const {getSetting} = require('../settings')
 const {isIntermediateAboutPage} = require('../lib/appUrlUtil')
 const urlParse = require('../../app/common/urlParse')
 
-let tabPageHoverTimeout
 let tabHoverTimeout = null
 
 const comparatorByKeyAsc = (a, b) => a.get('key') > b.get('key')
@@ -584,34 +583,14 @@ const getPreviewFrameKey = (state) => {
   return state.get('previewFrameKey')
 }
 
-const setPreviewTabPageIndex = (state, index, immediate = false) => {
-  clearTimeout(tabPageHoverTimeout)
+const setPreviewTabPageIndex = (state, index) => {
   const previewTabs = getSetting(settings.SHOW_TAB_PREVIEWS)
   const isActive = state.getIn(['ui', 'tabs', 'tabPageIndex']) === index
+  const hoverTabPageIndex = state.getIn(['ui', 'tabs', 'hoverTabPageIndex'])
   let newTabPageIndex = index
 
-  if (!previewTabs || state.getIn(['ui', 'tabs', 'hoverTabPageIndex']) !== index || isActive) {
+  if (!previewTabs || hoverTabPageIndex !== index || isActive) {
     newTabPageIndex = null
-  }
-
-  if (!immediate) {
-    // if there is an existing preview tab page index then we're already in preview mode
-    // we use actions here because that is the only way to delay updating the state
-    const previewMode = state.getIn(['ui', 'tabs', 'previewTabPageIndex']) != null
-    if (previewMode && newTabPageIndex == null) {
-      // add a small delay when we are clearing the preview frame key so we don't lose
-      // previewMode if the user mouses over another tab - see below
-      tabPageHoverTimeout = setTimeout(windowActions.setPreviewTabPageIndex.bind(null, null), 200)
-      return state
-    }
-
-    if (!previewMode) {
-      // If user isn't in previewMode so we add a bit of delay to avoid tab from flashing out
-      // as reported here: https://github.com/brave/browser-laptop/issues/1434
-      // using an action here because that is the only way we can do a delayed state update
-      tabPageHoverTimeout = setTimeout(windowActions.setPreviewTabPageIndex.bind(null, newTabPageIndex), 200)
-      return state
-    }
   }
 
   return state.setIn(['ui', 'tabs', 'previewTabPageIndex'], newTabPageIndex)
