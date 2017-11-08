@@ -444,4 +444,52 @@ describe('frameStateUtil', function () {
       assert.equal(result, true)
     })
   })
+
+  describe('isFirstFrameKeyInTabPage', function () {
+    beforeEach(function () {
+      this.frameKey1 = 1
+      this.frameKey2 = 7
+      this.state = defaultWindowStore.mergeIn(['frames'],
+        [{key: this.frameKey1}, {}, {}, {}, {}, {}, {key: this.frameKey2}]
+      )
+    })
+    it('returns false if frame list is empty', function () {
+      getSettingsValue = 10
+      this.state = this.state.set('frames', Immutable.fromJS([{}]))
+      const result = frameStateUtil.isFirstFrameKeyInTabPage(this.state, this.frameKey1)
+      assert.equal(result, false)
+    })
+    it('returns false if the frame is not the first frame', function () {
+      getSettingsValue = 10
+      this.state = this.state.setIn(['ui', 'tabs', 'tabPageIndex'], 0)
+      const result = frameStateUtil.isFirstFrameKeyInTabPage(this.state, this.frameKey7)
+      assert.equal(result, false)
+    })
+    it('returns false if the frame key is not defined', function () {
+      getSettingsValue = 10
+      this.state = this.state.setIn(['ui', 'tabs', 'tabPageIndex'], 0)
+      const result = frameStateUtil.isFirstFrameKeyInTabPage(this.state, null)
+      assert.equal(result, false)
+    })
+    it('returns true if the frame is the first in the first tab set', function () {
+      getSettingsValue = 10
+      this.state = this.state.setIn(['ui', 'tabs', 'tabPageIndex'], 0)
+      const result = frameStateUtil.isFirstFrameKeyInTabPage(this.state, this.frameKey1)
+      assert.equal(result, true)
+    })
+    it('ignores pinned frames even if frame is the first in the tab set', function () {
+      getSettingsValue = 10
+      this.state = this.state
+        .setIn(['ui', 'tabs', 'tabPageIndex'], 0)
+        .mergeIn(['frames', 0], {pinnedLocation: true})
+      const result = frameStateUtil.isFirstFrameKeyInTabPage(this.state, this.frameKey1)
+      assert.equal(result, false)
+    })
+    it('returns true if the frame is the first in the second tab set', function () {
+      this.state = this.state.setIn(['ui', 'tabs', 'tabPageIndex'], 1)
+      getSettingsValue = 6
+      const result = frameStateUtil.isFirstFrameKeyInTabPage(this.state, this.frameKey2)
+      assert.equal(result, true)
+    })
+  })
 })
