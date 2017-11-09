@@ -928,7 +928,11 @@ const styles = StyleSheet.create({
   braveryPanel__body__ul__li: {
     listStyleType: 'none',
     padding: '10px 0',
-    cursor: 'text'
+    cursor: 'text',
+
+    // #9839 and #11878: Avoid the panel width from increasing.
+    width: 0,
+    whiteSpace: 'nowrap'
   },
   braveryPanel__body__hr: {
     background: globalStyles.braveryPanel.body.hr.background,
@@ -980,10 +984,6 @@ const styles = StyleSheet.create({
   },
   braveryPanel_compact__body__ul__li: {
     padding: '5px 0',
-
-    // #9839: Avoid the panel width from increasing
-    width: 0,
-    whiteSpace: 'nowrap',
 
     ':first-of-type': {
       paddingTop: 0
