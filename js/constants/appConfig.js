@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+const Immutable = require('immutable')
 const {getTargetAboutUrl} = require('../lib/appUrlUtil')
 
 // BRAVE_UPDATE_HOST should be set to the host name for the auto-updater server
@@ -142,7 +143,7 @@ module.exports = {
     'general.download-default-path': '',
     'general.download-always-ask': true,
     'general.spellcheck-enabled': true,
-    'general.spellcheck-languages': ['en-US'],
+    'general.spellcheck-languages': Immutable.fromJS(['en-US']),
     'search.default-search-engine': 'Google',
     'search.offer-search-suggestions': false, // false by default for privacy reasons
     'tabs.switch-to-new-tabs': false,
