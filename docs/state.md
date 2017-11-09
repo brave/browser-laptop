@@ -238,6 +238,83 @@ AppStore
         publisher: string // url of the publisher in question
       }
     },
+    promotion: {
+      activeState: string,
+      claimedTimestamp: number,
+      promotionId: number,
+      remindTimestamp: number,
+      stateWallet: {
+        disabledWallet: {
+          notification: {
+            buttons: [{
+              buttonActionId: string,
+              className: string,
+              text: string
+            }],
+            firstShowTimestamp: number,
+            greeting: string,
+            message: string,
+            messageAction: string,
+            options: {
+              persist: boolean,
+              style: string
+            }        
+          },
+          panel: {
+            disclaimer: string,
+            optInMarkup: string,
+            optedInButton: string,
+            successText: string
+          }
+        },
+        emptyWallet: {
+          notification: {
+            buttons: [{
+              buttonActionId: string,
+              className: string,
+              text: string
+            }],
+            firstShowTimestamp: number,
+            greeting: string,
+            message: string,
+            messageAction: string,
+            options: {
+              persist: boolean,
+              style: string
+            }        
+          },
+          panel: {
+            disclaimer: string,
+            optInMarkup: string,
+            optedInButton: string,
+            successText: string
+          }
+        },
+        fundedWallet: {
+          notification: {
+            buttons: [{
+              buttonActionId: string,
+              className: string,
+              text: string
+            }],
+            firstShowTimestamp: number,
+            greeting: string,
+            message: string,
+            messageAction: string,
+            options: {
+              persist: boolean,
+              style: string
+            }        
+          },
+          panel: {
+            disclaimer: string,
+            optInMarkup: string,
+            optedInButton: string,
+            successText: string
+          }
+        }
+      }
+    }
     publisherTimestamp: number, // timestamp of last publisher update in the database
     synopsis: {
       options: {

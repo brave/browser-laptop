@@ -5,10 +5,17 @@
 const Immutable = require('immutable')
 const assert = require('assert')
 
+// Actions
+const appActions = require('../../../js/actions/appActions')
+
 // State
 const pageDataState = require('./pageDataState')
 
+// Constants
+const settings = require('../../../js/constants/settings')
+
 // Utils
+const getSetting = require('../../../js/settings').getSetting
 const siteSettings = require('../../../js/state/siteSettings')
 const urlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable, isMap} = require('../../common/state/immutableUtil')
@@ -326,7 +333,135 @@ const ledgerState = {
     return state
   },
 
-  // About page
+  /**
+   * PROMOTIONS
+   */
+  savePromotion: (state, promotion) => {
+    state = validateState(state)
+
+    if (promotion == null) {
+      return state
+    }
+
+    promotion = makeImmutable(promotion)
+
+    const oldPromotion = ledgerState.getPromotion(state)
+
+    if (promotion.get('promotionId') === oldPromotion.get('promotionId')) {
+      promotion = oldPromotion.mergeDeep(promotion)
+    } else {
+      if (!oldPromotion.isEmpty()) {
+        const notification = ledgerState.getPromotionNotification(state)
+        appActions.hideNotification(notification.get('message'))
+      }
+
+      promotion = promotion.set('remindTimestamp', -1)
+    }
+
+    state = state.setIn(['ledger', 'promotion'], promotion)
+    return ledgerState.setActivePromotion(state)
+  },
+
+  getPromotion: (state) => {
+    state = validateState(state)
+
+    return state.getIn(['ledger', 'promotion']) || Immutable.Map()
+  },
+
+  setActivePromotion: (state, paymentsEnabled = null) => {
+    state = validateState(state)
+    const promotion = ledgerState.getPromotion(state)
+
+    if (promotion.isEmpty()) {
+      return state
+    }
+
+    if (paymentsEnabled === null) {
+      paymentsEnabled = getSetting(settings.PAYMENTS_ENABLED)
+    }
+
+    let active = 'disabledWallet'
+    if (paymentsEnabled) {
+      const balance = ledgerState.getInfoProp(state, 'balance') || 0
+
+      if (balance > 0) {
+        active = 'fundedWallet'
+      } else {
+        active = 'emptyWallet'
+      }
+    }
+
+    return state.setIn(['ledger', 'promotion', 'activeState'], active)
+  },
+
+  getActivePromotion: (state) => {
+    state = validateState(state)
+    const active = state.getIn(['ledger', 'promotion', 'activeState'])
+
+    if (!active) {
+      return Immutable.Map()
+    }
+
+    return state.getIn(['ledger', 'promotion', 'stateWallet', active]) || Immutable.Map()
+  },
+
+  setPromotionProp: (state, prop, value) => {
+    state = validateState(state)
+
+    if (prop == null) {
+      return state
+    }
+
+    return state.setIn(['ledger', 'promotion', prop], value)
+  },
+
+  removePromotion: (state) => {
+    state = validateState(state)
+
+    let promotion = Immutable.fromJS({})
+
+    return state.setIn(['ledger', 'promotion'], promotion)
+  },
+
+  remindMeLater: (state, time) => {
+    const ledgerUtil = require('../lib/ledgerUtil')
+    if (time == null) {
+      time = 24 * ledgerUtil.miliseconds.hour
+    }
+
+    state = validateState(state)
+
+    return ledgerState.setPromotionProp(state, 'remindTimestamp', new Date().getTime() + time)
+  },
+
+  /**
+   * PROMOTIONS / NOTIFICATION
+   */
+
+  getPromotionNotification: (state) => {
+    state = validateState(state)
+
+    const promotion = ledgerState.getActivePromotion(state)
+
+    return promotion.get('notification') || Immutable.Map()
+  },
+
+  setPromotionNotificationProp: (state, prop, value) => {
+    state = validateState(state)
+
+    if (prop == null) {
+      return state
+    }
+
+    const active = state.getIn(['ledger', 'promotion', 'activeState'])
+    const path = ['ledger', 'promotion', 'stateWallet', active, 'notification', prop]
+
+    return state.setIn(path, value)
+  },
+
+  /**
+   * ABOUT PAGE
+   */
   // TODO (optimization) don't have two almost identical object in state (synopsi->publishers and about->synopsis)
   saveAboutSynopsis: (state, publishers) => {
     state = validateState(state)
@@ -356,6 +491,16 @@ const ledgerState = {
   geWizardData: (state) => {
     state = validateState(state)
     return state.getIn(['ledger', 'wizardData']) || Immutable.Map()
+  },
+
+  getAboutPromotion: (state) => {
+    const promotion = ledgerState.getActivePromotion(state)
+    const claim = state.getIn(['ledger', 'promotion', 'claimedTimestamp']) || null
+    if (claim) {
+      return promotion.set('claimedTimestamp', claim)
+    }
+
+    return promotion
   }
 }
 

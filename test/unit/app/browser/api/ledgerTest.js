@@ -41,6 +41,8 @@ describe('ledger api unit tests', function () {
   let onLedgerCallbackSpy
   let onBitcoinToBatBeginTransitionSpy
   let onChangeSettingSpy
+  let ledgersetPromotionSpy
+  let ledgergetPromotionSpy
 
   const defaultAppState = Immutable.fromJS({
     cache: {
@@ -142,12 +144,16 @@ describe('ledger api unit tests', function () {
       },
       publisherTimestamp: function () {
         return 0
-      }
+      },
+      getPromotion: () => {},
+      setPromotion: () => {}
     }
     ledgerClient.prototype.boolion = function (value) { return false }
     ledgerClient.prototype.getWalletPassphrase = function (state) {}
     ledgerTransitionSpy = sinon.spy(lc, 'transition')
     ledgerTransitionedSpy = sinon.spy(lc, 'transitioned')
+    ledgersetPromotionSpy = sinon.spy(lc, 'setPromotion')
+    ledgergetPromotionSpy = sinon.spy(lc, 'getPromotion')
     ledgerClient.returns(lc)
     mockery.registerMock('bat-client', ledgerClient)
 
@@ -493,6 +499,7 @@ describe('ledger api unit tests', function () {
 
       after(function () {
         verifiedPSpy.restore()
+        ledgerApi.setClient(undefined)
       })
 
       it('null case', function () {
@@ -1028,6 +1035,10 @@ describe('ledger api unit tests', function () {
       showPaymentDoneSpy.reset()
     })
 
+    after(function () {
+      showPaymentDoneSpy.restore()
+    })
+
     it('null case', function () {
       ledgerApi.observeTransactions(defaultAppState)
       assert(showPaymentDoneSpy.notCalled)
@@ -1081,8 +1092,12 @@ describe('ledger api unit tests', function () {
         generatePaymentDataSpy = sinon.spy(ledgerApi, 'generatePaymentData')
       })
 
-      after(function () {
+      afterEach(function () {
         generatePaymentDataSpy.reset()
+      })
+
+      after(function () {
+        generatePaymentDataSpy.restore()
       })
 
       it('null case', function () {
@@ -1303,6 +1318,90 @@ describe('ledger api unit tests', function () {
           .setIn(['ledger', 'info', 'unconfirmed'], 50)
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
+    })
+  })
+
+  describe('claimPromotion', function () {
+    const state = defaultAppState
+      .setIn(['ledger', 'promotion', 'promotionId'], '1')
+
+    before(function () {
+      ledgersetPromotionSpy.reset()
+    })
+
+    afterEach(function () {
+      ledgersetPromotionSpy.reset()
+    })
+
+    it('null case', function () {
+      ledgerApi.claimPromotion(defaultAppState)
+      assert(ledgersetPromotionSpy.notCalled)
+    })
+
+    it('empty client', function () {
+      const oldClient = ledgerApi.getClient()
+      ledgerApi.setClient(undefined)
+      ledgerApi.claimPromotion(state)
+      assert(ledgersetPromotionSpy.notCalled)
+      ledgerApi.setClient(oldClient)
+    })
+
+    it('execute', function () {
+      ledgerApi.claimPromotion(state)
+      assert(ledgersetPromotionSpy.calledOnce)
+    })
+  })
+
+  describe('getPromotion', function () {
+    before(function () {
+      ledgergetPromotionSpy.reset()
+      ledgerClient.reset()
+    })
+
+    afterEach(function () {
+      ledgergetPromotionSpy.reset()
+      ledgerClient.reset()
+    })
+
+    it('empty client', function () {
+      const oldClient = ledgerApi.getClient()
+      ledgerApi.setClient(undefined)
+      ledgerApi.getPromotion()
+      assert(ledgergetPromotionSpy.calledOnce)
+      assert(ledgerClient.calledOnce)
+      ledgerApi.setClient(oldClient)
+    })
+
+    it('existing client', function () {
+      ledgerApi.getPromotion()
+      assert(ledgerClient.notCalled)
+      assert(ledgergetPromotionSpy.calledOnce)
+    })
+  })
+
+  describe('onPromotionResponse', function () {
+    let removeNotificationSpy, fakeClock, getBalanceSpy
+
+    before(function () {
+      removeNotificationSpy = sinon.spy(ledgerNotificationsApi, 'removePromotionNotification')
+      getBalanceSpy = sinon.spy(ledgerApi, 'getBalance')
+      fakeClock = sinon.useFakeTimers()
+    })
+
+    after(function () {
+      removeNotificationSpy.restore()
+      getBalanceSpy.restore()
+      fakeClock.restore()
+    })
+
+    it('execute', function () {
+      fakeClock.tick(6000)
+      const result = ledgerApi.onPromotionResponse(defaultAppState)
+      const expectedSate = defaultAppState
+        .setIn(['ledger', 'promotion', 'claimedTimestamp'], 6000)
+      assert(removeNotificationSpy.calledOnce)
+      assert(getBalanceSpy.calledOnce)
+      assert.deepEqual(result.toJS(), expectedSate.toJS())
     })
   })
 })

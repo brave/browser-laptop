@@ -1824,6 +1824,43 @@ const appActions = {
     })
   },
 
+  saveLedgerPromotion: function (promotion) {
+    dispatch({
+      actionType: appConstants.APP_SAVE_LEDGER_PROMOTION,
+      promotion
+    })
+  },
+
+  onPromotionClaim: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_PROMOTION_CLAIM
+    })
+  },
+
+  onPromotionResponse: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_PROMOTION_RESPONSE
+    })
+  },
+
+  onPromotionRemind: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_PROMOTION_REMIND
+    })
+  },
+
+  onPromotionRemoval: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_PROMOTION_REMOVAL
+    })
+  },
+
+  onLedgerNotificationInterval: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_NOTIFICATION_INTERVAL
+    })
+  },
+
   onLedgerMediaData: function (url, type, tabId) {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_MEDIA_DATA,
