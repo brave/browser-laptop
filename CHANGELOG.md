@@ -1,6 +1,20 @@
 # Changelog
 
 Release Notes:
+## [0.19.88](https://github.com/brave/browser-laptop/releases/tag/v0.19.88dev)
+
+ - Fixed ctrl-shift-tab keyboard navigation. ([#11331](https://github.com/brave/browser-laptop/issues/11331))
+ - Fixed ledger notification not appearing above the tab area. ([#11256](https://github.com/brave/browser-laptop/issues/11256))
+ - Fixed navigating tabs via keyboard shortcuts doesn't switch tab page. ([#11884](https://github.com/brave/browser-laptop/issues/11884))
+ - Fixed incorrect USD value being shown momentarily post wallet conversion. ([#11746](https://github.com/brave/browser-laptop/issues/11746))
+ - Fixed spell check not being disabled when no language is set. ([#11739](https://github.com/brave/browser-laptop/issues/11739))
+ - Fixed Uncaught Exception: TypeError: ledgerClient is not a function while transition from 0.18.x to 0.19.x. ([#11703](https://github.com/brave/browser-laptop/issues/11703))
+ - Fixed BusyP errors when toggling payments several times and leaving disabled. ([#11684](https://github.com/brave/browser-laptop/issues/11684))
+ - Fixed addresses & QR codes not always being displayed when creating wallet. ([#11589](https://github.com/brave/browser-laptop/issues/11589))
+ - Fixed several bad state scenarios for the ledger. ([#11566](https://github.com/brave/browser-laptop/issues/11566))
+ - Upgraded to muon 4.5.15. ([#11850](https://github.com/brave/browser-laptop/issues/11850))
+ - Upgraded to Chromium 62.0.3202.89. ([#11827](https://github.com/brave/browser-laptop/issues/11827))
+
 ## [0.19.80](https://github.com/brave/browser-laptop/releases/tag/v0.19.80dev)
 
  - Added spell check and the ability to select multiple languages. ([#2183](https://github.com/brave/browser-laptop/issues/2183))
