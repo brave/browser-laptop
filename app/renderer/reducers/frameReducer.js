@@ -178,6 +178,7 @@ const frameReducer = (state, action, immutableAction) => {
         state = frameStateUtil.setActiveFrameKey(state, frame.get('key'))
         state = frameStateUtil.setFrameLastAccessedTime(state, sourceFrameIndex)
         state = state.set('previewFrameKey', null)
+        state = frameStateUtil.updateTabPageIndex(state, tabId)
       }
       break
     case windowConstants.WINDOW_SET_NAVIGATED:
