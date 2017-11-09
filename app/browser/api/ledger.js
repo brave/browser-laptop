@@ -8,7 +8,6 @@ const acorn = require('acorn')
 const moment = require('moment')
 const Immutable = require('immutable')
 const electron = require('electron')
-const ipc = electron.ipcMain
 const path = require('path')
 const os = require('os')
 const qr = require('qr-image')
@@ -30,12 +29,10 @@ const migrationState = require('../../common/state/migrationState')
 
 // Constants
 const settings = require('../../../js/constants/settings')
-const messages = require('../../../js/constants/messages')
 
 // Utils
 const tabs = require('../../browser/tabs')
 const locale = require('../../locale')
-const appConfig = require('../../../js/constants/appConfig')
 const getSetting = require('../../../js/settings').getSetting
 const {fileUrl, getSourceAboutUrl, isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 const urlParse = require('../../common/urlParse')
@@ -44,6 +41,7 @@ const request = require('../../../js/lib/request')
 const ledgerUtil = require('../../common/lib/ledgerUtil')
 const tabState = require('../../common/state/tabState')
 const pageDataUtil = require('../../common/lib/pageDataUtil')
+const ledgerNotifications = require('./ledgerNotifications')
 
 // Caching
 let locationDefault = 'NOOP'
@@ -103,319 +101,11 @@ const fileTypes = {
   png: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 }
 const minimumVisitTimeDefault = 8 * 1000
-const nextAddFundsTime = 3 * miliseconds.day
 let signatureMax = 0
 underscore.keys(fileTypes).forEach((fileType) => {
   if (signatureMax < fileTypes[fileType].length) signatureMax = fileTypes[fileType].length
 })
 signatureMax = Math.ceil(signatureMax * 1.5)
-
-// Notifications
-const sufficientBalanceToReconcile = (state) => {
-  const balance = Number(ledgerState.getInfoProp(state, 'balance') || 0)
-  const unconfirmed = Number(ledgerState.getInfoProp(state, 'unconfirmed') || 0)
-  const bat = ledgerState.getInfoProp(state, 'bat')
-  return bat && (balance + unconfirmed > 0.9 * Number(bat))
-}
-const hasFunds = (state) => {
-  const balance = getSetting(settings.PAYMENTS_ENABLED)
-    ? Number(ledgerState.getInfoProp(state, 'balance') || 0)
-    : 0
-  return balance > 0
-}
-const shouldShowNotificationReviewPublishers = () => {
-  const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP)
-  return !nextTime || (new Date().getTime() > nextTime)
-}
-const shouldShowNotificationAddFunds = () => {
-  const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP)
-  return !nextTime || (new Date().getTime() > nextTime)
-}
-const notifications = {
-  text: {
-    hello: locale.translation('updateHello'),
-    paymentDone: undefined,
-    addFunds: locale.translation('addFundsNotification'),
-    tryPayments: locale.translation('notificationTryPayments'),
-    reconciliation: locale.translation('reconciliationNotification'),
-    walletConvertedToBat: locale.translation('walletConvertedToBat')
-  },
-  pollingInterval: 15 * miliseconds.minutes,
-  timeout: undefined,
-  displayOptions: {
-    style: 'greetingStyle',
-    persist: false
-  },
-  init: (state) => {
-    // Check if relevant browser notifications should be shown every 15 minutes
-    if (notifications.timeout) {
-      clearInterval(notifications.timeout)
-    }
-    notifications.timeout = setInterval((state) => {
-      notifications.onInterval(state)
-    }, notifications.pollingInterval, state)
-  },
-  onLaunch: (state) => {
-    const enabled = getSetting(settings.PAYMENTS_ENABLED)
-    if (!enabled) {
-      return state
-    }
-
-    state = checkBtcBatMigrated(state, enabled)
-
-    if (hasFunds(state)) {
-      // Don't bother processing the rest, which are only notifications.
-      if (!getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
-        return state
-      }
-
-      // Show one-time BAT conversion message:
-      // - if payments are enabled
-      // - user has a positive balance
-      // - this is an existing profile (new profiles will have firstRunTimestamp matching batMercuryTimestamp)
-      // - wallet has been transitioned
-      // - notification has not already been shown yet
-      // (see https://github.com/brave/browser-laptop/issues/11021)
-      const isNewInstall = migrationState.isNewInstall(state)
-      const hasUpgradedWallet = migrationState.hasUpgradedWallet(state)
-      const hasBeenNotified = migrationState.hasBeenNotified(state)
-      if (!isNewInstall && hasUpgradedWallet && !hasBeenNotified) {
-        notifications.showBraveWalletUpdated()
-      }
-    }
-
-    return state
-  },
-  onInterval: (state) => {
-    if (getSetting(settings.PAYMENTS_ENABLED)) {
-      if (getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
-        notifications.showEnabledNotifications(state)
-      }
-    } else {
-      notifications.showDisabledNotifications(state)
-    }
-  },
-  onResponse: (message, buttonIndex, activeWindow) => {
-    switch (message) {
-      case notifications.text.addFunds:
-        // See showNotificationAddFunds() for buttons.
-        // buttonIndex === 1 is "Later"; the timestamp until which to delay is set
-        // in showNotificationAddFunds() when triggering this notification.
-        if (buttonIndex === 0) {
-          appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
-        } else if (buttonIndex === 2 && activeWindow) {
-          // Add funds: Open payments panel
-          appActions.createTabRequested({
-            url: 'about:preferences#payments',
-            windowId: activeWindow.id
-          })
-        }
-        break
-
-      case notifications.text.reconciliation:
-        // buttonIndex === 1 is Dismiss
-        if (buttonIndex === 0) {
-          appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
-        } else if (buttonIndex === 2 && activeWindow) {
-          appActions.createTabRequested({
-            url: 'about:preferences#payments',
-            windowId: activeWindow.id
-          })
-        }
-        break
-
-      case notifications.text.paymentDone:
-        if (buttonIndex === 0) {
-          appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
-        }
-        break
-
-      case notifications.text.tryPayments:
-        if (buttonIndex === 1 && activeWindow) {
-          appActions.createTabRequested({
-            url: 'about:preferences#payments',
-            windowId: activeWindow.id
-          })
-        }
-        appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
-        break
-
-      case notifications.text.walletConvertedToBat:
-        if (buttonIndex === 0) {
-          // Open backup modal
-          appActions.createTabRequested({
-            url: 'about:preferences#payments?ledgerBackupOverlayVisible',
-            windowId: activeWindow.id
-          })
-        }
-        break
-
-      default:
-        return
-    }
-
-    appActions.hideNotification(message)
-  },
-  /**
-   * Show message that it's time to add funds if reconciliation is less than
-   * a day in the future and balance is too low.
-   * 24 hours prior to reconciliation, show message asking user to review
-   * their votes.
-   */
-  showEnabledNotifications: (state) => {
-    const reconcileStamp = ledgerState.getInfoProp(state, 'reconcileStamp')
-    if (!reconcileStamp) {
-      return
-    }
-
-    if (reconcileStamp - new Date().getTime() < miliseconds.day) {
-      if (sufficientBalanceToReconcile(state)) {
-        if (shouldShowNotificationReviewPublishers()) {
-          const reconcileFrequency = ledgerState.getInfoProp(state, 'reconcileFrequency')
-          notifications.showReviewPublishers(reconcileStamp + ((reconcileFrequency - 2) * miliseconds.day))
-        }
-      } else if (shouldShowNotificationAddFunds()) {
-        notifications.showAddFunds()
-      }
-    } else if (reconcileStamp - new Date().getTime() < 2 * miliseconds.day) {
-      if (sufficientBalanceToReconcile(state) && (shouldShowNotificationReviewPublishers())) {
-        notifications.showReviewPublishers(new Date().getTime() + miliseconds.day)
-      }
-    }
-  },
-  showDisabledNotifications: (state) => {
-    if (!getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
-      const firstRunTimestamp = state.get('firstRunTimestamp')
-      if (new Date().getTime() - firstRunTimestamp < appConfig.payments.delayNotificationTryPayments) {
-        return
-      }
-
-      appActions.showNotification({
-        from: 'ledger',
-        greeting: locale.translation('updateHello'),
-        message: notifications.text.tryPayments,
-        buttons: [
-          {text: locale.translation('noThanks')},
-          {text: locale.translation('notificationTryPaymentsYes'), className: 'primaryButton'}
-        ],
-        options: {
-          style: 'greetingStyle',
-          persist: false
-        }
-      })
-    }
-  },
-  showReviewPublishers: (nextTime) => {
-    appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP, nextTime)
-
-    appActions.showNotification({
-      from: 'ledger',
-      greeting: notifications.text.hello,
-      message: notifications.text.reconciliation,
-      buttons: [
-        {text: locale.translation('turnOffNotifications')},
-        {text: locale.translation('dismiss')},
-        {text: locale.translation('reviewSites'), className: 'primaryButton'}
-      ],
-      options: notifications.displayOptions
-    })
-  },
-  showAddFunds: () => {
-    const nextTime = new Date().getTime() + nextAddFundsTime
-    appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
-
-    appActions.showNotification({
-      from: 'ledger',
-      greeting: notifications.text.hello,
-      message: notifications.text.addFunds,
-      buttons: [
-        {text: locale.translation('turnOffNotifications')},
-        {text: locale.translation('updateLater')},
-        {text: locale.translation('addFunds'), className: 'primaryButton'}
-      ],
-      options: notifications.displayOptions
-    })
-  },
-  // Called from observeTransactions() when we see a new payment (transaction).
-  showPaymentDone: (transactionContributionFiat) => {
-    notifications.text.paymentDone = locale.translation('notificationPaymentDone')
-      .replace(/{{\s*amount\s*}}/, transactionContributionFiat.amount)
-      .replace(/{{\s*currency\s*}}/, transactionContributionFiat.currency)
-    // Hide the 'waiting for deposit' message box if it exists
-    appActions.hideNotification(notifications.text.addFunds)
-    appActions.showNotification({
-      from: 'ledger',
-      greeting: locale.translation('updateHello'),
-      message: notifications.text.paymentDone,
-      buttons: [
-        {text: locale.translation('turnOffNotifications')},
-        {text: locale.translation('Ok'), className: 'primaryButton'}
-      ],
-      options: notifications.displayOptions
-    })
-  },
-  showBraveWalletUpdated: () => {
-    appActions.onBitcoinToBatNotified()
-
-    appActions.showNotification({
-      from: 'ledger',
-      greeting: notifications.text.hello,
-      message: notifications.text.walletConvertedToBat,
-      // Learn More.
-      buttons: [
-        {text: locale.translation('walletConvertedBackup')},
-        {text: locale.translation('walletConvertedDismiss')}
-      ],
-      options: {
-        style: 'greetingStyle',
-        persist: false,
-        advancedLink: 'https://brave.com/faq-payments/#brave-payments',
-        advancedText: locale.translation('walletConvertedLearnMore')
-      }
-    })
-  }
-}
-
-// TODO is it ok to have IPC here or is there better place
-if (ipc) {
-  ipc.on(messages.LEDGER_PUBLISHER, (event, location) => {
-    if (!synopsis || event.sender.session === electron.session.fromPartition('default') || !tldjs.isValid(location)) {
-      event.returnValue = {}
-      return
-    }
-
-    let ctx = urlParse(location, true)
-    ctx.TLD = tldjs.getPublicSuffix(ctx.host)
-    if (!ctx.TLD) {
-      if (_internal.verboseP) console.log('\nno TLD for:' + ctx.host)
-      event.returnValue = {}
-      return
-    }
-
-    ctx = underscore.mapObject(ctx, function (value) {
-      if (!underscore.isFunction(value)) return value
-    })
-    ctx.URL = location
-    ctx.SLD = tldjs.getDomain(ctx.host)
-    ctx.RLD = tldjs.getSubdomain(ctx.host)
-    ctx.QLD = ctx.RLD ? underscore.last(ctx.RLD.split('.')) : ''
-
-    if (!event.sender.isDestroyed()) {
-      event.sender.send(messages.LEDGER_PUBLISHER_RESPONSE + '-' + location, {
-        context: ctx,
-        rules: _internal.ruleset.cooked
-      })
-    }
-  })
-
-  ipc.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
-    notifications.onResponse(
-      message,
-      buttonIndex,
-      electron.BrowserWindow.getActiveWindow()
-    )
-  })
-}
 
 let ledgerPaymentsPresent = {}
 const paymentPresent = (state, tabId, present) => {
@@ -1573,7 +1263,7 @@ const observeTransactions = (state, transactions) => {
   if (getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
     if (transactions.length > 0) {
       const newestTransaction = transactions[transactions.length - 1]
-      notifications.showPaymentDone(newestTransaction.contribution.fiat)
+      ledgerNotifications.showPaymentDone(newestTransaction.contribution.fiat)
     }
   }
 }
@@ -1946,7 +1636,7 @@ const initialize = (state, paymentsEnabled) => {
   if (!v2RulesetDB) v2RulesetDB = levelUp(pathName(v2RulesetPath))
   state = enable(state, paymentsEnabled)
 
-  notifications.init(state)
+  ledgerNotifications.init(state)
 
   if (!paymentsEnabled) {
     client = null
@@ -2090,7 +1780,7 @@ const onInitRead = (state, parsedData) => {
   getBalance(state)
 
   // Show relevant browser notifications on launch
-  state = notifications.onLaunch(state)
+  state = ledgerNotifications.onLaunch(state)
 
   return state
 }
@@ -2450,7 +2140,7 @@ const transitionWalletToBat = () => {
         // NOTE: onLedgerCallback will save latest client to disk as ledger-state.json
         appActions.onLedgerCallback(result, random.randomInt({ min: miliseconds.minute, max: 10 * miliseconds.minute }))
         appActions.onBitcoinToBatTransitioned()
-        notifications.showBraveWalletUpdated()
+        ledgerNotifications.showBraveWalletUpdated()
         client.publisherTimestamp((err, result) => {
           if (err) {
             console.error('Error while retrieving publisher timestamp', err.toString())
@@ -2494,12 +2184,12 @@ const getMethods = () => {
     onNetworkConnected,
     migration,
     onInitRead,
-    notifications,
     deleteSynopsis,
     transitionWalletToBat,
     getNewClient,
     savePublisherData,
-    pruneSynopsis
+    pruneSynopsis,
+    checkBtcBatMigrated
   }
 
   let privateMethods = {}
@@ -2508,7 +2198,6 @@ const getMethods = () => {
     privateMethods = {
       enable,
       addVisit,
-      checkBtcBatMigrated,
       clearVisitsByPublisher: function () {
         visitsByPublisher = {}
       },
