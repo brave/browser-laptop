@@ -105,10 +105,11 @@ function production () {  // eslint-disable-line
   prod.plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true))
   if (env !== 'test') {
     prod.plugins.push(new UglifyJsPlugin({
+      parallel: true,
       uglifyOptions: {
-        compress: {
-          warnings: false
-        },
+        compress: false,
+        // skip pre-minified libs
+        exclude: [/\.min\.js$/gi],
         mangle: {
           reserved: ['module', 'exports', 'require']
         }
