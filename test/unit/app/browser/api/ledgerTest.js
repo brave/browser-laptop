@@ -534,8 +534,8 @@ describe('ledger api unit tests', function () {
       let showBraveWalletUpdatedSpy
       let transitionWalletToBatSpy
       beforeEach(function () {
-        showBraveWalletUpdatedSpy = sinon.spy(ledgerApi.notifications, 'showBraveWalletUpdated')
-        transitionWalletToBatSpy = sinon.spy(ledgerApi, 'transitionWalletToBat')
+        showBraveWalletUpdatedSpy = sinon.stub(ledgerApi.notifications, 'showBraveWalletUpdated')
+        transitionWalletToBatSpy = sinon.stub(ledgerApi, 'transitionWalletToBat')
       })
       afterEach(function () {
         showBraveWalletUpdatedSpy.restore()
