@@ -187,6 +187,7 @@ const frameReducer = (state, action, immutableAction) => {
         if (!frame.get('hasBeenActivated')) {
           state = state.setIn(['frames', index, 'hasBeenActivated'], true)
         }
+        state = frameStateUtil.updateTabPageIndex(state, tabId)
       }
       break
     case windowConstants.WINDOW_SET_NAVIGATED:
