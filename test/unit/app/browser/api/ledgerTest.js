@@ -12,21 +12,15 @@ const appActions = require('../../../../../js/actions/appActions')
 const migrationState = require('../../../../../app/common/state/migrationState')
 const batPublisher = require('bat-publisher')
 
-const defaultAppState = Immutable.fromJS({
-  ledger: {},
-  migrations: {}
-})
-
 describe('ledger api unit tests', function () {
   let ledgerApi
+  let ledgerNotificationsApi
   let isBusy = false
   let ledgerClient
 
   // settings
-  let paymentsEnabled
-  let paymentsNotifications
-  let paymentsMinVisitTime = 5000
   let contributionAmount = 25
+  let paymentsMinVisitTime = 5000
 
   // spies
   let ledgerTransitionSpy
@@ -36,34 +30,27 @@ describe('ledger api unit tests', function () {
   let onBitcoinToBatBeginTransitionSpy
   let onChangeSettingSpy
 
+  const defaultAppState = Immutable.fromJS({
+    ledger: {},
+    migrations: {}
+  })
+
   before(function () {
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    const fakeLevel = (pathName) => {
-      return {
-        batch: function (entries, cb) {
-          if (typeof cb === 'function') cb()
-        },
-        get: function (key, cb) {
-          if (typeof cb === 'function') cb(null, '{"' + key + '": "value-goes-here"}')
-        }
-      }
-    }
+
     const fakeElectron = require('../../../lib/fakeElectron')
     const fakeAdBlock = require('../../../lib/fakeAdBlock')
+    const fakeLevel = require('../../../lib/fakeLevel')
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('level', fakeLevel)
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('../../../js/settings', {
       getSetting: (settingKey, settingsCollection, value) => {
         switch (settingKey) {
-          case settings.PAYMENTS_ENABLED:
-            return paymentsEnabled
-          case settings.PAYMENTS_NOTIFICATIONS:
-            return paymentsNotifications
           case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
             return contributionAmount
           case settings.PAYMENTS_MINIMUM_VISIT_TIME:
@@ -150,6 +137,8 @@ describe('ledger api unit tests', function () {
     }
     mockery.registerMock('bat-publisher', lp)
 
+    ledgerNotificationsApi = require('../../../../../app/browser/api/ledgerNotifications')
+
     // once everything is stubbed, load the ledger
     ledgerApi = require('../../../../../app/browser/api/ledger')
   })
@@ -165,7 +154,7 @@ describe('ledger api unit tests', function () {
   describe('initialize', function () {
     let notificationsInitStub
     beforeEach(function () {
-      notificationsInitStub = sinon.stub(ledgerApi.notifications, 'init')
+      notificationsInitStub = sinon.stub(ledgerNotificationsApi, 'init')
     })
     afterEach(function () {
       notificationsInitStub.restore()
@@ -193,7 +182,7 @@ describe('ledger api unit tests', function () {
       contributionAmount = 25
     })
     before(function () {
-      onLaunchSpy = sinon.spy(ledgerApi.notifications, 'onLaunch')
+      onLaunchSpy = sinon.spy(ledgerNotificationsApi, 'onLaunch')
       setPaymentInfoSpy = sinon.spy(ledgerApi, 'setPaymentInfo')
     })
     after(function () {
@@ -497,258 +486,6 @@ describe('ledger api unit tests', function () {
     })
   })
 
-  describe('notifications', function () {
-    let fakeClock
-    before(function () {
-      fakeClock = sinon.useFakeTimers()
-    })
-    after(function () {
-      fakeClock.restore()
-    })
-    describe('init', function () {
-      let onIntervalSpy
-      beforeEach(function () {
-        onIntervalSpy = sinon.spy(ledgerApi.notifications, 'onInterval')
-      })
-      afterEach(function () {
-        onIntervalSpy.restore()
-      })
-      it('does not immediately call notifications.onInterval', function () {
-        ledgerApi.notifications.init(defaultAppState)
-        assert(onIntervalSpy.notCalled)
-      })
-      it('calls notifications.onInterval after interval', function () {
-        fakeClock.tick(0)
-        ledgerApi.notifications.init(defaultAppState)
-        fakeClock.tick(ledgerApi.notifications.pollingInterval)
-        assert(onIntervalSpy.calledOnce)
-      })
-      it('assigns a value to notifications.timeout', function () {
-        ledgerApi.notifications.timeout = 0
-        ledgerApi.notifications.init(defaultAppState)
-        assert(ledgerApi.notifications.timeout)
-      })
-    })
-
-    describe('onLaunch', function () {
-      let showBraveWalletUpdatedSpy
-      let transitionWalletToBatSpy
-      beforeEach(function () {
-        showBraveWalletUpdatedSpy = sinon.stub(ledgerApi.notifications, 'showBraveWalletUpdated')
-        transitionWalletToBatSpy = sinon.stub(ledgerApi, 'transitionWalletToBat')
-      })
-      afterEach(function () {
-        showBraveWalletUpdatedSpy.restore()
-        transitionWalletToBatSpy.restore()
-      })
-
-      describe('with BAT Mercury', function () {
-        let ledgerStateWithBalance
-
-        before(function () {
-          ledgerStateWithBalance = defaultAppState.merge(Immutable.fromJS({
-            ledger: {
-              info: {
-                balance: 200
-              }
-            },
-            firstRunTimestamp: 12345,
-            migrations: {
-              batMercuryTimestamp: 12345,
-              btc2BatTimestamp: 12345,
-              btc2BatNotifiedTimestamp: 12345
-            }
-          }))
-        })
-
-        describe('with wallet update message', function () {
-          describe('when payment notifications are disabled', function () {
-            before(function () {
-              paymentsEnabled = true
-              paymentsNotifications = false
-            })
-            it('does not notify the user', function () {
-              const targetSession = ledgerStateWithBalance
-                .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btc2BatTimestamp'], 54321)
-                .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
-              ledgerApi.notifications.onLaunch(targetSession)
-              assert(showBraveWalletUpdatedSpy.notCalled)
-            })
-          })
-
-          describe('when payments are disabled', function () {
-            before(function () {
-              paymentsEnabled = false
-              paymentsNotifications = true
-            })
-            it('does not notify the user', function () {
-              const targetSession = ledgerStateWithBalance
-                .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btc2BatTimestamp'], 54321)
-                .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
-              ledgerApi.notifications.onLaunch(targetSession)
-              assert(showBraveWalletUpdatedSpy.notCalled)
-            })
-          })
-
-          describe('user does not have funds', function () {
-            before(function () {
-              paymentsEnabled = true
-              paymentsNotifications = true
-            })
-            it('does not notify the user', function () {
-              const targetSession = ledgerStateWithBalance
-                .setIn(['ledger', 'info', 'balance'], 0)
-                .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btc2BatTimestamp'], 54321)
-                .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
-              ledgerApi.notifications.onLaunch(targetSession)
-              assert(showBraveWalletUpdatedSpy.notCalled)
-            })
-          })
-
-          describe('user did not have a session before BAT Mercury', function () {
-            before(function () {
-              paymentsEnabled = true
-              paymentsNotifications = true
-            })
-            it('does not notify the user', function () {
-              ledgerApi.notifications.onLaunch(ledgerStateWithBalance)
-              assert(showBraveWalletUpdatedSpy.notCalled)
-            })
-          })
-
-          describe('user has not had the wallet transitioned from BTC to BAT', function () {
-            before(function () {
-              paymentsEnabled = true
-              paymentsNotifications = true
-            })
-            it('does not notify the user', function () {
-              const targetSession = ledgerStateWithBalance
-                .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btc2BatTimestamp'], 32145)
-                .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
-              ledgerApi.notifications.onLaunch(targetSession)
-              assert(showBraveWalletUpdatedSpy.notCalled)
-            })
-          })
-
-          describe('user has already seen the notification', function () {
-            before(function () {
-              paymentsEnabled = true
-              paymentsNotifications = true
-            })
-            it('does not notify the user', function () {
-              const targetSession = ledgerStateWithBalance
-                .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btc2BatTimestamp'], 54321)
-                .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 54321)
-              ledgerApi.notifications.onLaunch(targetSession)
-              assert(showBraveWalletUpdatedSpy.notCalled)
-            })
-          })
-
-          describe('when payment notifications are enabled, payments are enabled, user has funds, user had wallet before BAT Mercury, wallet has been transitioned, and user not been shown message yet', function () {
-            before(function () {
-              paymentsEnabled = true
-              paymentsNotifications = true
-            })
-            it('notifies the user', function () {
-              const targetSession = ledgerStateWithBalance
-                .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btc2BatTimestamp'], 54321)
-                .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
-              ledgerApi.notifications.onLaunch(targetSession)
-              assert(showBraveWalletUpdatedSpy.calledOnce)
-            })
-          })
-        })
-
-        describe('with the wallet transition from bitcoin to BAT', function () {
-          describe('when payment notifications are disabled', function () {
-            before(function () {
-              paymentsEnabled = true
-              paymentsNotifications = false
-            })
-            it('calls ledger.transitionWalletToBat', function () {
-              const targetSession = ledgerStateWithBalance
-                .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btc2BatTimestamp'], 32145)
-              ledgerApi.notifications.onLaunch(targetSession)
-              assert(transitionWalletToBatSpy.calledOnce)
-            })
-          })
-
-          describe('when payments are disabled', function () {
-            before(function () {
-              paymentsEnabled = false
-              paymentsNotifications = true
-            })
-            it('does not call ledger.transitionWalletToBat', function () {
-              ledgerApi.notifications.onLaunch(ledgerStateWithBalance)
-              assert(transitionWalletToBatSpy.notCalled)
-            })
-          })
-
-          describe('user does not have funds', function () {
-            before(function () {
-              paymentsEnabled = true
-              paymentsNotifications = true
-            })
-            it('calls ledger.transitionWalletToBat', function () {
-              const ledgerStateWithoutBalance = ledgerStateWithBalance
-                .setIn(['ledger', 'info', 'balance'], 0)
-                .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btc2BatTimestamp'], 32145)
-              ledgerApi.notifications.onLaunch(ledgerStateWithoutBalance)
-              assert(transitionWalletToBatSpy.calledOnce)
-            })
-          })
-
-          describe('user did not have a session before BAT Mercury', function () {
-            before(function () {
-              paymentsEnabled = true
-              paymentsNotifications = true
-            })
-            it('does not call ledger.transitionWalletToBat', function () {
-              ledgerApi.notifications.onLaunch(ledgerStateWithBalance)
-              assert(transitionWalletToBatSpy.notCalled)
-            })
-          })
-
-          describe('user has already upgraded', function () {
-            before(function () {
-              paymentsEnabled = true
-              paymentsNotifications = true
-            })
-            it('does not call ledger.transitionWalletToBat', function () {
-              const ledgerStateSeenNotification = ledgerStateWithBalance
-                .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btc2BatTimestamp'], 54321)
-              ledgerApi.notifications.onLaunch(ledgerStateSeenNotification)
-              assert(transitionWalletToBatSpy.notCalled)
-            })
-          })
-
-          describe('when payments are enabled and user had wallet before BAT Mercury', function () {
-            before(function () {
-              paymentsEnabled = true
-              paymentsNotifications = true
-            })
-            it('calls ledger.transitionWalletToBat', function () {
-              const targetSession = ledgerStateWithBalance
-                .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-                .setIn(['migrations', 'btc2BatTimestamp'], 32145)
-              ledgerApi.notifications.onLaunch(targetSession)
-              assert(transitionWalletToBatSpy.calledOnce)
-            })
-          })
-        })
-      })
-    })
-  })
-
   describe('synopsisNormalizer', function () {
     describe('prune synopsis', function () {
       let pruneSynopsisSpy
@@ -855,8 +592,6 @@ describe('ledger api unit tests', function () {
         .setIn(['ledger', 'synopsis', 'publishers', 'clifton.io', 'options', 'verifiedTimestamp'], 10)
 
       const expectedState = newState
-        .setIn(['ledger', 'about', 'synopsis'], [])
-        .setIn(['ledger', 'about', 'synopsisOptions'], {})
         .setIn(['ledger', 'synopsis', 'publishers', 'clifton.io', 'options', 'verified'], true)
       const result = ledgerApi.checkVerifiedStatus(newState, 'clifton.io')
       assert.deepEqual(result.toJS(), expectedState.toJS())
