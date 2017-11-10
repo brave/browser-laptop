@@ -1172,7 +1172,7 @@ var exports = {
     }
     let env = {
       NODE_ENV: 'test',
-      CHROME_USER_DATA_DIR: userDataDir,
+      CHROME_USER_DATA_DIR_FOR_TEST: userDataDir,
       SPECTRON: true
     }
     let args = ['./', '--enable-logging', '--v=1']
