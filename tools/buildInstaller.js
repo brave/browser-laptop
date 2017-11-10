@@ -178,9 +178,7 @@ if (isDarwin) {
       setupExe: `${appName}-Setup-${arch}.exe`
     })
     resultPromise.then(() => {
-      cmds = [
-      ]
-      execute(cmds, {}, console.log.bind(null, 'done'))
+      console.log('done')
     }, (e) => console.log(`No dice: ${e.message}`))
   })
 } else if (isLinux) {
