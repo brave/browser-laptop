@@ -12,6 +12,7 @@ const Button = require('../common/button')
 // Constants
 const downloadStates = require('../../../../js/constants/downloadStates')
 const {PAUSE, RESUME, CANCEL} = require('../../../common/constants/electronDownloadItemActions')
+const locale = require('../../../../js/l10n')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -255,7 +256,7 @@ class DownloadItem extends React.Component {
       }
       <div className='downloadInfo'>
         <span>
-          <div data-test-id='downloadFilename' className='downloadFilename' title={this.props.fileName}>
+          <div data-test-id='downloadFilename' className='downloadFilename' title={this.props.fileName + '\n' + locale.translation(this.props.statel10n)}>
             {this.props.fileName}
           </div>
           {
@@ -266,7 +267,7 @@ class DownloadItem extends React.Component {
                     ? <span className='fa fa-unlock isInsecure' />
                     : null
                 }
-                <span data-l10n-id={this.props.isLocalFile ? 'downloadLocalFile' : null} title={this.props.origin}>
+                <span data-l10n-id={this.props.isLocalFile ? 'downloadLocalFile' : null} title={this.props.origin + '\n' + locale.translation(this.props.statel10n)}>
                   {this.props.isLocalFile ? null : this.props.origin}
                 </span>
               </div>

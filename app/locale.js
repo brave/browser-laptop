@@ -252,6 +252,15 @@ var rendererIdentifiers = function () {
     'downloadItemClear',
     'downloadToolbarHide',
     'downloadItemClearCompleted',
+    'downloadCancelled',
+    'downloadCompleted',
+    'downloadInProgress',
+    'downloadInProgressUnknownTotal',
+    'downloadInterrupted',
+    'downloadUnauthorized',
+    'downloadLocalFile',
+    'downloadPaused',
+    'noDownloads',
     'torrentDesc',
     // Caption buttons in titlebar (min/max/close - Windows only)
     'windowCaptionButtonMinimize',
@@ -400,7 +409,8 @@ exports.init = function (language) {
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'common.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'countries.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'locales.properties'),
-      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'preferences.properties')
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'preferences.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'downloads.properties')
       )
   }
 
