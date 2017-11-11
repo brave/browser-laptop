@@ -661,7 +661,12 @@ const displayHost = {
   fontWeight: 'normal',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  overflow: 'hidden'
+  overflow: 'hidden',
+
+  // See #11878: avoid a very long domain drom covering the webview.
+  // The value should maintain the panel width until 0.19.
+  // https://github.com/brave/browser-laptop/blob/0.19.x/app/renderer/components/main/braveryPanel.js#L708
+  maxWidth: '320px'
 }
 const editGlobalMarginBottom = '.25rem'
 
