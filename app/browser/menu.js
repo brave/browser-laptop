@@ -57,8 +57,8 @@ const createFileSubmenu = () => {
       label: locale.translation('openFile'),
       accelerator: 'CmdOrCtrl+O',
       click: (item, focusedWindow) => {
-        dialog.showOpenDialog(focusedWindow, {
-          properties: ['openFile', 'multiSelections']
+        dialog.showDialog(focusedWindow, {
+          type: 'select-open-multi-file'
         }, (paths) => {
           if (paths) {
             paths.forEach((path) => {

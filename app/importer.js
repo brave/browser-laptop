@@ -59,17 +59,15 @@ exports.importHTML = (selected) => {
   isImportingBookmarks = true
   const state = appStore.getState()
   hasBookmarks = bookmarksState.getBookmarks(state).size > 0 || bookmarkFoldersState.getFolders(state).size > 0
-  const files = dialog.showOpenDialog({
-    properties: ['openFile'],
-    filters: [{
-      name: 'HTML',
-      extensions: ['html', 'htm']
-    }]
+  dialog.showDialog(BrowserWindow.getFocusedWindow(), {
+    type: 'select-open-file',
+    extensions: [['html', 'htm']]
+  }, (files) => {
+    if (files && files.length === 1) {
+      const file = files[0]
+      importer.importHTML(file)
+    }
   })
-  if (files && files.length > 0) {
-    const file = files[0]
-    importer.importHTML(file)
-  }
 }
 
 importer.on('update-supported-browsers', (e, detail) => {
