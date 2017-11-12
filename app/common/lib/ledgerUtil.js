@@ -7,6 +7,7 @@
 const Immutable = require('immutable')
 const moment = require('moment')
 const BigNumber = require('bignumber.js')
+const queryString = require('querystring')
 
 // State
 const siteSettingsState = require('../state/siteSettingsState')
@@ -14,11 +15,13 @@ const ledgerState = require('../state/ledgerState')
 
 // Constants
 const settings = require('../../../js/constants/settings')
+const ledgerMediaProviders = require('../constants/ledgerMediaProviders')
 
 // Utils
 const {responseHasContent} = require('./httpUtil')
 const urlUtil = require('../../../js/lib/urlutil')
 const getSetting = require('../../../js/settings').getSetting
+const urlParse = require('../urlParse')
 
 /**
  * Is page an actual page being viewed by the user? (not an error page, etc)
@@ -188,16 +191,136 @@ const stickyP = (state, publisherKey) => {
   return (result === undefined || result)
 }
 
-module.exports = {
-  shouldTrackView,
-  batToCurrencyString,
-  formattedTimeFromNow,
-  formattedDateFromTimestamp,
-  walletStatus,
-  blockedP,
-  contributeP,
-  visibleP,
-  eligibleP,
-  stickyP,
-  formatCurrentBalance
+const getMediaId = (data, type) => {
+  let id = null
+
+  if (type == null || data == null) {
+    return id
+  }
+
+  switch (type) {
+    case ledgerMediaProviders.YOUTUBE:
+      {
+        id = data.docid
+        break
+      }
+  }
+
+  return id
 }
+
+const getMediaKey = (id, type) => {
+  if (id == null || type == null) {
+    return null
+  }
+
+  return `${type.toLowerCase()}_${id}`
+}
+
+const getMediaData = (xhr, type) => {
+  let result = null
+
+  if (xhr == null || type == null) {
+    return result
+  }
+
+  switch (type) {
+    case ledgerMediaProviders.YOUTUBE:
+      {
+        const parsedUrl = urlParse(xhr)
+        let query = null
+
+        if (parsedUrl && parsedUrl.query) {
+          query = queryString.parse(parsedUrl.query)
+        }
+        result = query
+        break
+      }
+  }
+
+  return result
+}
+
+const getMediaDuration = (data, type) => {
+  let duration = 0
+  switch (type) {
+    case ledgerMediaProviders.YOUTUBE: {
+      duration = getYouTubeDuration(data)
+      break
+    }
+  }
+
+  return duration
+}
+
+const getYouTubeDuration = (data) => {
+  let time = 0
+
+  if (data == null || data.st == null || data.et == null) {
+    return time
+  }
+
+  const startTime = data.st.split(',')
+  const endTime = data.et.split(',')
+
+  if (startTime.length !== endTime.length) {
+    return time
+  }
+
+  for (let i = 0; i < startTime.length; i++) {
+    time += parseFloat(endTime[i]) - parseFloat(startTime[i])
+  }
+
+  // we get seconds back, so we need to convert it into ms
+  time = time * 1000
+
+  return parseInt(time)
+}
+
+const getMediaProvider = (url) => {
+  let provider = null
+
+  if (url == null) {
+    return provider
+  }
+
+  // Youtube
+  if (url.startsWith('https://www.youtube.com/api/stats/watchtime?')) {
+    provider = ledgerMediaProviders.YOUTUBE
+  }
+
+  return provider
+}
+
+const getMethods = () => {
+  const publicMethods = {
+    shouldTrackView,
+    batToCurrencyString,
+    formattedTimeFromNow,
+    formattedDateFromTimestamp,
+    walletStatus,
+    blockedP,
+    contributeP,
+    visibleP,
+    eligibleP,
+    stickyP,
+    formatCurrentBalance,
+    getMediaId,
+    getMediaDuration,
+    getMediaProvider,
+    getMediaData,
+    getMediaKey
+  }
+
+  let privateMethods = {}
+
+  if (process.env.NODE_ENV === 'test') {
+    privateMethods = {
+      getYouTubeDuration
+    }
+  }
+
+  return Object.assign({}, publicMethods, privateMethods)
+}
+
+module.exports = getMethods()

@@ -51,7 +51,8 @@ const fivePublishers = {
   ]),
   synopsis: Immutable.List([
     Immutable.Map({
-      site: 'times.com',
+      publisherKey: 'times.com',
+      siteName: 'times.com',
       verified: false,
       views: 2,
       pinPercentage: 10,
@@ -66,7 +67,8 @@ const fivePublishers = {
       faviconURL: ''
     }),
     Immutable.Map({
-      site: 'cnn.com',
+      publisherKey: 'cnn.com',
+      siteName: 'cnn.com',
       verified: false,
       views: 1,
       pinPercentage: 15,
@@ -81,7 +83,8 @@ const fivePublishers = {
       faviconURL: ''
     }),
     Immutable.Map({
-      site: 'brianbondy.com',
+      publisherKey: 'brianbondy.com',
+      siteName: 'brianbondy.com',
       verified: true,
       views: 1,
       pinPercentage: 0,
@@ -96,7 +99,8 @@ const fivePublishers = {
       faviconURL: ''
     }),
     Immutable.Map({
-      site: 'github.com',
+      publisherKey: 'github.com',
+      siteName: 'github.com',
       verified: false,
       views: 1,
       pinPercentage: 0,
@@ -111,7 +115,8 @@ const fivePublishers = {
       faviconURL: ''
     }),
     Immutable.Map({
-      site: 'clifton.io',
+      publisherKey: 'clifton.io',
+      siteName: 'clifton.io',
       verified: false,
       views: 1,
       pinPercentage: 0,
@@ -164,7 +169,8 @@ describe('LedgerTable component', function () {
 
     const synopsis = Immutable.List([
       Immutable.Map({
-        site: 'times.com',
+        publisherKey: 'times.com',
+        siteName: 'times.com',
         verified: false,
         views: 2,
         pinPercentage: 0,
@@ -218,7 +224,8 @@ describe('LedgerTable component', function () {
 
     const synopsis = Immutable.List([
       Immutable.Map({
-        site: 'times.com',
+        publisherKey: 'times.com',
+        siteName: 'times.com',
         verified: false,
         views: 2,
         pinPercentage: 10,
@@ -233,7 +240,8 @@ describe('LedgerTable component', function () {
         faviconURL: ''
       }),
       Immutable.Map({
-        site: 'cnn.com',
+        publisherKey: 'cnn.com',
+        siteName: 'cnn.com',
         verified: false,
         views: 1,
         pinPercentage: 15,
@@ -248,7 +256,8 @@ describe('LedgerTable component', function () {
         faviconURL: ''
       }),
       Immutable.Map({
-        site: 'brianbondy.com',
+        publisherKey: 'brianbondy.com',
+        siteName: 'brianbondy.com',
         verified: true,
         views: 1,
         pinPercentage: 0,
@@ -297,7 +306,8 @@ describe('LedgerTable component', function () {
 
     const synopsis = Immutable.List([
       Immutable.Map({
-        site: 'times.com',
+        publisherKey: 'times.com',
+        siteName: 'times.com',
         verified: false,
         views: 2,
         pinPercentage: 10,
@@ -312,7 +322,8 @@ describe('LedgerTable component', function () {
         faviconURL: ''
       }),
       Immutable.Map({
-        site: 'cnn.com',
+        publisherKey: 'cnn.com',
+        siteName: 'cnn.com',
         verified: false,
         views: 1,
         pinPercentage: 15,
@@ -354,7 +365,8 @@ describe('LedgerTable component', function () {
 
     const synopsis = Immutable.List([
       Immutable.Map({
-        site: 'times.com',
+        publisherKey: 'times.com',
+        siteName: 'times.com',
         verified: false,
         views: 2,
         pinPercentage: 42,
@@ -424,7 +436,8 @@ describe('LedgerTable component', function () {
 
     const synopsis = Immutable.List([
       Immutable.Map({
-        site: 'times.com',
+        siteName: 'times.com',
+        publisherKey: 'times.com',
         verified: false,
         views: 2,
         pinPercentage: 10,
@@ -439,7 +452,8 @@ describe('LedgerTable component', function () {
         faviconURL: ''
       }),
       Immutable.Map({
-        site: 'cnn.com',
+        siteName: 'cnn.com',
+        publisherKey: 'cnn.com',
         verified: false,
         views: 1,
         pinPercentage: 15,
@@ -454,7 +468,8 @@ describe('LedgerTable component', function () {
         faviconURL: ''
       }),
       Immutable.Map({
-        site: 'brianbondy.com',
+        siteName: 'brianbondy.com',
+        publisherKey: 'brianbondy.com',
         verified: true,
         views: 1,
         pinPercentage: 0,
@@ -469,7 +484,8 @@ describe('LedgerTable component', function () {
         faviconURL: ''
       }),
       Immutable.Map({
-        site: 'github.com',
+        siteName: 'github.com',
+        publisherKey: 'github.com',
         verified: false,
         views: 1,
         pinPercentage: 0,
@@ -484,7 +500,8 @@ describe('LedgerTable component', function () {
         faviconURL: ''
       }),
       Immutable.Map({
-        site: 'clifton.io',
+        siteName: 'clifton.io',
+        publisherKey: 'clifton.io',
         verified: false,
         views: 1,
         pinPercentage: 0,

@@ -89,6 +89,9 @@ AppStore
         order: number,
         type: string // siteTags.BOOKMARK or siteTags.BOOKMARK_FOLDER
       }]
+    },
+    ledgerVideos: {
+      [mediaKey]: string // publisher key
     }
   }
   clearBrowsingDataDefaults: {
@@ -356,6 +359,7 @@ AppStore
     'general.startup-mode': string, // one of: lastTime, homePage, newTabPage
     'notification-add-funds-timestamp': number, // timestamp on which we decide if we will show notification Add founds
     'notification-reconcile-soon-timestamp': number, // timestamp
+    'payments.allow-media-publishers': boolean,
     'payments.allow-non-verified-publishers': boolean,
     'payments.contribution-amount': number, // in USD
     'payments.enabled': boolean, // true if the Payments pane is active
