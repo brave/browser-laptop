@@ -46,6 +46,10 @@ if (process.platform === 'win32') {
   require('./windowsInit')
 }
 
+if (process.platform === 'linux') {
+  require('./linuxInit')
+}
+
 const electron = require('electron')
 const app = electron.app
 const ipcMain = electron.ipcMain
