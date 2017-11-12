@@ -1812,6 +1812,25 @@ const appActions = {
       actionType: appConstants.APP_ON_PUBLISHER_TIMESTAMP,
       timestamp
     })
+  },
+
+  onLedgerMediaData: function (url, type, tabId) {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_MEDIA_DATA,
+      url,
+      type,
+      tabId
+    })
+  },
+
+  onLedgerMediaPublisher: function (mediaKey, response, duration, revisited) {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER,
+      mediaKey,
+      response,
+      duration,
+      revisited
+    })
   }
 }
 
