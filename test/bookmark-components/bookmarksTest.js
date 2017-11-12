@@ -1,7 +1,17 @@
 /* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
-const {homepageInput, urlInput, navigator, navigatorBookmarked, navigatorNotBookmarked, doneButton, removeButton, bookmarkNameInput, bookmarkLocationInput} = require('../lib/selectors')
+const {
+  homepageInput,
+  urlInput,
+  navigator,
+  navigatorBookmarked,
+  navigatorNotBookmarked,
+  bookmarkHangerDoneButton,
+  bookmarkHangerRemoveButton,
+  bookmarkNameInput,
+  bookmarkLocationInput
+} = require('../lib/selectors')
 const siteTags = require('../../js/constants/siteTags')
 
 describe('bookmark tests', function () {
@@ -25,14 +35,14 @@ describe('bookmark tests', function () {
           .activateURLMode()
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
-          .waitForVisible(doneButton)
+          .waitForVisible(bookmarkHangerDoneButton)
           .waitForBookmarkDetail(this.page1Url, 'Page 1')
-          .waitForEnabled(doneButton)
-          .click(doneButton)
+          .waitForEnabled(bookmarkHangerDoneButton)
+          .click(bookmarkHangerDoneButton)
           .activateURLMode()
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
-          .waitForVisible(doneButton)
+          .waitForVisible(bookmarkHangerDoneButton)
       })
 
       it('fills in the url field', function * () {
@@ -45,24 +55,24 @@ describe('bookmark tests', function () {
           .waitForExist(bookmarkNameInput)
           .waitForBookmarkDetail(this.page1Url, 'Page 1')
           .typeText(bookmarkNameInput, 'Custom Page 1')
-          .waitForEnabled(doneButton)
-          .click(doneButton)
+          .waitForEnabled(bookmarkHangerDoneButton)
+          .click(bookmarkHangerDoneButton)
       })
       it('check custom title', function * () {
         yield this.app.client
           .activateURLMode()
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
-          .waitForVisible(doneButton)
+          .waitForVisible(bookmarkHangerDoneButton)
           .waitForInputText(bookmarkNameInput, 'Custom Page 1')
-          .click(doneButton)
+          .click(bookmarkHangerDoneButton)
       })
       it('can delete custom title', function * () {
         yield this.app.client
           .activateURLMode()
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
-          .waitForVisible(doneButton)
+          .waitForVisible(bookmarkHangerDoneButton)
           .keys(Brave.keys.BACKSPACE)
           .waitForInputText(bookmarkNameInput, '')
       })
@@ -71,7 +81,7 @@ describe('bookmark tests', function () {
           .activateURLMode()
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
-          .waitForVisible(doneButton)
+          .waitForVisible(bookmarkHangerDoneButton)
           .setValue(bookmarkNameInput, '')
           .waitForInputText(bookmarkNameInput, '')
           .typeText(bookmarkNameInput, 'https://www.brave.com')
@@ -82,7 +92,7 @@ describe('bookmark tests', function () {
           .typeText(bookmarkLocationInput, 'https://www.brave.com')
           .keys(Brave.keys.END)
           .keys('а')
-          .click(doneButton)
+          .click(bookmarkHangerDoneButton)
           .windowByUrl(Brave.browserWindowUrl)
           .waitUntil(function () {
             return this.getAppState().then((val) => {
@@ -95,12 +105,12 @@ describe('bookmark tests', function () {
           .activateURLMode()
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
-          .waitForVisible(doneButton)
-          .click(doneButton)
+          .waitForVisible(bookmarkHangerDoneButton)
+          .click(bookmarkHangerDoneButton)
           .activateURLMode()
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
-          .waitForVisible(doneButton)
+          .waitForVisible(bookmarkHangerDoneButton)
           .setValue(bookmarkNameInput, '')
           .waitForInputText(bookmarkNameInput, '')
           .typeText(bookmarkNameInput, 'https://www.brave.com/1')
@@ -111,7 +121,7 @@ describe('bookmark tests', function () {
           .typeText(bookmarkLocationInput, 'https://www.brave.com/1')
           .typeText(bookmarkLocationInput, [Brave.keys.BACKSPACE, Brave.keys.BACKSPACE, Brave.keys.BACKSPACE], 'https://www.brave.com/1')
           .waitForInputText(bookmarkLocationInput, 'https://www.brave.co')
-          .click(removeButton)
+          .click(bookmarkHangerRemoveButton)
       })
     })
 
@@ -131,14 +141,14 @@ describe('bookmark tests', function () {
           .activateURLMode()
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
-          .waitForVisible(doneButton)
+          .waitForVisible(bookmarkHangerDoneButton)
       })
 
       it('fills in the title field', function * () {
         yield this.app.client
           .waitForExist(bookmarkNameInput)
           .waitForBookmarkDetail(this.page1Url, 'Page 1')
-          .waitForEnabled(doneButton)
+          .waitForEnabled(bookmarkHangerDoneButton)
           .waitForInputText(bookmarkNameInput, 'Page 1')
       })
 
@@ -151,8 +161,8 @@ describe('bookmark tests', function () {
         before(function * () {
           yield this.app.client
             .waitForBookmarkDetail(this.page1Url, 'Page 1')
-            .waitForEnabled(doneButton)
-            .click(doneButton)
+            .waitForEnabled(bookmarkHangerDoneButton)
+            .click(bookmarkHangerDoneButton)
         })
 
         it('displays title', function * () {
@@ -164,10 +174,10 @@ describe('bookmark tests', function () {
           before(function * () {
             yield this.app.client
               .activateURLMode()
-              .waitForVisible(navigatorNotBookmarked)
-              .click(navigatorNotBookmarked)
-              .waitForVisible(removeButton)
-              .click(removeButton)
+              .waitForVisible(navigatorBookmarked)
+              .click(navigatorBookmarked)
+              .waitForVisible(bookmarkHangerRemoveButton)
+              .click(bookmarkHangerRemoveButton)
           })
           it('removes the bookmark from the toolbar', function * () {
             yield this.app.client
@@ -194,7 +204,7 @@ describe('bookmark tests', function () {
           .waitForExist(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
           .waitForBookmarkDetail(this.pageNoTitle, this.title)
-          .waitForEnabled(doneButton + ':not([disabled]')
+          .waitForEnabled(bookmarkHangerDoneButton)
       })
 
       it('sets the title to the url', function * () {
@@ -238,7 +248,7 @@ describe('bookmark tests', function () {
           .activateURLMode()
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
-          .waitForVisible(doneButton)
+          .waitForVisible(bookmarkHangerDoneButton)
           .waitUntil(function () {
             return this.getAppState().then((val) => {
               title = val.value.tabs[0].title
@@ -246,12 +256,12 @@ describe('bookmark tests', function () {
             })
           })
           .waitForBookmarkDetail(page1Url, title)
-          .waitForEnabled(doneButton)
-          .click(doneButton)
+          .waitForEnabled(bookmarkHangerDoneButton)
+          .click(bookmarkHangerDoneButton)
           .activateURLMode()
           .waitForVisible(navigatorBookmarked)
           .click(navigatorBookmarked)
-          .waitForVisible(doneButton)
+          .waitForVisible(bookmarkHangerDoneButton)
           .waitForInputText(bookmarkLocationInput, page1Url)
       })
     })
@@ -274,10 +284,10 @@ describe('bookmark tests', function () {
           .activateURLMode()
           .waitForVisible(navigatorNotBookmarked)
           .click(navigatorNotBookmarked)
-          .waitForVisible(doneButton)
+          .waitForVisible(bookmarkHangerDoneButton)
           .waitForBookmarkDetail(prefsUrl, 'Preferences')
-          .waitForEnabled(doneButton)
-          .click(doneButton)
+          .waitForEnabled(bookmarkHangerDoneButton)
+          .click(bookmarkHangerDoneButton)
           .activateURLMode()
           .waitForVisible(navigatorBookmarked)
           .tabByIndex(0)

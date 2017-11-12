@@ -50,17 +50,19 @@ class UrlBarSuggestionItem extends ImmutableComponent {
   }
 
   render () {
-    return <li data-test-id='list-item'
+    return <li className={cx({
+      selected: this.props.selected,
+      suggestionItem: true,
+      [this.props.suggestion.get('type')]: true
+    })}
+      data-test-id='list-item'
+      data-test2-id={this.props.selected ? 'selected' : 'notSelected'}
       data-index={this.props.currentIndex}
       onMouseOver={this.onMouseOver}
       onClick={this.onClick}
       key={`${this.props.suggestion.get('location')}|${this.props.currentIndex + this.props.i}`}
       ref={(node) => { this.node = node }}
-      className={cx({
-        selected: this.props.selected,
-        suggestionItem: true,
-        [this.props.suggestion.get('type')]: true
-      })}>
+    >
       {
         this.props.suggestion.get('type') !== suggestionTypes.TOP_SITE && this.props.suggestion.get('title')
         ? <div data-test-id='suggestionTitle' className='suggestionTitle'>{this.props.suggestion.get('title')}</div>

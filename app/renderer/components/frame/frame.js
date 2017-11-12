@@ -909,6 +909,9 @@ class Frame extends React.Component {
   render () {
     return <div
       data-partition={this.props.partition}
+      data-test-id='frameWrapper'
+      data-test2-id={this.props.isActive ? 'activeFrame' : null}
+      data-test3-id={this.props.isPreview ? 'previewFrame' : null}
       className={cx({
         frameWrapper: true,
         isPreview: this.props.isPreview,

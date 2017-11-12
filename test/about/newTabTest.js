@@ -103,8 +103,8 @@ describe('about:newtab tests', function () {
         yield reloadNewTab(this.app.client)
 
         yield this.app.client
-          .waitForVisible('.counter.trackers')
-          .waitForTextValue('.counter.trackers', '2')
+          .waitForVisible('[data-test-id="trackers"]')
+          .waitForTextValue('[data-test-id="trackers"]', '2')
       })
 
       // NOTE(bsclifton): this test can take 20+ seconds to run :(
@@ -114,8 +114,8 @@ describe('about:newtab tests', function () {
         yield reloadNewTab(this.app.client)
 
         yield this.app.client
-          .waitForVisible('.counter.ads')
-          .waitForTextValue('.counter.ads', '1')
+          .waitForVisible('[data-test-id="ads"]')
+          .waitForTextValue('[data-test-id="ads"]', '1')
       })
 
       // TODO(bsclifton):
@@ -133,12 +133,12 @@ describe('about:newtab tests', function () {
         yield reloadNewTab(this.app.client)
 
         yield this.app.client
-          .waitForVisible('.topSitesElementFavicon[href^="https://twitter.com/brave"]')
-          .waitForVisible('.topSitesElementFavicon[href^="https://www.facebook.com/BraveSoftware"]')
-          .waitForVisible('.topSitesElementFavicon[href^="https://www.youtube.com"]')
-          .waitForVisible('.topSitesElementFavicon[href^="https://brave.com"]')
-          .waitForVisible('.topSitesElementFavicon[href^="https://itunes.apple.com"]')
-          .waitForVisible('.topSitesElementFavicon[href^="https://play.google.com/store"]')
+          .waitForVisible('[data-test-id="topSitesElementFavicon"][href^="https://twitter.com/brave"]')
+          .waitForVisible('[data-test-id="topSitesElementFavicon"][href^="https://www.facebook.com/BraveSoftware"]')
+          .waitForVisible('[data-test-id="topSitesElementFavicon"][href^="https://www.youtube.com"]')
+          .waitForVisible('[data-test-id="topSitesElementFavicon"][href^="https://brave.com"]')
+          .waitForVisible('[data-test-id="topSitesElementFavicon"][href^="https://itunes.apple.com"]')
+          .waitForVisible('[data-test-id="topSitesElementFavicon"][href^="https://play.google.com/store"]')
       })
 
       it('shows sites that have been visited', function * () {
@@ -149,7 +149,7 @@ describe('about:newtab tests', function () {
         yield reloadNewTab(this.app.client)
 
         yield this.app.client
-          .waitForVisible('.topSitesElementFavicon')
+          .waitForVisible('[data-test-id="topSitesElementFavicon"]')
       })
 
       it('lets you pin a tile (and shows the pinned icon afterwards)', function * () {
@@ -160,12 +160,12 @@ describe('about:newtab tests', function () {
         yield reloadNewTab(this.app.client)
 
         yield this.app.client
-          .waitForVisible('.topSitesElementFavicon')
-          .moveToObject('.topSitesElement')
-          .waitForVisible('.topSitesActionContainer')
-          .click('.topSitesActionBtn')
-          .moveToObject('.timeSaved')
-          .waitForVisible('.pinnedTopSite')
+          .waitForVisible('[data-test-id="topSitesElementFavicon"]')
+          .moveToObject('[data-test-id="topSitesElement"]')
+          .waitForVisible('[data-test-id="topSitesActionContainer"]')
+          .click('[data-test-id="topSitesActionBtn"]')
+          .moveToObject('[data-test-id="timeSaved"]')
+          .waitForVisible('[data-test-id="pinnedTopSite"]')
       })
 
       it('doesn\'t show about pages on topSites grid', function * () {
@@ -190,7 +190,7 @@ describe('about:newtab tests', function () {
         yield reloadNewTab(this.app.client)
 
         yield this.app.client
-          .waitForElementCount('.topSitesElementFavicon', 0)
+          .waitForElementCount('[data-test-id="topSitesElementFavicon"]', 0)
       })
 
       it('shows favicon image for topSites', function * () {
@@ -205,7 +205,7 @@ describe('about:newtab tests', function () {
         yield reloadNewTab(this.app.client)
 
         yield this.app.client
-          .waitForVisible('.topSitesElementFavicon img')
+          .waitForVisible('[data-test-id="topSitesElementFavicon"] img')
       })
 
       it('replace topSites favicon images with a letter when no icon is found', function * () {
@@ -222,8 +222,8 @@ describe('about:newtab tests', function () {
         yield reloadNewTab(this.app.client)
 
         yield this.app.client
-          .waitForVisible('.topSitesElementFavicon')
-          .waitForTextValue('.topSitesElementFavicon', 'F')
+          .waitForVisible('[data-test-id="topSitesElementFavicon"]')
+          .waitForTextValue('[data-test-id="topSitesElementFavicon"]', 'F')
       })
     })
   })

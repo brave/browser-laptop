@@ -43,14 +43,15 @@ class BookmarkButton extends ImmutableComponent {
       {
         !this.props.titleMode
           ? <span className='bookmarkButtonContainer'>
-            <button data-l10n-id={this.props.bookmarkKey ? 'removeBookmarkButton' : 'addBookmarkButton'}
-              className={cx({
-                navigationButton: true,
-                bookmarkButton: true,
-                removeBookmarkButton: !!this.props.bookmarkKey,
-                withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-                normalizeButton: true
-              })}
+            <button className={cx({
+              navigationButton: true,
+              bookmarkButton: true,
+              removeBookmarkButton: !!this.props.bookmarkKey,
+              withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
+              normalizeButton: true
+            })}
+              data-test-id={this.props.bookmarkKey ? 'removeBookmarkButton' : 'addBookmarkButton'}
+              data-l10n-id={this.props.bookmarkKey ? 'removeBookmarkButton' : 'addBookmarkButton'}
               onClick={this.onToggleBookmark}
             />
           </span>

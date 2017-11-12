@@ -4,13 +4,20 @@ const Brave = require('../lib/brave')
 const config = require('../../js/constants/config')
 const {urlInput, activeWebview, activeTabFavicon, activeTab, navigatorLoadTime,
   titleBar, urlbarIcon, bookmarksToolbar, navigatorNotBookmarked, navigatorBookmarked,
-  doneButton, allowRunInsecureContentButton, dismissAllowRunInsecureContentButton,
+  bookmarkHangerDoneButton, allowRunInsecureContentButton, dismissAllowRunInsecureContentButton,
   denyRunInsecureContentButton, dismissDenyRunInsecureContentButton, activeTabTitle,
   homeButton} = require('../lib/selectors')
 const urlParse = require('url').parse
 const assert = require('assert')
 const settings = require('../../js/constants/settings')
 const messages = require('../../js/constants/messages')
+
+const lockIconPotentialPhishingUrl = '[data-test2-id="isPotentialPhishingUrl"]'
+const lockIconSearch = '[data-test2-id="isSearch"]'
+const lockIconAboutPage = '[data-test2-id="isAboutPage"]'
+const lockIconSecure = '[data-test2-id="isSecure"]'
+const lockIconInsecureColor = '[data-test2-id="isInsecureColor"]'
+const lockIconInsecure = '[data-test2-id="isInsecure"]'
 
 describe('navigationBar tests', function () {
   function * setup (client) {
@@ -372,10 +379,8 @@ describe('navigationBar tests', function () {
     it('Fallback to default icon when no one is specified', function * () {
       const pageWithNoFavicon = Brave.server.url('page_no_favicon.html')
       yield this.app.client.tabByUrl(Brave.newTabUrl).url(pageWithNoFavicon).waitForUrl(pageWithNoFavicon).windowParentByUrl(pageWithNoFavicon)
-      yield this.app.client.waitUntil(function () {
-        return this.getAttribute('[data-test-id="defaultIcon"]', 'class').then((className) =>
-          className.includes('fa fa-file-o'))
-      })
+      yield this.app.client
+        .waitForVisible('[data-test-id="defaultIcon"]')
     })
   })
 
@@ -392,14 +397,9 @@ describe('navigationBar tests', function () {
         .tabByUrl(Brave.newTabUrl)
         .loadUrl(page1Url)
         .windowParentByUrl(page1Url)
-        .waitUntil(() =>
-          this.app.client
-            .activateURLMode()
-            .waitForExist(urlbarIcon)
-            .getAttribute(urlbarIcon, 'class').then((classes) =>
-              classes.includes('fa-unlock') && classes.includes('insecure-color')
-        ))
+        .waitForExist(lockIconInsecureColor)
         .windowByUrl(Brave.browserWindowUrl)
+        .activateURLMode()
         .click(urlbarIcon)
         .waitForVisible('[data-test-id="insecureConnection"]')
         .keys(Brave.keys.ESCAPE)
@@ -411,13 +411,8 @@ describe('navigationBar tests', function () {
         .keys(page1Url)
         .keys(Brave.keys.ENTER)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(() =>
-          this.app.client
-            .activateURLMode()
-            .waitForExist(urlbarIcon)
-            .getAttribute(urlbarIcon, 'class').then((classes) =>
-              classes.includes('fa-exclamation-triangle') && classes.includes('insecure-color')
-        ))
+        .activateURLMode()
+        .waitForExist(lockIconPotentialPhishingUrl)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForVisible('[data-test-id="phishingConnectionInfo"]')
         .keys(Brave.keys.ESCAPE)
@@ -433,28 +428,22 @@ describe('navigationBar tests', function () {
         .activateTitleMode()
         .click(activeWebview)
         .waitForExist(titleBar)
-        .waitForVisible(urlbarIcon, 1)
-        .getAttribute(urlbarIcon, 'class').then((classes) =>
-          classes.includes('fa-unlock') && classes.includes('insecure-color')
-        )
+        .waitForExist(lockIconInsecureColor)
     })
     it('Shows secure URL icon', function * () {
       const page1Url = 'https://badssl.com/'
       yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
       yield this.app.client
         .activateURLMode()
-        .waitForExist(urlbarIcon)
-        .waitUntil(() =>
-          this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
-            classes.includes('fa-lock')
-          ))
+        .waitForExist(lockIconSecure)
         .windowByUrl(Brave.browserWindowUrl)
-        .click(urlbarIcon)
+        .click(lockIconSecure)
         .waitForVisible('[data-test-id="secureConnection"]')
         .keys(Brave.keys.ESCAPE)
     })
     it('Shows secure URL icon in title mode', function * () {
-      const page1Url = Brave.server.url('page1.html')
+      const page1Url = 'https://badssl.com/'
+      yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
       yield this.app.client
         .tabByUrl(Brave.newTabUrl)
         .loadUrl(page1Url)
@@ -464,10 +453,7 @@ describe('navigationBar tests', function () {
         .activateTitleMode()
         .click(activeWebview)
         .waitForExist(titleBar)
-        .waitForVisible(urlbarIcon, 1)
-        .getAttribute(urlbarIcon, 'class').then((classes) =>
-          classes.includes('fa-lock')
-        )
+        .waitForExist(lockIconSecure)
     })
     it('does not show secure icon if page load fails', function * () {
       const page1Url = Brave.server.url('ssl_spoof.html')
@@ -484,13 +470,8 @@ describe('navigationBar tests', function () {
       yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
       yield this.app.client
         .activateURLMode()
-        .waitForExist(urlbarIcon)
-        .waitUntil(() =>
-          this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
-            classes.includes('fa-unlock') && !classes.includes('insecure-color')
-          )
-        )
-        .click(urlbarIcon)
+        .waitForExist(lockIconInsecure)
+        .click(lockIconInsecure)
         .waitForVisible('[data-test-id="partiallySecureConnection"]')
     })
     it('shows insecure icon on a site with a sha-1 cert', function * () {
@@ -498,17 +479,13 @@ describe('navigationBar tests', function () {
       yield this.app.client.tabByUrl(Brave.newTabUrl).url(page1Url).waitForUrl(page1Url).windowParentByUrl(page1Url)
       yield this.app.client
         .activateURLMode()
-        .waitForExist(urlbarIcon)
-        .waitUntil(() =>
-          this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
-            classes.includes('fa-unlock') && classes.includes('insecure-color')
-          )
-        )
+        .waitForExist(lockIconInsecureColor)
     })
     it('shows insecure icon on an HTTP PDF', function * () {
       const page1Url = Brave.server.url('img/test.pdf')
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
+        .activateURLMode()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             return val.value.extensions['jdbefljfgobbmcidnmpjamcbhnbphjnb']
@@ -518,17 +495,13 @@ describe('navigationBar tests', function () {
       yield this.app.client
         .activateURLMode()
         .waitForInputText(urlInput, page1Url)
-        .waitForExist(urlbarIcon)
-        .waitUntil(() =>
-          this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
-            classes.includes('fa-unlock') && classes.includes('insecure-color')
-          )
-        )
+        .waitForExist(lockIconInsecureColor)
     })
     it('shows secure icon on an HTTPS PDF', function * () {
       const page1Url = 'https://letsencrypt.org/documents/ISRG-CPS-October-18-2016.pdf'
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
+        .activateURLMode()
         .waitUntil(function () {
           return this.getAppState().then((val) => {
             return val.value.extensions['jdbefljfgobbmcidnmpjamcbhnbphjnb']
@@ -538,12 +511,7 @@ describe('navigationBar tests', function () {
       yield this.app.client
         .activateURLMode()
         .waitForInputText(urlInput, page1Url)
-        .waitForExist(urlbarIcon)
-        .waitUntil(() =>
-          this.app.client.getAttribute(urlbarIcon, 'class').then((classes) =>
-            classes.includes('fa-lock')
-          )
-        )
+        .waitForExist(lockIconSecure)
     })
     it('Blocks running insecure content', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
@@ -556,7 +524,8 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist(urlbarIcon + '.fa-lock')
+        .activateURLMode()
+        .waitForExist(lockIconSecure)
         .click(urlbarIcon)
         .waitForVisible('[data-test-id="runInsecureContentWarning"]')
         .waitForVisible(dismissAllowRunInsecureContentButton)
@@ -572,7 +541,7 @@ describe('navigationBar tests', function () {
         })
         .windowByUrl(Brave.browserWindowUrl)
         .click(urlbarIcon)
-        .waitForExist(urlbarIcon + '.fa-lock')
+        .waitForExist(lockIconSecure)
     })
     it('Temporarily allow/deny running insecure content', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
@@ -585,7 +554,8 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist(urlbarIcon + '.fa-lock')
+        .activateURLMode()
+        .waitForExist(lockIconSecure)
         .click(urlbarIcon)
         .waitForVisible('[data-test-id="secureConnection"]')
         .waitForVisible('[data-test-id="runInsecureContentWarning"]')
@@ -614,7 +584,7 @@ describe('navigationBar tests', function () {
         })
         .windowByUrl(Brave.browserWindowUrl)
         .click(urlbarIcon)
-        .waitForExist(urlbarIcon + '.fa-lock')
+        .waitForExist(lockIconSecure)
     })
     it('Limit effect of running insecure content in frame', function * () {
       const page1Url = 'https://mixed-script.badssl.com/'
@@ -627,8 +597,9 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist(urlbarIcon + '.fa-lock')
-        .click(urlbarIcon + '.fa-lock')
+        .activateURLMode()
+        .waitForExist(lockIconSecure)
+        .click(lockIconSecure)
         .waitForVisible('[data-test-id="secureConnection"]')
         .waitForVisible('[data-test-id="runInsecureContentWarning"]')
         .waitForVisible(dismissAllowRunInsecureContentButton)
@@ -694,6 +665,7 @@ describe('navigationBar tests', function () {
         })
         // background color changes when insecure content runs
         .windowByUrl(Brave.browserWindowUrl)
+        .activateURLMode()
         .tabByIndex(1)
         .waitUntil(() => {
           return this.app.client.getCssProperty('body', 'background-color').then((color) =>
@@ -701,8 +673,8 @@ describe('navigationBar tests', function () {
           )
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForExist(urlbarIcon + '.fa-lock')
-        .click(urlbarIcon)
+        .waitForExist(lockIconSecure)
+        .click(lockIconSecure)
         .waitForVisible('[data-test-id="secureConnection"]')
         .waitForVisible('[data-test-id="runInsecureContentWarning"]')
         .waitForVisible(dismissAllowRunInsecureContentButton)
@@ -940,15 +912,13 @@ describe('navigationBar tests', function () {
         // test that url is shown with proper icon
         // before getting cleared
         yield this.app.client
-          .waitForExist(urlbarIcon)
-          .getAttribute(urlbarIcon, 'class').then(classes => classes.includes('fa-unlock'))
-
-        // ensure that once cleaned, search icon
-        // is shown instead of protocol icon
-        yield this.app.client
-          .setValue(urlInput, '')
-          .waitForExist(urlbarIcon)
-          .getAttribute(urlbarIcon, 'class').then(classes => classes.includes('fa-search'))
+          .activateURLMode()
+          .waitForExist(lockIconInsecureColor)
+          // ensure that once cleaned, search icon is shown instead of protocol icon
+          .click(urlInput)
+          .keys(Brave.keys.BACKSPACE)
+          .waitForInputText(urlInput, '')
+          .waitForExist(lockIconSearch)
       })
     })
 
@@ -1010,7 +980,8 @@ describe('navigationBar tests', function () {
         yield this.app.client
           .tabByUrl(this.newTabUrl)
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist('.urlbarIcon.fa-search')
+          .activateURLMode()
+          .waitForExist(lockIconSearch)
       })
       it('shows the list icon in URL bar for other about pages', function * () {
         yield this.app.client
@@ -1021,7 +992,7 @@ describe('navigationBar tests', function () {
           .windowByUrl(Brave.browserWindowUrl)
           .activateURLMode()
           .waitForInputText(urlInput, 'about:about')
-          .waitForExist('.urlbarIcon.fa-list')
+          .waitForExist(lockIconAboutPage)
       })
     })
 
@@ -1282,10 +1253,10 @@ describe('navigationBar tests', function () {
         .activateURLMode()
         .waitForExist(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
-        .waitForVisible(doneButton)
+        .waitForVisible(bookmarkHangerDoneButton)
         .waitForBookmarkDetail(page1Url, 'Page 1')
-        .waitForEnabled(doneButton)
-        .click(doneButton)
+        .waitForEnabled(bookmarkHangerDoneButton)
+        .click(bookmarkHangerDoneButton)
         .activateTitleMode()
         .activateURLMode()
         .waitForExist(navigatorBookmarked)
@@ -1313,10 +1284,10 @@ describe('navigationBar tests', function () {
         .windowParentByUrl(page2Url)
         .activateURLMode()
         .click(navigatorNotBookmarked)
-        .waitForVisible(doneButton)
+        .waitForVisible(bookmarkHangerDoneButton)
         .waitForBookmarkDetail(page2Url, 'Page 2')
-        .waitForEnabled(doneButton)
-        .click(doneButton)
+        .waitForEnabled(bookmarkHangerDoneButton)
+        .click(bookmarkHangerDoneButton)
         .activateURLMode()
         .waitForExist(navigatorBookmarked)
         .waitForElementCount(bookmarksToolbar, 0)

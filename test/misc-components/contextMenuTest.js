@@ -1,7 +1,12 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {urlInput} = require('../lib/selectors')
+const {
+  urlInput,
+  contextMenu,
+  contextMenuItem,
+  contextMenuItemText
+} = require('../lib/selectors')
 
 describe('ContextMenu', function () {
   function * setup (client) {
@@ -12,7 +17,7 @@ describe('ContextMenu', function () {
   }
 
   const contextMenuIndexOf = (index) => {
-    return `.contextMenu div.selectedByKeyboard[data-index="${index}"]`
+    return `[data-test-id="contextMenu"] [data-test2-id="selectedByKeyboard"][data-index="${index}"]`
   }
 
   describe('navigation', function () {
@@ -46,7 +51,7 @@ describe('ContextMenu', function () {
         .click(this.input)
         .click(this.input)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible('.contextMenuItemText')
+        .waitForVisible(contextMenuItemText)
     })
 
     it('check if enter is prevented', function * () {
@@ -59,7 +64,7 @@ describe('ContextMenu', function () {
         .click(this.input)
         .click(this.input)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible('.contextMenu')
+        .waitForVisible(contextMenu)
         .keys(Brave.keys.DOWN)
         .waitForExist(contextMenuIndexOf(0))
         .keys(Brave.keys.DOWN)
@@ -78,8 +83,8 @@ describe('ContextMenu', function () {
         .click(this.input)
         .click(this.input)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible('.contextMenu')
-        .click('.contextMenuItem')
+        .waitForVisible(contextMenu)
+        .click(contextMenuItem)
         .tabByUrl(this.formfill)
         .waitForInputText(this.input, this.values[0])
     })
@@ -92,7 +97,7 @@ describe('ContextMenu', function () {
         .click(this.input)
         .click(this.input)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForVisible('.contextMenu')
+        .waitForVisible(contextMenu)
         .keys(Brave.keys.DOWN)
         .waitForExist(contextMenuIndexOf(0))
         .keys(Brave.keys.DOWN)
@@ -110,7 +115,7 @@ describe('ContextMenu', function () {
         .click(this.input)
         .windowByUrl(Brave.browserWindowUrl)
         .keys(Brave.keys.DOWN)
-        .waitForVisible('.contextMenu')
+        .waitForVisible(contextMenu)
         .keys(Brave.keys.DOWN)
         .waitForExist(contextMenuIndexOf(0))
         .keys(Brave.keys.DOWN)
@@ -136,7 +141,7 @@ describe('ContextMenu', function () {
         .click(this.input)
         .windowByUrl(Brave.browserWindowUrl)
         .keys('\uE015')
-        .waitForVisible('.contextMenu')
+        .waitForVisible(contextMenu)
         .keys('\uE012') // left
         .pause(10)
         .keys('\uE014') // right

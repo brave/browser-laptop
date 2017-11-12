@@ -120,7 +120,7 @@ class AboutStyle extends ImmutableComponent {
       <hr />
 
       <div id='typography'>
-        <h1 className='typography' data-l10n-id='typography' />
+        <h1 className='typography' data-l10n-id='typography' data-test-id='typography' />
         <h1 data-l10n-id='h1' />
         <h2 data-l10n-id='h2' />
         <h3 data-l10n-id='h3' />

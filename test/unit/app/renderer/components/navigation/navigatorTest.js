@@ -112,18 +112,16 @@ describe('Navigator component unit tests', function () {
     })
 
     it('both back/forward navigationButtonContainers are enabled', function () {
-      assert.equal(wrapper.find('[data-test-id="navigationBackButtonDisabled"]').length, 0)
-      assert.equal(wrapper.find('[data-test-id="navigationForwardButtonDisabled"]').length, 0)
+      assert.equal(wrapper.find('[data-test-id="navigationBackButtonEnabled"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="navigationForwardButtonEnabled"]').length, 1)
     })
 
     it('back navigation button is enabled', function () {
-      const node = wrapper.find('[data-test-id="backButton"]').getDOMNode()
-      assert.equal(node.disabled, false)
+      assert.equal(wrapper.find('[data-test-id="backButtonEnabled"]').length, 1)
     })
 
     it('forward navigation button is enabled', function () {
-      const node = wrapper.find('[data-test-id="forwardButton"]').getDOMNode()
-      assert.equal(node.disabled, false)
+      assert.equal(wrapper.find('[data-test-id="forwardButtonEnabled"]').length, 1)
     })
   })
 
@@ -149,13 +147,11 @@ describe('Navigator component unit tests', function () {
     })
 
     it('disables the back navigation button', function () {
-      const node = wrapper.find('[data-test-id="backButtonDisabled"]').getDOMNode()
-      assert.equal(node.disabled, true)
+      assert.equal(wrapper.find('[data-test-id="backButtonDisabled"]').length, 1)
     })
 
     it('disables the forward navigation button', function () {
-      const node = wrapper.find('[data-test-id="forwardButtonDisabled"]').getDOMNode()
-      assert.equal(node.disabled, true)
+      assert.equal(wrapper.find('[data-test-id="forwardButtonDisabled"]').length, 1)
     })
 
     it('disables the lion icon', function () {

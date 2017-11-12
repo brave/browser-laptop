@@ -61,11 +61,11 @@ class Stats extends ImmutableComponent {
     })
     return <ul className='statsContainer'>
       <li className='statsBlock'>
-        <span className='counter trackers'>{trackedBlockersCount.toLocaleString()}</span>
+        <span className='counter trackers' data-test-id='trackers'>{trackedBlockersCount.toLocaleString()}</span>
         <span className='statsText' data-l10n-id='trackersBlocked' data-l10n-args={blockedArgs} />
       </li>
       <li className='statsBlock'>
-        <span className='counter ads'>{adblockCount.toLocaleString()}</span>
+        <span className='counter ads' data-test-id='ads'>{adblockCount.toLocaleString()}</span>
         <span className='statsText' data-l10n-id='adsBlocked' data-l10n-args={blockedArgs} />
       </li>
       <li className='statsBlock'>
@@ -73,7 +73,7 @@ class Stats extends ImmutableComponent {
         <span className='statsText' data-l10n-id='httpsUpgraded' data-l10n-args={blockedArgs} />
       </li>
       <li className='statsBlock'>
-        <span className='counter timeSaved'>
+        <span className='counter timeSaved' data-test-id='timeSaved'>
           {timeSaved.value} <span className='text' data-l10n-id={timeSaved.id} data-l10n-args={timeSaved.args} />
         </span>
         <span className='statsText' data-l10n-id='estimatedTimeSaved' />

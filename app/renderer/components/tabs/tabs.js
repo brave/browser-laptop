@@ -210,14 +210,14 @@ class Tabs extends React.Component {
             : null
         }
         <LongPressButton
-          label='+'
-          l10nId='newTabButton'
-          testId='newTabButton'
           className={cx({
             browserButton: true,
             navbutton: true,
             [css(styles.tabs__tabStrip__newTabButton)]: true
           })}
+          label='+'
+          l10nId='newTabButton'
+          testId='newTabButton'
           disabled={false}
           onClick={this.newTab}
           onLongPress={this.onNewTabLongPress}

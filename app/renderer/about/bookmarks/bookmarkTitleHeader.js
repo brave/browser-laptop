@@ -25,7 +25,11 @@ class BookmarkTitleHeader extends ImmutableComponent {
   render () {
     return <div className='th-inner'>
       <span data-l10n-id={this.props.heading} />
-      <span data-l10n-id='addBookmark' className='addBookmark' onClick={this.addBookmark} />
+      <span className='addBookmark'
+        data-l10n-id='addBookmark'
+        data-test-id='addBookmark'
+        onClick={this.addBookmark}
+      />
     </div>
   }
 }

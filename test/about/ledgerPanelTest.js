@@ -218,7 +218,7 @@ describe('Regular payment panel tests', function () {
         .waitForElementCount('[data-tbody-index="1"] tr', 2)
         .click(securityTab)
         .waitForVisible('[data-test-id="clearBrowsingHistory"]')
-        .click('[data-test-id="clearBrowsingHistory"] .switchBackground')
+        .click('[data-test-id="clearBrowsingHistory"] [data-test-id="switchBackground"]')
       yield Brave.stopApp(false, 10000)
 
       yield Brave.startApp()
@@ -263,7 +263,7 @@ describe('Regular payment panel tests', function () {
         .waitForElementCount(addFundsButton, 0)
         .click(securityTab)
         .waitForVisible('[data-test-id="clearBrowsingHistory"]')
-        .click('[data-test-id="clearBrowsingHistory"] .switchBackground')
+        .click('[data-test-id="clearBrowsingHistory"] [data-test-id="switchBackground"]')
       yield Brave.stopApp(false, 10000)
 
       yield Brave.startApp()
@@ -588,8 +588,8 @@ describe('synopsis', function () {
       .click(paymentsTab)
       .waitForVisible('[data-l10n-id="publisher"]')
       .click('[data-l10n-id="publisher"]')
-      .waitForVisible(siteSettingItem + ' .switchBackground')
-      .click(siteSettingItem + ' .switchBackground')
+      .waitForVisible(siteSettingItem + ' [data-test-id="switchBackground"]')
+      .click(siteSettingItem + ' [data-test-id="switchBackground"]')
       .windowByUrl(Brave.browserWindowUrl)
       .waitUntil(function () {
         return this.getAppState().then((val) => {

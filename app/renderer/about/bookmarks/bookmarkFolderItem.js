@@ -121,6 +121,7 @@ class BookmarkFolderItem extends ImmutableComponent {
         onClick={this.props.onChangeSelectedFolder.bind(null, this.props.bookmarkFolder.get('folderId'))}
         draggable={this.props.draggable !== false ? 'true' : 'false'}
         data-folder-id={this.props.bookmarkFolder.get('folderId')}
+        data-test-id='bookmarkFolderListItem'
         className={cx({
           listItem: true,
           selected: this.props.selected,

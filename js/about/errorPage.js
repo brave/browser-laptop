@@ -31,11 +31,11 @@ class ErrorPage extends React.Component {
   }
 
   render () {
-    return <div className='errorContent'>
+    return <div className='errorContent' data-test-id='errorContent'>
       <div className='errorTitle'>
         <span className='errorText' data-l10n-id={this.state.title} />
-        <span className='errorUrl'>{this.state.url}</span>
-        <span className='errorText' data-l10n-id={this.state.message} />
+        <span className='errorUrl' data-test-id='errorUrl'>{this.state.url}</span>
+        <span className='errorText' data-test-id='errorText' data-l10n-id={this.state.message} />
       </div>
       <div className='buttons'>
         {this.showBackButton ? <BrowserButton actionItem fitContent l10nId='back' onClick={this.goBack} /> : null}

@@ -497,7 +497,7 @@ class UrlBar extends React.Component {
       </div>
       {
         this.props.titleMode
-        ? <div id='titleBar'>
+        ? <div id='titleBar' data-test-id='titleBar'>
           <span><strong>{this.props.hostValue}</strong></span>
           <span>{this.props.hostValue && this.titleValue ? ' | ' : ''}</span>
           <span>{this.titleValue}</span>
@@ -518,6 +518,7 @@ class UrlBar extends React.Component {
             testHookLoadDone: !this.props.loading
           })}
           id='urlInput'
+          data-test-id='urlInput'
           readOnly={this.props.titleMode}
           ref={(node) => { this.urlInput = node }} />
       }
@@ -527,7 +528,8 @@ class UrlBar extends React.Component {
         ? <span className={cx({
           'loadTime': true,
           'onFocus': this.props.isActive
-        })}>{this.loadTime}</span>
+        })}
+          data-test-id='loadTime'>{this.loadTime}</span>
         : null
       }
       {

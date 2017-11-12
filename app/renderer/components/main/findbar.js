@@ -258,7 +258,11 @@ class FindBar extends React.Component {
       styles.findBar__string__input
     )
 
-    return <div className={css(styles.findBar)} style={findBarStyle} data-test-id='findBar' onBlur={this.onBlur}>
+    return <div className={css(styles.findBar)}
+      data-test-id='findBar'
+      style={findBarStyle}
+      onBlur={this.onBlur}
+    >
       <div className={css(styles.findBar__string)}>
         <span className={cx({
           [globalStyles.appIcons.search]: true,

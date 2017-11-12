@@ -5,7 +5,7 @@ const appConfig = require('../../js/constants/appConfig')
 const settings = require('../../js/constants/settings')
 const {
   urlInput,
-  newFrameButton,
+  newTabButton,
   pinnedTabsTabs,
   tabsTabs,
   tabPage,
@@ -37,13 +37,13 @@ describe('tab pages', function () {
       yield this.app.client.windowByUrl(Brave.browserWindowUrl)
       for (let i = 0; i < appConfig.defaultSettings[settings.TABS_PER_PAGE] - 1; i++) {
         yield this.app.client
-          .click(newFrameButton)
+          .click(newTabButton)
           .waitForElementCount(tabsTabs, i + 2)
       }
     })
 
     it('shows 2 tab pages when there are more than 1 page worth of tabs', function * () {
-      yield this.app.client.click(newFrameButton)
+      yield this.app.client.click(newTabButton)
         .waitForElementCount(tabPage, 2)
     })
 
@@ -67,7 +67,7 @@ describe('tab pages', function () {
 
     it('closes tab page with middle click', function * () {
       yield this.app.client
-        .click(newFrameButton)
+        .click(newTabButton)
         .waitForElementCount(tabPage, 2)
         .waitForExist(tabPage2 + '[data-test-active-tabPage="true"]')
         .middleClick(tabPage1)
@@ -87,7 +87,7 @@ describe('tab pages', function () {
 
     it('shows the right number of tabs after closing with mouse', function * () {
       const numTabsPerPage = appConfig.defaultSettings[settings.TABS_PER_PAGE]
-      yield this.app.client.click(newFrameButton)
+      yield this.app.client.click(newTabButton)
         .waitForElementCount(tabPage, 2)
         .moveToObject(activeTab)
         .waitForExist('[data-test-id="tab"][data-frame-key="21"]')
@@ -99,7 +99,7 @@ describe('tab pages', function () {
 
     it('closing tab page option for non active tab page', function * () {
       yield this.app.client
-        .click(newFrameButton)
+        .click(newTabButton)
         .waitForElementCount(tabPage, 2)
         .closeTabPageByIndex(0, 1)
         .waitForElementCount(tabPage, 0)
@@ -110,7 +110,7 @@ describe('tab pages', function () {
     it('closing tab page option for active tab page', function * () {
       const numTabsPerPage = appConfig.defaultSettings[settings.TABS_PER_PAGE]
       yield this.app.client
-        .click(newFrameButton)
+        .click(newTabButton)
         .waitForElementCount(tabPage, 2)
         .closeTabPageByIndex(1, 1)
         .waitForElementCount(tabPage, 0)
@@ -122,7 +122,7 @@ describe('tab pages', function () {
       beforeEach(function * () {
         // Make sure there are 2 tab pages
         yield this.app.client
-          .click(newFrameButton)
+          .click(newTabButton)
           .waitForElementCount(tabPage, 2)
       })
 
@@ -180,7 +180,7 @@ describe('tab pages', function () {
 
       for (let i = 0; i < appConfig.defaultSettings[settings.TABS_PER_PAGE] - 1; i++) {
         yield this.app.client
-          .click(newFrameButton)
+          .click(newTabButton)
           .waitForElementCount(tabsTabs, i + 2)
       }
     })
@@ -194,7 +194,7 @@ describe('tab pages', function () {
 
     it('shows second tab page when you have 1 pinned and 21 unpinned tabs', function * () {
       yield this.app.client
-        .click(newFrameButton)
+        .click(newTabButton)
         .waitForElementCount(tabPage, 2)
     })
   })
@@ -210,8 +210,8 @@ describe('tab pages', function () {
       const tabsPerPage = appConfig.defaultSettings[settings.TABS_PER_PAGE]
       for (let i = 0; i < tabsPerPage; i++) {
         yield this.app.client
-          .waitForExist(newFrameButton)
-          .click(newFrameButton)
+          .waitForExist(newTabButton)
+          .click(newTabButton)
           .waitForElementCount(tabsTabs, ((i + 1) % tabsPerPage) + 1)
       }
       yield this.app.client

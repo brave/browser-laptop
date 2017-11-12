@@ -185,8 +185,8 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
-        .waitForVisible(`.switch-${adblockUUID}`)
-        .click(`.switch-${adblockUUID} .switchBackground`)
+        .waitForVisible(`[data-test-id="switch-${adblockUUID}"]`)
+        .click(`[data-test-id="switch-${adblockUUID}"] [data-test-id="switchBackground"]`)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
@@ -234,8 +234,8 @@ describe('Bravery Panel', function () {
         .tabByIndex(0)
         .loadUrl(aboutAdblockURL)
         .url(aboutAdblockURL)
-        .waitForVisible(`.switch-${adblockUUID}`)
-        .click(`.switch-${adblockUUID} .switchBackground`)
+        .waitForVisible(`[data-test-id="switch-${adblockUUID}"]`)
+        .click(`[data-test-id="switch-${adblockUUID}"] [data-test-id="switchBackground"]`)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {

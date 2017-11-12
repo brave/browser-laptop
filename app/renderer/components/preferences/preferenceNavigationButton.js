@@ -20,8 +20,12 @@ class PreferenceNavigationButton extends ImmutableComponent {
           customIcon && !this.props.selected && this.props.iconOff,
           customIcon && this.props.selected && this.props.iconOn,
           !customIcon && this.props.selected && styles.iconActive,
-          !customIcon && this.props.icon)} />
-        <div className={css(styles.text)} data-l10n-id={this.props.dataL10nId} />
+          !customIcon && this.props.icon)}
+        />
+        <div className={css(styles.text)}
+          data-l10n-id={this.props.l10nId}
+          data-test-id={this.props.testId}
+        />
       </div>
     </div>
   }

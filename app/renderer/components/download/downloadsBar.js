@@ -51,7 +51,9 @@ class DownloadsBar extends React.Component {
 
   render () {
     return <div className='downloadsBar'
-      onContextMenu={contextMenus.onDownloadsToolbarContextMenu.bind(null, undefined, undefined)}>
+      data-test-id='downloadsBar'
+      onContextMenu={contextMenus.onDownloadsToolbarContextMenu.bind(null, undefined, undefined)}
+    >
       <div className='downloadItems'>
         {
           this.props.downloads.map(downloadId =>

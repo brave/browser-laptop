@@ -157,7 +157,11 @@ class Bookmarks extends React.Component {
         <div className='folderView'>
           <div className='columnHeader'>
             <span data-l10n-id='folders' />
-            <span data-l10n-id='addBookmarkFolder' className='addBookmarkFolder' onClick={this.addBookmarkFolder} />
+            <span className='addBookmarkFolder'
+              data-l10n-id='addBookmarkFolder'
+              data-test-id='addBookmarkFolder'
+              onClick={this.addBookmarkFolder}
+            />
           </div>
           <BookmarkFolderList
             onClearSelection={this.clearSelection}

@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {notificationBar, urlInput} = require('../lib/selectors')
+const {notificationBar, notificationItem, urlInput} = require('../lib/selectors')
 
 describe('flash install interception', function () {
   function * setup (client) {
@@ -34,7 +34,7 @@ describe('flash install interception', function () {
         return this.getText(notificationBar).then((val) => val.includes('run Flash Player'))
       })
       .click('button=Deny')
-      .waitForElementCount('.notificationItem', 0)
+      .waitForElementCount(notificationItem, 0)
   })
   it('shows notification bar on img click', function * () {
     yield this.app.client

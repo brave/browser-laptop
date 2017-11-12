@@ -11,7 +11,7 @@ const BookmarkFolderItem = require('./bookmarkFolderItem')
 
 class BookmarkFolderList extends ImmutableComponent {
   render () {
-    return <list className='bookmarkFolderList'>
+    return <list className='bookmarkFolderList' data-test-id='bookmarkFolderList'>
       {
         this.props.isRoot && this.props.search
           ? <div role='listitem' className='listItem selected'>

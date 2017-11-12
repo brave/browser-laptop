@@ -124,11 +124,13 @@ class SiteSettingCheckbox extends ImmutableComponent {
   }
 
   render () {
-    return <div style={this.props.style} className={cx({
+    return <div className={cx({
       settingItem: true,
-      siteSettingItem: true,
       [this.props.className]: !!this.props.className
-    })}>
+    })}
+      style={this.props.style}
+      data-test-id='siteSettingItem'
+    >
       <SwitchControl
         small={this.props.small}
         disabled={this.props.disabled}

@@ -273,7 +273,7 @@ class BookmarkToolbarButton extends React.Component {
             [css(styles.bookmarkToolbarButton__bookmarkFile)]: true,
             [css(this.props.showOnlyFavicon && styles.bookmarkToolbarButton__marginRightZero)]: true
           })}
-            data-test-id='bookmarkFavicon'
+            data-test-id='defaultIcon'
             style={iconStyle} />
           : null
       }

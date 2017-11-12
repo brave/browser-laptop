@@ -160,7 +160,7 @@ describe('sessionStore test', function () {
       before(function * () {
         this.page1Url = Brave.server.url('page1.html')
         this.page2Url = Brave.server.url('page2.html')
-        this.activeTabSelector = '.frameWrapper.isActive webview[data-frame-key="1"][src="' + this.page1Url + '"]'
+        this.activeTabSelector = '[data-test2-id="activeFrame"] webview[data-frame-key="1"][src="' + this.page1Url + '"]'
         yield Brave.startApp()
         yield setupBrave(Brave.app.client)
         yield Brave.app.client
@@ -205,7 +205,7 @@ describe('sessionStore test', function () {
       before(function * () {
         this.page1Url = Brave.server.url('page1.html')
         this.page2Url = Brave.server.url('page2.html')
-        this.activeTabSelector = '.frameWrapper.isActive webview[data-frame-key="2"][src="' + this.page2Url + '"]'
+        this.activeTabSelector = '[data-test2-id="activeFrame"] webview[data-frame-key="2"][src="' + this.page2Url + '"]'
         yield Brave.startApp()
         yield setupBrave(Brave.app.client)
         yield Brave.app.client

@@ -1,7 +1,13 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {urlInput, backButton, forwardButton, pinnedTabsTabs} = require('../lib/selectors')
+const {urlInput,
+  pinnedTabsTabs,
+  backButtonEnabled,
+  backButtonDisabled,
+  forwardButtonEnabled,
+  forwardButtonDisabled
+} = require('../lib/selectors')
 const messages = require('../../js/constants/messages')
 
 describe('frame tests', function () {
@@ -11,8 +17,8 @@ describe('frame tests', function () {
 
       before(function * () {
         this.url1 = Brave.server.url('page1.html')
-        this.webview1 = '.frameWrapper:nth-child(1) webview'
-        this.webview2 = '.frameWrapper.isActive:nth-child(2) webview'
+        this.webview1 = '[data-test-id="frameWrapper"]:nth-child(1) webview'
+        this.webview2 = '[data-test2-id="activeFrame"]:nth-child(2) webview'
 
         yield setup(this.app.client)
         yield this.app.client
@@ -87,8 +93,8 @@ describe('frame tests', function () {
       before(function * () {
         this.url1 = Brave.server.url('page1.html')
         this.url2 = Brave.server.url('page2.html')
-        this.webview1 = '.frameWrapper:nth-child(1) webview'
-        this.webview2 = '.frameWrapper.isActive:nth-child(2) webview'
+        this.webview1 = '[data-test-id="frameWrapper"]:nth-child(1) webview'
+        this.webview2 = '[data-test2-id="activeFrame"]:nth-child(2) webview'
 
         yield setup(this.app.client)
         yield this.app.client
@@ -106,9 +112,9 @@ describe('frame tests', function () {
           .tabByIndex(1)
           .waitForUrl(this.url2)
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist(backButton + ':not([disabled])')
-          .waitForExist(forwardButton + '[disabled]')
-          .click(backButton)
+          .waitForExist(backButtonEnabled)
+          .waitForExist(forwardButtonDisabled)
+          .click(backButtonEnabled)
           .tabByIndex(1)
           .waitForUrl(this.url1)
           .windowByUrl(Brave.browserWindowUrl)
@@ -121,7 +127,7 @@ describe('frame tests', function () {
         this.url1 = Brave.server.url('page1.html')
         yield setup(this.app.client)
         yield this.app.client
-          .waitForExist('.navigationButtonContainer.disabled .backButton')
+          .waitForExist(backButtonDisabled)
           .tabByIndex(0)
           // add some history
           .loadUrl(this.url1)
@@ -130,13 +136,13 @@ describe('frame tests', function () {
 
       it('enables back button on first nav', function * () {
         yield this.app.client
-          .waitForExist('.navigationButtonContainer:not(.disabled) .backButton')
+          .waitForExist(backButtonEnabled)
       })
 
       it('enables forward button after pressing back', function * () {
         yield this.app.client
-          .click(backButton)
-          .waitForExist('.navigationButtonContainer:not(.disabled) .forwardButton')
+          .click(backButtonEnabled)
+          .waitForExist(forwardButtonEnabled)
       })
     })
 
@@ -146,8 +152,8 @@ describe('frame tests', function () {
       before(function * () {
         this.url1 = Brave.server.url('page1.html')
         this.url2 = Brave.server.url('page2.html')
-        this.webview1 = '.frameWrapper:nth-child(1) webview'
-        this.webview2 = '.frameWrapper.isActive:nth-child(2) webview'
+        this.webview1 = '[data-test-id="frameWrapper"]:nth-child(1) webview'
+        this.webview2 = '[data-test2-id="activeFrame"]:nth-child(2) webview'
 
         yield setup(this.app.client)
         yield this.app.client
@@ -165,14 +171,14 @@ describe('frame tests', function () {
           .tabByIndex(1)
           .waitForUrl(this.url1)
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist(backButton + ':not([disabled])')
-          .waitForExist(forwardButton + ':not([disabled])')
-          .click(forwardButton)
+          .waitForExist(backButtonEnabled)
+          .waitForExist(forwardButtonEnabled)
+          .click(forwardButtonEnabled)
           .tabByIndex(1)
           .waitForUrl(this.url2)
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist(backButton + ':not([disabled])')
-          .waitForExist(forwardButton + '[disabled]')
+          .waitForExist(backButtonEnabled)
+          .waitForExist(forwardButtonDisabled)
       })
     })
   })
@@ -183,8 +189,8 @@ describe('frame tests', function () {
     before(function * () {
       this.url = Brave.server.url('find_in_page.html')
       // todo: move to selectors
-      this.webview1 = '.frameWrapper:nth-child(1) webview'
-      this.webview2 = '.frameWrapper:nth-child(2) webview'
+      this.webview1 = '[data-test-id="frameWrapper"]:nth-child(1) webview'
+      this.webview2 = '[data-test-id="frameWrapper"]:nth-child(2) webview'
 
       yield setup(this.app.client)
       yield this.app.client
@@ -220,8 +226,8 @@ describe('frame tests', function () {
     before(function * () {
       this.url = Brave.fixtureUrl('viewSourceForFileScheme.html')
 
-      this.webview1 = '.frameWrapper:nth-child(1) webview'
-      this.webview2 = '.frameWrapper:nth-child(2) webview'
+      this.webview1 = '[data-test-id="frameWrapper"]:nth-child(1) webview'
+      this.webview2 = '[data-test-id="frameWrapper"]:nth-child(2) webview'
 
       yield setup(this.app.client)
       yield this.app.client

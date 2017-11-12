@@ -131,7 +131,7 @@ class NoScriptInfo extends React.Component {
       site: this.props.siteHost
     }
 
-    return <Dialog onHide={this.onHide} className='noScriptInfo' isClickDismiss>
+    return <Dialog onHide={this.onHide} className='noScriptInfo' testId='noScriptInfo' isClickDismiss>
       <div className='dialogInner' onClick={this.onClickInner}>
         <div
           className='truncate'
@@ -156,6 +156,7 @@ class NoScriptInfo extends React.Component {
                 groupedItem
                 actionItem
                 l10nId='allowScriptsOnce'
+                testId='allowScriptsOnce'
                 onClick={this.onAllow.bind(this, 0)}
               />
               {
@@ -164,6 +165,7 @@ class NoScriptInfo extends React.Component {
                   groupedItem
                   subtleItem
                   l10nId='allowScriptsTemp'
+                  testId='allowScriptsTemp'
                   onClick={this.onAllow.bind(this, 1)}
                 />
                 : null

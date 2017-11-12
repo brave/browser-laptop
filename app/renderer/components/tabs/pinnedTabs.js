@@ -93,7 +93,8 @@ class PinnedTabs extends React.Component {
       className={css(styles.pinnedTabs)}
       data-test-id='pinnedTabs'
       onDragOver={this.onDragOver}
-      onDrop={this.onDrop}>
+      onDrop={this.onDrop}
+    >
       {
          this.props.pinnedTabs
            .map((frameKey) =>

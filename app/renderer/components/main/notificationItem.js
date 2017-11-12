@@ -93,7 +93,9 @@ class NotificationItem extends React.Component {
       notificationItem: true,
       [css(commonStyles.notificationBar__notificationItem)]: true,
       [this.props.style]: this.props.style
-    })}>
+    })}
+      data-test-id='notificationItem'
+    >
       <div className={css(styles.flexJustifyBetween, styles.flexAlignCenter)}>
         <div className={css(styles.marginRight)}>
           {

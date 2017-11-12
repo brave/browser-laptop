@@ -4,7 +4,21 @@ const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const {tabPreviewTiming} = require('../../app/common/constants/settingsEnums')
-const {urlInput, backButton, forwardButton, activeTab, activeTabTitle, activeTabFavicon, newFrameButton, notificationBar, contextMenu, pinnedTabsTabs, tabsTabs, pinnedTabs, tabs} = require('../lib/selectors')
+const {
+  urlInput,
+  backButtonEnabled,
+  forwardButtonEnabled,
+  activeTab,
+  activeTabTitle,
+  activeTabFavicon,
+  newTabButton,
+  notificationBar,
+  contextMenu,
+  tabs,
+  tabsTabs,
+  pinnedTabs,
+  pinnedTabsTabs
+} = require('../lib/selectors')
 
 const newTabUrl = 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html'
 
@@ -34,13 +48,13 @@ describe('tab tests', function () {
         .loadUrl(this.page2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForTextValue(activeTabTitle, 'Page 2')
-        .waitForExist(backButton)
-        .click(backButton)
+        .waitForExist(backButtonEnabled)
+        .click(backButtonEnabled)
         .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForTextValue(activeTabTitle, 'Page 1')
-        .waitForExist(forwardButton)
-        .click(forwardButton)
+        .waitForExist(forwardButtonEnabled)
+        .click(forwardButtonEnabled)
         .waitForUrl(this.page2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForTextValue(activeTabTitle, 'Page 2')
@@ -56,13 +70,13 @@ describe('tab tests', function () {
         .loadUrl(this.page2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForTextValue(activeTabTitle, 'Page 2')
-        .waitForExist(backButton)
-        .click(backButton)
+        .waitForExist(backButtonEnabled)
+        .click(backButtonEnabled)
         .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForTextValue(activeTabTitle, 'Page 1')
-        .waitForExist('.forwardButton')
-        .rightClick(forwardButton)
+        .waitForExist(forwardButtonEnabled)
+        .rightClick(forwardButtonEnabled)
         .waitForExist(contextMenu)
         .middleClick(`${contextMenu} [data-index="0"]`)
         .waitForTabCount(2)
@@ -83,7 +97,7 @@ describe('tab tests', function () {
 
     it('makes the non partitioned webview visible', function * () {
       yield this.app.client
-        .waitForVisible('.frameWrapper[data-partition="persist:default"] webview')
+        .waitForVisible('[data-test-id="frameWrapper"][data-partition="persist:default"] webview')
     })
 
     it('shows new tab title instead of about:newtab', function * () {
@@ -114,12 +128,12 @@ describe('tab tests', function () {
 
     it('creates a new tab when clicked', function * () {
       yield this.app.client
-        .click(newFrameButton)
+        .click(newTabButton)
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
     })
     it('shows empty urlbar', function * () {
       yield this.app.client
-        .click(newFrameButton)
+        .click(newTabButton)
         .waitForExist('webview[data-frame-key="2"]')
         .waitUntil(function () {
           return this.getAttribute('webview[data-frame-key="2"]', 'src').then((value) => value === newTabUrl)
@@ -130,15 +144,15 @@ describe('tab tests', function () {
     })
     it.skip('shows a context menu when long pressed (click and hold)', function * () {
       yield this.app.client
-        .moveToObject(newFrameButton)
+        .moveToObject(newTabButton)
         .buttonDown(0)
-        .waitForExist('.contextMenu .contextMenuItem .contextMenuItemText')
+        .waitForExist('[data-test-id="contextMenu"] [data-test-id="contextMenuItem"] [data-test-id="contextMenuItemText"]')
         .buttonUp(0)
     })
     it.skip('shows a context menu when right clicked', function * () {
       yield this.app.client
-        .rightClick(newFrameButton)
-        .waitForExist('.contextMenu .contextMenuItem .contextMenuItemText')
+        .rightClick(newTabButton)
+        .waitForExist('[data-test-id="contextMenu"] [data-test-id="contextMenuItem"] [data-test-id="contextMenuItemText"]')
     })
   })
 
@@ -164,7 +178,7 @@ describe('tab tests', function () {
           .waitForExist('[data-test-id="tab-area"]:nth-of-type(2) [data-frame-key="3"]')
           .waitForExist('webview[data-frame-key="3"][src="' + this.page1 + '"]')
           .waitForExist('[data-test-id="tab-area"]:nth-of-type(3) [data-frame-key="4"]')
-          .waitForExist('.frameWrapper.isActive webview[data-frame-key="4"][src="' + this.page2 + '"]')
+          .waitForExist('[data-test2-id="activeFrame"] webview[data-frame-key="4"][src="' + this.page2 + '"]')
       })
     })
     describe('sequentially by default', function () {
@@ -300,7 +314,7 @@ describe('tab tests', function () {
     })
     it('makes the private webview visible', function * () {
       yield this.app.client
-        .waitForVisible('.frameWrapper[data-partition="default"] webview')
+        .waitForVisible('[data-test-id="frameWrapper"][data-partition="default"] webview')
     })
   })
 
@@ -320,7 +334,7 @@ describe('tab tests', function () {
     })
     it('makes the new session webview visible', function * () {
       yield this.app.client
-        .waitForVisible('.frameWrapper[data-partition="persist:partition-1"] webview')
+        .waitForVisible('[data-test-id="frameWrapper"][data-partition="persist:partition-1"] webview')
     })
   })
 
@@ -340,7 +354,7 @@ describe('tab tests', function () {
     })
     it('makes the new session webview visible', function * () {
       yield this.app.client
-        .waitForVisible('.frameWrapper[data-partition="persist:partition-3"] webview')
+        .waitForVisible('[data-test-id="frameWrapper"][data-partition="persist:partition-3"] webview')
     })
   })
 
@@ -504,18 +518,18 @@ describe('tab tests', function () {
       yield this.app.client
         .moveToObject('[data-test-id="tab"][data-frame-key="2"]')
         .moveToObject('[data-test-id="tab"][data-frame-key="2"]', 3, 3)
-        .waitForElementCount('.frameWrapper.isPreview webview[data-frame-key="2"]', 1)
+        .waitForElementCount('[data-test3-id="previewFrame"] webview[data-frame-key="2"]', 1)
         .moveToObject(urlInput)
     })
     it('does not show preview in the active tab', function * () {
       yield this.app.client
         .moveToObject('[data-test-id="tab"][data-frame-key="2"]')
         .waitForTextValue('[data-test-id="tab"][data-frame-key="2"]', 'Page 1')
-        .waitForExist('.frameWrapper.isPreview webview[data-frame-key="2"]')
+        .waitForExist('[data-test3-id="previewFrame"] webview[data-frame-key="2"]')
         .moveToObject('[data-test-id="tab"][data-frame-key="1"]')
         .click('[data-test-id="tab"][data-frame-key="1"]')
         .waitForExist('[data-test-active-tab][data-frame-key="1"]')
-        .waitForElementCount('.frameWrapper.isPreview webview[data-frame-key="1"]', 0)
+        .waitForElementCount('[data-test3-id="previewFrame"] webview[data-frame-key="1"]', 0)
     })
     it('does not show tab previews when setting is off', function * () {
       yield this.app.client.changeSetting(settings.SHOW_TAB_PREVIEWS, false)
@@ -523,7 +537,7 @@ describe('tab tests', function () {
         .moveToObject('[data-test-id="tab"][data-frame-key="2"]')
         .moveToObject('[data-test-id="tab"][data-frame-key="2"]', 3, 3)
       try {
-        yield this.app.client.waitForExist('.frameWrapper.isPreview webview[data-frame-key="2"]', 1000)
+        yield this.app.client.waitForExist('[data-test3-id="previewFrame"] webview[data-frame-key="2"]', 1000)
       } catch (e) {
         return
       }
@@ -579,7 +593,7 @@ describe('tab tests', function () {
         .moveToObject('[data-test-id="tab"][data-frame-key="7"]', 3, 3)
         .middleClick('[data-test-id="tab"][data-frame-key="7"]')
         // no preview should be shown
-        .waitForElementCount('.frameWrapper.isPreview webview', 0)
+        .waitForElementCount('[data-test3-id="previewFrame"] webview', 0)
     })
     // Failing on master
     it.skip('preview the next tab if preview option is on', function * () {
@@ -590,8 +604,8 @@ describe('tab tests', function () {
         .moveToObject('[data-test-id="tab"][data-frame-key="4"]')
         .moveToObject('[data-test-id="tab"][data-frame-key="4"]', 3, 3)
         .middleClick('[data-test-id="tab"][data-frame-key="4"]')
-        .waitForExist('.frameWrapper.isPreview webview[data-frame-key="5"]')
-        .waitForElementCount('.frameWrapper.isPreview webview[data-frame-key="5"]', 1)
+        .waitForExist('[data-test3-id="previewFrame"] webview[data-frame-key="5"]')
+        .waitForElementCount('[data-test3-id="previewFrame"] webview[data-frame-key="5"]', 1)
     })
     it('do not preview the next tab if preview option is off', function * () {
       yield this.app.client.changeSetting(settings.SHOW_TAB_PREVIEWS, false)
@@ -603,7 +617,7 @@ describe('tab tests', function () {
         .moveToObject('[data-test-id="tab"][data-frame-key="5"]')
         .middleClick('[data-test-id="tab"][data-frame-key="5"]')
         // no preview should be shown
-        .waitForElementCount('.frameWrapper.isPreview webview', 0)
+        .waitForElementCount('[data-test3-id="previewFrame"] webview', 0)
     })
   })
 
@@ -621,7 +635,7 @@ describe('tab tests', function () {
         .waitForUrl(this.page1)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
-        .waitForExist('.frameWrapper:not(.isActive) webview[data-frame-key="2"]')
+        .waitForExist('[data-test-id="frameWrapper"] webview[data-frame-key="2"]')
         .windowByUrl(Brave.browserWindowUrl)
         .waitForTab({index: 1, active: false})
     })
@@ -635,7 +649,7 @@ describe('tab tests', function () {
         yield this.app.client
           .waitForUrl(this.page2)
           .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
-          .waitForExist('.frameWrapper .isActive webview[data-frame-key="2"]')
+          .waitForExist('[data-test2-id="activeFrame"] webview[data-frame-key="2"]')
           .windowByUrl(Brave.browserWindowUrl)
           .waitForTab({index: 1, active: true})
       })
@@ -754,7 +768,7 @@ describe('tab tests', function () {
         .waitForBrowserWindow()
         .waitForTab({index: 0, url: Brave.newTabUrl, windowId: 1})
         .waitForTab({index: 0, url: this.page1, windowId: 2})
-        .waitForElementCount('.frameWrapper.isActive', 1)
+        .waitForElementCount('[data-test2-id="activeFrame"]', 1)
     })
 
     it('can move into an existing window', function * () {

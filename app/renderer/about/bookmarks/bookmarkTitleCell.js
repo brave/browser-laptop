@@ -42,6 +42,8 @@ class BookmarkTitleCell extends ImmutableComponent {
             bookmarkFile: !icon,
             [defaultIcon]: !icon
           })}
+          data-test-id='bookmarkFavicon'
+          data-test2-id={!icon ? 'defaultIcon' : null}
           style={iconStyle}
         />
       }

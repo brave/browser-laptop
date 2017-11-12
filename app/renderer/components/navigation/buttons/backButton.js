@@ -88,14 +88,14 @@ class BackButton extends React.Component {
   render () {
     return <NavigationButton
       testId={
-        !this.props.canGoBack
-          ? 'navigationBackButtonDisabled'
-          : 'navigationBackButton'
+        this.props.canGoBack
+          ? 'navigationBackButtonEnabled'
+          : 'navigationBackButtonDisabled'
       }
       testId2={
-        !this.props.canGoBack
-          ? 'backButtonDisabled'
-          : 'backButton'
+        this.props.canGoBack
+          ? 'backButtonEnabled'
+          : 'backButtonDisabled'
       }
       l10nId={'backButton'}
       class={'backButton'}
