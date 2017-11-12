@@ -73,16 +73,18 @@ const tabsReducer = (state, action, immutableAction) => {
       state = tabState.maybeCreateTab(state, action)
       break
     case appConstants.APP_TAB_ATTACHED:
-      state = tabs.updateTabsStateForAttachedTab(state, action.get('tabId'))
+      // XXX Commented out for SCIENCE - Ayumi
+      // state = tabs.updateTabsStateForAttachedTab(state, action.get('tabId'))
       break
     case appConstants.APP_TAB_WILL_ATTACH: {
-      const tabId = action.get('tabId')
-      const tabValue = tabState.getByTabId(state, tabId)
-      if (!tabValue) {
-        break
-      }
-      const oldWindowId = tabState.getWindowId(state, tabId)
-      state = tabs.updateTabsStateForWindow(state, oldWindowId)
+      // XXX Commented out for SCIENCE - Ayumi
+      // const tabId = action.get('tabId')
+      // const tabValue = tabState.getByTabId(state, tabId)
+      // if (!tabValue) {
+      //   break
+      // }
+      // const oldWindowId = tabState.getWindowId(state, tabId)
+      // state = tabs.updateTabsStateForWindow(state, oldWindowId)
       break
     }
     case appConstants.APP_TAB_MOVED:
