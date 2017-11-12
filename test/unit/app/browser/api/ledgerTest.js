@@ -11,12 +11,19 @@ const settings = require('../../../../../js/constants/settings')
 const appActions = require('../../../../../js/actions/appActions')
 const migrationState = require('../../../../../app/common/state/migrationState')
 const batPublisher = require('bat-publisher')
+const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
 
 describe('ledger api unit tests', function () {
   let ledgerApi
   let ledgerNotificationsApi
   let isBusy = false
   let ledgerClient
+  let ledgerPublisher
+
+  // constants
+  const xhr = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=11.338&et=21.339'
+  const videoId = 'youtube_kLiLOkzLetE'
+  const publisherKey = 'youtube#channel:UCFNTTISby1c_H-rm5Ww5rZg'
 
   // settings
   let contributionAmount = 25
@@ -31,6 +38,9 @@ describe('ledger api unit tests', function () {
   let onChangeSettingSpy
 
   const defaultAppState = Immutable.fromJS({
+    cache: {
+      ledgerVideos: {}
+    },
     ledger: {},
     migrations: {}
   })
@@ -128,14 +138,21 @@ describe('ledger api unit tests', function () {
     mockery.registerMock('bat-client', ledgerClient)
 
     // ledger publisher stubbing
-    const lp = {
+    ledgerPublisher = {
       ruleset: [],
-      getPublisherProps: function (publisher) {
+      getPublisherProps: function () {
         return null
       },
-      Synopsis: batPublisher.Synopsis
+      Synopsis: batPublisher.Synopsis,
+      getMedia: {
+        getPublisherFromMediaProps: () => {}
+      }
     }
-    mockery.registerMock('bat-publisher', lp)
+    mockery.registerMock('bat-publisher', ledgerPublisher)
+    mockery.registerMock('../../common/state/tabState', {
+      TAB_ID_NONE: -1,
+      getActiveTabId: () => 1
+    })
 
     ledgerNotificationsApi = require('../../../../../app/browser/api/ledgerNotifications')
 
@@ -156,9 +173,15 @@ describe('ledger api unit tests', function () {
     beforeEach(function () {
       notificationsInitStub = sinon.stub(ledgerNotificationsApi, 'init')
     })
+
     afterEach(function () {
       notificationsInitStub.restore()
     })
+
+    after(function () {
+      ledgerApi.setSynopsis(undefined)
+    })
+
     it('calls notifications.init', function () {
       ledgerApi.initialize(defaultAppState, true)
       assert(notificationsInitStub.calledOnce)
@@ -264,7 +287,7 @@ describe('ledger api unit tests', function () {
     })
   })
 
-  describe('addVisit', function () {
+  describe('addSiteVisit', function () {
     const fakeTabId = 7
     let stateWithLocation
     let fakeClock
@@ -289,7 +312,7 @@ describe('ledger api unit tests', function () {
 
       fakeClock.tick(6000)
 
-      const result = ledgerApi.addVisit(state, 0, 'https://clifton.io', fakeTabId)
+      const result = ledgerApi.addSiteVisit(state, 0, 'https://clifton.io', fakeTabId)
       const visitsByPublisher = ledgerApi.getVisitsByPublisher()
 
       // Assert state WAS modified AND publisher was recorded
@@ -301,7 +324,7 @@ describe('ledger api unit tests', function () {
 
       fakeClock.tick(0)
 
-      const result = ledgerApi.addVisit(state, 0, 'https://clifton.io', fakeTabId)
+      const result = ledgerApi.addSiteVisit(state, 0, 'https://clifton.io', fakeTabId)
       const visitsByPublisher = ledgerApi.getVisitsByPublisher()
 
       // Assert state WAS modified but publisher wasn NOT recorded
@@ -312,10 +335,10 @@ describe('ledger api unit tests', function () {
       const state = ledgerApi.initialize(stateWithLocation, true)
 
       fakeClock.tick(2000)
-      const result1 = ledgerApi.addVisit(state, 0, 'https://clifton.io', fakeTabId)
+      const result1 = ledgerApi.addSiteVisit(state, 0, 'https://clifton.io', fakeTabId)
 
       fakeClock.tick(15000)
-      const result2 = ledgerApi.addVisit(result1, 0, 'https://clifton.io', fakeTabId)
+      const result2 = ledgerApi.addSiteVisit(result1, 0, 'https://clifton.io', fakeTabId)
 
       const visitsByPublisher = ledgerApi.getVisitsByPublisher()
 
@@ -398,6 +421,10 @@ describe('ledger api unit tests', function () {
   })
 
   describe('transitionWalletToBat', function () {
+    after(function () {
+      ledgerApi.setSynopsis(undefined)
+    })
+
     describe('when client is not busy', function () {
       before(function () {
         ledgerApi.onBootStateFile(defaultAppState)
@@ -487,6 +514,10 @@ describe('ledger api unit tests', function () {
   })
 
   describe('synopsisNormalizer', function () {
+    after(function () {
+      ledgerApi.setSynopsis(undefined)
+    })
+
     describe('prune synopsis', function () {
       let pruneSynopsisSpy
 
@@ -511,6 +542,10 @@ describe('ledger api unit tests', function () {
   })
 
   describe('pruneSynopsis', function () {
+    after(function () {
+      ledgerApi.setSynopsis(undefined)
+    })
+
     it('null case', function () {
       const result = ledgerApi.pruneSynopsis(defaultAppState)
       assert.deepEqual(result.toJS(), defaultAppState.toJS())
@@ -538,6 +573,9 @@ describe('ledger api unit tests', function () {
       })
 
       const expectedResult = {
+        cache: {
+          ledgerVideos: {}
+        },
         ledger: {
           synopsis: {
             publishers: {
@@ -596,6 +634,212 @@ describe('ledger api unit tests', function () {
       const result = ledgerApi.checkVerifiedStatus(newState, 'clifton.io')
       assert.deepEqual(result.toJS(), expectedState.toJS())
       assert(verifiedPSpy.calledOnce)
+    })
+  })
+
+  describe('onMediaRequest', function () {
+    let publisherFromMediaPropsSpy, saveVisitSpy
+
+    beforeEach(function () {
+      publisherFromMediaPropsSpy = sinon.spy(ledgerPublisher.getMedia, 'getPublisherFromMediaProps')
+      saveVisitSpy = sinon.spy(ledgerApi, 'saveVisit')
+    })
+
+    afterEach(function () {
+      publisherFromMediaPropsSpy.restore()
+      saveVisitSpy.restore()
+      ledgerApi.setCurrentMediaKey(null)
+    })
+
+    after(function () {
+      ledgerApi.setSynopsis(undefined)
+    })
+
+    it('null case', function () {
+      const result = ledgerApi.onMediaRequest(defaultAppState)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      assert(publisherFromMediaPropsSpy.notCalled)
+      assert(saveVisitSpy.notCalled)
+    })
+
+    it('set currentMediaKey when it is different than saved', function () {
+      ledgerApi.onMediaRequest(defaultAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
+      assert.equal(ledgerApi.getCurrentMediaKey(), videoId)
+      assert(publisherFromMediaPropsSpy.calledOnce)
+      assert(saveVisitSpy.notCalled)
+    })
+
+    it('get data from cache', function () {
+      const state = defaultAppState.setIn(['cache', 'ledgerVideos', videoId], Immutable.fromJS({
+        publisher: publisherKey
+      }))
+      ledgerApi.onMediaRequest(state, xhr, ledgerMediaProviders.YOUTUBE, 1)
+      assert(publisherFromMediaPropsSpy.notCalled)
+      assert(saveVisitSpy.withArgs(state, publisherKey, 10001, false).calledOnce)
+    })
+
+    it('min duration is set to minimum visit time if below that threshold', function () {
+      const state = defaultAppState.setIn(['cache', 'ledgerVideos', videoId], Immutable.fromJS({
+        publisher: publisherKey
+      }))
+      const xhr2 = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=20.338&et=21.339'
+      ledgerApi.onMediaRequest(state, xhr2, ledgerMediaProviders.YOUTUBE, 1)
+      assert(publisherFromMediaPropsSpy.notCalled)
+      assert(saveVisitSpy.withArgs(state, publisherKey, paymentsMinVisitTime, false).calledOnce)
+    })
+
+    it('revisited if visiting the same media in the same tab', function () {
+      const state = defaultAppState.setIn(['cache', 'ledgerVideos', videoId], Immutable.fromJS({
+        publisher: publisherKey
+      }))
+      // first call, revisit false
+      ledgerApi.onMediaRequest(state, xhr, ledgerMediaProviders.YOUTUBE, 1)
+      assert.equal(ledgerApi.getCurrentMediaKey(), videoId)
+      assert(saveVisitSpy.withArgs(state, publisherKey, 10001, false).calledOnce)
+
+      // second call, revisit true
+      ledgerApi.onMediaRequest(state, xhr, ledgerMediaProviders.YOUTUBE, 1)
+      assert(publisherFromMediaPropsSpy.notCalled)
+      assert(saveVisitSpy.withArgs(state, publisherKey, 10001, true).calledOnce)
+    })
+
+    it('revisited if visiting media in the background tab', function () {
+      const state = defaultAppState.setIn(['cache', 'ledgerVideos', videoId], Immutable.fromJS({
+        publisher: publisherKey
+      }))
+      // first call, revisit false
+      ledgerApi.setCurrentMediaKey('11')
+      ledgerApi.onMediaRequest(state, xhr, ledgerMediaProviders.YOUTUBE, 10)
+      assert.equal(ledgerApi.getCurrentMediaKey(), '11')
+      assert(saveVisitSpy.withArgs(state, publisherKey, 10001, true).calledOnce)
+    })
+  })
+
+  describe('onMediaPublisher', function () {
+    let saveVisitSpy, verifiedPStub
+
+    const expectedState = Immutable.fromJS({
+      cache: {
+        ledgerVideos: {
+          'youtube_kLiLOkzLetE': {
+            publisher: 'youtube#channel:UCFNTTISby1c_H-rm5Ww5rZg',
+            faviconName: 'Brave',
+            providerName: 'Youtube',
+            faviconURL: 'data:image/jpeg;base64,...',
+            publisherURL: 'https://brave.com'
+          }
+        }
+      },
+      ledger: {
+        synopsis: {
+          publishers: {
+            'youtube#channel:UCFNTTISby1c_H-rm5Ww5rZg': {
+              exclude: false,
+              options: {
+                exclude: true
+              },
+              providerName: 'Youtube',
+              faviconName: 'Brave',
+              faviconURL: 'data:image/jpeg;base64,...',
+              publisherURL: 'https://brave.com'
+            }
+          }
+        }
+      },
+      migrations: {}
+    })
+
+    before(function () {
+      verifiedPStub = sinon.stub(ledgerApi, 'verifiedP', (state, publisherKey, fn) => state)
+    })
+
+    after(function () {
+      verifiedPStub.restore()
+    })
+
+    beforeEach(function () {
+      ledgerApi.setSynopsis({
+        initPublisher: () => {},
+        addPublisher: () => {},
+        publishers: {
+          [publisherKey]: {
+            exclude: false,
+            options: {
+              exclude: true
+            },
+            providerName: 'Youtube'
+          }
+        }
+      })
+      saveVisitSpy = sinon.spy(ledgerApi, 'saveVisit')
+    })
+
+    afterEach(function () {
+      ledgerApi.setSynopsis(undefined)
+      saveVisitSpy.restore()
+    })
+
+    it('null case', function () {
+      const result = ledgerApi.onMediaPublisher(defaultAppState)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+    })
+
+    it('create publisher if new and add cache', function () {
+      const response = Immutable.fromJS({
+        publisher: publisherKey,
+        faviconName: 'Brave',
+        faviconURL: 'data:image/jpeg;base64,...',
+        publisherURL: 'https://brave.com',
+        providerName: 'Youtube'
+      })
+
+      const state = ledgerApi.onMediaPublisher(defaultAppState, videoId, response, 1000, false)
+      assert(saveVisitSpy.calledOnce)
+      assert.deepEqual(state.toJS(), expectedState.toJS())
+    })
+
+    it('update publisher if exists', function () {
+      const newState = Immutable.fromJS({
+        cache: {
+          ledgerVideos: {
+            'youtube_kLiLOkzLetE': {
+              publisher: 'youtube#channel:UCFNTTISby1c_H-rm5Ww5rZg',
+              faviconName: 'Brave',
+              providerName: 'Youtube',
+              faviconURL: 'data:image/jpeg;base64,...',
+              publisherURL: 'https://brave.com'
+            }
+          }
+        },
+        ledger: {
+          synopsis: {
+            publishers: {
+              'youtube#channel:UCFNTTISby1c_H-rm5Ww5rZg': {
+                options: {
+                  exclude: true
+                },
+                faviconName: 'old Brave',
+                faviconURL: 'data:image/jpeg;base64,...',
+                publisherURL: 'https://brave.io',
+                providerName: 'Youtube'
+              }
+            }
+          }
+        },
+        migrations: {}
+      })
+
+      const response = Immutable.fromJS({
+        publisher: publisherKey,
+        faviconName: 'Brave',
+        faviconURL: 'data:image/jpeg;base64,...',
+        publisherURL: 'https://brave.com',
+        providerName: 'Youtube'
+      })
+
+      const state = ledgerApi.onMediaPublisher(newState, videoId, response, 1000, false)
+      assert(saveVisitSpy.calledOnce)
+      assert.deepEqual(state.toJS(), expectedState.toJS())
     })
   })
 })

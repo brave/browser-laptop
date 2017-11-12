@@ -183,6 +183,7 @@ module.exports = {
     // Tracking issue for that and to re-enable title mode on Windows is at #9900.
     'general.disable-title-mode': process.platform === 'linux' || process.platform === 'win32',
     // payments
+    'payments.allow-media-publishers': true,
     'payments.allow-non-verified-publishers': true,
     'payments.contribution-amount': 25, // BAT
     'payments.enabled': false,

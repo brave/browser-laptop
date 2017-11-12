@@ -3,6 +3,7 @@ const mockery = require('mockery')
 const assert = require('assert')
 const Immutable = require('immutable')
 require('../../../braveUnit')
+const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
 
 describe('ledgerUtil test', function () {
   let ledgerUtil
@@ -210,5 +211,124 @@ describe('ledgerUtil test', function () {
   })
 
   describe('walletStatus', function () {
+  })
+
+  describe('getMediaId', function () {
+    it('null case', function () {
+      const result = ledgerUtil.getMediaId()
+      assert.equal(result, null)
+    })
+
+    it('unknown type', function () {
+      const result = ledgerUtil.getMediaData({}, 'test')
+      assert.equal(result, null)
+    })
+
+    describe('Youtube', function () {
+      it('null case', function () {
+        const result = ledgerUtil.getMediaId(null, ledgerMediaProviders.YOUTUBE)
+        assert.equal(result, null)
+      })
+
+      it('id is provided', function () {
+        const result = ledgerUtil.getMediaId({docid: 'kLiLOkzLetE'}, ledgerMediaProviders.YOUTUBE)
+        assert.equal(result, 'kLiLOkzLetE')
+      })
+    })
+  })
+
+  describe('getMediaKey', function () {
+    it('null case', function () {
+      const result = ledgerUtil.getMediaKey()
+      assert.equal(result, null)
+    })
+
+    it('type is missing', function () {
+      const result = ledgerUtil.getMediaKey('kLiLOkzLetE')
+      assert.equal(result, null)
+    })
+
+    it('id is null', function () {
+      const result = ledgerUtil.getMediaKey(null, ledgerMediaProviders.YOUTUBE)
+      assert.equal(result, null)
+    })
+
+    it('data is ok', function () {
+      const result = ledgerUtil.getMediaKey('kLiLOkzLetE', ledgerMediaProviders.YOUTUBE)
+      assert.equal(result, 'youtube_kLiLOkzLetE')
+    })
+  })
+
+  describe('getMediaData', function () {
+    it('null case', function () {
+      const result = ledgerUtil.getMediaData()
+      assert.equal(result, null)
+    })
+
+    it('unknown type', function () {
+      const result = ledgerUtil.getMediaData('https://youtube.com', 'test')
+      assert.equal(result, null)
+    })
+
+    describe('Youtube', function () {
+      it('null case', function () {
+        const result = ledgerUtil.getMediaData(null, ledgerMediaProviders.YOUTUBE)
+        assert.equal(result, null)
+      })
+
+      it('query is not present', function () {
+        const result = ledgerUtil.getMediaData('https://youtube.com', ledgerMediaProviders.YOUTUBE)
+        assert.equal(result, null)
+      })
+
+      it('query is present', function () {
+        const result = ledgerUtil.getMediaData('https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=11.338&et=21.339', ledgerMediaProviders.YOUTUBE)
+        assert.deepEqual(result, {
+          docid: 'kLiLOkzLetE',
+          st: '11.338',
+          et: '21.339'
+        })
+      })
+    })
+  })
+
+  describe('getYouTubeDuration', function () {
+    it('null case', function () {
+      const result = ledgerUtil.getYouTubeDuration()
+      assert.equal(result, 0)
+    })
+
+    it('multiple times', function () {
+      const result = ledgerUtil.getYouTubeDuration({
+        st: '11.338,21.339,25.000',
+        et: '21.339,25.000,26.100'
+      })
+      assert.equal(result, 14762)
+    })
+
+    it('single time', function () {
+      const result = ledgerUtil.getYouTubeDuration({
+        st: '11.338',
+        et: '21.339'
+      })
+      assert.equal(result, 10001)
+    })
+  })
+
+  describe('getMediaProvider', function () {
+    it('null case', function () {
+      const result = ledgerUtil.getMediaProvider()
+      assert.equal(result, null)
+    })
+
+    it('unknown provider', function () {
+      const result = ledgerUtil.getMediaProvider('https://www.brave.com')
+      assert.equal(result, null)
+    })
+
+    it('youtube', function () {
+      const result = ledgerUtil.getMediaProvider('https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=11.338&et=21.339')
+      assert.equal(result, ledgerMediaProviders.YOUTUBE)
+    })
   })
 })

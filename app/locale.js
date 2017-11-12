@@ -182,6 +182,7 @@ var rendererIdentifiers = function () {
     'learnSpelling',
     'forgetLearnedSpelling',
     'lookupSelection',
+    'publisherMediaName',
     // Other identifiers
     'aboutBlankTitle',
     'urlCopied',
