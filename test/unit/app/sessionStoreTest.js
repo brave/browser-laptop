@@ -1,4 +1,4 @@
-/* global describe, before, after, it */
+/* global describe, before, after, afterEach, it */
 const mockery = require('mockery')
 const assert = require('assert')
 const sinon = require('sinon')
@@ -931,6 +931,86 @@ describe('sessionStore unit tests', function () {
         }, function (result) {
           assert.ok(false, 'promise was rejected: ' + result)
         })
+    })
+
+    describe('merge default state with the existing one', function () {
+      let readFileSyncStub, fileValue, defaultData, clock
+
+      before(function () {
+        clock = sinon.useFakeTimers()
+        defaultData = sessionStore.defaultAppState()
+        defaultData.defaultSiteSettingsListImported = true
+        defaultData.siteSettings = {
+          'https://www.twitch.tv': {
+            autoplay: true
+          },
+          'https://www.youtube.com': {
+            autoplay: true
+          }
+        }
+        runImportDefaultSettings.reset()
+        readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync', () => {
+          return fileValue
+        })
+      })
+
+      afterEach(function () {
+        runImportDefaultSettings.reset()
+      })
+
+      after(function () {
+        clock.restore()
+        readFileSyncStub.restore()
+      })
+
+      it('deep objects merge', function () {
+        // we want to append ledgerVideos from default appState into existing data loaded from file
+        const expectedData = Object.assign({}, defaultData)
+        expectedData.cache = {
+          bookmarkLocation: {},
+          bookmarkOrder: {},
+          ledgerVideos: {}
+        }
+
+        fileValue = JSON.stringify({
+          cache: {
+            bookmarkLocation: {},
+            bookmarkOrder: {}
+          }
+        })
+        return sessionStore.loadAppState()
+          .then(function () {
+            assert(runImportDefaultSettings.withArgs(expectedData).calledOnce)
+          }, function (result) {
+            assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+          })
+      })
+
+      it('deep objects with data', function () {
+        // we want to load ledgerVideos from file directly
+        const expectedData = Object.assign({}, defaultData)
+        expectedData.cache = {
+          bookmarkLocation: {},
+          bookmarkOrder: {},
+          ledgerVideos: {
+            data: 1
+          }
+        }
+
+        fileValue = JSON.stringify({
+          cache: {
+            bookmarkLocation: {},
+            bookmarkOrder: {},
+            ledgerVideos: {data: 1}
+          }
+        })
+        return sessionStore.loadAppState()
+          .then(function () {
+            assert(runImportDefaultSettings.withArgs(expectedData).calledOnce)
+          }, function (result) {
+            assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+          })
+      })
     })
 
     describe('when checking data.cleanedOnShutdown', function () {

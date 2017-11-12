@@ -53,6 +53,7 @@ const settings = {
   // Autofill
   AUTOFILL_ENABLED: 'privacy.autofill-enabled',
   // Payments Tab
+  PAYMENTS_ALLOW_MEDIA_PUBLISHERS: 'payments.allow-media-publishers',
   PAYMENTS_ALLOW_NON_VERIFIED: 'payments.allow-non-verified-publishers',
   PAYMENTS_CONTRIBUTION_AMOUNT: 'payments.contribution-amount',
   PAYMENTS_ENABLED: 'payments.enabled',

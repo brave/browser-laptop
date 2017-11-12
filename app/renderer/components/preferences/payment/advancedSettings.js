@@ -76,8 +76,17 @@ class AdvancedSettingsContent extends ImmutableComponent {
             prefKey={settings.PAYMENTS_ALLOW_NON_VERIFIED}
             settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting}
-            className={css(styles.listItem, commonStyles.noMarginBottom)}
+            className={css(styles.listItem)}
             switchClassName={css(styles.checkboxSwitch)}
+            labelClassName={css(commonStyles.noMarginBottom)}
+          />
+          <SettingCheckbox
+            dataTestId='payment-advance-video'
+            dataL10nId='allowMediaPublishers'
+            prefKey={settings.PAYMENTS_ALLOW_MEDIA_PUBLISHERS}
+            settings={this.props.settings}
+            onChangeSetting={this.props.onChangeSetting}
+            switchClassName={css(styles.checkboxSwitch, commonStyles.noMarginBottom)}
             labelClassName={css(commonStyles.noMarginBottom)}
           />
         </SettingsList>

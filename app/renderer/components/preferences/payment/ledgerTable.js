@@ -52,7 +52,7 @@ class LedgerTable extends ImmutableComponent {
   }
 
   getHostPattern (synopsis) {
-    return urlUtil.getHostPattern(synopsis.get('site'))
+    return urlUtil.getHostPattern(synopsis.get('publisherKey'))
   }
 
   getVerifiedIcon (synopsis) {
@@ -151,10 +151,11 @@ class LedgerTable extends ImmutableComponent {
     const duration = synopsis.get('duration')
     const publisherURL = synopsis.get('publisherURL')
     const percentage = pinned ? this.pinPercentageValue(synopsis) : synopsis.get('percentage')
-    const site = synopsis.get('site')
+    const publisherKey = synopsis.get('publisherKey')
+    const siteName = synopsis.get('siteName')
     const defaultAutoInclude = this.enabledForSite(synopsis)
 
-    const rowRefName = 'rowPercentage_' + site
+    const rowRefName = 'rowPercentage_' + publisherKey
     if (this.refs[rowRefName]) {
       this.refs[rowRefName].value = percentage
     }
@@ -169,13 +170,13 @@ class LedgerTable extends ImmutableComponent {
           <a className={css(styles.siteData)} href={publisherURL} target='_blank' tabIndex={-1}>
             {
               faviconURL
-                ? <img className={css(styles.favicon)} src={faviconURL} alt={site} />
+                ? <img className={css(styles.favicon)} src={faviconURL} alt={siteName} />
                 : <span className={css(styles.defaultIcon)}><span className={globalStyles.appIcons.defaultIcon} /></span>
             }
-            <span className={css(styles.url)} data-test-id='siteName'>{site}</span>
+            <span className={css(styles.url)} data-test-id='siteName'>{siteName}</span>
           </a>
         </div>,
-        value: site
+        value: publisherKey
       },
       {
         html: pinned

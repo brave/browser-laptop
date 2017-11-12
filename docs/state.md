@@ -54,6 +54,11 @@ AppStore
       timestamp: number
     }
   },
+  cache: {
+    ledgerVideos: {
+      [mediaKey]: string // publisher key
+    }
+  }
   clearBrowsingDataDefaults: {
     allSiteCookies: boolean,
     autocompleteData: boolean,
@@ -313,6 +318,7 @@ AppStore
     'general.useragent.value': (undefined|string), // custom user agent value
     'notification-add-funds-timestamp': number, // timestamp on which we decide if we will show notification Add founds
     'notification-reconcile-soon-timestamp': number, // timestamp
+    'payments.allow-media-publishers': boolean,
     'payments.allow-non-verified-publishers': boolean,
     'payments.contribution-amount': number, // in USD
     'payments.enabled': boolean, // true if the Payments pane is active

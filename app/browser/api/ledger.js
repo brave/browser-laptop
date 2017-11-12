@@ -8,6 +8,7 @@ const acorn = require('acorn')
 const moment = require('moment')
 const Immutable = require('immutable')
 const electron = require('electron')
+const ipc = electron.ipcMain
 const path = require('path')
 const os = require('os')
 const qr = require('qr-image')
@@ -29,6 +30,7 @@ const migrationState = require('../../common/state/migrationState')
 
 // Constants
 const settings = require('../../../js/constants/settings')
+const messages = require('../../../js/constants/messages')
 
 // Utils
 const tabs = require('../../browser/tabs')
@@ -42,6 +44,7 @@ const ledgerUtil = require('../../common/lib/ledgerUtil')
 const tabState = require('../../common/state/tabState')
 const pageDataUtil = require('../../common/lib/pageDataUtil')
 const ledgerNotifications = require('./ledgerNotifications')
+const ledgerVideoCache = require('../../common/cache/ledgerVideoCache')
 
 // Caching
 let locationDefault = 'NOOP'
@@ -106,6 +109,38 @@ underscore.keys(fileTypes).forEach((fileType) => {
   if (signatureMax < fileTypes[fileType].length) signatureMax = fileTypes[fileType].length
 })
 signatureMax = Math.ceil(signatureMax * 1.5)
+
+if (ipc) {
+  ipc.on(messages.LEDGER_PUBLISHER, (event, location) => {
+    if (!synopsis || event.sender.session === electron.session.fromPartition('default') || !tldjs.isValid(location)) {
+      event.returnValue = {}
+      return
+    }
+
+    let ctx = urlParse(location, true)
+    ctx.TLD = tldjs.getPublicSuffix(ctx.host)
+    if (!ctx.TLD) {
+      if (_internal.verboseP) console.log('\nno TLD for:' + ctx.host)
+      event.returnValue = {}
+      return
+    }
+
+    ctx = underscore.mapObject(ctx, function (value) {
+      if (!underscore.isFunction(value)) return value
+    })
+    ctx.URL = location
+    ctx.SLD = tldjs.getDomain(ctx.host)
+    ctx.RLD = tldjs.getSubdomain(ctx.host)
+    ctx.QLD = ctx.RLD ? underscore.last(ctx.RLD.split('.')) : ''
+
+    if (!event.sender.isDestroyed()) {
+      event.sender.send(messages.LEDGER_PUBLISHER_RESPONSE + '-' + location, {
+        context: ctx,
+        rules: _internal.ruleset.cooked
+      })
+    }
+  })
+}
 
 let ledgerPaymentsPresent = {}
 const paymentPresent = (state, tabId, present) => {
@@ -247,7 +282,8 @@ const getPublisherData = (result, scorekeeper) => {
   let data = {
     verified: result.options.verified || false,
     exclude: result.options.exclude || false,
-    site: result.publisherKey,
+    publisherKey: result.publisherKey,
+    siteName: result.publisherKey,
     views: result.visits,
     duration: duration,
     daysSpent: 0,
@@ -259,9 +295,16 @@ const getPublisherData = (result, scorekeeper) => {
     pinPercentage: result.pinPercentage,
     weight: result.pinPercentage
   }
-  // HACK: Protocol is sometimes blank here, so default to http:// so we can
-  // still generate publisherURL.
-  data.publisherURL = (result.protocol || 'http:') + '//' + result.publisherKey
+
+  data.publisherURL = result.publisherURL || ((result.protocol || 'https:') + '//' + result.publisherKey)
+
+  // media publisher
+  if (result.faviconName) {
+    data.siteName = locale.translation('publisherMediaName', {
+      publisherName: result.faviconName,
+      provider: result.providerName
+    })
+  }
 
   if (duration >= miliseconds.day) {
     data.daysSpent = Math.max(Math.round(duration / miliseconds.day), 1)
@@ -543,7 +586,7 @@ const excludeP = (publisherKey, callback) => {
       return done(err, result)
     }
 
-    let props = ledgerPublisher.getPublisherProps('https://' + publisherKey)
+    let props = ledgerPublisher.getPublisherProps(publisherKey)
     if (!props) return done()
 
     v2RulesetDB.createReadStream({lt: 'domain:'}).on('data', (data) => {
@@ -584,30 +627,26 @@ const excludeP = (publisherKey, callback) => {
   })
 }
 
-const addVisit = (state, startTimestamp, location, tabId) => {
+const addSiteVisit = (state, timestamp, location, tabId) => {
   if (!synopsis) {
     return state
   }
 
   location = pageDataUtil.getInfoKey(location)
   const locationData = ledgerState.getLocation(state, location)
-  const timestamp = new Date().getTime()
+  const duration = new Date().getTime() - timestamp
   if (_internal.verboseP) {
     console.log(
       `locations[${location}]=${JSON.stringify(locationData, null, 2)} ` +
-      `duration=${(timestamp - startTimestamp)} msec tabId= ${tabId}`
+      `duration=${(duration)} msec tabId= ${tabId}`
     )
   }
-  if (locationData.isEmpty() || !tabId) {
+
+  if (locationData.isEmpty()) {
     return state
   }
 
   let publisherKey = locationData.get('publisher')
-  if (!publisherKey) {
-    return state
-  }
-
-  let duration = timestamp - startTimestamp
   let revisitP = false
 
   if (duration >= getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)) {
@@ -627,13 +666,19 @@ const addVisit = (state, startTimestamp, location, tabId) => {
     }
   }
 
-  if (_internal.verboseP) {
-    console.log('\nadd publisher ' + publisherKey + ': ' + (duration / 1000) + ' sec' + ' revisitP=' + revisitP + ' state=' +
-      JSON.stringify(underscore.extend({location: location}, visitsByPublisher[publisherKey][location]),
-        null, 2))
+  return saveVisit(state, publisherKey, duration, revisitP)
+}
+
+const saveVisit = (state, publisherKey, duration, revisited) => {
+  if (!synopsis || !publisherKey) {
+    return state
   }
 
-  synopsis.addPublisher(publisherKey, {duration: duration, revisitP: revisitP})
+  if (_internal.verboseP) {
+    console.log('\nadd publisher ' + publisherKey + ': ' + (duration / 1000) + ' sec' + ' revisitP=' + revisited)
+  }
+
+  synopsis.addPublisher(publisherKey, {duration: duration, revisitP: revisited})
   state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
   state = updatePublisherInfo(state)
   state = checkVerifiedStatus(state, publisherKey)
@@ -684,7 +729,7 @@ const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo 
 
     // Add visit to the ledger when we are not in a private tab
     if (!isPrivate && !tabFromState.isEmpty() && ledgerUtil.shouldTrackView(tabFromState)) {
-      state = addVisit(state, currentTimestamp, currentUrl, currentTabId)
+      state = addSiteVisit(state, currentTimestamp, currentUrl, currentTabId)
     }
   }
 
@@ -1130,21 +1175,12 @@ const cacheRuleSet = (state, ruleset) => {
     for (let item of publishers) {
       const publisherKey = item[0]
       const publisher = item[1]
-      const location = (publisher.get('protocol') || 'http:') + '//' + publisherKey
-      let ctx = urlParse(location)
+      const ctx = ledgerPublisher.getPublisherProps(publisherKey)
 
-      ctx.TLD = tldjs.getPublicSuffix(ctx.host)
-      if (!ctx.TLD) {
-        return state
-      }
+      if (!ctx.TLD) continue
 
-      ctx = underscore.mapObject(ctx, function (value) {
-        if (!underscore.isFunction(value)) return value
-      })
-      ctx.URL = location
-      ctx.SLD = tldjs.getDomain(ctx.host)
-      ctx.RLD = tldjs.getSubdomain(ctx.host)
-      ctx.QLD = ctx.RLD ? underscore.last(ctx.RLD.split('.')) : ''
+      if (publisher.publisherURL) ctx.URL = publisher.publisherURL
+      if (!ctx.URL) ctx.URL = (publisher.get('protocol') || 'https:') + '//' + publisherKey
 
       stewed.forEach((rule) => {
         if (rule.consequent !== null || rule.dom) return
@@ -1178,7 +1214,8 @@ const roundtrip = (params, options, callback) => {
   let parts = typeof params.server === 'string' ? urlParse(params.server)
     : typeof params.server !== 'undefined' ? params.server
       : typeof options.server === 'string' ? urlParse(options.server) : options.server
-  const rawP = options.rawP
+  const binaryP = options.binaryP
+  const rawP = binaryP || options.rawP
 
   if (!params.method) params.method = 'GET'
   parts = underscore.extend(underscore.pick(parts, ['protocol', 'hostname', 'port']),
@@ -1205,7 +1242,7 @@ const roundtrip = (params, options, callback) => {
     url: urlFormat(parts),
     method: params.method,
     payload: params.payload,
-    responseType: 'text',
+    responseType: binaryP ? 'binary' : 'text',
     headers: underscore.defaults(params.headers || {}, {'content-type': 'application/json; charset=utf-8'}),
     verboseP: options.verboseP
   }
@@ -1220,7 +1257,7 @@ const roundtrip = (params, options, callback) => {
         console.log('>>> ' + header + ': ' + response.headers[header])
       })
       console.log('>>>')
-      console.log('>>> ' + (body || '').split('\n').join('\n>>> '))
+      console.log('>>> ' + (rawP ? '...' : (body || '').split('\n').join('\n>>> ')))
     }
 
     if (err) return callback(err, response)
@@ -2155,6 +2192,117 @@ const transitionWalletToBat = () => {
   }
 }
 
+let currentMediaKey = null
+const onMediaRequest = (state, xhr, type, tabId) => {
+  if (!xhr || type == null) {
+    return state
+  }
+
+  const parsed = ledgerUtil.getMediaData(xhr, type)
+  const mediaId = ledgerUtil.getMediaId(parsed, type)
+  const mediaKey = ledgerUtil.getMediaKey(mediaId, type)
+  let duration = ledgerUtil.getMediaDuration(parsed, type)
+
+  if (mediaId == null || duration == null || mediaKey == null) {
+    return state
+  }
+
+  const minDuration = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
+  duration = parseInt(duration)
+  if (duration > 0 && duration < minDuration) {
+    duration = minDuration
+  }
+
+  if (!ledgerPublisher) {
+    ledgerPublisher = require('bat-publisher')
+  }
+
+  let revisited = true
+  const activeTabId = tabState.getActiveTabId(state)
+  if (activeTabId === tabId && mediaKey !== currentMediaKey) {
+    revisited = false
+    currentMediaKey = mediaKey
+  }
+
+  const cache = ledgerVideoCache.getDataByVideoId(state, mediaKey)
+
+  if (!cache.isEmpty()) {
+    return module.exports.saveVisit(state, cache.get('publisher'), duration, revisited)
+  }
+
+  const options = underscore.extend({roundtrip: roundtrip}, clientOptions)
+  const mediaProps = {
+    mediaId,
+    providerName: type
+  }
+
+  ledgerPublisher.getMedia.getPublisherFromMediaProps(mediaProps, options, (error, response) => {
+    if (error) {
+      console.error('Error while getting publisher from media', error.toString())
+      return
+    }
+
+    // publisher not found
+    if (!response) {
+      return
+    }
+
+    appActions.onLedgerMediaPublisher(mediaKey, response, duration, revisited)
+  })
+
+  return state
+}
+
+const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
+  const publisherKey = response ? response.get('publisher') : null
+  if (publisherKey == null) {
+    return state
+  }
+
+  let publisher = ledgerState.getPublisher(state, publisherKey)
+  const faviconName = response.get('faviconName')
+  const faviconURL = response.get('faviconURL')
+  const publisherURL = response.get('publisherURL')
+
+  if (publisher.isEmpty()) {
+    revisited = false
+    synopsis.initPublisher(publisherKey)
+
+    synopsis.publishers[publisherKey].faviconName = faviconName
+    synopsis.publishers[publisherKey].faviconURL = faviconURL
+    synopsis.publishers[publisherKey].publisherURL = publisherURL
+    synopsis.publishers[publisherKey].providerName = response.get('providerName')
+
+    if (synopsis.publishers[publisherKey]) {
+      state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
+    }
+
+    if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
+      appActions.onPublisherOptionUpdate(publisherKey, 'exclude', true)
+      savePublisherOption(publisherKey, 'exclude', true)
+    } else {
+      excludeP(publisherKey, (unused, exclude) => {
+        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+        savePublisherOption(publisherKey, 'exclude', exclude)
+      })
+    }
+  } else {
+    synopsis.publishers[publisherKey].faviconName = faviconName
+    synopsis.publishers[publisherKey].faviconURL = faviconURL
+    synopsis.publishers[publisherKey].publisherURL = publisherURL
+    state = ledgerState.setPublishersProp(state, publisherKey, 'faviconName', faviconName)
+    state = ledgerState.setPublishersProp(state, publisherKey, 'faviconURL', faviconURL)
+    state = ledgerState.setPublishersProp(state, publisherKey, 'publisherURL', publisherURL)
+  }
+
+  // Add to cache
+  state = ledgerVideoCache.setCacheByVideoId(state, mediaKey, response)
+
+  state = module.exports.saveVisit(state, publisherKey, duration, revisited)
+
+  return state
+}
+
 const getMethods = () => {
   const publicMethods = {
     backupKeys,
@@ -2189,7 +2337,10 @@ const getMethods = () => {
     getNewClient,
     savePublisherData,
     pruneSynopsis,
-    checkBtcBatMigrated
+    checkBtcBatMigrated,
+    onMediaRequest,
+    onMediaPublisher,
+    saveVisit
   }
 
   let privateMethods = {}
@@ -2197,7 +2348,8 @@ const getMethods = () => {
   if (process.env.NODE_ENV === 'test') {
     privateMethods = {
       enable,
-      addVisit,
+      addSiteVisit,
+      checkBtcBatMigrated,
       clearVisitsByPublisher: function () {
         visitsByPublisher = {}
       },
@@ -2217,6 +2369,10 @@ const getMethods = () => {
       setClient: (data) => {
         client = data
       },
+      setCurrentMediaKey: (key) => {
+        currentMediaKey = key
+      },
+      getCurrentMediaKey: (key) => currentMediaKey,
       synopsisNormalizer,
       checkVerifiedStatus
     }

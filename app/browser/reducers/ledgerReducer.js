@@ -404,6 +404,22 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerState.setLedgerValue(state, 'publisherTimestamp', action.get('timestamp'))
         break
       }
+    case appConstants.APP_ON_LEDGER_MEDIA_DATA:
+      {
+        state = ledgerApi.onMediaRequest(state, action.get('url'), action.get('type'), action.get('tabId'))
+        break
+      }
+    case appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER:
+      {
+        state = ledgerApi.onMediaPublisher(
+          state,
+          action.get('mediaKey'),
+          action.get('response'),
+          action.get('duration'),
+          action.get('revisited')
+        )
+        break
+      }
   }
   return state
 }

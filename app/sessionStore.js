@@ -18,7 +18,9 @@ const os = require('os')
 const assert = require('assert')
 const app = electron.app
 const compareVersions = require('compare-versions')
-const locale = require('./locale')
+const merge = require('deepmerge')
+
+// Constants
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const downloadStates = require('../js/constants/downloadStates')
@@ -28,6 +30,7 @@ const { defaultSiteSettingsList } = require('../js/data/siteSettingsList')
 const sessionStorageVersion = 1
 const filtering = require('./filtering')
 const autofill = require('./autofill')
+const locale = require('./locale')
 const {navigatableTypes} = require('../js/lib/appUrlUtil')
 const Channel = require('./channel')
 const {isList, isMap, isImmutable, makeImmutable, deleteImmutablePaths} = require('./common/state/immutableUtil')
@@ -686,7 +689,7 @@ module.exports.loadAppState = () => {
       data = {}
     }
 
-    data = Object.assign({}, module.exports.defaultAppState(), data)
+    data = merge(module.exports.defaultAppState(), data)
     data = module.exports.runImportDefaultSettings(data)
     if (loaded) {
       data = module.exports.runPreMigrations(data)
@@ -759,6 +762,9 @@ module.exports.defaultAppState = () => {
       objectsById: {},
       pendingRecords: {},
       lastConfirmedRecordTimestamp: 0
+    },
+    cache: {
+      ledgerVideos: {}
     },
     locationSiteKeysCache: undefined,
     sites: getTopSiteMap(),

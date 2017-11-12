@@ -30,7 +30,8 @@ const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 const {fullscreenOption} = require('./common/constants/settingsEnums')
 const isThirdPartyHost = require('./browser/isThirdPartyHost')
-var extensionState = require('./common/state/extensionState.js')
+const extensionState = require('./common/state/extensionState')
+const ledgerUtil = require('./common/lib/ledgerUtil')
 const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
 const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
 
@@ -200,14 +201,21 @@ function registerForBeforeRequest (session, partition) {
       }
     }
     // Redirect to non-script version of DDG when it's blocked
-    let url = details.url
+    const url = details.url
     if (details.resourceType === 'mainFrame' &&
       url.startsWith('https://duckduckgo.com/?q') &&
     module.exports.isResourceEnabled('noScript', url, isPrivate)) {
-      url = url.replace('?q=', 'html?q=')
-      cb({redirectURL: url})
+      cb({redirectURL: url.replace('?q=', 'html?q=')})
     } else {
       cb({})
+    }
+
+    if (module.exports.isResourceEnabled('ledger') && module.exports.isResourceEnabled('ledgerMedia')) {
+      // Ledger media
+      const provider = ledgerUtil.getMediaProvider(url)
+      if (provider) {
+        appActions.onLedgerMediaData(url, provider, details.tabId)
+      }
     }
   })
 }
@@ -759,6 +767,14 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
   if (resourceName === 'webtorrent') {
     const extension = extensionState.getExtensionById(appState, config.torrentExtensionId)
     return extension !== undefined ? extension.get('enabled') : false
+  }
+
+  if (resourceName === 'ledger') {
+    return getSetting(settings.PAYMENTS_ENABLED, settingsState)
+  }
+
+  if (resourceName === 'ledgerMedia') {
+    return getSetting(settings.PAYMENTS_ALLOW_MEDIA_PUBLISHERS, settingsState)
   }
 
   const braverySettings = getBraverySettingsForUrl(url, appState, isPrivate)
