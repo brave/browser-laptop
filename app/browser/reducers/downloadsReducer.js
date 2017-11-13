@@ -88,7 +88,7 @@ const downloadsReducer = (state, action) => {
       if (state.get('downloads')) {
         const downloads = state.get('downloads')
           .filter((download) =>
-            ![downloadStates.COMPLETED, downloadStates.INTERRUPTED, downloadStates.CANCELLED].includes(download.get('state')))
+            ![downloadStates.COMPLETED, downloadStates.INTERRUPTED, downloadStates.UNAUTHORIZED, downloadStates.CANCELLED].includes(download.get('state')))
         state = state.set('downloads', downloads)
       }
       break

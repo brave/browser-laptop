@@ -12,6 +12,7 @@ const Button = require('../common/button')
 // Constants
 const downloadStates = require('../../../../js/constants/downloadStates')
 const {PAUSE, RESUME, CANCEL} = require('../../../common/constants/electronDownloadItemActions')
+const locale = require('../../../../js/l10n')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -80,6 +81,10 @@ class DownloadItem extends React.Component {
     return this.props.downloadState === downloadStates.INTERRUPTED
   }
 
+  get isUnauthorized () {
+    return this.props.downloadState === downloadStates.UNAUTHORIZED
+  }
+
   get isInProgress () {
     return this.props.downloadState === downloadStates.IN_PROGRESS
   }
@@ -132,7 +137,7 @@ class DownloadItem extends React.Component {
       width: this.props.percentageComplete
     }
 
-    if (this.isCancelled || this.isInterrupted) {
+    if (this.isCancelled || this.isInterrupted || this.isUnauthorized) {
       progressStyle.display = 'none'
     } else if (this.props.isPendingState) {
       l10nStateArgs.downloadPercent = this.props.percentageComplete
@@ -251,7 +256,7 @@ class DownloadItem extends React.Component {
       }
       <div className='downloadInfo'>
         <span>
-          <div data-test-id='downloadFilename' className='downloadFilename' title={this.props.fileName}>
+          <div data-test-id='downloadFilename' className='downloadFilename' title={this.props.fileName + '\n' + locale.translation(this.props.statel10n)}>
             {this.props.fileName}
           </div>
           {
@@ -262,14 +267,14 @@ class DownloadItem extends React.Component {
                     ? <span className='fa fa-unlock isInsecure' />
                     : null
                 }
-                <span data-l10n-id={this.props.isLocalFile ? 'downloadLocalFile' : null} title={this.props.origin}>
+                <span data-l10n-id={this.props.isLocalFile ? 'downloadLocalFile' : null} title={this.props.origin + '\n' + locale.translation(this.props.statel10n)}>
                   {this.props.isLocalFile ? null : this.props.origin}
                 </span>
               </div>
               : null
           }
           {
-            this.isCancelled || this.isInterrupted || this.isCompleted || this.isPaused || this.isInProgress
+            this.isCancelled || this.isInterrupted || this.isUnauthorized || this.isCompleted || this.isPaused || this.isInProgress
             ? <div className='downloadState' data-l10n-id={this.props.statel10n} data-l10n-args={JSON.stringify(l10nStateArgs)} />
             : null
           }

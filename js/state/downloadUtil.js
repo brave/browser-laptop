@@ -7,6 +7,7 @@ const domUtil = require('../../app/renderer/lib/domUtil')
 
 const pendingStates = [downloadStates.IN_PROGRESS, downloadStates.PAUSED]
 const stopStates = [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED]
+const unauthorizedStates = [downloadStates.UNAUTHORIZED]
 const notErrorStates = [downloadStates.IN_PROGRESS, downloadStates.PAUSED, downloadStates.COMPLETED]
 
 const downloadIsInState = (download, list) =>
@@ -25,7 +26,7 @@ const shouldAllowCancel = (download) =>
  downloadIsInState(download, pendingStates)
 
 const shouldAllowRedownload = (download) =>
- downloadIsInState(download, stopStates)
+ downloadIsInState(download, stopStates) || downloadIsInState(download, unauthorizedStates)
 
 const shouldAllowOpenDownloadLocation = (download) =>
  downloadIsInState(download, notErrorStates)
@@ -34,7 +35,7 @@ const shouldAllowDelete = (download) =>
  downloadIsInState(download, stopStates)
 
 const shouldAllowRemoveFromList = (download) =>
- downloadIsInState(download, stopStates)
+ (downloadIsInState(download, stopStates) || downloadIsInState(download, unauthorizedStates))
 
 const getL10nId = (download) => {
   switch (download.get('state')) {
@@ -42,6 +43,8 @@ const getL10nId = (download) => {
       return 'downloadInterrupted'
     case downloadStates.CANCELLED:
       return 'downloadCancelled'
+    case downloadStates.UNAUTHORIZED:
+      return 'downloadUnauthorized'
     case downloadStates.IN_PROGRESS:
       if (!download.get('totalBytes')) {
         return 'downloadInProgressUnknownTotal'

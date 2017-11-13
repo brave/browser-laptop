@@ -61,6 +61,9 @@ describe('downloadsBar component', function () {
     mockery.registerMock('../../app/renderer/lib/domUtil', {
       getStyleConstants: () => 100
     })
+    mockery.registerMock('../../../../js/l10n', {
+      translation: () => 'wow such title very translated'
+    })
     DownloadItem = require('../../../../../../app/renderer/components/download/downloadItem')
     DownloadsBar = require('../../../../../../app/renderer/components/download/downloadsBar')
     appStore = require('../../../../../../js/stores/appStoreRenderer')
