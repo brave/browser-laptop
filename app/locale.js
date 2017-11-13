@@ -379,7 +379,7 @@ const configuredLanguages = {
 for (var local in configuredLanguages) {
 	if (availableLanguages.indexOf(configuredLanguages[local]) === -1) {
 		availableLanguages.push(configuredLanguages[local])
-    }
+	}
 }
 
 // Return the default locale in xx-XX format I.e. pt-BR
