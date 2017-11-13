@@ -46,7 +46,7 @@ module.exports = [
   'electron-installer-redhat',
   'flow-bin',
   'babel$',
-  'babel-(?!polyfill|regenerator-runtime|preset-env)',
+  'babel-(?!polyfill|regenerator-runtime|preset-env|core)',
   'jsdom-global',
   'react-addons-perf',
   'react-addons-test-utils',
