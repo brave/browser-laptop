@@ -89,6 +89,9 @@ AppStore
         order: number,
         type: string // siteTags.BOOKMARK or siteTags.BOOKMARK_FOLDER
       }]
+    },
+    ledgerVideos: {
+      [mediaKey]: string // publisher key
     }
   }
   clearBrowsingDataDefaults: {
@@ -230,13 +233,10 @@ AppStore
     },
     locations: {
       [url]: {
-        publisher: string, // url of the publisher in question
-        verified: boolean, // wheter or not site is a verified publisher
-        exclude: boolean, // wheter or not site is in the excluded list
-        stickyP: boolean, // wheter or not site was added using addFunds urlbar toggle
-        timestamp: number // timestamp in milliseconds
+        publisher: string // url of the publisher in question
       }
-    }
+    },
+    publisherTimestamp: number, // timestamp of last publisher update in the database
     synopsis: {
       options: {
         emptyScores: {
@@ -258,6 +258,7 @@ AppStore
           options: {
             exclude: boolean,
             verified: boolean,
+            verifiedTimestamp: number, // timestamp of the last change 
             stickyP: boolean
           },
           pinPercentage: number,
@@ -285,6 +286,7 @@ AppStore
     batMercuryTimestamp: integer, // when session is upgraded (and this new schema added)
     btc2BatTimestamp: integer, // when call was made to backend to convert BTC => BAT
     btc2BatNotifiedTimestamp: integer, // when user was shown "wallet upgraded" notification
+    btc2BatTransitionPending: boolean // true if user is being shown transition screen
   },
   menu: {
     template: object // used on Windows and by our tests: template object with Menubar control
@@ -307,37 +309,20 @@ AppStore
     enabled: boolean // enable noscript
   },
   pageData: {
-    info: [{
-      faviconURL: string,
-      protocol: string,
-      publisher: string,
-      timestamp: number,
-      url: string,
-    }],
+    info: {
+      [urlKey]: {
+        faviconURL: string,
+        protocol: string,
+        publisher: string,
+        timestamp: number,
+        url: string
+      }
+    },
     last: {
       info: string, // last added info
-      tabId: number, // last active tabId
-      url: string // last active URL
-    },
-    load: [{
-     timestamp: number,
-     url: string,
-     tabId: number,
-     details: {
-       status: boolean,
-       newURL: string,
-       originalURL: string,
-       httpResponseCode: number,
-       requestMethod: string,
-       referrer: string,
-       resourceType: string
-     }
-    }],
-    view: {
-      timestamp: number,
-      url: string,
-      tabId: number
-    } // we save only the last view
+      tabId: number, // last active tabId,
+      closedTabValue: object // last closed tab data
+    }
   },
   pinnedSites: {
     [siteKey]: {
@@ -374,6 +359,7 @@ AppStore
     'general.startup-mode': string, // one of: lastTime, homePage, newTabPage
     'notification-add-funds-timestamp': number, // timestamp on which we decide if we will show notification Add founds
     'notification-reconcile-soon-timestamp': number, // timestamp
+    'payments.allow-media-publishers': boolean,
     'payments.allow-non-verified-publishers': boolean,
     'payments.contribution-amount': number, // in USD
     'payments.enabled': boolean, // true if the Payments pane is active

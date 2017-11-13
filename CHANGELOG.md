@@ -1,6 +1,60 @@
 # Changelog
 
-## [0.19.46](https://github.com/brave/browser-laptop/releases/tag/v0.19.46dev)
+Release Notes:
+## [0.19.88](https://github.com/brave/browser-laptop/releases/tag/v0.19.88dev)
+
+ - Fixed ctrl-shift-tab keyboard navigation. ([#11331](https://github.com/brave/browser-laptop/issues/11331))
+ - Fixed navigating tabs via keyboard shortcuts doesn't switch tab page. ([#11884](https://github.com/brave/browser-laptop/issues/11884))
+ - Fixed spell check not being disabled when no language is set. ([#11739](https://github.com/brave/browser-laptop/issues/11739))
+ - Fixed ledger notification not appearing above the tab area. ([#11256](https://github.com/brave/browser-laptop/issues/11256))
+ - Fixed incorrect USD value being shown momentarily post wallet conversion. ([#11746](https://github.com/brave/browser-laptop/issues/11746))
+ - Fixed Uncaught exception ledgerClient is not a function while transition from 0.18.x to 0.19.x. ([#11703](https://github.com/brave/browser-laptop/issues/11703))
+ - Fixed errors when toggling payments several times and leaving disabled. ([#11684](https://github.com/brave/browser-laptop/issues/11684))
+ - Fixed addresses & QR codes not always being displayed when creating wallet. ([#11589](https://github.com/brave/browser-laptop/issues/11589))
+ - Fixed several bad state scenarios for the ledger. ([#11566](https://github.com/brave/browser-laptop/issues/11566))
+ - Upgraded to muon 4.5.15. ([#11850](https://github.com/brave/browser-laptop/issues/11850))
+ - Upgraded to Chromium 62.0.3202.89. ([#11827](https://github.com/brave/browser-laptop/issues/11827))
+
+## [0.19.80](https://github.com/brave/browser-laptop/releases/tag/v0.19.80dev)
+
+ - Added spell check and the ability to select multiple languages. ([#2183](https://github.com/brave/browser-laptop/issues/2183))
+ - Fixed contribution amounts not being updated during the BTC => BAT conversion. ([#11719](https://github.com/brave/browser-laptop/issues/11719))
+ - Fixed websockets connection issues. ([#11716](https://github.com/brave/browser-laptop/issues/11716))
+ - Fixed unable to highlight sync words for copying. ([#11641](https://github.com/brave/browser-laptop/issues/11641))
+ - Fixed error: ENOENT: no such file or directory, access ledger-synopsis.json. ([#11674](https://github.com/brave/browser-laptop/issues/11674))
+ - Fixed error: Seed must be Uint8Array. when toggling payment on/off during wallet transition. ([#11673](https://github.com/brave/browser-laptop/issues/11673))
+ - Fixed error: ENOENT: no such file or directory, access ledger-newstate.json while upgrading. ([#11669](https://github.com/brave/browser-laptop/issues/11669))
+ - Fixed publisher not added if revisit happens. ([#11633](https://github.com/brave/browser-laptop/issues/11633))
+ - Fixed button wrap on about:preferences#payments (l10n). ([#11580](https://github.com/brave/browser-laptop/issues/11580))
+ - Fixed PDF printing for contribution statements on Windows. ([#11471](https://github.com/brave/browser-laptop/issues/11471))
+ - Moved brave/ad-block and brave/tracking-protection deps to muon. ([#11352](https://github.com/brave/browser-laptop/issues/11352))
+ - Upgraded to muon 4.5.x. ([#11712](https://github.com/brave/browser-laptop/issues/11712))
+ - Upgraded to Chromium 62.0.3202.75. ([#11711](https://github.com/brave/browser-laptop/issues/11711))
+
+## [0.19.70](https://github.com/brave/browser-laptop/releases/tag/v0.19.70dev)
+
+ - Fixed ledger time is not displayed correctly. ([#11675](https://github.com/brave/browser-laptop/issues/11675))
+ - Fixed publishers lost if upgrading from 0.18 with wallet disabled. ([#11614](https://github.com/brave/browser-laptop/issues/11614))
+ - Fixed removing "update to preview release" in preparation for channel builds. ([#11638](https://github.com/brave/browser-laptop/issues/11638))
+ - Fixed extension page opens with each browser launch. ([#11578](https://github.com/brave/browser-laptop/issues/11578))
+ - Fixed publishers auto-included even with auto-include switch disabled. ([#11553](https://github.com/brave/browser-laptop/issues/11553))
+ - Fixed sometimes a site is not added to publisher list. ([#11274](https://github.com/brave/browser-laptop/issues/11274))
+ - Fixed ledger table doesn't auto populate the publishers. ([#11273](https://github.com/brave/browser-laptop/issues/11273))
+ - Fixed MetaMask contentscript is injected on about pages when it should not be. ([#11596](https://github.com/brave/browser-laptop/issues/11596))
+ - Upgraded to muon 4.5.9. ([#11498](https://github.com/brave/browser-laptop/issues/11498))
+ - Upgraded to Chromium 62.0.3202.62. ([#11139](https://github.com/brave/browser-laptop/issues/11139))
+
+## [0.19.53](https://github.com/brave/browser-laptop/releases/tag/v0.19.53dev)
+
+ - Added support for MetaMask. ([#8671](https://github.com/brave/browser-laptop/issues/8671))
+ - Added detection of visiting a Dapp to prompt to install MetaMask. ([#11532](https://github.com/brave/browser-laptop/issues/11532))
+ - Fixed QR codes not being displayed when creating a new wallet. ([#11492](https://github.com/brave/browser-laptop/issues/11492))
+ - Fixed transition overlay displayed when wallet was created in previous version. ([#11506](https://github.com/brave/browser-laptop/issues/11506))
+ - Fixed chance of losing wallet on BAT upgrade. ([#11494](https://github.com/brave/browser-laptop/issues/11494))
+ - Fixed additional footer text causes button misalignment. ([#11489](https://github.com/brave/browser-laptop/issues/11489))
+ - Upgraded to muon 4.4.29. ([#11543](https://github.com/brave/browser-laptop/issues/11543))
+
+## [0.19.48](https://github.com/brave/browser-laptop/releases/tag/v0.19.48dev)
 
  - Added BAT payments. ([#10945](https://github.com/brave/browser-laptop/issues/10945))
  - Added new add-funds wizard UI to support BAT. ([#11193](https://github.com/brave/browser-laptop/issues/11193))

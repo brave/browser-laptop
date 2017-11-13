@@ -1,4 +1,4 @@
-/* global describe, it, before, after */
+/* global describe, it, before, beforeEach, after, afterEach */
 const Immutable = require('immutable')
 const assert = require('assert')
 const mockery = require('mockery')
@@ -51,7 +51,8 @@ describe('ledgerReducer unit tests', function () {
       onCallback: dummyModifyState,
       onTimeUntilReconcile: dummyModifyState,
       run: () => {},
-      onNetworkConnected: dummyModifyState
+      onNetworkConnected: dummyModifyState,
+      getNewClient: () => {}
     }
     fakeLedgerState = {
       resetSynopsis: dummyModifyState,
@@ -71,7 +72,8 @@ describe('ledgerReducer unit tests', function () {
     ledgerReducer = require('../../../../../app/browser/reducers/ledgerReducer')
 
     appState = Immutable.fromJS({
-      ledger: {}
+      ledger: {},
+      migrations: {}
     })
   })
 
@@ -215,25 +217,38 @@ describe('ledgerReducer unit tests', function () {
 
   describe('APP_IDLE_STATE_CHANGED', function () {
     let pageDataChangedSpy
-    let addVisitSpy
-    before(function () {
+    beforeEach(function () {
       pageDataChangedSpy = sinon.spy(fakeLedgerApi, 'pageDataChanged')
-      addVisitSpy = sinon.spy(fakeLedgerApi, 'addVisit')
+    })
+
+    afterEach(function () {
+      pageDataChangedSpy.restore()
+    })
+    it('does not calls ledgerApi.pageDataChanged when no idle state is provided', function () {
       returnedState = ledgerReducer(appState, Immutable.fromJS({
         actionType: appConstants.APP_IDLE_STATE_CHANGED
       }))
+      assert(pageDataChangedSpy.notCalled)
     })
-    after(function () {
-      pageDataChangedSpy.restore()
-      addVisitSpy.restore()
-    })
-    it('calls ledgerApi.pageDataChanged', function () {
+    it('calls ledgerApi.pageDataChanged when not in idleState', function () {
+      returnedState = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_IDLE_STATE_CHANGED,
+        idleState: 'notActive'
+      }))
       assert(pageDataChangedSpy.withArgs(appState).calledOnce)
     })
-    it('calls ledgerApi.addVisit', function () {
-      assert(addVisitSpy.calledOnce)
+    it('does not calls ledgerApi.pageDataChanged when in idleState', function () {
+      returnedState = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_IDLE_STATE_CHANGED,
+        idleState: 'active'
+      }))
+      assert(pageDataChangedSpy.notCalled)
     })
     it('returns a modified state', function () {
+      returnedState = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_IDLE_STATE_CHANGED,
+        idleState: 'notActive'
+      }))
       assert.notDeepEqual(returnedState, appState)
     })
   })
@@ -256,7 +271,7 @@ describe('ledgerReducer unit tests', function () {
     it('calls ledgerApi.boot', function () {
       assert(bootSpy.calledOnce)
     })
-    it('returns an ununmodified state', function () {
+    it('returns a non-modified state, if no transition in progress', function () {
       assert.deepEqual(returnedState, appState)
     })
   })

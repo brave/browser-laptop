@@ -28,7 +28,7 @@ const progressDownloadItems = () => {
 }
 
 module.exports.updateElectronDownloadItem = (win, downloadId, item, state) => {
-  if (state === downloadStates.INTERRUPTED || state === downloadStates.CANCELLED || state === downloadStates.COMPLETED) {
+  if (state === downloadStates.INTERRUPTED || state === downloadStates.CANCELLED || state === downloadStates.UNAUTHORIZED || state === downloadStates.COMPLETED) {
     if (app.dock && state === downloadStates.COMPLETED) {
       app.dock.downloadFinished(item.getSavePath())
     }

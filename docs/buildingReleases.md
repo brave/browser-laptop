@@ -35,14 +35,14 @@ Then do the following per OS:
 
 ```
 CHANNEL=dev npm run build-package
-IDENTIFIER=id-here npm run build-installer
+CHANNEL=dev IDENTIFIER=id-here npm run build-installer
 ```
 
 **Windows:**
 
 ```
 CHANNEL=dev npm run build-package
-CERT_PASSWORD=‘password-here’ npm run build-installer
+CHANNEL=dev CERT_PASSWORD=‘password-here’ npm run build-installer
 ````
 
 Check virus scan: https://www.virustotal.com/en/

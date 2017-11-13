@@ -4,6 +4,7 @@
 
 const {StyleSheet} = require('aphrodite')
 const globalStyles = require('./global')
+const {theme} = require('./theme')
 
 const styles = StyleSheet.create({
   formControl: {
@@ -132,8 +133,10 @@ const styles = StyleSheet.create({
 
   // User select
   userSelect: {
-    userSelect: 'initial',
-    cursor: 'text'
+    cursor: 'text',
+
+    // #11641
+    userSelect: 'text'
   },
   userSelectNone: {
     userSelect: 'none',
@@ -155,13 +158,13 @@ const styles = StyleSheet.create({
     },
     // last-child will always be orange, but others can be gray
     ':not(:last-child)': {
-      borderBottom: `1px solid ${globalStyles.color.tabsToolbarBorderColor}`
+      borderBottom: `1px solid ${theme.tabsToolbar.border.color}`
     }
   },
   notificationBar__notificationItem: {
     backgroundColor: globalStyles.color.notificationItemColor,
     boxSizing: 'border-box',
-    boxShadow: `0 -1px 0 ${globalStyles.color.tabsToolbarBorderColor}`,
+    boxShadow: `0 -1px 0 ${theme.tabsToolbar.border.color}`,
     lineHeight: '24px',
     padding: '8px 20px'
   },

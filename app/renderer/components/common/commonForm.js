@@ -38,7 +38,7 @@ class CommonFormMedium extends ImmutableComponent {
     return <div className={css(
       commonStyles.flyoutDialog,
       styles.commonForm,
-      styles.commonFormMedium,
+      styles.commonFormMedium
     )} {...this.props} />
   }
 }
@@ -66,12 +66,6 @@ class CommonFormBookmarkHanger extends ImmutableComponent {
 class CommonFormDropdown extends ImmutableComponent {
   render () {
     return <FormDropdown data-isCommonForm='true' {...this.props} />
-  }
-}
-
-class CommonFormFullWidthDropdown extends ImmutableComponent {
-  render () {
-    return <FormDropdown data-isCommonForm='true' data-isFullWidth='true' {...this.props} />
   }
 }
 
@@ -240,7 +234,6 @@ module.exports = {
   CommonFormLarge,
   CommonFormBookmarkHanger,
   CommonFormDropdown,
-  CommonFormFullWidthDropdown,
   CommonFormTextbox,
   CommonFormClickable,
   CommonFormSection,

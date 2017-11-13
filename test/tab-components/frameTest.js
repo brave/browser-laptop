@@ -63,9 +63,9 @@ describe('frame tests', function () {
       })
 
       it('inserts after the tab to clone', function * () {
-        this.tab1 = '.tabArea:nth-child(1) [data-test-id="tab"][data-frame-key="1"]'
-        this.tab2 = '.tabArea:nth-child(2) [data-test-id="tab"][data-frame-key="3"]'
-        this.tab3 = '.tabArea:nth-child(3) [data-test-id="tab"][data-frame-key="2"]'
+        this.tab1 = '[data-test-id="tab-area"]:nth-child(1) [data-test-id="tab"][data-frame-key="1"]'
+        this.tab2 = '[data-test-id="tab-area"]:nth-child(2) [data-test-id="tab"][data-frame-key="3"]'
+        this.tab3 = '[data-test-id="tab-area"]:nth-child(3) [data-test-id="tab"][data-frame-key="2"]'
         const tabUrl = this.clickWithTargetPage
         yield this.app.client
           .waitForTabCount(3)

@@ -1,18 +1,19 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+const Immutable = require('immutable')
 const {getTargetAboutUrl} = require('../lib/appUrlUtil')
 
 // BRAVE_UPDATE_HOST should be set to the host name for the auto-updater server
 const updateHost = process.env.BRAVE_UPDATE_HOST || 'https://brave-laptop-updates.global.ssl.fastly.net'
 const winUpdateHost = process.env.BRAVE_WIN_UPDATE_HOST || 'https://brave-download.global.ssl.fastly.net'
-const crashURL = process.env.BRAVE_CRASH_URL || 'https://brave-laptop-updates.herokuapp.com/1/crashes'
 const adHost = process.env.AD_HOST || 'https://oip.brave.com'
 const isTest = process.env.NODE_ENV === 'test'
 
 const buildConfig = require('./buildConfig')
 const isProduction = buildConfig.nodeEnv === 'production'
 const {fullscreenOption, autoplayOption} = require('../../app/common/constants/settingsEnums')
+const Channel = require('../../app/channel')
 
 module.exports = {
   name: 'Brave',
@@ -99,9 +100,6 @@ module.exports = {
     enabled: false,
     url: adHost
   },
-  crashes: {
-    crashSubmitUrl: crashURL
-  },
   payments: {
     delayNotificationTryPayments: 1000 * 60 * 60 * 24 * 10 // 10 days (from firstRunTimestamp)
   },
@@ -122,6 +120,8 @@ module.exports = {
     serverUrl: isProduction ? 'https://sync.brave.com' : 'https://sync-staging.brave.com',
     debug: !isProduction,
     testS3Url: 'https://brave-sync-test.s3.dualstack.us-west-2.amazonaws.com/',
+    snsUrl: 'https://sns.us-west-2.amazonaws.com/',
+    sqsUrl: 'https://sqs.us-west-2.amazonaws.com/',
     s3Url: isProduction ? 'https://brave-sync.s3.dualstack.us-west-2.amazonaws.com' : 'https://brave-sync-staging.s3.dualstack.us-west-2.amazonaws.com',
     fetchInterval: isProduction ? (1000 * 60 * 3) : (1000 * 60),
     fetchOffset: isTest ? 0 : 30, // seconds; reduce syncUtil.now() by this amount to compensate for records pending S3 consistency. See brave/sync #139
@@ -139,9 +139,11 @@ module.exports = {
     'general.show-home-button': false,
     'general.autohide-menu': true,
     'general.wide-url-bar': false,
-    'general.check-default-on-startup': true,
+    'general.check-default-on-startup': Channel.channel() === 'dev',
     'general.download-default-path': '',
     'general.download-always-ask': true,
+    'general.spellcheck-enabled': true,
+    'general.spellcheck-languages': Immutable.fromJS(['en-US']),
     'search.default-search-engine': 'Google',
     'search.offer-search-suggestions': false, // false by default for privacy reasons
     'tabs.switch-to-new-tabs': false,
@@ -181,6 +183,7 @@ module.exports = {
     // Tracking issue for that and to re-enable title mode on Windows is at #9900.
     'general.disable-title-mode': process.platform === 'linux' || process.platform === 'win32',
     // payments
+    'payments.allow-media-publishers': true,
     'payments.allow-non-verified-publishers': true,
     'payments.contribution-amount': 25, // BAT
     'payments.enabled': false,
@@ -204,7 +207,6 @@ module.exports = {
     'advanced.smooth-scroll-enabled': false,
     'advanced.send-crash-reports': true,
     'advanced.send-usage-statistics': false,
-    'advanced.update-to-preview-releases': false,
     'advanced.toolbar-ui-scale': 'normal',
     'advanced.swipe-nav-distance': 101,
     'shutdown.clear-history': false,
@@ -219,6 +221,7 @@ module.exports = {
     'extensions.honey.enabled': false,
     'extensions.pinterest.enabled': false,
     'extensions.metamask.enabled': false,
+    'extensions.metamask.promptDismissed': false,
     'general.bookmarks-toolbar-mode': null,
     'general.is-default-browser': null,
     'notification-add-funds-timestamp': null,

@@ -15,9 +15,7 @@ const {TextArea, DefaultTextArea} = require('../../app/renderer/components/commo
 const {
   Dropdown,
   FormDropdown,
-  SettingDropdown,
-  PanelDropdown,
-  BraveryPanelDropdown
+  SettingDropdown
 } = require('../../app/renderer/components/common/dropdown')
 
 const BrowserButton = require('../../app/renderer/components/common/browserButton')
@@ -94,16 +92,30 @@ class AboutStyle extends ImmutableComponent {
   render () {
     return <div className={css(styles.wrapper)}>
       <h1 data-l10n-id='introTitle' />
-      <p className={css(styles.fontSizeInitial)} data-l10n-id='intro' />
+      <div className={css(styles.wrapper__header)}>
+        <p data-l10n-id='intro' />
 
-      <ul className={css(styles.fontSizeInitial)}>
-        <li className={css(styles.toc__marginBottom)}><a href='#typography'>typography</a></li>
-        <li className={css(styles.toc__marginBottom)}><a href='#textboxes'>textboxes</a></li>
-        <li className={css(styles.toc__marginBottom)}><a href='#dropdowns'>dropdowns</a></li>
-        <li className={css(styles.toc__marginBottom)}><a href='#buttons'>buttons</a></li>
-        <li className={css(styles.toc__marginBottom)}><a href='#commonForm'>commonForm</a></li>
-        <li className={css(styles.toc__marginBottom)}><a href='#sectionTitle'>sectionTitle</a></li>
-      </ul>
+        <ul>
+          <li className={css(styles.wrapper__header__toc)}><a href='#typography'>typography</a></li>
+          <li className={css(styles.wrapper__header__toc)}><a href='#textboxes'>textboxes</a></li>
+          <li className={css(styles.wrapper__header__toc)}><a href='#dropdowns'>dropdowns</a></li>
+          <li className={css(styles.wrapper__header__toc)}><a href='#buttons'>buttons</a></li>
+          <li className={css(styles.wrapper__header__toc)}><a href='#commonForm'>commonForm</a></li>
+          <li className={css(styles.wrapper__header__toc)}><a href='#sectionTitle'>sectionTitle</a></li>
+        </ul>
+
+        <div>
+          <span data-l10n-id='IntroLinkToDocument' />
+          <a className={css(styles.wrapper__header__link)}
+            href='https://github.com/brave/browser-laptop/blob/master/docs/style.md'
+            rel='noopener' target='_blank'
+          >
+            docs/style.md
+          </a>
+        </div>
+
+        <p data-l10n-id='intro' />
+      </div>
 
       <hr />
 
@@ -182,6 +194,7 @@ class AboutStyle extends ImmutableComponent {
           </Dropdown>
           <Pre><Code>
             const { '{Dropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            {'\n'}
             &lt;Dropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
@@ -199,10 +212,47 @@ class AboutStyle extends ImmutableComponent {
           </FormDropdown>
           <Pre><Code>
             const { '{FormDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            {'\n'}
             &lt;FormDropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
+            &lt;/FormDropdown>
+          </Code></Pre>
+        </Container>
+
+        <Container>
+          <h2>Dropdown used on Brave Payments; has 180px width (same as Panel Item button below)</h2>
+          <FormDropdown data-isPanel>
+            <option>5 USD</option>
+            <option>10 USD</option>
+            <option>15 USD</option>
+          </FormDropdown>
+          <Pre><Code>
+            const { '{FormDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            {'\n'}
+            &lt;FormDropdown data-isPanel>{'\n'}
+            &nbsp;&nbsp;&lt;option>5 USD&lt;/option>{'\n'}
+            &nbsp;&nbsp;&lt;option>10 USD&lt;/option>{'\n'}
+            &nbsp;&nbsp;&lt;option>15 USD&lt;/option>{'\n'}
+            &lt;/FormDropdown>
+          </Code></Pre>
+        </Container>
+
+        <Container>
+          <h2>Dropdown used on Bravery Panel; has 100% width and 13px font size</h2>
+          <FormDropdown data-isFullWidth data-isBraveryPanel>
+            <option data-l10n-id='adsShowBrave' data-test-id='showBraveAds' value='showBraveAds' />
+            <option data-l10n-id='adsBlock' data-test-id='blockAdsOption' value='blockAds' />
+            <option data-l10n-id='adsAllow' data-test-id='showAdsOption' value='allowAdsAndTracking' />
+          </FormDropdown>
+          <Pre><Code>
+            const { '{FormDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            {'\n'}
+            &lt;FormDropdown data-isFullWidth data-isBraveryPanel>{'\n'}
+            &nbsp;&nbsp;&lt;option data-l10n-id='showBraveAds' data-test-id='showBraveAds' value='showBraveAds' />{'\n'}
+            &nbsp;&nbsp;&lt;option data-l10n-id='blockAds' data-test-id='blockAdsOption' value='blockAds' />{'\n'}
+            &nbsp;&nbsp;&lt;option data-l10n-id='allowAdsAndTracking' data-test-id='showAdsOption' value='allowAdsAndTracking' />{'\n'}
             &lt;/FormDropdown>
           </Code></Pre>
         </Container>
@@ -216,6 +266,7 @@ class AboutStyle extends ImmutableComponent {
           </SettingDropdown>
           <Pre><Code>
             const { '{SettingDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
+            {'\n'}
             &lt;SettingDropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
@@ -225,36 +276,20 @@ class AboutStyle extends ImmutableComponent {
         </Container>
 
         <Container>
-          <h2>Dropdown used on Brave Payments; has 180px width (same as Panel Item button below)</h2>
-          <PanelDropdown>
-            <option>5 USD</option>
-            <option>10 USD</option>
-            <option>15 USD</option>
-          </PanelDropdown>
-          <Pre><Code>
-            const { '{PanelDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
-            &lt;PanelDropdown>{'\n'}
-            &nbsp;&nbsp;&lt;option>5 USD&lt;/option>{'\n'}
-            &nbsp;&nbsp;&lt;option>10 USD&lt;/option>{'\n'}
-            &nbsp;&nbsp;&lt;option>15 USD&lt;/option>{'\n'}
-            &lt;/PanelDropdown>
-          </Code></Pre>
-        </Container>
-
-        <Container>
-          <h2>Dropdown used mostly on Bravery Panel; has 100% width and 13px font size</h2>
-          <BraveryPanelDropdown>
+          <h2>Dropdown used on CommonForm</h2>
+          <CommonFormDropdown>
             <option>Select Box</option>
             <option>Second Choice</option>
             <option>Third Choice</option>
-          </BraveryPanelDropdown>
+          </CommonFormDropdown>
           <Pre><Code>
-            const { '{BraveryPanelDropdown}' } = require('../../app/renderer/components/common/dropdown'){'\n'}
-            &lt;BraveryPanelDropdown>{'\n'}
+            const { '{CommonFormDropdown}' } = require('../../app/renderer/components/common/commonForm'){'\n'}
+            {'\n'}
+            &lt;CommonFormDropdown>{'\n'}
             &nbsp;&nbsp;&lt;option>Select Box&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Second Choice&lt;/option>{'\n'}
             &nbsp;&nbsp;&lt;option>Third Choice&lt;/option>{'\n'}
-            &lt;/BraveryPanelDropdown>
+            &lt;/CommonFormDropdown>
           </Code></Pre>
         </Container>
 
@@ -290,13 +325,26 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton subtleItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <BrowserButton groupedItem primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
-        <BrowserButton groupedItem secondaryColor l10nId='secondaryColor' onClick={this.onRemoveBookmark} />
-        <BrowserButton groupedItem primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
+        <div>
+          <BrowserButton groupedItem primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
+          <BrowserButton groupedItem secondaryColor l10nId='secondaryColor' onClick={this.onRemoveBookmark} />
+          <BrowserButton groupedItem primaryColor l10nId='primaryColor' onClick={this.onRemoveBookmark} />
+        </div>
+        <div className={css(styles.info)}>
+          <BrowserButton
+            iconOnly
+            iconClass={globalStyles.appIcons.moreInfo}
+            size='1.5rem'
+            color={globalStyles.color.braveOrange}
+          />
+          <span className={css(styles.info__content)} data-l10n-id='InfoBrowserButtonGrouped' />
+        </div>
         <Pre><Code>
-          &lt;BrowserButton groupedItem primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}
-          &lt;BrowserButton groupedItem secondaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}
-          &lt;BrowserButton groupedItem primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
+          &lt;div>
+          <Tab>&lt;BrowserButton groupedItem primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}</Tab>
+          <Tab>&lt;BrowserButton groupedItem secondaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />{'\n'}</Tab>
+          <Tab>&lt;BrowserButton groupedItem primaryColor l10nId='cancel' onClick={'{this.onRemoveBookmark}'} /></Tab>
+          &lt;/div>
         </Code></Pre>
 
         <BrowserButton extensionItem l10nId='extensionItem' onClick={this.onRemoveBookmark} />
@@ -304,11 +352,15 @@ class AboutStyle extends ImmutableComponent {
           &lt;BrowserButton extensionItem l10nId='cancel' onClick={'{this.onRemoveBookmark}'} />
         </Code></Pre>
 
-        <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
-        <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
+        <div>
+          <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
+          <BrowserButton groupedItem secondaryColor notificationItem l10nId='notificationItem' onClick={this.onEnableAutoplay} />
+        </div>
         <Pre><Code>
-          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Allow' onClick={'{this.onEnableAutoplay}'} />{'\n'}
-          &lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Deny' onClick={'{this.onEnableAutoplay}'} />
+          &lt;div>
+          <Tab>&lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Allow' onClick={'{this.onEnableAutoplay}'} />{'\n'}</Tab>
+          <Tab>&lt;BrowserButton groupedItem secondaryColor notificationItem l10nId='Deny' onClick={'{this.onEnableAutoplay}'} /></Tab>
+          &lt;/div>
         </Code></Pre>
 
         <BrowserButton iconOnly iconClass={globalStyles.appIcons.moreInfo} size='30px' color='rebeccapurple' />
@@ -418,6 +470,16 @@ class AboutStyle extends ImmutableComponent {
             <Tab>&lt;/CommonFormBottomWrapper&gt;{'\n'}</Tab>
             &lt;/CommonForm&gt;{'\n'}
           </Code></Pre>
+
+          <div className={css(styles.info)}>
+            <BrowserButton
+              iconOnly
+              iconClass={globalStyles.appIcons.moreInfo}
+              size='1.5rem'
+              color={globalStyles.color.braveOrange}
+            />
+            <span className={css(styles.info__content)} data-l10n-id='InfoCommonFormCustom' />
+          </div>
         </Container>
 
         <Container>
@@ -709,14 +771,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'flex-end'
   },
-  fontSizeInitial: {
-    fontSize: 'initial'
-  },
-  toc__marginBottom: {
-    marginBottom: '.25rem'
-  },
 
-  wrapper: common,
   container: common,
 
   pre: {
@@ -727,7 +782,8 @@ const styles = StyleSheet.create({
     borderRadius: globalStyles.radius.borderRadius,
     tabSize: '2',
     wordBreak: 'normal',
-    overflowX: 'scroll'
+    overflowX: 'scroll',
+    margin: '1rem auto'
   },
 
   code: {
@@ -743,14 +799,43 @@ const styles = StyleSheet.create({
   tab: {
     textIndent: tabWidth
   },
+
   tab2: {
     textIndent: `calc(${tabWidth} * 2)`
   },
+
   tab3: {
     textIndent: `calc(${tabWidth} * 3)`
   },
+
   tab4: {
     textIndent: `calc(${tabWidth} * 4)`
+  },
+
+  info: {
+    display: 'flex',
+    alignItems: 'center',
+    margin: '1rem auto'
+  },
+
+  info__content: {
+    marginLeft: '.5ch',
+    fontSize: '.95rem',
+    color: globalStyles.color.commonTextColor
+  },
+
+  wrapper: common,
+
+  wrapper__header: {
+    fontSize: 'initial'
+  },
+
+  wrapper__header__toc: {
+    marginBottom: '.25rem'
+  },
+
+  wrapper__header__link: {
+    marginLeft: '.5ch'
   }
 })
 

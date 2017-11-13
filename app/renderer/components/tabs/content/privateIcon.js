@@ -3,7 +3,8 @@
 * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite/no-important')
+const ReactDOM = require('react-dom')
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
@@ -15,12 +16,18 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const tabState = require('../../../../common/state/tabState')
 
 // Styles
-const {theme} = require('../../styles/theme')
 const globalStyles = require('../../styles/global')
-const {opacityIncreaseKeyframes} = require('../../styles/animations')
+const {theme} = require('../../styles/theme')
+const {opacityIncreaseElementKeyframes} = require('../../styles/animations')
+
 const privateSvg = require('../../../../extensions/brave/img/tabs/private.svg')
 
 class PrivateIcon extends React.Component {
+  constructor (props) {
+    super(props)
+    this.setRef = this.setRef.bind(this)
+  }
+
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const tabId = ownProps.tabId
@@ -35,46 +42,72 @@ class PrivateIcon extends React.Component {
     return props
   }
 
+  componentDidMount (props) {
+    this.transitionInIfRequired()
+  }
+
+  componentDidUpdate (prevProps) {
+    this.transitionInIfRequired(prevProps)
+  }
+
+  transitionInIfRequired (prevProps) {
+    const shouldTransitionIn = (
+      // need to have the element created already
+      this.element &&
+      // should show the icon
+      this.props.showPrivateIcon &&
+      // state has changed
+      (!prevProps || !prevProps.showPrivateIcon)
+    )
+    if (shouldTransitionIn) {
+      this.element.animate(opacityIncreaseElementKeyframes, {
+        duration: 200,
+        easing: 'linear'
+      })
+    }
+  }
+
+  setRef (ref) {
+    this.element = ReactDOM.findDOMNode(ref)
+  }
+
   render () {
     if (this.props.isPinned || !this.props.showPrivateIcon) {
       return null
     }
 
     const privateProps = StyleSheet.create({
-      private__icon_color: {
+      icon_private_color: {
         backgroundColor: this.props.isActive
-          ? theme.tab.content.icon.private.background.active
-          : theme.tab.content.icon.private.background.notActive
+          ? theme.tab.icon.private.background.active
+          : theme.tab.icon.private.background.notActive
       }
     })
 
     return <TabIcon
       data-test-id='privateIcon'
-      className={css(styles.private__icon, privateProps.private__icon_color)}
+      className={[
+        styles.icon_private,
+        privateProps.icon_private_color
+      ]}
+      ref={this.setRef}
     />
   }
 }
 
-module.exports = ReduxComponent.connect(PrivateIcon)
-
 const styles = StyleSheet.create({
-  private__icon: {
-    opacity: 0,
-    willChange: 'opacity',
-    animationName: opacityIncreaseKeyframes,
-    animationDelay: '100ms',
-    animationTimingFunction: 'linear',
-    animationDuration: '200ms',
-    animationFillMode: 'forwards',
-
-    zIndex: globalStyles.zindex.zindexTabsThumbnail,
-    boxSizing: 'border-box',
+  icon_private: {
     WebkitMaskRepeat: 'no-repeat',
     WebkitMaskPosition: 'center',
     WebkitMaskImage: `url(${privateSvg})`,
     WebkitMaskSize: globalStyles.spacing.sessionIconSize,
-    width: globalStyles.spacing.sessionIconSize,
+    marginRight: globalStyles.spacing.defaultTabMargin,
+
+    // Override default properties
+    backgroundSize: 0,
     height: globalStyles.spacing.sessionIconSize,
-    marginRight: globalStyles.spacing.defaultTabMargin
+    width: globalStyles.spacing.sessionIconSize
   }
 })
+
+module.exports = ReduxComponent.connect(PrivateIcon)

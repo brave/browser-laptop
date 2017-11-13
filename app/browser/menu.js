@@ -163,7 +163,6 @@ const createEditSubmenu = () => {
     CommonMenu.separatorMenuItem,
     {
       label: locale.translation('delete'),
-      accelerator: 'Delete',
       click: function (item, focusedWindow) {
         focusedWindow.webContents.delete()
       }

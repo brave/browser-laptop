@@ -2,20 +2,34 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const appConfig = require('../js/constants/appConfig')
-const buildConfig = require('../js/constants/buildConfig')
-const crashReporter = require('electron').crashReporter
+const Channel = require('./channel')
+const {app} = require('electron')
 
-exports.init = () => {
-  const options = {
-    productName: 'Brave Developers',
-    companyName: 'Brave.com',
-    submitURL: appConfig.crashes.crashSubmitUrl,
-    autoSubmit: true,
-    extra: {
-      node_env: process.env.NODE_ENV,
-      rev: buildConfig.BROWSER_LAPTOP_REV || 'unknown'
-    }
+const version = app.getVersion()
+const channel = Channel.channel()
+
+const crashKeys = {
+  'node-env': process.env.NODE_ENV,
+  '_version': version,
+  'channel': channel
+}
+
+const initCrashKeys = () => {
+  // set muon-app-version switch to pass version to renderer processes
+  app.commandLine.appendSwitch('muon-app-version', version)
+  app.commandLine.appendSwitch('muon-app-channel', channel)
+
+  for (let key in crashKeys) {
+    muon.crashReporter.setCrashKeyValue(key, crashKeys[key])
   }
-  crashReporter.start(options)
+}
+
+exports.init = (enabled) => {
+  initCrashKeys()
+  muon.crashReporter.setEnabled(enabled)
+  if (enabled) {
+    console.log('Crash reporting enabled')
+  } else {
+    console.log('Crash reporting disabled')
+  }
 }

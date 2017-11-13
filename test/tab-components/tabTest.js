@@ -4,7 +4,7 @@ const Brave = require('../lib/brave')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
 const {tabPreviewTiming} = require('../../app/common/constants/settingsEnums')
-const {urlInput, backButton, forwardButton, activeTab, activeTabTitle, activeTabFavicon, newFrameButton, notificationBar, contextMenu, pinnedTabsTabs, tabsTabs} = require('../lib/selectors')
+const {urlInput, backButton, forwardButton, activeTab, activeTabTitle, activeTabFavicon, newFrameButton, notificationBar, contextMenu, pinnedTabsTabs, tabsTabs, pinnedTabs, tabs} = require('../lib/selectors')
 
 const newTabUrl = 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-newtab.html'
 
@@ -150,7 +150,7 @@ describe('tab tests', function () {
         this.page2 = Brave.server.url('page2.html')
         yield setup(this.app.client)
         yield this.app.client
-          .waitForExist('.tabArea:nth-of-type(1) [data-frame-key="1"]') // original newtab
+          .waitForExist('[data-test-id="tab-area"]:nth-of-type(1) [data-frame-key="1"]') // original newtab
           .newTab({ url: this.page1, pinned: true })
           .waitForExist(pinnedTabsTabs + '[data-frame-key="2"]')
           .newTab({ url: this.page1 })
@@ -161,9 +161,9 @@ describe('tab tests', function () {
 
       it('sequentially by default', function * () {
         yield this.app.client
-          .waitForExist('.tabArea:nth-of-type(2) [data-frame-key="3"]')
+          .waitForExist('[data-test-id="tab-area"]:nth-of-type(2) [data-frame-key="3"]')
           .waitForExist('webview[data-frame-key="3"][src="' + this.page1 + '"]')
-          .waitForExist('.tabArea:nth-of-type(3) [data-frame-key="4"]')
+          .waitForExist('[data-test-id="tab-area"]:nth-of-type(3) [data-frame-key="4"]')
           .waitForExist('.frameWrapper.isActive webview[data-frame-key="4"][src="' + this.page2 + '"]')
       })
     })
@@ -178,7 +178,7 @@ describe('tab tests', function () {
           .newTab({ url: 'about:blank', active: false })
           .waitForExist('[data-test-id="tab"][data-frame-key="2"]')
           .newTab({ url: 'about:blank' })
-          .waitForExist('.tabArea + .tabArea + .tabArea [data-test-id="tab"][data-frame-key="3"]')
+          .waitForExist('[data-test-id="tab-area"] + [data-test-id="tab-area"] + [data-test-id="tab-area"] [data-test-id="tab"][data-frame-key="3"]')
       })
     })
     describe('new tabs with openerTabId', function () {
@@ -202,8 +202,85 @@ describe('tab tests', function () {
           .newTab({ url: 'about:blank', openerTabId: data.tabId })
           .waitForTabCount(3)
           .windowByUrl(Brave.browserWindowUrl)
-          .waitForExist('.tabArea:nth-child(2) [data-test-id="tab"][data-frame-key="3"]')
+          .waitForExist('[data-test-id="tab-area"]:nth-child(2) [data-test-id="tab"][data-frame-key="3"]')
       })
+    })
+  })
+
+  describe('tab order index change', function () {
+    Brave.beforeAll(this)
+    before(function * () {
+      this.page1 = Brave.server.url('page1.html')
+      this.page2 = Brave.server.url('page2.html')
+      yield setup(this.app.client)
+      yield this.app.client
+        .waitForExist('[data-test-id="tab-area"]:nth-of-type(1) [data-frame-key="1"]') // original newtab
+        .newTab({ url: this.page1, pinned: true })
+        .waitForExist(pinnedTabs + ' [data-frame-key="2"]')
+        .newTab({ url: this.page2, pinned: true })
+        .waitForExist(pinnedTabs + ' [data-frame-key="3"]')
+        .newTab({ url: this.page1 })
+        .waitForExist(tabs + ' [data-frame-key="4"]')
+        .newTab({ url: this.page2 })
+        .waitForExist(tabs + ' [data-frame-key="5"]')
+        // check initial order
+        .waitForExist(pinnedTabs + ' [data-test-id="tab-area"][data-frame-key="2"] + [data-test-id="tab-area"][data-frame-key="3"]')
+        .waitForExist(tabs + ' [data-test-id="tab-area"][data-frame-key="1"] + [data-test-id="tab-area"][data-frame-key="4"] + [data-test-id="tab-area"][data-frame-key="5"]')
+    })
+
+    it('does not move first unpinned index backwards', function * () {
+      yield this.app.client
+      .activateTabByFrameKey(1) // first created tab
+      .waitForExist('[data-test-active-tab][data-frame-key="1"]')
+      // attempt to move the first tab backwards
+      .moveTabIncrementally(false)
+      // should not have changed anything
+      .waitForExist(tabs + ' [data-test-id="tab-area"][data-frame-key="1"] + [data-test-id="tab-area"][data-frame-key="4"] + [data-test-id="tab-area"][data-frame-key="5"]')
+      .waitForExist(pinnedTabs + ' [data-test-id="tab-area"][data-frame-key="2"] + [data-test-id="tab-area"][data-frame-key="3"]')
+    })
+
+    it('does not move last unpinned index forwards', function * () {
+      yield this.app.client
+      .activateTabByFrameKey(5)
+      .waitForExist('[data-test-active-tab][data-frame-key="4"]')
+      // attempt to move the last tab forwards
+      .moveTabIncrementally(true)
+      // should not have changed anything
+      .waitForExist(tabs + ' [data-test-id="tab-area"][data-frame-key="1"] + [data-test-id="tab-area"][data-frame-key="4"] + [data-test-id="tab-area"][data-frame-key="5"]')
+      .waitForExist(pinnedTabs + ' [data-test-id="tab-area"][data-frame-key="2"] + [data-test-id="tab-area"][data-frame-key="3"]')
+    })
+
+    it('moves from first unpinned position to next', function * () {
+      yield this.app.client
+        .activateTabByFrameKey(1)
+        .waitForExist('[data-test-active-tab][data-frame-key="1"]')
+        // move first tab forwards
+        .moveTabIncrementally(true)
+        // check tabs are changed order and pinned remain unchanged
+        .waitForExist(tabs + ' [data-test-id="tab-area"][data-frame-key="4"] + [data-test-id="tab-area"][data-frame-key="1"] + [data-test-id="tab-area"][data-frame-key="5"]')
+        .waitForExist(pinnedTabs + ' [data-test-id="tab-area"][data-frame-key="2"] + [data-test-id="tab-area"][data-frame-key="3"]')
+    })
+
+    it('moves from last unpinned index backwards', function * () {
+      yield this.app.client
+      .activateTabByFrameKey(5)
+      .waitForExist('[data-test-active-tab][data-frame-key="5"]')
+      // move last tab backwards
+      .moveTabIncrementally(false)
+      // check tabs are changed order and pinned remain unchanged
+      .waitForExist(tabs + ' [data-test-id="tab-area"][data-frame-key="4"] + [data-test-id="tab-area"][data-frame-key="5"] + [data-test-id="tab-area"][data-frame-key="1"]')
+      .waitForExist(pinnedTabs + ' [data-test-id="tab-area"][data-frame-key="2"] + [data-test-id="tab-area"][data-frame-key="3"]')
+    })
+
+    it('moves from first pinned position to next', function * () {
+      yield this.app.client
+        .activateTabByFrameKey(2)
+        .waitForExist('[data-test-active-tab][data-frame-key="2"]')
+        // move first pinned tab forwards
+        .moveTabIncrementally(true)
+        // check pinned tabs are changed order and unpinned remain unchanged
+        .waitForExist(tabs + ' [data-test-id="tab-area"][data-frame-key="4"] + [data-test-id="tab-area"][data-frame-key="5"] + [data-test-id="tab-area"][data-frame-key="1"]')
+        .waitForExist(pinnedTabs + ' [data-test-id="tab-area"][data-frame-key="3"] + [data-test-id="tab-area"][data-frame-key="2"]')
     })
   })
 

@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 module.exports = [
-  'pre-comit',
+  'pre-commit',
   'pre-push',
   'test/',
   'docs/',
@@ -55,5 +55,7 @@ module.exports = [
   'sqlite3',
   'uglify-js',
   'webdriverio',
-  'webpack-dev-server'
+  'webpack-dev-server',
+  'Brave(.+)',
+  'brave-(.+)'
 ]

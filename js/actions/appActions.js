@@ -1101,9 +1101,9 @@ const appActions = {
   /**
    * Open dialog for default download path setting
    */
-  defaultDownloadPath: function () {
+  selectDefaultDownloadPath: function () {
     dispatch({
-      actionType: appConstants.APP_DOWNLOAD_DEFAULT_PATH
+      actionType: appConstants.APP_SELECT_DEFAULT_DOWNLOAD_PATH
     })
   },
 
@@ -1630,15 +1630,6 @@ const appActions = {
     })
   },
 
-  onLedgerLocationUpdate: function (location, prop, value) {
-    dispatch({
-      actionType: appConstants.APP_ON_LEDGER_LOCATION_UPDATE,
-      location,
-      prop,
-      value
-    })
-  },
-
   onLedgerWalletCreate: function () {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_WALLET_CREATE
@@ -1813,6 +1804,32 @@ const appActions = {
   onBitcoinToBatBeginTransition: function () {
     dispatch({
       actionType: appConstants.APP_ON_BTC_TO_BAT_BEGIN_TRANSITION
+    })
+  },
+
+  onPublisherTimestamp: function (timestamp) {
+    dispatch({
+      actionType: appConstants.APP_ON_PUBLISHER_TIMESTAMP,
+      timestamp
+    })
+  },
+
+  onLedgerMediaData: function (url, type, tabId) {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_MEDIA_DATA,
+      url,
+      type,
+      tabId
+    })
+  },
+
+  onLedgerMediaPublisher: function (mediaKey, response, duration, revisited) {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER,
+      mediaKey,
+      response,
+      duration,
+      revisited
     })
   }
 }

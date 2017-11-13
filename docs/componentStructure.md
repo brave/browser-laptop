@@ -1,4 +1,4 @@
-#Component Structure
+# Component Structure
 
 The UI is made up of a tree like structure of React components.
 
@@ -20,7 +20,6 @@ All [React](https://facebook.github.io/react/) components (with the exception of
     - TabsToolbar
       - Tabs
         - [Tab]
-          - DragIndicator
       - TabsToolbarButtons
         - [Button]
     - [Frame]

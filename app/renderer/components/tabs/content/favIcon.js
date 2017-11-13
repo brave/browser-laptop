@@ -3,6 +3,7 @@
 * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const ReactDOM = require('react-dom')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
@@ -16,12 +17,19 @@ const tabUIState = require('../../../../common/state/tabUIState')
 const tabState = require('../../../../common/state/tabState')
 
 // Styles
+const globalStyles = require('../../styles/global')
+const {theme} = require('../../styles/theme')
+const {spinKeyframes, opacityIncreaseElementKeyframes} = require('../../styles/animations')
+
 const defaultIconSvg = require('../../../../extensions/brave/img/tabs/default.svg')
 const loadingIconSvg = require('../../../../extensions/brave/img/tabs/loading.svg')
-const {filter, color, spacing} = require('../../styles/global')
-const {spinKeyframes, opacityIncreaseKeyframes} = require('../../styles/animations')
 
 class Favicon extends React.Component {
+  constructor (props) {
+    super(props)
+    this.setRef = this.setRef.bind(this)
+  }
+
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const tabId = ownProps.tabId
@@ -47,76 +55,86 @@ class Favicon extends React.Component {
       : this.props.favicon || 'defaultIcon'
   }
 
+  componentDidMount (props) {
+    this.transitionInIfRequired()
+  }
+
+  componentDidUpdate (prevProps) {
+    this.transitionInIfRequired(prevProps)
+  }
+
+  transitionInIfRequired (prevProps) {
+    const shouldTransitionIn = (
+      // need to have the element created already
+      this.element &&
+      // we do not transition the loading animation
+      !this.props.tabLoading &&
+      // only if the icon changes (or is new)
+      (!prevProps || this.props.favicon !== prevProps.favicon)
+    )
+    if (shouldTransitionIn) {
+      this.element.animate(opacityIncreaseElementKeyframes, {
+        duration: 200,
+        easing: 'linear'
+      })
+    }
+  }
+
+  setRef (ref) {
+    this.element = ReactDOM.findDOMNode(ref)
+  }
+
   render () {
     if (!this.props.isPinned && !this.props.showIcon) {
       return null
     }
 
-    const iconStyles = StyleSheet.create({
-      icon__loading_color: {
-        filter: this.props.tabIconColor === 'white'
-          ? filter.makeWhite
-          : 'none'
-      },
-      icon__favicon: {
-        backgroundImage: `url(${this.props.favicon})`,
-        filter: this.props.tabIconColor === 'white'
-          ? filter.whiteShadow
-          : 'none'
-      },
-      icon__default_sizeAndColor: {
-        WebkitMaskSize: this.props.showIconAtReducedSize ? '10px' : '12px',
-        backgroundColor: this.props.tabIconColor === 'white'
-          ? color.white100
-          : color.mediumGray
-      }
-    })
+    const themeLight = this.props.tabIconColor === 'white'
+    const instanceStyles = { }
+    if (this.props.favicon) {
+      instanceStyles['--faviconsrc'] = `url(${this.props.favicon})`
+    }
 
     return <TabIcon
       data-test-favicon={this.props.favicon}
       data-test-id={this.testingIcon}
-      className={css(
-        styles.icon,
-        this.props.favicon && iconStyles.icon__favicon,
-        !this.props.isPinned && this.props.showIconWithLessMargin && styles.icon_lessMargin,
-        !this.props.isPinned && this.props.showIconAtReducedSize && styles.icon_reducedSize
-      )}
+      className={[
+        this.props.favicon && styles.icon_fav,
+        (this.props.favicon && themeLight) && styles.icon_favLight,
+        (!this.props.isPinned && this.props.showIconWithLessMargin) && styles.icon_lessMargin,
+        (!this.props.isPinned && this.props.showIconAtReducedSize) && styles.icon_reducedSize
+      ]}
+      style={instanceStyles}
+      ref={this.setRef}
       symbol={
         this.props.tabLoading
           ? (
             // no loading icon if there's no room for the icon
             !this.props.showIconAtReducedSize &&
-            css(styles.icon__loading, iconStyles.icon__loading_color)
+            css(
+              styles.icon__symbol_loading,
+              themeLight && styles.icon__symbol_loading_colorLight
+            )
           )
           : (
             !this.props.favicon &&
-            css(styles.icon__default, iconStyles.icon__default_sizeAndColor)
+            css(
+              styles.icon__symbol_default,
+              this.props.showIconAtReducedSize && styles.icon__symbol_default_reducedSize,
+              themeLight && styles.icon__symbol_default_colorLight
+            )
           )
       } />
   }
 }
 
-module.exports = ReduxComponent.connect(Favicon)
-
 const styles = StyleSheet.create({
-  icon: {
-    opacity: 0,
-    willChange: 'opacity',
-    animationName: opacityIncreaseKeyframes,
-    animationDelay: '50ms',
-    animationTimingFunction: 'linear',
-    animationDuration: '200ms',
-    animationFillMode: 'forwards',
+  icon_fav: {
+    backgroundImage: 'var(--faviconsrc)'
+  },
 
-    position: 'relative',
-    boxSizing: 'border-box',
-    width: spacing.iconSize,
-    height: spacing.iconSize,
-    backgroundSize: spacing.iconSize,
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    display: 'flex',
-    alignSelf: 'center'
+  icon_favLight: {
+    filter: theme.filter.whiteShadow
   },
 
   icon_lessMargin: {
@@ -124,13 +142,13 @@ const styles = StyleSheet.create({
   },
 
   icon_reducedSize: {
-    width: spacing.narrowIconSize,
+    width: globalStyles.spacing.narrowIconSize,
     height: '-webkit-fill-available',
     alignItems: 'center',
-    backgroundSize: spacing.narrowIconSize
+    backgroundSize: globalStyles.spacing.narrowIconSize
   },
 
-  icon__loading: {
+  icon__symbol_loading: {
     position: 'absolute',
     left: 0,
     willChange: 'transform',
@@ -143,9 +161,25 @@ const styles = StyleSheet.create({
     animationIterationCount: 'infinite'
   },
 
-  icon__default: {
+  icon__symbol_loading_colorLight: {
+    filter: theme.filter.whiteShadow
+  },
+
+  icon__symbol_default: {
     WebkitMaskRepeat: 'no-repeat',
     WebkitMaskPosition: 'center',
-    WebkitMaskImage: `url(${defaultIconSvg})`
+    WebkitMaskImage: `url(${defaultIconSvg})`,
+    WebkitMaskSize: '14px',
+    backgroundColor: theme.tab.icon.symbol.default.backgroundColor
+  },
+
+  icon__symbol_default_reducedSize: {
+    WebkitMaskSize: '10px'
+  },
+
+  icon__symbol_default_colorLight: {
+    backgroundColor: theme.tab.icon.symbol.default.light.backgroundColor
   }
 })
+
+module.exports = ReduxComponent.connect(Favicon)

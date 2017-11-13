@@ -23,7 +23,7 @@ const TabPages = require('../tabs/tabPages')
 const TabsToolbar = require('../tabs/tabsToolbar')
 const FindBar = require('./findbar')
 const UpdateBar = require('./updateBar')
-const {NotificationBar} = require('./notificationBar')
+const {NotificationBar, BraveNotificationBar} = require('./notificationBar')
 const DownloadsBar = require('../download/downloadsBar')
 const SiteInfo = require('./siteInfo')
 const BraveryPanel = require('./braveryPanel')
@@ -73,6 +73,9 @@ const isDarwin = platformUtil.isDarwin()
 const isWindows = platformUtil.isWindows()
 const isLinux = platformUtil.isLinux()
 
+const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
+
 class Main extends React.Component {
   constructor (props) {
     super(props)
@@ -85,6 +88,12 @@ class Main extends React.Component {
   registerWindowLevelShortcuts () {
     // For window level shortcuts that don't work as local shortcuts
     document.addEventListener('keydown', (e) => {
+      // TODO: This Alt+F4 check should not be needed but something
+      // is going on in muon causing it to not work when there's a webview.
+      if (e.key === 'F4' && e.altKey && isWindows) {
+        appActions.closeWindow(getCurrentWindowId())
+        return
+      }
       switch (e.which) {
         case keyCodes.ESC:
           this.exitFullScreen()
@@ -684,6 +693,9 @@ class Main extends React.Component {
             : null
         }
         {
+          <BraveNotificationBar />
+        }
+        {
           this.props.showUpdate
           ? <UpdateBar />
           : null
@@ -696,11 +708,10 @@ class Main extends React.Component {
         {
           this.props.isSinglePage
           ? null
-          : <div className={cx({
-            tabPages: true,
-            allowDragging: this.props.shouldAllowWindowDrag,
-            singlePage: this.props.isSinglePage
-          })}
+          : <div className={css(
+            styles.tabPagesWrap,
+            this.props.shouldAllowWindowDrag && styles.tabPagesWrap_allowDragging
+          )}
             onContextMenu={this.onTabContextMenu}>
             {
               this.props.showTabPages
@@ -740,5 +751,21 @@ class Main extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  tabPagesWrap: {
+    background: 'none',
+    display: 'flex',
+    justifyContent: 'center',
+    height: globalStyles.spacing.tabPagesHeight,
+    margin: `${globalStyles.spacing.navbarMenubarMargin} 0 ${globalStyles.spacing.navbarMenubarMargin} 0`,
+    position: 'relative',
+    zIndex: globalStyles.zindex.zindexTabs
+  },
+
+  tabPagesWrap_allowDragging: {
+    WebkitAppRegion: 'drag'
+  }
+})
 
 module.exports = ReduxComponent.connect(Main)

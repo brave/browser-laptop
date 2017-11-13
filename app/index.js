@@ -7,7 +7,6 @@
 
 let ready = false
 
-// Setup the crash handling
 const CrashHerald = require('./crash-herald')
 const telemetry = require('./telemetry')
 
@@ -20,7 +19,8 @@ const handleUncaughtError = (error) => {
   message = 'Uncaught Exception:\n' + stack
   console.error('An uncaught exception occurred in the main process ' + message)
 
-  // TODO(bridiver) - this should also send a notification to Brave
+  muon.crashReporter.setCrashKeyValue('javascript-info', JSON.stringify({stack}))
+  muon.crashReporter.dumpWithoutCrashing()
 
   if (!ready) {
     console.error('Waiting 60 seconds for process to load')
@@ -44,6 +44,10 @@ process.on('warning', warning => console.warn(warning.stack))
 
 if (process.platform === 'win32') {
   require('./windowsInit')
+}
+
+if (process.platform === 'linux') {
+  require('./linuxInit')
 }
 
 const electron = require('electron')
@@ -71,6 +75,7 @@ const locale = require('./locale')
 const contentSettings = require('../js/state/contentSettings')
 const privacy = require('../js/state/privacy')
 const settings = require('../js/constants/settings')
+const {getSetting} = require('../js/settings')
 const BookmarksExporter = require('./browser/bookmarksExporter')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
@@ -95,18 +100,15 @@ let loadAppStatePromise = SessionStore.loadAppState()
 
 // Some settings must be set right away on startup, those settings should be handled here.
 loadAppStatePromise.then((initialImmutableState) => {
-  telemetry.setCheckpointAndReport('state-loaded')
   const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED, SEND_CRASH_REPORTS} = require('../js/constants/settings')
-  if (initialImmutableState.getIn(['settings', HARDWARE_ACCELERATION_ENABLED]) === false) {
+  CrashHerald.init(getSetting(SEND_CRASH_REPORTS, initialImmutableState.get('settings')))
+
+  telemetry.setCheckpointAndReport('state-loaded')
+  if (getSetting(HARDWARE_ACCELERATION_ENABLED, initialImmutableState.get('settings')) === false) {
     app.disableHardwareAcceleration()
   }
-  if (initialImmutableState.getIn(['settings', SEND_CRASH_REPORTS]) !== false) {
-    console.log('Crash reporting enabled')
-    CrashHerald.init()
-  } else {
-    console.log('Crash reporting disabled')
-  }
-  if (initialImmutableState.getIn(['settings', SMOOTH_SCROLL_ENABLED]) === false) {
+
+  if (getSetting(SMOOTH_SCROLL_ENABLED, initialImmutableState.get('settings')) === false) {
     app.commandLine.appendSwitch('disable-smooth-scrolling')
   }
 })
@@ -133,14 +135,14 @@ const notifyCertError = (webContents, url, error, cert) => {
 }
 
 app.on('ready', () => {
-  app.on('certificate-error', (e, webContents, url, error, cert, resourceType, overridable, strictEnforcement, expiredPreviousDecision, cb) => {
+  app.on('certificate-error', (e, webContents, url, error, cert, resourceType, overridable, strictEnforcement, expiredPreviousDecision, muonCb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
-      cb('continue')
+      muonCb('continue')
       return
     } else {
-      cb('deny')
+      muonCb('deny')
     }
 
     if (resourceType !== 'mainFrame') {
@@ -220,7 +222,8 @@ app.on('ready', () => {
       if (['development', 'test'].includes(process.env.NODE_ENV)) {
         isDefaultBrowser = true
       } else if (process.platform === 'linux') {
-        const desktopName = 'brave.desktop'
+        const Channel = require('./channel')
+        const desktopName = Channel.getLinuxDesktopName()
         isDefaultBrowser = app.isDefaultProtocolClient('', desktopName)
       } else {
         isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
@@ -323,13 +326,12 @@ app.on('ready', () => {
     })
     // DO NOT TO THIS LIST - see above
 
-    // We need the initial state to read the UPDATE_TO_PREVIEW_RELEASES preference
     loadAppStatePromise.then((initialImmutableState) => {
       updater.init(
         process.platform,
         process.arch,
         process.env.BRAVE_UPDATE_VERSION || app.getVersion(),
-        initialImmutableState.getIn(['settings', settings.UPDATE_TO_PREVIEW_RELEASES])
+        process.env.BRAVE_ENABLE_PREVIEW_UPDATES !== undefined
       )
 
       // This is fired by a menu entry

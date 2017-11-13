@@ -182,6 +182,7 @@ var rendererIdentifiers = function () {
     'learnSpelling',
     'forgetLearnedSpelling',
     'lookupSelection',
+    'publisherMediaName',
     // Other identifiers
     'aboutBlankTitle',
     'urlCopied',
@@ -235,6 +236,9 @@ var rendererIdentifiers = function () {
     'walletConvertedDismiss',
     'walletConvertedLearnMore',
     'walletConvertedToBat',
+    'dappDetected',
+    'dappDismiss',
+    'dappEnableExtension',
     // other
     'passwordsManager',
     'extensionsManager',
@@ -248,6 +252,15 @@ var rendererIdentifiers = function () {
     'downloadItemClear',
     'downloadToolbarHide',
     'downloadItemClearCompleted',
+    'downloadCancelled',
+    'downloadCompleted',
+    'downloadInProgress',
+    'downloadInProgressUnknownTotal',
+    'downloadInterrupted',
+    'downloadUnauthorized',
+    'downloadLocalFile',
+    'downloadPaused',
+    'noDownloads',
     'torrentDesc',
     // Caption buttons in titlebar (min/max/close - Windows only)
     'windowCaptionButtonMinimize',
@@ -264,9 +277,12 @@ var rendererIdentifiers = function () {
     'allowAutoplay',
     'autoplayMedia',
     // Release channels
-    'channelDev',
-    'channelBeta'
-  ].concat(countryCodes)
+    'channelRelease',
+    'channelBeta',
+    'channelDeveloper',
+    'channelNightly',
+    'spellCheckLanguages'
+  ].concat(countryCodes).concat(availableLanguages)
 }
 
 var ctx = null
@@ -416,7 +432,10 @@ exports.init = function (language) {
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'error.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'passwords.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'common.properties'),
-      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'countries.properties')
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'countries.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'locales.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'preferences.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'downloads.properties')
       )
   }
 

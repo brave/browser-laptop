@@ -13,22 +13,10 @@ const cx = require('../../../../../js/lib/classSet')
 
 // Styles
 const globalStyles = require('../../styles/global')
+const {theme} = require('../../styles/theme')
 
 class TabIcon extends ImmutableComponent {
   render () {
-    const styles = StyleSheet.create({
-      tabIcon: {
-        fontSize: this.props.symbolContent ? '8px' : 'inherit',
-        display: 'flex',
-        width: globalStyles.spacing.iconSize,
-        height: globalStyles.spacing.iconSize,
-        alignItems: 'center',
-        justifyContent: this.props.symbolContent ? 'flex-end' : 'center',
-        fontWeight: this.props.symbolContent ? 'bold' : 'normal',
-        color: this.props.symbolContent ? globalStyles.color.black100 : 'inherit'
-      }
-    })
-
     let altProps
     if (!this.props.symbol) {
       altProps = {
@@ -38,11 +26,12 @@ class TabIcon extends ImmutableComponent {
     }
 
     return <div
-      className={this.props.className}
+      className={css(styles.tabIcon, this.props.className)}
       data-test-favicon={this.props['data-test-favicon']}
       onDragStart={this.props.onDragStart}
       draggable={this.props.draggable}
       onClick={this.props.onClick}
+      style={this.props.style}
       {...altProps}
     >
       {
@@ -50,7 +39,7 @@ class TabIcon extends ImmutableComponent {
           ? <span
             className={cx({
               [this.props.symbol]: true,
-              [css(styles.tabIcon)]: true
+              [css(styles.tabIcon, styles.tabIcon_symbol, this.props.symbolContent && styles.tabIcon_symbol_content)]: true
             })}
             data-test-id={this.props['data-test-id']}
             data-test2-id={this.props['data-test2-id']}
@@ -62,5 +51,45 @@ class TabIcon extends ImmutableComponent {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  tabIcon: {
+    boxSizing: 'border-box',
+    position: 'relative',
+    zIndex: globalStyles.zindex.zindexTabsThumbnail,
+
+    // Default spacing properties
+    height: globalStyles.spacing.iconSize,
+    width: globalStyles.spacing.iconSize,
+
+    // Default flex properties
+    display: 'flex',
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    // Default background properties
+    backgroundSize: globalStyles.spacing.iconSize,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+
+    // Default animation properties
+    willChange: 'opacity',
+    animationFillMode: 'forwards'
+  },
+
+  tabIcon_symbol: {
+    fontSize: 'inherit',
+    fontWeight: 'normal',
+    color: 'inherit'
+  },
+
+  tabIcon_symbol_content: {
+    fontSize: '8px',
+    fontWeight: 'bold',
+    justifyContent: 'flex-end',
+    color: theme.tab.icon.symbol.color
+  }
+})
 
 module.exports = TabIcon

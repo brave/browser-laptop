@@ -9,8 +9,8 @@ const config = require('../js/constants/buildConfig')
 
 // The current channel is retrieved first from the buildConfig constants file,
 // then the environments and finally defaults to dev
-var channel = config.channel || process.env.CHANNEL || 'dev'
-let channels = new Set(['dev', 'beta', 'stable', 'developer', 'nightly'])
+var channel = config.channel || process.env.CHANNEL || ''
+let channels = new Set(['dev', 'beta', 'stable', 'developer', 'nightly', ''])
 
 if (!channels.has(channel)) {
   throw new Error(`Invalid channel ${channel}`)
@@ -24,12 +24,31 @@ exports.formattedChannel = () => {
   const locale = require('./locale')
 
   const channelMapping = {
-    'dev': locale.translation('channelDev'),
-    'beta': locale.translation('channelBeta')
+    'dev': locale.translation('channelRelease'),
+    'beta': locale.translation('channelBeta'),
+    'developer': locale.translation('channelDeveloper'),
+    'nightly': locale.translation('channelNightly')
   }
   return Object.keys(channelMapping).includes(channel) ? channelMapping[channel] : channel
 }
 
-exports.browserLaptopRev = () => process.env.NODE_ENV === 'development'
-  ? require('git-rev-sync').long()
-  : config.BROWSER_LAPTOP_REV
+exports.getLinuxDesktopName = () => {
+  let desktopName
+  switch (channel) {
+    case 'dev':
+      desktopName = 'brave.desktop'
+      break
+    case 'beta':
+      desktopName = 'brave-beta.desktop'
+      break
+    case 'developer':
+      desktopName = 'brave-developer.desktop'
+      break
+    case 'nightly':
+      desktopName = 'brave-nightly.desktop'
+      break
+    default:
+      desktopName = 'brave.desktop'
+  }
+  return desktopName
+}

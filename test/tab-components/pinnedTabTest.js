@@ -2,7 +2,6 @@
 
 const Brave = require('../lib/brave')
 
-const messages = require('../../js/constants/messages')
 const {urlInput, tabsTabs, pinnedTabsTabs} = require('../lib/selectors')
 
 describe('pinnedTabs', function () {
@@ -290,11 +289,12 @@ describe('pinnedTabs', function () {
         .click(pinnedTabsTabs)
         .waitForElementCount(pinnedTabsTabs + '[data-test-active-tab]', 1)
     })
-    it('close attempt retains pinned tab and selects next active frame', function * () {
+    it('closes the pinned with middle click', function * () {
       yield this.app.client
-        .waitForExist('[data-test-active-tab][data-frame-key="2"]')
-        .ipcSend(messages.SHORTCUT_CLOSE_FRAME)
-        .waitForExist('[data-test-active-tab][data-frame-key="1"]')
+        .click(pinnedTabsTabs)
+        .waitForExist('[data-test-active-tab]')
+        .middleClick(pinnedTabsTabs)
+        .waitForElementCount(pinnedTabsTabs, 0)
     })
   })
 

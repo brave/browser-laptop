@@ -5,6 +5,7 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -89,7 +90,8 @@ class PinnedTabs extends React.Component {
   render () {
     this.tabRefs = []
     return <div
-      className='pinnedTabs'
+      className={css(styles.pinnedTabs)}
+      data-test-id='pinnedTabs'
       onDragOver={this.onDragOver}
       onDrop={this.onDrop}>
       {
@@ -105,5 +107,14 @@ class PinnedTabs extends React.Component {
     </div>
   }
 }
+
+const styles = StyleSheet.create({
+  pinnedTabs: {
+    height: '-webkit-fill-available',
+    boxSizing: 'border-box',
+    marginLeft: 0,
+    marginTop: 0
+  }
+})
 
 module.exports = ReduxComponent.connect(PinnedTabs)

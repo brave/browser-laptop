@@ -3,7 +3,8 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite/no-important')
+const ReactDOM = require('react-dom')
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
@@ -18,14 +19,15 @@ const tabState = require('../../../../common/state/tabState')
 const windowActions = require('../../../../../js/actions/windowActions')
 
 // Styles
-const {widthIncreaseKeyframes} = require('../../styles/animations')
 const globalStyles = require('../../styles/global')
 const {theme} = require('../../styles/theme')
+const {widthIncreaseElementKeyframes} = require('../../styles/animations')
 
 class AudioTabIcon extends React.Component {
   constructor (props) {
     super(props)
     this.toggleMute = this.toggleMute.bind(this)
+    this.setRef = this.setRef.bind(this)
   }
 
   get audioIcon () {
@@ -56,6 +58,46 @@ class AudioTabIcon extends React.Component {
     return props
   }
 
+  componentDidMount (props) {
+    this.transitionIfRequired()
+  }
+
+  componentDidUpdate (prevProps) {
+    this.transitionIfRequired(prevProps)
+  }
+
+  transitionIfRequired (prevProps) {
+    const shouldTransitionIn = (
+      // need to have the element created already
+      this.element &&
+      // no icon is showing if pinned tab
+      !this.props.isPinned &&
+      // should show the icon
+      // TODO: if we want to animate the unmounting of the component (when
+      // audio is stopped), then we should use https://github.com/reactjs/react-transition-group
+      // For now, we'll just not do anything since we can't - the element
+      // will have already been removed
+      this.props.showAudioIcon &&
+      // state has changed
+      (!prevProps || this.props.showAudioIcon !== prevProps.showAudioIcon)
+    )
+    if (shouldTransitionIn) {
+      // TODO: measure element width if this ever becomes dynamic since
+      // it's not great to specify complex size logic in two places
+      // or animate a child element using transform: translateX
+      // in order to achieve the slide-in
+      const transitionKeyframes = widthIncreaseElementKeyframes(0, globalStyles.spacing.iconSize)
+      this.element.animate(transitionKeyframes, {
+        duration: 100,
+        easing: 'linear'
+      })
+    }
+  }
+
+  setRef (ref) {
+    this.element = ReactDOM.findDOMNode(ref)
+  }
+
   render () {
     if (this.props.isPinned || !this.props.showAudioIcon) {
       return null
@@ -63,36 +105,23 @@ class AudioTabIcon extends React.Component {
 
     return <TabIcon
       data-test-id={this.audioIcon}
-      className={css(styles.audioTab__icon)}
+      className={styles.icon_audio}
       symbol={this.audioIcon}
       onClick={this.toggleMute}
+      ref={this.setRef}
     />
   }
 }
 
 const styles = StyleSheet.create({
-  audioTab__icon: {
-    width: 0,
-    animationName: widthIncreaseKeyframes(0, globalStyles.spacing.iconSize),
-    animationDelay: '50ms',
-    animationTimingFunction: 'linear',
-    animationDuration: '100ms',
-    animationFillMode: 'forwards',
-
+  icon_audio: {
     overflow: 'hidden',
     margin: '0 -2px 0 2px',
-    zIndex: globalStyles.zindex.zindexTabsAudioTopBorder,
-    color: theme.tab.content.icon.audio.color,
+    color: theme.tab.icon.audio.color,
     fontSize: '13px',
-    height: globalStyles.spacing.iconSize,
-    backgroundSize: globalStyles.spacing.iconSize,
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    display: 'flex',
-    alignSelf: 'center',
-    position: 'relative',
-    textAlign: 'center',
-    justifyContent: 'center'
+
+    // Override default properties
+    zIndex: globalStyles.zindex.zindexTabsAudioTopBorder
   }
 })
 

@@ -493,8 +493,8 @@ class Frame extends React.Component {
           // Favicon changes lead to recalculation of top site data so only fire
           // this when needed.  Some sites update favicons very frequently.
           e.favicons[0] !== this.frame.get('icon')) {
-        imageUtil.getWorkingImageUrl(e.favicons[0], (imageFound) => {
-          windowActions.setFavicon(this.frame, imageFound ? e.favicons[0] : null)
+        imageUtil.getWorkingImageUrl(e.favicons[0], (error) => {
+          windowActions.setFavicon(this.frame, error ? null : e.favicons[0])
         })
       }
     }, { passive: true })

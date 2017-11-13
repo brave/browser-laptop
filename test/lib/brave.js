@@ -27,7 +27,7 @@ const logVerbose = (string, ...rest) => {
 }
 
 const generateUserDataDir = () => {
-  return path.join(os.tmpdir(), 'brave-test', (new Date().getTime()) + Math.floor(Math.random() * 1000).toString())
+  return process.env.BRAVE_USER_DATA_DIR || path.join(os.tmpdir(), 'brave-test', (new Date().getTime()) + Math.floor(Math.random() * 1000).toString())
 }
 
 const rmDir = (dirPath) => {
@@ -345,7 +345,7 @@ var exports = {
         .waitForVisible(urlInput)
     })
 
-    this.app.client.addCommand('waitForUrl', function (url) {
+    this.app.client.addCommand('waitForUrl', function (url, timeout = 5000, interval = 100) {
       logVerbose('waitForUrl("' + url + '")')
       return this.waitUntil(function () {
         return this.tabByUrl(url).then((response) => {
@@ -355,7 +355,7 @@ var exports = {
           logVerbose('tabByUrl("' + url + '") => false')
           return false
         })
-      }, 5000, null, 100)
+      }, timeout, null, interval)
     })
 
     this.app.client.addCommand('waitForSelectedText', function (text) {
@@ -675,6 +675,13 @@ var exports = {
       }, sourcePinKey, destinationPinKey, prepend)
     })
 
+    this.app.client.addCommand('moveTabIncrementally', function (moveNext, windowId = 1) {
+      logVerbose(`moveTabIncrementally(${moveNext}, ${windowId}`)
+      return this.execute(function (moveNext, windowId) {
+        return devTools('electron').testData.windowActions.tabMoveIncrementalRequested(windowId, moveNext)
+      }, moveNext, windowId)
+    })
+
     this.app.client.addCommand('ipcOn', function (message, fn) {
       logVerbose('ipcOn("' + message + '")')
       return this.execute(function (message, fn) {
@@ -703,7 +710,7 @@ var exports = {
       }).then((response) => response.value)
     })
 
-    this.app.client.addCommand('newTab', function (createProperties = {}) {
+    this.app.client.addCommand('newTab', function (createProperties = {}, activateIfOpen = false, isRestore = false) {
       return this
         .execute(function (createProperties) {
           return devTools('appActions').createTabRequested(createProperties)
@@ -713,6 +720,15 @@ var exports = {
     this.app.client.addCommand('activateTabByIndex', function (index) {
       return this.waitForTab({index}).getAppState().then((val) => {
         const tab = val.value.tabs.find((tab) => tab.index === index)
+        return this.execute(function (tabId) {
+          devTools('appActions').tabActivateRequested(tabId)
+        }, tab.tabId)
+      })
+    })
+
+    this.app.client.addCommand('activateTabByFrameKey', function (key) {
+      return this.getAppState().then((val) => {
+        const tab = val.value.tabs.find((tab) => tab.frame.key === key)
         return this.execute(function (tabId) {
           devTools('appActions').tabActivateRequested(tabId)
         }, tab.tabId)
@@ -733,20 +749,18 @@ var exports = {
       return this.execute(function (siteDetail) {
         return devTools('appActions').addBookmark(siteDetail)
       }, siteDetail).then((response) => response.value)
-      .waitForBookmarkEntry(waitUrl, false)
+      .waitForBookmarkEntry(waitUrl)
     })
 
-    this.app.client.addCommand('waitForBookmarkEntry', function (location, waitForTitle = true) {
-      logVerbose('waitForBookmarkEntry("' + location + '", "' + waitForTitle + '")')
+    this.app.client.addCommand('waitForBookmarkEntry', function (location) {
+      logVerbose('waitForBookmarkEntry("' + location + '")')
       return this.waitUntil(function () {
         return this.getAppState().then((val) => {
-          const ret = val.value && val.value.bookmarks && Array.from(Object.values(val.value.bookmarks)).find(
-              (bookmark) => bookmark.location === location &&
-              (!waitForTitle || (waitForTitle && bookmark.title)))
-          logVerbose('waitForBookmarkEntry("' + location + ', ' + waitForTitle + '") => ' + ret)
+          const ret = val.value.cache.bookmarkLocation.hasOwnProperty(location)
+          logVerbose('waitForBookmarkEntry("' + location + '") => ' + ret)
           return ret
         })
-      }, 5000, null, 100)
+      }, 10000, null, 100)
     })
 
     /**
@@ -1149,15 +1163,20 @@ var exports = {
     })
   },
 
-  startApp: function () {
+  /**
+   * @param {Array=} extraArgs
+   */
+  startApp: function (extraArgs) {
     if (process.env.KEEP_BRAVE_USER_DATA_DIR) {
       console.log('BRAVE_USER_DATA_DIR=' + userDataDir)
     }
     let env = {
       NODE_ENV: 'test',
-      BRAVE_USER_DATA_DIR: userDataDir,
+      CHROME_USER_DATA_DIR: userDataDir,
       SPECTRON: true
     }
+    let args = ['./', '--enable-logging', '--v=1']
+    if (extraArgs) { args = args.concat(extraArgs) }
     this.app = new Application({
       quitTimeout: 0,
       waitTimeout: exports.defaultTimeout,
@@ -1167,7 +1186,7 @@ var exports = {
         ? 'node_modules/electron-prebuilt/dist/brave.exe'
         : './node_modules/.bin/electron',
       env,
-      args: ['./', '--enable-logging', '--v=1'],
+      args,
       requireName: 'devTools'
     })
     return this.app.start()

@@ -3,7 +3,8 @@
 * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const {StyleSheet, css} = require('aphrodite/no-important')
+const ReactDOM = require('react-dom')
+const {StyleSheet} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
@@ -17,10 +18,16 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // Styles
 const globalStyles = require('../../styles/global')
-const {opacityIncreaseKeyframes} = require('../../styles/animations')
+const {opacityIncreaseElementKeyframes} = require('../../styles/animations')
+
 const newSessionSvg = require('../../../../extensions/brave/img/tabs/new_session.svg')
 
 class NewSessionIcon extends React.Component {
+  constructor (props) {
+    super(props)
+    this.setRef = this.setRef.bind(this)
+  }
+
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const tabId = ownProps.tabId
@@ -35,6 +42,38 @@ class NewSessionIcon extends React.Component {
     props.tabId = tabId
 
     return props
+  }
+
+  componentDidMount (props) {
+    this.transitionInIfRequired()
+  }
+
+  componentDidUpdate (prevProps) {
+    this.transitionInIfRequired(prevProps)
+  }
+
+  transitionInIfRequired (prevProps) {
+    const shouldTransitionIn = (
+      // need to have the element created already
+      this.element &&
+      // no icon is showing if pinned tab
+      !this.props.isPinned &&
+      // make sure icon should show
+      this.props.showPartitionIcon && this.props.partitionNumber !== 0 &&
+      // only if the icon showing is a new state
+      // check the previous state to see if it was not showing
+      (!prevProps || !prevProps.showPartitionIcon || prevProps.partitionNumber === 0)
+    )
+    if (shouldTransitionIn) {
+      this.element.animate(opacityIncreaseElementKeyframes, {
+        duration: 200,
+        easing: 'linear'
+      })
+    }
+  }
+
+  setRef (ref) {
+    this.element = ReactDOM.findDOMNode(ref)
   }
 
   render () {
@@ -56,36 +95,27 @@ class NewSessionIcon extends React.Component {
 
     return <TabIcon symbol
       data-test-id='newSessionIcon'
-      className={css(styles.newSession__icon, newSessionProps.newSession__indicator)}
+      className={[
+        styles.icon_newSession,
+        newSessionProps.newSession__indicator
+      ]}
       symbolContent={this.props.partitionNumber}
       l10nArgs={{partitionNumber: this.props.partitionNumber}}
       l10nId='sessionInfoTab'
+      ref={this.setRef}
     />
   }
 }
 
-module.exports = ReduxComponent.connect(NewSessionIcon)
-
 const styles = StyleSheet.create({
-  newSession__icon: {
-    opacity: 0,
-    willChange: 'opacity',
-    animationName: opacityIncreaseKeyframes,
-    animationDelay: '100ms',
-    animationTimingFunction: 'linear',
-    animationDuration: '200ms',
-    animationFillMode: 'forwards',
-
-    zIndex: globalStyles.zindex.zindexTabsThumbnail,
-    boxSizing: 'border-box',
-    display: 'flex',
-    alignItems: 'center',
+  icon_newSession: {
     backgroundImage: `url(${newSessionSvg})`,
     backgroundPosition: 'center left',
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: '13px',
-    width: globalStyles.spacing.iconSize,
-    height: globalStyles.spacing.iconSize,
-    marginRight: globalStyles.spacing.defaultTabMargin
+    marginRight: globalStyles.spacing.defaultTabMargin,
+
+    // Override default properties
+    backgroundSize: globalStyles.spacing.newSessionIconSize
   }
 })
+
+module.exports = ReduxComponent.connect(NewSessionIcon)

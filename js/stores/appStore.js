@@ -179,6 +179,7 @@ const handleAppAction = (action) => {
     reducers = [
       require('../../app/browser/reducers/downloadsReducer'),
       require('../../app/browser/reducers/flashReducer'),
+      require('../../app/browser/reducers/dappReducer'),
       require('../../app/browser/reducers/autoplayReducer'),
       // tabs, sites and windows reducers need to stay in that order
       // until we have a better way to manage dependencies.
@@ -492,7 +493,8 @@ const handleAppAction = (action) => {
       if (action.useBrave) {
         let isDefaultBrowser
         if (platformUtil.isLinux()) {
-          const desktopName = 'brave.desktop'
+          const Channel = require('../../app/channel')
+          const desktopName = Channel.getLinuxDesktopName()
           for (const p of defaultProtocols) {
             app.setAsDefaultProtocolClient(p, desktopName)
             app.setAsDefaultProtocolClient('', desktopName)
@@ -517,9 +519,9 @@ const handleAppAction = (action) => {
         calculateTopSites(false)
       }
       break
-    case appConstants.APP_RENDER_URL_TO_PDF:
+    case appConstants.APP_RENDER_TO_PDF:
       const pdf = require('../../app/pdf')
-      appState = pdf.renderUrlToPdf(appState, action)
+      appState = pdf.renderToPdf(appState, action)
       break
     case appConstants.APP_SET_OBJECT_ID:
       let obj = appState.getIn(action.objectPath)

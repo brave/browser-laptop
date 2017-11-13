@@ -45,12 +45,12 @@ class NavigationBar extends React.Component {
     const loading = activeFrame.get('loading')
     const location = activeFrame.get('location', '')
     const locationId = getBaseUrl(location)
-    const publisherId = ledgerState.getLocationProp(state, locationId, 'publisher')
+    const publisherKey = ledgerState.getLocationProp(state, locationId, 'publisher')
     const navbar = activeFrame.get('navbar', Immutable.Map())
     const locationCache = bookmarkLocationCache.getCacheKey(state, location)
 
     const hasTitle = title && location && title !== location.replace(/^https?:\/\//, '')
-    const titleMode = activeTabShowingMessageBox ||
+    const titleMode =
       (
         mouseInTitlebar === false &&
         bookmarkDetail.isEmpty() &&
@@ -65,6 +65,7 @@ class NavigationBar extends React.Component {
     const props = {}
     // used in renderer
     props.activeFrameKey = activeFrameKey
+    props.activeTabShowingMessageBox = activeTabShowingMessageBox
     props.titleMode = titleMode
     props.isWideUrlBarEnabled = getSetting(settings.WIDE_URL_BAR)
     props.showBookmarkHanger = bookmarkDetail.get('isBookmarkHanger', false)
@@ -72,7 +73,7 @@ class NavigationBar extends React.Component {
     props.isFocused = navbar.getIn(['urlbar', 'focused'], false)
     props.shouldRenderSuggestions = navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
     props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
-    props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherId)
+    props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherKey)
     props.activeTabId = activeTabId
     props.bookmarkKey = locationCache.get(0, false)
 
@@ -85,7 +86,7 @@ class NavigationBar extends React.Component {
       data-frame-key={this.props.activeFrameKey}
       className={cx({
         titleMode: this.props.titleMode,
-        [css(styles.navigator_wide)]: this.props.isWideUrlBarEnabled
+        [css(this.props.activeTabShowingMessageBox && styles.navigator_isActiveTabShowingMessageBox, this.props.isWideUrlBarEnabled && styles.navigator_wide)]: true
       })}>
       {
         this.props.showBookmarkHanger
@@ -118,8 +119,13 @@ class NavigationBar extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  navigator_wide: {
+  navigator_isActiveTabShowingMessageBox: {
+    // See browserButton_disabled and braveMenu_disabled
+    opacity: 0.25,
+    pointerEvents: 'none'
+  },
 
+  navigator_wide: {
     // TODO: Refactor navigationBar.js to remove !important
     maxWidth: '100% !important',
     marginRight: '0 !important',

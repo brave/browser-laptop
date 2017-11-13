@@ -7,7 +7,6 @@
 const electron = require('electron')
 const session = electron.session
 const underscore = require('underscore')
-const util = require('util')
 const urlParse = require('../../app/common/urlParse')
 
 /**
@@ -43,13 +42,13 @@ module.exports.request = (options, callback) => {
                               [ 'statusCode', 'statusMessage', 'headers', 'httpVersionMajor', 'httpVersionMinor' ])
 
     underscore.keys(rsp.headers).forEach((header) => {
-      if (util.isArray(rsp.headers[header])) rsp.headers[header] = rsp.headers[header][0]
+      if (Array.isArray(rsp.headers[header])) rsp.headers[header] = rsp.headers[header][0]
     })
 
     if (err) return callback(err, rsp)
 
     underscore.defaults(rsp, { statusMessage: '', httpVersionMajor: 1, httpVersionMinor: 1 })
-    if (responseType !== 'text') body = new Buffer(body, 'binary')
+    if (responseType !== 'text') body = Buffer.from(body, 'binary')
     if (responseType === 'blob') body = 'data:' + rsp.headers['content-type'] + ';base64,' + body.toString('base64')
 
     callback(null, rsp, body)

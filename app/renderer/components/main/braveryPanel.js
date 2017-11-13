@@ -11,7 +11,7 @@ const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
 const BrowserButton = require('../common/browserButton')
 const SwitchControl = require('../common/switchControl')
-const {BraveryPanelDropdown} = require('../common/dropdown')
+const {FormDropdown} = require('../common/dropdown')
 
 // Constants
 const config = require('../../../../js/constants/config')
@@ -506,11 +506,18 @@ class BraveryPanel extends React.Component {
                   !this.props.isCompactBraveryPanel && styles.braveryPanel__body__advanced__control__forms__dropdown,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__dropdown
                 )}>
-                  <BraveryPanelDropdown data-test-id='adsBlockedControl' value={this.props.adControl} onChange={this.onToggleAdControl} disabled={!this.props.shieldsUp}>
+                  <FormDropdown
+                    data-isFullWidth
+                    data-isBraveryPanel
+                    data-test-id='adsBlockedControl'
+                    value={this.props.adControl}
+                    onChange={this.onToggleAdControl}
+                    disabled={!this.props.shieldsUp}
+                  >
                     <option data-l10n-id='showBraveAds' data-test-id='showBraveAds' value='showBraveAds' />
                     <option data-l10n-id='blockAds' data-test-id='blockAdsOption' value='blockAds' />
                     <option data-l10n-id='allowAdsAndTracking' data-test-id='showAdsOption' value='allowAdsAndTracking' />
-                  </BraveryPanelDropdown>
+                  </FormDropdown>
                 </div>
 
                 <SwitchControl className={css(
@@ -552,11 +559,18 @@ class BraveryPanel extends React.Component {
                   this.props.isCompactBraveryPanel && gridStyles.row4col1,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__dropdown
                 )}>
-                  <BraveryPanelDropdown data-test-id='cookieControl' value={this.props.cookieControl} onChange={this.onToggleCookieControl} disabled={!this.props.shieldsUp}>
+                  <FormDropdown
+                    data-isFullWidth
+                    data-isBraveryPanel
+                    data-test-id='cookieControl'
+                    value={this.props.cookieControl}
+                    onChange={this.onToggleCookieControl}
+                    disabled={!this.props.shieldsUp}
+                  >
                     <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
                     <option data-l10n-id='allowAllCookies' data-test-id='allowAllCookies' value='allowAllCookies' />
                     <option data-l10n-id='blockAllCookies' data-test-id='blockAllCookies' value='blockAllCookies' />
-                  </BraveryPanelDropdown>
+                  </FormDropdown>
                 </div>
 
                 <div className={css(
@@ -580,15 +594,18 @@ class BraveryPanel extends React.Component {
                   this.props.isCompactBraveryPanel && gridStyles.row6col1,
                   this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__forms__dropdown
                 )}>
-                  <BraveryPanelDropdown
+                  <FormDropdown
+                    data-isFullWidth
+                    data-isBraveryPanel
                     data-test-id='fpControl'
                     value={this.props.fingerprintingProtection}
                     onChange={this.onToggleFp}
-                    disabled={!this.props.shieldsUp}>
+                    disabled={!this.props.shieldsUp}
+                  >
                     <option data-l10n-id='block3rdPartyFingerprinting' data-test-id='block3rdPartyFingerprinting' value='block3rdPartyFingerprinting' />
                     <option data-l10n-id='allowAllFingerprinting' data-test-id='allowAllFingerprinting' value='allowAllFingerprinting' />
                     <option data-l10n-id='blockAllFingerprinting' data-test-id='blockAllFingerprinting' value='blockAllFingerprinting' />
-                  </BraveryPanelDropdown>
+                  </FormDropdown>
                 </div>
 
                 <SwitchControl className={css(
@@ -904,7 +921,9 @@ const styles = StyleSheet.create({
     overflowY: 'auto',
     marginTop: '-20px',
     padding: '10px',
-    userSelect: 'initial'
+
+    // #11641
+    userSelect: 'text'
   },
   braveryPanel__body__ul__li: {
     listStyleType: 'none',

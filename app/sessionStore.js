@@ -18,6 +18,7 @@ const assert = require('assert')
 const Immutable = require('immutable')
 const app = electron.app
 const compareVersions = require('compare-versions')
+const merge = require('deepmerge')
 
 // Constants
 const UpdateStatus = require('../js/constants/updateStatus')
@@ -37,6 +38,7 @@ const filtering = require('./filtering')
 const autofill = require('./autofill')
 const {navigatableTypes} = require('../js/lib/appUrlUtil')
 const Channel = require('./channel')
+const BuildConfig = require('./buildConfig')
 const {isImmutable, makeImmutable, deleteImmutablePaths} = require('./common/state/immutableUtil')
 const {getSetting} = require('../js/settings')
 const platformUtil = require('./common/lib/platformUtil')
@@ -249,21 +251,25 @@ module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
   // Clean closed frame data before frames because the keys are re-ordered
   // and the new next key is calculated in windowStore.js based on
   // the max frame key ID.
-  if (immutablePerWindowData.get('closedFrames')) {
+  let closedFrames = immutablePerWindowData.get('closedFrames')
+  if (closedFrames) {
+    closedFrames = closedFrames.filter((frame) => frame)
+    immutablePerWindowData = immutablePerWindowData.set('closedFrames', closedFrames)
+    // clean each frame
     immutablePerWindowData =
-      immutablePerWindowData.get('closedFrames').reduce((immutablePerWindowData, immutableFrame, index) => {
+      closedFrames.reduce((immutablePerWindowData, immutableFrame, index) => {
         const cleanImmutableFrame = cleanFrame(immutableFrame, false)
         return immutablePerWindowData.setIn(['closedFrames', index], cleanImmutableFrame)
       }, immutablePerWindowData)
   }
-  let immutableFrames = immutablePerWindowData.get('frames')
-  if (immutableFrames) {
+  let frames = immutablePerWindowData.get('frames')
+  if (frames) {
     // Don't restore pinned locations because they will be auto created by the app state change event
-    immutableFrames = immutableFrames
-        .filter((frame) => !frame.get('pinnedLocation'))
-    immutablePerWindowData = immutablePerWindowData.set('frames', immutableFrames)
+    frames = frames.filter((frame) => frame && !frame.get('pinnedLocation'))
+    immutablePerWindowData = immutablePerWindowData.set('frames', frames)
+    // clean each frame
     immutablePerWindowData =
-      immutableFrames.reduce((immutablePerWindowData, immutableFrame, index) => {
+      frames.reduce((immutablePerWindowData, immutableFrame, index) => {
         const cleanImmutableFrame = cleanFrame(immutableFrame, true)
         return immutablePerWindowData.setIn(['frames', index], cleanImmutableFrame)
       }, immutablePerWindowData)
@@ -466,7 +472,7 @@ const safeGetVersion = (fieldName, getFieldVersion) => {
 const setVersionInformation = (immutableData) => {
   const versionFields = [
     ['Brave', app.getVersion],
-    ['rev', Channel.browserLaptopRev],
+    ['rev', BuildConfig.browserLaptopRev],
     ['Muon', () => { return process.versions['atom-shell'] }],
     ['libchromiumcontent', () => { return process.versions['chrome'] }],
     ['V8', () => { return process.versions.v8 }],
@@ -845,7 +851,7 @@ module.exports.loadAppState = () => {
       data = {}
     }
 
-    data = Object.assign({}, module.exports.defaultAppState(), data)
+    data = merge(module.exports.defaultAppState(), data)
     data = module.exports.runImportDefaultSettings(data)
     if (loaded) {
       data = module.exports.runPreMigrations(data)
@@ -921,7 +927,8 @@ module.exports.defaultAppState = () => {
     },
     cache: {
       bookmarkLocation: undefined,
-      bookmarkOrder: {}
+      bookmarkOrder: {},
+      ledgerVideos: {}
     },
     pinnedSites: {},
     bookmarks: {},
@@ -973,11 +980,8 @@ module.exports.defaultAppState = () => {
       info: {},
       last: {
         info: '',
-        url: '',
         tabId: -1
-      },
-      load: [],
-      view: {}
+      }
     },
     ledger: {
       about: {

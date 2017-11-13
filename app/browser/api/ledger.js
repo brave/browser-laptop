@@ -26,6 +26,7 @@ const appActions = require('../../../js/actions/appActions')
 // State
 const ledgerState = require('../../common/state/ledgerState')
 const pageDataState = require('../../common/state/pageDataState')
+const migrationState = require('../../common/state/migrationState')
 
 // Constants
 const settings = require('../../../js/constants/settings')
@@ -34,13 +35,16 @@ const messages = require('../../../js/constants/messages')
 // Utils
 const tabs = require('../../browser/tabs')
 const locale = require('../../locale')
-const appConfig = require('../../../js/constants/appConfig')
 const getSetting = require('../../../js/settings').getSetting
-const {fileUrl, getSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
+const {fileUrl, getSourceAboutUrl, isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 const urlParse = require('../../common/urlParse')
 const ruleSolver = require('../../extensions/brave/content/scripts/pageInformation')
 const request = require('../../../js/lib/request')
 const ledgerUtil = require('../../common/lib/ledgerUtil')
+const tabState = require('../../common/state/tabState')
+const pageDataUtil = require('../../common/lib/pageDataUtil')
+const ledgerNotifications = require('./ledgerNotifications')
+const ledgerVideoCache = require('../../common/cache/ledgerVideoCache')
 
 // Caching
 let locationDefault = 'NOOP'
@@ -71,9 +75,8 @@ let runTimeoutId
 // Database
 let v2RulesetDB
 const v2RulesetPath = 'ledger-rulesV2.leveldb'
-let v2PublishersDB
-const v2PublishersPath = 'ledger-publishersV2.leveldb'
 const statePath = 'ledger-state.json'
+const newClientPath = 'ledger-newstate.json'
 
 // Definitions
 const miliseconds = {
@@ -94,285 +97,19 @@ const clientOptions = {
   version: 'v2'
 }
 const fileTypes = {
-  bmp: new Buffer([0x42, 0x4d]),
-  gif: new Buffer([0x47, 0x49, 0x46, 0x38, [0x37, 0x39], 0x61]),
-  ico: new Buffer([0x00, 0x00, 0x01, 0x00]),
-  jpeg: new Buffer([0xff, 0xd8, 0xff]),
-  png: new Buffer([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+  bmp: Buffer.from([0x42, 0x4d]),
+  gif: Buffer.from([0x47, 0x49, 0x46, 0x38, [0x37, 0x39], 0x61]),
+  ico: Buffer.from([0x00, 0x00, 0x01, 0x00]),
+  jpeg: Buffer.from([0xff, 0xd8, 0xff]),
+  png: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 }
 const minimumVisitTimeDefault = 8 * 1000
-const nextAddFundsTime = 3 * miliseconds.day
 let signatureMax = 0
 underscore.keys(fileTypes).forEach((fileType) => {
   if (signatureMax < fileTypes[fileType].length) signatureMax = fileTypes[fileType].length
 })
 signatureMax = Math.ceil(signatureMax * 1.5)
 
-// Notifications
-const sufficientBalanceToReconcile = (state) => {
-  const balance = Number(ledgerState.getInfoProp(state, 'balance') || 0)
-  const unconfirmed = Number(ledgerState.getInfoProp(state, 'unconfirmed') || 0)
-  const bat = ledgerState.getInfoProp(state, 'bat')
-  return bat && (balance + unconfirmed > 0.9 * Number(bat))
-}
-const hasFunds = (state) => {
-  const balance = getSetting(settings.PAYMENTS_ENABLED)
-    ? Number(ledgerState.getInfoProp(state, 'balance') || 0)
-    : 0
-  return balance > 0
-}
-const shouldShowNotificationReviewPublishers = () => {
-  const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP)
-  return !nextTime || (new Date().getTime() > nextTime)
-}
-const shouldShowNotificationAddFunds = () => {
-  const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP)
-  return !nextTime || (new Date().getTime() > nextTime)
-}
-const notifications = {
-  text: {
-    hello: locale.translation('updateHello'),
-    paymentDone: undefined,
-    addFunds: locale.translation('addFundsNotification'),
-    tryPayments: locale.translation('notificationTryPayments'),
-    reconciliation: locale.translation('reconciliationNotification'),
-    walletConvertedToBat: locale.translation('walletConvertedToBat')
-  },
-  pollingInterval: 15 * miliseconds.minutes,
-  timeout: undefined,
-  displayOptions: {
-    style: 'greetingStyle',
-    persist: false
-  },
-  init: (state) => {
-    // Check if relevant browser notifications should be shown every 15 minutes
-    if (notifications.timeout) {
-      clearInterval(notifications.timeout)
-    }
-    notifications.timeout = setInterval((state) => {
-      notifications.onInterval(state)
-    }, notifications.pollingInterval, state)
-  },
-  onLaunch: (state) => {
-    if (!getSetting(settings.PAYMENTS_ENABLED)) {
-      return state
-    }
-
-    // One time conversion of wallet
-    const isNewInstall = state.get('firstRunTimestamp') === state.getIn(['migrations', 'batMercuryTimestamp'])
-    const hasUpgradedWallet = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatTimestamp'])
-    if (!isNewInstall && !hasUpgradedWallet) {
-      state = state.setIn(['migrations', 'btc2BatTransitionPending'], true)
-      module.exports.transitionWalletToBat()
-    }
-
-    if (hasFunds(state)) {
-      // Don't bother processing the rest, which are only notifications.
-      if (!getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
-        return state
-      }
-
-      // Show one-time BAT conversion message:
-      // - if payments are enabled
-      // - user has a positive balance
-      // - this is an existing profile (new profiles will have firstRunTimestamp matching batMercuryTimestamp)
-      // - wallet has been transitioned
-      // - notification has not already been shown yet
-      // (see https://github.com/brave/browser-laptop/issues/11021)
-      const hasBeenNotified = state.getIn(['migrations', 'batMercuryTimestamp']) !== state.getIn(['migrations', 'btc2BatNotifiedTimestamp'])
-      if (!isNewInstall && hasUpgradedWallet && !hasBeenNotified) {
-        notifications.showBraveWalletUpdated()
-      }
-    }
-
-    return state
-  },
-  onInterval: (state) => {
-    if (getSetting(settings.PAYMENTS_ENABLED)) {
-      if (getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
-        notifications.showEnabledNotifications(state)
-      }
-    } else {
-      notifications.showDisabledNotifications(state)
-    }
-  },
-  onResponse: (message, buttonIndex, activeWindow) => {
-    switch (message) {
-      case notifications.text.addFunds:
-        // See showNotificationAddFunds() for buttons.
-        // buttonIndex === 1 is "Later"; the timestamp until which to delay is set
-        // in showNotificationAddFunds() when triggering this notification.
-        if (buttonIndex === 0) {
-          appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
-        } else if (buttonIndex === 2 && activeWindow) {
-          // Add funds: Open payments panel
-          appActions.createTabRequested({
-            url: 'about:preferences#payments',
-            windowId: activeWindow.id
-          })
-        }
-        break
-
-      case notifications.text.reconciliation:
-        // buttonIndex === 1 is Dismiss
-        if (buttonIndex === 0) {
-          appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
-        } else if (buttonIndex === 2 && activeWindow) {
-          appActions.createTabRequested({
-            url: 'about:preferences#payments',
-            windowId: activeWindow.id
-          })
-        }
-        break
-
-      case notifications.text.paymentDone:
-        if (buttonIndex === 0) {
-          appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
-        }
-        break
-
-      case notifications.text.tryPayments:
-        if (buttonIndex === 1 && activeWindow) {
-          appActions.createTabRequested({
-            url: 'about:preferences#payments',
-            windowId: activeWindow.id
-          })
-        }
-        appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
-        break
-
-      case notifications.text.walletConvertedToBat:
-        if (buttonIndex === 0) {
-          // Open backup modal
-          appActions.createTabRequested({
-            url: 'about:preferences#payments?ledgerBackupOverlayVisible',
-            windowId: activeWindow.id
-          })
-        }
-        break
-
-      default:
-        return
-    }
-
-    appActions.hideNotification(message)
-  },
-  /**
-   * Show message that it's time to add funds if reconciliation is less than
-   * a day in the future and balance is too low.
-   * 24 hours prior to reconciliation, show message asking user to review
-   * their votes.
-   */
-  showEnabledNotifications: (state) => {
-    const reconcileStamp = ledgerState.getInfoProp(state, 'reconcileStamp')
-    if (!reconcileStamp) {
-      return
-    }
-
-    if (reconcileStamp - new Date().getTime() < miliseconds.day) {
-      if (sufficientBalanceToReconcile(state)) {
-        if (shouldShowNotificationReviewPublishers()) {
-          const reconcileFrequency = ledgerState.getInfoProp(state, 'reconcileFrequency')
-          notifications.showReviewPublishers(reconcileStamp + ((reconcileFrequency - 2) * miliseconds.day))
-        }
-      } else if (shouldShowNotificationAddFunds()) {
-        notifications.showAddFunds()
-      }
-    } else if (reconcileStamp - new Date().getTime() < 2 * miliseconds.day) {
-      if (sufficientBalanceToReconcile(state) && (shouldShowNotificationReviewPublishers())) {
-        notifications.showReviewPublishers(new Date().getTime() + miliseconds.day)
-      }
-    }
-  },
-  showDisabledNotifications: (state) => {
-    if (!getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
-      const firstRunTimestamp = state.get('firstRunTimestamp')
-      if (new Date().getTime() - firstRunTimestamp < appConfig.payments.delayNotificationTryPayments) {
-        return
-      }
-
-      appActions.showNotification({
-        greeting: locale.translation('updateHello'),
-        message: notifications.text.tryPayments,
-        buttons: [
-          {text: locale.translation('noThanks')},
-          {text: locale.translation('notificationTryPaymentsYes'), className: 'primaryButton'}
-        ],
-        options: {
-          style: 'greetingStyle',
-          persist: false
-        }
-      })
-    }
-  },
-  showReviewPublishers: (nextTime) => {
-    appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP, nextTime)
-
-    appActions.showNotification({
-      greeting: notifications.text.hello,
-      message: notifications.text.reconciliation,
-      buttons: [
-        {text: locale.translation('turnOffNotifications')},
-        {text: locale.translation('dismiss')},
-        {text: locale.translation('reviewSites'), className: 'primaryButton'}
-      ],
-      options: notifications.displayOptions
-    })
-  },
-  showAddFunds: () => {
-    const nextTime = new Date().getTime() + nextAddFundsTime
-    appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
-
-    appActions.showNotification({
-      greeting: notifications.text.hello,
-      message: notifications.text.addFunds,
-      buttons: [
-        {text: locale.translation('turnOffNotifications')},
-        {text: locale.translation('updateLater')},
-        {text: locale.translation('addFunds'), className: 'primaryButton'}
-      ],
-      options: notifications.displayOptions
-    })
-  },
-  // Called from observeTransactions() when we see a new payment (transaction).
-  showPaymentDone: (transactionContributionFiat) => {
-    notifications.text.paymentDone = locale.translation('notificationPaymentDone')
-      .replace(/{{\s*amount\s*}}/, transactionContributionFiat.amount)
-      .replace(/{{\s*currency\s*}}/, transactionContributionFiat.currency)
-    // Hide the 'waiting for deposit' message box if it exists
-    appActions.hideNotification(notifications.text.addFunds)
-    appActions.showNotification({
-      greeting: locale.translation('updateHello'),
-      message: notifications.text.paymentDone,
-      buttons: [
-        {text: locale.translation('turnOffNotifications')},
-        {text: locale.translation('Ok'), className: 'primaryButton'}
-      ],
-      options: notifications.displayOptions
-    })
-  },
-  showBraveWalletUpdated: () => {
-    appActions.onBitcoinToBatNotified()
-
-    appActions.showNotification({
-      greeting: notifications.text.hello,
-      message: notifications.text.walletConvertedToBat,
-      // Learn More.
-      buttons: [
-        {text: locale.translation('walletConvertedBackup')},
-        {text: locale.translation('walletConvertedDismiss')}
-      ],
-      options: {
-        style: 'greetingStyle',
-        persist: false,
-        advancedLink: 'https://brave.com/faq-payments/#brave-payments',
-        advancedText: locale.translation('walletConvertedLearnMore')
-      }
-    })
-  }
-}
-
-// TODO is it ok to have IPC here or is there better place
 if (ipc) {
   ipc.on(messages.LEDGER_PUBLISHER, (event, location) => {
     if (!synopsis || event.sender.session === electron.session.fromPartition('default') || !tldjs.isValid(location)) {
@@ -402,14 +139,6 @@ if (ipc) {
         rules: _internal.ruleset.cooked
       })
     }
-  })
-
-  ipc.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
-    notifications.onResponse(
-      message,
-      buttonIndex,
-      electron.BrowserWindow.getActiveWindow()
-    )
   })
 }
 
@@ -461,6 +190,13 @@ const onBootStateFile = (state) => {
   try {
     clientprep()
     client = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
+    client.publisherTimestamp((err, result) => {
+      if (err) {
+        console.error('Error while retrieving publisher timestamp', err.toString())
+        return
+      }
+      appActions.onPublisherTimestamp(result.timestamp)
+    })
   } catch (ex) {
     state = ledgerState.resetInfo(state)
     bootP = false
@@ -546,7 +282,8 @@ const getPublisherData = (result, scorekeeper) => {
   let data = {
     verified: result.options.verified || false,
     exclude: result.options.exclude || false,
-    site: result.publisherKey,
+    publisherKey: result.publisherKey,
+    siteName: result.publisherKey,
     views: result.visits,
     duration: duration,
     daysSpent: 0,
@@ -558,9 +295,16 @@ const getPublisherData = (result, scorekeeper) => {
     pinPercentage: result.pinPercentage,
     weight: result.pinPercentage
   }
-  // HACK: Protocol is sometimes blank here, so default to http:// so we can
-  // still generate publisherURL.
-  data.publisherURL = (result.protocol || 'http:') + '//' + result.publisherKey
+
+  data.publisherURL = result.publisherURL || ((result.protocol || 'https:') + '//' + result.publisherKey)
+
+  // media publisher
+  if (result.faviconName) {
+    data.siteName = locale.translation('publisherMediaName', {
+      publisherName: result.faviconName,
+      provider: result.providerName
+    })
+  }
 
   if (duration >= miliseconds.day) {
     data.daysSpent = Math.max(Math.round(duration / miliseconds.day), 1)
@@ -568,7 +312,7 @@ const getPublisherData = (result, scorekeeper) => {
     data.hoursSpent = Math.max(Math.floor(duration / miliseconds.hour), 1)
     data.minutesSpent = Math.round((duration % miliseconds.hour) / miliseconds.minute)
   } else if (duration >= miliseconds.minute) {
-    data.minutesSpent = Math.max(Math.round(duration / miliseconds.minute), 1)
+    data.minutesSpent = Math.max(Math.floor(duration / miliseconds.minute), 1)
     data.secondsSpent = Math.round((duration % miliseconds.minute) / miliseconds.second)
   } else {
     data.secondsSpent = Math.max(Math.round(duration / miliseconds.second), 1)
@@ -608,14 +352,32 @@ const roundToTarget = (l, target, property) => {
     })
 }
 
+// Removes entries older entries and entries that have 0 visits across windows
+const pruneSynopsis = (state) => {
+  if (!synopsis) {
+    return state
+  }
+
+  const json = synopsis.toJSON()
+  if (!json || !json.publishers) {
+    return state
+  }
+
+  return ledgerState.saveSynopsis(state, json.publishers)
+}
+
 // TODO we should convert this function and all related ones into immutable
 // TODO merge publishers and publisherData that is created in getPublisherData
 // so that we don't need to create new Map every single time
-const synopsisNormalizer = (state, changedPublisher, returnState) => {
+const synopsisNormalizer = (state, changedPublisher, returnState = true, prune = false) => {
   let dataPinned = [] // change to list
   let dataUnPinned = [] // change to list
   let dataExcluded = [] // change to list
   const scorekeeper = ledgerState.getSynopsisOption(state, 'scorekeeper')
+
+  if (prune) {
+    state = module.exports.pruneSynopsis(state)
+  }
 
   let results = []
   let publishers = ledgerState.getPublishers(state)
@@ -733,13 +495,12 @@ const synopsisNormalizer = (state, changedPublisher, returnState) => {
   return newData
 }
 
-const updatePublisherInfo = (state, changedPublisher) => {
-  if (!getSetting(settings.PAYMENTS_ENABLED)) {
+const updatePublisherInfo = (state, changedPublisher, refresh = false) => {
+  if (!refresh && !getSetting(settings.PAYMENTS_ENABLED)) {
     return state
   }
 
-  // const options = synopsis.options
-  state = synopsisNormalizer(state, changedPublisher, true)
+  state = synopsisNormalizer(state, changedPublisher)
 
   return state
 }
@@ -778,9 +539,19 @@ const inspectP = (db, path, publisher, property, key, callback) => {
 
 // TODO rename function name
 const verifiedP = (state, publisherKey, callback) => {
-  inspectP(v2PublishersDB, v2PublishersPath, publisherKey, 'verified', null, (err, result) => {
-    if (!err && callback) {
-      callback(null, result)
+  client.publisherInfo(publisherKey, (err, result) => {
+    if (err) {
+      console.error(`Error verifying publisher ${publisherKey}: `, err.toString())
+      return
+    }
+
+    if (callback) {
+      let data = false
+      if (result && result.properties && result.properties.verified) {
+        data = result.properties.verified
+      }
+
+      callback(null, data)
     }
   })
 
@@ -815,7 +586,7 @@ const excludeP = (publisherKey, callback) => {
       return done(err, result)
     }
 
-    let props = ledgerPublisher.getPublisherProps('https://' + publisherKey)
+    let props = ledgerPublisher.getPublisherProps(publisherKey)
     if (!props) return done()
 
     v2RulesetDB.createReadStream({lt: 'domain:'}).on('data', (data) => {
@@ -856,79 +627,119 @@ const excludeP = (publisherKey, callback) => {
   })
 }
 
-const setLocation = (state, timestamp, tabId) => {
+const addSiteVisit = (state, timestamp, location, tabId) => {
   if (!synopsis) {
     return state
   }
 
-  const locationData = ledgerState.getLocation(state, currentUrl)
+  location = pageDataUtil.getInfoKey(location)
+  const locationData = ledgerState.getLocation(state, location)
+  const duration = new Date().getTime() - timestamp
   if (_internal.verboseP) {
     console.log(
-      `locations[${currentUrl}]=${JSON.stringify(locationData, null, 2)} ` +
-      `duration=${(timestamp - currentTimestamp)} msec tabId= ${tabId}`
+      `locations[${location}]=${JSON.stringify(locationData, null, 2)} ` +
+      `duration=${(duration)} msec tabId= ${tabId}`
     )
   }
-  if (locationData.isEmpty() || !tabId) {
+
+  if (locationData.isEmpty()) {
     return state
   }
 
   let publisherKey = locationData.get('publisher')
-  if (!publisherKey) {
+  let revisitP = false
+
+  if (duration >= getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)) {
+    if (!visitsByPublisher[publisherKey]) {
+      visitsByPublisher[publisherKey] = {}
+    }
+
+    if (!visitsByPublisher[publisherKey][location]) {
+      visitsByPublisher[publisherKey][location] = {
+        tabIds: []
+      }
+    }
+
+    revisitP = visitsByPublisher[publisherKey][location].tabIds.indexOf(tabId) !== -1
+    if (!revisitP) {
+      visitsByPublisher[publisherKey][location].tabIds.push(tabId)
+    }
+  }
+
+  return saveVisit(state, publisherKey, duration, revisitP)
+}
+
+const saveVisit = (state, publisherKey, duration, revisited) => {
+  if (!synopsis || !publisherKey) {
     return state
   }
 
-  if (!visitsByPublisher[publisherKey]) {
-    visitsByPublisher[publisherKey] = {}
-  }
-
-  if (!visitsByPublisher[publisherKey][currentUrl]) {
-    visitsByPublisher[publisherKey][currentUrl] = {
-      tabIds: []
-    }
-  }
-
-  const revisitP = visitsByPublisher[publisherKey][currentUrl].tabIds.indexOf(tabId) !== -1
-  if (!revisitP) {
-    visitsByPublisher[publisherKey][currentUrl].tabIds.push(tabId)
-  }
-
-  let duration = timestamp - currentTimestamp
   if (_internal.verboseP) {
-    console.log('\nadd publisher ' + publisherKey + ': ' + duration + ' msec' + ' revisitP=' + revisitP + ' state=' +
-      JSON.stringify(underscore.extend({location: currentUrl}, visitsByPublisher[publisherKey][currentUrl]),
-        null, 2))
+    console.log('\nadd publisher ' + publisherKey + ': ' + (duration / 1000) + ' sec' + ' revisitP=' + revisited)
   }
 
-  synopsis.addPublisher(publisherKey, {duration: duration, revisitP: revisitP})
+  synopsis.addPublisher(publisherKey, {duration: duration, revisitP: revisited})
   state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
   state = updatePublisherInfo(state)
-  state = verifiedP(state, publisherKey, (error, result) => {
-    if (!error) {
-      appActions.onPublisherOptionUpdate(publisherKey, 'verified', result)
-      savePublisherOption(publisherKey, 'verified', result)
-    }
-  })
+  state = checkVerifiedStatus(state, publisherKey)
 
   return state
 }
 
-const addVisit = (state, location, timestamp, tabId) => {
+const checkVerifiedStatus = (state, publisherKey) => {
+  if (publisherKey == null) {
+    return state
+  }
+
+  const lastUpdate = parseInt(ledgerState.getLedgerValue(state, 'publisherTimestamp'))
+  const lastPublisherUpdate = parseInt(ledgerState.getPublisherOption(state, publisherKey, 'verifiedTimestamp') || 0)
+
+  if (lastUpdate > lastPublisherUpdate) {
+    state = module.exports.verifiedP(state, publisherKey, (error, result) => {
+      if (!error) {
+        appActions.onPublisherOptionUpdate(publisherKey, 'verified', result)
+        appActions.onPublisherOptionUpdate(publisherKey, 'verifiedTimestamp', lastUpdate)
+        savePublisherOption(publisherKey, 'verified', result)
+        savePublisherOption(publisherKey, 'verifiedTimestamp', lastUpdate)
+      }
+    })
+  }
+
+  return state
+}
+
+const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo = false) => {
+  // We always want to have the latest active tabId
+  const currentTabId = pageDataState.getLastActiveTabId(state)
+  state = pageDataState.setLastActiveTabId(state, tabId)
   if (location === currentUrl) {
     return state
   }
 
-  state = setLocation(state, timestamp, tabId)
+  // Save previous recorder page
+  if (currentUrl !== locationDefault && currentTabId != null && currentTabId !== tabState.TAB_ID_NONE) {
+    let tabFromState = tabState.getByTabId(state, currentTabId)
 
-  const lastUrl = pageDataState.getLastUrl(state)
-  const aboutUrl = getSourceAboutUrl(lastUrl) || lastUrl
-  if (aboutUrl && aboutUrl.match(/^about/)) {
+    if (tabFromState == null) {
+      tabFromState = pageDataState.getLastClosedTab(state, currentTabId)
+    }
+
+    const isPrivate = !tabFromState.get('partition', '').startsWith('persist:') ||
+      tabFromState.get('incognito')
+
+    // Add visit to the ledger when we are not in a private tab
+    if (!isPrivate && !tabFromState.isEmpty() && ledgerUtil.shouldTrackView(tabFromState)) {
+      state = addSiteVisit(state, currentTimestamp, currentUrl, currentTabId)
+    }
+  }
+
+  if (location === locationDefault && !keepInfo) {
     state = pageDataState.resetInfo(state)
   }
 
-  location = getSourceAboutUrl(location) || location
-
-  currentUrl = (location && location.match(/^about/)) ? locationDefault : location
-  currentTimestamp = timestamp
+  // Update to the latest view
+  currentUrl = location
+  currentTimestamp = new Date().getTime()
   return state
 }
 
@@ -999,7 +810,7 @@ const fetchFavIcon = (publisherKey, url, redirects) => {
         return null
       }
 
-      prefix = new Buffer(blob.substr(tail + 8, signatureMax), 'base64')
+      prefix = Buffer.from(blob.substr(tail + 8, signatureMax), 'base64')
       underscore.keys(fileTypes).forEach((fileType) => {
         if (matchP) return
         if (
@@ -1025,79 +836,61 @@ const fetchFavIcon = (publisherKey, url, redirects) => {
   })
 }
 
-const updateLocation = (state, location, publisherKey) => {
-  const locationData = ledgerState.getLocation(state, location)
-
-  if (locationData.get('stickyP') == null) {
-    state = ledgerState.setLocationProp(state, location, 'stickyP', ledgerUtil.stickyP(state, publisherKey))
-  }
-
-  if (locationData.get('verified') != null) {
+const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
+  if (!getSetting(settings.PAYMENTS_ENABLED)) {
     return state
   }
 
-  const publisher = ledgerState.getPublisher(state, publisherKey)
-  const verified = publisher.getIn(['options', 'verified'])
-  if (verified != null) {
-    state = ledgerState.setLocationProp(state, location, 'verified', (verified || false))
-  } else {
-    state = verifiedP(state, publisherKey, (err, result) => {
-      if (err && !err.notFound) {
-        return
-      }
-
-      const value = (result && result.verified) || false
-      appActions.onLedgerLocationUpdate(location, 'verified', value)
-    })
-  }
-
-  const exclude = publisher.getIn(['options', 'exclude'])
-  if (exclude != null) {
-    state = ledgerState.setLocationProp(state, location, 'exclude', (exclude || false))
-  } else {
-    excludeP(publisherKey, (err, result) => {
-      if (err && !err.notFound) {
-        return
-      }
-
-      const value = (result && result.exclude) || false
-      appActions.onLedgerLocationUpdate(location, 'exclude', value)
-    })
-  }
-
-  return state
-}
-
-const pageDataChanged = (state) => {
-  // NB: in theory we have already seen every element in info except for (perhaps) the last one...
   let info = pageDataState.getLastInfo(state)
+  const tabId = viewData.tabId || pageDataState.getLastActiveTabId(state)
+  const location = viewData.location || locationDefault
 
-  if (!synopsis || info.isEmpty()) {
+  if (!synopsis) {
+    state = addNewLocation(state, locationDefault, tabId)
     return state
   }
 
-  if (info.get('url', '').match(/^about/)) {
+  const realUrl = getSourceAboutUrl(location) || location
+  if (
+    info.isEmpty() &&
+    !isSourceAboutUrl(realUrl) &&
+    viewData &&
+    viewData.tabId != null &&
+    viewData.location != null
+  ) {
+    // we need to add visit even when you switch from about page to a normal site
+    state = addNewLocation(state, location, tabId)
+    return state
+  } else if (info.isEmpty() || isSourceAboutUrl(realUrl)) {
+    // we need to log empty visit
+    state = addNewLocation(state, locationDefault, tabId, keepInfo)
     return state
   }
 
-  const location = info.get('key')
-  const locationData = ledgerState.getLocation(state, location)
+  let locationKey = info.get('key')
+  const locationData = ledgerState.getLocation(state, locationKey)
   let publisherKey = locationData.get('publisher')
   let publisher = ledgerState.getPublisher(state, publisherKey)
   if (!publisher.isEmpty()) {
     if (publisher.get('faviconURL') == null) {
       state = getFavIcon(state, publisherKey, info)
     }
-
-    state = updateLocation(state, location, publisherKey)
   } else {
-    try {
-      publisherKey = ledgerPublisher.getPublisher(location, _internal.ruleset.raw)
-      if (!publisherKey || (publisherKey && ledgerUtil.blockedP(state, publisherKey))) {
-        publisherKey = null
+    const infoPublisher = info.get('publisher')
+    if (infoPublisher != null) {
+      publisherKey = infoPublisher
+    } else {
+      try {
+        // TODO this is only filled when you have ledger on, which means that this whole pageDataChanged
+        // can be ignored if ledger is disabled?
+        publisherKey = ledgerPublisher.getPublisher(locationKey, _internal.ruleset.raw)
+      } catch (ex) {
+        console.error('getPublisher error for ' + locationKey + ': ' + ex.toString())
       }
-    } catch (ex) {
-      console.error('getPublisher error for ' + location + ': ' + ex.toString())
+    }
+
+    if (!publisherKey || (publisherKey && ledgerUtil.blockedP(state, publisherKey))) {
+      publisherKey = null
     }
 
     state = ledgerState.setLocationProp(state, info.get('key'), 'publisher', publisherKey)
@@ -1112,30 +905,21 @@ const pageDataChanged = (state) => {
     }
 
     if (initP) {
-      excludeP(publisherKey, (unused, exclude) => {
-        if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
-          exclude = true
-        }
-        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
-        savePublisherOption(publisherKey, 'exclude', exclude)
-      })
+      if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
+        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', true)
+        savePublisherOption(publisherKey, 'exclude', true)
+      } else {
+        excludeP(publisherKey, (unused, exclude) => {
+          appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+          savePublisherOption(publisherKey, 'exclude', exclude)
+        })
+      }
     }
 
-    state = updateLocation(state, location, publisherKey)
     state = getFavIcon(state, publisherKey, info)
   }
 
-  const pageLoad = pageDataState.getLoad(state)
-  const view = pageDataState.getView(state)
-
-  if (ledgerUtil.shouldTrackView(view, pageLoad)) {
-    state = addVisit(
-      state,
-      view.get('url', locationDefault),
-      view.get('timestamp', new Date().getTime()),
-      view.get('tabId')
-    )
-  }
+  state = addNewLocation(state, location, tabId, keepInfo)
 
   return state
 }
@@ -1229,7 +1013,7 @@ const onWalletRecovery = (state, error, result) => {
 
 const quit = (state) => {
   quitP = true
-  state = addVisit(state, locationDefault, new Date().getTime(), null)
+  state = addNewLocation(state, locationDefault)
 
   if (!getSetting(settings.PAYMENTS_ENABLED) && getSetting(settings.SHUTDOWN_CLEAR_HISTORY)) {
     state = ledgerState.resetSynopsis(state, true)
@@ -1290,13 +1074,6 @@ const initSynopsis = (state) => {
       appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
       savePublisherOption(publisherKey, 'exclude', exclude)
     })
-
-    state = verifiedP(state, publisherKey, (error, result) => {
-      if (!error) {
-        appActions.onPublisherOptionUpdate(publisherKey, 'verified', result)
-        savePublisherOption(publisherKey, 'verified', result)
-      }
-    })
   }
 
   state = updatePublisherInfo(state)
@@ -1305,12 +1082,16 @@ const initSynopsis = (state) => {
 }
 
 const enable = (state, paymentsEnabled) => {
-  if (paymentsEnabled && !getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
-    appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
+  if (paymentsEnabled) {
+    state = checkBtcBatMigrated(state, paymentsEnabled)
+
+    if (!getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
+      appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
+    }
   }
 
   if (synopsis) {
-    return updatePublisherInfo(state)
+    return updatePublisherInfo(state, null, true)
   }
 
   if (!ledgerPublisher) {
@@ -1341,6 +1122,10 @@ const enable = (state, paymentsEnabled) => {
       delete synopsis.publishers[publisher].faviconURL
     }
   })
+
+  if (!ledgerState.getPublishers(state).isEmpty()) {
+    state = synopsisNormalizer(state)
+  }
 
   return state
 }
@@ -1390,21 +1175,12 @@ const cacheRuleSet = (state, ruleset) => {
     for (let item of publishers) {
       const publisherKey = item[0]
       const publisher = item[1]
-      const location = (publisher.get('protocol') || 'http:') + '//' + publisherKey
-      let ctx = urlParse(location)
+      const ctx = ledgerPublisher.getPublisherProps(publisherKey)
 
-      ctx.TLD = tldjs.getPublicSuffix(ctx.host)
-      if (!ctx.TLD) {
-        return state
-      }
+      if (!ctx.TLD) continue
 
-      ctx = underscore.mapObject(ctx, function (value) {
-        if (!underscore.isFunction(value)) return value
-      })
-      ctx.URL = location
-      ctx.SLD = tldjs.getDomain(ctx.host)
-      ctx.RLD = tldjs.getSubdomain(ctx.host)
-      ctx.QLD = ctx.RLD ? underscore.last(ctx.RLD.split('.')) : ''
+      if (publisher.publisherURL) ctx.URL = publisher.publisherURL
+      if (!ctx.URL) ctx.URL = (publisher.get('protocol') || 'https:') + '//' + publisherKey
 
       stewed.forEach((rule) => {
         if (rule.consequent !== null || rule.dom) return
@@ -1438,7 +1214,8 @@ const roundtrip = (params, options, callback) => {
   let parts = typeof params.server === 'string' ? urlParse(params.server)
     : typeof params.server !== 'undefined' ? params.server
       : typeof options.server === 'string' ? urlParse(options.server) : options.server
-  const rawP = options.rawP
+  const binaryP = options.binaryP
+  const rawP = binaryP || options.rawP
 
   if (!params.method) params.method = 'GET'
   parts = underscore.extend(underscore.pick(parts, ['protocol', 'hostname', 'port']),
@@ -1465,7 +1242,7 @@ const roundtrip = (params, options, callback) => {
     url: urlFormat(parts),
     method: params.method,
     payload: params.payload,
-    responseType: 'text',
+    responseType: binaryP ? 'binary' : 'text',
     headers: underscore.defaults(params.headers || {}, {'content-type': 'application/json; charset=utf-8'}),
     verboseP: options.verboseP
   }
@@ -1480,7 +1257,7 @@ const roundtrip = (params, options, callback) => {
         console.log('>>> ' + header + ': ' + response.headers[header])
       })
       console.log('>>>')
-      console.log('>>> ' + (body || '').split('\n').join('\n>>> '))
+      console.log('>>> ' + (rawP ? '...' : (body || '').split('\n').join('\n>>> ')))
     }
 
     if (err) return callback(err, response)
@@ -1523,7 +1300,7 @@ const observeTransactions = (state, transactions) => {
   if (getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
     if (transactions.length > 0) {
       const newestTransaction = transactions[transactions.length - 1]
-      notifications.showPaymentDone(newestTransaction.contribution.fiat)
+      ledgerNotifications.showPaymentDone(newestTransaction.contribution.fiat)
     }
   }
 }
@@ -1718,15 +1495,10 @@ const onWalletProperties = (state, body) => {
   // unconfirmed amount
   const unconfirmed = parseFloat(body.get('unconfirmed'))
   if (unconfirmed >= 0) {
-    if (ledgerState.getInfoProp(state, 'unconfirmed') === unconfirmed) {
-      return state
-    }
-
     state = ledgerState.setInfoProp(state, 'unconfirmed', unconfirmed)
     if (clientOptions.verboseP) {
       console.log('\ngetBalance refreshes ledger info: ' + ledgerState.getInfoProp(state, 'unconfirmed'))
     }
-    return state
   }
 
   if (clientOptions.verboseP) {
@@ -1754,7 +1526,14 @@ const setPaymentInfo = (amount) => {
   amount = parseInt(amount, 10)
   if (isNaN(amount) || (amount <= 0)) return
 
-  underscore.extend(bravery.fee, { amount: amount, currency: client.getWalletAddresses().BAT ? 'BAT' : 'USD' })
+  let currency = 'USD'
+  const addresses = client.getWalletAddresses()
+
+  if (addresses && addresses.BAT) {
+    currency = 'BAT'
+  }
+
+  underscore.extend(bravery.fee, { amount: amount, currency: currency })
   client.setBraveryProperties(bravery, (err, result) => {
     if (err) {
       err = err.toString()
@@ -1797,7 +1576,7 @@ const callback = (err, result, delayTime) => {
   }
 
   if (err) {
-    console.log('ledger client error(1): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
+    console.error('ledger client error(1): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
     if (!client) return
 
     if (typeof delayTime === 'undefined') {
@@ -1821,7 +1600,7 @@ const onCallback = (state, result, delayTime) => {
 
   if (client && result.getIn(['properties', 'wallet'])) {
     if (!ledgerState.getInfoProp(state, 'created')) {
-      setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
+      module.exports.setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
     }
 
     state = getStateInfo(state, regularResults) // TODO optimize if possible
@@ -1852,40 +1631,39 @@ const onCallback = (state, result, delayTime) => {
       const publishers = ledgerState.getPublishers(state)
       for (let item of publishers) {
         const publisherKey = item[0]
-        excludeP(publisherKey, (unused, exclude) => {
-          appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
-          savePublisherOption(publisherKey, 'exclude', exclude)
-        })
+        if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
+          appActions.onPublisherOptionUpdate(publisherKey, 'exclude', true)
+          savePublisherOption(publisherKey, 'exclude', true)
+        } else {
+          excludeP(publisherKey, (unused, exclude) => {
+            appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+            savePublisherOption(publisherKey, 'exclude', exclude)
+          })
+        }
       }
     })
   }
 
   if (result.has('publishersV2')) {
-    results = regularResults.publishersV2 // TODO optimize if possible
     delete regularResults.publishersV2
+  }
 
-    entries = []
-    results.forEach((entry) => {
-      const publisherKey = entry.publisher
-      entries.push({
-        type: 'put',
-        key: publisherKey,
-        value: JSON.stringify(underscore.omit(entry, ['publisher']))
-      })
-      const publisher = ledgerState.getPublisher(state, publisherKey)
-      const newValue = entry.verified
-      if (!publisher.isEmpty() && publisher.getIn(['options', 'verified']) !== newValue) {
-        synopsis.publishers[publisherKey].options.verified = newValue
-        state = ledgerState.setPublisherOption(state, publisherKey, 'verified', newValue)
+  // persist the new ledger state
+  muonWriter(statePath, regularResults)
+
+  // delete the temp file used during transition (if it still exists)
+  if (client && client.options && client.options.version === 'v2') {
+    const fs = require('fs')
+    fs.access(pathName(newClientPath), fs.FF_OK, (err) => {
+      if (err) {
+        return
       }
-    })
-    state = updatePublisherInfo(state)
-    v2PublishersDB.batch(entries, (err) => {
-      if (err) return console.error(v2PublishersPath + ' error: ' + JSON.stringify(err, null, 2))
+      fs.unlink(pathName(newClientPath), (err) => {
+        if (err) console.error('unlink error: ' + err.toString())
+      })
     })
   }
 
-  muonWriter(statePath, regularResults)
   run(state, delayTime)
 
   return state
@@ -1893,13 +1671,13 @@ const onCallback = (state, result, delayTime) => {
 
 const initialize = (state, paymentsEnabled) => {
   if (!v2RulesetDB) v2RulesetDB = levelUp(pathName(v2RulesetPath))
-  if (!v2PublishersDB) v2PublishersDB = levelUp(pathName(v2PublishersPath))
   state = enable(state, paymentsEnabled)
 
-  notifications.init(state)
+  ledgerNotifications.init(state)
 
   if (!paymentsEnabled) {
     client = null
+    newClient = false
     return ledgerState.resetInfo(state)
   }
 
@@ -1947,6 +1725,29 @@ const initialize = (state, paymentsEnabled) => {
   }
 }
 
+const getContributionAmount = () => {
+  let amount = parseInt(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT), 10)
+
+  // if amount is 5, 10, 15, or 20... the amount wasn't updated when changing
+  // from BTC to BAT (see https://github.com/brave/browser-laptop/issues/11719)
+  let updatedAmount
+  switch (amount) {
+    case 5: updatedAmount = 25; break
+    case 10: updatedAmount = 50; break
+    case 15: updatedAmount = 75; break
+    case 20: updatedAmount = 100; break
+  }
+
+  if (updatedAmount) {
+    if (clientOptions.verboseP) {
+      console.log('\nmigrating contribution amount of ' + amount + ' from USD to BAT (new amount is ' + updatedAmount + ')')
+    }
+    appActions.changeSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, updatedAmount)
+    return updatedAmount
+  }
+  return amount
+}
+
 const onInitRead = (state, parsedData) => {
   state = getStateInfo(state, parsedData)
 
@@ -1964,6 +1765,13 @@ const onInitRead = (state, parsedData) => {
     client = ledgerClient(parsedData.personaId,
       underscore.extend(parsedData.options, {roundtrip: roundtrip}, options),
       parsedData)
+    client.publisherTimestamp((err, result) => {
+      if (err) {
+        console.error('Error while retrieving publisher timestamp', err.toString())
+        return
+      }
+      appActions.onPublisherTimestamp(result.timestamp)
+    })
 
     // Scenario: User enables Payments, disables it, waits 30+ days, then
     // enables it again -> reconcileStamp is in the past.
@@ -2004,11 +1812,12 @@ const onInitRead = (state, parsedData) => {
     state = ledgerState.setInfoProp(state, 'address', client.getWalletAddress())
   }
 
-  setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
+  const contributionAmount = getContributionAmount()
+  module.exports.setPaymentInfo(contributionAmount)
   getBalance(state)
 
   // Show relevant browser notifications on launch
-  state = notifications.onLaunch(state)
+  state = ledgerNotifications.onLaunch(state)
 
   return state
 }
@@ -2080,7 +1889,7 @@ const run = (state, delayTime) => {
 
   let winners
   const ballots = client.ballots()
-  const data = (synopsis) && (ballots > 0) && synopsisNormalizer(state)
+  const data = (synopsis) && (ballots > 0) && synopsisNormalizer(state, null, false, true)
 
   if (data) {
     let weights = []
@@ -2102,7 +1911,7 @@ const run = (state, delayTime) => {
     })
     if (stateData) muonWriter(statePath, stateData)
   } catch (ex) {
-    console.log('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
+    console.error('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
   }
 
   if (delayTime === 0) {
@@ -2129,7 +1938,7 @@ const run = (state, delayTime) => {
       if (active !== client) return
 
       if (!client) {
-        return console.log('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
+        return console.error('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
       }
 
       if (client.sync(callback) === true) {
@@ -2184,12 +1993,11 @@ const muonWriter = (fileName, payload) => {
 
 const migration = (state) => {
   const synopsisPath = 'ledger-synopsis.json'
-
+  const fs = require('fs')
   const synopsisOptions = ledgerState.getSynopsisOptions(state)
 
-  if (getSetting(settings.PAYMENTS_ENABLED) && synopsisOptions.isEmpty()) {
+  if (synopsisOptions.isEmpty()) {
     // Move data from synopsis file into appState
-    const fs = require('fs')
     try {
       fs.accessSync(pathName(synopsisPath), fs.FF_OK)
       const data = fs.readFileSync(pathName(synopsisPath))
@@ -2200,9 +2008,7 @@ const migration = (state) => {
           console.error('error removing file ' + synopsisPath + ': ', err)
         }
       })
-    } catch (err) {
-      console.log('Error migrating file', err.toString())
-    }
+    } catch (err) {}
 
     // Delete ledgerInfo
     state = state.delete('ledgerInfo')
@@ -2214,6 +2020,16 @@ const migration = (state) => {
       state = state.delete('locationInfo')
     }
   }
+
+  const oldDb = pathName('ledger-publishersV2.leveldb')
+  fs.access(oldDb, fs.FF_OK, (err, result) => {
+    if (err) {
+      return
+    }
+
+    const fsExtra = require('fs-extra')
+    fsExtra.remove(oldDb)
+  })
 
   return state
 }
@@ -2228,13 +2044,13 @@ const saveOptionSynopsis = (prop, value) => {
 }
 
 const savePublisherOption = (publisherKey, prop, value) => {
-  if (synopsis.publishers && synopsis.publishers[publisherKey]) {
+  if (synopsis && synopsis.publishers && synopsis.publishers[publisherKey] && synopsis.publishers[publisherKey].options) {
     synopsis.publishers[publisherKey].options[prop] = value
   }
 }
 
 const savePublisherData = (publisherKey, prop, value) => {
-  if (synopsis.publishers && synopsis.publishers[publisherKey]) {
+  if (synopsis && synopsis.publishers && synopsis.publishers[publisherKey]) {
     synopsis.publishers[publisherKey][prop] = value
   }
 }
@@ -2243,42 +2059,85 @@ const deleteSynopsis = () => {
   synopsis.publishers = {}
 }
 
+// fix for incorrectly persisted state (see #11585)
+const yoDawg = (stateState) => {
+  while (stateState.hasOwnProperty('state') && stateState.state.persona) {
+    stateState = stateState.state
+  }
+  return stateState
+}
+
+const checkBtcBatMigrated = (state, paymentsEnabled) => {
+  if (!paymentsEnabled) {
+    return state
+  }
+
+  // One time conversion of wallet
+  const isNewInstall = migrationState.isNewInstall(state)
+  const hasUpgradedWallet = migrationState.hasUpgradedWallet(state)
+  if (!isNewInstall && !hasUpgradedWallet) {
+    state = migrationState.setTransitionStatus(state, true)
+    module.exports.transitionWalletToBat()
+  } else {
+    state = migrationState.setTransitionStatus(state, false)
+  }
+
+  return state
+}
+
 let newClient = null
+const getNewClient = () => {
+  return newClient
+}
+
 const transitionWalletToBat = () => {
   let newPaymentId, result
-  const newClientPath = 'ledger-newstate.json'
 
   if (newClient === true) return
-  // Restore newClient from the file
+  clientprep()
+
+  if (!client) {
+    console.log('Client is not initialized, will try again')
+    return
+  }
+
+  // only attempt this transition if the wallet is v1
+  if (client && client.options && client.options.version !== 'v1') {
+    // older versions incorrectly marked this for transition
+    // this will clean them up (no more bouncy ball)
+    appActions.onBitcoinToBatTransitioned()
+    return
+  }
+
+  // Restore newClient from the file (if one exists)
   if (!newClient) {
     const fs = require('fs')
     try {
       fs.accessSync(pathName(newClientPath), fs.FF_OK)
       fs.readFile(pathName(newClientPath), (error, data) => {
         if (error) {
-          console.log(`ledger client: can't read ${newClientPath} to restore newClient`)
+          console.error(`ledger client: can't read ${newClientPath} to restore newClient`)
           return
         }
         const parsedData = JSON.parse(data)
-        newClient = ledgerClient(parsedData.state.personaId,
-          underscore.extend(parsedData.options, {roundtrip: roundtrip}, clientOptions),
-          parsedData)
+        const state = yoDawg(parsedData)
+        newClient = ledgerClient(state.personaId,
+          underscore.extend(state.options, {roundtrip: roundtrip}, clientOptions),
+          state)
         transitionWalletToBat()
       })
       return
-    } catch (err) {
-      console.log(err.toString())
-    }
+    } catch (err) {}
   }
 
   // Create new client
   if (!newClient) {
     try {
-      clientprep()
       newClient = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
-      muonWriter(newClientPath, newClient)
+      muonWriter(newClientPath, newClient.state)
     } catch (ex) {
-      return console.error('ledger client creation error(2): ', ex)
+      console.error('ledger client creation error(2): ', ex)
+      return
     }
   }
 
@@ -2286,10 +2145,14 @@ const transitionWalletToBat = () => {
   if (!newPaymentId) {
     newClient.sync((err, result, delayTime) => {
       if (err) {
-        return console.log('ledger client error(3): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
+        return console.error('ledger client error(3): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
       }
 
       if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1, max: 500 })
+
+      if (newClient) {
+        muonWriter(newClientPath, newClient.state)
+      }
 
       setTimeout(() => transitionWalletToBat(), delayTime)
     })
@@ -2305,18 +2168,22 @@ const transitionWalletToBat = () => {
 
   try {
     client.transition(newPaymentId, (err, properties) => {
-      if (err) {
+      if (err || !newClient) {
         console.error('ledger client transition error: ', err)
       } else {
         result = newClient.transitioned(properties)
         client = newClient
         newClient = true
+        // NOTE: onLedgerCallback will save latest client to disk as ledger-state.json
         appActions.onLedgerCallback(result, random.randomInt({ min: miliseconds.minute, max: 10 * miliseconds.minute }))
         appActions.onBitcoinToBatTransitioned()
-        notifications.showBraveWalletUpdated()
-        const fs = require('fs')
-        fs.unlink(pathName(newClientPath), (err) => {
-          if (err) console.error('unlink error: ' + err.toString())
+        ledgerNotifications.showBraveWalletUpdated()
+        client.publisherTimestamp((err, result) => {
+          if (err) {
+            console.error('Error while retrieving publisher timestamp', err.toString())
+            return
+          }
+          appActions.onPublisherTimestamp(result.timestamp)
         })
       }
     })
@@ -2325,36 +2192,193 @@ const transitionWalletToBat = () => {
   }
 }
 
-module.exports = {
-  backupKeys,
-  recoverKeys,
-  quit,
-  addVisit,
-  pageDataChanged,
-  init,
-  initialize,
-  setPaymentInfo,
-  updatePublisherInfo,
-  networkConnected,
-  verifiedP,
-  boot,
-  onBootStateFile,
-  onWalletProperties,
-  paymentPresent,
-  addFoundClosed,
-  onWalletRecovery,
-  onBraveryProperties,
-  onLedgerFirstSync,
-  onCallback,
-  deleteSynopsisPublisher,
-  saveOptionSynopsis,
-  savePublisherOption,
-  onTimeUntilReconcile,
-  run,
-  onNetworkConnected,
-  migration,
-  onInitRead,
-  notifications,
-  deleteSynopsis,
-  transitionWalletToBat
+let currentMediaKey = null
+const onMediaRequest = (state, xhr, type, tabId) => {
+  if (!xhr || type == null) {
+    return state
+  }
+
+  const parsed = ledgerUtil.getMediaData(xhr, type)
+  const mediaId = ledgerUtil.getMediaId(parsed, type)
+  const mediaKey = ledgerUtil.getMediaKey(mediaId, type)
+  let duration = ledgerUtil.getMediaDuration(parsed, type)
+
+  if (mediaId == null || duration == null || mediaKey == null) {
+    return state
+  }
+
+  const minDuration = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
+  duration = parseInt(duration)
+  if (duration > 0 && duration < minDuration) {
+    duration = minDuration
+  }
+
+  if (!ledgerPublisher) {
+    ledgerPublisher = require('bat-publisher')
+  }
+
+  let revisited = true
+  const activeTabId = tabState.getActiveTabId(state)
+  if (activeTabId === tabId && mediaKey !== currentMediaKey) {
+    revisited = false
+    currentMediaKey = mediaKey
+  }
+
+  const cache = ledgerVideoCache.getDataByVideoId(state, mediaKey)
+
+  if (!cache.isEmpty()) {
+    return module.exports.saveVisit(state, cache.get('publisher'), duration, revisited)
+  }
+
+  const options = underscore.extend({roundtrip: roundtrip}, clientOptions)
+  const mediaProps = {
+    mediaId,
+    providerName: type
+  }
+
+  ledgerPublisher.getMedia.getPublisherFromMediaProps(mediaProps, options, (error, response) => {
+    if (error) {
+      console.error('Error while getting publisher from media', error.toString())
+      return
+    }
+
+    // publisher not found
+    if (!response) {
+      return
+    }
+
+    appActions.onLedgerMediaPublisher(mediaKey, response, duration, revisited)
+  })
+
+  return state
 }
+
+const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
+  const publisherKey = response ? response.get('publisher') : null
+  if (publisherKey == null) {
+    return state
+  }
+
+  let publisher = ledgerState.getPublisher(state, publisherKey)
+  const faviconName = response.get('faviconName')
+  const faviconURL = response.get('faviconURL')
+  const publisherURL = response.get('publisherURL')
+
+  if (publisher.isEmpty()) {
+    revisited = false
+    synopsis.initPublisher(publisherKey)
+
+    synopsis.publishers[publisherKey].faviconName = faviconName
+    synopsis.publishers[publisherKey].faviconURL = faviconURL
+    synopsis.publishers[publisherKey].publisherURL = publisherURL
+    synopsis.publishers[publisherKey].providerName = response.get('providerName')
+
+    if (synopsis.publishers[publisherKey]) {
+      state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
+    }
+
+    if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
+      appActions.onPublisherOptionUpdate(publisherKey, 'exclude', true)
+      savePublisherOption(publisherKey, 'exclude', true)
+    } else {
+      excludeP(publisherKey, (unused, exclude) => {
+        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+        savePublisherOption(publisherKey, 'exclude', exclude)
+      })
+    }
+  } else {
+    synopsis.publishers[publisherKey].faviconName = faviconName
+    synopsis.publishers[publisherKey].faviconURL = faviconURL
+    synopsis.publishers[publisherKey].publisherURL = publisherURL
+    state = ledgerState.setPublishersProp(state, publisherKey, 'faviconName', faviconName)
+    state = ledgerState.setPublishersProp(state, publisherKey, 'faviconURL', faviconURL)
+    state = ledgerState.setPublishersProp(state, publisherKey, 'publisherURL', publisherURL)
+  }
+
+  // Add to cache
+  state = ledgerVideoCache.setCacheByVideoId(state, mediaKey, response)
+
+  state = module.exports.saveVisit(state, publisherKey, duration, revisited)
+
+  return state
+}
+
+const getMethods = () => {
+  const publicMethods = {
+    backupKeys,
+    recoverKeys,
+    quit,
+    pageDataChanged,
+    init,
+    initialize,
+    setPaymentInfo,
+    updatePublisherInfo,
+    networkConnected,
+    verifiedP,
+    boot,
+    onBootStateFile,
+    onWalletProperties,
+    paymentPresent,
+    addFoundClosed,
+    onWalletRecovery,
+    onBraveryProperties,
+    onLedgerFirstSync,
+    onCallback,
+    deleteSynopsisPublisher,
+    saveOptionSynopsis,
+    savePublisherOption,
+    onTimeUntilReconcile,
+    run,
+    onNetworkConnected,
+    migration,
+    onInitRead,
+    deleteSynopsis,
+    transitionWalletToBat,
+    getNewClient,
+    savePublisherData,
+    pruneSynopsis,
+    checkBtcBatMigrated,
+    onMediaRequest,
+    onMediaPublisher,
+    saveVisit
+  }
+
+  let privateMethods = {}
+
+  if (process.env.NODE_ENV === 'test') {
+    privateMethods = {
+      enable,
+      addSiteVisit,
+      checkBtcBatMigrated,
+      clearVisitsByPublisher: function () {
+        visitsByPublisher = {}
+      },
+      getVisitsByPublisher: function () {
+        return visitsByPublisher
+      },
+      getSynopsis: () => synopsis,
+      setSynopsis: (data) => {
+        synopsis = data
+      },
+      resetNewClient: () => {
+        newClient = false
+      },
+      getClient: () => {
+        return client
+      },
+      setClient: (data) => {
+        client = data
+      },
+      setCurrentMediaKey: (key) => {
+        currentMediaKey = key
+      },
+      getCurrentMediaKey: (key) => currentMediaKey,
+      synopsisNormalizer,
+      checkVerifiedStatus
+    }
+  }
+
+  return Object.assign({}, publicMethods, privateMethods)
+}
+
+module.exports = getMethods()

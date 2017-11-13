@@ -23,7 +23,10 @@ function config () {
             path.resolve(__dirname, 'app', 'browser', '*'),
             path.resolve(__dirname, 'app', 'extensions', '*')
           ],
-          loader: 'babel-loader'
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true
+          }
         },
         {
           test: /\.less$/,

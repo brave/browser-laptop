@@ -38,7 +38,7 @@ Join our [Discord community chat](https://discordapp.com/invite/k57tYrS) for hig
 
 ## Useful documentation
 
-* See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for tips and guidelines about contributing.
+* See [CONTRIBUTING.md](CONTRIBUTING.md) for tips and guidelines about contributing.
 * See [docs/style.md](docs/style.md) for information on styling.
 * See [docs/tests.md](docs/tests.md) for information on testing, including how to run a subset of the tests.
 * See [docs/debugging.md](docs/debugging.md) for information on debugging.

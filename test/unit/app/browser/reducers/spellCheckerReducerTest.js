@@ -6,15 +6,21 @@ const assert = require('assert')
 const fakeElectron = require('../../../lib/fakeElectron')
 
 const appConstants = require('../../../../../js/constants/appConstants')
+const settings = require('../../../../../js/constants/settings')
 require('../../../braveUnit')
 
 describe('spellCheckerReducer unit tests', function () {
   let spellCheckerReducer
-  let fakeWebContentsCache, fakeWebContents, fakeSpellChecker
-  let getWebContentsSpy, replaceMisspellingSpy, replaceSpy, addWordSpy, removeWordSpy
+  let fakeWebContentsCache, fakeWebContents, fakeSpellChecker, fakeSettings, fakeUserPrefs
+  let getWebContentsSpy, replaceMisspellingSpy, replaceSpy, addWordSpy, removeWordSpy,
+    setUserPrefSpy, getSettingSpy
+  let spellCheckEnabled
+  let dicts
   const dictionaryWord = 'braave'
   const dictionarySuggestion = 'brave'
   const tabId = 111
+  const enabledPref = 'browser.enable_spellchecking'
+  const dictsPref = 'spellcheck.dictionaries'
 
   before(function () {
     mockery.enable({
@@ -40,15 +46,34 @@ describe('spellCheckerReducer unit tests', function () {
       }
     }
 
+    fakeSettings = {
+      getSetting: (settingKey, settingsCollection) => {
+        switch (settingKey) {
+          case settings.SPELLCHECK_ENABLED:
+            return spellCheckEnabled
+          case settings.SPELLCHECK_LANGUAGES:
+            return dicts
+        }
+      }
+    }
+
+    fakeUserPrefs = {
+      setUserPref: (path, value, incognito = false) => {}
+    }
+
     getWebContentsSpy = sinon.spy(fakeWebContentsCache, 'getWebContents')
     replaceMisspellingSpy = sinon.spy(fakeWebContents, 'replaceMisspelling')
     replaceSpy = sinon.spy(fakeWebContents, 'replace')
     addWordSpy = sinon.spy(fakeSpellChecker, 'addWord')
     removeWordSpy = sinon.spy(fakeSpellChecker, 'removeWord')
+    setUserPrefSpy = sinon.spy(fakeUserPrefs, 'setUserPref')
+    getSettingSpy = sinon.spy(fakeSettings, 'getSetting')
 
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('../webContentsCache', fakeWebContentsCache)
     mockery.registerMock('../../spellChecker', fakeSpellChecker)
+    mockery.registerMock('../../../js/state/userPrefs', fakeUserPrefs)
+    mockery.registerMock('../../../js/settings', fakeSettings)
 
     spellCheckerReducer = require('../../../../../app/browser/reducers/spellCheckerReducer')
   })
@@ -124,6 +149,154 @@ describe('spellCheckerReducer unit tests', function () {
     })
     it('calls webcontents.replace', function () {
       assert(replaceSpy.withArgs(dictionaryWord).calledOnce)
+    })
+  })
+
+  describe('APP_WINDOW_CREATED', function () {
+    describe('APP_WINDOW_CREATED with enabled', function () {
+      before(function () {
+        getSettingSpy.reset()
+        setUserPrefSpy.reset()
+        spellCheckEnabled = true
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
+        spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
+          actionType: appConstants.APP_WINDOW_CREATED
+        }))
+      })
+      it('calls setUserPref to set enabledPref to true', function () {
+        assert(setUserPrefSpy.withArgs(enabledPref, true).calledOnce)
+      })
+      it('calls setUserPref to set dictionaries', function () {
+        assert(setUserPrefSpy.withArgs(dictsPref, dicts).calledOnce)
+      })
+    })
+    describe('APP_WINDOW_CREATED with disabled', function () {
+      before(function () {
+        getSettingSpy.reset()
+        setUserPrefSpy.reset()
+        spellCheckEnabled = false
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
+        spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
+          actionType: appConstants.APP_WINDOW_CREATED
+        }))
+      })
+      it('calls setUserPref to set enabledPref to true', function () {
+        assert(setUserPrefSpy.withArgs(enabledPref, false).calledOnce)
+      })
+      it('not calls setUserPref to set dictionaries', function () {
+        assert(setUserPrefSpy.withArgs(dictsPref, dicts).notCalled)
+      })
+    })
+  })
+
+  describe('APP_CHANGE_SETTING', function () {
+    describe('SPELLCHECK_ENABLED with enabled', function () {
+      before(function () {
+        getSettingSpy.reset()
+        setUserPrefSpy.reset()
+        spellCheckEnabled = true
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
+        spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
+          actionType: appConstants.APP_CHANGE_SETTING,
+          key: settings.SPELLCHECK_ENABLED
+        }))
+      })
+      it('calls setUserPref to set enabledPref to true', function () {
+        assert(setUserPrefSpy.withArgs(enabledPref, true).calledOnce)
+      })
+      it('calls setUserPref to set dictionaries', function () {
+        assert(setUserPrefSpy.withArgs(dictsPref, dicts).calledOnce)
+      })
+    })
+    describe('SPELLCHECK_ENABLED with disabled', function () {
+      before(function () {
+        getSettingSpy.reset()
+        setUserPrefSpy.reset()
+        spellCheckEnabled = false
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
+        spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
+          actionType: appConstants.APP_CHANGE_SETTING,
+          key: settings.SPELLCHECK_ENABLED
+        }))
+      })
+      it('calls setUserPref to set enabledPref to true', function () {
+        assert(setUserPrefSpy.withArgs(enabledPref, false).calledOnce)
+      })
+      it('not calls setUserPref to set dictionaries', function () {
+        assert(setUserPrefSpy.withArgs(dictsPref, dicts).notCalled)
+      })
+    })
+    describe('SPELLCHECK_LANGUAGES with enabled', function () {
+      before(function () {
+        getSettingSpy.reset()
+        setUserPrefSpy.reset()
+        spellCheckEnabled = true
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
+        spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
+          actionType: appConstants.APP_CHANGE_SETTING,
+          key: settings.SPELLCHECK_LANGUAGES
+        }))
+      })
+      it('calls setUserPref to set enabledPref to true', function () {
+        assert(setUserPrefSpy.withArgs(enabledPref, true).calledOnce)
+      })
+      it('calls setUserPref to set dictionaries', function () {
+        assert(setUserPrefSpy.withArgs(dictsPref, dicts).calledOnce)
+      })
+    })
+    describe('empty SPELLCHECK_LANGUAGES with enabled', function () {
+      before(function () {
+        getSettingSpy.reset()
+        setUserPrefSpy.reset()
+        spellCheckEnabled = true
+        dicts = Immutable.fromJS([])
+        spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
+          actionType: appConstants.APP_CHANGE_SETTING,
+          key: settings.SPELLCHECK_LANGUAGES
+        }))
+      })
+      it('not calls setUserPref to set enabledPref to true', function () {
+        assert(setUserPrefSpy.withArgs(enabledPref, true).notCalled)
+      })
+      it('not calls setUserPref to set dictionaries', function () {
+        assert(setUserPrefSpy.withArgs(dictsPref, dicts).notCalled)
+      })
+    })
+    describe('SPELLCHECK_LANGUAGES with disabled', function () {
+      before(function () {
+        getSettingSpy.reset()
+        setUserPrefSpy.reset()
+        spellCheckEnabled = false
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
+        spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
+          actionType: appConstants.APP_CHANGE_SETTING,
+          key: settings.SPELLCHECK_LANGUAGES
+        }))
+      })
+      it('calls setUserPref to set enabledPref to true', function () {
+        assert(setUserPrefSpy.withArgs(enabledPref, false).calledOnce)
+      })
+      it('not calls setUserPref to set dictionaries', function () {
+        assert(setUserPrefSpy.withArgs(dictsPref, dicts).notCalled)
+      })
+    })
+    describe('other settings', function () {
+      before(function () {
+        getSettingSpy.reset()
+        setUserPrefSpy.reset()
+        spellCheckEnabled = false
+        dicts = Immutable.fromJS(['en-US', 'fr-FR'])
+        spellCheckerReducer(Immutable.Map(), Immutable.fromJS({
+          actionType: appConstants.APP_CHANGE_SETTING,
+          key: 'other-settings'
+        }))
+      })
+      it('not calls setUserPref to set enabledPref to true', function () {
+        assert(setUserPrefSpy.withArgs(enabledPref, false).notCalled)
+      })
+      it('not calls setUserPref to set dictionaries', function () {
+        assert(setUserPrefSpy.withArgs(dictsPref, dicts).notCalled)
+      })
     })
   })
 })

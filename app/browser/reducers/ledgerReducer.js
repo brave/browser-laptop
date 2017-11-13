@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
+const {BrowserWindow} = require('electron')
 
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
@@ -11,6 +12,8 @@ const settings = require('../../../js/constants/settings')
 
 // State
 const ledgerState = require('../../common/state/ledgerState')
+const pageDataState = require('../../common/state/pageDataState')
+const migrationState = require('../../common/state/migrationState')
 
 // Utils
 const ledgerApi = require('../../browser/api/ledger')
@@ -63,12 +66,6 @@ const ledgerReducer = (state, action, immutableAction) => {
           state = ledgerState.resetSynopsis(state)
           ledgerApi.deleteSynopsis()
         }
-        break
-      }
-    case appConstants.APP_IDLE_STATE_CHANGED:
-      {
-        state = ledgerApi.pageDataChanged(state)
-        state = ledgerApi.addVisit(state, 'NOOP', new Date().getTime(), null)
         break
       }
     case appConstants.APP_CHANGE_SETTING:
@@ -154,6 +151,7 @@ const ledgerReducer = (state, action, immutableAction) => {
                 break
               }
               state = ledgerState.setPublishersProp(state, publisherKey, 'pinPercentage', value)
+              ledgerApi.savePublisherData(publisherKey, 'pinPercentage', value)
               state = ledgerApi.updatePublisherInfo(state, publisherKey)
               break
             }
@@ -198,15 +196,6 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerState.setInfoProp(state, 'hasBitcoinHandler', hasBitcoinHandler)
         break
       }
-    case 'event-set-page-info':
-    case appConstants.APP_WINDOW_BLURRED:
-    case appConstants.APP_CLOSE_WINDOW:
-    case windowConstants.WINDOW_SET_FOCUSED_FRAME:
-    case windowConstants.WINDOW_GOT_RESPONSE_DETAILS:
-      {
-        state = ledgerApi.pageDataChanged(state)
-        break
-      }
     case appConstants.APP_ON_FAVICON_RECEIVED:
       {
         state = ledgerState.setPublishersProp(state, action.get('publisherKey'), 'faviconURL', action.get('blob'))
@@ -222,12 +211,6 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.updatePublisherInfo(state)
         break
       }
-    case appConstants.APP_ON_LEDGER_LOCATION_UPDATE:
-      {
-        const location = action.get('location')
-        state = ledgerState.setLocationProp(state, location, action.get('prop'), action.get('value'))
-        break
-      }
     case appConstants.APP_ON_PUBLISHER_OPTION_UPDATE:
       {
         const value = action.get('value')
@@ -239,6 +222,10 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_LEDGER_WALLET_CREATE:
       {
         ledgerApi.boot()
+        if (ledgerApi.getNewClient() === null) {
+          state = migrationState.setConversionTimestamp(state, new Date().getTime())
+          state = migrationState.setTransitionStatus(state, false)
+        }
         break
       }
     case appConstants.APP_ON_BOOT_STATE_FILE:
@@ -314,23 +301,123 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_BTC_TO_BAT_NOTIFIED:
       {
-        state = state.setIn(['migrations', 'btc2BatNotifiedTimestamp'], new Date().getTime())
+        state = migrationState.setNotifiedTimestamp(state, new Date().getTime())
         break
       }
     case appConstants.APP_ON_BTC_TO_BAT_BEGIN_TRANSITION:
       {
-        state = state.setIn(['migrations', 'btc2BatTransitionPending'], true)
+        state = migrationState.setTransitionStatus(state, true)
         break
       }
     case appConstants.APP_ON_BTC_TO_BAT_TRANSITIONED:
       {
-        state = state.setIn(['migrations', 'btc2BatTimestamp'], new Date().getTime())
-        state = state.setIn(['migrations', 'btc2BatTransitionPending'], false)
+        state = migrationState.setConversionTimestamp(state, new Date().getTime())
+        state = migrationState.setTransitionStatus(state, false)
         break
       }
     case appConstants.APP_ON_LEDGER_QR_GENERATED:
       {
         state = ledgerState.saveQRCode(state, action.get('currency'), action.get('image'))
+        break
+      }
+    case appConstants.APP_IDLE_STATE_CHANGED:
+      {
+        if (!getSetting(settings.PAYMENTS_ENABLED)) {
+          break
+        }
+
+        if (action.has('idleState') && action.get('idleState') !== 'active') {
+          state = ledgerApi.pageDataChanged(state)
+        }
+        break
+      }
+    case windowConstants.WINDOW_SET_FOCUSED_FRAME:
+      {
+        if (!getSetting(settings.PAYMENTS_ENABLED)) {
+          break
+        }
+
+        if (action.get('location')) {
+          state = ledgerApi.pageDataChanged(state, {
+            location: action.get('location'),
+            tabId: action.get('tabId')
+          })
+        }
+        break
+      }
+    case appConstants.APP_WINDOW_BLURRED:
+      {
+        if (!getSetting(settings.PAYMENTS_ENABLED)) {
+          break
+        }
+
+        let windowCount = BrowserWindow.getAllWindows().filter((win) => win.isFocused()).length
+        if (windowCount === 0) {
+          state = ledgerApi.pageDataChanged(state, {}, true)
+        }
+        break
+      }
+    case 'event-set-page-info':
+      {
+        if (!getSetting(settings.PAYMENTS_ENABLED)) {
+          break
+        }
+
+        state = ledgerApi.pageDataChanged(state, {
+          location: action.getIn(['pageInfo', 'url'])
+        })
+        break
+      }
+    case appConstants.APP_CLOSE_WINDOW:
+      {
+        if (!getSetting(settings.PAYMENTS_ENABLED)) {
+          break
+        }
+
+        state = ledgerApi.pageDataChanged(state)
+        break
+      }
+    case windowConstants.WINDOW_GOT_RESPONSE_DETAILS:
+      {
+        if (!getSetting(settings.PAYMENTS_ENABLED)) {
+          break
+        }
+
+        // Only capture response for the page (not sub resources, like images, JavaScript, etc)
+        if (action.getIn(['details', 'resourceType']) === 'mainFrame') {
+          const pageUrl = action.getIn(['details', 'newURL'])
+
+          // create a page view event if this is a page load on the active tabId
+          const lastActiveTabId = pageDataState.getLastActiveTabId(state)
+          const tabId = action.get('tabId')
+          if (!lastActiveTabId || tabId === lastActiveTabId) {
+            state = ledgerApi.pageDataChanged(state, {
+              location: pageUrl,
+              tabId
+            })
+          }
+        }
+        break
+      }
+    case appConstants.APP_ON_PUBLISHER_TIMESTAMP:
+      {
+        state = ledgerState.setLedgerValue(state, 'publisherTimestamp', action.get('timestamp'))
+        break
+      }
+    case appConstants.APP_ON_LEDGER_MEDIA_DATA:
+      {
+        state = ledgerApi.onMediaRequest(state, action.get('url'), action.get('type'), action.get('tabId'))
+        break
+      }
+    case appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER:
+      {
+        state = ledgerApi.onMediaPublisher(
+          state,
+          action.get('mediaKey'),
+          action.get('response'),
+          action.get('duration'),
+          action.get('revisited')
+        )
         break
       }
   }

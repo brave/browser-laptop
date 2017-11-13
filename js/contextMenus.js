@@ -517,17 +517,20 @@ function tabTemplateInit (frameProps) {
 
   template.push(CommonMenu.separatorMenuItem)
 
-  if (!frameProps.get('pinnedLocation')) {
-    template.push({
-      label: locale.translation('closeTab'),
-      click: (item, focusedWindow) => {
-        if (focusedWindow) {
-          // TODO: Don't switch active tabs when this is called
-          focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME, tabId)
+  template.push({
+    label: locale.translation('closeTab'),
+    click: (item, focusedWindow) => {
+      if (focusedWindow) {
+        const isPinned = frameProps.get('pinnedLocation')
+        // if a tab is pinned, unpin it first then close
+        if (isPinned) {
+          appActions.tabPinned(tabId, !isPinned)
         }
+        // TODO: Don't switch active tabs when this is called
+        focusedWindow.webContents.send(messages.SHORTCUT_CLOSE_FRAME, tabId)
       }
-    })
-  }
+    }
+  })
 
   template.push({
     label: locale.translation('closeOtherTabs'),

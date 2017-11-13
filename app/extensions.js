@@ -148,6 +148,23 @@ let generateBraveManifest = () => {
           indexHTML,
           getBraveExtUrl('*')
         ]
+      },
+      {
+        run_at: 'document_start',
+        all_frames: true,
+        js: [
+          'content/scripts/dappListener.js'
+        ],
+        matches: [
+          '<all_urls>'
+        ],
+        include_globs: [
+          'http://*/*', 'https://*/*', 'file://*'
+        ],
+        exclude_globs: [
+          indexHTML,
+          getBraveExtUrl('*')
+        ]
       }
     ],
     web_accessible_resources: [
@@ -243,7 +260,7 @@ let generateSyncManifest = () => {
     'default-src': '\'self\'',
     'form-action': '\'none\''
   }
-  const connectSources = ['\'self\'', appConfig.sync.serverUrl, appConfig.sync.s3Url]
+  const connectSources = ['\'self\'', appConfig.sync.serverUrl, appConfig.sync.s3Url, appConfig.sync.snsUrl, appConfig.sync.sqsUrl]
   if (process.env.NODE_ENV === 'development') {
     connectSources.push(appConfig.sync.testS3Url)
   }
@@ -442,13 +459,13 @@ module.exports.init = () => {
       // Verify we don't have info about an extension which doesn't exist
       // on disk anymore.  It will crash if it doesn't exist, so this is
       // just a safety net.
-      fs.exists(path.join(extensionPath, 'manifest.json'), (exists) => {
-        if (exists) {
-          session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
-        } else {
+      fs.access(path.join(extensionPath, 'manifest.json'), fs.constants.F_OK, (err) => {
+        if (err) {
           // This is an error condition, but we can recover.
           extensionInfo.setState(extensionId, undefined)
           componentUpdater.checkNow(extensionId)
+        } else {
+          session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
         }
       })
     } else {

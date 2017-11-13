@@ -2,6 +2,8 @@
 logs
 *.log
 npm-debug.log.*
+cpu-profiles
+*.cpuprofile
 
 # Runtime data
 pids
@@ -56,7 +58,7 @@ app/extensions/gen
 app/extensions/brave/gen
 app/extensions/torrent/gen
 *.pfx
-buildConfig.js
+js/constants/buildConfig.js
 
 # HTTPS Everywhere files
 rulesets.json

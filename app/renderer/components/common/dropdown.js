@@ -40,18 +40,6 @@ class SettingDropdown extends ImmutableComponent {
   }
 }
 
-class PanelDropdown extends ImmutableComponent {
-  render () {
-    return <FormDropdown data-isPanel {...this.props} />
-  }
-}
-
-class BraveryPanelDropdown extends ImmutableComponent {
-  render () {
-    return <FormDropdown data-isBraveryPanel {...this.props} />
-  }
-}
-
 const selectPadding = '0.4em'
 
 const styles = StyleSheet.create({
@@ -65,7 +53,10 @@ const styles = StyleSheet.create({
     // right padding is larger, to account for the down arrow SVG
     padding: `${selectPadding} 2em ${selectPadding} ${selectPadding}`,
     '-webkit-appearance': 'none',
-    width: 'auto'
+    width: 'auto',
+
+    // See: #11646
+    maxWidth: '100%'
   },
 
   outlineable: {
@@ -95,15 +86,12 @@ const styles = StyleSheet.create({
   },
 
   braveryPanel: {
-    fontSize: '13px',
-    width: '100%'
+    fontSize: '13px'
   }
 })
 
 module.exports = {
   Dropdown,
   FormDropdown,
-  SettingDropdown,
-  PanelDropdown,
-  BraveryPanelDropdown
+  SettingDropdown
 }

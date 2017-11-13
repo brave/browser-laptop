@@ -7,6 +7,7 @@
 const Immutable = require('immutable')
 const moment = require('moment')
 const BigNumber = require('bignumber.js')
+const queryString = require('querystring')
 
 // State
 const siteSettingsState = require('../state/siteSettingsState')
@@ -14,61 +15,43 @@ const ledgerState = require('../state/ledgerState')
 
 // Constants
 const settings = require('../../../js/constants/settings')
+const ledgerMediaProviders = require('../constants/ledgerMediaProviders')
 
 // Utils
 const {responseHasContent} = require('./httpUtil')
 const urlUtil = require('../../../js/lib/urlutil')
-const {makeImmutable} = require('../state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
+const urlParse = require('../urlParse')
 
 /**
  * Is page an actual page being viewed by the user? (not an error page, etc)
  * If the page is invalid, we don't want to collect usage info.
- * @param {Map} view - an entry from ['pageData', 'view']
- * @param {List} responseList - full ['pageData', 'load'] List
+ * @param {Map} tabValue - data about provided tab
  * @return {boolean} true if page should have usage collected, false if not
  */
-const shouldTrackView = (view, responseList) => {
-  if (view == null) {
+const shouldTrackView = (tabValue) => {
+  if (tabValue == null) {
     return false
   }
 
-  view = makeImmutable(view)
-  const tabId = view.get('tabId')
-  const url = view.get('url')
+  const aboutError = tabValue.has('aboutDetails')
+  const activeEntry = tabValue.getIn(['navigationState', 'activeEntry']) || {}
+  const response = activeEntry.httpStatusCode === 0 || responseHasContent(activeEntry.httpStatusCode)
 
-  if (!url || !tabId) {
-    return false
-  }
-
-  responseList = makeImmutable(responseList)
-  if (!responseList || responseList.size === 0) {
-    return false
-  }
-
-  for (let i = (responseList.size - 1); i > -1; i--) {
-    const response = responseList.get(i)
-
-    if (!response) {
-      continue
-    }
-
-    const responseUrl = response.getIn(['details', 'newURL'], null)
-
-    if (url === responseUrl && response.get('tabId') === tabId) {
-      return responseHasContent(response.getIn(['details', 'httpResponseCode']))
-    }
-  }
-
-  return false
+  return !aboutError && response
 }
 
 const batToCurrencyString = (bat, ledgerData) => {
   const balance = Number(bat || 0)
   const currency = 'USD'
 
-  if (balance === 0 || ledgerData == null) {
-    return `0 ${currency}`
+  if (balance === 0) {
+    return `0.00 ${currency}`
+  }
+
+  const hasBeenUpgraded = ledgerData && ledgerData.hasIn(['rates', 'BTC'])
+  if (ledgerData == null || !hasBeenUpgraded) {
+    return ''
   }
 
   const rate = ledgerData.get('currentRate') || 0
@@ -85,7 +68,7 @@ const formatCurrentBalance = (ledgerData) => {
   if (ledgerData != null) {
     balance = Number(ledgerData.get('balance') || 0)
     converted = Number.parseFloat(ledgerData.get('converted')) || 0
-    hasRate = ledgerData.has('currentRate')
+    hasRate = ledgerData.has('currentRate') && ledgerData.hasIn(['rates', 'BTC'])
   }
 
   balance = balance.toFixed(2)
@@ -208,16 +191,136 @@ const stickyP = (state, publisherKey) => {
   return (result === undefined || result)
 }
 
-module.exports = {
-  shouldTrackView,
-  batToCurrencyString,
-  formattedTimeFromNow,
-  formattedDateFromTimestamp,
-  walletStatus,
-  blockedP,
-  contributeP,
-  visibleP,
-  eligibleP,
-  stickyP,
-  formatCurrentBalance
+const getMediaId = (data, type) => {
+  let id = null
+
+  if (type == null || data == null) {
+    return id
+  }
+
+  switch (type) {
+    case ledgerMediaProviders.YOUTUBE:
+      {
+        id = data.docid
+        break
+      }
+  }
+
+  return id
 }
+
+const getMediaKey = (id, type) => {
+  if (id == null || type == null) {
+    return null
+  }
+
+  return `${type.toLowerCase()}_${id}`
+}
+
+const getMediaData = (xhr, type) => {
+  let result = null
+
+  if (xhr == null || type == null) {
+    return result
+  }
+
+  switch (type) {
+    case ledgerMediaProviders.YOUTUBE:
+      {
+        const parsedUrl = urlParse(xhr)
+        let query = null
+
+        if (parsedUrl && parsedUrl.query) {
+          query = queryString.parse(parsedUrl.query)
+        }
+        result = query
+        break
+      }
+  }
+
+  return result
+}
+
+const getMediaDuration = (data, type) => {
+  let duration = 0
+  switch (type) {
+    case ledgerMediaProviders.YOUTUBE: {
+      duration = getYouTubeDuration(data)
+      break
+    }
+  }
+
+  return duration
+}
+
+const getYouTubeDuration = (data) => {
+  let time = 0
+
+  if (data == null || data.st == null || data.et == null) {
+    return time
+  }
+
+  const startTime = data.st.split(',')
+  const endTime = data.et.split(',')
+
+  if (startTime.length !== endTime.length) {
+    return time
+  }
+
+  for (let i = 0; i < startTime.length; i++) {
+    time += parseFloat(endTime[i]) - parseFloat(startTime[i])
+  }
+
+  // we get seconds back, so we need to convert it into ms
+  time = time * 1000
+
+  return parseInt(time)
+}
+
+const getMediaProvider = (url) => {
+  let provider = null
+
+  if (url == null) {
+    return provider
+  }
+
+  // Youtube
+  if (url.startsWith('https://www.youtube.com/api/stats/watchtime?')) {
+    provider = ledgerMediaProviders.YOUTUBE
+  }
+
+  return provider
+}
+
+const getMethods = () => {
+  const publicMethods = {
+    shouldTrackView,
+    batToCurrencyString,
+    formattedTimeFromNow,
+    formattedDateFromTimestamp,
+    walletStatus,
+    blockedP,
+    contributeP,
+    visibleP,
+    eligibleP,
+    stickyP,
+    formatCurrentBalance,
+    getMediaId,
+    getMediaDuration,
+    getMediaProvider,
+    getMediaData,
+    getMediaKey
+  }
+
+  let privateMethods = {}
+
+  if (process.env.NODE_ENV === 'test') {
+    privateMethods = {
+      getYouTubeDuration
+    }
+  }
+
+  return Object.assign({}, publicMethods, privateMethods)
+}
+
+module.exports = getMethods()

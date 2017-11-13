@@ -37,7 +37,6 @@ const globalStyles = require('../styles/global')
 const {theme} = require('../styles/theme')
 
 // Utils
-const cx = require('../../../../js/lib/classSet')
 const {getTextColorForBackground} = require('../../../../js/lib/color')
 const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 const contextMenus = require('../../../../js/contextMenus')
@@ -61,6 +60,7 @@ class Tab extends React.Component {
     this.onDragOver = this.onDragOver.bind(this)
     this.onClickTab = this.onClickTab.bind(this)
     this.onObserve = this.onObserve.bind(this)
+    this.onTabClosedWithMouse = this.onTabClosedWithMouse.bind(this)
     this.tabNode = null
   }
 
@@ -191,12 +191,7 @@ class Tab extends React.Component {
         return
       case 1:
         // Close tab with middle click
-        // This is ignored for pinned tabs
-        // TODO: @cezaraugusto remove conditional
-        // when #4063 is resolved
-        if (!this.props.isPinnedTab) {
-          this.onTabClosedWithMouse(e)
-        }
+        this.onTabClosedWithMouse(e)
         break
       default:
         e.stopPropagation()
@@ -239,7 +234,7 @@ class Tab extends React.Component {
       return 0
     }
 
-    const rect = this.tabNode.parentNode.getBoundingClientRect()
+    const rect = this.elementRef.getBoundingClientRect()
     return rect && rect.width
   }
 
@@ -279,34 +274,55 @@ class Tab extends React.Component {
     return props
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (this.props.tabWidth && !nextProps.tabWidth) {
+      // remember the width so we can transition from it
+      this.originalWidth = this.elementRef.getBoundingClientRect().width
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.tabWidth && !this.props.tabWidth) {
+      window.requestAnimationFrame(() => {
+        const newWidth = this.elementRef.getBoundingClientRect().width
+        this.elementRef.animate([
+          { flexBasis: `${this.originalWidth}px`, flexGrow: 0, flexShrink: 0 },
+          { flexBasis: `${newWidth}px`, flexGrow: 0, flexShrink: 0 }
+        ], {
+          duration: 250,
+          iterations: 1,
+          easing: 'ease-in-out'
+        })
+      })
+    }
+  }
+
   render () {
     // we don't want themeColor if tab is private
-    const perPageStyles = !this.props.isPrivateTab && StyleSheet.create({
-      tab_themeColor: {
-        color: this.props.themeColor ? getTextColorForBackground(this.props.themeColor) : 'inherit',
-        background: this.props.themeColor ? this.props.themeColor : 'inherit',
-        ':hover': {
-          color: this.props.themeColor ? getTextColorForBackground(this.props.themeColor) : 'inherit',
-          background: this.props.themeColor ? this.props.themeColor : 'inherit'
-        }
-      }
-    })
+    const isThemed = !this.props.isPrivateTab && this.props.isActive && this.props.themeColor
+    const instanceStyles = { }
+    if (isThemed) {
+      instanceStyles['--theme-color-fg'] = getTextColorForBackground(this.props.themeColor)
+      instanceStyles['--theme-color-bg'] = this.props.themeColor
+    }
     return <div
       data-tab-area
-      className={cx({
-        tabArea: true,
-        draggingOverLeft: this.isDraggingOverLeft && !this.isDraggingOverSelf,
-        draggingOverRight: this.isDraggingOverRight && !this.isDraggingOverSelf,
-        isDragging: this.isDragging,
-        isPinned: this.props.isPinnedTab,
-        partOfFullPageSet: this.props.partOfFullPageSet || !!this.props.tabWidth
-      })}
+      className={css(
+        styles.tabArea,
+        (this.isDraggingOverLeft && !this.isDraggingOverSelf) && styles.tabArea_dragging_left,
+        (this.isDraggingOverRight && !this.isDraggingOverSelf) && styles.tabArea_dragging_right,
+        this.isDragging && styles.tabArea_isDragging,
+        this.props.isPinnedTab && styles.tabArea_isPinned,
+        (this.props.partOfFullPageSet || !!this.props.tabWidth) && styles.tabArea_partOfFullPageSet
+      )}
       style={this.props.tabWidth ? { flex: `0 0 ${this.props.tabWidth}px` } : {}}
       onMouseMove={this.onMouseMove}
       onMouseEnter={this.onMouseEnter}
       onMouseLeave={this.onMouseLeave}
       data-test-id='tab-area'
-      data-frame-key={this.props.frameKey}>
+      data-frame-key={this.props.frameKey}
+      ref={elementRef => { this.elementRef = elementRef }}
+      >
       {
         this.props.isActive && this.props.notificationBarActive
           ? <NotificationBarCaret />
@@ -316,18 +332,25 @@ class Tab extends React.Component {
         data-tab
         ref={(node) => { this.tabNode = node }}
         className={css(
-          styles.tab,
-          // Windows specific style
-          isWindows && styles.tab_forWindows,
-          this.props.isPinnedTab && styles.tab_pinned,
-          this.props.isActive && styles.tab_active,
-          this.props.isActive && this.props.themeColor && perPageStyles.tab_themeColor,
-          this.props.showAudioTopBorder && styles.tab_audioTopBorder,
-          // Private color should override themeColor
-          this.props.isPrivateTab && styles.tab_private,
-          this.props.isActive && this.props.isPrivateTab && styles.tab_active_private,
-          this.props.centralizeTabIcons && styles.tab__content_centered
+          styles.tabArea__tab,
+
+          // tab icon only (on pinned tab / small tab)
+          this.props.isPinnedTab && styles.tabArea__tab_pinned,
+          this.props.centralizeTabIcons && styles.tabArea__tab_centered,
+          this.props.showAudioTopBorder && styles.tabArea__tab_audioTopBorder,
+
+          // Windows specific style (color)
+          isWindows && styles.tabArea__tab_forWindows,
+
+          // Set background-color and color to active tab and private tab
+          this.props.isActive && styles.tabArea__tab_active,
+          this.props.isPrivateTab && styles.tabArea__tab_private,
+          (this.props.isPrivateTab && this.props.isActive) && styles.tabArea__tab_private_active,
+
+          // Apply themeColor if tab is active and not private
+          isThemed && styles.tabArea__tab_themed
         )}
+        style={instanceStyles}
         data-test-id='tab'
         data-test-active-tab={this.props.isActive}
         data-test-pinned-tab={this.props.isPinnedTab}
@@ -344,11 +367,11 @@ class Tab extends React.Component {
       >
         <div
           ref={(node) => { this.tabSentinel = node }}
-          className={css(styles.tab__sentinel)}
+          className={css(styles.tabArea__tab__sentinel)}
         />
         <div className={css(
-          styles.tab__identity,
-          this.props.centralizeTabIcons && styles.tab__content_centered
+          styles.tabArea__tab__identity,
+          this.props.centralizeTabIcons && styles.tabArea__tab__identity_centered
         )}>
           <Favicon tabId={this.props.tabId} />
           <AudioTabIcon tabId={this.props.tabId} />
@@ -356,17 +379,57 @@ class Tab extends React.Component {
         </div>
         <PrivateIcon tabId={this.props.tabId} />
         <NewSessionIcon tabId={this.props.tabId} />
-        <CloseTabIcon tabId={this.props.tabId} fixTabWidth={this.fixTabWidth} />
+        <CloseTabIcon tabId={this.props.tabId} onClick={this.onTabClosedWithMouse} />
       </div>
     </div>
   }
 }
 
 const styles = StyleSheet.create({
-  tab: {
+  tabArea: {
+    boxSizing: 'border-box',
+    display: 'inline-block',
+    position: 'relative',
+    verticalAlign: 'top',
+    overflow: 'hidden',
+    height: '-webkit-fill-available',
+    flex: 1,
+
+    // no-drag is applied to the button and tab area
+    // ref: tabs__tabStrip__newTabButton on tabs.js
+    WebkitAppRegion: 'no-drag',
+
+    // There's a special case that tabs should span the full width
+    // if there are a full set of them.
+    maxWidth: '184px'
+  },
+
+  tabArea_dragging_left: {
+    paddingLeft: globalStyles.spacing.dragSpacing
+  },
+
+  tabArea_dragging_right: {
+    paddingRight: globalStyles.spacing.dragSpacing
+  },
+
+  tabArea_isDragging: {
+    opacity: 0.2,
+    paddingLeft: 0,
+    paddingRight: 0
+  },
+
+  tabArea_isPinned: {
+    flex: 'initial'
+  },
+
+  tabArea_partOfFullPageSet: {
+    maxWidth: 'initial'
+  },
+
+  tabArea__tab: {
     borderWidth: '0 1px 0 0',
     borderStyle: 'solid',
-    borderColor: '#bbb',
+    borderColor: theme.tab.borderColor,
     boxSizing: 'border-box',
     color: theme.tab.color,
     display: 'flex',
@@ -382,26 +445,7 @@ const styles = StyleSheet.create({
     }
   },
 
-  // Windows specific style
-  tab_forWindows: {
-    color: theme.tab.forWindows.color
-  },
-
-  tab_pinned: {
-    padding: 0,
-    width: '28px',
-    justifyContent: 'center'
-  },
-
-  tab_active: {
-    background: theme.tab.active.background,
-
-    ':hover': {
-      background: theme.tab.active.background
-    }
-  },
-
-  tab_audioTopBorder: {
+  tabArea__tab_audioTopBorder: {
     '::before': {
       zIndex: globalStyles.zindex.zindexTabsAudioTopBorder,
       content: `''`,
@@ -415,11 +459,65 @@ const styles = StyleSheet.create({
     }
   },
 
+  tabArea__tab_pinned: {
+    padding: 0,
+    width: '28px',
+    justifyContent: 'center'
+  },
+
+  tabArea__tab_centered: {
+    flex: 'auto',
+    justifyContent: 'center',
+    padding: 0,
+    margin: 0
+  },
+
+  // Windows specific style
+  tabArea__tab_forWindows: {
+    color: theme.tab.forWindows.color
+  },
+
+  tabArea__tab_active: {
+    background: theme.tab.active.background,
+
+    ':hover': {
+      background: theme.tab.active.background
+    }
+  },
+
+  tabArea__tab_private: {
+    background: theme.tab.private.background,
+
+    ':hover': {
+      color: theme.tab.active.private.color,
+      background: theme.tab.active.private.background
+    }
+  },
+
+  tabArea__tab_private_active: {
+    background: theme.tab.active.private.background,
+    color: theme.tab.active.private.color,
+
+    ':hover': {
+      background: theme.tab.active.private.background
+    }
+  },
+
+  tabArea__tab_themed: {
+    color: `var(--theme-color-fg, inherit)`,
+    background: `var(--theme-color-bg, inherit)`,
+
+    ':hover': {
+      color: `var(--theme-color-fg, inherit)`,
+      background: `var(--theme-color-bg, inherit)`
+    }
+  },
+
   // The sentinel is responsible to respond to tabs
   // intersection state. This is an empty hidden element
   // which `width` value shouldn't be changed unless the intersection
   // point needs to be edited.
-  tab__sentinel: {
+  tabArea__tab__sentinel: {
     position: 'absolute',
     left: 0,
     height: '1px',
@@ -427,7 +525,7 @@ const styles = StyleSheet.create({
     width: globalStyles.spacing.sentinelSize
   },
 
-  tab__identity: {
+  tabArea__tab__identity: {
     justifyContent: 'flex-start',
     alignItems: 'center',
     overflow: 'hidden',
@@ -437,29 +535,11 @@ const styles = StyleSheet.create({
     margin: `0 ${globalStyles.spacing.defaultTabMargin}`
   },
 
-  tab__content_centered: {
+  tabArea__tab__identity_centered: {
     justifyContent: 'center',
     flex: 'auto',
     padding: 0,
     margin: 0
-  },
-
-  tab_active_private: {
-    background: theme.tab.active.private.background,
-    color: theme.tab.active.private.color,
-
-    ':hover': {
-      background: theme.tab.active.private.background
-    }
-  },
-
-  tab_private: {
-    background: theme.tab.private.background,
-
-    ':hover': {
-      color: theme.tab.active.private.color,
-      background: theme.tab.active.private.background
-    }
   }
 })
 

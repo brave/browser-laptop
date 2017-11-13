@@ -773,6 +773,24 @@ const doAction = (action) => {
     case appConstants.APP_WINDOW_RESIZED:
       windowState = windowState.set('windowInfo', action.windowValue)
       break
+    case windowConstants.WINDOW_TAB_MOVE_INCREMENTAL_REQUESTED:
+      const sourceFrame = frameStateUtil.getActiveFrame(windowState)
+      const sourceIsPinned = sourceFrame.get('pinnedLocation')
+      const frameGroup = sourceIsPinned ? frameStateUtil.getPinnedFrames(windowState) : frameStateUtil.getNonPinnedFrames(windowState)
+      const sourceFrameGroupIndex = frameGroup.indexOf(sourceFrame)
+      const destinationFrameGroupIndex = sourceFrameGroupIndex + (action.moveNext ? 1 : -1)
+      // conditions we cannot move tab:
+      // - if we can't find it,
+      // - if we ask to move to previous and tab is first,
+      // - or we ask to move to next and tab is last
+      if (destinationFrameGroupIndex < 0 || destinationFrameGroupIndex >= frameGroup.count()) {
+        break
+      }
+      const destinationFrame = frameGroup.get(destinationFrameGroupIndex)
+      const destinationFrameIndex = frameStateUtil.getFrameIndex(windowState, destinationFrame.get('key'))
+      const sourceFrameTabId = sourceFrame.get('tabId')
+      appActions.tabIndexChangeRequested(sourceFrameTabId, destinationFrameIndex)
+      break
     default:
       break
   }

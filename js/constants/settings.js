@@ -8,7 +8,6 @@ const settings = {
   HOMEPAGE: 'general.homepage',
   NEWTAB_MODE: 'general.newtab-mode',
   SHOW_HOME_BUTTON: 'general.show-home-button',
-  DEFAULT_DOWNLOAD_SAVE_PATH: 'general.downloads.default-save-path',
   AUTO_HIDE_MENU: 'general.autohide-menu',
   DISABLE_TITLE_MODE: 'general.disable-title-mode',
   WIDE_URL_BAR: 'general.wide-url-bar',
@@ -19,6 +18,8 @@ const settings = {
   IS_DEFAULT_BROWSER: 'general.is-default-browser',
   DOWNLOAD_DEFAULT_PATH: 'general.download-default-path',
   DOWNLOAD_ALWAYS_ASK: 'general.download-always-ask',
+  SPELLCHECK_ENABLED: 'general.spellcheck-enabled',
+  SPELLCHECK_LANGUAGES: 'general.spellcheck-languages',
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
   OFFER_SEARCH_SUGGESTIONS: 'search.offer-search-suggestions',
@@ -52,6 +53,7 @@ const settings = {
   // Autofill
   AUTOFILL_ENABLED: 'privacy.autofill-enabled',
   // Payments Tab
+  PAYMENTS_ALLOW_MEDIA_PUBLISHERS: 'payments.allow-media-publishers',
   PAYMENTS_ALLOW_NON_VERIFIED: 'payments.allow-non-verified-publishers',
   PAYMENTS_CONTRIBUTION_AMOUNT: 'payments.contribution-amount',
   PAYMENTS_ENABLED: 'payments.enabled',
@@ -75,7 +77,6 @@ const settings = {
   SMOOTH_SCROLL_ENABLED: 'advanced.smooth-scroll-enabled',
   SEND_CRASH_REPORTS: 'advanced.send-crash-reports',
   SEND_USAGE_STATISTICS: 'advanced.send-usage-statistics',
-  UPDATE_TO_PREVIEW_RELEASES: 'advanced.update-to-preview-releases',
   ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
   TOOLBAR_UI_SCALE: 'advanced.toolbar-ui-scale',
   SWIPE_NAV_DISTANCE: 'advanced.swipe-nav-distance',
@@ -92,6 +93,7 @@ const settings = {
   HONEY_ENABLED: 'extensions.honey.enabled',
   PINTEREST_ENABLED: 'extensions.pinterest.enabled',
   METAMASK_ENABLED: 'extensions.metamask.enabled',
+  METAMASK_PROMPT_DISMISSED: 'extensions.metamask.promptDismissed',
 
   // DEPRECATED settings
   // DO NOT REMOVE OR CHANGE THESE VALUES

@@ -126,19 +126,12 @@ class GeneralTab extends ImmutableComponent {
   }
 
   openDownloadDialog () {
-    appActions.defaultDownloadPath()
+    appActions.selectDefaultDownloadPath()
   }
 
   render () {
-    const languageOptions = this.props.languageCodes.map(function (lc) {
-      return (
-        <option data-l10n-id={lc} value={lc} />
-      )
-    })
-
     const homepage = getSetting(settings.HOMEPAGE, this.props.settings)
     const disableShowHomeButton = !homepage || !homepage.length
-    const defaultLanguage = this.props.languageCodes.find((lang) => lang.includes(navigator.language)) || 'en-US'
     const defaultBrowser = getSetting(settings.IS_DEFAULT_BROWSER, this.props.settings)
       ? <SettingItem dataL10nId='defaultBrowser' />
       : <SettingItem dataL10nId='notDefaultBrowser' >
@@ -148,7 +141,6 @@ class GeneralTab extends ImmutableComponent {
           onClick={this.setAsDefaultBrowser}
         />
       </SettingItem>
-
     const defaultZoomSetting = getSetting(settings.DEFAULT_ZOOM_LEVEL, this.props.settings)
     return <SettingsList>
       <DefaultSectionTitle data-test-id='generalSettings' data-l10n-id='generalSettings' />
@@ -211,12 +203,6 @@ class GeneralTab extends ImmutableComponent {
           <SettingCheckbox id='bookmarksBarSwitch' dataL10nId='bookmarkToolbar'
             prefKey={settings.SHOW_BOOKMARKS_TOOLBAR} settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting} />
-        </SettingItem>
-        <SettingItem dataL10nId='selectedLanguage'>
-          <SettingDropdown value={getSetting(settings.LANGUAGE, this.props.settings) || defaultLanguage}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.LANGUAGE)}>
-            {languageOptions}
-          </SettingDropdown>
         </SettingItem>
         <SettingItem dataL10nId='defaultZoomLevel'>
           <SettingDropdown
@@ -370,21 +356,21 @@ class SitePermissionsPage extends React.Component {
     return this.isPermissionsNonEmpty()
     ? <div id='sitePermissionsPage'>
       <DefaultSectionTitle data-l10n-id={this.props.defaults ? 'sitePermissionsExceptions' : 'sitePermissions'} />
-      <ul className='sitePermissions'>
+      <ul className={css(styles.sitePermissions)}>
         {
           Object.keys(this.props.names).map((name) =>
             this.hasEntryForPermission(name)
             ? <li>
               <div>
-                <span data-l10n-id={name} className='permissionName' />
-                <span className='clearAll'>
+                <span data-l10n-id={name} className={css(styles.sitePermissions__permissionName)} />
+                <span className={css(styles.sitePermissions__clearAll)}>
                   (
-                  <span className='clearAllLink' data-l10n-id='clearAll'
+                  <span className={css(styles.sitePermissions__clearAll__link)} data-l10n-id='clearAll'
                     onClick={this.clearPermissions.bind(this, name)} />
                   )
                 </span>
               </div>
-              <ul>
+              <ul className={css(styles.sitePermissions__list)}>
                 {
                   this.props.siteSettings.map((value, hostPattern) => {
                     if (!value.size) {
@@ -434,11 +420,16 @@ class SitePermissionsPage extends React.Component {
                       } else {
                         statusText = granted ? 'on' : 'off'
                       }
-                      return <div className='permissionItem'>
-                        <span className='fa fa-times permissionAction'
-                          onClick={this.deletePermission.bind(this, name, hostPattern)} />
-                        <span className='permissionHost'>{hostPattern + ': '}</span>
-                        <span className='permissionStatus'
+                      return <div className={css(styles.sitePermissions__list__item)}>
+                        <BrowserButton
+                          iconOnly
+                          iconClass={globalStyles.appIcons.remove}
+                          size='1rem'
+                          custom={styles.sitePermissions__list__item__button}
+                          onClick={this.deletePermission.bind(this, name, hostPattern)}
+                        />
+                        <span>{hostPattern + ':'}</span>
+                        <span className={css(styles.sitePermissions__list__item__status)}
                           data-l10n-id={statusText}
                           data-l10n-args={statusArgs ? JSON.stringify(statusArgs) : null} />
                       </div>
@@ -846,7 +837,8 @@ class AboutPreferences extends React.Component {
       settings.TORRENT_VIEWER_ENABLED,
       settings.SMOOTH_SCROLL_ENABLED,
       settings.SEND_CRASH_REPORTS,
-      settings.UPDATE_TO_PREVIEW_RELEASES
+      settings.SPELLCHECK_ENABLED,
+      settings.SPELLCHECK_LANGUAGES
     ]
     if (settingsRequiringRestart.includes(key)) {
       ipc.send(messages.PREFS_RESTART, key, value)
@@ -966,7 +958,10 @@ class AboutPreferences extends React.Component {
         tab = <SecurityTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
         break
       case preferenceTabs.ADVANCED:
-        tab = <AdvancedTab settings={settings} onChangeSetting={this.onChangeSetting} />
+        tab = <AdvancedTab
+          settings={settings}
+          languageCodes={languageCodes}
+          onChangeSetting={this.onChangeSetting} />
         break
     }
     return <div>
@@ -984,6 +979,51 @@ class AboutPreferences extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  sitePermissions: {
+    listStyle: 'none',
+    margin: '20px'
+  },
+
+  sitePermissions__permissionName: {
+    fontWeight: 600
+  },
+
+  sitePermissions__clearAll: {
+    cursor: 'pointer',
+    color: globalStyles.color.gray,
+    textDecoration: 'underline',
+    marginLeft: '.5ch'
+  },
+
+  sitePermissions__clearAll__link: {
+    // override the global value
+    color: globalStyles.color.gray
+  },
+
+  sitePermissions__list: {
+    marginBottom: '1rem'
+  },
+
+  sitePermissions__list__item: {
+    display: 'flex',
+    alignItems: 'center',
+    lineHeight: 1.4
+  },
+
+  sitePermissions__list__item__button: {
+    marginRight: '.25rem',
+    color: globalStyles.color.braveOrange,
+
+    ':hover': {
+      color: globalStyles.color.braveOrange
+    }
+  },
+
+  sitePermissions__list__item__status: {
+    marginLeft: '.5ch',
+    fontStyle: 'italic'
+  },
+
   sortableTable_searchTab: {
     width: '704px',
     marginBottom: globalStyles.spacing.settingsListContainerMargin // See syncTab.js for use cases

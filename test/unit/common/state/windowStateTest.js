@@ -11,23 +11,23 @@ const defaultAppState = Immutable.fromJS({
   otherProp: true
 })
 
-const shouldValidateId = function (cb) {
+const shouldValidateId = function (check) {
   it('throws an AssertionError if windowId is not a number', function () {
     assert.throws(
       () => {
-        cb(null)
+        check(null)
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb('b')
+        check('b')
       },
       AssertionError
     )
     assert.doesNotThrow(
       () => {
-        cb('1')
+        check('1')
       },
       AssertionError
     )
@@ -36,30 +36,30 @@ const shouldValidateId = function (cb) {
   it('throws an AssertionError if windowId < 1 and windowId != -1', function () {
     assert.throws(
       () => {
-        cb(0)
+        check(0)
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(-2)
+        check(-2)
       },
       AssertionError
     )
   })
 }
 
-const shouldValidateWindowState = function (cb) {
+const shouldValidateWindowState = function (check) {
   it('throws an AssertionError if state does not contain a `windows` array', function () {
     assert.doesNotThrow(
       () => {
-        cb(Immutable.fromJS({ windows: [] }))
+        check(Immutable.fromJS({ windows: [] }))
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(Immutable.Map({}))
+        check(Immutable.Map({}))
       },
       AssertionError
     )
@@ -68,72 +68,72 @@ const shouldValidateWindowState = function (cb) {
   it('throws an AssertionError if state is not convertable to an Immutable.Map', function () {
     assert.doesNotThrow(
       () => {
-        cb({ windows: [] })
+        check({ windows: [] })
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb([])
+        check([])
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb('test')
+        check('test')
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(null)
+        check(null)
       },
       AssertionError
     )
   })
 }
 
-const shouldValidateWindowValue = function (cb) {
+const shouldValidateWindowValue = function (check) {
   it('throws an AssertionError if `windowValue` does not contain a valid `windowId`', function () {
     assert.doesNotThrow(
       () => {
-        cb({ windowId: 1 })
+        check({ windowId: 1 })
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb({})
+        check({})
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb({ windowId: 'a' })
+        check({ windowId: 'a' })
       },
       AssertionError
     )
   })
 }
 
-const shouldValidateAction = function (cb) {
+const shouldValidateAction = function (check) {
   it('throws an AssertionError if action does not contain a `windowValue` that is convertable to an Immutable.Map', function () {
     assert.doesNotThrow(
       () => {
-        cb(Immutable.fromJS({ windowValue: { windowId: 1 } }))
-        cb({ windowValue: { windowId: 1 } })
+        check(Immutable.fromJS({ windowValue: { windowId: 1 } }))
+        check({ windowValue: { windowId: 1 } })
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(Immutable.Map({ blah: {} }))
+        check(Immutable.Map({ blah: {} }))
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(Immutable.Map({}))
+        check(Immutable.Map({}))
       },
       AssertionError
     )
@@ -142,25 +142,25 @@ const shouldValidateAction = function (cb) {
   it('throws an AssertionError if `action` is not convertable to an Immutable.Map', function () {
     assert.doesNotThrow(
       () => {
-        cb({ windowValue: { windowId: 1 } })
+        check({ windowValue: { windowId: 1 } })
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb([])
+        check([])
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb('test')
+        check('test')
       },
       AssertionError
     )
     assert.throws(
       () => {
-        cb(null)
+        check(null)
       },
       AssertionError
     )

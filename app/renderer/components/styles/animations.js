@@ -6,6 +6,7 @@ const spinKeyframes = {
   'from': {
     transform: 'rotate(0deg)'
   },
+
   'to': {
     transform: 'rotate(360deg)'
   }
@@ -15,9 +16,14 @@ const opacityIncreaseKeyframes = {
   'from': {
     opacity: 0
   },
+
   'to': {
     opacity: 1
   }
+}
+
+const opacityIncreaseElementKeyframes = {
+  opacity: [0, 1]
 }
 
 // TODO: this could be a function with param included
@@ -26,26 +32,50 @@ const widthIncreaseKeyframes = (start, end) => ({
   'from': {
     width: start
   },
+
   'to': {
     width: end
   }
+})
+
+const widthIncreaseElementKeyframes = (start, end) => ({
+  width: [start, end]
 })
 
 const loaderAnimation = {
   '0': {
     transform: 'translate(0,0)'
   },
+
   '50%': {
     transform: 'translate(0,15px)'
   },
+
   '100%': {
     transform: 'translate(0,0)'
+  }
+}
+
+const tabFadeInKeyframes = {
+  '0%': {
+    opacity: 0.5
+  },
+
+  '50%': {
+    opacity: 0.6
+  },
+
+  '100%': {
+    opacity: 0.5
   }
 }
 
 module.exports = {
   spinKeyframes,
   opacityIncreaseKeyframes,
+  opacityIncreaseElementKeyframes,
   widthIncreaseKeyframes,
+  widthIncreaseElementKeyframes,
+  tabFadeInKeyframes,
   loaderAnimation
 }

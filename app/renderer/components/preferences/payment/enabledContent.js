@@ -17,7 +17,7 @@ const settings = require('../../../../../js/constants/settings')
 const ImmutableComponent = require('../../immutableComponent')
 const BrowserButton = require('../../common/browserButton')
 const {FormTextbox} = require('../../common/textbox')
-const {PanelDropdown} = require('../../common/dropdown')
+const {FormDropdown} = require('../../common/dropdown')
 const LedgerTable = require('./ledgerTable')
 
 // style
@@ -174,10 +174,10 @@ class EnabledContent extends ImmutableComponent {
 
     return <section className={css(styles.enabledContent)}>
       <div className={css(styles.enabledContent__loader, inTransition && styles.enabledContent__loader_show)}>
-        <p className={css(styles.loader__text)}>
+        <div className={css(styles.loader__text)}>
           <p data-l10n-id='leaderLoaderText1' />
           <p data-l10n-id='leaderLoaderText2' />
-        </p>
+        </div>
         <div className={css(styles.leader__wrap)}>
           <div>
             <div className={css(styles.loader__line, styles.loader__line_1, !inTransition && styles.loader__line_off)} />
@@ -191,7 +191,8 @@ class EnabledContent extends ImmutableComponent {
         <div className={css(gridStyles.row1col2, styles.enabledContent__walletBar__title)} data-l10n-id='accountBalance' />
         <div className={css(gridStyles.row1col3)} />
         <div className={css(gridStyles.row2col1)}>
-          <PanelDropdown
+          <FormDropdown
+            data-isPanel
             data-test-id='fundsSelectBox'
             value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}>
@@ -199,12 +200,17 @@ class EnabledContent extends ImmutableComponent {
               [25, 50, 75, 100].map((amount) => {
                 let alternative = ''
                 if (ledgerData.has('currentRate')) {
-                  alternative = `(${batToCurrencyString(amount, ledgerData)})`
+                  const converted = batToCurrencyString(amount, ledgerData)
+
+                  if (converted) {
+                    alternative = `(${converted})`
+                  }
                 }
+
                 return <option value={amount}>{amount} BAT {alternative}</option>
               })
             }
-          </PanelDropdown>
+          </FormDropdown>
         </div>
         <div className={css(gridStyles.row2col2)}>
           {

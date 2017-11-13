@@ -3,6 +3,7 @@ const mockery = require('mockery')
 const assert = require('assert')
 const Immutable = require('immutable')
 require('../../../braveUnit')
+const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
 
 describe('ledgerUtil test', function () {
   let ledgerUtil
@@ -32,72 +33,101 @@ describe('ledgerUtil test', function () {
   })
 
   describe('shouldTrackView', function () {
-    const validView = Immutable.fromJS({
-      tabId: 1,
-      url: 'https://brave.com/'
-    })
-    const validResponseList = Immutable.fromJS([
-      {
-        tabId: validView.get('tabId'),
-        details: {
-          newURL: validView.get('url'),
-          httpResponseCode: 200
-        }
-      }
-    ])
-    const noMatchResponseList = Immutable.fromJS([
-      {
-        tabId: 3,
-        details: {
-          newURL: 'https://not-brave.com'
-        }
-      }
-    ])
-    const matchButErrored = Immutable.fromJS([
-      {
-        tabId: validView.get('tabId'),
-        details: {
-          newURL: validView.get('url'),
-          httpResponseCode: 404
-        }
-      }
-    ])
-
-    describe('input validation', function () {
-      it('returns false if view is falsey', function () {
-        assert.equal(ledgerUtil.shouldTrackView(null, validResponseList), false)
-      })
-      it('returns false if view.url is falsey', function () {
-        assert.equal(ledgerUtil.shouldTrackView({tabId: 1}, validResponseList), false)
-      })
-      it('returns false if view.tabId is falsey', function () {
-        assert.equal(ledgerUtil.shouldTrackView({url: 'https://brave.com/'}, validResponseList), false)
-      })
-      it('returns false if responseList is falsey', function () {
-        assert.equal(ledgerUtil.shouldTrackView(validView, null), false)
-      })
-      it('returns false if responseList is not an array', function () {
-        assert.equal(ledgerUtil.shouldTrackView(validView, {}), false)
-      })
-      it('returns false if responseList is a 0 length array', function () {
-        assert.equal(ledgerUtil.shouldTrackView(validView, []), false)
-      })
+    it('null case', function () {
+      assert.equal(ledgerUtil.shouldTrackView(), false)
     })
 
-    describe('when finding a matching response based on tabId and url', function () {
-      it('returns false if no match found', function () {
-        assert.equal(ledgerUtil.shouldTrackView(validView, noMatchResponseList), false)
+    it('we have about error, but dont have tab navigationState', function () {
+      const param = Immutable.fromJS({
+        aboutDetails: {
+          title: 'error'
+        }
       })
-      it('returns false if match is found BUT response code is a failure (ex: 404)', function () {
-        assert.equal(ledgerUtil.shouldTrackView(validView, matchButErrored), false)
+      assert.equal(ledgerUtil.shouldTrackView(param), false)
+    })
+
+    it('we have tab, but dont have active entry', function () {
+      const param = Immutable.fromJS({
+        navigationState: {}
       })
-      it('returns true when match is found AND response code is a success (ex: 200)', function () {
-        assert.equal(ledgerUtil.shouldTrackView(validView, validResponseList), true)
+      assert.equal(ledgerUtil.shouldTrackView(param), false)
+    })
+
+    it('we have tab, but active entry dont have httpStatusCode', function () {
+      const param = Immutable.fromJS({
+        navigationState: {
+          activeEntry: {}
+        }
       })
+      assert.equal(ledgerUtil.shouldTrackView(param), false)
+    })
+
+    it('we have tab, but httpStatusCode is 500', function () {
+      let param = Immutable.fromJS({
+        navigationState: {}
+      })
+
+      param = param.setIn(['navigationState', 'activeEntry'], {
+        httpStatusCode: 500
+      })
+      assert.equal(ledgerUtil.shouldTrackView(param), false)
+    })
+
+    it('we have tab and httpStatusCode is 200', function () {
+      let param = Immutable.fromJS({
+        navigationState: {}
+      })
+      param = param.setIn(['navigationState', 'activeEntry'], {
+        httpStatusCode: 200
+      })
+      assert.equal(ledgerUtil.shouldTrackView(param), true)
+    })
+
+    it('we have tab and httpStatusCode is 200, but we have aboutDetails', function () {
+      let param = Immutable.fromJS({
+        aboutDetails: {
+          title: 'error'
+        },
+        navigationState: {}
+      })
+      param = param.setIn(['navigationState', 'activeEntry'], {
+        httpStatusCode: 200
+      })
+      assert.equal(ledgerUtil.shouldTrackView(param), false)
     })
   })
 
   describe('batToCurrencyString', function () {
+    let ledgerData
+
+    before(function () {
+      ledgerData = Immutable.fromJS({
+        currentRate: '2',
+        rates: {
+          'BTC': 0.2222
+        }
+      })
+    })
+    it('null case', function () {
+      const result = ledgerUtil.batToCurrencyString()
+      assert.equal(result, '0.00 USD')
+    })
+
+    it('ledgerData is missing', function () {
+      const result = ledgerUtil.batToCurrencyString(1)
+      assert.equal(result, '')
+    })
+
+    it('rates are not defined yet', function () {
+      const data = ledgerData.delete('rates')
+      const result = ledgerUtil.batToCurrencyString(1, data)
+      assert.equal(result, '')
+    })
+
+    it('bat is converted', function () {
+      const result = ledgerUtil.batToCurrencyString(5, ledgerData)
+      assert.equal(result, '10.00 USD')
+    })
   })
 
   describe('formatCurrentBalance', function () {
@@ -134,7 +164,10 @@ describe('ledgerUtil test', function () {
         amount: 10,
         creating: false,
         balance: 5.00003,
-        paymentIMG: undefined
+        paymentIMG: undefined,
+        rates: {
+          'BTC': 0.2222
+        }
       })
     })
 
@@ -142,6 +175,13 @@ describe('ledgerUtil test', function () {
       const result = ledgerUtil.formatCurrentBalance()
       assert.equal(result, '0.00 BAT')
     })
+
+    it('defaults to 0 as balance when rate is not present', function () {
+      const data = ledgerData.delete('rates')
+      const result = ledgerUtil.formatCurrentBalance(data)
+      assert.equal(result, '5.00 BAT')
+    })
+
     it('formats `balance` and `converted` values to two decimal places', function () {
       const result = ledgerUtil.formatCurrentBalance(ledgerData)
       assert.equal(result, '5.00 BAT (1.12 USD)')
@@ -171,5 +211,124 @@ describe('ledgerUtil test', function () {
   })
 
   describe('walletStatus', function () {
+  })
+
+  describe('getMediaId', function () {
+    it('null case', function () {
+      const result = ledgerUtil.getMediaId()
+      assert.equal(result, null)
+    })
+
+    it('unknown type', function () {
+      const result = ledgerUtil.getMediaData({}, 'test')
+      assert.equal(result, null)
+    })
+
+    describe('Youtube', function () {
+      it('null case', function () {
+        const result = ledgerUtil.getMediaId(null, ledgerMediaProviders.YOUTUBE)
+        assert.equal(result, null)
+      })
+
+      it('id is provided', function () {
+        const result = ledgerUtil.getMediaId({docid: 'kLiLOkzLetE'}, ledgerMediaProviders.YOUTUBE)
+        assert.equal(result, 'kLiLOkzLetE')
+      })
+    })
+  })
+
+  describe('getMediaKey', function () {
+    it('null case', function () {
+      const result = ledgerUtil.getMediaKey()
+      assert.equal(result, null)
+    })
+
+    it('type is missing', function () {
+      const result = ledgerUtil.getMediaKey('kLiLOkzLetE')
+      assert.equal(result, null)
+    })
+
+    it('id is null', function () {
+      const result = ledgerUtil.getMediaKey(null, ledgerMediaProviders.YOUTUBE)
+      assert.equal(result, null)
+    })
+
+    it('data is ok', function () {
+      const result = ledgerUtil.getMediaKey('kLiLOkzLetE', ledgerMediaProviders.YOUTUBE)
+      assert.equal(result, 'youtube_kLiLOkzLetE')
+    })
+  })
+
+  describe('getMediaData', function () {
+    it('null case', function () {
+      const result = ledgerUtil.getMediaData()
+      assert.equal(result, null)
+    })
+
+    it('unknown type', function () {
+      const result = ledgerUtil.getMediaData('https://youtube.com', 'test')
+      assert.equal(result, null)
+    })
+
+    describe('Youtube', function () {
+      it('null case', function () {
+        const result = ledgerUtil.getMediaData(null, ledgerMediaProviders.YOUTUBE)
+        assert.equal(result, null)
+      })
+
+      it('query is not present', function () {
+        const result = ledgerUtil.getMediaData('https://youtube.com', ledgerMediaProviders.YOUTUBE)
+        assert.equal(result, null)
+      })
+
+      it('query is present', function () {
+        const result = ledgerUtil.getMediaData('https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=11.338&et=21.339', ledgerMediaProviders.YOUTUBE)
+        assert.deepEqual(result, {
+          docid: 'kLiLOkzLetE',
+          st: '11.338',
+          et: '21.339'
+        })
+      })
+    })
+  })
+
+  describe('getYouTubeDuration', function () {
+    it('null case', function () {
+      const result = ledgerUtil.getYouTubeDuration()
+      assert.equal(result, 0)
+    })
+
+    it('multiple times', function () {
+      const result = ledgerUtil.getYouTubeDuration({
+        st: '11.338,21.339,25.000',
+        et: '21.339,25.000,26.100'
+      })
+      assert.equal(result, 14762)
+    })
+
+    it('single time', function () {
+      const result = ledgerUtil.getYouTubeDuration({
+        st: '11.338',
+        et: '21.339'
+      })
+      assert.equal(result, 10001)
+    })
+  })
+
+  describe('getMediaProvider', function () {
+    it('null case', function () {
+      const result = ledgerUtil.getMediaProvider()
+      assert.equal(result, null)
+    })
+
+    it('unknown provider', function () {
+      const result = ledgerUtil.getMediaProvider('https://www.brave.com')
+      assert.equal(result, null)
+    })
+
+    it('youtube', function () {
+      const result = ledgerUtil.getMediaProvider('https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=11.338&et=21.339')
+      assert.equal(result, ledgerMediaProviders.YOUTUBE)
+    })
   })
 })
