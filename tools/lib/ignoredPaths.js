@@ -55,7 +55,5 @@ module.exports = [
   'sqlite3',
   'uglify-js',
   'webdriverio',
-  'webpack-dev-server',
-  'Brave(.+)',
-  'brave-(.+)'
+  'webpack-dev-server'
 ]
