@@ -233,8 +233,6 @@ const frameReducer = (state, action, immutableAction) => {
       break
     case windowConstants.WINDOW_CLOSE_FRAME:
       state = closeFrame(state, action)
-      const activeFrame = frameStateUtil.getActiveFrame(state)
-      state = frameStateUtil.updateTabPageIndex(state, activeFrame.get('tabId'))
       break
 
     case windowConstants.WINDOW_SET_FULL_SCREEN:
