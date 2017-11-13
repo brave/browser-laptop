@@ -26,7 +26,7 @@ const shouldAllowCancel = (download) =>
  downloadIsInState(download, pendingStates)
 
 const shouldAllowRedownload = (download) =>
- downloadIsInState(download, stopStates)
+ downloadIsInState(download, stopStates) || downloadIsInState(download, unauthorizedStates)
 
 const shouldAllowOpenDownloadLocation = (download) =>
  downloadIsInState(download, notErrorStates)
@@ -35,7 +35,7 @@ const shouldAllowDelete = (download) =>
  downloadIsInState(download, stopStates)
 
 const shouldAllowRemoveFromList = (download) =>
- (downloadIsInState(download, stopStates) && downloadIsInState(download, unauthorizedStates))
+ (downloadIsInState(download, stopStates) || downloadIsInState(download, unauthorizedStates))
 
 const getL10nId = (download) => {
   switch (download.get('state')) {
@@ -69,7 +69,7 @@ const getPercentageComplete = (download) => {
   return Math.ceil(download.get('receivedBytes') / totalBytes * 100) + '%'
 }
 
-const shouldAllowCopyLink = (download) => (download && !!download.get('url') && !downloadIsInState(download, unauthorizedStates)) || false
+const shouldAllowCopyLink = (download) => (download && !!download.get('url')) || false
 
 const getDownloadItems = (state) => {
   if (!state || !state.get('downloads')) {

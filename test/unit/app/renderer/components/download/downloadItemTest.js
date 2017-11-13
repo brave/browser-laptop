@@ -58,6 +58,9 @@ describe('downloadItem component', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('../../../../js/l10n', {
+      translation: () => 'wow such title very translated'
+    })
     DownloadItem = require('../../../../../../app/renderer/components/download/downloadItem')
     appActions = require('../../../../../../js/actions/appActions')
     appStore = require('../../../../../../js/stores/appStoreRenderer')
@@ -160,7 +163,7 @@ describe('downloadItem component', function () {
         appActions.downloadRevealed.restore()
       })
 
-      testButton('[data-test-id="deleteButton"]', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.UNAUTHORIZED, downloadStates.COMPLETED], function (button) {
+      testButton('[data-test-id="deleteButton"]', [downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.COMPLETED], function (button) {
         const spy = sinon.spy(appActions, 'showDownloadDeleteConfirmation')
         try {
           // Confirmation should NOT be visible by default
