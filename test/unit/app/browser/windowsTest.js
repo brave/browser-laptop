@@ -84,7 +84,8 @@ describe('window API unit tests', function () {
         browserWindowOptions: {
           disposition: ''
         }
-      }
+      },
+      isDestroyed: () => false
     }
 
     before(function () {
