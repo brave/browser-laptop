@@ -595,6 +595,15 @@ function registerForDownloadListener (session) {
         updateElectronDownloadItem(downloadId, item, downloadStates.CANCELLED)
         appActions.mergeDownloadDetail(downloadId)
       })
+
+      // Change state if download path is protected
+      const fs = require('fs')
+      fs.access(path.dirname(item.getSavePath()), fs.constants.R_OK | fs.constants.W_OK, (err) => {
+        if (err) {
+          const state = downloadStates.UNAUTHORIZED
+          updateDownloadState(win, downloadId, item, state)
+        }
+      })
     })
 
     item.on('done', function (e, state) {
