@@ -22,6 +22,7 @@ describe('ledger api unit tests', function () {
   let tabState = Immutable.fromJS({
     partition: 'persist:partition-1'
   })
+  let request
 
   // constants
   const xhr = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=11.338&et=21.339'
@@ -72,6 +73,8 @@ describe('ledger api unit tests', function () {
         return false
       }
     })
+    request = require('../../../../../js/lib/request')
+    mockery.registerMock('../../../js/lib/request', request)
     mockery.registerMock('../../../js/actions/appActions', appActions)
     onBitcoinToBatTransitionedSpy = sinon.spy(appActions, 'onBitcoinToBatTransitioned')
     onLedgerCallbackSpy = sinon.spy(appActions, 'onLedgerCallback')
@@ -879,6 +882,94 @@ describe('ledger api unit tests', function () {
       const state = ledgerApi.onMediaPublisher(newState, videoId, response, 1000, false)
       assert(saveVisitSpy.calledOnce)
       assert.deepEqual(state.toJS(), expectedState.toJS())
+    })
+  })
+
+  describe('roundtrip', function () {
+    let requestStub
+    const simpleCallback = sinon.stub()
+    let responseCode = 200
+
+    before(function () {
+      requestStub = sinon.stub(request, 'request', (options, callback) => {
+        switch (responseCode) {
+          case 403:
+            callback(null, {
+              statusCode: 403,
+              headers: {},
+              statusMessage: '<html><body>Your requested URL has been blocked by the URL Filter database module of {{EnterpriseName}}. The URL is listed in categories that are not allowed by your administrator at this time.</body></html>',
+              httpVersionMajor: 1,
+              httpVersionMinor: 1
+            })
+            break
+          case 200:
+          default:
+            callback(null, {
+              statusCode: 200,
+              headers: {},
+              statusMessage: '',
+              httpVersionMajor: 1,
+              httpVersionMinor: 1
+            }, {timestamp: '6487805648321904641'})
+        }
+      })
+    })
+
+    after(function () {
+      requestStub.restore()
+    })
+
+    describe('when params.useProxy is true', function () {
+      let expectedOptions
+      before(function () {
+        expectedOptions = {
+          url: 'https://ledger-proxy.privateinternetaccess.com/v3/publisher/timestamp',
+          method: 'GET',
+          payload: undefined,
+          responseType: 'text',
+          headers: { 'content-type': 'application/json; charset=utf-8' },
+          verboseP: undefined
+        }
+        requestStub.reset()
+        simpleCallback.reset()
+        ledgerApi.roundtrip({
+          server: 'https://ledger.brave.com',
+          path: '/v3/publisher/timestamp',
+          useProxy: true
+        }, {}, simpleCallback)
+      })
+
+      it('updates URL to use proxy (ledger-proxy.privateinternetaccess.com)', function () {
+        assert(requestStub.withArgs(expectedOptions, sinon.match.func).called)
+      })
+
+      it('calls the callback on success', function () {
+        assert(simpleCallback.calledOnce)
+      })
+
+      describe('when the proxy returns a 403', function () {
+        before(function () {
+          responseCode = 403
+          requestStub.reset()
+          ledgerApi.roundtrip({
+            server: 'https://ledger.brave.com',
+            path: '/v3/publisher/timestamp',
+            useProxy: true
+          }, {}, simpleCallback)
+        })
+        after(function () {
+          responseCode = 200
+        })
+        it('calls request a second time (with useProxy = false)', function () {
+          assert(requestStub.calledTwice)
+          assert(requestStub.withArgs(expectedOptions, sinon.match.func).called)
+
+          const secondCallOptions = Object.assign({}, expectedOptions, {
+            url: 'https://ledger.brave.com/v3/publisher/timestamp'
+          })
+          assert(requestStub.withArgs(secondCallOptions, sinon.match.func).called)
+        })
+      })
     })
   })
 })
