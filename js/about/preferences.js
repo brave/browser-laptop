@@ -212,7 +212,7 @@ class GeneralTab extends ImmutableComponent {
         <div className='iconTitle'>
           <span data-l10n-id='myHomepage' />
           <span className='fa fa-info-circle iconLink' onClick={aboutActions.createTabRequested.bind(null, {
-            url: 'https://github.com/brave/browser-laptop/wiki/End-User-FAQ#how-to-set-up-multiple-home-pages'
+            url: 'https://community.brave.com/t/how-to-set-up-multiple-home-pages/'
           })}
             data-l10n-id='multipleHomePages' />
         </div>
