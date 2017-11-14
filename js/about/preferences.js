@@ -164,10 +164,16 @@ class GeneralTab extends ImmutableComponent {
         </SettingItem>
         <div className='iconTitle'>
           <span data-l10n-id='myHomepage' />
-          <span className='fa fa-info-circle iconLink' onClick={aboutActions.createTabRequested.bind(null, {
-            url: 'https://github.com/brave/browser-laptop/wiki/End-User-FAQ#how-to-set-up-multiple-home-pages'
-          })}
-            data-l10n-id='multipleHomePages' />
+          <BrowserButton
+            iconOnly
+            iconClass={globalStyles.appIcons.moreInfo}
+            size='.95rem'
+            custom={styles.appIcons_moreInfo}
+            onClick={aboutActions.createTabRequested.bind(null, {
+              url: 'https://community.brave.com/t/how-to-set-up-multiple-home-pages/'
+            })}
+            l10nId='multipleHomePages'
+          />
         </div>
         <SettingItem>
           <SettingTextbox
@@ -974,6 +980,9 @@ class AboutPreferences extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  appIcons_moreInfo: {
+    marginLeft: '5px'
+  },
   sortableTable_searchTab: {
     width: '704px',
     marginBottom: globalStyles.spacing.settingsListContainerMargin // See syncTab.js for use cases
