@@ -1,7 +1,7 @@
 const React = require('react')
 const cx = require('../../lib/classSet')
 
-const {css} = require('aphrodite/no-important')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
 
 // Components
@@ -99,10 +99,10 @@ class TorrentViewer extends React.Component {
 
     return (
       <div className='siteDetailsPage'>
-        <div className='siteDetailsPageHeader'>
+        <div className={css(styles.siteDetailsPage__header)}>
           {titleElem}
 
-          <div className='headerActions'>
+          <div className={css(styles.siteDetailsPage__header__actions)}>
             {mainButton}
             {saveButton}
           </div>
@@ -126,5 +126,24 @@ class TorrentViewer extends React.Component {
     )
   }
 }
+
+const styles = StyleSheet.create({
+  siteDetailsPage__header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+
+    // See: .siteDetailsPageHeader
+    padding: '0 24px'
+  },
+
+  siteDetailsPage__header__actions: {
+    display: 'flex',
+    alignItems: 'center',
+
+    // See: .siteDetailsPageHeader
+    marginLeft: '24px'
+  }
+})
 
 module.exports = TorrentViewer
