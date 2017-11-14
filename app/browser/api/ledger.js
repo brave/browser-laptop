@@ -1262,6 +1262,11 @@ const roundtrip = (params, options, callback) => {
     if (err) return callback(err, response)
 
     if (Math.floor(response.statusCode / 100) !== 2) {
+      if ((params.useProxy) && (response.statusCode === 403)) {
+        params.useProxy = false
+        return roundtrip(params, options, callback)
+      }
+
       return callback(
         new Error('HTTP response ' + response.statusCode + ' for ' + params.method + ' ' + params.path),
         response)
