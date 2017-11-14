@@ -435,8 +435,14 @@ describe('ledger api unit tests', function () {
   })
 
   describe('transitionWalletToBat', function () {
+    let fakeClock
+
+    before(function () {
+      fakeClock = sinon.useFakeTimers()
+    })
     after(function () {
       ledgerApi.setSynopsis(undefined)
+      fakeClock.restore()
     })
 
     describe('when client is not busy', function () {

@@ -1262,7 +1262,7 @@ const roundtrip = (params, options, callback) => {
     if (err) return callback(err, response)
 
     if (Math.floor(response.statusCode / 100) !== 2) {
-      if ((params.useProxy) && (response.statusCode === 403)) {
+      if (params.useProxy && response.statusCode === 403) {
         params.useProxy = false
         return roundtrip(params, options, callback)
       }
@@ -2094,6 +2094,8 @@ const getNewClient = () => {
   return newClient
 }
 
+let busyRetryCount = 0
+
 const transitionWalletToBat = () => {
   let newPaymentId, result
 
@@ -2164,7 +2166,13 @@ const transitionWalletToBat = () => {
   }
 
   if (client.busyP()) {
-    console.log('ledger client is currently busy; transition will be retried on next launch')
+    if (++busyRetryCount > 3) {
+      console.log('ledger client is currently busy; transition will be retried on next launch')
+      return
+    }
+    const delayTime = random.randomInt({ min: miliseconds.minute, max: 10 * miliseconds.minute })
+    console.log('ledger client is currently busy; transition will be retried shortly (this was attempt ' + busyRetryCount + ')')
+    setTimeout(() => transitionWalletToBat(), delayTime)
     return
   }
 
