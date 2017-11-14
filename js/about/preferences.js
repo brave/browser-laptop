@@ -6,9 +6,9 @@
 const React = require('react')
 const ImmutableComponent = require('../../app/renderer/components/immutableComponent')
 const Immutable = require('immutable')
-const {StyleSheet, css} = require('aphrodite/no-important')
 const UrlUtil = require('../lib/urlutil')
 const Select = require('react-select')
+const {css} = require('aphrodite/no-important')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 const locale = require('../../js/l10n')
 
@@ -211,16 +211,10 @@ class GeneralTab extends ImmutableComponent {
         </SettingItem>
         <div className='iconTitle'>
           <span data-l10n-id='myHomepage' />
-          <BrowserButton
-            iconOnly
-            iconClass={globalStyles.appIcons.moreInfo}
-            size='.95rem'
-            custom={styles.appIcons_moreInfo}
-            onClick={aboutActions.createTabRequested.bind(null, {
-              url: 'https://community.brave.com/t/how-to-set-up-multiple-home-pages/'
-            })}
-            l10nId='multipleHomePages'
-          />
+          <span className='fa fa-info-circle iconLink' onClick={aboutActions.createTabRequested.bind(null, {
+            url: 'https://github.com/brave/browser-laptop/wiki/End-User-FAQ#how-to-set-up-multiple-home-pages'
+          })}
+            data-l10n-id='multipleHomePages' />
         </div>
         <SettingItem>
           <SettingTextbox
@@ -1016,12 +1010,6 @@ class AboutPreferences extends React.Component {
     </div>
   }
 }
-
-const styles = StyleSheet.create({
-  appIcons_moreInfo: {
-    marginLeft: '5px'
-  }
-})
 
 module.exports = {
   AboutPreferences: <AboutPreferences />
