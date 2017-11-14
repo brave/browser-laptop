@@ -159,6 +159,9 @@ class Tab extends React.Component {
     // if mouse entered a tab we only trigger a new preview
     // if user is in previewMode, which is defined by mouse move
     windowActions.setTabHoverState(this.props.frameKey, true, this.props.previewMode)
+    // In case there's a tab preview happening, cancel the preview
+    // when mouse is over a tab
+    windowActions.setTabPageHoverState(this.props.tabPageIndex, false)
   }
 
   onMouseMove () {
@@ -262,6 +265,7 @@ class Tab extends React.Component {
     props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.themeColor = tabUIState.getThemeColor(currentWindow, frameKey)
     props.title = frame.get('title')
+    props.tabPageIndex = frameStateUtil.getTabPageIndex(currentWindow)
     props.partOfFullPageSet = partOfFullPageSet
     props.showAudioTopBorder = audioState.showAudioTopBorder(currentWindow, frameKey, isPinned)
     props.centralizeTabIcons = tabUIState.centralizeTabIcons(currentWindow, frameKey, isPinned)
