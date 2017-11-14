@@ -442,7 +442,7 @@ class SyncTab extends ImmutableComponent {
   }
 
   render () {
-    return <section className='syncContainer'>
+    return <section data-test-id='syncContainer'>
       {
       this.isSetup && this.props.syncNewDeviceOverlayVisible
         ? <ModalOverlay

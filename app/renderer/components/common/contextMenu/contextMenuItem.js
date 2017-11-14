@@ -160,7 +160,7 @@ class ContextMenuItem extends ImmutableComponent {
     }
 
     if (this.props.contextMenuItem.get('type') === 'separator') {
-      return <div className='contextMenuItem contextMenuSeparator' role='listitem'>
+      return <div className='contextMenuItem contextMenuSeparator' data-test-id='contextMenuItem' role='listitem'>
         <hr />
       </div>
     }
@@ -182,6 +182,8 @@ class ContextMenuItem extends ImmutableComponent {
 
     return <div {...props}
       data-context-menu-item
+      data-test-id='contextMenuItem'
+      data-test2-id={this.props.selected ? 'selectedByKeyboard' : null}
       ref={(node) => { this.node = node }}
       draggable={this.props.contextMenuItem.get('draggable')}
       onDragStart={this.onDragStart.bind(this)}
@@ -212,6 +214,7 @@ class ContextMenuItem extends ImmutableComponent {
       }
       <span className='contextMenuItemText'
         data-l10n-id={this.props.contextMenuItem.get('l10nLabelId')}
+        data-test-id='contextMenuItemText'
       >{this.props.contextMenuItem.get('label')}</span>
       {
         this.isMulti && this.props.contextMenuItem.get('items').map((subItem) =>

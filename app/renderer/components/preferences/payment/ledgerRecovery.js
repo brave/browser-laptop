@@ -51,11 +51,12 @@ class LedgerRecoveryContent extends ImmutableComponent {
             <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoverySucceeded' />
             <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='balanceRecovered'
+              data-test-id='balanceRecoveredMessage'
               data-l10n-args={JSON.stringify(l10nDataArgs)}
             />
             <BrowserButton secondaryColor
               l10nId='ok'
-              testId='okButton'
+              testId='recoveryOverlayOkButton'
               onClick={this.clearRecoveryStatus.bind(this)}
             />
           </section>
@@ -67,10 +68,11 @@ class LedgerRecoveryContent extends ImmutableComponent {
             <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoveryNetworkFailedTitle' data-test-id='recoveryError' />
             <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='ledgerRecoveryNetworkFailedMessage'
+              data-test-id='ledgerRecoveryFailedMessage'
             />
             <BrowserButton secondaryColor
               l10nId='ok'
-              testId='okButton'
+              testId='recoveryOverlayErrorButton'
               onClick={this.clearRecoveryStatus.bind(this)}
             />
           </section>
@@ -82,10 +84,11 @@ class LedgerRecoveryContent extends ImmutableComponent {
             <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoveryFailedTitle' />
             <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='ledgerRecoveryFailedMessage'
+              data-test-id='ledgerRecoveryFailedMessage'
             />
             <BrowserButton secondaryColor
               l10nId='ok'
-              testId='okButton'
+              testId='recoveryOverlayErrorButton'
               onClick={this.clearRecoveryStatus.bind(this)}
             />
           </section>

@@ -94,9 +94,12 @@ class UrlBarSuggestions extends React.Component {
   }
 
   render () {
-    return <ul className='urlBarSuggestions' style={{
-      maxHeight: this.props.maxHeight
-    }}>
+    return <ul className='urlBarSuggestions'
+      data-test-id='urlBarSuggestions'
+      style={{
+        maxHeight: this.props.maxHeight
+      }}
+    >
       {this.generateAllItems()}
     </ul>
   }

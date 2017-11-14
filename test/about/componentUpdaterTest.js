@@ -1,7 +1,7 @@
 /* global describe, it, before */
 
 const Brave = require('../lib/brave')
-const {urlInput} = require('../lib/selectors')
+const {urlInput, notificationItem} = require('../lib/selectors')
 const appConfig = require('../../js/constants/appConfig')
 
 describe('component updater', function () {
@@ -64,7 +64,6 @@ describe('component updater', function () {
         return
       }
       const allowButton = 'button=Allow'
-      const notificationItem = '.notificationItem'
       const url = Brave.server.url('drm.html')
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)

@@ -33,7 +33,7 @@ describe('navigator component tests', function () {
         .waitForElementCount('[data-test2-id="shield-down-false"]', 1)
         .openBraveMenu(braveMenu, braveryPanel)
         .waitForElementCount('[data-test-id="shields-toggle"][data-switch-status="true"]', 1)
-        .click('[data-test-id="shields-toggle"] .switchBackground')
+        .click('[data-test-id="shields-toggle"] [data-test-id="switchBackground"]')
         .waitForElementCount('[data-test-id="shields-toggle"][data-switch-status="false"]', 1)
         .click(braveryPanelContainer)
         .waitForElementCount('[data-test2-id="shield-down-true"]', 1)

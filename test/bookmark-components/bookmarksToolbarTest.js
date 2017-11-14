@@ -1,7 +1,15 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const {urlInput, bookmarksToolbar, navigator, navigatorNotBookmarked, doneButton, bookmarkNameInput} = require('../lib/selectors')
+const {
+  urlInput,
+  bookmarksToolbar,
+  navigator,
+  navigatorNotBookmarked,
+  bookmarkHangerDoneButton,
+  bookmarkNameInput,
+  contextMenuItemText
+} = require('../lib/selectors')
 const settings = require('../../js/constants/settings')
 
 function * setup (client) {
@@ -55,7 +63,7 @@ describe('bookmarksToolbar', function () {
         .waitForVisible('[data-test-id="bookmarkToolbarButton"][title=demo1]')
         .click(bookmarksToolbar)
         .click('[data-test-id="bookmarkToolbarButton"][title=demo1]')
-        .waitForVisible('.contextMenuItemText[data-l10n-id=emptyFolderItem]')
+        .waitForVisible('[data-test-id="contextMenuItemText"][data-l10n-id=emptyFolderItem]')
     })
 
     it('automatically opens context menu if you move mouse over a different folder', function * () {
@@ -95,14 +103,14 @@ describe('bookmarksToolbar', function () {
         .activateURLMode()
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
-        .waitForVisible(doneButton)
+        .waitForVisible(bookmarkHangerDoneButton)
         .waitForBookmarkDetail(this.page1Url, 'Page 1')
-        .waitForEnabled(doneButton)
+        .waitForEnabled(bookmarkHangerDoneButton)
         .selectByValue('[data-test-id="bookmarkParentFolder"]', folderId2)
-        .click(doneButton)
+        .click(bookmarkHangerDoneButton)
         .click('[data-test-id="bookmarkToolbarButton"][title=demo1]')
         .moveToObject('[data-test-id="bookmarkToolbarButton"][title=demo2]')
-        .waitForTextValue('.contextMenuItemText', 'Page 1')
+        .waitForTextValue(contextMenuItemText, 'Page 1')
     })
 
     it('hides context menu when mousing over regular bookmark', function * () {
@@ -129,16 +137,16 @@ describe('bookmarksToolbar', function () {
         .activateURLMode()
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
-        .waitForVisible(doneButton)
+        .waitForVisible(bookmarkHangerDoneButton)
         .waitForBookmarkDetail(this.page1Url, 'Page 1')
         .typeText(bookmarkNameInput, 'test1')
-        .waitForEnabled(doneButton)
-        .click(doneButton)
+        .waitForEnabled(bookmarkHangerDoneButton)
+        .click(bookmarkHangerDoneButton)
         .waitForVisible('[data-test-id="bookmarkToolbarButton"][title^=test1]')
         .click('[data-test-id="bookmarkToolbarButton"][title=demo1]')
-        .waitForVisible('.contextMenuItemText[data-l10n-id=emptyFolderItem]')
+        .waitForVisible('[data-test-id="contextMenuItemText"][data-l10n-id=emptyFolderItem]')
         .moveToObject('[data-test-id="bookmarkToolbarButton"][title^=test1]')
-        .waitForElementCount('.contextMenuItemText', 0)
+        .waitForElementCount(contextMenuItemText, 0)
     })
   })
 
@@ -162,10 +170,10 @@ describe('bookmarksToolbar', function () {
         .activateURLMode()
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
-        .waitForVisible(doneButton)
+        .waitForVisible(bookmarkHangerDoneButton)
         .waitForBookmarkDetail(pageWithFavicon, pageWithFavicon.replace(/http:\/\//, ''))
-        .waitForEnabled(doneButton)
-        .click(doneButton)
+        .waitForEnabled(bookmarkHangerDoneButton)
+        .click(bookmarkHangerDoneButton)
         .click('[data-test-id="bookmarkToolbarButton"]')
 
       yield this.app.client.waitUntil(() =>
@@ -188,15 +196,11 @@ describe('bookmarksToolbar', function () {
         .activateURLMode()
         .waitForVisible(navigatorNotBookmarked)
         .click(navigatorNotBookmarked)
-        .waitForVisible(doneButton)
+        .waitForVisible(bookmarkHangerDoneButton)
         .waitForBookmarkDetail(pageWithoutFavicon, 'Favicon is not found page')
-        .waitForEnabled(doneButton)
-        .click(doneButton)
-
-      yield this.app.client.waitUntil(() =>
-        this.app.client.getAttribute('[data-test-id="bookmarkFavicon"]', 'class').then((className) =>
-          className.includes('bookmarkFile fa fa-file-o')
-      ))
+        .waitForEnabled(bookmarkHangerDoneButton)
+        .click(bookmarkHangerDoneButton)
+        .waitForVisible('[data-test-id="defaultIcon"]')
     })
   })
 })

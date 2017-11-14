@@ -173,6 +173,7 @@ class GeneralTab extends ImmutableComponent {
           <SettingTextbox
             spellCheck='false'
             data-l10n-id='homepageInput'
+            data-test-id='homepageInput'
             value={homepage}
             onChange={changeSetting.bind(null, this.onChangeSetting, settings.HOMEPAGE)} />
         </SettingItem>

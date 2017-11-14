@@ -21,7 +21,7 @@ describe('about:brave tests', function () {
     it('lists Brave', function * () {
       yield this.app.client
         .waitUntil(function () {
-          return this.getText('table.sortableTable td[data-sort="Brave"]')
+          return this.getText('[data-test-id="sortableTable"] td[data-sort="Brave"]')
             .then((textValue) => {
               return textValue && String(textValue).length > 0 && String(textValue) !== 'null'
             })
@@ -30,7 +30,7 @@ describe('about:brave tests', function () {
     it('lists Muon', function * () {
       yield this.app.client
         .waitUntil(function () {
-          return this.getText('table.sortableTable td[data-sort="Muon"]')
+          return this.getText('[data-test-id="sortableTable"] td[data-sort="Muon"]')
             .then((textValue) => {
               return textValue && String(textValue).length > 0 && String(textValue) !== 'null'
             })
@@ -39,7 +39,7 @@ describe('about:brave tests', function () {
     it('lists Update Channel', function * () {
       yield this.app.client
         .waitUntil(function () {
-          return this.getText('table.sortableTable td[data-sort="Update Channel"]')
+          return this.getText('[data-test-id="sortableTable"] td[data-sort="Update Channel"]')
             .then((textValue) => {
               return textValue && String(textValue).length > 0 && String(textValue) !== 'null'
             })

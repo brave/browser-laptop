@@ -1,7 +1,7 @@
 /* global describe, it, before, beforeEach */
 
 const Brave = require('../lib/brave')
-const {notificationBar, titleBar, urlInput, reloadButton} = require('../lib/selectors')
+const {notificationBar, notificationItem, titleBar, urlInput, reloadButton} = require('../lib/selectors')
 const {autoplayOption} = require('../../app/common/constants/settingsEnums')
 const {AUTOPLAY_MEDIA} = require('../../js/constants/settings')
 const settings = require('../../js/constants/settings')
@@ -22,7 +22,7 @@ describe('notificationBar permissions', function () {
 
   beforeEach(function * () {
     yield this.app.client
-      .waitForElementCount('.notificationItem', 0)
+      .waitForElementCount(notificationItem, 0)
   })
 
   it('shows notification bar for geolocation', function * () {
@@ -93,7 +93,7 @@ describe('notificationBar permissions', function () {
       .loadUrl(this.notificationUrl)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForExist(notificationBar)
-      .element('.notificationItem:nth-Child(1) [data-test-id="notificationOptions"]')
+      .element('[data-test-id="notificationItem"]:nth-Child(1) [data-test-id="notificationOptions"]')
       .click('button=Deny')
       .activateTitleMode()
       .waitUntil(function () {
@@ -107,12 +107,12 @@ describe('notificationBar permissions', function () {
       .tabByIndex(0)
       .loadUrl(notificationUrl)
       .windowByUrl(Brave.browserWindowUrl)
-      .waitForExist('.notificationItem:nth-child(2)')
+      .waitForExist('[data-test-id="notificationItem"]:nth-child(2)')
       .waitUntil(function () {
-        return this.getText('.notificationItem:last-child').then((val) => val.includes('notification'))
+        return this.getText('[data-test-id="notificationItem"]:last-child').then((val) => val.includes('notification'))
       })
       .click('button=Deny')
-      .waitForElementCount('.notificationItem', 1)
+      .waitForElementCount(notificationItem, 1)
       .click('button=Deny')
   })
 
@@ -154,7 +154,7 @@ describe('notificationBar passwords', function () {
 
   beforeEach(function * () {
     yield this.app.client
-      .waitForElementCount('.notificationItem', 0)
+      .waitForElementCount(notificationItem, 0)
   })
 
   before(function * () {
@@ -520,7 +520,7 @@ describe('Autoplay test', function () {
             })
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForElementCount('.notificationItem', 0)
+        .waitForElementCount(notificationItem, 0)
     })
   })
 
@@ -708,7 +708,7 @@ describe('Autoplay test', function () {
             })
         })
         .windowByUrl(Brave.browserWindowUrl)
-        .waitForElementCount('.notificationItem', 0)
+        .waitForElementCount(notificationItem, 0)
     })
   })
 })

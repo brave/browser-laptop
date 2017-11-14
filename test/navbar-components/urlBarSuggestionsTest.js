@@ -40,7 +40,7 @@ describe('urlBarSuggestions', function () {
     yield this.app.client.ipcSend('shortcut-focus-url')
       .waitForElementFocus(urlInput)
       .setValue(urlInput, 'twitter')
-      .waitForElementCount('li.suggestionItem', 1)
+      .waitForElementCount('[data-test-id="list-item"]', 1)
   })
 
   it('show suggestion when single letter is typed in', function * () {
@@ -53,7 +53,7 @@ describe('urlBarSuggestions', function () {
   it('deactivates suggestions on escape', function * () {
     yield this.app.client
       .setInputText(urlInput, 'Page 1')
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
+      .waitForExist(urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"]')
       .keys(Brave.keys.ESCAPE)
       .waitForElementCount(urlBarSuggestions, 0)
   })
@@ -61,7 +61,7 @@ describe('urlBarSuggestions', function () {
   it('deactivates suggestions on backspace', function * () {
     yield this.app.client
       .setInputText(urlInput, 'Page 1')
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
+      .waitForExist(urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"]')
       .keys(Brave.keys.BACKSPACE)
       .waitForElementCount(urlBarSuggestions, 0)
   })
@@ -69,7 +69,7 @@ describe('urlBarSuggestions', function () {
   it('deactivated suggestions do not pop back up when left or shift is pressed', function * () {
     yield this.app.client
       .setInputText(urlInput, 'Page 1')
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
+      .waitForExist(urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"]')
       .keys(Brave.keys.BACKSPACE)
       .waitForElementCount(urlBarSuggestions, 0)
       .keys(Brave.keys.LEFT)
@@ -86,7 +86,7 @@ describe('urlBarSuggestions', function () {
   it('deactivates suggestions on delete', function * () {
     yield this.app.client
       .setInputText(urlInput, 'Page 1')
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
+      .waitForExist(urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"]')
       .keys(Brave.keys.DELETE)
       .waitForElementCount(urlBarSuggestions, 0)
   })
@@ -94,8 +94,8 @@ describe('urlBarSuggestions', function () {
   it('navigates to a suggestion when clicked', function * () {
     yield this.app.client
       .setInputText(urlInput, 'Page 1')
-      .waitForVisible(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
-      .click(urlBarSuggestions + ' li.suggestionItem[data-index="0"]')
+      .waitForVisible(urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"]')
+      .click(urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"]')
       .tabByIndex(1)
       .waitForUrl(this.page1Url)
       .waitForTabCount(2)
@@ -104,8 +104,8 @@ describe('urlBarSuggestions', function () {
   it('navigates to non-first suggestion when clicked', function * () {
     yield this.app.client
       .setInputText(urlInput, 'Page')
-      .waitForVisible(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
-      .click(urlBarSuggestions + ' li.suggestionItem[data-index="1"]')
+      .waitForVisible(urlBarSuggestions + ' [data-test-id="list-item"][data-index="1"]')
+      .click(urlBarSuggestions + ' [data-test-id="list-item"][data-index="1"]')
       .tabByIndex(1)
       .waitForUrl(this.page2Url)
       .waitForTabCount(2)
@@ -116,24 +116,24 @@ describe('urlBarSuggestions', function () {
       .setInputText(urlInput, 'Page')
       .waitForExist(urlBarSuggestions)
       .keys(Brave.keys.DOWN)
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"].selected')
+      .waitForExist(urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"][data-test2-id="selected"]')
       .keys(Brave.keys.DOWN)
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="1"].selected')
+      .waitForExist(urlBarSuggestions + ' [data-test-id="list-item"][data-index="1"][data-test2-id="selected"]')
       .keys(Brave.keys.ENTER)
       .tabByIndex(1).getUrl().should.become(this.page2Url)
   })
 
   it('selected item works with mouse hover', function * () {
-    const firstItem = urlBarSuggestions + ' li.suggestionItem[data-index="0"]'
-    const secondItem = urlBarSuggestions + ' li.suggestionItem[data-index="1"]'
+    const firstItem = urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"]'
+    const secondItem = urlBarSuggestions + ' [data-test-id="list-item"][data-index="1"]'
     yield this.app.client
       .setInputText(urlInput, 'o')
       .waitForExist(firstItem)
       .waitForExist(secondItem)
       .moveToObject(firstItem)
-      .waitForExist(firstItem + '.selected')
+      .waitForExist(firstItem + '[data-test2-id="selected"]')
       .moveToObject(secondItem)
-      .waitForExist(secondItem + '.selected')
+      .waitForExist(secondItem + '[data-test2-id="selected"]')
   })
 
   it('selects a location auto complete result but not for titles', function * () {
@@ -141,9 +141,9 @@ describe('urlBarSuggestions', function () {
     yield this.app.client
       .setValue(urlInput, 'http://')
       .waitForInputText(urlInput, basePage1Url.slice(0, -1))
-      .waitForExist(urlBarSuggestions + ' li.selected')
+      .waitForExist(urlBarSuggestions + ' [data-test2-id="selected"]')
       .setValue(urlInput, 'Page')
-      .waitForElementCount(urlBarSuggestions + ' li.selected', 0)
+      .waitForElementCount(urlBarSuggestions + ' [data-test2-id="selected"]', 0)
   })
 
   it('on suggestion mouseover, appends autocomplete URLs without interrupting typing', function * () {
@@ -156,7 +156,7 @@ describe('urlBarSuggestions', function () {
     yield this.app.client
       .keys(pagePartialUrl)
       .waitForInputText(urlInput, page1Url) // after entering partial URL matching two options, 1st is tentatively filled in (_without_ moving cursor to end)
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem')
+      .waitForExist(urlBarSuggestions + ' [data-test-id="list-item"]')
       .waitForInputText(urlInput, page1Url) // mousing over 2nd option tentatively completes URL with 2nd option (_without_ moving cursor to end)
       .keys('2.html')
       .waitForInputText(urlInput, page2Url) // without moving mouse, typing rest of 1st option URL overwrites the autocomplete from mouseover
@@ -189,7 +189,7 @@ describe('urlBarSuggestions', function () {
       .setInputText(urlInput, 'pref')
       .waitForVisible(urlBarSuggestions)
       .keys(Brave.keys.DOWN)
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"].selected')
+      .waitForExist(urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"][data-test2-id="selected"]')
       .keys(Brave.keys.ENTER)
       .waitForInputText(urlInput, 'about:preferences')
   })
@@ -198,7 +198,7 @@ describe('urlBarSuggestions', function () {
     yield this.app.client
       .setInputText(urlInput, 'ave')
       .waitForVisible(urlBarSuggestions)
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]:not(.selected)')
+      .waitForExist(urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"][data-test2-id="notSelected"]')
       .keys(Brave.keys.ENTER)
       .waitForInputText(urlInput, /google.*\/.*q=ave/)
   })
@@ -233,7 +233,7 @@ describe('search suggestions', function () {
     yield this.app.client
       .waitForVisible(urlBarSuggestions)
       .keys(Brave.keys.DOWN)
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="0"]:not(.selected)')
+      .waitForExist(urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"][data-test2-id="notSelected"]')
       .keys(Brave.keys.ENTER)
       .waitForInputText(urlInput, /google.*\/.*q=what.+is/)
   })
@@ -247,7 +247,7 @@ describe('search suggestions', function () {
     }
     yield this.app.client
       .waitForVisible(urlBarSuggestions)
-      .waitForExist(urlBarSuggestions + ' li.suggestionItem[data-index="2"]')
+      .waitForExist(urlBarSuggestions + ' [data-test-id="list-item"][data-index="2"]')
       .waitUntil(function () {
         return this.getText(urlBarSuggestions).then((text) => {
           return text.includes('bug') && !text.includes('http')

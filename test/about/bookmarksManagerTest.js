@@ -118,21 +118,21 @@ describe('about:bookmarks', function () {
 
     it('displays entries with title', function * () {
       yield this.app.client
-        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
     })
 
     it('displays entries without a title using their URL', function * () {
       yield this.app.client
-        .waitForVisible('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
     })
 
     it('shows bookmark folders', function * () {
       yield this.app.client
-        .waitForVisible('.bookmarkFolderList .listItem[data-folder-id="' + folderId + '"]')
+        .waitForVisible('[data-test-id="bookmarkFolderList"] [data-test-id="bookmarkFolderListItem"][data-folder-id="' + folderId + '"]')
     })
 
     it('can add bookmark folder', function * () {
-      const addFolderButton = '.addBookmarkFolder'
+      const addFolderButton = '[data-test-id="addBookmarkFolder"]'
       yield this.app.client
         .waitForVisible(addFolderButton)
         .click(addFolderButton)
@@ -143,7 +143,7 @@ describe('about:bookmarks', function () {
     })
 
     it('can add bookmark', function * () {
-      const addButton = '.addBookmark'
+      const addButton = '[data-test-id="addBookmark"]'
       yield this.app.client
         .waitForVisible(addButton)
         .click(addButton)
@@ -162,7 +162,7 @@ describe('about:bookmarks', function () {
 
     it('opens a new tab with the location of the entry when double clicked', function * () {
       const site = Brave.server.url(browseableSiteUrl)
-      const target = 'table.sortableTable td.title[data-sort="' + browseableSiteTitle + '"]'
+      const target = '[data-test-id="sortableTable"] [data-test-id="title"][data-sort="' + browseableSiteTitle + '"]'
       yield this.app.client
         .waitForVisible(target)
         .doubleClick(target)
@@ -182,7 +182,8 @@ describe('about:bookmarks', function () {
 
     it('selects multiple rows when clicked with cmd/control', function * () {
       yield this.app.client
-        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
         .isDarwin().then((val) => {
           if (val === true) {
             return this.app.client.keys(Brave.keys.COMMAND)
@@ -190,10 +191,10 @@ describe('about:bookmarks', function () {
             return this.app.client.keys(Brave.keys.CONTROL)
           }
         })
-        .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="customTest"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="customTest"]')
         // key depressed
         .isDarwin().then((val) => {
           if (val === true) {
@@ -202,28 +203,29 @@ describe('about:bookmarks', function () {
             return this.app.client.keys(Brave.keys.CONTROL)
           }
         })
-        .click('table.sortableTable td.title[data-sort="facebook"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="facebook"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="customTest"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="facebook"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="facebook"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="customTest"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
         // reset state
-        .click('table.sortableTable td.title[data-sort="facebook"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="facebook"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="facebook"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="facebook"]')
     })
     it('selects multiple contiguous rows when shift clicked', function * () {
       yield this.app.client
-        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
         .keys(Brave.keys.SHIFT)
-        .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="customTest"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="facebook"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="customTest"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="facebook"]')
         // key depressed
         .keys(Brave.keys.SHIFT)
-        .click('table.sortableTable td.title[data-sort="facebook"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="facebook"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="facebook"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="facebook"]')
         .isDarwin().then((val) => {
           if (val === true) {
             return this.app.client.keys(Brave.keys.COMMAND)
@@ -231,8 +233,8 @@ describe('about:bookmarks', function () {
             return this.app.client.keys(Brave.keys.CONTROL)
           }
         })
-        .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
         // key depressed
         .isDarwin().then((val) => {
           if (val === true) {
@@ -242,24 +244,24 @@ describe('about:bookmarks', function () {
           }
         })
         .keys(Brave.keys.SHIFT)
-        .click('table.sortableTable td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="customTest"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="facebook"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="customTest"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="facebook"]')
         // reset state
         // key depressed
         .keys(Brave.keys.SHIFT)
-        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
     })
     it('deselects everything if something other than a row is clicked', function * () {
       yield this.app.client
         // Click one bookmark, to select it
-        .click('table.sortableTable td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]')
         // Click the header; this should dismiss and release selection
-        .click('table.sortableTable th')
-        .waitForElementCount('table.sortableTable tr.selected td.title[data-sort="Brave"]', 0)
+        .click('[data-test-id="sortableTable"] th')
+        .waitForElementCount('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]', 0)
     })
   })
 
@@ -273,8 +275,8 @@ describe('about:bookmarks', function () {
 
     it('display favicon for url inside bookmarks toolbar', function * () {
       yield this.app.client
-        .waitForVisible('td.title[data-sort="Page with Favicon"] .bookmarkFavicon')
-        .getCssProperty('td.title[data-sort="Page with Favicon"] .bookmarkFavicon', 'background-image')
+        .waitForVisible('[data-test-id="title"][data-sort="Page with Favicon"] [data-test-id="bookmarkFavicon"]')
+        .getCssProperty('[data-test-id="title"][data-sort="Page with Favicon"] [data-test-id="bookmarkFavicon"]', 'background-image')
         .then((val) => {
           return val === `url("${Brave.server.url('img/test.ico')}")`
         })
@@ -282,11 +284,7 @@ describe('about:bookmarks', function () {
 
     it('fallback to default favicon when url has no favicon inside bookmarks toolbar', function * () {
       yield this.app.client
-        .waitForVisible('td.title[data-sort="Page without Favicon"] .bookmarkFavicon')
-        .getAttribute('td.title[data-sort="Page without Favicon"] .bookmarkFavicon', 'class')
-        .then((val) => {
-          return val === 'bookmarkFavicon bookmarkFile fa fa-file-o'
-        })
+        .waitForVisible('[data-test-id="title"][data-sort="Page without Favicon"] [data-test2-id="defaultIcon"]')
     })
   })
 })

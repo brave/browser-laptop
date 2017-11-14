@@ -147,6 +147,8 @@ class DownloadItem extends React.Component {
       onContextMenu={contextMenus.onDownloadsToolbarContextMenu.bind(null, this.props.downloadId, this.props.download)}
       onDoubleClick={this.onOpenDownload}
       onMouseLeave={this.onHideDeleteConfirmation}
+      data-test-id='downloadItem'
+      data-test2-id={this.isCompleted ? 'completed' : null}
       className={cx({
         downloadItem: true,
         deleteConfirmationVisible: this.props.deleteConfirmationVisible,

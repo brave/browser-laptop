@@ -19,6 +19,6 @@ describe('about:styles', function () {
 
   it('displays the title', function * () {
     yield this.app.client
-      .waitForTextValue('.typography', 'Typography')
+      .waitForTextValue('[data-test-id="typography"]', 'Typography')
   })
 })

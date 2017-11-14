@@ -54,6 +54,26 @@ class UrlBarIcon extends React.Component {
     return []
   }
 
+  get dataTestId () {
+    if (this.props.isPotentialPhishingUrl) {
+      return ['isPotentialPhishingUrl']
+    } else if (this.isSearch) {
+      return ['isSearch']
+    } else if (this.props.isAboutPage && !this.props.titleMode) {
+      return ['isAboutPage']
+    } else if (this.props.isHTTPPage && !this.props.active) {
+      if (this.props.isSecure === true) {
+        return ['isSecure']
+      } else if (this.props.isSecure === false || this.props.isSecure === 2) {
+        return ['isInsecureColor']
+      } else if (this.props.isSecure === 1) {
+        return ['isInsecure']
+      }
+    }
+
+    return []
+  }
+
   /**
    * search icon:
    * - does not show when in title mode
@@ -156,6 +176,7 @@ class UrlBarIcon extends React.Component {
 
     return <span
       data-test-id='urlBarIcon'
+      data-test2-id={this.dataTestId}
       {...props}
       className={this.iconClasses}
       style={this.iconStyles} />

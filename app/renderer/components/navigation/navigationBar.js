@@ -84,6 +84,7 @@ class NavigationBar extends React.Component {
     return <div
       id='navigator'
       data-frame-key={this.props.activeFrameKey}
+      data-test-id='navigator'
       className={cx({
         titleMode: this.props.titleMode,
         [css(this.props.activeTabShowingMessageBox && styles.navigator_isActiveTabShowingMessageBox, this.props.isWideUrlBarEnabled && styles.navigator_wide)]: true

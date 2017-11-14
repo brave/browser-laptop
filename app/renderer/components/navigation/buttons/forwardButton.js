@@ -88,14 +88,14 @@ class ForwardButton extends React.Component {
   render () {
     return <NavigationButton
       testId={
-        !this.props.canGoForward
-          ? 'navigationForwardButtonDisabled'
-          : 'navigationForwardButton'
+        this.props.canGoForward
+          ? 'navigationForwardButtonEnabled'
+          : 'navigationForwardButtonDisabled'
       }
       testId2={
-        !this.props.canGoForward
-          ? 'forwardButtonDisabled'
-          : 'forwardButton'
+        this.props.canGoForward
+          ? 'forwardButtonEnabled'
+          : 'forwardButtonDisabled'
       }
       l10nId={'forwardButton'}
       class={'forwardButton'}

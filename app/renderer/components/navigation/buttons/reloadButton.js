@@ -42,6 +42,7 @@ class ReloadButton extends ImmutableComponent {
     return <span className='navigationButtonContainer'>
       <LongPressButton
         l10nId='reloadButton'
+        testId='reloadButton'
         className='normalizeButton navigationButton reloadButton'
         onClick={this.onReload}
         onLongPress={this.onReloadLongPress} />

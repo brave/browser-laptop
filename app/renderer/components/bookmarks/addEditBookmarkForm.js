@@ -245,7 +245,7 @@ class AddEditBookmarkForm extends React.Component {
         }
         <BrowserButton groupedItem primaryColor
           l10nId='done'
-          testId='bookmarkHangerDoneButton'
+          testId={!this.state.isDisabled ? 'bookmarkHangerDoneButton' : 'bookmarkHangerDoneButtonDisabled'}
           disabled={this.state.isDisabled}
           onClick={this.onSave}
         />

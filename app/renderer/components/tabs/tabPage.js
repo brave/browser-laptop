@@ -146,9 +146,8 @@ class TabPage extends React.Component {
   render () {
     return <span
       ref={(node) => { this.tabPageNode = node }}
-      data-tab-page={this.props.index}
       data-test-id='tabPage'
-      data-test2-id={this.props.index}
+      data-test-tab-page={this.props.index}
       data-test-active-tabPage={this.props.active}
       onDragOver={this.onDragOver.bind(this)}
       onMouseEnter={this.props.previewTabPage ? this.onMouseEnter : null}

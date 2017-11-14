@@ -25,54 +25,58 @@ class PreferenceNavigation extends ImmutableComponent {
     return <div className={css(styles.prefAside)}>
       <div className={css(styles.prefNav)}>
         <PreferenceNavigationButton icon={styles.general}
-          dataL10nId='general'
+          l10nId='general'
           onClick={this.props.changeTab.bind(null, preferenceTabs.GENERAL)}
           selected={this.props.preferenceTab === preferenceTabs.GENERAL}
         />
         <PreferenceNavigationButton icon={styles.search}
-          dataL10nId='search'
+          l10nId='search'
           onClick={this.props.changeTab.bind(null, preferenceTabs.SEARCH)}
           selected={this.props.preferenceTab === preferenceTabs.SEARCH}
         />
         <PreferenceNavigationButton icon={styles.tabs}
-          dataL10nId='tabs'
+          l10nId='tabs'
+          testId='tabsTabButton'
           onClick={this.props.changeTab.bind(null, preferenceTabs.TABS)}
           selected={this.props.preferenceTab === preferenceTabs.TABS}
         />
         <PreferenceNavigationButton icon={styles.security}
-          dataL10nId='security'
+          l10nId='security'
+          testId='securityTabButton'
           onClick={this.props.changeTab.bind(null, preferenceTabs.SECURITY)}
           selected={this.props.preferenceTab === preferenceTabs.SECURITY}
         />
         <PreferenceNavigationButton icon={styles.sync}
-          dataL10nId='sync'
+          l10nId='sync'
+          testId='syncTabButton'
           onClick={this.props.changeTab.bind(null, preferenceTabs.SYNC)}
           selected={this.props.preferenceTab === preferenceTabs.SYNC}
         />
         <PreferenceNavigationButton
           iconOn={styles.paymentsOn}
           iconOff={styles.paymentsOff}
-          dataL10nId='payments'
+          l10nId='payments'
+          testId='paymentsTabButton'
           onClick={this.props.changeTab.bind(null, preferenceTabs.PAYMENTS)}
           selected={this.props.preferenceTab === preferenceTabs.PAYMENTS}
         />
         <PreferenceNavigationButton icon={styles.extensions}
-          dataL10nId='extensions'
+          l10nId='extensions'
           onClick={this.props.changeTab.bind(null, preferenceTabs.EXTENSIONS)}
           selected={this.props.preferenceTab === preferenceTabs.EXTENSIONS}
         />
         <PreferenceNavigationButton icon={styles.plugins}
-          dataL10nId='plugins'
+          l10nId='plugins'
           onClick={this.props.changeTab.bind(null, preferenceTabs.PLUGINS)}
           selected={this.props.preferenceTab === preferenceTabs.PLUGINS}
         />
         <PreferenceNavigationButton icon={styles.shields}
-          dataL10nId='shields'
+          l10nId='shields'
           onClick={this.props.changeTab.bind(null, preferenceTabs.SHIELDS)}
           selected={this.props.preferenceTab === preferenceTabs.SHIELDS}
         />
         <PreferenceNavigationButton icon={styles.advanced}
-          dataL10nId='advanced'
+          l10nId='advanced'
           onClick={this.props.changeTab.bind(null, preferenceTabs.ADVANCED)}
           selected={this.props.preferenceTab === preferenceTabs.ADVANCED}
         />

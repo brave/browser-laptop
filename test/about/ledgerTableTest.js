@@ -141,7 +141,7 @@ describe('Ledger table', function () {
 
       yield this.app.client
         .tabByIndex(0)
-        .click(`${secondTableFirstRow} .switchBackground`)
+        .click(`${secondTableFirstRow} [data-test-id="switchBackground"]`)
         .waitForVisible(`${secondTableFirstRow} [data-switch-status="false"]`)
         .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
         .waitForVisible(`${firstTableFirstRow} [data-test-pinned="true"]`)
@@ -169,7 +169,7 @@ describe('Ledger table', function () {
         .keys([Brave.keys.DELETE, Brave.keys.DELETE, '60', Brave.keys.ENTER])
         .waitForInputText(`${firstTableFirstRow} [data-test-id="pinnedInput"]`, '60')
         .waitForTextValue(`${secondTableSecondRow} [data-test-id="percentageValue"]`, '40')
-        .click(`${secondTableSecondRow} .switchBackground`)
+        .click(`${secondTableSecondRow} [data-test-id="switchBackground"]`)
         .waitForInputText(`${firstTableFirstRow} [data-test-id="pinnedInput"]`, '100')
     })
 
@@ -178,7 +178,7 @@ describe('Ledger table', function () {
         .tabByIndex(0)
         .click(advancedSettingsButton)
         .waitForVisible(advancedSettingsDialog)
-        .click('[data-test-id="payment-advance-nonverified"] .switchBackground')
+        .click('[data-test-id="payment-advance-nonverified"] [data-test-id="switchBackground"]')
         .click('[data-l10n-id="done"]')
         .waitForElementCount(advancedSettingsDialog, 0)
         .waitForElementCount(`${secondTable} tr`, 1)

@@ -5,7 +5,7 @@ const settings = require('../../js/constants/settings')
 const {newTabMode} = require('../../app/common/constants/settingsEnums')
 const Brave = require('../lib/brave')
 const Immutable = require('immutable')
-const {adsBlockedControl, allowAllCookiesOption, bookmarksToolbar, braveMenu, braveryPanel, braveryPanelContainer, cookieControl, doneButton, fpControl, blockFpOption, httpsEverywhereSwitch, navigatorBookmarked, navigatorNotBookmarked, noScriptSwitch, urlInput, removeButton, safeBrowsingSwitch, showAdsOption, syncTab, syncSwitch, bookmarkNameInput} = require('../lib/selectors')
+const {adsBlockedControl, allowAllCookiesOption, bookmarksToolbar, braveMenu, braveryPanel, braveryPanelContainer, cookieControl, bookmarkHangerDoneButton, fpControl, blockFpOption, httpsEverywhereSwitch, navigatorBookmarked, navigatorNotBookmarked, noScriptSwitch, urlInput, bookmarkHangerRemoveButton, safeBrowsingSwitch, showAdsOption, syncTab, syncSwitch, bookmarkNameInput, addBookmarkFolder, contextMenu} = require('../lib/selectors')
 const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const aboutBookmarksUrl = getTargetAboutUrl('about:bookmarks')
 const aboutHistoryUrl = getTargetAboutUrl('about:history')
@@ -94,11 +94,11 @@ function * bookmarkUrl (url, title, folderId) {
     .activateURLMode()
     .waitForVisible(navigatorNotBookmarked)
     .click(navigatorNotBookmarked)
-    .waitForVisible(doneButton)
+    .waitForVisible(bookmarkHangerDoneButton)
     .waitForVisible(bookmarkNameInput)
     .typeText(bookmarkNameInput, title)
-    .waitForEnabled(doneButton)
-    .click(doneButton)
+    .waitForEnabled(bookmarkHangerDoneButton)
+    .click(bookmarkHangerDoneButton)
     .waitUntil(function () {
       return this.getText('[data-test-id="bookmarkToolbarButton"] [data-test-id="bookmarkText"]')
      .then(allTitles => allTitles.indexOf(title) !== -1)
@@ -115,21 +115,21 @@ function * bookmarkUrl (url, title, folderId) {
       .click(folderOption)
   }
   yield Brave.app.client
-    .waitForEnabled(doneButton)
-    .click(doneButton)
+    .waitForEnabled(bookmarkHangerDoneButton)
+    .click(bookmarkHangerDoneButton)
 }
 
-function * addBookmarkFolder (title) {
+function * addBookmarkFolderSync (title) {
   yield Brave.app.client
     .tabByIndex(0)
     .url(aboutBookmarksUrl)
-    .waitForVisible('.addBookmarkFolder')
-    .click('.addBookmarkFolder')
+    .waitForVisible(addBookmarkFolder)
+    .click(addBookmarkFolder)
     .windowParentByUrl(aboutBookmarksUrl)
     .waitForExist(bookmarkNameInput)
     .typeText(bookmarkNameInput, title)
-    .waitForEnabled(doneButton)
-    .click(doneButton)
+    .waitForEnabled(bookmarkHangerDoneButton)
+    .click(bookmarkHangerDoneButton)
 }
 
 describe('Sync Panel', function () {
@@ -283,8 +283,8 @@ describe('Sync Panel', function () {
         .click(syncTab)
         .waitForVisible(syncSwitch)
         .click(syncSwitch)
-        .waitForExist('[data-test-id="syncDataSection"] .switchBackground')
-        .click('[data-test-id="syncDataSection"] .switchBackground')
+        .waitForExist('[data-test-id="syncDataSection"] [data-test-id="switchBackground"]')
+        .click('[data-test-id="syncDataSection"] [data-test-id="switchBackground"]')
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntil(function () {
           return this.getAppState().then((val) => {
@@ -355,15 +355,15 @@ describe('Syncing bookmarks', function () {
       .activateURLMode()
       .waitForVisible(navigatorBookmarked)
       .click(navigatorBookmarked)
-      .waitForVisible(doneButton)
+      .waitForVisible(bookmarkHangerDoneButton)
       .waitForExist(bookmarkNameInput)
       .typeText(bookmarkNameInput, this.page2TitleUpdated)
-      .waitForEnabled(doneButton)
-      .click(doneButton)
+      .waitForEnabled(bookmarkHangerDoneButton)
+      .click(bookmarkHangerDoneButton)
       .activateURLMode()
       .waitForVisible(navigatorBookmarked)
       .click(navigatorBookmarked)
-      .waitForVisible(doneButton)
+      .waitForVisible(bookmarkHangerDoneButton)
       .waitForInputText(bookmarkNameInput, this.page2TitleUpdated)
 
     // For Delete: Bookmark page 3 and delete it
@@ -375,11 +375,11 @@ describe('Syncing bookmarks', function () {
       .activateURLMode()
       .waitForVisible(navigatorBookmarked)
       .click(navigatorBookmarked)
-      .waitForExist(removeButton)
-      .click(removeButton)
+      .waitForExist(bookmarkHangerRemoveButton)
+      .click(bookmarkHangerRemoveButton)
 
     // Create folder then add a bookmark
-    yield addBookmarkFolder(this.folder1Title)
+    yield addBookmarkFolderSync(this.folder1Title)
     const folder1Id = 1 // XXX: Hardcoded
     yield bookmarkUrl(this.folder1Page1Url, this.folder1Page1Title, folder1Id)
 
@@ -393,14 +393,14 @@ describe('Syncing bookmarks', function () {
       .activateURLMode()
       .waitForVisible(navigatorBookmarked)
       .click(navigatorBookmarked)
-      .waitForVisible(doneButton)
+      .waitForVisible(bookmarkHangerDoneButton)
       .click('[data-test-id="bookmarkParentFolder"]')
       .waitForVisible(folder1Option)
       .click(folder1Option)
-      .click(doneButton)
+      .click(bookmarkHangerDoneButton)
 
     // Delete folder (Create, add bookmark, Delete)
-    yield addBookmarkFolder(this.folder2Title)
+    yield addBookmarkFolderSync(this.folder2Title)
     const folder2Id = 2 // XXX: Hardcoded
     yield Brave.app.client
     yield bookmarkUrl(this.folder2Page1Url, this.folder2Page1Title, folder2Id)
@@ -449,8 +449,8 @@ describe('Syncing bookmarks', function () {
     yield Brave.app.client
       .waitForVisible(folder)
       .click(folder)
-      .waitForVisible('.contextMenu')
-      .waitForTextValue(`.contextMenuItem:nth-child(${pageNthChild})`, pageTitle)
+      .waitForVisible(contextMenu)
+      .waitForTextValue(`[data-test-id="contextMenuItem"]:nth-child(${pageNthChild})`, pageTitle)
   })
 
   it('update bookmark, moving it into the folder', function * () {
@@ -462,8 +462,8 @@ describe('Syncing bookmarks', function () {
       .waitForVisible(folder)
       .doubleClick(folder)
       .click(folder)
-      .waitForVisible('.contextMenu')
-      .waitForTextValue(`.contextMenuItem:nth-child(${pageNthChild})`, pageTitle)
+      .waitForVisible(contextMenu)
+      .waitForTextValue(`[data-test-id="contextMenuItem"]:nth-child(${pageNthChild})`, pageTitle)
   })
 
   it('delete folder', function * () {
@@ -526,20 +526,20 @@ describe('Syncing bookmarks from an existing profile', function () {
       .activateURLMode()
       .waitForVisible(navigatorBookmarked)
       .click(navigatorBookmarked)
-      .waitForVisible(doneButton)
+      .waitForVisible(bookmarkHangerDoneButton)
       .waitForVisible(bookmarkNameInput)
       .typeText(bookmarkNameInput, this.page2TitleUpdated)
-      .waitForEnabled(doneButton)
-      .click(doneButton)
+      .waitForEnabled(bookmarkHangerDoneButton)
+      .click(bookmarkHangerDoneButton)
       .activateURLMode()
       .waitForVisible(navigatorBookmarked)
       .click(navigatorBookmarked)
-      .waitForVisible(doneButton)
+      .waitForVisible(bookmarkHangerDoneButton)
       .waitForInputText(bookmarkNameInput, this.page2TitleUpdated)
-      .click(doneButton)
+      .click(bookmarkHangerDoneButton)
 
     // Create folder then add a bookmark
-    yield addBookmarkFolder(this.folder1Title)
+    yield addBookmarkFolderSync(this.folder1Title)
     const folder1Id = 1 // XXX: Hardcoded
     yield bookmarkUrl(this.folder1Page1Url, this.folder1Page1Title, folder1Id)
 
@@ -554,13 +554,13 @@ describe('Syncing bookmarks from an existing profile', function () {
       .activateURLMode()
       .waitForVisible(navigatorBookmarked)
       .click(navigatorBookmarked)
-      .waitForVisible(doneButton)
+      .waitForVisible(bookmarkHangerDoneButton)
       .waitForVisible('[data-test-id="bookmarkParentFolder"]')
       .click('[data-test-id="bookmarkParentFolder"]')
       .waitForVisible(folder1Option)
       .click(folder1Option)
-      .waitForEnabled(doneButton)
-      .click(doneButton)
+      .waitForEnabled(bookmarkHangerDoneButton)
+      .click(bookmarkHangerDoneButton)
 
     // Enable Sync
     this.seed = new Immutable.List(crypto.randomBytes(32))
@@ -605,8 +605,8 @@ describe('Syncing bookmarks from an existing profile', function () {
     yield Brave.app.client
       .waitForVisible(folder)
       .click(folder)
-      .waitForVisible('.contextMenu')
-      .waitForTextValue(`.contextMenuItem:nth-child(${pageNthChild})`, pageTitle)
+      .waitForVisible(contextMenu)
+      .waitForTextValue(`[data-test-id="contextMenuItem"]:nth-child(${pageNthChild})`, pageTitle)
   })
 
   it('update bookmark, moving it into the folder', function * () {
@@ -618,8 +618,8 @@ describe('Syncing bookmarks from an existing profile', function () {
       .waitForVisible(folder)
       .click(folder)
       .click(folder)
-      .waitForVisible('.contextMenu')
-      .waitForTextValue(`.contextMenuItem:nth-child(${pageNthChild})`, pageTitle)
+      .waitForVisible(contextMenu)
+      .waitForTextValue(`[data-test-id="contextMenuItem"]:nth-child(${pageNthChild})`, pageTitle)
   })
 
   it('sync order', function * () {
@@ -703,8 +703,8 @@ describe('Syncing history', function () {
 
   it('create', function * () {
     yield Brave.app.client
-      .waitForVisible(`table.sortableTable td.title[data-sort="${this.page1Title}"]`)
-      .waitForVisible(`table.sortableTable td.title[data-sort="${this.page2Title}"]`)
+      .waitForVisible(`[data-test-id="sortableTable"] [data-test-id="title"][data-sort="${this.page1Title}"]`)
+      .waitForVisible(`[data-test-id="sortableTable"] [data-test-id="title"][data-sort="${this.page2Title}"]`)
   })
 
   it('sync order', function * () {
@@ -712,14 +712,14 @@ describe('Syncing history', function () {
     const page2Title = this.page2Title
 
     yield Brave.app.client
-      .waitForTextValue('table.sortableTable tbody tr:nth-child(1) td.title', page2Title)
-      .waitForTextValue('table.sortableTable tbody tr:nth-child(2) td.title', page1Title)
+      .waitForTextValue('[data-test-id="sortableTable"] tbody tr:nth-child(1) td.title', page2Title)
+      .waitForTextValue('[data-test-id="sortableTable"] tbody tr:nth-child(2) td.title', page1Title)
   })
 
   it('private browsing does not sync', function * () {
     yield Brave.app.client
-      .waitForElementCount('table.sortableTable tbody tr', 2)
-      .waitForElementCount(`table.sortableTable td.title[data-sort="${this.page3Title}"]`, 0)
+      .waitForElementCount('[data-test-id="sortableTable"] tbody tr', 2)
+      .waitForElementCount(`[data-test-id="sortableTable"] [data-test-id="title"][data-sort="${this.page3Title}"]`, 0)
   })
 })
 
@@ -837,7 +837,7 @@ describe('Syncing and clearing data prevents it from syncing', function () {
 
   it('history', function * () {
     yield Brave.app.client
-      .waitForElementCount('table.sortableTable', 0)
+      .waitForElementCount('[data-test-id="sortableTable"]', 0)
   })
 
   it('site settings', function * () {
@@ -934,9 +934,9 @@ describe('Syncing then turning it off stops syncing', function () {
   it('history', function * () {
     yield Brave.app.client
       .tabByIndex(0)
-      .waitForElementCount('table.sortableTable tbody tr', 2)
-      .waitForVisible(`table.sortableTable td.title[data-sort="${this.page1Title}"]`)
-      .waitForElementCount(`table.sortableTable td.title[data-sort="${this.page2Title}"]`, 0)
+      .waitForElementCount('[data-test-id="sortableTable"] tbody tr', 2)
+      .waitForVisible(`[data-test-id="sortableTable"] [data-test-id="title"][data-sort="${this.page1Title}"]`)
+      .waitForElementCount(`[data-test-id="sortableTable"] [data-test-id="title"][data-sort="${this.page2Title}"]`, 0)
   })
 
   it('site settings', function * () {
@@ -981,7 +981,7 @@ describe('Syncing then turning it off, then turning it on sends new records', fu
 
     // Sync Off - Do some browsing
     yield toggleSync(Brave.app.client, false)
-    yield addBookmarkFolder(this.folder1Title)
+    yield addBookmarkFolderSync(this.folder1Title)
     yield bookmarkUrl(this.page1Url, this.page1Title)
     yield Brave.app.client
       .tabByIndex(0)
@@ -1030,8 +1030,8 @@ describe('Syncing then turning it off, then turning it on sends new records', fu
   // it('history', function * () {
   //   yield Brave.app.client
   //     .tabByIndex(0)
-  //     .waitForElementCount('table.sortableTable tbody tr', 1)
-  //     .waitForVisible(`table.sortableTable td.title[data-sort="${this.page1Title}"]`)
+  //     .waitForElementCount('[data-test-id="sortableTable"] tbody tr', 1)
+  //     .waitForVisible(`[data-test-id="sortableTable"] [data-test-id="title"][data-sort="${this.page1Title}"]`)
   // })
 
   it('site setting', function * () {

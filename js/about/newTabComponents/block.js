@@ -71,17 +71,19 @@ class Block extends ImmutableComponent {
       <div className='topSiteSquareSpace'>
         <div
           className='topSitesElement'
+          data-test-id='topSitesElement'
           style={{
             opacity: opacity
           }}
         >
-          <div className='topSitesActionContainer'>
+          <div className='topSitesActionContainer' data-test-id='topSitesActionContainer'>
             <button
               className={cx({
                 topSitesActionBtn: true,
                 fa: true,
                 [pinIcon]: true
               })}
+              data-test-id='topSitesActionBtn'
               onClick={onPinnedTopSite}
               data-l10n-id={isPinned ? 'pinTopSiteButton' : 'unpinTopSiteButton'}
             />
@@ -91,22 +93,25 @@ class Block extends ImmutableComponent {
                 fa: true,
                 [starIcon]: true
               })}
+              data-test-id='topSitesActionBtn'
               onClick={onToggleBookmark}
               data-l10n-id={isBookmarked ? 'removeBookmarkButton' : 'addBookmarkButton'}
             />
             <button
               className='topSitesActionBtn fa fa-close'
+              data-test-id='topSitesActionBtn'
               onClick={onIgnoredTopSite}
               data-l10n-id='removeTopSiteButton'
             />
           </div>
           <a
             className='topSitesElementFavicon'
+            data-test-id='topSitesElementFavicon'
             title={title}
             href={href}
             style={style}
           >
-            {isPinned ? <div className='pinnedTopSite'><span className='pin fa fa-thumb-tack' /></div> : null}
+            {isPinned ? <div className='pinnedTopSite' data-test-id='pinnedTopSite'><span className='pin fa fa-thumb-tack' /></div> : null}
             {favicon}
           </a>
         </div>

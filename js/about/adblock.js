@@ -36,7 +36,7 @@ class AdBlockItem extends ImmutableComponent {
     return <div>
       <SwitchControl id={this.props.resource.get('uuid')}
         rightText={this.props.resource.get('title')}
-        className={`switch-${this.props.resource.get('uuid')}`}
+        testId={`switch-${this.props.resource.get('uuid')}`}
         customRightTextClassName={css(styles.adblockLists__adblockItem__switchControl)}
         disabled={this.props.disabled}
         onClick={this.onClick}

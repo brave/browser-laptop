@@ -51,23 +51,23 @@ describe('about:history', function () {
 
     it('does not display Brave default sites', function * () {
       yield this.app.client
-        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
-        .waitForElementCount('td.time', 4)
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForElementCount('[data-test-id="time"]', 4)
     })
     it('displays entries with title as: title or URL', function * () {
       yield this.app.client
-        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
     })
 
     it('does NOT use customTitle when displaying entries', function * () {
       yield this.app.client
-        .waitForElementCount('table.sortableTable td.title[data-sort="customTest"]', 0)
+        .waitForElementCount('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="customTest"]', 0)
     })
 
     it('defaults to sorting table by time DESC', function * () {
       yield this.app.client
-        .waitForVisible('table.sortableTable .sort-default[data-sort-order="desc"] div[data-l10n-id="time"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="sort-default"][data-sort-order="desc"] div[data-l10n-id="time"]')
     })
   })
 
@@ -83,7 +83,8 @@ describe('about:history', function () {
       const site = Brave.server.url(browseableSiteUrl)
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
-        .doubleClick('table.sortableTable td.title[data-sort="' + browseableSiteTitle + '"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="' + browseableSiteTitle + '"]')
+        .doubleClick('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="' + browseableSiteTitle + '"]')
         .waitForTabCount(2)
         .waitForUrl(site)
         .tabByIndex(0)
@@ -102,7 +103,8 @@ describe('about:history', function () {
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
         .loadUrl(aboutHistoryUrl)
-        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
         .isDarwin().then((val) => {
           if (val === true) {
             return this.app.client.keys(Brave.keys.COMMAND)
@@ -110,10 +112,10 @@ describe('about:history', function () {
             return this.app.client.keys(Brave.keys.CONTROL)
           }
         })
-        .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="https://brave.com/test"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://brave.com/test"]')
         // key depressed
         .isDarwin().then((val) => {
           if (val === true) {
@@ -122,30 +124,31 @@ describe('about:history', function () {
             return this.app.client.keys(Brave.keys.CONTROL)
           }
         })
-        .click('table.sortableTable td.title[data-sort="https://www.facebook.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.facebook.com"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="https://brave.com/test"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.facebook.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.facebook.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://brave.com/test"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
         // reset state
-        .click('table.sortableTable td.title[data-sort="https://www.facebook.com"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="https://www.facebook.com"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.facebook.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.facebook.com"]')
     })
     it('selects multiple contiguous rows when shift clicked', function * () {
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
         .loadUrl(aboutHistoryUrl)
-        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
         .keys(Brave.keys.SHIFT)
-        .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://brave.com/test"]')
-        .waitForVisible('table.sortableTable td.title[data-sort="https://www.facebook.com"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://brave.com/test"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.facebook.com"]')
         // key depressed
         .keys(Brave.keys.SHIFT)
-        .click('table.sortableTable td.title[data-sort="https://www.facebook.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.facebook.com"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.facebook.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.facebook.com"]')
         .isDarwin().then((val) => {
           if (val === true) {
             return this.app.client.keys(Brave.keys.COMMAND)
@@ -153,8 +156,8 @@ describe('about:history', function () {
             return this.app.client.keys(Brave.keys.CONTROL)
           }
         })
-        .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
         // key depressed
         .isDarwin().then((val) => {
           if (val === true) {
@@ -164,54 +167,56 @@ describe('about:history', function () {
           }
         })
         .keys(Brave.keys.SHIFT)
-        .click('table.sortableTable td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://brave.com/test"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.facebook.com"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.youtube.com"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://brave.com/test"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.facebook.com"]')
         // reset state
         // key depressed
         .keys(Brave.keys.SHIFT)
-        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
     })
     it('selects multiple contiguous rows when shift clicked after sorting', function * () {
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
         .loadUrl(aboutHistoryUrl)
-        .waitForVisible('.heading-title')
-        .click('.heading-title')
+        .waitForVisible('[data-test2-id="heading-title"]')
+        .click('[data-test2-id="heading-title"]')
         // wait for sort
         .pause(200)
-        .click('table.sortableTable td.title[data-sort="Brave"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
         .keys(Brave.keys.SHIFT)
-        .click('table.sortableTable td.title[data-sort="https://www.facebook.com"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="https://www.facebook.com"]')
         .keys(Brave.keys.SHIFT)
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://brave.com/test"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="https://www.facebook.com"]')
-        .isExisting('table.sortableTable tr.selected td.title[data-sort="https://www.youtube.com"]', (isExisting) => assert(!isExisting))
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://brave.com/test"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.facebook.com"]')
+        .isExisting('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="https://www.youtube.com"]', (isExisting) => assert(!isExisting))
     })
     it('deselects everything if something other than the table is clicked', function * () {
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
         .loadUrl(aboutHistoryUrl)
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
         // Click one bookmark, to select it
-        .click('table.sortableTable td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]')
         // Click the search box; this should dismiss and release selection
         .click('input#historySearch')
-        .waitForElementCount('table.sortableTable tr.selected td.title[data-sort="Brave"]', 0)
+        .waitForElementCount('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]', 0)
     })
     it('does not lose selection if table is sorted', function * () {
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
         .loadUrl(aboutHistoryUrl)
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
         // Click one bookmark, to select it
-        .click('table.sortableTable td.title[data-sort="Brave"]')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+        .click('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="Brave"]')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]')
         // Click the "title" header; this sort the rows (but keep selection)
-        .click('table.sortableTable th')
-        .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
+        .click('[data-test-id="sortableTable"] th')
+        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="selected"] [data-test-id="title"][data-sort="Brave"]')
     })
   })
 })

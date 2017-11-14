@@ -396,7 +396,10 @@ class SortableTable extends React.Component {
           [customCellClassesStr]: true,
           [css(styles.table__tbody__tr__td, this.props.smallRow && styles.table__tbody__tr_smallRow__td)]: true
         })}
-          data-sort={value} data-td-index={`${j}`}>
+          data-sort={value}
+          data-td-index={`${j}`}
+          data-test-id={hasColumnClassNames}
+        >
           {
             cell || (value === true ? '✕' : html)
           }
@@ -423,6 +426,7 @@ class SortableTable extends React.Component {
         ? <tr {...rowAttributes}
           data-context-menu-disable={rowAttributes && rowAttributes.onContextMenu ? true : undefined}
           data-table-id={this.tableID}
+          data-test-id={this.stateOwner.state.selection.includes(this.getGlobalIndex(currentIndex)) ? 'selected' : null}
           data-row-index={`${currentIndex}`}
           className={cx({
             [css(styles.table__tbody__tr, this.props.largeRow && styles.table__tbody__tr_largeRow)]: true,
@@ -461,7 +465,9 @@ class SortableTable extends React.Component {
         [this.props.tableClassNames]: !!this.props.tableClassNames,
         [css(styles.table, this.props.fillAvailable && styles.table_fillAvailable)]: true
       })}
-      ref={(node) => { this.table = node }}>
+      ref={(node) => { this.table = node }}
+      data-test-id='sortableTable'
+    >
       <thead>
         <tr>
           {this.props.headings.map((heading, j) => {
@@ -484,6 +490,10 @@ class SortableTable extends React.Component {
             return <th className={cx(headerClasses)}
               data-sort-method={sortMethod}
               data-sort-order={this.props.defaultHeadingSortOrder}
+              data-test-id={cx({
+                'sort-default': this.sortingDisabled || heading === this.props.defaultHeading
+              })}
+              data-test2-id={heading === 'title' ? 'heading-title' : null}
             >
               {
                 isString
