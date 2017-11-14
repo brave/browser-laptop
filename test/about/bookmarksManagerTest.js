@@ -182,6 +182,7 @@ describe('about:bookmarks', function () {
 
     it('selects multiple rows when clicked with cmd/control', function * () {
       yield this.app.client
+        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
         .click('table.sortableTable td.title[data-sort="Brave"]')
         .isDarwin().then((val) => {
           if (val === true) {
@@ -213,6 +214,7 @@ describe('about:bookmarks', function () {
     })
     it('selects multiple contiguous rows when shift clicked', function * () {
       yield this.app.client
+        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
         .click('table.sortableTable td.title[data-sort="Brave"]')
         .keys(Brave.keys.SHIFT)
         .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')

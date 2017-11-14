@@ -83,6 +83,7 @@ describe('about:history', function () {
       const site = Brave.server.url(browseableSiteUrl)
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
+        .waitForVisible('table.sortableTable td.title[data-sort="' + browseableSiteTitle + '"]')
         .doubleClick('table.sortableTable td.title[data-sort="' + browseableSiteTitle + '"]')
         .waitForTabCount(2)
         .waitForUrl(site)
@@ -102,6 +103,7 @@ describe('about:history', function () {
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
         .loadUrl(aboutHistoryUrl)
+        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
         .click('table.sortableTable td.title[data-sort="Brave"]')
         .isDarwin().then((val) => {
           if (val === true) {
@@ -135,6 +137,7 @@ describe('about:history', function () {
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
         .loadUrl(aboutHistoryUrl)
+        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
         .click('table.sortableTable td.title[data-sort="Brave"]')
         .keys(Brave.keys.SHIFT)
         .click('table.sortableTable td.title[data-sort="https://www.youtube.com"]')
@@ -195,6 +198,7 @@ describe('about:history', function () {
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
         .loadUrl(aboutHistoryUrl)
+        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
         // Click one bookmark, to select it
         .click('table.sortableTable td.title[data-sort="Brave"]')
         .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
@@ -206,6 +210,7 @@ describe('about:history', function () {
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
         .loadUrl(aboutHistoryUrl)
+        .waitForVisible('table.sortableTable td.title[data-sort="Brave"]')
         // Click one bookmark, to select it
         .click('table.sortableTable td.title[data-sort="Brave"]')
         .waitForVisible('table.sortableTable tr.selected td.title[data-sort="Brave"]')
