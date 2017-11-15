@@ -2244,7 +2244,11 @@ const onMediaRequest = (state, xhr, type, tabId) => {
   const cache = ledgerVideoCache.getDataByVideoId(state, mediaKey)
 
   if (!cache.isEmpty()) {
-    return module.exports.saveVisit(state, cache.get('publisher'), duration, revisited)
+    const publisherKey = cache.get('publisher')
+    const publisher = ledgerState.getPublisher(state, publisherKey)
+    if (!publisher.isEmpty()) {
+      return module.exports.saveVisit(state, publisherKey, duration, revisited)
+    }
   }
 
   const options = underscore.extend({roundtrip: roundtrip}, clientOptions)
@@ -2280,19 +2284,22 @@ const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
   const faviconName = response.get('faviconName')
   const faviconURL = response.get('faviconURL')
   const publisherURL = response.get('publisherURL')
+  const providerName = response.get('providerName')
 
   if (publisher.isEmpty()) {
     revisited = false
     synopsis.initPublisher(publisherKey)
 
+    if (!synopsis.publishers[publisherKey]) {
+      return state
+    }
+
     synopsis.publishers[publisherKey].faviconName = faviconName
     synopsis.publishers[publisherKey].faviconURL = faviconURL
     synopsis.publishers[publisherKey].publisherURL = publisherURL
-    synopsis.publishers[publisherKey].providerName = response.get('providerName')
+    synopsis.publishers[publisherKey].providerName = providerName
 
-    if (synopsis.publishers[publisherKey]) {
-      state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
-    }
+    state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
 
     if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
       appActions.onPublisherOptionUpdate(publisherKey, 'exclude', true)
@@ -2307,13 +2314,18 @@ const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
     synopsis.publishers[publisherKey].faviconName = faviconName
     synopsis.publishers[publisherKey].faviconURL = faviconURL
     synopsis.publishers[publisherKey].publisherURL = publisherURL
+    synopsis.publishers[publisherKey].providerName = providerName
     state = ledgerState.setPublishersProp(state, publisherKey, 'faviconName', faviconName)
     state = ledgerState.setPublishersProp(state, publisherKey, 'faviconURL', faviconURL)
     state = ledgerState.setPublishersProp(state, publisherKey, 'publisherURL', publisherURL)
+    state = ledgerState.setPublishersProp(state, publisherKey, 'providerName', providerName)
   }
 
+  const cacheObject = Immutable.Map()
+    .set('publisher', publisherKey)
+
   // Add to cache
-  state = ledgerVideoCache.setCacheByVideoId(state, mediaKey, response)
+  state = ledgerVideoCache.setCacheByVideoId(state, mediaKey, cacheObject)
 
   state = module.exports.saveVisit(state, publisherKey, duration, revisited)
 

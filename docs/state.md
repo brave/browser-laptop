@@ -56,7 +56,9 @@ AppStore
   },
   cache: {
     ledgerVideos: {
-      [mediaKey]: string // publisher key
+      [mediaKey]: {
+        publisher: string // publisher key
+      }
     }
   }
   clearBrowsingDataDefaults: {
