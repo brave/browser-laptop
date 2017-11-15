@@ -2224,7 +2224,7 @@ const onMediaRequest = (state, xhr, type, tabId) => {
     return state
   }
 
-  const minDuration = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
+  const minDuration = parseInt(getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME))
   duration = parseInt(duration)
   if (duration > 0 && duration < minDuration) {
     duration = minDuration

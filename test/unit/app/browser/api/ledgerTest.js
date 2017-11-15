@@ -745,6 +745,15 @@ describe('ledger api unit tests', function () {
       assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, paymentsMinVisitTime, false).calledOnce)
     })
 
+    it('min duration is set to minimum visit time if below that threshold (string setting)', function () {
+      paymentsMinVisitTime = '5000'
+      const xhr2 = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=20.338&et=21.339'
+      ledgerApi.onMediaRequest(cacheAppState, xhr2, ledgerMediaProviders.YOUTUBE, 1)
+      assert(publisherFromMediaPropsSpy.notCalled)
+      assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, 5000, false).calledOnce)
+      paymentsMinVisitTime = 5000
+    })
+
     it('revisited if visiting the same media in the same tab', function () {
       // first call, revisit false
       ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
