@@ -86,6 +86,7 @@ class AdvancedSettingsContent extends ImmutableComponent {
             prefKey={settings.PAYMENTS_ALLOW_MEDIA_PUBLISHERS}
             settings={this.props.settings}
             onChangeSetting={this.props.onChangeSetting}
+            className={css(styles.listItem)}
             switchClassName={css(styles.checkboxSwitch, commonStyles.noMarginBottom)}
             labelClassName={css(commonStyles.noMarginBottom)}
           />
