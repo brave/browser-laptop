@@ -76,6 +76,9 @@ class TabPage extends React.Component {
   }
 
   onCloseTabPage () {
+    // if a tab page is closed, cancel the tab preview
+    windowActions.setTabPageHoverState(this.props.index, false)
+
     return this.props.tabPageFrames
       .map(frame => appActions.tabCloseRequested(frame.get('tabId')))
   }
@@ -92,12 +95,13 @@ class TabPage extends React.Component {
         return
       case 1:
         // Close tab page with middle click
-        // and eventually cancel the hover state
         this.onCloseTabPage()
-        windowActions.setTabPageHoverState(this.props.index, false)
         break
       default:
+        // Setting the new active tab page
+        // should also cancel tab preview
         windowActions.setTabPageIndex(this.props.index)
+        windowActions.setTabPageHoverState(this.props.index, false)
     }
   }
 
