@@ -96,23 +96,6 @@ const defaultProtocols = ['http', 'https']
   })
 })
 
-let loadAppStatePromise = SessionStore.loadAppState()
-
-// Some settings must be set right away on startup, those settings should be handled here.
-loadAppStatePromise.then((initialImmutableState) => {
-  const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED, SEND_CRASH_REPORTS} = require('../js/constants/settings')
-  CrashHerald.init(getSetting(SEND_CRASH_REPORTS, initialImmutableState.get('settings')))
-
-  telemetry.setCheckpointAndReport('state-loaded')
-  if (getSetting(HARDWARE_ACCELERATION_ENABLED, initialImmutableState.get('settings')) === false) {
-    app.disableHardwareAcceleration()
-  }
-
-  if (getSetting(SMOOTH_SCROLL_ENABLED, initialImmutableState.get('settings')) === false) {
-    app.commandLine.appendSwitch('disable-smooth-scrolling')
-  }
-})
-
 const notifyCertError = (webContents, url, error, cert) => {
   errorCerts[url] = {
     subjectName: cert.subjectName,
@@ -135,6 +118,23 @@ const notifyCertError = (webContents, url, error, cert) => {
 }
 
 app.on('ready', () => {
+  let loadAppStatePromise = SessionStore.loadAppState()
+
+  // Some settings must be set right away on startup, those settings should be handled here.
+  loadAppStatePromise.then((initialImmutableState) => {
+    const {HARDWARE_ACCELERATION_ENABLED, SMOOTH_SCROLL_ENABLED, SEND_CRASH_REPORTS} = require('../js/constants/settings')
+    CrashHerald.init(getSetting(SEND_CRASH_REPORTS, initialImmutableState.get('settings')))
+
+    telemetry.setCheckpointAndReport('state-loaded')
+    if (getSetting(HARDWARE_ACCELERATION_ENABLED, initialImmutableState.get('settings')) === false) {
+      app.disableHardwareAcceleration()
+    }
+
+    if (getSetting(SMOOTH_SCROLL_ENABLED, initialImmutableState.get('settings')) === false) {
+      app.commandLine.appendSwitch('disable-smooth-scrolling')
+    }
+  })
+
   app.on('certificate-error', (e, webContents, url, error, cert, resourceType, overridable, strictEnforcement, expiredPreviousDecision, muonCb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {

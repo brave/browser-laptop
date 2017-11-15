@@ -91,6 +91,15 @@ const fakeElectron = {
       webRequest: {
         fetch: function (url, options, handler) {
         }
+      },
+      userPrefs: {
+        prefs: {},
+        setDictionaryPref: (path, value) => {
+          fakeElectron.session.defaultSession.userPrefs.prefs[path] = value
+        },
+        getDictionaryPref: (path) => {
+          return fakeElectron.session.defaultSession.userPrefs.prefs[path]
+        }
       }
     }
   },
