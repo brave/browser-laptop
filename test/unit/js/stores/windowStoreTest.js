@@ -141,6 +141,7 @@ describe('Window store unit tests', function () {
       let windowState
       let tabDetachMenuItemClickedStub
       const demoWindowState = {
+        activeFrameKey: 2,
         frames: [{
           security: {
             isSecure: null
@@ -273,6 +274,7 @@ describe('Window store unit tests', function () {
         before(function () {
           const newAction = Object.assign(demoAction, {})
           newAction.frameOpts.active = false
+          newAction.frameOpts.disposition = 'background-tab'
           newAction.tabValue.active = false
 
           const fakeReducer = (state, action) => {
@@ -289,7 +291,7 @@ describe('Window store unit tests', function () {
         })
 
         it('does not set activeFrameKey', function () {
-          assert.equal(windowState.get('activeFrameKey'), undefined)
+          assert.equal(windowState.get('activeFrameKey'), demoWindowState.activeFrameKey)
         })
       })
     })
