@@ -139,9 +139,6 @@ class Tab extends React.Component {
 
   onMouseEnter (e) {
     windowActions.setTabHoverState(this.props.frameKey, true)
-    // In case there's a tab preview happening, cancel the preview
-    // when mouse is over a tab
-    windowActions.setTabPageHoverState(this.props.tabPageIndex, false)
   }
 
   onAuxClick (e) {
@@ -248,7 +245,6 @@ class Tab extends React.Component {
     props.isNarrowestView = tabContentState.isNarrowestView(currentWindow, props.frameKey)
     props.isPlayIndicatorBreakpoint = tabContentState.isMediumView(currentWindow, props.frameKey) || props.isNarrowView
     props.title = frame.get('title')
-    props.tabPageIndex = currentWindow.getIn(['ui', 'tabs', 'tabPageIndex'])
     props.showSessionIcon = partition && hasSeconardImage
     props.showPrivateIcon = props.isPrivateTab && hasSeconardImage
     props.showFavIcon = !((hasBreakpoint(breakpoint, 'extraSmall') && props.isActive) || frame.get('location') === 'about:newtab')
