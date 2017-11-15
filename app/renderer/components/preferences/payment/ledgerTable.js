@@ -417,7 +417,8 @@ const styles = StyleSheet.create({
   },
 
   url: {
-    padding: '0 6px'
+    padding: '0 6px',
+    textAlign: 'left'
   },
 
   hideExcludedSites: {
