@@ -120,7 +120,7 @@ class LedgerTable extends ImmutableComponent {
       css(styles.tableTd, styles.alignRight), // views
       css(styles.tableTd, styles.alignRight), // time spent
       css(styles.tableTd, styles.alignRight, styles.percTd), // percentage
-      css(styles.tableTd, styles.alignLeft)   // actions
+      css(styles.tableTd, styles.alignLeft, styles.actionTd)   // actions
     ]
   }
 
@@ -449,6 +449,10 @@ const styles = StyleSheet.create({
 
   alignLeft: {
     textAlign: 'left'
+  },
+
+  actionTd: {
+    whiteSpace: 'nowrap'
   },
 
   paymentsDisabled: {
