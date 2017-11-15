@@ -708,6 +708,15 @@ const checkVerifiedStatus = (state, publisherKey) => {
   return state
 }
 
+const shouldTrackTab = (state, tabId) => {
+  let tabFromState = tabState.getByTabId(state, tabId)
+  if (tabFromState == null) {
+    tabFromState = pageDataState.getLastClosedTab(state, tabId)
+  }
+  const isPrivate = !tabFromState.get('partition', '').startsWith('persist:') || tabFromState.get('incognito')
+  return !isPrivate && !tabFromState.isEmpty() && ledgerUtil.shouldTrackView(tabFromState)
+}
+
 const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo = false) => {
   // We always want to have the latest active tabId
   const currentTabId = pageDataState.getLastActiveTabId(state)
@@ -718,17 +727,7 @@ const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo 
 
   // Save previous recorder page
   if (currentUrl !== locationDefault && currentTabId != null && currentTabId !== tabState.TAB_ID_NONE) {
-    let tabFromState = tabState.getByTabId(state, currentTabId)
-
-    if (tabFromState == null) {
-      tabFromState = pageDataState.getLastClosedTab(state, currentTabId)
-    }
-
-    const isPrivate = !tabFromState.get('partition', '').startsWith('persist:') ||
-      tabFromState.get('incognito')
-
-    // Add visit to the ledger when we are not in a private tab
-    if (!isPrivate && !tabFromState.isEmpty() && ledgerUtil.shouldTrackView(tabFromState)) {
+    if (shouldTrackTab(state, currentTabId)) {
       state = addSiteVisit(state, currentTimestamp, currentUrl, currentTabId)
     }
   }
@@ -2204,6 +2203,11 @@ const onMediaRequest = (state, xhr, type, tabId) => {
   let duration = ledgerUtil.getMediaDuration(parsed, type)
 
   if (mediaId == null || duration == null || mediaKey == null) {
+    return state
+  }
+
+  // Don't record if visit is in private tab
+  if (!shouldTrackTab(state, tabId)) {
     return state
   }
 

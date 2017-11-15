@@ -19,6 +19,9 @@ describe('ledger api unit tests', function () {
   let isBusy = false
   let ledgerClient
   let ledgerPublisher
+  let tabState = Immutable.fromJS({
+    partition: 'persist:partition-1'
+  })
 
   // constants
   const xhr = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=11.338&et=21.339'
@@ -74,6 +77,11 @@ describe('ledger api unit tests', function () {
     onLedgerCallbackSpy = sinon.spy(appActions, 'onLedgerCallback')
     onBitcoinToBatBeginTransitionSpy = sinon.spy(appActions, 'onBitcoinToBatBeginTransition')
     onChangeSettingSpy = sinon.spy(appActions, 'changeSetting')
+
+    // default to tab state which should be tracked
+    tabState = tabState.setIn(['navigationState', 'activeEntry'], {
+      httpStatusCode: 200
+    })
 
     // ledger client stubbing
     ledgerClient = sinon.stub()
@@ -151,7 +159,10 @@ describe('ledger api unit tests', function () {
     mockery.registerMock('bat-publisher', ledgerPublisher)
     mockery.registerMock('../../common/state/tabState', {
       TAB_ID_NONE: -1,
-      getActiveTabId: () => 1
+      getActiveTabId: () => 1,
+      getByTabId: (tabId) => {
+        return tabState
+      }
     })
 
     ledgerNotificationsApi = require('../../../../../app/browser/api/ledgerNotifications')
@@ -655,11 +666,39 @@ describe('ledger api unit tests', function () {
       ledgerApi.setSynopsis(undefined)
     })
 
-    it('null case', function () {
+    it('does nothing if input is null', function () {
       const result = ledgerApi.onMediaRequest(defaultAppState)
       assert.deepEqual(result.toJS(), defaultAppState.toJS())
       assert(publisherFromMediaPropsSpy.notCalled)
       assert(saveVisitSpy.notCalled)
+    })
+
+    describe('when tab is private', function () {
+      let savedTabState
+      before(function () {
+        savedTabState = tabState
+        // Create a private tab state for this test
+        tabState = Immutable.fromJS({
+          partition: 'default',
+          incognito: true
+        })
+        tabState = tabState.setIn(['navigationState', 'activeEntry'], {
+          httpStatusCode: 200
+        })
+      })
+      after(function () {
+        // Revert after test
+        tabState = savedTabState
+      })
+      it('does nothing if tab is private', function () {
+        const state = defaultAppState.setIn(['cache', 'ledgerVideos', videoId], Immutable.fromJS({
+          publisher: publisherKey
+        }))
+        const xhr2 = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=20.338&et=21.339'
+        ledgerApi.onMediaRequest(state, xhr2, ledgerMediaProviders.YOUTUBE, 1)
+        assert(publisherFromMediaPropsSpy.notCalled)
+        assert(saveVisitSpy.notCalled)
+      })
     })
 
     it('set currentMediaKey when it is different than saved', function () {
