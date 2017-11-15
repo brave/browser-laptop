@@ -19,18 +19,25 @@ const uphold2 = require('../../../../extensions/brave/img/ledger/uphold_logo_med
 class DisabledContent extends ImmutableComponent {
   render () {
     return <section className={css(styles.disabledContent)} data-test-id='disabledContent'>
-      <div className={css(styles.disabledContent__message)} data-test-id='paymentsMessage'>
-        <h3 className={css(styles.disabledContent__message__header)} data-l10n-id='paymentsWelcomeTitle' />
-        <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText1' />
-        <div className={css(styles.disabledContent__message__text, styles.disabledContent__message__text_bold)} data-l10n-id='paymentsWelcomeText2' />
-        <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText3' />
-        <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText4' />
-        <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText5' />
-        <div className={css(styles.disabledContent__message__text)}>
-          <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
-          <a className={css(commonStyles.linkText)} href='https://brave.com/Payments_FAQ.html' rel='noopener' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
-          <span data-l10n-id='paymentsWelcomeText7' />
+      <div>
+        <div className={css(styles.disabledContent__message)} data-test-id='paymentsMessage'>
+          <h3 className={css(styles.disabledContent__message__header)} data-l10n-id='paymentsWelcomeTitle' />
+          <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText1' />
+          <div className={css(styles.disabledContent__message__text, styles.disabledContent__message__text_bold)} data-l10n-id='paymentsWelcomeText2' />
+          <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText3' />
+          <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText4' />
+          <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText5' />
+          <div className={css(styles.disabledContent__message__text)}>
+            <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
+            <a className={css(commonStyles.linkText)} href='https://brave.com/Payments_FAQ.html' rel='noopener' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
+            <span data-l10n-id='paymentsWelcomeText7' />
+          </div>
         </div>
+        <a data-l10n-id='termsOfService'
+          className={css(styles.disabledContent__message__toc)}
+          href='https://basicattentiontoken.org/contributor-terms-of-service/'
+          target='_blank'
+          rel='noreferrer noopener' />
       </div>
       <div className={css(styles.disabledContent__sidebar)}>
         <h2 className={css(styles.disabledContent__sidebar__header)} data-l10n-id='paymentsSidebarText1' />
@@ -72,6 +79,15 @@ const styles = StyleSheet.create({
 
   disabledContent__message__text_bold: {
     fontWeight: 'bold'
+  },
+
+  disabledContent__message__toc: {
+    display: 'flex',
+    flex: 1,
+    justifyContent: 'flex-end',
+    fontSize: '13px',
+    color: '#666',
+    padding: '20px 0'
   },
 
   disabledContent__sidebar: {
