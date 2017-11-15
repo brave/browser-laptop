@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach, afterEach */
 
 const Brave = require('../lib/brave')
-const {navigatorBookmarked, navigatorNotBookmarked, doneButton} = require('../lib/selectors')
+const {navigatorBookmarked, navigatorNotBookmarked, bookmarkHangerDoneButton} = require('../lib/selectors')
 const profilerUtil = require('../lib/profilerUtil')
 const userProfiles = require('../lib/userProfiles')
 
@@ -55,10 +55,10 @@ describe('Performance bookmarks', function () {
     function * runStory () {
       yield Brave.app.client
         .click(navigatorNotBookmarked)
-        .waitForVisible(doneButton)
+        .waitForVisible(bookmarkHangerDoneButton)
         .waitForBookmarkDetail(this.page1Url, 'Page 1')
-        .waitForEnabled(doneButton)
-        .click(doneButton)
+        .waitForEnabled(bookmarkHangerDoneButton)
+        .click(bookmarkHangerDoneButton)
         .activateURLMode()
         .waitForVisible(navigatorBookmarked)
     }
