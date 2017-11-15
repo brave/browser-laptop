@@ -308,17 +308,33 @@ class LedgerTable extends ImmutableComponent {
           unPinnedRows.map((synopsis) => this.getRow(synopsis)).toJS()
         ]}
       />
-      {
-        showButton
-        ? <div className={css(styles.ledgerTable__showAllWrap)}>
-          <BrowserButton secondaryColor
-            testId={showLess ? 'showAll' : 'showLess'}
-            l10nId={showLess ? 'showAll' : 'showLess'}
-            onClick={this.showAll.bind(this, !showLess)}
-          />
+      <div className={css(styles.ledgerTable__showAllWrap)}>
+        <div className={css(styles.ledgerTable__showAllWrap__col)} />
+        <div className={css(
+          styles.ledgerTable__showAllWrap__col,
+          styles.ledgerTable__showAllWrap__col_2
+        )}>
+          {
+            showButton
+            ? <BrowserButton secondaryColor
+              testId={showLess ? 'showAll' : 'showLess'}
+              l10nId={showLess ? 'showAll' : 'showLess'}
+              onClick={this.showAll.bind(this, !showLess)}
+            />
+            : null
+          }
         </div>
-        : null
-      }
+        <div className={css(
+          styles.ledgerTable__showAllWrap__col,
+          styles.ledgerTable__showAllWrap__col_3
+        )}>
+          <a data-l10n-id='termsOfService'
+            className={css(styles.ledgerTable__showAllWrap__col__link)}
+            href=' https://basicattentiontoken.org/contributor-terms-of-service/'
+            target='_blank'
+            rel='noreferrer noopener' />
+        </div>
+      </div>
     </section>
   }
 }
@@ -462,8 +478,30 @@ const styles = StyleSheet.create({
   },
 
   ledgerTable__showAllWrap: {
-    textAlign: 'center',
-    marginTop: globalStyles.spacing.panelMargin
+    position: 'relative',
+    marginTop: globalStyles.spacing.panelMargin,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0 75px'
+  },
+
+  ledgerTable__showAllWrap__col: {
+    display: 'flex',
+    flex: 0.3333
+  },
+
+  ledgerTable__showAllWrap__col_2: {
+    justifyContent: 'center'
+  },
+
+  ledgerTable__showAllWrap__col_3: {
+    justifyContent: 'flex-end'
+  },
+
+  ledgerTable__showAllWrap__col__link: {
+    fontSize: '15px',
+    color: '#666'
   }
 })
 
