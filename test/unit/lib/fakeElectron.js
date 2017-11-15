@@ -87,7 +87,11 @@ const fakeElectron = {
   },
   session: {
     defaultSession: {
-      partition: 'default'
+      partition: 'default',
+      webRequest: {
+        fetch: function (url, options, handler) {
+        }
+      }
     }
   },
   extensions: {
