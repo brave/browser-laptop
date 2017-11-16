@@ -666,19 +666,26 @@ const addSiteVisit = (state, timestamp, location, tabId) => {
     }
   }
 
-  return saveVisit(state, publisherKey, duration, revisitP)
+  return saveVisit(state, publisherKey, {
+    duration,
+    revisited: revisitP
+  })
 }
 
-const saveVisit = (state, publisherKey, duration, revisited) => {
-  if (!synopsis || !publisherKey) {
+const saveVisit = (state, publisherKey, options) => {
+  if (!synopsis || !publisherKey || !options) {
     return state
   }
 
   if (_internal.verboseP) {
-    console.log('\nadd publisher ' + publisherKey + ': ' + (duration / 1000) + ' sec' + ' revisitP=' + revisited)
+    console.log('\nadd publisher ' + publisherKey + ': ' + (options.duration / 1000) + ' sec' + ' revisitP=' + options.revisited)
   }
 
-  synopsis.addPublisher(publisherKey, {duration: duration, revisitP: revisited})
+  synopsis.addPublisher(publisherKey, {
+    duration: options.duration,
+    revisitP: options.revisited,
+    ignoreMinTime: options.ignoreMinTime || false
+  })
   state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
   state = updatePublisherInfo(state)
   state = checkVerifiedStatus(state, publisherKey)
@@ -2224,12 +2231,6 @@ const onMediaRequest = (state, xhr, type, tabId) => {
     return state
   }
 
-  const minDuration = parseInt(getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME))
-  duration = parseInt(duration)
-  if (duration > 0 && duration < minDuration) {
-    duration = minDuration
-  }
-
   if (!ledgerPublisher) {
     ledgerPublisher = require('bat-publisher')
   }
@@ -2247,7 +2248,11 @@ const onMediaRequest = (state, xhr, type, tabId) => {
     const publisherKey = cache.get('publisher')
     const publisher = ledgerState.getPublisher(state, publisherKey)
     if (!publisher.isEmpty()) {
-      return module.exports.saveVisit(state, publisherKey, duration, revisited)
+      return module.exports.saveVisit(state, publisherKey, {
+        duration,
+        revisited,
+        ignoreMinTime: true
+      })
     }
   }
 
@@ -2327,7 +2332,11 @@ const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
   // Add to cache
   state = ledgerVideoCache.setCacheByVideoId(state, mediaKey, cacheObject)
 
-  state = module.exports.saveVisit(state, publisherKey, duration, revisited)
+  state = module.exports.saveVisit(state, publisherKey, {
+    duration,
+    revisited,
+    ignoreMinTime: true
+  })
 
   return state
 }
