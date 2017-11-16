@@ -135,7 +135,7 @@ const notifyCertError = (webContents, url, error, cert) => {
 }
 
 app.on('ready', () => {
-  app.on('certificate-error', (e, webContents, url, error, cert, resourceType, overridable, strictEnforcement, expiredPreviousDecision, muonCb) => {
+  app.on('certificate-error', (e, webContents, url, error, cert, resourceType, strictEnforcement, expiredPreviousDecision, muonCb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
