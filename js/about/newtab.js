@@ -21,6 +21,7 @@ const config = require('../constants/config')
 const backgrounds = require('../data/backgrounds')
 const {random} = require('../../app/common/lib/randomUtil')
 const NewPrivateTab = require('./newprivatetab')
+const cx = require('../lib/classSet')
 const windowActions = require('../actions/windowActions')
 
 const ipc = window.chrome.ipcRenderer
@@ -34,6 +35,7 @@ class NewTabPage extends React.Component {
     this.state = {
       showSiteRemovalNotification: false,
       imageLoadFailed: false,
+      imageLoadComplete: false,
       updatedStamp: undefined,
       showEmptyPage: true,
       showImages: false,
@@ -68,13 +70,12 @@ class NewTabPage extends React.Component {
   }
   get randomBackgroundImage () {
     const image = Object.assign({}, backgrounds[Math.floor(random() * backgrounds.length)])
-    image.style = {backgroundImage: 'url(' + image.source + ')'}
     return image
   }
   get fallbackImage () {
     const image = Object.assign({}, config.newtab.fallbackImage)
     const pathToImage = path.join(__dirname, '..', '..', image.source)
-    image.style = {backgroundImage: 'url(' + `${pathToImage}` + ')'}
+    image.source = pathToImage
     return image
   }
   get topSites () {
@@ -236,6 +237,12 @@ class NewTabPage extends React.Component {
     })
   }
 
+  onImageLoadCompleted () {
+    this.setState({
+      imageLoadComplete: true
+    })
+  }
+
   render () {
     // don't render if user prefers an empty page
     if (this.state.showEmptyPage && !this.props.isIncognito) {
@@ -256,20 +263,27 @@ class NewTabPage extends React.Component {
       return name.charAt(0).toUpperCase()
     }
     const gridLayout = this.gridLayout
-    const backgroundProps = {}
-    let gradientClassName = 'gradient'
-    if (this.showImages) {
-      backgroundProps.style = this.state.backgroundImage.style
-      gradientClassName = 'bgGradient'
-    }
-    return <div data-test-id='dynamicBackground' className='dynamicBackground' {...backgroundProps}>
+    return <div data-test-id='dynamicBackground' className='dynamicBackground'>
       {
-        this.showImages
-          ? <img src={this.state.backgroundImage.source} onError={this.onImageLoadFailed.bind(this)} data-test-id='backgroundImage' />
-          : null
+        this.showImages &&
+        <div
+          className={cx({
+            imageBackground: true,
+            hasLoaded: this.state.imageLoadComplete
+          }
+        )}>
+          <img
+            src={this.state.backgroundImage.source}
+            onLoad={this.onImageLoadCompleted.bind(this)}
+            onError={this.onImageLoadFailed.bind(this)}
+            data-test-id='backgroundImage' />
+        </div>
       }
-      <div data-test-id={this.showImages ? 'bgGradient' : 'gradient'} className={gradientClassName} />
-      <div className='content'>
+      <div className={cx({
+        content: true,
+        backgroundLoaded: this.state.imageLoadComplete,
+        showImages: this.showImages
+      })}>
         <main>
           <div className='statsBar'>
             <Stats newTabData={this.state.newTabData} />
