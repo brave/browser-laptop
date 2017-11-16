@@ -7,6 +7,8 @@
 
 let ready = false
 
+require('v8-compile-cache')
+
 const CrashHerald = require('./crash-herald')
 const telemetry = require('./telemetry')
 
