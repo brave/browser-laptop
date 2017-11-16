@@ -8,7 +8,7 @@ Release Notes:
  - Fixed broken FAQ link under preferences. ([#11946](https://github.com/brave/browser-laptop/issues/11946))
  - Fixed several other 0.18.x to 0.19.x transition issues. ([#11936](https://github.com/brave/browser-laptop/issues/11936))
  - Fixed tab indexing issue when closing tabs. ([#11902](https://github.com/brave/browser-laptop/issues/11902))
- - Fixed closing tabs not always leaving preview mode when multiple tab pages present. ([#11632](https://github.com/brave/browser-laptop/issues/11632))
+ - Fixed closing tabs not always leaving preview mode when multiple tab pages are present. ([#11632](https://github.com/brave/browser-laptop/issues/11632))
  - Upgraded Muon to 4.5.16. ([#11971](https://github.com/brave/browser-laptop/issues/11971))
  - Upgraded to Chromium 62.0.3202.94. ([#11971](https://github.com/brave/browser-laptop/issues/11971))
 
