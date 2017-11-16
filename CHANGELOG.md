@@ -1,6 +1,17 @@
 # Changelog
 
 Release Notes:
+## [0.19.95](https://github.com/brave/browser-laptop/releases/tag/v0.19.95dev)
+
+ - Added the ability to pay YouTube publishers with BAT. ([#11851](https://github.com/brave/browser-laptop/issues/11851))
+ - Added Terms of Service link for Brave Payments under the payments panel. ([#11942](https://github.com/brave/browser-laptop/issues/11942))
+ - Fixed broken FAQ link under preferences. ([#11946](https://github.com/brave/browser-laptop/issues/11946))
+ - Fixed several other 0.18.x to 0.19.x transition issues. ([#11936](https://github.com/brave/browser-laptop/issues/11936))
+ - Fixed tab indexing issue when closing tabs. ([#11902](https://github.com/brave/browser-laptop/issues/11902))
+ - Fixed closing tabs not always leaving preview mode when multiple tab pages are present. ([#11632](https://github.com/brave/browser-laptop/issues/11632))
+ - Upgraded Muon to 4.5.16. ([#11971](https://github.com/brave/browser-laptop/issues/11971))
+ - Upgraded to Chromium 62.0.3202.94. ([#11971](https://github.com/brave/browser-laptop/issues/11971))
+
 ## [0.19.88](https://github.com/brave/browser-laptop/releases/tag/v0.19.88dev)
 
  - Fixed ctrl-shift-tab keyboard navigation. ([#11331](https://github.com/brave/browser-laptop/issues/11331))
