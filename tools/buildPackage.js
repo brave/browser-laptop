@@ -84,25 +84,19 @@ var cmds = ['echo cleaning up target...']
 
 if (isWindows) {
   cmds = cmds.concat([
-    `(if exist ${appName}-win32-x64 rmdir /s /q ${appName}-win32-x64)`,
-    `(if exist ${appName}-win32-ia32 rmdir /s /q ${appName}-win32-ia32)`
+    'for /d %x in (*-win32-x64) do rmdir /s /q "%x"',
+    'for /d %x in (*-win32-ia32) do rmdir /s /q "%x"'
   ])
 
-  // Remove the destination folder for the selected arch
-  if (arch === 'ia32') {
-    cmds = cmds.concat([
-      '(if exist dist-ia32 rmdir /s /q dist-ia32)'
-    ])
-  } else {
-    cmds = cmds.concat([
-      '(if exist dist-x64 rmdir /s /q dist-x64)'
-    ])
-  }
+  // Remove the destination folder
+  cmds = cmds.concat([
+    '(if exist dist rmdir /s /q dist)'
+  ])
 } else {
   cmds = cmds.concat([
-    'rm -Rf ' + buildDir,
+    'rm -Rf ' + '*-' + process.platform + '-' + arch,
     'rm -Rf dist',
-    `rm -f ${appName}.tar.bz2`
+    `rm -f *.tar.bz2`
   ])
 }
 
