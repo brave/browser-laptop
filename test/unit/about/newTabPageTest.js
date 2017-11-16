@@ -46,9 +46,7 @@ describe('NewTab component unit tests', function () {
 
   let wrapper, incognitoWrapper
   const backgroundImage = {
-    style: {
-      backgroundImage: 'url(testing123.jpg)'
-    }
+    source: 'testing123.jpg'
   }
   const TIME_UNIT = {
     SECOND: 'S',
@@ -116,23 +114,19 @@ describe('NewTab component unit tests', function () {
         assert.equal(randomSpy.calledOnce, true)
       })
 
-      it('returns an object which has a value set for `style.backgroundImage`', function () {
+      it('returns an object which has a value set for `source`', function () {
         const instance = wrapper.instance()
         const result = instance.randomBackgroundImage
         assert.notEqual(result, undefined)
-        assert.notEqual(result.style, undefined)
-        assert.notEqual(result.style.backgroundImage, undefined)
-        assert.equal(!!result.style.backgroundImage.match(/^url\(/), true)
+        assert.notEqual(result.source, undefined)
       })
     })
     describe('fallbackImage', function () {
-      it('returns an object which has a value set for `style.backgroundImage`', function () {
+      it('returns an object which has a value set for `source`', function () {
         const instance = wrapper.instance()
         const result = instance.fallbackImage
         assert.notEqual(result, undefined)
-        assert.notEqual(result.style, undefined)
-        assert.notEqual(result.style.backgroundImage, undefined)
-        assert.equal(!!result.style.backgroundImage.match(/^url\(/), true)
+        assert.notEqual(result.source, undefined)
       })
     })
     describe('topSites', function () {
@@ -192,18 +186,14 @@ describe('NewTab component unit tests', function () {
           })
         })
 
+        it('includes wallpaper background element', function () {
+          assert.equal(wrapper.find('[data-test-id="backgroundImage"]').length, 1)
+        })
+
         it('sets backgroundImage for root element to the URL of the image', function () {
-          const node = wrapper.find('[data-test-id="dynamicBackground"]').node
+          const node = wrapper.find('[data-test-id="backgroundImage"]').node
           assert.notEqual(node, undefined)
-          assert.deepEqual(node.props.style, backgroundImage.style)
-        })
-
-        it('includes div element with class bgGradient', function () {
-          assert.equal(wrapper.find('div[data-test-id="bgGradient"]').length, 1)
-        })
-
-        it('includes img element (used to detect onError)', function () {
-          assert.equal(wrapper.find('img[data-test-id="backgroundImage"]').length, 1)
+          assert.deepEqual(node.props.src, backgroundImage.source)
         })
       })
 
@@ -217,12 +207,8 @@ describe('NewTab component unit tests', function () {
           })
         })
 
-        it('includes element with class gradient', function () {
-          assert.equal(wrapper.find('div[data-test-id="gradient"]').length, 1)
-        })
-
-        it('does NOT include img element (used to detect onError)', function () {
-          assert.equal(wrapper.find('img[data-test-id="backgroundImage"]').length, 0)
+        it('does NOT include wallpaper background', function () {
+          assert.equal(wrapper.find('[data-test-id="backgroundImage"]').length, 0)
         })
       })
     })
