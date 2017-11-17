@@ -1823,6 +1823,13 @@ const appActions = {
     })
   },
 
+  onPruneSynopsis: function (publishers) {
+    dispatch({
+      actionType: appConstants.APP_ON_PRUNE_SYNOPSIS,
+      publishers
+    })
+  },
+
   onLedgerMediaPublisher: function (mediaKey, response, duration, revisited) {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER,
