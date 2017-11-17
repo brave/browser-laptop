@@ -1,5 +1,3 @@
-const fs = require('fs')
-
 const randomHostname = require('./randomHostname')
 
 const Synopsis = require('bat-publisher').Synopsis
@@ -22,14 +20,19 @@ const generateSynopsisVisits = function (synopsis, numPublishers) {
   return synopsis
 }
 
-const updateExistingSynopsisFile = function (synopsisPath, numPublishers) {
-  let synopsis = new Synopsis(JSON.parse(fs.readFileSync(synopsisPath).toString()))
+const addSynopsisVisits = function (sessionData, numPublishers) {
+  let synopsis = new Synopsis(sessionData.ledger.synopsis)
+  const generated = generateSynopsisVisits(synopsis, numPublishers)
 
-  synopsis = generateSynopsisVisits(synopsis, numPublishers)
+  try {
+    sessionData.ledger.synopsis = generated
+  } catch (e) {
+    console.log('Please create empty profile first')
+  }
 
-  fs.writeFileSync(synopsisPath, JSON.stringify(synopsis, null, 2))
+  return sessionData
 }
 
 module.exports = {
-  updateExistingSynopsisFile: updateExistingSynopsisFile
+  addSynopsisVisits
 }
