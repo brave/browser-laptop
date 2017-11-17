@@ -387,24 +387,39 @@ describe('ledger api unit tests', function () {
       })
 
       describe('prune synopsis', function () {
-        let pruneSynopsisSpy
+        let pruneSynopsisSpy, appActionsSpy
 
-        before(function () {
+        beforeEach(function () {
           pruneSynopsisSpy = sinon.spy(ledgerApi, 'pruneSynopsis')
+          appActionsSpy = sinon.spy(appActions, 'onPruneSynopsis')
         })
 
-        after(function () {
+        afterEach(function () {
           pruneSynopsisSpy.restore()
+          appActionsSpy.restore()
         })
 
         it('do not call prune', function () {
           ledgerApi.synopsisNormalizer(defaultAppState)
           assert(pruneSynopsisSpy.notCalled)
+          assert(appActionsSpy.notCalled)
         })
 
         it('call prune', function () {
+          ledgerApi.setSynopsis({
+            toJSON: () => {
+              return {
+                publishers: {
+                  'clifton.io': {
+                    visits: 1
+                  }
+                }
+              }
+            }
+          })
           ledgerApi.synopsisNormalizer(defaultAppState, null, false, true)
           assert(pruneSynopsisSpy.calledOnce)
+          assert(appActionsSpy.calledOnce)
         })
       })
     })
