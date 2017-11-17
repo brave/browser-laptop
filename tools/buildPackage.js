@@ -84,8 +84,8 @@ var cmds = ['echo cleaning up target...']
 
 if (isWindows) {
   cmds = cmds.concat([
-    'for /d %x in (*-win32-x64) do rmdir /s /q "%x"',
-    'for /d %x in (*-win32-ia32) do rmdir /s /q "%x"'
+    'cmd.exe /c for /d %x in (*-win32-x64) do rmdir /s /q "%x"',
+    'cmd.exe /c for /d %x in (*-win32-ia32) do rmdir /s /q "%x"'
   ])
 
   // Remove the destination folder
