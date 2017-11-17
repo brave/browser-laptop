@@ -57,7 +57,8 @@ describe('ledgerReducer unit tests', function () {
     fakeLedgerState = {
       resetSynopsis: dummyModifyState,
       setRecoveryStatus: dummyModifyState,
-      setInfoProp: dummyModifyState
+      setInfoProp: dummyModifyState,
+      saveSynopsis: dummyModifyState
     }
     mockery.registerMock('../../browser/api/ledger', fakeLedgerApi)
     mockery.registerMock('../../common/state/ledgerState', fakeLedgerState)
@@ -549,6 +550,40 @@ describe('ledgerReducer unit tests', function () {
     it('sets the state variable', function () {
       assert.notDeepEqual(returnedState, appState)
       assert.equal(returnedState.getIn(['migrations', 'btc2BatTransitionPending']), true)
+    })
+  })
+
+  describe('APP_ON_PRUNE_SYNOPSIS', function () {
+    let ledgerStateSpy
+
+    beforeEach(function () {
+      ledgerStateSpy = sinon.spy(fakeLedgerState, 'saveSynopsis')
+    })
+
+    afterEach(function () {
+      ledgerStateSpy.restore()
+    })
+
+    it('null case', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PRUNE_SYNOPSIS
+      }))
+      assert.deepEqual(result, appState)
+      assert(ledgerStateSpy.notCalled)
+    })
+
+    it('publishers provided', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PRUNE_SYNOPSIS,
+        publishers: {
+          'clifton.io': {
+            duration: 10000,
+            visits: 1
+          }
+        }
+      }))
+      assert.notDeepEqual(result, appState)
+      assert(ledgerStateSpy.calledOnce)
     })
   })
 })
