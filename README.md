@@ -53,9 +53,11 @@ For other platforms (macOS, Linux) You'll need certain packages installed before
 
 ### Prerequisites
 
-1. `nodejs` **`>= 7.9.0`**
+1. the current LTS version of `nodejs`
 
-    Install from your package manager or download from https://nodejs.org
+    Install from your package manager, [nvm](https://github.com/creationix/nvm), or download from https://nodejs.org
+
+2. [npm](https://github.com/npm/npm) version 5 or greater (to make use of the `package-lock.json`)
 
 #### On Debian / Ubuntu /Mint
 
