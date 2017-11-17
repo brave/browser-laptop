@@ -39,12 +39,20 @@ function addSimulatedLedgerTransactions (numTx) {
   }
 }
 
-const updateExistingSynopsisFile = require('../synopsisHelpers').updateExistingSynopsisFile
+const {addSynopsisVisits} = require('../synopsisHelpers')
 function addSimulatedSynopsisVisits (numPublishers) {
   let userDataPath = app.getPath('userData')
-  let ledgerSynopsisPath = path.join(userDataPath, 'ledger-synopsis.json')
+  const sessionFile = path.join(userDataPath, `session-store-1`)
 
-  updateExistingSynopsisFile(ledgerSynopsisPath, numPublishers)
+  try {
+    let sessionData = fs.readFileSync(sessionFile)
+    sessionData = JSON.parse(sessionData)
+
+    sessionData = addSynopsisVisits(sessionData, numPublishers)
+    fs.writeFileSync(sessionFile, JSON.stringify(sessionData, null, 2))
+  } catch (err) {
+    console.error('ERROR in addSimulatedSynopsisVisits: ', err.toString())
+  }
 }
 
 app.on('ready', () => {
