@@ -318,6 +318,10 @@ const getPublisherData = (result, scorekeeper) => {
     data.secondsSpent = Math.max(Math.round(duration / miliseconds.second), 1)
   }
 
+  if (_internal.verboseP) {
+    console.log('\ngetPublisherData result=' + JSON.stringify(result, null, 2) + '\ndata=' + JSON.stringify(data, null, 2))
+  }
+
   return data
 }
 
@@ -2266,6 +2270,11 @@ const onMediaRequest = (state, xhr, type, tabId) => {
     // publisher not found
     if (!response) {
       return
+    }
+
+    if (_internal.verboseP) {
+      console.log('\ngetPublisherFromMediaProps mediaProps=' + JSON.stringify(mediaProps, null, 2) + '\nresponse=' +
+                  JSON.stringify(response, null, 2))
     }
 
     appActions.onLedgerMediaPublisher(mediaKey, response, duration, revisited)
