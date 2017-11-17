@@ -409,6 +409,17 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.onMediaRequest(state, action.get('url'), action.get('type'), action.get('tabId'))
         break
       }
+    case appConstants.APP_ON_PRUNE_SYNOPSIS:
+      {
+        const publishers = action.get('publishers')
+
+        if (publishers == null) {
+          break
+        }
+
+        state = ledgerState.saveSynopsis(state, publishers)
+        break
+      }
     case appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER:
       {
         state = ledgerApi.onMediaPublisher(

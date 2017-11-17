@@ -367,6 +367,8 @@ const pruneSynopsis = (state) => {
     return state
   }
 
+  appActions.onPruneSynopsis(json.publishers)
+
   return ledgerState.saveSynopsis(state, json.publishers)
 }
 
