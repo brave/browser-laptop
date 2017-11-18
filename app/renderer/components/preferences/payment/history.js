@@ -29,6 +29,7 @@ class HistoryContent extends ImmutableComponent {
   render () {
     const transactions = Immutable.fromJS(
       addExportFilenamePrefixToTransactions(this.props.ledgerData.get('transactions').toJS())
+        .sort((transaction1, transaction2) => transaction2.submissionStamp - transaction1.submissionStamp)
     )
 
     return <table className={css(styles.paymentHistoryTable)}>
