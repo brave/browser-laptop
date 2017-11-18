@@ -120,6 +120,7 @@
     "react-dnd-html5-backend": "^2.1.2",
     "react-dom": "^15.5.4",
     "react-select": "^0.9.1",
+    "react-transition-group": "^2.2.1",
     "snazzy": "^7.0.0",
     "string.prototype.endswith": "^0.2.0",
     "string.prototype.startswith": "^0.2.0",

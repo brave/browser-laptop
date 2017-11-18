@@ -5,6 +5,7 @@
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite')
 const globalStyles = require('../../app/renderer/components/styles/global')
+const { theme } = require('../../app/renderer/components/styles/theme')
 const Stats = require('./newTabComponents/stats')
 const Clock = require('./newTabComponents/clock')
 const privateTabIcon = require('../../app/extensions/brave/img/newtab/private_tab_pagearea_icon.svg')
@@ -39,8 +40,21 @@ const atBreakpoint = `@media screen and (max-width: ${globalStyles.breakpoint.br
 const styles = StyleSheet.create({
   newPrivateTab: {
     background: `linear-gradient(
-      ${globalStyles.color.privateTabBackgroundActive},
-      ${globalStyles.color.black100})`,
+      ${theme.frame.privateTabBackground},
+      ${theme.frame.privateTabBackground2}
+    )`,
+    backgroundAttachment: 'fixed',
+    // fade in from the new tab background color
+    animationName: {
+      '0%': {
+        opacity: '0'
+      },
+      '100%': {
+        opacity: '1'
+      }
+    },
+    animationDuration: `0.35s`,
+    animationTiming: 'ease-out',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',

@@ -17,6 +17,7 @@ const contextMenus = require('../../../../js/contextMenus')
 const {getSetting} = require('../../../../js/settings')
 
 // Components
+const { Transition, TransitionGroup } = require('react-transition-group')
 const Navigator = require('../navigation/navigator')
 const Frame = require('../frame/frame')
 const TabPages = require('../tabs/tabPages')
@@ -731,15 +732,27 @@ class Main extends React.Component {
         }
       </div>
       <div className='mainContainer'>
-        <div className='tabContainer'>
+        <TransitionGroup className='tabContainer'>
           {
             this.props.sortedFrames.map((frameKey) =>
-              <Frame
-                frameKey={frameKey}
+              <Transition
                 key={frameKey}
-              />)
+                // after how long (ms)
+                // should the state 'entering' switch to 'entered'
+                // and also how long should state switch from 'exiting'
+                // to the <Frame /> component actually being removed
+                timeout={150}>
+                {
+                  (transitionState) =>
+                    <Frame
+                      frameKey={frameKey}
+                      transitionState={transitionState}
+                    />
+                }
+              </Transition>
+            )
           }
-        </div>
+        </TransitionGroup>
       </div>
       {
         this.props.showDownloadBar
