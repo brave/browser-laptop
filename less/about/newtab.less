@@ -9,10 +9,21 @@
   box-sizing: border-box;
 }
 
+// match private tab js-css values
+@newTabAnimationDuration: 0.5s;
+@newTabAnimationEasing: ease-out;
+
 strong, div, span, li, em, p, a {
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
+}
+
+.newTabDashboard
+{
+    animation: fadeIn;
+    animation-duration: .3s;
+    animation-timing-function: ease-out;
 }
 
 .copyrightNotice {

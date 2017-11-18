@@ -859,12 +859,15 @@ class Frame extends React.Component {
 
     const props = {}
     // used in renderer
+    props.transitionState = ownProps.transitionState
     props.partition = frameStateUtil.getPartition(frame)
     props.isFullScreen = frame.get('isFullScreen')
     props.isPreview = frame.get('key') === currentWindow.get('previewFrameKey')
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frame.get('key'))
     props.showFullScreenWarning = frame.get('showFullScreenWarning')
     props.location = location
+    props.isDefaultNewTabLocation = location === 'about:newtab'
+    props.isBlankLocation = location === 'about:blank'
     props.tabId = tabId
     props.showMessageBox = tabMessageBoxState.hasMessageBoxDetail(state, tabId)
     props.isFocused = isFocused(state)
@@ -906,7 +909,17 @@ class Frame extends React.Component {
     return props
   }
 
+  getTransitionStateClassName (stateName) {
+    // handle missing data
+    if (!stateName) {
+      return null
+    }
+    // convert Transition element state string to a more consistent css classname
+    return `is${stateName[0].toUpperCase()}${stateName.slice(1)}`
+  }
+
   render () {
+    const transitionClassName = this.getTransitionStateClassName(this.props.transitionState)
     return <div
       data-partition={this.props.partition}
       data-test-id='frameWrapper'
@@ -914,8 +927,12 @@ class Frame extends React.Component {
       data-test3-id={this.props.isPreview ? 'previewFrame' : null}
       className={cx({
         frameWrapper: true,
+        [this.props.className]: this.props.className,
+        [transitionClassName]: transitionClassName,
         isPreview: this.props.isPreview,
-        isActive: this.props.isActive
+        isActive: this.props.isActive,
+        isDefaultNewTabLocation: this.props.isDefaultNewTabLocation,
+        isBlankLocation: this.props.isBlankLocation
       })}>
       {
         this.props.isFullScreen && this.props.showFullScreenWarning
