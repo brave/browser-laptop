@@ -278,7 +278,7 @@ class NewTabPage extends React.Component {
         backgroundLoaded: this.state.imageLoadComplete,
         showImages: this.showImages
       })}>
-        <main>
+        <main className='newTabDashboard'>
           <div className='statsBar'>
             <Stats newTabData={this.state.newTabData} />
             <Clock />

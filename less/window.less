@@ -66,16 +66,68 @@ html,
 .frameWrapper {
   height: 100%;
   width: 100%;
-  z-index: @zindexWindow;
+
   position: absolute;
   top: 0;
   left: 0;
 
   // Needed to be able to click and drag to select content in pages.
   user-select: none;
+  // default frame background
+  // TODO: use theme.frame.defaultBackground
+  --frame-bg: #fff;
+  // custom frame background(s)
+  &.isDefaultNewTabLocation {
+    // matches tab dashboard background
+    // will also show when about:newtab === about:blank or is Private Tab
+    // TODO: use theme.frame.newTabBackground
+    --frame-bg: #222;
+  }
+  // Webviews can cause flickers w/ Chrome  v49 if left visible
+  // in the background.  This also has a major benefit for background
+  // tabs that have video and animations in them.
+  visibility: hidden;
+  // delay frames getting hidden when new tabs show up
+  // in order to avoid showing 0 frames and just the window
+  // background
+  // whilst this does also affect visibility when switching tabs,
+  // z-index ensures the delayed-hidden tab is not visible
+  // Note that this value can be as large as we want, it does not
+  // need to match the timeout specified in the frame's <Transition /> element
+  // (in renderer main.js). However, there is no reason to set it higher than that.
+  transition: visibility 0s linear 150ms;
+  // 1000
+  z-index: @zindexWindow;
+  &:not(.isActive) {
+    // 900
+    z-index: @zindexWindowNotActive;
+  }
+  &.isPreview {
+    background: #222;
+    // 1100
+    z-index: @zindexWindowIsPreview;
+  }
+  // show frame when active or preview
+  &.isActive,
+  &.isPreview,
+  // keep window contents around when exiting, to allow
+  // time for next active frame to be shown
+  &.isExiting {
+    visibility: visible;
+    // show instantly
+    transition-delay: 0s;
+  }
+  // hide frame whilst it's figuring out which location to be
+  // note: that isEntering is timed-out at a value set in renderer main.js
+  // but isBlankLocation will change at the exact moment that the frame
+  // has an actual location
+  &.isEntering.isBlankLocation {
+    visibility: hidden;
+    transition-delay: 0s;
+  }
 
   webview {
-    background-color: #fff;
+    background-color: var(--frame-bg);
     border: 0;
     height: 100%;
     outline: none;
@@ -93,21 +145,6 @@ html,
     }
   }
 
-  &:not(.isActive) {
-    z-index: @zindexWindowNotActive;
-
-    &.isPreview {
-      background: gray;
-      z-index: @zindexWindowIsPreview;
-    }
-
-    // Webviews can cause flickers w/ Chrome  v49 if left visible
-    // in the background.  This also has a major benefit for background
-    // tabs that have video and animations in them.
-    &:not(.isPreview) {
-      visibility: hidden;
-    }
-  }
 }
 
 .hrefPreview {
