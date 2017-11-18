@@ -40,7 +40,20 @@ const styles = StyleSheet.create({
   newPrivateTab: {
     background: `linear-gradient(
       ${globalStyles.color.privateTabBackgroundActive},
-      ${globalStyles.color.black100})`,
+      #000
+    )`,
+    backgroundAttachment: 'fixed',
+    // fade in from the new tab background color
+    animationName: {
+      '0%': {
+        opacity: '0'
+      },
+      '100%': {
+        opacity: '1'
+      }
+    },
+    animationDuration: `0.35s`,
+    animationTiming: 'ease-out',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
