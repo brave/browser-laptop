@@ -21,6 +21,7 @@ const BrowserButton = require('../../common/browserButton')
 const {FormTextbox} = require('../../common/textbox')
 const {FormDropdown} = require('../../common/dropdown')
 const LedgerTable = require('./ledgerTable')
+const BatTOSLink = require('./batTOSLink')
 
 // style
 const globalStyles = require('../../styles/global')
@@ -341,11 +342,9 @@ class EnabledContent extends ImmutableComponent {
         settings={this.props.settings}
         onChangeSetting={this.props.onChangeSetting}
         siteSettings={this.props.siteSettings} />
-      <a data-l10n-id='termsOfService'
-        className={css(styles.enabledContent__tos)}
-        href='https://basicattentiontoken.org/contributor-terms-of-service/'
-        target='_blank'
-        rel='noreferrer noopener' />
+      <div className={css(styles.enabledContent__tos)}>
+        <BatTOSLink />
+      </div>
     </section>
   }
 }
@@ -454,8 +453,6 @@ const styles = StyleSheet.create({
 
   enabledContent__tos: {
     float: 'right',
-    fontSize: '13px',
-    color: '#666',
     padding: '20px 60px'
   },
 
