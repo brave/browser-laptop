@@ -187,6 +187,9 @@ var downloadHandler = (err, metadata) => {
   if (process.platform === 'win32') {
     // check versions to see if an update is required
     if (metadata) {
+      if (metadata.braveURL) {
+        autoUpdater.setFeedURL(metadata.braveURL)
+      }
       autoUpdater.checkForUpdates()
     } else {
       autoUpdater.emit(messages.UPDATE_NOT_AVAILABLE)
