@@ -589,7 +589,11 @@ describe('ledger api unit tests', function () {
       it('get data from cache, if we have publisher in synopsis', function () {
         ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
         assert(publisherFromMediaPropsSpy.notCalled)
-        assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, 10001, false).calledOnce)
+        assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
+          duration: 10001,
+          revisited: false,
+          ignoreMinTime: true
+        }).calledOnce)
       })
 
       it('get data from server if we have cache, but we do not have publisher in synopsis', function () {
@@ -601,32 +605,24 @@ describe('ledger api unit tests', function () {
         assert(saveVisitSpy.notCalled)
       })
 
-      it('min duration is set to minimum visit time if below that threshold', function () {
-        const xhr2 = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=20.338&et=21.339'
-        ledgerApi.onMediaRequest(cacheAppState, xhr2, ledgerMediaProviders.YOUTUBE, 1)
-        assert(publisherFromMediaPropsSpy.notCalled)
-        assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, paymentsMinVisitTime, false).calledOnce)
-      })
-
-      it('min duration is set to minimum visit time if below that threshold (string setting)', function () {
-        paymentsMinVisitTime = '5000'
-        const xhr2 = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=20.338&et=21.339'
-        ledgerApi.onMediaRequest(cacheAppState, xhr2, ledgerMediaProviders.YOUTUBE, 1)
-        assert(publisherFromMediaPropsSpy.notCalled)
-        assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, 5000, false).calledOnce)
-        paymentsMinVisitTime = 5000
-      })
-
       it('revisited if visiting the same media in the same tab', function () {
         // first call, revisit false
         ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
         assert.equal(ledgerApi.getCurrentMediaKey(), videoId)
-        assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, 10001, false).calledOnce)
+        assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
+          duration: 10001,
+          revisited: false,
+          ignoreMinTime: true
+        }).calledOnce)
 
         // second call, revisit true
         ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
         assert(publisherFromMediaPropsSpy.notCalled)
-        assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, 10001, true).calledOnce)
+        assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
+          duration: 10001,
+          revisited: false,
+          ignoreMinTime: true
+        }).calledOnce)
       })
 
       it('revisited if visiting media in the background tab', function () {
@@ -634,7 +630,11 @@ describe('ledger api unit tests', function () {
         ledgerApi.setCurrentMediaKey('11')
         ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 10)
         assert.equal(ledgerApi.getCurrentMediaKey(), '11')
-        assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, 10001, true).calledOnce)
+        assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
+          duration: 10001,
+          revisited: true,
+          ignoreMinTime: true
+        }).calledOnce)
       })
     })
 
