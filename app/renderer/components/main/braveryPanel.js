@@ -922,17 +922,15 @@ const styles = StyleSheet.create({
   },
   braveryPanel__body__ul: {
     fontSize: 'smaller',
-    maxHeight: '300px',
+    maxHeight: 'calc(300px - 1rem - .25rem - 2rem - 1rem)', // #12041: Reduce the fingerprinting column (label and dropdown) height.
     overflowY: 'auto',
     marginTop: '-20px',
     padding: '10px',
-
-    // #11641
-    userSelect: 'text'
+    userSelect: 'text' // #11641
   },
   braveryPanel__body__ul__li: {
     listStyleType: 'none',
-    padding: '10px 0',
+    padding: '7px 0',
     cursor: 'text',
 
     // #9839 and #11878: Avoid the panel width from increasing.
@@ -1055,8 +1053,6 @@ const styles = StyleSheet.create({
     gridColumnGap: 0,
     gridTemplateColumns: 'initial',
     margin: 0,
-
-    // Align the advanced control wrapper with the counters
-    padding: '0 4px'
+    padding: '0 4px' // Align the advanced control wrapper with the counters
   }
 })
