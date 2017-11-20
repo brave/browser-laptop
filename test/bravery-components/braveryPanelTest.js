@@ -453,38 +453,56 @@ describe('Bravery Panel', function () {
     it('blocks websocket tracking', function * () {
       const url = Brave.server.url('websockets.html')
       yield this.app.client
-        .waitForDataFile('adblock')
-        .tabByIndex(0)
-        .loadUrl(url)
-        .waitForTextValue('#result', 'success')
-        .waitForTextValue('#error', 'error')
+        .newTab({ url })
+        .waitForUrl(url)
+        .waitForElementCount('#result', 1)
+        .moveToObject('#result')
+        .click('#result') // hack for intermittent
+        .waitUntil(function () {
+          return this.getText('#result').then((value) => value === 'success')
+        }, 10000)
+        .waitForElementCount('#error', 1)
+        .moveToObject('#error')
+        .waitUntil(function () {
+          return this.getText('#error').then((value) => value === 'error')
+        }, 10000)
+        .windowByUrl(Brave.browserWindowUrl)
         .openBraveMenu(braveMenu, braveryPanel)
         .waitForTextValue(adsBlockedStat, '1')
         .click(adsBlockedStat)
         .waitUntil(function () {
           return this.getText('[data-test-id="braveryPanelBodyList"]')
             .then((body) => {
-              return body[0] === 'ws://ag.innovid.com/dv/sync?tid=2'
+              return body[0] === 'ws://wfpscripts.webspectator.com/bootstrap/ws-606FF556.js'
             })
         })
+    })
 
-        .changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
-        .keys(Brave.keys.ESCAPE)
-
-        .windowByUrl(Brave.browserWindowUrl)
+    it('blocks websocket tracking using compact panel', function * () {
+      const url = Brave.server.url('websockets.html')
+      yield this.app.client.changeSetting(settings.COMPACT_BRAVERY_PANEL, true)
+      yield this.app.client
         .newTab({ url })
-        .waitForTabCount(2)
         .waitForUrl(url)
-
-        .waitForTextValue('#result', 'success')
-        .waitForTextValue('#error', 'error')
+        .waitForElementCount('#result', 1)
+        .moveToObject('#result')
+        .click('#result') // hack for intermittent
+        .waitUntil(function () {
+          return this.getText('#result').then((value) => value === 'success')
+        }, 10000)
+        .waitForElementCount('#error', 1)
+        .moveToObject('#error')
+        .waitUntil(function () {
+          return this.getText('#error').then((value) => value === 'error')
+        }, 10000)
+        .windowByUrl(Brave.browserWindowUrl)
         .openBraveMenu(braveMenu, braveryPanelCompact)
         .waitForTextValue(adsBlockedStat, '1')
         .click(adsBlockedStat)
         .waitUntil(function () {
           return this.getText('[data-test-id="braveryPanelBodyList"]')
             .then((body) => {
-              return body[0] === 'ws://ag.innovid.com/dv/sync?tid=2'
+              return body[0] === 'ws://wfpscripts.webspectator.com/bootstrap/ws-606FF556.js'
             })
         })
     })
