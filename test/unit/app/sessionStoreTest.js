@@ -378,15 +378,35 @@ describe('sessionStore unit tests', function () {
     })
 
     describe('if perWindowState is present', function () {
+      let cleanPerWindowDataStub
+      before(function () {
+        cleanPerWindowDataStub = sinon.stub(sessionStore, 'cleanPerWindowData', (state) => state)
+      })
+      after(function () {
+        cleanPerWindowDataStub.restore()
+      })
       it('calls cleanPerWindowData for each item', function () {
-        const cleanPerWindowDataStub = sinon.stub(sessionStore, 'cleanPerWindowData')
         const data = Immutable.fromJS({
           perWindowState: ['window1', 'window2']
         })
         sessionStore.cleanAppData(data, 'IS_SHUTDOWN_VALUE')
         assert.equal(cleanPerWindowDataStub.withArgs('window1', 'IS_SHUTDOWN_VALUE').calledOnce, true)
         assert.equal(cleanPerWindowDataStub.withArgs('window2', 'IS_SHUTDOWN_VALUE').calledOnce, true)
-        cleanPerWindowDataStub.restore()
+      })
+
+      it('removes state for windows which have no frames', function () {
+        let data = Immutable.fromJS({
+          perWindowState: [{
+            id: 1,
+            frames: []
+          }, {
+            id: 2,
+            frames: [1, 2, 3]
+          }]
+        })
+        const result = sessionStore.cleanAppData(data)
+        assert.equal(result.get('perWindowState').size, 1)
+        assert.equal(result.getIn(['perWindowState', 0, 'id']), 2)
       })
     })
 

@@ -431,13 +431,12 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
   }
 
   // Remove windowState from perWindowState if there are no frames
+  // ex: if window only had a single private tab, let's remove it (they aren't saved)
   if (perWindowStateList) {
     perWindowStateList.forEach((immutablePerWindowState, i) => {
-      if (isMap(immutablePerWindowState)) {
-        if (immutablePerWindowState.has('frames')) {
-          if (!immutablePerWindowState.get('frames').size) {
-            immutableData = immutableData.deleteIn(['perWindowState', i])
-          }
+      if (isMap(immutablePerWindowState) && immutablePerWindowState.has('frames')) {
+        if (!immutablePerWindowState.get('frames').size) {
+          immutableData = immutableData.deleteIn(['perWindowState', i])
         }
       }
     })
