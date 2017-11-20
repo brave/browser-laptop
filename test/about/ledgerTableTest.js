@@ -6,6 +6,8 @@ const {
   addFundsButton,
   paymentsWelcomePage,
   paymentsTab,
+  pinnedPublisher,
+  unpinnedPublisher,
   walletSwitch,
   advancedSettingsDialog,
   advancedSettingsButton
@@ -65,14 +67,13 @@ function * before (client, siteList) {
     .loadUrl(prefsUrl)
     .waitForVisible(paymentsTab)
     .click(paymentsTab)
-    .waitForVisible('[data-l10n-id="publisher"]')
-}
-
-function findBiggestPercentage (synopsis) {
-  return synopsis.sortBy((publisher) => publisher.get('percentage')).get(0)
+    .waitForVisible('[data-test-id="ledgerTable"]')
+    .moveToObject('[data-test-id="ledgerTable"]')
 }
 
 describe('Ledger table', function () {
+  const pinnedSite = '[data-test-url="http://brianbondy.com"]'
+
   describe('2 publishers', function () {
     Brave.beforeEach(this)
     beforeEach(function * () {
@@ -82,42 +83,22 @@ describe('Ledger table', function () {
 
     it('check if all sites are on the unpinned by default', function * () {
       yield this.app.client
-        .tabByIndex(0)
         .waitForElementCount(`${secondTable} tr`, sites.length)
     })
 
     it('pin publisher', function * () {
-      let topPublisher
-
       yield this.app.client
-        .tabByIndex(0)
-        .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
-        .waitForVisible(`${firstTableFirstRow} [data-test-pinned="true"]`)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitUntilSynopsis(function (synopsis) {
-          topPublisher = findBiggestPercentage(synopsis)
-          return true
-        })
-        .tabByIndex(0)
-        .waitForVisible(`${firstTableFirstRow} [data-test-id="siteName"]`)
-        .waitUntil(function () {
-          return this.getText(`${firstTableFirstRow} [data-test-id="siteName"]`).then((value) => {
-            return value === topPublisher.get('site')
-          })
-        }, 5000)
-        .waitForVisible(`${firstTableFirstRow} [data-test-id="pinnedInput"]`)
-        .waitUntil(function () {
-          return this.getValue(`${firstTableFirstRow} [data-test-id="pinnedInput"]`).then((value) => {
-            return Number(value) === topPublisher.get('pinPercentage')
-          })
-        }, 5000)
+        .waitForVisible(`${secondTableFirstRow} ${unpinnedPublisher}`)
+        .click(`${secondTableFirstRow} ${unpinnedPublisher}`)
+        .waitForVisible(`${firstTableFirstRow} ${pinnedPublisher}`)
+        .waitForElementCount(`${firstTableFirstRow} ${pinnedSite}${pinnedPublisher}`, 1)
     })
 
     it('pin publisher and change percentage', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
-        .waitForVisible(`${firstTableFirstRow} [data-test-pinned="true"]`)
+        .click(`${secondTableFirstRow} ${unpinnedPublisher}`)
+        .waitForVisible(`${firstTableFirstRow} ${pinnedPublisher}`)
         .click(`${firstTableFirstRow} [data-test-id="pinnedInput"]`)
         .pause(100)
         .keys([Brave.keys.DELETE, Brave.keys.DELETE, '40', Brave.keys.ENTER])
@@ -128,43 +109,34 @@ describe('Ledger table', function () {
     it('pin publisher and change percentage over 100', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
-        .waitForVisible(`${firstTableFirstRow} [data-test-pinned="true"]`)
+        .click(`${secondTableFirstRow} ${unpinnedPublisher}`)
+        .waitForVisible(`${firstTableFirstRow} ${pinnedPublisher}`)
         .click(`${firstTableFirstRow} [data-test-id="pinnedInput"]`)
+        .pause(100)
         .keys([Brave.keys.DELETE, Brave.keys.DELETE, '150', Brave.keys.ENTER])
         .waitForInputText(`${firstTableFirstRow} [data-test-id="pinnedInput"]`, '100')
         .waitForTextValue(`${secondTableSecondRow} [data-test-id="percentageValue"]`, '0')
     })
 
     it('pin excluded publisher', function * () {
-      let topPublisher
-
       yield this.app.client
         .tabByIndex(0)
         .click(`${secondTableFirstRow} [data-test-id="switchBackground"]`)
         .waitForVisible(`${secondTableFirstRow} [data-switch-status="false"]`)
-        .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
-        .waitForVisible(`${firstTableFirstRow} [data-test-pinned="true"]`)
-        .windowByUrl(Brave.browserWindowUrl)
-        .waitUntilSynopsis(function (synopsis) {
-          topPublisher = findBiggestPercentage(synopsis)
-          return true
-        })
-        .tabByIndex(0)
+        .click(`${secondTableFirstRow} ${unpinnedPublisher}`)
+        .waitForVisible(`${firstTableFirstRow} ${pinnedPublisher}`)
+        .waitForExist(`${firstTableFirstRow} [data-test-id="siteName"]`)
         .waitForVisible(`${firstTableFirstRow} [data-test-id="siteName"]`)
-        .waitUntil(function () {
-          return this.getText(`${firstTableFirstRow} [data-test-id="siteName"]`).then((value) => {
-            return value === topPublisher.get('site')
-          })
-        }, 5000)
+        .moveToObject(`${firstTableFirstRow} [data-test-id="siteName"]`)
+        .waitForElementCount(`${firstTableFirstRow} ${pinnedSite}${pinnedPublisher}`, 1)
         .waitForVisible(`${firstTableFirstRow} [data-switch-status="true"]`)
     })
 
     it('check pinned sites amount, when you have 0 eligible unpinned sites', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
-        .waitForVisible(`${firstTableFirstRow} [data-test-pinned="true"]`)
+        .click(`${secondTableFirstRow} ${unpinnedPublisher}`)
+        .waitForVisible(`${firstTableFirstRow} ${pinnedPublisher}`)
         .click(`${firstTableFirstRow} [data-test-id="pinnedInput"]`)
         .keys([Brave.keys.DELETE, Brave.keys.DELETE, '60', Brave.keys.ENTER])
         .waitForInputText(`${firstTableFirstRow} [data-test-id="pinnedInput"]`, '60')
@@ -202,11 +174,11 @@ describe('Ledger table', function () {
     it('pin 3 publishers', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
+        .click(`${secondTableFirstRow} ${unpinnedPublisher}`)
         .waitForElementCount(`${firstTable} tr`, 1)
-        .click(`${secondTableSecondRow} [data-test-pinned="false"]`)
+        .click(`${secondTableSecondRow} ${unpinnedPublisher}`)
         .waitForElementCount(`${firstTable} tr`, 2)
-        .click(`${secondTableThirdRow} [data-test-pinned="false"]`)
+        .click(`${secondTableThirdRow} ${unpinnedPublisher}`)
         .waitForElementCount(`${firstTable} tr`, 3)
         .waitForElementCount(`${secondTable} tr`, sites2.length - 3)
     })
@@ -243,11 +215,11 @@ describe('Ledger table', function () {
     it('pin 3 publishers custom value and check unpinned value', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
+        .click(`${secondTableFirstRow} ${unpinnedPublisher}`)
         .waitForElementCount(`${firstTable} tr`, 1)
-        .click(`${secondTableSecondRow} [data-test-pinned="false"]`)
+        .click(`${secondTableSecondRow} ${unpinnedPublisher}`)
         .waitForElementCount(`${firstTable} tr`, 2)
-        .click(`${secondTableThirdRow} [data-test-pinned="false"]`)
+        .click(`${secondTableThirdRow} ${unpinnedPublisher}`)
         .waitForElementCount(`${firstTable} tr`, 3)
         .click(`${firstTableFirstRow} [data-test-id="pinnedInput"]`)
         .keys([Brave.keys.DELETE, Brave.keys.DELETE, '40', Brave.keys.ENTER])
@@ -261,11 +233,11 @@ describe('Ledger table', function () {
     it('pin 3 publishers over 100 value and check unpinned value', function * () {
       yield this.app.client
         .tabByIndex(0)
-        .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
+        .click(`${secondTableFirstRow} ${unpinnedPublisher}`)
         .waitForElementCount(`${firstTable} tr`, 1)
-        .click(`${secondTableSecondRow} [data-test-pinned="false"]`)
+        .click(`${secondTableSecondRow} ${unpinnedPublisher}`)
         .waitForElementCount(`${firstTable} tr`, 2)
-        .click(`${secondTableThirdRow} [data-test-pinned="false"]`)
+        .click(`${secondTableThirdRow} ${unpinnedPublisher}`)
         .waitForElementCount(`${firstTable} tr`, 3)
         .click(`${firstTableFirstRow} [data-test-id="pinnedInput"]`)
         .keys([Brave.keys.DELETE, Brave.keys.DELETE, '40', Brave.keys.ENTER])

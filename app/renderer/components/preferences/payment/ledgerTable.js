@@ -220,6 +220,7 @@ class LedgerTable extends ImmutableComponent {
           <span className={css(styles.mainIcon, styles.pinIcon, pinned && styles.pinnedIcon)}
             onClick={this.togglePinSite.bind(this, this.getHostPattern(synopsis), !pinned, percentage)}
             data-test-pinned={pinned}
+            data-test-url={publisherURL}
           />
           <span className={css(styles.mainIcon, styles.removeIcon)}
             onClick={this.banSite.bind(this, this.getHostPattern(synopsis))}
