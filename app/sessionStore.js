@@ -39,7 +39,7 @@ const autofill = require('./autofill')
 const {navigatableTypes} = require('../js/lib/appUrlUtil')
 const Channel = require('./channel')
 const BuildConfig = require('./buildConfig')
-const {isImmutable, makeImmutable, deleteImmutablePaths} = require('./common/state/immutableUtil')
+const {isImmutable, isMap, makeImmutable, deleteImmutablePaths} = require('./common/state/immutableUtil')
 const {getSetting} = require('../js/settings')
 const platformUtil = require('./common/lib/platformUtil')
 const historyUtil = require('./common/lib/historyUtil')
@@ -428,6 +428,18 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
 
   if (immutableData.hasIn(['ledger', 'locations'])) {
     immutableData = immutableData.deleteIn(['ledger', 'locations'])
+  }
+
+  // Remove windowState from perWindowState if there are no frames
+  // ex: if window only had a single private tab, let's remove it (they aren't saved)
+  if (perWindowStateList) {
+    perWindowStateList.forEach((immutablePerWindowState, i) => {
+      if (isMap(immutablePerWindowState) && immutablePerWindowState.has('frames')) {
+        if (!immutablePerWindowState.get('frames').size) {
+          immutableData = immutableData.deleteIn(['perWindowState', i])
+        }
+      }
+    })
   }
 
   return immutableData
