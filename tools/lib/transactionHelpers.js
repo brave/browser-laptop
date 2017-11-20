@@ -1,7 +1,6 @@
 let Joi = require('joi')
 let generateRandomHost = require('./randomHostname')
-
-const SATOSHIS_PER_BTC = Math.pow(10, 8)
+const BigNumber = require('bignumber.js')
 
 const VALID_CURRENCY_CODE_REGEX = /^[A-Z]+$/
 const VALID_HOSTNAME_REGEX = /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9])$/
@@ -10,13 +9,13 @@ const transactionSchema = Joi.object().keys({
   viewingId: Joi.string().guid().required().description('a unique id for the transaction'),
   surveyorId: Joi.string().length(32, 'base64').required().description('a unique id for the surveyor. 32 bytes, base64 encoded'),
   contribution: Joi.object().keys({
+    altcurrency: Joi.string().required(),
     fiat: Joi.object().keys({
       amount: Joi.number().min(0).precision(2).required(),
       currency: Joi.string().required()
     }).required(),
     rates: Joi.object().pattern(VALID_CURRENCY_CODE_REGEX, Joi.number().min(0).precision(2)),
-    satoshis: Joi.number().integer().min(0).required().description('contribution amount in satoshis (10E-8 BTC)'),
-    fee: Joi.number().integer().min(0).required().description('transaction fee in satoshis for the contribution (10E-8 BTC)')
+    probi: Joi.string().min(0).required().description('contribution amount in satoshis (10E-8 BTC)')
   }).required().description('object describing contribution in fiat and BTC, with exchange rate at time of contribution and network transaction fee'),
   submissionStamp: Joi.date().timestamp().required(),
   /** submissionId is 32 bytes, 64 chars hex-encoded **/
@@ -104,36 +103,27 @@ const generateSurveyorIds = function (count) {
   return (new Array(count)).fill(null).map(generateSurveyorId)
 }
 
-const generateContribution = function (satoshis, currency, rate, fee) {
-  let plusOrMinusTenPercentFactor = 1 + (2 * (Math.random() - 0.5) * 0.1)
-  let randomExchangeRateUSDPerBTC = 620 * plusOrMinusTenPercentFactor
-  let randomExchangeRateSatoshisPerUSD = (1 / randomExchangeRateUSDPerBTC) * SATOSHIS_PER_BTC
-  let randomContributionAmountUSD = [5, 10, 15][ Math.round(Math.random() * 2) ]
+const generateContribution = function () {
+  let randomContributionAmount = [25, 50, 75, 100][ Math.round(Math.random() * 3) ]
+  const currency = 'BAT'
 
-  currency = currency || 'USD'
-  currency = currency.toUpperCase()
-  rate = rate || randomExchangeRateUSDPerBTC
-  satoshis = satoshis || Math.round(randomContributionAmountUSD * randomExchangeRateSatoshisPerUSD)
-  fee = fee || (0.0001 * SATOSHIS_PER_BTC)
-
-  let rates = {}
-  rates[currency] = parseFloat(rate.toFixed(2))
-
-  if (currency.toUpperCase() !== 'USD') {
-    rates.USD = randomExchangeRateUSDPerBTC
+  let rates = {
+    BTC: 0.00004132,
+    ETH: 0.0006605302785672951,
+    EUR: 0.16857817177013637,
+    GBP: 0.150931297991734,
+    USD: 0.1991611604
   }
 
-  let contribution = {
+  return {
+    altcurrency: currency,
     fiat: {
-      amount: parseFloat((satoshis / SATOSHIS_PER_BTC * rate).toFixed(2)),
+      amount: randomContributionAmount,
       currency: currency
     },
     rates: rates,
-    satoshis: satoshis,
-    fee: fee
+    probi: new BigNumber(randomContributionAmount.toString()).times('1e18').toString()
   }
-
-  return contribution
 }
 
 const generateSubmissionStamp = function () {
