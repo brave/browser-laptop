@@ -661,7 +661,12 @@ const displayHost = {
   fontWeight: 'normal',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  overflow: 'hidden'
+  overflow: 'hidden',
+
+  // See #11878: avoid a very long domain drom covering the webview.
+  // The value should maintain the panel width until 0.19.
+  // https://github.com/brave/browser-laptop/blob/0.19.x/app/renderer/components/main/braveryPanel.js#L708
+  maxWidth: '320px'
 }
 const editGlobalMarginBottom = '.25rem'
 
@@ -928,7 +933,11 @@ const styles = StyleSheet.create({
   braveryPanel__body__ul__li: {
     listStyleType: 'none',
     padding: '10px 0',
-    cursor: 'text'
+    cursor: 'text',
+
+    // #9839 and #11878: Avoid the panel width from increasing.
+    width: 0,
+    whiteSpace: 'nowrap'
   },
   braveryPanel__body__hr: {
     background: globalStyles.braveryPanel.body.hr.background,
@@ -980,10 +989,6 @@ const styles = StyleSheet.create({
   },
   braveryPanel_compact__body__ul__li: {
     padding: '5px 0',
-
-    // #9839: Avoid the panel width from increasing
-    width: 0,
-    whiteSpace: 'nowrap',
 
     ':first-of-type': {
       paddingTop: 0
