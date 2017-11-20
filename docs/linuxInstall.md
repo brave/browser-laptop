@@ -30,10 +30,12 @@ sudo apt update
 sudo apt install brave
 ```
 
-To install the latest which also often has early staging builds:
+To install the latest `brave-beta` which often has early staging builds:
 ```
 curl https://s3-us-west-2.amazonaws.com/brave-apt-staging/keys.asc | sudo apt-key add -
 echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt-staging `lsb_release -sc` main" | sudo tee -a /etc/apt/sources.list.d/brave-`lsb_release -sc`.list
+sudo apt update
+sudo apt install brave-beta
 ```
 
 Upgrades can be done via:
