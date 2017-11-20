@@ -36,6 +36,7 @@ function addSimulatedLedgerTransactions (numTx) {
     console.error('ERROR in addSimulatedLedgerTransactions: could not find/open/parse Ledger data file.')
     console.error(`Expected path to Ledger data file: ${ledgerStatePath}`)
     console.error('Probable solution: Run Brave and enable Payments, then execute this script. Enabling/disabling Payments (or restarting Brave) should then show the generated transactions in Brave.')
+    console.error(exc.toString())
   }
 }
 
