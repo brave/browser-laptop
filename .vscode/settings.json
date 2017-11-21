@@ -1,3 +1,4 @@
 {
-  "standard.enable": true
+  "standard.enable": true,
+  "standard.usePackageJson": true
 }
