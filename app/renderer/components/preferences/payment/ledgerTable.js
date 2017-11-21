@@ -184,7 +184,7 @@ class LedgerTable extends ImmutableComponent {
             small
             disabled
             checkedOn
-            switchClassName={css(styles.switchControl_center)}
+            customWrapperClassName={css(styles.switchControl_center)}
             indicatorClassName={css(styles.pinnedToggle)}
             testId='pinnedDisabled'
             onClick={() => {}}
