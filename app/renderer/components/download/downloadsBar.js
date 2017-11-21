@@ -17,7 +17,6 @@ const webviewActions = require('../../../../js/actions/webviewActions')
 const appActions = require('../../../../js/actions/appActions')
 
 // Utils
-const contextMenus = require('../../../../js/contextMenus')
 const downloadUtil = require('../../../../js/state/downloadUtil')
 const cx = require('../../../../js/lib/classSet')
 const {getSetting} = require('../../../../js/settings')
@@ -51,7 +50,7 @@ class DownloadsBar extends React.Component {
   mergeProps (state, ownProps) {
     const props = {}
     // used in renderer
-    props.isToolbarDownloads = getSetting(settings.SHOW_TOOLBAR_DOWNLOADS)
+    props.showToolbarWhenDownloading = getSetting(settings.SHOW_TOOLBAR_WHEN_DOWNLOADING)
     props.downloads = downloadUtil.getDownloadItems(state) || Immutable.List()
 
     return props
@@ -59,7 +58,7 @@ class DownloadsBar extends React.Component {
 
   render () {
     return <div className={cx({
-      [css(styles.downloadsBar, !this.props.isToolbarDownloads && styles.downloadBar_hidden)]: true,
+      [css(styles.downloadsBar, !this.props.showToolbarWhenDownloading && styles.downloadBar_hidden)]: true,
 
       // Required for isFullScreen on window.less
       // TODO: css(isFullScreen && styles.downloadsBar_isFullScreen)

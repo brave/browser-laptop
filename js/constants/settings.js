@@ -18,6 +18,7 @@ const settings = {
   IS_DEFAULT_BROWSER: 'general.is-default-browser',
   DOWNLOAD_DEFAULT_PATH: 'general.download-default-path',
   DOWNLOAD_ALWAYS_ASK: 'general.download-always-ask',
+  SHOW_TOOLBAR_WHEN_DOWNLOADING: 'general.download-show-toolbar-when-downloading',
   SPELLCHECK_ENABLED: 'general.spellcheck-enabled',
   SPELLCHECK_LANGUAGES: 'general.spellcheck-languages',
   // Search tab
@@ -97,8 +98,6 @@ const settings = {
   PINTEREST_ENABLED: 'extensions.pinterest.enabled',
   METAMASK_ENABLED: 'extensions.metamask.enabled',
   METAMASK_PROMPT_DISMISSED: 'extensions.metamask.promptDismissed',
-  // View Menu
-  SHOW_TOOLBAR_DOWNLOADS: 'toolbar.downloads',
 
   // DEPRECATED settings
   // DO NOT REMOVE OR CHANGE THESE VALUES

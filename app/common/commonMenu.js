@@ -297,17 +297,6 @@ module.exports.bookmarksToolbarMenuItem = () => {
   }
 }
 
-module.exports.downloadsToolbarMenuItem = () => {
-  return {
-    label: locale.translation('toolbarDownloads'),
-    type: 'checkbox',
-    checked: getSetting(settings.SHOW_TOOLBAR_DOWNLOADS),
-    click: (item, focusedWindow) => {
-      appActions.changeSetting(settings.SHOW_TOOLBAR_DOWNLOADS, !getSetting(settings.SHOW_TOOLBAR_DOWNLOADS))
-    }
-  }
-}
-
 module.exports.autoHideMenuBarMenuItem = () => {
   const autoHideMenuBar = getSetting(settings.AUTO_HIDE_MENU)
   return {

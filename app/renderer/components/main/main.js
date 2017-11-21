@@ -60,6 +60,7 @@ const menuBarState = require('../../../common/state/menuBarState')
 const windowState = require('../../../common/state/windowState')
 const updateState = require('../../../common/state/updateState')
 const tabState = require('../../../common/state/tabState')
+const downloadsToolbarState = require('../../../common/state/downloadsToolbarState')
 
 // Util
 const _ = require('underscore')
@@ -540,6 +541,7 @@ class Main extends React.Component {
     const widevinePanelDetail = currentWindow.get('widevinePanelDetail', Immutable.Map())
     const loginRequiredDetails = basicAuthState.getLoginRequiredDetail(state, activeTabId)
     const focused = isFocused(state)
+    const currentWindowId = currentWindow.getIn(['windowInfo', 'windowId'])
 
     const props = {}
     // used in renderer
@@ -574,8 +576,7 @@ class Main extends React.Component {
         item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true).size > 0
     props.showFindBar = activeFrame.get('findbarShown') && !activeFrame.get('isFullScreen')
     props.sortedFrames = frameStateUtil.getSortedFrameKeys(currentWindow)
-    props.showDownloadBar = currentWindow.getIn(['ui', 'downloadsToolbar', 'isVisible']) &&
-      state.get('downloads') && state.get('downloads').size > 0
+    props.showDownloadBar = downloadsToolbarState.isVisible(state, currentWindowId)
     props.title = activeFrame.get('title')
     props.location = activeFrame.get('location')
     props.loginRequiredUrl = loginRequiredDetails

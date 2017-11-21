@@ -14,6 +14,7 @@ const windowConstants = require('../../../js/constants/windowConstants')
 
 // State
 const windowState = require('../../common/state/windowState')
+const downloadsToolbarState = require('../../common/state/downloadsToolbarState')
 
 // Utils
 const windows = require('../windows')
@@ -372,6 +373,9 @@ const windowsReducer = (state, action, immutableAction) => {
       break
     case windowConstants.WINDOW_SHOULD_OPEN_DEV_TOOLS:
       windows.openDevTools(action.get('windowId'))
+      break
+    case windowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
+      state = downloadsToolbarState.setVisibility(state, action.get('senderWindowId'), action.get('isVisible'))
       break
   }
   return state

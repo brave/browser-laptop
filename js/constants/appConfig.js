@@ -142,6 +142,7 @@ module.exports = {
     'general.check-default-on-startup': Channel.channel() === 'dev',
     'general.download-default-path': '',
     'general.download-always-ask': true,
+    'general.download-show-toolbar-when-downloading': true,
     'general.spellcheck-enabled': true,
     'general.spellcheck-languages': Immutable.fromJS(['en-US']),
     'search.default-search-engine': 'Google',
@@ -229,7 +230,6 @@ module.exports = {
     'general.is-default-browser': null,
     'notification-add-funds-timestamp': null,
     'notification-reconcile-soon-timestamp': null,
-    'toolbar.downloads': true,
 
     // DEPRECATED settings
     // DO NOT REMOVE OR CHANGE THESE VALUES

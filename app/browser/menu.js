@@ -22,6 +22,7 @@ const settings = require('../../js/constants/settings')
 const {getByTabId} = require('../common/state/tabState')
 const tabState = require('../../app/common/state/tabState')
 const appStore = require('../../js/stores/appStore')
+const downloadsToolbarState = require('../../app/common/state/downloadsToolbarState')
 
 // Actions
 const appActions = require('../../js/actions/appActions')
@@ -44,6 +45,8 @@ let appMenu = null
 let closedFrames = new Immutable.OrderedMap()
 let lastClosedUrl = null
 let currentLocation = null
+let focusedWindowId
+let downloadsToolbarVisible
 
 // Submenu initialization
 const createFileSubmenu = () => {
@@ -193,13 +196,29 @@ const createEditSubmenu = () => {
   return submenu
 }
 
+// NOTE: this only deals with the currently focused window
+const downloadsToolbarMenuItem = {
+  label: locale.translation('toolbarDownloads'),
+  type: 'checkbox',
+  checked: downloadsToolbarVisible,
+  click: (item, focusedWindow) => {
+    CommonMenu.sendToFocusedWindow(focusedWindow,
+      [
+        downloadsToolbarVisible
+        ? messages.HIDE_DOWNLOADS_TOOLBAR
+        : messages.SHOW_DOWNLOADS_TOOLBAR
+      ]
+    )
+  }
+}
+
 const createViewSubmenu = () => {
   return [
     {
       label: locale.translation('toolbar'),
       submenu: [
         CommonMenu.bookmarksToolbarMenuItem(),
-        CommonMenu.downloadsToolbarMenuItem()
+        downloadsToolbarMenuItem
       ]
     },
     CommonMenu.separatorMenuItem,
@@ -660,6 +679,12 @@ const doAction = (state, action) => {
           currentLocation = frame.location
           setMenuItemChecked(state, locale.translation('bookmarkPage'), isCurrentLocationBookmarked(state))
         }
+        // Get the current visible status of the downloads toolbar; update menu
+        focusedWindowId = action.senderWindowId
+        if (focusedWindowId) {
+          downloadsToolbarVisible = downloadsToolbarState.isVisible(state, focusedWindowId)
+          setMenuItemChecked(state, locale.translation('toolbarDownloads'), downloadsToolbarVisible)
+        }
         break
       }
     case appConstants.APP_CHANGE_SETTING:
@@ -734,6 +759,14 @@ const doAction = (state, action) => {
         if (clickedMenuItem) {
           const focusedWindow = BrowserWindow.getFocusedWindow()
           clickedMenuItem.click(clickedMenuItem, focusedWindow, focusedWindow.webContents)
+        }
+        break
+      }
+    case windowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
+      {
+        if (action.senderWindowId === focusedWindowId) {
+          downloadsToolbarVisible = action.isVisible
+          setMenuItemChecked(state, locale.translation('toolbarDownloads'), downloadsToolbarVisible)
         }
         break
       }
