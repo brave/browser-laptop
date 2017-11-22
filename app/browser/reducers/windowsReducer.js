@@ -75,7 +75,7 @@ const setWindowDimensions = (browserOpts, defaults, immutableWindowState) => {
   const windowInfoState = immutableWindowState.get('windowInfo')
   if (windowInfoState) {
     browserOpts.width = firstDefinedValue(browserOpts.width, windowInfoState.get('width'))
-    browserOpts.height = firstDefinedValue(browserOpts.height, windowInfoState.get('windowInfo'))
+    browserOpts.height = firstDefinedValue(browserOpts.height, windowInfoState.get('height'))
   } else {
     browserOpts.width = firstDefinedValue(browserOpts.width, browserOpts.innerWidth, defaults.width)
     // height and innerHeight are the frame webview size

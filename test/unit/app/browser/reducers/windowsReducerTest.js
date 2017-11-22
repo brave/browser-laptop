@@ -115,63 +115,138 @@ describe('windowsReducer unit test', function () {
       assert.deepEqual(fakeDisplay.workAreaSize, { width, height })
     })
 
-    it('allows a window size to be exactly specified', function () {
-      const expectedDimensions = { width: 600, outerHeight: 700 }
-      const action = {
-        actionType: appConstants.APP_NEW_WINDOW,
-        browserOpts: Object.assign({}, expectedDimensions)
-      }
-      windowsReducer(state, action)
-      fakeTimers.tick(0)
-      const windowOptions = spy.args[0][0]
-      assert.propertyVal(windowOptions, 'width', expectedDimensions.width)
-      assert.propertyVal(windowOptions, 'height', expectedDimensions.outerHeight)
-    })
+    describe('when specifying window size', function () {
+      const exampleDimensions = { width: 600, height: 700 }
 
-    it('allows a window size to be specified, ignoring navBar height', function () {
-      const expectedDimensions = { width: 600, height: 700 }
-      const action = {
-        actionType: appConstants.APP_NEW_WINDOW,
-        browserOpts: Object.assign({}, expectedDimensions)
-      }
-      windowsReducer(state, action)
-      fakeTimers.tick(0)
-      const windowOptions = spy.args[0][0]
-      // width should be exact
-      assert.propertyVal(windowOptions, 'width', expectedDimensions.width)
-      // height should have 'navBar' added on to it
-      assert.isAbove(windowOptions.height, expectedDimensions.height)
-      // but should not be larger than screen height
-      assert.isBelow(windowOptions.height, new FakeElectronDisplay().workAreaSize.height)
-    })
-
-    it('positions the window by the mouse cursor when asked', function () {
-      const expectedPosition = fakeElectron.screen.getCursorScreenPoint()
-      const action = {
-        actionType: appConstants.APP_NEW_WINDOW,
-        browserOpts: { positionByMouseCursor: true }
-      }
-      windowsReducer(state, action)
-      fakeTimers.tick(0)
-      const windowOptions = spy.args[0][0]
-      assert.propertyVal(windowOptions, 'x', expectedPosition.x)
-      assert.propertyVal(windowOptions, 'y', expectedPosition.y)
-    })
-
-    it('positions the window to an exact point when asked', function () {
-      const expectedPosition = { x: 500, y: 600 }
-      const action = {
-        actionType: appConstants.APP_NEW_WINDOW,
-        browserOpts: {
-          x: expectedPosition.x,
-          y: expectedPosition.y
+      it('allows a window size to be exactly specified', function () {
+        const expectedDimensions = { width: exampleDimensions.width, outerHeight: exampleDimensions.height }
+        const action = {
+          actionType: appConstants.APP_NEW_WINDOW,
+          browserOpts: Object.assign({}, expectedDimensions)
         }
-      }
-      windowsReducer(state, action)
-      fakeTimers.tick(0)
-      const windowOptions = spy.args[0][0]
-      assert.propertyVal(windowOptions, 'x', expectedPosition.x)
-      assert.propertyVal(windowOptions, 'y', expectedPosition.y)
+        windowsReducer(state, action)
+        fakeTimers.tick(0)
+        const windowOptions = spy.args[0][0]
+        assert.propertyVal(windowOptions, 'width', expectedDimensions.width)
+        assert.propertyVal(windowOptions, 'height', expectedDimensions.outerHeight)
+      })
+
+      it('allows a window size to be specified, ignoring navBar height', function () {
+        const action = {
+          actionType: appConstants.APP_NEW_WINDOW,
+          browserOpts: Object.assign({}, exampleDimensions)
+        }
+        windowsReducer(state, action)
+        fakeTimers.tick(0)
+        const windowOptions = spy.args[0][0]
+        // width should be exact
+        assert.propertyVal(windowOptions, 'width', exampleDimensions.width)
+        // height should have 'navBar' added on to it
+        assert.isAbove(windowOptions.height, exampleDimensions.height)
+        // but should not be larger than screen height
+        assert.isBelow(windowOptions.height, new FakeElectronDisplay().workAreaSize.height)
+      })
+
+      it('allows size to be specified via `restoredState`', function () {
+        const action = {
+          actionType: appConstants.APP_NEW_WINDOW,
+          restoredState: {
+            windowInfo: exampleDimensions
+          }
+        }
+        windowsReducer(state, action)
+        fakeTimers.tick(0)
+        const windowOptions = spy.args[0][0]
+        assert.propertyVal(windowOptions, 'width', exampleDimensions.width)
+        assert.propertyVal(windowOptions, 'height', exampleDimensions.height)
+      })
+
+      it('falls back to the defaults if size is not provided', function () {
+        const stateWithDefault = state.mergeIn(['defaultWindowParams'], exampleDimensions)
+        const action = {
+          actionType: appConstants.APP_NEW_WINDOW
+        }
+        windowsReducer(stateWithDefault, action)
+        fakeTimers.tick(0)
+        const windowOptions = spy.args[0][0]
+        assert.propertyVal(windowOptions, 'width', exampleDimensions.width)
+        assert.propertyVal(windowOptions, 'height', exampleDimensions.height)
+      })
+
+      it('falls back to the deprecated defaults if no other size is provided', function () {
+        const stateWithDefault = state
+          .set('defaultWindowWidth', exampleDimensions.width)
+          .set('defaultWindowHeight', exampleDimensions.height)
+        const action = {
+          actionType: appConstants.APP_NEW_WINDOW
+        }
+        windowsReducer(stateWithDefault, action)
+        fakeTimers.tick(0)
+        const windowOptions = spy.args[0][0]
+        assert.propertyVal(windowOptions, 'width', exampleDimensions.width)
+        assert.propertyVal(windowOptions, 'height', exampleDimensions.height)
+      })
+    })
+
+    describe('when specifying the window position', function () {
+      const expectedPosition = { x: 500, y: 600 }
+
+      it('positions the window by the mouse cursor when asked', function () {
+        const expectedPosition = fakeElectron.screen.getCursorScreenPoint()
+        const action = {
+          actionType: appConstants.APP_NEW_WINDOW,
+          browserOpts: { positionByMouseCursor: true }
+        }
+        windowsReducer(state, action)
+        fakeTimers.tick(0)
+        const windowOptions = spy.args[0][0]
+        assert.propertyVal(windowOptions, 'x', expectedPosition.x)
+        assert.propertyVal(windowOptions, 'y', expectedPosition.y)
+      })
+
+      it('positions the window to an exact point when asked', function () {
+        const action = {
+          actionType: appConstants.APP_NEW_WINDOW,
+          browserOpts: {
+            x: expectedPosition.x,
+            y: expectedPosition.y
+          }
+        }
+        windowsReducer(state, action)
+        fakeTimers.tick(0)
+        const windowOptions = spy.args[0][0]
+        assert.propertyVal(windowOptions, 'x', expectedPosition.x)
+        assert.propertyVal(windowOptions, 'y', expectedPosition.y)
+      })
+
+      it('allows size to be specified via `restoredState`', function () {
+        const action = {
+          actionType: appConstants.APP_NEW_WINDOW,
+          restoredState: {
+            windowInfo: {
+              left: expectedPosition.x,
+              top: expectedPosition.y
+            }
+          }
+        }
+        windowsReducer(state, action)
+        fakeTimers.tick(0)
+        const windowOptions = spy.args[0][0]
+        assert.propertyVal(windowOptions, 'x', expectedPosition.x)
+        assert.propertyVal(windowOptions, 'y', expectedPosition.y)
+      })
+
+      it('falls back to the defaults if size is not provided', function () {
+        const stateWithDefault = state.mergeIn(['defaultWindowParams'], expectedPosition)
+        const action = {
+          actionType: appConstants.APP_NEW_WINDOW
+        }
+        windowsReducer(stateWithDefault, action)
+        fakeTimers.tick(0)
+        const windowOptions = spy.args[0][0]
+        assert.propertyVal(windowOptions, 'x', expectedPosition.x)
+        assert.propertyVal(windowOptions, 'y', expectedPosition.y)
+      })
     })
 
     it('restores a maximized window', function () {
