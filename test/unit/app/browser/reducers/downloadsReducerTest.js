@@ -148,19 +148,25 @@ describe('downloadsReducer', function () {
   })
 
   describe('APP_DOWNLOAD_REDOWNLOADED', function () {
-    it('should redownload the same URL', function (cb) {
-      const win = {
-        webContents: {
-          downloadURL: function () {
-          }
+    const win = {
+      webContents: {
+        downloadURL: function () {
         }
       }
+    }
+    let spy
+    before(() => {
+      spy = sinon.stub(fakeElectron.BrowserWindow, 'getFocusedWindow', (path) => {
+        return win
+      })
+    })
+    after(() => {
+      spy.restore()
+    })
+    it('should redownload the same URL', function (cb) {
       sinon.stub(win.webContents, 'downloadURL', (redownloadUrl) => {
         assert.equal(redownloadUrl, downloadUrl)
         cb()
-      })
-      sinon.stub(fakeElectron.BrowserWindow, 'getFocusedWindow', (path) => {
-        return win
       })
       const oldState = oneDownloadWithState(CANCELLED)
       downloadsReducer(oldState, {actionType: appConstants.APP_DOWNLOAD_REDOWNLOADED, downloadId: downloadId(oldState)})
