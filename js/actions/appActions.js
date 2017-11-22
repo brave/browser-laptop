@@ -48,6 +48,16 @@ const appActions = {
     })
   },
 
+  windowRendered: function (windowId) {
+    dispatch({
+      actionType: appConstants.APP_WINDOW_RENDERED,
+      windowId,
+      queryInfo: {
+        windowId
+      }
+    })
+  },
+
   closeWindow: function (windowId) {
     dispatch({
       actionType: appConstants.APP_CLOSE_WINDOW,

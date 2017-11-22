@@ -87,8 +87,12 @@ ipc.on(messages.INITIALIZE_WINDOW, (e, mem) => {
   windowStore.state = newState
   generateTabs(newState, message.frames, windowValue.id)
   appActions.windowReady(windowValue.id, windowValue)
-  ReactDOM.render(<Window />, document.getElementById('appContainer'))
+  ReactDOM.render(<Window />, document.getElementById('appContainer'), fireOnReactRender.bind(null, windowValue))
 })
+
+const fireOnReactRender = (windowValue) => {
+  appActions.windowRendered(windowValue.id)
+}
 
 const generateTabs = (windowState, frames, windowId) => {
   const activeFrameKey = windowState.get('activeFrameKey')

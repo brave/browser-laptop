@@ -1,4 +1,6 @@
 const {EventEmitter} = require('events')
+const FakeElectronDisplay = require('./fakeElectronDisplay')
+const FakeElectronWindow = require('./fakeWindow')
 const ipcMain = new EventEmitter()
 ipcMain.send = ipcMain.emit
 const fakeElectron = {
@@ -7,21 +9,7 @@ const fakeElectron = {
     fakeElectron.remote.app.removeAllListeners()
     fakeElectron.autoUpdater.removeAllListeners()
   },
-  BrowserWindow: {
-    getFocusedWindow: function () {
-      return {
-        id: 1
-      }
-    },
-    getActiveWindow: function () {
-      return {
-        id: 1
-      }
-    },
-    getAllWindows: function () {
-      return [{id: 1}]
-    }
-  },
+  BrowserWindow: FakeElectronWindow,
   MenuItem: class {
     constructor (template) {
       this.template = template
@@ -100,6 +88,13 @@ const fakeElectron = {
   autoUpdater: new EventEmitter(),
   importer: {
     on: () => {}
+  },
+  screen: {
+    getDisplayMatching: () => new FakeElectronDisplay(),
+    getPrimaryDisplay: () => new FakeElectronDisplay(),
+    getDisplayNearestPoint: () => new FakeElectronDisplay(),
+    getAllDisplays: () => [new FakeElectronDisplay()],
+    getCursorScreenPoint: () => ({ x: 200, y: 200 })
   }
 }
 

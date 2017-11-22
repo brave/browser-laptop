@@ -7,6 +7,7 @@ const _ = null
 const appConstants = {
   APP_NEW_WINDOW: _,
   APP_WINDOW_READY: _,
+  APP_WINDOW_RENDERED: _,
   APP_CLOSE_WINDOW: _,
   APP_WINDOW_CLOSED: _,
   APP_WINDOW_CREATED: _,
