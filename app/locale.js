@@ -183,6 +183,7 @@ var rendererIdentifiers = function () {
     'forgetLearnedSpelling',
     'lookupSelection',
     'publisherMediaName',
+
     // Other identifiers
     'aboutBlankTitle',
     'urlCopied',
@@ -216,6 +217,7 @@ var rendererIdentifiers = function () {
     'smartphoneTitle',
     'updateLater',
     'updateHello',
+
     // notifications
     'notificationPasswordWithUserName',
     'notificationUpdatePasswordWithUserName',
@@ -239,6 +241,7 @@ var rendererIdentifiers = function () {
     'dappDetected',
     'dappDismiss',
     'dappEnableExtension',
+
     // other
     'passwordsManager',
     'extensionsManager',
@@ -262,6 +265,7 @@ var rendererIdentifiers = function () {
     'downloadPaused',
     'noDownloads',
     'torrentDesc',
+
     // Caption buttons in titlebar (min/max/close - Windows only)
     'windowCaptionButtonMinimize',
     'windowCaptionButtonMaximize',
@@ -276,6 +280,7 @@ var rendererIdentifiers = function () {
     'unknownError',
     'allowAutoplay',
     'autoplayMedia',
+
     // Release channels
     'channelRelease',
     'channelBeta',
