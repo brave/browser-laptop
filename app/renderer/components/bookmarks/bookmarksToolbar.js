@@ -27,7 +27,6 @@ const siteTags = require('../../../../js/constants/siteTags')
 // Utils
 const {isFocused} = require('../../currentWindow')
 const contextMenus = require('../../../../js/contextMenus')
-const cx = require('../../../../js/lib/classSet')
 const dnd = require('../../../../js/dnd')
 const dndData = require('../../../../js/dndData')
 const isWindows = require('../../../common/lib/platformUtil').isWindows()
@@ -181,37 +180,35 @@ class BookmarksToolbar extends React.Component {
 
   render () {
     this.bookmarkRefs = []
-    return <div
-      className={cx({
-        bookmarksToolbar: true,
-        showFavicon: this.props.showFavicon,
-        showOnlyFavicon: this.props.showOnlyFavicon,
-        [css(styles.bookmarksToolbar)]: true,
-        [css(this.props.shouldAllowWindowDrag && styles.bookmarksToolbar__allowDragging)]: true,
-        [css(styles.bookmarksToolbar__showOnlyFavicon)]: true
-      })}
+    return <div className={css(
+      styles.bookmarksToolbar,
+      this.props.shouldAllowWindowDrag && styles.bookmarksToolbar_allowDragging,
+      this.props.showOnlyFavicon && styles.bookmarksToolbar_showOnlyFavicon
+    )}
       data-test-id='bookmarksToolbar'
       onDrop={this.onDrop}
       onDragEnter={this.onDragEnter}
       onDragOver={this.onDragOver}
-      onContextMenu={this.onContextMenu}>
+      onContextMenu={this.onContextMenu}
+    >
       {
           this.props.visibleBookmarks.map((bookmarkKey, i) =>
             <BookmarkToolbarButton
               ref={(node) => this.bookmarkRefs.push(node)}
               key={`toolbar-button-${i}`}
-              bookmarkKey={bookmarkKey} />)
+              bookmarkKey={bookmarkKey}
+            />)
       }
       {
         this.props.hiddenBookmarks.size !== 0
         ? <BrowserButton
           bookmarksOverflowIndicator
+          iconOnly
+          size='14px'
           iconClass={globalStyles.appIcons.angleDoubleRight}
           onClick={this.onMoreBookmarksMenu}
-          custom={[
-            styles.bookmarksToolbar__bookmarkButton,
-            styles.bookmarksToolbar__overflowIndicator
-          ]} />
+          custom={styles.bookmarksToolbar__overflowIndicator}
+        />
         : null
       }
     </div>
@@ -223,30 +220,21 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     display: 'flex',
     flex: 1,
+    alignItems: 'center', // to align bookmarksToolbar__overflowIndicator to the center
     padding: `0 ${globalStyles.spacing.bookmarksToolbarPadding}`,
     margin: `${globalStyles.spacing.navbarMenubarMargin} 0`
   },
-  bookmarksToolbar__allowDragging: {
+
+  bookmarksToolbar_allowDragging: {
     WebkitAppRegion: 'drag'
   },
-  bookmarksToolbar__showOnlyFavicon: {
+
+  bookmarksToolbar_showOnlyFavicon: {
     padding: `0 0 0 ${globalStyles.spacing.bookmarksToolbarPadding}`
   },
-  bookmarksToolbar__bookmarkButton: {
-    boxSizing: 'border-box',
-    fontSize: '14px',
-    height: 'auto',
-    lineHeight: '12px',
-    marginLeft: 'auto',
-    marginRight: '5px',
-    width: 'auto',
-    userSelect: 'none'
-  },
+
   bookmarksToolbar__overflowIndicator: {
-    paddingLeft: '6px',
-    paddingRight: '11px',
-    margin: 'auto 0 auto auto',
-    WebkitAppRegion: 'no-drag'
+    margin: '0 5px 0 auto'
   }
 })
 
