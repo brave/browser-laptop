@@ -183,6 +183,8 @@ var rendererIdentifiers = function () {
     'zoom',
     'zoomIn',
     'zoomOut',
+    'no',
+    'yes',
 
     // Other identifiers
     'aboutBlankTitle',
@@ -257,7 +259,6 @@ var rendererIdentifiers = function () {
     'dappEnableExtension',
     'dismiss',
     'neverForThisSite',
-    'no',
     'noThanks',
     'notificationPassword',
     'notificationPasswordSettings',
@@ -272,7 +273,6 @@ var rendererIdentifiers = function () {
     'walletConvertedDismiss',
     'walletConvertedLearnMore',
     'walletConvertedToBat',
-    'yes',
 
     // Caption buttons in titlebar (min/max/close - Windows only)
     'windowCaptionButtonClose',
