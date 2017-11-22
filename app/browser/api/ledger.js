@@ -1309,15 +1309,22 @@ const roundtrip = (params, options, callback) => {
 }
 
 const observeTransactions = (state, transactions) => {
+  if (!transactions) {
+    return
+  }
+
   const current = ledgerState.getInfoProp(state, 'transactions')
   if (current && current.size === transactions.length) {
     return
   }
+
   // Notify the user of new transactions.
   if (getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
     if (transactions.length > 0) {
-      const newestTransaction = transactions[transactions.length - 1]
-      ledgerNotifications.showPaymentDone(newestTransaction.contribution.fiat)
+      const newestTransaction = transactions[0]
+      if (newestTransaction && newestTransaction.contribution) {
+        ledgerNotifications.showPaymentDone(newestTransaction.contribution.fiat)
+      }
     }
   }
 }
@@ -2424,7 +2431,8 @@ const getMethods = () => {
       getCurrentMediaKey: (key) => currentMediaKey,
       synopsisNormalizer,
       checkVerifiedStatus,
-      roundtrip
+      roundtrip,
+      observeTransactions
     }
   }
 

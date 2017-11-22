@@ -32,6 +32,7 @@ describe('ledger api unit tests', function () {
   // settings
   let contributionAmount = 25
   let paymentsMinVisitTime = 5000
+  let paymentsNotifications = true
 
   // spies
   let ledgerTransitionSpy
@@ -69,6 +70,8 @@ describe('ledger api unit tests', function () {
             return contributionAmount
           case settings.PAYMENTS_MINIMUM_VISIT_TIME:
             return paymentsMinVisitTime
+          case settings.PAYMENTS_NOTIFICATIONS:
+            return paymentsNotifications
         }
         return false
       }
@@ -1011,6 +1014,62 @@ describe('ledger api unit tests', function () {
           assert(ledgerTransitionSpy.notCalled)
         })
       })
+    })
+  })
+
+  describe('observeTransactions', function () {
+    let showPaymentDoneSpy
+
+    before(function () {
+      showPaymentDoneSpy = sinon.spy(ledgerNotificationsApi, 'showPaymentDone')
+    })
+
+    afterEach(function () {
+      showPaymentDoneSpy.reset()
+    })
+
+    it('null case', function () {
+      ledgerApi.observeTransactions(defaultAppState)
+      assert(showPaymentDoneSpy.notCalled)
+    })
+
+    it('no new transaction', function () {
+      const state = defaultAppState.setIn(['ledger', 'info', 'transactions'], Immutable.fromJS([{votes: 10}]))
+      ledgerApi.observeTransactions(state, [{votes: 10}])
+      assert(showPaymentDoneSpy.notCalled)
+    })
+
+    it('payment notifications are disabled', function () {
+      paymentsNotifications = false
+      ledgerApi.observeTransactions(defaultAppState, [{votes: 10}])
+      assert(showPaymentDoneSpy.notCalled)
+      paymentsNotifications = true
+    })
+
+    it('payment notifications are enabled, but there is no transactions', function () {
+      ledgerApi.observeTransactions(defaultAppState, [])
+      assert(showPaymentDoneSpy.notCalled)
+    })
+
+    it('transaction is corupted', function () {
+      ledgerApi.observeTransactions(defaultAppState, [{votes: 10}])
+      assert(showPaymentDoneSpy.notCalled)
+    })
+
+    it('show notification (first transaction in the array)', function () {
+      ledgerApi.observeTransactions(defaultAppState, [
+        {
+          contribution: {
+            fiat: 10
+          }
+        },
+        {
+          contribution: {
+            fiat: 30
+          }
+        }
+      ])
+      assert(showPaymentDoneSpy.withArgs(10).calledOnce)
     })
   })
 })
