@@ -211,7 +211,7 @@ function downloadsToolbarTemplateInit (downloadId, downloadItem) {
       template.push(CommonMenu.separatorMenuItem)
     }
     template.push({
-      label: locale.translation('downloadToolbarHide'),
+      label: locale.translation('toolbarsDownloadsHide'),
       click: () => {
         windowActions.setDownloadsToolbarVisible(false)
       }

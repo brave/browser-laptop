@@ -198,7 +198,7 @@ const createEditSubmenu = () => {
 
 // NOTE: this only deals with the currently focused window
 const downloadsToolbarMenuItem = {
-  label: locale.translation('toolbarDownloads'),
+  label: locale.translation('toolbarsDownloads'),
   type: 'checkbox',
   checked: downloadsToolbarVisible,
   click: (item, focusedWindow) => {
@@ -215,10 +215,16 @@ const downloadsToolbarMenuItem = {
 const createViewSubmenu = () => {
   return [
     {
-      label: locale.translation('toolbar'),
+      label: locale.translation('toolbars'),
       submenu: [
         CommonMenu.bookmarksToolbarMenuItem(),
         downloadsToolbarMenuItem
+        /*
+        {label: 'Favorites Bar', accelerator: 'Alt+CmdOrCtrl+B'},
+        {label: 'Tab Bar'},
+        {label: 'Address Bar', accelerator: 'Alt+CmdOrCtrl+A'},
+        {label: 'Tab Previews', accelerator: 'Alt+CmdOrCtrl+P'}
+        */
       ]
     },
     CommonMenu.separatorMenuItem,
@@ -242,19 +248,6 @@ const createViewSubmenu = () => {
       }
     },
     CommonMenu.separatorMenuItem,
-    /*
-    {
-      label: locale.translation('toolbars'),
-      visible: false
-      submenu: [
-        {label: 'Favorites Bar', accelerator: 'Alt+CmdOrCtrl+B'},
-        {label: 'Tab Bar'},
-        {label: 'Address Bar', accelerator: 'Alt+CmdOrCtrl+A'},
-        {label: 'Tab Previews', accelerator: 'Alt+CmdOrCtrl+P'}
-      ]
-    },
-    CommonMenu.separatorMenuItem,
-    */
     {
       label: locale.translation('stop'),
       accelerator: isDarwin ? 'Cmd+.' : 'Esc',
