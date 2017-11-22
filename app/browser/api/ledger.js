@@ -1735,6 +1735,7 @@ const initialize = (state, paymentsEnabled) => {
 
   if (!ledgerPublisher) ledgerPublisher = require('bat-publisher')
   let ruleset = []
+  if (typeof ledgerPublisher.ruleset === 'function') ledgerPublisher.ruleset = ledgerPublisher.ruleset()
   ledgerPublisher.ruleset.forEach(rule => {
     if (rule.consequent) ruleset.push(rule)
   })
