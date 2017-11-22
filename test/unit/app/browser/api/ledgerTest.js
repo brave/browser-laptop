@@ -1072,4 +1072,237 @@ describe('ledger api unit tests', function () {
       assert(showPaymentDoneSpy.withArgs(10).calledOnce)
     })
   })
+
+  describe('onWalletProperties', function () {
+    describe('generatePaymentData', function () {
+      let generatePaymentDataSpy
+
+      before(function () {
+        generatePaymentDataSpy = sinon.spy(ledgerApi, 'generatePaymentData')
+      })
+
+      after(function () {
+        generatePaymentDataSpy.reset()
+      })
+
+      it('null case', function () {
+        ledgerApi.onWalletProperties()
+        assert(generatePaymentDataSpy.notCalled)
+      })
+
+      it('we need to call generatePaymentData', function () {
+        ledgerApi.onWalletProperties(defaultAppState, Immutable.Map())
+        assert(generatePaymentDataSpy.calledOnce)
+      })
+    })
+
+    describe('addresses', function () {
+      it('null case', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.Map())
+        assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+
+      it('set new addresses ', function () {
+        const addresses = {
+          BAT: 'BAT_address',
+          BTC: 'BTC_address',
+          CARD_ID: 'CARD_ID_address',
+          ETH: 'ETH_address',
+          LTC: 'LTC_address'
+        }
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          addresses: addresses
+        }))
+        const expectedState = defaultAppState.setIn(['ledger', 'info', 'addresses'], Immutable.fromJS(addresses))
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+    })
+
+    describe('balance', function () {
+      it('null case', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.Map())
+        assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+
+      it('balance is not a number', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          balance: '.'
+        }))
+        assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+
+      it('set new balance', function () {
+        const balance = 10.20
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          balance: balance.toString()
+        }))
+        const expectedState = defaultAppState.setIn(['ledger', 'info', 'balance'], balance)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+    })
+
+    describe('rates', function () {
+      it('null case', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.Map())
+        assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+
+      it('set new rates', function () {
+        const rate = 0.1433458965
+        const rates = {
+          'BTC': 0.00001966,
+          'ETH': 0.00042591989579941384,
+          'USD': rate,
+          'EUR': 0.12100429176330299
+        }
+
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          rates: rates
+        }))
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'info', 'rates'], Immutable.fromJS(rates))
+          .setIn(['ledger', 'info', 'currentRate'], rate)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+    })
+
+    describe('current rate', function () {
+      it('null case', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.Map())
+        assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+
+      it('rates are present, but there is no USD rate', function () {
+        const rates = {
+          'BTC': 0.00001966,
+          'ETH': 0.00042591989579941384,
+          'EUR': 0.12100429176330299
+        }
+
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          rates: rates
+        }))
+        const expectedState = defaultAppState.setIn(['ledger', 'info', 'rates'], Immutable.fromJS(rates))
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+
+      it('rates are present (we use fixed USD)', function () {
+        const rate = 0.1433458965
+        const rates = {
+          'BTC': 0.00001966,
+          'ETH': 0.00042591989579941384,
+          'EUR': 0.12100429176330299,
+          'USD': rate
+        }
+
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          rates: rates
+        }))
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'info', 'rates'], Immutable.fromJS(rates))
+          .setIn(['ledger', 'info', 'currentRate'], rate)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+    })
+
+    describe('probi', function () {
+      const rate = 0.1433458965
+      const probi = 25000000000000000000
+      const rates = {
+        'BTC': 0.00001966,
+        'ETH': 0.00042591989579941384,
+        'EUR': 0.12100429176330299,
+        'USD': rate
+      }
+
+      it('null case', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.Map())
+        assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+
+      it('probi is not a number', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          probi: '.'
+        }))
+        assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+
+      it('rate is not present', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          probi: probi,
+          balance: 25
+        }))
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'info', 'probi'], probi)
+          .setIn(['ledger', 'info', 'balance'], 25)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+
+      it('amount is null', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          probi: probi,
+          rates: rates
+        }))
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'info', 'rates'], Immutable.fromJS(rates))
+          .setIn(['ledger', 'info', 'currentRate'], rate)
+          .setIn(['ledger', 'info', 'probi'], probi)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+
+      it('small probi', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          probi: probi,
+          balance: 25,
+          rates: rates
+        }))
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'info', 'rates'], Immutable.fromJS(rates))
+          .setIn(['ledger', 'info', 'currentRate'], rate)
+          .setIn(['ledger', 'info', 'converted'], '3.58')
+          .setIn(['ledger', 'info', 'balance'], 25)
+          .setIn(['ledger', 'info', 'probi'], probi)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+
+      it('big probi', function () {
+        const bigProbi = '7.309622404968674704085e+21'
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          probi: bigProbi,
+          balance: '7309.6224',
+          rates: rates
+        }))
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'info', 'rates'], Immutable.fromJS(rates))
+          .setIn(['ledger', 'info', 'currentRate'], rate)
+          .setIn(['ledger', 'info', 'converted'], '1047.80')
+          .setIn(['ledger', 'info', 'balance'], 7309.6224)
+          .setIn(['ledger', 'info', 'probi'], bigProbi)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+    })
+
+    describe('unconfirmed amount', function () {
+      it('null case', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.Map())
+        assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+
+      it('amount is not a number', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          unconfirmed: '.'
+        }))
+        assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+
+      it('amount is ok', function () {
+        const result = ledgerApi.onWalletProperties(defaultAppState, Immutable.fromJS({
+          unconfirmed: 50
+        }))
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'info', 'unconfirmed'], 50)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+    })
+  })
 })

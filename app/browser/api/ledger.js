@@ -1369,7 +1369,7 @@ const getStateInfo = (state, parsedData) => {
 
   if (info) {
     state = ledgerState.mergeInfoProp(state, info)
-    state = generatePaymentData(state)
+    state = module.exports.generatePaymentData(state)
   }
 
   let transactions = []
@@ -1473,8 +1473,15 @@ const getPaymentInfo = (state) => {
 }
 
 const onWalletProperties = (state, body) => {
+  if (body == null) {
+    return state
+  }
+
   // Addresses
-  state = ledgerState.setInfoProp(state, 'addresses', body.get('addresses'))
+  const addresses = body.get('addresses')
+  if (addresses) {
+    state = ledgerState.setInfoProp(state, 'addresses', addresses)
+  }
 
   // Balance
   const balance = parseFloat(body.get('balance'))
@@ -1511,7 +1518,7 @@ const onWalletProperties = (state, body) => {
     if (amount != null && rate) {
       const bigProbi = new BigNumber(probi.toString()).dividedBy('1e18')
       const bigRate = new BigNumber(rate.toString())
-      const converted = bigProbi.times(bigRate).toFormat(2)
+      const converted = bigProbi.times(bigRate).toFixed(2)
       state = ledgerState.setInfoProp(state, 'converted', converted)
     }
   }
@@ -1528,7 +1535,7 @@ const onWalletProperties = (state, body) => {
   if (clientOptions.verboseP) {
     console.log('\nWalletProperties refreshes payment info')
   }
-  state = generatePaymentData(state)
+  state = module.exports.generatePaymentData(state)
 
   return state
 }
@@ -2396,7 +2403,8 @@ const getMethods = () => {
     checkBtcBatMigrated,
     onMediaRequest,
     onMediaPublisher,
-    saveVisit
+    saveVisit,
+    generatePaymentData
   }
 
   let privateMethods = {}
