@@ -43,6 +43,7 @@ describe('ledger api unit tests', function () {
   let onChangeSettingSpy
   let ledgersetPromotionSpy
   let ledgergetPromotionSpy
+  let ledgerSetTimeUntilReconcile
 
   const defaultAppState = Immutable.fromJS({
     cache: {
@@ -146,7 +147,8 @@ describe('ledger api unit tests', function () {
         return 0
       },
       getPromotion: () => {},
-      setPromotion: () => {}
+      setPromotion: () => {},
+      setTimeUntilReconcile: () => {}
     }
     ledgerClient.prototype.boolion = function (value) { return false }
     ledgerClient.prototype.getWalletPassphrase = function (state) {}
@@ -154,6 +156,7 @@ describe('ledger api unit tests', function () {
     ledgerTransitionedSpy = sinon.spy(lc, 'transitioned')
     ledgersetPromotionSpy = sinon.spy(lc, 'setPromotion')
     ledgergetPromotionSpy = sinon.spy(lc, 'getPromotion')
+    ledgerSetTimeUntilReconcile = sinon.spy(lc, 'setTimeUntilReconcile')
     ledgerClient.returns(lc)
     mockery.registerMock('bat-client', ledgerClient)
 
@@ -164,8 +167,10 @@ describe('ledger api unit tests', function () {
         return null
       },
       Synopsis: batPublisher.Synopsis,
-      getMedia: {
-        getPublisherFromMediaProps: () => {}
+      getMedia: () => {
+        return {
+          getPublisherFromMediaProps: () => {}
+        }
       }
     }
     mockery.registerMock('bat-publisher', ledgerPublisher)
@@ -531,7 +536,7 @@ describe('ledger api unit tests', function () {
     })
 
     describe('onMediaRequest', function () {
-      let publisherFromMediaPropsSpy, saveVisitSpy
+      let mediaSpy, saveVisitSpy
 
       const cacheAppState = defaultAppState
         .setIn(['cache', 'ledgerVideos', videoId], Immutable.fromJS({
@@ -543,12 +548,12 @@ describe('ledger api unit tests', function () {
         }))
 
       beforeEach(function () {
-        publisherFromMediaPropsSpy = sinon.spy(ledgerPublisher.getMedia, 'getPublisherFromMediaProps')
+        mediaSpy = sinon.spy(ledgerPublisher, 'getMedia')
         saveVisitSpy = sinon.spy(ledgerApi, 'saveVisit')
       })
 
       afterEach(function () {
-        publisherFromMediaPropsSpy.restore()
+        mediaSpy.restore()
         saveVisitSpy.restore()
         ledgerApi.setCurrentMediaKey(null)
       })
@@ -560,7 +565,7 @@ describe('ledger api unit tests', function () {
       it('does nothing if input is null', function () {
         const result = ledgerApi.onMediaRequest(defaultAppState)
         assert.deepEqual(result.toJS(), defaultAppState.toJS())
-        assert(publisherFromMediaPropsSpy.notCalled)
+        assert(mediaSpy.notCalled)
         assert(saveVisitSpy.notCalled)
       })
 
@@ -584,7 +589,7 @@ describe('ledger api unit tests', function () {
         it('does nothing if tab is private', function () {
           const xhr2 = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=20.338&et=21.339'
           ledgerApi.onMediaRequest(cacheAppState, xhr2, ledgerMediaProviders.YOUTUBE, 1)
-          assert(publisherFromMediaPropsSpy.notCalled)
+          assert(mediaSpy.notCalled)
           assert(saveVisitSpy.notCalled)
         })
       })
@@ -592,13 +597,13 @@ describe('ledger api unit tests', function () {
       it('set currentMediaKey when it is different than saved', function () {
         ledgerApi.onMediaRequest(defaultAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
         assert.equal(ledgerApi.getCurrentMediaKey(), videoId)
-        assert(publisherFromMediaPropsSpy.calledOnce)
+        assert(mediaSpy.calledOnce)
         assert(saveVisitSpy.notCalled)
       })
 
       it('get data from cache, if we have publisher in synopsis', function () {
         ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
-        assert(publisherFromMediaPropsSpy.notCalled)
+        assert(mediaSpy.notCalled)
         assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
           duration: 10001,
           revisited: false,
@@ -611,7 +616,7 @@ describe('ledger api unit tests', function () {
           publisher: publisherKey
         }))
         ledgerApi.onMediaRequest(state, xhr, ledgerMediaProviders.YOUTUBE, 1)
-        assert(publisherFromMediaPropsSpy.calledOnce)
+        assert(mediaSpy.calledOnce)
         assert(saveVisitSpy.notCalled)
       })
 
@@ -627,7 +632,7 @@ describe('ledger api unit tests', function () {
 
         // second call, revisit true
         ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
-        assert(publisherFromMediaPropsSpy.notCalled)
+        assert(mediaSpy.notCalled)
         assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
           duration: 10001,
           revisited: false,
@@ -1366,14 +1371,24 @@ describe('ledger api unit tests', function () {
     it('empty client', function () {
       const oldClient = ledgerApi.getClient()
       ledgerApi.setClient(undefined)
-      ledgerApi.getPromotion()
+      ledgerApi.getPromotion(defaultAppState)
       assert(ledgergetPromotionSpy.calledOnce)
       assert(ledgerClient.calledOnce)
       ledgerApi.setClient(oldClient)
     })
 
+    it('empty client with existing wallet', function () {
+      const state = defaultAppState.setIn(['ledger', 'info', 'paymentId'], 'a-1-a')
+      const oldClient = ledgerApi.getClient()
+      ledgerApi.setClient(undefined)
+      ledgerApi.getPromotion(state)
+      assert(ledgergetPromotionSpy.withArgs(sinon.match.any, 'a-1-a', sinon.match.any).calledOnce)
+      assert(ledgerClient.calledOnce)
+      ledgerApi.setClient(oldClient)
+    })
+
     it('existing client', function () {
-      ledgerApi.getPromotion()
+      ledgerApi.getPromotion(defaultAppState)
       assert(ledgerClient.notCalled)
       assert(ledgergetPromotionSpy.calledOnce)
     })
@@ -1384,8 +1399,13 @@ describe('ledger api unit tests', function () {
 
     before(function () {
       removeNotificationSpy = sinon.spy(ledgerNotificationsApi, 'removePromotionNotification')
+      ledgerSetTimeUntilReconcile.reset()
       getBalanceSpy = sinon.spy(ledgerApi, 'getBalance')
       fakeClock = sinon.useFakeTimers()
+    })
+
+    afterEach(function () {
+      ledgerSetTimeUntilReconcile.reset()
     })
 
     after(function () {
@@ -1402,6 +1422,22 @@ describe('ledger api unit tests', function () {
       assert(removeNotificationSpy.calledOnce)
       assert(getBalanceSpy.calledOnce)
       assert.deepEqual(result.toJS(), expectedSate.toJS())
+    })
+
+    it('set minReconcile timestamp if higher then current reconcileStamp', function () {
+      const state = defaultAppState
+        .setIn(['ledger', 'promotion', 'minimumReconcileTimestamp'], 10000)
+        .setIn(['ledger', 'info', 'reconcileStamp'], 100)
+      ledgerApi.onPromotionResponse(state)
+      assert(ledgerSetTimeUntilReconcile.calledOnce)
+    })
+
+    it('do not set minReconcile timestamp if lower then current reconcileStamp', function () {
+      const state = defaultAppState
+        .setIn(['ledger', 'promotion', 'minimumReconcileTimestamp'], 10000)
+        .setIn(['ledger', 'info', 'reconcileStamp'], 10001)
+      ledgerApi.onPromotionResponse(state)
+      assert(ledgerSetTimeUntilReconcile.notCalled)
     })
   })
 })

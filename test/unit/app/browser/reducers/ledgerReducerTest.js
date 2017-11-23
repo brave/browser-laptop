@@ -11,6 +11,7 @@ describe('ledgerReducer unit tests', function () {
   let ledgerReducer
   let fakeLedgerApi
   let fakeLedgerState
+  let fakeLedgerNotifications
   let appState
   let paymentsEnabled
   let returnedState
@@ -52,16 +53,27 @@ describe('ledgerReducer unit tests', function () {
       onTimeUntilReconcile: dummyModifyState,
       run: () => {},
       onNetworkConnected: dummyModifyState,
-      getNewClient: () => {}
+      getNewClient: () => {},
+      claimPromotion: () => {},
+      onPromotionResponse: dummyModifyState,
+      getPromotion: () => {}
     }
     fakeLedgerState = {
       resetSynopsis: dummyModifyState,
       setRecoveryStatus: dummyModifyState,
       setInfoProp: dummyModifyState,
-      saveSynopsis: dummyModifyState
+      saveSynopsis: dummyModifyState,
+      savePromotion: dummyModifyState,
+      remindMeLater: dummyModifyState,
+      removePromotion: dummyModifyState
+    }
+    fakeLedgerNotifications = {
+      onPromotionReceived: dummyModifyState,
+      onInterval: dummyModifyState
     }
     mockery.registerMock('../../browser/api/ledger', fakeLedgerApi)
     mockery.registerMock('../../common/state/ledgerState', fakeLedgerState)
+    mockery.registerMock('../../browser/api/ledgerNotifications', fakeLedgerNotifications)
     mockery.registerMock('../../../js/settings', {
       getSetting: (settingKey, settingsCollection, value) => {
         if (settingKey === settings.PAYMENTS_ENABLED) {
@@ -584,6 +596,145 @@ describe('ledgerReducer unit tests', function () {
       }))
       assert.notDeepEqual(result, appState)
       assert(ledgerStateSpy.calledOnce)
+    })
+  })
+
+  describe('APP_SAVE_LEDGER_PROMOTION', function () {
+    let savePromotionSpy, onPromotionReceivedSpy
+
+    before(function () {
+      savePromotionSpy = sinon.spy(fakeLedgerState, 'savePromotion')
+      onPromotionReceivedSpy = sinon.spy(fakeLedgerNotifications, 'onPromotionReceived')
+    })
+
+    after(function () {
+      savePromotionSpy.restore()
+    })
+
+    it('execute', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_SAVE_LEDGER_PROMOTION,
+        promotion: {
+          promotionId: '1'
+        }
+      }))
+      assert.notDeepEqual(result, appState)
+      assert(savePromotionSpy.calledOnce)
+      assert(onPromotionReceivedSpy.calledOnce)
+    })
+  })
+
+  describe('APP_ON_PROMOTION_CLAIM', function () {
+    let claimPromotionSpy
+
+    before(function () {
+      claimPromotionSpy = sinon.spy(fakeLedgerApi, 'claimPromotion')
+    })
+
+    after(function () {
+      claimPromotionSpy.restore()
+    })
+
+    it('execute', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PROMOTION_CLAIM
+      }))
+      assert(claimPromotionSpy.calledOnce)
+    })
+  })
+
+  describe('APP_ON_PROMOTION_REMIND', function () {
+    let remindMeLaterSpy
+
+    before(function () {
+      remindMeLaterSpy = sinon.spy(fakeLedgerState, 'remindMeLater')
+    })
+
+    after(function () {
+      remindMeLaterSpy.restore()
+    })
+
+    it('execute', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PROMOTION_REMIND
+      }))
+      assert(remindMeLaterSpy.calledOnce)
+    })
+  })
+
+  describe('APP_ON_PROMOTION_RESPONSE', function () {
+    let onPromotionResponseSpy
+
+    before(function () {
+      onPromotionResponseSpy = sinon.spy(fakeLedgerApi, 'onPromotionResponse')
+    })
+
+    after(function () {
+      onPromotionResponseSpy.restore()
+    })
+
+    it('execute', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PROMOTION_RESPONSE
+      }))
+      assert(onPromotionResponseSpy.calledOnce)
+    })
+  })
+
+  describe('APP_ON_PROMOTION_REMOVAL', function () {
+    let removePromotionSpy
+
+    before(function () {
+      removePromotionSpy = sinon.spy(fakeLedgerState, 'removePromotion')
+    })
+
+    after(function () {
+      removePromotionSpy.restore()
+    })
+
+    it('execute', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PROMOTION_REMOVAL
+      }))
+      assert(removePromotionSpy.calledOnce)
+    })
+  })
+
+  describe('APP_ON_LEDGER_NOTIFICATION_INTERVAL', function () {
+    let onIntervalSpy
+
+    before(function () {
+      onIntervalSpy = sinon.spy(fakeLedgerNotifications, 'onInterval')
+    })
+
+    after(function () {
+      onIntervalSpy.restore()
+    })
+
+    it('execute', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_LEDGER_NOTIFICATION_INTERVAL
+      }))
+      assert(onIntervalSpy.calledOnce)
+    })
+  })
+
+  describe('APP_ON_PROMOTION_GET', function () {
+    let getPromotionSpy
+
+    before(function () {
+      getPromotionSpy = sinon.spy(fakeLedgerApi, 'getPromotion')
+    })
+
+    after(function () {
+      getPromotionSpy.restore()
+    })
+
+    it('execute', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PROMOTION_GET
+      }))
+      assert(getPromotionSpy.calledOnce)
     })
   })
 })

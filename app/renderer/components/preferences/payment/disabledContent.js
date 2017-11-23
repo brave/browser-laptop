@@ -27,9 +27,9 @@ class DisabledContent extends ImmutableComponent {
 
   getAlternativeText () {
     return <div>
-      <h3 data-l10n-id='paymentsWelcomeTitle' />
-      <p data-l10n-id='paymentsWelcomeText1' />
-      <p data-l10n-id='paymentsWelcomeText2' />
+      <h3 className={css(styles.disabledContent__message__header)} data-l10n-id='paymentsWelcomeTitle' />
+      <p className={css(styles.disabledContent__commonText)} data-l10n-id='paymentsWelcomeText1' />
+      <p className={css(styles.disabledContent__commonText)} data-l10n-id='paymentsWelcomeText2' />
     </div>
   }
 
@@ -38,14 +38,22 @@ class DisabledContent extends ImmutableComponent {
       return
     }
 
-    const text = this.props.ledgerData.getIn(['promotion', 'panel', 'optInMarkup'])
+    const markup = this.props.ledgerData.getIn(['promotion', 'panel', 'optInMarkup'])
     const claimed = this.props.ledgerData.has('claimedTimestamp')
 
-    if (!text || !claimed) {
+    if (!markup || claimed) {
       return
     }
 
-    this.text = <div dangerouslySetInnerHTML={{ __html: text }} />
+    const text = markup.get('title')
+    let message = markup.get('message')
+
+    this.text = <div>
+      <h3 className={css(styles.disabledContent__message__header)}>{ text }</h3>
+      {
+        message.map(item => <p className={css(styles.disabledContent__commonText)}>{ item }</p>)
+      }
+    </div>
   }
 
   render () {

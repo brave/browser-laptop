@@ -452,6 +452,11 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerNotifications.onInterval(state)
         break
       }
+    case appConstants.APP_ON_PROMOTION_GET:
+      {
+        ledgerApi.getPromotion(state)
+        break
+      }
     case appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER:
       {
         state = ledgerApi.onMediaPublisher(

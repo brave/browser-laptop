@@ -181,37 +181,38 @@ AppStore
   },
   ledger: {
     info: {
-      address: string, // the BTC wallet address (in base58)
-      amount: number, // fiat amount to contribute per reconciliation period
-      balance: string, // confirmed balance in BTC.toFixed(4)
+      addresses: {
+        BAT: string, 
+        BTC: string, 
+        CARD_ID: string, 
+        ETH: string, 
+        LTC: string
+      },
+      balance: number, // confirmed balance in BAT.toFixed(2)
       bravery: {
+        days: number, 
         fee: {
-          amount: number, // set from `amount` above
-          currency: string // set from `currency` above
-        }
-      }, // values round-tripped through the ledger-client
-      btc: string, // BTC to contribute per reconciliation period
-      buyURL: string, // URL to buy bitcoin using debit/credit card
-      countryCode: string, // ISO3166 2-letter code for country of browser's location
-      created: boolean, // wallet is created
+          amount: number,
+          currency: string
+        }, 
+        setting: string
+      },
+      converted: string,
+      created, bolean, // wallet is created
       creating: boolean, // wallet is being created
-      currency: string, // fiat currency denominating the amount
-      error: {
-        caller: string, // function in which error was handled
-        error: object  // error object returned
-      }, // non-null if the last updateLedgerInfo happened concurrently with an error
-      exchangeInfo: {
-        exchangeName: string,  // the name of the BTC exchange
-        exchangeURL: string // the URL of the BTC exchange
-      }, // information about the corresponding "friendliest" BTC exchange (suggestions welcome!)
+      currentRate: number,
       hasBitcoinHandler: boolean, // brave browser has a `bitcoin:` URI handler
-      passphrase: string, // the BTC wallet passphrase
-      paymentIMG: string, // the QR code equivalent of `paymentURL` expressed as "data:image/...;base64,..."
-      paymentURL: string, // bitcoin:...?amount={btc}&label=Brave%20Software
-      reconcileFrequency: number, // duration between each reconciliation in days
-      reconcileStamp: number, // timestamp for the next reconcilation
-      recoverySucceeded: boolean, // the status of an attempted recovery
-      probi: number, // confirmed balance as an integer number of probi
+      passphrase: string, // the BAT wallet passphrase
+      paymentId: string,
+      probi: number,
+      rates:{
+        BTC: string, 
+        ETH: number, 
+        EUR: number, 
+        USD: number
+      },
+      reconcileFrequency: number // duration between each reconciliation in days
+      reconcileStamp: number,  // timestamp for the next reconcilation
       transactions: [{
         ballots: {
           [publisher]: number // e.g., "wikipedia.org": 3
@@ -230,8 +231,8 @@ AppStore
         count: number, // total number of ballots allowed to be cast
         submissionStamp: number, // timestamp for this contribution
         viewingId: string, // UUIDv4 for this contribution
-      }], // contributions reconciling/reconciled
-      unconfirmed: string // unconfirmed balance in BTC.toFixed(4)
+      }],
+      unconfirmed: string // unconfirmed balance in BAT.toFixed(2)
     },
     locations: {
       [url]: {
@@ -241,6 +242,7 @@ AppStore
     promotion: {
       activeState: string,
       claimedTimestamp: number,
+      minimumReconcileTimestamp: number,
       promotionId: number,
       remindTimestamp: number,
       stateWallet: {
@@ -261,10 +263,10 @@ AppStore
             }        
           },
           panel: {
-            disclaimer: string,
-            optInMarkup: string,
-            optedInButton: string,
-            successText: string
+            optInMarkup: {
+              message: Array<string>,
+              title: string
+            }
           }
         },
         emptyWallet: {
@@ -285,9 +287,11 @@ AppStore
           },
           panel: {
             disclaimer: string,
-            optInMarkup: string,
             optedInButton: string,
-            successText: string
+            successText: {
+              message: string,
+              title: string
+            }
           }
         },
         fundedWallet: {
@@ -308,9 +312,11 @@ AppStore
           },
           panel: {
             disclaimer: string,
-            optInMarkup: string,
             optedInButton: string,
-            successText: string
+            successText: {
+              message: string,
+              title: string
+            }
           }
         }
       }

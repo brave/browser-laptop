@@ -31,13 +31,13 @@ const text = {
   walletConvertedToBat: locale.translation('walletConvertedToBat')
 }
 
-const pollingInterval = 15 * ledgerUtil.miliseconds.minute // 15 * minutes
+const pollingInterval = 15 * ledgerUtil.milliseconds.minute // 15 * minutes
 let intervalTimeout
 const displayOptions = {
   style: 'greetingStyle',
   persist: false
 }
-const nextAddFundsTime = 3 * ledgerUtil.miliseconds.day
+const nextAddFundsTime = 3 * ledgerUtil.milliseconds.day
 
 const sufficientBalanceToReconcile = (state) => {
   const balance = Number(ledgerState.getInfoProp(state, 'balance') || 0)
@@ -236,18 +236,18 @@ const showEnabledNotifications = (state) => {
     return
   }
 
-  if (reconcileStamp - new Date().getTime() < ledgerUtil.miliseconds.day) {
+  if (reconcileStamp - new Date().getTime() < ledgerUtil.milliseconds.day) {
     if (sufficientBalanceToReconcile(state)) {
       if (shouldShowNotificationReviewPublishers()) {
         const reconcileFrequency = ledgerState.getInfoProp(state, 'reconcileFrequency')
-        showReviewPublishers(reconcileStamp + ((reconcileFrequency - 2) * ledgerUtil.miliseconds.day))
+        showReviewPublishers(reconcileStamp + ((reconcileFrequency - 2) * ledgerUtil.milliseconds.day))
       }
     } else if (shouldShowNotificationAddFunds()) {
       showAddFunds()
     }
-  } else if (reconcileStamp - new Date().getTime() < 2 * ledgerUtil.miliseconds.day) {
+  } else if (reconcileStamp - new Date().getTime() < 2 * ledgerUtil.milliseconds.day) {
     if (sufficientBalanceToReconcile(state) && (shouldShowNotificationReviewPublishers())) {
-      showReviewPublishers(new Date().getTime() + ledgerUtil.miliseconds.day)
+      showReviewPublishers(new Date().getTime() + ledgerUtil.milliseconds.day)
     }
   }
 }
@@ -372,7 +372,10 @@ const showPromotionNotification = (state) => {
     return
   }
 
-  appActions.showNotification(notification.toJS())
+  const data = notification.toJS()
+  data.from = 'ledger'
+
+  appActions.showNotification(data)
 }
 
 const removePromotionNotification = (state) => {

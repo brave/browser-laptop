@@ -1855,6 +1855,12 @@ const appActions = {
     })
   },
 
+  onPromotionGet: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_PROMOTION_GET
+    })
+  },
+
   onLedgerNotificationInterval: function () {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_NOTIFICATION_INTERVAL

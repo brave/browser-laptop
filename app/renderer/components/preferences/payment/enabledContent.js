@@ -81,19 +81,17 @@ class EnabledContent extends ImmutableComponent {
       return null
     }
 
-    return <div>
-      <BrowserButton
-        custom={[
-          styles.claimButton
-        ]}
-        secondaryColor
-        panelItem
-        testId={'claimButton'}
-        onClick={this.onClaimClick}
-        disabled={!ledgerData.get('created')}
-        label={promotion.getIn(['panel', 'optedInButton'])}
-      />
-    </div>
+    return <BrowserButton
+      custom={[
+        styles.claimButton
+      ]}
+      secondaryColor
+      panelItem
+      testId={'claimButton'}
+      onClick={this.onClaimClick}
+      disabled={!ledgerData.get('created')}
+      label={promotion.getIn(['panel', 'optedInButton'])}
+    />
   }
 
   ledgerDataErrorText () {
@@ -214,7 +212,9 @@ class EnabledContent extends ImmutableComponent {
         className={css(styles.enabledContent__grant_close)}
         onClick={this.closeClick}
       />
-      <p className={css(styles.enabledContent__grant_title)} dangerouslySetInnerHTML={{ __html: successText }} />
+      <p className={css(styles.enabledContent__grant_title)}>
+        <span className={css(styles.enabledContent__grant_bold)}>{ successText.get('title') }</span> { successText.get('message') }
+      </p>
       <p className={css(styles.enabledContent__grant_text)}>
         {promo.getIn(['panel', 'disclaimer'])}
       </p>
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
   },
 
   claimButton: {
-    marginTop: '-10px'
+    marginTop: '10px'
   },
 
   enabledContent__grant: {
@@ -496,6 +496,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     width: '100%',
+    minHeight: '159px',
     background: '#f3f3f3',
     borderRadius: '8px',
     padding: '30px 50px 20px',
@@ -524,6 +525,10 @@ const styles = StyleSheet.create({
     fontSize: '20px',
     display: 'block',
     marginBottom: '10px'
+  },
+
+  enabledContent__grant_bold: {
+    color: '#ff5500'
   },
 
   enabledContent__grant_text: {

@@ -592,6 +592,14 @@ describe('ledgerNotifications unit test', function () {
       ledgerNotificationsApi.showPromotionNotification(state)
       assert(showNotificationSpy.calledOnce)
     })
+
+    it('we set global notification', function () {
+      const notification = state
+        .getIn(['ledger', 'promotion', 'stateWallet', 'disabledWallet', 'notification'])
+        .set('from', 'ledger')
+      ledgerNotificationsApi.showPromotionNotification(state)
+      assert(showNotificationSpy.withArgs(notification.toJS()).calledOnce)
+    })
   })
 
   describe('removePromotionNotification', function () {
