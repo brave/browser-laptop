@@ -1,0 +1,432 @@
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 100;
+    src: url(./Poppins-v5/Poppins_100_italic_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 100;
+    src: url(./Poppins-v5/Poppins_100_italic_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 100;
+    src: url(./Poppins-v5/Poppins_100_italic_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 200;
+    src: url(./Poppins-v5/Poppins_200_italic_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 200;
+    src: url(./Poppins-v5/Poppins_200_italic_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 200;
+    src: url(./Poppins-v5/Poppins_200_italic_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 300;
+    src: url(./Poppins-v5/Poppins_300_italic_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 300;
+    src: url(./Poppins-v5/Poppins_300_italic_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 300;
+    src: url(./Poppins-v5/Poppins_300_italic_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 400;
+    src: url(./Poppins-v5/Poppins_400_italic_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 400;
+    src: url(./Poppins-v5/Poppins_400_italic_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 400;
+    src: url(./Poppins-v5/Poppins_400_italic_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 500;
+    src: url(./Poppins-v5/Poppins_500_italic_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 500;
+    src: url(./Poppins-v5/Poppins_500_italic_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 500;
+    src: url(./Poppins-v5/Poppins_500_italic_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 600;
+    src: url(./Poppins-v5/Poppins_600_italic_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 600;
+    src: url(./Poppins-v5/Poppins_600_italic_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 600;
+    src: url(./Poppins-v5/Poppins_600_italic_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 700;
+    src: url(./Poppins-v5/Poppins_700_italic_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 700;
+    src: url(./Poppins-v5/Poppins_700_italic_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 700;
+    src: url(./Poppins-v5/Poppins_700_italic_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 800;
+    src: url(./Poppins-v5/Poppins_800_italic_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 800;
+    src: url(./Poppins-v5/Poppins_800_italic_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 800;
+    src: url(./Poppins-v5/Poppins_800_italic_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 900;
+    src: url(./Poppins-v5/Poppins_900_italic_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 900;
+    src: url(./Poppins-v5/Poppins_900_italic_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: italic;
+    font-weight: 900;
+    src: url(./Poppins-v5/Poppins_900_italic_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 100;
+    src: url(./Poppins-v5/Poppins_100_normal_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 100;
+    src: url(./Poppins-v5/Poppins_100_normal_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 100;
+    src: url(./Poppins-v5/Poppins_100_normal_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 200;
+    src: url(./Poppins-v5/Poppins_200_normal_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 200;
+    src: url(./Poppins-v5/Poppins_200_normal_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 200;
+    src: url(./Poppins-v5/Poppins_200_normal_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 300;
+    src: url(./Poppins-v5/Poppins_300_normal_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 300;
+    src: url(./Poppins-v5/Poppins_300_normal_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 300;
+    src: url(./Poppins-v5/Poppins_300_normal_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    src: url(./Poppins-v5/Poppins_400_normal_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    src: url(./Poppins-v5/Poppins_400_normal_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    src: url(./Poppins-v5/Poppins_400_normal_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 500;
+    src: url(./Poppins-v5/Poppins_500_normal_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 500;
+    src: url(./Poppins-v5/Poppins_500_normal_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 500;
+    src: url(./Poppins-v5/Poppins_500_normal_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 600;
+    src: url(./Poppins-v5/Poppins_600_normal_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 600;
+    src: url(./Poppins-v5/Poppins_600_normal_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 600;
+    src: url(./Poppins-v5/Poppins_600_normal_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 700;
+    src: url(./Poppins-v5/Poppins_700_normal_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 700;
+    src: url(./Poppins-v5/Poppins_700_normal_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 700;
+    src: url(./Poppins-v5/Poppins_700_normal_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 800;
+    src: url(./Poppins-v5/Poppins_800_normal_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 800;
+    src: url(./Poppins-v5/Poppins_800_normal_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 800;
+    src: url(./Poppins-v5/Poppins_800_normal_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+/* devanagari */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 900;
+    src: url(./Poppins-v5/Poppins_900_normal_0d7e19fe5b51588a56ee51ac676b63d8_devanagari_v5.woff2) format('woff2');
+    unicode-range: U+02BC, U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200B-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 900;
+    src: url(./Poppins-v5/Poppins_900_normal_78f97281f840d609aa7d345caef392c5_latin-ext_v5.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 900;
+    src: url(./Poppins-v5/Poppins_900_normal_bfa3a4d70cc392ea9c1260963baae6ed_latin_v5.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
