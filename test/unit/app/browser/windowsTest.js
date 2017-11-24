@@ -83,7 +83,7 @@ describe('window API unit tests', function () {
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('../../js/stores/appStore', appStore)
-    mockery.registerMock('../../common/lib/platformUtil', fakePlatformUtil)
+    mockery.registerMock('../common/lib/platformUtil', fakePlatformUtil)
     mockery.registerMock('../../js/dispatcher/appDispatcher', fakeAppDispatcher)
     windows = require('../../../../app/browser/windows')
     appActions = require('../../../../js/actions/appActions')
