@@ -2,14 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const ImmutableComponent = require('../../immutableComponent')
+const ImmutableComponent = require('../immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
-class BatTOSLink extends ImmutableComponent {
+class BraveLink extends ImmutableComponent {
   render () {
-    return <a className={css(styles.a)}
-      data-l10n-id='termsOfService'
-      href='https://basicattentiontoken.org/contributor-terms-of-service/'
+    return <a className={css(
+      this.props['data-isBatTOS'] && styles.braveLink_batTOS
+    )}
+      data-l10n-id={this.props.l10nId}
+      data-test-id={this.props.testId}
+      href={this.props.href}
       target='_blank'
       rel='noreferrer noopener'
     />
@@ -17,10 +20,10 @@ class BatTOSLink extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
-  a: {
+  braveLink_batTOS: {
     fontSize: '13px',
     color: '#666'
   }
 })
 
-module.exports = BatTOSLink
+module.exports = BraveLink

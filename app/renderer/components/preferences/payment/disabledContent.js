@@ -7,7 +7,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ImmutableComponent = require('../../immutableComponent')
-const BatTOSLink = require('./batTOSLink')
+const BraveLink = require('../../common/braveLink')
 
 // Utils
 const cx = require('../../../../../js/lib/classSet')
@@ -70,7 +70,11 @@ class DisabledContent extends ImmutableComponent {
             {this.text}
           </div>
           <div className={css(styles.disabledContent__message__toc)}>
-            <BatTOSLink />
+            <BraveLink
+              data-isBatTOS
+              l10nId='termsOfService'
+              href='https://basicattentiontoken.org/contributor-terms-of-service/'
+            />
           </div>
           <div className={css(styles.disabledContent__footer)}>
             <div className={css(styles.disabledContent__commonText)} data-l10n-id='paymentsWelcomeText3' />

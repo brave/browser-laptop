@@ -21,7 +21,7 @@ const BrowserButton = require('../../common/browserButton')
 const {FormTextbox} = require('../../common/textbox')
 const {FormDropdown} = require('../../common/dropdown')
 const LedgerTable = require('./ledgerTable')
-const BatTOSLink = require('./batTOSLink')
+const BraveLink = require('../../common/braveLink')
 
 // style
 const globalStyles = require('../../styles/global')
@@ -343,7 +343,11 @@ class EnabledContent extends ImmutableComponent {
         onChangeSetting={this.props.onChangeSetting}
         siteSettings={this.props.siteSettings} />
       <div className={css(styles.enabledContent__tos)}>
-        <BatTOSLink />
+        <BraveLink
+          data-isBatTOS
+          l10nId='termsOfService'
+          href='https://basicattentiontoken.org/contributor-terms-of-service/'
+        />
       </div>
     </section>
   }
