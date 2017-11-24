@@ -16,6 +16,7 @@ const {
   AboutPageSectionTitle,
   AboutPageSectionSubTitle
 } = require('../../app/renderer/components/common/sectionTitle')
+const BraveLink = require('../../app/renderer/components/common/braveLink')
 
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
@@ -36,9 +37,9 @@ class AboutAbout extends ImmutableComponent {
           {
             aboutUrls.keySeq().sort().filter((aboutSourceUrl) => isNavigatableAboutPage(aboutSourceUrl)).map((aboutSourceUrl) =>
               <li>
-                <a href={aboutUrls.get(aboutSourceUrl)} rel='noopener' target='_blank'>
+                <BraveLink href={aboutUrls.get(aboutSourceUrl)}>
                   {aboutSourceUrl}
-                </a>
+                </BraveLink>
               </li>)
           }
         </ul>
