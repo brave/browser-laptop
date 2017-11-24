@@ -289,7 +289,6 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -354,6 +353,7 @@ const styles = StyleSheet.create({
   },
 
   item__text: {
+    flex: 1,
     marginTop: 'auto',
     marginBottom: 'auto',
     paddingRight: '10px',
@@ -369,10 +369,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.contextMenu.item.isMulti.backgroundColor,
     color: theme.contextMenu.item.isMulti.color,
     display: 'flex',
-    flexGrow: 1,
     justifyContent: 'center',
     margin: '1px',
-    padding: '4px'
+    padding: '4px 1rem'
   },
 
   item__submenuIndicator: {
