@@ -5,6 +5,9 @@
 const React = require('react')
 const ImmutableComponent = require('../../../app/renderer/components/immutableComponent')
 const aboutActions = require('../aboutActions')
+const BraveLink = require('../../../app/renderer/components/common/braveLink')
+
+const {StyleSheet} = require('aphrodite/no-important')
 
 class FooterInfo extends ImmutableComponent {
   render () {
@@ -15,7 +18,7 @@ class FooterInfo extends ImmutableComponent {
           this.props.backgroundImage && this.props.backgroundImage.name
           ? <div>
             <div className='copyrightCredits'>
-              <span className='photoBy' data-l10n-id='photoBy' /> <a className='copyrightOwner' href={this.props.backgroundImage.link} rel='noopener' target='_blank'>{this.props.backgroundImage.author}</a>
+              <span className='photoBy' data-l10n-id='photoBy' /> <BraveLink href={this.props.backgroundImage.link} customStyle={styles.copyrightCredits__owner}>{this.props.backgroundImage.author}</BraveLink>
             </div>
             <span className='photoName'>{this.props.backgroundImage.name}</span>
           </div>
@@ -30,5 +33,13 @@ class FooterInfo extends ImmutableComponent {
     </footer>
   }
 }
+
+const styles = StyleSheet.create({
+  copyrightCredits__owner: {
+    color: '#fff',
+    textTransform: 'uppercase',
+    textDecoration: 'underline'
+  }
+})
 
 module.exports = FooterInfo
