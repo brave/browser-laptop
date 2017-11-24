@@ -22,6 +22,8 @@ const aboutActions = require('./aboutActions')
 
 const ipc = window.chrome.ipcRenderer
 
+const BraveLink = require('../../app/renderer/components/common/braveLink')
+
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 
@@ -439,9 +441,9 @@ class ContributionStatement extends React.Component {
                 transactions.map(function (tx) {
                   return (
                     <li>
-                      <a className={css(styles.list__anchor)} href={aboutContributionsUrl + '#' + tx.get('viewingId')} rel='noopener' target='_blank'>
+                      <BraveLink customStyle={styles.list__anchor} href={aboutContributionsUrl + '#' + tx.get('viewingId')}>
                         {this.receiptFileName(tx)}
-                      </a>
+                      </BraveLink>
                     </li>
                   )
                 }.bind(this))
@@ -655,20 +657,12 @@ const styles = StyleSheet.create({
     cursor: 'default',
     userSelect: 'none'
   },
+
   list__anchor: {
-    color: '#3B3B3B',
-    fontSize: '16px',
-    fontWeight: '200',
-
-    ':-webkit-any-link': {
-      textDecoration: 'underline',
-      cursor: 'auto'
-    },
-
-    ':focus': {
-      outline: '-webkit-focus-ring-color auto 5px'
-    }
+    color: '#3b3b3b',
+    fontSize: '1rem'
   },
+
   list__ul: {
     marginLeft: '48px',
     display: 'block',
