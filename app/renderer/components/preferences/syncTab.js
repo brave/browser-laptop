@@ -13,6 +13,7 @@ const ModalOverlay = require('../common/modalOverlay')
 const BrowserButton = require('../common/browserButton')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../common/settings')
 const SortableTable = require('../common/sortableTable')
+const BraveLink = require('../common/braveLink')
 
 const {
   SectionTitleLabelWrapper,
@@ -487,12 +488,12 @@ class SyncTab extends ImmutableComponent {
 
         <div className={css(styles.settingsListContainerMargin__bottom)}>
           <span className='settingsListTitle' data-l10n-id='syncTitleMessage' />
-          <a href='https://github.com/brave/sync/wiki/Design' rel='noopener' target='_blank'>
+          <BraveLink href='https://github.com/brave/sync/wiki/Design'>
             <span className={cx({
               fa: true,
               'fa-question-circle': true
             })} />
-          </a>
+          </BraveLink>
           <div className={cx({
             settingsListTitle: true,
             [css(styles.subText)]: true

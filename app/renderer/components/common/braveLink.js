@@ -8,14 +8,17 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 class BraveLink extends ImmutableComponent {
   render () {
     return <a className={css(
-      this.props['data-isBatTOS'] && styles.braveLink_batTOS
+      this.props['data-isBatTOS'] && styles.braveLink_batTOS,
+      this.props.customStyle
     )}
       data-l10n-id={this.props.l10nId}
       data-test-id={this.props.testId}
       href={this.props.href}
-      target='_blank'
-      rel='noreferrer noopener'
-    />
+      target={this.props.customTarget ? this.props.customTarget : '_blank'}
+      rel={this.props.isReferrer ? 'noopener' : 'noreferrer noopener'}
+    >
+      {this.props.children}
+    </a>
   }
 }
 
