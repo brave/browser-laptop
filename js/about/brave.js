@@ -19,6 +19,7 @@ const {
   AboutPageSectionTitle,
   AboutPageSectionSubTitle
 } = require('../../app/renderer/components/common/sectionTitle')
+const BraveLink = require('../../app/renderer/components/common/braveLink')
 
 require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
@@ -60,10 +61,10 @@ class AboutBrave extends React.Component {
         <div>
           <span data-l10n-id='relNotesInfo1' />
           &nbsp;
-          <a className={css(commonStyles.linkText)}
+          <BraveLink
             href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.get('Brave')}dev`}
-            data-l10n-id='relNotesInfo2'
-            rel='noopener' target='_blank'
+            l10nId='relNotesInfo2'
+            customStyle={commonStyles.linkText}
           />
           &nbsp;
           <span data-l10n-id='relNotesInfo3' />
@@ -83,7 +84,7 @@ class AboutBrave extends React.Component {
             },
             {
               html: name === 'rev'
-                ? <a className={css(commonStyles.linkText)} href={`https://github.com/brave/browser-laptop/commit/${version}`} rel='noopener' target='_blank'>{(version && version.substring(0, 7)) || ''}</a>
+                ? <BraveLink href={`https://github.com/brave/browser-laptop/commit/${version}`} customStyle={commonStyles.linkText}>{(version && version.substring(0, 7)) || ''}</BraveLink>
                 : version,
               value: version
             }
