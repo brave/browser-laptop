@@ -14,7 +14,7 @@ class BraveLink extends ImmutableComponent {
       data-l10n-id={this.props.l10nId}
       data-test-id={this.props.testId}
       href={this.props.href}
-      target={this.props.customTarget ? this.props.customTarget : '_blank'}
+      target={this.props.self ? '_self' : '_blank'}
       rel={this.props.isReferrer ? 'noopener' : 'noreferrer noopener'}
     >
       {this.props.children}

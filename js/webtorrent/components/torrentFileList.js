@@ -6,6 +6,7 @@ const {css} = require('aphrodite/no-important')
 const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
 
 const {AboutPageSectionSubTitle} = require('../../../app/renderer/components/common/sectionTitle')
+const BraveLink = require('../../../app/renderer/components/common/braveLink')
 
 class TorrentFileList extends React.Component {
   render () {
@@ -50,7 +51,7 @@ class TorrentFileList extends React.Component {
     if (isDownload) {
       if (serverUrl) {
         const httpURL = serverUrl + '/' + ix
-        return <a className={css(commonStyles.userSelect)} href={httpURL} download={file.name}>⇩</a>
+        return <BraveLink href={httpURL} self download={file.name}>⇩</BraveLink>
       } else {
         return <div /> // No download links until the server is ready
       }
@@ -59,7 +60,7 @@ class TorrentFileList extends React.Component {
         ? '#ix=' + ix
         : '&ix=' + ix
       const href = torrentId + suffix
-      return <a className={css(commonStyles.userSelect)} href={href}>{file.name}</a>
+      return <BraveLink self href={href}>{file.name}</BraveLink>
     }
   }
 }
