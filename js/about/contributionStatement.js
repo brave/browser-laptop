@@ -659,7 +659,6 @@ const styles = StyleSheet.create({
   },
 
   list__anchor: {
-    color: '#3b3b3b',
     fontSize: '1rem'
   },
 

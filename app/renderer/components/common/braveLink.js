@@ -4,11 +4,15 @@
 
 const ImmutableComponent = require('../immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../styles/global')
 
 class BraveLink extends ImmutableComponent {
   render () {
     return <a className={css(
-      this.props['data-isBatTOS'] && styles.braveLink_batTOS,
+      styles.braveLink,
+      this.props.mediumGray && styles.braveLink_color_mediumGray,
+      this.props.braveOrange && styles.braveLink_color_braveOrange,
+      this.props.smaller && styles.braveLink_text_smaller,
       this.props.customStyle
     )}
       data-l10n-id={this.props.l10nId}
@@ -23,9 +27,24 @@ class BraveLink extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
-  braveLink_batTOS: {
-    fontSize: '13px',
-    color: '#666'
+  braveLink: {
+    color: globalStyles.color.commonTextColor
+  },
+
+  braveLink_color_mediumGray: {
+    color: globalStyles.color.mediumGray
+  },
+
+  braveLink_color_braveOrange: {
+    color: globalStyles.color.braveOrange,
+
+    ':hover': {
+      color: globalStyles.color.commonTextColor
+    }
+  },
+
+  braveLink_text_smaller: {
+    fontSize: 'smaller'
   }
 })
 

@@ -50,9 +50,10 @@ class TorrentViewer extends React.Component {
         />
       )
       legalNotice = (
-        <BraveLink href='https://webtorrent.io'
+        <BraveLink
+          smaller mediumGray
+          href='https://webtorrent.io'
           l10nId='poweredByWebTorrent'
-          customStyle={styles.legalNotice_braveLink}
         />
       )
     } else {
@@ -71,10 +72,7 @@ class TorrentViewer extends React.Component {
           onClick={() => dispatch('start')}
         />
       )
-      legalNotice = <div className={cx({
-        legalNotice: true,
-        [css(commonStyles.userSelectNone)]: true
-      })} data-l10n-id='legalNotice' />
+      legalNotice = <div className={css(styles.legalNotice)} data-l10n-id='legalNotice' />
     }
 
     if (torrentIdProtocol === 'magnet:') {
@@ -118,7 +116,7 @@ class TorrentViewer extends React.Component {
             stateOwner={this}
           />
 
-          {legalNotice}
+          <div className={css(styles.siteDetailsPage__siteDetailsPageContent__legalNotice)}>{legalNotice}</div>
         </div>
       </div>
     )
@@ -139,11 +137,14 @@ const styles = StyleSheet.create({
     marginLeft: '24px' // See: .siteDetailsPageHeader
   },
 
-  legalNotice_braveLink: {
-    color: globalStyles.color.gray,
-    fontSize: '9px',
-    userSelect: 'none',
-    textDecoration: 'underline'
+  siteDetailsPage__siteDetailsPageContent__legalNotice: {
+    marginTop: '15px',
+    userSelect: 'none'
+  },
+
+  legalNotice: {
+    color: globalStyles.color.mediumGray,
+    fontSize: 'smaller'
   }
 })
 

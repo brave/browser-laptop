@@ -71,9 +71,9 @@ class DisabledContent extends ImmutableComponent {
           </div>
           <div className={css(styles.disabledContent__message__toc)}>
             <BraveLink
-              data-isBatTOS
-              l10nId='termsOfService'
+              smaller mediumGray
               href='https://basicattentiontoken.org/contributor-terms-of-service/'
+              l10nId='termsOfService'
             />
           </div>
           <div className={css(styles.disabledContent__footer)}>

@@ -62,9 +62,9 @@ class AboutBrave extends React.Component {
           <span data-l10n-id='relNotesInfo1' />
           &nbsp;
           <BraveLink
+            braveOrange
             href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.get('Brave')}dev`}
             l10nId='relNotesInfo2'
-            customStyle={commonStyles.linkText}
           />
           &nbsp;
           <span data-l10n-id='relNotesInfo3' />
@@ -84,7 +84,7 @@ class AboutBrave extends React.Component {
             },
             {
               html: name === 'rev'
-                ? <BraveLink href={`https://github.com/brave/browser-laptop/commit/${version}`} customStyle={commonStyles.linkText}>{(version && version.substring(0, 7)) || ''}</BraveLink>
+                ? <BraveLink braveOrange href={`https://github.com/brave/browser-laptop/commit/${version}`}>{(version && version.substring(0, 7)) || ''}</BraveLink>
                 : version,
               value: version
             }

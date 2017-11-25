@@ -18,7 +18,8 @@ class FooterInfo extends ImmutableComponent {
           this.props.backgroundImage && this.props.backgroundImage.name
           ? <div>
             <div className='copyrightCredits'>
-              <span className='photoBy' data-l10n-id='photoBy' /> <BraveLink href={this.props.backgroundImage.link} customStyle={styles.copyrightCredits__owner}>{this.props.backgroundImage.author}</BraveLink>
+              <span className='photoBy' data-l10n-id='photoBy' />
+              <BraveLink href={this.props.backgroundImage.link} customStyle={styles.copyrightCredits__owner}>{this.props.backgroundImage.author}</BraveLink>
             </div>
             <span className='photoName'>{this.props.backgroundImage.name}</span>
           </div>
@@ -37,8 +38,7 @@ class FooterInfo extends ImmutableComponent {
 const styles = StyleSheet.create({
   copyrightCredits__owner: {
     color: '#fff',
-    textTransform: 'uppercase',
-    textDecoration: 'underline'
+    textTransform: 'uppercase'
   }
 })
 

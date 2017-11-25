@@ -344,9 +344,9 @@ class EnabledContent extends ImmutableComponent {
         siteSettings={this.props.siteSettings} />
       <div className={css(styles.enabledContent__tos)}>
         <BraveLink
-          data-isBatTOS
-          l10nId='termsOfService'
+          smaller mediumGray
           href='https://basicattentiontoken.org/contributor-terms-of-service/'
+          l10nId='termsOfService'
         />
       </div>
     </section>
