@@ -2,12 +2,14 @@ const React = require('react')
 const cx = require('../../lib/classSet')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../../app/renderer/components/styles/global')
 const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
 
 // Components
 const Button = require('../../../app/renderer/components/common/button')
 const TorrentFileList = require('./torrentFileList')
 const TorrentStatus = require('./torrentStatus')
+const BraveLink = require('../../../app/renderer/components/common/braveLink')
 
 const {AboutPageSectionTitle} = require('../../../app/renderer/components/common/sectionTitle')
 
@@ -48,13 +50,9 @@ class TorrentViewer extends React.Component {
         />
       )
       legalNotice = (
-        <a className={cx({
-          legalNotice: true,
-          [css(commonStyles.userSelectNone)]: true
-        })}
-          data-l10n-id='poweredByWebTorrent'
-          href='https://webtorrent.io'
-          rel='noopener' target='_blank'
+        <BraveLink href='https://webtorrent.io'
+          l10nId='poweredByWebTorrent'
+          customStyle={styles.legalNotice_braveLink}
         />
       )
     } else {
@@ -132,17 +130,20 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-
-    // See: .siteDetailsPageHeader
-    padding: '0 24px'
+    padding: '0 24px' // See: .siteDetailsPageHeader
   },
 
   siteDetailsPage__header__actions: {
     display: 'flex',
     alignItems: 'center',
+    marginLeft: '24px' // See: .siteDetailsPageHeader
+  },
 
-    // See: .siteDetailsPageHeader
-    marginLeft: '24px'
+  legalNotice_braveLink: {
+    color: globalStyles.color.gray,
+    fontSize: '9px',
+    userSelect: 'none',
+    textDecoration: 'underline'
   }
 })
 
