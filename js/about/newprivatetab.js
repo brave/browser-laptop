@@ -9,7 +9,9 @@ const { theme } = require('../../app/renderer/components/styles/theme')
 const Stats = require('./newTabComponents/stats')
 const Clock = require('./newTabComponents/clock')
 const privateTabIcon = require('../../app/extensions/brave/img/newtab/private_tab_pagearea_icon.svg')
+
 // TODO: remove it once we use Aphrodite on stats and clock components
+require('../../less/about/common.less')
 require('../../less/about/newtab.less')
 
 class NewPrivateTab extends React.Component {

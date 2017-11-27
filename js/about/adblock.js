@@ -14,11 +14,17 @@ const SwitchControl = require('../../app/renderer/components/common/switchContro
 const {DefaultTextArea} = require('../../app/renderer/components/common/textbox')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
+
+const {
+  SectionTitleWrapper,
+  AboutPageSectionTitle,
+  AboutPageSectionSubTitle
+} = require('../../app/renderer/components/common/sectionTitle')
 
 const ipc = window.chrome.ipcRenderer
 
 // Stylesheets
-require('../../less/switchControls.less')
 require('../../less/about/common.less')
 
 class AdBlockItem extends ImmutableComponent {
@@ -67,7 +73,10 @@ class AboutAdBlock extends React.Component {
   render () {
     const lastUpdateDate = new Date(this.state.adblock.get('lastCheckDate'))
     return <div className={css(styles.adblockDetailsPage)}>
-      <h2 className={css(styles.adblockDetailsPage__h2)} data-l10n-id='adblock' />
+      <SectionTitleWrapper>
+        <AboutPageSectionTitle data-l10n-id='adblock' />
+      </SectionTitleWrapper>
+
       <list>
         <div role='listitem'>
           <div className={css(styles.adblockDetailsPageContent)}>
@@ -82,7 +91,8 @@ class AboutAdBlock extends React.Component {
               ? <div><span data-l10n-id='lastCheckETagLabel' /> <span>{this.state.adblock.get('etag')}</span></div>
               : null
             }
-            <h3 className={css(styles.adblockDetailsPage__h3)} data-l10n-id='additionalFilterLists' />
+
+            <AboutPageSectionSubTitle data-l10n-id='additionalFilterLists' />
             <div className={css(styles.adblockSubtext)} data-l10n-id='adblockTooManyListsWarning' />
             <div className={css(styles.adblockLists)}>
               {
@@ -91,7 +101,8 @@ class AboutAdBlock extends React.Component {
                     settings={this.state.settings} />)
               }
             </div>
-            <h3 className={css(styles.adblockDetailsPage__h3)} data-l10n-id='customFilters' />
+
+            <AboutPageSectionSubTitle data-l10n-id='customFilters' />
             <div className={css(styles.adblockSubtext)} data-l10n-id='customFilterDescription' />
             <DefaultTextArea
               onChange={this.onChangeCustomFilters}
@@ -99,7 +110,8 @@ class AboutAdBlock extends React.Component {
               data-test-id='customFiltersInput'
               cols='100'
               rows='10'
-              spellCheck='false' />
+              spellCheck='false'
+            />
           </div>
         </div>
       </list>
@@ -115,26 +127,16 @@ class AboutAdBlock extends React.Component {
 
 const styles = StyleSheet.create({
   adblockDetailsPage: {
-    margin: '20px',
+    margin: globalStyles.spacing.aboutPageMargin,
     minWidth: '704px'
   },
-  adblockDetailsPage__h2: {
-    marginBottom: '10px'
-  },
-  adblockDetailsPage__h3: {
-    marginTop: '20px',
-    marginBottom: '10px'
-  },
+
   adblockDetailsPageContent: {
     marginBottom: '10px'
   },
 
   adblockLists: {
     marginTop: '10px'
-  },
-  adblockLists__adblockItem__switchControl: {
-    // TODO: refactor switchControl to remove !important
-    marginLeft: '15px !important'
   },
 
   adblockSubtext: {

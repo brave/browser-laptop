@@ -1,14 +1,8 @@
-@import "./itemList.less";
-@import "./common.less";
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-strong, div, span, li, em, p, a {
-  font-weight: 400;
-  -webkit-font-smoothing: antialiased;
-}
-
-body {
-  background: @veryLightGray;
-}
+@import "../variables.less";
 
 .siteDetailsPage {
   margin: 0;
@@ -29,22 +23,15 @@ body {
         min-width: 280px;
       }
 
-      .searchInputPlaceholder {
-        color: @gray;
-        font-family: FontAwesome;
-        left: -25px;
-        margin: 0;
-        padding: 0;
-        position: relative;
-        width: 0;
-      }
-
+      .searchInputPlaceholder,
       .searchInputClear {
+        font-family: FontAwesome;
+        color: @gray;
+        left: -25px;
         margin: 0;
         padding: 0;
-        width: 0;
         position: relative;
-        left: -25px;
+        width: 0;
       }
     }
   }
@@ -55,11 +42,4 @@ body {
     display: block;
     clear: both;
   }
-}
-
-.searchInputClear {
-  float: right;
-  padding: 8px;
-  margin-top: -39px;
-  color: #999;
 }

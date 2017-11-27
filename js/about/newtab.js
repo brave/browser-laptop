@@ -34,6 +34,7 @@ const cx = require('../lib/classSet')
 const ipc = window.chrome.ipcRenderer
 
 // Styles
+require('../../less/about/common.less')
 require('../../less/about/newtab.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 

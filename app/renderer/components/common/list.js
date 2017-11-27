@@ -5,7 +5,6 @@
 const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
-const globalStyles = require('../styles/global')
 
 class List extends ImmutableComponent {
   render () {
@@ -25,7 +24,6 @@ class DownloadList extends ImmutableComponent {
 
 const styles = StyleSheet.create({
   isDownload: {
-    marginTop: globalStyles.spacing.aboutPageSectionMargin,
     overflow: 'hidden'
   }
 })

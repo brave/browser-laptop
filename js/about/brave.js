@@ -13,14 +13,19 @@ const ipc = window.chrome.ipcRenderer
 
 const cx = require('../lib/classSet')
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 const {
+  SectionTitleWrapper,
   AboutPageSectionTitle,
   AboutPageSectionSubTitle
 } = require('../../app/renderer/components/common/sectionTitle')
 
-require('../../less/about/history.less')
+require('../../less/about/common.less')
+require('../../less/about/itemList.less')
+require('../../less/about/siteDetails.less')
+
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const tranformVersionInfoToString = (versionInformation) =>
@@ -44,17 +49,21 @@ class AboutBrave extends React.Component {
   }
 
   render () {
-    return <div className='siteDetailsPage'>
-      <div className='siteDetailsPageHeader'>
-        <AboutPageSectionTitle data-l10n-id='aboutBrave' />
+    return <div className={cx({
+      [css(styles.aboutPage)]: true,
+      siteDetailsPage: true
+    })}>
+      <div className={cx({
+        [css(styles.aboutPage__header)]: true,
+        siteDetailsPageHeader: true
+      })}>
+        <SectionTitleWrapper>
+          <AboutPageSectionTitle data-l10n-id='aboutBrave' />
+        </SectionTitleWrapper>
         <div data-l10n-id='braveInfo' />
       </div>
 
-      <div className={cx({
-        siteDetailsPageContent: true,
-        aboutBrave: true,
-        [css(commonStyles.siteDetailsPageContent)]: true
-      })}>
+      <div className='siteDetailsPageContent'>
         <AboutPageSectionSubTitle data-l10n-id='releaseNotes' />
 
         <div>
@@ -69,12 +78,13 @@ class AboutBrave extends React.Component {
           <span data-l10n-id='relNotesInfo3' />
         </div>
 
-        <div className={css(styles.versionInformationWrapper)}>
+        <div className={css(styles.aboutPage__versionInformation)}>
           <AboutPageSectionSubTitle data-l10n-id='versionInformation' />
           <ClipboardButton copyAction={this.onCopy} />
         </div>
 
         <SortableTable
+          fillAvailable
           headings={['Name', 'Version']}
           rows={this.state.versionInformation.map((version, name) => [
             {
@@ -95,11 +105,24 @@ class AboutBrave extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  versionInformationWrapper: {
+  aboutPage: {
+    width: '400px',
+    margin: globalStyles.spacing.aboutPageMargin,
+
+    // Issue #10711
+    // TODO: Refactor siteDetails.less to remove !important
+    paddingTop: '0 !important'
+  },
+
+  aboutPage__header: {
+    // TODO: Refactor siteDetails.less to remove !important
+    padding: '0 !important'
+  },
+
+  aboutPage__versionInformation: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'baseline',
-    width: '400px'
+    alignItems: 'baseline'
   }
 })
 

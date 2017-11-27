@@ -13,6 +13,12 @@ const ipc = window.chrome.ipcRenderer
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 
+const {
+  SectionTitleWrapper,
+  AboutPageSectionTitle,
+  AboutPageSectionSubTitle
+} = require('../../app/renderer/components/common/sectionTitle')
+
 require('../../less/about/common.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
@@ -182,7 +188,7 @@ class AboutPasswords extends React.Component {
     var savedPasswordsPage = this.isPasswordsEmpty
     ? null
     : <div>
-      <h2 data-l10n-id='savedPasswords' />
+      <AboutPageSectionSubTitle data-l10n-id='savedPasswords' />
       <div className={css(styles.passwordsPageContent)}>
         <table className={css(styles.passwordsList)}>
           <thead>
@@ -214,7 +220,7 @@ class AboutPasswords extends React.Component {
     var savedSitesPage = this.isSitesEmpty
     ? null
     : <div>
-      <h2 data-l10n-id='passwordSites' />
+      <AboutPageSectionSubTitle data-l10n-id='passwordSites' />
       <div className={css(styles.passwordsPageContent)}>
         <table className={css(styles.passwordsList)}>
           <tbody>
@@ -228,7 +234,9 @@ class AboutPasswords extends React.Component {
     </div>
 
     return <div className={css(styles.passwordsPage)}>
-      <h1 data-l10n-id='passwordsTitle' />
+      <SectionTitleWrapper>
+        <AboutPageSectionTitle data-l10n-id='passwordsTitle' />
+      </SectionTitleWrapper>
       <div className={css(styles.passwordInstructions)} data-l10n-id='passwordDisableInstructions' />
       {
         this.isPasswordsEmpty && this.isSitesEmpty
@@ -251,16 +259,20 @@ const styles = StyleSheet.create({
       backgroundColor: '#9cd4fe'
     }
   },
+
   passwordsPage: {
-    margin: '20px'
+    margin: globalStyles.spacing.aboutPageMargin
   },
+
   passwordsPageContent: {
     borderTop: `1px solid ${globalStyles.color.chromeBorderColor}`
   },
+
   passwordsList: {
     paddingTop: '10px',
     overflow: 'hidden'
   },
+
   passwordInstructions: {
     borderTop: `1px solid ${globalStyles.color.chromeBorderColor}`,
     paddingTop: '10px',
@@ -268,10 +280,12 @@ const styles = StyleSheet.create({
     fontSize: '18px',
     color: 'grey'
   },
+
   passwordsPageFooter: {
     padding: '10px',
     marginBottom: '20px'
   },
+
   passwordsPageFooterClear: {
     color: 'grey',
     cursor: 'pointer',
@@ -282,6 +296,7 @@ const styles = StyleSheet.create({
     padding: itemPadding,
     textAlign: 'left'
   },
+
   passwordsTr: {
     cursor: 'default',
     overflow: 'hidden',
@@ -294,14 +309,17 @@ const styles = StyleSheet.create({
       backgroundColor: '#ceeaff'
     }
   },
+
   isHead: {
     ':hover': {
       backgroundColor: 'inherit'
     }
   },
+
   passwordsTd: {
     padding: itemPadding
   },
+
   isAction: {
     padding: 0
   }

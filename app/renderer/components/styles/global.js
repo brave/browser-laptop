@@ -151,9 +151,6 @@ const globalStyles = {
     navbarBraveButtonMarginLeft: '80px',
     navbarLeftMarginDarwin: '76px',
     sideBarWidth: '190px',
-    aboutPageDetailsPageWidth: '704px',
-    aboutPageSectionPadding: '24px',
-    aboutPageSectionMargin: '10px',
     defaultTabMargin: '6px',
     defaultIconPadding: '2px',
     iconSize: '16px',
@@ -177,7 +174,13 @@ const globalStyles = {
     panelItemMargin: '12px',
     panelPadding: '18px',
     addFundsDialogMinHeight: '250px',
-    batIconWidth: '40px'
+    batIconWidth: '40px',
+
+    // about pages
+    aboutPageMargin: '24px',
+    aboutPageDetailsPageWidth: '704px',
+    aboutPageSectionPadding: '24px',
+    aboutPageSectionMargin: '10px'
   },
   shadow: {
     switchShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.35)',

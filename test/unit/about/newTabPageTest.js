@@ -25,6 +25,7 @@ describe('NewTab component unit tests', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
+    mockery.registerMock('../../less/about/common.less', {})
     mockery.registerMock('../../less/about/newtab.less', {})
     mockery.registerMock('../../node_modules/font-awesome/css/font-awesome.css', {})
     mockery.registerMock('../../app/extensions/brave/img/newtab/private_tab_pagearea_icon.svg')

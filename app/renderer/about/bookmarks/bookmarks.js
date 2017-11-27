@@ -24,6 +24,9 @@ const aboutActions = require('../../../../js/about/aboutActions')
 const windowActions = require('../../../../js/actions/windowActions')
 
 // Stylesheets
+require('../../../../less/about/common.less')
+require('../../../../less/about/itemList.less')
+require('../../../../less/about/siteDetails.less')
 require('../../../../less/about/bookmarks.less')
 require('../../../../node_modules/font-awesome/css/font-awesome.css')
 

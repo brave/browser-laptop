@@ -1,5 +1,8 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 @import "../variables.less";
-@import "../button.less";
 @import "../switchControls.less";
 @import "../sortableTable.less";
 
@@ -13,10 +16,19 @@
   padding: 0;
 }
 
-html, body, #appContainer, #appContainer > div {
-  height: 100%;
-}
-
 body {
   font-size: 100%;
+  background: @veryLightGray;
+}
+
+strong, div, span, li, em, p, a {
+  -webkit-font-smoothing: antialiased;
+}
+
+div, span, li, em, p, a {
+  font-weight: 400;
+}
+
+strong {
+  font-weight: 600;
 }
