@@ -15,9 +15,8 @@ const viewerBaseUrl = `${pdfjsBaseUrl}content/web/viewer.html`
 
 const onBeforeRequest = (details) => {
   const result = { resourceName: 'pdfjs' }
-  if (!(details.resourceType === 'mainFrame' &&
-    UrlUtil.isFileScheme(details.url) &&
-    UrlUtil.isFileType(details.url, 'pdf'))) {
+  if (details.resourceType != 'mainFrame' ||
+    !UrlUtil.isFileType(details.url, 'pdf')) {
     return result
   }
   appActions.loadURLRequested(details.tabId, `${viewerBaseUrl}?file=${encodeURIComponent(details.url)}`)
