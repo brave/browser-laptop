@@ -2,9 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { makeImmutable, isMap, isList } = require('./immutableUtil')
 const Immutable = require('immutable')
 const assert = require('assert')
+const { createSelector } = require('reselect')
+const { makeImmutable, isMap, isList } = require('./immutableUtil')
 
 // TODO(bridiver) - make these generic validation functions
 const validateId = function (propName, id) {
@@ -182,6 +183,18 @@ const api = {
       !windowState.getIn(['ui', 'noScriptInfo', 'isVisible']) &&
       frame && !frame.getIn(['security', 'loginRequiredDetail']) &&
       !windowState.getIn(['ui', 'menubar', 'selectedIndex'])
+  },
+
+  /**
+   * Allows a selector to be created from appStore state, that can call
+   * a child selector which expects windowStore state. Must be called from renderer
+   * component, which stores windowState on appState.currentWindow
+   */
+  generateWindowStateSelector: function generateWindowStateSelector (resultFunc) {
+    return createSelector(
+      state => state.get('currentWindow'),
+      resultFunc
+    )
   }
 }
 

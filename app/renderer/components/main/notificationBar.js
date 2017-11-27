@@ -4,15 +4,12 @@
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
-const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
 const NotificationItem = require('./notificationItem')
 
 // Utils
-const {getOrigin} = require('../../../../js/lib/urlutil')
-const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const notificationBarState = require('../../../common/state/notificationBarState')
 
 // Styles
@@ -21,26 +18,14 @@ const globalStyles = require('../styles/global')
 
 class NotificationBar extends React.Component {
   mergeProps (state, ownProps) {
-    const currentWindow = state.get('currentWindow')
-    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
-    const activeOrigin = getOrigin(activeFrame.get('location'))
-    const notifications = notificationBarState.getNotifications(state)
-
     const props = {}
-    props.activeNotifications = notifications
-      .filter((item) => {
-        return item.get('frameOrigin')
-          ? activeOrigin === item.get('frameOrigin')
-          : item.get('position') !== 'global'
-      })
-      .takeLast(3)
-    props.showNotifications = !props.activeNotifications.isEmpty()
+    props.activeNotifications = notificationBarState.getActiveNotifications(state)
     return props
   }
 
   render () {
     // Avoid rendering an empty notification wrapper
-    if (!this.props.showNotifications) {
+    if (this.props.activeNotifications.isEmpty()) {
       return null
     }
     return <div className={css(commonStyles.notificationBar)} data-test-id='notificationBar'>

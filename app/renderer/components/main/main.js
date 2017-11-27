@@ -536,7 +536,6 @@ class Main extends React.Component {
     const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
     const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(currentWindow)
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
-    const activeOrigin = !activeFrame.isEmpty() ? urlUtil.getOrigin(activeFrame.get('location')) : null
     const widevinePanelDetail = currentWindow.get('widevinePanelDetail', Immutable.Map())
     const loginRequiredDetails = basicAuthState.getLoginRequiredDetail(state, activeTabId)
     const focused = isFocused(state)
@@ -570,8 +569,6 @@ class Main extends React.Component {
     props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, focused)
     props.isSinglePage = nonPinnedFrames.size <= tabsPerPage
     props.showTabPages = nonPinnedFrames.size > tabsPerPage
-    props.showNotificationBar = activeOrigin && state.get('notifications').filter((item) =>
-        item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true).size > 0
     props.showFindBar = activeFrame.get('findbarShown') && !activeFrame.get('isFullScreen')
     props.sortedFrames = frameStateUtil.getSortedFrameKeys(currentWindow)
     props.showDownloadBar = currentWindow.getIn(['ui', 'downloadsToolbar', 'isVisible']) &&
@@ -724,11 +721,7 @@ class Main extends React.Component {
           </div>
         }
         <TabsToolbar key='tab-bar' />
-        {
-          this.props.showNotificationBar
-          ? <NotificationBar />
-          : null
-        }
+        <NotificationBar />
         {
           this.props.showFindBar
           ? <FindBar />
