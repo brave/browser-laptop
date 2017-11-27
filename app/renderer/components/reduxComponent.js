@@ -1,10 +1,33 @@
 const ipc = require('electron').ipcRenderer
+const React = require('react')
 const appStore = require('../../../js/stores/appStoreRenderer')
 const ImmutableComponent = require('./immutableComponent')
-const React = require('react')
 const windowStore = require('../../../js/stores/windowStore')
 const {isList, isSameHashCode} = require('../../common/state/immutableUtil')
 const messages = require('../../../js/constants/messages')
+
+// Memozing appState.set('currentWindow', windowState)
+// is not so much for performance of this specific operation,
+// but for the ability to equality check with the === operator
+// inside component state selection, in order to very quickly
+// check for each component if anything has changed.
+// Otherwise each component would have a different state object (with the same properties)
+// since, previously, we were appending currentWindow to appState for each component individually
+// whenever either state changes.
+function createMemoizeComponentState () {
+  let lastAppState
+  let lastWindowState
+  let state
+  return function getOrComputeCombinedState () {
+    if (lastAppState !== appStore.state || lastWindowState !== windowStore.state) {
+      state = appStore.state.set('currentWindow', windowStore.state)
+      lastAppState = appStore.state
+      lastWindowState = windowStore.state
+    }
+    return state
+  }
+}
+const selectComponentState = createMemoizeComponentState()
 
 const mergePropsImpl = (stateProps, ownProps) => {
   return Object.assign({}, stateProps, ownProps)
@@ -12,8 +35,10 @@ const mergePropsImpl = (stateProps, ownProps) => {
 
 const buildPropsImpl = (props, componentType, mergeStateToProps) => {
   const fn = mergeStateToProps || mergePropsImpl
-  const state = appStore.state.set('currentWindow', windowStore.state)
-  return fn(state, props)
+  // use memoized function to help state equality checks
+  // since map.set('a', 1) !== map.set('a', 1)
+  // ...in other words, they have to actually be the same reference
+  return fn(selectComponentState(), props)
 }
 
 const checkParam = function (old, next, prop) {
