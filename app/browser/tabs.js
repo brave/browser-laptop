@@ -7,6 +7,7 @@ const windowActions = require('../../js/actions/windowActions')
 const tabActions = require('../common/actions/tabActions')
 const config = require('../../js/constants/config')
 const Immutable = require('immutable')
+const { shouldDebugTabEvents } = require('../cmdLine')
 const tabState = require('../common/state/tabState')
 const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
 const {makeImmutable, makeJS} = require('../common/state/immutableUtil')
@@ -71,6 +72,9 @@ const getTabValue = function (tabId) {
 
 const updateTab = (tabId, changeInfo = {}) => {
   let tabValue = getTabValue(tabId)
+  if (shouldDebugTabEvents) {
+    console.log('tab updated from muon', { tabId, changeIndex: changeInfo.index, changeActive: changeInfo.active, newIndex: tabValue && tabValue.get('index'), newActive: tabValue && tabValue.get('active') })
+  }
   if (tabValue) {
     appActions.tabUpdated(tabValue, makeImmutable(changeInfo))
   }
@@ -505,11 +509,23 @@ const api = {
     })
 
     process.on('chrome-tabs-created', (tabId) => {
+      if (shouldDebugTabEvents) {
+        console.log(`tab [${tabId} via process] chrome-tabs-created`)
+      }
       updateTab(tabId)
     })
 
     process.on('chrome-tabs-updated', (tabId, changeInfo) => {
+      if (shouldDebugTabEvents) {
+        console.log(`tab [${tabId} via process] chrome-tabs-updated`)
+      }
       updateTab(tabId, changeInfo)
+    })
+
+    process.on('chrome-tabs-removed', (tabId, changeInfo) => {
+      if (shouldDebugTabEvents) {
+        console.log(`tab [${tabId} via process] - chrome-tabs-removed`)
+      }
     })
 
     app.on('web-contents-created', function (event, tab) {
@@ -517,6 +533,19 @@ const api = {
         return
       }
       const tabId = tab.getId()
+
+      // command-line flag --debug-tab-events
+      if (shouldDebugTabEvents) {
+        console.log(`Tab [${tabId}] created in window ${tab.tabValue().windowId}`)
+        // output console log for each event the tab receives
+        const oldEmit = tab.emit
+        tab.emit = function () {
+          const eventTabId = tab && !tab.isDestroyed() ? tab.getId() : `probably ${tabId}`
+          console.log(`Tab [${eventTabId}] event '${arguments[0]}'`)
+          oldEmit.apply(tab, arguments)
+        }
+      }
+
       tab.on('did-start-navigation', (e, navigationHandle) => {
         if (!tab.isDestroyed() && navigationHandle.isValid() && navigationHandle.isInMainFrame()) {
           const controller = tab.controller()
