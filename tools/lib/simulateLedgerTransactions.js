@@ -8,12 +8,13 @@ const getNthContributionPeriodBack = function (n) {
 
 function simulateLedgerTransactions (numTx) {
   let numTransactions = numTx || 10
+  const mapCount = numTransactions - 1
 
   let transactions = (new Array(numTransactions))
         .fill(null)
         .map(function (nothing, idx) {
           let tx = TxHelpers.generateTransaction()
-          tx.submissionStamp = getNthContributionPeriodBack(idx)
+          tx.submissionStamp = getNthContributionPeriodBack(mapCount - idx)
           tx.submissionDate = new Date(tx.submissionStamp)
 
           let validatorOutput = TxHelpers.validateTransaction(tx)
