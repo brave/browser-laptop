@@ -5,7 +5,7 @@ const Immutable = require('immutable')
 require('../../../braveUnit')
 const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
 
-describe('ledgerUtil test', function () {
+describe('ledgerUtil unit test', function () {
   let ledgerUtil
   let fakeLevel
   const fakeElectron = require('../../../lib/fakeElectron')
@@ -329,6 +329,38 @@ describe('ledgerUtil test', function () {
     it('youtube', function () {
       const result = ledgerUtil.getMediaProvider('https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=11.338&et=21.339')
       assert.equal(result, ledgerMediaProviders.YOUTUBE)
+    })
+  })
+
+  describe('milliseconds', function () {
+    it('seconds', function () {
+      const result = ledgerUtil.milliseconds.second
+      assert.equal(result, 1000)
+    })
+
+    it('minute', function () {
+      const result = ledgerUtil.milliseconds.minute
+      assert.equal(result, 60000)
+    })
+
+    it('hour', function () {
+      const result = ledgerUtil.milliseconds.hour
+      assert.equal(result, 3600000)
+    })
+
+    it('day', function () {
+      const result = ledgerUtil.milliseconds.day
+      assert.equal(result, 86400000)
+    })
+
+    it('week', function () {
+      const result = ledgerUtil.milliseconds.week
+      assert.equal(result, 604800000)
+    })
+
+    it('year', function () {
+      const result = ledgerUtil.milliseconds.year
+      assert.equal(result, 31536000000)
     })
   })
 })

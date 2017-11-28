@@ -5,6 +5,7 @@
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const moment = require('moment')
+const Immutable = require('immutable')
 
 // util
 const {batToCurrencyString, formatCurrentBalance, formattedDateFromTimestamp, walletStatus} = require('../../../../common/lib/ledgerUtil')
@@ -24,6 +25,7 @@ const LedgerTable = require('./ledgerTable')
 const globalStyles = require('../../styles/global')
 const {paymentStylesVariables} = require('../../styles/payment')
 const {loaderAnimation} = require('../../styles/animations')
+const closeButton = require('../../../../../img/toolbar/stoploading_btn.svg')
 const cx = require('../../../../../js/lib/classSet')
 
 // Actions
@@ -32,6 +34,12 @@ const appActions = require('../../../../../js/actions/appActions')
 // TODO: report when funds are too low
 // TODO: support non-USD currency
 class EnabledContent extends ImmutableComponent {
+  constructor (props) {
+    super(props)
+    this.claimButton = this.claimButton.bind(this)
+    this.onClaimClick = this.onClaimClick.bind(this)
+  }
+
   walletButton () {
     const ledgerData = this.props.ledgerData
     const buttonText = ledgerData.get('created')
@@ -59,6 +67,31 @@ class EnabledContent extends ImmutableComponent {
         target='_blank' rel='noopener'
       />
     </div>
+  }
+
+  onClaimClick () {
+    appActions.onPromotionClaim()
+  }
+
+  claimButton () {
+    const ledgerData = this.props.ledgerData || Immutable.Map()
+    const promotion = ledgerData.get('promotion')
+
+    if (promotion == null || promotion.isEmpty() || promotion.has('claimedTimestamp') || !ledgerData.get('created')) {
+      return null
+    }
+
+    return <BrowserButton
+      custom={[
+        styles.claimButton
+      ]}
+      secondaryColor
+      panelItem
+      testId={'claimButton'}
+      onClick={this.onClaimClick}
+      disabled={!ledgerData.get('created')}
+      label={promotion.getIn(['panel', 'optedInButton'])}
+    />
   }
 
   ledgerDataErrorText () {
@@ -167,6 +200,38 @@ class EnabledContent extends ImmutableComponent {
     </section>
   }
 
+  closeClick () {
+    appActions.onPromotionRemoval()
+  }
+
+  successMessage () {
+    const promo = this.props.ledgerData.get('promotion') || Immutable.Map()
+    const successText = promo.getIn(['panel', 'successText'])
+
+    if (!successText || !promo.has('claimedTimestamp')) {
+      return
+    }
+
+    return <div className={cx({[css(styles.enabledContent__grant)]: true, 'enabledContent__grant': true})}>
+      <div
+        className={css(styles.enabledContent__grant_close)}
+        onClick={this.closeClick}
+      />
+      <p className={css(styles.enabledContent__grant_title)}>
+        <span className={css(styles.enabledContent__grant_bold)}>{ successText.get('title') }</span> { successText.get('message') }
+      </p>
+      <p className={css(styles.enabledContent__grant_text)}>
+        {promo.getIn(['panel', 'disclaimer'])}
+      </p>
+      <BrowserButton
+        secondaryColor
+        l10nId={'ok'}
+        custom={styles.enabledContent__grant_button}
+        onClick={this.closeClick}
+      />
+    </div>
+  }
+
   render () {
     const ledgerData = this.props.ledgerData
     const walletStatusText = walletStatus(ledgerData)
@@ -189,7 +254,9 @@ class EnabledContent extends ImmutableComponent {
       <div className={css(styles.enabledContent__walletBar)} data-test-id='walletBar'>
         <div className={css(gridStyles.row1col1, styles.enabledContent__walletBar__title)} data-l10n-id='monthlyBudget' />
         <div className={css(gridStyles.row1col2, styles.enabledContent__walletBar__title)} data-l10n-id='accountBalance' />
-        <div className={css(gridStyles.row1col3)} />
+        <div className={css(gridStyles.row1col3)}>
+          {this.claimButton()}
+        </div>
         <div className={css(gridStyles.row2col1)}>
           <PanelDropdown
             data-test-id='fundsSelectBox'
@@ -236,6 +303,7 @@ class EnabledContent extends ImmutableComponent {
           data-l10n-id={walletStatusText.id}
           data-l10n-args={walletStatusText.args ? JSON.stringify(walletStatusText.args) : null}
         />
+        {this.successMessage()}
       </div>
       <LedgerTable ledgerData={this.props.ledgerData}
         settings={this.props.settings}
@@ -299,6 +367,7 @@ const gridStyles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   enabledContent__walletBar: {
+    position: 'relative',
     display: 'grid',
     gridTemplateColumns: '1fr 1fr 1fr',
     background: globalStyles.color.lightGray,
@@ -408,6 +477,61 @@ const styles = StyleSheet.create({
 
   loader__line_off: {
     animationName: 'none'
+  },
+
+  claimButton: {
+    marginTop: '10px'
+  },
+
+  enabledContent__grant: {
+    position: 'absolute',
+    zIndex: 3,
+    top: 0,
+    left: 0,
+    width: '100%',
+    minHeight: '159px',
+    background: '#f3f3f3',
+    borderRadius: '8px',
+    padding: '30px 50px 20px',
+    boxSizing: 'border-box',
+    boxShadow: '4px 6px 3px #dadada'
+  },
+
+  enabledContent__grant_close: {
+    position: 'absolute',
+    right: '15px',
+    top: '15px',
+    height: '15px',
+    width: '15px',
+    cursor: 'pointer',
+
+    background: `url(${closeButton}) center no-repeat`,
+    backgroundSize: `15px`,
+
+    ':focus': {
+      outline: 'none'
+    }
+  },
+
+  enabledContent__grant_title: {
+    color: '#5f5f5f',
+    fontSize: '20px',
+    display: 'block',
+    marginBottom: '10px'
+  },
+
+  enabledContent__grant_bold: {
+    color: '#ff5500'
+  },
+
+  enabledContent__grant_text: {
+    fontSize: '16px',
+    color: '#9b9b9b',
+    maxWidth: '600px'
+  },
+
+  enabledContent__grant_button: {
+    float: 'right'
   }
 })
 

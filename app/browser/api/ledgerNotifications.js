@@ -19,16 +19,8 @@ const appActions = require('../../../js/actions/appActions')
 
 // Utils
 const locale = require('../../locale')
+const ledgerUtil = require('../../common/lib/ledgerUtil')
 const getSetting = require('../../../js/settings').getSetting
-
-const miliseconds = {
-  year: 365 * 24 * 60 * 60 * 1000,
-  week: 7 * 24 * 60 * 60 * 1000,
-  day: 24 * 60 * 60 * 1000,
-  hour: 60 * 60 * 1000,
-  minute: 60 * 1000,
-  second: 1000
-}
 
 const text = {
   hello: locale.translation('updateHello'),
@@ -39,13 +31,13 @@ const text = {
   walletConvertedToBat: locale.translation('walletConvertedToBat')
 }
 
-const pollingInterval = 15 * miliseconds.minute // 15 * minutes
+const pollingInterval = 15 * ledgerUtil.milliseconds.minute // 15 * minutes
 let intervalTimeout
 const displayOptions = {
   style: 'greetingStyle',
   persist: false
 }
-const nextAddFundsTime = 3 * miliseconds.day
+const nextAddFundsTime = 3 * ledgerUtil.milliseconds.day
 
 const sufficientBalanceToReconcile = (state) => {
   const balance = Number(ledgerState.getInfoProp(state, 'balance') || 0)
@@ -68,14 +60,14 @@ const shouldShowNotificationAddFunds = () => {
   return !nextTime || (new Date().getTime() > nextTime)
 }
 
-const init = (state) => {
+const init = () => {
   // Check if relevant browser notifications should be shown every 15 minutes
   if (intervalTimeout) {
     clearInterval(intervalTimeout)
   }
-  intervalTimeout = setInterval((state) => {
-    module.exports.onInterval(state)
-  }, pollingInterval, state)
+  intervalTimeout = setInterval(() => {
+    appActions.onLedgerNotificationInterval()
+  }, pollingInterval)
 }
 
 const onLaunch = (state) => {
@@ -114,11 +106,34 @@ const onLaunch = (state) => {
 const onInterval = (state) => {
   if (getSetting(settings.PAYMENTS_ENABLED)) {
     if (getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
-      showEnabledNotifications(state)
+      module.exports.showEnabledNotifications(state)
     }
   } else {
-    showDisabledNotifications(state)
+    module.exports.showDisabledNotifications(state)
   }
+
+  if (getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
+    state = module.exports.onIntervalDynamic(state)
+  }
+
+  return state
+}
+
+const onIntervalDynamic = (state) => {
+  const promotion = ledgerState.getPromotion(state)
+  const time = new Date().getTime()
+
+  if (promotion.isEmpty()) {
+    return state
+  }
+
+  const timestamp = promotion.get('remindTimestamp')
+  if (timestamp && timestamp !== -1 && time > timestamp) {
+    state = ledgerState.setPromotionProp(state, 'remindTimestamp', -1)
+    module.exports.showPromotionNotification(state)
+  }
+
+  return state
 }
 
 const onResponse = (message, buttonIndex, activeWindow) => {
@@ -139,7 +154,7 @@ const onResponse = (message, buttonIndex, activeWindow) => {
       break
 
     case text.reconciliation:
-// buttonIndex === 1 is Dismiss
+      // buttonIndex === 1 is Dismiss
       if (buttonIndex === 0) {
         appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
       } else if (buttonIndex === 2 && activeWindow) {
@@ -183,6 +198,32 @@ const onResponse = (message, buttonIndex, activeWindow) => {
   appActions.hideNotification(message)
 }
 
+const onDynamicResponse = (message, actionId, activeWindow) => {
+  if (!message) {
+    return
+  }
+
+  switch (actionId) {
+    case 'optInPromotion':
+      {
+        if (activeWindow) {
+          appActions.createTabRequested({
+            url: 'about:preferences#payments',
+            windowId: activeWindow.id
+          })
+        }
+        break
+      }
+    case 'remindLater':
+      {
+        appActions.onPromotionRemind()
+        break
+      }
+  }
+
+  appActions.hideNotification(message)
+}
+
 /**
  * Show message that it's time to add funds if reconciliation is less than
  * a day in the future and balance is too low.
@@ -195,18 +236,18 @@ const showEnabledNotifications = (state) => {
     return
   }
 
-  if (reconcileStamp - new Date().getTime() < miliseconds.day) {
+  if (reconcileStamp - new Date().getTime() < ledgerUtil.milliseconds.day) {
     if (sufficientBalanceToReconcile(state)) {
       if (shouldShowNotificationReviewPublishers()) {
         const reconcileFrequency = ledgerState.getInfoProp(state, 'reconcileFrequency')
-        showReviewPublishers(reconcileStamp + ((reconcileFrequency - 2) * miliseconds.day))
+        showReviewPublishers(reconcileStamp + ((reconcileFrequency - 2) * ledgerUtil.milliseconds.day))
       }
     } else if (shouldShowNotificationAddFunds()) {
       showAddFunds()
     }
-  } else if (reconcileStamp - new Date().getTime() < 2 * miliseconds.day) {
+  } else if (reconcileStamp - new Date().getTime() < 2 * ledgerUtil.milliseconds.day) {
     if (sufficientBalanceToReconcile(state) && (shouldShowNotificationReviewPublishers())) {
-      showReviewPublishers(new Date().getTime() + miliseconds.day)
+      showReviewPublishers(new Date().getTime() + ledgerUtil.milliseconds.day)
     }
   }
 }
@@ -307,8 +348,57 @@ const showBraveWalletUpdated = () => {
   })
 }
 
+const onPromotionReceived = (state) => {
+  const promotion = ledgerState.getPromotionNotification(state)
+
+  if (!promotion.isEmpty() && !promotion.has('firstShowTimestamp')) {
+    state = ledgerState.setPromotionNotificationProp(state, 'firstShowTimestamp', new Date().getTime())
+    showPromotionNotification(state)
+  }
+
+  return state
+}
+
+const showPromotionNotification = (state) => {
+  const notification = ledgerState.getPromotionNotification(state)
+
+  if (
+    notification.isEmpty() ||
+    (
+      getSetting(settings.PAYMENTS_ENABLED) &&
+      !getSetting(settings.PAYMENTS_NOTIFICATIONS)
+    )
+  ) {
+    return
+  }
+
+  const data = notification.toJS()
+  data.from = 'ledger'
+
+  appActions.showNotification(data)
+}
+
+const removePromotionNotification = (state) => {
+  const notification = ledgerState.getPromotionNotification(state)
+
+  if (notification.isEmpty()) {
+    return
+  }
+
+  appActions.hideNotification(notification.get('message'))
+}
+
 if (ipc) {
-  ipc.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex) => {
+  ipc.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, checkbox, index, buttonActionId) => {
+    if (buttonActionId) {
+      onDynamicResponse(
+        message,
+        buttonActionId,
+        electron.BrowserWindow.getActiveWindow()
+      )
+      return
+    }
+
     onResponse(
       message,
       buttonIndex,
@@ -323,7 +413,13 @@ const getMethods = () => {
     init,
     onLaunch,
     showBraveWalletUpdated,
-    onInterval
+    onInterval,
+    onPromotionReceived,
+    removePromotionNotification,
+    showDisabledNotifications,
+    showEnabledNotifications,
+    onIntervalDynamic,
+    showPromotionNotification
   }
 
   let privateMethods = {}
@@ -338,7 +434,8 @@ const getMethods = () => {
       },
       getPollingInterval: () => {
         return pollingInterval
-      }
+      },
+      onDynamicResponse
     }
   }
 

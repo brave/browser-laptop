@@ -13,6 +13,7 @@ describe('ledgerNotifications unit test', function () {
   let fakeClock
   let ledgerApi
   let ledgerNotificationsApi
+  let appAction
 
   let paymentsEnabled
   let paymentsNotifications
@@ -53,6 +54,7 @@ describe('ledgerNotifications unit test', function () {
     fakeClock = sinon.useFakeTimers()
     ledgerApi = require('../../../../../app/browser/api/ledger')
     ledgerNotificationsApi = require('../../../../../app/browser/api/ledgerNotifications')
+    appAction = require('../../../../../js/actions/appActions')
   })
 
   after(function () {
@@ -62,26 +64,26 @@ describe('ledgerNotifications unit test', function () {
   })
 
   describe('init', function () {
-    let onIntervalSpy
+    let notificationAction
     beforeEach(function () {
-      onIntervalSpy = sinon.spy(ledgerNotificationsApi, 'onInterval')
+      notificationAction = sinon.spy(appAction, 'onLedgerNotificationInterval')
     })
     afterEach(function () {
-      onIntervalSpy.restore()
+      notificationAction.restore()
     })
     it('does not immediately call notifications.onInterval', function () {
-      ledgerNotificationsApi.init(defaultAppState)
-      assert(onIntervalSpy.notCalled)
+      ledgerNotificationsApi.init()
+      assert(notificationAction.notCalled)
     })
     it('calls notifications.onInterval after interval', function () {
       fakeClock.tick(0)
-      ledgerNotificationsApi.init(defaultAppState)
+      ledgerNotificationsApi.init()
       fakeClock.tick(ledgerNotificationsApi.getPollingInterval())
-      assert(onIntervalSpy.calledOnce)
+      assert(notificationAction.calledOnce)
     })
     it('assigns a value to timeout', function () {
       ledgerNotificationsApi.setTimeOut(0)
-      ledgerNotificationsApi.init(defaultAppState)
+      ledgerNotificationsApi.init()
       assert(ledgerNotificationsApi.getTimeOut(0))
     })
   })
@@ -301,6 +303,338 @@ describe('ledgerNotifications unit test', function () {
           })
         })
       })
+    })
+  })
+
+  describe('onInterval', function () {
+    let showEnabledNotificationsSpy, showDisabledNotificationsSpy, onIntervalDynamicSpy
+
+    before(function () {
+      showEnabledNotificationsSpy = sinon.spy(ledgerNotificationsApi, 'showEnabledNotifications')
+      showDisabledNotificationsSpy = sinon.spy(ledgerNotificationsApi, 'showDisabledNotifications')
+      onIntervalDynamicSpy = sinon.spy(ledgerNotificationsApi, 'onIntervalDynamic')
+    })
+
+    afterEach(function () {
+      showDisabledNotificationsSpy.reset()
+      showEnabledNotificationsSpy.reset()
+      onIntervalDynamicSpy.reset()
+    })
+
+    after(function () {
+      showDisabledNotificationsSpy.restore()
+      showEnabledNotificationsSpy.restore()
+      onIntervalDynamicSpy.restore()
+    })
+
+    it('payments disabled', function () {
+      paymentsEnabled = false
+      ledgerNotificationsApi.onInterval(defaultAppState)
+      assert(showEnabledNotificationsSpy.notCalled)
+      assert(showDisabledNotificationsSpy.calledOnce)
+      assert(onIntervalDynamicSpy.calledOnce)
+      paymentsEnabled = true
+    })
+
+    it('payments enabled, but notifications disabled', function () {
+      paymentsNotifications = false
+      paymentsEnabled = true
+      ledgerNotificationsApi.onInterval(defaultAppState)
+      assert(showEnabledNotificationsSpy.notCalled)
+      assert(showDisabledNotificationsSpy.notCalled)
+      assert(onIntervalDynamicSpy.notCalled)
+      paymentsNotifications = true
+    })
+
+    it('payments enabled and notifications enabled', function () {
+      paymentsNotifications = true
+      ledgerNotificationsApi.onInterval(defaultAppState)
+      assert(showDisabledNotificationsSpy.notCalled)
+      assert(showEnabledNotificationsSpy.calledOnce)
+      assert(onIntervalDynamicSpy.calledOnce)
+    })
+  })
+
+  describe('onIntervalDynamic', function () {
+    let fakeClock, showPromotionNotificationSpy
+
+    before(function () {
+      fakeClock = sinon.useFakeTimers()
+      showPromotionNotificationSpy = sinon.spy(ledgerNotificationsApi, 'showPromotionNotification')
+    })
+
+    afterEach(function () {
+      showPromotionNotificationSpy.reset()
+    })
+
+    after(function () {
+      fakeClock.restore()
+      showPromotionNotificationSpy.restore()
+    })
+
+    it('empty promotions', function () {
+      const result = ledgerNotificationsApi.onIntervalDynamic(defaultAppState)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      assert(showPromotionNotificationSpy.notCalled)
+    })
+
+    it('promotion was not shown yet', function () {
+      const state = defaultAppState
+        .setIn(['ledger', 'promotion'], Immutable.fromJS({
+          promotionId: '1'
+        }))
+      const result = ledgerNotificationsApi.onIntervalDynamic(state)
+      assert.deepEqual(result.toJS(), state.toJS())
+      assert(showPromotionNotificationSpy.notCalled)
+    })
+
+    it('promotion was shown, but it is not time yet', function () {
+      const state = defaultAppState
+        .setIn(['ledger', 'promotion'], Immutable.fromJS({
+          promotionId: '1',
+          remindTimestamp: 100
+        }))
+      const result = ledgerNotificationsApi.onIntervalDynamic(state)
+      assert.deepEqual(result.toJS(), state.toJS())
+      assert(showPromotionNotificationSpy.notCalled)
+    })
+
+    it('promotion was shown, but it is not time to re-show it yet', function () {
+      fakeClock.tick(0)
+      const state = defaultAppState
+        .setIn(['ledger', 'promotion'], Immutable.fromJS({
+          promotionId: '1',
+          remindTimestamp: 100
+        }))
+      const result = ledgerNotificationsApi.onIntervalDynamic(state)
+      assert.deepEqual(result.toJS(), state.toJS())
+      assert(showPromotionNotificationSpy.notCalled)
+    })
+
+    it('promotion was re-shown', function () {
+      fakeClock.tick(800)
+      const state = defaultAppState
+        .setIn(['ledger', 'promotion'], Immutable.fromJS({
+          promotionId: '1',
+          remindTimestamp: 700
+        }))
+      const result = ledgerNotificationsApi.onIntervalDynamic(state)
+      const expectedState = state
+        .setIn(['ledger', 'promotion', 'remindTimestamp'], -1)
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+      assert(showPromotionNotificationSpy.calledOnce)
+    })
+  })
+
+  describe('onDynamicResponse', function () {
+    let hideNotificationSpy
+    before(function () {
+      hideNotificationSpy = sinon.spy(appAction, 'hideNotification')
+    })
+
+    afterEach(function () {
+      hideNotificationSpy.reset()
+    })
+
+    after(function () {
+      hideNotificationSpy.restore()
+    })
+
+    it('null case', function () {
+      ledgerNotificationsApi.onDynamicResponse()
+      assert(hideNotificationSpy.notCalled)
+    })
+
+    describe('optInPromotion', function () {
+      let createTabRequestedSpy
+
+      before(function () {
+        createTabRequestedSpy = sinon.spy(appAction, 'createTabRequested')
+      })
+
+      afterEach(function () {
+        createTabRequestedSpy.reset()
+      })
+
+      it('activeWindow is missing', function () {
+        ledgerNotificationsApi.onDynamicResponse('msg', 'optInPromotion')
+        assert(hideNotificationSpy.calledOnce)
+        assert(createTabRequestedSpy.notCalled)
+      })
+
+      it('called', function () {
+        ledgerNotificationsApi.onDynamicResponse('msg', 'optInPromotion', {id: 1})
+        assert(hideNotificationSpy.calledOnce)
+        assert(createTabRequestedSpy.calledOnce)
+      })
+    })
+
+    describe('remindLater', function () {
+      let onPromotionRemindSpy
+
+      before(function () {
+        onPromotionRemindSpy = sinon.spy(appAction, 'onPromotionRemind')
+      })
+
+      afterEach(function () {
+        onPromotionRemindSpy.reset()
+      })
+
+      after(function () {
+        onPromotionRemindSpy.restore()
+      })
+
+      it('called', function () {
+        ledgerNotificationsApi.onDynamicResponse('msg', 'remindLater')
+        assert(hideNotificationSpy.calledOnce)
+        assert(onPromotionRemindSpy.calledOnce)
+      })
+    })
+  })
+
+  describe('onPromotionReceived', function () {
+    let showPromotionNotificationSpy, fakeClock
+
+    before(function () {
+      showPromotionNotificationSpy = sinon.spy(ledgerNotificationsApi, 'showPromotionNotification')
+      fakeClock = sinon.useFakeTimers()
+    })
+
+    afterEach(function () {
+      showPromotionNotificationSpy.reset()
+    })
+
+    after(function () {
+      showPromotionNotificationSpy.restore()
+      fakeClock.restore()
+    })
+
+    it('there is no promotion', function () {
+      ledgerNotificationsApi.onPromotionReceived(defaultAppState)
+      assert(showPromotionNotificationSpy.notCalled)
+    })
+
+    it('promotion was already shown', function () {
+      const state = defaultAppState
+        .setIn(['ledger', 'promotion', 'activeState'], 'disabledWallet')
+        .setIn(['ledger', 'promotion', 'stateWallet'], Immutable.fromJS({
+          disabledWallet: {
+            firstShowTimestamp: 1
+          }
+        }))
+      ledgerNotificationsApi.onPromotionReceived(state)
+      assert(showPromotionNotificationSpy.notCalled)
+    })
+
+    it('show promotion', function () {
+      fakeClock.tick(6000)
+      const state = defaultAppState
+        .setIn(['ledger', 'promotion', 'activeState'], 'disabledWallet')
+        .setIn(['ledger', 'promotion', 'stateWallet'], Immutable.fromJS({
+          disabledWallet: {
+            notification: {
+              message: 'Hello'
+            }
+          }
+        }))
+      const result = ledgerNotificationsApi.onPromotionReceived(state)
+      const expectedState = state
+        .setIn(['ledger', 'promotion', 'stateWallet', 'disabledWallet', 'notification', 'firstShowTimestamp'], 6000)
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+      assert(showPromotionNotificationSpy.notCalled)
+    })
+  })
+
+  describe('showPromotionNotification', function () {
+    let showNotificationSpy
+
+    const state = defaultAppState
+      .setIn(['ledger', 'promotion', 'activeState'], 'disabledWallet')
+      .setIn(['ledger', 'promotion', 'stateWallet'], Immutable.fromJS({
+        disabledWallet: {
+          notification: {
+            message: 'Hello'
+          }
+        }
+      }))
+
+    before(function () {
+      showNotificationSpy = sinon.spy(appAction, 'showNotification')
+    })
+
+    afterEach(function () {
+      showNotificationSpy.reset()
+    })
+
+    after(function () {
+      showNotificationSpy.restore()
+    })
+
+    it('no promotion', function () {
+      ledgerNotificationsApi.showPromotionNotification(defaultAppState)
+      assert(showNotificationSpy.notCalled)
+    })
+
+    it('notifications disabled while payments are enabled', function () {
+      paymentsEnabled = true
+      paymentsNotifications = false
+      ledgerNotificationsApi.showPromotionNotification(state)
+      assert(showNotificationSpy.notCalled)
+      paymentsNotifications = true
+    })
+
+    it('payments disabled, notification is shown', function () {
+      ledgerNotificationsApi.showPromotionNotification(state)
+      assert(showNotificationSpy.calledOnce)
+    })
+
+    it('notification is shown', function () {
+      ledgerNotificationsApi.showPromotionNotification(state)
+      assert(showNotificationSpy.calledOnce)
+    })
+
+    it('we set global notification', function () {
+      const notification = state
+        .getIn(['ledger', 'promotion', 'stateWallet', 'disabledWallet', 'notification'])
+        .set('from', 'ledger')
+      ledgerNotificationsApi.showPromotionNotification(state)
+      assert(showNotificationSpy.withArgs(notification.toJS()).calledOnce)
+    })
+  })
+
+  describe('removePromotionNotification', function () {
+    let hideNotificationSpy
+
+    const state = defaultAppState
+      .setIn(['ledger', 'promotion', 'activeState'], 'disabledWallet')
+      .setIn(['ledger', 'promotion', 'stateWallet'], Immutable.fromJS({
+        disabledWallet: {
+          notification: {
+            message: 'Hello'
+          }
+        }
+      }))
+
+    before(function () {
+      hideNotificationSpy = sinon.spy(appAction, 'hideNotification')
+    })
+
+    afterEach(function () {
+      hideNotificationSpy.reset()
+    })
+
+    after(function () {
+      hideNotificationSpy.restore()
+    })
+
+    it('no promotion', function () {
+      ledgerNotificationsApi.removePromotionNotification(defaultAppState)
+      assert(hideNotificationSpy.notCalled)
+    })
+
+    it('notification is shown', function () {
+      ledgerNotificationsApi.removePromotionNotification(state)
+      assert(hideNotificationSpy.calledOnce)
     })
   })
 })
