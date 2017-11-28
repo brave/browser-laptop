@@ -30,7 +30,7 @@ class NotificationItem extends React.Component {
     this.toggleCheckbox = this.toggleCheckbox.bind(this)
   }
 
-  clickHandler (buttonIndex) {
+  clickHandler (buttonIndex, buttonActionId) {
     if (this.props.nonce) {
       // This needs to be changed into an app action but it is
       // currently ipc.emit on purpose so the message goes to the
@@ -42,7 +42,8 @@ class NotificationItem extends React.Component {
         this.props.message,
         buttonIndex,
         this.checkbox ? this.checkbox.checked : false,
-        this.props.index
+        this.props.index,
+        buttonActionId
       )
     } else {
       // This needs to be changed into an app action but it is
@@ -53,7 +54,8 @@ class NotificationItem extends React.Component {
         this.props.message,
         buttonIndex,
         this.checkbox ? this.checkbox.checked : false,
-        this.props.index
+        this.props.index,
+        buttonActionId
       )
     }
   }
@@ -128,7 +130,7 @@ class NotificationItem extends React.Component {
                   iconClass={button.get('className')}
                   testId='notificationButton'
                   label={button.get('text')}
-                  onClick={this.clickHandler.bind(this, i)}
+                  onClick={this.clickHandler.bind(this, i, button.get('buttonActionId'))}
                 />)
               : null
           }

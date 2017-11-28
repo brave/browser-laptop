@@ -17,6 +17,7 @@ const migrationState = require('../../common/state/migrationState')
 
 // Utils
 const ledgerApi = require('../../browser/api/ledger')
+const ledgerNotifications = require('../../browser/api/ledgerNotifications')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
 
@@ -404,6 +405,22 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerState.setLedgerValue(state, 'publisherTimestamp', action.get('timestamp'))
         break
       }
+    case appConstants.APP_SAVE_LEDGER_PROMOTION:
+      {
+        state = ledgerState.savePromotion(state, action.get('promotion'))
+        state = ledgerNotifications.onPromotionReceived(state)
+        break
+      }
+    case appConstants.APP_ON_PROMOTION_CLAIM:
+      {
+        ledgerApi.claimPromotion(state)
+        break
+      }
+    case appConstants.APP_ON_PROMOTION_REMIND:
+      {
+        state = ledgerState.remindMeLater(state)
+        break
+      }
     case appConstants.APP_ON_LEDGER_MEDIA_DATA:
       {
         state = ledgerApi.onMediaRequest(state, action.get('url'), action.get('type'), action.get('tabId'))
@@ -418,6 +435,26 @@ const ledgerReducer = (state, action, immutableAction) => {
         }
 
         state = ledgerState.saveSynopsis(state, publishers)
+        break
+      }
+    case appConstants.APP_ON_PROMOTION_RESPONSE:
+      {
+        state = ledgerApi.onPromotionResponse(state)
+        break
+      }
+    case appConstants.APP_ON_PROMOTION_REMOVAL:
+      {
+        state = ledgerState.removePromotion(state)
+        break
+      }
+    case appConstants.APP_ON_LEDGER_NOTIFICATION_INTERVAL:
+      {
+        state = ledgerNotifications.onInterval(state)
+        break
+      }
+    case appConstants.APP_ON_PROMOTION_GET:
+      {
+        ledgerApi.getPromotion(state)
         break
       }
     case appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER:

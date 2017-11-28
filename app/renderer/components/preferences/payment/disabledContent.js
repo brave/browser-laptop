@@ -5,8 +5,11 @@
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
-// components
+// Components
 const ImmutableComponent = require('../../immutableComponent')
+
+// Utils
+const cx = require('../../../../../js/lib/classSet')
 
 // style
 const globalStyles = require('../../styles/global')
@@ -17,27 +20,71 @@ const uphold = require('../../../../extensions/brave/img/ledger/uphold_logo_smal
 const uphold2 = require('../../../../extensions/brave/img/ledger/uphold_logo_medium.png')
 
 class DisabledContent extends ImmutableComponent {
+  constructor (props) {
+    super(props)
+    this.text = this.getAlternativeText()
+  }
+
+  getAlternativeText () {
+    return <div>
+      <h3 className={css(styles.disabledContent__message__header)} data-l10n-id='paymentsWelcomeTitle' />
+      <p className={css(styles.disabledContent__commonText)} data-l10n-id='paymentsWelcomeText1' />
+      <p className={css(styles.disabledContent__commonText)} data-l10n-id='paymentsWelcomeText2' />
+    </div>
+  }
+
+  getText () {
+    if (this.props.ledgerData == null) {
+      return
+    }
+
+    const markup = this.props.ledgerData.getIn(['promotion', 'panel', 'optInMarkup'])
+    const claimed = this.props.ledgerData.has('claimedTimestamp')
+
+    if (!markup || claimed) {
+      return
+    }
+
+    const text = markup.get('title')
+    let message = markup.get('message')
+
+    this.text = <div>
+      <h3 className={css(styles.disabledContent__message__header)}>{ text }</h3>
+      {
+        message.map(item => <p className={css(styles.disabledContent__commonText)}>{ item }</p>)
+      }
+    </div>
+  }
+
   render () {
+    this.getText()
+
     return <section className={css(styles.disabledContent)} data-test-id='disabledContent'>
       <div>
-        <div className={css(styles.disabledContent__message)} data-test-id='paymentsMessage'>
-          <h3 className={css(styles.disabledContent__message__header)} data-l10n-id='paymentsWelcomeTitle' />
-          <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText1' />
-          <div className={css(styles.disabledContent__message__text, styles.disabledContent__message__text_bold)} data-l10n-id='paymentsWelcomeText2' />
-          <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText3' />
-          <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText4' />
-          <div className={css(styles.disabledContent__message__text)} data-l10n-id='paymentsWelcomeText5' />
-          <div className={css(styles.disabledContent__message__text)}>
-            <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
-            <a className={css(commonStyles.linkText)} href='https://brave.com/Payments_FAQ.html' rel='noopener' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
-            <span data-l10n-id='paymentsWelcomeText7' />
+        <div className={css(styles.disabledContent__wrapper)} data-test-id='paymentsMessage'>
+          <div className={cx({
+            [css(styles.disabledContent__message)]: true,
+            disabledLedgerContent: true
+          })} data-test-id='paymentsMessage'>
+            {this.text}
+          </div>
+          <a data-l10n-id='termsOfService'
+            className={css(styles.disabledContent__message__toc)}
+            href='https://basicattentiontoken.org/contributor-terms-of-service/'
+            target='_blank'
+            rel='noreferrer noopener'
+          />
+          <div className={css(styles.disabledContent__footer)}>
+            <div className={css(styles.disabledContent__commonText)} data-l10n-id='paymentsWelcomeText3' />
+            <div className={css(styles.disabledContent__commonText)} data-l10n-id='paymentsWelcomeText4' />
+            <div className={css(styles.disabledContent__commonText)} data-l10n-id='paymentsWelcomeText5' />
+            <div className={css(styles.disabledContent__commonText)}>
+              <span data-l10n-id='paymentsWelcomeText6' />&nbsp;
+              <a className={css(commonStyles.linkText)} href='https://brave.com/Payments_FAQ.html' rel='noopener' target='_blank' data-l10n-id='paymentsWelcomeLink' />&nbsp;
+              <span data-l10n-id='paymentsWelcomeText7' />
+            </div>
           </div>
         </div>
-        <a data-l10n-id='termsOfService'
-          className={css(styles.disabledContent__message__toc)}
-          href='https://basicattentiontoken.org/contributor-terms-of-service/'
-          target='_blank'
-          rel='noreferrer noopener' />
       </div>
       <div className={css(styles.disabledContent__sidebar)}>
         <h2 className={css(styles.disabledContent__sidebar__header)} data-l10n-id='paymentsSidebarText1' />
@@ -58,27 +105,30 @@ const styles = StyleSheet.create({
     marginTop: globalStyles.spacing.panelMargin
   },
 
+  disabledContent__commonText: {
+    padding: '0.5em 0'
+  },
+
+  disabledContent__commonText_bold: {
+    fontWeight: 'bold'
+  },
+
+  disabledContent__wrapper: {
+    fontSize: globalStyles.payments.fontSize.regular,
+    color: globalStyles.color.mediumGray
+  },
+
   disabledContent__message: {
     backgroundColor: globalStyles.color.lightGray,
     borderRadius: globalStyles.radius.borderRadiusUIbox,
     boxSizing: 'border-box',
     padding: '40px',
-    fontSize: globalStyles.payments.fontSize.regular,
-    lineHeight: '1.8em',
-    color: globalStyles.color.mediumGray
+    lineHeight: '1.8em'
   },
 
   disabledContent__message__header: {
     fontSize: '18px',
     paddingBottom: '0.5em'
-  },
-
-  disabledContent__message__text: {
-    padding: '0.5em 0'
-  },
-
-  disabledContent__message__text_bold: {
-    fontWeight: 'bold'
   },
 
   disabledContent__message__toc: {
@@ -122,6 +172,11 @@ const styles = StyleSheet.create({
     backgroundSize: 'contain',
     backgroundRepeat: 'no-repeat',
     height: '50px'
+  },
+
+  disabledContent__footer: {
+    lineHeight: '1.2em',
+    padding: '20px'
   }
 })
 
