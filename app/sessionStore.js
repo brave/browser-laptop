@@ -827,7 +827,8 @@ module.exports.defaultAppState = () => {
       synopsis: {
         options: {},
         publishers: {}
-      }
+      },
+      promotion: {}
     },
     migrations: {
       batMercuryTimestamp: now,

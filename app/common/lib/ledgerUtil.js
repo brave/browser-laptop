@@ -292,6 +292,15 @@ const getMediaProvider = (url) => {
   return provider
 }
 
+const milliseconds = {
+  year: 365 * 24 * 60 * 60 * 1000,
+  week: 7 * 24 * 60 * 60 * 1000,
+  day: 24 * 60 * 60 * 1000,
+  hour: 60 * 60 * 1000,
+  minute: 60 * 1000,
+  second: 1000
+}
+
 const getMethods = () => {
   const publicMethods = {
     shouldTrackView,
@@ -309,7 +318,8 @@ const getMethods = () => {
     getMediaDuration,
     getMediaProvider,
     getMediaData,
-    getMediaKey
+    getMediaKey,
+    milliseconds
   }
 
   let privateMethods = {}

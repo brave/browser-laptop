@@ -289,7 +289,9 @@ class PaymentsTab extends ImmutableComponent {
             showOverlay={this.props.showOverlay}
             siteSettings={this.props.siteSettings}
           />
-          : <DisabledContent />
+          : <DisabledContent
+            ledgerData={this.props.ledgerData}
+          />
       }
     </div>
   }
