@@ -13,7 +13,10 @@ const generateSynopsisVisits = function (synopsis, numPublishers) {
     let numVisits = Math.round(Math.random() * 10)
 
     for (let i = 0; i < numVisits; i++) {
-      synopsis.addVisit(PROTOCOL_PREFIXES[Math.round(Math.random())] + host + '/', Math.round(Math.random() * 60 * 1000))
+      synopsis.addPublisher(PROTOCOL_PREFIXES[Math.round(Math.random())] + host + '/', {
+        duration: Math.round(Math.random() * 60 * 1000),
+        revisitP: false
+      })
     }
   })
 

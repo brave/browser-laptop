@@ -515,10 +515,16 @@ const ledgerState = {
   },
 
   getAboutPromotion: (state) => {
-    const promotion = ledgerState.getActivePromotion(state)
+    let promotion = ledgerState.getActivePromotion(state)
     const claim = state.getIn(['ledger', 'promotion', 'claimedTimestamp']) || null
+    const status = state.getIn(['ledger', 'promotion', 'promotionStatus']) || null
+
     if (claim) {
-      return promotion.set('claimedTimestamp', claim)
+      promotion = promotion.set('claimedTimestamp', claim)
+    }
+
+    if (status) {
+      promotion = promotion.set('promotionStatus', status)
     }
 
     return promotion
