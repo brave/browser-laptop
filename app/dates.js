@@ -30,3 +30,11 @@ exports.todayWOY = () => {
 exports.todayMonth = () => {
   return (new Date()).getMonth() + 1
 }
+
+const MILLISECONDS_IN_ONE_DAY = 60 * 60 * 24 * 1000
+
+// return YYYY-MM-DD of closest Monday in the past to current date
+exports.lastMonday = (d) => {
+  var monday = new Date(d.getTime() - ((d.getDay() - 1) * MILLISECONDS_IN_ONE_DAY))
+  return localYMD(monday)
+}
