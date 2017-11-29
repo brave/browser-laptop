@@ -13,6 +13,7 @@ const {l10nErrorText} = require('../../../../common/lib/httpUtil')
 const {changeSetting} = require('../../../lib/settingsUtil')
 const getSetting = require('../../../../../js/settings').getSetting
 const settings = require('../../../../../js/constants/settings')
+const locale = require('../../../../../js/l10n')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
@@ -38,6 +39,7 @@ class EnabledContent extends ImmutableComponent {
     super(props)
     this.claimButton = this.claimButton.bind(this)
     this.onClaimClick = this.onClaimClick.bind(this)
+    this.closeClick = this.closeClick.bind(this)
   }
 
   walletButton () {
@@ -201,15 +203,49 @@ class EnabledContent extends ImmutableComponent {
   }
 
   closeClick () {
-    appActions.onPromotionRemoval()
+    const promo = this.props.ledgerData.get('promotion') || Immutable.Map()
+    const status = promo.get('promotionStatus')
+    if (status && !promo.has('claimedTimestamp')) {
+      if (status === 'expiredError') {
+        appActions.onPromotionRemoval()
+      } else {
+        appActions.onPromotionClose()
+      }
+    } else {
+      appActions.onPromotionRemoval()
+    }
   }
 
-  successMessage () {
+  statusMessage () {
     const promo = this.props.ledgerData.get('promotion') || Immutable.Map()
     const successText = promo.getIn(['panel', 'successText'])
+    let status = promo.get('promotionStatus')
 
-    if (!successText || !promo.has('claimedTimestamp')) {
+    if ((!successText || !promo.has('claimedTimestamp')) && !status) {
       return
+    }
+
+    let title = successText.get('title')
+    let message = successText.get('message')
+    let text = promo.getIn(['panel', 'disclaimer'])
+
+    if (status) {
+      switch (status) {
+        case 'generalError':
+          {
+            title = locale.translation('promotionGeneralErrorTitle')
+            message = locale.translation('promotionGeneralErrorMessage')
+            text = locale.translation('promotionGeneralErrorText')
+            break
+          }
+        case 'expiredError':
+          {
+            title = locale.translation('promotionClaimedErrorTitle')
+            message = locale.translation('promotionClaimedErrorMessage')
+            text = locale.translation('promotionClaimedErrorText')
+            break
+          }
+      }
     }
 
     return <div className={cx({[css(styles.enabledContent__grant)]: true, 'enabledContent__grant': true})}>
@@ -218,14 +254,14 @@ class EnabledContent extends ImmutableComponent {
         onClick={this.closeClick}
       />
       <p className={css(styles.enabledContent__grant_title)}>
-        <span className={css(styles.enabledContent__grant_bold)}>{ successText.get('title') }</span> { successText.get('message') }
+        <span className={css(styles.enabledContent__grant_bold)}>{title}</span> {message}
       </p>
       <p className={css(styles.enabledContent__grant_text)}>
-        {promo.getIn(['panel', 'disclaimer'])}
+        {text}
       </p>
       <BrowserButton
         secondaryColor
-        l10nId={'ok'}
+        l10nId={'paymentHistoryOKText'}
         custom={styles.enabledContent__grant_button}
         onClick={this.closeClick}
       />
@@ -303,7 +339,7 @@ class EnabledContent extends ImmutableComponent {
           data-l10n-id={walletStatusText.id}
           data-l10n-args={walletStatusText.args ? JSON.stringify(walletStatusText.args) : null}
         />
-        {this.successMessage()}
+        {this.statusMessage()}
       </div>
       <LedgerTable ledgerData={this.props.ledgerData}
         settings={this.props.settings}

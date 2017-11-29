@@ -439,11 +439,12 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_PROMOTION_RESPONSE:
       {
-        state = ledgerApi.onPromotionResponse(state)
+        state = ledgerApi.onPromotionResponse(state, action.get('status'))
         break
       }
     case appConstants.APP_ON_PROMOTION_REMOVAL:
       {
+        ledgerNotifications.removePromotionNotification(state)
         state = ledgerState.removePromotion(state)
         break
       }
@@ -455,6 +456,11 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_PROMOTION_GET:
       {
         ledgerApi.getPromotion(state)
+        break
+      }
+    case appConstants.APP_ON_PROMOTION_CLOSE:
+      {
+        state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
         break
       }
     case appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER:

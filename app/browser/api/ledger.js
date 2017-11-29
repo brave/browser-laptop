@@ -89,7 +89,7 @@ const clientOptions = {
   server: process.env.LEDGER_SERVER_URL,
   createWorker: electron.app.createWorker,
   version: 'v2',
-  environment: 'staging' // TODO remove before merge
+  environment: process.env.LEDGER_ENVIRONMENT || 'production'
 }
 const fileTypes = {
   bmp: Buffer.from([0x42, 0x4d]),
@@ -993,6 +993,8 @@ const recoverKeys = (state, useRecoveryKeyFile, key) => {
 
   client.recoverWallet(null, recoveryKey, (err, result) => {
     appActions.onWalletRecovery(err, result)
+    appActions.onPromotionRemoval()
+    appActions.onPromotionGet()
   })
 
   return state
@@ -2429,17 +2431,29 @@ const claimPromotion = (state) => {
     return
   }
 
-  client.setPromotion(promotion.get('promotionId'), (err) => {
+  client.setPromotion(promotion.get('promotionId'), (err, _, status) => {
+    let param = null
     if (err) {
       console.error(`Problem claiming promotion ${err.toString()}`)
-      return
+      param = status
     }
 
-    appActions.onPromotionResponse()
+    appActions.onPromotionResponse(param)
   })
 }
 
-const onPromotionResponse = (state) => {
+const onPromotionResponse = (state, status) => {
+  if (status) {
+    if (status.get('statusCode') === 422) {
+      // promotion already claimed
+      state = ledgerState.setPromotionProp(state, 'promotionStatus', 'expiredError')
+    } else {
+      // general error
+      state = ledgerState.setPromotionProp(state, 'promotionStatus', 'generalError')
+    }
+    return state
+  }
+
   ledgerNotifications.removePromotionNotification(state)
   state = ledgerState.setPromotionProp(state, 'claimedTimestamp', new Date().getTime())
 

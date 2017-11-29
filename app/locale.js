@@ -272,7 +272,14 @@ var rendererIdentifiers = function () {
     'channelBeta',
     'channelDeveloper',
     'channelNightly',
-    'spellCheckLanguages'
+    'spellCheckLanguages',
+    // Ledger
+    'promotionGeneralErrorTitle',
+    'promotionGeneralErrorMessage',
+    'promotionGeneralErrorText',
+    'promotionClaimedErrorMessage',
+    'promotionClaimedErrorText',
+    'promotionClaimedErrorTitle'
   ].concat(countryCodes).concat(availableLanguages)
 }
 
