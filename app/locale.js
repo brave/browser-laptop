@@ -268,7 +268,14 @@ var rendererIdentifiers = function () {
     // Release channels
     'channelDev',
     'channelBeta',
-    'spellCheckLanguages'
+    'spellCheckLanguages',
+    // Ledger
+    'promotionGeneralErrorTitle',
+    'promotionGeneralErrorMessage',
+    'promotionGeneralErrorText',
+    'promotionClaimedErrorMessage',
+    'promotionClaimedErrorText',
+    'promotionClaimedErrorTitle'
   ].concat(availableLanguages)
 }
 

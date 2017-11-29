@@ -1710,9 +1710,10 @@ const appActions = {
     })
   },
 
-  onPromotionResponse: function () {
+  onPromotionResponse: function (status) {
     dispatch({
-      actionType: appConstants.APP_ON_PROMOTION_RESPONSE
+      actionType: appConstants.APP_ON_PROMOTION_RESPONSE,
+      status
     })
   },
 
@@ -1731,6 +1732,12 @@ const appActions = {
   onPromotionGet: function () {
     dispatch({
       actionType: appConstants.APP_ON_PROMOTION_GET
+    })
+  },
+
+  onPromotionClose: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_PROMOTION_CLOSE
     })
   },
 

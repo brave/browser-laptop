@@ -69,7 +69,8 @@ describe('ledgerReducer unit tests', function () {
     }
     fakeLedgerNotifications = {
       onPromotionReceived: dummyModifyState,
-      onInterval: dummyModifyState
+      onInterval: dummyModifyState,
+      removePromotionNotification: () => {}
     }
     mockery.registerMock('../../browser/api/ledger', fakeLedgerApi)
     mockery.registerMock('../../common/state/ledgerState', fakeLedgerState)

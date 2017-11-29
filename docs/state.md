@@ -191,6 +191,7 @@ AppStore
       claimedTimestamp: number,
       minimumReconcileTimestamp: number,
       promotionId: number,
+      promotionStatus: string,
       remindTimestamp: number,
       stateWallet: {
         disabledWallet: {
