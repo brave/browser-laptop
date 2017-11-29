@@ -42,6 +42,7 @@ public/built
 .DS-Store
 temp.VisualElementsManifest.xml
 app/extensions/gen/
+.cache-require-paths.json
 
 # electron-packager output dirs
 *-darwin-x64
