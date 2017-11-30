@@ -27,6 +27,7 @@ const ledgerAPIWaitTimeout = 20000
 const site1 = 'http://example.com/'
 const site2 = 'https://www.eff.org/'
 const site3 = 'http://web.mit.edu/zyan/Public/wait.html'
+const BatTOSUrl = 'https://basicattentiontoken.org/contributor-terms-of-service/'
 
 function * setupBrave () {
   Brave.addCommands()
@@ -137,6 +138,39 @@ describe('Regular payment panel tests', function () {
         .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .waitForEnabled(addFundsButton)
+    })
+
+    it('clicks BAT TOS link when payments are enabled', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(prefsUrl)
+        .waitForVisible(paymentsTab)
+        .click(paymentsTab)
+        .waitForVisible(paymentsWelcomePage)
+        .waitForVisible(walletSwitch)
+        .click(walletSwitch)
+        .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
+        .waitForVisible('[data-test-id="termsOfService"]')
+        .click('[data-test-id="termsOfService"]')
+        .tabByUrl(BatTOSUrl)
+        .waitForUrl(BatTOSUrl)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForHistoryEntry(BatTOSUrl)
+    })
+
+    it('clicks BAT TOS link when payments are disabled', function * () {
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(prefsUrl)
+        .waitForVisible(paymentsTab)
+        .click(paymentsTab)
+        .waitForVisible(paymentsWelcomePage)
+        .waitForVisible('[data-test-id="termsOfService"]')
+        .click('[data-test-id="termsOfService"]')
+        .tabByUrl(BatTOSUrl)
+        .waitForUrl(BatTOSUrl)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForHistoryEntry(BatTOSUrl)
     })
   })
 
