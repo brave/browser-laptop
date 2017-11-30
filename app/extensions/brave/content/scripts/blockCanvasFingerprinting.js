@@ -9,7 +9,6 @@
  */
 
 if (chrome.contentSettings.canvasFingerprinting == 'block') {
-
   Error.stackTraceLimit = Infinity // collect all frames
 
   // https://code.google.com/p/v8-wiki/wiki/JavaScriptStackTraceApi
@@ -47,14 +46,12 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
   function getOriginatingScriptUrl () {
     var trace = getStackTrace(true)
 
-    if (trace.length < 4) {
+    if (trace.length < 3) {
       return ''
     }
 
-    // This script is at positions 0 (this function), 1 (the reportBlock
-    // function) and 2 (the newGlobalFunction function).  Index 3 and beyond
-    // are on the client page.
-    var callSite = trace[3]
+    // this script is at 0 and 1
+    var callSite = trace[2]
 
     if (callSite.isEval()) {
       // argh, getEvalOrigin returns a string ...
@@ -99,18 +96,6 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     return (possiblePropDesc && !possiblePropDesc.configurable)
   })
 
-  /**
-   * Returns a false-y default value, depending on how a proxy is being coerced.
-   *
-   * @param {String} hint
-   *   A string, describing the type of coercion being applied to the proxy.
-   *   Expected values are "string", "number" or "default".
-   *
-   * @return {String|Number|undefined}
-   *   A falsey value, determined by the type of coercion being applied.
-   *
-   * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toPrimitive
-   */
   var valueOfCoercionFunc = function (hint) {
     if (hint === 'string') {
       return ''
@@ -121,158 +106,65 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     return undefined
   }
 
-  // This object is used to map from names of blocking proxy objects,
-  // to the proxy object itself.  Its used to allow the handler of each
-  // proxy to refer to the proxy before the proxy is created (since the
-  // handler is needed to create the proxy, there would otherwise be a
-  // chicken and egg situation).
-  var proxyRegistery = {}
+  var allPurposeProxy = new Proxy(defaultFunc, {
+    get: function (target, property) {
 
-  /**
-   * Returns a handler object, for use in configuring a Proxy object.
-   *
-   * The returned handler will return a named proxy on get, set and apply
-   * operations up to `loopGuardMax` times (1000), and then returns undefined
-   * to avoid infinite loops.
-   *
-   * @param {String} proxyName
-   *   The name of the proxy ("registered" in the above "proxyRegistery"
-   *   object) to return when the proxy object is {get,set,apply}'ed.
-   * @param {?Function(String)} onTriggerCallback
-   *   An optional callback funciton that will be called whenever the
-   *   proxy object is get,'ed.  This callback is called with
-   *   a single argument, the name of the property being looked up.
-   *
-   * @return {Object}
-   *   A valid Proxy handler definition.
-   *
-   * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler
-   */
-  var createProxyHandler = function (proxyName, onTriggerCallback) {
-
-    var loopGuardMax = 1000
-    var callCounter = 0
-
-    return {
-      get: function (target, property) {
-
-        if (onTriggerCallback !== undefined) {
-          onTriggerCallback(property)
-        }
-
-        // If the proxy has been called a large number of times on this page,
-        // it might be stuck in an loop.  To prevent locking up the page,
-        // return undefined to break the loop, and then resume the normal
-        // behavior on subsequent calls.
-        if (callCounter > loopGuardMax) {
-          callCounter = 0
-          return undefined
-        }
-
-        callCounter += 1
-
-        if (property === Symbol.toPrimitive) {
-          return valueOfCoercionFunc
-        }
-
-        if (property === 'toString') {
-          return ''
-        }
-
-        if (property === 'valueOf') {
-          return 0
-        }
-
-        return proxyRegistery[proxyName]
-      },
-      set: function () {
-        return proxyRegistery[proxyName]
-      },
-      apply: function () {
-        return proxyRegistery[proxyName]
-      },
-      ownKeys: function () {
-        return unconfigurablePropNames
-      },
-      has: function (target, property) {
-        return (unconfigurablePropNames.indexOf(property) > -1)
-      },
-      getOwnPropertyDescriptor: function (target, property) {
-        if (unconfigurablePropNames.indexOf(property) === -1) {
-          return undefined
-        }
-        return Object.getOwnPropertyDescriptor(defaultFunc, property)
+      if (property === Symbol.toPrimitive) {
+        return valueOfCoercionFunc
       }
-    }
-  }
 
-  var mainFrameBlockingProxy = new Proxy(defaultFunc, createProxyHandler("mainFrameBlockingProxy"))
-  proxyRegistery["mainFrameBlockingProxy"] = mainFrameBlockingProxy
-
-  /**
-   * Reports that a method related to fingerprinting was called by the page.
-   *
-   * @param {String} type
-   *   A category of the fingerprinting method, such as "SVG", "iFrame" or
-   *   "Canvas".
-   * @param {?String} scriptUrlToReport
-   *   Optional URL to report where the fingerprinting effort happened.
-   *   If this is undefined, then the script URL is determined from
-   *   a stack trace.
-   */
-  function reportBlock (type, scriptUrlToReport) {
-
-    var scriptUrl
-
-    if (scriptUrlToReport !== undefined) {
-      scriptUrl = scriptUrlToReport
-    } else {
-      scriptUrl = getOriginatingScriptUrl()
-      if (scriptUrl) {
-        scriptUrl = stripLineAndColumnNumbers(scriptUrl)
-      } else {
-        scriptUrl = window.location.href
+      if (property === 'toString') {
+        return ''
       }
-    }
 
+      if (property === 'valueOf') {
+        return 0
+      }
+
+      return allPurposeProxy
+    },
+    set: function () {
+      return allPurposeProxy
+    },
+    apply: function () {
+      return allPurposeProxy
+    },
+    ownKeys: function () {
+      return unconfigurablePropNames
+    },
+    has: function (target, property) {
+      return (unconfigurablePropNames.indexOf(property) > -1)
+    },
+    getOwnPropertyDescriptor: function (target, property) {
+      if (unconfigurablePropNames.indexOf(property) === -1) {
+        return undefined
+      }
+      return Object.getOwnPropertyDescriptor(defaultFunc, property)
+    }
+  })
+
+  function reportBlock (type) {
+    var script_url = getOriginatingScriptUrl()
     var msg = {
       type,
-      scriptUrl: stripLineAndColumnNumbers(scriptUrl)
+      scriptUrl: stripLineAndColumnNumbers(script_url)
     }
 
     // Block the read from occuring; send info to background page instead
     chrome.ipcRenderer.sendToHost('got-canvas-fingerprinting', msg)
+
+    return allPurposeProxy
   }
 
   /**
-   * Replaces global method with one that reports the fingerprinting attempt.
-   *
-   * @param {Object} item
-   *   A definition for the method that should be replaced.
-   * @param {String} item.type
-   *   A category for the type of fingerprinting method being blocked, such
-   *   as "SVG" or "Canvas"
-   * @param {?String} item.propName
-   *   The name of the property / method to be modified.  If provided,
-   *   item.objName must also be provided.
-   * @param {?String} item.objName
-   *   The name of the global structure to modfiy.  If this is provided,
-   *   then the item.propName on the prototype of this object will be modified.
-   * @param {?String} item.methodName
-   *   A global, singleton method to overwrite.  If this is provided,
-   *   then item.propName and item.objName are ignored.
+   * Monitor the reads from a canvas instance
+   * @param item special item objects
    */
   function trapInstanceMethod (item) {
-
-    var newGlobalFunction = function () {
-      reportBlock(item.type)
-      return mainFrameBlockingProxy
-    }
-
     if (!item.methodName) {
-      chrome.webFrame.setGlobal(item.objName + ".prototype." + item.propName, newGlobalFunction)
+      chrome.webFrame.setGlobal(item.objName + ".prototype." + item.propName, reportBlock.bind(null, item.type))
     } else {
-      chrome.webFrame.setGlobal(item.methodName, newGlobalFunction)
+      chrome.webFrame.setGlobal(item.methodName, reportBlock.bind(null, item.type))
     }
   }
 
@@ -370,75 +262,4 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     type: 'WebRTC',
     methodName: 'navigator.mediaDevices.enumerateDevices'
   })
-
-  var propertiesToReportInIframe = new Set(canvasMethods
-    .concat(canvasElementMethods)
-    .concat(webglMethods)
-    .concat(audioBufferMethods)
-    .concat(analyserMethods)
-    .concat(svgPathMethods)
-    .concat(svgTextContentMethods)
-    .concat(webrtcMethods)
-    .concat(['enumerateDevices']))
-
-  // Boolean guard used to make sure we don't report more than one iframe
-  // fingerprinting attempt per page.
-  var hasiFrameReported = false
-
-  /**
-   * Callback function called when the iframe proxy receives a "get".
-   *
-   * This callback is used to report fingerprinting attempts using methods
-   * extracted from an iframe.
-   *
-   * @param {String} property
-   *   The name of the propery being "get" in the iframe proxy.
-   *
-   * @return {Boolean}
-   *   true if a fingerprinting attempt was reported, otherwise false
-   */
-  var onIframeProxyCalled = function (property) {
-
-    if (hasiFrameReported === true) {
-      return false
-    }
-
-    if (propertiesToReportInIframe.has(property) === false) {
-      return false
-    }
-
-    hasiFrameReported = true
-    reportBlock("Iframe", window.location.href)
-    return true
-  }
-
-  var iframeBlockingProxy = new Proxy(defaultFunc, createProxyHandler("iframeBlockingProxy", onIframeProxyCalled))
-  proxyRegistery["iframeBlockingProxy"] = iframeBlockingProxy
-
-  chrome.webFrame.setGlobal("window.__braveIframeProxy", iframeBlockingProxy)
-
-  // Prevent access to frames' contentDocument / contentWindow
-  // properties, to prevent the parent frame from pulling unblocked
-  // references to blocked standards from injected frames.
-  // This may break some sites, but, fingers crossed, its not too much.
-  var pageScriptToInject = function () {
-    var frameTypesToModify = [window.HTMLIFrameElement, window.HTMLFrameElement]
-    var propertiesToModify = ['contentWindow', 'contentDocument']
-    var braveIframeProxy = window.__braveIframeProxy
-    delete window.__braveIframeProxy
-
-    frameTypesToModify.forEach(function (frameType) {
-      propertiesToModify.forEach(function (propertyToModify) {
-        Object.defineProperty(frameType.prototype, propertyToModify, {
-          get: () => {
-            // XXX: this breaks contentWindow.postMessage since the target window
-            // is now the parent window
-            return braveIframeProxy
-          }
-        })
-      })
-    })
-  }
-
-  chrome.webFrame.executeJavaScript(`(${pageScriptToInject.toString()})()`)
 }
