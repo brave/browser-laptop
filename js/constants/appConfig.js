@@ -185,7 +185,7 @@ module.exports = {
     // After shown, set timestamp to next reconcile time - 1 day.
     'payments.notification-reconcile-soon-timestamp': null,
     'payments.notification-try-payments-dismissed': false, // True if you dismiss the message or enable Payments
-    'payments.notifications': false,
+    'payments.notifications': true,
     'payments.sites-auto-suggest': true,
     'payments.sites-hide-excluded': false,
     'payments.sites-show-less': true,
