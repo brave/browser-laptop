@@ -3,6 +3,7 @@ const mockery = require('mockery')
 const assert = require('assert')
 const Immutable = require('immutable')
 require('../../../braveUnit')
+const settings = require('../../../../../js/constants/settings')
 const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
 
 describe('ledgerUtil unit test', function () {
@@ -10,6 +11,9 @@ describe('ledgerUtil unit test', function () {
   let fakeLevel
   const fakeElectron = require('../../../lib/fakeElectron')
   const fakeAdBlock = require('../../../lib/fakeAdBlock')
+
+  // settings
+  let paymentsContributionAmount = 25
 
   before(function () {
     mockery.enable({
@@ -24,6 +28,16 @@ describe('ledgerUtil unit test', function () {
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('level', fakeLevel)
+
+    mockery.registerMock('../../../js/settings', {
+      getSetting: (settingKey) => {
+        switch (settingKey) {
+          case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
+            return paymentsContributionAmount
+        }
+        return false
+      }
+    })
 
     ledgerUtil = require('../../../../../app/common/lib/ledgerUtil')
   })
@@ -211,6 +225,143 @@ describe('ledgerUtil unit test', function () {
   })
 
   describe('walletStatus', function () {
+    it('null case', function () {
+      const result = ledgerUtil.walletStatus()
+      assert.deepEqual(result, {
+        id: 'createWalletStatus'
+      })
+    })
+
+    it('on error', function () {
+      const state = Immutable.fromJS({
+        error: {
+          caller: 'recoveryWallet',
+          err: 'No data in backup file'
+        }
+      })
+      const result = ledgerUtil.walletStatus(state)
+      assert.deepEqual(result, {
+        id: 'statusOnError'
+      })
+    })
+
+    describe('wallet created', function () {
+      describe('insufficient funds', function () {
+        it('min balance is missing', function () {
+          const state = Immutable.fromJS({
+            created: 1111,
+            unconfirmed: 24
+          })
+          const result = ledgerUtil.walletStatus(state)
+          assert.deepEqual(result, {
+            id: 'insufficientFundsStatus'
+          })
+        })
+
+        it('funds are above budget', function () {
+          const state = Immutable.fromJS({
+            created: 1111,
+            balance: 30
+          })
+          const result = ledgerUtil.walletStatus(state)
+          assert.deepEqual(result, {
+            id: 'createdWalletStatus'
+          })
+        })
+
+        it('funds are bellow budget', function () {
+          const state = Immutable.fromJS({
+            created: 1111,
+            unconfirmed: 5,
+            balance: 10
+          })
+          const result = ledgerUtil.walletStatus(state)
+          assert.deepEqual(result, {
+            id: 'insufficientFundsStatus'
+          })
+        })
+      })
+    })
+
+    describe('pending funds', function () {
+      it('without conversion', function () {
+        const state = Immutable.fromJS({
+          created: 1111,
+          unconfirmed: 5,
+          balance: 25
+        })
+        const result = ledgerUtil.walletStatus(state)
+        assert.deepEqual(result, {
+          id: 'pendingFundsStatus',
+          args: {
+            funds: '5.00 BAT'
+          }
+        })
+      })
+
+      it('with conversion', function () {
+        const state = Immutable.fromJS({
+          created: 1111,
+          unconfirmed: 5,
+          balance: 25,
+          currentRate: 1.5,
+          rates: {
+            BTC: '0.2'
+          }
+        })
+        const result = ledgerUtil.walletStatus(state)
+        assert.deepEqual(result, {
+          id: 'pendingFundsStatus',
+          args: {
+            funds: '5.00 BAT (7.50 USD)'
+          }
+        })
+      })
+    })
+
+    it('default crated wallet', function () {
+      const state = Immutable.fromJS({
+        created: 1111,
+        balance: 25
+      })
+      const result = ledgerUtil.walletStatus(state)
+      assert.deepEqual(result, {
+        id: 'createdWalletStatus'
+      })
+    })
+
+    it('wallet with transactions', function () {
+      const state = Immutable.fromJS({
+        created: 1111,
+        balance: 25,
+        transactions: [
+          {
+            timestamp: 1111
+          }
+        ]
+      })
+      const result = ledgerUtil.walletStatus(state)
+      assert.deepEqual(result, {
+        id: 'defaultWalletStatus'
+      })
+    })
+
+    it('wallet is creating', function () {
+      const state = Immutable.fromJS({
+        creating: 1111
+      })
+      const result = ledgerUtil.walletStatus(state)
+      assert.deepEqual(result, {
+        id: 'creatingWalletStatus'
+      })
+    })
+
+    it('wallet not crated', function () {
+      const result = ledgerUtil.walletStatus(Immutable.Map())
+      assert.deepEqual(result, {
+        id: 'createWalletStatus'
+      })
+    })
   })
 
   describe('getMediaId', function () {
