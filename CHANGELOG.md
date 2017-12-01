@@ -1,6 +1,16 @@
 # Changelog
 
 Release Notes:
+## [0.19.105](https://github.com/brave/browser-laptop/releases/tag/v0.19.105dev)
+
+ - Fixed USD conversion for wallet balance always shows 1.00. ([#12054](https://github.com/brave/browser-laptop/issues/12054))
+ - Fixed time spent calculations when minimum page time set to 1min. ([#11997](https://github.com/brave/browser-laptop/issues/11997))
+ - Fixed incorrect values being displayed under contribution notification. ([#11989](https://github.com/brave/browser-laptop/issues/11989))
+ - Fixed white flash on new tab page before content loads. ([#5309](https://github.com/brave/browser-laptop/issues/5309))
+ - Fixed white flash after tab open or close. ([#11813](https://github.com/brave/browser-laptop/issues/11813))
+ - Optimized fingerprint tracking by blocking additional methods. ([#10288](https://github.com/brave/browser-laptop/issues/10288))
+ - Optimized blocking technique to avoid hard errors on page that expect blocked functionality. ([#10285](https://github.com/brave/browser-laptop/issues/10285))
+
 ## [0.19.95](https://github.com/brave/browser-laptop/releases/tag/v0.19.95dev)
 
  - Added the ability to pay YouTube publishers with BAT. ([#11851](https://github.com/brave/browser-laptop/issues/11851))
