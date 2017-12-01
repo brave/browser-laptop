@@ -355,11 +355,11 @@ class EnabledContent extends ImmutableComponent {
                   data-l10n-id={walletStatusText.id}
                   data-l10n-args={walletStatusText.args ? JSON.stringify(walletStatusText.args) : null}
                 />
-                {this.statusMessage()}
               </td>
             </tr>
           </tbody>
         </table>
+        {this.statusMessage()}
       </div>
       <LedgerTable ledgerData={this.props.ledgerData}
         settings={this.props.settings}
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     width: '100%',
-    minHeight: '159px',
+    minHeight: '100%',
     background: '#f3f3f3',
     borderRadius: '8px',
     padding: '30px 50px 20px',
