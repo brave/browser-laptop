@@ -12,6 +12,7 @@ require('../braveUnit')
 
 describe('sessionStore unit tests', function () {
   let sessionStore
+  let userPrefs
   let shutdownClearHistory = false
   let shutdownClearAutocompleteData = false
   let shutdownClearAutofillData = false
@@ -90,6 +91,10 @@ describe('sessionStore unit tests', function () {
     })
     mockery.registerMock('./filtering', fakeFiltering)
     sessionStore = require('../../../app/sessionStore')
+    userPrefs = require('../../../js/state/userPrefs')
+    sinon.stub(userPrefs, 'setUserPref', (key, value) => {
+      fakeElectron.session.defaultSession.userPrefs.setDictionaryPref(key, value)
+    })
   })
 
   after(function () {
@@ -122,12 +127,6 @@ describe('sessionStore unit tests', function () {
     })
 
     describe('with isShutdown', function () {
-      before(function () {
-        this.writeImportantSpy = sinon.spy(muon.file, 'writeImportant')
-      })
-      after(function () {
-        this.writeImportantSpy.restore()
-      })
       it('calls cleanSessionDataOnShutdown if true', function (cb) {
         cleanSessionDataOnShutdownStub.reset()
         return sessionStore.saveAppState(Immutable.Map(), true)
@@ -153,7 +152,8 @@ describe('sessionStore unit tests', function () {
       it('sets cleanedOnShutdown for saveAppState', function (cb) {
         sessionStore.saveAppState(Immutable.Map(), true)
           .then(() => {
-            assert.equal(JSON.parse(this.writeImportantSpy.getCall(0).args[1]).cleanedOnShutdown, true)
+            console.log(fakeElectron.session.defaultSession.userPrefs.getDictionaryPref('app_state'))
+            assert.equal(fakeElectron.session.defaultSession.userPrefs.getDictionaryPref('app_state').cleanedOnShutdown, true)
             cb()
           }, function (err) {
             assert(!err)
@@ -163,7 +163,7 @@ describe('sessionStore unit tests', function () {
       it('sets lastAppVersion for saveAppState', function (cb) {
         sessionStore.saveAppState(Immutable.Map(), true)
           .then(() => {
-            assert.equal(JSON.parse(this.writeImportantSpy.getCall(0).args[1]).lastAppVersion, '0.14.0')
+            assert.equal(fakeElectron.session.defaultSession.userPrefs.getDictionaryPref('app_state').lastAppVersion, '0.14.0')
             cb()
           }, function (err) {
             assert(!err)
@@ -808,20 +808,20 @@ describe('sessionStore unit tests', function () {
 
     describe('when reading the session file', function () {
       describe('happy path', function () {
-        let readFileSyncSpy
+        let userPrefsSpy
 
         before(function () {
-          readFileSyncSpy = sinon.spy(fakeFileSystem, 'readFileSync')
+          userPrefsSpy = sinon.spy(userPrefs, 'getDictionaryPref')
         })
 
         after(function () {
-          readFileSyncSpy.restore()
+          userPrefsSpy.restore()
         })
 
-        it('calls fs.readFileSync', function () {
+        it('calls userPrefs.getDictionaryPref', function () {
           return sessionStore.loadAppState()
             .then(function (result) {
-              assert.equal(readFileSyncSpy.calledOnce, true)
+              assert.equal(userPrefsSpy.calledOnce, true)
             }, function (result) {
               assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
             })
@@ -829,94 +829,20 @@ describe('sessionStore unit tests', function () {
       })
 
       describe('when exception is thrown', function () {
-        let readFileSyncStub
+        let getUserPrefStub
 
         before(function () {
-          readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').throws('error reading file')
+          getUserPrefStub = sinon.stub(userPrefs, 'getDictionaryPref').throws('error reading file')
         })
 
         after(function () {
-          readFileSyncStub.restore()
+          getUserPrefStub.restore()
         })
 
         it('does not crash when exception thrown during read', function () {
           return sessionStore.loadAppState()
             .then(function (result) {
               assert.ok(result.get('firstRunTimestamp'))
-            }, function (result) {
-              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
-            })
-        })
-      })
-    })
-
-    describe('when calling JSON.parse', function () {
-      describe('exception is thrown', function () {
-        let readFileSyncStub
-
-        before(function () {
-          readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns('this is not valid JSON')
-        })
-
-        after(function () {
-          readFileSyncStub.restore()
-        })
-
-        it('does not call runPreMigrations', function () {
-          runPreMigrationsSpy.reset()
-          return sessionStore.loadAppState()
-            .then(function (result) {
-              assert.equal(runPreMigrationsSpy.notCalled, true)
-            }, function (result) {
-              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
-            })
-        })
-
-        it('does not call cleanAppData', function () {
-          cleanAppDataStub.reset()
-          return sessionStore.loadAppState()
-            .then(function (result) {
-              assert.equal(cleanAppDataStub.notCalled, true)
-            }, function (result) {
-              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
-            })
-        })
-
-        it('calls defaultAppState to get a default app state', function () {
-          defaultAppStateSpy.reset()
-          return sessionStore.loadAppState()
-            .then(function (result) {
-              assert.equal(defaultAppStateSpy.calledOnce, true)
-            }, function (result) {
-              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
-            })
-        })
-
-        it('does not call runPostMigrations', function () {
-          runPostMigrationsSpy.reset()
-          return sessionStore.loadAppState()
-            .then(function (result) {
-              assert.equal(runPostMigrationsSpy.notCalled, true)
-            }, function (result) {
-              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
-            })
-        })
-
-        it('calls backupSessionStub', function () {
-          backupSessionStub.reset()
-          return sessionStore.loadAppState()
-            .then(function (result) {
-              assert.equal(backupSessionStub.calledOnce, true)
-            }, function (result) {
-              assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
-            })
-        })
-
-        it('calls runImportDefaultSettings', function () {
-          runImportDefaultSettings.reset()
-          return sessionStore.loadAppState()
-            .then(function (result) {
-              assert.equal(runImportDefaultSettings.calledOnce, true)
             }, function (result) {
               assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
             })
@@ -935,7 +861,7 @@ describe('sessionStore unit tests', function () {
     })
 
     describe('merge default state with the existing one', function () {
-      let readFileSyncStub, fileValue, defaultData, clock
+      let getUserPrefStub, prefsValue, defaultData, clock
 
       before(function () {
         clock = sinon.useFakeTimers()
@@ -950,8 +876,8 @@ describe('sessionStore unit tests', function () {
           }
         }
         runImportDefaultSettings.reset()
-        readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync', () => {
-          return fileValue
+        getUserPrefStub = sinon.stub(userPrefs, 'getDictionaryPref', () => {
+          return prefsValue
         })
       })
 
@@ -961,7 +887,7 @@ describe('sessionStore unit tests', function () {
 
       after(function () {
         clock.restore()
-        readFileSyncStub.restore()
+        getUserPrefStub.restore()
       })
 
       it('deep objects merge', function () {
@@ -973,12 +899,12 @@ describe('sessionStore unit tests', function () {
           ledgerVideos: {}
         }
 
-        fileValue = JSON.stringify({
+        prefsValue = {
           cache: {
             bookmarkLocation: {},
             bookmarkOrder: {}
           }
-        })
+        }
         return sessionStore.loadAppState()
           .then(function () {
             assert(runImportDefaultSettings.withArgs(expectedData).calledOnce)
@@ -998,13 +924,13 @@ describe('sessionStore unit tests', function () {
           }
         }
 
-        fileValue = JSON.stringify({
+        prefsValue = {
           cache: {
             bookmarkLocation: {},
             bookmarkOrder: {},
             ledgerVideos: {data: 1}
           }
-        })
+        }
         return sessionStore.loadAppState()
           .then(function () {
             assert(runImportDefaultSettings.withArgs(expectedData).calledOnce)
@@ -1015,17 +941,17 @@ describe('sessionStore unit tests', function () {
     })
 
     describe('when checking data.cleanedOnShutdown', function () {
-      let readFileSyncStub
+      let getUserPrefStub
 
       describe('when true', function () {
         before(function () {
-          readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns(JSON.stringify({
+          getUserPrefStub = sinon.stub(userPrefs, 'getDictionaryPref').returns({
             cleanedOnShutdown: true,
             lastAppVersion: fakeElectron.app.getVersion()
-          }))
+          })
         })
         after(function () {
-          readFileSyncStub.restore()
+          getUserPrefStub.restore()
         })
         it('does not call cleanAppData', function () {
           cleanAppDataStub.reset()
@@ -1040,13 +966,13 @@ describe('sessionStore unit tests', function () {
 
       describe('when NOT true', function () {
         before(function () {
-          readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns(JSON.stringify({
+          getUserPrefStub = sinon.stub(userPrefs, 'getDictionaryPref').returns({
             cleanedOnShutdown: false,
             lastAppVersion: fakeElectron.app.getVersion()
-          }))
+          })
         })
         after(function () {
-          readFileSyncStub.restore()
+          getUserPrefStub.restore()
         })
         it('calls cleanAppData', function () {
           cleanAppDataStub.reset()
@@ -1061,17 +987,17 @@ describe('sessionStore unit tests', function () {
     })
 
     describe('when checking data.lastAppVersion', function () {
-      let readFileSyncStub
+      let getUserPrefStub
 
       describe('when it matches app.getVersion', function () {
         before(function () {
-          readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns(JSON.stringify({
+          getUserPrefStub = sinon.stub(userPrefs, 'getDictionaryPref').returns({
             cleanedOnShutdown: true,
             lastAppVersion: fakeElectron.app.getVersion()
-          }))
+          })
         })
         after(function () {
-          readFileSyncStub.restore()
+          getUserPrefStub.restore()
         })
         it('does not call cleanAppData', function () {
           cleanAppDataStub.reset()
@@ -1086,13 +1012,13 @@ describe('sessionStore unit tests', function () {
 
       describe('when it does NOT match app.getVersion', function () {
         before(function () {
-          readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns(JSON.stringify({
+          getUserPrefStub = sinon.stub(userPrefs, 'getDictionaryPref').returns({
             cleanedOnShutdown: true,
             lastAppVersion: 'NOT A REAL VERSION'
-          }))
+          })
         })
         after(function () {
-          readFileSyncStub.restore()
+          getUserPrefStub.restore()
         })
         it('calls cleanAppData', function () {
           cleanAppDataStub.reset()

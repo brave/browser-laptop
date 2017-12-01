@@ -22,6 +22,10 @@ const fakeFileSystem = {
   remove: (path, callback) => {
     console.log('calling mocked fs.remove')
     if (callback) callback()
+  },
+  unlink: (path, callback) => {
+    console.log('calling mocked fs.unlink')
+    if (callback) callback()
   }
 }
 

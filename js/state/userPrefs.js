@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const {session} = require('electron')
+
 let registeredCallbacks = []
 let registeredSessions = {}
 let registeredPrivateSessions = {}
@@ -49,6 +51,14 @@ const runCallback = (cb, incognito) => {
   return true
 }
 
+module.exports.getDictionaryPref = (path, ses = session.defaultSession) => {
+  if (ses) {
+    return ses.userPrefs.getDictionaryPref(path)
+  } else {
+    return null
+  }
+}
+
 module.exports.setUserPref = (path, value, incognito = false) => {
   value = value.toJS ? value.toJS() : value
 
@@ -56,7 +66,10 @@ module.exports.setUserPref = (path, value, incognito = false) => {
   for (let partition in partitions) {
     const ses = partitions[partition]
     setUserPrefType(ses, path, value)
-    ses.webRequest.handleBehaviorChanged()
+    if (path === 'content_settings') {
+      // TODO(bridiver) - move this to muon
+      ses.webRequest.handleBehaviorChanged()
+    }
   }
 }
 

@@ -19,6 +19,7 @@ const Immutable = require('immutable')
 const app = electron.app
 const compareVersions = require('compare-versions')
 const merge = require('deepmerge')
+const fs = require('fs-extra')
 
 // Constants
 const UpdateStatus = require('../js/constants/updateStatus')
@@ -43,6 +44,7 @@ const {isImmutable, isMap, makeImmutable, deleteImmutablePaths} = require('./com
 const {getSetting} = require('../js/settings')
 const platformUtil = require('./common/lib/platformUtil')
 const historyUtil = require('./common/lib/historyUtil')
+const userPrefs = require('../js/state/userPrefs')
 
 const sessionStorageVersion = 1
 const sessionStorageName = `session-store-${sessionStorageVersion}`
@@ -55,7 +57,11 @@ const getTempStoragePath = (filename) => {
     : path.join(process.env.HOME, '.brave-test-session-store-' + filename + '-' + epochTimestamp)
 }
 
-const getStoragePath = () => {
+const getPrefsPath = () => {
+  return path.join(app.getPath('userData'), 'UserPrefs')
+}
+
+const getDeprecatedStoragePath = () => {
   return path.join(app.getPath('userData'), sessionStorageName)
 }
 /**
@@ -104,15 +110,12 @@ module.exports.saveAppState = (immutablePayload, isShutdown) => {
       module.exports.cleanSessionDataOnShutdown()
     }
 
-    const storagePath = getStoragePath()
-    const json = JSON.stringify(immutablePayload)
-    muon.file.writeImportant(storagePath, json, (success) => {
-      if (success) {
-        resolve()
-      } else {
-        reject(new Error('Could not save app state to ' + getStoragePath()))
-      }
-    })
+    try {
+      userPrefs.setUserPref('app_state', immutablePayload.toJS(), false)
+      resolve()
+    } catch (e) {
+      reject(new Error('Could not save app state to UserPrefs', e))
+    }
   })
 }
 
@@ -775,7 +778,6 @@ module.exports.runPreMigrations = (data) => {
     try { runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1 } catch (e) {}
 
     if (runWidevineCleanup) {
-      const fs = require('fs-extra')
       const wvExtPath = path.join(app.getPath('userData'), 'Extensions', 'WidevineCdm')
       fs.remove(wvExtPath, (err) => {
         if (err) {
@@ -841,18 +843,30 @@ module.exports.runImportDefaultSettings = (data) => {
  */
 module.exports.loadAppState = () => {
   return new Promise((resolve, reject) => {
-    const fs = require('fs')
-
-    let data
-
-    try {
-      data = fs.readFileSync(getStoragePath())
-    } catch (e) {}
-
     let loaded = false
+    let data = null
+
     try {
-      data = JSON.parse(data)
-      loaded = true
+      data = userPrefs.getDictionaryPref('app_state')
+      const filePath = getDeprecatedStoragePath()
+      if (!data || Object.keys(data).length === 0) {
+        // look for a legacy session store file
+        try {
+          data = fs.readFileSync(filePath)
+          data = JSON.parse(data)
+          loaded = true
+        } catch (e) {
+          module.exports.backupSession(filePath)
+          data = {}
+        } finally {
+          // copy to .bak for deletion on next successful startup
+          module.exports.backupSession(filePath, filePath + '.bak')
+        }
+      } else {
+        // loaded successfully so go ahead and delete the old session store
+        fs.unlink(filePath + '.bak', () => {}) // eslint-disable-line handle-callback-err
+        loaded = true
+      }
     } catch (e) {
       // Session state might be corrupted; let's backup this
       // corrupted value for people to report into support.
@@ -908,11 +922,7 @@ module.exports.loadAppState = () => {
 /**
  * Called when session is suspected for corruption; this will move it out of the way
  */
-module.exports.backupSession = () => {
-  const fs = require('fs-extra')
-  const src = getStoragePath()
-  const dest = getTempStoragePath('backup')
-
+module.exports.backupSession = (src = getPrefsPath(), dest = getTempStoragePath('backup')) => {
   if (fs.existsSync(src)) {
     try {
       fs.copySync(src, dest)
