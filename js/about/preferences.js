@@ -653,6 +653,7 @@ class SecurityTab extends ImmutableComponent {
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.AUTOPLAY_MEDIA)}>
             <option data-l10n-id='alwaysAsk' value={autoplayOption.ALWAYS_ASK} />
             <option data-l10n-id='alwaysAllow' value={autoplayOption.ALWAYS_ALLOW} />
+            <option data-l10n-id='alwaysDeny' value={autoplayOption.ALWAYS_DENY} />
           </SettingDropdown>
         </SettingItem>
       </SettingsList>
