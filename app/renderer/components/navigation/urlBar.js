@@ -51,11 +51,13 @@ class UrlBar extends React.Component {
     super(props)
     this.lastVal = ''
     this.lastSuffix = ''
+    this.isOnComposition = false
     this.onFocus = this.onFocus.bind(this)
     this.onBlur = this.onBlur.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onKeyUp = this.onKeyUp.bind(this)
     this.onChange = this.onChange.bind(this)
+    this.onComposition = this.onComposition.bind(this)
     this.onKeyPress = this.onKeyPress.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
@@ -263,9 +265,19 @@ class UrlBar extends React.Component {
   }
 
   onChange (e) {
-    if (e.target.value !== this.lastVal + this.lastSuffix) {
+    if (e.target.value !== this.lastVal + this.lastSuffix &&
+        !this.isOnComposition) {
       e.preventDefault()
       this.setValue(e.target.value)
+    }
+  }
+
+  onComposition (e) {
+    if (e.type === 'compositionend') {
+      this.isOnComposition = false
+      this.onChange(e)
+    } else {
+      this.isOnComposition = true
     }
   }
 
@@ -521,6 +533,9 @@ class UrlBar extends React.Component {
           onKeyUp={this.onKeyUp}
           onChange={this.onChange}
           onKeyPress={this.onKeyPress}
+          onCompositionStart={this.onComposition}
+          onCompositionUpdate={this.onComposition}
+          onCompositionEnd={this.onComposition}
           onClick={this.onClick}
           onContextMenu={this.onContextMenu}
           data-l10n-id='urlbar'
