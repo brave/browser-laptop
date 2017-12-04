@@ -15,10 +15,12 @@ const isLinux = process.platform === 'linux'
 
 var env = {
   NODE_ENV: 'production',
-  CHANNEL: process.env.CHANNEL
+  CHANNEL: process.env.CHANNEL,
+  REF: process.env.REF || null
 }
 
 const channel = env.CHANNEL
+const ref = env.REF
 
 var channels = { nightly: true, developer: true, beta: true, dev: true }
 if (!channels[channel]) {
@@ -75,7 +77,8 @@ config.writeBuildConfig(
   {
     channel: channel,
     BROWSER_LAPTOP_REV: require('git-rev-sync').long(),
-    nodeEnv: env.NODE_ENV
+    nodeEnv: env.NODE_ENV,
+    ref: ref || null
   },
   'buildConfig.js'
 )

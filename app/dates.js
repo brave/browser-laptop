@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 // The iso week is defined as the week number starting on January 4th indexed to the first Thursday
 var isoWeek = function () {
   var date = new Date()
@@ -29,4 +33,12 @@ exports.todayWOY = () => {
 // We add 1 to make sure January does not fail a truth test
 exports.todayMonth = () => {
   return (new Date()).getMonth() + 1
+}
+
+const MILLISECONDS_IN_ONE_DAY = 60 * 60 * 24 * 1000
+
+// return YYYY-MM-DD of closest Monday in the past to current date
+exports.lastMonday = (d) => {
+  var monday = new Date(d.getTime() - ((d.getDay() - 1) * MILLISECONDS_IN_ONE_DAY))
+  return localYMD(monday)
 }
