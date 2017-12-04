@@ -29,7 +29,8 @@ const buildDir = 'Brave-' + process.platform + '-' + arch
 
 var env = {
   NODE_ENV: 'production',
-  CHANNEL: process.env.CHANNEL
+  CHANNEL: process.env.CHANNEL,
+  REF: process.env.REF || null
 }
 
 var channels = { dev: true, beta: true, stable: true, nightly: true, developer: true }
@@ -42,7 +43,8 @@ config.writeBuildConfig(
   {
     channel: env.CHANNEL,
     BROWSER_LAPTOP_REV: require('git-rev-sync').long(),
-    nodeEnv: env.NODE_ENV
+    nodeEnv: env.NODE_ENV,
+    ref: env.REF || null
   },
   'buildConfig.js'
 )

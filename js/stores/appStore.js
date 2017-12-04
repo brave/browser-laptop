@@ -498,6 +498,9 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['updates', 'lastCheckWOY'], dates.todayWOY())
       appState = appState.setIn(['updates', 'lastCheckMonth'], dates.todayMonth())
       appState = appState.setIn(['updates', 'firstCheckMade'], true)
+      if (!appState.getIn(['updates', 'weekOfInstallation'])) {
+        appState = appState.setIn(['updates', 'weekOfInstallation'], dates.lastMonday(new Date()))
+      }
       break
     case appConstants.APP_SET_UPDATE_STATUS:
       if (action.status !== undefined) {
