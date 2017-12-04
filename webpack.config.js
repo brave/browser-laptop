@@ -105,6 +105,8 @@ function production () {  // eslint-disable-line
   prod.plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true))
   if (env !== 'test') {
     prod.plugins.push(new UglifyJsPlugin({
+      cache: true,
+      parallel: true,
       uglifyOptions: {
         compress: {
           warnings: false
