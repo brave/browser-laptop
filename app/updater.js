@@ -18,6 +18,7 @@ const appActions = require('../js/actions/appActions')
 const Immutable = require('immutable')
 const dates = require('./dates')
 const Channel = require('./channel')
+const buildConfig = require('../js/constants/buildConfig')
 
 const fs = require('fs')
 const path = require('path')
@@ -117,12 +118,14 @@ exports.init = (platform, arch, ver, updateToPreview) => {
 // This is a privacy preserving policy. Instead of passing personally identifying
 // information, the browser will pass thefour boolean values indicating when the last
 // update check occurred.
-var paramsFromLastCheckDelta = (lastCheckYMD, lastCheckWOY, lastCheckMonth, firstCheckMade) => {
+var paramsFromLastCheckDelta = (lastCheckYMD, lastCheckWOY, lastCheckMonth, firstCheckMade, weekOfInstallation, ref) => {
   return {
     daily: !lastCheckYMD || (dates.todayYMD() > lastCheckYMD),
     weekly: !lastCheckWOY || (dates.todayWOY() !== lastCheckWOY),
     monthly: !lastCheckMonth || (dates.todayMonth() !== lastCheckMonth),
-    first: !firstCheckMade
+    first: !firstCheckMade,
+    woi: weekOfInstallation,
+    ref: ref || null
   }
 }
 
@@ -143,12 +146,18 @@ var requestVersionInfo = (done, pingOnly) => {
   const firstCheckMade = state.getIn(['updates', 'firstCheckMade'], false)
   debug(`firstCheckMade = ${firstCheckMade}`)
 
+  // The previous Monday from the installation date
+  const weekOfInstallation = state.getIn(['updates', 'weekOfInstallation'], null)
+  debug(`weekOfInstallation= ${weekOfInstallation}`)
+
   // Build query string based on the last date an update request was made
   const query = paramsFromLastCheckDelta(
     lastCheckYMD,
     lastCheckWOY,
     lastCheckMonth,
-    firstCheckMade
+    firstCheckMade,
+    weekOfInstallation,
+    buildConfig.ref || null
   )
   query.accept_preview = updateToPreviewReleases ? 'true' : 'false'
   const queryString = `${platformBaseUrl}?${querystring.stringify(query)}`
