@@ -896,7 +896,7 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
       }
     }
 
-    if (!publisherKey || (publisherKey && ledgerUtil.blockedP(state, publisherKey))) {
+    if (!publisherKey || (ledgerUtil.blockedP(state, publisherKey))) {
       publisherKey = null
     }
 
@@ -973,11 +973,9 @@ const recoverKeys = (state, useRecoveryKeyFile, key) => {
       return state
     }
 
-    if (recoveryKeyFile) {
-      const result = loadKeysFromBackupFile(state, recoveryKeyFile)
-      recoveryKey = result.recoveryKey || ''
-      state = result.state
-    }
+    const result = loadKeysFromBackupFile(state, recoveryKeyFile)
+    recoveryKey = result.recoveryKey || ''
+    state = result.state
   }
 
   if (!recoveryKey) {
@@ -2163,7 +2161,7 @@ const transitionWalletToBat = () => {
   }
 
   // only attempt this transition if the wallet is v1
-  if (client && client.options && client.options.version !== 'v1') {
+  if (client.options && client.options.version !== 'v1') {
     // older versions incorrectly marked this for transition
     // this will clean them up (no more bouncy ball)
     appActions.onBitcoinToBatTransitioned()
