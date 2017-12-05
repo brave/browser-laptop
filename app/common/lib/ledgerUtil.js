@@ -90,18 +90,28 @@ const formattedDateFromTimestamp = (timestamp, format) => {
 const walletStatus = (ledgerData) => {
   let status = {}
 
+  if (ledgerData == null) {
+    return {
+      id: 'createWalletStatus'
+    }
+  }
+
   if (ledgerData.get('error')) {
     status.id = 'statusOnError'
   } else if (ledgerData.get('created')) {
     const transactions = ledgerData.get('transactions')
-    const pendingFunds = Number(ledgerData.get('unconfirmed') || 0).toFixed(2)
+    const pendingFunds = Number(ledgerData.get('unconfirmed') || 0)
+    const balance = Number(ledgerData.get('balance') || 0)
+    const minBalance = parseInt(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT), 10) || 25
 
-    if (pendingFunds + Number(ledgerData.get('balance') || 0) <
-      0.9 * Number(ledgerData.get('bat') || 0)) {
+    if (pendingFunds + balance < minBalance) {
       status.id = 'insufficientFundsStatus'
     } else if (pendingFunds > 0) {
+      const converted = batToCurrencyString(pendingFunds, ledgerData)
       status.id = 'pendingFundsStatus'
-      status.args = {funds: `${pendingFunds} BAT (${batToCurrencyString(pendingFunds, ledgerData)})`}
+      status.args = {
+        funds: `${pendingFunds.toFixed(2)} BAT${converted ? ` (${converted})` : ''}`
+      }
     } else if (transactions && transactions.size > 0) {
       status.id = 'defaultWalletStatus'
     } else {
@@ -112,6 +122,7 @@ const walletStatus = (ledgerData) => {
   } else {
     status.id = 'createWalletStatus'
   }
+
   return status
 }
 
