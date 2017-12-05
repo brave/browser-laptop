@@ -341,11 +341,14 @@ class EnabledContent extends ImmutableComponent {
         settings={this.props.settings}
         onChangeSetting={this.props.onChangeSetting}
         siteSettings={this.props.siteSettings} />
-      <a data-l10n-id='termsOfService'
-        className={css(styles.enabledContent__tos)}
-        href='https://basicattentiontoken.org/contributor-terms-of-service/'
-        target='_blank'
-        rel='noreferrer noopener' />
+      <div className={css(styles.enabledContent__tos)}>
+        <a data-l10n-id='termsOfService'
+          data-test-id='termsOfService'
+          className={css(styles.enabledContent__tos__link)}
+          href='https://basicattentiontoken.org/contributor-terms-of-service/'
+          target='_blank'
+          rel='noreferrer noopener' />
+      </div>
     </section>
   }
 }
@@ -454,9 +457,12 @@ const styles = StyleSheet.create({
 
   enabledContent__tos: {
     float: 'right',
-    fontSize: '13px',
-    color: '#666',
     padding: '20px 60px'
+  },
+
+  enabledContent__tos__link: {
+    fontSize: '13px',
+    color: '#666'
   },
 
   enabledContent__loader: {

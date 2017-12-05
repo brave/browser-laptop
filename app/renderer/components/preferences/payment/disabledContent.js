@@ -68,12 +68,15 @@ class DisabledContent extends ImmutableComponent {
           })} data-test-id='paymentsMessage'>
             {this.text}
           </div>
-          <a data-l10n-id='termsOfService'
-            className={css(styles.disabledContent__message__toc)}
-            href='https://basicattentiontoken.org/contributor-terms-of-service/'
-            target='_blank'
-            rel='noreferrer noopener'
-          />
+          <div className={css(styles.disabledContent__message__toc)}>
+            <a data-l10n-id='termsOfService'
+              data-test-id='termsOfService'
+              className={css(styles.disabledContent__message__toc__link)}
+              href='https://basicattentiontoken.org/contributor-terms-of-service/'
+              target='_blank'
+              rel='noreferrer noopener'
+            />
+          </div>
           <div className={css(styles.disabledContent__footer)}>
             <div className={css(styles.disabledContent__commonText)} data-l10n-id='paymentsWelcomeText3' />
             <div className={css(styles.disabledContent__commonText)} data-l10n-id='paymentsWelcomeText4' />
@@ -135,9 +138,12 @@ const styles = StyleSheet.create({
     display: 'flex',
     flex: 1,
     justifyContent: 'flex-end',
-    fontSize: '13px',
-    color: '#666',
     padding: '20px 0'
+  },
+
+  disabledContent__message__toc__link: {
+    fontSize: '13px',
+    color: '#666'
   },
 
   disabledContent__sidebar: {
