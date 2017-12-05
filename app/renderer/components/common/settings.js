@@ -91,6 +91,7 @@ class SettingCheckbox extends ImmutableComponent {
     return <div {...props} data-test-id={this.props.dataTestId}>
       <SwitchControl id={this.props.prefKey}
         small={this.props.small}
+        large={this.props.large}
         disabled={this.props.disabled}
         onClick={this.onClick}
         checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)}

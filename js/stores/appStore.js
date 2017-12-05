@@ -200,7 +200,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/extensionsReducer'),
       require('../../app/browser/reducers/shareReducer'),
       require('../../app/browser/reducers/updatesReducer'),
-      require('../../app/browser/reducers/topSitesReducer'),
+      require('../../app/browser/reducers/aboutNewTabReducer'),
       require('../../app/browser/reducers/braverySettingsReducer'),
       require('../../app/browser/reducers/bookmarkToolbarReducer'),
       require('../../app/browser/reducers/siteSettingsReducer'),
@@ -246,12 +246,6 @@ const handleAppAction = (action) => {
     case appConstants.APP_SHUTTING_DOWN:
       appDispatcher.shutdown()
       app.quit()
-      break
-    case appConstants.APP_CHANGE_NEW_TAB_DETAIL:
-      appState = aboutNewTabState.mergeDetails(appState, action)
-      if (action.refresh) {
-        calculateTopSites(true, true)
-      }
       break
     case appConstants.APP_DATA_URL_COPIED:
       nativeImage.copyDataURL(action.dataURL, action.html, action.text)

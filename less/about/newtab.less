@@ -7,6 +7,10 @@
 
 * {
   box-sizing: border-box;
+  // undo global override from common.less
+  // and allow typography to flow from parent to descendent
+  font-family: inherit;
+  font-weight: inherit;
 }
 
 // match private tab js-css values
@@ -14,13 +18,16 @@
 @newTabAnimationEasing: ease-out;
 
 strong, div, span, li, em, p, a {
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  font-weight: 400;
-  -webkit-font-smoothing: antialiased;
+  font-family: inherit;
+  font-weight: inherit;
+  -webkit-font-smoothing: antialiased; // light text on dark backgrounds on macOS looks better with this
 }
 
 .newTabDashboard
 {
+    // default typography if not specified in element ancestor hierarchy
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
     animation: fadeIn;
     animation-duration: .3s;
     animation-timing-function: ease-out;
@@ -242,6 +249,7 @@ ul {
   }
 
   .siteRemovalNotification {
+    @typography-display();
     border-radius: @borderRadius;
     box-shadow: 2px 2px 6px rgba(0,0,0,0.5);
     background-color: #fff;
@@ -287,6 +295,8 @@ ul {
       line-height: 1.3;
 
       .copyrightCredits {
+        @typography-display();
+
         &, .photoBy, .copyrightOwner {
           color: #fff;
           font-size: 13px;
@@ -294,7 +304,10 @@ ul {
         }
 
         .copyrightOwner {
-          text-decoration: underline;
+          font-weight: 700;
+          &:hover {
+            text-decoration: underline;
+          }
         }
         .copyRightYear {
           position: relative;
@@ -308,6 +321,8 @@ ul {
 
       .photoName {
         color: @white50;
+        @typography-display();
+        letter-spacing: @typographyDisplayMediumSpacing;
         font-size: 23px;
       }
     }
@@ -343,6 +358,7 @@ ul {
 }
 
 .statsBar {
+  @typography-display();
   width: 100%;
   padding: 40px 0;
   display: flex;
@@ -357,6 +373,7 @@ ul {
     }
 
     .counter {
+      letter-spacing: @typographyDisplayLargeSpacing;
       font-size: 44px;
       line-height: 53px;
       text-overflow: ellipsis;
@@ -383,6 +400,7 @@ ul {
         display: inline;
         color: @statsLightGray;
         font-size: 20px;
+        letter-spacing: 0;
         line-height: 24px;
         margin-left: 3px;
       }
@@ -397,21 +415,32 @@ ul {
   .clock {
     line-height: 1;
     user-select: none;
+    display: flex;
     cursor: default;
 
     .time {
+      letter-spacing: 0;
       font-size: 75px;
       font-weight: 200;
       color: #fff;
+      display: inline-flex;
     }
 
     .timePeriod {
       color: #fff;
       display: inline-block;
       font-size: 20px;
+      letter-spacing: @typographyDisplayMediumSpacing;
       font-weight: 400;
-      margin-top: 6px;
+      margin-top: 8px;
+      margin-left: 3px;
       vertical-align: top;
+    }
+
+    .timeSeparator {
+      color: #fff;
+      // center colon vertically in the text-content line
+      margin-top: -0.1em;
     }
 
     .dayTime {
