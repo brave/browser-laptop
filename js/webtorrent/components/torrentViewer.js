@@ -2,12 +2,14 @@ const React = require('react')
 const cx = require('../../lib/classSet')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../../app/renderer/components/styles/global')
 const commonStyles = require('../../../app/renderer/components/styles/commonStyles')
 
 // Components
 const Button = require('../../../app/renderer/components/common/button')
 const TorrentFileList = require('./torrentFileList')
 const TorrentStatus = require('./torrentStatus')
+const BraveLink = require('../../../app/renderer/components/common/braveLink')
 
 const {AboutPageSectionTitle} = require('../../../app/renderer/components/common/sectionTitle')
 
@@ -48,13 +50,10 @@ class TorrentViewer extends React.Component {
         />
       )
       legalNotice = (
-        <a className={cx({
-          legalNotice: true,
-          [css(commonStyles.userSelectNone)]: true
-        })}
-          data-l10n-id='poweredByWebTorrent'
+        <BraveLink
+          smaller mediumGray
           href='https://webtorrent.io'
-          rel='noopener' target='_blank'
+          l10nId='poweredByWebTorrent'
         />
       )
     } else {
@@ -73,10 +72,7 @@ class TorrentViewer extends React.Component {
           onClick={() => dispatch('start')}
         />
       )
-      legalNotice = <div className={cx({
-        legalNotice: true,
-        [css(commonStyles.userSelectNone)]: true
-      })} data-l10n-id='legalNotice' />
+      legalNotice = <div className={css(styles.legalNotice)} data-l10n-id='legalNotice' />
     }
 
     if (torrentIdProtocol === 'magnet:') {
@@ -120,7 +116,7 @@ class TorrentViewer extends React.Component {
             stateOwner={this}
           />
 
-          {legalNotice}
+          <div className={css(styles.siteDetailsPage__siteDetailsPageContent__legalNotice)}>{legalNotice}</div>
         </div>
       </div>
     )
@@ -132,17 +128,23 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-
-    // See: .siteDetailsPageHeader
-    padding: '0 24px'
+    padding: '0 24px' // See: .siteDetailsPageHeader
   },
 
   siteDetailsPage__header__actions: {
     display: 'flex',
     alignItems: 'center',
+    marginLeft: '24px' // See: .siteDetailsPageHeader
+  },
 
-    // See: .siteDetailsPageHeader
-    marginLeft: '24px'
+  siteDetailsPage__siteDetailsPageContent__legalNotice: {
+    marginTop: '15px',
+    userSelect: 'none'
+  },
+
+  legalNotice: {
+    color: globalStyles.color.mediumGray,
+    fontSize: 'smaller'
   }
 })
 

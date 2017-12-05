@@ -19,6 +19,7 @@ const {
 } = require('../../app/renderer/components/common/dropdown')
 
 const BrowserButton = require('../../app/renderer/components/common/browserButton')
+const BraveLink = require('../../app/renderer/components/common/braveLink')
 
 const {
   SectionTitleWrapper,
@@ -102,12 +103,11 @@ class AboutStyle extends ImmutableComponent {
 
         <div>
           <span data-l10n-id='IntroLinkToDocument' />
-          <a className={css(styles.wrapper__header__link)}
-            href='https://github.com/brave/browser-laptop/blob/master/docs/style.md'
-            rel='noopener' target='_blank'
+          <BraveLink href='https://github.com/brave/browser-laptop/blob/master/docs/style.md'
+            customStyle={styles.wrapper__header__link}
           >
             docs/style.md
-          </a>
+          </BraveLink>
         </div>
 
         <p data-l10n-id='intro' />

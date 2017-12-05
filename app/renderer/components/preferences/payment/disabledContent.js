@@ -7,6 +7,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ImmutableComponent = require('../../immutableComponent')
+const BraveLink = require('../../common/braveLink')
 
 // Utils
 const cx = require('../../../../../js/lib/classSet')
@@ -68,12 +69,13 @@ class DisabledContent extends ImmutableComponent {
           })} data-test-id='paymentsMessage'>
             {this.text}
           </div>
-          <a data-l10n-id='termsOfService'
-            className={css(styles.disabledContent__message__toc)}
-            href='https://basicattentiontoken.org/contributor-terms-of-service/'
-            target='_blank'
-            rel='noreferrer noopener'
-          />
+          <div className={css(styles.disabledContent__message__toc)}>
+            <BraveLink
+              smaller mediumGray
+              href='https://basicattentiontoken.org/contributor-terms-of-service/'
+              l10nId='termsOfService'
+            />
+          </div>
           <div className={css(styles.disabledContent__footer)}>
             <div className={css(styles.disabledContent__commonText)} data-l10n-id='paymentsWelcomeText3' />
             <div className={css(styles.disabledContent__commonText)} data-l10n-id='paymentsWelcomeText4' />
@@ -135,8 +137,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     flex: 1,
     justifyContent: 'flex-end',
-    fontSize: '13px',
-    color: '#666',
     padding: '20px 0'
   },
 

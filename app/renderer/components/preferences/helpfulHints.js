@@ -6,6 +6,8 @@ const ImmutableComponent = require('../immutableComponent')
 const {StyleSheet, css} = require('aphrodite')
 const globalStyles = require('../styles/global')
 
+const BraveLink = require('../common/braveLink')
+
 class HelpfulHints extends ImmutableComponent {
   render () {
     return <div className={css(styles.helpfulHints)}>
@@ -21,10 +23,11 @@ class HelpfulHints extends ImmutableComponent {
       </span>
       <div className={css(styles.hints, styles.white)} data-l10n-id={`hint${this.props.hintNumber}`} />
       <div className={css(styles.helpfulHintsBottom)}>
-        <a className={css(styles.white)}
+        <BraveLink
           href='https://community.brave.com/'
-          data-l10n-id='submitFeedback'
-          rel='noopener' target='_blank' />
+          l10nId='submitFeedback'
+          customStyle={styles.white}
+        />
       </div>
     </div>
   }
