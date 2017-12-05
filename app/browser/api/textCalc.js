@@ -18,7 +18,7 @@ const {makeImmutable} = require('../../common/state/immutableUtil')
 const globalStyles = require('../../renderer/components/styles/global')
 
 const fontSize = globalStyles.spacing.bookmarksItemFontSize
-const fontFamily = globalStyles.defaultFontFamily
+const fontFamily = globalStyles.typography.default.family
 
 const calcText = (item, type) => {
   const title = type === siteTags.BOOKMARK
@@ -34,7 +34,7 @@ const calcText = (item, type) => {
       let ctx = document.createElement('canvas').getContext('2d')
       ctx.font = '${fontSize} ${fontFamily}'
       const width = ctx.measureText('${title}').width
-      
+
       return width
     })()
   `
@@ -84,7 +84,7 @@ const calcTextList = (list) => {
       const bookmarks = []
       const folders = []
       const list = JSON.parse('${paramList}')
-  
+
       list.forEach(item => {
         if (item.type === '${siteTags.BOOKMARK}') {
           bookmarks.push({
@@ -100,12 +100,12 @@ const calcTextList = (list) => {
           })
         }
       })
-  
+
       const result = {
         bookmarks: bookmarks,
         folders: folders
       }
-  
+
       return JSON.stringify(result)
     })()
   `
