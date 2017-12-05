@@ -6,9 +6,13 @@ const React = require('react')
 const ImmutableComponent = require('../../../app/renderer/components/immutableComponent')
 const aboutActions = require('../aboutActions')
 
+const createOpenUrlBinding = (url) => aboutActions.createTabRequested.bind(null, {url})
+const preferencesOpenUrlBinding = createOpenUrlBinding('about:preferences')
+const bookmarksOpenUrlBinding = createOpenUrlBinding('about:bookmarks')
+const historyOpenUrlBinding = createOpenUrlBinding('about:history')
+
 class FooterInfo extends ImmutableComponent {
   render () {
-    const openUrl = (url) => aboutActions.createTabRequested.bind(null, {url})
     return <footer className='footerContainer'>
       <div className='copyrightNotice'>
         {
@@ -23,9 +27,9 @@ class FooterInfo extends ImmutableComponent {
         }
       </div>
       <nav className='shortcutsContainer'>
-        <span className='shortcutIcon settingsIcon' onClick={openUrl('about:preferences')} data-l10n-id='preferencesPage' />
-        <span className='shortcutIcon bookmarksIcon' onClick={openUrl('about:bookmarks')} data-l10n-id='bookmarksPage' />
-        <span className='shortcutIcon historyIcon' onClick={openUrl('about:history')} data-l10n-id='historyPage' />
+        <span className='shortcutIcon settingsIcon' onClick={preferencesOpenUrlBinding} data-l10n-id='preferencesPage' />
+        <span className='shortcutIcon bookmarksIcon' onClick={bookmarksOpenUrlBinding} data-l10n-id='bookmarksPage' />
+        <span className='shortcutIcon historyIcon' onClick={historyOpenUrlBinding} data-l10n-id='historyPage' />
       </nav>
     </footer>
   }

@@ -22,6 +22,10 @@ const {opacityIncreaseKeyframes} = require('./animations')
  * Remove fully global items and take preference for component properties (@see button)
  */
 
+const defaultFontFamily = `-apple-system, BlinkMacSystemFont, "Segoe UI"` +
+`, "Helvetica Neue", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans"` +
+`, "Droid Sans", sans-serif`
+
 const globalStyles = {
   breakpoint: {
     breakpointWideViewport: '1000px',
@@ -110,6 +114,26 @@ const globalStyles = {
   filter: {
     makeWhite: 'brightness(0) invert(1)',
     whiteShadow: 'drop-shadow(0px 0px 2px rgb(255, 255, 255))'
+  },
+  typography: {
+    // font for titles, labels in *most* cases (it's not a hard rule, consult a designer)
+    display: {
+      family: 'Poppins, ' + defaultFontFamily,
+      // spacing for fonts >= 30px (generally)
+      spacingLarge: '-0.4px',
+      // spacing for font >= 20px and < 30px
+      spacingMedium: '-0.2px',
+      // spacing for font < 20px
+      spacingRegular: 0
+    },
+    // font choices for flowing body text
+    body: {
+      family: `Muli, ` + defaultFontFamily
+    },
+    // system text
+    default: {
+      family: defaultFontFamily
+    }
   },
   radius: {
     borderRadius: '4px',

@@ -22,6 +22,7 @@ const settings = {
   SPELLCHECK_LANGUAGES: 'general.spellcheck-languages',
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
+  USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE: 'search.use-alternate-private-search-engine',
   OFFER_SEARCH_SUGGESTIONS: 'search.offer-search-suggestions',
   // Tabs tab
   SWITCH_TO_NEW_TABS: 'tabs.switch-to-new-tabs',

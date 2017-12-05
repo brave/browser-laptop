@@ -28,6 +28,7 @@ const ipc = window.chrome.ipcRenderer
 
 require('../../less/about/newtab.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
+require('../../fonts')
 
 class NewTabPage extends React.Component {
   constructor (props) {

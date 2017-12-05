@@ -8,6 +8,7 @@ const Immutable = require('immutable')
 const appActions = require('../../../js/actions/appActions')
 const debounce = require('../../../js/lib/debounce')
 const siteUtil = require('../../../js/state/siteUtil')
+const aboutNewTabState = require('../../common/state/aboutNewTabState')
 const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 const aboutNewTabMaxEntries = 100
 let appStore
@@ -21,20 +22,12 @@ const compareSites = (site1, site2) => {
     site1.get('partitionNumber') === site2.get('partitionNumber')
 }
 
-const pinnedTopSites = (state) => {
-  return (state.getIn(['about', 'newtab', 'pinnedTopSites']) || Immutable.List()).setSize(18)
-}
-
-const ignoredTopSites = (state) => {
-  return state.getIn(['about', 'newtab', 'ignoredTopSites']) || Immutable.List()
-}
-
 const isPinned = (state, siteProps) => {
-  return pinnedTopSites(state).filter((site) => compareSites(site, siteProps)).size > 0
+  return aboutNewTabState.getPinnedTopSites(state).filter((site) => compareSites(site, siteProps)).size > 0
 }
 
 const isIgnored = (state, siteProps) => {
-  return ignoredTopSites(state).filter((site) => compareSites(site, siteProps)).size > 0
+  return aboutNewTabState.getIgnoredTopSites(state).filter((site) => compareSites(site, siteProps)).size > 0
 }
 
 const sortCountDescending = (left, right) => {
@@ -117,7 +110,7 @@ const startCalculatingTopSiteData = debounce(() => {
 
   // Merge the pinned and unpinned lists together
   // Pinned items have priority because the position is important
-  let gridSites = pinnedTopSites(state).map((pinnedSite) => {
+  let gridSites = aboutNewTabState.getPinnedTopSites(state).map((pinnedSite) => {
     // Fetch latest siteDetail objects from appState.sites using location/partition
     if (pinnedSite) {
       const matches = sites.filter((site) => compareSites(site, pinnedSite))

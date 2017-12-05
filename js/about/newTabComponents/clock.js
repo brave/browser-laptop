@@ -11,14 +11,26 @@ class Clock extends React.Component {
     this.state = this.getClockState(new Date())
   }
   get formattedTime () {
-    const time = this.state.currentTime
-    return time.replace(' AM', '').replace(' PM', '')
+    return this.state.currentTime.map(component => {
+      if (component.type === 'literal') {
+        // wrap ':' in a span with a class, so it can be centered
+        if (component.value === ':') {
+          return <span className='timeSeparator'>{component.value}</span>
+        } else if (component.value.trim() === '') {
+          // hide blank strings
+          return null
+        }
+      } else if (component.type === 'dayperiod') {
+        // hide day-period (AM / PM), it's rendered in a separate component
+        return null
+      }
+      return component.value
+    })
   }
   get formattedTimePeriod () {
     const time = this.state.currentTime
-    if (time.toUpperCase().indexOf(' AM') > -1) return 'AM'
-    if (time.toUpperCase().indexOf(' PM') > -1) return 'PM'
-    return ''
+    const period = time.find(component => component.type === 'dayperiod')
+    return period ? period.value : ''
   }
   getMinutes (date) {
     return Math.floor(date / 1000 / 60)
@@ -32,12 +44,13 @@ class Clock extends React.Component {
   getClockState (now) {
     return {
       date: now,
-      currentTime: this.dateTimeFormat.format(now)
+      currentTime: this.dateTimeFormat.formatToParts(now)
     }
   }
   componentDidMount () {
     window.setInterval(this.maybeUpdateClock.bind(this), 2000)
   }
+
   render () {
     return <div className='clock'>
       <span className='time'>{this.formattedTime}</span><span className='timePeriod'>{this.formattedTimePeriod}</span>

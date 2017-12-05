@@ -410,7 +410,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/extensionsReducer'),
       require('../../app/browser/reducers/shareReducer'),
       require('../../app/browser/reducers/updatesReducer'),
-      require('../../app/browser/reducers/topSitesReducer'),
+      require('../../app/browser/reducers/aboutNewTabReducer'),
       require('../../app/browser/reducers/braverySettingsReducer'),
       require('../../app/browser/reducers/siteSettingsReducer'),
       require('../../app/browser/reducers/pageDataReducer'),
@@ -457,12 +457,6 @@ const handleAppAction = (action) => {
       break
     case appConstants.APP_NEW_WINDOW:
       createWindow(action)
-      break
-    case appConstants.APP_CHANGE_NEW_TAB_DETAIL:
-      appState = aboutNewTabState.mergeDetails(appState, action)
-      if (action.refresh) {
-        calculateTopSites(true)
-      }
       break
     case appConstants.APP_POPULATE_HISTORY:
       appState = aboutHistoryState.setHistory(appState, action)
