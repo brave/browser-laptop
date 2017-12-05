@@ -24,6 +24,16 @@ const fetchSearchSuggestions = debounce((windowId, tabId, autocompleteURL, searc
       return
     }
 
+    const contentType = response['headers']['content-type']
+    if (contentType && contentType.search(/utf-8/i) !== -1) {
+      let utf8SearchResults = []
+      for (let i = 0; i < searchResults.length; ++i) {
+        utf8SearchResults.push(decodeURIComponent(escape(searchResults[i])))
+      }
+      const utf8Query = decodeURIComponent(escape(query))
+      searchResults = utf8SearchResults
+      query = utf8Query
+    }
     // Once we have the online suggestions, append them to the others
     appActions.searchSuggestionResultsAvailable(tabId, query, searchResults)
   })
