@@ -18,6 +18,7 @@ describe('ledgerNotifications unit test', function () {
   let paymentsEnabled
   let paymentsNotifications
   let paymentsMinVisitTime = 5000
+  let paymentsContributionAmount = 25
 
   const defaultAppState = Immutable.fromJS({
     ledger: {},
@@ -38,7 +39,7 @@ describe('ledgerNotifications unit test', function () {
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('level', fakeLevel)
     mockery.registerMock('../../../js/settings', {
-      getSetting: (settingKey, settingsCollection, value) => {
+      getSetting: (settingKey) => {
         switch (settingKey) {
           case settings.PAYMENTS_ENABLED:
             return paymentsEnabled
@@ -46,6 +47,8 @@ describe('ledgerNotifications unit test', function () {
             return paymentsNotifications
           case settings.PAYMENTS_MINIMUM_VISIT_TIME:
             return paymentsMinVisitTime
+          case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
+            return paymentsContributionAmount
         }
         return false
       }
@@ -635,6 +638,39 @@ describe('ledgerNotifications unit test', function () {
     it('notification is shown', function () {
       ledgerNotificationsApi.removePromotionNotification(state)
       assert(hideNotificationSpy.calledOnce)
+    })
+  })
+
+  describe('sufficientBalanceToReconcile', function () {
+    it('null case', function () {
+      const result = ledgerNotificationsApi.sufficientBalanceToReconcile(defaultAppState)
+      assert.equal(result, false)
+    })
+
+    it('balance is bellow budget', function () {
+      const state = defaultAppState.setIn(['ledger', 'info', 'balance'], 10)
+      const result = ledgerNotificationsApi.sufficientBalanceToReconcile(state)
+      assert.equal(result, false)
+    })
+
+    it('balance is the same as budget', function () {
+      const state = defaultAppState.setIn(['ledger', 'info', 'balance'], 25)
+      const result = ledgerNotificationsApi.sufficientBalanceToReconcile(state)
+      assert.equal(result, true)
+    })
+
+    it('balance is above budget', function () {
+      const state = defaultAppState.setIn(['ledger', 'info', 'balance'], 30)
+      const result = ledgerNotificationsApi.sufficientBalanceToReconcile(state)
+      assert.equal(result, true)
+    })
+
+    it('default budget', function () {
+      paymentsContributionAmount = null
+      const state = defaultAppState.setIn(['ledger', 'info', 'balance'], 30)
+      const result = ledgerNotificationsApi.sufficientBalanceToReconcile(state)
+      assert.equal(result, true)
+      paymentsContributionAmount = 25
     })
   })
 })
