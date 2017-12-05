@@ -186,6 +186,7 @@ let generateBraveManifest = () => {
     'default-src': '\'self\'',
     'form-action': '\'none\'',
     'style-src': '\'self\' \'unsafe-inline\'',
+    'font-src': '\'self\' data:',
     'img-src': '* data: file://*',
     'frame-src': '\'self\' https://brave.com'
   }
@@ -198,6 +199,7 @@ let generateBraveManifest = () => {
       'http://' + devServer,
       'ws://' + devServer].join(' ')
     cspDirectives['style-src'] = '\'self\' \'unsafe-inline\' http://' + devServer
+    cspDirectives['font-src'] += ` http://${devServer}`
   }
 
   baseManifest.content_security_policy = concatCSP(cspDirectives)

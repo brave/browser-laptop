@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const Immutable = require('immutable')
 const {makeImmutable} = require('./immutableUtil')
 
 /**
@@ -12,6 +13,14 @@ const {makeImmutable} = require('./immutableUtil')
 const aboutNewTabState = {
   getSites: (state) => {
     return state.getIn(['about', 'newtab', 'sites'])
+  },
+
+  getPinnedTopSites: (state) => {
+    return state.getIn(['about', 'newtab', 'pinnedTopSites'], Immutable.List())
+  },
+
+  getIgnoredTopSites: (state) => {
+    return state.getIn(['about', 'newtab', 'ignoredTopSites'], Immutable.List())
   },
 
   mergeDetails: (state, props) => {
@@ -38,6 +47,10 @@ const aboutNewTabState = {
 
     state = state.setIn(['about', 'newtab', 'sites'], makeImmutable([]))
     return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
+  },
+
+  getData: (state) => {
+    return state.getIn(['about', 'newtab'], Immutable.Map())
   }
 }
 

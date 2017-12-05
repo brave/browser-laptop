@@ -14,18 +14,18 @@ const {opacityIncreaseKeyframes, tabFadeInKeyframes} = require('./animations')
 * migrate customizable options to theme.js
 */
 
+const defaultFontFamily = `-apple-system, BlinkMacSystemFont, "Segoe UI"` +
+`, "Helvetica Neue", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans"` +
+`, "Droid Sans", sans-serif`
+
 const globalStyles = {
-  defaultFontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI"` +
-    `, "Helvetica Neue", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans"` +
-    `, "Droid Sans", sans-serif`,
 
   breakpoint: {
     breakpointWideViewport: '1000px',
     breakpointNarrowViewport: '600px',
     breakpointExtensionButtonPadding: '720px',
     breakpointSmallWin32: '650px',
-    breakpointTinyWin32: '500px',
-    breakpointNewPrivateTab: '890px' // page's breakpoint for the private tab page
+    breakpointTinyWin32: '500px'
   },
   intersection: {
     // whereas 1 === 100%
@@ -99,6 +99,26 @@ const globalStyles = {
     almostInvisible: 'rgba(255,255,255,0.01)',
     urlBarOutline: '#bbb',
     alphaWhite: 'rgba(255,255,255,0.8)'
+  },
+  typography: {
+    // font for titles, labels in *most* cases (it's not a hard rule, consult a designer)
+    display: {
+      family: 'Poppins, ' + defaultFontFamily,
+      // spacing for fonts >= 30px (generally)
+      spacingLarge: '-0.4px',
+      // spacing for font >= 20px and < 30px
+      spacingMedium: '-0.2px',
+      // spacing for font < 20px
+      spacingRegular: 0
+    },
+    // font choices for flowing body text
+    body: {
+      family: `Muli, ` + defaultFontFamily
+    },
+    // system text
+    default: {
+      family: defaultFontFamily
+    }
   },
   radius: {
     borderRadius: '4px',
