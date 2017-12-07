@@ -1953,7 +1953,7 @@ const run = (state, delayTime) => {
   if (data) {
     let weights = []
     data.forEach((datum) => {
-      weights.push({publisher: datum.site, weight: datum.weight / 100.0})
+      weights.push({publisher: datum.publisherKey, weight: datum.weight / 100.0})
     })
     winners = synopsis.winners(ballots, weights)
   }
