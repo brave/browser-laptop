@@ -2,9 +2,12 @@
 const mockery = require('mockery')
 const sinon = require('sinon')
 const Immutable = require('immutable')
-const assert = require('assert')
+const { assert } = require('chai')
 const dragTypes = require('../../../../js/constants/dragTypes')
+const settings = require('../../../../js/constants/settings')
+const { tabCloseAction } = require('../../../../app/common/constants/settingsEnums')
 const fakeElectron = require('../../lib/fakeElectron')
+const FakeTab = require('../../lib/fakeTab')
 const fakeAdBlock = require('../../lib/fakeAdBlock')
 
 require('../../braveUnit')
@@ -64,39 +67,41 @@ describe('tabs API unit tests', function () {
       addChangeListener: () => {}
     }
 
+    this.fakeGetWebContents = (tabId) => {
+      const webContents = {
+        canGoBack: () => true,
+        canGoForward: () => true,
+        session: {
+          partition: 'default'
+        },
+        tabValue: () =>
+          this.state.get('tabs').find((tab) => tab.get('tabId') === tabId),
+        isDestroyed: () => false,
+        detach: (cb) => cb(),
+        once: (event, cb) => {
+          setImmediate(cb)
+        }
+      }
+      if (tabId === 1) {
+        Object.assign(webContents, this.tabWithDevToolsClosed)
+      } else if (tabId === 2) {
+        Object.assign(webContents, this.tabWithDevToolsOpened)
+      } else if (tabId === 3) {
+        Object.assign(webContents, this.tabWithDevToolsOpenedAndFocused)
+      }
+      return webContents
+    }
+    this.fakeGetOpenerTabId = () => null
+
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('../../js/stores/appStore', this.appStore)
     mockery.registerMock('../filtering', {
       isResourceEnabled: (resourceName, url, isPrivate) => false
     })
-
-    mockery.registerMock('./webContentsCache', {
-      getWebContents: (tabId) => {
-        const webContents = {
-          canGoBack: () => true,
-          canGoForward: () => true,
-          session: {
-            partition: 'default'
-          },
-          tabValue: () =>
-            this.state.get('tabs').find((tab) => tab.get('tabId') === tabId),
-          isDestroyed: () => false,
-          detach: (cb) => cb(),
-          once: (event, cb) => {
-            setImmediate(cb)
-          }
-        }
-        if (tabId === 1) {
-          Object.assign(webContents, this.tabWithDevToolsClosed)
-        } else if (tabId === 2) {
-          Object.assign(webContents, this.tabWithDevToolsOpened)
-        } else if (tabId === 3) {
-          Object.assign(webContents, this.tabWithDevToolsOpenedAndFocused)
-        }
-        return webContents
-      }
-    })
+    this.actualActiveTabHistory = require('../../../../app/browser/activeTabHistory')
+    this.actualWebContentsCache = require('../../../../app/browser/webContentsCache')
+    this.settings = require('../../../../js/settings')
     tabs = require('../../../../app/browser/tabs')
     appActions = require('../../../../js/actions/appActions')
   })
@@ -106,6 +111,16 @@ describe('tabs API unit tests', function () {
   })
 
   describe('toggleDevTools', function () {
+    before(function () {
+      this.getWebContentsStub = sinon.stub(this.actualWebContentsCache, 'getWebContents', this.fakeGetWebContents)
+      this.getOpenerTabIdStub = sinon.stub(this.actualWebContentsCache, 'getOpenerTabId', this.fakeGetOpenerTabId)
+    })
+
+    after(function () {
+      this.getWebContentsStub.restore()
+      this.getOpenerTabIdStub.restore()
+    })
+
     afterEach(function () {
       this.tabWithDevToolsClosed.openDevTools.reset()
       this.tabWithDevToolsClosed.closeDevTools.reset()
@@ -135,6 +150,16 @@ describe('tabs API unit tests', function () {
   })
 
   describe('isDevToolsFocused', function () {
+    before(function () {
+      this.getWebContentsStub = sinon.stub(this.actualWebContentsCache, 'getWebContents', this.fakeGetWebContents)
+      this.getOpenerTabIdStub = sinon.stub(this.actualWebContentsCache, 'getOpenerTabId', this.fakeGetOpenerTabId)
+    })
+
+    after(function () {
+      this.getWebContentsStub.restore()
+      this.getOpenerTabIdStub.restore()
+    })
+
     it('returns false if devtools are opened but not focused', function () {
       assert.equal(tabs.isDevToolsFocused(1), false)
     })
@@ -151,15 +176,25 @@ describe('tabs API unit tests', function () {
       this.browserOpts = {
         positionByMouseCursor: true
       }
+      this.getWebContentsStub = sinon.stub(this.actualWebContentsCache, 'getWebContents', this.fakeGetWebContents)
+      this.getOpenerTabIdStub = sinon.stub(this.actualWebContentsCache, 'getOpenerTabId', this.fakeGetOpenerTabId)
     })
+
+    after(function () {
+      this.getWebContentsStub.restore()
+      this.getOpenerTabIdStub.restore()
+    })
+
     beforeEach(function () {
       this.newWindowSpy = sinon.spy(appActions, 'newWindow')
       this.newWebContentsAddedSpy = sinon.spy(appActions, 'newWebContentsAdded')
     })
+
     afterEach(function () {
       this.newWindowSpy.restore()
       this.newWebContentsAddedSpy.restore()
     })
+
     it('moves tab to a new window', function () {
       const state = this.state.set('dragData', Immutable.fromJS({
         windowId: 1,
@@ -273,6 +308,139 @@ describe('tabs API unit tests', function () {
       tabs.moveTo(state, frameOpts.tabId, frameOpts, this.browserOpts, state.getIn(['dragData', 'dropWindowId']))
       assert.equal(this.newWindowSpy.notCalled, true)
       assert.equal(this.newWebContentsAddedSpy.calledOnce, true)
+    })
+  })
+
+  describe('getNextActiveTabId', function () {
+    // because we aren't currently mocking
+    // the tab events, namely tab.on('set-active'),
+    // we manually call activeTabHistory and webContentsCache functions here,
+    // which is ok as they are specifically for this function's purpose
+    // but it tightly couples implementation with
+    // description of expected results. change these usages if use of those
+    // singleton-style reference dependencies in the actual code changes
+
+    let tabCloseSettingValue
+    const windowId = 1
+    const tabIdParent = 1
+
+    before(function () {
+      // we want to use actual instance of webContentsCache for these tests
+      mockery.deregisterMock('./webContentsCache')
+      // override TAB_CLOSE_ACTION setting
+      this.stubGetSettings = sinon.stub(this.settings, 'getSetting',
+        (settingKey, settingsCollection, value) => {
+          if (settingKey === settings.TAB_CLOSE_ACTION) {
+            return tabCloseSettingValue
+          }
+          return false
+        }
+      )
+    })
+
+    after(function () {
+      this.stubGetSettings.restore()
+    })
+
+    beforeEach(function () {
+      // add manual entries to webContentsCache and activeTabHistory
+      // open a tab
+      this.actualWebContentsCache.updateWebContents(tabIdParent, new FakeTab(tabIdParent, windowId))
+      this.actualActiveTabHistory.setActiveTabForWindow(windowId, tabIdParent)
+      // open some child tabs
+      for (const tabId of [2, 3, 4]) {
+        this.actualWebContentsCache.updateWebContents(tabId, new FakeTab(tabId, windowId), tabIdParent)
+        this.actualActiveTabHistory.setActiveTabForWindow(windowId, tabId)
+      }
+    })
+
+    afterEach(function () {
+      // clean up our manual entries in webContentsCache
+      const webContentsCache = this.actualWebContentsCache.currentWebContents
+      for (const tabId of Object.keys(webContentsCache)) {
+        delete webContentsCache[tabId]
+      }
+      // clean up our manual entries in activeTabHistory
+      this.actualActiveTabHistory.clearTabbedWindow(1)
+      this.actualActiveTabHistory.clearTabbedWindow(2)
+    })
+
+    it('switches to parent', function () {
+      // set preference to activate parent tab of closed tab
+      tabCloseSettingValue = tabCloseAction.PARENT
+      // set the middle tab as active
+      this.actualActiveTabHistory.setActiveTabForWindow(windowId, 3)
+      // close the tab
+      this.actualActiveTabHistory.clearTabFromWindow(windowId, 3)
+      // perform test
+      const actual = tabs.getNextActiveTabId(windowId, 3)
+      const expected = tabIdParent
+      assert.equal(actual, expected, 'next active tab id is parent tab id of closed tab')
+    })
+
+    it('does not switch to parent if parent is detached', function () {
+      // set preference to activate parent tab of closed tab
+      tabCloseSettingValue = tabCloseAction.PARENT
+      // set the middle tab as active
+      this.actualActiveTabHistory.setActiveTabForWindow(windowId, 3)
+      // detach the parent
+      this.actualActiveTabHistory.clearTabFromWindow(windowId, tabIdParent)
+      const newParentWindowId = windowId + 1
+      this.actualWebContentsCache.getWebContents(tabIdParent).windowId = newParentWindowId
+      this.actualActiveTabHistory.setActiveTabForWindow(newParentWindowId, tabIdParent)
+      // close the tab
+      this.actualActiveTabHistory.clearTabFromWindow(windowId, 3)
+      // perform test
+      const actual = tabs.getNextActiveTabId(windowId, 3)
+      assert.isNull(actual)
+    })
+
+    it('does not switch to parent if child is detached', function () {
+      // set preference to activate parent tab of closed tab
+      tabCloseSettingValue = tabCloseAction.PARENT
+      // set the middle tab as active
+      this.actualActiveTabHistory.setActiveTabForWindow(windowId, 3)
+      // detach a child tab
+      this.actualActiveTabHistory.clearTabFromWindow(windowId, 2)
+      const newChildWindowId = windowId + 1
+      this.actualActiveTabHistory.setActiveTabForWindow(newChildWindowId, 2)
+      const childTab = this.actualWebContentsCache.getWebContents(2)
+      childTab.windowId = newChildWindowId
+      // close the tab
+      this.actualActiveTabHistory.clearTabFromWindow(newChildWindowId, 2)
+      // perform test
+      const actual = tabs.getNextActiveTabId(newChildWindowId, 2)
+      assert.isNull(actual)
+    })
+
+    it('switches to last active', function () {
+      // set preference to active last activated tab
+      tabCloseSettingValue = tabCloseAction.LAST_ACTIVE
+      const activeOrder = [3, 1, 4, 2]
+      for (const tabId of activeOrder) {
+        this.actualActiveTabHistory.setActiveTabForWindow(windowId, tabId)
+      }
+      // close all but the first active tab, and check that the previously-active gets
+      // chosen for becoming active
+      for (let i = activeOrder.length - 1; i > 0; i--) {
+        const closeTabId = activeOrder[i]
+        // close tab
+        this.actualActiveTabHistory.clearTabFromWindow(windowId, closeTabId)
+        // check
+        const expectedNextActiveTabId = activeOrder[i - 1]
+        const actualNextActiveTabId = tabs.getNextActiveTabId(windowId, closeTabId)
+        assert.equal(actualNextActiveTabId, expectedNextActiveTabId, 'next active tab is the previously active tab')
+      }
+    })
+
+    it('switches to next index, by not overriding', function () {
+      // set preference to next index
+      tabCloseSettingValue = tabCloseAction.NEXT
+      // close active tab
+      this.actualActiveTabHistory.clearTabFromWindow(windowId, 4)
+      // shouldn't do anything as muon will handle
+      const actual = tabs.getNextActiveTabId(windowId, 4)
+      assert.isNull(actual, 'next active tab is not set')
     })
   })
 
