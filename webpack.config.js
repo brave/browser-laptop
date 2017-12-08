@@ -158,6 +158,7 @@ var app = {
   output: {
     path: path.resolve(__dirname, 'app', 'extensions', 'brave', 'gen'),
     filename: '[name].entry.js',
+    chunkFilename: '[name].chunk.js',
     publicPath: './gen/'
   }
 }
