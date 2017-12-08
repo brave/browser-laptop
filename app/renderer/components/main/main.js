@@ -283,6 +283,7 @@ class Main extends React.Component {
         if (entry.name === engine) {
           appActions.defaultSearchEngineLoaded(Immutable.fromJS({
             searchURL: entry.search,
+            privateSearchURL: entry.privateSearch,
             autocompleteURL: entry.autocomplete,
             platformClientId: entry.platformClientId
           }))

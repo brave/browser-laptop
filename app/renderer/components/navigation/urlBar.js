@@ -24,6 +24,7 @@ const KeyCodes = require('../../../common/constants/keyCodes')
 // State
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const siteSettings = require('../../../../js/state/siteSettings')
+const urlBarState = require('../../../common/state/urlBarState')
 const tabState = require('../../../common/state/tabState')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
 const ledgerState = require('../../../common/state/ledgerState')
@@ -406,6 +407,7 @@ class UrlBar extends React.Component {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
+    const activeFrameIsPrivate = activeFrame.get('isPrivate')
 
     const location = tabState.getVisibleURL(state, activeTabId)
     const frameLocation = activeFrame.get('location', '')
@@ -414,25 +416,17 @@ class UrlBar extends React.Component {
     const hostValue = displayEntry.get('host', '')
 
     const baseUrl = getBaseUrl(location)
-    const urlbar = activeFrame.getIn(['navbar', 'urlbar'], Immutable.Map())
+    const urlbar = urlBarState.getActiveFrameUrlBarState(activeFrame)
     const urlbarLocation = urlbar.get('location')
     const selectedIndex = urlbar.getIn(['suggestions', 'selectedIndex'])
-    const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame.get('isPrivate'))
+    const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrameIsPrivate)
     const braverySettings = siteSettings.getSiteSettingsForURL(allSiteSettings, location)
 
     // TODO(bridiver) - these definitely needs a helpers
     const publisherKey = ledgerState.getLocationProp(state, baseUrl, 'publisher')
 
-    const activateSearchEngine = urlbar.getIn(['searchDetail', 'activateSearchEngine'])
-    const urlbarSearchDetail = urlbar.get('searchDetail')
-    let searchURL = state.getIn(['searchDetail', 'searchURL'])
-    let searchShortcut = ''
-    // remove shortcut from the search terms
-    if (activateSearchEngine && urlbarSearchDetail !== null) {
-      const provider = urlbarSearchDetail
-      searchShortcut = new RegExp('^' + provider.get('shortcut') + ' ', 'g')
-      searchURL = provider.get('search')
-    }
+    // get search provider state
+    const { searchURL, searchShortcut } = urlBarState.getSearchData(state, activeFrame, urlbar)
     const suggestionList = urlbar.getIn(['suggestions', 'suggestionList'])
     const scriptsBlocked = activeFrame.getIn(['noScript', 'blocked'])
     const enableNoScript = siteSettingsState.isNoScriptEnabled(state, braverySettings)
