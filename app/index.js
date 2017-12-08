@@ -138,10 +138,10 @@ app.on('ready', () => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {
       // Ignore the cert error
-      cb('continue')
+      muonCb('continue')
       return
     } else {
-      cb('deny')
+      muonCb('deny')
     }
 
     if (resourceType !== 'mainFrame') {
