@@ -72,6 +72,9 @@ httpse.leveldb
 # webstrom
 .idea
 
+# VSC
+*.code-workspace
+
 # sync bundle file should be built and copied from the brave/sync repo for now
 app/extensions/brave/content/scripts/sync.js
 
