@@ -16,6 +16,7 @@ const ledgerMediaProviders = require('../../../../../app/common/constants/ledger
 describe('ledger api unit tests', function () {
   let ledgerApi
   let ledgerNotificationsApi
+  let ledgerState
   let isBusy = false
   let ledgerClient
   let ledgerPublisher
@@ -183,6 +184,7 @@ describe('ledger api unit tests', function () {
     })
 
     ledgerNotificationsApi = require('../../../../../app/browser/api/ledgerNotifications')
+    ledgerState = require('../../../../../app/common/state/ledgerState')
 
     // once everything is stubbed, load the ledger
     ledgerApi = require('../../../../../app/browser/api/ledger')
@@ -1438,6 +1440,110 @@ describe('ledger api unit tests', function () {
         .setIn(['ledger', 'info', 'reconcileStamp'], 10001)
       ledgerApi.onPromotionResponse(state)
       assert(ledgerSetTimeUntilReconcile.notCalled)
+    })
+  })
+
+  describe('onWalletRecovery', function () {
+    let setRecoveryStatusSpy, getBalanceSpy, fakeClock
+
+    const unit = Buffer.from([
+      32,
+      87,
+      30,
+      26,
+      223,
+      56,
+      224,
+      31,
+      213,
+      136,
+      248,
+      95,
+      136,
+      56,
+      250,
+      78,
+      179,
+      121,
+      255,
+      162,
+      195,
+      39,
+      143,
+      136,
+      18,
+      140,
+      49,
+      216,
+      221,
+      154,
+      78,
+      173
+    ])
+    const newSeed = new Uint8Array(Object.values(unit))
+    const param = Immutable.fromJS({
+      bootStamp: 1512939627058,
+      properties: {
+        wallet: {
+          altcurrency: 'BAT',
+          keyinfo: {
+            seed: unit
+          }
+        }
+      }
+    })
+
+    before(function () {
+      setRecoveryStatusSpy = sinon.spy(ledgerState, 'setRecoveryStatus')
+      getBalanceSpy = sinon.spy(ledgerApi, 'getBalance')
+      onLedgerCallbackSpy.reset()
+      fakeClock = sinon.useFakeTimers()
+    })
+
+    afterEach(function () {
+      setRecoveryStatusSpy.reset()
+      onLedgerCallbackSpy.reset()
+      getBalanceSpy.reset()
+    })
+
+    after(function () {
+      setRecoveryStatusSpy.restore()
+      onLedgerCallbackSpy.restore()
+      getBalanceSpy.restore()
+      fakeClock.restore()
+    })
+
+    it('on error', function () {
+      const result = ledgerApi.onWalletRecovery(defaultAppState, 'Wrong key')
+      const expectedSate = defaultAppState
+        .set('about', Immutable.fromJS({
+          preferences: {
+            recoverySucceeded: false,
+            updatedStamp: 0
+          }
+        }))
+        .setIn(['ledger', 'info', 'error'], Immutable.fromJS({
+          caller: 'recoveryWallet',
+          error: 'Wrong key'
+        }))
+      assert(setRecoveryStatusSpy.withArgs(sinon.match.any, false))
+      assert.deepEqual(result.toJS(), expectedSate.toJS())
+    })
+
+    it('success', function () {
+      const result = ledgerApi.onWalletRecovery(defaultAppState, null, param)
+      const expectedSate = defaultAppState
+        .set('about', Immutable.fromJS({
+          preferences: {
+            recoverySucceeded: true,
+            updatedStamp: 0
+          }
+        }))
+      assert(setRecoveryStatusSpy.withArgs(sinon.match.any, true))
+      assert.deepEqual(result.toJS(), expectedSate.toJS())
+      const callBack = onLedgerCallbackSpy.getCall(0).args[0]
+      const unit = callBack.getIn(['properties', 'wallet', 'keyinfo', 'seed'])
+      assert.deepStrictEqual(unit, newSeed)
     })
   })
 })
