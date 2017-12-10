@@ -1008,6 +1008,13 @@ const onWalletRecovery = (state, error, result) => {
     state = logError(state, error.toString(), 'recoveryWallet')
     state = ledgerState.setRecoveryStatus(state, false)
   } else {
+    // convert buffer to Uint8Array
+    let seed = result && result.getIn(['properties', 'wallet', 'keyinfo', 'seed'])
+    if (seed) {
+      seed = new Uint8Array(Object.values(seed))
+      result = result.setIn(['properties', 'wallet', 'keyinfo', 'seed'], seed)
+    }
+
     callback(error, result)
 
     if (balanceTimeoutId) {
@@ -2559,7 +2566,8 @@ const getMethods = () => {
       synopsisNormalizer,
       checkVerifiedStatus,
       roundtrip,
-      observeTransactions
+      observeTransactions,
+      onWalletRecovery
     }
   }
 
