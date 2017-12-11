@@ -36,14 +36,22 @@ function config () {
           test: /\.css$/,
           loader: 'style-loader!css-loader?-minimize'
         },
-        // Loads font files for Font Awesome
+        // load font files with url, not data: uri since not every unicode char
+        // or language will be needed on every page and there are many small
+        // size font files
         {
-          test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-          loader: 'url-loader?limit=10000&minetype=application/font-woff'
-        },
-        {
-          test: /\.(ttf|eot|svg|png|jpg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+          test: /\/fonts\/.*\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
           loader: 'file-loader'
+        },
+        // inline other asset files using data: uri unless they are larger than
+        // a certain limit. it is implied that these files are used by all / most
+        // users if they are `require`d and theferore inlined to the main js bundle
+        {
+          test: /\.(woff2|woff|ttf|eot|svg|png|jpg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+          loader: 'url-loader',
+          options: {
+            limit: 10000
+          }
         }
       ]
     },
