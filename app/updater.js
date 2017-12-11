@@ -18,7 +18,6 @@ const appActions = require('../js/actions/appActions')
 const Immutable = require('immutable')
 const dates = require('./dates')
 const Channel = require('./channel')
-const buildConfig = require('../js/constants/buildConfig')
 
 const fs = require('fs')
 const path = require('path')
@@ -150,6 +149,10 @@ var requestVersionInfo = (done, pingOnly) => {
   const weekOfInstallation = state.getIn(['updates', 'weekOfInstallation'], null)
   debug(`weekOfInstallation= ${weekOfInstallation}`)
 
+  // The installation promoCode from buildConfig
+  const promoCode = state.getIn(['updates', 'promoCode'], 'none')
+  debug(`promoCode = ${promoCode}`)
+
   // Build query string based on the last date an update request was made
   const query = paramsFromLastCheckDelta(
     lastCheckYMD,
@@ -157,7 +160,7 @@ var requestVersionInfo = (done, pingOnly) => {
     lastCheckMonth,
     firstCheckMade,
     weekOfInstallation,
-    buildConfig.ref || null
+    promoCode
   )
   query.accept_preview = updateToPreviewReleases ? 'true' : 'false'
   const queryString = `${platformBaseUrl}?${querystring.stringify(query)}`

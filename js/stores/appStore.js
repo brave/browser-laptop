@@ -37,6 +37,7 @@ const profiles = require('../../app/browser/profiles')
 const {zoomLevel} = require('../../app/common/constants/toolbarUserInterfaceScale')
 const {initWindowCacheState} = require('../../app/sessionStoreShutdown')
 const platformUtil = require('../../app/common/lib/platformUtil')
+const buildConfig = require('../constants/buildConfig')
 
 // state helpers
 const {isImmutable, makeImmutable, makeJS} = require('../../app/common/state/immutableUtil')
@@ -494,6 +495,9 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['updates', 'firstCheckMade'], true)
       if (!appState.getIn(['updates', 'weekOfInstallation'])) {
         appState = appState.setIn(['updates', 'weekOfInstallation'], dates.lastMonday(new Date()))
+      }
+      if (!appState.getIn(['updates', 'promoCode'])) {
+        appState = appState.setIn(['updates', 'promoCode'], buildConfig.ref || 'none')
       }
       break
     case appConstants.APP_SET_UPDATE_STATUS:
