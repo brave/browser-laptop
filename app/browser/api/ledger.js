@@ -1908,8 +1908,13 @@ const init = (state) => {
 }
 
 const run = (state, delayTime) => {
+  let noDelay = false
+  if (process.env.LEDGER_NO_DELAY) {
+    noDelay = ledgerClient.prototype.boolion(process.env.LEDGER_NO_DELAY)
+  }
+
   if (clientOptions.verboseP) {
-    console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime)
+    console.log('\nledger client run: clientP=' + (!!client) + ' delayTime=' + delayTime + (noDelay ? ' LEDGER_NO_DELAY=true' : ''))
 
     const line = (fields) => {
       let result = ''
@@ -1993,6 +1998,8 @@ const run = (state, delayTime) => {
 
   if (delayTime > 0) {
     if (runTimeoutId) return
+    // useful for QA - #12249
+    if (noDelay) delayTime = 5000
 
     const active = client
     if (delayTime > (1 * ledgerUtil.milliseconds.hour)) {
