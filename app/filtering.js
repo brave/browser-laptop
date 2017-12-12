@@ -674,11 +674,6 @@ module.exports.initPartition = initPartition
 const filterableProtocols = ['http:', 'https:', 'ws:', 'wss:', 'magnet:', 'file:']
 
 function shouldIgnoreUrl (details) {
-  // internal requests
-  if (details.tabId === -1) {
-    return true
-  }
-
   // data:, is a special origin from SecurityOrigin::urlWithUniqueSecurityOrigin
   // and usually occurs when there is an https in an http main frame
   if (details.firstPartyUrl === 'data:,') {
@@ -860,10 +855,10 @@ module.exports.getMainFrameUrl = (details) => {
     return details.url
   }
   const tab = webContents.fromTabID(details.tabId)
-  if (tab && !tab.isDestroyed()) {
+  try {
     return tab.getURL()
-  }
-  return null
+  } catch (ex) {}
+  return details.firstPartyUrl || null
 }
 
 module.exports.alwaysAllowFullscreen = () => {
