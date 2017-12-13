@@ -36,6 +36,12 @@ class LedgerTable extends ImmutableComponent {
     this.props.onChangeSetting(settings.PAYMENTS_SITES_SHOW_LESS, value)
   }
 
+  onFaviconError (faviconURL, publisherKey) {
+    console.log('missing or corrupted favicon file', faviconURL)
+    // Set the publishers favicon to null so that it gets refetched
+    aboutActions.setLedgerFavicon(publisherKey, null)
+  }
+
   getFormattedTime (synopsis) {
     var d = synopsis.get('daysSpent')
     var h = synopsis.get('hoursSpent')
@@ -170,7 +176,7 @@ class LedgerTable extends ImmutableComponent {
           <a className={css(styles.siteData)} href={publisherURL} rel='noopener' target='_blank' tabIndex={-1}>
             {
               faviconURL
-                ? <img className={css(styles.favicon)} src={faviconURL} alt={siteName} />
+                ? <img className={css(styles.favicon)} src={faviconURL} alt='' onError={this.onFaviconError.bind(null, faviconURL, publisherKey)} />
                 : <span className={css(styles.defaultIcon)}><span className={globalStyles.appIcons.defaultIcon} /></span>
             }
             <span className={css(styles.url)} data-test-id='siteName'>{siteName}</span>
