@@ -155,6 +155,19 @@ const aboutActions = {
   },
 
   /**
+   * Sets ledger publisher favicon property
+   * @param {string} publisherKey
+   * @param {string?} blob
+   */
+  setLedgerFavicon: function (publisherKey, blob) {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_ON_FAVICON_RECEIVED,
+      publisherKey,
+      blob
+    })
+  },
+
+  /**
    * Click through a certificate error.
    *
    * @param {string} url - The URL with the cert error

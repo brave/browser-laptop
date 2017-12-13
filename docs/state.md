@@ -180,6 +180,10 @@ AppStore
     }
   },
   ledger: {
+    about: {
+      synopsis: Array.Object,
+      synopsisOptions: Object
+    },
     info: {
       addresses: {
         BAT: string, 
@@ -340,7 +344,7 @@ AppStore
       publishers: {
         [publisherId]: {
           duration: number,
-          faviconUrl: string,
+          faviconURL: string,
           options: {
             exclude: boolean,
             verified: boolean,
@@ -683,6 +687,7 @@ WindowStore
     }],
     top: number // the top position of the context menu
   },
+  createdFaviconDirectory: boolean, // whether the ledger-favicons directory has been created already in the appData directory
   frames: [{
     aboutDetails: object, // details for about pages
     activeShortcut: string, // set by the application store when the component should react to a shortcut

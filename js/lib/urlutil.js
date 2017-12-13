@@ -206,6 +206,33 @@ const UrlUtil = {
   },
 
   /**
+   * Parses a favicon data URL
+   * @param {String} url The data URL
+   * @returns {{data: String, ext: String}?}
+   */
+  parseFaviconDataUrl: function (url) {
+    if (!UrlUtil.isDataUrl(url)) {
+      return null
+    }
+    const parsed = {}
+    url = url.slice(5) // slice off 'data:' prefix
+    const header = url.split(',')[0]
+    if (!header || !header.includes(';base64')) {
+      return null
+    }
+    const mimeType = header.split(';')[0]
+    if (!mimeType.startsWith('image/')) {
+      return null
+    }
+    parsed.ext = mimeType.split('/')[1]
+    parsed.data = url.split(',')[1]
+    if (parsed.data && parsed.ext) {
+      return parsed
+    }
+    return null
+  },
+
+  /**
    * Checks if a url is a phishable url.
    * @param {String} input The input url.
    * @returns {Boolean}
