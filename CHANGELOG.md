@@ -1,6 +1,15 @@
 # Changelog
 
 Release Notes:
+## [0.19.116](https://github.com/brave/browser-laptop/releases/tag/v0.19.116dev)
+
+ - Added the ability to use DuckDuckGo as a separate default search engine for private tabs. ([#11305](https://github.com/brave/browser-laptop/issues/11305))
+ - Fixed a problem with the restore a backup wallet screen. ([#12254](https://github.com/brave/browser-laptop/issues/12254))
+ - Fixed notification not appearing after a contribution is made. ([#12201](https://github.com/brave/browser-laptop/issues/12201))
+ - Fixed promotion banners need a line break between text. ([#12145](https://github.com/brave/browser-laptop/issues/12145))
+ - Fixed add funds dialog appears even if user already has BAT. ([#12078](https://github.com/brave/browser-laptop/issues/12078))
+ - Fixed records for recent contributions not being displayed. ([#12055](https://github.com/brave/browser-laptop/issues/12055))
+
 ## [0.19.105](https://github.com/brave/browser-laptop/releases/tag/v0.19.105dev)
 
  - Fixed USD conversion for wallet balance always shows 1.00. ([#12054](https://github.com/brave/browser-laptop/issues/12054))
