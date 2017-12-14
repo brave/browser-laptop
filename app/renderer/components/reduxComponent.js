@@ -8,8 +8,8 @@ const mergePropsImpl = (stateProps, ownProps) => {
   return Object.assign({}, stateProps, ownProps)
 }
 
-const buildPropsImpl = (props, componentType) => {
-  const fn = componentType.prototype.mergeProps || mergePropsImpl
+const buildPropsImpl = (props, componentType, mergeStateToProps) => {
+  const fn = mergeStateToProps || mergePropsImpl
   const state = appStore.state.set('currentWindow', windowStore.state)
   return fn(state, props)
 }
@@ -40,9 +40,10 @@ const didPropsChange = function (oldProps, newProps) {
 }
 
 class ReduxComponent extends ImmutableComponent {
-  constructor (componentType, props) {
+  constructor (componentType, mergeStateToProps, props) {
     super(props)
     this.componentType = componentType
+    this.mergeStateToProps = mergeStateToProps
     this.state = this.buildProps(this.props)
     this.checkForUpdates = this.checkForUpdates.bind(this)
     this.dontCheck = true
@@ -85,7 +86,7 @@ class ReduxComponent extends ImmutableComponent {
   }
 
   buildProps (props = this.props) {
-    return buildPropsImpl(props, this.componentType)
+    return buildPropsImpl(props, this.componentType, this.mergeStateToProps)
   }
 
   render () {
@@ -93,6 +94,6 @@ class ReduxComponent extends ImmutableComponent {
   }
 }
 
-module.exports.connect = (componentType) => {
-  return ReduxComponent.bind(null, componentType)
+module.exports.connect = (componentType, mergeStateToProps = componentType.prototype.mergeProps) => {
+  return ReduxComponent.bind(null, componentType, mergeStateToProps)
 }
