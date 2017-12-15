@@ -213,6 +213,7 @@ describe('search suggestions', function () {
       .waitForBrowserWindow()
       .waitForVisible(urlInput)
       .changeSetting(settings.OFFER_SEARCH_SUGGESTIONS, true)
+      .pause(100)
   })
 
   it('Finds search suggestions and performs a search when selected', function * () {
@@ -235,7 +236,7 @@ describe('search suggestions', function () {
       .keys(Brave.keys.DOWN)
       .waitForExist(urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"][data-test2-id="notSelected"]')
       .keys(Brave.keys.ENTER)
-      .waitForInputText(urlInput, /google.*\/.*q=what.+is/)
+      .waitForInputText(urlInput, /google.*\/.*q=what/)
   })
 
   it('does not offer URL suggestions if user is not typing a URL', function * () {
@@ -253,5 +254,24 @@ describe('search suggestions', function () {
           return text.includes('bug') && !text.includes('http')
         })
       })
+  })
+
+  it('Can load search suggestions from non-default search provider', function * () {
+    yield this.app.client.changeSetting(settings.DEFAULT_SEARCH_ENGINE, 'DuckDuckGo')
+      .newTab()
+      .waitForUrl(Brave.newTabUrl)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForExist('[data-test-active-tab][data-frame-key="2"]')
+      .waitForElementFocus(urlInput)
+    const input = 'what is'
+    for (let i = 0; i < input.length; i++) {
+      yield this.app.client
+        .keys(input[i])
+        .pause(50)
+    }
+    yield this.app.client
+      .waitForVisible(urlBarSuggestions)
+      .keys(Brave.keys.ENTER)
+      .waitForInputText(urlInput, /duckduckgo.*\/.*q=what.+is/)
   })
 })
