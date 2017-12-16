@@ -1539,6 +1539,10 @@ describe('ledger api unit tests', function () {
             updatedStamp: 0
           }
         }))
+        .setIn(['ledger', 'info'], Immutable.fromJS({
+          addresses: {},
+          walletQR: {}
+        }))
       assert(setRecoveryStatusSpy.withArgs(sinon.match.any, true))
       assert.deepEqual(result.toJS(), expectedSate.toJS())
       const callBack = onLedgerCallbackSpy.getCall(0).args[0]

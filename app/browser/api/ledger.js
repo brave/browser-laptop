@@ -1015,6 +1015,10 @@ const onWalletRecovery = (state, error, result) => {
       result = result.setIn(['properties', 'wallet', 'keyinfo', 'seed'], seed)
     }
 
+    // remove old QR codes and addresses
+    state = ledgerState.setInfoProp(state, 'walletQR', Immutable.Map())
+    state = ledgerState.setInfoProp(state, 'addresses', Immutable.Map())
+
     callback(error, result)
 
     if (balanceTimeoutId) {
@@ -1494,6 +1498,7 @@ const getPaymentInfo = (state) => {
 
     client.getWalletProperties(amount, currency, function (err, body) {
       if (err) {
+        console.error('getWalletProperties error: ' + err.toString())
         return
       }
 
