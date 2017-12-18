@@ -11,7 +11,7 @@ const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
 const getTransactionCSVRows = ledgerExportUtil.getTransactionCSVRows
 const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
 
-const moment = require('moment')
+const format = require('date-fns/format')
 
 const messages = require('../constants/messages')
 
@@ -463,19 +463,17 @@ class ContributionStatement extends React.Component {
 
 function formattedDateFromTimestamp (timestamp) {
   // e.g. 2016-11-15
-  return moment(new Date(timestamp)).format('YYYY-MM-DD')
+  return format(new Date(timestamp), 'YYYY-MM-DD')
 }
 
 function formattedTimeFromTimestamp (timestamp) {
   // e.g. 4:00pm
-  return moment(new Date(timestamp)).format('h:mma')
+  return format(new Date(timestamp), 'h:mma')
 }
 
 function longFormattedDateFromTimestamp (timestamp) {
-  let momentDate = moment(new Date(timestamp))
-
   // e.g. June 15th at 4:00pm
-  return `${momentDate.format('MMMM Do')} at ${momentDate.format('h:mma')}`
+  return `${format(new Date(timestamp), 'MMMM Do')} at ${format(new Date(timestamp), 'h:mma')}`
 }
 
 const containerMargin = '25px'
