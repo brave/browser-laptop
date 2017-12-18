@@ -22,8 +22,6 @@ const {paymentStylesVariables} = require('../../styles/payment')
 // other
 const aboutUrls = appUrlUtil.aboutUrls
 const aboutContributionsUrl = aboutUrls.get('about:contributions')
-const moment = require('moment')
-moment.locale(navigator.language)
 
 class HistoryContent extends ImmutableComponent {
   render () {
