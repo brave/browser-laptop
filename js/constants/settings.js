@@ -81,6 +81,7 @@ const settings = {
   ADBLOCK_CUSTOM_RULES: 'adblock.customRules',
   TOOLBAR_UI_SCALE: 'advanced.toolbar-ui-scale',
   SWIPE_NAV_DISTANCE: 'advanced.swipe-nav-distance',
+  PAYMENTS_ALLOW_PROMOTIONS: 'advanced.payments-allow-promotions',
   // Sync settings
   SYNC_ENABLED: 'sync.enabled',
   SYNC_DEVICE_NAME: 'sync.device-name',

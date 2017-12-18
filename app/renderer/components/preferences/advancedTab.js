@@ -100,6 +100,7 @@ class AdvancedTab extends ImmutableComponent {
           <SettingCheckbox dataL10nId='useSmoothScroll' prefKey={settings.SMOOTH_SCROLL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           <SettingCheckbox dataL10nId='sendCrashReports' prefKey={settings.SEND_CRASH_REPORTS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
           <SettingCheckbox dataL10nId='sendUsageStatistics' prefKey={settings.SEND_USAGE_STATISTICS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+          <SettingCheckbox dataL10nId='paymentsAllowPromotions' prefKey={settings.PAYMENTS_ALLOW_PROMOTIONS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         </SettingsList>
 
         <DefaultSectionTitle data-l10n-id='toolbarUserInterfaceScale' />
