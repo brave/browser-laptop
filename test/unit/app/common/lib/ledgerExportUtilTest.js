@@ -2,7 +2,7 @@
 const assert = require('assert')
 const underscore = require('underscore')
 const uuid = require('uuid')
-const moment = require('moment')
+const format = require('date-fns/format')
 
 require('../../../braveUnit')
 
@@ -322,7 +322,7 @@ describe('ledger export utilities test', function () {
 
       let tx = txs[0]
       let timestamp = tx.submissionStamp
-      let dateStr = moment(new Date(timestamp)).format('YYYY-MM-DD')
+      let dateStr = format(new Date(timestamp), 'YYYY-MM-DD')
       let expectedExportFilenamePrefix = `${EXPORT_FILENAME_CONST_PREFIX_PART}${dateStr}`
 
       assert.equal(typeof tx.exportFilenamePrefix, 'string', 'transaction should have "exportFilenamePrefix" field with type "string"')
