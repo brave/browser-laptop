@@ -349,6 +349,12 @@ const UrlUtil = {
     return url.replace(`chrome-extension://${pdfjsExtensionId}/`, '')
   },
 
+  getPDFViewerUrl: function (url) {
+    const pdfjsBaseUrl = `chrome-extension://${pdfjsExtensionId}/`
+    const viewerBaseUrl = `${pdfjsBaseUrl}content/web/viewer.html`
+    return `${viewerBaseUrl}?file=${encodeURIComponent(url)}`
+  },
+
   /**
    * Converts a potential PDF URL to the PDFJS URL.
    * XXX: This only looks at the URL file extension, not MIME types.
@@ -357,7 +363,7 @@ const UrlUtil = {
    */
   toPDFJSLocation: function (url) {
     if (url && UrlUtil.isHttpOrHttps(url) && UrlUtil.isFileType(url, 'pdf')) {
-      return `chrome-extension://${pdfjsExtensionId}/${url}`
+      return UrlUtil.getPDFViewerUrl(url)
     }
     return url
   },
