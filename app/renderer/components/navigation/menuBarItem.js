@@ -4,6 +4,7 @@
 
 const React = require('react')
 const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -13,6 +14,9 @@ const windowActions = require('../../../../js/actions/windowActions')
 
 // Utils
 const {showContextMenu} = require('../../../common/lib/menuUtil')
+
+const globalStyles = require('../styles/global')
+const {theme} = require('../styles/theme')
 
 class MenuBarItem extends React.Component {
   constructor (props) {
@@ -66,15 +70,57 @@ class MenuBarItem extends React.Component {
   }
 
   render () {
-    return <span
+    return <span className={css(
+      styles.menubarItem,
+      this.props.selected && styles.menubarItem_selected
+    )}
       data-menubar-item
-      className={'menubarItem' + (this.props.selected ? ' selected' : '')}
       onClick={this.onClick}
       onMouseOver={this.onMouseOver}
-      data-index={this.props.index}>
+      data-index={this.props.index}
+    >
       { this.props.label }
     </span>
   }
 }
+
+const breakpointSmallWin32 = `@media screen and (max-width: ${globalStyles.breakpoint.breakpointSmallWin32})`
+const breakpointTinyWin32 = `@media screen and (max-width: ${globalStyles.breakpoint.breakpointTinyWin32})`
+
+const styles = StyleSheet.create({
+  menubarItem: {
+    boxSizing: 'border-box',
+    color: theme.navigator.menuBar.item.color,
+    font: 'menu',
+    fontSize: '12px',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: theme.navigator.menuBar.item.borderColor,
+    WebkitAppRegion: 'no-drag',
+
+    padding: '0 10px 1px',
+    [breakpointSmallWin32]: { padding: '0 5px 1px' },
+    [breakpointTinyWin32]: { padding: '0 3px 1px' },
+
+    ':hover': {
+      backgroundColor: theme.navigator.menuBar.item.onHover.backgroundColor,
+      borderWidth: '1px',
+      borderStyle: 'solid',
+      borderColor: theme.navigator.menuBar.item.onHover.borderColor
+    }
+  },
+
+  menubarItem_selected: {
+    backgroundColor: theme.navigator.menuBar.item.selected.backgroundColor,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: theme.navigator.menuBar.item.selected.borderColor,
+
+    ':hover': {
+      backgroundColor: theme.navigator.menuBar.item.selected.backgroundColor,
+      borderColor: theme.navigator.menuBar.item.selected.borderColor
+    }
+  }
+})
 
 module.exports = ReduxComponent.connect(MenuBarItem)
