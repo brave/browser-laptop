@@ -3,7 +3,6 @@ const contextMenus = require('./browser/extensions/contextMenus')
 const extensionActions = require('./common/actions/extensionActions')
 const config = require('../js/constants/config')
 const appConfig = require('../js/constants/appConfig')
-const messages = require('../js/constants/messages')
 const {fileUrl} = require('../js/lib/appUrlUtil')
 const {getExtensionsPath, getBraveExtUrl, getBraveExtIndexHTML} = require('../js/lib/appUrlUtil')
 const {getSetting} = require('../js/settings')
@@ -17,7 +16,7 @@ const fs = require('fs')
 const path = require('path')
 const l10n = require('../js/l10n')
 const {bravifyText} = require('./renderer/lib/extensionsUtil')
-const {ipcMain, componentUpdater, session} = require('electron')
+const {componentUpdater, session} = require('electron')
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -394,10 +393,6 @@ module.exports.init = () => {
     }
   })
 
-  ipcMain.on(messages.LOAD_URL_REQUESTED, (e, tabId, url) => {
-    appActions.loadURLRequested(tabId, url)
-  })
-
   process.on('extension-load-error', (error) => {
     console.error(error)
   })
@@ -449,8 +444,26 @@ module.exports.init = () => {
   }
 
   let loadExtension = (extensionId, extensionPath, manifest = {}, manifestLocation = 'unpacked') => {
-    if (extensionId === config.PDFJSExtensionId) {
+    const isPDF = extensionId === config.PDFJSExtensionId
+    if (isPDF) {
       manifestLocation = 'component'
+      // Override the manifest. TODO: Update manifest in pdf.js itself after enough
+      // clients have updated to Brave 0.20.x+
+      manifest = {
+        name: 'PDF Viewer',
+        manifest_version: 2,
+        version: '1.9.457',
+        description: 'Uses HTML5 to display PDF files directly in the browser.',
+        icons: {
+          '128': 'icon128.png',
+          '48': 'icon48.png',
+          '16': 'icon16.png'
+        },
+        permissions: ['storage', '<all_urls>'],
+        content_security_policy: "script-src 'self'; object-src 'self'",
+        incognito: 'split',
+        key: config.PDFJSExtensionPublicKey
+      }
     }
     if (!extensionInfo.isLoaded(extensionId) && !extensionInfo.isLoading(extensionId)) {
       extensionInfo.setState(extensionId, extensionStates.LOADING)
