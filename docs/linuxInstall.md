@@ -16,7 +16,7 @@ automatically and transactionally so your app is always fresh and never broken.
 Installation instructions for `snapd` [can be found here](https://snapcraft.io/docs/core/install).
 Once `snapd` is installed, installing Brave looks like this:
 
-    snap install brave --beta
+    snap install brave
 
 ## Debian (Jessie) and Ubuntu (Artful, Zesty, Yakkety, Xenial, and Trusty) AMD64:
 
