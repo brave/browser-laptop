@@ -52,32 +52,32 @@ describe('notificationBarState test', function () {
     })
   })
 
-  describe('getLedgerNotifications', function () {
+  describe('getGlobalNotifications', function () {
     it('returns a list of ledger-related notifications', function () {
       const notificationsList = Immutable.fromJS([
-        { from: 'ledger', message: 'HELLO LEDGER' },
-        { from: 'ledger', message: 'HELLO YOU' }
+        { position: 'global', message: 'HELLO LEDGER' },
+        { position: 'global', message: 'HELLO YOU' }
       ])
       state = state.mergeIn(['notifications'], notificationsList)
-      const result = notificationBarState.getLedgerNotifications(state)
+      const result = notificationBarState.getGlobalNotifications(state)
       assert.equal(result.size, 2)
     })
 
     it('does not show notifications that are not ledger-related', function () {
       const notificationsList = Immutable.fromJS([
-        { from: 'ledger', message: 'HELLO LEDGER' },
-        { from: 'other place', message: 'HELLO YOU FROM OUTWHERE' }
+        { position: 'global', message: 'HELLO LEDGER' },
+        { position: 'other place', message: 'HELLO YOU FROM OUTWHERE' }
       ])
       state = state.mergeIn(['notifications'], notificationsList)
-      const result = notificationBarState.getLedgerNotifications(state)
+      const result = notificationBarState.getGlobalNotifications(state)
       assert.equal(result.size, 1)
     })
 
     it('returns an empty Immutable list if no ledger-related notification is found', function () {
       state = state.mergeIn(['notifications'], [
-        { from: 'Brazil', message: 'Hello from Brazil!' }
+        { position: 'Brazil', message: 'Hello from Brazil!' }
       ])
-      const result = notificationBarState.getLedgerNotifications(state)
+      const result = notificationBarState.getGlobalNotifications(state)
       assert.equal(result.isEmpty(), true)
       assert.equal(isList(result), true)
     })
