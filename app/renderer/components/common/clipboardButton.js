@@ -42,14 +42,13 @@ class ClipboardButton extends React.Component {
         this.state.visibleLabel && styles.clipboardButton__label_visible,
         (this.props.bottomTooltip || this.props.topTooltip) && styles.clipboardButton__label_vertical,
         (this.props.bottomTooltip && !this.props.topTooltip) && styles.clipboardButton__label_bottom,
-
-        // Applied on add funds panel
-        (!this.props.bottomTooltip && this.props.topTooltip) && styles.clipboardButton__label_top
+        (!this.props.bottomTooltip && this.props.topTooltip) && styles.clipboardButton__label_top // Applied on add funds panel
       )}
         onAnimationEnd={this.onAnimationEnd}
         data-l10n-id='copied'
       />
       <BrowserButton
+        iconOnly
         iconClass={globalStyles.appIcons.clipboard}
         custom={styles.clipboardButton__browserButton}
         l10nId={this.props.dataL10nId ? this.props.dataL10nId : 'copyToClipboard'}

@@ -169,7 +169,7 @@ const globalStyles = {
     navbarMenubarMargin: '7px',
     navbarButtonSpacing: '4px',
     navbarButtonWidth: '20px',
-    navbarBraveButtonWidth: '23px',
+    navbarBraveButtonWidth: '24px',
     navbarBraveButtonMarginLeft: '80px',
     navbarLeftMarginDarwin: '76px',
     sideBarWidth: '190px',
@@ -261,6 +261,7 @@ const globalStyles = {
     exclude: 'fa fa-ban',
     findNext: 'fa fa-caret-down',
     findPrev: 'fa fa-caret-up',
+    link: 'fa fa-link',
     loading: 'fa fa-spinner fa-spin',
     lock: 'fa fa-lock',
     moreInfo: 'fa fa-info-circle',
@@ -276,6 +277,7 @@ const globalStyles = {
     retry: 'fa fa-repeat',
     search: 'fa fa-search',
     trash: 'fa fa-trash',
+    trashO: 'fa fa-trash-o',
     unlock: 'fa fa-unlock',
     user: 'fa fa-user',
     volumeOff: 'fa fa-volume-off',
@@ -367,13 +369,6 @@ const globalStyles = {
     }
   },
 
-  // TODO (Suguru): move them to payment.js after style refactoring is done
-  payments: {
-    fontSize: {
-      regular: '14.5px'
-    }
-  },
-
   sortableTable: {
     cell: {
       normal: {
@@ -382,6 +377,21 @@ const globalStyles = {
 
       small: {
         padding: '.5rem'
+      }
+    }
+  },
+
+  // TODO (Suguru): move them to payment.js after style refactoring is done
+  payments: {
+    fontSize: {
+      regular: '14.5px'
+    }
+  },
+
+  downloadBar: {
+    item: {
+      info: {
+        margin: '6px'
       }
     }
   }

@@ -153,7 +153,8 @@ class BraveryPanel extends React.Component {
             rightl10nId='shieldsUp'
             checkedOn={this.props.shieldsUp}
           />
-          <BrowserButton custom={styles.braveryPanel_compact__header__top__right__close}
+          <BrowserButton
+            custom={styles.braveryPanel_compact__header__top__right__close}
             testId='braveryCloseButton'
             onClick={this.onHide}
           />
@@ -581,9 +582,11 @@ class BraveryPanel extends React.Component {
                   styles.braveryPanel__body__advanced__control__forms__title
                 )}>
                   <span data-l10n-id='fingerprintingProtection' />
-                  <span className={globalStyles.appIcons.question}
-                    title={config.fingerprintingInfoUrl}
+                  <BrowserButton
+                    iconClass={globalStyles.appIcons.question}
+                    custom={styles.braveryPanel__body__iconButton}
                     onClick={this.onInfoClick}
+                    title={config.fingerprintingInfoUrl}
                   />
                 </div>
 
@@ -643,9 +646,13 @@ class BraveryPanel extends React.Component {
               styles.braveryPanel__body__footer__reload,
               styles.braveryPanel__body__footer__reload_clickable
             )}
-              onClick={this.onReload}>
+              onClick={this.onReload}
+            >
               <span className={css(styles.braveryPanel__body__footer__reload__text)} data-l10n-id='reload' />
-              <span className='fa fa-repeat' />
+              <BrowserButton
+                iconClass={globalStyles.appIcons.retry}
+                custom={styles.braveryPanel__body__iconButton}
+              />
             </div>
           </div>
         </section>
@@ -653,8 +660,6 @@ class BraveryPanel extends React.Component {
     </Dialog>
   }
 }
-
-module.exports = ReduxComponent.connect(BraveryPanel)
 
 const displayHost = {
   fontSize: '20px',
@@ -806,19 +811,13 @@ const styles = StyleSheet.create({
   },
   braveryPanel_compact__header__top__right__close: {
     // ref: https://github.com/brave/browser-laptop/blob/master/app/renderer/components/common/modalOverlay.js#L160
-    display: 'inline-block',
-    color: globalStyles.braveryPanel.header.color,
+    position: 'absolute',
+    right: '10px',
+    top: '15px',
     height: buttonSize,
     width: buttonSize,
-    cursor: 'pointer',
-    position: 'absolute',
-    top: '15px',
-    right: '10px',
-
-    // TODO: refactor button to remove !important
-    padding: '0 !important',
-    background: `url(${closeButton}) center no-repeat !important`,
-    backgroundSize: `${buttonSize} ${buttonSize} !important`,
+    background: `url(${closeButton}) center no-repeat`,
+    backgroundSize: `${buttonSize} ${buttonSize}`,
 
     ':focus': {
       outline: 'none'
@@ -945,6 +944,12 @@ const styles = StyleSheet.create({
     height: '1px',
     margin: '1rem 0'
   },
+  braveryPanel__body__iconButton: {
+    fontSize: '.9rem',
+    lineHeight: '.9rem',
+    height: '.9rem',
+    width: '.9rem'
+  },
   braveryPanel__body__footer: {
     display: 'flex',
     flexFlow: 'row wrap',
@@ -958,13 +963,11 @@ const styles = StyleSheet.create({
   },
   braveryPanel__body__footer__reload: {
     display: 'flex',
-    alignItems: 'baseline'
+    alignItems: 'baseline',
+    cursor: 'pointer'
   },
   braveryPanel__body__footer__reload__text: {
     marginRight: '.3rem'
-  },
-  braveryPanel__body__footer__reload_clickable: {
-    cursor: 'pointer'
   },
 
   // braveryPanelBody - Compact Panel
@@ -1038,12 +1041,6 @@ const styles = StyleSheet.create({
   braveryPanel__body__advanced__control__switchControl_noScript: {
     marginTop: '2.5px'
   },
-  braveryPanel__body__advanced__control__switchControl__infoButton: {
-    display: 'inline',
-    cursor: 'pointer',
-    paddingLeft: '2px',
-    fontSize: '15px'
-  },
 
   // controlWrapper - Normal Panel
   braveryPanel__body__advanced__control__forms__dropdown: {
@@ -1060,3 +1057,5 @@ const styles = StyleSheet.create({
     padding: '0 4px'
   }
 })
+
+module.exports = ReduxComponent.connect(BraveryPanel)

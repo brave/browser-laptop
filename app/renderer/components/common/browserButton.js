@@ -18,11 +18,14 @@ class BrowserButton extends ImmutableComponent {
       this.props.actionItem &&
         [styles.browserButton_default, styles.browserButton_subtleItem, styles.browserButton_actionItem],
       this.props.extensionItem && styles.browserButton_extensionItem,
-      this.props.groupedItem && styles.browserButton_groupedItem,
       this.props.notificationItem && styles.browserButton_notificationItem,
       this.props.panelItem && styles.browserButton_panelItem,
-      this.props.iconOnly && styles.browserButton_iconOnly,
       this.props.fitContent && styles.browserButton_fitContent,
+      this.props.groupedItem && styles.browserButton_groupedItem,
+      this.props.smallItem && styles.browserButton_smallItem,
+      this.props.iconOnly && styles.browserButton_iconOnly,
+      this.props.isMaskImage && styles.browserButton_isMaskImage,
+
       // TODO: These are other button styles app-wise
       // that needs to be refactored and included in this file
       // .............................................
@@ -65,8 +68,10 @@ class BrowserButton extends ImmutableComponent {
       data-l10n-id={this.props.l10nId}
       data-test-id={this.props.testId}
       data-test2-id={this.props.test2Id}
+      data-test-pinned={this.props.testPinned}
       data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
       style={this.buttonStyle}
+      title={this.props.title}
       data-button-value={this.props.dataButtonValue}
       onClick={this.props.onClick}
       className={css(this.classNames, this.props.custom)}>
@@ -89,7 +94,6 @@ const styles = StyleSheet.create({
     width: buttonSize,
     whiteSpace: 'nowrap',
     outline: 'none',
-    cursor: 'default',
     display: 'inline-block',
     borderRadius: '2px',
     textAlign: 'center',
@@ -101,6 +105,9 @@ const styles = StyleSheet.create({
     backgroundImage: 'none',
     backgroundColor: globalStyles.button.default.backgroundColor,
     border: 'none',
+
+    // See #11114
+    cursor: 'pointer',
 
     // TODO: #9223
     fontSize: '13px',
@@ -120,6 +127,16 @@ const styles = StyleSheet.create({
     // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L49
     color: globalStyles.button.color,
 
+    // #9223
+    // Set the common default font-family with common.less and window.less
+    // See:
+    //  - https://github.com/brave/browser-laptop/blob/e1b67c219b64b829cae284717de6ecccb0da8154/less/about/common.less#L11
+    //  - https://github.com/brave/browser-laptop/blob/321281bc2de68f46fed89c87a97dd8c4e35f35c5/less/window.less#L10
+    fontFamily: globalStyles.defaultFontFamily,
+    // Currently -webkit-font-smoothing works only on macOS. See: https://caniuse.com/#search=font-smooth
+    // Set initial to cancel the inherited value
+    WebkitFontSmoothing: 'initial',
+
     // See #11111
     WebkitAppRegion: 'no-drag',
 
@@ -132,11 +149,11 @@ const styles = StyleSheet.create({
   browserButton_default: {
     position: 'relative',
     boxShadow: globalStyles.button.default.boxShadow,
-    cursor: 'pointer',
 
-    // TODO: #9223
+    // #9223
     height: '32px', // 32px == 1rem * 2
     fontSize: globalStyles.spacing.defaultFontSize,
+    fontWeight: 400,
     lineHeight: 1.25,
 
     // cf: https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L92
@@ -172,10 +189,9 @@ const styles = StyleSheet.create({
     borderRight: '2px solid transparent',
     borderTop: `2px solid ${globalStyles.button.primary.gradientColor1}`,
     borderBottom: `2px solid ${globalStyles.button.primary.gradientColor2}`,
-    cursor: 'pointer',
 
-    // https://github.com/brave/browser-laptop/blob/548e11b1c889332fadb379237555625ad2a3c845/less/button.less#L115
-    fontWeight: 500,
+    // #9223
+    fontWeight: 300,
 
     ':hover': {
       border: `2px solid ${globalStyles.button.primary.borderHoverColor}`,
@@ -187,8 +203,6 @@ const styles = StyleSheet.create({
     background: globalStyles.button.secondary.background,
     border: '1px solid white',
     color: globalStyles.button.secondary.color,
-    cursor: 'pointer',
-    fontWeight: 500,
 
     ':hover': {
       border: `1px solid ${globalStyles.button.secondary.borderHoverColor}`,
@@ -222,6 +236,14 @@ const styles = StyleSheet.create({
     ':first-child': {
       marginLeft: '0'
     }
+  },
+
+  browserButton_smallItem: {
+    fontSize: '12px',
+    minWidth: 'fit-content',
+    height: 'auto',
+    paddingTop: '3px',
+    paddingBottom: '3px'
   },
 
   browserButton_notificationItem: {
@@ -263,6 +285,14 @@ const styles = StyleSheet.create({
     width: '18px',
     height: '18px',
     fontSize: '24px'
+  },
+
+  // -webkit-mask-image requires background-color instead of color specified above
+  // See bookmarkTitleHeader.js for an example
+  browserButton_isMaskImage: {
+    ':hover': {
+      backgroundColor: globalStyles.button.default.hoverColor
+    }
   },
 
   browserButton_disabled: {

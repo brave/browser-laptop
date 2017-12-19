@@ -29,6 +29,10 @@
       flex-grow: 1;
 
       .columnHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
         background: linear-gradient(to bottom, @lightGray, @veryLightGray);
         border-top: 1px solid @gray;
         text-align: left;
@@ -80,8 +84,14 @@
 
       .sortableTable {
         user-select: none;
+
         // Custom title column (has add bookmark icon)
-        th:first-of-type > div { display: block; }
+        th:first-of-type > div {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
         // Bookmark last visited column
         th:nth-of-type(2), td.date { width: 250px; }
         td {
@@ -140,55 +150,6 @@
 
 .bookmarkFolderList list >* {
   padding-left: 12px;
-}
-
-.addBookmarkFolder,
-.addBookmark {
-  background-color: @buttonColor;
-  -webkit-mask-repeat: no-repeat;
-  width: 24px;
-  height: 26px;
-  float: right;
-  margin-right: 7px;
-}
-
-.addBookmarkFolder {
-  -webkit-mask-image: url('../../img/toolbar/add_BM_folder_btn.svg');
-}
-
-.addBookmark {
-  -webkit-mask-image: url('../../img/toolbar/add_bookmark_btn.svg');
-  width: 20px;
-  height: 20px;
-}
-
-.addBookmark,
-.addBookmarkFolder,
-.importBrowserData,
-.exportBookmarks {
-  &:hover {
-    background-color: #000;
-  }
-}
-
-.exportBookmarks,
-.importBrowserData {
-  background-color: @buttonColor;
-  -webkit-mask-repeat: no-repeat;
-  width: 43px;
-  height: 22px;
-  display: inline-block;
-  vertical-align: top;
-  margin: 7px 0 5px 10px;
-}
-
-
-.importBrowserData {
-  -webkit-mask-image: url('../../img/toolbar/bookmarks_import.svg');
-}
-
-.exportBookmarks {
-  -webkit-mask-image: url('../../img/toolbar/bookmarks_export.svg');
 }
 
 // Reset styles for small breakpoints

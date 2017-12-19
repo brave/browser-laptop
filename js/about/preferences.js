@@ -167,7 +167,7 @@ class GeneralTab extends ImmutableComponent {
             iconOnly
             iconClass={globalStyles.appIcons.moreInfo}
             size='.95rem'
-            custom={styles.appIcons_moreInfo}
+            custom={[styles.appIcons, styles.appIcons_moreInfo]}
             onClick={aboutActions.createTabRequested.bind(null, {
               url: 'https://community.brave.com/t/how-to-set-up-multiple-home-pages/'
             })}
@@ -981,6 +981,10 @@ class AboutPreferences extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  appIcons: {
+    color: globalStyles.color.mediumGray
+  },
+
   appIcons_moreInfo: {
     marginLeft: '5px'
   },

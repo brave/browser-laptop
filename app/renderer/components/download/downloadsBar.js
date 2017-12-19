@@ -8,7 +8,6 @@ const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
-const Button = require('../common/button')
 const BrowserButton = require('../common/browserButton')
 const DownloadItem = require('./downloadItem')
 
@@ -21,6 +20,9 @@ const appActions = require('../../../../js/actions/appActions')
 const contextMenus = require('../../../../js/contextMenus')
 const downloadUtil = require('../../../../js/state/downloadUtil')
 const cx = require('../../../../js/lib/classSet')
+
+const closeDownloadButton = require('../../../../img/toolbar/close_download_btn.svg')
+const closeDownloadButtonHover = require('../../../../img/toolbar/close_download_btn_hover.svg')
 
 class DownloadsBar extends React.Component {
   constructor (props) {
@@ -65,15 +67,16 @@ class DownloadsBar extends React.Component {
         downloadBarButtons: true,
         [css(styles.downloadsBar__downloadBarButtons)]: true
       })}>
-        <BrowserButton
-          secondaryColor
+        <BrowserButton secondaryColor
+          custom={styles.downloadsBar__downloadBarButtons__viewAllButton}
           l10nId='downloadViewAll'
           testId='downloadViewAll'
-          custom={styles.downloadsBar__downloadBarButtons__viewAllButton}
           onClick={this.onShowDownloads}
         />
-        <Button
-          className='downloadButton hideDownloadsToolbar'
+        <BrowserButton
+          iconOnly
+          size='14px'
+          custom={styles.downloadsBar__downloadBarButtons__hideButton}
           testId='hideDownloadsToolbar'
           onClick={this.onHideDownloadsToolbar}
         />
@@ -81,8 +84,6 @@ class DownloadsBar extends React.Component {
     </div>
   }
 }
-
-module.exports = ReduxComponent.connect(DownloadsBar)
 
 const styles = StyleSheet.create({
   downloadsBar__downloadBarButtons: {
@@ -93,5 +94,15 @@ const styles = StyleSheet.create({
 
   downloadsBar__downloadBarButtons__viewAllButton: {
     marginRight: '20px'
+  },
+
+  downloadsBar__downloadBarButtons__hideButton: {
+    background: `url(${closeDownloadButton}) center no-repeat !important`,
+
+    ':hover': {
+      background: `url(${closeDownloadButtonHover}) center no-repeat !important`
+    }
   }
 })
+
+module.exports = ReduxComponent.connect(DownloadsBar)

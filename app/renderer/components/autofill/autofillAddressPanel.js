@@ -9,7 +9,7 @@ const {css} = require('aphrodite/no-important')
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
-const Button = require('../common/button')
+const BrowserButton = require('../common/browserButton')
 const {
   CommonForm,
   CommonFormSection,
@@ -272,12 +272,12 @@ class AutofillAddressPanel extends React.Component {
           </div>
         </CommonFormSection>
         <CommonFormSection buttons>
-          <Button className='whiteButton'
+          <BrowserButton groupedItem secondaryColor
             l10nId='cancel'
             testId='cancelAddressButton'
             onClick={this.onHide}
           />
-          <Button className='primaryButton'
+          <BrowserButton groupedItem primaryColor
             disabled={this.props.disableSaveButton}
             l10nId='save'
             testId='saveAddressButton'

@@ -222,7 +222,12 @@ class AboutHistory extends React.Component {
           <input type='text' className='searchInput' ref='historySearch' id='historySearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='historySearch' />
           {
             this.state.search
-            ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear' />
+            ? <BrowserButton
+              iconClass={globalStyles.appIcons.remove}
+              iconStyle={{ color: globalStyles.color.gray }}
+              custom={styles.headerActions__search__input__button_clear}
+              onClick={this.onClearSearchText}
+            />
             : <span className='fa fa-search searchInputPlaceholder' />
           }
         </div>
@@ -251,6 +256,16 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center'
+  },
+
+  headerActions__search__input__button_clear: {
+    // See siteDetails.less
+    margin: 0,
+    padding: 0,
+    width: 0,
+    position: 'relative',
+    left: '-25px',
+    fontSize: '16px'
   },
 
   subTitleMargin: {

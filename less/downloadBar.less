@@ -100,9 +100,9 @@
       }
 
       .downloadInfo {
-        display: flex;
-        margin: auto 0;
-        .downloadFilename, .downloadState, .downloadOrigin {
+        .downloadFilename,
+        .downloadState,
+        .downloadOrigin {
           margin: auto 0;
           white-space: nowrap;
           overflow: hidden;
@@ -127,63 +127,19 @@
       }
 
       .downloadActions {
-        margin: 8px 0 0;
-
-        .browserButton {
-          font-size: 14px;
-          height: auto;
-          line-height: inherit;
-          margin: auto 15px auto auto;
-          width: auto;
-
-          &.removeDownloadFromList {
-            float: right;
-            margin-right: 0;
-          }
-
-          &:hover {
-            color: @highlightBlue;
-          }
-        }
+        margin: 6px 0 0;
       }
 
       .deleteConfirmation {
-        line-height: 2;
-        border-bottom: 1px solid #CCC;
-        padding: 5px 0;
-        margin-bottom: auto 0 10px 0;
-        font-size: 12px;
-
-        .confirmDeleteButton {
-          font-weight: normal;
-          padding: 1px;
-          min-width: 50px;
-          float: right;
-          margin-right: -5px;
-        }
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
       }
     }
   }
 
   .downloadBarButtons {
     margin: auto 0;
-
-    .downloadButton {
-      background: url('../img/toolbar/close_download_btn.svg') center no-repeat;
-      background-size: 14px 14px;
-      height: 18px;
-      width: 18px;
-
-      &:hover {
-        background: url('../img/toolbar/close_download_btn_hover.svg') center no-repeat;
-        background-size: 14px 14px;
-        height: 18px;
-        width: 18px;
-      }
-
-      &.hideButton:not([disabled]):hover {
-        background: @chromeControlsWarningBackground;
-      }
-    }
   }
 }

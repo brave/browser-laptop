@@ -5,7 +5,7 @@
 const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
 const cx = require('../../../../js/lib/classSet')
-const Button = require('./button')
+const BrowserButton = require('./browserButton')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
@@ -62,7 +62,7 @@ class ModalOverlay extends ImmutableComponent {
 
     if (!this.props.emptyDialog) {
       close = (this.props.onHide
-        ? <Button className={css(styles.dialog__header__close)}
+        ? <BrowserButton custom={styles.dialog__header__close}
           testId='modalCloseButton'
           onClick={this.props.onHide}
         /> : null)
@@ -174,18 +174,13 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   dialog__header__close: {
-    display: 'inline-block',
     position: 'absolute',
     right: buttonSize,
     top: buttonSize,
     height: buttonSize,
     width: buttonSize,
-    cursor: 'pointer',
-
-    // TODO: refactor button to remove !important
-    padding: '0 !important',
-    background: `url(${closeButton}) center no-repeat !important`,
-    backgroundSize: `${buttonSize} ${buttonSize} !important`,
+    background: `url(${closeButton}) center no-repeat`,
+    backgroundSize: `${buttonSize} ${buttonSize}`,
 
     ':focus': {
       outline: 'none'

@@ -225,18 +225,22 @@ class LedgerTable extends ImmutableComponent {
       },
       {
         html: <div className={css(styles.actionIcons)}>
-          <span className={css(
-            styles.actionIcons__icon,
-            styles.actionIcons__icon_pin,
-            pinned && styles.actionIcons__icon_pin_isPinned
-          )}
+          <BrowserButton
+            isMaskImage
+            custom={[
+              styles.actionIcons__icon,
+              styles.actionIcons__icon_pin,
+              pinned && styles.actionIcons__icon_pin_isPinned
+            ]}
             onClick={this.togglePinSite.bind(this, this.getHostPattern(synopsis), !pinned, percentage)}
-            data-test-pinned={pinned}
+            testPinned={pinned}
           />
-          <span className={css(
-            styles.actionIcons__icon,
-            styles.actionIcons__icon_remove
-          )}
+          <BrowserButton
+            isMaskImage
+            custom={[
+              styles.actionIcons__icon,
+              styles.actionIcons__icon_remove
+            ]}
             onClick={this.banSite.bind(this, this.getHostPattern(synopsis))}
           />
         </div>,
