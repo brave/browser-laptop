@@ -63,7 +63,6 @@ const ipc = window.chrome.ipcRenderer
 const hintCount = 3
 
 // Stylesheets
-require('../../less/switchControls.less')
 require('../../less/about/preferences.less')
 require('../../less/forms.less')
 require('../../less/button.less')

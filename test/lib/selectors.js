@@ -56,7 +56,7 @@ module.exports = {
   adsBlockedControl: '[data-test-id="adsBlockedControl"]',
   showAdsOption: '[data-test-id="showAdsOption"]',
   blockAdsOption: '[data-test-id="blockAdsOption"]',
-  noScriptSwitch: '[data-test-id="noScriptSwitch"] [data-test-id="switchMiddle"]',
+  noScriptSwitch: '[data-test-id="noScriptSwitch"] [data-test-id="switchBackground"]',
   fpControl: '[data-test-id="fpControl"]',
   blockFpOption: '[data-test-id="blockAllFingerprinting"]',
   allowFpOption: '[data-test-id="allowAllFingerprinting"]',
@@ -66,8 +66,8 @@ module.exports = {
   blockAllCookiesOption: '[data-test-id="blockAllCookies"]',
 
   braveryPanelContainer: '[data-test-id="braveryPanelContainer"]',
-  httpsEverywhereSwitch: '[data-test-id="httpsEverywhereSwitch"] [data-test-id="switchMiddle"]',
-  safeBrowsingSwitch: '[data-test-id="safeBrowsingSwitch"] [data-test-id="switchMiddle"]',
+  httpsEverywhereSwitch: '[data-test-id="httpsEverywhereSwitch"] [data-test-id="switchBackground"]',
+  safeBrowsingSwitch: '[data-test-id="safeBrowsingSwitch"] [data-test-id="switchBackground"]',
   noScriptNavButton: '[data-test-id="noScriptButton"]',
   noScriptInfo: '[data-test-id="noScriptInfo"]',
   noScriptAllowTempButton: '[data-test-id="allowScriptsTemp"]',
@@ -133,8 +133,8 @@ module.exports = {
   contextMenuItemText: '[data-test-id="contextMenuItemText"]',
 
   // used by the MessageBox control
-  msgBoxSuppress: '[data-test-id^="msgBoxTab_"] [data-test-id="switchMiddle"]',
-  msgBoxSuppressTrue: '[data-test-id^="msgBoxTab_"] [data-test-id="switchMiddle"] [data-test2-id="switchedOn"]',
+  msgBoxSuppress: '[data-test-id^="msgBoxTab_"] [data-test-id="switchBackground"]',
+  msgBoxSuppressTrue: '[data-test-id^="msgBoxTab_"] [data-test-id="switchBackground"][data-test2-id="switchedOn"]',
   msgBoxMessage: '[data-test-id="msgBoxMessage"]',
   msgBoxTitle: '[data-test-id="msgBoxTitle"]',
 

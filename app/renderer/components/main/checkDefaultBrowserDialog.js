@@ -84,7 +84,7 @@ class CheckDefaultBrowserDialog extends React.Component {
             <div>
               <div className={css(styles.section__title)} data-l10n-id='makeBraveDefault' />
               <SwitchControl
-                className={css(styles.section__switchControl)}
+                customStyleWrapper={styles.section__switchControl}
                 rightl10nId='checkDefaultOnStartup'
                 checkedOn={this.props.checkDefaultOnStartup}
                 onClick={this.onCheckDefaultOnStartup}

@@ -70,7 +70,7 @@ describe('Clear Browsing Panel', function () {
         })
       yield openClearBrowsingDataPanel(this.app.client)
       yield this.app.client
-        .waitForVisible('[data-test-id="browserHistorySwitch"] [data-test2-id="switchedOn"]')
+        .waitForVisible('[data-test-id="browserHistorySwitch"] [data-test-id="switchBackground"][data-test2-id="switchedOn"]')
         .waitForVisible(clearDataButton)
         .click(clearDataButton)
         .waitUntil(function () {
@@ -120,7 +120,7 @@ describe('Clear Browsing Panel', function () {
         .waitForVisible(clearBrowsingDataButton)
         .click(clearBrowsingDataButton)
         .waitForBrowserWindow()
-        .waitForVisible('[data-test-id="browserHistorySwitch"] [data-test2-id="switchedOn"]')
+        .waitForVisible('[data-test-id="browserHistorySwitch"] [data-test-id="switchBackground"][data-test2-id="switchedOn"]')
         .waitForVisible(clearDataButton)
         .click(clearDataButton)
         .waitUntil(function () {

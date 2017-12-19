@@ -66,10 +66,6 @@ const globalStyles = {
     braveLightOrange: '#FF7A1D',
     braveMediumOrange: 'rgb(232, 72, 0)',
     braveDarkOrange: '#D44600',
-    switchBG_off: '#d3d3d3',
-    switchBG_off_lrg: '#adadad',
-    switchBG_dis: '#e8e8e8',
-    switchNubColor: 'white',
     veryLightGray: 'rgb(250, 250, 250)',
     lightGray: 'rgb(236, 236, 236)',
     gray: 'rgb(153, 153, 153)',
@@ -139,8 +135,14 @@ const globalStyles = {
     textAreaFontSize: '14.5px',
     dragSpacing: '50px',
     switchHeight: '16px',
+    switchHeightLarge: '26px',
+    switchHeightSmall: '12px',
     switchWidth: '45px',
+    switchWidthLarge: '60px',
+    switchWidthSmall: '30px',
     switchNubDiameter: '12px',
+    switchNubDiameterLarge: '22px',
+    switchNubDiameterSmall: '10px',
     switchNubTopMargin: '2px',
     switchNubLeftMargin: '2px',
     switchNubRightMargin: '2px',
@@ -392,7 +394,6 @@ globalStyles.color.focusUrlbarOutline = globalStyles.color.highlightBlue
 globalStyles.color.siteSecureColor = globalStyles.color.buttonColor
 globalStyles.color.loadTimeColor = globalStyles.color.highlightBlue
 globalStyles.color.activeTabDefaultColor = globalStyles.color.chromePrimary
-globalStyles.color.switchBG_on = globalStyles.color.braveOrange
 
 globalStyles.braveryPanel.stats.colorAds = globalStyles.color.statsRed
 globalStyles.braveryPanel.stats.colorRedirected = globalStyles.color.statsBlue

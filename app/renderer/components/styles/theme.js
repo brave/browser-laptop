@@ -234,5 +234,31 @@
       newTabBackground: '#222',
       privateTabBackground: globalStyles.color.privateTabBackgroundActive,
       privateTabBackground2: '#000'
+    },
+
+    switchControl: {
+      label: {
+        top: {
+          color: '#bbb'
+        }
+      },
+
+      switch: {
+        off: {
+          backgroundColor: '#d3d3d3',
+
+          large: {
+            backgroundColor: '#adadad'
+          }
+        },
+
+        on: {
+          backgroundColor: globalStyles.color.braveOrange
+        },
+
+        indicator: {
+          backgroundColor: '#fff'
+        }
+      }
     }
   }

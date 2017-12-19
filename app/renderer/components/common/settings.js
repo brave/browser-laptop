@@ -96,8 +96,8 @@ class SettingCheckbox extends ImmutableComponent {
         onClick={this.onClick}
         checkedOn={this.props.checked !== undefined ? this.props.checked : getSetting(this.props.prefKey, this.props.settings)}
         className={this.props.switchClassName}
-        customRightTextClassName={this.props.rightLabelClassName}
-        customLeftTextClassName={this.props.leftLabelClassName}
+        customStyleTextRight={this.props.customStyleTextRight}
+        customStyleTextLeft={this.props.customStyleTextLeft}
         rightl10nId={this.props.dataL10nId}
         rightl10nArgs={this.props.dataL10nArgs}
         leftl10nId={this.props.dataL10nIdLeft}
