@@ -435,6 +435,8 @@ function tabTemplateInit (frameProps) {
   const template = [CommonMenu.newTabMenuItem(frameProps.get('tabId'))]
   const location = frameProps.get('location')
   const store = windowStore.getState()
+  const frames = store.get('frames')
+  const closedFrames = store.get('closedFrames')
 
   if (location !== 'about:newtab') {
     template.push(
@@ -454,7 +456,7 @@ function tabTemplateInit (frameProps) {
       })
   }
 
-  if (windowStore.getState().get('frames').size > 1 &&
+  if (frames && frames.size > 1 &&
       !frameProps.get('pinnedLocation')) {
     template.push({
       label: locale.translation('detach'),
@@ -486,7 +488,6 @@ function tabTemplateInit (frameProps) {
   //   }
   // })
 
-  const frames = windowStore.getState().get('frames')
   const frameToSkip = frameProps.get('key')
   const frameList = frames.map((frame) => {
     return {
@@ -551,7 +552,7 @@ function tabTemplateInit (frameProps) {
 
   template.push(Object.assign({},
     CommonMenu.reopenLastClosedTabItem(),
-    { enabled: store.get('closedFrames').size > 0 }
+    { enabled: closedFrames ? closedFrames.size > 0 : false }
   ))
 
   return menuUtil.sanitizeTemplateItems(template)
