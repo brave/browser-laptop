@@ -25,7 +25,6 @@ module.exports = { "providers" :
       "base" : "https://duckduckgo.com",
       "image" : "https://duckduckgo.com/favicon.ico",
       "search" : "https://duckduckgo.com/?q={searchTerms}&t=brave",
-      "privateSearch" : "https://duckduckgo.com/?q={searchTerms}&t=bravep",
       "autocomplete" : "https://ac.duckduckgo.com/ac/?q={searchTerms}&type=list",
       "shortcut" : ":d"
     },
