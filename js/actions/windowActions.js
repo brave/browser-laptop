@@ -1033,13 +1033,6 @@ const windowActions = {
     })
   },
 
-  onTabMouseMove: function (data) {
-    dispatch({
-      actionType: windowConstants.WINDOW_TAB_MOUSE_MOVE,
-      data
-    })
-  },
-
   onTabMouseLeave: function (data) {
     dispatch({
       actionType: windowConstants.WINDOW_TAB_MOUSE_LEAVE,
