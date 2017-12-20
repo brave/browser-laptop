@@ -43,7 +43,6 @@ let windowState = Immutable.fromJS({
   }
 })
 let lastEmittedState
-let mouseTimeout
 
 const CHANGE_EVENT = 'change'
 
@@ -357,21 +356,8 @@ const doAction = (action) => {
         windowState = frameStateUtil.updateTabPageIndex(windowState, action.frameProps.get('tabId'))
       }
       break
-    case windowConstants.WINDOW_TAB_MOUSE_MOVE:
-      {
-        // previewMode is only triggered if mouse is idle over a tab
-        // for a given amount of time based on timing defined in prefs->tabs
-        // we use actions here because that is the only way to delay updating the state
-        clearTimeout(mouseTimeout)
-        mouseTimeout = setTimeout(
-          () => windowActions.setTabHoverState(action.data, true, true),
-          getSetting(settings.TAB_PREVIEW_TIMING)
-        )
-        break
-      }
     case windowConstants.WINDOW_SET_TAB_HOVER_STATE:
       {
-        clearTimeout(mouseTimeout)
         windowState = frameStateUtil
           .setTabHoverState(windowState, action.frameKey, action.hoverState, action.previewMode)
         break

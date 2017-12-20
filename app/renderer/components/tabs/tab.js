@@ -30,6 +30,7 @@ const tabUIState = require('../../../common/state/tabUIState')
 const tabState = require('../../../common/state/tabState')
 
 // Constants
+const settings = require('../../../../js/constants/settings')
 const dragTypes = require('../../../../js/constants/dragTypes')
 
 // Styles
@@ -48,6 +49,7 @@ const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const {getCurrentWindowId} = require('../../currentWindow')
 const {setObserver} = require('../../lib/observerUtil')
 const UrlUtil = require('../../../../js/lib/urlutil')
+const {getSetting} = require('../../../../js/settings')
 
 class Tab extends React.Component {
   constructor (props) {
@@ -62,6 +64,7 @@ class Tab extends React.Component {
     this.onClickTab = this.onClickTab.bind(this)
     this.onObserve = this.onObserve.bind(this)
     this.tabNode = null
+    this.mouseTimeout = null
   }
 
   get frame () {
@@ -152,12 +155,14 @@ class Tab extends React.Component {
   onMouseLeave (e) {
     // mouseleave will keep the previewMode
     // as long as the related target is another tab
+    clearTimeout(this.mouseTimeout)
     windowActions.setTabHoverState(this.props.frameKey, false, hasTabAsRelatedTarget(e))
   }
 
   onMouseEnter (e) {
     // if mouse entered a tab we only trigger a new preview
     // if user is in previewMode, which is defined by mouse move
+    clearTimeout(this.mouseTimeout)
     windowActions.setTabHoverState(this.props.frameKey, true, this.props.previewMode)
     // In case there's a tab preview happening, cancel the preview
     // when mouse is over a tab
@@ -167,7 +172,12 @@ class Tab extends React.Component {
   onMouseMove () {
     // dispatch a message to the store so it can delay
     // and preview the tab based on mouse idle time
-    windowActions.onTabMouseMove(this.props.frameKey)
+    clearTimeout(this.mouseTimeout)
+    this.mouseTimeout = setTimeout(
+      () => {
+        windowActions.setTabHoverState(this.props.frameKey, true, true)
+      },
+      getSetting(settings.TAB_PREVIEW_TIMING))
   }
 
   onAuxClick (e) {
@@ -221,6 +231,7 @@ class Tab extends React.Component {
 
   componentWillUnmount () {
     this.observer.unobserve(this.tabSentinel)
+    clearTimeout(this.mouseTimeout)
   }
 
   onObserve (entries) {
