@@ -1,6 +1,11 @@
 # Changelog
 
 Release Notes:
+## [0.19.121](https://github.com/brave/browser-laptop/releases/tag/v0.19.121dev)
+
+ - Upgraded muon to 4.5.31. ([#12206](https://github.com/brave/browser-laptop/issues/12206))
+ - Upgraded Chromium to 63.0.3239.108. ([#11890](https://github.com/brave/browser-laptop/issues/11890))
+
 ## [0.19.116](https://github.com/brave/browser-laptop/releases/tag/v0.19.116dev)
 
  - Added the ability to use DuckDuckGo as a separate default search engine for private tabs. ([#11305](https://github.com/brave/browser-laptop/issues/11305))
