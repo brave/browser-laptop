@@ -1,6 +1,10 @@
 # Changelog
 
 Release Notes:
+## [0.19.122](https://github.com/brave/browser-laptop/releases/tag/v0.19.122dev)
+
+ - Fixed DuckDuckGo referral code for private search. ([#12347](https://github.com/brave/browser-laptop/issues/12347))
+
 ## [0.19.121](https://github.com/brave/browser-laptop/releases/tag/v0.19.121dev)
 
  - Upgraded muon to 4.5.31. ([#12206](https://github.com/brave/browser-laptop/issues/12206))
