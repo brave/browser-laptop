@@ -5,11 +5,14 @@ Submitter Checklist:
 - [ ] Added/updated tests for this change (for new code or code which already has tests).
 - [ ] Ran `git rebase -i` to squash commits (if needed).
 - [ ] Tagged reviewers and labelled the pull request [as needed](https://github.com/brave/browser-laptop/wiki/Pull-request-process).
+- [ ] Request a security/privacy review [as needed](https://github.com/brave/handbook/blob/master/development/security.md#how-to-request-a-security-review). (Ask a Brave employee to help if you cannot access this document.)
 
 Test Plan:
 
 
 Reviewer Checklist:
+
+- [ ] Request a security/privacy review [as needed](https://github.com/brave/handbook/blob/master/development/security.md#how-to-request-a-security-review) if one was not already requested.
 
 Tests
 
