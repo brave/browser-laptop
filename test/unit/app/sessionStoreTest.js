@@ -1317,14 +1317,65 @@ describe('sessionStore unit tests', function () {
             objectId: [
               16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
             ]
+          },
+          'https://www.example-bookmark.com|0|0': {
+            'lastAccessedTime': 1513663682383,
+            'customTitle': 'My favorite site',
+            'order': 23678,
+            'parentFolderId': 0,
+            'partitionNumber': 0,
+            'favicon': 'https://www.example-bookmark.com/favicon.ico',
+            'location': 'https://www.example-bookmark.com',
+            'title': 'Brave Software - Example Bookmark 1',
+            'tags': [
+              'bookmark'
+            ],
+            'themeColor': 'rgb(136, 136, 136)',
+            objectId: [
+              2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32
+            ]
+          },
+          'https://www.example-bookmark2.com|0|0': {
+            'lastAccessedTime': 1513663682484,
+            'order': 23679,
+            'favicon': 'https://www.example-bookmark2.com/favicon.ico',
+            'location': 'https://www.example-bookmark2.com',
+            'title': 'Brave Software - Example Bookmark 2',
+            'tags': [
+              'bookmark'
+            ],
+            'themeColor': 'rgb(0, 0, 0)'
+          },
+          'https://www.history-example.com|0|0': {
+            'lastAccessedTime': 1513835914244,
+            'order': 29015,
+            'count': 1,
+            'partitionNumber': 0,
+            'favicon': 'https://www.history-example.com/favicon.ico',
+            'location': 'https://www.history-example.com',
+            'title': 'Brave Software - Example History Entry',
+            'tags': [],
+            'themeColor': 'rgb(250, 250, 250)'
           }
+        },
+        locationSiteKeysCache: {
+          fakeEntry: 2
         },
         // BEGIN - these values should never exist for actual users
         pinnedSites: {
           'https://should-be-cleared-on-migrate.com|0|0': {}
         },
+        bookmarks: {
+          'https://not-a-real-entry|0|0': {}
+        },
         bookmarkFolders: {
           '12': {}
+        },
+        cache: {
+          fakeEntry: {}
+        },
+        history: {
+          'https://not-a-real-entry|0': {}
         },
         // END - these values should never exist for actual users
         'about': {
@@ -1581,15 +1632,106 @@ describe('sessionStore unit tests', function () {
         })
 
         describe('bookmarks', function () {
-          // TODO:
+          let oldValue
+          let newValue
+
+          before(function () {
+            oldValue = data.getIn(['sites', 'https://www.example-bookmark.com|0|0'])
+            newValue = runPreMigrations.bookmarks['https://www.example-bookmark.com|0|0']
+          })
+
+          describe('with title', function () {
+            it('copies from customTitle if present', function () {
+              assert.equal(oldValue.get('customTitle'), newValue.title)
+            })
+            it('copies from title when customTitle is not present', function () {
+              const tempOldValue = data.getIn(['sites', 'https://www.example-bookmark2.com|0|0'])
+              const tempNewValue = runPreMigrations.bookmarks['https://www.example-bookmark2.com|0|0']
+              assert.equal(tempOldValue.get('title'), tempNewValue.title)
+            })
+          })
+          describe('with parentFolderId', function () {
+            it('copies from parentFolderId if present', function () {
+              assert.equal(oldValue.get('parentFolderId'), newValue.parentFolderId)
+            })
+            it('defaults to 0 is not present', function () {
+              const tempNewValue = runPreMigrations.bookmarks['https://www.example-bookmark2.com|0|0']
+              assert.equal(tempNewValue.parentFolderId, 0)
+            })
+          })
+          it('copies location', function () {
+            assert.equal(oldValue.get('location'), newValue.location)
+          })
+          it('copies partitionNumber', function () {
+            assert.equal(oldValue.get('partitionNumber'), newValue.partitionNumber)
+          })
+          it('copies objectId', function () {
+            assert.deepEqual(oldValue.get('objectId').toJS(), newValue.objectId)
+          })
+          it('copies favicon', function () {
+            assert.deepEqual(oldValue.get('favicon'), newValue.favicon)
+          })
+          it('copies themeColor', function () {
+            assert.deepEqual(oldValue.get('themeColor'), newValue.themeColor)
+          })
+          it('sets type to bookmark', function () {
+            assert.equal(newValue.type, siteTags.BOOKMARK)
+          })
+          it('sets key', function () {
+            assert.equal(newValue.key, 'https://www.example-bookmark.com|0|0')
+          })
+          it('destroys any existing values in `data.bookmarks`', function () {
+            assert.equal(runPreMigrations.bookmarks['https://not-a-real-entry|0|0'], undefined)
+          })
         })
 
-        describe('add cache to the state', function () {
-          // TODO:
+        describe('adding cache to the state', function () {
+          let oldValue
+          let newValue
+
+          before(function () {
+            oldValue = data.get('locationSiteKeysCache')
+            newValue = runPreMigrations.cache
+          })
+
+          it('copies the entry for bookmark location from existing cache', function () {
+            assert.deepEqual(newValue.bookmarkLocation, oldValue.toJS())
+          })
+          it('creates an entry for bookmark order', function () {
+            assert(newValue.bookmarkOrder)
+          })
+          it('destroys any existing values in `data.cache`', function () {
+            assert.equal(newValue.fakeEntry, undefined)
+          })
         })
 
         describe('history', function () {
-          // TODO:
+          let oldValue
+          let newValue
+
+          before(function () {
+            oldValue = data.getIn(['sites', 'https://www.history-example.com|0|0'])
+            newValue = runPreMigrations.historySites['https://www.history-example.com|0']
+          })
+
+          it('copies location', function () {
+            assert.equal(oldValue.get('location'), newValue.location)
+          })
+          it('copies partitionNumber', function () {
+            assert.equal(oldValue.get('partitionNumber'), newValue.partitionNumber)
+          })
+          it('copies favicon', function () {
+            assert.deepEqual(oldValue.get('favicon'), newValue.favicon)
+          })
+          it('copies title', function () {
+            assert.deepEqual(oldValue.get('title'), newValue.title)
+          })
+          it('copies themeColor', function () {
+            assert.deepEqual(oldValue.get('themeColor'), newValue.themeColor)
+          })
+          it('destroys any existing values in `data.historySites`', function () {
+            assert.equal(runPreMigrations.historySites['https://not-a-real-entry|0'], undefined)
+          })
         })
 
         it('deletes `data.sites`', function () {
