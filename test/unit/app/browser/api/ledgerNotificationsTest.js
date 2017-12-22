@@ -599,7 +599,7 @@ describe('ledgerNotifications unit test', function () {
     it('we set global notification', function () {
       const notification = state
         .getIn(['ledger', 'promotion', 'stateWallet', 'disabledWallet', 'notification'])
-        .set('from', 'ledger')
+        .set('position', 'global')
       ledgerNotificationsApi.showPromotionNotification(state)
       assert(showNotificationSpy.withArgs(notification.toJS()).calledOnce)
     })

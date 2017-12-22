@@ -255,6 +255,7 @@ app.on('ready', () => {
           options: {
             persist: false
           },
+          position: 'global',
           message
         })
         prefsRestartCallbacks[message] = (buttonIndex, persist) => {
