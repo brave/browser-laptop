@@ -79,6 +79,14 @@ describe('appUrlUtil test', function () {
       assert.equal(fileUrl, expected)
     })
   })
+  describe('chromeUrl', function () {
+    it('can convert file paths', function () {
+      const filePath = '/users/bbondy/space here/tesT.html'
+      const chromeUrl = appUrlUtil.chromeUrl(filePath)
+      const expected = 'chrome://brave/users/bbondy/space%20here/tesT.html'
+      assert.equal(chromeUrl, expected)
+    })
+  })
   describe('newFrameUrl', function () {
     describe('when NEWTAB_MODE = HOMEPAGE', function () {
       it('returns the configured home page', function () {
