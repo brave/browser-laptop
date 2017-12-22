@@ -40,7 +40,8 @@ const fullscreenOption = {
 
 const autoplayOption = {
   ALWAYS_ASK: 'alwaysAsk',
-  ALWAYS_ALLOW: 'alwaysAllow'
+  ALWAYS_ALLOW: 'alwaysAllow',
+  ALWAYS_DENY: 'alwaysDeny'
 }
 
 module.exports = {

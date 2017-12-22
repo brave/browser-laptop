@@ -7,13 +7,16 @@ const fakeElectron = require('../../../lib/fakeElectron')
 
 const appConstants = require('../../../../../js/constants/appConstants')
 const messages = require('../../../../../js/constants/messages')
+const settings = require('../../../../../js/constants/settings')
+const {autoplayOption} = require('../../../../../app/common/constants/settingsEnums')
 require('../../../braveUnit')
 
 describe('autoplayReducer unit tests', function () {
   let autoplayReducer
-  let fakeWebContents, fakeAppActions, fakeLocale
+  let fakeWebContents, fakeAppActions, fakeLocale, fakeSettings
   let showNotificationSpy, hideNotificationSpy, translationSpy,
-    removeListenerSpy, changeSiteSettingSpy, removeSiteSettingSpy
+    removeListenerSpy, changeSiteSettingSpy, removeSiteSettingSpy, getSettingSpy
+  let autoplayMedia = autoplayOption.ALWAYS_ASK
   const tabId = 123
   const url = 'https://www.brave.com/niceplay'
   const origin = 'https://www.brave.com'
@@ -78,16 +81,27 @@ describe('autoplayReducer unit tests', function () {
       }
     }
 
+    fakeSettings = {
+      getSetting: (settingKey, settingsCollection) => {
+        switch (settingKey) {
+          case settings.AUTOPLAY_MEDIA:
+            return autoplayMedia
+        }
+      }
+    }
+
     showNotificationSpy = sinon.spy(fakeAppActions, 'showNotification')
     hideNotificationSpy = sinon.spy(fakeAppActions, 'hideNotification')
     translationSpy = sinon.spy(fakeLocale, 'translation')
     removeListenerSpy = sinon.spy(fakeElectron.ipcMain, 'removeListener')
     changeSiteSettingSpy = sinon.spy(fakeAppActions, 'changeSiteSetting')
     removeSiteSettingSpy = sinon.spy(fakeAppActions, 'removeSiteSetting')
+    getSettingSpy = sinon.spy(fakeSettings, 'getSetting')
 
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('../../../js/actions/appActions', fakeAppActions)
     mockery.registerMock('../../locale', fakeLocale)
+    mockery.registerMock('../../../js/settings', fakeSettings)
 
     autoplayReducer = require('../../../../../app/browser/reducers/autoplayReducer')
   })
@@ -99,12 +113,14 @@ describe('autoplayReducer unit tests', function () {
     removeListenerSpy.restore()
     changeSiteSettingSpy.restore()
     removeSiteSettingSpy.restore()
+    getSettingSpy.restore()
     mockery.deregisterAll()
     mockery.disable()
   })
 
   describe('Allow autoplay once', function () {
     before(function () {
+      autoplayMedia = autoplayOption.ALWAYS_ASK
       autoplayReducer(Immutable.fromJS({
         siteSettings: {}
       }), Immutable.fromJS({
@@ -139,6 +155,7 @@ describe('autoplayReducer unit tests', function () {
 
   describe('Allow autoplay and remember', function () {
     before(function () {
+      autoplayMedia = autoplayOption.ALWAYS_ASK
       autoplayReducer(Immutable.fromJS({
         siteSettings: {}
       }), Immutable.fromJS({
@@ -173,6 +190,7 @@ describe('autoplayReducer unit tests', function () {
 
   describe('Deny autoplay once', function () {
     before(function () {
+      autoplayMedia = autoplayOption.ALWAYS_ASK
       autoplayReducer(Immutable.fromJS({
         siteSettings: {}
       }), Immutable.fromJS({
@@ -203,6 +221,7 @@ describe('autoplayReducer unit tests', function () {
 
   describe('Deny autoplay and remember', function () {
     before(function () {
+      autoplayMedia = autoplayOption.ALWAYS_ASK
       autoplayReducer(Immutable.fromJS({
         siteSettings: {}
       }), Immutable.fromJS({
@@ -235,8 +254,31 @@ describe('autoplayReducer unit tests', function () {
     })
   })
 
+  describe('Always deny', function () {
+    before(function () {
+      translationSpy.reset()
+      showNotificationSpy.reset()
+      autoplayMedia = autoplayOption.ALWAYS_DENY
+      autoplayReducer(Immutable.fromJS({
+        siteSettings: {}
+      }), Immutable.fromJS({
+        actionType: appConstants.APP_AUTOPLAY_BLOCKED,
+        tabId: tabId
+      }))
+    })
+
+    it('no calls local.translation', function () {
+      assert(translationSpy.notCalled)
+    })
+
+    it('no calls appActions.showNotification', function () {
+      assert(showNotificationSpy.withArgs(showNotificationArg).notCalled)
+    })
+  })
+
   describe('Calling with exsting deny rules', function () {
     before(function () {
+      autoplayMedia = autoplayOption.ALWAYS_ASK
       showNotificationSpy.reset()
       autoplayReducer(Immutable.fromJS({
         siteSettings: {
@@ -261,6 +303,7 @@ describe('autoplayReducer unit tests', function () {
 
   describe('APP_MEDIA_STARTED_PLAYING', function () {
     before(function () {
+      autoplayMedia = autoplayOption.ALWAYS_ASK
       autoplayReducer(Immutable.fromJS({
         siteSettings: {}
       }), Immutable.fromJS({
