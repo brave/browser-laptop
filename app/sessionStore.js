@@ -674,7 +674,7 @@ module.exports.runPreMigrations = (data) => {
 
   if (data.sites) {
     // pinned sites
-    data.pinnedSites = data.pinnedSites || {}
+    data.pinnedSites = {}
     for (let key of Object.keys(data.sites)) {
       const site = data.sites[key]
       if (site.tags && site.tags.includes('pinned')) {
@@ -716,111 +716,102 @@ module.exports.runPreMigrations = (data) => {
     let bookmarkOrder = {}
 
     // bookmark folders
-    if (!data.bookmarkFolders) {
-      data.bookmarkFolders = {}
+    data.bookmarkFolders = {}
+    for (let key of Object.keys(data.sites)) {
+      const oldFolder = data.sites[key]
+      if (oldFolder.tags && oldFolder.tags.includes(siteTags.BOOKMARK_FOLDER)) {
+        let folder = {}
+        key = key.toString()
 
-      for (let key of Object.keys(data.sites)) {
-        const oldFolder = data.sites[key]
-        if (oldFolder.tags && oldFolder.tags.includes(siteTags.BOOKMARK_FOLDER)) {
-          let folder = {}
-          key = key.toString()
-
-          if (oldFolder.customTitle) {
-            folder.title = oldFolder.customTitle
-          } else {
-            folder.title = oldFolder.title
-          }
-
-          if (oldFolder.parentFolderId == null) {
-            folder.parentFolderId = 0
-          } else {
-            folder.parentFolderId = oldFolder.parentFolderId
-          }
-
-          folder.folderId = oldFolder.folderId
-          folder.partitionNumber = oldFolder.partitionNumber
-          folder.objectId = oldFolder.objectId
-          folder.type = siteTags.BOOKMARK_FOLDER
-          folder.key = key
-          data.bookmarkFolders[key] = folder
-
-          // bookmark order
-          const id = folder.parentFolderId.toString()
-          if (!bookmarkOrder[id]) {
-            bookmarkOrder[id] = []
-          }
-
-          bookmarkOrder[id].push({
-            key: key,
-            order: oldFolder.order,
-            type: siteTags.BOOKMARK_FOLDER
-          })
+        if (oldFolder.customTitle) {
+          folder.title = oldFolder.customTitle
+        } else {
+          folder.title = oldFolder.title
         }
+
+        if (oldFolder.parentFolderId == null) {
+          folder.parentFolderId = 0
+        } else {
+          folder.parentFolderId = oldFolder.parentFolderId
+        }
+
+        folder.folderId = oldFolder.folderId
+        folder.partitionNumber = oldFolder.partitionNumber
+        folder.objectId = oldFolder.objectId
+        folder.type = siteTags.BOOKMARK_FOLDER
+        folder.key = key
+        data.bookmarkFolders[key] = folder
+
+        // bookmark order
+        const id = folder.parentFolderId.toString()
+        if (!bookmarkOrder[id]) {
+          bookmarkOrder[id] = []
+        }
+
+        bookmarkOrder[id].push({
+          key: key,
+          order: oldFolder.order,
+          type: siteTags.BOOKMARK_FOLDER
+        })
       }
     }
 
     // bookmarks
-    if (!data.bookmarks) {
-      data.bookmarks = {}
+    data.bookmarks = {}
 
-      for (let key of Object.keys(data.sites)) {
-        const oldBookmark = data.sites[key]
-        if (oldBookmark.tags && oldBookmark.tags.includes(siteTags.BOOKMARK)) {
-          let bookmark = {}
+    for (let key of Object.keys(data.sites)) {
+      const oldBookmark = data.sites[key]
+      if (oldBookmark.tags && oldBookmark.tags.includes(siteTags.BOOKMARK)) {
+        let bookmark = {}
 
-          if (oldBookmark.customTitle && oldBookmark.customTitle.length > 0) {
-            bookmark.title = oldBookmark.customTitle
-          } else {
-            bookmark.title = oldBookmark.title
-          }
-
-          if (oldBookmark.parentFolderId == null) {
-            bookmark.parentFolderId = 0
-          } else {
-            bookmark.parentFolderId = oldBookmark.parentFolderId
-          }
-
-          bookmark.location = oldBookmark.location
-          bookmark.partitionNumber = oldBookmark.partitionNumber
-          bookmark.objectId = oldBookmark.objectId
-          bookmark.favicon = oldBookmark.favicon
-          bookmark.themeColor = oldBookmark.themeColor
-          bookmark.type = siteTags.BOOKMARK
-          bookmark.key = key
-          data.bookmarks[key] = bookmark
-
-          // bookmark order
-          const id = bookmark.parentFolderId.toString()
-          if (!bookmarkOrder[id]) {
-            bookmarkOrder[id] = []
-          }
-
-          bookmarkOrder[id].push({
-            key: key,
-            order: oldBookmark.order,
-            type: siteTags.BOOKMARK
-          })
+        if (oldBookmark.customTitle && oldBookmark.customTitle.length > 0) {
+          bookmark.title = oldBookmark.customTitle
+        } else {
+          bookmark.title = oldBookmark.title
         }
+
+        if (oldBookmark.parentFolderId == null) {
+          bookmark.parentFolderId = 0
+        } else {
+          bookmark.parentFolderId = oldBookmark.parentFolderId
+        }
+
+        bookmark.location = oldBookmark.location
+        bookmark.partitionNumber = oldBookmark.partitionNumber
+        bookmark.objectId = oldBookmark.objectId
+        bookmark.favicon = oldBookmark.favicon
+        bookmark.themeColor = oldBookmark.themeColor
+        bookmark.type = siteTags.BOOKMARK
+        bookmark.key = key
+        data.bookmarks[key] = bookmark
+
+        // bookmark order
+        const id = bookmark.parentFolderId.toString()
+        if (!bookmarkOrder[id]) {
+          bookmarkOrder[id] = []
+        }
+
+        bookmarkOrder[id].push({
+          key: key,
+          order: oldBookmark.order,
+          type: siteTags.BOOKMARK
+        })
       }
     }
 
     // Add cache to the state
-    if (!data.cache) {
-      data.cache = {}
-      data.cache.bookmarkLocation = data.locationSiteKeysCache
-      data.cache.bookmarkOrder = sortBookmarkOrder(bookmarkOrder)
-    }
+    data.cache = {}
+    data.cache.bookmarkLocation = data.locationSiteKeysCache
+    data.cache.bookmarkOrder = sortBookmarkOrder(bookmarkOrder)
 
     // history
-    if (!data.historySites) {
-      data.historySites = {}
+    data.historySites = {}
 
-      for (let key of Object.keys(data.sites)) {
-        const site = data.sites[key]
-        const newKey = historyUtil.getKey(makeImmutable(site))
-        if (site.lastAccessedTime || !site.tags || site.tags.length === 0) {
-          data.historySites[newKey] = site
-        }
+    for (let key of Object.keys(data.sites)) {
+      const site = data.sites[key]
+      const newKey = historyUtil.getKey(makeImmutable(site))
+      if (site.lastAccessedTime || !site.tags || site.tags.length === 0) {
+        data.historySites[newKey] = site
       }
     }
 
