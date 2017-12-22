@@ -22,6 +22,7 @@ const platformUtil = require('../common/lib/platformUtil')
 const windowState = require('../common/state/windowState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
 const {zoomLevel} = require('../common/constants/toolbarUserInterfaceScale')
+const activeTabHistory = require('./activeTabHistory')
 
 const isDarwin = platformUtil.isDarwin()
 const {app, BrowserWindow, ipcMain} = electron
@@ -43,6 +44,7 @@ const getWindowState = (win) => {
 
 const cleanupWindow = (windowId) => {
   delete currentWindows[windowId]
+  activeTabHistory.clearTabbedWindow(windowId)
 }
 
 const getWindowValue = (windowId) => {
