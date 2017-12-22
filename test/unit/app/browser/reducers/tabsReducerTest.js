@@ -4,7 +4,7 @@ const assert = require('assert')
 const mockery = require('mockery')
 const sinon = require('sinon')
 const appConstants = require('../../../../../js/constants/appConstants')
-const tabActions = require('../../../../../app/common/actions/tabActions')
+const tabActionsConsts = require('../../../../../app/common/constants/tabAction')
 const dragTypes = require('../../../../../js/constants/dragTypes')
 const fakeElectron = require('../../../lib/fakeElectron')
 const fakeAdBlock = require('../../../lib/fakeAdBlock')
@@ -111,7 +111,7 @@ describe('tabsReducer unit tests', function () {
       this.tabId = 1
 
       this.action = {
-        actionType: tabActions.reload.name,
+        actionType: tabActionsConsts.RELOAD,
         tabId: this.tabId
       }
       this.reload = sinon.spy()
@@ -139,7 +139,7 @@ describe('tabsReducer unit tests', function () {
       }
 
       const action = {
-        actionType: tabActions.didFinishNavigation.name,
+        actionType: tabActionsConsts.FINISH_NAVIGATION,
         tabId: this.tabId,
         navigationState: this.navigationState
       }
@@ -173,7 +173,7 @@ describe('tabsReducer unit tests', function () {
       }
 
       const action = {
-        actionType: tabActions.didStartNavigation.name,
+        actionType: tabActionsConsts.START_NAVIGATION,
         tabId: this.tabId,
         navigationState: this.navigationState
       }
