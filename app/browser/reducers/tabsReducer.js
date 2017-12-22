@@ -201,8 +201,6 @@ const tabsReducer = (state, action, immutableAction) => {
         if (tabId === tabState.TAB_ID_NONE) {
           break
         }
-        const nextActiveTabId = tabs.getNextActiveTab(state, tabId)
-
         // Must be called before tab is removed
         // But still check for no tabId because on tab detach there's a dummy tabId
         const tabValue = tabState.getByTabId(state, tabId)
@@ -211,11 +209,6 @@ const tabsReducer = (state, action, immutableAction) => {
           state = tabs.updateTabsStateForWindow(state, windowIdOfTabBeingRemoved)
         }
         state = tabState.removeTabByTabId(state, tabId)
-        setImmediate(() => {
-          if (nextActiveTabId !== tabState.TAB_ID_NONE) {
-            tabs.setActive(nextActiveTabId)
-          }
-        })
         tabs.forgetTab(tabId)
       }
       break

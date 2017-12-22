@@ -11,16 +11,31 @@ const cleanupWebContents = (tabId) => {
 }
 
 const getWebContents = (tabId) => {
-  return currentWebContents[tabId]
+  const tabData = currentWebContents[tabId]
+  return tabData ? tabData.tab : null
 }
 
-const updateWebContents = (tabId, tab) => {
-  currentWebContents[tabId] = tab
+const getOpenerTabId = (tabId) => {
+  const tabData = currentWebContents[tabId]
+  return tabData ? tabData.openerTabId : null
+}
+
+const updateWebContents = (tabId, tab, openerTabId) => {
+  currentWebContents[tabId] = { tab, openerTabId }
+}
+
+const forgetOpenerForTabId = (tabId) => {
+  const tabData = currentWebContents[tabId]
+  if (tabData) {
+    tabData.openerTabId = null
+  }
 }
 
 module.exports = {
   cleanupWebContents,
   getWebContents,
+  getOpenerTabId,
+  forgetOpenerForTabId,
   updateWebContents,
   currentWebContents
 }
