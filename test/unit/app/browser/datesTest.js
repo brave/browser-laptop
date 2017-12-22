@@ -7,7 +7,7 @@ let dates
 require('../../braveUnit')
 
 describe('update date handling', function () {
-  const exampleDate = 1510687381887 // Tuesday November 14th 2017, 12:23:01 PM
+  const exampleDate = 1510654981887 // Tuesday November 14th 2017, 10:23:01 UTC
   const exampleDate2 = 1512304291746 // Monday December 04th 2017, 9:18:11 AM
   let fakeClock
   before(function () {
