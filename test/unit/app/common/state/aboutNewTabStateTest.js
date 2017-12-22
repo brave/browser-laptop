@@ -1,7 +1,12 @@
-/* global describe, it */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* global describe, it, before, after */
 const aboutNewTabState = require('../../../../../app/common/state/aboutNewTabState')
 const Immutable = require('immutable')
 const assert = require('assert')
+const sinon = require('sinon')
 
 const defaultAppState = Immutable.fromJS({
   about: {
@@ -10,7 +15,7 @@ const defaultAppState = Immutable.fromJS({
       sites: [],
       ignoredTopSites: [],
       pinnedTopSites: [],
-      updatedStamp: undefined
+      updatedStamp: 0
     }
   }
 })
@@ -26,10 +31,10 @@ const assertTimeUpdated = (state) => {
 const assertNoChange = (state) => {
   const updatedStamp = state.getIn(['about', 'newtab', 'updatedStamp'])
   assert.deepEqual(state, defaultAppState)
-  assert.equal(updatedStamp, undefined)
+  assert.equal(updatedStamp, 0)
 }
 
-describe('aboutNewTabState', function () {
+describe('aboutNewTabState unit test', function () {
   describe('getSites', function () {
     it('returns the contents of about.newtab.sites', function () {
       const expectedSites = Immutable.List().push(1).push(2).push(3)
@@ -85,6 +90,27 @@ describe('aboutNewTabState', function () {
       const state = aboutNewTabState.mergeDetails(defaultAppState, action)
       const updatedValue = state.getIn(['about', 'newtab', 'testing123'])
       assert.equal(updatedValue, 'TEST STRING')
+    })
+  })
+
+  describe('clearTopSites', function () {
+    before(function () {
+      this.clock = sinon.useFakeTimers()
+      this.clock.tick(0)
+    })
+
+    after(function () {
+      this.clock.restore()
+    })
+
+    it('is cleared', function () {
+      const state = defaultAppState.setIn(['about', 'newtab', 'sites'], Immutable.fromJS([
+        {
+          location: 'https://brave.com'
+        }
+      ]))
+      const topSItes = aboutNewTabState.clearTopSites(state)
+      assert.deepEqual(topSItes.toJS(), defaultAppState.toJS())
     })
   })
 })
