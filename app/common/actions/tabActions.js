@@ -5,19 +5,20 @@
 'use strict'
 
 const dispatchAction = require('../../common/dispatcher/dispatchAction')
+const tabActionConstants = require('../../common/constants/tabAction')
 
 const tabActions = {
   // TODO(bridiver) - this is an action anti-pattern and the code that uses it should be refactored
   // to be declarative
-  reload: function tabActionsReload (tabId, ignoreCache) {
-    dispatchAction(tabActions.reload.name, {
+  reload: (tabId, ignoreCache) => {
+    dispatchAction(tabActionConstants.RELOAD, {
       tabId,
       ignoreCache
     })
   },
 
-  didFinishNavigation: function tabActionsDidFinishNavigation (tabId, navigationState, windowId) {
-    dispatchAction(tabActions.didFinishNavigation.name, {
+  didFinishNavigation: (tabId, navigationState, windowId) => {
+    dispatchAction(tabActionConstants.FINISH_NAVIGATION, {
       tabId,
       navigationState,
       queryInfo: {
@@ -26,8 +27,8 @@ const tabActions = {
     })
   },
 
-  didStartNavigation: function tabActionsDidStartNavigation (tabId, navigationState, windowId) {
-    dispatchAction(tabActions.didFinishNavigation.name, {
+  didStartNavigation: (tabId, navigationState, windowId) => {
+    dispatchAction(tabActionConstants.START_NAVIGATION, {
       tabId,
       navigationState,
       queryInfo: {
