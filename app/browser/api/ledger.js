@@ -2632,7 +2632,9 @@ const getPromotion = (state) => {
 
   tempClient.getPromotion(lang, paymentId, (err, result) => {
     if (err) {
-      console.error('Error retrieving promotion', err.toString())
+      if (clientOptions.verboseP) {
+        console.error('Error retrieving promotion', err.toString())
+      }
       return
     }
 
