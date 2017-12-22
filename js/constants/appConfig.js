@@ -210,6 +210,7 @@ module.exports = {
     'advanced.send-usage-statistics': false,
     'advanced.toolbar-ui-scale': 'normal',
     'advanced.swipe-nav-distance': 101,
+    'advanced.payments-allow-promotions': true,
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
     'shutdown.clear-cache': false,
