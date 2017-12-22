@@ -260,17 +260,14 @@ const showDisabledNotifications = (state) => {
     }
 
     appActions.showNotification({
-      from: 'ledger',
+      position: 'global',
       greeting: locale.translation('updateHello'),
       message: text.tryPayments,
       buttons: [
         {text: locale.translation('noThanks')},
         {text: locale.translation('notificationTryPaymentsYes'), className: 'primaryButton'}
       ],
-      options: {
-        style: 'greetingStyle',
-        persist: false
-      }
+      options: displayOptions
     })
   }
 }
@@ -279,7 +276,7 @@ const showReviewPublishers = (nextTime) => {
   appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP, nextTime)
 
   appActions.showNotification({
-    from: 'ledger',
+    position: 'global',
     greeting: text.hello,
     message: text.reconciliation,
     buttons: [
@@ -296,7 +293,7 @@ const showAddFunds = () => {
   appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP, nextTime)
 
   appActions.showNotification({
-    from: 'ledger',
+    position: 'global',
     greeting: text.hello,
     message: text.addFunds,
     buttons: [
@@ -316,7 +313,7 @@ const showPaymentDone = (transactionContributionFiat) => {
   // Hide the 'waiting for deposit' message box if it exists
   appActions.hideNotification(text.addFunds)
   appActions.showNotification({
-    from: 'ledger',
+    position: 'global',
     greeting: locale.translation('updateHello'),
     message: text.paymentDone,
     buttons: [
@@ -331,7 +328,7 @@ const showBraveWalletUpdated = () => {
   appActions.onBitcoinToBatNotified()
 
   appActions.showNotification({
-    from: 'ledger',
+    position: 'global',
     greeting: text.hello,
     message: text.walletConvertedToBat,
     // Learn More.
@@ -373,7 +370,7 @@ const showPromotionNotification = (state) => {
   }
 
   const data = notification.toJS()
-  data.from = 'ledger'
+  data.position = 'global'
 
   appActions.showNotification(data)
 }

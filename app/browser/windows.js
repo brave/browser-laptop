@@ -209,6 +209,7 @@ const api = {
           })
 
           appActions.showNotification({
+            position: 'global',
             buttons: [
               {text: locale.translation('ok')}
             ],
