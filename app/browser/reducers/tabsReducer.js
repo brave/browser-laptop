@@ -11,7 +11,6 @@ const windows = require('../windows')
 const {getWebContents} = require('../webContentsCache')
 const {BrowserWindow} = require('electron')
 const tabState = require('../../common/state/tabState')
-const tabActions = require('../../common/actions/tabActions')
 const siteSettings = require('../../../js/state/siteSettings')
 const siteSettingsState = require('../../common/state/siteSettingsState')
 const windowConstants = require('../../../js/constants/windowConstants')
@@ -21,6 +20,7 @@ const {getFlashResourceId} = require('../../../js/flash')
 const {l10nErrorText} = require('../../common/lib/httpUtil')
 const Immutable = require('immutable')
 const dragTypes = require('../../../js/constants/dragTypes')
+const tabActionConsts = require('../../common/constants/tabAction')
 const flash = require('../../../js/flash')
 const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
 const {isSourceAboutUrl, isTargetAboutUrl, isNavigatableAboutPage} = require('../../../js/lib/appUrlUtil')
@@ -48,8 +48,8 @@ const getWebRTCPolicy = (state, tabId) => {
 const tabsReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
-    case tabActions.didStartNavigation.name:
-    case tabActions.didFinishNavigation.name:
+    case tabActionConsts.FINISH_NAVIGATION:
+    case tabActionConsts.START_NAVIGATION:
       {
         const tabId = action.get('tabId')
         state = tabState.setNavigationState(state, tabId, action.get('navigationState'))
@@ -58,7 +58,7 @@ const tabsReducer = (state, action, immutableAction) => {
         })
         break
       }
-    case tabActions.reload.name:
+    case tabActionConsts.RELOAD:
       {
         const tabId = tabState.resolveTabId(state, action.get('tabId'))
         setImmediate(() => {
