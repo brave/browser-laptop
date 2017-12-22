@@ -324,7 +324,7 @@ const doAction = (action) => {
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
       {
         const closedFrames = windowState.get('closedFrames')
-        if (closedFrames.size === 0) {
+        if (!closedFrames || closedFrames.size === 0) {
           break
         }
         const frame = closedFrames.last()
