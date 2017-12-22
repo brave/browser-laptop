@@ -1365,6 +1365,10 @@ const observeTransactions = (state, transactions) => {
 
 // TODO convert this function and related ones to immutable
 const getStateInfo = (state, parsedData) => {
+  if (parsedData == null) {
+    return state
+  }
+
   const info = parsedData.paymentInfo
   const then = new Date().getTime() - ledgerUtil.milliseconds.year
 
@@ -1385,18 +1389,17 @@ const getStateInfo = (state, parsedData) => {
     parsedData.properties.wallet.keyinfo.seed = seed
   }
 
-  let passphrase = ledgerClient.prototype.getWalletPassphrase(parsedData)
-  if (passphrase) {
-    passphrase = passphrase.join(' ')
-  }
-
   const newInfo = {
     paymentId: parsedData.properties.wallet.paymentId,
-    passphrase: passphrase,
     created: !!parsedData.properties.wallet,
     creating: !parsedData.properties.wallet,
     reconcileFrequency: parsedData.properties.days,
     reconcileStamp: parsedData.reconcileStamp
+  }
+
+  let passphrase = ledgerClient.prototype.getWalletPassphrase(parsedData)
+  if (passphrase) {
+    newInfo.passphrase = passphrase.join(' ')
   }
 
   state = ledgerState.mergeInfoProp(state, newInfo)
@@ -2573,7 +2576,8 @@ const getMethods = () => {
       checkVerifiedStatus,
       roundtrip,
       observeTransactions,
-      onWalletRecovery
+      onWalletRecovery,
+      getStateInfo
     }
   }
 

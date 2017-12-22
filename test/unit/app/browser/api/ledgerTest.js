@@ -24,6 +24,7 @@ describe('ledger api unit tests', function () {
     partition: 'persist:partition-1'
   })
   let request
+  let walletPassphraseReturn
 
   // constants
   const xhr = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=11.338&et=21.339'
@@ -151,8 +152,13 @@ describe('ledger api unit tests', function () {
       setPromotion: () => {},
       setTimeUntilReconcile: () => {}
     }
+    window.getWalletPassphrase = (parsedData) => {
+      return walletPassphraseReturn
+    }
     ledgerClient.prototype.boolion = function (value) { return false }
-    ledgerClient.prototype.getWalletPassphrase = function (state) {}
+    ledgerClient.prototype.getWalletPassphrase = function (parsedData) {
+      return window.getWalletPassphrase(parsedData)
+    }
     ledgerTransitionSpy = sinon.spy(lc, 'transition')
     ledgerTransitionedSpy = sinon.spy(lc, 'transitioned')
     ledgersetPromotionSpy = sinon.spy(lc, 'setPromotion')
@@ -1530,6 +1536,158 @@ describe('ledger api unit tests', function () {
       const callBack = onLedgerCallbackSpy.getCall(0).args[0]
       const unit = callBack.getIn(['properties', 'wallet', 'keyinfo', 'seed'])
       assert.deepStrictEqual(unit, newSeed)
+    })
+  })
+
+  describe('getStateInfo', function () {
+    let mergeInfoPropSpy, getWalletPassphraseSpy
+
+    const unit = Buffer.from([
+      32,
+      87,
+      30,
+      26,
+      223,
+      56,
+      224,
+      31,
+      213,
+      136,
+      248,
+      95,
+      136,
+      56,
+      250,
+      78,
+      179,
+      121,
+      255,
+      162,
+      195,
+      39,
+      143,
+      136,
+      18,
+      140,
+      49,
+      216,
+      221,
+      154,
+      78,
+      173
+    ])
+
+    const seedData = {
+      properties: {
+        days: 30,
+        wallet: {
+          keyinfo: {
+            seed: new Uint8Array(Object.values(unit))
+          },
+          paymentId: '21951877-5998-4acf-9302-4a7b101c9188',
+          addresses: {
+            BAT: 'BAT_addres',
+            BTC: 'BTC_addres',
+            CARD_ID: 'CARD_ID_addres',
+            ETH: 'ETH_addres',
+            LTC: 'LTC_addres'
+          }
+        }
+      },
+      reconcileStamp: 1
+    }
+
+    before(function () {
+      mergeInfoPropSpy = sinon.spy(ledgerState, 'mergeInfoProp')
+      getWalletPassphraseSpy = sinon.spy(window, 'getWalletPassphrase')
+    })
+
+    afterEach(function () {
+      walletPassphraseReturn = null
+      mergeInfoPropSpy.reset()
+      getWalletPassphraseSpy.reset()
+    })
+
+    after(function () {
+      mergeInfoPropSpy.restore()
+      getWalletPassphraseSpy.restore()
+    })
+
+    it('null case', function () {
+      const result = ledgerApi.getStateInfo(defaultAppState)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      assert(mergeInfoPropSpy.notCalled)
+      assert(getWalletPassphraseSpy.notCalled)
+    })
+
+    it('wallet is missing', function () {
+      const data = {
+        properties: {}
+      }
+      const result = ledgerApi.getStateInfo(defaultAppState, data)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      assert(mergeInfoPropSpy.notCalled)
+      assert(getWalletPassphraseSpy.notCalled)
+    })
+
+    describe('seed info', function () {
+      it('seed is in wrong format', function () {
+        const wrongSeed = Immutable
+          .fromJS(seedData)
+          .setIn(['properties', 'wallet', 'keyinfo', 'seed'], unit)
+          .toJS()
+
+        const result = ledgerApi.getStateInfo(defaultAppState, wrongSeed)
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'info'], Immutable.fromJS({
+            'created': true,
+            'creating': false,
+            'paymentId': '21951877-5998-4acf-9302-4a7b101c9188',
+            'reconcileFrequency': 30,
+            'reconcileStamp': 1
+          }))
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+        assert(getWalletPassphraseSpy.withArgs(seedData).calledOnce)
+      })
+
+      it('seed is missing', function () {
+        const missingSeed = Immutable
+          .fromJS(seedData)
+          .deleteIn(['properties', 'wallet', 'keyinfo'])
+          .toJS()
+
+        const result = ledgerApi.getStateInfo(defaultAppState, missingSeed)
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'info'], Immutable.fromJS({
+            'created': true,
+            'creating': false,
+            'paymentId': '21951877-5998-4acf-9302-4a7b101c9188',
+            'reconcileFrequency': 30,
+            'reconcileStamp': 1
+          }))
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+        assert(mergeInfoPropSpy.withArgs(sinon.match.any, expectedState.getIn(['ledger', 'info']).toJS()).calledOnce)
+      })
+
+      it('passphrase is added to new info', function () {
+        walletPassphraseReturn = [
+          'test',
+          'lol',
+          'ok'
+        ]
+
+        const result = ledgerApi.getStateInfo(defaultAppState, seedData)
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'info'], Immutable.fromJS({
+            'created': true,
+            'creating': false,
+            'passphrase': 'test lol ok',
+            'paymentId': '21951877-5998-4acf-9302-4a7b101c9188',
+            'reconcileFrequency': 30,
+            'reconcileStamp': 1
+          }))
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
     })
   })
 })
