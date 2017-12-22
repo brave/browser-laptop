@@ -9,6 +9,7 @@ const windowConstants = require('../../../../../js/constants/windowConstants')
 const appConstants = require('../../../../../js/constants/appConstants')
 const settings = require('../../../../../js/constants/settings')
 const tabActions = require('../../../../../app/common/actions/tabActions')
+const tabActionConsts = require('../../../../../app/common/constants/tabAction')
 
 require('../../../braveUnit')
 
@@ -134,7 +135,7 @@ describe('urlBarReducer', function () {
 
   describe('tabActions.didFinishNavigation', function () {
     before(function () {
-      this.newState = urlBarReducer(windowState, {actionType: tabActions.didFinishNavigation.name,
+      this.newState = urlBarReducer(windowState, {actionType: tabActionConsts.FINISH_NAVIGATION,
         tabId: 2,
         navigationState: Immutable.fromJS({
           visibleEntry: {
