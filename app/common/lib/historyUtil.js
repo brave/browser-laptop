@@ -5,7 +5,7 @@
 
 const Immutable = require('immutable')
 const UrlUtil = require('../../../js/lib/urlutil')
-const {makeImmutable} = require('../state/immutableUtil')
+const {makeImmutable, isList, isMap} = require('../state/immutableUtil')
 const aboutHistoryMaxEntries = 500
 
 const sortTimeDescending = (left, right) => {
@@ -15,13 +15,30 @@ const sortTimeDescending = (left, right) => {
 }
 
 const getHistory = (sites) => {
-  sites = makeImmutable(sites) ? makeImmutable(sites).toList() : new Immutable.List()
+  if (sites == null) {
+    return Immutable.List()
+  }
+
+  sites = makeImmutable(sites)
+
+  if (!isList(sites)) {
+    if (isMap(sites)) {
+      sites = sites.toList()
+    } else {
+      sites = Immutable.List()
+    }
+  }
+
   return sites
       .sort(sortTimeDescending)
       .slice(0, aboutHistoryMaxEntries)
 }
 
 const getDayString = (entry, locale) => {
+  if (entry == null) {
+    return ''
+  }
+
   const lastAccessedTime = entry.get('lastAccessedTime')
   return lastAccessedTime
     ? new Date(lastAccessedTime).toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
@@ -29,6 +46,10 @@ const getDayString = (entry, locale) => {
 }
 
 const groupEntriesByDay = (history, locale) => {
+  if (history == null) {
+    return Immutable.List()
+  }
+
   const reduced = history.reduce((previousValue, currentValue, currentIndex) => {
     const result = currentIndex === 1 ? [] : previousValue
     if (currentIndex === 1) {
@@ -44,6 +65,7 @@ const groupEntriesByDay = (history, locale) => {
     }
     return result
   })
+
   if (reduced) {
     return Immutable.fromJS(
       Array.isArray(reduced)
@@ -51,7 +73,7 @@ const groupEntriesByDay = (history, locale) => {
         : [{date: getDayString(reduced, locale), entries: [reduced]}]
     )
   }
-  return Immutable.fromJS([])
+  return Immutable.List()
 }
 
 /**
@@ -59,16 +81,22 @@ const groupEntriesByDay = (history, locale) => {
  * Format is expected to be array containing one array per day.
  */
 const totalEntries = (entriesByDay) => {
-  entriesByDay = makeImmutable(entriesByDay) || new Immutable.List()
+  if (entriesByDay == null) {
+    return Immutable.List()
+  }
 
-  let result = new Immutable.List()
-  entriesByDay.forEach((entry) => {
-    result = result.push(entry.get('entries'))
+  entriesByDay = makeImmutable(entriesByDay)
+
+  return entriesByDay.map((entry) => {
+    return entry.get('entries')
   })
-  return result
 }
 
 const prepareHistoryEntry = (siteDetail) => {
+  if (siteDetail == null) {
+    return Immutable.Map()
+  }
+
   const time = siteDetail.has('lastAccessedTime')
     ? siteDetail.get('lastAccessedTime')
     : new Date().getTime()
@@ -82,13 +110,24 @@ const prepareHistoryEntry = (siteDetail) => {
     count: 1,
     themeColor: siteDetail.get('themeColor'),
     favicon: siteDetail.get('favicon', siteDetail.get('icon')),
-    key: getKey(siteDetail),
+    key: module.exports.getKey(siteDetail),
     skipSync: siteDetail.get('skipSync', null)
   })
 }
 
 const mergeSiteDetails = (oldDetail, newDetail) => {
-  const objectId = newDetail.has('objectId') ? newDetail.get('objectId') : oldDetail.get('objectId', undefined)
+  if (newDetail == null) {
+    return Immutable.Map()
+  }
+
+  if (oldDetail == null) {
+    oldDetail = Immutable.Map()
+  }
+
+  newDetail = makeImmutable(newDetail)
+  oldDetail = makeImmutable(oldDetail)
+
+  const objectId = newDetail.has('objectId') ? newDetail.get('objectId') : oldDetail.get('objectId') || undefined
   const time = newDetail.has('lastAccessedTime')
     ? newDetail.get('lastAccessedTime')
     : new Date().getTime()
@@ -115,16 +154,20 @@ const mergeSiteDetails = (oldDetail, newDetail) => {
     site = site.set('favicon', favicon)
   }
 
-  site = site.set('key', getKey(site))
+  site = site.set('key', module.exports.getKey(site))
 
   return site
 }
 
 const getDetailFromFrame = (frame) => {
+  if (frame == null) {
+    return Immutable.Map()
+  }
+
   return makeImmutable({
     location: frame.get('location'),
     title: frame.get('title'),
-    partitionNumber: frame.get('partitionNumber'),
+    partitionNumber: frame.get('partitionNumber') || 0,
     favicon: frame.get('icon'),
     themeColor: frame.get('themeColor') || frame.get('computedThemeColor')
   })
@@ -142,6 +185,7 @@ const getKey = (siteDetail) => {
     return location + '|' +
       (siteDetail.get('partitionNumber') || 0)
   }
+
   return null
 }
 

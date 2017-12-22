@@ -33,11 +33,16 @@ const validateState = function (state) {
 const bookmarksState = {
   getBookmarks: (state) => {
     state = validateState(state)
-    return state.get(STATE_SITES.BOOKMARKS)
+    return state.get(STATE_SITES.BOOKMARKS) || Immutable.Map()
   },
 
   getBookmark: (state, key) => {
     state = validateState(state)
+
+    if (key == null) {
+      return Immutable.Map()
+    }
+
     return state.getIn([STATE_SITES.BOOKMARKS, key], Immutable.Map())
   },
 
@@ -48,6 +53,11 @@ const bookmarksState = {
    */
   findBookmark: (state, key) => {
     state = validateState(state)
+
+    if (key == null) {
+      return Immutable.Map()
+    }
+
     let bookmark = bookmarksState.getBookmark(state, key)
     if (bookmark.isEmpty()) {
       bookmark = bookmarkFoldersState.getFolder(state, key)
@@ -75,8 +85,15 @@ const bookmarksState = {
 
   addBookmark: (state, bookmarkDetail, destinationKey, isLeftSide) => {
     state = validateState(state)
+
+    if (bookmarkDetail == null) {
+      return state
+    }
+
+    bookmarkDetail = makeImmutable(bookmarkDetail)
+
     const key = bookmarkDetail.get('key')
-    if (key === null) {
+    if (key == null) {
       return state
     }
 
@@ -91,6 +108,13 @@ const bookmarksState = {
 
   editBookmark: (state, oldBookmark, bookmarkDetail) => {
     state = validateState(state)
+
+    if (oldBookmark == null || bookmarkDetail == null) {
+      return state
+    }
+
+    bookmarkDetail = makeImmutable(bookmarkDetail)
+    oldBookmark = makeImmutable(oldBookmark)
 
     const newKey = bookmarkDetail.get('key')
     const editKey = oldBookmark.get('key')
@@ -110,6 +134,10 @@ const bookmarksState = {
 
   removeBookmark: (state, bookmarkKey) => {
     state = validateState(state)
+
+    if (bookmarkKey == null) {
+      return state
+    }
 
     const bookmark = bookmarksState.getBookmark(state, bookmarkKey)
 
@@ -140,24 +168,29 @@ const bookmarksState = {
       return state
     }
 
+    parentFolderId = Number(parentFolderId)
+
     const syncEnabled = getSetting(settings.SYNC_ENABLED) === true
     const removedBookmarks = []
     const bookmarks = bookmarksState.getBookmarks(state)
       .filter(bookmark => {
-        if (bookmark.get('parentFolderId') !== Number(parentFolderId)) {
+        if (bookmark.get('parentFolderId') !== parentFolderId) {
           return true
         }
+
         if (syncEnabled) {
           removedBookmarks.push(bookmark.toJS())
         }
 
         state = bookmarkLocationCache.removeCacheKey(state, bookmark.get('location'), bookmark.get('key'))
+        state = bookmarkOrderCache.removeCacheKey(state, bookmark.get('parentFolderId'), bookmark.get('key'))
         return false
       })
 
     if (syncEnabled && removedBookmarks.length) {
       syncActions.removeSites(removedBookmarks)
     }
+
     return state.set(STATE_SITES.BOOKMARKS, bookmarks)
   },
 
@@ -195,9 +228,13 @@ const bookmarksState = {
 
     const bookmarkUtil = require('../lib/bookmarkUtil')
     let bookmark = bookmarksState.getBookmark(state, bookmarkKey)
-    let destinationItem = bookmarksState.findBookmark(state, destinationKey)
-
     if (bookmark.isEmpty()) {
+      return state
+    }
+
+    let destinationItem = bookmarksState.findBookmark(state, destinationKey)
+    const numKey = Number(destinationKey)
+    if (destinationItem.isEmpty() && numKey !== -1 && numKey !== 0) {
       return state
     }
 
@@ -251,7 +288,13 @@ const bookmarksState = {
   },
 
   setWidth: (state, key, width) => {
-    return state.setIn([STATE_SITES.BOOKMARKS, key, 'width'], parseFloat(width))
+    width = parseFloat(width)
+
+    if (key == null || isNaN(width)) {
+      return state
+    }
+
+    return state.setIn([STATE_SITES.BOOKMARKS, key, 'width'], width)
   }
 }
 

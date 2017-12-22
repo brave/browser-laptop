@@ -36,6 +36,11 @@ const bookmarkFoldersState = {
 
   getFolder: (state, folderKey) => {
     state = validateState(state)
+
+    if (folderKey == null) {
+      return Immutable.Map()
+    }
+
     folderKey = folderKey.toString()
     return state.getIn([STATE_SITES.BOOKMARK_FOLDERS, folderKey], Immutable.Map())
   },
@@ -43,12 +48,26 @@ const bookmarkFoldersState = {
   getFoldersByParentId: (state, parentFolderId) => {
     state = validateState(state)
 
+    if (parentFolderId == null) {
+      return Immutable.List()
+    }
+
     const folders = bookmarkOrderCache.getFoldersByParentId(state, parentFolderId)
     return folders.map(folder => bookmarkFoldersState.getFolder(state, folder.get('key')))
   },
 
   addFolder: (state, folderDetails, destinationKey) => {
     state = validateState(state)
+
+    if (folderDetails == null) {
+      return state
+    }
+
+    folderDetails = makeImmutable(folderDetails)
+
+    if (folderDetails.get('key') == null) {
+      return state
+    }
 
     state = state.setIn([STATE_SITES.BOOKMARK_FOLDERS, folderDetails.get('key')], folderDetails)
     state = bookmarkOrderCache.addFolderToCache(state, folderDetails.get('parentFolderId'), folderDetails.get('key'), destinationKey)
@@ -78,13 +97,15 @@ const bookmarkFoldersState = {
   },
 
   removeFolder: (state, folderKey) => {
-    const bookmarksState = require('./bookmarksState')
-    const folders = bookmarkFoldersState.getFolders(state)
+    state = validateState(state)
     const folder = bookmarkFoldersState.getFolder(state, folderKey)
 
     if (folder.isEmpty()) {
       return state
     }
+
+    const bookmarksState = require('./bookmarksState')
+    const folders = bookmarkFoldersState.getFolders(state)
 
     if (getSetting(settings.SYNC_ENABLED) === true) {
       syncActions.removeSites([folder.toJS()])
@@ -92,10 +113,7 @@ const bookmarkFoldersState = {
 
     folders.filter(folder => folder.get('parentFolderId') === Number(folderKey))
       .map(folder => {
-        state = bookmarksState.removeBookmarksByParentId(state, folder.get('folderId'))
         state = bookmarkFoldersState.removeFolder(state, folder.get('folderId'))
-        state = bookmarkOrderCache.removeCacheParent(state, folder.get('folderId'))
-        state = bookmarkOrderCache.removeCacheKey(state, folder.get('parentFolderId'), folderKey)
       })
 
     state = bookmarksState.removeBookmarksByParentId(state, folderKey)
@@ -105,14 +123,15 @@ const bookmarkFoldersState = {
   },
 
   /**
-   * Get all folders except provided folder
+   * Get a list of all folders except provided folder
    * @param state
-   * @param folderKey
+   * @param {number} folderKey
    * @param parentFolderId
    * @param labelPrefix
-   * @returns {Array}
+   * @returns {Array} - each entry with folder id and label (title)
    */
   getFoldersWithoutKey: (state, folderKey, parentFolderId = 0, labelPrefix = '') => {
+    state = validateState(state)
     let folders = []
     const results = bookmarkFoldersState.getFoldersByParentId(state, parentFolderId)
 
@@ -128,26 +147,35 @@ const bookmarkFoldersState = {
         folderId: folder.get('folderId'),
         label
       })
-      const subSites = bookmarkFoldersState.getFoldersWithoutKey(state, folderKey, folder.get('folderId'), (label || '') + ' / ')
-      folders = folders.concat(subSites)
+      const subFolders = bookmarkFoldersState.getFoldersWithoutKey(state, folderKey, folder.get('folderId'), (label || '') + ' / ')
+      folders = folders.concat(subFolders)
     }
 
     return folders
   },
 
   moveFolder: (state, folderKey, destinationKey, append, moveIntoParent) => {
-    const bookmarksState = require('./bookmarksState')
+    state = validateState(state)
     let folder = bookmarkFoldersState.getFolder(state, folderKey)
-    let destinationItem = bookmarksState.findBookmark(state, destinationKey)
-
     if (folder.isEmpty()) {
       return state
     }
 
+    const bookmarksState = require('./bookmarksState')
+    let destinationItem = bookmarksState.findBookmark(state, destinationKey)
+    const numKey = Number(destinationKey)
+    if (destinationItem.isEmpty() && numKey !== -1 && numKey !== 0) {
+      return state
+    }
+
     if (moveIntoParent || destinationItem.get('parentFolderId') !== folder.get('parentFolderId')) {
-      const parentFolderId = destinationItem.get('type') === siteTags.BOOKMARK
+      let parentFolderId = destinationItem.get('type') === siteTags.BOOKMARK
         ? destinationItem.get('parentFolderId')
         : destinationItem.get('folderId')
+
+      if (parentFolderId == null) {
+        parentFolderId = destinationKey
+      }
 
       state = bookmarkOrderCache.removeCacheKey(state, folder.get('parentFolderId'), folderKey)
       folder = folder.set('parentFolderId', Number(parentFolderId))
@@ -169,7 +197,14 @@ const bookmarkFoldersState = {
   },
 
   setWidth: (state, key, width) => {
-    return state.setIn([STATE_SITES.BOOKMARK_FOLDERS, key, 'width'], parseFloat(width))
+    state = validateState(state)
+    width = parseFloat(width)
+
+    if (key == null || isNaN(width)) {
+      return state
+    }
+
+    return state.setIn([STATE_SITES.BOOKMARK_FOLDERS, key, 'width'], width)
   }
 }
 
