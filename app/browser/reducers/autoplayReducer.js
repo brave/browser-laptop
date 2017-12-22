@@ -12,13 +12,17 @@ const appActions = require('../../../js/actions/appActions')
 const {getOrigin} = require('../../../js/lib/urlutil')
 const locale = require('../../locale')
 const messages = require('../../../js/constants/messages')
+const getSetting = require('../../../js/settings').getSetting
+const settings = require('../../../js/constants/settings')
+const {autoplayOption} = require('../../common/constants/settingsEnums')
 
 let notificationCallbacks = []
 let temporaryAllowPlays = []
 
 const showAutoplayMessageBox = (state, tabId) => {
   const tab = webContents.fromTabID(tabId)
-  if (!tab || tab.isDestroyed()) {
+  if (!tab || tab.isDestroyed() ||
+      getSetting(settings.AUTOPLAY_MEDIA) === autoplayOption.ALWAYS_DENY) {
     return
   }
   const location = tab.getURL()
