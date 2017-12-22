@@ -24,6 +24,13 @@ module.exports.fileUrl = (filePath) => {
   return encodeURI('file://' + fileUrlPath)
 }
 
+module.exports.chromeUrl = (filePath = '') => {
+  filePath = module.exports.fileUrl(filePath)
+  filePath = filePath.replace('file://', 'chrome://brave')
+
+  return filePath
+}
+
 /**
  * Gets the URL of a page hosted by the braveExtension or torrentExtension
  * Returns 'chrome-extension://<...>'
