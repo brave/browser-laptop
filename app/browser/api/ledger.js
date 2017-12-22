@@ -2418,6 +2418,10 @@ const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
 }
 
 const getPromotion = (state) => {
+  if (!getSetting(settings.PAYMENTS_ALLOW_PROMOTIONS)) {
+    return
+  }
+
   let tempClient = client
   let paymentId = null
   if (!tempClient) {
