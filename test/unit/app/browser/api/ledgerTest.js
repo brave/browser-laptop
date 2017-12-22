@@ -35,6 +35,7 @@ describe('ledger api unit tests', function () {
   let contributionAmount = 25
   let paymentsMinVisitTime = 5000
   let paymentsNotifications = true
+  let paymentsAllowPromotions = true
 
   // spies
   let ledgerTransitionSpy
@@ -77,6 +78,8 @@ describe('ledger api unit tests', function () {
             return paymentsMinVisitTime
           case settings.PAYMENTS_NOTIFICATIONS:
             return paymentsNotifications
+          case settings.PAYMENTS_ALLOW_PROMOTIONS:
+            return paymentsAllowPromotions
         }
         return false
       }
@@ -1374,6 +1377,14 @@ describe('ledger api unit tests', function () {
     afterEach(function () {
       ledgergetPromotionSpy.reset()
       ledgerClient.reset()
+    })
+
+    it('promotions are disabled', function () {
+      paymentsAllowPromotions = false
+      ledgerApi.getPromotion(defaultAppState)
+      assert(ledgerClient.notCalled)
+      assert(ledgergetPromotionSpy.notCalled)
+      paymentsAllowPromotions = true
     })
 
     it('empty client', function () {
