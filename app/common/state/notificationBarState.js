@@ -26,13 +26,13 @@ const notificationBarState = {
   },
 
   /**
-   * Gets an immutable list of ledger notifications
+   * Gets an immutable list of global notifications (shown above tab bar)
    * @param {Map} appState - The app state object
-   * @return {List} - immutable list of ledger notifications
+   * @return {List} - immutable list of global notifications
    */
-  getLedgerNotifications: (state) => {
+  getGlobalNotifications: (state) => {
     const notifications = notificationBarState.getNotifications(state)
-    return notifications.filter(item => item.get('from') === 'ledger')
+    return notifications.filter(item => item.get('position') === 'global')
   }
 }
 

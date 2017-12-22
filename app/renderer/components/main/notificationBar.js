@@ -31,10 +31,7 @@ class NotificationBar extends React.Component {
       .filter((item) => {
         return item.get('frameOrigin')
           ? activeOrigin === item.get('frameOrigin')
-          // TODO: this should filter all cases
-          // for notifications that are not per-tab
-          // and not only ledger
-          : item.get('from') !== 'ledger'
+          : item.get('position') !== 'global'
       })
       .takeLast(3)
     props.showNotifications = !props.activeNotifications.isEmpty()
@@ -61,9 +58,7 @@ class NotificationBar extends React.Component {
 class BraveNotificationBar extends React.Component {
   mergeProps (state, ownProps) {
     const props = {}
-    // TODO: for now we cover only ledger notifications in this method
-    // this should cover all notifications that are global
-    props.notifications = notificationBarState.getLedgerNotifications(state)
+    props.notifications = notificationBarState.getGlobalNotifications(state)
     props.showNotifications = !props.notifications.isEmpty()
     return props
   }
