@@ -110,19 +110,42 @@ class ContextMenuItem extends ImmutableComponent {
 
   onMouseEnter (e) {
     if (this.props.contextMenuItem.has('folderKey')) {
+      // Context menu item in bookmarks toolbar (bookmarks always have a folder id)
       const yAxis = this.getYAxis(e)
       windowActions.onShowBookmarkFolderMenu(this.props.contextMenuItem.get('folderKey'), yAxis, null, this.props.submenuIndex)
     } else if (this.hasSubmenu) {
+      // Regular context menu with submenu (ex: hamburger menu)
       let openedSubmenuDetails = this.props.contextMenuDetail.get('openedSubmenuDetails')
+
       openedSubmenuDetails = openedSubmenuDetails
         ? openedSubmenuDetails.splice(this.props.submenuIndex, openedSubmenuDetails.size)
         : new Immutable.List()
       const yAxis = this.getYAxis(e)
+
       openedSubmenuDetails = openedSubmenuDetails.push(Immutable.fromJS({
         y: yAxis,
-        template: this.submenu
+        template: this.submenu,
+        openerSubmenuIndex: this.props.submenuIndex,
+        openerDataIndex: this.props.dataIndex
       }))
+
       windowActions.setContextMenuDetail(this.props.contextMenuDetail.set('openedSubmenuDetails', openedSubmenuDetails))
+    } else {
+      // Regular context menu item (no children)
+      let openedSubmenuDetails = this.props.contextMenuDetail && this.props.contextMenuDetail.get('openedSubmenuDetails')
+
+      // If a menu is open, see if the submenuIndex matches
+      if (openedSubmenuDetails) {
+        for (let i = 0; i < openedSubmenuDetails.size; i++) {
+          if (this.props.submenuIndex === openedSubmenuDetails.getIn([i, 'openerSubmenuIndex'])) {
+            // When index matches, menu should be closed
+            // User is hovering over a different item at the same level
+            openedSubmenuDetails = openedSubmenuDetails.remove(i)
+            windowActions.setContextMenuDetail(this.props.contextMenuDetail.set('openedSubmenuDetails', openedSubmenuDetails))
+            break
+          }
+        }
+      }
     }
   }
   getLabelForItem (item) {
