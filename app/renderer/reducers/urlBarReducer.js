@@ -14,9 +14,9 @@ const {navigateSiteClickHandler} = require('../suggestionClickHandlers')
 const navigationBarState = require('../../common/state/navigationBarState')
 const tabState = require('../../common/state/tabState')
 const {normalizeLocation} = require('../../common/lib/suggestion')
-const tabActions = require('../../common/actions/tabActions')
 const { getSetting } = require('../../../js/settings')
 const settings = require('../../../js/constants/settings')
+const tabActionConsts = require('../../common/constants/tabAction')
 
 const updateSearchEngineInfoFromInput = (state, frameProps) => {
   const input = frameProps.getIn(['navbar', 'urlbar', 'location'])
@@ -192,7 +192,7 @@ const setUrlBarSelected = (state, selected) => {
 
 const urlBarReducer = (state, action) => {
   // TODO(bridiver) - this is a workaround until we can migrate frames to tabs
-  if (action.actionType === tabActions.didFinishNavigation.name) {
+  if (action.actionType === tabActionConsts.FINISH_NAVIGATION) {
     const tabId = action.tabId
     const navigationState = action.navigationState
 
