@@ -6,10 +6,12 @@ const process = require('process')
 const assert = require('assert')
 const uuid = require('uuid')
 const path = require('path')
+const appActions = require('../../../../../js/actions/appActions')
 const fakeElectron = require('../../../lib/fakeElectron')
 
 const appConstants = require('../../../../../js/constants/appConstants')
 const {PENDING, IN_PROGRESS, RESUMING, PAUSED, COMPLETED, CANCELLED, INTERRUPTED} = require('../../../../../js/constants/downloadStates')
+const settings = require('../../../../../js/constants/settings')
 const {CANCEL} = require('../../../../../app/common/constants/electronDownloadItemActions')
 require('../../../braveUnit')
 
@@ -32,17 +34,35 @@ const oneDownloadWithState = (state) => Immutable.fromJS({
 
 describe('downloadsReducer', function () {
   let downloadsReducer
+  let fakeSettings
+  let downloadDefaultPath
+  let changeSettingSpy
   before(function () {
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
       useCleanCache: true
     })
+
+    fakeSettings = {
+      getSetting: (settingKey, settingsCollection) => {
+        switch (settingKey) {
+          case settings.DOWNLOAD_DEFAULT_PATH:
+            return downloadDefaultPath
+        }
+      }
+    }
+
+    changeSettingSpy = sinon.spy(appActions, 'changeSetting')
+
     mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('../../../js/settings', fakeSettings)
+    mockery.registerMock('../../../js/actions/appActions', appActions)
     downloadsReducer = require('../../../../../app/browser/reducers/downloadsReducer')
   })
 
   after(function () {
+    changeSettingSpy.restore()
     mockery.disable()
   })
 
@@ -255,6 +275,21 @@ describe('downloadsReducer', function () {
       it('passes the correct properties object', function () {
         assert.deepEqual(options.properties, ['openDirectory', 'createDirectory'])
       })
+    })
+  })
+
+  describe('APP_SET_STATE', function () {
+    it('set DOWNLOAD_DEFAULT_PATH when empty', function () {
+      changeSettingSpy.reset()
+      downloadDefaultPath = ''
+      downloadsReducer({}, {actionType: appConstants.APP_SET_STATE})
+      assert(changeSettingSpy.withArgs(settings.DOWNLOAD_DEFAULT_PATH, `${process.cwd()}/downloads`).calledOnce)
+    })
+    it('does not set DOWNLOAD_DEFAULT_PATH when not empty', function () {
+      changeSettingSpy.reset()
+      downloadDefaultPath = '123'
+      downloadsReducer({}, {actionType: appConstants.APP_SET_STATE})
+      assert(changeSettingSpy.notCalled)
     })
   })
 })
