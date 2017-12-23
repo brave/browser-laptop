@@ -14,6 +14,7 @@ const {cancelDownload, pauseDownload, resumeDownload} = require('../electronDown
 const {CANCEL, PAUSE, RESUME} = require('../../common/constants/electronDownloadItemActions')
 const appActions = require('../../../js/actions/appActions')
 const userPrefs = require('../../../js/state/userPrefs')
+const getSetting = require('../../../js/settings').getSetting
 
 const downloadsReducer = (state, action) => {
   const download = action.downloadId ? state.getIn(['downloads', action.downloadId]) : undefined
@@ -21,10 +22,17 @@ const downloadsReducer = (state, action) => {
       ![appConstants.APP_MERGE_DOWNLOAD_DETAIL,
         appConstants.APP_CLEAR_COMPLETED_DOWNLOADS,
         appConstants.APP_SELECT_DEFAULT_DOWNLOAD_PATH,
-        appConstants.APP_CHANGE_SETTING].includes(action.actionType)) {
+        appConstants.APP_CHANGE_SETTING,
+        appConstants.APP_SET_STATE].includes(action.actionType)) {
     return state
   }
   switch (action.actionType) {
+    case appConstants.APP_SET_STATE:
+      if (getSetting(settings.DOWNLOAD_DEFAULT_PATH) === '') {
+        const defaultPath = app.getPath('downloads')
+        appActions.changeSetting(settings.DOWNLOAD_DEFAULT_PATH, defaultPath)
+      }
+      break
     case appConstants.APP_DOWNLOAD_REVEALED:
       fs.access(download.get('savePath'), fs.constants.F_OK, (err) => {
         if (err) {
