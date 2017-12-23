@@ -56,7 +56,7 @@ const showAutoplayMessageBox = (state, tabId) => {
             const temporaryAllow = (e) => {
               tab.removeListener('media-started-playing', temporaryAllow)
               if (!persist) {
-                appActions.removeSiteSetting(origin, 'autoplay')
+                setTimeout(() => appActions.removeSiteSetting(origin, 'autoplay'), 5000)
               }
             }
             tab.on('media-started-playing', temporaryAllow)
