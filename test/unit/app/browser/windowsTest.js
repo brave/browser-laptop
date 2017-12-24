@@ -123,6 +123,7 @@ describe('window API unit tests', function () {
   describe('privateMethods', function () {
     let updatePinnedTabs
     let createTabRequestedSpy, tabCloseRequestedSpy
+
     const win = {
       id: 1,
       webContents: {
@@ -149,21 +150,30 @@ describe('window API unit tests', function () {
 
     describe('updatePinnedTabs', function () {
       it('takes no action if pinnedSites list matches tab state', function () {
-        updatePinnedTabs(win)
+        updatePinnedTabs(win, defaultState)
         assert.equal(createTabRequestedSpy.calledOnce, false)
         assert.equal(tabCloseRequestedSpy.calledOnce, false)
       })
 
       it('calls `appActions.createTabRequested` for pinnedSites not in tab state', function () {
-        appStore.getState = () => Immutable.fromJS(createTabState)
-        updatePinnedTabs(win)
+        updatePinnedTabs(win, createTabState)
         assert.equal(createTabRequestedSpy.calledOnce, true)
       })
 
       it('calls `appActions.tabCloseRequested` for items in tab state but not in pinnedSites', function () {
-        appStore.getState = () => Immutable.fromJS(tabCloseState)
-        updatePinnedTabs(win)
+        updatePinnedTabs(win, tabCloseState)
         assert.equal(tabCloseRequestedSpy.calledOnce, true)
+      })
+
+      it('does not create duplicate pinnedSites whilst waiting for tabs to be created', function () {
+        // use a unique state for this test since updatePinnedTabs memoizes itself based on its input
+        const createTabStateClone = Immutable.fromJS(createTabState.toJS())
+        // should ask for a new tab
+        updatePinnedTabs(win, createTabStateClone)
+        assert.equal(createTabRequestedSpy.callCount, 1)
+        // should not ask for a new tab
+        updatePinnedTabs(win, createTabStateClone)
+        assert.equal(createTabRequestedSpy.callCount, 1)
       })
     })
 
