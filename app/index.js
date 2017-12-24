@@ -249,8 +249,8 @@ app.on('ready', () => {
       } else {
         appActions.showNotification({
           buttons: [
-            {text: locale.translation('yes')},
-            {text: locale.translation('no')}
+            {text: locale.translation('no')},
+            {text: locale.translation('yes')}
           ],
           options: {
             persist: false
@@ -260,7 +260,7 @@ app.on('ready', () => {
         })
         prefsRestartCallbacks[message] = (buttonIndex, persist) => {
           delete prefsRestartCallbacks[message]
-          if (buttonIndex === 0) {
+          if (buttonIndex === 1) {
             const args = process.argv.slice(1)
             args.push('--relaunch')
             app.relaunch({args})
