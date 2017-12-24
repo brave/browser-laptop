@@ -5,6 +5,7 @@
 const electron = require('electron')
 const Immutable = require('immutable')
 const appActions = require('../../js/actions/appActions')
+const appStore = require('../../js/stores/appStore')
 const appUrlUtil = require('../../js/lib/appUrlUtil')
 const {getLocationIfPDF} = require('../../js/lib/urlutil')
 const debounce = require('../../js/lib/debounce')
@@ -29,6 +30,7 @@ const {app, BrowserWindow, ipcMain} = electron
 
 // TODO(bridiver) - set window uuid
 let currentWindows = {}
+const windowPinnedTabStateMemoize = new WeakMap()
 
 const getWindowState = (win) => {
   if (win.isFullScreen()) {
@@ -83,7 +85,7 @@ const siteMatchesTab = (site, tab) => {
   return matchesLocation && matchesPartition
 }
 
-const updatePinnedTabs = (win) => {
+const updatePinnedTabs = (win, appState) => {
   // don't continue if window won't need pinned tabs updated
   if (
     !win ||
@@ -92,15 +94,22 @@ const updatePinnedTabs = (win) => {
   ) {
     return
   }
-  const appStore = require('../../js/stores/appStore')
-  const state = appStore.getState()
   const windowId = win.id
-  const pinnedSites = pinnedSitesState.getSites(state)
-  let pinnedWindowTabs = getPinnedTabsByWindowId(state, windowId)
+  const statePinnedSites = pinnedSitesState.getSites(appState)
+  // no need to continue if we've already processed this state for this window
+  if (windowPinnedTabStateMemoize.get(win) === statePinnedSites) {
+    return
+  }
+  // cache that this state has been updated for this window,
+  // so we do not repeat the operation until
+  // this specific part of the state has changed
+  // See
+  windowPinnedTabStateMemoize.set(win, statePinnedSites)
+  let pinnedWindowTabs = getPinnedTabsByWindowId(appState, windowId)
   // sites are instructions of what should be pinned
   // tabs are sites our window already has pinned
   // for each site which should be pinned, find if it's already pinned
-  for (const site of pinnedSites.values()) {
+  for (const site of statePinnedSites.values()) {
     const existingPinnedTabIdx = pinnedWindowTabs.findIndex(tab => siteMatchesTab(site, tab))
     if (existingPinnedTabIdx !== -1) {
       // if it's already pinned we don't need to consider the tab in further searches
@@ -276,9 +285,10 @@ const api = {
 
   pinnedTabsChanged: () => {
     setImmediate(() => {
+      const state = appStore.getState()
       for (let windowId in currentWindows) {
         if (currentWindows[windowId].__ready) {
-          updatePinnedTabs(currentWindows[windowId])
+          updatePinnedTabs(currentWindows[windowId], state)
         }
       }
     })
@@ -342,7 +352,8 @@ const api = {
     setImmediate(() => {
       const win = currentWindows[windowId]
       if (win && !win.isDestroyed()) {
-        updatePinnedTabs(win)
+        const state = appStore.getState()
+        updatePinnedTabs(win, state)
         win.__ready = true
         win.emit(messages.WINDOW_RENDERER_READY)
       }
