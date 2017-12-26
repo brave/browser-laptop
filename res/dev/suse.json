@@ -1,5 +1,5 @@
 {
-  "name": "brave",
+  "name": "brave-suse",
   "bin": "brave",
   "userDataDir": "brave",
   "productName": "Brave",
