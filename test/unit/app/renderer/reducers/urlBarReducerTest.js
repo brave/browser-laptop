@@ -8,7 +8,6 @@ const fakeElectron = require('../../../lib/fakeElectron')
 const windowConstants = require('../../../../../js/constants/windowConstants')
 const appConstants = require('../../../../../js/constants/appConstants')
 const settings = require('../../../../../js/constants/settings')
-const tabActions = require('../../../../../app/common/actions/tabActions')
 const tabActionConsts = require('../../../../../app/common/constants/tabAction')
 
 require('../../../braveUnit')
