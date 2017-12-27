@@ -52,7 +52,7 @@ function isPDFDownloadable (details) {
   // viewer to open the PDF, but first check whether the Content-Disposition
   // header specifies an attachment. This allows sites like Google Drive to
   // operate correctly (#6106).
-  if (details.type === 'main_frame' &&
+  if (details.resourceType === 'mainFrame' &&
       details.url.indexOf('=download') === -1) {
     return false
   }
