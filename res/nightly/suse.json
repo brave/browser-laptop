@@ -1,5 +1,5 @@
 {
-  "name": "brave-nightly",
+  "name": "brave-nightly-suse",
   "bin": "brave-nightly",
   "userDataDir": "brave-nightly",
   "productName": "Brave Nightly",
