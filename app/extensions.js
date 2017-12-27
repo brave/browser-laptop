@@ -3,7 +3,7 @@ const contextMenus = require('./browser/extensions/contextMenus')
 const extensionActions = require('./common/actions/extensionActions')
 const config = require('../js/constants/config')
 const appConfig = require('../js/constants/appConfig')
-const {chromeUrl} = require('../js/lib/appUrlUtil')
+const {fileUrl} = require('../js/lib/appUrlUtil')
 const {getExtensionsPath, getBraveExtUrl, getBraveExtIndexHTML} = require('../js/lib/appUrlUtil')
 const {getSetting} = require('../js/settings')
 const settings = require('../js/constants/settings')
@@ -408,7 +408,7 @@ module.exports.init = () => {
     extensionInfo.setInstallInfo(installInfo.id, installInfo)
     installInfo.filePath = installInfo.base_path
 
-    installInfo.base_path = chromeUrl(installInfo.base_path)
+    installInfo.base_path = fileUrl(installInfo.base_path)
 
     extensionActions.extensionInstalled(installInfo.id, installInfo)
     extensionActions.extensionEnabled(installInfo.id)
