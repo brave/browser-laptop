@@ -5,6 +5,7 @@
 const { makeImmutable } = require('./immutableUtil')
 const Immutable = require('immutable')
 const platformUtil = require('../lib/platformUtil')
+const {chromeUrl} = require('../../../js/lib/appUrlUtil')
 
 const browserActionDefaults = Immutable.fromJS({
   tabs: {}
@@ -77,7 +78,7 @@ const extensionState = {
   browserActionBackgroundImage: (browserAction, tabId) => {
     tabId = tabId ? tabId.toString() : '-1'
     let path = browserAction.getIn(['tabs', tabId, 'path']) || browserAction.get('path')
-    let basePath = browserAction.get('base_path')
+    let basePath = chromeUrl(browserAction.get('base_path'))
     if (path && basePath) {
       // Older extensions may provide a string path
       if (typeof path === 'string') {
