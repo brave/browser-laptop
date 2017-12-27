@@ -24,11 +24,11 @@ module.exports.fileUrl = (filePath) => {
   return encodeURI('file://' + fileUrlPath)
 }
 
-module.exports.chromeUrl = (filePath = '') => {
-  filePath = module.exports.fileUrl(filePath)
-  filePath = filePath.replace('file://', 'chrome://brave')
-
-  return filePath
+/**
+ * Converts file URL to chrome:// URL
+ */
+module.exports.chromeUrl = (fileUrl = '') => {
+  return fileUrl.replace('file://', 'chrome://brave')
 }
 
 /**
