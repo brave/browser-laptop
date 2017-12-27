@@ -190,9 +190,12 @@ class Tab extends React.Component {
 
     if (frame && !frame.isEmpty()) {
       const tabWidth = this.fixTabWidth
-      windowActions.onTabClosedWithMouse({
-        fixTabWidth: tabWidth
-      })
+      // do not mimic tab size if closed tab is a pinned tab
+      if (!this.props.isPinnedTab) {
+        windowActions.onTabClosedWithMouse({
+          fixTabWidth: tabWidth
+        })
+      }
       appActions.tabCloseRequested(this.props.tabId)
     }
   }
