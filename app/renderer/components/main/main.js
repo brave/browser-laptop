@@ -232,8 +232,8 @@ class Main extends React.Component {
       if (trackingFingers) {
         deltaX = deltaX + e.deltaX
         deltaY = deltaY + e.deltaY
-        const distanceThreshold = getSetting(settings.SWIPE_NAV_DISTANCE)
-        const percent = Math.abs(deltaX) / distanceThreshold
+        const distanceThresholdX = getSetting(settings.SWIPE_NAV_DISTANCE)
+        const percent = Math.abs(deltaX) / distanceThresholdX
         if (isSwipeOnRightEdge) {
           if (percent > 1) {
             appActions.swipedRight(1)
@@ -252,12 +252,13 @@ class Main extends React.Component {
     }, { passive: true })
 
     ipc.on('scroll-touch-end', () => {
-      const distanceThreshold = getSetting(settings.SWIPE_NAV_DISTANCE)
+      const distanceThresholdX = getSetting(settings.SWIPE_NAV_DISTANCE)
+      const distanceThresholdY = 101
       const timeThreshold = 80
-      if (trackingFingers && time > timeThreshold && Math.abs(deltaY) < distanceThreshold) {
-        if (deltaX > distanceThreshold && isSwipeOnRightEdge) {
+      if (trackingFingers && time > timeThreshold && Math.abs(deltaY) < distanceThresholdY) {
+        if (deltaX > distanceThresholdX && isSwipeOnRightEdge) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        } else if (deltaX < -distanceThreshold && isSwipeOnLeftEdge) {
+        } else if (deltaX < -distanceThresholdX && isSwipeOnLeftEdge) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         }
       }
