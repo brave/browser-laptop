@@ -629,6 +629,22 @@ const api = {
         }
       })
 
+      tab.on('media-started-playing', (e) => {
+        let tabValue = getTabValue(tabId)
+        if (tabValue) {
+          const windowId = tabValue.get('windowId')
+          appActions.mediaStartedPlaying(tabId, windowId)
+        }
+      })
+
+      tab.on('media-paused', (e) => {
+        let tabValue = getTabValue(tabId)
+        if (tabValue) {
+          const windowId = tabValue.get('windowId')
+          appActions.mediaPaused(tabId, windowId)
+        }
+      })
+
       tab.once('will-destroy', (e) => {
         const tabValue = getTabValue(tabId)
         if (tabValue) {

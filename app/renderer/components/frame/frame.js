@@ -756,19 +756,6 @@ class Frame extends React.Component {
       }
       windowActions.setFullScreen(this.props.tabId, false)
     })
-    this.webview.addEventListener('media-started-playing', ({title}) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      appActions.autoplayDismissed(this.props.tabId)
-      windowActions.setAudioPlaybackActive(this.frame, true)
-    })
-    this.webview.addEventListener('media-paused', ({title}) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-      windowActions.setAudioPlaybackActive(this.frame, false)
-    })
     this.webview.addEventListener('did-change-theme-color', ({themeColor}) => {
       if (this.frame.isEmpty()) {
         return
