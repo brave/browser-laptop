@@ -65,10 +65,10 @@ const appActions = {
     })
   },
 
-  windowClosed: function (windowValue) {
+  windowClosed: function (windowId) {
     dispatch({
       actionType: appConstants.APP_WINDOW_CLOSED,
-      windowValue
+      windowId
     })
   },
 
