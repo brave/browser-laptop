@@ -116,12 +116,12 @@ const shouldValidateWindowValue = function (check) {
   })
 }
 
-const shouldValidateAction = function (check) {
+const shouldValidateAction = function (check, payload = { windowValue: { windowId: 1 } }) {
   it('throws an AssertionError if action does not contain a `windowValue` that is convertable to an Immutable.Map', function () {
     assert.doesNotThrow(
       () => {
-        check(Immutable.fromJS({ windowValue: { windowId: 1 } }))
-        check({ windowValue: { windowId: 1 } })
+        check(Immutable.fromJS(payload))
+        check(payload)
       },
       AssertionError
     )
@@ -142,7 +142,7 @@ const shouldValidateAction = function (check) {
   it('throws an AssertionError if `action` is not convertable to an Immutable.Map', function () {
     assert.doesNotThrow(
       () => {
-        check({ windowValue: { windowId: 1 } })
+        check(payload)
       },
       AssertionError
     )
@@ -327,24 +327,20 @@ describe('windowState', function () {
 
     it('returns a new immutable state with the window removed by `windowId`', function () {
       assert.deepEqual(
-        windowState.removeWindow(this.appState, { windowValue: { windowId: 2 } }).get('windows').toJS(),
+        windowState.removeWindow(this.appState, { windowId: 2 }).get('windows').toJS(),
         [{ windowId: 1 }])
     })
 
     shouldValidateAction((action) => {
       windowState.removeWindow(defaultAppState, action)
-    })
-
-    shouldValidateWindowValue((windowValue) => {
-      windowState.removeWindow(defaultAppState, { windowValue })
-    })
+    }, { windowId: 1 })
 
     shouldValidateId((windowId) => {
-      windowState.removeWindow(defaultAppState, { windowValue: { windowId } })
+      windowState.removeWindow(defaultAppState, { windowId })
     })
 
     shouldValidateWindowState((state) => {
-      windowState.removeWindow(state, { windowValue: { windowId: 1 } })
+      windowState.removeWindow(state, { windowId: 1 })
     })
   })
 
