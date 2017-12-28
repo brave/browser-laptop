@@ -234,6 +234,8 @@ const api = {
         appActions.windowCreated(windowValue, windowId)
       })
       win.once('closed', () => {
+        appActions.windowClosed(windowId)
+        cleanupWindow(windowId)
       })
       win.on('blur', () => {
         appActions.windowBlurred(windowId)

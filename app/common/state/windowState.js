@@ -115,8 +115,7 @@ const api = {
   removeWindow: (state, action) => {
     action = validateAction(action)
     state = validateState(state)
-    let windowValue = validateWindowValue(action.get('windowValue'))
-    let windowId = validateId('windowId', windowValue.get('windowId'))
+    const windowId = action.get('windowId')
     return api.removeWindowByWindowId(state, windowId)
   },
 

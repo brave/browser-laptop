@@ -329,9 +329,8 @@ const windowsReducer = (state, action, immutableAction) => {
       break
     case appConstants.APP_WINDOW_CLOSED:
       state = windowState.removeWindow(state, action)
-      const windowId = action.getIn(['windowValue', 'windowId'])
+      const windowId = action.get('windowId')
       sessionStoreShutdown.removeWindowFromCache(windowId)
-      windows.cleanupWindow(windowId)
       break
     case appConstants.APP_WINDOW_CREATED:
     case appConstants.APP_WINDOW_RESIZED:
