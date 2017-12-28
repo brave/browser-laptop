@@ -1,6 +1,10 @@
 # Changelog
 
 Release Notes:
+## [0.19.123](https://github.com/brave/browser-laptop/releases/tag/v0.19.123dev)
+
+ - Fixed vulnerability in WebTorrent ([#12400](https://github.com/brave/browser-laptop/issues/12400))
+
 ## [0.19.122](https://github.com/brave/browser-laptop/releases/tag/v0.19.122dev)
 
  - Fixed DuckDuckGo referral code for private search. ([#12347](https://github.com/brave/browser-laptop/issues/12347))
