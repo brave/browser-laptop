@@ -48,7 +48,6 @@ const windowConstants = {
   WINDOW_SET_POPUP_WINDOW_DETAIL: _, // If set, also indicates that the popup window is shown
   WINDOW_HIDE_BOOKMARK_HANGER: _,
   WINDOW_SET_AUDIO_MUTED: _,
-  WINDOW_SET_AUDIO_PLAYBACK_ACTIVE: _,
   WINDOW_SET_FAVICON: _,
   WINDOW_SET_MOUSE_IN_TITLEBAR: _,
   WINDOW_SET_FINDBAR_SHOWN: _, // whether the findbar is shown
