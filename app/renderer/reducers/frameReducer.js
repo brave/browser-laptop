@@ -181,6 +181,19 @@ const frameReducer = (state, action, immutableAction) => {
         state = frameStateUtil.updateTabPageIndex(state, tabId)
       }
       break
+
+    case appConstants.APP_MEDIA_STARTED_PLAYING: {
+      const index = frameStateUtil.getIndexByTabId(state, action.tabId)
+      state = state.setIn(['frames', index, 'audioPlaybackActive'], true)
+      break
+    }
+
+    case appConstants.APP_MEDIA_PAUSED: {
+      const index = frameStateUtil.getIndexByTabId(state, action.tabId)
+      state = state.setIn(['frames', index, 'audioPlaybackActive'], false)
+      break
+    }
+
     case windowConstants.WINDOW_SET_NAVIGATED:
       // For about: URLs, make sure we store the URL as about:something
       // and not what we map to.

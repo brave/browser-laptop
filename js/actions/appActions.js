@@ -1316,14 +1316,23 @@ const appActions = {
     })
   },
 
-  /**
-   * Notifies autoplay notification can be dismissed
-   * @param {number} tabId - Tab id of current frame
-   */
-  autoplayDismissed: function (tabId) {
+  mediaStartedPlaying: function (tabId, windowId) {
     dispatch({
-      actionType: appConstants.APP_AUTOPLAY_DISMISSED,
-      tabId
+      actionType: appConstants.APP_MEDIA_STARTED_PLAYING,
+      tabId,
+      queryInfo: {
+        windowId
+      }
+    })
+  },
+
+  mediaPaused: function (tabId, windowId) {
+    dispatch({
+      actionType: appConstants.APP_MEDIA_PAUSED,
+      tabId,
+      queryInfo: {
+        windowId
+      }
     })
   },
 

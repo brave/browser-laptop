@@ -17,6 +17,7 @@ const settings = require('../../../js/constants/settings')
 const {autoplayOption} = require('../../common/constants/settingsEnums')
 
 let notificationCallbacks = []
+let temporaryAllowPlays = []
 
 const showAutoplayMessageBox = (state, tabId) => {
   const tab = webContents.fromTabID(tabId)
@@ -53,13 +54,9 @@ const showAutoplayMessageBox = (state, tabId) => {
           appActions.changeSiteSetting(origin, 'autoplay', true)
           if (tab && !tab.isDestroyed()) {
             tab.reload()
-            const temporaryAllow = (e) => {
-              tab.removeListener('media-started-playing', temporaryAllow)
-              if (!persist) {
-                appActions.removeSiteSetting(origin, 'autoplay')
-              }
+            if (!persist) {
+              temporaryAllowPlays[tabId] = origin
             }
-            tab.on('media-started-playing', temporaryAllow)
           }
         } else {
           if (persist) {
@@ -89,6 +86,15 @@ const hideAutoplayMessageBox = (tabId) => {
     ipcMain.removeListener(messages.NOTIFICATION_RESPONSE, notificationCallbacks[tabId])
     delete notificationCallbacks[tabId]
   }
+  temporaryAllowPlays[tabId] = origin
+  appActions.changeSiteSetting(origin, 'autoplay', true)
+}
+
+const removeTemporaryAllowPlays = (tabId) => {
+  if (temporaryAllowPlays[tabId]) {
+    appActions.removeSiteSetting(temporaryAllowPlays[tabId], 'autoplay')
+    delete temporaryAllowPlays[tabId]
+  }
 }
 
 const autoplayReducer = (state, action, immutableAction) => {
@@ -97,8 +103,16 @@ const autoplayReducer = (state, action, immutableAction) => {
     case appConstants.APP_AUTOPLAY_BLOCKED:
       showAutoplayMessageBox(state, action.get('tabId'))
       break
-    case appConstants.APP_AUTOPLAY_DISMISSED:
+    case appConstants.APP_MEDIA_STARTED_PLAYING:
       hideAutoplayMessageBox(action.get('tabId'))
+      break
+    case appConstants.APP_TAB_CLOSED:
+      removeTemporaryAllowPlays(action.get('tabId'))
+      break
+    case appConstants.APP_SHUTTING_DOWN:
+      temporaryAllowPlays.forEach((origin) => {
+        appActions.removeSiteSetting(origin, 'autoplay')
+      })
       break
   }
   return state

@@ -494,9 +494,6 @@ const doAction = (action) => {
         windowState = windowState.setIn(['frames', index, 'audioMuted'], frameProp.muted)
       })
       break
-    case windowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE:
-      windowState = windowState.setIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), 'audioPlaybackActive'], action.audioPlaybackActive)
-      break
     case windowConstants.WINDOW_SET_FAVICON:
       windowState = windowState.setIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), 'icon'], action.favicon)
       break
