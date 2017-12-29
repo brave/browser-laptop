@@ -22,6 +22,7 @@ const debugTabEventsFlagName = '--debug-tab-events'
 
 let appInitialized = false
 let newWindowURL
+const debugWindowEventsFlagName = '--debug-window-events'
 
 const focusOrOpenWindow = function (url) {
   // don't try to do anything if the app hasn't been initialized
@@ -131,7 +132,7 @@ app.on('will-finish-launching', () => {
 process.on(messages.APP_INITIALIZED, () => { appInitialized = true })
 
 const api = module.exports = {
-  newWindowURL: () => {
+  newWindowURL () {
     const openUrl = newWindowURL || getUrlFromCommandLine(process.argv)
     if (openUrl) {
       const parsedUrl = urlParse(openUrl)
@@ -142,7 +143,7 @@ const api = module.exports = {
     return newWindowURL
   },
 
-  getValueForKey: function (key, args = process.argv) {
+  getValueForKey (key, args = process.argv) {
     // TODO: support --blah=bloop as well as the currently supported --blah bloop
     //       and also boolean values inferred by key existance or 'no-' prefix
     //       similar to https://github.com/substack/minimist/blob/master/index.js#97
@@ -154,7 +155,7 @@ const api = module.exports = {
     return null
   },
 
-  getFirstRunPromoCode: function (args = process.argv) {
+  getFirstRunPromoCode (args = process.argv) {
     const installerPath = api.getValueForKey('--squirrel-installer-path', args)
     if (!installerPath || typeof installerPath !== 'string') {
       return null
@@ -170,5 +171,6 @@ const api = module.exports = {
     return null
   },
 
-  shouldDebugTabEvents: process.argv.includes(debugTabEventsFlagName)
+  shouldDebugTabEvents: process.argv.includes(debugTabEventsFlagName),
+  shouldDebugWindowEvents: process.argv.includes(debugWindowEventsFlagName)
 }

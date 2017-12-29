@@ -388,11 +388,13 @@ describe('sessionStore unit tests', function () {
       })
       it('calls cleanPerWindowData for each item', function () {
         const data = Immutable.fromJS({
-          perWindowState: ['window1', 'window2']
+          perWindowState: [{ 'window': 1 }, { 'window': 2 }]
         })
+        const window1 = data.getIn(['perWindowState', 0])
+        const window2 = data.getIn(['perWindowState', 1])
         sessionStore.cleanAppData(data, 'IS_SHUTDOWN_VALUE')
-        assert.equal(cleanPerWindowDataStub.withArgs('window1', 'IS_SHUTDOWN_VALUE').calledOnce, true)
-        assert.equal(cleanPerWindowDataStub.withArgs('window2', 'IS_SHUTDOWN_VALUE').calledOnce, true)
+        assert.equal(cleanPerWindowDataStub.withArgs(window1, 'IS_SHUTDOWN_VALUE').calledOnce, true)
+        assert.equal(cleanPerWindowDataStub.withArgs(window2, 'IS_SHUTDOWN_VALUE').calledOnce, true)
       })
 
       it('removes state for windows which have no frames', function () {
