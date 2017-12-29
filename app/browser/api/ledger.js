@@ -1818,6 +1818,10 @@ const getContributionAmount = () => {
 }
 
 const onInitRead = (state, parsedData) => {
+  parsedData.transactions.sort((transaction1, transaction2) => {
+    return transaction2.submissionStamp - transaction1.submissionStamp
+  })
+
   state = getStateInfo(state, parsedData)
 
   try {
