@@ -55,7 +55,9 @@ const pinnedSiteState = {
     site = site.set('order', sites.size)
 
     const key = pinnedSitesUtil.getKey(site)
-    if (key === null) {
+    // check if key is valid
+    // or if key already exists so we do not mutate state unneccessarily
+    if (key === null || state.hasIn([STATE_SITES.PINNED_SITES, key])) {
       return state
     }
 

@@ -92,21 +92,22 @@ const fireOnReactRender = (windowValue) => {
 
 const generateTabs = (windowState, frames, windowId) => {
   const activeFrameKey = windowState.get('activeFrameKey')
-
-  frames.forEach((frame, i) => {
-    if (frame.guestInstanceId) {
-      appActions.newWebContentsAdded(windowId, frame)
-    } else {
-      appActions.createTabRequested({
-        url: frame.location || frame.src || frame.provisionalLocation || frame.url,
-        partitionNumber: frame.partitionNumber,
-        isPrivate: frame.isPrivate,
-        active: activeFrameKey ? frame.key === activeFrameKey : true,
-        discarded: frame.unloaded,
-        title: frame.title,
-        faviconUrl: frame.icon,
-        index: i
-      }, false, true /* isRestore */)
-    }
-  })
+  if (frames && frames.length) {
+    frames.forEach((frame, i) => {
+      if (frame.guestInstanceId) {
+        appActions.newWebContentsAdded(windowId, frame)
+      } else {
+        appActions.createTabRequested({
+          url: frame.location || frame.src || frame.provisionalLocation || frame.url,
+          partitionNumber: frame.partitionNumber,
+          isPrivate: frame.isPrivate,
+          active: activeFrameKey ? frame.key === activeFrameKey : true,
+          discarded: frame.unloaded,
+          title: frame.title,
+          faviconUrl: frame.icon,
+          index: i
+        }, false, true /* isRestore */)
+      }
+    })
+  }
 }

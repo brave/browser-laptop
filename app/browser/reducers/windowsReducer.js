@@ -22,14 +22,8 @@ const {makeImmutable, isImmutable} = require('../../common/state/immutableUtil')
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const firstDefinedValue = require('../../../js/lib/functional').firstDefinedValue
-const appConfig = require('../../../js/constants/appConfig')
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
-
-const platformUtil = require('../../common/lib/platformUtil')
-
-const isDarwin = platformUtil.isDarwin()
-const isWindows = platformUtil.isWindows()
 
 // TODO cleanup all this createWindow crap
 function isModal (browserOpts) {
@@ -100,6 +94,8 @@ const setWindowPosition = (browserOpts, defaults, immutableWindowState) => {
     const screenPos = electron.screen.getCursorScreenPoint()
     browserOpts.x = screenPos.x
     browserOpts.y = screenPos.y
+    // ensure only valid BrowserWindow opts remain in browserOpts
+    delete browserOpts.positionByMouseCursor
   } else if (immutableWindowState.getIn(['windowInfo'])) {
     // Position comes from window state
     browserOpts.x = firstDefinedValue(browserOpts.x, immutableWindowState.getIn(['windowInfo', 'left']))
@@ -120,7 +116,7 @@ const setMaximized = (state, browserOpts, immutableWindowState) => {
   if (Object.keys(browserOpts).length > 0 && !browserOpts.checkMaximized) {
     return false
   }
-
+  delete browserOpts.checkMaximized
   if (immutableWindowState.getIn(['windowInfo'])) {
     return immutableWindowState.getIn(['windowInfo', 'state']) === 'maximized'
   }
@@ -138,12 +134,7 @@ function windowDefaults (state) {
     minHeight: 300,
     minModalHeight: 100,
     minModalWidth: 100,
-    windowOffset: 20,
-    webPreferences: {
-      // XXX: Do not edit without security review
-      sharedWorker: true,
-      partition: 'default'
-    }
+    windowOffset: 20
   }
 }
 
@@ -246,20 +237,10 @@ const handleCreateWindowAction = (state, action) => {
   browserOpts.width = browserOpts.width < minWidth ? minWidth : browserOpts.width
   browserOpts.height = browserOpts.height < minHeight ? minHeight : browserOpts.height
 
-  const autoHideMenuBarSetting = isDarwin || getSetting(settings.AUTO_HIDE_MENU)
-
   const windowProps = {
     // smaller min size for "modal" windows
     minWidth,
     minHeight,
-    // Neither a frame nor a titlebar
-    // frame: false,
-    // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
-    titleBarStyle: 'hidden-inset',
-    autoHideMenuBar: autoHideMenuBarSetting,
-    title: appConfig.name,
-    webPreferences: defaults.webPreferences,
-    frame: !isWindows,
     disposition: frameOpts.disposition
   }
 

@@ -231,6 +231,9 @@ const appActions = {
   /**
    * A request for a new tab has been made with the specified createProperties
    * @param {Object} createProperties
+   * @param {Boolean} activateIfOpen if the tab is already open with the same properties,
+   * switch to it instead of creating a new one
+   * @param {Boolean} isRestore when true, won't try to activate the new tab, even if the user preference indicates to
    */
   createTabRequested: function (createProperties, activateIfOpen = false, isRestore = false) {
     dispatch({
