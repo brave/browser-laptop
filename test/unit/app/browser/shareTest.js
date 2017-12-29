@@ -73,7 +73,7 @@ describe('share API', function () {
         assert.equal(this.mockTabs.create.withArgs(expectedUrl).callCount, 0)
       })
     })
-    describe('other', function () {
+    describe('other share page links', function () {
       it('calls createTabRequested with correct args', function () {
         Object.entries(share.templateUrls).forEach(([shareType, template]) => {
           if (shareType === 'email') {
