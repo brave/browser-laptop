@@ -57,11 +57,14 @@ const appConfig = require('../../../../js/constants/appConfig')
 const messages = require('../../../../js/constants/messages')
 const config = require('../../../../js/constants/config')
 
-const pdfjsOrigin = `chrome-extension://${config.PDFJSExtensionId}/`
-
 function isTorrentViewerURL (url) {
   const isEnabled = getSetting(settings.TORRENT_VIEWER_ENABLED)
   return isEnabled && isSourceMagnetUrl(url)
+}
+
+function isPDFJSURL (url) {
+  const pdfjsOrigin = `chrome-extension://${config.PDFJSExtensionId}/`
+  return url && url.startsWith(pdfjsOrigin)
 }
 
 class Frame extends React.Component {
@@ -288,7 +291,9 @@ class Frame extends React.Component {
         if (this.props.tabUrl !== this.props.location &&
           !this.isAboutPage() &&
           !isTorrentViewerURL(this.props.location)) {
-          appActions.loadURLRequested(this.props.tabId, this.props.location)
+        } else if (isPDFJSURL(this.props.location)) {
+          appActions.loadURLRequested(this.props.tabId,
+            UrlUtil.getLocationIfPDF(this.props.location))
         } else {
           tabActions.reload(this.props.tabId)
         }
@@ -620,7 +625,7 @@ class Frame extends React.Component {
         }, 250)
       }
 
-      if (url.startsWith(pdfjsOrigin)) {
+      if (isPDFJSURL(url)) {
         let displayLocation = UrlUtil.getLocationIfPDF(url)
         windowActions.setSecurityState(this.props.tabId, {
           secure: urlParse(displayLocation).protocol === 'https:',
