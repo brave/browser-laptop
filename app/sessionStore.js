@@ -367,15 +367,13 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
     }
   })
 
-  if (immutableData.get('sites')) {
-    const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
-    if (clearHistory) {
-      immutableData = immutableData.set('historySites', Immutable.Map())
-      immutableData = deleteImmutablePaths(immutableData, [
-        ['about', 'history'],
-        ['about', 'newtab']
-      ])
-    }
+  const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
+  if (clearHistory) {
+    immutableData = immutableData.set('historySites', Immutable.Map())
+    immutableData = deleteImmutablePaths(immutableData, [
+      ['about', 'history'],
+      ['about', 'newtab']
+    ])
   }
 
   if (immutableData.get('downloads')) {

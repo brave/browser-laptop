@@ -5,9 +5,11 @@
 /* global describe, it, before, beforeEach, after, afterEach */
 
 const Brave = require('../lib/brave')
+const assert = require('assert')
 const {urlInput, navigatorBookmarked, navigatorNotBookmarked, pinnedTabsTabs, tabsTabs} = require('../lib/selectors')
 const siteTags = require('../../js/constants/siteTags')
 const settings = require('../../js/constants/settings')
+const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const {startsWithOption} = require('../../app/common/constants/settingsEnums')
 
 describe('sessionStore test', function () {
@@ -39,6 +41,12 @@ describe('sessionStore test', function () {
       .browserWindow.getBounds().then((res) => res.y).should.eventually.be.equal(y)
   }
 
+  function * restart () {
+    yield Brave.stopApp(false, 10000)
+    yield Brave.startApp()
+    yield setupBrave()
+  }
+
   describe('state is preserved with a normal shutdown', function () {
     Brave.beforeAllServerSetup(this)
     before(function * () {
@@ -61,9 +69,7 @@ describe('sessionStore test', function () {
         .addBookmark(site)
         .waitForExist(navigatorBookmarked)
       // See: #10490
-      yield Brave.stopApp(false, 10000)
-      yield Brave.startApp()
-      yield setupBrave(Brave.app.client)
+      yield restart()
     })
 
     after(function * () {
@@ -109,9 +115,7 @@ describe('sessionStore test', function () {
         .addBookmark(site)
         .waitForExist(navigatorBookmarked)
       // See: #10490
-      yield Brave.stopApp(false, 10000)
-      yield Brave.startApp()
-      yield setupBrave(Brave.app.client)
+      yield restart()
 
       yield Brave.app.client
         .windowByUrl(Brave.browserWindowUrl)
@@ -123,9 +127,7 @@ describe('sessionStore test', function () {
         .waitForTabCount(2)
         .waitForBrowserWindow()
       // See: #10490
-      yield Brave.stopApp(false, 10000)
-      yield Brave.startApp()
-      yield setupBrave(Brave.app.client)
+      yield restart()
     })
 
     after(function * () {
@@ -182,9 +184,7 @@ describe('sessionStore test', function () {
           .activateTabByIndex(1)
           .waitForExist(this.activeTabSelector, 30000)
         // See: #10490
-        yield Brave.stopApp(false, 10000)
-        yield Brave.startApp()
-        yield setupBrave(Brave.app.client)
+        yield restart()
       })
 
       after(function * () {
@@ -222,9 +222,7 @@ describe('sessionStore test', function () {
           .waitForElementCount(tabsTabs, 1)
           .waitForExist(this.activeTabSelector)
         // See: #10490
-        yield Brave.stopApp(false, 10000)
-        yield Brave.startApp()
-        yield setupBrave(Brave.app.client)
+        yield restart()
       })
 
       after(function * () {
@@ -269,9 +267,7 @@ describe('sessionStore test', function () {
         })
 
       // See: #10490
-      yield Brave.stopApp(false, 10000)
-      yield Brave.startApp()
-      yield setupBrave(Brave.app.client)
+      yield restart()
       yield Brave.app.client
         .waitForUrl(Brave.newTabUrl)
         .waitForBrowserWindow()
@@ -314,9 +310,7 @@ describe('sessionStore test', function () {
         .changeSetting(settings.STARTUP_MODE, startsWithOption.WINDOWS_TABS_FROM_LAST_TIME)
 
       // See: #10490
-      yield Brave.stopApp(false, 10000)
-      yield Brave.startApp()
-      yield setupBrave(Brave.app.client)
+      yield restart()
       yield setup(Brave.app.client)
 
       yield checkWindow(Brave, width, height, x, y)
@@ -329,9 +323,7 @@ describe('sessionStore test', function () {
         .changeSetting(settings.STARTUP_MODE, startsWithOption.HOMEPAGE)
 
       // See: #10490
-      yield Brave.stopApp(false, 10000)
-      yield Brave.startApp()
-      yield setupBrave(Brave.app.client)
+      yield restart()
       yield setup(Brave.app.client)
 
       yield checkWindow(Brave, width, height, x, y)
@@ -344,12 +336,38 @@ describe('sessionStore test', function () {
         .changeSetting(settings.STARTUP_MODE, startsWithOption.NEW_TAB_PAGE)
 
       // See: #10490
-      yield Brave.stopApp(false, 10000)
-      yield Brave.startApp()
-      yield setupBrave(Brave.app.client)
+      yield restart()
       yield setup(Brave.app.client)
 
       yield checkWindow(Brave, width, height, x, y)
+    })
+  })
+
+  describe('clears data on shutdown', function () {
+    Brave.beforeAllServerSetup(this)
+    beforeEach(function * () {
+      yield Brave.startApp()
+      yield setupBrave(Brave.app.client)
+      yield setup(Brave.app.client)
+      yield Brave.app.client
+        .waitForUrl(Brave.newTabUrl)
+        .waitForBrowserWindow()
+    })
+    it('clears history', function * () {
+      const aboutHistoryUrl = getTargetAboutUrl('about:history')
+      yield Brave.app.client
+        .changeSetting(settings.SHUTDOWN_CLEAR_HISTORY, true)
+        .addHistorySite({ location: 'https://abcdefg.com/test' })
+        .tabByIndex(0)
+        .url(aboutHistoryUrl)
+        .waitForElementCount('[data-test-id="time"]', 1)
+      yield restart()
+      yield Brave.app.client
+        .waitForBrowserWindow()
+        .tabByIndex(0)
+        .url(aboutHistoryUrl)
+        .pause(100)
+        .isExisting('[data-test-id="time"]').then((isExisting) => assert(!isExisting))
     })
   })
 })
