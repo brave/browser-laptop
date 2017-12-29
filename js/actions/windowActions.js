@@ -583,20 +583,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to indicate that audio is playing
-   *
-   * @param {Object} frameProps - Properties of the frame in question
-   * @param {boolean} audioPlaybackActive - true if audio is playing in the frame
-   */
-  setAudioPlaybackActive: function (frameProps, audioPlaybackActive) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_AUDIO_PLAYBACK_ACTIVE,
-      frameProps,
-      audioPlaybackActive
-    })
-  },
-
-  /**
    * Dispatches a message to indicate that the theme color has changed for a page
    *
    * @param {Object} frameProps - Properties of the frame in question
