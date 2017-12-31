@@ -1818,6 +1818,12 @@ const getContributionAmount = () => {
 }
 
 const onInitRead = (state, parsedData) => {
+  if (Array.isArray(parsedData.transactions)) {
+    parsedData.transactions.sort((transaction1, transaction2) => {
+      return transaction1.submissionStamp - transaction2.submissionStamp
+    })
+  }
+
   state = getStateInfo(state, parsedData)
 
   try {
