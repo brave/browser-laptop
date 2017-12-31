@@ -290,26 +290,30 @@ var ctx = null
 var translations = {}
 var lang = 'en-US'
 
+// Return a translate token from cache or a placeholder
+// indicating that no translation is available
+exports.translation = function (token, replacements = {}) {
+  if (translations[token]) {
+    return exports.translationReplace(translations[token], replacements)
+  } else {
+    // This will return an identifier in upper case useful for determining if a translation was not requested in the menu
+    // identifiers above.
+    return token.toUpperCase()
+  }
+}
+
 // todo: FSI/PDI stripping can probably be replaced once
 // https://github.com/l20n/l20n.js/commit/2fea50bf43c43a8e930a519a37f0f64f3626e885
 // is released
 const FSI = '\u2068'
 const PDI = '\u2069'
 
-// Return a translate token from cache or a placeholder
-// indicating that no translation is available
-exports.translation = function (token, replacements = {}) {
-  if (translations[token]) {
-    let returnVal = translations[token]
-    for (var key in replacements) {
-      returnVal = returnVal.replace(new RegExp(FSI + '{{\\s*' + key + '\\s*}}' + PDI), replacements[key])
-    }
-    return returnVal
-  } else {
-    // This will return an identifier in upper case useful for determining if a translation was not requested in the menu
-    // identifiers above.
-    return token.toUpperCase()
+exports.translationReplace = function (translation, replacements = {}) {
+  let returnVal = translation
+  for (var key in replacements) {
+    returnVal = returnVal.replace(new RegExp(FSI + '{{\\s*' + key + '\\s*}}' + PDI), replacements[key])
   }
+  return returnVal
 }
 
 // Default language locale identifier

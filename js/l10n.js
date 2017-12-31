@@ -11,7 +11,7 @@ const {LANGUAGE, REQUEST_LANGUAGE} = require('./constants/messages')
 var rendererTranslationCache = {}
 
 // As for a translation for the current language
-exports.translation = (token) => {
+exports.translation = (token, replacements = {}) => {
   if (!token) return ''
 
   // If we are in the renderer process
@@ -22,11 +22,13 @@ exports.translation = (token) => {
       // per renderer process)
       rendererTranslationCache = ipcRenderer.sendSync('translations')
     }
+
+    const translation = rendererTranslationCache[token] || `[${token.toLowerCase()}]`
     // Return the translation
-    return rendererTranslationCache[token] || `[${token.toLowerCase()}]`
+    return locale.translationReplace(translation, replacements)
   } else {
     // Otherwise retrieve translation directly
-    return locale.translation(token)
+    return locale.translation(token, replacements)
   }
 }
 
