@@ -143,8 +143,10 @@ module.exports.printMenuItem = () => {
 }
 
 module.exports.simpleShareActiveTabMenuItem = (l10nId, type, accelerator) => {
+  const siteName = type.charAt(0).toUpperCase() + type.slice(1)
+
   return {
-    label: locale.translation(l10nId),
+    label: locale.translation(l10nId, {siteName: siteName}),
     accelerator,
     click: function (item, focusedWindow) {
       appActions.simpleShareActiveTabRequested(type)

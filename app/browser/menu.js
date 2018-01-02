@@ -107,13 +107,13 @@ const createFileSubmenu = () => {
       submenu: [
         CommonMenu.simpleShareActiveTabMenuItem('emailPageLink', 'email'),
         CommonMenu.separatorMenuItem,
-        CommonMenu.simpleShareActiveTabMenuItem('tweetPageLink', 'twitter'),
-        CommonMenu.simpleShareActiveTabMenuItem('facebookPageLink', 'facebook'),
-        CommonMenu.simpleShareActiveTabMenuItem('pinterestPageLink', 'pinterest'),
-        CommonMenu.simpleShareActiveTabMenuItem('googlePlusPageLink', 'googlePlus'),
-        CommonMenu.simpleShareActiveTabMenuItem('linkedInPageLink', 'linkedIn'),
-        CommonMenu.simpleShareActiveTabMenuItem('bufferPageLink', 'buffer'),
-        CommonMenu.simpleShareActiveTabMenuItem('redditPageLink', 'reddit')
+        CommonMenu.simpleShareActiveTabMenuItem('sharePageLink', 'twitter'),
+        CommonMenu.simpleShareActiveTabMenuItem('sharePageLink', 'facebook'),
+        CommonMenu.simpleShareActiveTabMenuItem('sharePageLink', 'pinterest'),
+        CommonMenu.simpleShareActiveTabMenuItem('sharePageLink', 'googlePlus'),
+        CommonMenu.simpleShareActiveTabMenuItem('sharePageLink', 'linkedIn'),
+        CommonMenu.simpleShareActiveTabMenuItem('sharePageLink', 'buffer'),
+        CommonMenu.simpleShareActiveTabMenuItem('sharePageLink', 'reddit')
       ]
     },
     // Move inside share menu when it's enabled
