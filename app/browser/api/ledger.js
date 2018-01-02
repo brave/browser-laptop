@@ -427,7 +427,7 @@ const synopsisNormalizer = (state, changedPublisher, returnState = true, prune =
   // round if over 100% of pinned publishers
   if (pinnedTotal > 100) {
     if (changedPublisher) {
-      let changedObject = dataPinned.filter(publisher => publisher.site === changedPublisher)[0] // TOOD optimize to find from filter
+      let changedObject = dataPinned.filter(publisher => publisher.publisherKey === changedPublisher)[0] // TOOD optimize to find from filter
       const setOne = changedObject.pinPercentage > (100 - dataPinned.length - 1)
 
       if (setOne) {
@@ -436,7 +436,7 @@ const synopsisNormalizer = (state, changedPublisher, returnState = true, prune =
       }
 
       const pinnedRestTotal = pinnedTotal - changedObject.pinPercentage
-      dataPinned = dataPinned.filter(publisher => publisher.site !== changedPublisher)
+      dataPinned = dataPinned.filter(publisher => publisher.publisherKey !== changedPublisher)
       dataPinned = normalizePinned(dataPinned, pinnedRestTotal, (100 - changedObject.pinPercentage), setOne)
       dataPinned = roundToTarget(dataPinned, (100 - changedObject.pinPercentage), 'pinPercentage')
 
@@ -480,7 +480,7 @@ const synopsisNormalizer = (state, changedPublisher, returnState = true, prune =
 
   // sync synopsis
   newData.forEach((item) => {
-    const publisherKey = item.site
+    const publisherKey = item.publisherKey
     const weight = item.weight
     const pinPercentage = item.pinPercentage
     savePublisherData(publisherKey, 'weight', weight)
