@@ -44,9 +44,25 @@ const showDialog = (state) => {
     if (fileName) {
       personal = createBookmarkArray(state)
       other = createBookmarkArray(state, -1, false)
-      fs.writeFileSync(fileName, createBookmarkHTML(personal, other))
+      try {
+        fs.writeFileSync(fileName, createBookmarkHTML(personal, other))
+      } catch (e) {
+        console.log('Error exporting bookmarks: ', e)
+      }
     }
   })
+}
+
+const encodeHref = (string) => {
+  return (string || '')
+    .replace(/"/g, '&quot;')
+}
+
+const encodeTitle = (string) => {
+  return (string || '')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 }
 
 const createBookmarkArray = (state, parentFolderId = 0, first = true, depth = 1) => {
@@ -60,10 +76,12 @@ const createBookmarkArray = (state, parentFolderId = 0, first = true, depth = 1)
 
   for (let site of bookmarks) {
     if (bookmarkUtil.isBookmark(site) && site.get('location')) {
-      title = site.get('title', site.get('location'))
-      payload.push(`${indentNext}<DT><A HREF="${site.get('location')}">${title}</A>`)
+      title = encodeTitle(site.get('title', site.get('location')))
+      const href = encodeHref(site.get('location'))
+      payload.push(`${indentNext}<DT><A HREF="${href}">${title}</A>`)
     } else if (bookmarkFoldersUtil.isFolder(site)) {
-      payload.push(`${indentNext}<DT><H3>${site.get('title')}</H3>`)
+      title = encodeTitle(site.get('title'))
+      payload.push(`${indentNext}<DT><H3>${title}</H3>`)
       payload = payload.concat(createBookmarkArray(state, site.get('folderId'), true, (depth + 1)))
     }
   }
