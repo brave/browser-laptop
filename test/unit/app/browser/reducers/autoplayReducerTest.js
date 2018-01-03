@@ -302,30 +302,71 @@ describe('autoplayReducer unit tests', function () {
   })
 
   describe('APP_MEDIA_STARTED_PLAYING', function () {
-    before(function () {
-      autoplayMedia = autoplayOption.ALWAYS_ASK
-      autoplayReducer(Immutable.fromJS({
-        siteSettings: {}
-      }), Immutable.fromJS({
-        actionType: appConstants.APP_AUTOPLAY_BLOCKED,
-        tabId: tabId
-      }))
-      autoplayReducer(Immutable.Map(), Immutable.fromJS({
-        actionType: appConstants.APP_MEDIA_STARTED_PLAYING,
-        tabId: tabId
-      }))
+    describe('without NOTIFICATION_RESPONSE', function () {
+      before(function () {
+        autoplayMedia = autoplayOption.ALWAYS_ASK
+        autoplayReducer(Immutable.fromJS({
+          siteSettings: {}
+        }), Immutable.fromJS({
+          actionType: appConstants.APP_AUTOPLAY_BLOCKED,
+          tabId: tabId
+        }))
+        autoplayReducer(Immutable.Map(), Immutable.fromJS({
+          actionType: appConstants.APP_MEDIA_STARTED_PLAYING,
+          tabId: tabId
+        }))
+      })
+
+      it('calls local.translation', function () {
+        assert(translationSpy.withArgs('allowAutoplay', {origin}).called)
+      })
+
+      it('calls appActions.hideNotification', function () {
+        assert(hideNotificationSpy.withArgs(message).called)
+      })
+
+      it('calls ipcMain.removeListener', function () {
+        assert(removeListenerSpy.called)
+      })
+
+      it('calls appActions.changeSiteSetting', function () {
+        assert(changeSiteSettingSpy.withArgs(origin, 'autoplay', true).called)
+      })
     })
 
-    it('calls local.translation', function () {
-      assert(translationSpy.withArgs('allowAutoplay', {origin}).called)
-    })
+    describe('with NOTIFICATION_RESPONSE', function () {
+      before(function () {
+        autoplayMedia = autoplayOption.ALWAYS_ASK
+        autoplayReducer(Immutable.fromJS({
+          siteSettings: {}
+        }), Immutable.fromJS({
+          actionType: appConstants.APP_AUTOPLAY_BLOCKED,
+          tabId: tabId
+        }))
+        fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 0, true)
+        removeListenerSpy.reset()
+        changeSiteSettingSpy.reset()
+        autoplayReducer(Immutable.Map(), Immutable.fromJS({
+          actionType: appConstants.APP_MEDIA_STARTED_PLAYING,
+          tabId: tabId
+        }))
+      })
 
-    it('calls appActions.hideNotification', function () {
-      assert(hideNotificationSpy.withArgs(message).called)
-    })
+      it('calls local.translation', function () {
+        assert(translationSpy.withArgs('allowAutoplay', {origin}).called)
+      })
 
-    it('calls ipcMain.removeListener', function () {
-      assert(removeListenerSpy.called)
+      it('calls appActions.hideNotification', function () {
+        assert(hideNotificationSpy.withArgs(message).called)
+      })
+
+      it('no calls ipcMain.removeListener', function () {
+        assert(removeListenerSpy.notCalled)
+      })
+
+      it('no calls appActions.changeSiteSetting', function () {
+        assert(changeSiteSettingSpy.notCalled)
+      })
     })
   })
 
@@ -338,6 +379,7 @@ describe('autoplayReducer unit tests', function () {
         actionType: appConstants.APP_AUTOPLAY_BLOCKED,
         tabId: tabId
       }))
+      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 0, false)
       autoplayReducer(Immutable.Map(), Immutable.fromJS({
         actionType: appConstants.APP_TAB_CLOSED,
         tabId: tabId
@@ -370,6 +412,7 @@ describe('autoplayReducer unit tests', function () {
         actionType: appConstants.APP_AUTOPLAY_BLOCKED,
         tabId: tabId
       }))
+      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 0, false)
       autoplayReducer(Immutable.Map(), Immutable.fromJS({
         actionType: appConstants.APP_SHUTTING_DOWN
       }))

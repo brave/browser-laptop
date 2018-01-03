@@ -85,9 +85,9 @@ const hideAutoplayMessageBox = (tabId) => {
   if (notificationCallbacks[tabId]) {
     ipcMain.removeListener(messages.NOTIFICATION_RESPONSE, notificationCallbacks[tabId])
     delete notificationCallbacks[tabId]
+    temporaryAllowPlays[tabId] = origin
+    appActions.changeSiteSetting(origin, 'autoplay', true)
   }
-  temporaryAllowPlays[tabId] = origin
-  appActions.changeSiteSetting(origin, 'autoplay', true)
 }
 
 const removeTemporaryAllowPlays = (tabId) => {
