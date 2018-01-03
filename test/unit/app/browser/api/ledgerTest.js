@@ -290,20 +290,6 @@ describe('ledger api unit tests', function () {
             assert(onChangeSettingSpy.withArgs(settings.PAYMENTS_CONTRIBUTION_AMOUNT, 25).calledOnce)
           })
         })
-        describe('when set to 10 USD', function () {
-          before(function () {
-            setPaymentInfoSpy.reset()
-            onChangeSettingSpy.reset()
-            contributionAmount = 10
-            ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
-          })
-          it('converts to 50 BAT', function () {
-            assert(setPaymentInfoSpy.withArgs(50).calledOnce)
-          })
-          it('updates the setting', function () {
-            assert(onChangeSettingSpy.withArgs(settings.PAYMENTS_CONTRIBUTION_AMOUNT, 50).calledOnce)
-          })
-        })
         describe('when set to 15 USD', function () {
           before(function () {
             setPaymentInfoSpy.reset()
