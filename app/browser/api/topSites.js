@@ -121,6 +121,7 @@ const getTopSiteData = () => {
 
   if (sites.size < 18) {
     const preDefined = staticData
+      // TODO: this doesn't work properly
       .filter((site) => {
         return !isIgnored(state, site.get('key'))
       })
@@ -131,23 +132,23 @@ const getTopSiteData = () => {
     sites = sites.concat(preDefined)
   }
 
-  sites = removeDuplicateDomains(sites)
-
-  // TODO: newer sites should skip pinned position
-  let gridSites = aboutNewTabState.getPinnedTopSites(state)
-
-  sites.forEach((site) => {
-    const siteExists = gridSites.some(pinnedSite => {
-      if (!pinnedSite) {
-        return false
-      }
-      return site.get('key') === pinnedSite.get('key')
-    })
-
-    if (!siteExists) {
-      gridSites.unshift(site)
+  const pinnedTopSites = aboutNewTabState.getPinnedTopSites(state)
+  let gridSites = pinnedTopSites.map(pinned => {
+    // topsites are populated once user visit a new site.
+    // pinning a site to a given index is a user decision
+    // and should be taken as priority. If there's an empty
+    // space we just fill it with visited sites. Otherwise
+    // fallback to the pinned item.
+    if (!pinned) {
+      const firstSite = sites.first()
+      sites = sites.shift()
+      return firstSite
     }
+    return pinned
   })
+
+  gridSites = gridSites.filter(site => site != null)
+  gridSites = removeDuplicateDomains(gridSites)
 
   appActions.topSiteDataAvailable(gridSites)
 }
