@@ -285,6 +285,7 @@ class Tab extends React.Component {
     props.centralizeTabIcons = tabUIState.centralizeTabIcons(currentWindow, frameKey, isPinned)
     // required only so that context menu shows correct state (mute vs unmute)
     props.isAudioMuted = audioState.isAudioMuted(currentWindow, frameKey)
+    props.isAudio = audioState.canPlayAudio(currentWindow, frameKey)
 
     // used in other functions
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
