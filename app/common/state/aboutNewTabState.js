@@ -4,7 +4,7 @@
 
 const Immutable = require('immutable')
 const {makeImmutable} = require('./immutableUtil')
-
+const topSites = require('../../browser/api/topSites')
 /**
  * topSites are defined by users. Pinned sites are attached to their positions
  * in the grid, and the non pinned indexes are populated with newly accessed sites
@@ -16,9 +16,11 @@ const aboutNewTabState = {
   },
 
   getPinnedTopSites: (state) => {
+    // add same number as fallback to avoid race condition on startup
+    const maxEntries = topSites.aboutNewTabMaxEntries || 100
     // we need null spaces in order to proper pin a topSite in the right position.
-    // historically defined with 3 rows of 6 and kept as-is for parity with other areas.
-    return state.getIn(['about', 'newtab', 'pinnedTopSites'], Immutable.List()).setSize(18)
+    // so let's set it to the same number as max new tab entries.
+    return state.getIn(['about', 'newtab', 'pinnedTopSites'], Immutable.List()).setSize(maxEntries)
   },
 
   getIgnoredTopSites: (state) => {
