@@ -131,6 +131,7 @@ class SwitchControl extends ImmutableComponent {
               styles.switchControl__text__label,
               styles.switchControl__text__label_right,
               this.props.small && styles.switchControl__text__label_small,
+              this.props.disabled && styles.switchControl__text_disabled,
               this.props.customStyleTextRight
             )}
               data-l10n-id={this.props.rightl10nId}
