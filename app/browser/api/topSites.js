@@ -20,7 +20,12 @@ let minAccessOfTopSites
 const staticData = Immutable.fromJS(newTabData.topSites)
 
 const isPinned = (state, siteKey) => {
-  return aboutNewTabState.getPinnedTopSites(state).find(site => site.get('key') === siteKey)
+  return aboutNewTabState.getPinnedTopSites(state).some(site => {
+    if (!site || !site.get) {
+      return false
+    }
+    return site.get('key') === siteKey
+  })
 }
 
 const isIgnored = (state, siteKey) => {
@@ -117,7 +122,7 @@ const getTopSiteData = () => {
   if (sites.size < 18) {
     const preDefined = staticData
       .filter((site) => {
-        return !isPinned(state, site.get('key')) && !isIgnored(state, site.get('key'))
+        return !isIgnored(state, site.get('key'))
       })
       .map(site => {
         const bookmarkKey = bookmarkLocationCache.getCacheKey(state, site.get('location'))
@@ -126,7 +131,25 @@ const getTopSiteData = () => {
     sites = sites.concat(preDefined)
   }
 
-  appActions.topSiteDataAvailable(sites)
+  sites = removeDuplicateDomains(sites)
+
+  // TODO: newer sites should skip pinned position
+  let gridSites = aboutNewTabState.getPinnedTopSites(state)
+
+  sites.forEach((site) => {
+    const siteExists = gridSites.some(pinnedSite => {
+      if (!pinnedSite) {
+        return false
+      }
+      return site.get('key') === pinnedSite.get('key')
+    })
+
+    if (!siteExists) {
+      gridSites.unshift(site)
+    }
+  })
+
+  appActions.topSiteDataAvailable(gridSites)
 }
 
 /**

@@ -16,7 +16,9 @@ const aboutNewTabState = {
   },
 
   getPinnedTopSites: (state) => {
-    return state.getIn(['about', 'newtab', 'pinnedTopSites'], Immutable.List())
+    // we need null spaces in order to proper pin a topSite in the right position.
+    // historically defined with 3 rows of 6 and kept as-is for parity with other areas.
+    return state.getIn(['about', 'newtab', 'pinnedTopSites'], Immutable.List()).setSize(18)
   },
 
   getIgnoredTopSites: (state) => {

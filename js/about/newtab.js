@@ -109,20 +109,19 @@ class NewTabPage extends React.Component {
   }
 
   isPinned (siteKey) {
-    return this.pinnedTopSites.find(site => site.get('key') === siteKey)
+    return this.pinnedTopSites.some(site => {
+      if (!site || !site.get) {
+        return false
+      }
+      return site.get('key') === siteKey
+    })
   }
 
   get gridLayout () {
     const sizeToCount = {large: 18, medium: 12, small: 6}
     const count = sizeToCount[this.gridLayoutSize]
 
-    let sites = this.pinnedTopSites.take(count)
-
-    if (sites.size < count) {
-      sites = sites.concat(this.topSites.take(count - sites.size))
-    }
-
-    return sites
+    return this.topSites.take(count)
   }
 
   showNotification () {
@@ -178,14 +177,13 @@ class NewTabPage extends React.Component {
   }
 
   onPinnedTopSite (siteKey) {
-    let pinnedTopSites = this.pinnedTopSites
+    const currentSiteIndex = this.topSites.findIndex(site => site.get('key') === siteKey)
     const siteProps = this.topSites.find(site => site.get('key') === siteKey)
-
-    if (this.isPinned(siteKey)) {
-      pinnedTopSites = pinnedTopSites.filter(site => site.get('key') !== siteKey)
-    } else {
-      pinnedTopSites = pinnedTopSites.push(siteProps)
-    }
+    // ensure pinned sites are pinned in the right order
+    // do not edit these lines unless you've manually tested site visits
+    // after pinning and after dnd reordering
+    let pinnedTopSites = this.pinnedTopSites
+      .splice(currentSiteIndex, 1, this.isPinned(siteKey) ? null : siteProps)
 
     aboutActions.setNewTabDetail({pinnedTopSites: pinnedTopSites}, true)
   }
