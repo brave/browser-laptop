@@ -74,15 +74,15 @@ describe('Bookmarks export', function () {
         type: siteTags.BOOKMARK
       },
       'https://brave.com/5|0|3': {
-        title: 'Website 5',
+        title: 'Title </A> with "characters" in it',
         location: 'https://brave.com/5',
         parentFolderId: 3,
         key: 'https://brave.com/5|0|3',
         type: siteTags.BOOKMARK
       },
       'https://brave.com/6|0|0': {
-        title: 'Website 6',
-        location: 'https://brave.com/6',
+        title: 'Bookmarklet example',
+        location: 'javascript:(function(){var x,n,nD,z,i; function htmlEscape(s){s=s.replace(/&/g,\'&amp;\');s=s.replace(/>/g,\'&gt;\');s=s.replace(/</g,\'&lt;\');return s;} function attrQuoteEscape(s){s=s.replace(/&/g,\'&amp;\'); s=s.replace(/"/g, \'&quot;\');return s;} x=prompt("show links with this word/phrase in link text or target url (leave blank to list all links):", ""); n=0; if(x!=null) { x=x.toLowerCase(); nD = window.open().document; nD.writeln(\'<html><head><title>Links containing "\'+htmlEscape(x)+\'"</title><base target="_blank"></head><body>\'); nD.writeln(\'Links on <a href="\'+attrQuoteEscape(location.href)+\'">\'+htmlEscape(location.href)+\'</a><br> with link text or target url containing &quot;\' + htmlEscape(x) + \'&quot;<br><hr>\'); z = document.links; for (i = 0; i < z.length; ++i) { if ((z[i].innerHTML && z[i].innerHTML.toLowerCase().indexOf(x) != -1) || z[i].href.toLowerCase().indexOf(x) != -1 ) { nD.writeln(++n + \'. <a href="\' + attrQuoteEscape(z[i].href) + \'">\' + (z[i].innerHTML || htmlEscape(z[i].href)) + \'</a><br>\'); } } nD.writeln(\'<hr></body></html>\'); nD.close(); } })();',
         parentFolderId: 0,
         key: 'https://brave.com/6|0|0',
         type: siteTags.BOOKMARK
@@ -163,10 +163,10 @@ describe('Bookmarks export', function () {
     '      </DL><p>',
     '      <DT><H3>folder 3</H3>',
     '      <DL><p>',
-    '        <DT><A HREF="https://brave.com/5">Website 5</A>',
+    '        <DT><A HREF="https://brave.com/5">Title &lt;/A&gt; with &quot;characters&quot; in it</A>',
     '      </DL><p>',
     '    </DL><p>',
-    '    <DT><A HREF="https://brave.com/6">Website 6</A>',
+    '    <DT><A HREF="javascript:(function(){var x,n,nD,z,i; function htmlEscape(s){s=s.replace(/&/g,\'&amp;\');s=s.replace(/>/g,\'&gt;\');s=s.replace(/</g,\'&lt;\');return s;} function attrQuoteEscape(s){s=s.replace(/&/g,\'&amp;\'); s=s.replace(/&quot;/g, \'&quot;\');return s;} x=prompt(&quot;show links with this word/phrase in link text or target url (leave blank to list all links):&quot;, &quot;&quot;); n=0; if(x!=null) { x=x.toLowerCase(); nD = window.open().document; nD.writeln(\'<html><head><title>Links containing &quot;\'+htmlEscape(x)+\'&quot;</title><base target=&quot;_blank&quot;></head><body>\'); nD.writeln(\'Links on <a href=&quot;\'+attrQuoteEscape(location.href)+\'&quot;>\'+htmlEscape(location.href)+\'</a><br> with link text or target url containing &quot;\' + htmlEscape(x) + \'&quot;<br><hr>\'); z = document.links; for (i = 0; i < z.length; ++i) { if ((z[i].innerHTML && z[i].innerHTML.toLowerCase().indexOf(x) != -1) || z[i].href.toLowerCase().indexOf(x) != -1 ) { nD.writeln(++n + \'. <a href=&quot;\' + attrQuoteEscape(z[i].href) + \'&quot;>\' + (z[i].innerHTML || htmlEscape(z[i].href)) + \'</a><br>\'); } } nD.writeln(\'<hr></body></html>\'); nD.close(); } })();">Bookmarklet example</A>',
     '    <DT><H3>folder 4</H3>',
     '    <DL><p>',
     '    </DL><p>',
@@ -185,25 +185,29 @@ describe('Bookmarks export', function () {
     '    </DL><p>'
   ]
 
-  it('personal array', function () {
-    const gen = exporter.createBookmarkArray(state)
-    assert.deepEqual(gen, personalArray)
+  describe('createBookmarkArray', function () {
+    it('serializes the regular bookmarks', function () {
+      const gen = exporter.createBookmarkArray(state)
+      assert.deepEqual(gen, personalArray)
+    })
+
+    it('serializes the "other" bookmarks', function () {
+      const gen = exporter.createBookmarkArray(state, -1, false)
+      assert.deepEqual(gen, otherArray)
+    })
   })
 
-  it('other array', function () {
-    const gen = exporter.createBookmarkArray(state, -1, false)
-    assert.deepEqual(gen, otherArray)
-  })
+  describe('createBookmarkHTML', function () {
+    it('generates an HTML response', function () {
+      const personal = exporter.createBookmarkArray(state)
+      const other = exporter.createBookmarkArray(state, -1, false)
+      let result = exporter.createBookmarkHTML(personal, other)
+      let expected = fs.readFileSync('./test/fixtures/bookmarkExport.html', 'utf8')
 
-  it('generated html', function () {
-    const personal = exporter.createBookmarkArray(state)
-    const other = exporter.createBookmarkArray(state, -1, false)
-    let result = exporter.createBookmarkHTML(personal, other)
-    let expected = fs.readFileSync('./test/fixtures/bookmarkExport.html', 'utf8')
+      result = result.replace(/\s+/g, ' ').trim()
+      expected = expected.replace(/\s+/g, ' ').trim()
 
-    result = result.replace(/\s+/g, ' ')
-    expected = expected.replace(/\s+/g, ' ')
-
-    assert.equal(result, expected)
+      assert.equal(result, expected)
+    })
   })
 })
