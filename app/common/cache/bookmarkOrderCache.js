@@ -57,7 +57,7 @@ const addCacheItem = (state, parentId = 0, key, destinationKey, tag, append) => 
 
   const cache = state.getIn(['cache', 'bookmarkOrder', parentId])
   // destination key is not provided
-  if (destinationKey == null) {
+  if (destinationKey == null || parentId === destinationKey) {
     const keyExist = cache.some(item => item.get('key') === key)
     if (keyExist) {
       return state
