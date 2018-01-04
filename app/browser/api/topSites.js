@@ -123,7 +123,7 @@ const getTopSiteData = () => {
     const preDefined = staticData
       // TODO: this doesn't work properly
       .filter((site) => {
-        return !isIgnored(state, site.get('key'))
+        return !isPinned(state, site.get('key')) && !isIgnored(state, site.get('key'))
       })
       .map(site => {
         const bookmarkKey = bookmarkLocationCache.getCacheKey(state, site.get('location'))
@@ -132,8 +132,11 @@ const getTopSiteData = () => {
     sites = sites.concat(preDefined)
   }
 
-  const pinnedTopSites = aboutNewTabState.getPinnedTopSites(state)
-  let gridSites = pinnedTopSites.map(pinned => {
+  let gridSites = aboutNewTabState.getPinnedTopSites(state).map(pinned => {
+    // do not allow duplicates
+    if (pinned) {
+      sites = sites.filter(site => site.get('key') !== pinned.get('key'))
+    }
     // topsites are populated once user visit a new site.
     // pinning a site to a given index is a user decision
     // and should be taken as priority. If there's an empty
@@ -148,7 +151,6 @@ const getTopSiteData = () => {
   })
 
   gridSites = gridSites.filter(site => site != null)
-  gridSites = removeDuplicateDomains(gridSites)
 
   appActions.topSiteDataAvailable(gridSites)
 }

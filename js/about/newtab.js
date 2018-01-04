@@ -97,7 +97,7 @@ class NewTabPage extends React.Component {
   }
 
   get pinnedTopSites () {
-    return this.state.newTabData.getIn(['newTabDetail', 'pinnedTopSites'], Immutable.List())
+    return this.state.newTabData.getIn(['newTabDetail', 'pinnedTopSites'], Immutable.List()).setSize(100)
   }
 
   get ignoredTopSites () {
@@ -120,7 +120,6 @@ class NewTabPage extends React.Component {
   get gridLayout () {
     const sizeToCount = {large: 18, medium: 12, small: 6}
     const count = sizeToCount[this.gridLayoutSize]
-
     return this.topSites.take(count)
   }
 
