@@ -71,6 +71,8 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
           break
         }
 
+        const oldFolder = bookmarkFoldersState.getFolder(state, key)
+
         state = bookmarkFoldersState.moveFolder(
           state,
           key,
@@ -81,7 +83,11 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
 
         const destinationDetail = bookmarkFoldersState.getFolder(state, action.get('destinationKey'))
         state = syncUtil.updateObjectCache(state, destinationDetail, STATE_SITES.BOOKMARK_FOLDERS)
-        if (destinationDetail.get('parentFolderId') === 0 || action.get('destinationKey') === 0) {
+        if (
+          destinationDetail.get('parentFolderId') === 0 ||
+          action.get('destinationKey') === 0 ||
+          oldFolder.get('parentFolderId') === 0
+        ) {
           state = bookmarkToolbarState.setToolbars(state)
         }
         break
