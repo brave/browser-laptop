@@ -104,10 +104,19 @@ describe('historyReducer unit test', function () {
       clearHistory: () => {
       }
     })
+    mockery.registerMock('../../../js/settings', {
+      getSetting: (settingKey) => {
+        switch (settingKey) {
+          case settings.AUTOCOMPLETE_HISTORY_SIZE:
+            return 500
+        }
+        return false
+      }
+    })
     mockery.registerMock('electron', fakeElectron)
-    historyReducer = require('../../../../../app/browser/reducers/historyReducer')
     historyState = require('../../../../../app/common/state/historyState')
     aboutHistoryState = require('../../../../../app/common/state/aboutHistoryState')
+    historyReducer = require('../../../../../app/browser/reducers/historyReducer')
   })
 
   after(function () {
@@ -118,12 +127,19 @@ describe('historyReducer unit test', function () {
   describe('APP_ON_CLEAR_BROWSING_DATA', function () {
     let spy
 
+    before(function () {
+      spy = sinon.spy(historyState, 'clearSites')
+    })
+
     afterEach(function () {
+      spy.reset()
+    })
+
+    after(function () {
       spy.restore()
     })
 
     it('null case', function () {
-      spy = sinon.spy(historyState, 'clearSites')
       const newState = historyReducer(state, {
         actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA
       })
@@ -132,7 +148,6 @@ describe('historyReducer unit test', function () {
     })
 
     it('clearBrowsingDataDefaults is provided', function () {
-      spy = sinon.spy(historyState, 'clearSites')
       const initState = stateWithData.set('clearBrowsingDataDefaults', Immutable.fromJS({
         browserHistory: true
       }))
@@ -147,7 +162,6 @@ describe('historyReducer unit test', function () {
     })
 
     it('tempClearBrowsingData is provided', function () {
-      spy = sinon.spy(historyState, 'clearSites')
       const initState = stateWithData.set('tempClearBrowsingData', Immutable.fromJS({
         browserHistory: true
       }))
@@ -162,7 +176,6 @@ describe('historyReducer unit test', function () {
     })
 
     it('both are provided', function () {
-      spy = sinon.spy(historyState, 'clearSites')
       const initState = stateWithData
         .set('tempClearBrowsingData', Immutable.fromJS({
           browserHistory: true
@@ -188,14 +201,24 @@ describe('historyReducer unit test', function () {
   describe('APP_ADD_HISTORY_SITE', function () {
     let spy, spyAbout
 
+    before(function () {
+      this.clock = sinon.useFakeTimers()
+      this.clock.tick(0)
+      spy = sinon.spy(historyState, 'addSite')
+      spyAbout = sinon.spy(aboutHistoryState, 'setHistory')
+    })
+
     afterEach(function () {
+      spy.reset()
+      spyAbout.reset()
+    })
+
+    after(function () {
       spy.restore()
       spyAbout.restore()
     })
 
     it('null case', function () {
-      spy = sinon.spy(historyState, 'addSite')
-      spyAbout = sinon.spy(aboutHistoryState, 'setHistory')
       const newState = historyReducer(state, {
         actionType: appConstants.APP_ADD_HISTORY_SITE
       })
@@ -205,8 +228,6 @@ describe('historyReducer unit test', function () {
     })
 
     it('siteDetail is a list', function () {
-      spy = sinon.spy(historyState, 'addSite')
-      spyAbout = sinon.spy(aboutHistoryState, 'setHistory')
       const newState = historyReducer(state, {
         actionType: appConstants.APP_ADD_HISTORY_SITE,
         siteDetail: [
@@ -276,14 +297,13 @@ describe('historyReducer unit test', function () {
           ],
           updatedStamp: 0
         }))
+
       assert.equal(spy.callCount, 2)
       assert.equal(spyAbout.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
     })
 
     it('siteDetail is a map', function () {
-      spy = sinon.spy(historyState, 'addSite')
-      spyAbout = sinon.spy(aboutHistoryState, 'setHistory')
       const newState = historyReducer(state, {
         actionType: appConstants.APP_ADD_HISTORY_SITE,
         siteDetail: {
@@ -323,49 +343,32 @@ describe('historyReducer unit test', function () {
           ],
           updatedStamp: 0
         }))
+
       assert.equal(spy.calledOnce, true)
       assert.equal(spyAbout.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
-    })
-
-    it('we only have limited history size limit', function () {
-      let newState = state
-      const maxSize = getSetting(settings.AUTOCOMPLETE_HISTORY_SIZE)
-
-      for (let i = 0; i <= (maxSize + 1); i++) {
-        newState = newState.setIn(['historySites', `h${i}|0`], Immutable.fromJS({
-          [`https://h${i}.io/|0`]: {
-            count: i,
-            key: `https://h${i}.io/|0`,
-            location: `https://h${i}.io/`,
-            partitionNumber: 0
-          }
-        }))
-      }
-
-      const result = historyReducer(newState, {
-        actionType: appConstants.APP_ADD_HISTORY_SITE,
-        siteDetail: {
-          location: 'https://clifton.io/',
-          title: 'Clifton'
-        }
-      })
-
-      assert.deepEqual(result.get('historySites').size, maxSize)
     })
   })
 
   describe('APP_REMOVE_HISTORY_SITE', function () {
     let spy, spyAbout
 
+    before(function () {
+      spy = sinon.spy(historyState, 'removeSite')
+      spyAbout = sinon.spy(aboutHistoryState, 'setHistory')
+    })
+
     afterEach(function () {
+      spy.reset()
+      spyAbout.reset()
+    })
+
+    after(function () {
       spy.restore()
       spyAbout.restore()
     })
 
     it('null case', function () {
-      spy = sinon.spy(historyState, 'removeSite')
-      spyAbout = sinon.spy(aboutHistoryState, 'setHistory')
       const newState = historyReducer(state, {
         actionType: appConstants.APP_REMOVE_HISTORY_SITE
       })
@@ -375,8 +378,6 @@ describe('historyReducer unit test', function () {
     })
 
     it('historyKey is a list', function () {
-      spy = sinon.spy(historyState, 'removeSite')
-      spyAbout = sinon.spy(aboutHistoryState, 'setHistory')
       const newState = historyReducer(stateWithData, {
         actionType: appConstants.APP_REMOVE_HISTORY_SITE,
         historyKey: [
@@ -390,8 +391,6 @@ describe('historyReducer unit test', function () {
     })
 
     it('historyKey is a map', function () {
-      spy = sinon.spy(historyState, 'removeSite')
-      spyAbout = sinon.spy(aboutHistoryState, 'setHistory')
       const newState = historyReducer(stateWithData, {
         actionType: appConstants.APP_REMOVE_HISTORY_SITE,
         historyKey: 'https://brave.com/|0'
@@ -435,12 +434,19 @@ describe('historyReducer unit test', function () {
   describe('APP_POPULATE_HISTORY', function () {
     let spy
 
+    before(function () {
+      spy = sinon.spy(aboutHistoryState, 'setHistory')
+    })
+
     afterEach(function () {
+      spy.reset()
+    })
+
+    after(function () {
       spy.restore()
     })
 
     it('is working', function () {
-      spy = sinon.spy(aboutHistoryState, 'setHistory')
       const customState = stateWithData.delete('about')
       let newState = historyReducer(customState, {
         actionType: appConstants.APP_POPULATE_HISTORY
@@ -475,6 +481,68 @@ describe('historyReducer unit test', function () {
       newState = newState.setIn(['about', 'history', 'updatedStamp'], 0)
       assert.equal(spy.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
+    })
+  })
+
+  describe('APP_ON_HISTORY_LIMIT', function () {
+    let spyAbout
+
+    before(function () {
+      spyAbout = sinon.spy(aboutHistoryState, 'setHistory')
+    })
+
+    afterEach(function () {
+      spyAbout.reset()
+    })
+
+    after(function () {
+      spyAbout.restore()
+    })
+
+    it('we do not change anything if we are bellow the limit', function () {
+      let newState = state
+      const limit = 20
+
+      for (let i = 0; i < limit; i++) {
+        newState = newState.setIn(['historySites', `h${i}|0`], Immutable.fromJS({
+          [`https://h${i}.io/|0`]: {
+            count: i,
+            key: `https://h${i}.io/|0`,
+            location: `https://h${i}.io/`,
+            partitionNumber: 0
+          }
+        }))
+      }
+
+      const result = historyReducer(newState, {
+        actionType: appConstants.APP_ON_HISTORY_LIMIT
+      })
+
+      assert(spyAbout.notCalled)
+      assert.deepEqual(result.get('historySites').size, limit)
+    })
+
+    it('we limit history size to the max history limit', function () {
+      let newState = state
+      const maxSize = getSetting(settings.AUTOCOMPLETE_HISTORY_SIZE)
+
+      for (let i = 0; i <= (maxSize + 1); i++) {
+        newState = newState.setIn(['historySites', `h${i}|0`], Immutable.fromJS({
+          [`https://h${i}.io/|0`]: {
+            count: i,
+            key: `https://h${i}.io/|0`,
+            location: `https://h${i}.io/`,
+            partitionNumber: 0
+          }
+        }))
+      }
+
+      const result = historyReducer(newState, {
+        actionType: appConstants.APP_ON_HISTORY_LIMIT
+      })
+
+      assert(spyAbout.calledOnce)
+      assert.deepEqual(result.get('historySites').size, maxSize)
     })
   })
 })
