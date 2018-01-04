@@ -75,9 +75,20 @@ describe('bookmarksReducer unit test', function () {
       'https://brianbondy.com/|0|1': {
         favicon: undefined,
         title: 'Clifton',
-        location: 'https://clifton.io/',
-        key: 'https://clifton.io/|0|1',
+        location: 'https://brianbondy.com/',
+        key: 'https://brianbondy.com/|0|1',
         parentFolderId: 1,
+        partitionNumber: 0,
+        objectId: null,
+        themeColor: undefined,
+        type: siteTags.BOOKMARK
+      },
+      'https://test.com/|0|2': {
+        favicon: undefined,
+        title: 'Clifton',
+        location: 'https://test.com/',
+        key: 'https://test.com/|0|2',
+        parentFolderId: 2,
         partitionNumber: 0,
         objectId: null,
         themeColor: undefined,
@@ -105,6 +116,13 @@ describe('bookmarksReducer unit test', function () {
             order: 0,
             type: siteTags.BOOKMARK
           }
+        ],
+        '2': [
+          {
+            key: 'https://test.com/|0|2',
+            order: 0,
+            type: siteTags.BOOKMARK
+          }
         ]
       },
       bookmarkLocation: {
@@ -116,6 +134,9 @@ describe('bookmarksReducer unit test', function () {
         ],
         'https://brianbondy.com/': [
           'https://brianbondy.com/|0|1'
+        ],
+        'https://test.com/': [
+          'https://test.com/|0|2'
         ]
       }
     },
@@ -536,14 +557,24 @@ describe('bookmarksReducer unit test', function () {
       assert.deepEqual(newState.toJS(), expectedState.toJS())
     })
 
-    it('destination key is not on bookmark toolbar', function () {
+    it('bookmark is moved from folder to another folder', function () {
+      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
+      bookmarksReducer(stateWithData, {
+        actionType: appConstants.APP_MOVE_BOOKMARK,
+        bookmarkKey: 'https://brianbondy.com/|0|1',
+        destinationKey: 'https://test.com/|0|2'
+      })
+      assert.equal(spyToolbar.notCalled, true)
+    })
+
+    it('bookmark is moved from toolbar to another folder', function () {
       spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
       bookmarksReducer(stateWithData, {
         actionType: appConstants.APP_MOVE_BOOKMARK,
         bookmarkKey: 'https://clifton.io/|0|0',
-        destinationKey: 'https://brianbondy.com/|0|1'
+        destinationKey: 'https://test.com/|0|2'
       })
-      assert.equal(spyToolbar.notCalled, true)
+      assert.equal(spyToolbar.calledOnce, true)
     })
   })
 

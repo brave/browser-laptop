@@ -75,6 +75,15 @@ describe('bookmarkFoldersReducer unit test', function () {
         partitionNumber: 0,
         objectId: null,
         type: siteTags.BOOKMARK_FOLDER
+      },
+      '81': {
+        title: 'folder80',
+        folderId: 81,
+        key: '81',
+        parentFolderId: 1,
+        partitionNumber: 0,
+        objectId: null,
+        type: siteTags.BOOKMARK_FOLDER
       }
     },
     cache: {
@@ -88,6 +97,13 @@ describe('bookmarkFoldersReducer unit test', function () {
           {
             key: '69',
             order: 1,
+            type: siteTags.BOOKMARK_FOLDER
+          }
+        ],
+        '1': [
+          {
+            key: '81',
+            order: 0,
             type: siteTags.BOOKMARK_FOLDER
           }
         ],
@@ -373,14 +389,24 @@ describe('bookmarkFoldersReducer unit test', function () {
       assert.deepEqual(newState.toJS(), expectedState.toJS())
     })
 
-    it('destination key is not on bookmark toolbar', function () {
+    it('folder is moved from one folder to another', function () {
+      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
+      bookmarkFoldersReducer(stateWithData, {
+        actionType: appConstants.APP_MOVE_BOOKMARK_FOLDER,
+        folderKey: '81',
+        destinationKey: '80'
+      })
+      assert.equal(spyToolbar.notCalled, true)
+    })
+
+    it('folder is moved from the toolbar into other bookmarks', function () {
       spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
       bookmarkFoldersReducer(stateWithData, {
         actionType: appConstants.APP_MOVE_BOOKMARK_FOLDER,
         folderKey: '1',
-        destinationKey: '80'
+        destinationKey: '-1'
       })
-      assert.equal(spyToolbar.notCalled, true)
+      assert.equal(spyToolbar.calledOnce, true)
     })
   })
 
@@ -413,7 +439,7 @@ describe('bookmarkFoldersReducer unit test', function () {
           '69'
         ]
       })
-      assert.equal(spy.callCount, 3)
+      assert.equal(spy.callCount, 4)
       assert.equal(spyToolbar.calledOnce, true)
       assert.deepEqual(newState.toJS(), state.toJS())
     })
@@ -433,11 +459,13 @@ describe('bookmarkFoldersReducer unit test', function () {
             type: siteTags.BOOKMARK_FOLDER
           }
         ]))
+        .deleteIn(['cache', 'bookmarkOrder', '1'])
         .deleteIn([STATE_SITES.BOOKMARK_FOLDERS, '1'])
+        .deleteIn([STATE_SITES.BOOKMARK_FOLDERS, '81'])
         .setIn(['windows', 0, 'bookmarksToolbar', 'toolbar'], Immutable.fromJS([
           '69'
         ]))
-      assert.equal(spy.calledOnce, true)
+      assert.equal(spy.calledTwice, true)
       assert.equal(spyToolbar.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
     })
