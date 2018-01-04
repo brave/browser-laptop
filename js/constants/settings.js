@@ -51,6 +51,7 @@ const settings = {
   FLASH_INSTALLED: 'security.flash.installed',
   FULLSCREEN_CONTENT: 'security.fullscreen.content',
   AUTOPLAY_MEDIA: 'security.autoplay.media',
+  SITE_ISOLATION_ENABLED: 'security.site-isolation-enabled',
   // Autofill
   AUTOFILL_ENABLED: 'privacy.autofill-enabled',
   // Payments Tab

@@ -166,6 +166,7 @@ module.exports = {
     'security.fullscreen.content': fullscreenOption.ALWAYS_ASK,
     'security.autoplay.media': autoplayOption.ALWAYS_ALLOW,
     'security.flash.installed': false,
+    'security.site-isolation-enabled': false,
     'shields.blocked-count-badge': true,
     'shields.compact-bravery-panel': false,
     // sync

@@ -667,6 +667,10 @@ class SecurityTab extends ImmutableComponent {
       <SettingsList>
         <SettingCheckbox dataL10nId='doNotTrack' prefKey={settings.DO_NOT_TRACK} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
+      <DefaultSectionTitle data-l10n-id='siteIsolation' />
+      <SettingsList>
+        <SettingCheckbox dataL10nId='useSiteIsolation' prefKey={settings.SITE_ISOLATION_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+      </SettingsList>
       <SitePermissionsPage siteSettings={this.props.siteSettings} names={permissionNames} />
       <div data-l10n-id='requiresRestart' className={css(commonStyles.requiresRestart)} />
     </div>
@@ -842,6 +846,7 @@ class AboutPreferences extends React.Component {
       settings.PDFJS_ENABLED,
       settings.TORRENT_VIEWER_ENABLED,
       settings.SMOOTH_SCROLL_ENABLED,
+      settings.SITE_ISOLATION_ENABLED,
       settings.SEND_CRASH_REPORTS,
       settings.SPELLCHECK_ENABLED,
       settings.SPELLCHECK_LANGUAGES
