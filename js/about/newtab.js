@@ -176,15 +176,26 @@ class NewTabPage extends React.Component {
   }
 
   onPinnedTopSite (siteKey) {
-    const currentSiteIndex = this.topSites.findIndex(site => site.get('key') === siteKey)
-    const siteProps = this.topSites.find(site => site.get('key') === siteKey)
-    // ensure pinned sites are pinned in the right order
-    // do not edit these lines unless you've manually tested site visits
-    // after pinning and after dnd reordering
+    let sites = this.topSites
     let pinnedTopSites = this.pinnedTopSites
-      .splice(currentSiteIndex, 1, this.isPinned(siteKey) ? null : siteProps)
 
-    aboutActions.setNewTabDetail({pinnedTopSites: pinnedTopSites}, true)
+    const siteProps = sites.find(site => site.get('key') === siteKey)
+
+    const currentSiteIndex = sites.findIndex(site => site.get('key') === siteKey)
+    const currentPinnedSiteIndex = pinnedTopSites
+      .findIndex(site => site && site.get('key') === siteKey)
+
+    // ensure pinned sites are pinned in the right order when pinned
+    // if not pinned, pin and attach it to its position
+    if (!this.isPinned(siteKey)) {
+      pinnedTopSites = pinnedTopSites.splice(currentSiteIndex, 1, siteProps)
+    } else {
+      pinnedTopSites = pinnedTopSites.splice(currentPinnedSiteIndex, 1, null)
+      sites = sites.splice(currentPinnedSiteIndex, 1, siteProps)
+      aboutActions.setNewTabDetail({sites}, true)
+    }
+
+    aboutActions.setNewTabDetail({pinnedTopSites}, true)
   }
 
   onIgnoredTopSite (siteKey) {
