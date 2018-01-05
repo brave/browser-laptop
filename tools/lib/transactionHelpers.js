@@ -104,7 +104,7 @@ const generateSurveyorIds = function (count) {
 }
 
 const generateContribution = function () {
-  let randomContributionAmount = [10, 25, 50, 75, 100][ Math.round(Math.random() * 3) ]
+  let randomContributionAmount = [5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0][ Math.round(Math.random() * 3) ]
   const currency = 'BAT'
 
   let rates = {
