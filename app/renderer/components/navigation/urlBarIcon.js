@@ -112,7 +112,8 @@ class UrlBarIcon extends React.Component {
   onDragStart (e) {
     dndData.setupDataTransferURL(e.dataTransfer, this.props.location, this.props.title)
     dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.TAB, {
-      tabId: this.props.tabId
+      location: this.props.location,
+      title: this.props.title
     })
   }
 
@@ -140,7 +141,6 @@ class UrlBarIcon extends React.Component {
 
     // used in other functions
     props.title = activeFrame.get('title', '')
-    props.tabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
 
     return props
   }
