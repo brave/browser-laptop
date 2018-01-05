@@ -173,6 +173,11 @@ const bookmarkFoldersState = {
         ? destinationItem.get('parentFolderId')
         : destinationItem.get('folderId')
 
+      // always use parent ID when we are not moving into the folder
+      if (!moveIntoParent) {
+        parentFolderId = destinationItem.get('parentFolderId')
+      }
+
       if (parentFolderId == null) {
         parentFolderId = destinationKey
       }

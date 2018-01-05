@@ -895,7 +895,52 @@ describe('bookmarkState unit test', function () {
     })
 
     it('destination parent ID is different then current parent ID', function () {
-      const result = bookmarksState.moveBookmark(stateWithData, 'https://brave.com/|0|0', '2')
+      const result = bookmarksState.moveBookmark(stateWithData, 'https://brave.com/|0|0', '2', false, false)
+      const expectedState = stateWithData
+        .deleteIn(['bookmarks', 'https://brave.com/|0|0'])
+        .setIn(['bookmarks', 'https://brave.com/|0|1'], Immutable.fromJS(bookmark1))
+        .setIn(['bookmarks', 'https://brave.com/|0|1', 'parentFolderId'], 1)
+        .setIn(['bookmarks', 'https://brave.com/|0|1', 'key'], 'https://brave.com/|0|1')
+        .setIn(['cache', 'bookmarkOrder', '0'], Immutable.fromJS([
+          {
+            key: 'https://clifton.io/|0|0',
+            order: 0,
+            type: siteTags.BOOKMARK
+          },
+          {
+            key: '1',
+            order: 1,
+            type: siteTags.BOOKMARK_FOLDER
+          }
+        ]))
+        .setIn(['cache', 'bookmarkOrder', '1'], Immutable.fromJS([
+          {
+            key: 'https://brianbondy.com/|0|1',
+            order: 0,
+            type: siteTags.BOOKMARK
+          },
+          {
+            key: '2',
+            order: 1,
+            type: siteTags.BOOKMARK_FOLDER
+          },
+          {
+            key: 'https://brave.com/|0|1',
+            order: 2,
+            type: siteTags.BOOKMARK
+          }
+        ]))
+        .setIn(['cache', 'bookmarkLocation', 'https://brave.com/'], Immutable.fromJS([
+          'https://brave.com/|0|1'
+        ]))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+      assert(removeCacheKeySpy.calledOnce)
+      assert(addFolderToCacheSpy.calledOnce)
+      assert(findBookmarkSpy.calledOnce)
+    })
+
+    it('we want to move it into the parent folder', function () {
+      const result = bookmarksState.moveBookmark(stateWithData, 'https://brave.com/|0|0', '2', false, true)
       const expectedState = stateWithData
         .deleteIn(['bookmarks', 'https://brave.com/|0|0'])
         .setIn(['bookmarks', 'https://brave.com/|0|2'], Immutable.fromJS(bookmark1))
