@@ -1742,6 +1742,47 @@ describe('sessionStore unit tests', function () {
   })
 
   describe('runPostMigrations', function () {
-    // TODO:
+    describe('when `fingerprintingProtectionAll` is set', function () {
+      it('does not modify anything', function () {
+        let exampleState = Immutable.fromJS(sessionStore.defaultAppState())
+        exampleState = exampleState.set('fingerprintingProtectionAll', {enabled: false})
+        const returnedAppState = sessionStore.runPostMigrations(exampleState)
+        assert.equal(returnedAppState, exampleState)
+      })
+    })
+
+    describe('when `fingerprintingProtectionAll` is not set', function () {
+      describe('when `fingerprintingProtection` is `true` for a site', function () {
+        it('updates to a text status of `blockAllFingerprinting`', function () {
+          let exampleState = Immutable.fromJS(sessionStore.defaultAppState())
+          exampleState = exampleState.setIn(['siteSettings', 'example.com', 'fingerprintingProtection'], true)
+          const returnedAppState = sessionStore.runPostMigrations(exampleState)
+          assert.equal(returnedAppState.getIn(['siteSettings', 'example.com', 'fingerprintingProtection']), 'blockAllFingerprinting')
+        })
+      })
+
+      describe('when `fingerprintingProtection` is `false` for a site', function () {
+        it('updates to a text status of `allowAllFingerprinting`', function () {
+          let exampleState = Immutable.fromJS(sessionStore.defaultAppState())
+          exampleState = exampleState.setIn(['siteSettings', 'example.com', 'fingerprintingProtection'], false)
+          const returnedAppState = sessionStore.runPostMigrations(exampleState)
+          assert.equal(returnedAppState.getIn(['siteSettings', 'example.com', 'fingerprintingProtection']), 'allowAllFingerprinting')
+        })
+      })
+
+      it('sets a new global fingerprinting value (based on existing value truthy-ness)', function () {
+        let exampleState = Immutable.fromJS(sessionStore.defaultAppState())
+        exampleState = exampleState.setIn(['settings', 'privacy.block-canvas-fingerprinting'], 'EXAMPLE TRUTHY VALUE')
+        const returnedAppState = sessionStore.runPostMigrations(exampleState)
+        assert.equal(returnedAppState.getIn(['fingerprintingProtectionAll', 'enabled']), true)
+      })
+
+      it('deletes the old global fingerprinting value', function () {
+        let exampleState = Immutable.fromJS(sessionStore.defaultAppState())
+        exampleState = exampleState.setIn(['settings', 'privacy.block-canvas-fingerprinting'], true)
+        const returnedAppState = sessionStore.runPostMigrations(exampleState)
+        assert.equal(returnedAppState.getIn(['siteSettings', 'privacy.block-canvas-fingerprinting']), undefined)
+      })
+    })
   })
 })
