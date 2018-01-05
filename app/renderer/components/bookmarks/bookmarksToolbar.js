@@ -57,19 +57,32 @@ class BookmarksToolbar extends React.Component {
         }
         return bookmarkRef.props.bookmarkKey !== sourceKey
       }), e.clientX)
-    const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
+    let bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
     if (bookmark) {
       // Figure out the droppedOn element filtering out the source drag item
-      const bookmarkKey = bookmark.get('key')
+      let bookmarkKey = bookmark.get('key')
+      let tabDrop = false
+
+      // When we have key null is only when we are getting data from TAB transfer type
+      if (bookmarkKey == null) {
+        tabDrop = true
+      }
+
       const droppedOn = getClosestFromPos(e.clientX, bookmarkKey)
       if (droppedOn.selectedRef) {
         const isRightSide = !dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
         const droppedOnKey = droppedOn.selectedRef.props.bookmarkKey
         const isDestinationParent = droppedOn.selectedRef.state.isFolder && droppedOn && droppedOn.isDroppedOn
-        if (bookmark.get('type') === siteTags.BOOKMARK_FOLDER) {
-          appActions.moveBookmarkFolder(bookmark.get('key'), droppedOnKey, isRightSide, isDestinationParent)
+        if (tabDrop) {
+          const parentKey = isDestinationParent ? droppedOnKey : null
+          bookmark = bookmark.set('parentFolderId', parentKey)
+          appActions.addBookmark(bookmark)
         } else {
-          appActions.moveBookmark(bookmark.get('key'), droppedOnKey, isRightSide, isDestinationParent)
+          if (bookmark.get('type') === siteTags.BOOKMARK_FOLDER) {
+            appActions.moveBookmarkFolder(bookmarkKey, droppedOnKey, isRightSide, isDestinationParent)
+          } else {
+            appActions.moveBookmark(bookmarkKey, droppedOnKey, isRightSide, isDestinationParent)
+          }
         }
         dnd.onDragEnd()
       }
