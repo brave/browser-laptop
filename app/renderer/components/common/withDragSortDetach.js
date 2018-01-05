@@ -6,6 +6,7 @@
 
 const React = require('react')
 const throttle = require('lodash.throttle')
+const webContentsUtil = require('../../../common/lib/webContentsUtil')
 
 const DRAG_DETACH_PX_THRESHOLD_X = 60
 const DRAG_DETACH_MS_TIME_BUFFER = 0
@@ -109,13 +110,6 @@ type EvaluateDraggingItemAndParentSizeFunction = (HTMLElement) => ({
 type MouseEventClientPoint = {
   clientX: number,
   clientY: number
-}
-
-// HACK - see the related `createEventFromSendMouseMoveInput` in tabDraggingWindowReducer.js
-function translateEventFromSendMouseMoveInput (receivedEvent: any): MouseEventClientPoint {
-  return (receivedEvent.x === 1 && receivedEvent.y === 99)
-    ? { clientX: receivedEvent.screenX || 0, clientY: receivedEvent.screenY || 0 }
-    : receivedEvent
 }
 
 module.exports = function withDragSortDetach (
@@ -369,7 +363,7 @@ module.exports = function withDragSortDetach (
     }
 
     onDraggingMouseMove = (e: MouseEventClientPoint) => {
-      const position = translateEventFromSendMouseMoveInput(e)
+      const position = webContentsUtil.translateEventFromSendMouseMoveInput(e)
       if (!this.isSingleItem() || !this.props.onDragMoveSingleItem) {
         // move item with mouse (rAF - smooth)
         this.dragItemMouseMoveFrame = this.dragItemMouseMoveFrame || window.requestAnimationFrame(this.dragItem.bind(this, position))

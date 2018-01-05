@@ -9,6 +9,8 @@ const electron = require('electron')
 const tabState = require('../../common/state/tabState')
 const tabDraggingState = require('../../common/state/tabDraggingState')
 const browserWindowUtil = require('../../common/lib/browserWindowUtil')
+const webContentsUtil = require('../../common/lib/webContentsUtil')
+const screenUtil = require('../../common/lib/screenUtil')
 const platformUtil = require('../../common/lib/platformUtil')
 const { makeImmutable } = require('../../common/state/immutableUtil')
 const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
@@ -22,7 +24,22 @@ const isLinux = platformUtil.isLinux()
 
 let moveStableHandle
 let lastWindowAssignedFocus
+let currentDragSourceWindow
 const { BrowserWindow } = electron
+
+function relayMouseMoveToSourceWindow ({ screenX, screenY }) {
+  if (currentDragSourceWindow) {
+    console.log(`Received screen mousemove`, screenX, screenY)
+    const windowClientPoint = browserWindowUtil.getWindowClientPointAtScreenPoint(currentDragSourceWindow, {x: screenX, y: screenY})
+    // only relay if point is outside window (otherwise OS will relay anyway)
+    if (!browserWindowUtil.isClientPointWithinWindowBounds(currentDragSourceWindow, windowClientPoint)) {
+      console.log(`...relaying to source window`)
+      currentDragSourceWindow.webContents.sendInputEvent(webContentsUtil.createEventForSendMouseMoveInput(windowClientPoint.x, windowClientPoint.y, ['leftButtonDown']))
+    } else {
+      console.log(`... NOT relaying to source window`)
+    }
+  }
+}
 
 const reducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -89,12 +106,23 @@ const reducer = (state, action, immutableAction) => {
           }
         })
       }
-      // TODO: if linux, send mouse events
-      // TODO: don't close any windows if mid-drag (to keep mouse events and window buffer)
+      // Linux (Ubuntu) windows do not receive mousemove event when mouse moves outside originating
+      // window bounds, but Windows and macOS do. It will receive mouseup though, so we can manually
+      // relay mousemove events when the mouse is outside the window, and luckily we do not have to
+      // attempt to intercept mouseup events, which there is no API for on the browser-process side
+      // anyway.
+      if (isLinux) {
+        currentDragSourceWindow = BrowserWindow.fromId(sourceWindowId)
+        screenUtil.addListener('mousemove', relayMouseMoveToSourceWindow)
+      }
       break
     }
     case appConstants.APP_TAB_DRAG_CANCELLED: {
       console.log('drag cancelled')
+      if (isLinux) {
+        screenUtil.removeListener('mousemove', relayMouseMoveToSourceWindow)
+      }
+      currentDragSourceWindow = null
       // reset mouse events for window, so it now works like a normal window
       const detachedWindowId = tabDraggingState.app.getDragDetachedWindowId(state)
       if (detachedWindowId != null) {
@@ -116,6 +144,10 @@ const reducer = (state, action, immutableAction) => {
         clearTimeout(moveStableHandle)
       }
       console.log('drag complete')
+      if (isLinux) {
+        screenUtil.removeListener('mousemove', relayMouseMoveToSourceWindow)
+      }
+      currentDragSourceWindow = null
       // reset mouse events for window, so it now works like a normal window
       const detachedWindowId = tabDraggingState.app.getDragDetachedWindowId(state)
       if (detachedWindowId != null) {

@@ -58,3 +58,5 @@ function continuouslyReportMousePosition () {
   // stop continuation of event if we've stopped listening
   timeoutObserveMousePosition = setTimeout(continuouslyReportMousePosition, INTERVAL_POLL_MOUSEPOSITION_MS)
 }
+
+module.exports = screenUtil

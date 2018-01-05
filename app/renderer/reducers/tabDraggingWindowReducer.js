@@ -11,6 +11,7 @@ const appActions = require('../../../js/actions/appActions')
 const frameStateUtil = require('../../../js/state/frameStateUtil')
 const {getCurrentWindowId} = require('../currentWindow')
 const browserWindowUtil = require('../../common/lib/browserWindowUtil')
+const webContentsUtil = require('../../common/lib/webContentsUtil')
 const {getSetting} = require('../../../js/settings')
 const settings = require('../../../js/constants/settings')
 const tabDraggingState = require('../../common/state/tabDraggingState')
@@ -124,24 +125,5 @@ const reportMoveToOtherWindow = throttle(mouseMoveEvent => {
     x: mouseMoveEvent.screenX,
     y: mouseMoveEvent.screenY
   })
-  win.webContents.sendInputEvent(createEventForSendMouseMoveInput(clientX, clientY))
+  win.webContents.sendInputEvent(webContentsUtil.createEventForSendMouseMoveInput(clientX, clientY, ['leftButtonDown']))
 }, 4)
-
-// HACK mousemove will only trigger in the other window if the coords are inside the bounds but
-// will trigger for this window even if the mouse is outside the window, since we started a dragEvent,
-// *but* it will forward anything for globalX and globalY, so we'll send the client coords in those properties
-// and send some fake coords in the clientX and clientY properties
-// An alternative solution would be for the other window to just call electron API
-// to get mouse cursor, and we could just send 0, 0 coords, but this reduces the spread of electron
-// calls in components, and also puts the (tiny) computation in another process, freeing the other
-// window to perform the animation
-function createEventForSendMouseMoveInput (screenX, screenY) {
-  return {
-    type: 'mousemove',
-    x: 1,
-    y: 99,
-    globalX: screenX,
-    globalY: screenY,
-    button: 'left'
-  }
-}
