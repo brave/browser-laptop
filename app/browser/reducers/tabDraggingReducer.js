@@ -58,19 +58,10 @@ const reducer = (state, action, immutableAction) => {
       // and where we think a screen coordinate would be
       const dragSourceData = action.get('dragSourceData')
       const sourceWindowId = dragSourceData.get('originalWindowId')
-      const clientX = dragSourceData.get('originClientX')
-      const clientY = dragSourceData.get('originClientY')
-      const screenX = dragSourceData.get('originScreenX')
-      const screenY = dragSourceData.get('originScreenY')
       const sourceWindow = BrowserWindow.fromId(sourceWindowId)
       const [winX, winY] = sourceWindow.getPosition()
-      const frameTopHeight = screenY - clientY - winY
-      const frameLeftWidth = screenX - clientX - winX
       // replace state data
-      state = state.set(stateKey, dragSourceData.merge({
-        frameTopHeight,
-        frameLeftWidth
-      }))
+      state = state.set(stateKey, dragSourceData)
       console.log('drag started from window', sourceWindowId)
       if (dragSourceData.get('originatedFromSingleTabWindow') === false) {
         // prepare buffer window for potential flash-free detach
@@ -309,7 +300,7 @@ const reducer = (state, action, immutableAction) => {
         break
       }
       // move entire window, but maintain position relative to tab and mouse cursor
-      setImmediate(() => {
+      setImmediate(async () => {
         const mouseScreenPos = electron.screen.getCursorScreenPoint()
         process.stdout.write('M-')
         // only tab, move the position by delta
@@ -318,11 +309,11 @@ const reducer = (state, action, immutableAction) => {
         const relativeTabY = dragSourceData.get('relativeYDragStart')
         const tabX = action.get('tabX')
         const tabY = action.get('tabY')
-        const frameLeftWidth = dragSourceData.get('frameLeftWidth')
-        const frameTopHeight = dragSourceData.get('frameTopHeight')
-        const windowY = Math.floor(mouseScreenPos.y - tabY - frameTopHeight - relativeTabY)
-        const windowX = Math.floor(mouseScreenPos.x - tabX - frameLeftWidth - relativeTabX)
-        singleTabMoveWin.setPosition(windowX, windowY)
+        const clientPosition = {
+          x: tabX + relativeTabX,
+          y: tabY + relativeTabY
+        }
+        await browserWindowUtil.moveClientPositionToMouseCursor(singleTabMoveWin, clientPosition)
         // briefly ignore mouse events so we can get the event from a tab in another window
         // underneath this one. This works well on macOS
         if (isDarwin) {
@@ -508,7 +499,7 @@ const reducer = (state, action, immutableAction) => {
           // TODO: remove this timeout when the browser window
           // can more instantly render the active frame
           // probably when it is single-webview
-          setTimeout(() => {
+          setTimeout(async () => {
             // new window should already be at current window's position
             // as that is sent on drag start, or attach to new window
             // give focus to the detached window so it acts on the mouse events
@@ -527,7 +518,7 @@ const reducer = (state, action, immutableAction) => {
             // move the detached window to the mouse cursor position
             const relativeTabX = dragSourceData.get('relativeXDragStart')
             const relativeClientY = dragSourceData.get('originClientY')
-            const newPoint = browserWindowUtil.getWindowPositionForClientPointAtCursor(bufferWindow, {
+            const newPoint = await browserWindowUtil.getWindowPositionForClientPointAtCursor({
               x: relativeTabX + action.get('tabX'),
               y: relativeClientY
             })
