@@ -1128,13 +1128,6 @@ const windowActions = {
     })
   },
 
-  onFrameBookmark: function (tabId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_FRAME_BOOKMARK,
-      tabId
-    })
-  },
-
   onStop: function (isFocused, shouldRender) {
     dispatch({
       actionType: windowConstants.WINDOW_ON_STOP,
