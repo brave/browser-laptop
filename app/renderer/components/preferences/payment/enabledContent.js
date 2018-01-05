@@ -299,7 +299,7 @@ class EnabledContent extends ImmutableComponent {
             value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}>
             {
-              [10, 25, 50, 75, 100].map((amount) => {
+              [5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0].map((amount) => {
                 let alternative = ''
                 if (ledgerData.has('currentRate')) {
                   const converted = batToCurrencyString(amount, ledgerData)
@@ -308,8 +308,9 @@ class EnabledContent extends ImmutableComponent {
                     alternative = `(${converted})`
                   }
                 }
+                const displayAmount = Number(amount).toFixed(1)
 
-                return <option value={amount}>{amount} BAT {alternative}</option>
+                return <option value={amount}>{displayAmount} BAT {alternative}</option>
               })
             }
           </PanelDropdown>
