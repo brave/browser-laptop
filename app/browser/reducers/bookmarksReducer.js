@@ -95,7 +95,7 @@ const bookmarksReducer = (state, action, immutableAction) => {
           action.get('moveIntoParent')
         )
 
-        const destinationDetail = bookmarksState.getBookmark(state, action.get('destinationKey'))
+        const destinationDetail = bookmarksState.findBookmark(state, action.get('destinationKey'))
         state = syncUtil.updateObjectCache(state, destinationDetail, STATE_SITES.BOOKMARKS)
 
         if (

@@ -5,6 +5,7 @@
 const Immutable = require('immutable')
 
 // State
+const bookmarksState = require('../../common/state/bookmarksState')
 const bookmarkFoldersState = require('../../common/state/bookmarkFoldersState')
 const bookmarkToolbarState = require('../../common/state/bookmarkToolbarState')
 
@@ -81,7 +82,7 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
           action.get('moveIntoParent')
         )
 
-        const destinationDetail = bookmarkFoldersState.getFolder(state, action.get('destinationKey'))
+        const destinationDetail = bookmarksState.findBookmark(state, action.get('destinationKey'))
         state = syncUtil.updateObjectCache(state, destinationDetail, STATE_SITES.BOOKMARK_FOLDERS)
         if (
           destinationDetail.get('parentFolderId') === 0 ||
