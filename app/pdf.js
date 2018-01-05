@@ -4,6 +4,8 @@
 
 'use strict'
 
+const tabs = require('./browser/tabs')
+const {fileUrl} = require('../js/lib/appUrlUtil')
 const {getWebContents} = require('./browser/webContentsCache')
 
 const renderToPdf = (appState, action) => {
@@ -13,6 +15,7 @@ const renderToPdf = (appState, action) => {
   }
 
   const savePath = action.savePath
+  const openAfterwards = action.openAfterwards
 
   tab.printToPDF({}, function (err, data) {
     if (err) {
@@ -24,7 +27,23 @@ const renderToPdf = (appState, action) => {
     }
 
     let pdfDataURI = 'data:application/pdf;base64,' + data.toString('base64')
-    tab.downloadURL(pdfDataURI, true, savePath)
+    tab.downloadURL(pdfDataURI, true, savePath, (downloadItem) => {
+      downloadItem.once('done', function (event, state) {
+        if (state === 'completed') {
+          let finalSavePath = downloadItem.getSavePath()
+
+          if (openAfterwards && finalSavePath) {
+            let createProperties = {
+              url: fileUrl(finalSavePath)
+            }
+            if (tab && !tab.isDestoyed()) {
+              createProperties.openerTabId = tab.getId()
+            }
+            tabs.create(createProperties)
+          }
+        }
+      })
+    })
   })
   return appState
 }
