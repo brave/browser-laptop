@@ -6,7 +6,9 @@ const windowActions = require('./actions/windowActions')
 const appActions = require('./actions/appActions')
 const ReactDOM = require('react-dom')
 const dndData = require('./dndData')
+const Immutable = require('immutable')
 const dragTypes = require('./constants/dragTypes')
+const siteTags = require('./constants/siteTags')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const {getCurrentWindowId} = require('../app/renderer/currentWindow')
 const {ESC} = require('../app/common/constants/keyCodes.js')
@@ -137,7 +139,11 @@ module.exports.prepareBookmarkDataFromCompatible = (dataTransfer) => {
   if (!bookmark) {
     const dragData = dndData.getDragData(dataTransfer, dragTypes.TAB)
     if (dragData) {
-      windowActions.onFrameBookmark(dragData.get('tabId'))
+      bookmark = Immutable.fromJS({
+        location: dragData.get('location'),
+        title: dragData.get('title'),
+        type: siteTags.BOOKMARK
+      })
     }
   }
   return bookmark
