@@ -665,7 +665,46 @@ describe('bookmarkFoldersState unit test', function () {
     })
 
     it('destination parent ID is different then current parent ID', function () {
-      const result = bookmarkFoldersState.moveFolder(moveState, '69', '2')
+      const result = bookmarkFoldersState.moveFolder(moveState, '69', '2', false, false)
+      const expectedState = moveState
+        .setIn(['bookmarkFolders', '69', 'parentFolderId'], 1)
+        .setIn(['cache', 'bookmarkOrder', '0'], Immutable.fromJS([
+          {
+            key: '1',
+            order: 0,
+            type: siteTags.BOOKMARK_FOLDER
+          },
+          {
+            key: '70',
+            order: 1,
+            type: siteTags.BOOKMARK_FOLDER
+          }
+        ]))
+        .setIn(['cache', 'bookmarkOrder', '1'], Immutable.fromJS([
+          {
+            key: '2',
+            order: 0,
+            type: siteTags.BOOKMARK_FOLDER
+          },
+          {
+            key: 'https://brave.com/|0|0',
+            order: 1,
+            type: siteTags.BOOKMARK
+          },
+          {
+            key: '69',
+            order: 2,
+            type: siteTags.BOOKMARK_FOLDER
+          }
+        ]))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+      assert(removeCacheKeySpy.calledOnce)
+      assert(addFolderToCacheSpy.calledOnce)
+      assert(findBookmarkSpy.calledOnce)
+    })
+
+    it('we want to move folder into the parent', function () {
+      const result = bookmarkFoldersState.moveFolder(moveState, '69', '2', false, true)
       const expectedState = moveState
         .setIn(['bookmarkFolders', '69', 'parentFolderId'], 2)
         .setIn(['cache', 'bookmarkOrder', '0'], Immutable.fromJS([
