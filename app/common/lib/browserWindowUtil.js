@@ -25,19 +25,17 @@ if (app && !app.isReady()) {
  * Determines the screen point for a window's client point
  */
 function getScreenPointAtWindowClientPoint (browserWindow, clientPoint) {
-  // TODO: include frame size calculation
-  const [winX, winY] = browserWindow.getPosition()
-  const x = Math.floor(winX + clientPoint.x)
-  const y = Math.floor(winY + clientPoint.y)
+  const contentPosition = browserWindow.getContentBounds()
+  const x = Math.floor(contentPosition.x + clientPoint.x)
+  const y = Math.floor(contentPosition.y + clientPoint.y)
   return { x, y }
 }
 
 function getWindowClientPointAtScreenPoint (browserWindow, screenPoint) {
-  const [winX, winY] = browserWindow.getPosition()
-  // TODO: include frame size calculation
+  const contentPosition = browserWindow.getContentBounds()
   return {
-    x: screenPoint.x - winX,
-    y: screenPoint.y - winY
+    x: screenPoint.x - contentPosition.x,
+    y: screenPoint.y - contentPosition.y
   }
 }
 
@@ -64,10 +62,13 @@ function getWindowClientPointAtCursor (browserWindow) {
  * @param {*} screenPoint - the screen position
  * @param {*} clientPoint - the client position
  */
-function getWindowPositionForClientPointAtScreenPoint (screenPoint, clientPoint) {
-  // TODO: include frame size calculation
-  const x = Math.floor(screenPoint.x - clientPoint.x)
-  const y = Math.floor(screenPoint.y - clientPoint.y)
+function getWindowPositionForClientPointAtScreenPoint (browserWindow, screenPoint, clientPoint) {
+  const contentPosition = browserWindow.getContentBounds()
+  const framePosition = browserWindow.getBounds()
+  const frameLeftSize = contentPosition.x - framePosition.x
+  const frameTopSize = contentPosition.y - framePosition.y
+  const x = Math.floor(screenPoint.x - clientPoint.x + frameLeftSize)
+  const y = Math.floor(screenPoint.y - clientPoint.y + frameTopSize)
   return { x, y }
 }
 
@@ -78,8 +79,8 @@ function getWindowPositionForClientPointAtScreenPoint (screenPoint, clientPoint)
  *
  * @param {*} clientPoint - the client position
  */
-function getWindowPositionForClientPointAtCursor (clientPoint) {
-  return getWindowPositionForClientPointAtScreenPoint(screen.getCursorScreenPoint(), clientPoint)
+function getWindowPositionForClientPointAtCursor (browserWindow, clientPoint) {
+  return getWindowPositionForClientPointAtScreenPoint(browserWindow, screen.getCursorScreenPoint(), clientPoint)
 }
 
 function moveClientPositionToMouseCursor (browserWindow, clientX, clientY, {
@@ -90,7 +91,7 @@ function moveClientPositionToMouseCursor (browserWindow, clientX, clientY, {
 }
 
 function moveClientPositionToScreenPoint (browserWindow, clientX, clientY, screenX, screenY, { animate = false } = {}) {
-  const screenPoint = getWindowPositionForClientPointAtScreenPoint({ x: screenX, screenY }, { x: clientX, clientY })
+  const screenPoint = getWindowPositionForClientPointAtScreenPoint(browserWindow, { x: screenX, screenY }, { x: clientX, clientY })
   browserWindow.setPosition(screenPoint.x, screenPoint.y, animate)
 }
 

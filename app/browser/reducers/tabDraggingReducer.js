@@ -527,7 +527,7 @@ const reducer = (state, action, immutableAction) => {
             // move the detached window to the mouse cursor position
             const relativeTabX = dragSourceData.get('relativeXDragStart')
             const relativeClientY = dragSourceData.get('originClientY')
-            const newPoint = browserWindowUtil.getWindowPositionForClientPointAtCursor({
+            const newPoint = browserWindowUtil.getWindowPositionForClientPointAtCursor(bufferWindow, {
               x: relativeTabX + action.get('tabX'),
               y: relativeClientY
             })
