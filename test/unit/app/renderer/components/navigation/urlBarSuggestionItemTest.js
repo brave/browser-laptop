@@ -25,12 +25,12 @@ describe('UrlBarSuggestionItem component', function () {
     UrlBarSuggestionItem = require('../../../../../../app/renderer/components/navigation/urlBarSuggestionItem')
     appActions = require('../../../../../../js/actions/appActions')
     windowActions = require('../../../../../../js/actions/windowActions')
-    this.onMouseOver = sinon.spy(appActions, 'urlBarSelectedIndexChanged')
+    this.onMouseMove = sinon.spy(appActions, 'urlBarSelectedIndexChanged')
     this.onSuggestionClicked = sinon.spy(windowActions, 'activeSuggestionClicked')
   })
 
   afterEach(function () {
-    this.onMouseOver.reset()
+    this.onMouseMove.reset()
     this.onSuggestionClicked.reset()
   })
 
@@ -79,12 +79,12 @@ describe('UrlBarSuggestionItem component', function () {
       it('detects mouse click', function () {
         this.result.simulate('click')
         assert.ok(this.onSuggestionClicked.calledOnce)
-        assert.ok(this.onMouseOver.notCalled)
+        assert.ok(this.onMouseMove.notCalled)
       })
 
-      it('detects mouse over', function () {
-        this.result.simulate('mouseover')
-        assert.ok(this.onMouseOver.calledOnce)
+      it('detects mouse move', function () {
+        this.result.simulate('mousemove')
+        assert.ok(this.onMouseMove.calledOnce)
       })
     })
   })
