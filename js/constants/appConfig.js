@@ -185,7 +185,7 @@ module.exports = {
     // payments
     'payments.allow-media-publishers': true,
     'payments.allow-non-verified-publishers': true,
-    'payments.contribution-amount': 25, // BAT
+    'payments.contribution-amount': 10, // BAT
     'payments.enabled': false,
     'payments.minimum-visit-time': 8000,
     'payments.minimum-visits': 1,
