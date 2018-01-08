@@ -6,6 +6,7 @@ const Immutable = require('immutable')
 
 // Constants
 const config = require('../constants/config')
+const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
 
 // Actions
@@ -299,10 +300,6 @@ function getPartitionNumber (partition) {
   return Number((matches && matches[1]) || 0)
 }
 
-function isPrivatePartition (partition) {
-  return partition && !partition.startsWith('persist:')
-}
-
 function isSessionPartition (partition) {
   return partition && partition.startsWith('persist:partition-')
 }
@@ -485,6 +482,13 @@ const isFirstFrameKeyInTabPage = (state, frameKey) => {
     .slice(startingFrameIndex, startingFrameIndex + tabsPerTabPage).first()
 
   return firstFrame && firstFrame.get('key') === frameKey
+}
+
+/**
+ * Check if frame or tab object is associated with a tor private tab
+ */
+function isTor (frame) {
+  return !!(frame && frame.get('partition') === appConfig.tor.partition)
 }
 
 const getTabPageIndex = (state) => {
@@ -771,7 +775,6 @@ module.exports = {
   getHistory,
   isFrameKeyPinned,
   getNonPinnedFrameCount,
-  isPrivatePartition,
   isSessionPartition,
   getFrames,
   getFrameKeys,
@@ -808,6 +811,7 @@ module.exports = {
   onFindBarHide,
   getTotalBlocks,
   isPinned,
+  isTor,
   isFirstFrameKeyInTabPage,
   getTabPageIndex,
   updateTabPageIndex,

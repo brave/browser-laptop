@@ -498,6 +498,20 @@ const UrlUtil = {
     return url
       .replace(/((#?\/?)|(\/#?))$/, '') // remove trailing # and /
       .trim() // remove whitespaces
+  },
+
+  /**
+   * Whether a site is a Tor Hidden Service .onion URL
+   * @param {string} url
+   * @return {boolean}
+   */
+  isOnionUrl: (url) => {
+    if (typeof url !== 'string') { return false }
+    const hostname = urlParse(url).hostname
+    if (!hostname) {
+      return false
+    }
+    return hostname.endsWith('.onion')
   }
 }
 

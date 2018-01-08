@@ -401,6 +401,9 @@ const handleAppAction = (action) => {
         }
       }
       break
+    case appConstants.APP_SET_TOR_NEW_IDENTITY:
+      filtering.setTorNewIdentity(action.url, action.tabId)
+      break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
       const defaults = appState.get('clearBrowsingDataDefaults')
       const temp = appState.get('tempClearBrowsingData', Immutable.Map())
