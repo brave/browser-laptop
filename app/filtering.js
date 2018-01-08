@@ -9,12 +9,14 @@ const electron = require('electron')
 const session = electron.session
 const BrowserWindow = electron.BrowserWindow
 const webContents = electron.webContents
+const webContentsCache = require('./browser/webContentsCache')
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
 const hostContentSettings = require('./browser/contentSettings/hostContentSettings')
 const downloadStates = require('../js/constants/downloadStates')
 const urlParse = require('./common/urlParse')
 const getSetting = require('../js/settings').getSetting
+const {getExtensionsPath} = require('../js/lib/appUrlUtil')
 const appUrlUtil = require('../js/lib/appUrlUtil')
 const siteSettings = require('../js/state/siteSettings')
 const settings = require('../js/constants/settings')
@@ -34,6 +36,7 @@ const extensionState = require('./common/state/extensionState')
 const ledgerUtil = require('./common/lib/ledgerUtil')
 const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
 const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
+const {getTorSocksProxy} = require('./channel')
 
 let appStore = null
 
@@ -485,6 +488,9 @@ function registerPermissionHandler (session, partition) {
       if (!permissions[permission]) {
         console.warn('WARNING: got unregistered permission request', permission)
         response.push(false)
+      } else if (permission === 'geolocation' && partition === appConfig.tor.partition) {
+        // Never allow geolocation in Tor mode
+        response.push(false)
       } else if (isFullscreen && mainFrameOrigin &&
         // The Torrent Viewer extension is always allowed to show fullscreen media
         mainFrameOrigin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
@@ -651,6 +657,19 @@ function registerForMagnetHandler (session) {
   }
 }
 
+module.exports.setTorNewIdentity = (url, tabId) => {
+  const ses = session.fromPartition(appConfig.tor.partition)
+  if (!ses || !url) {
+    return
+  }
+  ses.setTorNewIdentity(url, () => {
+    const tab = webContentsCache.getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.reload(true)
+    }
+  })
+}
+
 function initSession (ses, partition) {
   registeredSessions[partition] = ses
   ses.setEnableBrotli(true)
@@ -658,6 +677,7 @@ function initSession (ses, partition) {
 }
 
 const initPartition = (partition) => {
+  const isTorPartition = partition === appConfig.tor.partition
   // Partitions can only be initialized once the app is ready
   if (!app.isReady()) {
     partitionsToInitialize.push(partition)
@@ -667,6 +687,7 @@ const initPartition = (partition) => {
     return
   }
   initializedPartitions[partition] = true
+
   let fns = [initSession,
     userPrefs.init,
     hostContentSettings.init,
@@ -682,8 +703,20 @@ const initPartition = (partition) => {
   if (isSessionPartition(partition)) {
     options.parent_partition = ''
   }
+  if (isTorPartition) {
+    // TODO(riastradh): Duplicate logic in app/browser/tabs.js.
+    options.isolated_storage = true
+    options.parent_partition = ''
+    options.tor_proxy = getTorSocksProxy()
+    if (process.platform === 'win32') {
+      options.tor_path = path.join(getExtensionsPath('bin'), 'tor.exe')
+    } else {
+      options.tor_path = path.join(getExtensionsPath('bin'), 'tor')
+    }
+  }
 
   let ses = session.fromPartition(partition, options)
+
   fns.forEach((fn) => {
     fn(ses, partition, module.exports.isPrivate(partition))
   })
@@ -732,7 +765,11 @@ function shouldIgnoreUrl (details) {
 }
 
 module.exports.isPrivate = (partition) => {
-  return !partition.startsWith('persist:')
+  const ses = session.fromPartition(partition)
+  if (!ses) {
+    return false
+  }
+  return ses.isOffTheRecord()
 }
 
 module.exports.init = (state, action, store) => {

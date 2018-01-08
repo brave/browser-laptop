@@ -492,4 +492,22 @@ describe('frameStateUtil', function () {
       assert.equal(result, true)
     })
   })
+
+  describe('isTor', function () {
+    const frame1 = Immutable.Map({partition: 'persist:tor'})
+    const frame2 = Immutable.Map({partition: ''})
+    const frame3 = Immutable.Map({foobar: false})
+    it('null frame case', function () {
+      assert.equal(frameStateUtil.isTor(null), false)
+    })
+    it('other frame case', function () {
+      assert.equal(frameStateUtil.isTor(frame3), false)
+    })
+    it('regular frame case', function () {
+      assert.equal(frameStateUtil.isTor(frame2), false)
+    })
+    it('tor frame case', function () {
+      assert.equal(frameStateUtil.isTor(frame1), true)
+    })
+  })
 })

@@ -119,7 +119,6 @@ const newFrame = (state, frameOpts) => {
     : 0
 
   if (frameOpts.partition) {
-    frameOpts.isPrivate = frameStateUtil.isPrivatePartition(frameOpts.partition)
     if (frameStateUtil.isSessionPartition(frameOpts.partition)) {
       frameOpts.partitionNumber = frameStateUtil.getPartitionNumber(frameOpts.partition)
     }
