@@ -6,6 +6,7 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite')
 const privateTabIcon = require('../../app/extensions/brave/img/newtab/private_tab_pagearea_icon.svg')
 const ddgIcon = require('../../app/extensions/brave/img/newtab/private_tab_pagearea_ddgicon.svg')
+const torIcon = require('../../app/extensions/brave/img/newtab/toricon.svg')
 const globalStyles = require('../../app/renderer/components/styles/global')
 const { theme } = require('../../app/renderer/components/styles/theme')
 const {SettingCheckbox} = require('../../app/renderer/components/common/settings')
@@ -18,15 +19,26 @@ const aboutActions = require('./aboutActions')
 require('../../less/about/newtab.less')
 
 const useAlternativePrivateSearchEngineDataKeys = ['newTabDetail', 'useAlternativePrivateSearchEngine']
+const torEnabled = ['newTabDetail', 'torEnabled']
 
 class NewPrivateTab extends React.Component {
   onChangePrivateSearch (e) {
     aboutActions.changeSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, e.target.value)
   }
 
+  onChangeTor (e) {
+    aboutActions.changeSetting(settings.USE_TOR_PRIVATE_TABS, e.target.value)
+    aboutActions.recreateTorTab(e.target.value)
+  }
+
   onClickPrivateSearchTitle () {
     const newSettingValue = !this.props.newTabData.getIn(useAlternativePrivateSearchEngineDataKeys)
     aboutActions.changeSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, newSettingValue)
+  }
+
+  onClickTorTitle () {
+    const newSettingValue = !this.props.newTabData.getIn(torEnabled)
+    aboutActions.changeSetting(settings.USE_TOR_PRIVATE_TABS, newSettingValue)
   }
 
   render () {
@@ -39,15 +51,19 @@ class NewPrivateTab extends React.Component {
         <Clock />
       </div>
       <div className={css(styles.section_privateTab, styles.wrapper)}>
-        <div className={css(styles.iconGutter, styles.lionImage)} />
         <div className={css(styles.textWrapper)}>
           <h1 className={css(styles.title)} data-l10n-id='privateTabTitle' />
-          <p className={css(styles.text)} data-l10n-id='privateTabText1' />
-          <p className={css(styles.text, styles.text_thirdPartyNote)} data-l10n-id='privateTabText3' />
           {
             this.props.newTabData.hasIn(useAlternativePrivateSearchEngineDataKeys) &&
             <div className={css(styles.privateSearch)}>
               <div className={css(styles.privateSearch__setting)}>
+                <img className={css(styles.privateSearch__ddgImage)} src={ddgIcon} alt='DuckDuckGo logo' />
+                <span>
+                  <h2 onClick={this.onClickPrivateSearchTitle.bind(this)} className={css(styles.privateSearch__title)}>
+                    <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabSearchSectionTitle' />
+                  </h2>
+                  <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabSearchText1' />
+                </span>
                 <SettingCheckbox
                   large
                   switchClassName={css(styles.privateSearch__switch)}
@@ -55,16 +71,36 @@ class NewPrivateTab extends React.Component {
                   checked={Boolean(this.props.newTabData.getIn(useAlternativePrivateSearchEngineDataKeys))}
                   onChange={this.onChangePrivateSearch.bind(this)}
                 />
-                <h2 onClick={this.onClickPrivateSearchTitle.bind(this)} className={css(styles.privateSearch__title)}>
-                  <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabSearchSectionTitle' />
-                  <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>DuckDuckGo</strong>
-                </h2>
-                <img className={css(styles.privateSearch__ddgImage)} src={ddgIcon} alt='DuckDuckGo logo' />
               </div>
-              <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabSearchText1' />
+            </div>
+          }
+          {
+            <div className={css(styles.privateSearch)}>
+              <div className={css(styles.privateSearch__setting)}>
+                <img className={css(styles.privateSearch__torImage)} src={torIcon} alt='Tor logo' />
+                <span>
+                  <h2 onClick={this.onClickPrivateSearchTitle.bind(this)} className={css(styles.privateSearch__title)}>
+                    <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabTorTitle' />
+                  </h2>
+                  <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabTorText1' />
+                </span>
+                <SettingCheckbox
+                  large
+                  switchClassName={css(styles.privateSearch__switch)}
+                  rightLabelClassName={css(styles.sectionTitle)}
+                  checked={Boolean(this.props.newTabData.getIn(torEnabled))}
+                  onChange={this.onChangeTor.bind(this)}
+                />
+              </div>
             </div>
           }
         </div>
+      </div>
+      <div className={css(styles.section_privateTab)}>
+        <h1 className={css(styles.title)} data-l10n-id='privateTabsMore' />
+        <p className={css(styles.text)} data-l10n-id='privateTabText1' />
+        <p className={css(styles.text)} data-l10n-id='privateTabText2' />
+        <p className={css(styles.text)} data-l10n-id='privateTabText3' />
       </div>
     </div>
   }
@@ -113,13 +149,12 @@ const styles = StyleSheet.create({
   },
 
   section_privateTab: {
-    margin: '20px 0 0 0'
+    margin: '0 0 10px 70px'
   },
 
   wrapper: {
     fontFamily: globalStyles.typography.body.family,
     display: 'flex',
-    alignSelf: 'center',
     maxWidth: '780px',
 
     [atBreakpointIconGutter]: {
@@ -129,7 +164,6 @@ const styles = StyleSheet.create({
 
   textWrapper: {
     fontFamily: 'inherit',
-    marginLeft: '25px',
     marginBottom: 0,
     [atBreakpointIconGutter]: {
       padding: '14px 0',
@@ -172,10 +206,10 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    lineHeight: '1.4',
-    fontSize: '18px',
+    lineHeight: '1.5',
+    fontSize: '17px',
     color: globalStyles.color.alphaWhite,
-    maxWidth: '544px',
+    maxWidth: '800px',
     fontFamily: 'inherit',
     ':not(:last-of-type)': {
       paddingBottom: '20px'
@@ -185,11 +219,6 @@ const styles = StyleSheet.create({
   text_privateSearch: {
     fontSize: '17px',
     lineHeight: '1.5'
-  },
-
-  text_thirdPartyNote: {
-    fontStyle: 'italic',
-    fontSize: '15px'
   },
 
   text_sectionTitle: {
@@ -206,7 +235,10 @@ const styles = StyleSheet.create({
   },
 
   privateSearch: {
-    marginTop: '40px'
+    border: 'solid 2px',
+    borderRadius: '10px',
+    padding: '20px',
+    marginBottom: '10px'
   },
 
   privateSearch__setting: {
@@ -216,17 +248,23 @@ const styles = StyleSheet.create({
   },
 
   privateSearch__ddgImage: {
-    width: 'auto',
-    height: 'var(--private-tab-section-title-logo-height)'
+    width: '82px',
+    marginRight: '20px'
+  },
+
+  privateSearch__torImage: {
+    width: '70px',
+    marginRight: '14px'
   },
 
   privateSearch__switch: {
-    marginRight: '14px',
+    marginLeft: '14px',
     padding: 0,
     cursor: 'pointer'
   },
 
   privateSearch__title: {
+    maxWidth: '800px',
     whiteSpace: 'nowrap',
     marginRight: '18px',
     display: 'flex',

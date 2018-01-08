@@ -539,6 +539,7 @@ class Main extends React.Component {
     const widevinePanelDetail = currentWindow.get('widevinePanelDetail', Immutable.Map())
     const loginRequiredDetails = basicAuthState.getLoginRequiredDetail(state, activeTabId)
     const focused = isFocused(state)
+    const isTor = frameStateUtil.isTor(activeFrame)
 
     const props = {}
     // used in renderer
@@ -559,7 +560,7 @@ class Main extends React.Component {
       !!currentWindow.get('braveryPanelDetail')
     props.showClearData = currentWindow.getIn(['ui', 'isClearBrowsingDataPanelVisible'], false)
     props.showImportData = currentWindow.has('importBrowserDataDetail')
-    props.showWidevine = currentWindow.getIn(['widevinePanelDetail', 'shown']) && !isLinux
+    props.showWidevine = currentWindow.getIn(['widevinePanelDetail', 'shown']) && !isLinux && !isTor
     props.showAutoFillAddress = currentWindow.has('autofillAddressDetail')
     props.showAutoFillCC = currentWindow.has('autofillCreditCardDetail')
     props.showLogin = !!loginRequiredDetails
