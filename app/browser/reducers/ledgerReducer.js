@@ -402,7 +402,11 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_PUBLISHER_TIMESTAMP:
       {
+        const oldValue = ledgerState.getLedgerValue(state, 'publisherTimestamp')
         state = ledgerState.setLedgerValue(state, 'publisherTimestamp', action.get('timestamp'))
+        if (action.get('updateList')) {
+          ledgerApi.onPublisherTimestamp(state, oldValue, action.get('timestamp'))
+        }
         break
       }
     case appConstants.APP_SAVE_LEDGER_PROMOTION:
