@@ -9,7 +9,7 @@ const { shouldDebugTabEvents } = require('../cmdLine')
 const tabState = require('../common/state/tabState')
 const {app, extensions, session, ipcMain} = require('electron')
 const {makeImmutable, makeJS} = require('../common/state/immutableUtil')
-const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
+const {getExtensionsPath, getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
 const {isSessionPartition} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/lib/urlutil')
@@ -28,7 +28,7 @@ const {newTabMode} = require('../common/constants/settingsEnums')
 const {tabCloseAction} = require('../common/constants/settingsEnums')
 const webContentsCache = require('./webContentsCache')
 const {FilterOptions} = require('ad-block')
-const {isResourceEnabled} = require('../filtering')
+const {isResourceEnabled, initPartition} = require('../filtering')
 const autofill = require('../autofill')
 const bookmarksState = require('../common/state/bookmarksState')
 const bookmarkFoldersState = require('../common/state/bookmarkFoldersState')
@@ -38,6 +38,8 @@ const bookmarkOrderCache = require('../common/cache/bookmarkOrderCache')
 const ledgerState = require('../common/state/ledgerState')
 const {getWindow, notifyWindowWebContentsAdded} = require('./windows')
 const activeTabHistory = require('./activeTabHistory')
+const path = require('path')
+const {getTorSocksProxy} = require('../channel')
 
 let adBlockRegions
 let currentPartitionNumber = 0
@@ -101,6 +103,8 @@ const getPartition = (createProperties) => {
   let partition = session.defaultSession.partition
   if (createProperties.partition) {
     partition = createProperties.partition
+  } else if (createProperties.isTor) {
+    partition = appConfig.tor.partition
   } else if (createProperties.isPrivate) {
     partition = 'default'
   } else if (createProperties.isPartitioned) {
@@ -114,6 +118,7 @@ const getPartition = (createProperties) => {
 
 const needsPartitionAssigned = (createProperties) => {
   return !createProperties.openerTabId ||
+    createProperties.isTor ||
     createProperties.isPrivate ||
     createProperties.isPartitioned ||
     createProperties.partitionNumber ||
@@ -511,6 +516,12 @@ const api = {
         index = newTabValue.get('index')
       }
 
+      const ses = session.fromPartition(newTab.session.partition)
+      let isPrivate
+      if (ses) {
+        isPrivate = ses.isOffTheRecord()
+      }
+
       const frameOpts = {
         location,
         displayURL,
@@ -519,6 +530,7 @@ const api = {
         active: !!newTabValue.get('active'),
         guestInstanceId: newTab.guestInstanceId,
         isPinned: !!newTabValue.get('pinned'),
+        isPrivate,
         openerTabId,
         disposition,
         index,
@@ -1048,6 +1060,17 @@ const api = {
         if (isSessionPartition(createProperties.partition)) {
           createProperties.parent_partition = ''
         }
+        if (createProperties.isTor) {
+          // TODO(riastradh): Duplicate logic in app/filtering.js.
+          createProperties.isolated_storage = true
+          createProperties.parent_partition = ''
+          createProperties.tor_proxy = getTorSocksProxy()
+          if (process.platform === 'win32') {
+            createProperties.tor_path = path.join(getExtensionsPath('bin'), 'tor.exe')
+          } else {
+            createProperties.tor_path = path.join(getExtensionsPath('bin'), 'tor')
+          }
+        }
       }
 
       // Tabs are allowed to be initially discarded (unloaded) if they are regular tabs
@@ -1069,6 +1092,11 @@ const api = {
         }
         extensions.createTab(createProperties, (tab) => {
           cb && cb(tab)
+          // XXX: Workaround for 'browser-context-created' not emitted for Tor
+          // browsing context
+          if (createProperties.isTor) {
+            initPartition(appConfig.tor.partition)
+          }
         })
       }
 

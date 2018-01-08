@@ -15,7 +15,7 @@ const tabState = require('../../common/state/tabState')
 const windowState = require('../../common/state/windowState')
 const siteSettings = require('../../../js/state/siteSettings')
 const siteSettingsState = require('../../common/state/siteSettingsState')
-const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
+const {frameOptsFromFrame, isTor} = require('../../../js/state/frameStateUtil')
 const updateState = require('../../common/state/updateState')
 
 // Constants
@@ -49,6 +49,10 @@ const getWebRTCPolicy = (state, tabId) => {
   const tabValue = tabState.getByTabId(state, tabId)
   if (tabValue == null) {
     return webrtcConstants.default
+  }
+
+  if (isTor(tabValue)) {
+    return webrtcConstants.disableNonProxiedUdp
   }
 
   const allSiteSettings = siteSettingsState.getAllSiteSettings(state, tabValue.get('incognito') === true)
@@ -254,6 +258,21 @@ const tabsReducer = (state, action, immutableAction) => {
         }
       })
       break
+    case appConstants.APP_RECREATE_TOR_TAB:
+      {
+        const tabId = action.get('tabId')
+        tabs.create({
+          url: 'about:newtab',
+          isPrivate: true,
+          windowId: tabState.getWindowId(state, tabId),
+          index: action.get('index'),
+          active: true,
+          isTor: action.get('torEnabled')
+        }, (tab) => {
+          appActions.tabCloseRequested(tabId)
+        })
+        break
+      }
     case appConstants.APP_TAB_UPDATED:
       state = tabState.maybeCreateTab(state, action)
       // tabs.debugTabs(state)

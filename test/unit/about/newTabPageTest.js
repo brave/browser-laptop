@@ -30,6 +30,7 @@ describe('NewTab component unit tests', function () {
     mockery.registerMock('../../fonts')
     mockery.registerMock('../../app/extensions/brave/img/newtab/private_tab_pagearea_icon.svg')
     mockery.registerMock('../../app/extensions/brave/img/newtab/private_tab_pagearea_ddgicon.svg')
+    mockery.registerMock('../../app/extensions/brave/img/newtab/toricon.svg')
     randomSpy = sinon.spy(randomWrapper, 'random')
     mockery.registerMock('../../app/common/lib/randomUtil', randomWrapper)
     window.chrome = fakeElectron
