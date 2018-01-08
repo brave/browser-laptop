@@ -158,6 +158,15 @@ if (isLinux) {
   cmds.push(`"node_modules/rcedit/bin/rcedit.exe" ./${appName}-win32-` + arch + `/${appName}.exe --set-version-string "SquirrelAwareVersion" "1"`)
 }
 
+// Verify tor binaries and bundle with Brave
+var torPath
+if (isDarwin) {
+  torPath = path.join(buildDir, `${appName}.app`, 'Contents', 'Resources', 'extensions', 'bin')
+} else {
+  torPath = path.join(buildDir, 'resources', 'extensions', 'bin')
+}
+cmds.push('npm run package-tor ' + torPath)
+
 if (isDarwin) {
   const macAppName = `${appName}.app`
   cmds.push('mkdirp ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten'))

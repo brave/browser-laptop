@@ -3,19 +3,27 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const { makeImmutable } = require('../../common/state/immutableUtil')
+const appConfig = require('../../../js/constants/appConfig')
 
 let registeredCallbacks = []
 let registeredSessions = {}
 let registeredPrivateSessions = {}
+const blockContentSetting = { setting: 'block', primaryPattern: '*' }
 
 module.exports.setContentSettings = (contentSettings, incognito) => {
   contentSettings = makeImmutable(contentSettings)
 
   const partitions = incognito ? registeredPrivateSessions : registeredSessions
   for (let partition in partitions) {
+    let newContentSettings = contentSettings
+    if (partition === appConfig.tor.partition) {
+      // Do not allow plugins to be enabled in Tor contexts
+      newContentSettings = contentSettings.set('plugins', makeImmutable([blockContentSetting]))
+    }
+
     const ses = partitions[partition]
 
-    contentSettings.forEach((settings, contentType) => {
+    newContentSettings.forEach((settings, contentType) => {
       ses.contentSettings.clearForOneType(contentType)
       settings.forEach((setting) => {
         module.exports.setContentSetting(ses, setting.get('primaryPattern'), setting.get('secondaryPattern'),
