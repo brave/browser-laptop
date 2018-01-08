@@ -25,16 +25,15 @@ For other versions of our browser, please see:
 
 To download the latest release, [see our releases page](https://github.com/brave/browser-laptop/releases).
 
-You can also [visit our website](https://brave.com/downloads.html) to get the latest stable release (along with a more user-friendly download page).
+You can also <a href='https://brave.com/downloads.html' target="_blank">visit our website</a> to get the latest stable release (along with a more user-friendly download page).
 
-Brave supports 4 [release channels](https://github.com/brave/browser-laptop/wiki/Release-channels): Release, Beta, Developer, and Nightly.
+Brave supports 4 <a href ="https://github.com/brave/browser-laptop/wiki/Release-channels" target="_blank">release channels</a> Release, Beta, Developer, and Nightly.
 
 ## Community
+<a href="https://community.brave.com" target="_blank">Join the Q&A community</a> if you'd like to get more involved with Brave. You can <a href="https://community.brave.com/c/help-me" target="_blank">ask for help</a>,
+<a href ="https://community.brave.com/c/feature-requests" target="_blank">discuss features you'd like to see,</a> and a lot more. We'd love to have your help so that we can continue improving Brave.
 
-[Join the Q&A community](https://community.brave.com/) if you'd like to get more involved with Brave. You can [ask for help](https://community.brave.com/c/help-me),
-[discuss features you'd like to see](https://community.brave.com/c/feature-requests), and a lot more. We'd love to have your help so that we can continue improving Brave.
-
-Join our [Discord community chat](https://discordapp.com/invite/k57tYrS) for higher bandwidth discussions.
+Join our <a href="https://discordapp.com/invite/k57tYrS" target ="_blank">Discord community chat</a> for higher bandwidth discussions.
 
 ## Useful documentation
 
@@ -47,7 +46,7 @@ Join our [Discord community chat](https://discordapp.com/invite/k57tYrS) for hig
 
 ## Running from source
 
-If you're setting up using Windows, please see the [Building on Windows wiki entry](https://github.com/brave/browser-laptop/wiki/(setup)-Windows-build-guide) for a full walkthrough.
+If you're setting up using Windows, please see the <a href ="https://github.com/brave/browser-laptop/wiki/(setup)-Windows-build-guide" target="_blank">Building on Windows wiki entry</a> for a full walkthrough.
 
 For other platforms (macOS, Linux) You'll need certain packages installed before you can build and run Brave locally.
 
@@ -55,9 +54,9 @@ For other platforms (macOS, Linux) You'll need certain packages installed before
 
 1. the current LTS version of `nodejs`
 
-    Install from your package manager, [nvm](https://github.com/creationix/nvm), or download from https://nodejs.org
+    Install from your package manager, <a href="https://github.com/creationix/nvm" target= "_blank">Nvm</a>, or download from https://nodejs.org
 
-2. [npm](https://github.com/npm/npm) version 5 or greater (to make use of the `package-lock.json`)
+2. <a href="https://github.com/npm/npm">Npm</a> version 5 or greater (to make use of the `package-lock.json`)
 
 #### On Debian / Ubuntu /Mint
 
