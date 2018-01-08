@@ -163,6 +163,9 @@ module.exports.onFlashContextMenu = (state, tabId) => {
   if (!tab) {
     return
   }
+  if (tabState.isIncognito(state, tabId) && getSetting(settings.USE_TOR_PRIVATE_TABS)) {
+    return
+  }
 
   const flashMenu = Menu.buildFromTemplate(flashMenuTemplateInit(state, tabId))
   flashMenu.popup(tab)

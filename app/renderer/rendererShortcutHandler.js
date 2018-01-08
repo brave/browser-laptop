@@ -148,8 +148,14 @@ function handleShortcut (frameKey, shortcut, e, args) {
       break
     }
     case 'clean-reload': {
+      const frame = frameStateUtil.getFrameByKey(windowStore.state, frameKey)
       const tabId = frameStateUtil.getTabIdByFrameKey(windowStore.state, frameKey)
-      tabActions.reload(tabId, true)
+      if (frameStateUtil.isTor(frame)) {
+        // set new tor circuit
+        appActions.setTorNewIdentity(tabId, frame.get('location'))
+      } else {
+        tabActions.reload(tabId, true)
+      }
       break
     }
     case 'save': {

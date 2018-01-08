@@ -23,7 +23,7 @@ const dndData = require('../../../../js/dndData')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
-const {isPotentialPhishingUrl} = require('../../../../js/lib/urlutil')
+const {isPotentialPhishingUrl, isOnionUrl} = require('../../../../js/lib/urlutil')
 
 const searchIconSize = 16
 
@@ -44,6 +44,8 @@ class UrlBarIcon extends React.Component {
     } else if (this.props.isHTTPPage && !this.props.active) {
       if (this.props.isSecure === true) {
         return ['fa-lock']
+      } else if (this.props.isOnionUrl) {
+        return []
       } else if (this.props.isSecure === false || this.props.isSecure === 2) {
         return ['fa-unlock', 'insecure-color']
       } else if (this.props.isSecure === 1) {
@@ -158,6 +160,7 @@ class UrlBarIcon extends React.Component {
     props.activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
     props.isAboutPage = isSourceAboutUrl(props.location) && props.location !== 'about:newtab'
     props.isPotentialPhishingUrl = isPotentialPhishingUrl(props.location)
+    props.isOnionUrl = isOnionUrl(props.location)
 
     // used in other functions
     props.title = activeFrame.get('title', '')
