@@ -854,11 +854,15 @@ module.exports.getMainFrameUrl = (details) => {
   if (details.resourceType === 'mainFrame') {
     return details.url
   }
+  let url = null
   const tab = webContents.fromTabID(details.tabId)
-  try {
-    return tab.getURL()
-  } catch (ex) {}
-  return details.firstPartyUrl || null
+  if (tab && !tab.isDestroyed()) {
+    url = tab.getURL()
+  }
+  if (!url && details.firstPartyUrl) {
+    url = details.firstPartyUrl
+  }
+  return url
 }
 
 module.exports.alwaysAllowFullscreen = () => {
