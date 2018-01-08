@@ -16,7 +16,7 @@ const {getSetting} = require('../../../js/settings')
 const settings = require('../../../js/constants/settings')
 const tabDraggingState = require('../../common/state/tabDraggingState')
 
-module.exports = function (windowState, action) {
+module.exports = function tabDraggingWindowReducer (windowState, action) {
   switch (action.actionType) {
     // from initial window
     case appConstants.APP_TAB_DRAG_STARTED:
@@ -41,7 +41,7 @@ module.exports = function (windowState, action) {
       if (!isPinnedTab) {
         const pageIndex = frameStateUtil.getTabPageIndex(windowState)
         const tabsPerTabPage = Number(getSetting(settings.TABS_PER_PAGE))
-        const destinationPageIndex = Math.floor(destinationFrameIndex / tabsPerTabPage)
+        const destinationPageIndex = Math.floor(destinationIndex / tabsPerTabPage)
         if (destinationPageIndex !== pageIndex) {
           pageChange = true
           windowState = windowState.deleteIn(['ui', 'tabs', 'previewTabPageIndex'])
@@ -60,7 +60,7 @@ module.exports = function (windowState, action) {
       break
     case appConstants.APP_TAB_MOVED:
       console.log('tab moved')
-      // TODO: change tab page to match where dragged tab is
+      // TODO: change tab page to match where dragged tab is, if becomes neccessary
       break
   }
   return windowState
