@@ -93,11 +93,11 @@ describe('downloadItem component', function () {
       })
 
       it('filename exists and matches download filename', function () {
-        assert.equal(result.find('.downloadFilename').text(), appStore.state.getIn(['downloads', downloadId, 'filename']))
+        assert.equal(result.find('[data-test-id="downloadFilename"]').text(), appStore.state.getIn(['downloads', downloadId, 'filename']))
       })
 
       it('has local origin i.e file: and matches to "Local file" origin', function () {
-        assert.equal(result.find('.downloadOrigin').text(), '')
+        assert.equal(result.find('[data-test-id="downloadOrigin"]').text(), '')
       })
     })
 

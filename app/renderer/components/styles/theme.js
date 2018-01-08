@@ -260,5 +260,33 @@
           backgroundColor: '#fff'
         }
       }
+    },
+
+    downloadsBar: {
+      backgroundColor: '#e6e6e6',
+      borderTopColor: '#888',
+      color: '#000',
+
+      item: {
+        backgroundColor: '#fff',
+        backgroundColor_filled: '#e6e6e6',
+        borderColor: globalStyles.color.chromeTertiary,
+
+        deleteConfirmation: {
+          borderColor: '#ccc'
+        },
+
+        progress: {
+          backgroundColor: globalStyles.color.highlightBlue,
+
+          isPaused: {
+            borderColor: '#000'
+          }
+        },
+
+        unlock: {
+          color: globalStyles.color.siteInsecureColor
+        }
+      }
     }
   }

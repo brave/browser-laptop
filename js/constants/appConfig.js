@@ -142,6 +142,7 @@ module.exports = {
     'general.check-default-on-startup': Channel.channel() === 'dev',
     'general.download-default-path': '',
     'general.download-always-ask': true,
+    'general.download-show-toolbar-when-downloading': true,
     'general.spellcheck-enabled': true,
     'general.spellcheck-languages': Immutable.fromJS(['en-US']),
     'search.default-search-engine': 'Google',

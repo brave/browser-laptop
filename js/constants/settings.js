@@ -18,6 +18,7 @@ const settings = {
   IS_DEFAULT_BROWSER: 'general.is-default-browser',
   DOWNLOAD_DEFAULT_PATH: 'general.download-default-path',
   DOWNLOAD_ALWAYS_ASK: 'general.download-always-ask',
+  SHOW_TOOLBAR_WHEN_DOWNLOADING: 'general.download-show-toolbar-when-downloading',
   SPELLCHECK_ENABLED: 'general.spellcheck-enabled',
   SPELLCHECK_LANGUAGES: 'general.spellcheck-languages',
   // Search tab

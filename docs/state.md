@@ -616,6 +616,9 @@ AppStore
       toolbar: Array<string>, // bookmark and folder keys that we want to display
       other: Array<string> // bookmark and folder keys that we display in more menu (limited to 100)
     },
+    downloadsToolbar: {
+      isVisible: boolean // whether or not the downloads toolbar is visible
+    },
     focused: boolean,
     height: number,
     left: number,
@@ -814,9 +817,6 @@ WindowStore
   ui: {
     bookmarksToolbar: {
       selectedFolderId: number // folderId from the siteDetail of the currently expanded folder
-    },
-    downloadsToolbar: {
-      isVisible: boolean // whether or not the downloads toolbar is visible
     },
     isClearBrowsingDataPanelVisible: boolean, // true if the Clear Browsing Data panel is visible
     menubar: {

@@ -149,7 +149,6 @@ const globalStyles = {
     buttonHeight: '25px',
     buttonWidth: '25px',
     navbarHeight: '36px',
-    downloadsBarHeight: '60px',
     tabsToolbarHeight: '26px',
     tabPagesHeight: '7px',
     bookmarkHangerMaxWidth: '350px',
@@ -169,7 +168,7 @@ const globalStyles = {
     navbarMenubarMargin: '7px',
     navbarButtonSpacing: '4px',
     navbarButtonWidth: '20px',
-    navbarBraveButtonWidth: '23px',
+    navbarBraveButtonWidth: '24px',
     navbarBraveButtonMarginLeft: '80px',
     navbarLeftMarginDarwin: '76px',
     sideBarWidth: '190px',
@@ -258,9 +257,11 @@ const globalStyles = {
     clipboard: 'fa fa-clipboard',
     closeTab: 'fa fa-times-circle',
     defaultIcon: 'fa fa-file-o',
+    downArrow: 'fa fa-caret-down',
     exclude: 'fa fa-ban',
     findNext: 'fa fa-caret-down',
     findPrev: 'fa fa-caret-up',
+    link: 'fa fa-link',
     loading: 'fa fa-spinner fa-spin',
     lock: 'fa fa-lock',
     moreInfo: 'fa fa-info-circle',
@@ -276,6 +277,7 @@ const globalStyles = {
     retry: 'fa fa-repeat',
     search: 'fa fa-search',
     trash: 'fa fa-trash',
+    trashO: 'fa fa-trash-o',
     unlock: 'fa fa-unlock',
     user: 'fa fa-user',
     volumeOff: 'fa fa-volume-off',
@@ -382,6 +384,24 @@ const globalStyles = {
 
       small: {
         padding: '.5rem'
+      }
+    }
+  },
+
+  downloadBar: {
+    // If updating update app/common/constants/styleValues.js as well and vice-versa
+    spacing: {
+      height: '60px',
+      padding: '20px',
+
+      item: {
+        height: '36px',
+        width: '200px',
+        margin: '10px',
+
+        info: {
+          margin: '6px'
+        }
       }
     }
   }

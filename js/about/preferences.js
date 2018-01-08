@@ -199,6 +199,9 @@ class GeneralTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='downloadAlwaysAsk' prefKey={settings.DOWNLOAD_ALWAYS_ASK}
           settings={this.props.settings}
           onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='downloadShowToolbarAfter' prefKey={settings.SHOW_TOOLBAR_WHEN_DOWNLOADING}
+          settings={this.props.settings}
+          onChangeSetting={this.props.onChangeSetting} />
         <SettingItem dataL10nId='bookmarkToolbarSettings'>
           <SettingDropdown id='bookmarksBarSelect' value={getSetting(settings.BOOKMARKS_TOOLBAR_MODE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.BOOKMARKS_TOOLBAR_MODE)}>

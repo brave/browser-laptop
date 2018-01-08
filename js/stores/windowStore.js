@@ -590,9 +590,6 @@ const doAction = (action) => {
         windowState = windowState.setIn(['autofillCreditCardDetail', action.property], action.newValue)
       }
       break
-    case windowConstants.WINDOW_SET_DOWNLOADS_TOOLBAR_VISIBLE:
-      windowState = windowState.setIn(['ui', 'downloadsToolbar', 'isVisible'], action.isVisible)
-      break
     case windowConstants.WINDOW_SET_RELEASE_NOTES_VISIBLE:
       windowState = windowState.setIn(['ui', 'releaseNotes', 'isVisible'], action.isVisible)
       break
