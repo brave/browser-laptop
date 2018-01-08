@@ -20,7 +20,12 @@ let minAccessOfTopSites
 const staticData = Immutable.fromJS(newTabData.topSites)
 
 const isPinned = (state, siteKey) => {
-  return aboutNewTabState.getPinnedTopSites(state).find(site => site.get('key') === siteKey)
+  return aboutNewTabState.getPinnedTopSites(state).some(site => {
+    if (!site || !site.get) {
+      return false
+    }
+    return site.get('key') === siteKey
+  })
 }
 
 const isIgnored = (state, siteKey) => {
@@ -116,6 +121,7 @@ const getTopSiteData = () => {
 
   if (sites.size < 18) {
     const preDefined = staticData
+      // TODO: this doesn't work properly
       .filter((site) => {
         return !isPinned(state, site.get('key')) && !isIgnored(state, site.get('key'))
       })
@@ -126,7 +132,27 @@ const getTopSiteData = () => {
     sites = sites.concat(preDefined)
   }
 
-  appActions.topSiteDataAvailable(sites)
+  let gridSites = aboutNewTabState.getPinnedTopSites(state).map(pinned => {
+    // do not allow duplicates
+    if (pinned) {
+      sites = sites.filter(site => site.get('key') !== pinned.get('key'))
+    }
+    // topsites are populated once user visit a new site.
+    // pinning a site to a given index is a user decision
+    // and should be taken as priority. If there's an empty
+    // space we just fill it with visited sites. Otherwise
+    // fallback to the pinned item.
+    if (!pinned) {
+      const firstSite = sites.first()
+      sites = sites.shift()
+      return firstSite
+    }
+    return pinned
+  })
+
+  gridSites = gridSites.filter(site => site != null)
+
+  appActions.topSiteDataAvailable(gridSites)
 }
 
 /**

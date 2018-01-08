@@ -32,7 +32,6 @@ const windowState = require('./common/state/windowState')
 
 // Utils
 const locale = require('./locale')
-const {pinnedTopSites} = require('../js/data/newTabData')
 const {defaultSiteSettingsList} = require('../js/data/siteSettingsList')
 const filtering = require('./filtering')
 const autofill = require('./autofill')
@@ -1007,7 +1006,7 @@ module.exports.defaultAppState = () => {
         gridLayoutSize: 'small',
         sites: [],
         ignoredTopSites: [],
-        pinnedTopSites: pinnedTopSites
+        pinnedTopSites: []
       },
       welcome: {
         showOnLoad: !['test', 'development'].includes(process.env.NODE_ENV)
