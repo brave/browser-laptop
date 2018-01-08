@@ -1899,6 +1899,12 @@ const appActions = {
     })
   },
 
+  onHistoryLimit: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_HISTORY_LIMIT
+    })
+  },
+
   onLedgerMediaPublisher: function (mediaKey, response, duration, revisited) {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER,

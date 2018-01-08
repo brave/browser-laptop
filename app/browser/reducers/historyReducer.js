@@ -5,6 +5,9 @@
 const Immutable = require('immutable')
 const BrowserWindow = require('electron').BrowserWindow
 
+// Actions
+const appActions = require('../../../js/actions/appActions')
+
 // State
 const historyState = require('../../common/state/historyState')
 const aboutHistoryState = require('../../common/state/aboutHistoryState')
@@ -13,6 +16,7 @@ const aboutHistoryState = require('../../common/state/aboutHistoryState')
 const appConstants = require('../../../js/constants/appConstants')
 const {STATE_SITES} = require('../../../js/constants/stateConstants')
 const messages = require('../../../js/constants/messages')
+const settings = require('../../../js/constants/settings')
 
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
@@ -21,6 +25,7 @@ const syncUtil = require('../../../js/state/syncUtil')
 const filtering = require('../../filtering')
 const {calculateTopSites} = require('../api/topSites')
 const bookmarkLocationCache = require('../../common/cache/bookmarkLocationCache')
+const {getSetting} = require('../../../js/settings')
 
 /**
  * Helper to pass message to windows to clear closed frames
@@ -35,6 +40,8 @@ const clearClosedFrames = (windows, historyKey) => {
     wnd.webContents.send(messages.CLEAR_CLOSED_FRAMES, historyKey.split('|')[0])
   })
 }
+
+let historyLimitTimout
 
 const historyReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -80,6 +87,15 @@ const historyReducer = (state, action, immutableAction) => {
 
         calculateTopSites(true)
         state = aboutHistoryState.setHistory(state, historyState.getSites(state))
+
+        if (historyLimitTimout) {
+          clearTimeout(historyLimitTimout)
+        }
+
+        // keep only the latest history items (debounced for 1 min)
+        historyLimitTimout = setTimeout(() => {
+          appActions.onHistoryLimit()
+        }, 60 * 1000)
         break
       }
 
@@ -111,8 +127,26 @@ const historyReducer = (state, action, immutableAction) => {
       }
 
     case appConstants.APP_POPULATE_HISTORY:
-      state = aboutHistoryState.setHistory(state, historyState.getSites(state))
-      break
+      {
+        state = aboutHistoryState.setHistory(state, historyState.getSites(state))
+        break
+      }
+
+    case appConstants.APP_ON_HISTORY_LIMIT:
+      {
+        const historyLimit = getSetting(settings.AUTOCOMPLETE_HISTORY_SIZE)
+        let historySites = historyState.getSites(state)
+
+        if (historySites.size > historyLimit) {
+          historySites = historySites
+            .sort((site1, site2) => (site2.get('lastAccessedTime') || 0) - (site1.get('lastAccessedTime') || 0))
+            .take(historyLimit)
+
+          state = state.set(STATE_SITES.HISTORY_SITES, historySites)
+          calculateTopSites(true)
+          state = aboutHistoryState.setHistory(state, historySites)
+        }
+      }
   }
 
   return state
