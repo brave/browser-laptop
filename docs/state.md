@@ -186,19 +186,19 @@ AppStore
     },
     info: {
       addresses: {
-        BAT: string, 
-        BTC: string, 
-        CARD_ID: string, 
-        ETH: string, 
+        BAT: string,
+        BTC: string,
+        CARD_ID: string,
+        ETH: string,
         LTC: string
       },
       balance: number, // confirmed balance in BAT.toFixed(2)
       bravery: {
-        days: number, 
+        days: number,
         fee: {
           amount: number,
           currency: string
-        }, 
+        },
         setting: string
       },
       converted: string,
@@ -210,9 +210,9 @@ AppStore
       paymentId: string,
       probi: number,
       rates:{
-        BTC: string, 
-        ETH: number, 
-        EUR: number, 
+        BTC: string,
+        ETH: number,
+        EUR: number,
         USD: number
       },
       reconcileFrequency: number // duration between each reconciliation in days
@@ -265,7 +265,7 @@ AppStore
             options: {
               persist: boolean,
               style: string
-            }        
+            }
           },
           panel: {
             optInMarkup: {
@@ -288,7 +288,7 @@ AppStore
             options: {
               persist: boolean,
               style: string
-            }        
+            }
           },
           panel: {
             disclaimer: string,
@@ -313,7 +313,7 @@ AppStore
             options: {
               persist: boolean,
               style: string
-            }        
+            }
           },
           panel: {
             disclaimer: string,
@@ -348,7 +348,7 @@ AppStore
           options: {
             exclude: boolean,
             verified: boolean,
-            verifiedTimestamp: number, // timestamp of the last change 
+            verifiedTimestamp: number, // timestamp of the last change
             stickyP: boolean
           },
           pinPercentage: number,

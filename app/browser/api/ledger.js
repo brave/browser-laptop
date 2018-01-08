@@ -73,6 +73,7 @@ let balanceTimeoutId = false
 let runTimeoutId
 let promotionTimeoutId
 let togglePromotionTimeoutId
+let verifiedTimeoutId = false
 
 // Database
 let v2RulesetDB
@@ -149,10 +150,22 @@ const paymentPresent = (state, tabId, present) => {
     if (!balanceTimeoutId) {
       module.exports.getBalance(state)
     }
+
+    getPublisherTimestamp(true)
   } else if (balanceTimeoutId) {
     clearTimeout(balanceTimeoutId)
     balanceTimeoutId = false
   }
+}
+
+const getPublisherTimestamp = (updateList) => {
+  client.publisherTimestamp((err, result) => {
+    if (err) {
+      console.error('Error while retrieving publisher timestamp', err.toString())
+      return
+    }
+    appActions.onPublisherTimestamp(result.timestamp, updateList)
+  })
 }
 
 const addFoundClosed = (state) => {
@@ -185,13 +198,8 @@ const onBootStateFile = (state) => {
   try {
     clientprep()
     client = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
-    client.publisherTimestamp((err, result) => {
-      if (err) {
-        console.error('Error while retrieving publisher timestamp', err.toString())
-        return
-      }
-      appActions.onPublisherTimestamp(result.timestamp)
-    })
+
+    getPublisherTimestamp()
   } catch (ex) {
     state = ledgerState.resetInfo(state)
     bootP = false
@@ -540,21 +548,26 @@ const inspectP = (db, path, publisher, property, key, callback) => {
 
 // TODO rename function name
 const verifiedP = (state, publisherKey, callback) => {
-  client.publisherInfo(publisherKey, (err, result) => {
+  const clientCallback = (err, result) => {
     if (err) {
       console.error(`Error verifying publisher ${publisherKey}: `, err.toString())
       return
     }
 
     if (callback) {
-      let data = false
-      if (result && result.properties && result.properties.verified) {
-        data = result.properties.verified
+      if (result) {
+        callback(null, result)
+      } else {
+        callback(err, {})
       }
-
-      callback(null, data)
     }
-  })
+  }
+
+  if (Array.isArray(publisherKey)) {
+    client.publishersInfo(publisherKey, clientCallback)
+  } else {
+    client.publisherInfo(publisherKey, clientCallback)
+  }
 
   if (process.env.NODE_ENV === 'test') {
     ['brianbondy.com', 'clifton.io'].forEach((key) => {
@@ -689,29 +702,49 @@ const saveVisit = (state, publisherKey, options) => {
   })
   state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
   state = updatePublisherInfo(state)
-  state = checkVerifiedStatus(state, publisherKey)
+  state = module.exports.checkVerifiedStatus(state, publisherKey)
 
   return state
 }
 
-const checkVerifiedStatus = (state, publisherKey) => {
-  if (publisherKey == null) {
+const checkVerifiedStatus = (state, publisherKeys, publisherTimestamp) => {
+  if (publisherKeys == null) {
     return state
   }
 
-  const lastUpdate = parseInt(ledgerState.getLedgerValue(state, 'publisherTimestamp'))
-  const lastPublisherUpdate = parseInt(ledgerState.getPublisherOption(state, publisherKey, 'verifiedTimestamp') || 0)
-
-  if (lastUpdate > lastPublisherUpdate) {
-    state = module.exports.verifiedP(state, publisherKey, (error, result) => {
-      if (!error) {
-        appActions.onPublisherOptionUpdate(publisherKey, 'verified', result)
-        appActions.onPublisherOptionUpdate(publisherKey, 'verifiedTimestamp', lastUpdate)
-        savePublisherOption(publisherKey, 'verified', result)
-        savePublisherOption(publisherKey, 'verifiedTimestamp', lastUpdate)
-      }
-    })
+  if (!Array.isArray(publisherKeys)) {
+    publisherKeys = [publisherKeys]
   }
+
+  const checkKeys = []
+  const lastUpdate = parseInt(publisherTimestamp || ledgerState.getLedgerValue(state, 'publisherTimestamp'))
+
+  publisherKeys.forEach(key => {
+    const lastPublisherUpdate = parseInt(ledgerState.getPublisherOption(state, key, 'verifiedTimestamp') || 0)
+
+    if (lastUpdate > lastPublisherUpdate) {
+      checkKeys.push(key)
+    }
+  })
+
+  if (checkKeys.length === 0) {
+    return state
+  }
+
+  state = module.exports.verifiedP(state, checkKeys, (error, result) => {
+    if (!error) {
+      const publisherKey = result.publisher
+
+      if (result && result.properties && result.properties) {
+        const verified = !!result.properties.verified
+        appActions.onPublisherOptionUpdate(publisherKey, 'verified', verified)
+        savePublisherOption(publisherKey, 'verified', verified)
+      }
+
+      appActions.onPublisherOptionUpdate(publisherKey, 'verifiedTimestamp', lastUpdate)
+      savePublisherOption(publisherKey, 'verifiedTimestamp', lastUpdate)
+    }
+  })
 
   return state
 }
@@ -1748,11 +1781,17 @@ const initialize = (state, paymentsEnabled) => {
 
   ledgerNotifications.init()
 
+  if (verifiedTimeoutId) {
+    clearInterval(verifiedTimeoutId)
+  }
+
   if (!paymentsEnabled) {
     client = null
     newClient = false
     return ledgerState.resetInfo(state, true)
   }
+
+  verifiedTimeoutId = setInterval(getPublisherTimestamp, 1 * ledgerUtil.milliseconds.hour)
 
   if (client) {
     return state
@@ -1838,13 +1877,8 @@ const onInitRead = (state, parsedData) => {
     client = ledgerClient(parsedData.personaId,
       underscore.extend(parsedData.options, {roundtrip: roundtrip}, options),
       parsedData)
-    client.publisherTimestamp((err, result) => {
-      if (err) {
-        console.error('Error while retrieving publisher timestamp', err.toString())
-        return
-      }
-      appActions.onPublisherTimestamp(result.timestamp)
-    })
+
+    getPublisherTimestamp(true)
 
     // Scenario: User enables Payments, disables it, waits 30+ days, then
     // enables it again -> reconcileStamp is in the past.
@@ -2272,13 +2306,7 @@ const transitionWalletToBat = () => {
         }))
         appActions.onBitcoinToBatTransitioned()
         ledgerNotifications.showBraveWalletUpdated()
-        client.publisherTimestamp((err, result) => {
-          if (err) {
-            console.error('Error while retrieving publisher timestamp', err.toString())
-            return
-          }
-          appActions.onPublisherTimestamp(result.timestamp)
-        })
+        getPublisherTimestamp()
       }
     })
   } catch (ex) {
@@ -2508,6 +2536,21 @@ const onPromotionResponse = (state, status) => {
   return state
 }
 
+const onPublisherTimestamp = (state, oldTimestamp, newTimestamp) => {
+  if (oldTimestamp === newTimestamp) {
+    return
+  }
+
+  const publishers = ledgerState.getPublishers(state)
+  if (publishers.isEmpty()) {
+    return
+  }
+
+  publishers.forEach((publisher, key) => {
+    module.exports.checkVerifiedStatus(state, key, newTimestamp)
+  })
+}
+
 const getMethods = () => {
   const publicMethods = {
     backupKeys,
@@ -2550,7 +2593,9 @@ const getMethods = () => {
     claimPromotion,
     onPromotionResponse,
     getBalance,
-    getPromotion
+    getPromotion,
+    onPublisherTimestamp,
+    checkVerifiedStatus
   }
 
   let privateMethods = {}
@@ -2584,7 +2629,6 @@ const getMethods = () => {
       },
       getCurrentMediaKey: (key) => currentMediaKey,
       synopsisNormalizer,
-      checkVerifiedStatus,
       roundtrip,
       observeTransactions,
       onWalletRecovery,
