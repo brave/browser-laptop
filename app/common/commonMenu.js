@@ -90,6 +90,36 @@ module.exports.newPrivateTabMenuItem = () => {
   }
 }
 
+module.exports.newTorTabMenuItem = () => {
+  return {
+    label: locale.translation('newTorTab'),
+    click: function (item, focusedWindow) {
+      ensureAtLeastOneWindow({
+        url: 'about:newtab',
+        isPrivate: true,
+        isTor: true
+      })
+    }
+  }
+}
+
+module.exports.newTorIdentityMenuItem = () => {
+  return {
+    label: locale.translation('newTorIdentity'),
+    click: function (item, focusedWindow) {
+      // XXX new tor circuits
+      let torSession = electron.session.fromPartition('tor')
+      torSession.clearCache(() => { console.log('cleared tor cache') })
+      torSession.clearStorageData({}, () => {
+        console.log('cleared tor storage')
+      })
+      torSession.clearHostResolverCache(() => {
+        console.log('cleared host resolver cache')
+      })
+    }
+  }
+}
+
 module.exports.newPartitionedTabMenuItem = () => {
   const newPartitionedMenuItem = (partitionNumber) => ({
     label: `${locale.translation('newSessionTab')} ${partitionNumber}`,

@@ -649,6 +649,18 @@ function initSession (ses, partition) {
   ses.userPrefs.setDefaultZoomLevel(getSetting(settings.DEFAULT_ZOOM_LEVEL) || config.zoom.defaultValue)
 }
 
+function initTor (ses, partition) {
+  if (partition !== 'tor') {
+    return
+  }
+  // XXX Specify SOCKS username and password per first-party origin.
+  // Can we do this with a specially crafted PAC script (proxy
+  // autoconfig), or will it be necessary to change the way that proxy
+  // configuration works in Muon?
+  let proxyconfig = {proxyRules: 'socks5://127.0.0.1:9050'}
+  ses.setProxy(proxyconfig, () => { console.log('inited tor session ' + ses) })
+}
+
 const initPartition = (partition) => {
   // Partitions can only be initialized once the app is ready
   if (!app.isReady()) {
@@ -660,6 +672,7 @@ const initPartition = (partition) => {
   }
   initializedPartitions[partition] = true
   let fns = [initSession,
+    initTor,
     userPrefs.init,
     hostContentSettings.init,
     registerForBeforeRequest,
