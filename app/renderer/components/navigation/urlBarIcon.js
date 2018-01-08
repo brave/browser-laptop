@@ -28,7 +28,7 @@ const dndData = require('../../../../js/dndData')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
-const {isPotentialPhishingUrl} = require('../../../../js/lib/urlutil')
+const {isPotentialPhishingUrl, isOnionUrl} = require('../../../../js/lib/urlutil')
 
 class UrlBarIcon extends React.Component {
   constructor (props) {
@@ -92,6 +92,7 @@ class UrlBarIcon extends React.Component {
     props.activeTabShowingMessageBox = tabState.isShowingMessageBox(state, activeTabId)
     props.isAboutPage = isSourceAboutUrl(props.location) && props.location !== 'about:newtab'
     props.isPotentialPhishingUrl = isPotentialPhishingUrl(props.location)
+    props.isOnionUrl = isOnionUrl(props.location)
 
     // used in other functions
     props.title = activeFrame.get('title', '')
@@ -131,6 +132,8 @@ class UrlBarIcon extends React.Component {
         icon = <EncryptedIcon />
         iconTestId = 'isSecure'
         isExtendedSecure = this.props.isSecureWithEVCert
+      } else if (this.props.isOnionUrl) {
+        iconTestId = 'isInsecureOnion'
       } else if (this.props.isSecure === 1) {
         icon = <UnencryptedIcon />
         iconTestId = 'isInsecure'
