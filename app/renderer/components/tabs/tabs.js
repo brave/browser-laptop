@@ -335,7 +335,8 @@ class Tabs extends React.Component {
               // as the hiding is to avoid a gap, but that would create a new gap
               this.props.draggingTabId != null && !this.props.onNextPage && styles.tabs__postTabButtons_isInvisible
             )}
-            ListWithTransitionsPreventMoveRight>
+            data-prevent-transition-move-right
+          >
             <LongPressButton
               className={css(
                 styles.tabs__tabStrip__newTabButton

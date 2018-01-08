@@ -124,9 +124,10 @@ class ListWithTransitions extends Component {
               deltaY = deltaY + offsetY
             }
             // children can prevent themselves moving in a particular direction
+            const preventMoveRight = childData.domNode.getAttribute('data-prevent-transition-move-right') === 'true'
             if (
-              !child.props.ListWithTransitionsPreventMoveRight ||
-              (child.props.ListWithTransitionsPreventMoveRight && deltaX > 0)
+              !preventMoveRight || // allowed to move right
+              (preventMoveRight && deltaX > 0) // not allowed to move right, but element is moving left
             ) {
               keyFrames = [
                 {
