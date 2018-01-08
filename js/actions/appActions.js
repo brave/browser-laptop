@@ -1826,10 +1826,11 @@ const appActions = {
     })
   },
 
-  onPublisherTimestamp: function (timestamp) {
+  onPublisherTimestamp: function (timestamp, updateList) {
     dispatch({
       actionType: appConstants.APP_ON_PUBLISHER_TIMESTAMP,
-      timestamp
+      timestamp,
+      updateList
     })
   },
 
