@@ -57,8 +57,10 @@ class BraveryPanel extends React.Component {
     this.onToggleHTTPSE = this.onToggleSiteSetting.bind(this, 'httpsEverywhere')
     this.onToggleFp = this.onToggleSiteSetting.bind(this, 'fingerprintingProtection')
     this.onReload = this.onReload.bind(this)
+    this.onNewTorCircuit = this.onNewTorCircuit.bind(this)
     this.onEditGlobal = this.onEditGlobal.bind(this)
     this.onInfoClick = this.onInfoClick.bind(this)
+    this.onTorInfoClick = this.onTorInfoClick.bind(this)
   }
 
   onToggleAdsAndTracking (e) {
@@ -104,6 +106,10 @@ class BraveryPanel extends React.Component {
     appActions.loadURLRequested(this.props.tabId, this.props.lastCommittedURL)
   }
 
+  onNewTorCircuit () {
+    appActions.setTorNewIdentity(this.props.tabId, this.props.lastCommittedURL)
+  }
+
   onEditGlobal () {
     appActions.createTabRequested({
       url: 'about:preferences#shields'
@@ -114,6 +120,15 @@ class BraveryPanel extends React.Component {
     this.onHide()
     appActions.createTabRequested({
       url: config.fingerprintingInfoUrl
+    })
+  }
+
+  onTorInfoClick () {
+    this.onHide()
+    appActions.createTabRequested({
+      url: config.torCircuitInfoUrl,
+      isPrivate: true,
+      isTor: true
     })
   }
 
@@ -232,6 +247,7 @@ class BraveryPanel extends React.Component {
     props.isBlockedScriptsShown = braveryPanelDetail.get('expandNoScript')
     props.isBlockingFingerprinting = props.blockedFingerprinting.size > 0
     props.isFpShown = braveryPanelDetail.get('expandFp')
+    props.isTor = frameStateUtil.isTor(activeFrame)
 
     // used in other functions
     props.lastCommittedURL = lastCommittedURL
@@ -623,6 +639,16 @@ class BraveryPanel extends React.Component {
             </section>
             : null
           }
+          {
+            this.props.isTor
+            ? <div className={css(
+              styles.braveryPanel__body__footer__tor,
+              this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__footer__tor
+            )}
+              data-l10n-id='braveryTorWarning'
+            />
+            : null
+          }
           <hr className={css(
             styles.braveryPanel__body__hr,
             this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__hr
@@ -648,6 +674,24 @@ class BraveryPanel extends React.Component {
               <span className='fa fa-repeat' />
             </div>
           </div>
+          {
+            this.props.isTor
+              ? <div>
+                <span className={css(
+                  styles.braveryPanel__body__footer__tor,
+                  styles.braveryPanel__body__footer__edit_clickable,
+                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__footer__tor
+                )}
+                  onClick={this.onNewTorCircuit}
+                  data-l10n-id='newTorCircuit'
+                />
+                <span className={globalStyles.appIcons.question}
+                  title={config.torCircuitInfoUrl}
+                  onClick={this.onTorInfoClick}
+                />
+              </div>
+            : null
+          }
         </section>
       </div>
     </Dialog>
@@ -953,6 +997,9 @@ const styles = StyleSheet.create({
   braveryPanel__body__footer__edit: {
     marginRight: '1rem'
   },
+  braveryPanel__body__footer__tor: {
+    marginTop: '10px'
+  },
   braveryPanel__body__footer__edit_clickable: {
     cursor: 'pointer'
   },
@@ -1012,6 +1059,10 @@ const styles = StyleSheet.create({
   },
   braveryPanel_compact__body__footer__edit: {
     marginBottom: editGlobalMarginBottom
+  },
+  braveryPanel_compact__body__footer__tor: {
+    maxWidth: '300px',
+    marginLeft: '4px'
   },
 
   // controlWrapper - Common

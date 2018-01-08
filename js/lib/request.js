@@ -31,11 +31,12 @@ const getDefaultSession = () => {
  * Depends on there being a loaded browser window available.
  * @param {Object|string} options - options object or URL to load
  * @param {function.<Error, Object, string>} callback
+ * @param {Object=} session - muon session to use if not the default
  */
-module.exports.request = (options, callback) => {
+module.exports.request = (options, callback, session) => {
   var params
   var responseType = options.responseType || 'text'
-  var defaultSession = getDefaultSession()
+  var defaultSession = session || getDefaultSession()
 
   if (!defaultSession) return callback(new Error('Request failed, no session available'))
 
