@@ -154,38 +154,28 @@ describe('topSites api', function () {
     ])
 
     it('respects position of pinned items when populating results', function () {
-      const allPinned = Immutable.fromJS([site1, site4])
-      const stateWithPinnedSites = defaultAppState
+      const allPinned = Immutable.fromJS([null, site2, null, site4])
+      let stateWithPinnedSites = defaultAppState
         .set(STATE_SITES.HISTORY_SITES, generateMap(site1, site2, site3, site4))
         .setIn(['about', 'newtab', 'pinnedTopSites'], allPinned)
       this.topSites.calculateTopSites(stateWithPinnedSites)
       // checks:
-      // - pinned item are in their expected order
+      // - pinned item are in their expected order (site 2 at i-1 and site4 at i-3)
       // - unpinned items fill the rest of the spots (starting w/ highest # visits first)
+      this.topSites.calculateTopSites(stateWithPinnedSites)
       getStateValue = stateWithPinnedSites
       this.clock.tick(calculateTopSitesClockTime)
       assert.equal(this.appActions.topSiteDataAvailable.callCount, 1)
       const newSitesData = this.appActions.topSiteDataAvailable.getCall(0).args[0]
-      const expectedSites = Immutable.fromJS([
-        {
-          location: 'https://example3.com/',
-          title: 'sample 3',
-          parentFolderId: 0,
-          count: 23,
-          lastAccessedTime: 123,
-          bookmarked: false,
-          key: 'https://example3.com/|0'
-        },
-        {
-          location: 'https://example2.com/',
-          title: 'sample 2',
-          parentFolderId: 0,
-          count: 5,
-          bookmarked: false,
-          key: 'https://example2.com/|0'
-        }
-      ])
-      assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())
+
+      // assert that first site is populated
+      assert.deepEqual(newSitesData.get(0).isEmpty(), false)
+      // assert that site 2 is at i-1 as planned
+      assert.deepEqual(newSitesData.get(1), site2)
+      // assert that second site is populated
+      assert.deepEqual(newSitesData.get(2).isEmpty(), false)
+      // assert that site 4 is at i-3 as planned
+      assert.deepEqual(newSitesData.get(3), site4)
     })
 
     it('only includes one result for a domain (the one with the highest count)', function () {
@@ -294,7 +284,7 @@ describe('topSites api', function () {
         assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())
       })
 
-      it('only returns the last `maxSites` results', function () {
+      it('only returns the last maxSites results', function () {
         const maxSites = this.topSites.aboutNewTabMaxEntries
         let tooManySites = Immutable.Map()
         for (let i = 0; i < maxSites + 1; i++) {

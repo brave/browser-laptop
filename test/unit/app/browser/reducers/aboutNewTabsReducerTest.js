@@ -50,7 +50,7 @@ describe('aboutNewTabReducerTest', function () {
     const initialState = Immutable.fromJS({
       settings: { },
       about: {
-        newtab: { }
+        newtab: { pinnedTopSites: [] }
       }
     })
     it('gets a value from default settings when nothing is set', () => {

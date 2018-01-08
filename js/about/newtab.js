@@ -97,7 +97,7 @@ class NewTabPage extends React.Component {
   }
 
   get pinnedTopSites () {
-    return this.state.newTabData.getIn(['newTabDetail', 'pinnedTopSites'], Immutable.List())
+    return this.state.newTabData.getIn(['newTabDetail', 'pinnedTopSites'], Immutable.List()).setSize(100)
   }
 
   get ignoredTopSites () {
@@ -109,20 +109,18 @@ class NewTabPage extends React.Component {
   }
 
   isPinned (siteKey) {
-    return this.pinnedTopSites.find(site => site.get('key') === siteKey)
+    return this.pinnedTopSites.some(site => {
+      if (!site || !site.get) {
+        return false
+      }
+      return site.get('key') === siteKey
+    })
   }
 
   get gridLayout () {
     const sizeToCount = {large: 18, medium: 12, small: 6}
     const count = sizeToCount[this.gridLayoutSize]
-
-    let sites = this.pinnedTopSites.take(count)
-
-    if (sites.size < count) {
-      sites = sites.concat(this.topSites.take(count - sites.size))
-    }
-
-    return sites
+    return this.topSites.take(count)
   }
 
   showNotification () {
@@ -178,16 +176,26 @@ class NewTabPage extends React.Component {
   }
 
   onPinnedTopSite (siteKey) {
+    let sites = this.topSites
     let pinnedTopSites = this.pinnedTopSites
-    const siteProps = this.topSites.find(site => site.get('key') === siteKey)
 
-    if (this.isPinned(siteKey)) {
-      pinnedTopSites = pinnedTopSites.filter(site => site.get('key') !== siteKey)
+    const siteProps = sites.find(site => site.get('key') === siteKey)
+
+    const currentSiteIndex = sites.findIndex(site => site.get('key') === siteKey)
+    const currentPinnedSiteIndex = pinnedTopSites
+      .findIndex(site => site && site.get('key') === siteKey)
+
+    // ensure pinned sites are pinned in the right order when pinned
+    // if not pinned, pin and attach it to its position
+    if (!this.isPinned(siteKey)) {
+      pinnedTopSites = pinnedTopSites.splice(currentSiteIndex, 1, siteProps)
     } else {
-      pinnedTopSites = pinnedTopSites.push(siteProps)
+      pinnedTopSites = pinnedTopSites.splice(currentPinnedSiteIndex, 1, null)
+      sites = sites.splice(currentPinnedSiteIndex, 1, siteProps)
+      aboutActions.setNewTabDetail({sites}, true)
     }
 
-    aboutActions.setNewTabDetail({pinnedTopSites: pinnedTopSites}, true)
+    aboutActions.setNewTabDetail({pinnedTopSites}, true)
   }
 
   onIgnoredTopSite (siteKey) {
