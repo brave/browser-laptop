@@ -1596,7 +1596,7 @@ const setPaymentInfo = (amount) => {
     }, 2 * ledgerUtil.milliseconds.second)
   }
 
-  amount = parseInt(amount, 10)
+  amount = parseFloat(amount)
   if (isNaN(amount) || (amount <= 0)) return
 
   let currency = 'USD'
@@ -1800,7 +1800,7 @@ const initialize = (state, paymentsEnabled) => {
 }
 
 const getContributionAmount = () => {
-  let amount = parseInt(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT), 10)
+  let amount = parseFloat(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
 
   // if amount is 5, 15, or 20... the amount wasn't updated when changing
   // from BTC to BAT (see https://github.com/brave/browser-laptop/issues/11719)
