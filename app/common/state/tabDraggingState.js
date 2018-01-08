@@ -33,6 +33,8 @@ const windowTabDragDataSelector = createSelector(
 
 const tabDraggingState = {
   app: {
+    key: appStateKey,
+
     isCurrentWindowDetached: createSelector(
       // re-run next function only if dragDetachedWindowId changes
       dragDetachedWindowIdSelector,

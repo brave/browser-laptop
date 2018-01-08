@@ -49,7 +49,7 @@ module.exports = function (windowState, action) {
         }
       }
       setImmediate(() => {
-        appActions.tabDragChangeWindowDisplayIndex(destinationIndex, destinationFrameIndex, pageChange)
+        appActions.tabDragChangeWindowDisplayIndex(destinationFrameIndex, pageChange)
       })
       break
     case windowConstants.WINDOW_TAB_DRAG_PAUSING_FOR_PAGE_CHANGE:

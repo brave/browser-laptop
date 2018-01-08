@@ -177,6 +177,13 @@ function isMouseCursorOverWindowContent (browserWindow, cursorScreenPoint = scre
   return isClientPointWithinWindowBounds(browserWindow, windowClientPoint)
 }
 
+function mirrorWindowSizeAndPosition (browserWindow, otherWindow) {
+  const [winX, winY] = otherWindow.getPosition()
+  const [width, height] = otherWindow.getSize()
+  browserWindow.setPosition(winX, winY)
+  browserWindow.setSize(width, height)
+}
+
 // BrowserWindow ctor options which can be manually
 // set after window creation
 const optionsSetCompatible = new Set([
@@ -290,6 +297,7 @@ module.exports = {
   getWindowClientSize,
   isMouseCursorOverWindowContent,
   isClientPointWithinWindowBounds,
+  mirrorWindowSizeAndPosition,
   canSetAllPropertiesOnExistingWindow,
   setPropertiesOnExistingWindow
 }
