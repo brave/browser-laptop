@@ -154,6 +154,8 @@ var rendererIdentifiers = function () {
     'showAll',
     'newPrivateTab',
     'newSessionTab',
+    'newTorTab',
+    'newTorIdentity',
     'newWindow',
     'reopenLastClosedTab',
     'print',

@@ -92,6 +92,8 @@ const getPartition = (createProperties) => {
   let partition = session.defaultSession.partition
   if (createProperties.partition) {
     partition = createProperties.partition
+  } else if (createProperties.isTor) {
+    partition = 'tor'
   } else if (createProperties.isPrivate) {
     partition = 'default'
   } else if (createProperties.isPartitioned) {
@@ -105,6 +107,7 @@ const getPartition = (createProperties) => {
 
 const needsPartitionAssigned = (createProperties) => {
   return !createProperties.openerTabId ||
+    createProperties.isTor ||
     createProperties.isPrivate ||
     createProperties.isPartitioned ||
     createProperties.partitionNumber ||
