@@ -35,7 +35,6 @@ const extensionState = require('./common/state/extensionState')
 const ledgerUtil = require('./common/lib/ledgerUtil')
 const {cookieExceptions, isRefererException} = require('../js/data/siteHacks')
 const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
-
 let appStore = null
 
 const beforeSendHeadersFilteringFns = []
@@ -103,7 +102,7 @@ module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
  */
 function registerForBeforeRequest (session, partition) {
   const isPrivate = module.exports.isPrivate(partition)
-  session.webRequest.onBeforeRequest((details, muonCb) => {
+  session.webRequest.onBeforeRequest(async (details, muonCb) => {
     if (process.env.NODE_ENV === 'development') {
       let page = appUrlUtil.getGenDir(details.url)
       if (page) {
@@ -121,7 +120,6 @@ function registerForBeforeRequest (session, partition) {
       const redirectURL = faviconUtil.unwrapFaviconUrl(url)
       faviconURLs.add(redirectURL)
       muonCb({ redirectURL })
-      return
     }
 
     if (shouldIgnoreUrl(details)) {

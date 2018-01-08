@@ -86,6 +86,8 @@ const settings = require('../js/constants/settings')
 const {getSetting} = require('../js/settings')
 const BookmarksExporter = require('./browser/bookmarksExporter')
 
+const {registerBZZProtocols} = require('./extensions/hive/protocol')
+
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 
 // Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
@@ -157,6 +159,7 @@ const notifyCertError = (webContents, url, error, cert) => {
 }
 
 app.on('ready', () => {
+  registerBZZProtocols()
   app.on('certificate-error', (e, webContents, url, error, cert, resourceType, strictEnforcement, expiredPreviousDecision, muonCb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {

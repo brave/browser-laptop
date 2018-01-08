@@ -101,5 +101,6 @@ module.exports = {
   windows: {
     timeoutToShowWindowMs: 5000
   },
-  iconSize: 16
+  iconSize: 16,
+  bzzUrlSchemes: ['bzz', 'bzz-raw', 'bzz-hash', 'bzz-list', 'bzz-immutable', 'bzz-resource']
 }
