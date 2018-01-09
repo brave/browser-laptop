@@ -1,6 +1,23 @@
 # Changelog
 
 Release Notes:
+## [0.19.131](https://github.com/brave/browser-laptop/releases/tag/v0.19.131dev)
+
+ - Added the ability to enable strict site isolation. ([#12490](https://github.com/brave/browser-laptop/issues/12490))
+ - Added additional BAT contribution amounts. ([#12234](https://github.com/brave/browser-laptop/issues/12234))
+ - Changed default contribution for new installs to 10 BAT. ([#12528](https://github.com/brave/browser-laptop/issues/12528))
+ - Improved security by disabling password autofill during page loads. ([#12489](https://github.com/brave/browser-laptop/issues/12489))
+ - Fixed issue with initial 2000 grants during last BAT promotion. ([#12547](https://github.com/brave/browser-laptop/issues/12547))
+ - Fixed muted media not being autoplayed. ([#12152](https://github.com/brave/browser-laptop/issues/12152))
+ - Fixed autoplay blocking user initialized media. ([#12149](https://github.com/brave/browser-laptop/issues/12149))
+ - Fixed music not being played on several popular services. ([#11527](https://github.com/brave/browser-laptop/issues/11527))
+ - Fixed notification bar buttons not responding in certain cases. ([#9171](https://github.com/brave/browser-laptop/issues/9171))
+ - Fixed autoplay notifications not being dismissed when user ignores notification and continues stream. ([#9143](https://github.com/brave/browser-laptop/issues/9143))
+ - Fixed sites being added into the autoplay permission list when default permission is set as "always allow". ([#9008](https://github.com/brave/browser-laptop/issues/9008))
+ - Fixed autoplay notifications being displayed for local files. ([#8929](https://github.com/brave/browser-laptop/issues/8929))
+ - Upgraded muon to 4.5.36. ([#12501](https://github.com/brave/browser-laptop/issues/12501))
+ - Upgraded to Chromium 63.0.3239.132. ([#12521](https://github.com/brave/browser-laptop/issues/12521))
+
 ## [0.19.123](https://github.com/brave/browser-laptop/releases/tag/v0.19.123dev)
 
  - Fixed vulnerability in WebTorrent ([#12400](https://github.com/brave/browser-laptop/issues/12400))
