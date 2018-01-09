@@ -1948,6 +1948,13 @@ const appActions = {
     })
   },
 
+  onUserModelDemoValue: function (value) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_DEMO_VALUE,
+      value
+    })
+  },
+
   onReferralCodeFail: function () {
     dispatch({
       actionType: appConstants.APP_ON_REFERRAL_CODE_FAIL
