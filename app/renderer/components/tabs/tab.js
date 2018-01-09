@@ -182,7 +182,8 @@ class Tab extends React.Component {
   }
 
   get fixTabWidth () {
-    if (!this.tabNode) {
+    if (!this.elementRef) {
+      console.error('accessed fixTabWidth without an element to read')
       return 0
     }
 
@@ -279,7 +280,7 @@ class Tab extends React.Component {
     props.dragIntendedWindowId = tabDraggingState.app.getCurrentWindowId(state)
     const isTabDragging = tabState.isTabDragging(state, tabId)
     props.isDragging = isTabDragging
-    props.tabWidth = isTabDragging && (tabDraggingState.app.getTabWidth(state) || props.tabWidth)
+    props.tabWidth = (isTabDragging && tabDraggingState.app.getTabWidth(state)) || props.tabWidth
     return props
   }
 
