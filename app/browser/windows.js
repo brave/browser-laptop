@@ -4,6 +4,7 @@
 
 const electron = require('electron')
 const Immutable = require('immutable')
+const { EventEmitter } = require('events')
 const appActions = require('../../js/actions/appActions')
 const appStore = require('../../js/stores/appStore')
 const appUrlUtil = require('../../js/lib/appUrlUtil')
@@ -12,7 +13,6 @@ const debounce = require('../../js/lib/debounce')
 const {getSetting} = require('../../js/settings')
 const locale = require('../locale')
 const LocalShortcuts = require('../localShortcuts')
-const {initWindowCacheState} = require('../sessionStoreShutdown')
 const {makeImmutable} = require('../common/state/immutableUtil')
 const {getPinnedTabsByWindowId} = require('../common/state/tabState')
 const messages = require('../../js/constants/messages')
@@ -31,6 +31,8 @@ const {app, BrowserWindow, ipcMain} = electron
 // TODO(bridiver) - set window uuid
 let currentWindows = {}
 const windowPinnedTabStateMemoize = new WeakMap()
+const publicEvents = new EventEmitter()
+let lastCreatedWindowIsRendererWindow = false
 
 const getWindowState = (win) => {
   if (win.isFullScreen()) {
@@ -154,6 +156,12 @@ function showDeferredShowWindow (win) {
 const api = {
   init: (state, action) => {
     app.on('browser-window-created', function (event, win) {
+      // handle non-renderer windows
+      if (!lastCreatedWindowIsRendererWindow) {
+        // nothing to do as yet
+        return
+      }
+      lastCreatedWindowIsRendererWindow = false
       let windowId = -1
       const updateWindowMove = debounce(updateWindow, 100)
       const updateWindowDebounce = debounce(updateWindow, 5)
@@ -423,10 +431,16 @@ const api = {
       fullscreenWhenRendered = true
     }
     // create window with Url to renderer
+    // new-window action handler is sync, so won't be added to any 'renderer collection' we create here
+    // by the time the action handler runs.
+    // Instead, add a flag to indicate the next-created window is an actual
+    // tabbed renderer window
+    lastCreatedWindowIsRendererWindow = true
     const win = new electron.BrowserWindow(windowOptions)
     win.loadURL(appUrlUtil.getBraveExtIndexHTML())
+
     // TODO: pass UUID
-    initWindowCacheState(win.id, immutableState)
+    publicEvents.emit('new-window-state', win.id, immutableState)
     // let the windowReady handler know to show the window
     win.__showWhenRendered = showWhenRendered
     if (win.__showWhenRendered) {
@@ -500,6 +514,20 @@ const api = {
     }
     return windowState.WINDOW_ID_NONE
   },
+
+  /**
+   * Provides an array of all Browser Windows which are actual
+   * main windows (not background workers), and are not destroyed
+   */
+  getAllRendererWindows: () => {
+    return Object.keys(currentWindows)
+      .map(key => currentWindows[key])
+      .filter(win => win && !win.isDestroyed())
+  },
+
+  on: (...args) => publicEvents.on(...args),
+  off: (...args) => publicEvents.off(...args),
+  once: (...args) => publicEvents.once(...args),
 
   privateMethods: () => {
     return process.env.NODE_ENV === 'test'

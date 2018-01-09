@@ -4,8 +4,9 @@
 
 'use strict'
 
-const {BrowserWindow, app, ipcMain} = require('electron')
+const {app, ipcMain} = require('electron')
 const sessionStore = require('./sessionStore')
+const windows = require('./browser/windows')
 const updateStatus = require('../js/constants/updateStatus')
 const updater = require('./updater')
 const appConfig = require('../js/constants/appConfig')
@@ -31,6 +32,10 @@ let sessionStateSaveInterval
 let immutableWindowStateCache
 let sessionStoreQueue
 let appStore
+
+windows.on('new-window-state', (windowId, immutableWindowState) => {
+  immutableWindowStateCache = immutableWindowStateCache.set(windowId, immutableWindowState)
+})
 
 // Useful for automated tests
 const reset = () => {
@@ -76,7 +81,7 @@ const saveAppState = (forceSave = false) => {
   }
 
   let immutableAppState = appStore.getState().set('perWindowState', immutablePerWindowState)
-  const receivedAllWindows = immutablePerWindowState.size === BrowserWindow.getAllWindows().length
+  const receivedAllWindows = immutablePerWindowState.size === windows.getAllRendererWindows().length
   if (receivedAllWindows) {
     clearTimeout(saveAppStateTimeout)
   }
@@ -138,12 +143,14 @@ const initiateSessionStateSave = () => {
     if (isAllWindowsClosed && immutableLastWindowClosedState) {
       immutablePerWindowState = immutablePerWindowState.push(immutableLastWindowClosedState)
       saveAppState(true)
-    } else if (BrowserWindow.getAllWindows().length > 0) {
+    } else if (windows.getAllRendererWindows().length > 0) {
       ++windowCloseRequestId
-      const windowIds = BrowserWindow.getAllWindows().map((win) => {
+      const windowIds = windows.getAllRendererWindows().map((win) => {
         return win.id
       })
-      BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(messages.REQUEST_WINDOW_STATE, windowCloseRequestId))
+      windows.getAllRendererWindows().forEach((win) => {
+        win.webContents.send(messages.REQUEST_WINDOW_STATE, windowCloseRequestId)
+      })
       // Just in case a window is not responsive, we don't want to wait forever.
       // In this case just save session store for the windows that we have already.
       saveAppStateTimeout = setTimeout(() => {
@@ -164,10 +171,6 @@ const removeWindowFromCache = (windowId) => {
     return
   }
   immutableWindowStateCache = immutableWindowStateCache.delete(windowId)
-}
-
-const initWindowCacheState = (windowId, immutableWindowState) => {
-  immutableWindowStateCache = immutableWindowStateCache.set(windowId, immutableWindowState)
 }
 
 app.on('before-quit', (e) => {
@@ -241,6 +244,5 @@ module.exports = {
   startSessionSaveInterval,
   initiateSessionStateSave,
   reset,
-  removeWindowFromCache,
-  initWindowCacheState
+  removeWindowFromCache
 }
