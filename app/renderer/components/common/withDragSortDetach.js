@@ -275,7 +275,7 @@ module.exports = function withDragSortDetach (
     // in any other window the item may have been dragged to
     onDragStart = (e: SyntheticDragEvent<HTMLElement>) => {
       e.preventDefault()
-      const dragElement: ?HTMLElement = e.target instanceof HTMLElement ? e.target : this.elementRef
+      const dragElement: ?HTMLElement = this.elementRef || (e.target instanceof HTMLElement ? e.target : null)
       if (!dragElement) {
         throw new Error('No valid element target for drag start operation')
       }
