@@ -33,4 +33,22 @@ describe('content loading', function () {
       .windowByUrl(Brave.browserWindowUrl)
       .waitForTextValue('[data-test-id="tabTitle"]', 'fail')
   })
+
+  it('does not support credentials API', function * () {
+    const page1 = Brave.fixtureUrl('credentials.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .url(page1)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForTextValue('[data-test-id="tabTitle"]', 'fail')
+  })
+
+  it('does not support sharedarraybuffer API', function * () {
+    const page1 = Brave.fixtureUrl('sharedArrayBuffer.html')
+    yield this.app.client
+      .tabByIndex(0)
+      .url(page1)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForTextValue('[data-test-id="tabTitle"]', 'fail')
+  })
 })
