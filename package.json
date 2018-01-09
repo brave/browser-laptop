@@ -88,6 +88,7 @@
   },
   "homepage": "https://www.brave.com/",
   "dependencies": {
+    "@brave-intl/bat-usermodel": "^0.1.4",
     "aphrodite": "1.1.0",
     "async": "^2.0.1",
     "bat-balance": "^1.0.7",
@@ -116,6 +117,7 @@
     "lru-cache": "^1.0.0",
     "nan": "2.8.0",
     "niceware": "^1.0.4",
+    "node-notifier": "^5.2.1",
     "parse-torrent": "^5.8.1",
     "prettier-bytes": "^1.0.3",
     "prop-types": "^15.5.6",
