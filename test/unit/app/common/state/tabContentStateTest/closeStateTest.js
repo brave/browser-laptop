@@ -150,7 +150,7 @@ describe('closeState unit tests', function () {
     it('returns false if tab is intersected and not active', function * () {
       const state = defaultState
         .set('activeFrameKey', 1337)
-        .setIn(['ui', 'tabs', 'intersectionRatio', intersection.at45])
+        .setIn(['ui', 'tabs', 'intersectionRatio', intersection.at46])
       const result = closeState.showCloseTabIcon(state, frameKey)
       assert.equal(result, false)
     })

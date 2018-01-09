@@ -130,7 +130,8 @@ class Favicon extends React.Component {
 
 const styles = StyleSheet.create({
   icon_fav: {
-    backgroundImage: 'var(--faviconsrc)'
+    backgroundImage: 'var(--faviconsrc)',
+    overflow: 'visible'
   },
 
   icon_favLight: {

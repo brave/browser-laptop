@@ -574,6 +574,7 @@ class Main extends React.Component {
         item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true).size > 0
     props.showFindBar = activeFrame.get('findbarShown') && !activeFrame.get('isFullScreen')
     props.sortedFrames = frameStateUtil.getSortedFrameKeys(currentWindow)
+    props.hasFramePreview = currentWindow.get('previewFrameKey') != null
     props.showDownloadBar = currentWindow.getIn(['ui', 'downloadsToolbar', 'isVisible']) &&
       state.get('downloads') && state.get('downloads').size > 0
     props.title = activeFrame.get('title')
@@ -736,7 +737,10 @@ class Main extends React.Component {
         }
       </div>
       <div className='mainContainer'>
-        <TransitionGroup className='tabContainer'>
+        <TransitionGroup className={cx({
+          tabContainer: true,
+          hasFramePreview: this.props.hasFramePreview
+        })}>
           {
             this.props.sortedFrames.map((frameKey) =>
               <Transition

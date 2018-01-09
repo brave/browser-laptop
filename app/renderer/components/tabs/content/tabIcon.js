@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0, // must keep set width and height and not crop self
 
     // Default background properties
     backgroundSize: globalStyles.spacing.iconSize,

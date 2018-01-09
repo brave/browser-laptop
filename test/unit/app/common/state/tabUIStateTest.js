@@ -8,7 +8,6 @@ const assert = require('assert')
 const Immutable = require('immutable')
 const mockery = require('mockery')
 const fakeElectron = require('../../../lib/fakeElectron')
-const {theme} = require('../../../../../app/renderer/components/styles/theme')
 const {intersection} = require('../../../../../app/renderer/components/styles/global')
 
 const frameKey = 1
@@ -305,97 +304,6 @@ describe('tabUIState unit tests', function () {
         .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at20)
       const result = tabUIState.centralizeTabIcons(state, frameKey)
       assert.equal(result, true)
-    })
-  })
-
-  describe('getTabEndIconBackgroundColor', function () {
-    before(function () {
-      // just a helper for results
-      this.defaultResult = (bgColor, color1Size, color2Size) =>
-        `linear-gradient(to left, ${bgColor} ${color1Size}, transparent ${color2Size})`
-    })
-
-    describe('when tab is private', function () {
-      it('returns `tab.private.background` color if not active', function * () {
-        const state = defaultState
-          .set('activeFrameKey', 1337)
-          .mergeIn(['frames', index], {
-            themeColor: '#c0ff33',
-            isPrivate: true
-          })
-        const result = tabUIState.getTabEndIconBackgroundColor(state, frameKey)
-        const expected = this.defaultResult(theme.tab.private.background, '10px', '40px')
-        assert.equal(result, expected)
-      })
-
-      it('returns `tab.active.private.background` if tab is active', function * () {
-        const state = defaultState
-          .mergeIn(['frames', index], {
-            themeColor: '#c0ff33',
-            isPrivate: true
-          })
-        const result = tabUIState.getTabEndIconBackgroundColor(state, frameKey)
-        const expected = this.defaultResult(theme.tab.active.private.background, '10px', '40px')
-        assert.equal(result, expected)
-      })
-
-      it('retuns active private color if tab is being hovered', function * () {
-        const state = defaultState
-          .mergeIn(['frames', index], {
-            themeColor: '#c0ff33',
-            isPrivate: true
-          })
-          .setIn(['ui', 'tabs', 'hoverTabIndex'], index)
-        const result = tabUIState.getTabEndIconBackgroundColor(state, frameKey)
-        const expected = this.defaultResult(theme.tab.active.private.background, '10px', '40px')
-        assert.equal(result, expected)
-      })
-    })
-
-    describe('when tab is not private', function () {
-      it('returns the themeColor if tab is active', function * () {
-        const state = defaultState
-          .setIn(['frames', index, 'themeColor'], '#c0ff33')
-        const result = tabUIState.getTabEndIconBackgroundColor(state, frameKey)
-        const expected = this.defaultResult('#c0ff33', '0', '12px')
-        assert.equal(result, expected)
-      })
-      it('returns `theme.tab.background` if tab is not active', function * () {
-        const state = defaultState
-          .set('activeFrameKey', 1337)
-          .setIn(['frames', index, 'themeColor'], '#c0ff33')
-        const result = tabUIState.getTabEndIconBackgroundColor(state, frameKey)
-        const expected = this.defaultResult(theme.tab.background, '0', '12px')
-        assert.equal(result, expected)
-      })
-    })
-
-    describe('returns `linear gradient` size', function () {
-      it('at 10px/40px if tab is partitioned', function * () {
-        const state = defaultState
-          .mergeIn(['frames', index], {
-            partitionNumber: 1337,
-            themeColor: '#c0ff33'
-          })
-        const result = tabUIState.getTabEndIconBackgroundColor(state, frameKey)
-        const expected = this.defaultResult('#c0ff33', '10px', '40px')
-        assert.equal(result, expected)
-      })
-      it('at 10px/40px gradient size if tab has a visible close icon', function * () {
-        const state = defaultState
-          .setIn(['frames', index, 'themeColor'], '#c0ff33')
-          .setIn(['ui', 'tabs', 'hoverTabIndex'], index)
-        const result = tabUIState.getTabEndIconBackgroundColor(state, frameKey)
-        const expected = this.defaultResult('#c0ff33', '10px', '40px')
-        assert.equal(result, expected)
-      })
-      it('at 0/12px gradient size if is neither private, partition or has close icon visible', function * () {
-        const state = defaultState
-          .setIn(['frames', index, 'themeColor'], '#c0ff33')
-        const result = tabUIState.getTabEndIconBackgroundColor(state, frameKey)
-        const expected = this.defaultResult('#c0ff33', '0', '12px')
-        assert.equal(result, expected)
-      })
     })
   })
 })

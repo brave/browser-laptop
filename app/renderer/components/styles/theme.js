@@ -137,16 +137,21 @@
     },
 
     tab: {
-      transition: `
-      background-color 150ms cubic-bezier(0.26, 0.63, 0.39, 0.65),
-      color 150ms cubic-bezier(0.26, 0.63, 0.39, 0.65)
-    `,
+      transitionDurationOut: '400ms',
+      transitionDurationIn: '200ms',
+      transitionEasingOut: 'ease-in',
+      transitionEasingIn: 'ease-out',
       background: '#ddd',
       borderColor: '#bbb',
+      borderWidth: 1,
       color: '#5a5a5a',
 
       hover: {
-        background: 'rgba(255, 255, 255, 0.4)'
+        background: '#eaeaea',
+
+        private: {
+          borderColor: 'rgba(75, 60, 110, .7)'
+        }
       },
 
       forWindows: {
@@ -154,7 +159,7 @@
       },
 
       active: {
-        background: 'rgba(255, 255, 255, 0.8)',
+        background: '#f8f8f8',
 
         private: {
           background: '#4b3c6e',

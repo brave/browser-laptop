@@ -869,12 +869,14 @@ class Frame extends React.Component {
     const contextMenu = currentWindow.get('contextMenuDetail')
     const tab = tabId && tabId > -1 && tabState.getByTabId(state, tabId)
 
+    const previewFrameKey = currentWindow.get('previewFrameKey')
+
     const props = {}
     // used in renderer
     props.transitionState = ownProps.transitionState
     props.partition = frameStateUtil.getPartition(frame)
     props.isFullScreen = frame.get('isFullScreen')
-    props.isPreview = frame.get('key') === currentWindow.get('previewFrameKey')
+    props.isPreview = frame.get('key') === previewFrameKey
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frame.get('key'))
     props.showFullScreenWarning = frame.get('showFullScreenWarning')
     props.location = location
@@ -956,8 +958,7 @@ class Frame extends React.Component {
       }
       <div ref={(node) => { this.webviewContainer = node }}
         className={cx({
-          webviewContainer: true,
-          isPreview: this.props.isPreview
+          webviewContainer: true
         })} />
       <HrefPreview frameKey={this.props.frameKey} />
       {
