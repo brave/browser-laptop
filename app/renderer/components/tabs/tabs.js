@@ -333,6 +333,7 @@ class Tabs extends React.Component {
               styles.tabs__postTabButtons,
               // hide during drag but only when there's no 'next page' button
               // as the hiding is to avoid a gap, but that would create a new gap
+              this.props.draggingTabId != null && styles.tabs__postTabButtons_ancestorIsDragging,
               this.props.draggingTabId != null && !this.props.onNextPage && styles.tabs__postTabButtons_isInvisible
             )}
             data-prevent-transition-move-right
@@ -426,9 +427,12 @@ const styles = StyleSheet.create({
   },
   tabs__postTabButtons: {
     background: '#ddd',
-    zIndex: 400,
+    zIndex: 50, // underneath normal tab, on top of dragged tab
     opacity: 1,
     transition: 'opacity 120ms ease-in-out'
+  },
+  tabs__postTabButtons_ancestorIsDragging: {
+    zIndex: 450
   },
   tabs__postTabButtons_isInvisible: {
     opacity: 0
