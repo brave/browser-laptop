@@ -31,9 +31,8 @@ class AboutWelcome extends React.Component {
           <div className={css(styles.et_pb_column, styles.et_pb_column_2_3)}>
             <p className={css(styles.p3, styles.note)}>
               <b className={css(styles.p3_b)}>Note</b>: This version of Brave should only be used by those who have been invited to participate in the
-              Brave Ads Trial program. If you have found your way here by accident, please download the current
-              release version for your device at <br />
-              <a href='https://brave.com/download' target='_blank' className={css(styles.link)}>https://brave.com/download</a>
+              Brave Ads Test Program. If you have found your way here by accident, please download the current
+              release version for your device at <a href='https://brave.com/download' target='_blank' className={css(styles.link)}>https://brave.com/download</a>
             </p>
             <p className={css(styles.p3)}>
               <b className={css(styles.p3_b)}>Brave Ads will give you your fair share of ad dollars.</b>&nbsp;
@@ -58,7 +57,7 @@ class AboutWelcome extends React.Component {
             <p className={css(styles.p3)}>
               This version of Brave Ads is part of a test <b className={css(styles.p3_b)}>which sends your browsing
               activity and other potentially sensitive data to Brave.</b> If you’re not part of this test program,
-              do not use this version of Brave.The test will complete in 14 days, after which we recommend an
+              do not use this version of Brave. The test will complete in 14 days, after which we recommend an
               upgrade to the Brave production version that will no longer collect any browsing history or activity.
             </p>
             <p className={css(styles.p3, styles.pr_no)}>
