@@ -454,7 +454,8 @@ const reducer = (state, action, immutableAction) => {
         bufferWindowId: detachedWindowId
       })
       // get dragged frame, but set index to destination
-      const frameOpts = frameOptsFromFrame(tabDraggingState.app.sourceFrame(state)).set('index', destinationFrameIndex)
+      const frameOpts = frameOptsFromFrame(tabDraggingState.app.sourceFrame(state))
+        .set('index', destinationFrameIndex)
       // existing window would be closed since it won't have any tabs left,
       // but instead let's set it up as the new Buffer Window in case we're needed again
       // and also (very importantly) to keep the drag event going since it may
@@ -474,6 +475,8 @@ const reducer = (state, action, immutableAction) => {
           if (shouldDebugTabEvents) {
             console.timeEnd('attachRequested-toattach')
           }
+          // make tab active when dragged to a new window
+          tabs.setActive(sourceTabId)
           // Since we've got a new Buffer Window, move it in to position
           // so that it appears hidden
           // Note that we cannot actually hide that window
