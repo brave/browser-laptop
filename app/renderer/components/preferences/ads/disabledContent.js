@@ -66,7 +66,7 @@ class DisabledContent extends React.Component {
   }
 
   showWarning (config, available) {
-    if (config === undefined && available === undefined) {
+    if (config == null && available == null) {
       return null
     }
 
@@ -102,7 +102,7 @@ class DisabledContent extends React.Component {
 
     return <div>
       <p className={css(styles.disabledContent__message__text, styles.disabledContent__message_white)}>
-        Thank you helping us develop BAT Ads in Brave. This test phase involves
+        Thank you for helping us develop Brave Ads in Brave. This test phase involves
         <b className={css(styles.disabledContent__message_bold)}> sending a detailed log of your browsing activity
         (including full URLs) in non-private tabs, which ads are seen and clicked, IP address, operating system and
         browser version, browser ads settings, when the browser is being used, and a unique identifier per
