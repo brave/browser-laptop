@@ -99,6 +99,7 @@ const messages = {
   PRINTKEYS_UPDATED: _,
   NEWTAB_DATA_UPDATED: _,
   VERSION_INFORMATION_UPDATED: _,
+  DEMO_UPDATED: _,
   // About pages from contentScript
   DISPATCH_ACTION: _,
   ABOUT_COMPONENT_INITIALIZED: _,

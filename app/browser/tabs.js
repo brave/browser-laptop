@@ -38,6 +38,7 @@ const bookmarkOrderCache = require('../common/cache/bookmarkOrderCache')
 const ledgerState = require('../common/state/ledgerState')
 const {getWindow, notifyWindowWebContentsAdded} = require('./windows')
 const activeTabHistory = require('./activeTabHistory')
+const demoApi = require('../browser/api/demo')
 
 let adBlockRegions
 let currentPartitionNumber = 0
@@ -288,6 +289,8 @@ const updateAboutDetails = (tabId) => {
   } else if (url === 'about:preferences#sync' || location === 'about:contributions' || onPaymentsPage) {
     const sync = appState.get('sync', Immutable.Map())
     sendAboutDetails(tabId, messages.SYNC_UPDATED, sync)
+  } else if (url === 'about:preferences#demo') {
+    sendAboutDetails(tabId, messages.DEMO_UPDATED, Immutable.fromJS({demoValue: demoApi.getValue()}))
   } else if (location === 'about:extensions' || url === 'about:preferences#extensions') {
     const extensionsValue = appState.get('extensions', Immutable.Map())
     sendAboutDetails(tabId, messages.EXTENSIONS_UPDATED, extensionsValue)

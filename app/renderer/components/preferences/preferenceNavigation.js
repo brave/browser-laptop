@@ -84,6 +84,11 @@ class PreferenceNavigation extends ImmutableComponent {
           onClick={this.props.changeTab.bind(null, preferenceTabs.ADVANCED)}
           selected={this.props.preferenceTab === preferenceTabs.ADVANCED}
         />
+        <PreferenceNavigationButton icon={styles.advanced}
+          l10nId='demo'
+          onClick={this.props.changeTab.bind(null, preferenceTabs.DEMO)}
+          selected={this.props.preferenceTab === preferenceTabs.DEMO}
+        />
       </div>
       <HelpfulHints hintNumber={this.props.hintNumber} refreshHint={this.props.refreshHint} />
     </div>

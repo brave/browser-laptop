@@ -118,6 +118,10 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
       setting: getSetting(settings.METAMASK_PROMPT_DISMISSED) || getSetting(settings.METAMASK_ENABLED) ? 'block' : 'allow',
       primaryPattern: '*'
     }],
+    BATads: [{
+      setting: 'allow',
+      primaryPattern: '*'
+    }],
     popups: [{
       setting: 'block',
       primaryPattern: '*'

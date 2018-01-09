@@ -1189,6 +1189,8 @@ module.exports.defaultAppState = () => {
       },
       promotion: {}
     },
+    usermodel: {
+    },
     windowReady: false
   }
 }
