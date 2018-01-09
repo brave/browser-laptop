@@ -19,3 +19,6 @@ if (chrome.contentSettings.doNotTrack == 'allow') {
 if (chrome.contentSettings.ads == 'block') {
   chrome.webFrame.setGlobal("window.google_onload_fired", true)
 }
+
+// Spectre hotfix (https://github.com/brave/browser-laptop/issues/12570)
+chrome.webFrame.setGlobal('window.SharedArrayBuffer', false)
