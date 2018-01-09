@@ -3,10 +3,10 @@
 Release Notes:
 ## [0.19.131](https://github.com/brave/browser-laptop/releases/tag/v0.19.131dev)
 
- - Added the ability to enable strict site isolation. ([#12490](https://github.com/brave/browser-laptop/issues/12490))
- - Added additional BAT contribution amounts. ([#12234](https://github.com/brave/browser-laptop/issues/12234))
- - Changed default contribution for new installs to 10 BAT. ([#12528](https://github.com/brave/browser-laptop/issues/12528))
+ - Added new security option: Strict Site Isolation. ([#12490](https://github.com/brave/browser-laptop/issues/12490))
  - Improved security by disabling password autofill during page loads. ([#12489](https://github.com/brave/browser-laptop/issues/12489))
+ - Added additional token amounts for Brave Payments. ([#12234](https://github.com/brave/browser-laptop/issues/12234))
+ - Changed default contribution for new installs to 10 BAT. ([#12528](https://github.com/brave/browser-laptop/issues/12528))
  - Fixed issue with initial 2000 grants during last BAT promotion. ([#12547](https://github.com/brave/browser-laptop/issues/12547))
  - Fixed muted media not being autoplayed. ([#12152](https://github.com/brave/browser-laptop/issues/12152))
  - Fixed autoplay blocking user initialized media. ([#12149](https://github.com/brave/browser-laptop/issues/12149))
