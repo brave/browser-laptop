@@ -180,3 +180,8 @@ sudo rpm -i ./brave.rpm
 ```
 wget https://laptop-updates.brave.com/latest/linux64 -O- | tar xj
 ```
+
+Or,
+```
+curl -L https://laptop-updates.brave.com/latest/linux64 | tar xj
+```
