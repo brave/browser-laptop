@@ -856,19 +856,9 @@ const searchSelectionMenuItem = (location) => {
   var searchText = textUtils.ellipse(location)
   return {
     label: locale.translation('openSearch').replace(/{{\s*selectedVariable\s*}}/, searchText),
-    click: (item) => {
-      if (location) {
-        let activeFrame = windowStore.getState().get('activeFrameKey')
-        let frame = windowStore.getFrame(activeFrame)
-        let searchUrl = appStoreRenderer.state.getIn(['searchDetail', 'searchURL']).replace('{searchTerms}', encodeURIComponent(location))
-        appActions.createTabRequested({
-          url: searchUrl,
-          isPrivate: frame.get('isPrivate'),
-          partitionNumber: frame.get('partitionNumber'),
-          windowId: frame.get('windowId')
-        })
-      }
-    }
+    submenu: [
+      
+    ]
   }
 }
 
