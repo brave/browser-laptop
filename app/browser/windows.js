@@ -109,7 +109,8 @@ const updatePinnedTabs = (win, appState) => {
   // sites are instructions of what should be pinned
   // tabs are sites our window already has pinned
   // for each site which should be pinned, find if it's already pinned
-  for (const site of statePinnedSites.values()) {
+  const statePinnedSitesOrdered = statePinnedSites.sort((a, b) => a.get('order') - b.get('order'))
+  for (const site of statePinnedSitesOrdered.values()) {
     const existingPinnedTabIdx = pinnedWindowTabs.findIndex(tab => siteMatchesTab(site, tab))
     if (existingPinnedTabIdx !== -1) {
       // if it's already pinned we don't need to consider the tab in further searches
