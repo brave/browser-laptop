@@ -1547,6 +1547,19 @@ const getPaymentInfo = (state) => {
   return state
 }
 
+const lockInContributionAmount = (balance) => {
+  // Lock in contribution amount if amount hasn't been chosen and balance is non-zero
+  // (ex: they receive a grant or fund the wallet)
+  // Amount is only set when user explicitly picks a contribution amount
+  if (balance > 0) {
+    const value = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, undefined, false)
+    if (value === null) {
+      const defaultFromConfig = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT)
+      appActions.changeSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, defaultFromConfig)
+    }
+  }
+}
+
 const onWalletProperties = (state, body) => {
   if (body == null) {
     return state
@@ -1562,6 +1575,7 @@ const onWalletProperties = (state, body) => {
   const balance = parseFloat(body.get('balance'))
   if (balance >= 0) {
     state = ledgerState.setInfoProp(state, 'balance', balance)
+    lockInContributionAmount()
   }
 
   // Rates
@@ -2631,7 +2645,8 @@ const getMethods = () => {
       roundtrip,
       observeTransactions,
       onWalletRecovery,
-      getStateInfo
+      getStateInfo,
+      lockInContributionAmount
     }
   }
 

@@ -38,13 +38,24 @@ const bookmarksBarDefault = (settingKey, settingsCollection) => {
   return bookmarksToolbarMode.TEXT_ONLY
 }
 
-// Retrofit a new setting based on old values; we don't want to lose existing user settings.
+const contributionDefaultAmount = (settingKey, settingsCollection) => {
+  return appConfig.payments.defaultContributionAmount
+}
+
 const getDefaultSetting = (settingKey, settingsCollection) => {
+  // Two use cases for this:
   switch (settingKey) {
+    // 1) Retrofit a new setting based on old values
+    // we don't want to lose existing user settings.
     case settings.ACTIVE_PASSWORD_MANAGER:
       return passwordManagerDefault(settingKey, settingsCollection)
     case settings.BOOKMARKS_TOOLBAR_MODE:
       return bookmarksBarDefault(settingKey, settingsCollection)
+
+    // 2) Get a default value when no value is set
+    // allows for default to change until user locks it in
+    case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
+      return contributionDefaultAmount(settingKey, settingsCollection)
   }
   return undefined
 }
@@ -64,10 +75,12 @@ const resolveValue = (settingKey, settingsCollection) => {
   return appSettings.get(settingKey) !== undefined ? appSettings.get(settingKey) : appConfig.defaultSettings[settingKey]
 }
 
-module.exports.getSetting = (settingKey, settingsCollection) => {
+module.exports.getSetting = (settingKey, settingsCollection, defaultWhenNull = true) => {
   const setting = resolveValue(settingKey, settingsCollection)
   if (typeof setting !== 'undefined' && setting !== null) return setting
-  return getDefaultSetting(settingKey, settingsCollection)
+  return defaultWhenNull
+    ? getDefaultSetting(settingKey, settingsCollection)
+    : setting
 }
 
 module.exports.getActivePasswordManager = (settingsCollection) => {
