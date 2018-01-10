@@ -1575,7 +1575,7 @@ const onWalletProperties = (state, body) => {
   const balance = parseFloat(body.get('balance'))
   if (balance >= 0) {
     state = ledgerState.setInfoProp(state, 'balance', balance)
-    lockInContributionAmount()
+    lockInContributionAmount(balance)
   }
 
   // Rates
