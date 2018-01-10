@@ -32,7 +32,7 @@ describe('ledger api unit tests', function () {
   const publisherKey = 'youtube#channel:UCFNTTISby1c_H-rm5Ww5rZg'
 
   // settings
-  let contributionAmount = 25
+  let contributionAmount = 10
   let paymentsMinVisitTime = 5000
   let paymentsNotifications = true
   let paymentsAllowPromotions = true
@@ -252,7 +252,7 @@ describe('ledger api unit tests', function () {
             }
           }
         }
-        contributionAmount = 25
+        contributionAmount = 10
       })
       before(function () {
         onLaunchSpy = sinon.spy(ledgerNotificationsApi, 'onLaunch')
@@ -271,26 +271,12 @@ describe('ledger api unit tests', function () {
       it('calls setPaymentInfo with contribution amount', function () {
         setPaymentInfoSpy.reset()
         ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
-        assert(setPaymentInfoSpy.withArgs(25).calledOnce)
+        assert(setPaymentInfoSpy.withArgs(10).calledOnce)
       })
 
       describe('when contribution amount is still set to the USD amount (before BAT Mercury)', function () {
         after(function () {
-          contributionAmount = 25
-        })
-        describe('when set to 5 USD', function () {
-          before(function () {
-            setPaymentInfoSpy.reset()
-            onChangeSettingSpy.reset()
-            contributionAmount = 5
-            ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
-          })
-          it('converts to 25 BAT', function () {
-            assert(setPaymentInfoSpy.withArgs(25).calledOnce)
-          })
-          it('updates the setting', function () {
-            assert(onChangeSettingSpy.withArgs(settings.PAYMENTS_CONTRIBUTION_AMOUNT, 25).calledOnce)
-          })
+          contributionAmount = 10
         })
         describe('when set to 15 USD', function () {
           before(function () {
