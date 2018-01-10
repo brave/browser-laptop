@@ -1841,11 +1841,10 @@ const initialize = (state, paymentsEnabled) => {
 const getContributionAmount = () => {
   let amount = parseFloat(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
 
-  // if amount is 5, 15, or 20... the amount wasn't updated when changing
+  // if amount is 15, or 20... the amount wasn't updated when changing
   // from BTC to BAT (see https://github.com/brave/browser-laptop/issues/11719)
   let updatedAmount
   switch (amount) {
-    case 5: updatedAmount = 25; break
     case 15: updatedAmount = 75; break
     case 20: updatedAmount = 100; break
   }
