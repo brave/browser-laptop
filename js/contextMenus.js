@@ -39,6 +39,7 @@ const platformUtil = require('../app/common/lib/platformUtil')
 const bookmarkFoldersUtil = require('../app/common/lib/bookmarkFoldersUtil')
 const historyUtil = require('../app/common/lib/historyUtil')
 const {makeImmutable} = require('../app/common/state/immutableUtil')
+const searchProviders = require('./data/searchProviders.js').providers
 
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
@@ -852,12 +853,32 @@ const copyEmailAddressMenuItem = (location) => {
   }
 }
 
+const searchEngineMenuItem = (location, searchProvider, searchDetail) => {
+  return {
+    label: searchProvider,
+    click: (item) => {
+      if(location) {
+        let activeFrame = windowStore.getState().get('activeFrameKey')
+        let frame = windowStore.getFrame(activeFrame)
+
+        let searchUrl = searchDetail.replace('{searchTerms}', encodeURIComponent(location))
+        appActions.createTabRequested({
+          url: searchUrl,
+          isPrivate: frame.get('isPrivate'),
+          partitionNumber: frame.get('partitionNumber'),
+          windowId: frame.get('windowId')
+        })
+      }
+    }
+  }
+}
+
 const searchSelectionMenuItem = (location) => {
   var searchText = textUtils.ellipse(location)
   return {
     label: locale.translation('openSearch').replace(/{{\s*selectedVariable\s*}}/, searchText),
     submenu: [
-      
+      searchEngineMenuItem(location, searchProviders[1].name, searchProviders[1].search)
     ]
   }
 }
