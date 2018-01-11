@@ -159,6 +159,10 @@ const paymentPresent = (state, tabId, present) => {
 }
 
 const getPublisherTimestamp = (updateList) => {
+  if (!client) {
+    return
+  }
+
   client.publisherTimestamp((err, result) => {
     if (err) {
       console.error('Error while retrieving publisher timestamp', err.toString())
@@ -1716,6 +1720,13 @@ const onCallback = (state, result, delayTime) => {
     return state
   }
 
+  const newAddress = result.getIn(['properties', 'wallet', 'addresses', 'BAT'])
+  const oldAddress = ledgerState.getInfoProps(state).getIn(['addresses', 'BAT'])
+
+  if (newAddress !== oldAddress) {
+    state = ledgerState.setInfoProp(state, 'walletQR', Immutable.Map())
+  }
+
   const regularResults = result.toJS()
 
   if (client && result.getIn(['properties', 'wallet'])) {
@@ -2644,7 +2655,8 @@ const getMethods = () => {
       observeTransactions,
       onWalletRecovery,
       getStateInfo,
-      lockInContributionAmount
+      lockInContributionAmount,
+      callback
     }
   }
 

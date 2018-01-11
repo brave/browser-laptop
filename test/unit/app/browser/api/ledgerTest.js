@@ -1802,9 +1802,9 @@ describe('ledger api unit tests', function () {
 
     it('check multiple publishers', function () {
       const multiple = stateWithData
-      .setIn(['ledger', 'synopsis', 'publishers', 'brave.com'], Immutable.fromJS({
-        visits: 1
-      }))
+        .setIn(['ledger', 'synopsis', 'publishers', 'brave.com'], Immutable.fromJS({
+          visits: 1
+        }))
       ledgerApi.onPublisherTimestamp(multiple, 10, 20)
 
       assert.equal(checkVerifiedStatusSpy.getCall(0).args[1], 'clifton.io')
@@ -1838,6 +1838,43 @@ describe('ledger api unit tests', function () {
       it('does not call appActions.changeSetting', function () {
         ledgerApi.lockInContributionAmount(0)
         assert(onChangeSettingSpy.notCalled)
+      })
+    })
+  })
+
+  describe('onCallback', function () {
+    describe('wallet QR', function () {
+      const resultParam = Immutable.fromJS({
+        properties: {
+          wallet: {
+            addresses: {
+              BAT: 'address'
+            }
+          }
+        }
+      })
+
+      it('do not clear QR codes when address is the same', function () {
+        const stateWithData = defaultAppState
+          .setIn(['ledger', 'info', 'addresses', 'BAT'], 'address')
+          .setIn(['ledger', 'info', 'walletQR', 'BAT', 'qr'])
+
+        const result = ledgerApi.onCallback(stateWithData, resultParam)
+        assert.deepEqual(result.toJS(), stateWithData.toJS())
+      })
+
+      it('clear QR code when we get new addresses', function () {
+        const stateWithData = defaultAppState
+          .setIn(['ledger', 'info', 'addresses', 'BAT'], 'old address')
+          .setIn(['ledger', 'info', 'walletQR', 'BAT'], 'qr')
+
+        // address is not different because we get it from the client in another call
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'info', 'addresses', 'BAT'], 'old address')
+          .setIn(['ledger', 'info', 'walletQR'], Immutable.Map())
+
+        const result = ledgerApi.onCallback(stateWithData, resultParam)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
       })
     })
   })
