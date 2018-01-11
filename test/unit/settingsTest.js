@@ -56,7 +56,7 @@ describe('settings unit test', function () {
       assert.equal(response, nonDefaultValue)
     })
 
-    describe('when setting default value for new config entries (based on previous session data)', function () {
+    describe('when setting default value for null/empty config entries (based on previous session data)', function () {
       describe('ACTIVE_PASSWORD_MANAGER', function () {
         it('returns `1Password` if ONE_PASSWORD_ENABLED was true', function () {
           settingsCollection[settingsConst.ONE_PASSWORD_ENABLED] = true
@@ -132,6 +132,29 @@ describe('settings unit test', function () {
           const response = settings.getSetting(settingsConst.BOOKMARKS_TOOLBAR_MODE, settingsCollection)
           assert.equal(response, bookmarksToolbarMode.TEXT_ONLY)
         })
+      })
+
+      describe('settings.PAYMENTS_CONTRIBUTION_AMOUNT', function () {
+        it('defaults to payments.defaultContributionAmount when null', function () {
+          settingsCollection[settingsConst.PAYMENTS_CONTRIBUTION_AMOUNT] = null
+          const response = settings.getSetting(settingsConst.PAYMENTS_CONTRIBUTION_AMOUNT, settingsCollection)
+          assert.equal(response, appConfig.payments.defaultContributionAmount)
+        })
+
+        it('does not modify value once set', function () {
+          const exampleAmount = 10
+          settingsCollection[settingsConst.PAYMENTS_CONTRIBUTION_AMOUNT] = exampleAmount
+          const response = settings.getSetting(settingsConst.PAYMENTS_CONTRIBUTION_AMOUNT, settingsCollection)
+          assert.equal(response, exampleAmount)
+        })
+      })
+    })
+
+    describe('when not setting default value for null/empty config entries', function () {
+      it('returns raw value when `defaultWhenNull` is false', function () {
+        settingsCollection[settingsConst.PAYMENTS_CONTRIBUTION_AMOUNT] = null
+        const response = settings.getSetting(settingsConst.PAYMENTS_CONTRIBUTION_AMOUNT, settingsCollection, false)
+        assert.equal(response, null)
       })
     })
   })
