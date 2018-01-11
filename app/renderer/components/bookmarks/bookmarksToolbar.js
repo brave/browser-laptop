@@ -32,6 +32,7 @@ const dndData = require('../../../../js/dndData')
 const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const bookmarkUtil = require('../../../common/lib/bookmarkUtil')
+const bookmarkDndUtil = require('../../../common/lib/bookmarkDndUtil')
 const {elementHasDataset} = require('../../../../js/lib/eventUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 
@@ -50,13 +51,6 @@ class BookmarksToolbar extends React.Component {
 
   onDrop (e) {
     e.preventDefault()
-    const getClosestFromPos = (clientX, sourceKey) =>
-      dnd.closestFromXOffset(this.bookmarkRefs.filter((bookmarkRef) => {
-        if (!bookmarkRef) {
-          return false
-        }
-        return bookmarkRef.props.bookmarkKey !== sourceKey
-      }), e.clientX)
     let bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
     if (bookmark) {
       // Figure out the droppedOn element filtering out the source drag item
@@ -68,7 +62,7 @@ class BookmarksToolbar extends React.Component {
         tabDrop = true
       }
 
-      const droppedOn = getClosestFromPos(e.clientX, bookmarkKey)
+      const droppedOn = bookmarkDndUtil.getClosestFromPos(this.bookmarkRefs, e.clientX, bookmarkKey)
       if (droppedOn.selectedRef) {
         const isRightSide = !dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
         const droppedOnKey = droppedOn.selectedRef.props.bookmarkKey
@@ -86,47 +80,46 @@ class BookmarksToolbar extends React.Component {
         }
         dnd.onDragEnd()
       }
-      return
-    }
+    } else {
+      const droppedOn = bookmarkDndUtil.getClosestFromPos(e.clientX, undefined)
+      let isLeftSide = false
+      let closestKey
+      if (droppedOn.selectedRef) {
+        closestKey = droppedOn.selectedRef.props.bookmarkKey
+        isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
+      }
 
-    const droppedOn = getClosestFromPos(e.clientX, undefined)
-    let isLeftSide = false
-    let closestKey
-    if (droppedOn.selectedRef) {
-      closestKey = droppedOn.selectedRef.props.bookmarkKey
-      isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
-    }
+      const droppedHTML = e.dataTransfer.getData('text/html')
+      if (droppedHTML) {
+        const parser = new window.DOMParser()
+        const doc = parser.parseFromString(droppedHTML, 'text/html')
+        const a = doc.querySelector('a')
+        if (a && a.href) {
+          appActions.addBookmark(Immutable.fromJS({
+            title: a.innerText,
+            location: e.dataTransfer.getData('text/plain')
+          }), closestKey, isLeftSide)
+          return
+        }
+      }
 
-    const droppedHTML = e.dataTransfer.getData('text/html')
-    if (droppedHTML) {
-      const parser = new window.DOMParser()
-      const doc = parser.parseFromString(droppedHTML, 'text/html')
-      const a = doc.querySelector('a')
-      if (a && a.href) {
-        appActions.addBookmark(Immutable.fromJS({
-          title: a.innerText,
-          location: e.dataTransfer.getData('text/plain')
-        }), closestKey, isLeftSide)
+      if (e.dataTransfer.files.length > 0) {
+        Array.from(e.dataTransfer.items).forEach((item) => {
+          item.getAsString((name) => appActions.addBookmark(Immutable.fromJS({
+            location: item.type,
+            title: name
+          }), closestKey, isLeftSide))
+        })
         return
       }
-    }
 
-    if (e.dataTransfer.files.length > 0) {
-      Array.from(e.dataTransfer.items).forEach((item) => {
-        item.getAsString((name) => appActions.addBookmark(Immutable.fromJS({
-          location: item.type,
-          title: name
-        }), closestKey, isLeftSide))
-      })
-      return
+      e.dataTransfer.getData('text/uri-list')
+        .split('\n')
+        .map((x) => x.trim())
+        .filter((x) => !x.startsWith('#') && x.length > 0)
+        .forEach((url) =>
+          appActions.addBookmark(Immutable.fromJS({ location: url }), closestKey, isLeftSide))
     }
-
-    e.dataTransfer.getData('text/uri-list')
-      .split('\n')
-      .map((x) => x.trim())
-      .filter((x) => !x.startsWith('#') && x.length > 0)
-      .forEach((url) =>
-        appActions.addBookmark(Immutable.fromJS({ location: url }), closestKey, isLeftSide))
   }
 
   onDragEnter (e) {

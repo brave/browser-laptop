@@ -12,6 +12,7 @@ const bookmarkFoldersState = require('../../common/state/bookmarkFoldersState')
 // Util
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const textCalc = require('../../browser/api/textCalc')
+// const dnd = require('../../../js/dnd')
 
 const bookmarkToolbarReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -30,6 +31,9 @@ const bookmarkToolbarReducer = (state, action, immutableAction) => {
         }
       }
       break
+    case appConstants.APP_ON_DROP_BOOKMARK: {
+      break
+    }
   }
   return state
 }

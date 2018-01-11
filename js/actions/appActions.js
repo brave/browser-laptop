@@ -1583,6 +1583,13 @@ const appActions = {
     })
   },
 
+  onDropBookmark: function (folderKey) {
+    dispatch({
+      actionType: appConstants.APP_ON_DROP_BOOKMARK,
+      folderKey
+    })
+  },
+
   noReportStateModeClicked: function (windowId) {
     dispatch({
       actionType: appConstants.APP_DEBUG_NO_REPORT_STATE_MODE_CLICKED,
