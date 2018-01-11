@@ -101,7 +101,8 @@ module.exports = {
     url: adHost
   },
   payments: {
-    delayNotificationTryPayments: 1000 * 60 * 60 * 24 * 10 // 10 days (from firstRunTimestamp)
+    delayNotificationTryPayments: 1000 * 60 * 60 * 24 * 10, // 10 days (from firstRunTimestamp)
+    defaultContributionAmount: 5
   },
   updates: {
     // Check for front end updates every hour
@@ -185,7 +186,7 @@ module.exports = {
     // payments
     'payments.allow-media-publishers': true,
     'payments.allow-non-verified-publishers': true,
-    'payments.contribution-amount': 10, // BAT
+    'payments.contribution-amount': null, // BAT
     'payments.enabled': false,
     'payments.minimum-visit-time': 8000,
     'payments.minimum-visits': 1,
