@@ -857,10 +857,9 @@ const searchEngineMenuItem = (location, searchProvider, searchDetail) => {
   return {
     label: searchProvider,
     click: (item) => {
-      if(location) {
+      if (location) {
         let activeFrame = windowStore.getState().get('activeFrameKey')
         let frame = windowStore.getFrame(activeFrame)
-
         let searchUrl = searchDetail.replace('{searchTerms}', encodeURIComponent(location))
         appActions.createTabRequested({
           url: searchUrl,
