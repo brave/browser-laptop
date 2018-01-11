@@ -35,6 +35,7 @@ describe('ledger api unit tests', function () {
   let contributionAmount = 10
   let paymentsMinVisitTime = 5000
   let paymentsNotifications = true
+  let contributionAmountSet = true
 
   // spies
   let ledgerTransitionSpy
@@ -69,10 +70,14 @@ describe('ledger api unit tests', function () {
     mockery.registerMock('level', fakeLevel)
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('../../../js/settings', {
-      getSetting: (settingKey, settingsCollection, value) => {
+      getSetting: (settingKey, settingsCollection, defaultWhenNull = true) => {
         switch (settingKey) {
           case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
-            return contributionAmount
+            return contributionAmountSet
+              ? contributionAmount
+              : defaultWhenNull
+                ? contributionAmount
+                : null
           case settings.PAYMENTS_MINIMUM_VISIT_TIME:
             return paymentsMinVisitTime
           case settings.PAYMENTS_NOTIFICATIONS:
@@ -1673,6 +1678,36 @@ describe('ledger api unit tests', function () {
             'reconcileStamp': 1
           }))
         assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+    })
+  })
+
+  describe('lockInContributionAmount', function () {
+    beforeEach(function () {
+      onChangeSettingSpy.reset()
+      contributionAmountSet = true
+    })
+
+    describe('when balance is greater than 0', function () {
+      describe('when setting already has a value', function () {
+        it('does not call appActions.changeSetting', function () {
+          ledgerApi.lockInContributionAmount(5)
+          assert(onChangeSettingSpy.notCalled)
+        })
+      })
+      describe('when setting does not have a value', function () {
+        it('calls appActions.changeSetting', function () {
+          contributionAmountSet = false
+          ledgerApi.lockInContributionAmount(5)
+          assert(onChangeSettingSpy.withArgs(settings.PAYMENTS_CONTRIBUTION_AMOUNT, contributionAmount).calledOnce)
+        })
+      })
+    })
+
+    describe('when balance is not greater than 0', function () {
+      it('does not call appActions.changeSetting', function () {
+        ledgerApi.lockInContributionAmount(0)
+        assert(onChangeSettingSpy.notCalled)
       })
     })
   })
