@@ -139,6 +139,7 @@ describe('sessionStoreShutdown unit tests', function () {
 
   describe('app before-quit event', function () {
     before(function () {
+      this.windowsAPI = require('../../../app/browser/windows')
       this.appStoreGetStateStub = sinon.stub(appStore, 'getState', () => {
         return Immutable.fromJS({})
       })
@@ -160,7 +161,7 @@ describe('sessionStoreShutdown unit tests', function () {
     describe('with no windows', function () {
       before(function () {
         this.requestId = 1
-        this.getAllWindowsStub = sinon.stub(fakeElectron.BrowserWindow, 'getAllWindows', () => {
+        this.getAllWindowsStub = sinon.stub(this.windowsAPI, 'getAllRendererWindows', () => {
           return []
         })
       })
@@ -234,7 +235,7 @@ describe('sessionStoreShutdown unit tests', function () {
       before(function () {
         this.fakeWindow1 = new FakeWindow(1)
         this.requestId = 1
-        this.getAllWindowsStub = sinon.stub(fakeElectron.BrowserWindow, 'getAllWindows', () => {
+        this.getAllWindowsStub = sinon.stub(this.windowsAPI, 'getAllRendererWindows', () => {
           return [this.fakeWindow1]
         })
       })
@@ -286,7 +287,7 @@ describe('sessionStoreShutdown unit tests', function () {
         this.fakeWindow2 = new FakeWindow(2)
         this.fakeWindow3 = new FakeWindow(3)
         this.requestId = 1
-        this.getAllWindowsStub = sinon.stub(fakeElectron.BrowserWindow, 'getAllWindows', () => {
+        this.getAllWindowsStub = sinon.stub(this.windowsAPI, 'getAllRendererWindows', () => {
           return [this.fakeWindow1, this.fakeWindow2, this.fakeWindow3]
         })
       })
