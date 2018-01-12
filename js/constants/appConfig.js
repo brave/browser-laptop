@@ -93,7 +93,7 @@ module.exports = {
   },
   payments: {
     delayNotificationTryPayments: 1000 * 60 * 60 * 24 * 10, // 10 days (from firstRunTimestamp)
-    defaultContributionAmount: 5
+    defaultContributionAmount: 7.5
   },
   updates: {
     // Check for front end updates every hour
