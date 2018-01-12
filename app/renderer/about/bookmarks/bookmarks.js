@@ -35,6 +35,7 @@ class Bookmarks extends React.Component {
     this.onClearSearchText = this.onClearSearchText.bind(this)
     this.importBrowserData = this.importBrowserData.bind(this)
     this.exportBookmarks = this.exportBookmarks.bind(this)
+    this.onContextMenu = this.onContextMenu.bind(this)
     this.addBookmarkFolder = this.addBookmarkFolder.bind(this)
     this.onClick = this.onClick.bind(this)
     this.clearSelection = this.clearSelection.bind(this)
@@ -134,8 +135,20 @@ class Bookmarks extends React.Component {
     this.refs.bookmarkSearch.focus()
   }
 
+  onContextMenu (e) {
+    aboutActions.contextMenu({
+      folderId: this.state.selectedFolderId,
+      isEditable: false,
+      inputFieldType: 'none'
+    }, '', e)
+  }
+
   render () {
-    return <div className='siteDetailsPage bookmarksManager' onClick={this.onClick}>
+    return <div
+      className='siteDetailsPage bookmarksManager'
+      onClick={this.onClick}
+      onContextMenu={this.onContextMenu}
+    >
       <div className={cx({
         siteDetailsPageHeader: true,
         [css(styles.bookmarksManager__header)]: true
