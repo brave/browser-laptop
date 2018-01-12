@@ -289,6 +289,7 @@ module.exports.submitFeedbackMenuItem = () => {
 module.exports.bookmarksToolbarMenuItem = () => {
   return {
     label: locale.translation('bookmarksToolbar'),
+    accelerator: 'CmdOrCtrl+Shift+B',
     type: 'checkbox',
     checked: getSetting(settings.SHOW_BOOKMARKS_TOOLBAR),
     click: (item, focusedWindow) => {
