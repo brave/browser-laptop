@@ -1,6 +1,29 @@
 # Changelog
 
 Release Notes:
+<<<<<<< HEAD
+## [0.19.134](https://github.com/brave/browser-laptop/releases/tag/v0.19.134dev)
+
+ - Added a changeable default contribution amount for new installs. ([#12573](https://github.com/brave/browser-laptop/issues/12573))
+ - Reverted muted media always being autoplayed. ([#12152](https://github.com/brave/browser-laptop/issues/12152))
+ - Fixed backup key being replaced by "a" when wallet restore fails. ([#11383](https://github.com/brave/browser-laptop/issues/11383))
+=======
+## [0.19.133](https://github.com/brave/browser-laptop/releases/tag/v0.19.133dev)
+
+ - Added a changeable default contribution amount for new installs. ([#12573](https://github.com/brave/browser-laptop/issues/12573))
+ - Reverted muted media always being autoplayed. ([#12152](https://github.com/brave/browser-laptop/issues/12152))
+>>>>>>> fc0abb80ae2d42897beef301193dd616a8327613
+ - Fixed prompting users to save passwords on passphrase confirmation pages. ([#12563](https://github.com/brave/browser-laptop/issues/12563))
+ - Fixed passwords being filled after disabling password manager. ([#10566](https://github.com/brave/browser-laptop/issues/10566))
+ - Fixed monthly budget reverting after browser restart. ([#12581](https://github.com/brave/browser-laptop/issues/12581))
+ - Fixed Brave appearing as vulnerable on Spectre test site. ([#12570](https://github.com/brave/browser-laptop/issues/12570))
+ - Fixed "Always show the URL bar" text missing under preferences. ([#12559](https://github.com/brave/browser-laptop/issues/12559))
+<<<<<<< HEAD
+=======
+ - Fixed backup key being replaced by "a" when wallet restore fails. ([#11383](https://github.com/brave/browser-laptop/issues/11383))
+>>>>>>> fc0abb80ae2d42897beef301193dd616a8327613
+ - Upgraded muon to 4.5.38. ([#12602](https://github.com/brave/browser-laptop/issues/12602))
+
 ## [0.19.131](https://github.com/brave/browser-laptop/releases/tag/v0.19.131dev)
 
  - Added new security option: Strict Site Isolation. ([#12490](https://github.com/brave/browser-laptop/issues/12490))
