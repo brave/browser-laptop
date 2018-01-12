@@ -58,10 +58,21 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
           break
         }
 
-        state = bookmarkFoldersState.editFolder(state, key, folder)
+        const oldFolder = bookmarkFoldersState.getFolder(state, key)
+
+        if (oldFolder.isEmpty()) {
+          return state
+        }
+
+        state = bookmarkFoldersState.editFolder(state, key, oldFolder, folder)
         state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
         const folderDetails = bookmarkFoldersState.getFolder(state, key)
         textCalc.calcText(folderDetails, siteTags.BOOKMARK_FOLDER)
+
+        if (folder.has('parentFolderId') && oldFolder.get('parentFolderId') !== folder.get('parentFolderId')) {
+          state = bookmarkToolbarState.setToolbars(state)
+        }
+
         break
       }
     case appConstants.APP_MOVE_BOOKMARK_FOLDER:

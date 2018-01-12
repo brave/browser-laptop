@@ -216,6 +216,10 @@ describe('bookmarkFoldersState unit test', function () {
 
   describe('editFolder', function () {
     let addFolderToCacheSpy, removeCacheKeySpy
+
+    const oldFolder = stateWithData.getIn(['bookmarkFolders', '1'])
+    const editKey = '1'
+
     before(function () {
       addFolderToCacheSpy = sinon.spy(bookmarkOrderCache, 'addFolderToCache')
       removeCacheKeySpy = sinon.spy(bookmarkOrderCache, 'removeCacheKey')
@@ -239,13 +243,13 @@ describe('bookmarkFoldersState unit test', function () {
     })
 
     it('old parent id is not the same as provided one', function () {
-      const result = bookmarkFoldersState.editFolder(stateWithData, '1', Immutable.fromJS({
+      const result = bookmarkFoldersState.editFolder(stateWithData, editKey, oldFolder, Immutable.fromJS({
         title: 'New folder name',
         parentFolderId: 1
       }))
       const expectedState = stateWithData
-        .setIn(['bookmarkFolders', '1', 'parentFolderId'], 1)
-        .setIn(['bookmarkFolders', '1', 'title'], 'New folder name')
+        .setIn(['bookmarkFolders', editKey, 'parentFolderId'], 1)
+        .setIn(['bookmarkFolders', editKey, 'title'], 'New folder name')
         .setIn(['cache', 'bookmarkOrder', '0'], Immutable.fromJS([
           {
             key: '69',
@@ -271,11 +275,11 @@ describe('bookmarkFoldersState unit test', function () {
     })
 
     it('old parent id is the same as provided one', function () {
-      const result = bookmarkFoldersState.editFolder(stateWithData, '1', Immutable.fromJS({
+      const result = bookmarkFoldersState.editFolder(stateWithData, editKey, oldFolder, Immutable.fromJS({
         title: 'New folder name'
       }))
       const expectedState = stateWithData
-        .setIn(['bookmarkFolders', '1', 'title'], 'New folder name')
+        .setIn(['bookmarkFolders', editKey, 'title'], 'New folder name')
       assert.deepEqual(result.toJS(), expectedState.toJS())
       assert(addFolderToCacheSpy.notCalled)
       assert(removeCacheKeySpy.notCalled)

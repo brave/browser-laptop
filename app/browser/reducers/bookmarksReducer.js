@@ -75,6 +75,9 @@ const bookmarksReducer = (state, action, immutableAction) => {
         textCalc.calcText(bookmarkDetail, siteTags.BOOKMARK)
 
         state = bookmarkUtil.updateActiveTabBookmarked(state)
+        if (oldBookmark.get('parentFolderId') !== bookmarkDetail.get('parentFolderId')) {
+          state = bookmarkToolbarState.setToolbars(state)
+        }
         break
       }
     case appConstants.APP_MOVE_BOOKMARK:

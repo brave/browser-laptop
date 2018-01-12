@@ -74,11 +74,10 @@ const bookmarkFoldersState = {
     return state
   },
 
-  editFolder: (state, editKey, folderDetails) => {
+  editFolder: (state, editKey, oldFolder, folderDetails) => {
     state = validateState(state)
-    const oldFolder = bookmarkFoldersState.getFolder(state, editKey)
 
-    if (oldFolder.isEmpty()) {
+    if (oldFolder == null) {
       return state
     }
 
