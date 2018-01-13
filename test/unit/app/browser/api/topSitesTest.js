@@ -305,37 +305,6 @@ describe('topSites api', function () {
         assert.equal(newSitesData.size, maxSites)
         assert.equal(newSitesData.getIn([0, 'title']), 'sample ' + this.topSites.aboutNewTabMaxEntries)
       })
-
-      it('does not include items marked as ignored', function () {
-        const ignoredSites = Immutable.List().push('https://example1.com/|0').push('https://example3.com/|0')
-        const stateWithIgnoredSites = defaultAppState
-          .set(STATE_SITES.HISTORY_SITES, generateMap(site1, site2, site3, site4))
-          .setIn(['about', 'newtab', 'ignoredTopSites'], ignoredSites)
-        this.topSites.calculateTopSites(stateWithIgnoredSites)
-        getStateValue = stateWithIgnoredSites
-        this.clock.tick(calculateTopSitesClockTime)
-        assert.equal(this.appActions.topSiteDataAvailable.callCount, 1)
-        const newSitesData = this.appActions.topSiteDataAvailable.getCall(0).args[0]
-        const expectedSites = Immutable.fromJS([
-          {
-            location: 'https://example2.com/',
-            title: 'sample 2',
-            parentFolderId: 0,
-            count: 5,
-            bookmarked: false,
-            key: 'https://example2.com/|0'
-          },
-          {
-            location: 'https://example4.com/',
-            title: 'sample 4',
-            parentFolderId: 0,
-            count: 0,
-            bookmarked: false,
-            key: 'https://example4.com/|0'
-          }
-        ])
-        assert.deepEqual(newSitesData.toJS(), expectedSites.concat(staticNewData).toJS())
-      })
     })
   })
 })
