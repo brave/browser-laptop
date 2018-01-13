@@ -28,7 +28,7 @@ class TorrentViewer extends React.Component {
       dispatch
     } = this.props
 
-    let titleElem, mainButton, saveButton, legalNotice
+    let titleElem, mainButton, saveButton, privacyNotice
 
     if (torrent) {
       if (name) {
@@ -47,9 +47,9 @@ class TorrentViewer extends React.Component {
           onClick={() => dispatch('stop')}
         />
       )
-      legalNotice = (
+      privacyNotice = (
         <a className={cx({
-          legalNotice: true,
+          footerText: true,
           [css(commonStyles.userSelectNone)]: true
         })}
           data-l10n-id='poweredByWebTorrent'
@@ -73,10 +73,17 @@ class TorrentViewer extends React.Component {
           onClick={() => dispatch('start')}
         />
       )
-      legalNotice = <div className={cx({
-        legalNotice: true,
-        [css(commonStyles.userSelectNone)]: true
-      })} data-l10n-id='legalNotice' />
+      privacyNotice = <div className={
+        cx({
+          privacyNotice: true,
+          [css(commonStyles.userSelectNone)]: true
+        })
+      }>
+        <span className={cx({
+          boldFooterText: true,
+        })} data-l10n-id='privacyNoticeTitle' />
+        <span  data-l10n-id='privacyNotice' />
+      </div>
     }
 
     if (torrentIdProtocol === 'magnet:') {
@@ -120,7 +127,7 @@ class TorrentViewer extends React.Component {
             stateOwner={this}
           />
 
-          {legalNotice}
+          {privacyNotice}
         </div>
       </div>
     )
