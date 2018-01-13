@@ -28,10 +28,6 @@ const isPinned = (state, siteKey) => {
   })
 }
 
-const isIgnored = (state, siteKey) => {
-  return aboutNewTabState.getIgnoredTopSites(state).includes(siteKey)
-}
-
 const sortCountDescending = (left, right) => {
   const leftCount = left.get('count', 0)
   const rightCount = right.get('count', 0)
@@ -89,7 +85,6 @@ const getTopSiteData = () => {
   let sites = historyState.getSites(state)
     .filter((site, key) => !isSourceAboutUrl(site.get('location')) &&
       !isPinned(state, key) &&
-      !isIgnored(state, key) &&
       (minCountOfTopSites === undefined || (site.get('count') || 0) >= minCountOfTopSites) &&
       (minAccessOfTopSites === undefined || (site.get('lastAccessedTime') || 0) >= minAccessOfTopSites)
     )
@@ -123,7 +118,7 @@ const getTopSiteData = () => {
     const preDefined = staticData
       // TODO: this doesn't work properly
       .filter((site) => {
-        return !isPinned(state, site.get('key')) && !isIgnored(state, site.get('key'))
+        return !isPinned(state, site.get('key'))
       })
       .map(site => {
         const bookmarkKey = bookmarkLocationCache.getCacheKey(state, site.get('location'))

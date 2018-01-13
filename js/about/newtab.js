@@ -201,10 +201,14 @@ class NewTabPage extends React.Component {
   onIgnoredTopSite (siteKey) {
     this.showNotification(siteKey)
 
-    // If a pinnedTopSite is ignored, remove it from the pinned list as well
     const newTabState = {}
+    // If a pinnedTopSite is ignored, remove it from the pinned list as well
     if (this.isPinned(siteKey)) {
-      newTabState.pinnedTopSites = this.pinnedTopSites.filter(site => site.get('key') !== siteKey)
+      const topSites = this.topSites
+      const currentPosition = topSites.find(site => site.get('key') === siteKey)
+      const currentPositionIndex = topSites.indexOf(currentPosition)
+      const pinnedTopSites = this.pinnedTopSites.splice(currentPositionIndex, 1, null)
+      newTabState.pinnedTopSites = pinnedTopSites
     }
 
     newTabState.ignoredTopSites = this.ignoredTopSites.push(siteKey)
@@ -214,7 +218,7 @@ class NewTabPage extends React.Component {
   onUndoIgnoredTopSite () {
     // Remove last List's entry
     const ignoredTopSites = this.ignoredTopSites.pop()
-    aboutActions.setNewTabDetail({ignoredTopSites: ignoredTopSites}, true)
+    aboutActions.setNewTabDetail({ignoredTopSites}, true)
     this.hideSiteRemovalNotification()
   }
 
@@ -295,8 +299,14 @@ class NewTabPage extends React.Component {
           <div className='topSitesContainer'>
             <nav className='topSitesGrid'>
               {
-                gridLayout.map(site =>
-                  <Block
+                gridLayout.map(site => {
+                  // the removal action should be immediate
+                  // which is why the logic is set here in the component
+                  // given that newtab updates can be debounced
+                  if (this.ignoredTopSites.includes(site.get('key'))) {
+                    return
+                  }
+                  return <Block
                     key={site.get('location')}
                     id={site.get('key')}
                     title={site.get('title')}
@@ -314,7 +324,7 @@ class NewTabPage extends React.Component {
                     isPinned={this.isPinned(site.get('key'))}
                     isBookmarked={site.get('bookmarked')}
                   />
-                )
+                })
               }
             </nav>
           </div>
