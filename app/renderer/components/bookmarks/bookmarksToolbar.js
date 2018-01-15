@@ -80,45 +80,6 @@ class BookmarksToolbar extends React.Component {
         }
         dnd.onDragEnd()
       }
-    } else {
-      const droppedOn = bookmarkDndUtil.getClosestFromPos(e.clientX, undefined)
-      let isLeftSide = false
-      let closestKey
-      if (droppedOn.selectedRef) {
-        closestKey = droppedOn.selectedRef.props.bookmarkKey
-        isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
-      }
-
-      const droppedHTML = e.dataTransfer.getData('text/html')
-      if (droppedHTML) {
-        const parser = new window.DOMParser()
-        const doc = parser.parseFromString(droppedHTML, 'text/html')
-        const a = doc.querySelector('a')
-        if (a && a.href) {
-          appActions.addBookmark(Immutable.fromJS({
-            title: a.innerText,
-            location: e.dataTransfer.getData('text/plain')
-          }), closestKey, isLeftSide)
-          return
-        }
-      }
-
-      if (e.dataTransfer.files.length > 0) {
-        Array.from(e.dataTransfer.items).forEach((item) => {
-          item.getAsString((name) => appActions.addBookmark(Immutable.fromJS({
-            location: item.type,
-            title: name
-          }), closestKey, isLeftSide))
-        })
-        return
-      }
-
-      e.dataTransfer.getData('text/uri-list')
-        .split('\n')
-        .map((x) => x.trim())
-        .filter((x) => !x.startsWith('#') && x.length > 0)
-        .forEach((url) =>
-          appActions.addBookmark(Immutable.fromJS({ location: url }), closestKey, isLeftSide))
     }
   }
 
