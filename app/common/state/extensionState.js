@@ -46,12 +46,11 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
-    if (extension) {
-      extension = extension.set('browserAction', browserActionDefaults.merge(action.get('browserAction')))
-      return state.setIn(['extensions', extensionId], extension)
-    } else {
+    if (!extension) {
       return state
     }
+    extension = extension.set('browserAction', browserActionDefaults.merge(action.get('browserAction')))
+    return state.setIn(['extensions', extensionId], extension)
   },
 
   browserActionUpdated: (state, action) => {
@@ -59,20 +58,25 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
-    if (extension && extension.get('browserAction')) {
-      let tabId = action.get('tabId')
-      if (tabId) {
-        let tabs = extension.getIn(['browserAction', 'tabs'])
-        let tab = tabs.get(tabId) || Immutable.Map()
-        tabs = tabs.set(tabId, tab.merge(action.get('browserAction')))
-        extension = extension.setIn(['browserAction', 'tabs'], tabs)
-      } else {
-        extension = extension.set('browserAction', extension.get('browserAction').merge(action.get('browserAction')))
-      }
-      return state.setIn(['extensions', extensionId], extension)
-    } else {
-      return state
+    if (!extension) {
+        return state
     }
+
+    if (extension.get('browserAction')) {
+        return state
+    }
+
+    let tabId = action.get('tabId')
+    if (!tabId) {
+      extension = extension.get('browserAction').merge(action.get('browserAction'))
+    }
+
+    let tabs = extension.getIn(['browserAction', 'tabs'])
+    let tab = tabs.get(tabId) || Immutable.Map()
+    tabs = tabs.set(tabId, tab.merge(action.get('browserAction')))
+    extension = extension.setIn(['browserAction', 'tabs'], tabs)
+
+    return state.setIn(['extensions', extensionId], extension)
   },
 
   browserActionBackgroundImage: (browserAction, tabId) => {
@@ -111,10 +115,11 @@ const extensionState = {
     // Since we populate uninstalled extensions with dummyContent,
     // removing installInfo would just add dummy data instead of removing it
     // so we add a prop called 'excluded' and use it to hide extension on UI
-    if (extension) {
-      return state.setIn(['extensions', extensionId], extension.set('excluded', true))
+    if (!extension) {
+      return state
     }
-    return state
+
+    return state.setIn(['extensions', extensionId], extension.set('excluded', true))
   },
 
   extensionEnabled: (state, action) => {
@@ -122,11 +127,11 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
-    if (extension) {
-      return state.setIn(['extensions', extensionId], extension.set('enabled', true))
-    } else {
+    if (!extension) {
       return state
     }
+
+    return state.setIn(['extensions', extensionId], extension.set('enabled', true))
   },
 
   extensionDisabled: (state, action) => {
@@ -134,11 +139,11 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
-    if (extension) {
-      return state.setIn(['extensions', extensionId], extension.set('enabled', false))
-    } else {
+    if (!extension) {
       return state
     }
+
+    return state.setIn(['extensions', extensionId], extension.set('enabled', false))
   },
 
   getPersistentTabState: (extension) => {
@@ -154,33 +159,56 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
-    if (extension) {
-      if (state.getIn(['extensions', extensionId, 'contextMenus']) === undefined) {
-        state = state.setIn(['extensions', extensionId, 'contextMenus'], new Immutable.List())
-      }
-      let contextMenus = state.getIn(['extensions', extensionId, 'contextMenus'])
-      const basePath =
-        platformUtil.getPathFromFileURI(state.getIn(['extensions', extensionId, 'base_path']))
-      const iconPath = action.get('icon')
-      if (!iconPath) {
-        contextMenus = contextMenus.push({
-          extensionId: extensionId,
-          menuItemId: action.get('menuItemId'),
-          properties: action.get('properties').toJS()
-        })
-      } else {
-        contextMenus = contextMenus.push({
-          extensionId: extensionId,
-          menuItemId: action.get('menuItemId'),
-          properties: action.get('properties').toJS(),
-          icon: basePath + '/' + iconPath
-        })
-      }
-      return state.setIn(['extensions', extensionId, 'contextMenus'],
-        contextMenus)
-    } else {
+    if (!extension) {
       return state
     }
+
+    let contextMenus = state.getIn(['extensions', extensionId, 'contextMenus'])
+    if (!contextMenus) {
+      contextMenus = new Immutable.List()
+    }
+
+    const basePath = platformUtil.getPathFromFileURI(state.getIn(['extensions', extensionId, 'base_path']))
+    const iconPath = action.get('icon')
+
+    let menu = {
+      extensionId: extensionId,
+      menuItemId: action.get('menuItemId'),
+      properties: action.get('properties').toJS()
+    };
+    if (iconPath) {
+      menu.icon = basePath + '/' + iconPath
+    }
+
+    contextMenus = contextMenus.push(menu)
+
+    return state.setIn(['extensions', extensionId, 'contextMenus'], contextMenus)
+  },
+
+  contextMenuRemoved: (state, action) => {
+    action = makeImmutable(action)
+    state = makeImmutable(state)
+
+    let menuItemId = action.get('menuItemId').toString()
+    if (!menuItemId) {
+        return state
+    }
+
+    let extensionId = action.get('extensionId').toString()
+    let extension = extensionState.getExtensionById(state, extensionId)
+    if (!extension) {
+        return state
+    }
+
+    let menuItemId = action.get('menuItemId').toString()
+    if (!menuItemId) {
+        return state
+    }
+
+    let contextMenus = Array.from(extension.get('contextMenus'))
+      .filter((contextMenu) => menuItemId !== contextMenu.menuItemId)
+
+    return state.setIn(['extensions', extensionId, 'contextMenus'], contextMenus)
   },
 
   contextMenuAllRemoved: (state, action) => {
@@ -188,11 +216,11 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
-    if (extension) {
-      return state.deleteIn(['extensions', extensionId, 'contextMenus'])
-    } else {
+    if (!extension) {
       return state
     }
+
+    return state.deleteIn(['extensions', extensionId, 'contextMenus'])
   },
 
   getContextMenusProperties: (state) => {

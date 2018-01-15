@@ -5,6 +5,8 @@ npm-debug.log.*
 cpu-profiles
 *.cpuprofile
 
+browser-laptop.iml
+
 # Runtime data
 pids
 *.pid

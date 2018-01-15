@@ -101,6 +101,20 @@ const extensionActions = {
    * Dispatched when an extension has removed all item in context menu
    *
    * @param {string} extensionId - the extension id
+   * @param {string} menuItemId - the id of the menu item that is being removed
+   */
+  contextMenuRemoved: function (extensionId, menuItemId) {
+    appDispatcher.dispatch({
+      actionType: ExtensionConstants.CONTEXT_MENU_REMOVED,
+      extensionId,
+      menuItemId
+    })
+  },
+
+  /**
+   * Dispatched when an extension has removed all item in context menu
+   *
+   * @param {string} extensionId - the extension id
    */
   contextMenuAllRemoved: function (extensionId) {
     appDispatcher.dispatch({
