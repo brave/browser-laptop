@@ -1516,14 +1516,14 @@ describe('sessionStore unit tests', function () {
 
           before(function () {
             oldValue = data.getIn(['sites', 'https://pinned-tab.com|0|0'])
-            newValue = runPreMigrations.pinnedSites['https://pinned-tab.com|0|0']
+            newValue = runPreMigrations.pinnedSites['https://pinned-tab.com|0']
           })
 
           it('copies lastAccessedTime', function () {
             assert.equal(oldValue.get('lastAccessedTime'), newValue.lastAccessedTime)
           })
-          it('copies order', function () {
-            assert.equal(oldValue.get('order'), newValue.order)
+          it('resets order', function () {
+            assert.equal(newValue.order, 0)
           })
           it('copies partitionNumber', function () {
             assert.equal(oldValue.get('partitionNumber'), newValue.partitionNumber)
