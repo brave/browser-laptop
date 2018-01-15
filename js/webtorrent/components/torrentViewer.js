@@ -80,9 +80,9 @@ class TorrentViewer extends React.Component {
         })
       }>
         <span className={cx({
-          boldFooterText: true,
+          boldFooterText: true
         })} data-l10n-id='privacyNoticeTitle' />
-        <span  data-l10n-id='privacyNotice' />
+        <span data-l10n-id='privacyNotice' />
       </div>
     }
 

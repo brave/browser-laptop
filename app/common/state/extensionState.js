@@ -59,11 +59,11 @@ const extensionState = {
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
     if (!extension) {
-        return state
+      return state
     }
 
     if (extension.get('browserAction')) {
-        return state
+      return state
     }
 
     let tabId = action.get('tabId')
@@ -172,20 +172,20 @@ const extensionState = {
     let menu = {
       extensionId: extensionId,
       menuItemId: action.get('menuItemId')
-    };
+    }
 
     const alreadyExists = (all, current) => all.map(m => m.menuItemId)
-      .some(function(id) {
+      .some(function (id) {
         return id.toString().toLowerCase() === current.menuItemId.toString().toLowerCase()
-      });
+      })
 
     if (alreadyExists(contextMenus, menu)) {
       action.set('updateProperties', props)
       action.set('properties', undefined)
       return this.contextMenuUpdated(state, action)
     }
-    menu.properties = menuProperties({}, props);
-    menu.properties.id = menuItemId;
+    menu.properties = menuProperties({}, props)
+    menu.properties.id = menu.menuItemId
 
     const basePath = platformUtil.getPathFromFileURI(state.getIn(['extensions', extensionId, 'base_path']))
     const iconPath = action.get('icon')
@@ -205,22 +205,22 @@ const extensionState = {
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
     if (!extension) {
-        return state
+      return state
     }
 
     let menuItemId = action.get('menuItemId').toString()
     if (!menuItemId) {
-        return state
+      return state
     }
 
     let props = action.get('updateProperties')
     if (!props) {
-        return state
+      return state
     }
 
-    let menus = extension.get('contextMenus');
+    let menus = extension.get('contextMenus')
     let idx = Array.from(menus)
-      .findIndex(m => m.menuItemId.toString().toLowerCase() === menuItemId.toString().toLowerCase());
+      .findIndex(m => m.menuItemId.toString().toLowerCase() === menuItemId.toString().toLowerCase())
 
     if (idx === -1) {
       action.set('properties', props)
@@ -229,12 +229,12 @@ const extensionState = {
       return state.setIn(['extensions', extensionId, 'contextMenus'], menus)
     }
 
-    let menu = menus[idx];
-    menu.menuItemId = menuItemId;
-    menu.properties = menuProperties(menu.properties, props);
-    menu.properties.id = menuItemId;
+    let menu = menus[idx]
+    menu.menuItemId = menuItemId
+    menu.properties = menuProperties(menu.properties, props)
+    menu.properties.id = menuItemId
 
-    menus[idx] = menu;
+    menus[idx] = menu
 
     return state.setIn(['extensions', extensionId, 'contextMenus'], menus)
   },
@@ -245,18 +245,13 @@ const extensionState = {
 
     let menuItemId = action.get('menuItemId').toString()
     if (!menuItemId) {
-        return state
+      return state
     }
 
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
     if (!extension) {
-        return state
-    }
-
-    let menuItemId = action.get('menuItemId').toString()
-    if (!menuItemId) {
-        return state
+      return state
     }
 
     let contextMenus = Array.from(extension.get('contextMenus'))
@@ -290,11 +285,11 @@ const extensionState = {
   }
 }
 
-function menuProperties(properties, props) {
-  let updated = properties || {};
+function menuProperties (properties, props) {
+  let updated = properties || {}
 
-  updated = menuType(updated, props.type);
-  updated = menuContexts(updated, props.contexts);
+  updated = menuType(updated, props.type)
+  updated = menuContexts(updated, props.contexts)
 
   if (props.title) {
     updated.title = props.title.toString()
@@ -312,36 +307,41 @@ function menuProperties(properties, props) {
   // TODO https://github.com/brave/browser-laptop/issues/8331
   // TODO https://github.com/brave/browser-laptop/issues/8789
   // @see https://developer.chrome.com/extensions/contextMenus
-  //if (props.enabled) {}
-  //if (props.documentUrlPatterns) {}
-  //if (props.targetUrlPatterns) {}
+  // if (props.enabled) {}
+  // if (props.documentUrlPatterns) {}
+  // if (props.targetUrlPatterns) {}
 
   return updated
 }
 
-function menuType(props, type) {
+function menuType (props, type) {
   if (typeof type !== 'string') {
     return props
   }
 
-  let supported = ["normal", "checkbox", "radio", "separator"];
+  let supported = ['normal', 'checkbox', 'radio', 'separator']
   if (!supported.some((t) => props.type.toLowerCase() === t)) {
     throw new Error('Unsupported `type` property. Acceptable values are:' + supported.toString())
   }
 
-  return Object.assign(props, {type: type.toLowerCase()});
+  return Object.assign(props, {type: type.toLowerCase()})
 }
 
-function menuContexts(props, contexts) {
+function menuContexts (props, contexts) {
   if (!contexts) {
     return props
   }
 
-  if(!Array.isArray(contexts)) {
-    contexts = [contexts];
+  if (!Array.isArray(contexts)) {
+    contexts = [contexts]
   }
 
-  function isSupported(c) {
+  let acceptable = [
+    'all', 'page', 'frame', 'selection', 'link', 'editable',
+    'image', 'video', 'audio', 'launcher', 'browser_action', 'page_action'
+  ]
+
+  function isSupported (c) {
     if (typeof c !== 'string') {
       return false
     }
@@ -350,11 +350,6 @@ function menuContexts(props, contexts) {
       return true
     }
 
-    let acceptable = [
-      "all", "page", "frame", "selection", "link", "editable",
-      "image", "video", "audio", "launcher", "browser_action", "page_action"
-    ];
-
     return acceptable.includes(c.toLowerCase())
   }
 
@@ -362,7 +357,7 @@ function menuContexts(props, contexts) {
     throw new Error('At least one `context` is not supported. Acceptable values are:' + acceptable.toString())
   }
 
-  return Object.assign(props, {contexts: contexts.map(c => c.toLowerCase()}))
+  return Object.assign(props, {contexts: contexts.map(c => c.toLowerCase())})
 }
 
 module.exports = extensionState
