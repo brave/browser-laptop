@@ -21,6 +21,7 @@ const bookmarkLocationCache = require('../cache/bookmarkLocationCache')
 const {getSetting} = require('../../../js/settings')
 const UrlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable} = require('../state/immutableUtil')
+const dnd = require('../../../js/dnd')
 
 const bookmarkHangerHeading = (editMode, isAdded) => {
   if (isAdded) {
@@ -62,6 +63,15 @@ const getDNDBookmarkData = (state, bookmarkKey) => {
     state.getIn(['dragData', 'dragOverData'], Immutable.Map())) || Immutable.Map()
 
   return data.get('draggingOverKey') === bookmarkKey ? data : Immutable.Map()
+}
+
+const getClosestFromPos = (refs, clientX, sourceKey) => {
+  return dnd.closestFromXOffset(refs.filter((bookmarkRef) => {
+    if (!bookmarkRef) {
+      return false
+    }
+    return bookmarkRef.props.bookmarkKey !== sourceKey
+  }), clientX)
 }
 
 const getDetailFromFrame = (frame) => {
@@ -226,6 +236,7 @@ module.exports = {
   showOnlyFavicon,
   showFavicon,
   getDNDBookmarkData,
+  getClosestFromPos,
   getDetailFromFrame,
   isLocationBookmarked,
   toCreateProperties,

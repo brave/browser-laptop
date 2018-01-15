@@ -1583,10 +1583,14 @@ const appActions = {
     })
   },
 
-  onDropBookmark: function (folderKey) {
+  onDropBookmark: function (bookmark, droppedOnKey, isFolder, isDroppedOn, isRightSide) {
     dispatch({
       actionType: appConstants.APP_ON_DROP_BOOKMARK,
-      folderKey
+      bookmark,
+      droppedOnKey,
+      isFolder,
+      isDroppedOn,
+      isRightSide
     })
   },
 

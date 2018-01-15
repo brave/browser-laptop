@@ -22,7 +22,6 @@ const bookmarkToolbarState = require('../../../common/state/bookmarkToolbarState
 
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
-const siteTags = require('../../../../js/constants/siteTags')
 
 // Utils
 const {isFocused} = require('../../currentWindow')
@@ -32,7 +31,6 @@ const dndData = require('../../../../js/dndData')
 const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const bookmarkUtil = require('../../../common/lib/bookmarkUtil')
-const bookmarkDndUtil = require('../../../common/lib/bookmarkDndUtil')
 const {elementHasDataset} = require('../../../../js/lib/eventUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 
@@ -51,35 +49,26 @@ class BookmarksToolbar extends React.Component {
 
   onDrop (e) {
     e.preventDefault()
-    let bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
+    const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
     if (bookmark) {
-      // Figure out the droppedOn element filtering out the source drag item
-      let bookmarkKey = bookmark.get('key')
-      let tabDrop = false
+      const droppedOn = bookmarkUtil.getClosestFromPos(
+        this.bookmarkRefs,
+        e.clientX,
+        bookmark.get('key')
+      )
+      const currentNode = ReactDOM.findDOMNode(droppedOn.selectedRef)
+      const isRightSide = dnd.isRightSide(currentNode, e.clientX)
 
-      // When we have key null is only when we are getting data from TAB transfer type
-      if (bookmarkKey == null) {
-        tabDrop = true
+      if (droppedOn && droppedOn.selectedRef) {
+        appActions.onDropBookmark(
+          bookmark,
+          droppedOn.selectedRef.props.bookmarkKey,
+          droppedOn.selectedRef.state.isFolder,
+          droppedOn.isDroppedOn,
+          isRightSide
+        )
       }
-
-      const droppedOn = bookmarkDndUtil.getClosestFromPos(this.bookmarkRefs, e.clientX, bookmarkKey)
-      if (droppedOn.selectedRef) {
-        const isRightSide = !dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
-        const droppedOnKey = droppedOn.selectedRef.props.bookmarkKey
-        const isDestinationParent = droppedOn.selectedRef.state.isFolder && droppedOn && droppedOn.isDroppedOn
-        if (tabDrop) {
-          const parentKey = isDestinationParent ? droppedOnKey : null
-          bookmark = bookmark.set('parentFolderId', parentKey)
-          appActions.addBookmark(bookmark)
-        } else {
-          if (bookmark.get('type') === siteTags.BOOKMARK_FOLDER) {
-            appActions.moveBookmarkFolder(bookmarkKey, droppedOnKey, isRightSide, isDestinationParent)
-          } else {
-            appActions.moveBookmark(bookmarkKey, droppedOnKey, isRightSide, isDestinationParent)
-          }
-        }
-        dnd.onDragEnd()
-      }
+      dnd.onDragEnd()
     }
   }
 

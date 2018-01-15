@@ -9,10 +9,15 @@ const appConstants = require('../../../js/constants/appConstants')
 const bookmarksState = require('../../common/state/bookmarksState')
 const bookmarkFoldersState = require('../../common/state/bookmarkFoldersState')
 
+// Actions
+const appActions = require('../../../js/actions/appActions')
+
+// Constants
+const siteTags = require('../../../js/constants/siteTags')
+
 // Util
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const textCalc = require('../../browser/api/textCalc')
-// const dnd = require('../../../js/dnd')
 
 const bookmarkToolbarReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -32,6 +37,40 @@ const bookmarkToolbarReducer = (state, action, immutableAction) => {
       }
       break
     case appConstants.APP_ON_DROP_BOOKMARK: {
+      let bookmark = action.get('bookmark')
+      let tabDrop = false
+
+      // When we have key null is only when we are getting data from TAB transfer type
+      if (bookmark.get('key') == null) {
+        tabDrop = true
+      }
+
+      const isDestinationParent = action.get('isFolder') && action.get('isDroppedOn')
+
+      // tabDrop is the action of dropping a bookmark from the urlbar
+      if (tabDrop) {
+        const parentKey = isDestinationParent ? action.get('droppedOnKey') : null
+        bookmark = bookmark.set('parentFolderId', parentKey)
+        appActions.addBookmark(bookmark)
+      } else {
+        // if not a tabdrop, then user is just moving bookmarks around
+        // in this case, check whether dragged element is a folder or not
+        if (bookmark.get('type') === siteTags.BOOKMARK_FOLDER) {
+          appActions.moveBookmarkFolder(
+            bookmark.get('key'),
+            action.get('droppedOnKey'),
+            action.get('isRightSide'),
+            isDestinationParent
+          )
+        } else {
+          appActions.moveBookmark(
+            bookmark.get('key'),
+            action.get('droppedOnKey'),
+            action.get('isRightSide'),
+            isDestinationParent
+          )
+        }
+      }
       break
     }
   }
