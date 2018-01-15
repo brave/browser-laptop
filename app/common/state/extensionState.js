@@ -168,14 +168,27 @@ const extensionState = {
       contextMenus = new Immutable.List()
     }
 
-    const basePath = platformUtil.getPathFromFileURI(state.getIn(['extensions', extensionId, 'base_path']))
-    const iconPath = action.get('icon')
-
+    let props = action.get('properties').toJS()
     let menu = {
       extensionId: extensionId,
-      menuItemId: action.get('menuItemId'),
-      properties: action.get('properties').toJS()
+      menuItemId: action.get('menuItemId')
     };
+
+    const alreadyExists = (all, current) => all.map(m => m.menuItemId)
+      .some(function(id) {
+        id.toString().toLowerCase() === current.menuItemId.toString().toLowerCase())
+      });
+
+    if (alreadyExists(contextMenus, menu)) {
+      action.set('updateProperties', props)
+      action.set('properties', undefined)
+      return this.contextMenuUpdated(state, action)
+    }
+    menu.properties = menuProperties({}, props);
+    menu.properties.id = menuItemId;
+
+    const basePath = platformUtil.getPathFromFileURI(state.getIn(['extensions', extensionId, 'base_path']))
+    const iconPath = action.get('icon')
     if (iconPath) {
       menu.icon = basePath + '/' + iconPath
     }
@@ -183,6 +196,47 @@ const extensionState = {
     contextMenus = contextMenus.push(menu)
 
     return state.setIn(['extensions', extensionId, 'contextMenus'], contextMenus)
+  },
+
+  contextMenuUpdated: (state, action) => {
+    action = makeImmutable(action)
+    state = makeImmutable(state)
+
+    let extensionId = action.get('extensionId').toString()
+    let extension = extensionState.getExtensionById(state, extensionId)
+    if (!extension) {
+        return state
+    }
+
+    let menuItemId = action.get('menuItemId').toString()
+    if (!menuItemId) {
+        return state
+    }
+
+    let props = action.get('updateProperties')
+    if (!props) {
+        return state
+    }
+
+    let menus = extension.get('contextMenus');
+    let idx = Array.from(menus)
+      .findIndex(m => m.menuItemId.toString().toLowerCase() === menuItemId.toString().toLowerCase());
+
+    if (idx === -1) {
+      action.set('properties', props)
+      action.set('updateProperties', undefined)
+      menus.push(this.contextMenuCreated(state, action))
+      return state.setIn(['extensions', extensionId, 'contextMenus'], menus)
+    }
+
+    let menu = menus[idx];
+    menu.menuItemId = menuItemId;
+    menu.properties = menuProperties(menu.properties, props);
+    menu.properties.id = menuItemId;
+
+    menus[idx] = menu;
+
+    return state.setIn(['extensions', extensionId, 'contextMenus'], menus)
   },
 
   contextMenuRemoved: (state, action) => {
@@ -234,6 +288,81 @@ const extensionState = {
     })
     return allProperties
   }
+}
+
+function menuProperties(properties, props) {
+  let updated = properties || {};
+
+  updated = menuType(updated, props.type);
+  updated = menuContexts(updated, props.contexts);
+
+  if (props.title) {
+    updated.title = props.title.toString()
+  }
+  if (props.visible) {
+    updated.visible = Boolean(props.visible)
+  }
+  if (props.checked) {
+    updated.checked = Boolean(props.checked)
+  }
+  if (props.parentId) {
+    updated.parentId = props.parentId.toString()
+  }
+
+  // TODO https://github.com/brave/browser-laptop/issues/8331
+  // TODO https://github.com/brave/browser-laptop/issues/8789
+  // @see https://developer.chrome.com/extensions/contextMenus
+  //if (props.enabled) {}
+  //if (props.documentUrlPatterns) {}
+  //if (props.targetUrlPatterns) {}
+
+  return updated
+}
+
+function menuType(props, type) {
+  if (typeof type !== 'string') {
+    return props
+  }
+
+  let supported = ["normal", "checkbox", "radio", "separator"];
+  if (!supported.some((t) => props.type.toLowerCase() === t)) {
+    throw new Error('Unsupported `type` property. Acceptable values are:' + supported.toString())
+  }
+
+  return Object.assign(props, {type: type.toLowerCase()});
+}
+
+function menuContexts(props, contexts) {
+  if (!contexts) {
+    return props
+  }
+
+  if(!Array.isArray(contexts)) {
+    contexts = [contexts];
+  }
+
+  function isSupported(c) {
+    if (typeof c !== 'string') {
+      return false
+    }
+
+    if (c === '') {
+      return true
+    }
+
+    let acceptable = [
+      "all", "page", "frame", "selection", "link", "editable",
+      "image", "video", "audio", "launcher", "browser_action", "page_action"
+    ];
+
+    return acceptable.includes(c.toLowerCase())
+  }
+
+  if (!contexts.every((c) => isSupported(c.trim()))) {
+    throw new Error('At least one `context` is not supported. Acceptable values are:' + acceptable.toString())
+  }
+
+  return Object.assign(props, {contexts: contexts.map(c => c.toLowerCase()}))
 }
 
 module.exports = extensionState

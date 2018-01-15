@@ -11,6 +11,9 @@ const contextMenus = {
     process.on('chrome-context-menus-create', (extensionId, menuItemId, properties, icon) => {
       extensionActions.contextMenuCreated(extensionId, menuItemId, properties, icon)
     })
+    process.on('chrome-context-menus-update', (extensionId, menuItemId, properties) => {
+      extensionActions.contextMenuUpdated(extensionId, menuItemId, properties)
+    })
   }
 }
 
