@@ -176,7 +176,7 @@ const extensionState = {
 
     const alreadyExists = (all, current) => all.map(m => m.menuItemId)
       .some(function(id) {
-        id.toString().toLowerCase() === current.menuItemId.toString().toLowerCase())
+        return id.toString().toLowerCase() === current.menuItemId.toString().toLowerCase()
       });
 
     if (alreadyExists(contextMenus, menu)) {
