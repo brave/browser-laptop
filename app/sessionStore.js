@@ -660,12 +660,19 @@ module.exports.runPreMigrations = (data) => {
   if (data.sites) {
     // pinned sites
     data.pinnedSites = {}
-    for (let key of Object.keys(data.sites)) {
-      const site = data.sites[key]
-      if (site.tags && site.tags.includes('pinned')) {
-        delete site.tags
-        data.pinnedSites[key] = site
-      }
+    // get pre-site split pinned sites, in order
+    const sitesToPin = Object.keys(data.sites)
+      .map(key => data.sites[key])
+      .filter(site => site.tags && site.tags.includes('pinned'))
+      .sort((a, b) => a.order - b.order)
+    for (const site of sitesToPin) {
+      // convert to new format (split to its own pinnedSites key)
+      // reset 'order', same as pinnedSitesState
+      const pinnedSite = Object.assign({}, site, { order: Object.keys(data.pinnedSites).length })
+      delete pinnedSite.tags
+      // matches `getKey` from pinnedSitesUtil
+      const pinnedSiteKey = `${site.location}|${site.partitionNumber}`
+      data.pinnedSites[pinnedSiteKey] = pinnedSite
     }
 
     // default sites

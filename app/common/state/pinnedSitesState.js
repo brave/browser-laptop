@@ -59,6 +59,10 @@ const pinnedSiteState = {
       return state
     }
 
+    if (state.hasIn([STATE_SITES.PINNED_SITES, key])) {
+      return state
+    }
+
     state = state.setIn([STATE_SITES.PINNED_SITES, key], site)
     return state
   },
