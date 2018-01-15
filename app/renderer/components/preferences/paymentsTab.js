@@ -81,6 +81,7 @@ class PaymentsTab extends ImmutableComponent {
     const funds = formatCurrentBalance(ledgerData)
     const budget = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings)
     const minAmount = batToCurrencyString(budget, ledgerData)
+    const buyForm = ledgerData.get('buyForm') || Immutable.Map()
 
     return <AddFundsDialog
       addFundsDialog={wizardData}
@@ -88,6 +89,7 @@ class PaymentsTab extends ImmutableComponent {
       minAmount={minAmount}
       addresses={addresses}
       walletQR={walletQR}
+      buyForm={buyForm}
     />
   }
 

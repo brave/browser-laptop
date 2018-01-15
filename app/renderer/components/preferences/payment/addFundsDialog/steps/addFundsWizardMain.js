@@ -43,6 +43,23 @@ class AddFundsWizardMain extends React.Component {
     appActions.onChangeAddFundsDialogStep('addFundsWizardAddress', 'LTC')
   }
 
+  generateBuyForm () {
+    const form = this.props.buyForm
+    if (!form.has('action')) {
+      return null
+    }
+
+    return <form action={form.get('action')} method={form.get('method')} target='_blank'>
+      {
+        form.map((value, key) => {
+          if ((key === 'action') || (key === 'method')) return
+          return <input type='hidden' name={key} value={value} />
+        })
+      }
+      <input type='submit' value='Buy BAT' />
+    </form>
+  }
+
   render () {
     return (
       <div data-test-id='addFundsWizardMain'
@@ -55,6 +72,9 @@ class AddFundsWizardMain extends React.Component {
               styles.wizardMain__text_bold
             )}
           />
+          <div>
+            {this.generateBuyForm()}
+          </div>
           <BrowserButton groupedItem secondaryColor
             onClick={this.onClickBTC}
             testId='btcButton'
@@ -177,6 +197,12 @@ const styles = StyleSheet.create({
 
     '::after': {
       content: '"btc"'
+    }
+  },
+
+  wizardMain__currencyIcon_cc: {
+    '::after': {
+      content: '"cc"'
     }
   },
 

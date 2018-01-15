@@ -183,7 +183,7 @@ let generateBraveManifest = () => {
 
   let cspDirectives = {
     'default-src': '\'self\'',
-    'form-action': '\'none\'',
+    'form-action': 'https://sandbox.test-simplexcc.com https://api.simplexcc.com',
     'style-src': '\'self\' \'unsafe-inline\'',
     'font-src': '\'self\' data:',
     'img-src': '* data: file://*',
