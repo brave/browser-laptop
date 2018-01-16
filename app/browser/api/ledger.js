@@ -1762,10 +1762,9 @@ const onCallback = (state, result, delayTime) => {
       const publishers = ledgerState.getPublishers(state)
       for (let item of publishers) {
         const publisherKey = item[0]
-        if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
-          appActions.onPublisherOptionUpdate(publisherKey, 'exclude', true)
-          savePublisherOption(publisherKey, 'exclude', true)
-        } else {
+        const publisher = item[1] || Immutable.Map()
+
+        if (!publisher.getIn(['options', 'exclude'])) {
           excludeP(publisherKey, (unused, exclude) => {
             appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
             savePublisherOption(publisherKey, 'exclude', exclude)
