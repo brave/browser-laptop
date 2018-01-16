@@ -11,7 +11,7 @@ const dragTypes = require('./constants/dragTypes')
 const siteTags = require('./constants/siteTags')
 const appStoreRenderer = require('./stores/appStoreRenderer')
 const {getCurrentWindowId} = require('../app/renderer/currentWindow')
-// const {ESC} = require('../app/common/constants/keyCodes.js')
+const {ESC} = require('../app/common/constants/keyCodes.js')
 
 module.exports.getInterBraveDragData = () => {
   return appStoreRenderer.state.getIn(['dragData', 'data'])
@@ -30,11 +30,11 @@ module.exports.onDragStart = (dragType, data, e) => {
   appActions.dragStarted(getCurrentWindowId(), dragType, data)
 }
 
-// document.addEventListener('keyup', (e) => {
-//   if (e.keyCode === ESC) {
-//     appActions.dragCancelled()
-//   }
-// }, true)
+document.addEventListener('keyup', (e) => {
+  if (e.keyCode === ESC) {
+    appActions.dragCancelled()
+  }
+}, true)
 
 module.exports.onDragEnd = () => {
   windowActions.setContextMenuDetail()

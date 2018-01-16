@@ -52,6 +52,7 @@ class BookmarksToolbar extends React.Component {
     const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
     if (bookmark) {
       const droppedOn = bookmarkUtil.getClosestFromPos(
+        dnd,
         this.bookmarkRefs,
         e.clientX,
         bookmark.get('key')
