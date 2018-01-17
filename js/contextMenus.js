@@ -874,11 +874,13 @@ const searchEngineMenuItem = (location, searchProvider, searchDetail) => {
 
 const searchSelectionMenuItem = (location) => {
   var searchText = textUtils.ellipse(location)
+  const maxSearchEngines = Array(searchProviders.length)
+  const searchEngineSubmenu = Array.from(maxSearchEngines, (_,i) =>
+    searchEngineMenuItem(location, searchProviders[i].name, searchProviders[i].search))
+
   return {
     label: locale.translation('openSearch').replace(/{{\s*selectedVariable\s*}}/, searchText),
-    submenu: [
-      searchEngineMenuItem(location, searchProviders[1].name, searchProviders[1].search)
-    ]
+    submenu: searchEngineSubmenu
   }
 }
 
