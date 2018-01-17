@@ -271,7 +271,7 @@ class SearchTab extends ImmutableComponent {
     let array = []
 
     entries.forEach((entry) => {
-      let iconStyle = {backgroundImage: `url(${entry.image})`}
+      let iconStyle = {backgroundImage: `url(${entry.localImage})`}
 
       array.push([
         {
