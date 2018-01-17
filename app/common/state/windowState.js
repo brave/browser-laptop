@@ -167,7 +167,7 @@ const api = {
     const checkDefaultBrowserDialogIsVisible = isFocused &&
       defaultBrowserState.shouldDisplayDialog(state)
 
-    return !state.get('contextMenuDetail') &&
+    return !windowState.has('contextMenuDetail') &&
       !windowState.get('popupWindowDetail') &&
       !windowState.get('bookmarkDetail') &&
       !windowState.getIn(['ui', 'siteInfo', 'isVisible']) &&
