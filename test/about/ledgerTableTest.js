@@ -15,12 +15,12 @@ const ledgerAPIWaitTimeout = 20000
 const prefsUrl = 'about:preferences'
 const sites = [
   'http://example.com/',
-  'https://brianbondy.com/'
+  'https://clifton.io/'
 ]
 const sites2 = [
   'http://example.com/',
   'https://www.eff.org/',
-  'https://brianbondy.com/',
+  'http://alexwykoff.com/',
   'https://clifton.io/'
 ]
 const firstTable = '[data-tbody-index="0"]'
@@ -52,24 +52,24 @@ function * before (client, siteList) {
     .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
 
   for (let site of siteList) {
-    yield client
-      .tabByIndex(0)
-      .loadUrl(site)
-      .windowByUrl(Brave.browserWindowUrl)
-      .waitForHistoryEntry(site, false)
-      .tabByUrl(site)
+    yield client.addPaymentsSite(site)
   }
 
   yield client
     .tabByIndex(0)
-    .loadUrl(prefsUrl)
-    .waitForVisible(paymentsTab)
-    .click(paymentsTab)
     .waitForVisible('[data-l10n-id="publisher"]')
 }
 
 function findBiggestPercentage (synopsis) {
-  return synopsis.sortBy((publisher) => publisher.get('percentage')).get(0)
+  return synopsis.get('publishers').map((publisher, key) => {
+    return publisher.set('publisherKey', key)
+  }).sort((a, b) => {
+    const aValue = a.get('pinPercentage') || 0
+    const bValue = b.get('pinPercentage') || 0
+    if (aValue < bValue) { return 1 }
+    if (aValue > bValue) { return -1 }
+    if (aValue === bValue) { return 0 }
+  }).first()
 }
 
 describe('Ledger table', function () {
@@ -102,7 +102,7 @@ describe('Ledger table', function () {
         .waitForVisible(`${firstTableFirstRow} [data-test-id="siteName"]`)
         .waitUntil(function () {
           return this.getText(`${firstTableFirstRow} [data-test-id="siteName"]`).then((value) => {
-            return value === topPublisher.get('site')
+            return value === topPublisher.get('publisherKey')
           })
         }, 5000)
         .waitForVisible(`${firstTableFirstRow} [data-test-id="pinnedInput"]`)
@@ -142,8 +142,8 @@ describe('Ledger table', function () {
       yield this.app.client
         .tabByIndex(0)
         .click(`${secondTableFirstRow} [data-test-id="switchBackground"]`)
-        .waitForVisible(`${secondTableFirstRow} [data-switch-status="false"]`)
-        .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
+        .waitForVisible(`${secondTableSecondRow} [data-switch-status="false"]`)
+        .click(`${secondTableSecondRow} [data-test-pinned="false"]`)
         .waitForVisible(`${firstTableFirstRow} [data-test-pinned="true"]`)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntilSynopsis(function (synopsis) {
@@ -154,7 +154,7 @@ describe('Ledger table', function () {
         .waitForVisible(`${firstTableFirstRow} [data-test-id="siteName"]`)
         .waitUntil(function () {
           return this.getText(`${firstTableFirstRow} [data-test-id="siteName"]`).then((value) => {
-            return value === topPublisher.get('site')
+            return value === topPublisher.get('publisherKey')
           })
         }, 5000)
         .waitForVisible(`${firstTableFirstRow} [data-switch-status="true"]`)
@@ -223,7 +223,7 @@ describe('Ledger table', function () {
         .waitForElementCount(`${firstTable} tr`, 3)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntilSynopsis(function (synopsis) {
-          pinnedSum = synopsis.reduce((total, publisher) => {
+          pinnedSum = synopsis.get('publishers').reduce((total, publisher) => {
             if (publisher.get('pinPercentage') !== undefined) {
               return total + publisher.get('pinPercentage')
             }
