@@ -511,7 +511,7 @@ class Frame extends React.Component {
       if (this.frame.isEmpty()) {
         return
       }
-      contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame, e.target.getBoundingClientRect())
+      contextMenus.onShowAutofillMenu(e.suggestions, e.rect, this.frame)
     }, { passive: true })
     this.webview.addEventListener('hide-autofill-popup', (e) => {
       if (this.props.isAutFillContextMenu) {

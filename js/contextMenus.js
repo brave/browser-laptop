@@ -1279,7 +1279,7 @@ function onLedgerContextMenu (location, hostPattern) {
   menu.popup(getCurrentWindow())
 }
 
-function onShowAutofillMenu (suggestions, targetRect, frame, boundingClientRect) {
+function onShowAutofillMenu (suggestions, targetRect, frame) {
   const menuTemplate = autofillTemplateInit(suggestions, frame)
   // toolbar UI scale ratio
   const xRatio = window.innerWidth / window.outerWidth
@@ -1288,8 +1288,8 @@ function onShowAutofillMenu (suggestions, targetRect, frame, boundingClientRect)
   windowActions.setContextMenuDetail(Immutable.fromJS({
     type: 'autofill',
     tabId,
-    left: boundingClientRect.left + (targetRect.x * xRatio),
-    top: boundingClientRect.top + ((targetRect.y + targetRect.height) * yRatio),
+    left: targetRect.x * xRatio,
+    top: (targetRect.y + targetRect.height) * yRatio,
     template: menuTemplate
   }))
 }
