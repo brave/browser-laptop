@@ -13,6 +13,7 @@ const settings = require('../../../../js/constants/settings')
 const config = require('../../../../js/constants/config')
 const {getSetting} = require('../../../../js/settings')
 const {SettingCheckbox} = require('../common/settings')
+const commonStyles = require('../styles/commonStyles')
 const {isPasswordManager, getExtensionKey, isBuiltInExtension, bravifyText} = require('../../lib/extensionsUtil')
 
 const {DefaultSectionTitle} = require('../common/sectionTitle')
@@ -99,7 +100,7 @@ class ExtensionsTab extends ImmutableComponent {
       <footer className={css(styles.moreInfo)}>
         <HelpfulText l10nId='extensionsTabFooterInfo'>&nbsp;
           <span data-l10n-id='community'
-            className={css(styles.moreInfo__link)}
+            className={css(commonStyles.linkText)}
             onClick={aboutActions.createTabRequested.bind(null, {
               url: 'https://community.brave.com/c/feature-requests/extension-requests'
             }, true)}
@@ -135,16 +136,6 @@ const styles = StyleSheet.create({
     // ref: https://github.com/brave/browser-laptop/blob/64c48d5039b5ab66c45b5fdd5be68206ffd6aa89/app/renderer/components/preferences/paymentsTab.js#L292
     // and https://github.com/brave/browser-laptop/blob/0d0261a2d107d6173e917bb98b56de386601295b/less/about/preferences.less#L18
     margin: '40px 0'
-  },
-
-  moreInfo__link: {
-    cursor: 'pointer',
-    color: globalStyles.color.braveOrange,
-    textDecoration: 'none',
-
-    ':hover': {
-      textDecoration: 'underline'
-    }
   }
 })
 
