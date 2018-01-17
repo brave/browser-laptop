@@ -65,6 +65,7 @@ const _internal = {
 // Libraries
 let ledgerPublisher
 let ledgerClient
+let ledgerBalance
 let client
 let synopsis
 
@@ -1292,6 +1293,13 @@ const cacheRuleSet = (state, ruleset) => {
 }
 
 const clientprep = () => {
+  const balanceServer = process.env.BALANCE_SERVER_URL
+
+  if ((!ledgerBalance) && (balanceServer)) {
+    ledgerBalance = require('bat-balance')
+    ledgerBalance.providers.forEach((entry) => { entry.site = entry.server = balanceServer })
+  }
+
   if (!ledgerClient) ledgerClient = require('bat-client')
   _internal.debugP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_DEBUG)
   _internal.verboseP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_VERBOSE)
