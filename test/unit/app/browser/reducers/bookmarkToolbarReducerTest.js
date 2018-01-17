@@ -22,6 +22,12 @@ describe('bookmarkToolbarReducer unit test', function () {
     calcTextList: () => true
   }
 
+  const fakeAppAction = {
+    addBookmark: () => {},
+    moveBookmarkFolder: () => {},
+    moveBookmark: () => {}
+  }
+
   const stateWithData = Immutable.fromJS({
     windows: [],
     bookmarks: {
@@ -103,6 +109,7 @@ describe('bookmarkToolbarReducer unit test', function () {
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('../../browser/api/textCalc', fakeTextCalc)
+    mockery.registerMock('../../../js/actions/appActions', fakeAppAction)
     bookmarkToolbarReducer = require('../../../../../app/browser/reducers/bookmarkToolbarReducer')
   })
 
@@ -135,6 +142,104 @@ describe('bookmarkToolbarReducer unit test', function () {
         actionType: appConstants.APP_SET_STATE
       })
       assert.equal(spyCalc.notCalled, true)
+    })
+  })
+  describe('APP_ON_DROP_BOOKMARK', function () {
+    let bookmark = Immutable.fromJS({
+      actionType: appConstants.APP_ON_DROP_BOOKMARK,
+      bookmark: {
+        location: 'https://brazilian-ameri-do-te-karate.com',
+        type: 'bookmark'
+      }
+    })
+
+    describe('when bookmark is dropped from urlbar', function () {
+      let fakeAddBookmark
+
+      afterEach(function () {
+        fakeAddBookmark.restore()
+      })
+
+      it('if dropped inside a folder sets the parentFolderId as droppedOnKey', function () {
+        fakeAddBookmark = sinon.spy(fakeAppAction, 'addBookmark')
+
+        const droppedBookmark = bookmark.merge(Immutable.fromJS({
+          isFolder: true,
+          isDroppedOn: true,
+          droppedOnKey: 11
+        }))
+
+        bookmarkToolbarReducer(stateWithData, droppedBookmark)
+        // assert that addBookmark was called
+        assert.equal(fakeAddBookmark.calledOnce, true)
+        // assert that parentFolderId is the same as original key where it was dropped
+        assert.equal(
+          fakeAddBookmark.args[0][0].get('parentFolderId'),
+          droppedBookmark.get('droppedOnKey')
+        )
+      })
+
+      it('if NOT dropped inside a folder sets it in the toolbar (parentFolderId is null)', function () {
+        fakeAddBookmark = sinon.spy(fakeAppAction, 'addBookmark')
+
+        const droppedBookmark = bookmark.merge(Immutable.fromJS({
+          isFolder: false,
+          isDroppedOn: true
+        }))
+
+        bookmarkToolbarReducer(stateWithData, droppedBookmark)
+        // assert that addBookmark was called
+        assert.equal(fakeAddBookmark.calledOnce, true)
+        // assert that parentFolderId is null
+        assert.equal(fakeAddBookmark.args[0][0].get('parentFolderId'), null)
+      })
+    })
+
+    describe('when bookmark already exists', function () {
+      let fakeMoveBookmarkFolder
+      let fakeMoveBookmark
+
+      afterEach(function () {
+
+      })
+
+      it('calls moveBookmark if it is a bookmark', function () {
+        fakeMoveBookmark = sinon.spy(fakeAppAction, 'moveBookmark')
+
+        const droppedBookmark = bookmark
+          .merge(Immutable.fromJS({
+            isRightSide: true,
+            isDroppedOn: true,
+            droppedOnKey: 'https://some-other-karate-bookmark.com/|0|0'
+          }))
+          .mergeIn(['bookmark'], Immutable.fromJS({
+            key: 123123123,
+            type: 'bookmark'
+          }))
+
+        bookmarkToolbarReducer(stateWithData, droppedBookmark)
+        assert.equal(fakeMoveBookmark.calledOnce, true)
+        fakeMoveBookmark.restore()
+      })
+
+      it('calls moveBookmarkFolder if it is a bookmark folder', function () {
+        fakeMoveBookmarkFolder = sinon.spy(fakeAppAction, 'moveBookmarkFolder')
+
+        const droppedBookmark = bookmark
+          .merge(Immutable.fromJS({
+            isRightSide: true,
+            isDroppedOn: false,
+            droppedOnKey: 'https://yet-another-karate-bookmark.com/|0|0'
+          }))
+          .mergeIn(['bookmark'], Immutable.fromJS({
+            key: 123123123,
+            type: 'bookmark-folder'
+          }))
+
+        bookmarkToolbarReducer(stateWithData, droppedBookmark)
+        assert.equal(fakeMoveBookmarkFolder.calledOnce, true)
+        fakeMoveBookmarkFolder.restore()
+      })
     })
   })
 })
