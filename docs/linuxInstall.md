@@ -20,15 +20,25 @@ Once `snapd` is installed, installing Brave looks like this:
 
 ## Debian (Jessie) and Ubuntu (Artful, Zesty, Yakkety, Xenial, and Trusty) AMD64:
 
-To install Brave using apt and lsb\_release :
+In the terminal to be used for the below commands, prime the `sudo` command (enter your password once).
+```
+sudo echo
+```
+
+To install Brave using `apt` and `lsb_release`:
 
 ```
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
 echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt `lsb_release -sc` main" | sudo tee -a /etc/apt/sources.list.d/brave-`lsb_release -sc`.list
 ```
 
-You will want to make sure the /etc/apt/sources.list.d/brave-\*.list file lists a new repository and does not contain the word lsb\_release. If you see the word lsb\_release you might not have lsb\_release installed. Otherwise run:
+Verify the `/etc/apt/sources.list.d/brave-*.list` file lists a new repository and does not contain the word `lsb_release`. If you see the word `lsb_release` you might not have `lsb_release` installed.
+ * TIP, the following command should return empty if all went well:
+ ```
+ grep lsb_release /etc/apt/sources.list.d/brave*
+ ```
 
+Finally, install Brave:
 ```
 sudo apt update
 sudo apt install brave
@@ -46,73 +56,69 @@ sudo apt install brave-beta
 Upgrades can be done via:
 
 ```
-apt-get update && apt-get upgrade -y
+sudo apt-get update && sudo apt-get upgrade -y
 ```
 
 Alternatively you can install the deb directly but then you won't get automatic
-upgrades:
+upgrades (NOT recommended):
 
+For Debian:
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/dev/debian64
 sudo apt-get install -y gdebi && sudo gdebi brave.deb
 ```
 
-Or for Ubuntu
-
+For Ubuntu:
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/dev/ubuntu64
 sudo dpkg -i brave.deb
 ```
 
 If there are dependency errors during `dpkg -i`, the following command will
-install the dependency for you:
-
+install the dependencies for you:
 ```
 sudo apt-get -f install
 ```
 
 ## Linux Mint
 
-Brave does not currently support an apt repository for Linux Mint directly, but
-you can use the corresponding Ubuntu package. Using the lsb\_release method
-above will return an error during `apt update`.
+Brave does not currently support an apt repository for Linux Mint directly, however you can use the corresponding Ubuntu package. Using the `lsb_release` method above will return an error during `apt update`.
+
+In the terminal to be used for the below commands, prime the `sudo` command (enter your password once).
+```
+sudo echo
+```
 
 For Sarah, Serena and Sonya:
-
 ```
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
 echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt xenial main" | sudo tee -a /etc/apt/sources.list.d/brave-xenial.list
 ```
 
-Or for Qiana, Rebecca, Rafaela and Rosa:
-
+For Qiana, Rebecca, Rafaela and Rosa:
 ```
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
 echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt trusty main" | sudo tee -a /etc/apt/sources.list.d/brave-trusty.list
 ```
 
-Or for LMDE Betsy:
-
+For LMDE Betsy:
 ```
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
 echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt jessie main" | sudo tee -a /etc/apt/sources.list.d/brave-jessie.list
 ```
 
-Then install Brave with:
-
+Finally, install Brave:
 ```
 sudo apt update
 sudo apt install brave
 ```
 
 Upgrades can be done via:
-
 ```
-apt-get update && apt-get upgrade -y
+sudo apt-get update && sudo apt-get upgrade -y
 ```
 
-Alternatively you can install the deb directly but then you won't get automatic upgrades:
-
+Alternatively you can install the deb directly but then you won't get automatic upgrades (NOT recommended):
 ```
 wget -O brave.deb https://laptop-updates.brave.com/latest/mint64
 sudo dpkg -i ./brave.deb
@@ -120,7 +126,6 @@ sudo dpkg -i ./brave.deb
 
 If there are dependency errors during `dpkg -i`, the following command will
 install the dependency for you:
-
 ```
 sudo apt-get -f install
 ```
@@ -128,7 +133,6 @@ sudo apt-get -f install
 ## Fedora x86_64:
 
 To install Brave using dnf:
-
 ```
 sudo dnf config-manager --add-repo https://s3-us-west-2.amazonaws.com/brave-rpm-release/x86_64/
 sudo rpm --import https://s3-us-west-2.amazonaws.com/brave-rpm-release/keys.asc
@@ -136,13 +140,11 @@ sudo dnf install brave
 ```
 
 To update Brave using dnf:
-
 ```
-dnf upgrade brave
+sudo dnf upgrade brave
 ```
 
 Alternatively you can install the rpm directly, but then you won't get automatic upgrades:
-
 ```
 sudo dnf install lsb
 wget -O brave.rpm https://laptop-updates.brave.com/latest/fedora64
@@ -152,7 +154,6 @@ sudo dnf install ./brave.rpm
 ## OpenSUSE AMD64:
 
 To install Brave using zypper:
-
 ```
 sudo rpmkeys --import https://s3-us-west-2.amazonaws.com/brave-rpm-release/keys.asc
 sudo zypper install lsb
@@ -162,14 +163,12 @@ sudo zypper install brave
 ```
 
 To update Brave using zypper:
-
 ```
 sudo zypper ref
 sudo zypper update brave
 ```
 
 Alternatively you can install the rpm directly, but then you won't get automatic upgrades:
-
 ```
 wget -O brave.rpm https://laptop-updates.brave.com/latest/openSUSE64
 sudo rpm -i ./brave.rpm
