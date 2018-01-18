@@ -178,8 +178,7 @@ class BookmarksToolbar extends React.Component {
     // used in renderer
     props.showOnlyFavicon = bookmarkUtil.showOnlyFavicon()
     props.showFavicon = bookmarkUtil.showFavicon()
-    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state)) &&
-      !isWindows
+    props.shouldAllowWindowDrag = !isWindows && windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state))
     props.visibleBookmarks = bookmarkToolbarState.getToolbar(state, currentWindowId)
     props.hiddenBookmarks = bookmarkToolbarState.getOther(state, currentWindowId)
 
@@ -196,6 +195,7 @@ class BookmarksToolbar extends React.Component {
     return <div className={css(
       styles.bookmarksToolbar,
       this.props.shouldAllowWindowDrag && styles.bookmarksToolbar_allowDragging,
+      !this.props.shouldAllowWindowDrag && styles.bookmarksToolbar_disallowDragging,
       this.props.showOnlyFavicon && styles.bookmarksToolbar_showOnlyFavicon
     )}
       data-test-id='bookmarksToolbar'
@@ -240,6 +240,10 @@ const styles = StyleSheet.create({
 
   bookmarksToolbar_allowDragging: {
     WebkitAppRegion: 'drag'
+  },
+
+  bookmarksToolbar_disallowDragging: {
+    WebkitAppRegion: 'no-drag'
   },
 
   bookmarksToolbar_showOnlyFavicon: {
