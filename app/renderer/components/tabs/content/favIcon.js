@@ -120,8 +120,7 @@ class Favicon extends React.Component {
             !this.props.favicon &&
             css(
               styles.icon__symbol_default,
-              this.props.showIconAtReducedSize && styles.icon__symbol_default_reducedSize,
-              themeLight && styles.icon__symbol_default_colorLight
+              this.props.showIconAtReducedSize && styles.icon__symbol_default_reducedSize
             )
           )
       } />
@@ -171,15 +170,11 @@ const styles = StyleSheet.create({
     WebkitMaskPosition: 'center',
     WebkitMaskImage: `url(${defaultIconSvg})`,
     WebkitMaskSize: '14px',
-    backgroundColor: theme.tab.icon.symbol.default.backgroundColor
+    backgroundColor: 'var(--tab-default-icon-color)'
   },
 
   icon__symbol_default_reducedSize: {
     WebkitMaskSize: '10px'
-  },
-
-  icon__symbol_default_colorLight: {
-    backgroundColor: theme.tab.icon.symbol.default.light.backgroundColor
   }
 })
 

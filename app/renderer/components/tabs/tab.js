@@ -38,13 +38,12 @@ const globalStyles = require('../styles/global')
 const {theme} = require('../styles/theme')
 
 // Utils
-const {getTextColorForBackground} = require('../../../../js/lib/color')
+const {backgroundRequiresLightText} = require('../../../../js/lib/color')
 const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 const contextMenus = require('../../../../js/contextMenus')
 const dnd = require('../../../../js/dnd')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {hasTabAsRelatedTarget} = require('../../lib/tabUtil')
-const isWindows = require('../../../common/lib/platformUtil').isWindows()
 const {getCurrentWindowId} = require('../../currentWindow')
 const {setObserver} = require('../../lib/observerUtil')
 const UrlUtil = require('../../../../js/lib/urlutil')
@@ -316,8 +315,18 @@ class Tab extends React.Component {
     const isThemed = !this.props.isPrivateTab && this.props.isActive && this.props.themeColor
     const instanceStyles = { }
     if (isThemed) {
-      instanceStyles['--theme-color-fg'] = getTextColorForBackground(this.props.themeColor)
+      const lightText = backgroundRequiresLightText(this.props.themeColor)
       instanceStyles['--theme-color-bg'] = this.props.themeColor
+      // complementing foreground color
+      instanceStyles['--theme-color-fg'] =
+        lightText
+          ? theme.tab.active.colorLight
+          : theme.tab.active.colorDark
+      // complementing icon color
+      instanceStyles['--theme-color-default-icon'] =
+        lightText
+          ? theme.tab.defaultFaviconColorLight
+          : theme.tab.defaultFaviconColor
     }
     if (this.props.tabWidth) {
       instanceStyles.flex = `0 0 ${this.props.tabWidth}px`
@@ -334,8 +343,6 @@ class Tab extends React.Component {
         this.props.isPreview && styles.tabArea_isPreview,
         !this.props.isPreview && this.props.anyTabIsPreview && styles.tabArea_siblingIsPreview,
         this.props.isActive && this.props.anyTabIsPreview && styles.tabArea_isActive_siblingIsPreview,
-        // Windows specific style (color)
-        isWindows && styles.tabArea__tab_forWindows,
         // Set background-color and color to active tab and private tab
         this.props.isActive && styles.tabArea_isActive,
         this.props.isPrivateTab && styles.tabArea_private,
@@ -445,9 +452,11 @@ const styles = StyleSheet.create({
     '--tab-background': theme.tab.background,
     '--tab-color': theme.tab.color,
     '--tab-border-color': theme.tab.borderColor,
+    '--tab-default-icon-color': theme.tab.defaultFaviconColor,
     ':hover': {
       '--tab-background': `var(--tab-background-hover, ${theme.tab.hover.background})`,
       '--tab-color': `var(--tab-color-hover, ${theme.tab.color})`,
+      '--tab-default-icon-color': `var(--tab-default-icon-color-hover, ${theme.tab.defaultFaviconColor})`,
       '--tab-border-color': `var(--tab-border-color-hover, ${theme.tab.borderColor})`,
       '--tab-transit-duration': theme.tab.transitionDurationIn,
       '--tab-transit-easing': theme.tab.transitionEasingIn
@@ -478,23 +487,24 @@ const styles = StyleSheet.create({
   },
 
   tabArea_isActive: {
+    '--tab-color': theme.tab.active.colorDark,
     '--tab-background': theme.tab.active.background,
-    '--border-bottom-color': theme.tab.active.background,
+    '--tab-background-hover': theme.tab.hover.active.background,
     '--tab-border-color-bottom': 'var(--tab-background)',
     '--tab-transit-duration': theme.tab.transitionDurationIn,
     '--tab-transit-easing': theme.tab.transitionEasingIn
   },
 
   tabArea_isPreview: {
-    '--tab-background': 'white',
-    '--tab-background-hover': 'white',
-    '--tab-color': theme.tab.color,
-    '--tab-color-hover': theme.tab.color,
-    '--tab-border-color': 'white',
-    '--tab-border-color-hover': 'white',
+    '--tab-background': theme.tab.preview.background,
+    '--tab-background-hover': theme.tab.preview.background,
+    '--tab-color': theme.tab.active.colorDark,
+    '--tab-color-hover': theme.tab.active.colorDark,
+    '--tab-border-color': theme.tab.preview.background,
+    '--tab-border-color-hover': theme.tab.preview.background,
     zIndex: 110,
-    transform: 'scale(1.08)',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.22)',
+    transform: `scale(${theme.tab.preview.scale})`,
+    boxShadow: theme.tab.preview.boxShadow,
     // want the zindex to change immediately when previewing, but delay when un-previewing
     '--tab-zindex-delay': '0s',
     '--tab-zindex-duration': '0s',
@@ -515,29 +525,25 @@ const styles = StyleSheet.create({
     opacity: '.5'
   },
 
-  tabArea_forWindows: {
-    '--tab-color': theme.tab.forWindows.color
-  },
-
   tabArea_private: {
     '--tab-background': theme.tab.private.background,
-    '--tab-background-hover': theme.tab.active.private.background,
-    '--tab-color-hover': theme.tab.active.private.color,
-    '--tab-border-color-hover': theme.tab.hover.private.borderColor
+    '--tab-background-hover': theme.tab.hover.private.background
   },
 
   tabArea_private_active: {
     '--tab-background': theme.tab.active.private.background,
     '--tab-color': theme.tab.active.private.color,
     '--tab-background-hover': theme.tab.active.private.background,
-    '--tab-color-hover': theme.tab.active.private.color
+    '--tab-color-hover': theme.tab.active.private.color,
+    '--tab-default-icon-color': theme.tab.active.private.defaultFaviconColor
   },
 
   tabArea_themed: {
     '--tab-color': `var(--theme-color-fg)`,
     '--tab-background': `var(--theme-color-bg)`,
     '--tab-background-hover': 'var(--theme-color-bg)',
-    '--tab-color-hover': 'var(--theme-color-fg)'
+    '--tab-color-hover': 'var(--theme-color-fg)',
+    '--tab-default-icon-color': 'var(--theme-color-default-icon)'
   },
 
   tabArea__tab: {
@@ -566,7 +572,7 @@ const styles = StyleSheet.create({
       left: 0,
       right: 0,
       height: '2px',
-      background: 'lightskyblue'
+      background: theme.tab.icon.audio.color
     }
   },
 
