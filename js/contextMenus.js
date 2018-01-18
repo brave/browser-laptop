@@ -875,7 +875,7 @@ const searchEngineMenuItem = (location, searchProvider, searchDetail) => {
 const searchSelectionMenuItem = (location) => {
   var searchText = textUtils.ellipse(location)
   const maxSearchEngines = Array(searchProviders.length)
-  const searchEngineSubmenu = Array.from(maxSearchEngines, (_,i) =>
+  const searchEngineSubmenu = Array.from(maxSearchEngines, (_, i) =>
     searchEngineMenuItem(location, searchProviders[i].name, searchProviders[i].search))
 
   return {
