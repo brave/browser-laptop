@@ -1048,8 +1048,7 @@ const onWalletRecovery = (state, error, result) => {
     // convert buffer to Uint8Array
     let seed = result && result.getIn(['properties', 'wallet', 'keyinfo', 'seed'])
     if (seed) {
-      seed = new Uint8Array(Object.values(seed))
-      result = result.setIn(['properties', 'wallet', 'keyinfo', 'seed'], seed)
+      result = result.setIn(['properties', 'wallet', 'keyinfo', 'seed'], uintKeySeed(seed))
     }
 
     // remove old QR codes and addresses
@@ -1679,10 +1678,27 @@ const onBraveryProperties = (state, error, result) => {
   }
 
   if (result) {
+    if (result.properties && result.properties.wallet && result.properties.wallet.keyinfo) {
+      result.properties.wallet.keyinfo.seed = uintKeySeed(result.properties.wallet.keyinfo.seed)
+    }
     muonWriter(statePath, result)
   }
 
   return state
+}
+
+const uintKeySeed = (currentSeed) => {
+  if (currentSeed == null) {
+    return currentSeed
+  }
+
+  try {
+    currentSeed.toJSON()
+    const seed = new Uint8Array(Object.values(currentSeed))
+    currentSeed = seed
+  } catch (err) { }
+
+  return currentSeed
 }
 
 const getBalance = (state) => {
@@ -1725,6 +1741,11 @@ const onCallback = (state, result, delayTime) => {
 
   if (newAddress !== oldAddress) {
     state = ledgerState.setInfoProp(state, 'walletQR', Immutable.Map())
+  }
+
+  const seed = result.getIn(['properties', 'wallet', 'keyinfo', 'seed'])
+  if (seed) {
+    result = result.setIn(['properties', 'wallet', 'keyinfo', 'seed'], uintKeySeed(seed))
   }
 
   const regularResults = result.toJS()
@@ -2657,7 +2678,8 @@ const getMethods = () => {
       onWalletRecovery,
       getStateInfo,
       lockInContributionAmount,
-      callback
+      callback,
+      uintKeySeed
     }
   }
 
