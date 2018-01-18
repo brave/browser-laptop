@@ -529,7 +529,8 @@ describe('ledger api unit tests', function () {
         }))
         .setIn(['ledger', 'synopsis', 'publishers', publisherKey], Immutable.fromJS({
           visits: 1,
-          duration: 1000
+          duration: 1000,
+          providerName: 'YouTube'
         }))
 
       beforeEach(function () {
@@ -636,10 +637,26 @@ describe('ledger api unit tests', function () {
           ignoreMinTime: true
         }).calledOnce)
       })
+
+      it('state for this publisher is corrupted, so we need to fetch it again', function () {
+        const badState = defaultAppState
+          .setIn(['cache', 'ledgerVideos', videoId], Immutable.fromJS({
+            publisher: publisherKey
+          }))
+          .setIn(['ledger', 'synopsis', 'publishers', publisherKey], Immutable.fromJS({
+            options: {
+              excluded: false
+            }
+          }))
+
+        ledgerApi.onMediaRequest(badState, xhr, ledgerMediaProviders.YOUTUBE, 10)
+        assert(mediaSpy.calledOnce)
+        assert(saveVisitSpy.notCalled)
+      })
     })
 
     describe('onMediaPublisher', function () {
-      let saveVisitSpy, verifiedPStub
+      let saveVisitSpy, verifiedPStub, setPublisherSpy
 
       const expectedState = Immutable.fromJS({
         cache: {
@@ -668,12 +685,18 @@ describe('ledger api unit tests', function () {
         migrations: {}
       })
 
-      before(function () {
-        verifiedPStub = sinon.stub(ledgerApi, 'verifiedP', (state, publisherKey, fn) => state)
+      const response = Immutable.fromJS({
+        publisher: publisherKey,
+        faviconName: 'Brave',
+        faviconURL: 'data:image/jpeg;base64,...',
+        publisherURL: 'https://brave.com',
+        providerName: 'Youtube'
       })
 
-      after(function () {
-        verifiedPStub.restore()
+      before(function () {
+        verifiedPStub = sinon.stub(ledgerApi, 'verifiedP', (state, publisherKey, fn) => state)
+        saveVisitSpy = sinon.spy(ledgerApi, 'saveVisit')
+        setPublisherSpy = sinon.spy(ledgerState, 'setPublisher')
       })
 
       beforeEach(function () {
@@ -686,33 +709,92 @@ describe('ledger api unit tests', function () {
               options: {
                 exclude: true
               },
-              providerName: 'Youtube'
+              providerName: 'YouTube'
             }
           }
         })
-        saveVisitSpy = sinon.spy(ledgerApi, 'saveVisit')
+      })
+
+      after(function () {
+        verifiedPStub.restore()
+        saveVisitSpy.restore()
+        setPublisherSpy.restore()
       })
 
       afterEach(function () {
         ledgerApi.setSynopsis(undefined)
-        saveVisitSpy.restore()
+        verifiedPStub.reset()
+        saveVisitSpy.reset()
+        setPublisherSpy.reset()
       })
 
       it('null case', function () {
         const result = ledgerApi.onMediaPublisher(defaultAppState)
         assert.deepEqual(result.toJS(), defaultAppState.toJS())
+        assert(setPublisherSpy.notCalled)
+        assert(saveVisitSpy.notCalled)
+      })
+
+      it('we do not have publisher in the synopsis', function () {
+        ledgerApi.setSynopsis({
+          initPublisher: () => {
+            ledgerApi.setSynopsis({
+              initPublisher: () => {},
+              addPublisher: () => {},
+              publishers: {
+                [publisherKey]: {
+                  exclude: false,
+                  options: {
+                    exclude: true
+                  },
+                  providerName: 'YouTube'
+                }
+              }
+            })
+          },
+          addPublisher: () => {},
+          publishers: { }
+        })
+
+        const newState = Immutable.fromJS({
+          cache: {
+            ledgerVideos: {
+              'youtube_kLiLOkzLetE': {
+                publisher: 'youtube#channel:UCFNTTISby1c_H-rm5Ww5rZg',
+                faviconName: 'Brave',
+                providerName: 'Youtube',
+                faviconURL: 'data:image/jpeg;base64,...',
+                publisherURL: 'https://brave.com'
+              }
+            }
+          },
+          ledger: {
+            synopsis: {
+              publishers: {
+                'youtube#channel:UCFNTTISby1c_H-rm5Ww5rZg': {
+                  options: {
+                    exclude: true
+                  },
+                  faviconName: 'old Brave',
+                  faviconURL: 'data:image/jpeg;base64,...',
+                  publisherURL: 'https://brave.io',
+                  providerName: 'Youtube'
+                }
+              }
+            }
+          },
+          migrations: {}
+        })
+
+        const state = ledgerApi.onMediaPublisher(newState, videoId, response, 1000, false)
+        assert(saveVisitSpy.calledOnce)
+        assert(setPublisherSpy.calledTwice)
+        assert.deepEqual(state.toJS(), expectedState.toJS())
       })
 
       it('create publisher if new and add cache', function () {
-        const response = Immutable.fromJS({
-          publisher: publisherKey,
-          faviconName: 'Brave',
-          faviconURL: 'data:image/jpeg;base64,...',
-          publisherURL: 'https://brave.com',
-          providerName: 'Youtube'
-        })
-
         const state = ledgerApi.onMediaPublisher(defaultAppState, videoId, response, 1000, false)
+        assert(setPublisherSpy.calledTwice)
         assert(saveVisitSpy.calledOnce)
         assert.deepEqual(state.toJS(), expectedState.toJS())
       })
@@ -748,15 +830,8 @@ describe('ledger api unit tests', function () {
           migrations: {}
         })
 
-        const response = Immutable.fromJS({
-          publisher: publisherKey,
-          faviconName: 'Brave',
-          faviconURL: 'data:image/jpeg;base64,...',
-          publisherURL: 'https://brave.com',
-          providerName: 'Youtube'
-        })
-
         const state = ledgerApi.onMediaPublisher(newState, videoId, response, 1000, false)
+        assert(setPublisherSpy.calledOnce)
         assert(saveVisitSpy.calledOnce)
         assert.deepEqual(state.toJS(), expectedState.toJS())
       })
