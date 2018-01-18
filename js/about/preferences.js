@@ -272,7 +272,7 @@ class SearchTab extends ImmutableComponent {
     const iconSize = 16
     entries.forEach((entry) => {
       let iconStyle = {
-        backgroundImage: `url(${entry.image})`,
+        backgroundImage: `url(${entry.localImage})`,
         minWidth: iconSize,
         width: iconSize,
         backgroundSize: iconSize,
