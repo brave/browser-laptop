@@ -1878,4 +1878,58 @@ describe('ledger api unit tests', function () {
       })
     })
   })
+
+  describe('uintKeySeed', function () {
+    const buff = Buffer.from([
+      32,
+      87,
+      30,
+      26,
+      223,
+      56,
+      224,
+      31,
+      213,
+      136,
+      248,
+      95,
+      136,
+      56,
+      250,
+      78,
+      179,
+      121,
+      255,
+      162,
+      195,
+      39,
+      143,
+      136,
+      18,
+      140,
+      49,
+      216,
+      221,
+      154,
+      78,
+      173
+    ])
+
+    const uint = new Uint8Array(Object.values(buff))
+
+    it('null case', function () {
+      const result = ledgerApi.uintKeySeed()
+      assert.equal(result, undefined)
+    })
+
+    it('seed is in the correct format', function () {
+      const result = ledgerApi.uintKeySeed(uint)
+      assert.deepStrictEqual(result, uint)
+    })
+
+    it('seed needs to be converted', function () {
+      const result = ledgerApi.uintKeySeed(buff)
+      assert.deepStrictEqual(result, uint)
+    })
+  })
 })
