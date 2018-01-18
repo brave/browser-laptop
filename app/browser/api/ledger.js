@@ -2400,7 +2400,7 @@ const onMediaRequest = (state, xhr, type, tabId) => {
   if (!cache.isEmpty()) {
     const publisherKey = cache.get('publisher')
     const publisher = ledgerState.getPublisher(state, publisherKey)
-    if (!publisher.isEmpty()) {
+    if (!publisher.isEmpty() && publisher.has('providerName')) {
       return module.exports.saveVisit(state, publisherKey, {
         duration,
         revisited,
@@ -2449,18 +2449,12 @@ const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
   const publisherURL = response.get('publisherURL')
   const providerName = response.get('providerName')
 
-  if (publisher.isEmpty()) {
-    revisited = false
+  if (!synopsis.publishers[publisherKey] || publisher.isEmpty()) {
     synopsis.initPublisher(publisherKey)
 
     if (!synopsis.publishers[publisherKey]) {
       return state
     }
-
-    synopsis.publishers[publisherKey].faviconName = faviconName
-    synopsis.publishers[publisherKey].faviconURL = faviconURL
-    synopsis.publishers[publisherKey].publisherURL = publisherURL
-    synopsis.publishers[publisherKey].providerName = providerName
 
     state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
 
@@ -2473,15 +2467,19 @@ const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
         savePublisherOption(publisherKey, 'exclude', exclude)
       })
     }
-  } else {
-    synopsis.publishers[publisherKey].faviconName = faviconName
-    synopsis.publishers[publisherKey].faviconURL = faviconURL
-    synopsis.publishers[publisherKey].publisherURL = publisherURL
-    synopsis.publishers[publisherKey].providerName = providerName
-    state = ledgerState.setPublishersProp(state, publisherKey, 'faviconName', faviconName)
-    state = ledgerState.setPublishersProp(state, publisherKey, 'faviconURL', faviconURL)
-    state = ledgerState.setPublishersProp(state, publisherKey, 'publisherURL', publisherURL)
-    state = ledgerState.setPublishersProp(state, publisherKey, 'providerName', providerName)
+  }
+
+  synopsis.publishers[publisherKey].faviconName = faviconName
+  synopsis.publishers[publisherKey].faviconURL = faviconURL
+  synopsis.publishers[publisherKey].publisherURL = publisherURL
+  synopsis.publishers[publisherKey].providerName = providerName
+  state = ledgerState.setPublishersProp(state, publisherKey, 'faviconName', faviconName)
+  state = ledgerState.setPublishersProp(state, publisherKey, 'faviconURL', faviconURL)
+  state = ledgerState.setPublishersProp(state, publisherKey, 'publisherURL', publisherURL)
+  state = ledgerState.setPublishersProp(state, publisherKey, 'providerName', providerName)
+
+  if (publisher.isEmpty()) {
+    revisited = false
   }
 
   const cacheObject = Immutable.Map()
