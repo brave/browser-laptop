@@ -1,6 +1,17 @@
 # Changelog
 
 Release Notes:
+## [0.19.139](https://github.com/brave/browser-laptop/releases/tag/v0.19.139dev)
+
+ - Enabled SSL certificate pinning for important Brave domains. ([#12190](https://github.com/brave/browser-laptop/issues/12190))
+ - Fixed recovery key corruption for recovered wallets when browser restarts. ([#12672](https://github.com/brave/browser-laptop/issues/12672))
+ - Fixed recovering wallets when using cross-OS generated recovery keys. ([#12716](https://github.com/brave/browser-laptop/issues/12716))
+ - Fixed YouTube publishers appearing as URL's under Brave Payments. ([#12591](https://github.com/brave/browser-laptop/issues/12591))
+ - Fixed "Folder Upload" in Google Drive. ([#8601](https://github.com/brave/browser-laptop/issues/8601))
+ - Fixed misaligned show definition popup under macOS. ([#8554](https://github.com/brave/browser-laptop/issues/8554))
+ - Upgraded to muon 4.7.2. ([#12641](https://github.com/brave/browser-laptop/issues/12641))
+ - Upgraded to Chromium 64.0.3282.85. ([#12640](https://github.com/brave/browser-laptop/issues/12640))
+
 ## [0.19.134](https://github.com/brave/browser-laptop/releases/tag/v0.19.134dev)
 
  - Added a changeable default contribution amount for new installs. ([#12573](https://github.com/brave/browser-laptop/issues/12573))
