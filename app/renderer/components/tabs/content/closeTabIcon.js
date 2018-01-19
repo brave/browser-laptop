@@ -74,8 +74,8 @@ class CloseTabIcon extends React.Component {
     )
     if (shouldTransitionIn) {
       this.element.animate(opacityIncreaseElementKeyframes, {
-        duration: 200,
-        easing: 'linear'
+        duration: 120,
+        easing: 'ease-out'
       })
     }
   }
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     height: globalStyles.spacing.closeIconSize,
 
     // mask icon to gray to avoid calling another icon on hover
-    transition: 'filter 150ms linear',
+    transition: 'filter 120ms ease',
     filter: theme.tab.icon.close.filter,
 
     ':hover': {

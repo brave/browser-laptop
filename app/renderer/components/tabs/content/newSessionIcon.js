@@ -66,8 +66,8 @@ class NewSessionIcon extends React.Component {
     )
     if (shouldTransitionIn) {
       this.element.animate(opacityIncreaseElementKeyframes, {
-        duration: 200,
-        easing: 'linear'
+        duration: 120,
+        easing: 'ease-out'
       })
     }
   }
