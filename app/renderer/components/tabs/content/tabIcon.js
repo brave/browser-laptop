@@ -75,7 +75,6 @@ const styles = StyleSheet.create({
     backgroundRepeat: 'no-repeat',
 
     // Default animation properties
-    willChange: 'opacity',
     animationFillMode: 'forwards'
   },
 

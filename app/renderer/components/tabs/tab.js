@@ -549,6 +549,9 @@ const styles = StyleSheet.create({
   tabArea__tab: {
     boxSizing: 'border-box',
     background: `var(--tab-background, ${theme.tab.background})`,
+    // make sure the tab element which contains the background color
+    // has a new layer, so that the tab title text is rendered with subpixel antialiasing
+    // that knows about both the foreground and background colors
     display: 'flex',
     paddingBottom: 0, // explicitly defined for transition on active
     transition: ['background-color', 'color', 'border']

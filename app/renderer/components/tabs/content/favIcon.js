@@ -151,7 +151,6 @@ const styles = StyleSheet.create({
   icon__symbol_loading: {
     position: 'absolute',
     left: 0,
-    willChange: 'transform',
     backgroundImage: `url(${loadingIconSvg})`,
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'top left',
