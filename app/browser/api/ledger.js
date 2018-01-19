@@ -266,9 +266,9 @@ const loadKeysFromBackupFile = (state, filePath) => {
     try {
       const recoveryFileContents = data.toString()
 
-      let messageLines = recoveryFileContents.split(os.EOL)
+      let messageLines = recoveryFileContents.match(/^.+$/gm)
 
-      let passphraseLine = '' || messageLines[3]
+      let passphraseLine = '' || messageLines[2]
 
       const passphrasePattern = new RegExp([locale.translation('ledgerBackupText4'), '(.+)$'].join(' '))
       recoveryKey = (passphraseLine.match(passphrasePattern) || [])[1]
@@ -2675,7 +2675,8 @@ const getMethods = () => {
       getStateInfo,
       lockInContributionAmount,
       callback,
-      uintKeySeed
+      uintKeySeed,
+      loadKeysFromBackupFile
     }
   }
 
