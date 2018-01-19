@@ -189,9 +189,9 @@ class Tab extends React.Component {
     const frame = this.frame
 
     if (frame && !frame.isEmpty()) {
-      const tabWidth = this.fixTabWidth
       // do not mimic tab size if closed tab is a pinned tab
       if (!this.props.isPinnedTab) {
+        const tabWidth = this.fixTabWidth
         windowActions.onTabClosedWithMouse({
           fixTabWidth: tabWidth
         })
@@ -276,7 +276,7 @@ class Tab extends React.Component {
     props.isPinnedTab = isPinned
     props.isPrivateTab = privateState.isPrivateTab(currentWindow, frameKey)
     props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
-    props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
+    props.tabWidth = isPinned ? null : currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.themeColor = tabUIState.getThemeColor(currentWindow, frameKey)
     props.title = frame.get('title')
     props.tabPageIndex = frameStateUtil.getTabPageIndex(currentWindow)
@@ -295,25 +295,15 @@ class Tab extends React.Component {
     return props
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (this.props.tabWidth && !nextProps.tabWidth) {
-      // remember the width so we can transition from it
-      this.originalWidth = this.elementRef.getBoundingClientRect().width
-    }
-  }
-
   componentDidUpdate (prevProps) {
-    if (prevProps.tabWidth && !this.props.tabWidth) {
-      window.requestAnimationFrame(() => {
-        const newWidth = this.elementRef.getBoundingClientRect().width
-        this.elementRef.animate([
-          { flexBasis: `${this.originalWidth}px`, flexGrow: 0, flexShrink: 0 },
-          { flexBasis: `${newWidth}px`, flexGrow: 0, flexShrink: 0 }
-        ], {
-          duration: 250,
-          iterations: 1,
-          easing: 'ease-in-out'
-        })
+    if (prevProps.tabWidth && !this.props.tabWidth && !this.props.partOfFullPageSet) {
+      this.elementRef.animate([
+          { flexBasis: `${prevProps.tabWidth}px`, flexGrow: 0, flexShrink: 0 },
+          { flexBasis: 0, flexGrow: 1, flexShrink: 1 }
+      ], {
+        duration: 250,
+        iterations: 1,
+        easing: 'ease-in-out'
       })
     }
   }
@@ -414,7 +404,7 @@ const styles = StyleSheet.create({
     verticalAlign: 'top',
     overflow: 'hidden',
     height: '-webkit-fill-available',
-    flex: 1,
+    flex: '1 1 0',
 
     // no-drag is applied to the button and tab area
     // ref: tabs__tabStrip__newTabButton on tabs.js
