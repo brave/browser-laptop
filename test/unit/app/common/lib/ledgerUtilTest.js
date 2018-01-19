@@ -200,21 +200,30 @@ describe('ledgerUtil unit test', function () {
       const result = ledgerUtil.formatCurrentBalance(ledgerData)
       assert.equal(result, '5.00 BAT (1.12 USD)')
     })
+
     it('defaults `balance` to 0 if not found', function () {
       const result = ledgerUtil.formatCurrentBalance(ledgerData.delete('balance'))
       assert.equal(result, '0.00 BAT (1.12 USD)')
     })
+
     it('defaults `converted` to 0 if not found', function () {
       const result = ledgerUtil.formatCurrentBalance(ledgerData.delete('converted'))
       assert.equal(result, '5.00 BAT (0.00 USD)')
     })
+
     it('handles `balance` being a string', function () {
       const result = ledgerUtil.formatCurrentBalance(ledgerData.set('balance', '5'))
       assert.equal(result, '5.00 BAT (1.12 USD)')
     })
+
     it('handles `converted` being a string', function () {
       const result = ledgerUtil.formatCurrentBalance(ledgerData.set('converted', '1.1234'))
       assert.equal(result, '5.00 BAT (1.12 USD)')
+    })
+
+    it('custom format for amount lower then 0.01', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('converted', '0.004'))
+      assert.equal(result, '5.00 BAT (<.01 USD)')
     })
   })
 
