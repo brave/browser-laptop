@@ -1558,14 +1558,14 @@ const getPaymentInfo = (state) => {
   return state
 }
 
-const lockInContributionAmount = (balance) => {
+const lockInContributionAmount = (state, balance) => {
   // Lock in contribution amount if amount hasn't been chosen and balance is non-zero
   // (ex: they receive a grant or fund the wallet)
   // Amount is only set when user explicitly picks a contribution amount
   if (balance > 0) {
     const value = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, undefined, false)
     if (value === null) {
-      const defaultFromConfig = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT)
+      const defaultFromConfig = ledgerState.getContributionAmount(state)
       appActions.changeSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, defaultFromConfig)
     }
   }
@@ -1582,11 +1582,19 @@ const onWalletProperties = (state, body) => {
     state = ledgerState.setInfoProp(state, 'addresses', addresses)
   }
 
+  // Update default contribution amount
+  let monthly = parseFloat(body.getIn(['parameters', 'adFree', 'fee', 'BAT'])) || 0
+  if (monthly < 0 || isNaN(monthly)) {
+    monthly = 0
+  }
+
+  state = ledgerState.setInfoProp(state, 'contributionAmount', monthly)
+
   // Balance
   const balance = parseFloat(body.get('balance'))
   if (balance >= 0) {
     state = ledgerState.setInfoProp(state, 'balance', balance)
-    lockInContributionAmount(balance)
+    lockInContributionAmount(state, balance)
   }
 
   // Rates
@@ -1635,6 +1643,7 @@ const onWalletProperties = (state, body) => {
   if (clientOptions.verboseP) {
     console.log('\nWalletProperties refreshes payment info')
   }
+
   state = module.exports.generatePaymentData(state)
 
   return state
@@ -1760,7 +1769,7 @@ const onCallback = (state, result, delayTime) => {
 
   if (client && result.getIn(['properties', 'wallet'])) {
     if (!ledgerState.getInfoProp(state, 'created')) {
-      module.exports.setPaymentInfo(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
+      module.exports.setPaymentInfo(ledgerState.getContributionAmount(state))
     }
 
     state = getStateInfo(state, regularResults) // TODO optimize if possible
@@ -1891,8 +1900,8 @@ const initialize = (state, paymentsEnabled) => {
   }
 }
 
-const getContributionAmount = () => {
-  let amount = parseFloat(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT))
+const getContributionAmount = (state) => {
+  let amount = ledgerState.getContributionAmount(state)
 
   // if amount is 15, or 20... the amount wasn't updated when changing
   // from BTC to BAT (see https://github.com/brave/browser-laptop/issues/11719)
@@ -1971,7 +1980,7 @@ const onInitRead = (state, parsedData) => {
     state = ledgerState.setInfoProp(state, 'address', client.getWalletAddress())
   }
 
-  const contributionAmount = getContributionAmount()
+  const contributionAmount = getContributionAmount(state)
   module.exports.setPaymentInfo(contributionAmount)
   module.exports.getBalance(state)
 
