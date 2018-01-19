@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
   tabArea__tab__identity: {
     justifyContent: 'flex-start',
     alignItems: 'center',
-    overflow: 'hidden',
+    overflow: 'visible',
     display: 'flex',
     flex: '1',
     minWidth: '0', // @see https://bugzilla.mozilla.org/show_bug.cgi?id=1108514#c5

@@ -44,7 +44,7 @@
 
     filter: {
       makeWhite: 'brightness(0) invert(1)',
-      whiteShadow: 'drop-shadow(0px 0px 2px rgb(255, 255, 255))'
+      whiteShadow: 'drop-shadow(-10px 0px 12px rgb(255, 255, 255))'
     },
 
     tabsToolbar: {
