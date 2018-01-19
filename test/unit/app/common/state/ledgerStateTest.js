@@ -2,14 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global describe, it, before, after, afterEach */
+/* global describe, it, before, beforeEach, after, afterEach */
 const assert = require('assert')
 const Immutable = require('immutable')
 const sinon = require('sinon')
 const mockery = require('mockery')
 
 require('../../../braveUnit')
-const ledgerState = require('../../../../../app/common/state/ledgerState')
 const appActions = require('../../../../../js/actions/appActions')
 const settings = require('../../../../../js/constants/settings')
 
@@ -27,6 +26,9 @@ describe('ledgerState unit test', function () {
 
   // settings
   let paymentsEnabled = true
+  let paymentsAmount = 5
+
+  let ledgerState
 
   before(function () {
     mockery.enable({
@@ -40,10 +42,17 @@ describe('ledgerState unit test', function () {
         switch (settingKey) {
           case settings.PAYMENTS_ENABLED:
             return paymentsEnabled
+          case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
+            {
+              return paymentsAmount
+            }
         }
+
         return false
       }
     })
+
+    ledgerState = require('../../../../../app/common/state/ledgerState')
   })
 
   describe('setLedgerValue', function () {
@@ -74,6 +83,7 @@ describe('ledgerState unit test', function () {
     let setActivePromotionSpy
 
     before(function () {
+      paymentsEnabled = false
       setActivePromotionSpy = sinon.spy(ledgerState, 'setActivePromotion')
     })
 
@@ -82,6 +92,7 @@ describe('ledgerState unit test', function () {
     })
 
     after(function () {
+      paymentsEnabled = true
       setActivePromotionSpy.restore()
     })
 
@@ -520,6 +531,52 @@ describe('ledgerState unit test', function () {
       const state = defaultState.setIn(['ledger', 'promotion', 'promotionId'], '1')
       const result = ledgerState.getPromotionProp(state, 'promotionId')
       assert.deepEqual(result, '1')
+    })
+  })
+
+  describe('getContributionAmount', function () {
+    beforeEach(function () {
+      paymentsAmount = 5
+    })
+
+    it('user did change the amount', function () {
+      paymentsAmount = 10
+      const result = ledgerState.getContributionAmount()
+      assert.equal(result, 10)
+    })
+
+    it('state contains the amount', function () {
+      paymentsAmount = null
+      const state = defaultState
+        .setIn(['ledger', 'info', 'contributionAmount'], 15)
+      const result = ledgerState.getContributionAmount(state, 'promotionId')
+      assert.equal(result, 15)
+    })
+
+    describe('we pass amount directly', function () {
+      beforeEach(function () {
+        paymentsAmount = null
+      })
+
+      it('amount is word', function () {
+        const result = ledgerState.getContributionAmount(null, 'sdfsdf')
+        assert.equal(result, 5)
+      })
+
+      it('amount is string', function () {
+        const result = ledgerState.getContributionAmount(null, '10.5')
+        assert.equal(result, 10.5)
+      })
+
+      it('amount is number', function () {
+        const result = ledgerState.getContributionAmount(null, 11)
+        assert.equal(result, 11)
+      })
+
+      it('amount is 0', function () {
+        const result = ledgerState.getContributionAmount(null, 0)
+        assert.equal(result, 5)
+      })
     })
   })
 })

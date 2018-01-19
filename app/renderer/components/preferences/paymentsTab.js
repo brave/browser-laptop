@@ -31,6 +31,9 @@ const {LedgerRecoveryContent, LedgerRecoveryFooter} = require('./payment/ledgerR
 // Actions
 const appActions = require('../../../../js/actions/appActions')
 
+// State
+const ledgerState = require('../../../common/state/ledgerState')
+
 // Style
 const globalStyles = require('../styles/global')
 const {paymentStylesVariables} = require('../styles/payment')
@@ -79,7 +82,7 @@ class PaymentsTab extends ImmutableComponent {
     const walletQR = ledgerData.get('walletQR') || Immutable.List()
     const wizardData = ledgerData.get('wizardData') || Immutable.Map()
     const funds = formatCurrentBalance(ledgerData)
-    const budget = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings)
+    const budget = ledgerState.getContributionAmount(null, ledgerData.get('contributionAmount'), this.props.settings)
     const minAmount = batToCurrencyString(budget, ledgerData)
 
     return <AddFundsDialog
