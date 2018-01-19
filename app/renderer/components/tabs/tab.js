@@ -295,29 +295,6 @@ class Tab extends React.Component {
     return props
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (this.props.tabWidth && !nextProps.tabWidth) {
-      // remember the width so we can transition from it
-      this.originalWidth = this.elementRef.getBoundingClientRect().width
-    }
-  }
-
-  componentDidUpdate (prevProps) {
-    if (prevProps.tabWidth && !this.props.tabWidth) {
-      window.requestAnimationFrame(() => {
-        const newWidth = this.elementRef.getBoundingClientRect().width
-        this.elementRef.animate([
-          { flexBasis: `${this.originalWidth}px`, flexGrow: 0, flexShrink: 0 },
-          { flexBasis: `${newWidth}px`, flexGrow: 0, flexShrink: 0 }
-        ], {
-          duration: 250,
-          iterations: 1,
-          easing: 'ease-in-out'
-        })
-      })
-    }
-  }
-
   render () {
     // we don't want themeColor if tab is private
     const isThemed = !this.props.isPrivateTab && this.props.isActive && this.props.themeColor
@@ -334,16 +311,17 @@ class Tab extends React.Component {
         (this.isDraggingOverRight && !this.isDraggingOverSelf) && styles.tabArea_dragging_right,
         this.isDragging && styles.tabArea_isDragging,
         this.props.isPinnedTab && styles.tabArea_isPinned,
-        (this.props.partOfFullPageSet || !!this.props.tabWidth) && styles.tabArea_partOfFullPageSet
+        (this.props.partOfFullPageSet || !!this.props.tabWidth) && styles.tabArea_partOfFullPageSet,
+        this.props.tabWidth && styles.tabArea_forcedWidth
       )}
-      style={this.props.tabWidth ? { flex: `0 0 ${this.props.tabWidth}px` } : {}}
       onMouseMove={this.onMouseMove}
       onMouseEnter={this.onMouseEnter}
       onMouseLeave={this.onMouseLeave}
       data-test-id='tab-area'
       data-frame-key={this.props.frameKey}
       ref={elementRef => { this.elementRef = elementRef }}
-      >
+      style={this.props.tabWidth ? { '--tab-forced-width': `${this.props.tabWidth}px` } : { }}
+    >
       {
         this.props.isActive && this.props.notificationBarActive
           ? <NotificationBarCaret />
@@ -414,8 +392,8 @@ const styles = StyleSheet.create({
     verticalAlign: 'top',
     overflow: 'hidden',
     height: '-webkit-fill-available',
-    flex: 1,
-
+    flex: '1 1 0',
+    transition: 'flex .45s ease',
     // no-drag is applied to the button and tab area
     // ref: tabs__tabStrip__newTabButton on tabs.js
     WebkitAppRegion: 'no-drag',
@@ -445,6 +423,11 @@ const styles = StyleSheet.create({
 
   tabArea_partOfFullPageSet: {
     maxWidth: 'initial'
+  },
+
+  tabArea_forcedWidth: {
+    flex: '0 0 var(--tab-forced-width)',
+    transitionDuration: '0s'
   },
 
   tabArea__tab: {
