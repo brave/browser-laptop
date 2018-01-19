@@ -12,6 +12,7 @@ const appActions = require('../../../../../js/actions/appActions')
 const migrationState = require('../../../../../app/common/state/migrationState')
 const batPublisher = require('bat-publisher')
 const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
+const fs = require('fs')
 
 describe('ledger api unit tests', function () {
   let ledgerApi
@@ -93,6 +94,7 @@ describe('ledger api unit tests', function () {
     onLedgerCallbackSpy = sinon.spy(appActions, 'onLedgerCallback')
     onBitcoinToBatBeginTransitionSpy = sinon.spy(appActions, 'onBitcoinToBatBeginTransition')
     onChangeSettingSpy = sinon.spy(appActions, 'changeSetting')
+    mockery.registerMock('fs', fs)
 
     // default to tab state which should be tracked
     tabState = tabState.setIn(['navigationState', 'activeEntry'], {
@@ -1838,6 +1840,40 @@ describe('ledger api unit tests', function () {
     it('seed needs to be converted', function () {
       const result = ledgerApi.uintKeySeed(buff)
       assert.deepStrictEqual(result, uint)
+    })
+  })
+
+  describe('loadKeysFromBackupFile', function () {
+    describe('when parsing the recovery key', function () {
+      let stub
+
+      afterEach(function () {
+        stub.restore()
+      })
+
+      it('works with \\n (Linux)', function () {
+        stub = sinon.stub(fs, 'readFileSync', (path, options) => {
+          return 'Brave Wallet Recovery Key\nDate created: 01/18/2018\n\nLEDGERBACKUPTEXT4 a b d e f g h i j k l m n o p q\n\nNote: This key is not stored on Brave servers. This key is your only method of recovering your Brave wallet. Save this key in a safe place, separate from your Brave browser. Make sure you keep this key private, or else your wallet will be compromised.'
+        })
+        const result = ledgerApi.loadKeysFromBackupFile(undefined, 'file.txt')
+        assert.equal(result.recoveryKey, 'a b d e f g h i j k l m n o p q')
+      })
+
+      it('works with \\r (Classic Mac OS)', function () {
+        stub = sinon.stub(fs, 'readFileSync', (path, options) => {
+          return 'Brave Wallet Recovery Key\rDate created: 01/18/2018\r\rLEDGERBACKUPTEXT4 a b d e f g h i j k l m n o p q\r\rNote: This key is not stored on Brave servers. This key is your only method of recovering your Brave wallet. Save this key in a safe place, separate from your Brave browser. Make sure you keep this key private, or else your wallet will be compromised.'
+        })
+        const result = ledgerApi.loadKeysFromBackupFile(undefined, 'file.txt')
+        assert.equal(result.recoveryKey, 'a b d e f g h i j k l m n o p q')
+      })
+
+      it('works with \\r\\n (Windows)', function () {
+        stub = sinon.stub(fs, 'readFileSync', (path, options) => {
+          return 'Brave Wallet Recovery Key\r\nDate created: 01/18/2018\r\n\r\nLEDGERBACKUPTEXT4 a b d e f g h i j k l m n o p q\r\nNote: This key is not stored on Brave servers. This key is your only method of recovering your Brave wallet. Save this key in a safe place, separate from your Brave browser. Make sure you keep this key private, or else your wallet will be compromised.'
+        })
+        const result = ledgerApi.loadKeysFromBackupFile(undefined, 'file.txt')
+        assert.equal(result.recoveryKey, 'a b d e f g h i j k l m n o p q')
+      })
     })
   })
 })
