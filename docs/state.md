@@ -144,8 +144,9 @@ AppStore
         }, 
         setting: string
       },
+      contributionAmount: number,
       converted: string,
-      created, bolean, // wallet is created
+      created, boolean, // wallet is created
       creating: boolean, // wallet is being created
       currentRate: number,
       hasBitcoinHandler: boolean, // brave browser has a `bitcoin:` URI handler

@@ -42,7 +42,7 @@ const nextAddFundsTime = 3 * ledgerUtil.milliseconds.day
 const sufficientBalanceToReconcile = (state) => {
   const balance = Number(ledgerState.getInfoProp(state, 'balance') || 0)
   const unconfirmed = Number(ledgerState.getInfoProp(state, 'unconfirmed') || 0)
-  const budget = parseInt(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT), 10) || 25
+  const budget = ledgerState.getContributionAmount(state)
   return balance + unconfirmed >= budget
 }
 const hasFunds = (state) => {

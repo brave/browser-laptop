@@ -102,7 +102,7 @@ const walletStatus = (ledgerData) => {
     const transactions = ledgerData.get('transactions')
     const pendingFunds = Number(ledgerData.get('unconfirmed') || 0)
     const balance = Number(ledgerData.get('balance') || 0)
-    const minBalance = parseInt(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT), 10) || 25
+    const minBalance = ledgerState.getContributionAmount(null, ledgerData.get('contributionAmount'))
 
     if (pendingFunds + balance < minBalance) {
       status.id = 'insufficientFundsStatus'
