@@ -303,6 +303,33 @@ const ledgerState = {
   },
 
   /**
+   * Functions returns default monthly amount
+   * If user did not select it from the drop down we use defaults
+   *
+   * @param {any} state - app state
+   * @param {float} amount - custom amount, when we are using partial state
+   * @param {object} settingsCollection - settings object (used in about pages)
+   */
+  getContributionAmount: (state, amount, settingsCollection) => {
+    const value = getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, settingsCollection, false)
+
+    if (value === null) {
+      amount = parseFloat(amount)
+
+      if (state != null) {
+        state = validateState(state)
+        amount = ledgerState.getInfoProp(state, 'contributionAmount')
+      }
+
+      if (amount > 0) {
+        return amount
+      }
+    }
+
+    return parseFloat(getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, settingsCollection) || 5)
+  },
+
+  /**
    * OTHERS
    */
   setRecoveryStatus: (state, status) => {
