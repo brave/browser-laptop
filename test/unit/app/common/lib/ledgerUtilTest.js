@@ -514,4 +514,10 @@ describe('ledgerUtil unit test', function () {
       assert.equal(result, 31536000000)
     })
   })
+
+  describe('defaultMonthlyAmounts', function () {
+    it('should match', function () {
+      assert.deepEqual(ledgerUtil.defaultMonthlyAmounts.toJS(), [5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0])
+    })
+  })
 })
