@@ -93,6 +93,7 @@ const clientOptions = {
   version: 'v2',
   environment: process.env.LEDGER_ENVIRONMENT || 'production'
 }
+
 const fileTypes = {
   bmp: Buffer.from([0x42, 0x4d]),
   gif: Buffer.from([0x47, 0x49, 0x46, 0x38, [0x37, 0x39], 0x61]),
@@ -1630,6 +1631,18 @@ const onWalletProperties = (state, body) => {
       state = ledgerState.setInfoProp(state, 'converted', converted)
     }
   }
+
+  // monthly amount list
+  let list = body.getIn(['parameters', 'adFree', 'choices', 'BAT'])
+  if (list == null || !Immutable.List.isList(list) || list.isEmpty()) {
+    list = ledgerUtil.defaultMonthlyAmounts
+  }
+
+  const currentAmount = ledgerState.getContributionAmount(state)
+  if (!list.includes(currentAmount)) {
+    list = list.push(currentAmount).sort()
+  }
+  state = ledgerState.setInfoProp(state, 'monthlyAmounts', list)
 
   // unconfirmed amount
   const unconfirmed = parseFloat(body.get('unconfirmed'))

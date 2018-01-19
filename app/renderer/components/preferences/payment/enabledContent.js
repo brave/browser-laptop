@@ -10,6 +10,7 @@ const Immutable = require('immutable')
 // util
 const {batToCurrencyString, formatCurrentBalance, formattedDateFromTimestamp, walletStatus} = require('../../../../common/lib/ledgerUtil')
 const {l10nErrorText} = require('../../../../common/lib/httpUtil')
+const ledgerUtil = require('../../../../common/lib/ledgerUtil')
 const {changeSetting} = require('../../../lib/settingsUtil')
 const settings = require('../../../../../js/constants/settings')
 const locale = require('../../../../../js/l10n')
@@ -270,6 +271,7 @@ class EnabledContent extends ImmutableComponent {
     const walletStatusText = walletStatus(ledgerData)
     const contributionAmount = ledgerState.getContributionAmount(null, ledgerData.get('contributionAmount'), this.props.settings)
     const inTransition = ledgerData.getIn(['migration', 'btc2BatTransitionPending']) === true
+    const amountList = ledgerData.get('monthlyAmounts') || ledgerUtil.defaultMonthlyAmounts
 
     return <section className={css(styles.enabledContent)}>
       <div className={css(
@@ -309,9 +311,10 @@ class EnabledContent extends ImmutableComponent {
             data-isPanel
             data-test-id='fundsSelectBox'
             value={contributionAmount}
-            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}>
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}
+          >
             {
-              [5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0].map((amount) => {
+              amountList.map((amount) => {
                 let alternative = ''
                 if (ledgerData.has('currentRate')) {
                   const converted = batToCurrencyString(amount, ledgerData)
