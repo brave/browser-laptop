@@ -1214,8 +1214,9 @@ describe('ledger api unit tests', function () {
   })
 
   describe('onWalletProperties', function () {
-    const state = defaultAppState
+    let state = defaultAppState
       .setIn(['ledger', 'info', 'contributionAmount'], 0)
+      .setIn(['ledger', 'info', 'monthlyAmounts'], Immutable.List([5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0]))
 
     describe('generatePaymentData', function () {
       let generatePaymentDataSpy
@@ -1515,6 +1516,72 @@ describe('ledger api unit tests', function () {
         const expectedState = state
           .setIn(['ledger', 'info', 'unconfirmed'], 50)
         assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+    })
+
+    describe('monthly amount list', function () {
+      const oldState = state
+
+      const body = Immutable.fromJS({
+        parameters: {
+          adFree: {
+            choices: {
+              BAT: [
+                5,
+                15,
+                20
+              ]
+            }
+          }
+        }
+      })
+
+      before(function () {
+        state = state
+          .deleteIn(['ledger', 'info', 'monthlyAmounts'])
+      })
+
+      after(function () {
+        state = oldState
+      })
+
+      it('null case', function () {
+        const result = ledgerApi.onWalletProperties(state, Immutable.Map())
+        assert.deepEqual(result.toJS(), oldState.toJS())
+      })
+
+      it('list is string', function () {
+        const result = ledgerApi.onWalletProperties(state, Immutable.fromJS({
+          parameters: {
+            adFree: {
+              choices: {
+                BAT: 'rewrwer'
+              }
+            }
+          }
+        }))
+        assert.deepEqual(result.toJS(), oldState.toJS())
+      })
+
+      it('user has monthly amount that is not on the list', function () {
+        const result = ledgerApi.onWalletProperties(state, body)
+
+        const expectedState = oldState
+          .setIn(['ledger', 'info', 'monthlyAmounts'], Immutable.List([5.0, 10.0, 15.0, 20.0]))
+
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+
+      it('list is normal', function () {
+        contributionAmount = 5
+
+        const expectedState = oldState
+        .setIn(['ledger', 'info', 'monthlyAmounts'], Immutable.List([5.0, 15.0, 20.0]))
+
+        const result = ledgerApi.onWalletProperties(state, body)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+
+        contributionAmount = 10
       })
     })
   })

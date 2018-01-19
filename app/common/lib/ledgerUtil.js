@@ -303,6 +303,8 @@ const getMediaProvider = (url) => {
   return provider
 }
 
+const defaultMonthlyAmounts = Immutable.List([5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0])
+
 const milliseconds = {
   year: 365 * 24 * 60 * 60 * 1000,
   week: 7 * 24 * 60 * 60 * 1000,
@@ -330,7 +332,8 @@ const getMethods = () => {
     getMediaProvider,
     getMediaData,
     getMediaKey,
-    milliseconds
+    milliseconds,
+    defaultMonthlyAmounts
   }
 
   let privateMethods = {}
