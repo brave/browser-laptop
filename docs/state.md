@@ -207,6 +207,7 @@ AppStore
       creating: boolean, // wallet is being created
       currentRate: number,
       hasBitcoinHandler: boolean, // brave browser has a `bitcoin:` URI handler
+      monthlyAmounts: Array<float> // list of all monthly amounts for the contribution
       passphrase: string, // the BAT wallet passphrase
       paymentId: string,
       probi: number,
