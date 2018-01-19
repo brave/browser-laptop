@@ -61,6 +61,7 @@ const _internal = {
     cooked: []
   }
 }
+let userAgent = ''
 
 // Libraries
 let ledgerPublisher
@@ -1338,7 +1339,10 @@ const roundtrip = (params, options, callback) => {
     method: params.method,
     payload: params.payload,
     responseType: binaryP ? 'binary' : 'text',
-    headers: underscore.defaults(params.headers || {}, {'content-type': 'application/json; charset=utf-8'}),
+    headers: underscore.defaults(params.headers || {}, {
+      'content-type': 'application/json; charset=utf-8',
+      'user-agent': userAgent
+    }),
     verboseP: options.verboseP
   }
   request.request(options, (err, response, body) => {
@@ -1858,6 +1862,19 @@ const initialize = (state, paymentsEnabled) => {
 
   if (verifiedTimeoutId) {
     clearInterval(verifiedTimeoutId)
+  }
+
+  if (!userAgent) {
+    const versionInformation = state.getIn(['about', 'brave', 'versionInformation'])
+    if (versionInformation) {
+      userAgent = [
+        `Brave/${versionInformation.get('Brave')}`,
+        `Chrome/${versionInformation.get('libchromiumcontent')}`,
+        `Muon/${versionInformation.get('Muon')}`,
+        versionInformation.get('OS Platform'),
+        versionInformation.get('OS Architecture')
+      ].join(' ')
+    }
   }
 
   if (!paymentsEnabled) {
