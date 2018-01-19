@@ -11,9 +11,11 @@ const Immutable = require('immutable')
 const {batToCurrencyString, formatCurrentBalance, formattedDateFromTimestamp, walletStatus} = require('../../../../common/lib/ledgerUtil')
 const {l10nErrorText} = require('../../../../common/lib/httpUtil')
 const {changeSetting} = require('../../../lib/settingsUtil')
-const getSetting = require('../../../../../js/settings').getSetting
 const settings = require('../../../../../js/constants/settings')
 const locale = require('../../../../../js/l10n')
+
+// State
+const ledgerState = require('../../../../common/state/ledgerState')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
@@ -271,6 +273,7 @@ class EnabledContent extends ImmutableComponent {
   render () {
     const ledgerData = this.props.ledgerData
     const walletStatusText = walletStatus(ledgerData)
+    const contributionAmount = ledgerState.getContributionAmount(null, ledgerData.get('contributionAmount'), this.props.settings)
     const inTransition = ledgerData.getIn(['migration', 'btc2BatTransitionPending']) === true
 
     return <section className={css(styles.enabledContent)}>
@@ -296,7 +299,7 @@ class EnabledContent extends ImmutableComponent {
         <div className={css(gridStyles.row2col1)}>
           <PanelDropdown
             data-test-id='fundsSelectBox'
-            value={getSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, this.props.settings)}
+            value={contributionAmount}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}>
             {
               [5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0].map((amount) => {
