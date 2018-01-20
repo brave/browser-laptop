@@ -943,7 +943,10 @@ describe('ledger api unit tests', function () {
             method: 'GET',
             payload: undefined,
             responseType: 'text',
-            headers: { 'content-type': 'application/json; charset=utf-8' },
+            headers: {
+              'content-type': 'application/json; charset=utf-8',
+              'user-agent': ''
+            },
             verboseP: undefined
           }
           requestStub.reset()
