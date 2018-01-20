@@ -86,6 +86,17 @@ describe('historyReducer unit test', function () {
             partitionNumber: 0,
             themeColor: undefined,
             title: 'Brave'
+          },
+          {
+            count: 2,
+            favicon: undefined,
+            key: 'https://brave.com/|1',
+            lastAccessedTime: 0,
+            location: 'https://brave.com/',
+            objectId: null,
+            partitionNumber: 0,
+            themeColor: undefined,
+            title: 'Brave | Another Page'
           }
         ]
       }
@@ -347,6 +358,83 @@ describe('historyReducer unit test', function () {
       assert.equal(spy.calledOnce, true)
       assert.equal(spyAbout.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
+    })
+  })
+
+  describe('APP_REMOVE_HISTORY_DOMAIN', function () {
+    let spy, spyAbout
+
+    before(function () {
+      spy = sinon.spy(historyState, 'removeSite')
+      spyAbout = sinon.spy(aboutHistoryState, 'setHistory')
+    })
+
+    afterEach(function () {
+      spy.reset()
+      spyAbout.reset()
+    })
+
+    after(function () {
+      spy.restore()
+      spyAbout.restore()
+    })
+
+    it('null case', function () {
+      const newState = historyReducer(state, {
+        actionType: appConstants.APP_REMOVE_HISTORY_DOMAIN
+      })
+      assert.equal(spy.notCalled, true)
+      assert.equal(spyAbout.notCalled, true)
+      assert.deepEqual(newState.toJS(), state.toJS())
+    })
+
+    it('domain is a string', function () {
+      const newState = historyReducer(stateWithData, {
+        actionType: appConstants.APP_REMOVE_HISTORY_DOMAIN,
+        domain: 'https://brave.com'
+      })
+      const expectedState = state
+        .set('historySites', Immutable.fromJS({
+          'https://clifton.io/|0': {
+            count: 1,
+            favicon: undefined,
+            key: 'https://clifton.io/|0',
+            lastAccessedTime: 0,
+            location: 'https://clifton.io/',
+            objectId: null,
+            partitionNumber: 0,
+            themeColor: undefined,
+            title: 'Clifton'
+          }
+        }))
+        .setIn(['about', 'history'], Immutable.fromJS({
+          entries: [
+            {
+              count: 1,
+              favicon: undefined,
+              key: 'https://clifton.io/|0',
+              lastAccessedTime: 0,
+              location: 'https://clifton.io/',
+              objectId: null,
+              partitionNumber: 0,
+              themeColor: undefined,
+              title: 'Clifton'
+            }
+          ],
+          updatedStamp: 0
+        }))
+
+      it('calls remove for each matching domain', () => {
+        assert.equal(spy.calledTwice, true)
+      })
+
+      it('sets the history with the update site list', () => {
+        assert.equal(spyAbout.calledOnce, true)
+      })
+
+      it('returns the updated state', () => {
+        assert.deepEqual(newState.toJS(), expectedState.toJS())
+      })
     })
   })
 

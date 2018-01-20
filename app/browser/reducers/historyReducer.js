@@ -19,6 +19,7 @@ const messages = require('../../../js/constants/messages')
 const settings = require('../../../js/constants/settings')
 
 // Utils
+const urlParse = require('../../common/urlParse')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {remove} = require('../../common/lib/siteSuggestions')
 const syncUtil = require('../../../js/state/syncUtil')
@@ -125,6 +126,24 @@ const historyReducer = (state, action, immutableAction) => {
         state = aboutHistoryState.setHistory(state, historyState.getSites(state))
         break
       }
+
+    case appConstants.APP_REMOVE_HISTORY_DOMAIN: {
+      const domain = action.get('domain')
+
+      if (!domain) {
+        break
+      }
+
+      historyState.getSites(state).forEach(historySite => {
+        if (urlParse(historySite.get('location')).hostname === domain) {
+          state = historyState.removeSite(state, historySite.get('key'))
+        }
+      })
+
+      state = aboutHistoryState.setHistory(state, historyState.getSites(state))
+
+      break
+    }
 
     case appConstants.APP_POPULATE_HISTORY:
       {
