@@ -11,3 +11,10 @@
   #watch-channel-brand-div {
     display: none !important;
 }
+
+/* CoinMarketCap Ads */
+link[href*='files.coinmarketcap.com'] ~ #icobanner-wrapper,
+link[href*='files.coinmarketcap.com'] ~ .container #leaderboard,
+link[href*='files.coinmarketcap.com'] ~ .container #leaderboard-bottom {
+  display: none !important;
+}
