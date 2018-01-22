@@ -289,7 +289,7 @@ class SyncTab extends ImmutableComponent {
       : getSetting(settings.SYNC_DEVICE_NAME, this.props.settings)
   }
 
-  get deviceNameInputContent () {
+  deviceNameInputContent (hasAutoFocus = false) {
     return <SettingItem>
       <div className={css(styles.syncOverlayBody__label)} data-l10n-id='syncDeviceNameInput' />
       <input className={css(
@@ -298,6 +298,7 @@ class SyncTab extends ImmutableComponent {
         commonStyles.textbox__outlineable,
         commonStyles.textbox__isSettings
       )}
+        autoFocus={hasAutoFocus}
         spellCheck='false'
         ref={(node) => { this.deviceNameInput = node }}
         placeholder={this.defaultDeviceName} />
@@ -306,7 +307,7 @@ class SyncTab extends ImmutableComponent {
 
   get startOverlayContent () {
     return <section className={css(styles.syncOverlayBody__formBottomMargin)}>
-      {this.deviceNameInputContent}
+      {this.deviceNameInputContent(true)}
     </section>
   }
 
@@ -329,12 +330,13 @@ class SyncTab extends ImmutableComponent {
           styles.textArea__passphrase
         )}
           spellCheck='false'
+          autoFocus
           ref={(node) => { this.passphraseInput = node }}
           onChange={this.enableRestore}
         />
       </div>
       <div className={css(styles.syncOverlayBody__formBottomMargin)}>
-        {this.deviceNameInputContent}
+        {this.deviceNameInputContent()}
       </div>
     </section>
   }
@@ -430,15 +432,6 @@ class SyncTab extends ImmutableComponent {
       }
     }
     window.alert('Invalid input code; please try again or create a new profile.')
-  }
-
-  componentDidUpdate () {
-    if (!this.isSetup && this.props.syncStartOverlayVisible) {
-      this.deviceNameInput.focus()
-    }
-    if (!this.isSetup && this.props.syncAddOverlayVisible) {
-      this.passphraseInput.focus()
-    }
   }
 
   render () {
