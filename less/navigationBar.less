@@ -826,6 +826,7 @@
       height: @urlbarFormHeight;
       min-height: @urlbarFormHeight;
       margin: 0 5px;
+      max-width: 40%;
 
       .urlbarIcon {
         color: @siteSecureColor;
@@ -865,6 +866,9 @@
         color: forestgreen;
         padding: 5px;
         border-right: 1px solid #ccc;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }
