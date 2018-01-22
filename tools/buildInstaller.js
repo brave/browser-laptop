@@ -91,9 +91,11 @@ if (isDarwin) {
   const wvResources = wvContents + '/Resources'
   const wvBundleSig = wvResources + '/Brave Framework.sig'
   const wvPlugin = buildDir + `/${appName}.app/Contents/Frameworks/Brave Framework.framework/Libraries/WidevineCdm/_platform_specific/mac_x64/widevinecdmadapter.plugin`
+  // choose pkg or dmg based on channel
   cmds = [
     // Remove old
     'rm -f ' + outDir + `/${appName}.dmg`,
+    'rm -f ' + outDir + `/${appName}.pkg`,
 
     // sign for widevine
     'mkdir -p "' + wvResources + '"',
@@ -109,11 +111,10 @@ if (isDarwin) {
     'cd ../../..',
     `codesign --deep --force --strict --verbose --sign $IDENTIFIER ${appName}.app/`,
 
-    // Package it into a dmg
+    // Package it into a dmg or package
     'cd ..',
     'build ' +
       '--prepackaged="' + buildDir + `/${appName}.app" ` +
-      '--mac=dmg ' +
       ` --config=res/${channel}/builderConfig.json `,
 
     // Create an update zip
@@ -125,7 +126,7 @@ if (isDarwin) {
       return
     }
 
-    console.log.bind(null, 'done')
+    console.log('done')
   })
 } else if (isWindows) {
   // a cert file must be present to sign the created package
