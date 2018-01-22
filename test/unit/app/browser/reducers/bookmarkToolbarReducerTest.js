@@ -122,7 +122,7 @@ describe('bookmarkToolbarReducer unit test', function () {
       bookmarkToolbarReducer(stateWithData, {
         actionType: appConstants.APP_SET_STATE
       })
-      assert.equal(spyCalc.callCount, 2)
+      assert.equal(spyCalc.callCount, 1)
     })
 
     it('we are on version 0.21', function () {
