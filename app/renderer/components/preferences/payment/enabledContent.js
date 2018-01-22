@@ -523,7 +523,8 @@ const styles = StyleSheet.create({
   },
 
   claimButton: {
-    marginTop: '10px'
+    marginBottom: '10px',
+    marginTop: 0
   },
 
   enabledContent__grant: {
