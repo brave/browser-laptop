@@ -645,6 +645,7 @@
   display: flex;
   flex-grow: 1;
   min-width: 0%; // allow the navigator to shrink
+  margin-left: 1px;
 
   *:not(legend) {
     z-index: @zindexUrlbarNotLegend;
@@ -882,9 +883,8 @@
       align-items: center;
       justify-content: center;
       height: @urlbarFormHeight;
-      width: @urlbarFormHeight;
       min-height: @urlbarFormHeight;
-      min-width: @urlbarFormHeight;
+      margin: 0 5px;
 
       .urlbarIcon {
         color: @siteSecureColor;
@@ -893,6 +893,7 @@
         background-position: center;
         position: relative;
         bottom: -1px;
+        margin-left: 3px;
 
         // about:newtab
         &.fa-search {
@@ -916,6 +917,13 @@
         &.extendedValidation {
           color: @siteEVColor;
         }
+      }
+
+      .evCert {
+        font-size: 12px;
+        color: forestgreen;
+        padding: 5px;
+        border-right: 1px solid #ccc;
       }
     }
   }

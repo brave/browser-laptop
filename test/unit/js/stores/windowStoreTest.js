@@ -114,7 +114,8 @@ describe('Window store unit tests', function () {
             windowState.getIn(['frames', 0, 'security']),
             Immutable.fromJS({
               isSecure: null,
-              runInsecureContent: false
+              runInsecureContent: false,
+              evCert: undefined
             }))
         })
       })

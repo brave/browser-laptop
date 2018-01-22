@@ -763,6 +763,7 @@ WindowStore
     security: {
       blockedRunInsecureContent: Array<string>, // sources of blocked active mixed content
       isSecure: (boolean|number), // true = fully secure, false = fully insecure, 1 = partially secure, 2 = cert error
+      evCert: string,
       loginRequiredDetail: {
         isProxy: boolean,
         host: string,
