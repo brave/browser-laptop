@@ -450,6 +450,7 @@ class UrlBar extends React.Component {
     props.loading = activeFrame.get('loading')
     props.showDisplayTime = !props.titleMode && props.displayURL === location
     props.showNoScriptInfo = enableNoScript && scriptsBlocked && scriptsBlocked.size
+    props.evCert = activeFrame.getIn(['security', 'evCert'])
     props.isActive = urlbar.get('active')
     props.showUrlBarSuggestions = urlbar.getIn(['suggestions', 'shouldRender']) === true &&
       suggestionList && suggestionList.size > 0
@@ -475,7 +476,26 @@ class UrlBar extends React.Component {
     return props
   }
 
+  get showEvCert () {
+    if (this.props.titleMode) {
+      return null
+    }
+    return <span className='evCert'> {this.props.evCert} </span>
+  }
+
   render () {
+    const urlbarIconContainer = this.props.evCert
+    ? (<div className='urlbarIconContainer'>
+      <UrlBarIcon
+        titleMode={this.props.titleMode}
+      />
+      {this.showEvCert}
+    </div>)
+    : (<div className='urlbarIconContainer'>
+      <UrlBarIcon
+        titleMode={this.props.titleMode}
+      />
+    </div>)
     return <div
       className={cx({
         urlbarForm: true,
@@ -484,11 +504,7 @@ class UrlBar extends React.Component {
       })}
       id='urlbar'
     >
-      <div className='urlbarIconContainer'>
-        <UrlBarIcon
-          titleMode={this.props.titleMode}
-        />
-      </div>
+      {urlbarIconContainer}
       {
         this.props.titleMode
         ? <div id='titleBar' data-test-id='titleBar'>

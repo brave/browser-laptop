@@ -679,6 +679,7 @@ class Frame extends React.Component {
       }
       let isSecure = null
       let runInsecureContent = this.props.runInsecureContent
+      let evCert = null
       if (e.securityState === 'secure') {
         isSecure = true
       } else if (e.securityState === 'insecure') {
@@ -694,9 +695,22 @@ class Frame extends React.Component {
         const parsedUrl = urlParse(this.props.location)
         ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.tabId)
       }
+
+      if (e.securityInfo.securityLevel === 'ev-secure') {
+        if (e.securityInfo.certificate &&
+            e.securityInfo.certificate.organizationNames.length) {
+          const countryName = e.securityInfo.certificate.countryName
+          const organizationName = e.securityInfo.certificate.organizationNames[0]
+          evCert = organizationName
+          if (countryName) {
+            evCert += ` [${countryName}]`
+          }
+        }
+      }
       windowActions.setSecurityState(this.props.tabId, {
         secure: runInsecureContent ? false : isSecure,
-        runInsecureContent
+        runInsecureContent,
+        evCert
       })
     }, { passive: true })
     this.webview.addEventListener('load-start', (e) => {
