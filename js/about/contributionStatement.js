@@ -324,12 +324,13 @@ class ContributionStatement extends React.Component {
               <tr className={css(styles.table__tr, styles.table__spacingRow)} />
               {
               page.map(function (row, idx) {
-                let publisherSynopsis = (this.synopsis.filter((entry) => { return entry.site === row[0] }) || [])[0] || {}
+                const publisherKey = row[0]
+                const publisherSynopsis = (this.synopsis.filter((entry) => { return entry.publisherKey === publisherKey }) || [])[0] || {}
 
-                let verified = publisherSynopsis.verified
-                let site = row[0]
-                let fractionStr = (parseFloat(row[2]) * 100).toFixed(2)
-                let fiatStr = row[3]
+                const verified = publisherSynopsis && publisherSynopsis.verified
+                const fractionStr = (parseFloat(row[2]) * 100).toFixed(2)
+                const fiatStr = row[3]
+                const title = (publisherSynopsis && publisherSynopsis.siteName) ? publisherSynopsis.siteName : publisherKey
 
                 return (
                   <tr className={css(styles.textAlignRight, styles.table__tr)}>
@@ -340,7 +341,7 @@ class ContributionStatement extends React.Component {
                       styles.table__siteColumn)}
                       data-test-id='siteColumnTr'>
                       {verified ? <span className={css(imgStyle.verified, styles.table__verified)} /> : null}
-                      <span className={verified ? css(styles.table__verifiedSite) : site}>{site}</span>
+                      <span className={verified ? css(styles.table__verifiedSite) : false}>{title}</span>
                     </td>
                     <td className='fractionColumn'>{fractionStr}</td>
                     <td className='fiatColumn'>{fiatStr}</td>
