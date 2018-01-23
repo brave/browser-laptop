@@ -15,13 +15,8 @@ const telemetry = require('./telemetry')
 // set initial base line checkpoint
 telemetry.setCheckpoint('init')
 
-const handleUncaughtError = (error) => {
-  var message, ref, stack
-  stack = (ref = error.stack) != null ? ref : error.name + ': ' + error.message
-  message = 'Uncaught Exception:\n' + stack
-  console.error('An uncaught exception occurred in the main process ' + message)
-
-  muon.crashReporter.setCrashKeyValue('javascript-info', JSON.stringify({stack}))
+const handleUncaughtError = (stack, message) => {
+  muon.crashReporter.setCrashKeyValue('javascript-info', JSON.stringify({stack, message}))
   muon.crashReporter.dumpWithoutCrashing()
 
   if (!ready) {
@@ -35,11 +30,16 @@ const handleUncaughtError = (error) => {
   }
 }
 process.on('uncaughtException', function (error) {
-  handleUncaughtError(error)
+  var message, ref, stack
+  stack = (ref = error.stack) != null ? ref : error.name + ': ' + error.message
+  message = 'Uncaught Exception:\n' + stack
+  console.error('An uncaught exception occurred in the main process ' + message)
+  handleUncaughtError(stack, message)
 })
 
-process.on('unhandledRejection', function (error, promise) {
-  handleUncaughtError(error)
+process.on('unhandledRejection', function (reason, promise) {
+  console.error('Unhandled promise rejection in the main process ' + reason)
+  handleUncaughtError(promise, reason)
 })
 
 process.on('warning', warning => console.warn(warning.stack))
