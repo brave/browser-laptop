@@ -496,10 +496,9 @@ const handleAppAction = (action) => {
         if (platformUtil.isLinux()) {
           const Channel = require('../../app/channel')
           const desktopName = Channel.getLinuxDesktopName()
-          var args = [desktopName, "--"];
           for (const p of defaultProtocols) {
-            app.setAsDefaultProtocolClient(p, args)
-            app.setAsDefaultProtocolClient('', args)
+            app.setAsDefaultProtocolClient(p, desktopName)
+            app.setAsDefaultProtocolClient('', desktopName)
           }
           isDefaultBrowser = app.isDefaultProtocolClient('', desktopName)
         } else {
