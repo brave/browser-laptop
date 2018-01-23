@@ -16,7 +16,8 @@ const isLinux = process.platform === 'linux'
 var env = {
   NODE_ENV: 'production',
   CHANNEL: process.env.CHANNEL,
-  REF: process.env.REF || null
+  REF: process.env.REF || null,
+  REFERRAL_API_KEY: process.env.REFERRAL_API_KEY
 }
 
 const channel = env.CHANNEL
@@ -78,7 +79,8 @@ config.writeBuildConfig(
     channel: channel,
     BROWSER_LAPTOP_REV: require('git-rev-sync').long(),
     nodeEnv: env.NODE_ENV,
-    ref: ref || null
+    ref: ref || null,
+    referralAPI: env.REFERRAL_API_KEY
   },
   'buildConfig.js'
 )
