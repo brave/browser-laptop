@@ -218,7 +218,6 @@
     "plugins": [
       "flowtype"
     ],
-    "parser": "babel-eslint",
     "ignore": [
       "app/extensions/**",
       "app/browser/ads/adDivCandidates.js",
