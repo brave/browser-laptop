@@ -280,40 +280,6 @@ describe('ledger api unit tests', function () {
         ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
         assert(setPaymentInfoSpy.withArgs(10).calledOnce)
       })
-
-      describe('when contribution amount is still set to the USD amount (before BAT Mercury)', function () {
-        after(function () {
-          contributionAmount = 10
-        })
-        describe('when set to 15 USD', function () {
-          before(function () {
-            setPaymentInfoSpy.reset()
-            onChangeSettingSpy.reset()
-            contributionAmount = 15
-            ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
-          })
-          it('converts to 75 BAT', function () {
-            assert(setPaymentInfoSpy.withArgs(75).calledOnce)
-          })
-          it('updates the setting', function () {
-            assert(onChangeSettingSpy.withArgs(settings.PAYMENTS_CONTRIBUTION_AMOUNT, 75).calledOnce)
-          })
-        })
-        describe('when set to 20 USD', function () {
-          before(function () {
-            setPaymentInfoSpy.reset()
-            onChangeSettingSpy.reset()
-            contributionAmount = 20
-            ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
-          })
-          it('converts to 100 BAT', function () {
-            assert(setPaymentInfoSpy.withArgs(100).calledOnce)
-          })
-          it('updates the setting', function () {
-            assert(onChangeSettingSpy.withArgs(settings.PAYMENTS_CONTRIBUTION_AMOUNT, 100).calledOnce)
-          })
-        })
-      })
     })
 
     describe('checkBtcBatMigrated', function () {
