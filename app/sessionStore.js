@@ -25,6 +25,7 @@ const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const siteTags = require('../js/constants/siteTags')
 const downloadStates = require('../js/constants/downloadStates')
+const {defaultProtocols} = require('../js/constants/appConfig')
 
 // State
 const tabState = require('./common/state/tabState')
@@ -874,8 +875,10 @@ const protocolHandlerMigration = (immutableData) => {
     if (platformUtil.isWindows() &&
       immutableData.getIn(['settings', settings.IS_DEFAULT_BROWSER])) {
       // Update the protocol handler to be safe
-      app.setAsDefaultProtocolClient('http', ['--'])
-      app.setAsDefaultProtocolClient('https', ['--'])
+      defaultProtocols.forEach((protocol) => {
+        app.removeAsDefaultProtocolClient(protocol)
+        app.setAsDefaultProtocolClient(protocol, undefined, ['--'])
+      })
     }
     immutableData = immutableData.set('defaultProtocolMigration', true)
   }

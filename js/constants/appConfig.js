@@ -258,5 +258,6 @@ module.exports = {
     'advanced.hide-lower-sites': true
     // END - DEPRECATED WITH 0.21.0
   },
-  defaultFavicon: 'img/empty_favicon.png'
+  defaultFavicon: 'img/empty_favicon.png',
+  defaultProtocols: ['http', 'https'] // Protocols handled by Brave
 }
