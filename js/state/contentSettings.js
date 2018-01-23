@@ -373,6 +373,7 @@ const doAction = (action) => {
   switch (action.actionType) {
     case appConstants.APP_REMOVE_SITE_SETTING:
     case appConstants.APP_CHANGE_SITE_SETTING:
+    case appConstants.APP_CLEAR_SITE_SETTINGS:
     case appConstants.APP_ADD_NOSCRIPT_EXCEPTIONS:
       appDispatcher.waitFor([AppStore.dispatchToken], () => {
         userPrefsUpdateTrigger(action.temporary)
