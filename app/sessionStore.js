@@ -792,7 +792,10 @@ module.exports.runPreMigrations = (data) => {
     }
 
     // Add cache to the state
-    data.cache = {}
+    if (!data.cache) {
+      data.cache = {}
+    }
+
     data.cache.bookmarkLocation = data.locationSiteKeysCache
     data.cache.bookmarkOrder = sortBookmarkOrder(bookmarkOrder)
 
