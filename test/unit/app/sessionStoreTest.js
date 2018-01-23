@@ -1372,7 +1372,7 @@ describe('sessionStore unit tests', function () {
           '12': {}
         },
         cache: {
-          fakeEntry: {}
+          ledgerVideos: {}
         },
         history: {
           'https://not-a-real-entry|0': {}
@@ -1700,8 +1700,8 @@ describe('sessionStore unit tests', function () {
           it('creates an entry for bookmark order', function () {
             assert(newValue.bookmarkOrder)
           })
-          it('destroys any existing values in `data.cache`', function () {
-            assert.equal(newValue.fakeEntry, undefined)
+          it('keep any existing values in `data.cache`', function () {
+            assert(newValue.ledgerVideos)
           })
         })
 
