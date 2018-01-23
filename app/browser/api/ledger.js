@@ -1931,24 +1931,7 @@ const initialize = (state, paymentsEnabled) => {
 }
 
 const getContributionAmount = (state) => {
-  let amount = ledgerState.getContributionAmount(state)
-
-  // if amount is 15, or 20... the amount wasn't updated when changing
-  // from BTC to BAT (see https://github.com/brave/browser-laptop/issues/11719)
-  let updatedAmount
-  switch (amount) {
-    case 15: updatedAmount = 75; break
-    case 20: updatedAmount = 100; break
-  }
-
-  if (updatedAmount) {
-    if (clientOptions.verboseP) {
-      console.log('\nmigrating contribution amount of ' + amount + ' from USD to BAT (new amount is ' + updatedAmount + ')')
-    }
-    appActions.changeSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, updatedAmount)
-    return updatedAmount
-  }
-  return amount
+  return ledgerState.getContributionAmount(state)
 }
 
 const onInitRead = (state, parsedData) => {
