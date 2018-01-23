@@ -35,6 +35,7 @@ const {HrtimeLogger} = require('../../app/common/lib/logUtil')
 const platformUtil = require('../../app/common/lib/platformUtil')
 const urlUtil = require('../lib/urlutil')
 const buildConfig = require('../constants/buildConfig')
+const {defaultProtocols} = require('../constants/appConfig')
 
 // state helpers
 const {makeImmutable} = require('../../app/common/state/immutableUtil')
@@ -50,8 +51,6 @@ const bookmarkToolbarState = require('../../app/common/state/bookmarkToolbarStat
 
 // Only used internally
 const CHANGE_EVENT = 'app-state-change'
-
-const defaultProtocols = ['https', 'http']
 
 let appState = null
 let initialized = false
@@ -503,7 +502,7 @@ const handleAppAction = (action) => {
           isDefaultBrowser = app.isDefaultProtocolClient('', desktopName)
         } else {
           for (const p of defaultProtocols) {
-            app.setAsDefaultProtocolClient(p)
+            app.setAsDefaultProtocolClient(p, ['--'])
           }
           isDefaultBrowser = defaultProtocols.every(p => app.isDefaultProtocolClient(p))
         }

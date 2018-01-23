@@ -25,6 +25,7 @@ const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const siteTags = require('../js/constants/siteTags')
 const downloadStates = require('../js/constants/downloadStates')
+const {defaultProtocols} = require('../js/constants/appConfig')
 
 // State
 const tabState = require('./common/state/tabState')
@@ -868,8 +869,25 @@ const fingerprintingProtectionMigration = (immutableData) => {
   return immutableData
 }
 
+const protocolHandlerMigration = (immutableData) => {
+  // Fix https://github.com/brave/browser-laptop/issues/12797
+  if (!immutableData.get('defaultProtocolMigration')) {
+    if (platformUtil.isWindows() &&
+      immutableData.getIn(['settings', settings.IS_DEFAULT_BROWSER])) {
+      // Update the protocol handler to be safe
+      defaultProtocols.forEach((protocol) => {
+        app.removeAsDefaultProtocolClient(protocol)
+        app.setAsDefaultProtocolClient(protocol, undefined, ['--'])
+      })
+    }
+    immutableData = immutableData.set('defaultProtocolMigration', true)
+  }
+  return immutableData
+}
+
 module.exports.runPostMigrations = (immutableData) => {
   immutableData = fingerprintingProtectionMigration(immutableData)
+  immutableData = protocolHandlerMigration(immutableData)
   return immutableData
 }
 
