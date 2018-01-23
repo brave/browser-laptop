@@ -113,6 +113,7 @@ AppStore
     enabled: boolean // enable all cookie/referer blocking
   },
   defaultBrowserCheckComplete: boolean, // true to indicate default browser check is complete
+  defaultProtocolMigration: boolean, // whether the 0.19.x hotfix 4 protocol migration has run
   defaultWindowHeight: number, // DEPRECATED (0.12.7); replaced w/ defaultWindowParams.height
   defaultWindowParams: {
     height: number,

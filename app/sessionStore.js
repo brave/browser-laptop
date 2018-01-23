@@ -868,8 +868,23 @@ const fingerprintingProtectionMigration = (immutableData) => {
   return immutableData
 }
 
+const protocolHandlerMigration = (immutableData) => {
+  // Fix https://github.com/brave/browser-laptop/issues/12797
+  if (!immutableData.get('defaultProtocolMigration')) {
+    if (platformUtil.isWindows() &&
+      immutableData.getIn(['settings', settings.IS_DEFAULT_BROWSER])) {
+      // Update the protocol handler to be safe
+      app.setAsDefaultProtocolClient('http', ['--'])
+      app.setAsDefaultProtocolClient('https', ['--'])
+    }
+    immutableData = immutableData.set('defaultProtocolMigration', true)
+  }
+  return immutableData
+}
+
 module.exports.runPostMigrations = (immutableData) => {
   immutableData = fingerprintingProtectionMigration(immutableData)
+  immutableData = protocolHandlerMigration(immutableData)
   return immutableData
 }
 
