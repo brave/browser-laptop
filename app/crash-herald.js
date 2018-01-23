@@ -9,7 +9,6 @@ const version = app.getVersion()
 const channel = Channel.channel()
 
 const crashKeys = {
-  'node-env': process.env.NODE_ENV,
   '_version': version,
   'channel': channel
 }
