@@ -15,6 +15,7 @@ const punycode = require('punycode/')
 const urlParse = require('../../app/common/urlParse')
 const urlFormat = require('url').format
 const pdfjsExtensionId = require('../constants/config').PDFJSExtensionId
+const ip = require('ip')
 
 /**
  * A simple class for parsing and dealing with URLs.
@@ -486,6 +487,27 @@ const UrlUtil = {
     return url
       .replace(/((#?\/?)|(\/#?))$/, '') // remove trailing # and /
       .trim() // remove whitespaces
+  },
+
+  /**
+   * Whether a URL is an internal address
+   * @param {string} url
+   * @returns {boolean}
+   */
+  isInternalUrl: (url) => {
+    if (!url) {
+      return false
+    }
+    // TODO: make these user-configurable
+    const whitelistSuffixes = ['local', 'localhost']
+    let hostname = urlParse(url).hostname
+    if (hostname && hostname.startsWith('[') && hostname.endsWith(']')) {
+      // Strip brackets from ipv6 address for ip.isPrivate
+      hostname = hostname.slice(1, hostname.length - 1)
+    }
+    return ip.isPrivate(hostname) || hostname === 'localhost' || whitelistSuffixes.some((suffix) => {
+      return hostname && hostname.endsWith(`.${suffix}`)
+    })
   }
 }
 

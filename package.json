@@ -107,6 +107,7 @@
     "immutable": "^3.7.5",
     "immutablediff": "^0.4.2",
     "immutablepatch": "brave/immutable-js-patch",
+    "ip": "^1.1.5",
     "l20n": "^3.5.1",
     "lru-cache": "^1.0.0",
     "nan": "2.8.0",
