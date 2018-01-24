@@ -40,6 +40,7 @@ const ledgerState = require('../common/state/ledgerState')
 const {getWindow} = require('./windows')
 const activeTabHistory = require('./activeTabHistory')
 const tabMessageBox = require('../browser/tabMessageBox')
+const locale = require('../locale')
 
 let adBlockRegions
 let currentPartitionNumber = 0
@@ -678,7 +679,7 @@ const api = {
       tab.on('before-autofill', (e, values) => {
         tabMessageBox.show(tabId, {
           message: values.join('\n'),
-          title: 'You are about to autofill:',
+          title: `${locale.translation('aboutToAutofill')}`,
           buttons: ['ok', 'cancel'],
           cancelId: 1,
           suppress: false
