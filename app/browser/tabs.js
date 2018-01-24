@@ -39,6 +39,7 @@ const bookmarkOrderCache = require('../common/cache/bookmarkOrderCache')
 const ledgerState = require('../common/state/ledgerState')
 const {getWindow} = require('./windows')
 const activeTabHistory = require('./activeTabHistory')
+const tabMessageBox = require('../browser/tabMessageBox')
 
 let adBlockRegions
 let currentPartitionNumber = 0
@@ -672,6 +673,32 @@ const api = {
           const windowId = tabValue.get('windowId')
           appActions.mediaPaused(tabId, windowId)
         }
+      })
+
+      tab.on('before-autofill', (e, values) => {
+        tabMessageBox.show(tabId, {
+          message: values.join('\n'),
+          title: 'You are about to autofill:',
+          buttons: ['ok', 'cancel'],
+          cancelId: 1,
+          suppress: false
+        }, (result) => {
+          if (result) {
+            const tab = webContentsCache.getWebContents(tabId)
+            if (tab) {
+              tab.autofillConfirm()
+            }
+          } else {
+            windowActions.autofillPopupHidden(tabId)
+          }
+        })
+      })
+
+      tab.on('show-autofill-settings', (e) => {
+        appActions.createTabRequested({
+          url: 'about:autofill',
+          active: true
+        })
       })
 
       tab.once('will-destroy', (e) => {

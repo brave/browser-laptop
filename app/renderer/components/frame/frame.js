@@ -503,12 +503,6 @@ class Frame extends React.Component {
         })
       }
     }, { passive: true })
-    this.webview.addEventListener('show-autofill-settings', (e) => {
-      appActions.createTabRequested({
-        url: 'about:autofill',
-        active: true
-      })
-    }, { passive: true })
     this.webview.addEventListener('show-autofill-popup', (e) => {
       if (this.frame.isEmpty()) {
         return
