@@ -203,8 +203,8 @@ describe('TabsTab component', function () {
         true
       )
     })
-    it('can switch tab previews time to activate previews to NORMAL', function () {
-      settingDefaultValue = tabPreviewTiming.NORMAL
+    it('can switch tab previews time to activate previews to NONE', function () {
+      settingDefaultValue = tabPreviewTiming.NONE
       const wrapper = shallow(<TabsTab settings={settingDefaultValue} />)
 
       assert.equal(
