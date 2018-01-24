@@ -22,9 +22,9 @@ const bookmarksToolbarMode = {
 }
 
 const tabPreviewTiming = {
-  LONG: 2000,
-  NORMAL: 1000,
-  SHORT: 500
+  NONE: 50, // add a bit of delay to avoid flashing of unwanted previews
+  SHORT: 400,
+  LONG: 750
 }
 
 const tabCloseAction = {

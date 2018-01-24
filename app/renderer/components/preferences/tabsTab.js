@@ -39,16 +39,16 @@ class TabsTab extends ImmutableComponent {
   get tabPreviewTimingOptions () {
     return [
       {
-        id: 'long',
-        action: tabPreviewTiming.LONG
-      },
-      {
-        id: 'normal',
-        action: tabPreviewTiming.NORMAL
+        id: 'none',
+        action: tabPreviewTiming.NONE
       },
       {
         id: 'short',
         action: tabPreviewTiming.SHORT
+      },
+      {
+        id: 'long',
+        action: tabPreviewTiming.LONG
       }
     ]
   }
