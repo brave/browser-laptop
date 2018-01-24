@@ -453,7 +453,7 @@ function registerPermissionHandler (session, partition) {
     }
 
     if (origin == null) {
-      muonCb(false)
+      cb(false)
     }
 
     let response = []
