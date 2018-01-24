@@ -12,7 +12,7 @@ const isTest = process.env.NODE_ENV === 'test'
 
 const buildConfig = require('./buildConfig')
 const isProduction = buildConfig.nodeEnv === 'production'
-const {fullscreenOption, autoplayOption} = require('../../app/common/constants/settingsEnums')
+const {fullscreenOption, autoplayOption, tabPreviewTiming} = require('../../app/common/constants/settingsEnums')
 const Channel = require('../../app/channel')
 
 module.exports = {
@@ -151,7 +151,7 @@ module.exports = {
     'tabs.tabs-per-page': 20,
     'tabs.close-action': 'parent',
     'tabs.show-tab-previews': true,
-    'tabs.preview-timing': 1000,
+    'tabs.preview-timing': tabPreviewTiming.SHORT,
     'tabs.show-dashboard-images': true,
     'privacy.history-suggestions': true,
     'privacy.bookmark-suggestions': true,
