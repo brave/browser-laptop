@@ -452,6 +452,10 @@ function registerPermissionHandler (session, partition) {
       tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), origin)
     }
 
+    if (origin == null) {
+      muonCb(false)
+    }
+
     let response = []
     for (let i = 0; i < permissionTypes.length; i++) {
       const responseSizeThisIteration = response.length
