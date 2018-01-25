@@ -18,3 +18,9 @@ link[href*='files.coinmarketcap.com'] ~ .container #leaderboard,
 link[href*='files.coinmarketcap.com'] ~ .container #leaderboard-bottom {
   display: none !important;
 }
+
+/* YouTube Masthead and Sidebar Ads */
+#player-ads.ytd-watch,
+ytd-page-manager #masthead-ad.ytd-browse {
+  display: none !important;
+}
