@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const Immutable = require('immutable')
+
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
 
@@ -20,13 +22,18 @@ const bookmarkToolbarReducer = (state, action, immutableAction) => {
       {
         // update session for 0.21.x version
         const bookmarks = bookmarksState.getBookmarks(state)
+        let list = Immutable.List()
         if (bookmarks.first() && !bookmarks.first().has('width')) {
-          textCalc.calcTextList(bookmarks.toList())
+          list = bookmarks.toList()
         }
 
         const bookmarkFolders = bookmarkFoldersState.getFolders(state)
         if (bookmarkFolders.first() && !bookmarkFolders.first().has('width')) {
-          textCalc.calcTextList(bookmarkFolders.toList())
+          list = list.concat(bookmarkFolders.toList())
+        }
+
+        if (!list.isEmpty()) {
+          textCalc.calcTextList(list)
         }
       }
       break
