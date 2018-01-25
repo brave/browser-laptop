@@ -678,7 +678,8 @@ const api = {
 
       tab.on('before-autofill', (e, values) => {
         tabMessageBox.show(tabId, {
-          message: values.join('\n'),
+          message: values.join('\n') +
+                   `\n\n${locale.translation('autofillWarning')}`,
           title: `${locale.translation('aboutToAutofill')}`,
           buttons: ['ok', 'cancel'],
           cancelId: 1,

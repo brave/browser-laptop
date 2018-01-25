@@ -283,7 +283,8 @@ var rendererIdentifiers = function () {
     'promotionClaimedErrorMessage',
     'promotionClaimedErrorText',
     'promotionClaimedErrorTitle',
-    'aboutToAutofill'
+    'aboutToAutofill',
+    'autofillWarning'
   ].concat(countryCodes).concat(availableLanguages)
 }
 
