@@ -13,6 +13,7 @@ const getSetting = require('../settings').getSetting
 const getPrivacySettings = () => {
   const passwordManagerEnabled = getSetting(settings.ACTIVE_PASSWORD_MANAGER) === passwordManagers.BUILT_IN
   return { 'autofill.enabled': getSetting(settings.AUTOFILL_ENABLED),
+    'autofill.confirm_enabled': getSetting(settings.AUTOFILL_CONFIRM_ENABLED),
     'profile.password_manager_enabled': passwordManagerEnabled,
     'credentials_enable_service': passwordManagerEnabled,
     'credentials_enable_autosignin': false

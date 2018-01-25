@@ -162,6 +162,7 @@ module.exports = {
     'privacy.autocomplete.history-size': 500,
     'bookmarks.toolbar.show': false,
     'privacy.autofill-enabled': true,
+    'privacy.autofill-confirm-enabled': true,
     'privacy.do-not-track': false,
     'security.passwords.active-password-manager': null, // Set in settings.js by passwordManagerDefault (defaults to built in)
     'security.passwords.enpass-enabled': false,

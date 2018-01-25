@@ -466,6 +466,7 @@ AppStore
     'payments.sites-show-less': boolean, // whether to show less sites in the payments list
     'privacy.autocomplete.history-size': number, // number of autocomplete entries to keep
     'privacy.autofill-enabled': boolean, // true to enable autofill
+    'privacy.autofill-confirm-enabled': boolean, // true to enable autofill confirmation
     'privacy.bookmark-suggestions': boolean, // auto suggest for bookmarks enabled
     'privacy.do-not-track': boolean, // whether DNT is 1
     'privacy.history-suggestions': boolean, // auto suggest for history enabled
