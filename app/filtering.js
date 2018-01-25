@@ -452,11 +452,14 @@ function registerPermissionHandler (session, partition) {
       tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), origin)
     }
 
+    let response = new Array(permissionTypes.length)
+
     if (origin == null) {
-      cb(false)
+      response.fill(false, 0, permissionTypes.length)
+      cb(response)
+      return
     }
 
-    let response = []
     for (let i = 0; i < permissionTypes.length; i++) {
       const responseSizeThisIteration = response.length
       const permission = permissionTypes[i]
