@@ -21,13 +21,18 @@ const fontSize = globalStyles.spacing.bookmarksItemFontSize
 const fontFamily = globalStyles.typography.default.family
 
 const calcText = (item, type) => {
-  const title = type === siteTags.BOOKMARK
+  let title = type === siteTags.BOOKMARK
     ? item.get('title') || item.get('location')
     : item.get('title')
 
   if (title && title.length === 0) {
     return
   }
+
+  title = title
+    .replace(/'/g, '!')
+    .replace(/\\"/g, '!')
+    .replace(/\\\\/g, '//')
 
   const param = `
     (function() {
@@ -133,7 +138,7 @@ const calcTextList = (list) => {
     if (list.size > 0) {
       calcTextList(list)
     }
-  })
+  }, true)
 }
 
 module.exports = {
