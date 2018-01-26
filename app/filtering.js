@@ -453,9 +453,10 @@ function registerPermissionHandler (session, partition) {
       tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), origin)
     }
 
-    let response = new Array(permissionTypes.length)
+    let response = []
 
     if (origin == null) {
+      response = new Array(permissionTypes.length)
       response.fill(false, 0, permissionTypes.length)
       muonCb(response)
       return
