@@ -1,6 +1,36 @@
 # Changelog
 
 Release Notes:
+## [0.19.147](https://github.com/brave/browser-laptop/releases/tag/v0.19.147dev)
+
+ - Fixed crash reports not sending crash ID's under Windows. ([#12838](https://github.com/brave/browser-laptop/issues/12838))
+ - Fixed crash reports not sending the correct version of Brave being used. ([#12772](https://github.com/brave/browser-laptop/issues/12772))
+ - Upgraded to muon 4.7.6. ([#12824](https://github.com/brave/browser-laptop/issues/12824))
+ - Upgraded to Chromium 64.0.3282.119. ([#12873](https://github.com/brave/browser-laptop/issues/12873))
+
+## [0.19.139](https://github.com/brave/browser-laptop/releases/tag/v0.19.139dev)
+
+ - Enabled SSL certificate pinning for important Brave domains. ([#12190](https://github.com/brave/browser-laptop/issues/12190))
+ - Fixed recovery key corruption for recovered wallets when browser restarts. ([#12672](https://github.com/brave/browser-laptop/issues/12672))
+ - Fixed recovering wallets when using cross-OS generated recovery keys. ([#12716](https://github.com/brave/browser-laptop/issues/12716))
+ - Fixed YouTube publishers appearing as URL's under Brave Payments. ([#12591](https://github.com/brave/browser-laptop/issues/12591))
+ - Fixed "Folder Upload" in Google Drive. ([#8601](https://github.com/brave/browser-laptop/issues/8601))
+ - Fixed misaligned show definition popup under macOS. ([#8554](https://github.com/brave/browser-laptop/issues/8554))
+ - Upgraded to muon 4.7.2. ([#12641](https://github.com/brave/browser-laptop/issues/12641))
+ - Upgraded to Chromium 64.0.3282.85. ([#12640](https://github.com/brave/browser-laptop/issues/12640))
+
+## [0.19.134](https://github.com/brave/browser-laptop/releases/tag/v0.19.134dev)
+
+ - Added a changeable default contribution amount for new installs. ([#12573](https://github.com/brave/browser-laptop/issues/12573))
+ - Reverted muted media always being autoplayed. ([#12152](https://github.com/brave/browser-laptop/issues/12152))
+ - Fixed backup key being replaced by "a" when wallet restore fails. ([#11383](https://github.com/brave/browser-laptop/issues/11383))
+ - Fixed prompting users to save passwords on passphrase confirmation pages. ([#12563](https://github.com/brave/browser-laptop/issues/12563))
+ - Fixed passwords being filled after disabling password manager. ([#10566](https://github.com/brave/browser-laptop/issues/10566))
+ - Fixed monthly budget reverting after browser restart. ([#12581](https://github.com/brave/browser-laptop/issues/12581))
+ - Fixed Brave appearing as vulnerable on Spectre test site. ([#12570](https://github.com/brave/browser-laptop/issues/12570))
+ - Fixed "Always show the URL bar" text missing under preferences. ([#12559](https://github.com/brave/browser-laptop/issues/12559))
+ - Upgraded muon to 4.5.38. ([#12602](https://github.com/brave/browser-laptop/issues/12602))
+
 ## [0.19.131](https://github.com/brave/browser-laptop/releases/tag/v0.19.131dev)
 
  - Added the ability to enable strict site isolation. ([#12490](https://github.com/brave/browser-laptop/issues/12490))
