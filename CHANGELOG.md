@@ -1,6 +1,13 @@
 # Changelog
 
 Release Notes:
+## [0.19.147](https://github.com/brave/browser-laptop/releases/tag/v0.19.147dev)
+
+ - Fixed crash reports not sending crash ID's under Windows. ([#12838](https://github.com/brave/browser-laptop/issues/12838))
+ - Fixed crash reports not sending the correct version of Brave being used. ([#12772](https://github.com/brave/browser-laptop/issues/12772))
+ - Upgraded to muon 4.7.6. ([#12824](https://github.com/brave/browser-laptop/issues/12824))
+ - Upgraded to Chromium 64.0.3282.119. ([#12873](https://github.com/brave/browser-laptop/issues/12873))
+
 ## [0.19.139](https://github.com/brave/browser-laptop/releases/tag/v0.19.139dev)
 
  - Enabled SSL certificate pinning for important Brave domains. ([#12190](https://github.com/brave/browser-laptop/issues/12190))
