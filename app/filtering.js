@@ -596,7 +596,7 @@ function registerForDownloadListener (session) {
       }
       const state = item.isPaused() ? downloadStates.PAUSED : downloadStates.IN_PROGRESS
       updateDownloadState(win, downloadId, item, state)
-      if (win) {
+      if (win && !win.isDestroyed() && !win.webContents.isDestroyed()) {
         win.webContents.send(messages.SHOW_DOWNLOADS_TOOLBAR)
       }
       item.on('removed', function () {
