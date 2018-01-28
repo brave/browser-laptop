@@ -9,10 +9,11 @@ All [React](https://facebook.github.io/react/) components (with the exception of
 # Hierarchy
 
 - App
-  - Main
-    - NavigationBar
-      - [Button]
-      - UrlBar
+  - Renderer
+    - Components
+      - Navigation
+        - [Button]
+        - UrlBar
         - html:input
         - UrlBarSuggestions
     - TabPages
