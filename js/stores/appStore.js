@@ -358,6 +358,9 @@ const filterOutNonRecents = debounce(() => {
  */
 function handleChangeSettingAction (settingKey, settingValue) {
   switch (settingKey) {
+    case settings.HARDWARE_ACCELERATION_ENABLED:
+      app.setBooleanPref('hardware_acceleration_mode.enabled', settingValue)
+      break
     case settings.AUTO_HIDE_MENU:
       BrowserWindow.getAllWindows().forEach(function (wnd) {
         wnd.setAutoHideMenuBar(settingValue)

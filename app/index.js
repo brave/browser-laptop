@@ -109,8 +109,14 @@ loadAppStatePromise.then((initialImmutableState) => {
   CrashHerald.init(getSetting(SEND_CRASH_REPORTS, initialSettings))
 
   telemetry.setCheckpointAndReport('state-loaded')
-  if (getSetting(HARDWARE_ACCELERATION_ENABLED, initialSettings) === false) {
-    app.disableHardwareAcceleration()
+
+  // Check in case a user is upgrading with this setting.
+  // For non-legacy users, they will always have these settings in sync.
+  const oldHardwareAccelValue = getSetting(HARDWARE_ACCELERATION_ENABLED, initialSettings)
+  if (oldHardwareAccelValue !== app.getBooleanPref('hardware_acceleration_mode.enabled')) {
+    // This won't take effect until the next restart of the app, so some users
+    // may have to restart an extra time if UI doesn't work.
+    app.setBooleanPref('hardware_acceleration_mode.enabled', oldHardwareAccelValue)
   }
 
   if (getSetting(SMOOTH_SCROLL_ENABLED, initialSettings) === false) {
