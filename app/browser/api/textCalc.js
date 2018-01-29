@@ -138,7 +138,7 @@ const calcTextList = (list) => {
     if (list.size > 0) {
       calcTextList(list)
     }
-  }, true)
+  })
 }
 
 module.exports = {
