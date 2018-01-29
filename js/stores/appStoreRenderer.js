@@ -13,6 +13,9 @@ class AppStoreRenderer extends EventEmitter {
   constructor () {
     super()
     this.appState = new Immutable.Map()
+    // Many components can subscribe to changes in store state
+    // so ignore any memory-leak warning about having more than 10 listeners.
+    this.setMaxListeners(0)
   }
   emitChanges () {
     if (lastEmittedState !== this.appState) {
