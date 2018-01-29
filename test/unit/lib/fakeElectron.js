@@ -53,7 +53,7 @@ const fakeElectron = {
     }
   },
   dialog: {
-    showOpenDialog: function () { }
+    showDialog: function () { }
   },
   Menu: {
     setApplicationMenu: (template) => {},

@@ -227,24 +227,22 @@ const onBootStateFile = (state) => {
 
 const promptForRecoveryKeyFile = () => {
   const defaultRecoveryKeyFilePath = path.join(electron.app.getPath('userData'), '/brave_wallet_recovery.txt')
-  let files
   if (process.env.SPECTRON) {
     // skip the dialog for tests
     console.log(`for test, trying to recover keys from path: ${defaultRecoveryKeyFilePath}`)
-    files = [defaultRecoveryKeyFilePath]
+    return defaultRecoveryKeyFilePath
   } else {
     const dialog = electron.dialog
-    files = dialog.showOpenDialog({
-      properties: ['openFile'],
+    const BrowserWindow = electron.BrowserWindow
+    dialog.showDialog(BrowserWindow.getFocusedWindow(), {
+      type: 'select-open-file',
       defaultPath: defaultRecoveryKeyFilePath,
-      filters: [{
-        name: 'TXT files',
-        extensions: ['txt']
-      }]
+      extensions: [['txt']],
+      includeAllFiles: false
+    }, (files) => {
+      return (files && files.length ? files[0] : null)
     })
   }
-
-  return (files && files.length ? files[0] : null)
 }
 
 const logError = (state, err, caller) => {

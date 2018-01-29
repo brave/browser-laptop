@@ -34,14 +34,12 @@ const showDialog = (state) => {
   let personal = []
   let other = []
 
-  dialog.showSaveDialog(focusedWindow, {
+  dialog.showDialog(focusedWindow, {
     defaultPath: defaultPath,
-    filters: [{
-      name: 'HTML',
-      extensions: ['html']
-    }]
-  }, (fileName) => {
-    if (fileName) {
+    type: 'select-saveas-file',
+    extensions: [['html']]
+  }, (fileNames) => {
+    if (fileNames && fileNames.length === 1) {
       personal = createBookmarkArray(state)
       other = createBookmarkArray(state, -1, false)
       try {

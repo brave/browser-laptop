@@ -254,7 +254,7 @@ describe('downloadsReducer', function () {
       let options
 
       before(function () {
-        stub = sinon.stub(fakeElectron.dialog, 'showOpenDialog', function (arg1, arg2) {
+        stub = sinon.stub(fakeElectron.dialog, 'showDialog', function (arg1, arg2) {
           options = arg2
         })
         downloadsReducer({}, {actionType: appConstants.APP_SELECT_DEFAULT_DOWNLOAD_PATH})
@@ -264,7 +264,7 @@ describe('downloadsReducer', function () {
         stub.restore()
       })
 
-      it('calls dialog.showOpenDialog', function () {
+      it('calls dialog.showDialog', function () {
         assert(stub.calledOnce)
       })
 
@@ -273,7 +273,7 @@ describe('downloadsReducer', function () {
       })
 
       it('passes the correct properties object', function () {
-        assert.deepEqual(options.properties, ['openDirectory', 'createDirectory'])
+        assert.deepEqual(options.type, 'select-folder')
       })
     })
   })
