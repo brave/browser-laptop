@@ -562,7 +562,7 @@
       user-select: none;
       color: @buttonColor;
       cursor: default;
-      border-radius: 4px;
+      border-radius: 0px;
       font-weight: 300;
       opacity: 0.2;
 
@@ -595,7 +595,7 @@
   legend:before {
     content: ' ';
     position: absolute;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 0px 0px 0;
     color: #333;
     box-shadow: inset 0 0 0 1px @urlBarOutline, inset 0 0 0 3px @focusUrlbarOutline;
     outline: none;
@@ -612,7 +612,7 @@
   }
 
   #navigator:not(.titleMode) & {
-    border-radius: @borderRadiusURL;
+    border-radius: 0px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     box-shadow: inset 0 0 0 1px rgba(187, 187, 187, 1.0);
