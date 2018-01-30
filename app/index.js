@@ -31,7 +31,11 @@ const handleUncaughtError = (stack, message) => {
 }
 process.on('uncaughtException', function (error) {
   var message, ref, stack
-  stack = (ref = error.stack) != null ? ref : error.name + ': ' + error.message
+  if (typeof error === 'string') {
+    stack = error
+  } else {
+    stack = (ref = error.stack) != null ? ref : error.name + ': ' + error.message
+  }
   message = 'Uncaught Exception:\n' + stack
   console.error('An uncaught exception occurred in the main process ' + message)
   handleUncaughtError(stack, message)
