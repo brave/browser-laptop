@@ -12,7 +12,7 @@ const tabState = require('../common/state/tabState')
 const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
 const {makeImmutable, makeJS} = require('../common/state/immutableUtil')
 const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
-const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
+const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, getLocationIfPDF} = require('../../js/lib/urlutil')
 const {isSessionPartition} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/lib/urlutil')
 const settingsStore = require('../../js/settings')
@@ -113,11 +113,9 @@ const needsPartitionAssigned = (createProperties) => {
 }
 
 const isAutoDiscardable = (createProperties) => {
-  if (createProperties.pinned) {
-    return false
-  }
-
-  return isHttpOrHttps(createProperties.url)
+  // Temporarily disabled due to bad handling for auto discarded tabs
+  // See https://github.com/brave/browser-laptop/issues/10673
+  return false
 }
 
 const aboutTabs = {}
