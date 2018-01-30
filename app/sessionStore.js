@@ -808,7 +808,6 @@ module.exports.runPreMigrations = (data) => {
       data.cache = {}
     }
 
-    data.cache.bookmarkLocation = data.locationSiteKeysCache
     data.cache.bookmarkOrder = sortBookmarkOrder(bookmarkOrder)
 
     // history
