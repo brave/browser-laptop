@@ -14,24 +14,6 @@ const normalizeLocation = (location) => {
   return UrlUtil.getLocationIfPDF(location)
 }
 
-/**
- * Calculate location for siteKey
- *
- * @param siteKey The site key to to be calculated
- * @return {string|null}
- */
-const getLocationFromCacheKey = function (siteKey) {
-  if (!siteKey) {
-    return null
-  }
-
-  const splitKey = siteKey.split('|', 2)
-  if (typeof splitKey[0] === 'string' && typeof splitKey[1] === 'string') {
-    return splitKey[0]
-  }
-  return null
-}
-
 const generateCache = (state) => {
   const cache = state.getIn(['cache', 'bookmarkLocation']) || Immutable.Map()
   if (!cache.isEmpty()) {
@@ -41,11 +23,7 @@ const generateCache = (state) => {
   state = state.setIn(['cache', 'bookmarkLocation'], Immutable.Map())
   const bookmarksState = require('../state/bookmarksState')
   bookmarksState.getBookmarks(state).forEach((site, siteKey) => {
-    const location = getLocationFromCacheKey(siteKey)
-    if (!location) {
-      return
-    }
-    state = addCacheKey(state, location, siteKey)
+    state = addCacheKey(state, site.get('location'), siteKey)
   })
   return state
 }

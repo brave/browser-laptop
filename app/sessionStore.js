@@ -839,6 +839,15 @@ module.exports.runPreMigrations = (data) => {
         }
       })
     }
+
+    // Bookmark cache was generated wrongly on and before 0.20.25 from 0.19.x upgrades
+    let runCacheClean = false
+    try { runCacheClean = compareVersions(data.lastAppVersion, '0.20.25') < 1 } catch (e) {}
+    if (runCacheClean) {
+      if (data.cache) {
+        delete data.cache.bookmarkLocation
+      }
+    }
   }
 
   return data
