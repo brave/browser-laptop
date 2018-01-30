@@ -171,7 +171,7 @@ if (isDarwin) {
       authors: 'Brave Software',
       loadingGif: 'res/brave_splash_installing.gif',
       setupIcon: `res/${channel}/brave_installer.ico`,
-      iconUrl: `https://raw.githubusercontent.com/brave/browser-laptop/coexisted-channels/res/${channel}/app.ico`,
+      iconUrl: `https://raw.githubusercontent.com/brave/browser-laptop/master/res/${channel}/app.ico`,
       signWithParams: format('-a -fd sha256 -f "%s" -p "%s"', path.resolve(cert), certPassword),
       noMsi: true,
       exe: `${appName}.exe`,
