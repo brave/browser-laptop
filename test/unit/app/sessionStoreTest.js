@@ -1666,17 +1666,12 @@ describe('sessionStore unit tests', function () {
         })
 
         describe('adding cache to the state', function () {
-          let oldValue
           let newValue
 
           before(function () {
-            oldValue = data.get('locationSiteKeysCache')
             newValue = runPreMigrations.cache
           })
 
-          it('copies the entry for bookmark location from existing cache', function () {
-            assert.deepEqual(newValue.bookmarkLocation, oldValue.toJS())
-          })
           it('creates an entry for bookmark order', function () {
             assert(newValue.bookmarkOrder)
           })
