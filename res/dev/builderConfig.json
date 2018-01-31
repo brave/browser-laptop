@@ -13,7 +13,10 @@
     ]
   },
   "pkg": {
-    "installLocation": "/Applications"
+    "installLocation": "/Applications",
+    "allowAnywhere": false,
+    "allowCurrentUserHome": false,
+    "allowRootDirectory": false
   },
   "dmg": {
     "title": "Brave",
