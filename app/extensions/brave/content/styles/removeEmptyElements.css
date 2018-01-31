@@ -8,7 +8,8 @@
   .ytp-ad-progress-list,
   .ad-container,
   #video-masthead,
-  #watch-channel-brand-div {
+  #watch-channel-brand-div,
+  #Billboard-ad {
     display: none !important;
 }
 
