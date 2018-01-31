@@ -57,7 +57,7 @@ let currentKey = 0
 const incrementNextKey = () => ++currentKey
 
 class WindowStore extends EventEmitter {
-  constructor() {
+  constructor () {
     super()
     // Many components can subscribe to changes in store state
     // so ignore any memory-leak warning about having more than 10 listeners.
