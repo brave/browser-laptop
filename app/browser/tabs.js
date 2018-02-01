@@ -94,7 +94,7 @@ const getPartition = (createProperties) => {
   if (createProperties.partition) {
     partition = createProperties.partition
   } else if (createProperties.isTor) {
-    partition = 'tor'
+    partition = 'persist:tor'
   } else if (createProperties.isPrivate) {
     partition = 'default'
   } else if (createProperties.isPartitioned) {

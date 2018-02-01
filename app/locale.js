@@ -282,7 +282,10 @@ var rendererIdentifiers = function () {
     'promotionGeneralErrorText',
     'promotionClaimedErrorMessage',
     'promotionClaimedErrorText',
-    'promotionClaimedErrorTitle'
+    'promotionClaimedErrorTitle',
+    // Tor
+    'torCheckError',
+    'torCheckFailure'
   ].concat(countryCodes).concat(availableLanguages)
 }
 

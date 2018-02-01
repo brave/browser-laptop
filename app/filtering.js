@@ -16,6 +16,7 @@ const downloadStates = require('../js/constants/downloadStates')
 const urlParse = require('./common/urlParse')
 const getSetting = require('../js/settings').getSetting
 const appUrlUtil = require('../js/lib/appUrlUtil')
+const {request} = require('../js/lib/request')
 const siteSettings = require('../js/state/siteSettings')
 const settings = require('../js/constants/settings')
 const userPrefs = require('../js/state/userPrefs')
@@ -650,15 +651,50 @@ function initSession (ses, partition) {
 }
 
 function initTor (ses, partition) {
-  if (partition !== 'tor') {
+  if (partition !== 'persist:tor') {
     return
   }
+  console.log('in init tor')
   // XXX Specify SOCKS username and password per first-party origin.
   // Can we do this with a specially crafted PAC script (proxy
   // autoconfig), or will it be necessary to change the way that proxy
   // configuration works in Muon?
-  let proxyconfig = {proxyRules: 'socks5://127.0.0.1:9050'}
-  ses.setProxy(proxyconfig, () => { console.log('inited tor session ' + ses) })
+  let proxyconfig = {
+    proxyRules: 'socks5://127.0.0.1:9050,direct://'
+  }
+  ses.setProxy(proxyconfig, () => {
+    // Make a request to check.torproject.org to ensure that proxying works
+    console.log('checking for Tor proxy')
+    request('https://check.torproject.org/?TorButton=true', (err, response, body) => {
+      let success = null
+      if (err) {
+        console.log('Could not check Tor status', err)
+      } else if (body && body.includes('id="TorCheckResult" target="success"')) {
+        // success
+        console.log('Tor is running!')
+        success = true
+      } else if (body && body.includes('id="TorCheckResult" target="failure"')) {
+        // we are not using Tor
+        console.log('Tor is not running.')
+        success = false
+      } else {
+        // unknown error
+        console.log('Bad response from check.torproject.org. HTTP status:',
+          response.statusCode)
+      }
+      if (!success) {
+        appActions.showNotification({
+          position: 'global',
+          message: locale.translation(success === false ? 'torCheckFailure' : 'torCheckError'),
+          buttons: [
+            {text: locale.translation('dismiss')}
+          ]
+        })
+      } else {
+        // do tor stuff
+      }
+    }, ses)
+  })
 }
 
 const initPartition = (partition) => {
