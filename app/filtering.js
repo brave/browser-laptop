@@ -42,7 +42,7 @@ const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 const beforeRedirectFilteringFns = []
 const headersReceivedFilteringFns = []
-let partitionsToInitialize = ['default']
+let partitionsToInitialize = ['default', 'tor-test']
 let initializedPartitions = {}
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
@@ -644,28 +644,25 @@ function registerForMagnetHandler (session) {
   }
 }
 
-function initSession (ses, partition) {
-  registeredSessions[partition] = ses
-  ses.setEnableBrotli(true)
-  ses.userPrefs.setDefaultZoomLevel(getSetting(settings.DEFAULT_ZOOM_LEVEL) || config.zoom.defaultValue)
-}
-
-function initTor (ses, partition) {
-  if (partition !== 'persist:tor') {
+/**
+ * Checks that a Tor proxy is available on socks5 port 9050
+ */
+module.exports.checkTorAvailable = () => {
+  const ses = registeredSessions['tor-test']
+  if (!ses) {
+    initPartition('tor-test')
+    module.exports.checkTorAvailable()
     return
   }
-  console.log('in init tor')
-  // XXX Specify SOCKS username and password per first-party origin.
-  // Can we do this with a specially crafted PAC script (proxy
-  // autoconfig), or will it be necessary to change the way that proxy
-  // configuration works in Muon?
-  let proxyconfig = {
+
+  const proxyConfig = {
     proxyRules: 'socks5://127.0.0.1:9050,direct://'
   }
-  // darkdh to diracdeltas: this can be deleted because it is covered by "tor_proxy"
-  ses.setProxy(proxyconfig, () => {
-    // Make a request to check.torproject.org to ensure that proxying works
-    console.log('checking for Tor proxy')
+  // XXX: due to muon bug, callback is required but doesn't do anything
+  ses.setProxy(proxyConfig, () => {})
+
+  // TODO: remove setTimeout once muon supports setProxy callback
+  setTimeout(() => {
     request('https://check.torproject.org/?TorButton=true', (err, response, body) => {
       let success = null
       if (err) {
@@ -684,21 +681,35 @@ function initTor (ses, partition) {
           response.statusCode)
       }
       if (!success) {
+        const message =
+          locale.translation(success === false ? 'torCheckFailure' : 'torCheckError')
         appActions.showNotification({
           position: 'global',
-          message: locale.translation(success === false ? 'torCheckFailure' : 'torCheckError'),
+          message,
           buttons: [
             {text: locale.translation('dismiss')}
-          ]
+          ],
+          options: {
+            persist: false
+          }
         })
-      } else {
-        // do tor stuff
+        permissionCallbacks[message] = () => {
+          appActions.hideNotification(message)
+        }
       }
     }, ses)
-  })
+  }, 500)
+}
+
+function initSession (ses, partition) {
+  registeredSessions[partition] = ses
+  ses.setEnableBrotli(true)
+  ses.userPrefs.setDefaultZoomLevel(getSetting(settings.DEFAULT_ZOOM_LEVEL) || config.zoom.defaultValue)
 }
 
 const initPartition = (partition) => {
+  const isTorPartition = partition === 'persist:tor'
+  const isTorTestPartition = partition === 'tor-test'
   // Partitions can only be initialized once the app is ready
   if (!app.isReady()) {
     partitionsToInitialize.push(partition)
@@ -708,8 +719,18 @@ const initPartition = (partition) => {
     return
   }
   initializedPartitions[partition] = true
+
+  if (isTorTestPartition) {
+    // This partition is only used to check for Tor proxy availability
+    let ses = session.fromPartition(partition, {
+      parent_partition: '',
+      cache: false
+    })
+    registeredSessions[partition] = ses
+    return
+  }
+
   let fns = [initSession,
-    initTor,
     userPrefs.init,
     hostContentSettings.init,
     registerForBeforeRequest,
@@ -724,13 +745,14 @@ const initPartition = (partition) => {
   if (isSessionPartition(partition)) {
     options.parent_partition = ''
   }
-  if (partition === 'persist:tor') {
+  if (isTorPartition) {
     options.isolated_storage = true
     options.parent_partition = ''
     options.tor_proxy = 'socks5://127.0.0.1:9050'
   }
 
   let ses = session.fromPartition(partition, options)
+
   fns.forEach((fn) => {
     fn(ses, partition, module.exports.isPrivate(partition))
   })
