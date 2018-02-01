@@ -175,7 +175,7 @@ if (isDarwin) {
       signWithParams: format('-a -fd sha256 -f "%s" -p "%s"', path.resolve(cert), certPassword),
       noMsi: true,
       exe: `${appName}.exe`,
-      setupExe: `${appName}-Setup-${arch}.exe`
+      setupExe: `${appName}Setup-${arch}.exe`
     })
     resultPromise.then(() => {
       console.log('done')
