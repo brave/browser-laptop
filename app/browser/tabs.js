@@ -12,7 +12,7 @@ const windowState = require('../common/state/windowState')
 const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
 const {makeImmutable, makeJS} = require('../common/state/immutableUtil')
 const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
-const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, getLocationIfPDF} = require('../../js/lib/urlutil')
+const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
 const {isSessionPartition} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/lib/urlutil')
 const {getSetting} = require('../../js/settings')
@@ -106,12 +106,6 @@ const needsPartitionAssigned = (createProperties) => {
     createProperties.isPartitioned ||
     createProperties.partitionNumber ||
     createProperties.partition
-}
-
-const isAutoDiscardable = (createProperties) => {
-  // Temporarily disabled due to bad handling for auto discarded tabs
-  // See https://github.com/brave/browser-laptop/issues/10673
-  return false
 }
 
 const aboutTabs = {}
@@ -844,8 +838,24 @@ const api = {
           createProperties.parent_partition = ''
         }
       }
-      if (!isAutoDiscardable(createProperties)) {
+
+      // Tabs are allowed to be initially discarded (unloaded) if they are regular tabs
+      // i.e not about: pages, and not pinned
+      // and only if the tab creation request passes in `discarded: true`
+      const isRegularContent = isHttpOrHttps(createProperties.url)
+      const preventLazyLoad = createProperties.pinned || !isRegularContent
+      if (preventLazyLoad) {
         createProperties.discarded = false
+      }
+      // Similarly, autoDiscardable will happen for regular tabs (not about: tabs)
+      const preventAutoDiscard = createProperties.pinned || !isRegularContent
+      if (preventAutoDiscard) {
+        createProperties.autoDiscardable = false
+      } else {
+        // (temporarily) forced autoDiscardable to ALWAYS false due to
+        // inability to switch to auto-discarded tabs.
+        // See https://github.com/brave/browser-laptop/issues/10673
+        // remove this forced 'else' condition when #10673 is resolved
         createProperties.autoDiscardable = false
       }
 
