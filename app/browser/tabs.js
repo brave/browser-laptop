@@ -1009,6 +1009,11 @@ const api = {
         if (isSessionPartition(createProperties.partition)) {
           createProperties.parent_partition = ''
         }
+        if (createProperties.isTor) {
+          createProperties.isolated_storage = true
+          createProperties.parent_partition = ''
+          createProperties.tor_proxy = 'socks5://127.0.0.1:9050'
+        }
       }
 
       // Tabs are allowed to be initially discarded (unloaded) if they are regular tabs

@@ -670,6 +670,7 @@ function initTor (ses, partition) {
   let proxyconfig = {
     proxyRules: 'socks5://127.0.0.1:9050,direct://'
   }
+  // darkdh to diracdeltas: this can be deleted because it is covered by "tor_proxy"
   ses.setProxy(proxyconfig, () => {
     // Make a request to check.torproject.org to ensure that proxying works
     console.log('checking for Tor proxy')
@@ -730,6 +731,11 @@ const initPartition = (partition) => {
 
   if (isSessionPartition(partition)) {
     options.parent_partition = ''
+  }
+  if (partition === 'persist:tor') {
+    options.isolated_storage = true
+    options.parent_partition = ''
+    options.tor_proxy = 'socks5://127.0.0.1:9050'
   }
 
   let ses = session.fromPartition(partition, options)
