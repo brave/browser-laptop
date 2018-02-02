@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.20.30](https://github.com/brave/browser-laptop/releases/tag/v0.20.30dev)
+
+ - Fixed restoring tabs at startup causing slow performance. ([#12976](https://github.com/brave/browser-laptop/issues/12976))
+
 ## [0.20.29](https://github.com/brave/browser-laptop/releases/tag/v0.20.29dev)
 
  - Optimized sites storage into separate entities to avoid filtering when rendering. ([#9978](https://github.com/brave/browser-laptop/issues/9978))
