@@ -169,8 +169,8 @@ Or most of the time just append `.debug()` to a series of commands.
 This will pause the browser from running tests, and you can open up browser dev tools or content dev tools to inspect logs, console, and other things.
 You should act fast or else adjust the timeout or the test will fail though.
 
-To get browser process logs, run tests with the `BRAVE_TEST_BROWSER_LOGS=1` envrionment variable.
-To get renderer process logs, run tests with the `BRAVE_TEST_RENDERER_LOGS=1` envrionment variable.
+To get browser process logs, run tests with the `BRAVE_TEST_BROWSER_LOGS=1` environment variable.
+To get renderer process logs, run tests with the `BRAVE_TEST_RENDERER_LOGS=1` environment variable.
 
 ### Avoiding intermittent failures in automated UI tests
 
@@ -181,5 +181,5 @@ Here are some strategies to avoid intermittent failures:
 - Never assume that state will be reflected right away, for example if loading a URL, don't assume an entry is already added to the app's `sites` state.  Instead use `waitForSiteEntry`.
 - Enable verbose mode as described above to get better information.
 - Prefer adding Webdriver IO commands when possible, especially for waiting operations, and add logging to them.
-- When possible, make the Webdriver commands you add wait for a result.  Example: Changing a seting also waits for the changed value to be reflected in state.
+- When possible, make the Webdriver commands you add wait for a result.  Example: Changing a setting also waits for the changed value to be reflected in state.
 - Look out for elements that can be disabled temporarily, in this case, a click could for example happen while the element is still disabled.

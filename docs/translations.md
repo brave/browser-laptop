@@ -13,7 +13,7 @@ We manage all of our translations using Transifex. Here's how you can get starte
 At this point, you are ready to join and help with translations or you can request a language.
 - Visit https://www.transifex.com/brave/brave-laptop/
 - In the top right, you can click "Join team".
-- You can specify the lanaguages you speak OR request a language which is not currently provided
+- You can specify the languages you speak OR request a language which is not currently provided
 - One of our contributors will be able to approve your access.
 
 ## How does translated text get back into the GitHub repository?
