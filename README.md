@@ -95,7 +95,7 @@ After installing the prerequisites:
 
         npm install
 
-Instead of `npm install` you may also install with [yarn](https://github.com/yarnpkg/yarn).
+Instead of `npm install` you may also install with [yarn](https://github.com/yarnpkg/yarn) running `yarn install`.
 
 ### Troubleshooting
 
