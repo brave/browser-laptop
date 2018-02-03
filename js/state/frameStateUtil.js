@@ -290,13 +290,15 @@ function isAncestorFrameKey (state, frame, parentFrameKey) {
 }
 
 function getPartitionNumber (partition) {
+  if (isPrivatePartition(partition))
+    return 0
   const regex = /(?:persist:)?partition-(\d+)/
   const matches = regex.exec(partition)
   return Number((matches && matches[1]) || 0)
 }
 
 function isPrivatePartition (partition) {
-  return partition && !partition.startsWith('persist:')
+  return partition && partition.startsWith('partition-private')
 }
 
 function isSessionPartition (partition) {
@@ -311,7 +313,7 @@ function getPartitionFromNumber (partitionNumber, incognito) {
   if (!partitionNumber && !incognito) {
     return 'persist:default'
   } else if (incognito) {
-    return 'default'
+    return 'partition-private'
   }
   return `persist:partition-${partitionNumber}`
 }

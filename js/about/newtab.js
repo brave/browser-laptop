@@ -64,6 +64,7 @@ class NewTabPage extends React.Component {
 
       const showEmptyPage = !!data.get('showEmptyPage')
       const showImages = !!data.get('showImages') && !showEmptyPage
+
       this.setState({
         newTabData: data,
         updatedStamp,
