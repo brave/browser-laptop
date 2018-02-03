@@ -292,7 +292,6 @@ const updateAboutDetails = (tabId) => {
     const trackedBlockersCount = appState.getIn(['trackingProtection', 'count'], 0)
     const httpsUpgradedCount = appState.getIn(['httpsEverywhere', 'count'], 0)
     const adblockCount = appState.getIn(['adblock', 'count'], 0)
-
     sendAboutDetails(tabId, messages.NEWTAB_DATA_UPDATED, {
       showEmptyPage,
       showImages,

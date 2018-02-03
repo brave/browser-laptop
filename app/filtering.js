@@ -647,7 +647,6 @@ function initSession (ses, partition) {
 }
 
 const initPartition = (partition) => {
-  console.warn(partition)
   // Partitions can only be initialized once the app is ready
   if (!app.isReady()) {
     partitionsToInitialize.push(partition)
