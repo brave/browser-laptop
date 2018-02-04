@@ -96,7 +96,6 @@ module.exports.newTorTabMenuItem = () => {
     click: function (item, focusedWindow) {
       ensureAtLeastOneWindow({
         url: 'about:newtab',
-        isPrivate: true,
         isTor: true
       })
       // Check if Tor is available

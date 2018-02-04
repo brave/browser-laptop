@@ -296,7 +296,7 @@ function getPartitionNumber (partition) {
 }
 
 function isPrivatePartition (partition) {
-  return partition && !partition.startsWith('persist:')
+  return partition && (!partition.startsWith('persist:') || partition === 'persist:tor')
 }
 
 function isSessionPartition (partition) {
