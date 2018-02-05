@@ -418,20 +418,40 @@ const synopsisNormalizer = (state, changedPublisher, returnState = true, prune =
     state = module.exports.pruneSynopsis(state)
   }
 
-  let results = []
-  let publishers = ledgerState.getPublishers(state)
-  for (let item of publishers) {
-    const publisherKey = item[0]
-    let publisher = item[1]
+  let publishers = ledgerState.getPublishers(state).toJS()
+  let pinnedTotal = 0
+  let unPinnedTotal = 0
+  Object.keys(publishers).forEach(publisherKey => {
+    let publisher = publishers[publisherKey]
+
     if (!ledgerUtil.visibleP(state, publisherKey)) {
-      continue
+      return
     }
 
-    publisher = publisher.set('publisherKey', publisherKey)
-    results.push(publisher.toJS())
-  }
+    publisher.publisherKey = publisherKey
 
-  if (results.length === 0) {
+    if (publisher.pinPercentage && publisher.pinPercentage > 0) {
+      // pinned
+      pinnedTotal += publisher.pinPercentage
+      dataPinned.push(getPublisherData(publisher, scorekeeper))
+    } else if (ledgerUtil.stickyP(state, publisher.publisherKey)) {
+      // unpinned
+      unPinnedTotal += publisher.scores[scorekeeper]
+      dataUnPinned.push(publisher)
+    } else {
+      // excluded
+      let newPublisher = getPublisherData(publisher, scorekeeper)
+      newPublisher.percentage = 0
+      newPublisher.weight = 0
+      dataExcluded.push(newPublisher)
+    }
+  })
+
+  if (
+    dataPinned.length === 0 &&
+    dataUnPinned.length === 0 &&
+    dataExcluded.length === 0
+  ) {
     if (returnState) {
       return ledgerState.saveAboutSynopsis(state, Immutable.List())
     }
@@ -439,46 +459,25 @@ const synopsisNormalizer = (state, changedPublisher, returnState = true, prune =
     return []
   }
 
-  results = underscore.sortBy(results, (entry) => -entry.scores[scorekeeper])
-
-  let pinnedTotal = 0
-  let unPinnedTotal = 0
-  // move publisher to the correct array and get totals
-  results.forEach((result) => {
-    if (result.pinPercentage && result.pinPercentage > 0) {
-      // pinned
-      pinnedTotal += result.pinPercentage
-      dataPinned.push(getPublisherData(result, scorekeeper))
-    } else if (ledgerUtil.stickyP(state, result.publisherKey)) {
-      // unpinned
-      unPinnedTotal += result.scores[scorekeeper]
-      dataUnPinned.push(result)
-    } else {
-      // excluded
-      let publisher = getPublisherData(result, scorekeeper)
-      publisher.percentage = 0
-      publisher.weight = 0
-      dataExcluded.push(publisher)
-    }
-  })
-
   // round if over 100% of pinned publishers
   if (pinnedTotal > 100) {
     if (changedPublisher) {
-      let changedObject = dataPinned.filter(publisher => publisher.publisherKey === changedPublisher)[0] // TOOD optimize to find from filter
-      const setOne = changedObject.pinPercentage > (100 - dataPinned.length - 1)
+      let changedObject = dataPinned.find(publisher => publisher.publisherKey === changedPublisher)
+      if (changedObject) {
+        const setOne = changedObject.pinPercentage > (100 - dataPinned.length - 1)
 
-      if (setOne) {
-        changedObject.pinPercentage = 100 - dataPinned.length + 1
-        changedObject.weight = changedObject.pinPercentage
+        if (setOne) {
+          changedObject.pinPercentage = 100 - dataPinned.length + 1
+          changedObject.weight = changedObject.pinPercentage
+        }
+
+        const pinnedRestTotal = pinnedTotal - changedObject.pinPercentage
+        dataPinned = dataPinned.filter(publisher => publisher.publisherKey !== changedPublisher)
+        dataPinned = normalizePinned(dataPinned, pinnedRestTotal, (100 - changedObject.pinPercentage), setOne)
+        dataPinned = roundToTarget(dataPinned, (100 - changedObject.pinPercentage), 'pinPercentage')
+
+        dataPinned.push(changedObject)
       }
-
-      const pinnedRestTotal = pinnedTotal - changedObject.pinPercentage
-      dataPinned = dataPinned.filter(publisher => publisher.publisherKey !== changedPublisher)
-      dataPinned = normalizePinned(dataPinned, pinnedRestTotal, (100 - changedObject.pinPercentage), setOne)
-      dataPinned = roundToTarget(dataPinned, (100 - changedObject.pinPercentage), 'pinPercentage')
-
-      dataPinned.push(changedObject)
     } else {
       dataPinned = normalizePinned(dataPinned, pinnedTotal, 100)
       dataPinned = roundToTarget(dataPinned, 100, 'pinPercentage')
