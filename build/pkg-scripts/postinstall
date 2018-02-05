@@ -1,0 +1,35 @@
+#!/bin/sh
+# This postinstall script is run on macOS pkg installers
+
+# Extract a referral / promo code from the installer path of the format /dir/path/Setup-Brave-Anything-xxx001.pkg
+# where the promo code would be xxx001
+installerPath=$1
+installerPathPromoCodeRegex='.+-([a-zA-Z0-9]{3}[0-9]{3})\.pkg$'
+userDataDir="$HOME/Library/Application Support/brave"
+promoCodePath="$userDataDir/promoCode"
+# pkg runs this script as root so we need to get current username
+userName="$USER"
+echo "Installer path is: $installerPath"
+echo "Username is: $userName"
+
+if [[ $installerPath =~ $installerPathPromoCodeRegex ]]; then
+  echo "Installer path matched for promo code"
+  n=${#BASH_REMATCH[*]}
+  if [ $n -ge 1 ]; then
+    promoCode=${BASH_REMATCH[1]}
+    echo "Got promo code: $promoCode"
+    echo "Writing to user data directory at: $userDataDir/promoCode"
+    # TODO: it is a bit ugly to assume the user-data path here, and to manually
+    # write to it and hopefully set the correct permissions. An alternative would
+    # be to run Brave with a flag, similar to the process for Windows.
+    mkdir -p "$userDataDir"
+    echo "$promoCode" > "$promoCodePath"
+    # fix permissions
+    sudo chown "$userName" "$userDataDir"
+    sudo chown "$userName" "$promoCodePath"
+  fi
+else
+  echo "Installer path did not match for promo code"
+fi
+
+exit 0
