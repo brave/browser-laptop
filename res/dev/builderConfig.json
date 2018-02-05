@@ -3,7 +3,20 @@
   "productName": "Brave",
   "npmRebuild": false,
   "mac": {
-    "target": "dmg"
+    "target": [
+      {
+        "target": "pkg"
+      },
+      {
+        "target": "dmg"
+      }
+    ]
+  },
+  "pkg": {
+    "installLocation": "/Applications",
+    "allowAnywhere": false,
+    "allowCurrentUserHome": false,
+    "allowRootDirectory": false
   },
   "dmg": {
     "title": "Brave",
