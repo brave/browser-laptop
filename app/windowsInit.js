@@ -10,6 +10,9 @@ const spawnSync = childProcess.spawnSync
 const execSync = childProcess.execSync
 const app = electron.app
 const Channel = require('./channel')
+const cmdLine = require('./cmdLine')
+const promoCodeFirstRunStorage = require('./promoCodeFirstRunStorage')
+
 let appUserModelId = 'com.squirrel.brave.Brave'
 switch (Channel.channel()) {
   case 'nightly':
@@ -53,19 +56,32 @@ function CopyManifestFile () {
   execSync(cmd)
 }
 
- // windows installation events etc...
+// windows installation events etc...
 if (process.platform === 'win32') {
   const shouldQuit = require('electron-squirrel-startup')
-  const cmd = process.argv[1]
   const channel = Channel.channel()
-  if (cmd === '--squirrel-install' || cmd === '--squirrel-updated') {
+  const isSquirrelInstall = process.argv.includes('--squirrel-install')
+  const isSquirrelUpdate = process.argv.includes('--squirrel-updated')
+  const isSquirrelUninstall = process.argv.includes('--squirrel-uninstall')
+  const isSquirrelFirstRun = process.argv.includes('--squirrel-firstrun')
+  // handle running as part of install process
+  if (isSquirrelInstall) {
+    // determine if promo code was provided by setup.exe
+    const promoCode = cmdLine.getFirstRunPromoCode()
+    if (promoCode) {
+      // write promo code so state can access it
+      promoCodeFirstRunStorage.writeFirstRunPromoCodeSync(promoCode)
+    }
+  }
+  // first-run after install / update
+  if (isSquirrelInstall || isSquirrelUpdate) {
     // The manifest file is used to customize the look of the Start menu tile.
     // This function copies it from the versioned folder to the parent folder
     // (where the auto-update executable lives)
     CopyManifestFile()
     // Launch defaults helper to add defaults on install
     spawn(getBraveDefaultsBinPath(), [], { detached: true })
-  } else if (cmd === '--squirrel-uninstall') {
+  } else if (isSquirrelUninstall) {
     // Launch defaults helper to remove defaults on uninstall
     // Sync to avoid file path in use on uninstall
     spawnSync(getBraveDefaultsBinPath(), ['-uninstall'])
@@ -80,7 +96,7 @@ if (process.platform === 'win32') {
       !process.argv.includes('--relaunch') &&
       !process.argv.includes('--user-data-dir-name=brave-development')) {
     delete process.env.CHROME_USER_DATA_DIR
-    if (cmd === '--squirrel-firstrun') {
+    if (isSquirrelFirstRun) {
       app.relaunch({args: [userDataDirSwitch, '--relaunch']})
     } else {
       app.relaunch({args: process.argv.slice(1).concat([userDataDirSwitch, '--relaunch'])})

@@ -13,9 +13,13 @@ const appActions = require('../js/actions/appActions')
 const urlParse = require('./common/urlParse')
 const {fileUrl} = require('../js/lib/appUrlUtil')
 const sessionStore = require('./sessionStore')
-const isDarwin = process.platform === 'darwin'
 const fs = require('fs')
 const path = require('path')
+
+const isDarwin = process.platform === 'darwin'
+const promoCodeFilenameRegex = /-([a-zA-Z\d]{3}\d{3})$/g
+const debugTabEventsFlagName = '--debug-tab-events'
+
 let appInitialized = false
 let newWindowURL
 
@@ -126,13 +130,44 @@ app.on('will-finish-launching', () => {
 
 process.on(messages.APP_INITIALIZED, () => { appInitialized = true })
 
-module.exports.newWindowURL = () => {
-  const openUrl = newWindowURL || getUrlFromCommandLine(process.argv)
-  if (openUrl) {
-    const parsedUrl = urlParse(openUrl)
-    if (sessionStore.isProtocolHandled(parsedUrl.protocol)) {
-      newWindowURL = openUrl
+const api = module.exports = {
+  newWindowURL: () => {
+    const openUrl = newWindowURL || getUrlFromCommandLine(process.argv)
+    if (openUrl) {
+      const parsedUrl = urlParse(openUrl)
+      if (sessionStore.isProtocolHandled(parsedUrl.protocol)) {
+        newWindowURL = openUrl
+      }
     }
-  }
-  return newWindowURL
+    return newWindowURL
+  },
+
+  getValueForKey: function (key, args = process.argv) {
+    // TODO: support --blah=bloop as well as the currently supported --blah bloop
+    //       and also boolean values inferred by key existance or 'no-' prefix
+    //       similar to https://github.com/substack/minimist/blob/master/index.js#97
+    const keyArgIndex = args.findIndex(arg => arg === key)
+    const valueIndex = keyArgIndex + 1
+    if (keyArgIndex !== -1 && args.length > valueIndex) {
+      return args[valueIndex]
+    }
+    return null
+  },
+  getFirstRunPromoCode: function (args = process.argv) {
+    const installerPath = api.getValueForKey('--squirrel-installer-path', args)
+    if (!installerPath || typeof installerPath !== 'string') {
+      return null
+    }
+
+    // parse promo code from installer path
+    // first, get filename
+    const fileName = path.win32.parse(installerPath).name
+    const matches = promoCodeFilenameRegex.exec(fileName)
+    if (matches && matches.length === 2) {
+      return matches[1]
+    }
+    return null
+  },
+
+  shouldDebugTabEvents: process.argv.includes(debugTabEventsFlagName)
 }
