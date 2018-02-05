@@ -20,6 +20,7 @@ const appActions = require('../../../../js/actions/appActions')
 
 // Utils
 const dndData = require('../../../../js/dndData')
+const locale = require('../../../../js/l10n')
 
 class BookmarksList extends ImmutableComponent {
   onDoubleClick (entry, e) {
@@ -42,8 +43,9 @@ class BookmarksList extends ImmutableComponent {
     e.dataTransfer.effectAllowed = 'all'
     dndData.setupDataTransferBraveData(e.dataTransfer, dragTypes.BOOKMARK, siteDetail)
     // TODO: Pass the location here when content scripts are fixed
+    const count = siteDetail.size
     dndData.setupDataTransferURL(e.dataTransfer, '', isList
-      ? 'Multi-selection (' + siteDetail.size + ' bookmarks)'
+      ? locale.translation('multiSelectionBookmarks', {count})
       : siteDetail.get('title'))
   }
   /**
