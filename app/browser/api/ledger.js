@@ -473,14 +473,14 @@ const synopsisNormalizer = (state, changedPublisher, returnState = true, prune =
 
         const pinnedRestTotal = pinnedTotal - changedObject.pinPercentage
         dataPinned = dataPinned.filter(publisher => publisher.publisherKey !== changedPublisher)
-        dataPinned = normalizePinned(dataPinned, pinnedRestTotal, (100 - changedObject.pinPercentage), setOne)
-        dataPinned = roundToTarget(dataPinned, (100 - changedObject.pinPercentage), 'pinPercentage')
+        dataPinned = module.exports.normalizePinned(dataPinned, pinnedRestTotal, (100 - changedObject.pinPercentage), setOne)
+        dataPinned = module.exports.roundToTarget(dataPinned, (100 - changedObject.pinPercentage), 'pinPercentage')
 
         dataPinned.push(changedObject)
       }
     } else {
-      dataPinned = normalizePinned(dataPinned, pinnedTotal, 100)
-      dataPinned = roundToTarget(dataPinned, 100, 'pinPercentage')
+      dataPinned = module.exports.normalizePinned(dataPinned, pinnedTotal, 100)
+      dataPinned = module.exports.roundToTarget(dataPinned, 100, 'pinPercentage')
     }
 
     dataUnPinned = dataUnPinned.map((result) => {
@@ -494,8 +494,18 @@ const synopsisNormalizer = (state, changedPublisher, returnState = true, prune =
     state = ledgerState.changePinnedValues(state, dataPinned)
   } else if (dataUnPinned.length === 0 && pinnedTotal < 100) {
     // when you don't have any unpinned sites and pinned total is less then 100 %
-    dataPinned = normalizePinned(dataPinned, pinnedTotal, 100, false)
-    dataPinned = roundToTarget(dataPinned, 100, 'pinPercentage')
+    let changedObject = dataPinned.find(publisher => publisher.publisherKey === changedPublisher)
+    if (changedObject) {
+      const pinnedRestTotal = pinnedTotal - changedObject.pinPercentage
+      const restPercentage = 100 - changedObject.pinPercentage
+      dataPinned = dataPinned.filter(publisher => publisher.publisherKey !== changedPublisher)
+      dataPinned = module.exports.normalizePinned(dataPinned, pinnedRestTotal, restPercentage)
+      dataPinned = module.exports.roundToTarget(dataPinned, restPercentage, 'pinPercentage')
+      dataPinned.push(changedObject)
+    } else {
+      dataPinned = module.exports.normalizePinned(dataPinned, pinnedTotal, 100, false)
+      dataPinned = module.exports.roundToTarget(dataPinned, 100, 'pinPercentage')
+    }
 
     // sync app store
     state = ledgerState.changePinnedValues(state, dataPinned)
@@ -510,7 +520,7 @@ const synopsisNormalizer = (state, changedPublisher, returnState = true, prune =
     })
 
     // normalize unpinned values
-    dataUnPinned = roundToTarget(dataUnPinned, (100 - pinnedTotal), 'percentage')
+    dataUnPinned = module.exports.roundToTarget(dataUnPinned, (100 - pinnedTotal), 'percentage')
   }
 
   const newData = dataPinned.concat(dataUnPinned, dataExcluded)
@@ -2836,6 +2846,8 @@ const getMethods = () => {
     deleteSynopsis,
     transitionWalletToBat,
     getNewClient,
+    normalizePinned,
+    roundToTarget,
     savePublisherData,
     pruneSynopsis,
     checkBtcBatMigrated,

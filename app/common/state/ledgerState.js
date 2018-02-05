@@ -359,7 +359,7 @@ const ledgerState = {
 
     publishers = makeImmutable(publishers)
     publishers.forEach((item) => {
-      const publisherKey = item.get('site')
+      const publisherKey = item.get('publisherKey')
       const pattern = urlUtil.getHostPattern(publisherKey)
       const percentage = item.get('pinPercentage')
       let newSiteSettings = siteSettings.mergeSiteSetting(state.get('siteSettings'), pattern, 'ledgerPinPercentage', percentage)
