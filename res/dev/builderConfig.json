@@ -13,6 +13,7 @@
     ]
   },
   "pkg": {
+    "scripts": "pkg-scripts/",
     "installLocation": "/Applications",
     "allowAnywhere": false,
     "allowCurrentUserHome": false,
