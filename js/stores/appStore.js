@@ -389,7 +389,7 @@ const handleAppAction = (action) => {
       }
       break
     case appConstants.APP_CHECK_TOR_AVAILABLE:
-      filtering.checkTorAvailable()
+      filtering.checkTorAvailable(action.cb)
       break
     case appConstants.APP_SET_TOR_NEW_IDENTITY:
       const activeTab = tabState.getActiveTab(appState)

@@ -6,6 +6,7 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite')
 const privateTabIcon = require('../../app/extensions/brave/img/newtab/private_tab_pagearea_icon.svg')
 const ddgIcon = require('../../app/extensions/brave/img/newtab/private_tab_pagearea_ddgicon.svg')
+const torIcon = require('../../app/extensions/brave/img/newtab/toricon.svg')
 const globalStyles = require('../../app/renderer/components/styles/global')
 const { theme } = require('../../app/renderer/components/styles/theme')
 const {SettingCheckbox} = require('../../app/renderer/components/common/settings')
@@ -18,15 +19,27 @@ const aboutActions = require('./aboutActions')
 require('../../less/about/newtab.less')
 
 const useAlternativePrivateSearchEngineDataKeys = ['newTabDetail', 'useAlternativePrivateSearchEngine']
+const torAvailable = ['newTabDetail', 'torAvailable']
+const torEnabled = ['newTabDetail', 'torEnabled']
 
 class NewPrivateTab extends React.Component {
   onChangePrivateSearch (e) {
     aboutActions.changeSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, e.target.value)
   }
 
+  onChangeTor (e) {
+    aboutActions.changeSetting(settings.USE_TOR_PRIVATE_TABS, e.target.value)
+    aboutActions.recreateTorTab(e.target.value)
+  }
+
   onClickPrivateSearchTitle () {
     const newSettingValue = !this.props.newTabData.getIn(useAlternativePrivateSearchEngineDataKeys)
     aboutActions.changeSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, newSettingValue)
+  }
+
+  onClickTorTitle () {
+    const newSettingValue = !this.props.newTabData.getIn(torEnabled)
+    aboutActions.changeSetting(settings.USE_TOR_PRIVATE_TABS, newSettingValue)
   }
 
   render () {
@@ -43,7 +56,6 @@ class NewPrivateTab extends React.Component {
         <div className={css(styles.textWrapper)}>
           <h1 className={css(styles.title)} data-l10n-id='privateTabTitle' />
           <p className={css(styles.text)} data-l10n-id='privateTabText1' />
-          <p className={css(styles.text, styles.text_thirdPartyNote)} data-l10n-id='privateTabText3' />
           {
             this.props.newTabData.hasIn(useAlternativePrivateSearchEngineDataKeys) &&
             <div className={css(styles.privateSearch)}>
@@ -63,6 +75,26 @@ class NewPrivateTab extends React.Component {
               </div>
               <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabSearchText1' />
             </div>
+          }
+          {
+            this.props.newTabData.getIn(torAvailable)
+              ? <div className={css(styles.privateSearch)}>
+                <div className={css(styles.privateSearch__setting)}>
+                  <SettingCheckbox
+                    large
+                    switchClassName={css(styles.privateSearch__switch)}
+                    rightLabelClassName={css(styles.sectionTitle)}
+                    checked={Boolean(this.props.newTabData.getIn(torEnabled))}
+                    onChange={this.onChangeTor.bind(this)}
+                  />
+                  <h2 onClick={this.onClickTorTitle.bind(this)} className={css(styles.privateSearch__title)}>
+                    <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabTorTitle' />
+                  </h2>
+                  <img className={css(styles.privateSearch__ddgImage)} src={torIcon} alt='Tor logo' />
+                </div>
+                <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabTorText1' />
+              </div>
+              : null
           }
         </div>
       </div>

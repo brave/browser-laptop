@@ -14,14 +14,23 @@ const aboutNewTabReducer = (state, action) => {
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:
       const useAlternativePrivateSearchEngine = getSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, state.get('settings'))
+      const torEnabled = getSetting(settings.USE_TOR_PRIVATE_TABS)
       state = aboutNewTabState.mergeDetails(state, {
         newTabPageDetail: {
-          useAlternativePrivateSearchEngine
+          useAlternativePrivateSearchEngine,
+          torEnabled
         }
       })
       break
     case appConstants.APP_TOP_SITE_DATA_AVAILABLE:
       state = aboutNewTabState.setSites(state, action.topSites)
+      break
+    case appConstants.APP_TOR_AVAILABLE:
+      state = aboutNewTabState.mergeDetails(state, {
+        newTabPageDetail: {
+          torAvailable: action.value
+        }
+      })
       break
     case appConstants.APP_CHANGE_NEW_TAB_DETAIL:
       state = aboutNewTabState.mergeDetails(state, action)
@@ -34,6 +43,12 @@ const aboutNewTabReducer = (state, action) => {
         state = aboutNewTabState.mergeDetails(state, {
           newTabPageDetail: {
             useAlternativePrivateSearchEngine: action.value
+          }
+        })
+      } else if (action.key === settings.USE_TOR_PRIVATE_TABS) {
+        state = aboutNewTabState.mergeDetails(state, {
+          newTabPageDetail: {
+            torEnabled: action.value
           }
         })
       }

@@ -1964,15 +1964,32 @@ const appActions = {
     })
   },
 
-  checkTorAvailable: function () {
+  checkTorAvailable: function (cb) {
     dispatch({
-      actionType: appConstants.APP_CHECK_TOR_AVAILABLE
+      actionType: appConstants.APP_CHECK_TOR_AVAILABLE,
+      cb
+    })
+  },
+
+  torAvailable: function (value) {
+    dispatch({
+      actionType: appConstants.APP_TOR_AVAILABLE,
+      value
     })
   },
 
   setTorNewIdentity: function () {
     dispatch({
       actionType: appConstants.APP_SET_TOR_NEW_IDENTITY
+    })
+  },
+
+  recreateTorTab: function (torEnabled, tabId, index) {
+    dispatch({
+      actionType: appConstants.APP_RECREATE_TOR_TAB,
+      torEnabled,
+      tabId,
+      index
     })
   }
 }

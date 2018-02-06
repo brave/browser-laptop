@@ -99,6 +99,8 @@ const settings = {
   METAMASK_PROMPT_DISMISSED: 'extensions.metamask.promptDismissed',
   // Debug settings
   DEBUG_ALLOW_MANUAL_TAB_DISCARD: 'debug.manual-tab-discard.enabled',
+  // Tor settings
+  USE_TOR_PRIVATE_TABS: 'tor.private-tabs.enabled',
 
   // DEPRECATED settings
   // DO NOT REMOVE OR CHANGE THESE VALUES

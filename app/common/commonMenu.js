@@ -9,7 +9,7 @@ const messages = require('../../js/constants/messages')
 const locale = require('../../js/l10n')
 const settings = require('../../js/constants/settings')
 const {tabs} = require('../../js/constants/config')
-const getSetting = require('../../js/settings').getSetting
+const {getSetting} = require('../../js/settings')
 const communityURL = 'https://community.brave.com/'
 const isDarwin = process.platform === 'darwin'
 const electron = require('electron')
@@ -82,24 +82,23 @@ module.exports.newPrivateTabMenuItem = () => {
     label: locale.translation('newPrivateTab'),
     accelerator: 'Shift+CmdOrCtrl+P',
     click: function (item, focusedWindow) {
-      ensureAtLeastOneWindow({
-        url: 'about:newtab',
-        isPrivate: true
-      })
-    }
-  }
-}
-
-module.exports.newTorTabMenuItem = () => {
-  return {
-    label: locale.translation('newTorTab'),
-    click: function (item, focusedWindow) {
-      ensureAtLeastOneWindow({
-        url: 'about:newtab',
-        isTor: true
-      })
       // Check if Tor is available
-      appActions.checkTorAvailable()
+      const useTor = getSetting(settings.USE_TOR_PRIVATE_TABS)
+      if (useTor) {
+        const cb = (success) => {
+          ensureAtLeastOneWindow({
+            url: 'about:newtab',
+            isPrivate: true,
+            isTor: success
+          })
+        }
+        appActions.checkTorAvailable(cb)
+      } else {
+        ensureAtLeastOneWindow({
+          url: 'about:newtab',
+          isPrivate: true
+        })
+      }
     }
   }
 }
