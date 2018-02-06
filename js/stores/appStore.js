@@ -394,7 +394,8 @@ const handleAppAction = (action) => {
     case appConstants.APP_SET_TOR_NEW_IDENTITY:
       const activeTab = tabState.getActiveTab(appState)
       if (activeTab) {
-        filtering.setTorNewIdentity(activeTab.get('url'))
+        filtering.setTorNewIdentity(activeTab.get('url'),
+                                    activeTab.get('tabId'))
       }
       break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
