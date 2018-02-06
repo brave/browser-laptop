@@ -566,6 +566,7 @@ function updateDownloadState (win, downloadId, item, state) {
 }
 
 function registerForDownloadListener (session) {
+  var repaint = false
   session.on('default-download-directory-changed', (e, newPath) => {
     if (newPath !== getSetting(settings.DOWNLOAD_DEFAULT_PATH)) {
       appActions.changeSetting(settings.DOWNLOAD_DEFAULT_PATH, newPath)
@@ -590,14 +591,16 @@ function registerForDownloadListener (session) {
     item.setPrompt(getSetting(settings.DOWNLOAD_ALWAYS_ASK) || false)
 
     const downloadId = item.getGuid()
+    repaint = true
     item.on('updated', function (e, st) {
       if (!item.getSavePath()) {
         return
       }
       const state = item.isPaused() ? downloadStates.PAUSED : downloadStates.IN_PROGRESS
       updateDownloadState(win, downloadId, item, state)
-      if (win && !win.isDestroyed() && !win.webContents.isDestroyed()) {
+      if (win && !win.isDestroyed() && !win.webContents.isDestroyed() && repaint) {
         win.webContents.send(messages.SHOW_DOWNLOADS_TOOLBAR)
+        repaint = false
       }
       item.on('removed', function () {
         updateElectronDownloadItem(downloadId, item, downloadStates.CANCELLED)
