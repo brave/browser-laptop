@@ -218,7 +218,7 @@ class LedgerTable extends ImmutableComponent {
               defaultValue={percentage}
               patern={this.getHostPattern(synopsis)}
             />
-            : percentage
+            : <span className={css(styles.regularPercentage)}>{percentage}</span>
           }
         </span>,
         value: percentage
@@ -491,6 +491,10 @@ const styles = StyleSheet.create({
   ledgerTable__showAll: {
     textAlign: 'center',
     marginTop: globalStyles.spacing.panelMargin
+  },
+
+  regularPercentage: {
+    paddingRight: '10px'
   }
 })
 
