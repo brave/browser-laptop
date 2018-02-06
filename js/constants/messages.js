@@ -76,6 +76,7 @@ const messages = {
   DETACH: _,
   PASSWORD_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
   PASSWORD_SITE_DETAILS_UPDATED: _, /** @arg {Object} passwords app state */
+  RECREATE_TOR_TAB: _, /** @arg {boolean} torEnabled */
   // Init
   INITIALIZE_WINDOW: _,
   // Session restore

@@ -170,6 +170,7 @@ module.exports = {
     'security.autoplay.media': autoplayOption.ALWAYS_ALLOW,
     'security.flash.installed': false,
     'security.site-isolation-enabled': false,
+    'tor.private-tabs.enabled': true,
     'shields.blocked-count-badge': true,
     'shields.compact-bravery-panel': false,
     // sync
