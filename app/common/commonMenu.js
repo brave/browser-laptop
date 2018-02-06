@@ -108,9 +108,8 @@ module.exports.newTorIdentityMenuItem = () => {
   return {
     label: locale.translation('newTorIdentity'),
     click: function (item, focusedWindow) {
-      // TODO
-    },
-    enabled: false
+      appActions.setTorNewIdentity()
+    }
   }
 }
 

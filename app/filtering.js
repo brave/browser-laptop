@@ -701,6 +701,15 @@ module.exports.checkTorAvailable = () => {
   }, 500)
 }
 
+module.exports.setTorNewIdentity = (url) => {
+  const origin = getOrigin(url)
+  const ses = session.fromPartition('persist:tor')
+  if (!ses || !origin) {
+    return
+  }
+  ses.setTorNewIdentity(origin)
+}
+
 function initSession (ses, partition) {
   registeredSessions[partition] = ses
   ses.setEnableBrotli(true)
