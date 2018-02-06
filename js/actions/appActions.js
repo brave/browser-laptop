@@ -1968,6 +1968,12 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_CHECK_TOR_AVAILABLE
     })
+  },
+
+  setTorNewIdentity: function () {
+    dispatch({
+      actionType: appConstants.APP_SET_TOR_NEW_IDENTITY
+    })
   }
 }
 

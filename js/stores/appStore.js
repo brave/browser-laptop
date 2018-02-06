@@ -391,6 +391,12 @@ const handleAppAction = (action) => {
     case appConstants.APP_CHECK_TOR_AVAILABLE:
       filtering.checkTorAvailable()
       break
+    case appConstants.APP_SET_TOR_NEW_IDENTITY:
+      const activeTab = tabState.getActiveTab(appState)
+      if (activeTab) {
+        filtering.setTorNewIdentity(activeTab.get('url'))
+      }
+      break
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
       const defaults = appState.get('clearBrowsingDataDefaults')
       const temp = appState.get('tempClearBrowsingData', Immutable.Map())

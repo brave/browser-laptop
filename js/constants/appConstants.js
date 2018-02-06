@@ -198,7 +198,8 @@ const appConstants = {
   APP_CHECK_REFERRAL_ACTIVITY: _,
   APP_ON_REFERRAL_ACTIVITY: _,
   APP_ON_LEDGER_MEDIA_PUBLISHER: _,
-  APP_CHECK_TOR_AVAILABLE: _
+  APP_CHECK_TOR_AVAILABLE: _,
+  APP_SET_TOR_NEW_IDENTITY: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
