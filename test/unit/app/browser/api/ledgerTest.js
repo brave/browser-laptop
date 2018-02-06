@@ -9,7 +9,6 @@ const sinon = require('sinon')
 const mockery = require('mockery')
 const settings = require('../../../../../js/constants/settings')
 const appActions = require('../../../../../js/actions/appActions')
-const migrationState = require('../../../../../app/common/state/migrationState')
 const batPublisher = require('bat-publisher')
 const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
 const fs = require('fs')
@@ -22,6 +21,7 @@ describe('ledger api unit tests', function () {
   let ledgerUtil
   let isBusy = false
   let ledgerClient
+  let ledgerClientObject
   let ledgerPublisher
   let tabState = Immutable.fromJS({
     partition: 'persist:partition-1'
@@ -43,11 +43,7 @@ describe('ledger api unit tests', function () {
   let contributionAmountSet = true
 
   // spies
-  let ledgerTransitionSpy
-  let ledgerTransitionedSpy
-  let onBitcoinToBatTransitionedSpy
   let onLedgerCallbackSpy
-  let onBitcoinToBatBeginTransitionSpy
   let onChangeSettingSpy
   let ledgersetPromotionSpy
   let ledgergetPromotionSpy
@@ -57,8 +53,7 @@ describe('ledger api unit tests', function () {
     cache: {
       ledgerVideos: {}
     },
-    ledger: {},
-    migrations: {}
+    ledger: {}
   })
 
   before(function () {
@@ -96,9 +91,7 @@ describe('ledger api unit tests', function () {
     request = require('../../../../../js/lib/request')
     mockery.registerMock('../../../js/lib/request', request)
     mockery.registerMock('../../../js/actions/appActions', appActions)
-    onBitcoinToBatTransitionedSpy = sinon.spy(appActions, 'onBitcoinToBatTransitioned')
     onLedgerCallbackSpy = sinon.spy(appActions, 'onLedgerCallback')
-    onBitcoinToBatBeginTransitionSpy = sinon.spy(appActions, 'onBitcoinToBatBeginTransition')
     onChangeSettingSpy = sinon.spy(appActions, 'changeSetting')
     mockery.registerMock('fs', fs)
 
@@ -109,7 +102,7 @@ describe('ledger api unit tests', function () {
 
     // ledger client stubbing
     ledgerClient = sinon.stub()
-    const lc = {
+    ledgerClientObject = {
       sync: function (callback) { return false },
       getBraveryProperties: function () {
         return {
@@ -131,9 +124,6 @@ describe('ledger api unit tests', function () {
       getWalletProperties: function (amount, currency, callback) {
         callback(null, {})
       },
-      transition: function (paymentId, callback) {
-        callback()
-      },
       getPaymentId: function () {
         return 'payementIdGoesHere'
       },
@@ -141,9 +131,6 @@ describe('ledger api unit tests', function () {
         wallet: {
           paymentId: 12345
         }
-      },
-      transitioned: function () {
-        return {}
       },
       setBraveryProperties: function (clientProperties, callback) {
         if (typeof callback === 'function') {
@@ -172,12 +159,10 @@ describe('ledger api unit tests', function () {
     ledgerClient.prototype.getWalletPassphrase = function (parsedData) {
       return window.getWalletPassphrase(parsedData)
     }
-    ledgerTransitionSpy = sinon.spy(lc, 'transition')
-    ledgerTransitionedSpy = sinon.spy(lc, 'transitioned')
-    ledgersetPromotionSpy = sinon.spy(lc, 'setPromotion')
-    ledgergetPromotionSpy = sinon.spy(lc, 'getPromotion')
-    ledgerSetTimeUntilReconcile = sinon.spy(lc, 'setTimeUntilReconcile')
-    ledgerClient.returns(lc)
+    ledgersetPromotionSpy = sinon.spy(ledgerClientObject, 'setPromotion')
+    ledgergetPromotionSpy = sinon.spy(ledgerClientObject, 'getPromotion')
+    ledgerSetTimeUntilReconcile = sinon.spy(ledgerClientObject, 'setTimeUntilReconcile')
+    ledgerClient.returns(ledgerClientObject)
     mockery.registerMock('bat-client', ledgerClient)
 
     // ledger publisher stubbing
@@ -212,9 +197,7 @@ describe('ledger api unit tests', function () {
     ledgerApi = require('../../../../../app/browser/api/ledger')
   })
   after(function () {
-    onBitcoinToBatTransitionedSpy.restore()
     onLedgerCallbackSpy.restore()
-    onBitcoinToBatBeginTransitionSpy.restore()
     onChangeSettingSpy.restore()
     mockery.deregisterAll()
     mockery.disable()
@@ -283,77 +266,6 @@ describe('ledger api unit tests', function () {
         setPaymentInfoSpy.reset()
         ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
         assert(setPaymentInfoSpy.withArgs(10).calledOnce)
-      })
-    })
-
-    describe('checkBtcBatMigrated', function () {
-      let transitionWalletToBatStub
-      before(function () {
-        transitionWalletToBatStub = sinon.stub(ledgerApi, 'transitionWalletToBat')
-      })
-      after(function () {
-        transitionWalletToBatStub.restore()
-      })
-
-      describe('when not a new install and wallet has not been upgraded', function () {
-        let result
-        before(function () {
-          const notMigratedYet = defaultAppState.merge(Immutable.fromJS({
-            firstRunTimestamp: 12345,
-            migrations: {
-              batMercuryTimestamp: 34512,
-              btc2BatTimestamp: 34512,
-              btc2BatNotifiedTimestamp: 34512,
-              btc2BatTransitionPending: false
-            }
-          }))
-          assert.equal(migrationState.inTransition(notMigratedYet), false)
-          transitionWalletToBatStub.reset()
-          result = ledgerApi.checkBtcBatMigrated(notMigratedYet, true)
-        })
-        it('sets transition status to true', function () {
-          assert(migrationState.inTransition(result))
-        })
-        it('calls transitionWalletToBat', function () {
-          assert(transitionWalletToBatStub.calledOnce)
-        })
-      })
-
-      describe('when a transition is already being shown', function () {
-        it('sets transition to false if new install', function () {
-          const stuckOnMigrate = defaultAppState.merge(Immutable.fromJS({
-            firstRunTimestamp: 12345,
-            migrations: {
-              batMercuryTimestamp: 12345,
-              btc2BatTimestamp: 12345,
-              btc2BatNotifiedTimestamp: 12345,
-              btc2BatTransitionPending: true
-            }
-          }))
-          assert(migrationState.isNewInstall(stuckOnMigrate))
-          assert.equal(migrationState.hasUpgradedWallet(stuckOnMigrate), false)
-          assert(migrationState.inTransition(stuckOnMigrate))
-
-          const result = ledgerApi.checkBtcBatMigrated(stuckOnMigrate, true)
-          assert.equal(migrationState.inTransition(result), false)
-        })
-        it('sets transition to false if wallet has been upgraded', function () {
-          const stuckOnMigrate = defaultAppState.merge(Immutable.fromJS({
-            firstRunTimestamp: 12345,
-            migrations: {
-              batMercuryTimestamp: 34512,
-              btc2BatTimestamp: 54321,
-              btc2BatNotifiedTimestamp: 34512,
-              btc2BatTransitionPending: true
-            }
-          }))
-          assert.equal(migrationState.isNewInstall(stuckOnMigrate), false)
-          assert(migrationState.hasUpgradedWallet(stuckOnMigrate))
-          assert(migrationState.inTransition(stuckOnMigrate))
-
-          const result = ledgerApi.checkBtcBatMigrated(stuckOnMigrate, true)
-          assert.equal(migrationState.inTransition(result), false)
-        })
       })
     })
 
@@ -546,8 +458,7 @@ describe('ledger api unit tests', function () {
                 }
               }
             }
-          },
-          migrations: {}
+          }
         }
 
         const result = ledgerApi.pruneSynopsis(defaultAppState)
@@ -814,8 +725,7 @@ describe('ledger api unit tests', function () {
               }
             }
           }
-        },
-        migrations: {}
+        }
       })
 
       const response = Immutable.fromJS({
@@ -915,8 +825,7 @@ describe('ledger api unit tests', function () {
                 }
               }
             }
-          },
-          migrations: {}
+          }
         })
 
         const state = ledgerApi.onMediaPublisher(newState, videoId, response, 1000, false)
@@ -959,8 +868,7 @@ describe('ledger api unit tests', function () {
                 }
               }
             }
-          },
-          migrations: {}
+          }
         })
 
         const state = ledgerApi.onMediaPublisher(newState, videoId, response, 1000, false)
@@ -1122,105 +1030,6 @@ describe('ledger api unit tests', function () {
         assert.notDeepEqual(result1, state)
         assert.notDeepEqual(result2, result1)
         assert(visitsByPublisher['clifton.io'])
-      })
-    })
-
-    describe('transitionWalletToBat', function () {
-      let fakeClock
-
-      before(function () {
-        fakeClock = sinon.useFakeTimers()
-      })
-      after(function () {
-        ledgerApi.setSynopsis(undefined)
-        fakeClock.restore()
-      })
-
-      describe('when client is not busy', function () {
-        before(function () {
-          ledgerApi.onBootStateFile(defaultAppState)
-          ledgerTransitionSpy.reset()
-          onBitcoinToBatTransitionedSpy.reset()
-          onLedgerCallbackSpy.reset()
-          ledgerTransitionedSpy.reset()
-          onBitcoinToBatBeginTransitionSpy.reset()
-          ledgerClient.reset()
-          ledgerApi.resetNewClient()
-          isBusy = false
-          ledgerApi.transitionWalletToBat()
-        })
-        it('creates a new instance of ledgerClient', function () {
-          assert(ledgerClient.calledOnce)
-        })
-        it('calls AppActions.onBitcoinToBatBeginTransition', function () {
-          assert(onBitcoinToBatBeginTransitionSpy.calledOnce)
-        })
-        it('calls client.transition', function () {
-          assert(ledgerTransitionSpy.calledOnce)
-        })
-        describe('when transition completes', function () {
-          it('calls client.transitioned', function () {
-            assert(ledgerTransitionedSpy.calledOnce)
-          })
-          it('calls AppActions.onLedgerCallback', function () {
-            assert(onLedgerCallbackSpy.calledOnce)
-          })
-          it('calls AppActions.onBitcoinToBatTransitioned', function () {
-            assert(onBitcoinToBatTransitionedSpy.calledOnce)
-          })
-        })
-      })
-      describe('when client is busy', function () {
-        before(function () {
-          ledgerApi.onBootStateFile(defaultAppState)
-          ledgerTransitionSpy.reset()
-          onBitcoinToBatTransitionedSpy.reset()
-          onLedgerCallbackSpy.reset()
-          ledgerTransitionedSpy.reset()
-          onBitcoinToBatBeginTransitionSpy.reset()
-          ledgerClient.reset()
-          ledgerApi.resetNewClient()
-          isBusy = true
-          ledgerApi.transitionWalletToBat()
-        })
-        after(function () {
-          isBusy = false
-        })
-        it('does not call AppActions.onBitcoinToBatBeginTransition', function () {
-          assert(onBitcoinToBatBeginTransitionSpy.notCalled)
-        })
-        it('does not call client.transition', function () {
-          assert(ledgerTransitionSpy.notCalled)
-        })
-      })
-      describe('when client is not v1', function () {
-        let oldClient
-        before(function () {
-          const batState = ledgerApi.onBootStateFile(defaultAppState)
-          ledgerTransitionSpy.reset()
-          onBitcoinToBatTransitionedSpy.reset()
-          onLedgerCallbackSpy.reset()
-          ledgerTransitionedSpy.reset()
-          onBitcoinToBatBeginTransitionSpy.reset()
-          ledgerClient.reset()
-          oldClient = ledgerApi.getClient()
-          ledgerApi.setClient({
-            options: {
-              version: 'v2'
-            }
-          })
-          ledgerApi.resetNewClient()
-          ledgerApi.transitionWalletToBat(batState)
-        })
-        after(function () {
-          ledgerApi.setClient(oldClient)
-        })
-        it('calls AppActions.onBitcoinToBatTransitioned', function () {
-          assert(onBitcoinToBatTransitionedSpy.calledOnce)
-        })
-        it('does not call client.transition', function () {
-          assert(ledgerTransitionSpy.notCalled)
-        })
       })
     })
   })
@@ -1663,6 +1472,7 @@ describe('ledger api unit tests', function () {
       .setIn(['ledger', 'promotion', 'promotionId'], '1')
 
     before(function () {
+      ledgerApi.setClient(ledgerClientObject)
       ledgersetPromotionSpy.reset()
     })
 

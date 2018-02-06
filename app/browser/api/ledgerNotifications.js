@@ -12,7 +12,6 @@ const settings = require('../../../js/constants/settings')
 
 // State
 const ledgerState = require('../../common/state/ledgerState')
-const migrationState = require('../../common/state/migrationState')
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
@@ -27,8 +26,7 @@ const text = {
   paymentDone: undefined,
   addFunds: locale.translation('addFundsNotification'),
   tryPayments: locale.translation('notificationTryPayments'),
-  reconciliation: locale.translation('reconciliationNotification'),
-  walletConvertedToBat: locale.translation('walletConvertedToBat')
+  reconciliation: locale.translation('reconciliationNotification')
 }
 
 const pollingInterval = 15 * ledgerUtil.milliseconds.minute // 15 * minutes
@@ -76,27 +74,10 @@ const onLaunch = (state) => {
     return state
   }
 
-  const ledger = require('./ledger')
-  state = ledger.checkBtcBatMigrated(state, enabled)
-
   if (hasFunds(state)) {
     // Don't bother processing the rest, which are only
     if (!getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
       return state
-    }
-
-    // Show one-time BAT conversion message:
-    // - if payments are enabled
-    // - user has a positive balance
-    // - this is an existing profile (new profiles will have firstRunTimestamp matching batMercuryTimestamp)
-    // - wallet has been transitioned
-    // - notification has not already been shown yet
-    // (see https://github.com/brave/browser-laptop/issues/11021)
-    const isNewInstall = migrationState.isNewInstall(state)
-    const hasUpgradedWallet = migrationState.hasUpgradedWallet(state)
-    const hasBeenNotified = migrationState.hasBeenNotified(state)
-    if (!isNewInstall && hasUpgradedWallet && !hasBeenNotified) {
-      module.exports.showBraveWalletUpdated()
     }
   }
 
@@ -179,16 +160,6 @@ const onResponse = (message, buttonIndex, activeWindow) => {
         })
       }
       appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
-      break
-
-    case text.walletConvertedToBat:
-      if (buttonIndex === 0) {
-        // Open backup modal
-        appActions.createTabRequested({
-          url: 'about:preferences#payments?ledgerBackupOverlayVisible',
-          windowId: activeWindow.id
-        })
-      }
       break
 
     default:
@@ -324,27 +295,6 @@ const showPaymentDone = (transactionContributionFiat) => {
   })
 }
 
-const showBraveWalletUpdated = () => {
-  appActions.onBitcoinToBatNotified()
-
-  appActions.showNotification({
-    position: 'global',
-    greeting: text.hello,
-    message: text.walletConvertedToBat,
-    // Learn More.
-    buttons: [
-      {text: locale.translation('walletConvertedBackup')},
-      {text: locale.translation('walletConvertedDismiss')}
-    ],
-    options: {
-      style: 'greetingStyle',
-      persist: false,
-      advancedLink: 'https://brave.com/faq-payments/#brave-payments',
-      advancedText: locale.translation('walletConvertedLearnMore')
-    }
-  })
-}
-
 const onPromotionReceived = (state) => {
   const promotion = ledgerState.getPromotionNotification(state)
 
@@ -410,7 +360,6 @@ const getMethods = () => {
     showPaymentDone,
     init,
     onLaunch,
-    showBraveWalletUpdated,
     onInterval,
     onPromotionReceived,
     removePromotionNotification,

@@ -26,7 +26,6 @@ const appActions = require('../../../js/actions/appActions')
 // State
 const ledgerState = require('../../common/state/ledgerState')
 const pageDataState = require('../../common/state/pageDataState')
-const migrationState = require('../../common/state/migrationState')
 const updateState = require('../../common/state/updateState')
 
 // Constants
@@ -85,7 +84,6 @@ let verifiedTimeoutId = false
 let v2RulesetDB
 const v2RulesetPath = 'ledger-rulesV2.leveldb'
 const statePath = 'ledger-state.json'
-const newClientPath = 'ledger-newstate.json'
 
 // Definitions
 const clientOptions = {
@@ -1223,8 +1221,6 @@ const checkPromotions = () => {
 
 const enable = (state, paymentsEnabled) => {
   if (paymentsEnabled) {
-    state = checkBtcBatMigrated(state, paymentsEnabled)
-
     if (!getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
       appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
     }
@@ -1915,19 +1911,6 @@ const onCallback = (state, result, delayTime) => {
   // persist the new ledger state
   muonWriter(statePath, regularResults)
 
-  // delete the temp file used during transition (if it still exists)
-  if (client && client.options && client.options.version === 'v2') {
-    const fs = require('fs')
-    fs.access(pathName(newClientPath), fs.FF_OK, (err) => {
-      if (err) {
-        return
-      }
-      fs.unlink(pathName(newClientPath), (err) => {
-        if (err) console.error('unlink error: ' + err.toString())
-      })
-    })
-  }
-
   run(state, delayTime)
 
   return state
@@ -2019,7 +2002,6 @@ const initialize = (state, paymentsEnabled) => {
 
   if (!paymentsEnabled) {
     client = null
-    newClient = false
     return ledgerState.resetInfo(state, true)
   }
 
@@ -2393,147 +2375,6 @@ const deleteSynopsis = () => {
   synopsis.publishers = {}
 }
 
-// fix for incorrectly persisted state (see #11585)
-const yoDawg = (stateState) => {
-  while (stateState.hasOwnProperty('state') && stateState.state.persona) {
-    stateState = stateState.state
-  }
-  return stateState
-}
-
-const checkBtcBatMigrated = (state, paymentsEnabled) => {
-  if (!paymentsEnabled) {
-    return state
-  }
-
-  // One time conversion of wallet
-  const isNewInstall = migrationState.isNewInstall(state)
-  const hasUpgradedWallet = migrationState.hasUpgradedWallet(state)
-  if (!isNewInstall && !hasUpgradedWallet) {
-    state = migrationState.setTransitionStatus(state, true)
-    module.exports.transitionWalletToBat()
-  } else {
-    state = migrationState.setTransitionStatus(state, false)
-  }
-
-  return state
-}
-
-let newClient = null
-const getNewClient = () => {
-  return newClient
-}
-
-let busyRetryCount = 0
-
-const transitionWalletToBat = () => {
-  let newPaymentId, result
-
-  if (newClient === true) return
-  clientprep()
-
-  if (!client) {
-    console.log('Client is not initialized, will try again')
-    return
-  }
-
-  // only attempt this transition if the wallet is v1
-  if (client.options && client.options.version !== 'v1') {
-    // older versions incorrectly marked this for transition
-    // this will clean them up (no more bouncy ball)
-    appActions.onBitcoinToBatTransitioned()
-    return
-  }
-
-  // Restore newClient from the file (if one exists)
-  if (!newClient) {
-    const fs = require('fs')
-    try {
-      fs.accessSync(pathName(newClientPath), fs.FF_OK)
-      fs.readFile(pathName(newClientPath), (error, data) => {
-        if (error) {
-          console.error(`ledger client: can't read ${newClientPath} to restore newClient`)
-          return
-        }
-        const parsedData = JSON.parse(data)
-        const state = yoDawg(parsedData)
-        newClient = ledgerClient(state.personaId,
-          underscore.extend(state.options, {roundtrip: module.exports.roundtrip}, clientOptions),
-          state)
-        transitionWalletToBat()
-      })
-      return
-    } catch (err) {}
-  }
-
-  // Create new client
-  if (!newClient) {
-    try {
-      newClient = ledgerClient(null, underscore.extend({roundtrip: module.exports.roundtrip}, clientOptions), null)
-      muonWriter(newClientPath, newClient.state)
-    } catch (ex) {
-      console.error('ledger client creation error(2): ', ex)
-      return
-    }
-  }
-
-  newPaymentId = newClient.getPaymentId()
-  if (!newPaymentId) {
-    newClient.sync((err, result, delayTime) => {
-      if (err) {
-        return console.error('ledger client error(3): ' + JSON.stringify(err, null, 2) + (err.stack ? ('\n' + err.stack) : ''))
-      }
-
-      if (typeof delayTime === 'undefined') delayTime = random.randomInt({ min: 1, max: 500 })
-
-      if (newClient) {
-        muonWriter(newClientPath, newClient.state)
-      }
-
-      setTimeout(() => transitionWalletToBat(), delayTime)
-    })
-    return
-  }
-
-  if (client.busyP()) {
-    if (++busyRetryCount > 3) {
-      console.log('ledger client is currently busy; transition will be retried on next launch')
-      return
-    }
-    const delayTime = random.randomInt({
-      min: ledgerUtil.milliseconds.minute,
-      max: 10 * ledgerUtil.milliseconds.minute
-    })
-    console.log('ledger client is currently busy; transition will be retried shortly (this was attempt ' + busyRetryCount + ')')
-    setTimeout(() => transitionWalletToBat(), delayTime)
-    return
-  }
-
-  appActions.onBitcoinToBatBeginTransition()
-
-  try {
-    client.transition(newPaymentId, (err, properties) => {
-      if (err || !newClient) {
-        console.error('ledger client transition error: ', err)
-      } else {
-        result = newClient.transitioned(properties)
-        client = newClient
-        newClient = true
-        // NOTE: onLedgerCallback will save latest client to disk as ledger-state.json
-        appActions.onLedgerCallback(result, random.randomInt({
-          min: ledgerUtil.milliseconds.minute,
-          max: 10 * ledgerUtil.milliseconds.minute
-        }))
-        appActions.onBitcoinToBatTransitioned()
-        ledgerNotifications.showBraveWalletUpdated()
-        getPublisherTimestamp()
-      }
-    })
-  } catch (ex) {
-    console.error('exception during ledger client transition: ', ex)
-  }
-}
-
 let currentMediaKey = null
 const onMediaRequest = (state, xhr, type, tabId) => {
   if (!xhr || type == null) {
@@ -2872,13 +2713,10 @@ const getMethods = () => {
     migration,
     onInitRead,
     deleteSynopsis,
-    transitionWalletToBat,
-    getNewClient,
     normalizePinned,
     roundToTarget,
     savePublisherData,
     pruneSynopsis,
-    checkBtcBatMigrated,
     onMediaRequest,
     onMediaPublisher,
     saveVisit,
@@ -2900,7 +2738,6 @@ const getMethods = () => {
     privateMethods = {
       enable,
       addSiteVisit,
-      checkBtcBatMigrated,
       clearVisitsByPublisher: function () {
         visitsByPublisher = {}
       },
@@ -2910,9 +2747,6 @@ const getMethods = () => {
       getSynopsis: () => synopsis,
       setSynopsis: (data) => {
         synopsis = data
-      },
-      resetNewClient: () => {
-        newClient = false
       },
       getClient: () => {
         return client

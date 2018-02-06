@@ -42,20 +42,6 @@ const widthIncreaseElementKeyframes = (start, end) => ({
   width: [start, end]
 })
 
-const loaderAnimation = {
-  '0': {
-    transform: 'translate(0,0)'
-  },
-
-  '50%': {
-    transform: 'translate(0,15px)'
-  },
-
-  '100%': {
-    transform: 'translate(0,0)'
-  }
-}
-
 const tabFadeInKeyframes = {
   '0%': {
     opacity: 0.5
@@ -76,6 +62,5 @@ module.exports = {
   opacityIncreaseElementKeyframes,
   widthIncreaseKeyframes,
   widthIncreaseElementKeyframes,
-  tabFadeInKeyframes,
-  loaderAnimation
+  tabFadeInKeyframes
 }
