@@ -701,13 +701,15 @@ module.exports.checkTorAvailable = () => {
   }, 500)
 }
 
-module.exports.setTorNewIdentity = (url) => {
-  const origin = getOrigin(url)
+module.exports.setTorNewIdentity = (url, tabId) => {
   const ses = session.fromPartition('persist:tor')
-  if (!ses || !origin) {
+  if (!ses || !url) {
     return
   }
-  ses.setTorNewIdentity(origin)
+  ses.setTorNewIdentity(url, () => {
+    const tab = webContents.fromTabID(tabId)
+    tab.reload()
+  })
 }
 
 function initSession (ses, partition) {
