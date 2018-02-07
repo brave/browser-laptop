@@ -169,7 +169,7 @@ class LedgerTable extends ImmutableComponent {
     return [
       {
         html: verified && this.getVerifiedIcon(synopsis),
-        value: ''
+        value: verified ? (this.enabledForSite(synopsis) ? 2 : 1) : 0
       },
       {
         html: <div>
