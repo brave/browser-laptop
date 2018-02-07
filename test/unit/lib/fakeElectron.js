@@ -80,7 +80,8 @@ const fakeElectron = {
         fetch: function (url, options, handler) {
         }
       }
-    }
+    },
+    fromPartition: () => {}
   },
   extensions: {
     createTab: function () {}

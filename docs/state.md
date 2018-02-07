@@ -217,7 +217,7 @@ AppStore
         EUR: number,
         USD: number
       },
-      reconcileFrequency: number // duration between each reconciliation in days
+      reconcileFrequency: number, // duration between each reconciliation in days
       reconcileStamp: number,  // timestamp for the next reconcilation
       transactions: [{
         ballots: {
@@ -600,6 +600,8 @@ AppStore
       name: string, // name of the update
       notes: string // release notes for the active update
     },
+    referralDownloadId: string, // download ID that is returned from the referral server
+    referralTimestamp: number, // timestamp when referral was accumulated (after ~30 days)
     status: string, // updateStatus from js/constants/updateStatus.js
     verbose: boolean // whether to show update UI for checking, downloading, and errors
   },
