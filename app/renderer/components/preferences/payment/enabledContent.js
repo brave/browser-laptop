@@ -266,6 +266,23 @@ class EnabledContent extends ImmutableComponent {
     </div>
   }
 
+  get deletedSitesLink () {
+    if (this.props.showDeletedSites) {
+      return <span>
+        <a data-l10n-id='showDeletedSitesDialog'
+          data-test-id='showDeletedSitesDialog'
+          className={css(styles.enabledContent__footer__link)}
+          onClick={this.props.showOverlay.bind(this, 'deletedSites')}
+        />
+        <span
+          className={css(styles.enabledContent__footer__link, styles.enabledContent__footer__separator)}
+        >|</span>
+      </span>
+    }
+
+    return null
+  }
+
   render () {
     const ledgerData = this.props.ledgerData
     const walletStatusText = walletStatus(ledgerData)
@@ -362,9 +379,10 @@ class EnabledContent extends ImmutableComponent {
         onChangeSetting={this.props.onChangeSetting}
         siteSettings={this.props.siteSettings} />
       <div className={css(styles.enabledContent__tos)}>
+        { this.deletedSitesLink }
         <a data-l10n-id='termsOfService'
           data-test-id='termsOfService'
-          className={css(styles.enabledContent__tos__link)}
+          className={css(styles.enabledContent__footer__link)}
           href='https://basicattentiontoken.org/contributor-terms-of-service/'
           target='_blank'
           rel='noreferrer noopener' />
@@ -463,9 +481,14 @@ const styles = StyleSheet.create({
     padding: '20px 60px'
   },
 
-  enabledContent__tos__link: {
+  enabledContent__footer__link: {
     fontSize: '13px',
     color: '#666'
+  },
+
+  enabledContent__footer__separator: {
+    display: 'inline-block',
+    padding: '0 10px'
   },
 
   enabledContent__loader: {

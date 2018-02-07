@@ -435,6 +435,7 @@ class AboutPreferences extends React.Component {
       bitcoinOverlayVisible: false,
       qrcodeOverlayVisible: false,
       paymentHistoryOverlayVisible: false,
+      deletedSitesOverlayVisible: false,
       advancedSettingsOverlayVisible: false,
       ledgerBackupOverlayVisible: false,
       ledgerRecoveryOverlayVisible: false,
@@ -702,6 +703,7 @@ class AboutPreferences extends React.Component {
           bitcoinOverlayVisible={this.state.bitcoinOverlayVisible}
           qrcodeOverlayVisible={this.state.qrcodeOverlayVisible}
           paymentHistoryOverlayVisible={this.state.paymentHistoryOverlayVisible}
+          deletedSitesOverlayVisible={this.state.deletedSitesOverlayVisible}
           advancedSettingsOverlayVisible={this.state.advancedSettingsOverlayVisible}
           ledgerBackupOverlayVisible={this.state.ledgerBackupOverlayVisible}
           ledgerRecoveryOverlayVisible={this.state.ledgerRecoveryOverlayVisible}

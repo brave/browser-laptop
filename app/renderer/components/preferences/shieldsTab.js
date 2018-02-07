@@ -30,7 +30,6 @@ const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
 const noScript = appConfig.resourceNames.NOSCRIPT
 
 const braveryPermissionNames = {
-  'ledgerPaymentsShown': ['boolean', 'number'],
   'shieldsUp': ['boolean'],
   'adControl': ['string'],
   'cookieControl': ['string'],
@@ -129,11 +128,13 @@ class ShieldsTab extends ImmutableComponent {
           onChangeSetting={this.props.onChangeSetting}
         />
       </SettingsList>
-      <SitePermissionsPage siteSettings={this.props.siteSettings}
+      <SitePermissionsPage
+        siteSettings={this.props.siteSettings}
         names={braveryPermissionNames}
         defaults={this.props.braveryDefaults.merge({
           ledgerPaymentsShown: true, shieldsUp: true})
-        } />
+        }
+      />
     </div>
   }
 }
