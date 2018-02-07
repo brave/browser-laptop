@@ -854,11 +854,8 @@ class AboutPreferences extends React.Component {
     if (settingsRequiringRestart.includes(key)) {
       ipc.send(messages.PREFS_RESTART, key, value)
     }
-    if (key === settings.PAYMENTS_ENABLED) {
-      this.onChangeSetting(settings.PAYMENTS_NOTIFICATIONS, value)
-      if (value === true) {
-        this.createWallet()
-      }
+    if (key === settings.PAYMENTS_ENABLED && value === true) {
+      this.createWallet()
     }
   }
 
