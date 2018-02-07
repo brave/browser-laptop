@@ -4,24 +4,33 @@
 
 'strict mode'
 
-const assert = require('assert')
-const request = require('../js/lib/request').request
-const electron = require('electron')
-const autoUpdater = electron.autoUpdater
-const app = electron.app
-const appConfig = require('../js/constants/appConfig')
-const messages = require('../js/constants/messages')
-const UpdateStatus = require('../js/constants/updateStatus')
-const querystring = require('querystring')
-const AppStore = require('../js/stores/appStore')
-const appActions = require('../js/actions/appActions')
-const Immutable = require('immutable')
-const dates = require('./dates')
-const Channel = require('./channel')
-
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
+const assert = require('assert')
+const electron = require('electron')
+const querystring = require('querystring')
+const Immutable = require('immutable')
+const autoUpdater = electron.autoUpdater
+const app = electron.app
+
+// Actions
+const appActions = require('../js/actions/appActions')
+
+// State
+const AppStore = require('../js/stores/appStore')
+const updateState = require('./common/state/updateState')
+
+// Constants
+const appConfig = require('../js/constants/appConfig')
+const messages = require('../js/constants/messages')
+const UpdateStatus = require('../js/constants/updateStatus')
+
+// Utils
+const request = require('../js/lib/request').request
+const ledgerUtil = require('./common/lib/ledgerUtil')
+const dates = require('./dates')
+const Channel = require('./channel')
 
 // in built mode console.log output is not emitted to the terminal
 // in prod mode we pipe to a file
@@ -212,8 +221,25 @@ var downloadHandler = (err, metadata) => {
 }
 
 // Make network request to check for an available update
-exports.checkForUpdate = (verbose) => {
-  const updateStatus = AppStore.getState().getIn(['updates', 'status'])
+exports.checkForUpdate = (verbose, skipReferral = false) => {
+  const state = AppStore.getState()
+
+  // check for referral 30 days
+  if (
+    !skipReferral &&
+    !updateState.getUpdateProp(state, 'referralTimestamp') &&
+    updateState.getUpdateProp(state, 'referralDownloadId')
+  ) {
+    const installTime = state.get('firstRunTimestamp')
+    const month = parseInt(process.env.LEDGER_REFERRAL_CHECK_TIME || ledgerUtil.milliseconds.day * 30)
+
+    if (installTime + month < new Date().getTime()) {
+      appActions.checkReferralActivity()
+      return
+    }
+  }
+
+  const updateStatus = state.getIn(['updates', 'status'])
   if (updateStatus !== UpdateStatus.UPDATE_ERROR &&
       updateStatus !== UpdateStatus.UPDATE_NOT_AVAILABLE &&
       updateStatus !== UpdateStatus.UPDATE_NONE) {

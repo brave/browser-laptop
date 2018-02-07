@@ -27,12 +27,14 @@ const appActions = require('../../../js/actions/appActions')
 const ledgerState = require('../../common/state/ledgerState')
 const pageDataState = require('../../common/state/pageDataState')
 const migrationState = require('../../common/state/migrationState')
+const updateState = require('../../common/state/updateState')
 
 // Constants
 const settings = require('../../../js/constants/settings')
 const messages = require('../../../js/constants/messages')
 
 // Utils
+const config = require('../../../js/constants/buildConfig')
 const tabs = require('../../browser/tabs')
 const locale = require('../../locale')
 const getSetting = require('../../../js/settings').getSetting
@@ -45,6 +47,8 @@ const tabState = require('../../common/state/tabState')
 const pageDataUtil = require('../../common/lib/pageDataUtil')
 const ledgerNotifications = require('./ledgerNotifications')
 const ledgerVideoCache = require('../../common/cache/ledgerVideoCache')
+const updater = require('../../updater')
+const promoCodeFirstRunStorage = require('../../promoCodeFirstRunStorage')
 
 // Caching
 let locationDefault = 'NOOP'
@@ -93,6 +97,27 @@ const clientOptions = {
   createWorker: electron.app.createWorker,
   version: 'v2',
   environment: process.env.LEDGER_ENVIRONMENT || 'production'
+}
+
+var platforms = {
+  'darwin': 'osx',
+  'win32x64': 'winx64',
+  'win32ia32': 'winia32',
+  'linux': 'linux'
+}
+
+let platform = platforms[process.platform]
+
+if (process.platform === 'win32') {
+  platform = platforms[process.platform + process.arch]
+}
+
+let referralServer = 'https://laptop-updates-staging.herokuapp.com'
+let referralAPI = 'key'
+
+if (clientOptions.environment === 'production') {
+  referralServer = 'https://laptop-updates.brave.com'
+  referralAPI = config.referralAPI || process.env.LEDGER_REFERRAL_API_KEY || ''
 }
 
 const fileTypes = {
@@ -204,7 +229,7 @@ const onBootStateFile = (state) => {
 
   try {
     clientprep()
-    client = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
+    client = ledgerClient(null, underscore.extend({roundtrip: module.exports.roundtrip}, clientOptions), null)
 
     getPublisherTimestamp()
   } catch (ex) {
@@ -1220,8 +1245,12 @@ const enable = (state, paymentsEnabled) => {
 }
 
 const pathName = (name) => {
+  if (!name) {
+    return null
+  }
+
   const parts = path.parse(name)
-  return path.join(electron.app.getPath('userData'), parts.name + parts.ext)
+  return path.join(electron.app.getPath('userData'), parts.dir, `${parts.name}${parts.ext}`)
 }
 
 const cacheRuleSet = (state, ruleset) => {
@@ -1364,7 +1393,7 @@ const roundtrip = (params, options, callback) => {
     if (Math.floor(response.statusCode / 100) !== 2) {
       if (params.useProxy && response.statusCode === 403) {
         params.useProxy = false
-        return roundtrip(params, options, callback)
+        return module.exports.roundtrip(params, options, callback)
       }
 
       return callback(
@@ -1854,7 +1883,55 @@ const onCallback = (state, result, delayTime) => {
   return state
 }
 
+const onReferralCodeRead = (code) => {
+  if (!code) {
+    return
+  }
+
+  code = code.trim()
+
+  if (code.length > 0) {
+    module.exports.roundtrip({
+      server: referralServer,
+      method: 'PUT',
+      path: '/promo/initialize/nonua',
+      payload: {
+        api_key: referralAPI,
+        referral_code: code,
+        platform: platform
+      }
+    }, {}, onReferralInit)
+  }
+}
+
+const onReferralInit = (err, response, body) => {
+  if (err) {
+    if (clientOptions.verboseP) {
+      console.error(err)
+    }
+    return
+  }
+
+  if (body && body.download_id) {
+    appActions.onReferralCodeRead(body.download_id)
+    promoCodeFirstRunStorage
+      .removePromoCode()
+      .catch(error => {
+        if (clientOptions.verboseP) {
+          console.error('read error: ' + error.toString())
+        }
+      })
+    return
+  }
+
+  if (clientOptions.verboseP) {
+    console.error(`Referral check was not successful ${body}`)
+  }
+}
+
 const initialize = (state, paymentsEnabled) => {
+  let fs
+
   if (!v2RulesetDB) v2RulesetDB = levelUp(pathName(v2RulesetPath))
   state = enable(state, paymentsEnabled)
 
@@ -1875,6 +1952,19 @@ const initialize = (state, paymentsEnabled) => {
         versionInformation.get('OS Architecture')
       ].join(' ')
     }
+  }
+
+  if (updateState.getUpdateProp(state, 'referralDownloadId') == null) {
+    promoCodeFirstRunStorage
+      .readFirstRunPromoCode()
+      .then((code) => {
+        onReferralCodeRead(code)
+      })
+      .catch(error => {
+        if (clientOptions.verboseP) {
+          console.error('read error: ' + error.toString())
+        }
+      })
   }
 
   if (!paymentsEnabled) {
@@ -1898,7 +1988,7 @@ const initialize = (state, paymentsEnabled) => {
   state = cacheRuleSet(state, ruleset)
 
   try {
-    const fs = require('fs')
+    if (!fs) fs = require('fs')
     fs.access(pathName(statePath), fs.FF_OK, (err) => {
       if (err) {
         return
@@ -1949,7 +2039,7 @@ const onInitRead = (state, parsedData) => {
     } catch (ex) {}
 
     client = ledgerClient(parsedData.personaId,
-      underscore.extend(parsedData.options, {roundtrip: roundtrip}, options),
+      underscore.extend(parsedData.options, {roundtrip: module.exports.roundtrip}, options),
       parsedData)
 
     getPublisherTimestamp(true)
@@ -2312,7 +2402,7 @@ const transitionWalletToBat = () => {
         const parsedData = JSON.parse(data)
         const state = yoDawg(parsedData)
         newClient = ledgerClient(state.personaId,
-          underscore.extend(state.options, {roundtrip: roundtrip}, clientOptions),
+          underscore.extend(state.options, {roundtrip: module.exports.roundtrip}, clientOptions),
           state)
         transitionWalletToBat()
       })
@@ -2323,7 +2413,7 @@ const transitionWalletToBat = () => {
   // Create new client
   if (!newClient) {
     try {
-      newClient = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
+      newClient = ledgerClient(null, underscore.extend({roundtrip: module.exports.roundtrip}, clientOptions), null)
       muonWriter(newClientPath, newClient.state)
     } catch (ex) {
       console.error('ledger client creation error(2): ', ex)
@@ -2433,7 +2523,7 @@ const onMediaRequest = (state, xhr, type, tabId) => {
     }
   }
 
-  const options = underscore.extend({roundtrip: roundtrip}, clientOptions)
+  const options = underscore.extend({roundtrip: module.exports.roundtrip}, clientOptions)
   const mediaProps = {
     mediaId,
     providerName: type
@@ -2530,7 +2620,7 @@ const getPromotion = (state) => {
   let paymentId = null
   if (!tempClient) {
     clientprep()
-    tempClient = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
+    tempClient = ledgerClient(null, underscore.extend({roundtrip: module.exports.roundtrip}, clientOptions), null)
     paymentId = ledgerState.getInfoProp(state, 'paymentId')
   }
 
@@ -2621,6 +2711,46 @@ const onPublisherTimestamp = (state, oldTimestamp, newTimestamp) => {
   })
 }
 
+const checkReferralActivity = (state) => {
+  const downloadId = updateState.getUpdateProp(state, 'referralDownloadId')
+
+  if (!downloadId) {
+    updater.checkForUpdate(false, true)
+    return
+  }
+
+  module.exports.roundtrip({
+    server: referralServer,
+    method: 'PUT',
+    path: '/promo/activity',
+    payload: {
+      download_id: downloadId,
+      api_key: referralAPI
+    }
+  }, {}, activityRoundTrip)
+}
+
+const activityRoundTrip = (err, response, body) => {
+  if (err) {
+    if (clientOptions.verboseP) {
+      console.error(err)
+    }
+    updater.checkForUpdate(false, true)
+    return
+  }
+
+  if (body && body.finalized) {
+    appActions.onReferralActivity()
+    return
+  }
+
+  if (clientOptions.verboseP) {
+    console.log('Referral is still not ready, please wait at least 30days')
+  }
+
+  updater.checkForUpdate(false, true)
+}
+
 const getMethods = () => {
   const publicMethods = {
     backupKeys,
@@ -2665,7 +2795,9 @@ const getMethods = () => {
     getBalance,
     getPromotion,
     onPublisherTimestamp,
-    checkVerifiedStatus
+    checkVerifiedStatus,
+    checkReferralActivity,
+    roundtrip
   }
 
   let privateMethods = {}
@@ -2699,14 +2831,17 @@ const getMethods = () => {
       },
       getCurrentMediaKey: (key) => currentMediaKey,
       synopsisNormalizer,
-      roundtrip,
       observeTransactions,
       onWalletRecovery,
       getStateInfo,
       lockInContributionAmount,
       callback,
       uintKeySeed,
-      loadKeysFromBackupFile
+      loadKeysFromBackupFile,
+      activityRoundTrip,
+      pathName,
+      onReferralInit,
+      onReferralCodeRead
     }
   }
 
