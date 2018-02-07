@@ -23,6 +23,7 @@ const locale = require('../../locale')
 const {separatorMenuItem} = require('../../common/commonMenu')
 const bookmarkUtil = require('./bookmarkUtil')
 const bookmarkFoldersUtil = require('./bookmarkFoldersUtil')
+const {aboutUrls} = require('../../../js/lib/appUrlUtil')
 
 /**
  * Get the an electron MenuItem object from a Menu based on its label
@@ -266,6 +267,11 @@ module.exports.updateRecentlyClosedMenuItems = (appMenu, closedFrames) => {
       historyMenu.items[menuIndex].visible = true
       visibleItems += 1
     } else {
+      // About pages should not be displayed in recently closed items
+      const isAboutPage = aboutUrls.has(frame.get('location'))
+      if (isAboutPage) {
+        return
+      }
       const template = recentlyClosedTemplate(url, frame)
       const item = new MenuItem(template)
       // XXX: Can't set this with MenuItem constructor
