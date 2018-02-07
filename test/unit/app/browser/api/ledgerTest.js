@@ -26,6 +26,7 @@ describe('ledger api unit tests', function () {
   })
   let request
   let walletPassphraseReturn
+  let updater
 
   // constants
   const xhr = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=11.338&et=21.339'
@@ -203,6 +204,7 @@ describe('ledger api unit tests', function () {
 
     ledgerNotificationsApi = require('../../../../../app/browser/api/ledgerNotifications')
     ledgerState = require('../../../../../app/common/state/ledgerState')
+    updater = require('../../../../../app/updater')
 
     // once everything is stubbed, load the ledger
     ledgerApi = require('../../../../../app/browser/api/ledger')
@@ -2148,6 +2150,163 @@ describe('ledger api unit tests', function () {
         const result = ledgerApi.loadKeysFromBackupFile(undefined, 'file.txt')
         assert.equal(result.recoveryKey, 'a b d e f g h i j k l m n o p q')
       })
+    })
+  })
+
+  describe('checkReferralActivity', function () {
+    let checkForUpdateSpy, roundtripSpy
+
+    before(function () {
+      checkForUpdateSpy = sinon.stub(updater, 'checkForUpdate')
+      roundtripSpy = sinon.stub(ledgerApi, 'roundtrip')
+    })
+
+    afterEach(function () {
+      checkForUpdateSpy.reset()
+      roundtripSpy.reset()
+    })
+
+    after(function () {
+      checkForUpdateSpy.restore()
+      roundtripSpy.restore()
+    })
+
+    it('null case', function () {
+      ledgerApi.checkReferralActivity(defaultAppState)
+      assert(checkForUpdateSpy.withArgs(false, true).calledOnce)
+    })
+
+    it('round trip is called', function () {
+      const state = defaultAppState
+        .setIn(['updates', 'referralDownloadId'], 1234)
+      ledgerApi.checkReferralActivity(state)
+      assert(roundtripSpy.calledOnce)
+    })
+  })
+
+  describe('activityRoundTrip', function () {
+    let checkForUpdateSpy, onReferralActivitySpy
+
+    before(function () {
+      checkForUpdateSpy = sinon.stub(updater, 'checkForUpdate')
+      onReferralActivitySpy = sinon.spy(appActions, 'onReferralActivity')
+    })
+
+    afterEach(function () {
+      checkForUpdateSpy.reset()
+      onReferralActivitySpy.reset()
+    })
+
+    after(function () {
+      checkForUpdateSpy.restore()
+      onReferralActivitySpy.restore()
+    })
+
+    it('error', function () {
+      ledgerApi.activityRoundTrip('error')
+      assert(checkForUpdateSpy.withArgs(false, true).calledOnce)
+    })
+
+    it('referral activity is not finalized yet', function () {
+      ledgerApi.activityRoundTrip(null, null, {finalized: false})
+      assert(checkForUpdateSpy.withArgs(false, true).calledOnce)
+    })
+
+    it('referral activity is finalized', function () {
+      ledgerApi.activityRoundTrip(null, null, {finalized: true})
+      assert(checkForUpdateSpy.notCalled)
+      assert(onReferralActivitySpy.calledOnce)
+    })
+  })
+
+  describe('pathName', function () {
+    it('null case', function () {
+      const result = ledgerApi.pathName()
+      assert.equal(result, null)
+    })
+
+    it('name is a file', function () {
+      const result = ledgerApi.pathName('test')
+      assert.equal(result, `${process.cwd()}/userData/test`)
+    })
+
+    it('name has folder path', function () {
+      const result = ledgerApi.pathName('folder/test')
+      assert.equal(result, `${process.cwd()}/userData/folder/test`)
+    })
+  })
+
+  describe('onReferralInit', function () {
+    let onReferralCodeReadSpy, fsUnlinkSpy
+
+    before(function () {
+      onReferralCodeReadSpy = sinon.spy(appActions, 'onReferralCodeRead')
+      fsUnlinkSpy = sinon.spy(fs, 'unlink')
+    })
+
+    afterEach(function () {
+      onReferralCodeReadSpy.reset()
+      fsUnlinkSpy.reset()
+    })
+
+    after(function () {
+      onReferralCodeReadSpy.restore()
+      fsUnlinkSpy.restore()
+    })
+
+    it('null case', function () {
+      ledgerApi.onReferralInit()
+      assert(onReferralCodeReadSpy.notCalled)
+      assert(fsUnlinkSpy.notCalled)
+    })
+
+    it('on error', function () {
+      ledgerApi.onReferralInit('error')
+      assert(onReferralCodeReadSpy.notCalled)
+      assert(fsUnlinkSpy.notCalled)
+    })
+
+    it('download id is missing', function () {
+      ledgerApi.onReferralInit(null, null, {})
+      assert(onReferralCodeReadSpy.notCalled)
+      assert(fsUnlinkSpy.notCalled)
+    })
+
+    it('download id is provided', function () {
+      ledgerApi.onReferralInit(null, null, {download_id: 'rwerer'})
+      assert(onReferralCodeReadSpy.calledOnce)
+      assert(fsUnlinkSpy.calledOnce)
+    })
+  })
+
+  describe('onReferralCodeRead', function () {
+    let roundtripSpy
+
+    before(function () {
+      roundtripSpy = sinon.stub(ledgerApi, 'roundtrip')
+    })
+
+    afterEach(function () {
+      roundtripSpy.reset()
+    })
+
+    after(function () {
+      roundtripSpy.restore()
+    })
+
+    it('null case', function () {
+      ledgerApi.onReferralCodeRead()
+      assert(roundtripSpy.notCalled)
+    })
+
+    it('code is empty', function () {
+      ledgerApi.onReferralCodeRead('')
+      assert(roundtripSpy.notCalled)
+    })
+
+    it('code is correct', function () {
+      ledgerApi.onReferralCodeRead('aaa101')
+      assert(roundtripSpy.calledOnce)
     })
   })
 })

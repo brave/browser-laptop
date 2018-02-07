@@ -22,7 +22,6 @@ const {responseHasContent} = require('./httpUtil')
 const urlUtil = require('../../../js/lib/urlutil')
 const getSetting = require('../../../js/settings').getSetting
 const urlParse = require('../urlParse')
-
 /**
  * Is page an actual page being viewed by the user? (not an error page, etc)
  * If the page is invalid, we don't want to collect usage info.
