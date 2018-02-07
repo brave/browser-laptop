@@ -14,6 +14,7 @@ const settings = require('../../../js/constants/settings')
 const ledgerState = require('../../common/state/ledgerState')
 const pageDataState = require('../../common/state/pageDataState')
 const migrationState = require('../../common/state/migrationState')
+const updateState = require('../../common/state/updateState')
 
 // Utils
 const ledgerApi = require('../../browser/api/ledger')
@@ -465,6 +466,26 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_PROMOTION_CLOSE:
       {
         state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
+        break
+      }
+    case appConstants.APP_ON_REFERRAL_CODE_READ:
+      {
+        state = updateState.setUpdateProp(state, 'referralDownloadId', action.get('downloadId'))
+        break
+      }
+    case appConstants.APP_ON_REFERRAL_CODE_FAIL:
+      {
+        state = updateState.setUpdateProp(state, 'referralDownloadId', false)
+        break
+      }
+    case appConstants.APP_CHECK_REFERRAL_ACTIVITY:
+      {
+        ledgerApi.checkReferralActivity(state)
+        break
+      }
+    case appConstants.APP_ON_REFERRAL_ACTIVITY:
+      {
+        state = updateState.setUpdateProp(state, 'referralTimestamp', new Date().getTime())
         break
       }
     case appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER:

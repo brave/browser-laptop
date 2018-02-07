@@ -1900,6 +1900,31 @@ const appActions = {
     })
   },
 
+  onReferralCodeRead: function (downloadId) {
+    dispatch({
+      actionType: appConstants.APP_ON_REFERRAL_CODE_READ,
+      downloadId
+    })
+  },
+
+  onReferralCodeFail: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_REFERRAL_CODE_FAIL
+    })
+  },
+
+  checkReferralActivity: function () {
+    dispatch({
+      actionType: appConstants.APP_CHECK_REFERRAL_ACTIVITY
+    })
+  },
+
+  onReferralActivity: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_REFERRAL_ACTIVITY
+    })
+  },
+
   onHistoryLimit: function () {
     dispatch({
       actionType: appConstants.APP_ON_HISTORY_LIMIT

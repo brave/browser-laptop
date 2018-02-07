@@ -18,6 +18,7 @@ module.exports = {
     // write promo code so state can access it
     fs.writeFileSync(promoCodeOutputPath, promoCode)
   },
+
   readFirstRunPromoCode: () => new Promise((resolve, reject) => {
     fs.readFile(getPromoCodeFileAbsolutePath(), (err, data) => {
       if (err) {
@@ -26,7 +27,19 @@ module.exports = {
         }
         return reject(err)
       }
-      resolve(data)
+      resolve(data.toString())
+    })
+  }),
+
+  removePromoCode: () => new Promise((resolve, reject) => {
+    fs.unlink(getPromoCodeFileAbsolutePath(), (err) => {
+      if (err) {
+        if (err.code === 'ENOENT') {
+          return resolve(null)
+        }
+        return reject(err)
+      }
+      resolve(true)
     })
   })
 }
