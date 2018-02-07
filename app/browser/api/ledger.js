@@ -1501,7 +1501,7 @@ const getStateInfo = (state, parsedData) => {
   const info = parsedData.paymentInfo
   const then = new Date().getTime() - ledgerUtil.milliseconds.year
 
-  if (!parsedData.properties.wallet) {
+  if (!parsedData.properties || !parsedData.properties.wallet) {
     return state
   }
 
@@ -2057,6 +2057,22 @@ const getContributionAmount = (state) => {
 }
 
 const onInitRead = (state, parsedData) => {
+  const isBTC = parsedData &&
+    parsedData.properties &&
+    parsedData.properties.wallet &&
+    parsedData.properties.wallet.keychains
+
+  if (isBTC) {
+    const fs = require('fs')
+    fs.renameSync(pathName(statePath), pathName('ledger-state-btc.json'))
+    state = ledgerState.resetInfo(state)
+    clientprep()
+    client = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
+    parsedData = client.state
+    getPaymentInfo(state)
+    muonWriter(statePath, parsedData)
+  }
+
   if (Array.isArray(parsedData.transactions)) {
     parsedData.transactions.sort((transaction1, transaction2) => {
       return transaction1.submissionStamp - transaction2.submissionStamp
