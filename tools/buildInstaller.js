@@ -54,7 +54,9 @@ switch (channel) {
     throw new Error('CHANNEL environment variable must be set to nightly, developer, beta or dev')
 }
 
+var tarName
 if (isLinux) {
+  tarName = appName
   appName = appName.toLowerCase()
 }
 
@@ -237,7 +239,7 @@ if (isDarwin) {
       ' --arch x86_64' +
       ` --config res/${channel}/suse.json`,
     // .tar.bz2 file
-    `tar -jcvf dist/${appName}.tar.bz2 ./${appName}-linux-x64`
+    `tar -jcvf dist/${tarName}.tar.bz2 ./${appName}-linux-x64`
   ]
   execute(cmds, {}, (err) => {
     if (err) {
