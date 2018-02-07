@@ -19,6 +19,7 @@ describe('ledgerNotifications unit test', function () {
   let paymentsNotifications
   let paymentsMinVisitTime = 5000
   let paymentsContributionAmount = 25
+  let paymentsAllowPromotions = true
 
   const defaultAppState = Immutable.fromJS({
     ledger: {},
@@ -49,6 +50,8 @@ describe('ledgerNotifications unit test', function () {
             return paymentsMinVisitTime
           case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
             return paymentsContributionAmount
+          case settings.PAYMENTS_ALLOW_PROMOTIONS:
+            return paymentsAllowPromotions
         }
         return false
       }
@@ -589,6 +592,13 @@ describe('ledgerNotifications unit test', function () {
     it('payments disabled, notification is shown', function () {
       ledgerNotificationsApi.showPromotionNotification(state)
       assert(showNotificationSpy.calledOnce)
+    })
+
+    it('promotions are disabled, notification is not shown', function () {
+      paymentsAllowPromotions = false
+      ledgerNotificationsApi.showPromotionNotification(state)
+      assert(showNotificationSpy.notCalled)
+      paymentsAllowPromotions = true
     })
 
     it('notification is shown', function () {
