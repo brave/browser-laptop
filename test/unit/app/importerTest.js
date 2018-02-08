@@ -24,12 +24,18 @@ describe('importer unit tests', function () {
   })
 
   describe('shouldSkipCookie', function () {
-    it('returns true if domain is google and URL is one which has a mismatch', function () {
-      assert.equal(importer.shouldSkipCookie({domain: '.google.com', url: 'https://notifications.google.com'}), true)
+    it('returns true if domain is google and name is one which has a mismatch', function () {
+      assert.equal(importer.shouldSkipCookie({domain: '.google.com', name: 'OSID'}), true)
+      assert.equal(importer.shouldSkipCookie({domain: 'mail.google.com', name: 'LSID'}), true)
+      assert.equal(importer.shouldSkipCookie({domain: '.google.com.tw', name: 'SIDCC'}), true)
     })
 
     it('returns false for other cases', function () {
-      assert.equal(importer.shouldSkipCookie({domain: '.brave.com', url: 'https://brave.com'}), false)
+      assert.equal(importer.shouldSkipCookie({domain: '.brave.com', name: 'OSID'}), false)
+      assert.equal(importer.shouldSkipCookie({domain: 'ggoogle.com', name: 'OSID'}), false)
+      assert.equal(importer.shouldSkipCookie({domain: '.google.comm', name: 'OSID'}), false)
+      assert.equal(importer.shouldSkipCookie({domain: '.google.comm.', name: 'OSID'}), false)
+      assert.equal(importer.shouldSkipCookie({domain: '.google.com', name: 'BRAVE'}), false)
     })
   })
 })
