@@ -86,6 +86,7 @@ module.exports = {
   pinterestExtensionPublicKey: 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDB95q2hyt49ZDuVnYI91XaZhqQkbXu0X3fzoNxPxhFbfqGKwtts90LJ7lD5DCIfnBg8WGFhp3eW4GxOglAKrnksmJoyAD5PnSAufx8fD3trZvo/ZAqFx1x5Xm3Rm34EgvVXdralgHSYiqcEU/FX3kYnLLhr2TS4lcrsn1KZd/lcQIDAQAB',
   metamaskExtensionId: 'nkbihfbeogaeaoehlefnkodbefgpgknn',
   metamaskPublicKey: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlcgI4VVL4JUvo6hlSgeCZp9mGltZrzFvc2Asqzb1dDGO9baoYOe+QRoh27/YyVXugxni480Q/R147INhBOyQZVMhZOD5pFMVutia9MHMaZhgRXzrK3BHtNSkKLL1c5mhutQNwiLqLtFkMSGvka91LoMEC8WTI0wi4tACnJ5FyFZQYzvtqy5sXo3VS3gzfOBluLKi7BxYcaUJjNrhOIxl1xL2qgK5lDrDOLKcbaurDiwqofVtAFOL5sM3uJ6D8nOO9tG+T7hoobRFN+nxk43PHgCv4poicOv+NMZQEk3da1m/xfuzXV88NcE/YRbRLwAS82m3gsJZKc6mLqm4wZHzBwIDAQAB',
+  cryptoTokenExtensionId: 'kmendfapggjehodndflmmgagdbamhnfd',
   newtab: {
     fallbackImage: {
       name: 'Bay Bridge',
