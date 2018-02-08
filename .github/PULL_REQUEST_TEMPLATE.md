@@ -1,4 +1,4 @@
-Submitter Checklist:
+## Submitter Checklist:
 
 - [ ] Submitted a [ticket](https://github.com/brave/browser-laptop/issues) for my issue if one did not already exist.
 - [ ] Used Github [auto-closing keywords](https://help.github.com/articles/closing-issues-via-commit-messages/) in the commit message.
@@ -7,10 +7,10 @@ Submitter Checklist:
 - [ ] Tagged reviewers and labelled the pull request [as needed](https://github.com/brave/browser-laptop/wiki/Pull-request-process).
 - [ ] Request a security/privacy review [as needed](https://github.com/brave/handbook/blob/master/development/security.md#how-to-request-a-security-review). (Ask a Brave employee to help if you cannot access this document.)
 
-Test Plan:
+## Test Plan:
 
 
-Reviewer Checklist:
+## Reviewer Checklist:
 
 - [ ] Request a security/privacy review [as needed](https://github.com/brave/handbook/blob/master/development/security.md#how-to-request-a-security-review) if one was not already requested.
 
