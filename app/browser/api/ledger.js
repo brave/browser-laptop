@@ -1163,6 +1163,19 @@ const initSynopsis = (state) => {
   return state
 }
 
+const checkPromotions = () => {
+  if (promotionTimeoutId) {
+    clearInterval(promotionTimeoutId)
+  }
+
+  // get promotions
+  appActions.onPromotionGet()
+
+  promotionTimeoutId = setTimeout(() => {
+    checkPromotions()
+  }, random.randomInt({min: 20 * ledgerUtil.milliseconds.hour, max: 24 * ledgerUtil.milliseconds.hour}))
+}
+
 const enable = (state, paymentsEnabled) => {
   if (paymentsEnabled) {
     state = checkBtcBatMigrated(state, paymentsEnabled)
@@ -1174,19 +1187,15 @@ const enable = (state, paymentsEnabled) => {
 
   if (paymentsEnabled === getSetting(settings.PAYMENTS_ENABLED)) {
     // on start
-    if (promotionTimeoutId) {
-      clearInterval(promotionTimeoutId)
-    }
-    promotionTimeoutId = setInterval(() => {
-      appActions.onPromotionGet()
-    }, 24 * ledgerUtil.milliseconds.hour)
 
     if (togglePromotionTimeoutId) {
       clearTimeout(togglePromotionTimeoutId)
     }
+
     togglePromotionTimeoutId = setTimeout(() => {
-      appActions.onPromotionGet()
-    }, 15 * ledgerUtil.milliseconds.second)
+      checkPromotions()
+    }, random.randomInt({min: 10 * ledgerUtil.milliseconds.second, max: 15 * ledgerUtil.milliseconds.second}))
+
   } else if (paymentsEnabled) {
     // on toggle
     if (togglePromotionTimeoutId) {
