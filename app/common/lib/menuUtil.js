@@ -82,6 +82,21 @@ module.exports.setTemplateItemChecked = (template, label, checked) => {
   return null
 }
 
+/**
+ * Search a menu template and update the enabled status
+ *
+ * @return the new template OR null if no change was made (no update needed)
+ */
+module.exports.setTemplateItemEnabled = (template, label, enabled) => {
+  const menu = template.toJS()
+  const menuItem = getTemplateItem(menu, label)
+  if (menuItem.enabled !== enabled) {
+    menuItem.enabled = enabled
+    return makeImmutable(menu)
+  }
+  return null
+}
+
 const createBookmarkTemplateItems = (state, parentFolderId) => {
   const bookmarks = bookmarksState.getBookmarksWithFolders(state, parentFolderId)
 
