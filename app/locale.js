@@ -345,6 +345,7 @@ const availableLanguages = [
   'te',
   'tr-TR',
   'uk',
+  'hu-HU',
   'zh-CN'
 ]
 
