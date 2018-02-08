@@ -50,7 +50,7 @@ class ExtensionsTab extends ImmutableComponent {
   }
 
   getRow (extension) {
-    if ([config.braveExtensionId, config.syncExtensionId].includes(extension.get('id')) ||
+    if ([config.braveExtensionId, config.syncExtensionId, config.cryptoTokenExtensionId].includes(extension.get('id')) ||
     (!extension.get('dummy') && this.isRemovableExtension(extension))) {
       return []
     }
