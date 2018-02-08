@@ -657,7 +657,7 @@ module.exports.checkTorAvailable = (cb) => {
   }
 
   const proxyConfig = {
-    proxyRules: 'socks5://127.0.0.1:9050,direct://'
+    proxyRules: 'socks5://abc:abc@127.0.0.1:9050, direct://'
   }
   ses.setProxy(proxyConfig, () => {
     request('https://check.torproject.org/?TorButton=true', (err, response, body) => {
