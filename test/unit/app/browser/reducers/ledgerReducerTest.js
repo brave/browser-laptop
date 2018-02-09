@@ -56,7 +56,8 @@ describe('ledgerReducer unit tests', function () {
       getNewClient: () => {},
       claimPromotion: () => {},
       onPromotionResponse: dummyModifyState,
-      getPromotion: () => {}
+      getPromotion: () => {},
+      checkReferralActivity: dummyModifyState
     }
     fakeLedgerState = {
       resetSynopsis: dummyModifyState,
@@ -736,6 +737,26 @@ describe('ledgerReducer unit tests', function () {
         actionType: appConstants.APP_ON_PROMOTION_GET
       }))
       assert(getPromotionSpy.calledOnce)
+    })
+  })
+
+  describe('APP_CHECK_REFERRAL_ACTIVITY', function () {
+    let checkReferralActivitySpy
+
+    before(function () {
+      checkReferralActivitySpy = sinon.spy(fakeLedgerApi, 'checkReferralActivity')
+    })
+
+    after(function () {
+      checkReferralActivitySpy.restore()
+    })
+
+    it('execute', function () {
+      const returnedState = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_CHECK_REFERRAL_ACTIVITY
+      }))
+      assert(checkReferralActivitySpy.calledOnce)
+      assert.notDeepEqual(returnedState, appState)
     })
   })
 })

@@ -2154,11 +2154,13 @@ describe('ledger api unit tests', function () {
   })
 
   describe('checkReferralActivity', function () {
-    let checkForUpdateSpy, roundtripSpy
+    let checkForUpdateSpy, roundtripSpy, fakeClock
 
     before(function () {
       checkForUpdateSpy = sinon.stub(updater, 'checkForUpdate')
       roundtripSpy = sinon.stub(ledgerApi, 'roundtrip')
+      fakeClock = sinon.useFakeTimers()
+      fakeClock.tick(86402000)
     })
 
     afterEach(function () {
@@ -2169,18 +2171,62 @@ describe('ledger api unit tests', function () {
     after(function () {
       checkForUpdateSpy.restore()
       roundtripSpy.restore()
+      fakeClock.restore()
     })
 
     it('null case', function () {
-      ledgerApi.checkReferralActivity(defaultAppState)
+      const returnState = ledgerApi.checkReferralActivity(defaultAppState)
+      assert(roundtripSpy.notCalled)
       assert(checkForUpdateSpy.withArgs(false, true).calledOnce)
+      assert.deepEqual(returnState.toJS(), defaultAppState.toJS())
+    })
+
+    it('counter is greater then 30', function () {
+      const state = defaultAppState
+        .setIn(['updates', 'referralDownloadId'], 1234)
+        .setIn(['updates', 'referralAttemptCount'], 30)
+      const expectedState = defaultAppState
+        .setIn(['updates'], Immutable.Map())
+      const returnState = ledgerApi.checkReferralActivity(state)
+      assert(checkForUpdateSpy.withArgs(false, true).calledOnce)
+      assert(roundtripSpy.notCalled)
+      assert.deepEqual(returnState.toJS(), expectedState.toJS())
+    })
+
+    it('makes call if this is the first attempt', function () {
+      const state = defaultAppState
+        .setIn(['updates', 'referralDownloadId'], 1234)
+        .setIn(['updates', 'referralAttemptCount'], 1)
+      const expectedState = state
+        .setIn(['updates', 'referralAttemptCount'], 2)
+        .setIn(['updates', 'referralAttemptTimestamp'], 86402000)
+      const returnState = ledgerApi.checkReferralActivity(state)
+      assert(roundtripSpy.calledOnce)
+      assert.deepEqual(returnState.toJS(), expectedState.toJS())
+    })
+
+    it('does not make call if within 24 hours of an attempt', function () {
+      const state = defaultAppState
+        .setIn(['updates', 'referralDownloadId'], 1234)
+        .setIn(['updates', 'referralAttemptCount'], 1)
+        .setIn(['updates', 'referralAttemptTimestamp'], 87402000)
+      const returnState = ledgerApi.checkReferralActivity(state)
+      assert(checkForUpdateSpy.withArgs(false, true).calledOnce)
+      assert(roundtripSpy.notCalled)
+      assert.deepEqual(returnState.toJS(), state.toJS())
     })
 
     it('round trip is called', function () {
+      fakeClock.tick(86402000)
       const state = defaultAppState
         .setIn(['updates', 'referralDownloadId'], 1234)
-      ledgerApi.checkReferralActivity(state)
+        .setIn(['updates', 'referralAttemptTimestamp'], 86400000)
+      const expectedState = state
+        .setIn(['updates', 'referralAttemptCount'], 1)
+        .setIn(['updates', 'referralAttemptTimestamp'], 172804000)
+      const returnState = ledgerApi.checkReferralActivity(state)
       assert(roundtripSpy.calledOnce)
+      assert.deepEqual(returnState.toJS(), expectedState.toJS())
     })
   })
 

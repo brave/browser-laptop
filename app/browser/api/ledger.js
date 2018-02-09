@@ -2730,18 +2730,42 @@ const checkReferralActivity = (state) => {
 
   if (!downloadId) {
     updater.checkForUpdate(false, true)
-    return
+    return state
   }
 
-  module.exports.roundtrip({
-    server: referralServer,
-    method: 'PUT',
-    path: '/promo/activity',
-    payload: {
-      download_id: downloadId,
-      api_key: referralAPI
+  const timestamp = updateState.getUpdateProp(state, 'referralAttemptTimestamp') || 0
+  const count = updateState.getUpdateProp(state, 'referralAttemptCount') || 0
+
+  if (count >= 30) {
+    if (clientOptions.verboseP) {
+      console.log('I tried 30 times, but now I need to stop trying. (Referral program)')
     }
-  }, {}, activityRoundTrip)
+    state = updateState.deleteUpdateProp(state, 'referralAttemptTimestamp')
+    state = updateState.deleteUpdateProp(state, 'referralAttemptCount')
+    state = updateState.deleteUpdateProp(state, 'referralDownloadId')
+    updater.checkForUpdate(false, true)
+    return state
+  }
+
+  const time = new Date().getTime()
+  if (time - timestamp >= ledgerUtil.milliseconds.hour * 24) {
+    state = updateState.setUpdateProp(state, 'referralAttemptCount', count + 1)
+    state = updateState.setUpdateProp(state, 'referralAttemptTimestamp', time)
+
+    module.exports.roundtrip({
+      server: referralServer,
+      method: 'PUT',
+      path: '/promo/activity',
+      payload: {
+        download_id: downloadId,
+        api_key: referralAPI
+      }
+    }, {}, activityRoundTrip)
+  } else {
+    updater.checkForUpdate(false, true)
+  }
+
+  return state
 }
 
 const activityRoundTrip = (err, response, body) => {
