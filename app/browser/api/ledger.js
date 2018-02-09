@@ -1195,7 +1195,6 @@ const enable = (state, paymentsEnabled) => {
     togglePromotionTimeoutId = setTimeout(() => {
       checkPromotions()
     }, random.randomInt({min: 10 * ledgerUtil.milliseconds.second, max: 15 * ledgerUtil.milliseconds.second}))
-
   } else if (paymentsEnabled) {
     // on toggle
     if (togglePromotionTimeoutId) {
