@@ -38,6 +38,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       {
         state = ledgerApi.migration(state)
         state = ledgerApi.init(state)
+        state = ledgerApi.referralCheck(state)
         break
       }
     case appConstants.APP_BACKUP_KEYS:
@@ -471,6 +472,7 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_REFERRAL_CODE_READ:
       {
         state = updateState.setUpdateProp(state, 'referralDownloadId', action.get('downloadId'))
+        state = updateState.setUpdateProp(state, 'referralPromoCode', action.get('promoCode'))
         break
       }
     case appConstants.APP_ON_REFERRAL_CODE_FAIL:

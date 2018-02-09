@@ -1913,7 +1913,7 @@ const onReferralInit = (err, response, body) => {
   }
 
   if (body && body.download_id) {
-    appActions.onReferralCodeRead(body.download_id)
+    appActions.onReferralCodeRead(body.download_id, body.referral_code)
     promoCodeFirstRunStorage
       .removePromoCode()
       .catch(error => {
@@ -2754,6 +2754,17 @@ const checkReferralActivity = (state) => {
   return state
 }
 
+const referralCheck = (state) => {
+  const installTime = state.get('firstRunTimestamp')
+  const period = parseInt(process.env.LEDGER_REFERRAL_DELETE_TIME || (ledgerUtil.milliseconds.day * 90))
+
+  if (new Date().getTime() >= installTime + period) {
+    state = updateState.deleteUpdateProp(state, 'referralPromoCode')
+  }
+
+  return state
+}
+
 const activityRoundTrip = (err, response, body) => {
   if (err) {
     if (clientOptions.verboseP) {
@@ -2821,6 +2832,7 @@ const getMethods = () => {
     onPublisherTimestamp,
     checkVerifiedStatus,
     checkReferralActivity,
+    referralCheck,
     roundtrip
   }
 
