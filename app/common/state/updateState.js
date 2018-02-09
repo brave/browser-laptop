@@ -62,6 +62,15 @@ const updateState = {
     }
 
     return state.setIn(['updates', prop], value)
+  },
+
+  deleteUpdateProp: (state, prop) => {
+    state = validateState(state)
+    if (prop == null) {
+      return state
+    }
+
+    return state.deleteIn(['updates', prop])
   }
 }
 
