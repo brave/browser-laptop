@@ -159,7 +159,7 @@ var requestVersionInfo = (done, pingOnly) => {
   debug(`weekOfInstallation= ${weekOfInstallation}`)
 
   // The installation promoCode from buildConfig
-  const promoCode = state.getIn(['updates', 'promoCode'], 'none')
+  const promoCode = updateState.getUpdateProp(state, 'referralPromoCode') || 'none'
   debug(`promoCode = ${promoCode}`)
 
   // Build query string based on the last date an update request was made
@@ -231,7 +231,7 @@ exports.checkForUpdate = (verbose, skipReferral = false) => {
     updateState.getUpdateProp(state, 'referralDownloadId')
   ) {
     const installTime = state.get('firstRunTimestamp')
-    const month = parseInt(process.env.LEDGER_REFERRAL_CHECK_TIME || ledgerUtil.milliseconds.day * 30)
+    const month = parseInt(process.env.LEDGER_REFERRAL_CHECK_TIME || (ledgerUtil.milliseconds.day * 30))
 
     if (installTime + month < new Date().getTime()) {
       appActions.checkReferralActivity()

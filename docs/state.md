@@ -602,6 +602,7 @@ AppStore
     },
     referralDownloadId: string, // download ID that is returned from the referral server
     referralTimestamp: number, // timestamp when referral was accumulated (after ~30 days)
+    referralPromoCode: string, // promo code for the referral
     status: string, // updateStatus from js/constants/updateStatus.js
     verbose: boolean // whether to show update UI for checking, downloading, and errors
   },

@@ -1900,10 +1900,11 @@ const appActions = {
     })
   },
 
-  onReferralCodeRead: function (downloadId) {
+  onReferralCodeRead: function (downloadId, promoCode) {
     dispatch({
       actionType: appConstants.APP_ON_REFERRAL_CODE_READ,
-      downloadId
+      downloadId,
+      promoCode
     })
   },
 

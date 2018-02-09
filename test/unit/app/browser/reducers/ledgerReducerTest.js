@@ -57,7 +57,8 @@ describe('ledgerReducer unit tests', function () {
       claimPromotion: () => {},
       onPromotionResponse: dummyModifyState,
       getPromotion: () => {},
-      checkReferralActivity: dummyModifyState
+      checkReferralActivity: dummyModifyState,
+      referralCheck: () => {}
     }
     fakeLedgerState = {
       resetSynopsis: dummyModifyState,
