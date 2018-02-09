@@ -479,7 +479,8 @@ class SortableTable extends React.Component {
               [css(styles.table__th, this.props.smallRow && styles.table__th_smallRow)]: true
             }
             const isString = typeof heading === 'string'
-            const sortMethod = this.sortingDisabled ? 'none' : (dataType === 'number' ? 'number' : undefined)
+            const nonSortableColumns = this.props.nonSortableColumns ? this.props.nonSortableColumns : []
+            const sortMethod = (this.sortingDisabled || nonSortableColumns.includes(heading)) ? 'none' : (dataType === 'number' ? 'number' : undefined)
             if (isString) headerClasses['heading-' + heading] = true
 
             return <th className={cx(headerClasses)}
