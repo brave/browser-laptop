@@ -18,6 +18,7 @@ describe('ledger api unit tests', function () {
   let ledgerApi
   let ledgerNotificationsApi
   let ledgerState
+  let updateState
   let isBusy = false
   let ledgerClient
   let ledgerPublisher
@@ -204,6 +205,7 @@ describe('ledger api unit tests', function () {
 
     ledgerNotificationsApi = require('../../../../../app/browser/api/ledgerNotifications')
     ledgerState = require('../../../../../app/common/state/ledgerState')
+    updateState = require('../../../../../app/common/state/updateState')
     updater = require('../../../../../app/updater')
 
     // once everything is stubbed, load the ledger
@@ -2353,6 +2355,47 @@ describe('ledger api unit tests', function () {
     it('code is correct', function () {
       ledgerApi.onReferralCodeRead('aaa101')
       assert(roundtripSpy.calledOnce)
+    })
+  })
+
+  describe('referralCheck', function () {
+    let deleteUpdatePropSpy, fakeClock
+
+    before(function () {
+      deleteUpdatePropSpy = sinon.spy(updateState, 'deleteUpdateProp')
+      fakeClock = sinon.useFakeTimers()
+      fakeClock.tick(172800000)
+    })
+
+    afterEach(function () {
+      deleteUpdatePropSpy.reset()
+      fakeClock.reset()
+    })
+
+    after(function () {
+      deleteUpdatePropSpy.restore()
+      fakeClock.restore()
+    })
+
+    it('first run is only few days', function () {
+      const state = defaultAppState
+        .set('firstRunTimestamp', 1000)
+        .setIn(['updates', 'referralPromoCode'], '1234')
+      const returnedState = ledgerApi.referralCheck(state)
+      assert.deepEqual(returnedState.toJS(), state.toJS())
+      assert(deleteUpdatePropSpy.notCalled)
+    })
+
+    it('first run is over 90 days so we can delete promo code', function () {
+      const state = defaultAppState
+        .set('firstRunTimestamp', 1000)
+        .setIn(['updates', 'referralPromoCode'], '1234')
+      fakeClock.tick(7776000000) // 90 days
+      const expectedState = state
+        .deleteIn(['updates', 'referralPromoCode'])
+      const returnedState = ledgerApi.referralCheck(state)
+      assert.deepEqual(returnedState.toJS(), expectedState.toJS())
+      assert(deleteUpdatePropSpy.calledOnce)
     })
   })
 })
