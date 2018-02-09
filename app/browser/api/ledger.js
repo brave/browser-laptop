@@ -174,11 +174,12 @@ const paymentPresent = (state, tabId, present) => {
     delete ledgerPaymentsPresent[tabId]
   }
 
-  if (Object.keys(ledgerPaymentsPresent).length > 0 && getSetting(settings.PAYMENTS_ENABLED)) {
+  if (getSetting(settings.PAYMENTS_ENABLED) && present) {
     if (!balanceTimeoutId) {
       module.exports.getBalance(state)
     }
 
+    appActions.onPromotionGet()
     getPublisherTimestamp(true)
   } else if (balanceTimeoutId) {
     clearTimeout(balanceTimeoutId)
