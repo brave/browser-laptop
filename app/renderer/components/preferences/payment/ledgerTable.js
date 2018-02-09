@@ -297,6 +297,7 @@ class LedgerTable extends ImmutableComponent {
         fillAvailable
         smallRow
         headings={['', 'publisher', 'include', 'views', 'timeSpent', 'percentage', 'actions']}
+        nonSortableColumns={['actions']}
         defaultHeading='percentage'
         defaultHeadingSortOrder='desc'
         headerStyles={styles.header}
