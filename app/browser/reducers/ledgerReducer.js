@@ -480,12 +480,14 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_CHECK_REFERRAL_ACTIVITY:
       {
-        ledgerApi.checkReferralActivity(state)
+        state = ledgerApi.checkReferralActivity(state)
         break
       }
     case appConstants.APP_ON_REFERRAL_ACTIVITY:
       {
         state = updateState.setUpdateProp(state, 'referralTimestamp', new Date().getTime())
+        state = updateState.deleteUpdateProp(state, 'referralAttemptTimestamp')
+        state = updateState.deleteUpdateProp(state, 'referralAttemptCount')
         break
       }
     case appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER:
