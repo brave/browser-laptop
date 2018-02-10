@@ -256,6 +256,11 @@ module.exports.updateRecentlyClosedMenuItems = (appMenu, closedFrames) => {
 
   let visibleItems = 0
   closedFrames.reverse().forEach((frame, url) => {
+    // About pages should not be displayed in recently closed items
+    const isAboutPage = aboutUrls.has(frame.get('location'))
+    if (isAboutPage) {
+      return
+    }
     const menuIndex = historyMenuIndicesByOrder[url]
     if (visibleItems >= maxMenuItems) {
       if (menuIndex) {
@@ -267,11 +272,6 @@ module.exports.updateRecentlyClosedMenuItems = (appMenu, closedFrames) => {
       historyMenu.items[menuIndex].visible = true
       visibleItems += 1
     } else {
-      // About pages should not be displayed in recently closed items
-      const isAboutPage = aboutUrls.has(frame.get('location'))
-      if (isAboutPage) {
-        return
-      }
       const template = recentlyClosedTemplate(url, frame)
       const item = new MenuItem(template)
       // XXX: Can't set this with MenuItem constructor
