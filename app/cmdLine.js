@@ -17,7 +17,7 @@ const fs = require('fs')
 const path = require('path')
 
 const isDarwin = process.platform === 'darwin'
-const promoCodeFilenameRegex = /-([a-zA-Z\d]{3}\d{3})$/g
+const promoCodeFilenameRegex = /-([a-zA-Z\d]{3}\d{3})\s?(?:\(\d+\))?$/g
 const debugTabEventsFlagName = '--debug-tab-events'
 
 let appInitialized = false
