@@ -1670,7 +1670,8 @@ const onWalletProperties = (state, body) => {
     if (amount != null && rate) {
       const bigProbi = new BigNumber(probi.toString()).dividedBy('1e18')
       const bigRate = new BigNumber(rate.toString())
-      const converted = bigProbi.times(bigRate).toFixed(2)
+      const converted = bigProbi.times(bigRate).toNumber()
+
       state = ledgerState.setInfoProp(state, 'converted', converted)
     }
   }
