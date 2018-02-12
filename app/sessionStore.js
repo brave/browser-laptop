@@ -463,6 +463,9 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
  * @return a promise which resolve when the work is done.
  */
 module.exports.cleanSessionDataOnShutdown = () => {
+  if (getSetting(settings.SHUTDOWN_CLEAR_COOKIES_NO_LOCAL_STORAGE) === true) {
+    filtering.clearCookies()
+  }
   if (getSetting(settings.SHUTDOWN_CLEAR_ALL_SITE_COOKIES) === true) {
     filtering.clearStorageData()
   }
