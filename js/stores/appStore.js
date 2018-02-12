@@ -23,7 +23,6 @@ const path = require('path')
 const diff = require('immutablediff')
 const debounce = require('../lib/debounce')
 const autofill = require('../../app/autofill')
-const nativeImage = require('../../app/nativeImage')
 const filtering = require('../../app/filtering')
 const basicAuth = require('../../app/browser/basicAuth')
 const webtorrent = require('../../app/browser/webtorrent')
@@ -250,9 +249,6 @@ const handleAppAction = (action) => {
     case appConstants.APP_SHUTTING_DOWN:
       appDispatcher.shutdown()
       app.quit()
-      break
-    case appConstants.APP_DATA_URL_COPIED:
-      nativeImage.copyDataURL(action.dataURL, action.html, action.text)
       break
     case appConstants.APP_SET_DATA_FILE_ETAG:
       appState = appState.setIn([action.resourceName, 'etag'], action.etag)
