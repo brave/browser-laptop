@@ -153,6 +153,7 @@ const visibleP = (state, publisherKey) => {
     state = ledgerState.setSynopsisOption(state, 'showOnlyVerified', showOnlyVerified)
   }
 
+  const pinPercentage = publisher.get('pinPercentage')
   const publisherOptions = publisher.get('options', Immutable.Map())
   const onlyVerified = !showOnlyVerified
 
@@ -160,15 +161,17 @@ const visibleP = (state, publisherKey) => {
   const deletedByUser = blockedP(state, publisherKey)
   const eligibleByStats = eligibleP(state, publisherKey) // num of visits and time spent
   const verifiedPublisher = publisherOptions.get('verified')
+  const isPinned = pinPercentage && pinPercentage > 0
 
-  return (
+  return ((
       eligibleByStats &&
       (
         (onlyVerified && verifiedPublisher) ||
         !onlyVerified
       )
     ) &&
-    !deletedByUser
+    !deletedByUser) ||
+    isPinned
 }
 
 // TODO rename function
