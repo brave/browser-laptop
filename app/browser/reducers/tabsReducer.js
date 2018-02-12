@@ -261,6 +261,11 @@ const tabsReducer = (state, action, immutableAction) => {
         tabs.inspectElement(action.get('tabId'), action.get('x'), action.get('y'))
       })
       break
+    case appConstants.APP_COPY_IMAGE:
+      setImmediate(() => {
+        tabs.copyImageAt(action.get('tabId'), action.get('x'), action.get('y'))
+      })
+      break
     case appConstants.APP_LOAD_URL_REQUESTED:
       setImmediate(() => {
         tabs.loadURL(action)
