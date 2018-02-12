@@ -464,7 +464,7 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
  */
 module.exports.cleanSessionDataOnShutdown = () => {
   if (getSetting(settings.SHUTDOWN_CLEAR_ALL_SITE_COOKIES) === true) {
-    filtering.clearStorageData()
+    filtering.clearCookies()
   }
   if (getSetting(settings.SHUTDOWN_CLEAR_CACHE) === true) {
     filtering.clearCache()

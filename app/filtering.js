@@ -846,6 +846,18 @@ module.exports.clearStorageData = () => {
 }
 
 /**
+ * Clears all cookies
+ */
+module.exports.clearCookies = () => {
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    setImmediate(() => {
+      ses.clearStorageData.bind(ses, {'storages': ['cookies']})(() => {})
+    })
+  }
+}
+
+/**
  * Clears all session caches.
  */
 module.exports.clearCache = () => {

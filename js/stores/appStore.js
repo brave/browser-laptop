@@ -387,7 +387,7 @@ const handleAppAction = (action) => {
         handleAppAction({actionType: appConstants.APP_CLEAR_PASSWORDS})
       }
       if (clearData.get('allSiteCookies')) {
-        filtering.clearStorageData()
+        filtering.clearCookies()
       }
       if (clearData.get('autocompleteData')) {
         autofill.clearAutocompleteData()
