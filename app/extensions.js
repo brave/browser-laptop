@@ -53,7 +53,12 @@ let generateBraveManifest = () => {
       {
         run_at: 'document_start',
         all_frames: true,
-        matches: ['https://www.washingtonpost.com/*', 'https://www.youtube.com/*', 'https://coinmarketcap.com/*'],
+        matches: [
+          'https://www.washingtonpost.com/*',
+          'https://www.youtube.com/*',
+          'https://coinmarketcap.com/*',
+          'https://www.yahoo.com/*'
+        ],
         css: [
           'content/styles/removeEmptyElements.css'
         ]
