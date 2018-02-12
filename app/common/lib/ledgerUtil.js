@@ -71,7 +71,12 @@ const formatCurrentBalance = (ledgerData) => {
   }
 
   balance = balance.toFixed(2)
-  converted = converted.toFixed(2)
+
+  if (converted > 0 && converted < 0.01) {
+    converted = '<.01'
+  } else {
+    converted = converted.toFixed(2)
+  }
 
   return `${balance} BAT${hasRate ? ` (${converted} ${currency})` : ''}`
 }
