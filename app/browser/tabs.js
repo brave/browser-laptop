@@ -669,6 +669,13 @@ const api = {
     }
   },
 
+  copyImageAt: (tabId, x, y) => {
+    const tab = getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.copyImageAt(x, y)
+    }
+  },
+
   setActive: (tabId) => {
     let tab = getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
