@@ -963,6 +963,10 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
       publisherKey = null
     }
 
+    if (publisherKey) {
+      publisher = ledgerState.getPublisher(state, publisherKey)
+    }
+
     state = ledgerState.setLocationProp(state, info.get('key'), 'publisher', publisherKey)
   }
 
