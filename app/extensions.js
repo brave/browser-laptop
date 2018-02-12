@@ -167,7 +167,13 @@ let generateBraveManifest = () => {
       }
     ],
     web_accessible_resources: [
-      'img/favicon.ico'
+      'img/favicon.ico',
+      'img/newtab/defaultTopSitesIcon/appstore.png',
+      'img/newtab/defaultTopSitesIcon/brave.ico',
+      'img/newtab/defaultTopSitesIcon/facebook.png',
+      'img/newtab/defaultTopSitesIcon/playstore.png',
+      'img/newtab/defaultTopSitesIcon/twitter.png',
+      'img/newtab/defaultTopSitesIcon/youtube.png'
     ],
     permissions: [
       'externally_connectable.all_urls', 'tabs', '<all_urls>', 'contentSettings', 'idle'
