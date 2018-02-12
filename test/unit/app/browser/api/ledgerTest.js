@@ -1446,7 +1446,7 @@ describe('ledger api unit tests', function () {
         const expectedState = state
           .setIn(['ledger', 'info', 'rates'], Immutable.fromJS(rates))
           .setIn(['ledger', 'info', 'currentRate'], rate)
-          .setIn(['ledger', 'info', 'converted'], '3.58')
+          .setIn(['ledger', 'info', 'converted'], 3.5836474125)
           .setIn(['ledger', 'info', 'balance'], 25)
           .setIn(['ledger', 'info', 'probi'], probi)
         assert.deepEqual(result.toJS(), expectedState.toJS())
@@ -1462,7 +1462,7 @@ describe('ledger api unit tests', function () {
         const expectedState = state
           .setIn(['ledger', 'info', 'rates'], Immutable.fromJS(rates))
           .setIn(['ledger', 'info', 'currentRate'], rate)
-          .setIn(['ledger', 'info', 'converted'], '1047.80')
+          .setIn(['ledger', 'info', 'converted'], 1047.8043767167208)
           .setIn(['ledger', 'info', 'balance'], 7309.6224)
           .setIn(['ledger', 'info', 'probi'], bigProbi)
         assert.deepEqual(result.toJS(), expectedState.toJS())
