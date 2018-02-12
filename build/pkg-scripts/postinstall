@@ -4,7 +4,7 @@
 # Extract a referral / promo code from the installer path of the format /dir/path/Setup-Brave-Anything-xxx001.pkg
 # where the promo code would be xxx001
 installerPath=$1
-installerPathPromoCodeRegex='.+-([a-zA-Z0-9]{3}[0-9]{3})\.pkg$'
+installerPathPromoCodeRegex='.+-([a-zA-Z0-9]{3}[0-9]{3})\s?(?:\([0-9]+\))?\.pkg$'
 userDataDir="$HOME/Library/Application Support/brave"
 promoCodePath="$userDataDir/promoCode"
 # pkg runs this script as root so we need to get current username
