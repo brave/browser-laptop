@@ -280,7 +280,7 @@ module.exports.submitFeedbackMenuItem = () => {
     click: function (item, focusedWindow) {
       ensureAtLeastOneWindow({
         url: communityURL
-      }, true)
+      })
     }
   }
 }

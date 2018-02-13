@@ -34,10 +34,10 @@ const getTransactionsByViewingIds = (transactions, viewingIds) => {
     return transactions
   }
 
-  if (viewingIds && typeof (viewingIds) === 'string') {
+  if (typeof (viewingIds) === 'string') {
     viewingIds = [viewingIds]
   }
-  if (viewingIds && !viewingIds.length) {
+  if (!viewingIds.length) {
     viewingIds = null
   }
 

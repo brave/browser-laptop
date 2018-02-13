@@ -433,7 +433,7 @@ const UrlUtil = {
     }
 
     const localFileOrigins = ['file:', 'blob:', 'data:', 'chrome-extension:', 'chrome:']
-    return origin && localFileOrigins.some((localFileOrigin) => origin.startsWith(localFileOrigin))
+    return localFileOrigins.some((localFileOrigin) => origin.startsWith(localFileOrigin))
   },
 
   getDisplayHost: (url) => {
