@@ -71,16 +71,18 @@ const userModelReducer = (state, action, immutableAction) => {
       }
       break
     case appConstants.APP_TEXT_SCRAPER_DATA_AVAILABLE:
-    //    const lastActivTabId = pageDataState.getLastActiveTabId(state)
-    //    const tabId = action.get('tabId')
-    //    if (!lastActivTabId || tabId === lastActivTabId) {
-      const tabId = action.get('tabId')
-      const tab = tabState.getByTabId(state, tabId)
-      const url = tab.get('url')
-      state = userModel.testShoppingData(state, url)
-      state = userModel.testSearchState(state, url)
-      state = userModel.classifyPage(state, action)
-      break
+      {
+        const tabId = action.get('tabId')
+        const tab = tabState.getByTabId(state, tabId)
+        if (!tab) {
+          break
+        }
+        const url = tab.get('url')
+        state = userModel.testShoppingData(state, url)
+        state = userModel.testSearchState(state, url)
+        state = userModel.classifyPage(state, action, tab.get('windowId'))
+        break
+      }
     case appConstants.APP_SHUTTING_DOWN:
       state = userModel.saveCachedInfo(state)
       break
