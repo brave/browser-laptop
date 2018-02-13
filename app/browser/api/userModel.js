@@ -3,15 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 'use strict'
-
-// load utilities
-// const path = require('path')
-// const os = require('os')
-// const levelUp = require('level')
-// const historyUtil = require('../../common/lib/historyUtil')
-const urlUtil = require('../../../js/lib/urlutil')
 const um = require('@brave-intl/bat-usermodel')
-const notifier = require('node-notifier')
 
 let matrixData
 let priorData
@@ -19,9 +11,16 @@ let sampleAdFeed
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
+const windowActions = require('../../../js/actions/windowActions')
 
 // State
 const userModelState = require('../../common/state/userModelState')
+
+// Constants
+const notificationTypes = require('../../common/constants/notificationTypes')
+
+// Utils
+const urlUtil = require('../../../js/lib/urlutil')
 
 // Definitions
 const miliseconds = {
@@ -127,7 +126,7 @@ function randomKey (dictionary) {
   return keys[keys.length * Math.random() << 0]
 }
 
-const classifyPage = (state, action) => {
+const classifyPage = (state, action, windowId) => {
   // console.log('data in', action)// run NB on the code
 
   let headers = action.get('scrapedData').get('headers')
@@ -169,90 +168,46 @@ const classifyPage = (state, action) => {
 
   console.log('Current Page Class: ', immediateWinner, ' Moving Average of Classes: ', winnerOverTime)
 
-  let samples = um.getSampleAdFiles()
-
   let bundle = sampleAdFeed
-
   let arbitraryKey
   let notificationText
   let notificationUrl
 
-  let allgood = true
+  let allGood = true
 
   if (bundle) {
     let result = bundle['categories'][immediateWinner]
     arbitraryKey = randomKey(result)
 
     let entry = result[arbitraryKey]
-    // let payload = entry[0]
     let payload = entry
 
     if (payload) {
       notificationText = payload['notificationText']
       notificationUrl = payload['notificationURL']
-    }
-    else {
+    } else {
       console.warn('BAT Ads: Couldn\'t read ad data for display.')
     }
   }
 
-  if (!notificationText) {
-    allgood = false
-  }
-
-  if (!notificationUrl) {
-    allgood = false
-  }
-
-  notifier.on('click', function (notifierObject, options) {
-    // Triggers if `wait: true` and user clicks notification
-    // console.log('notifierObject: ', notifierObject)
-    // console.log('click options: ', options, '\n')
-  })
-
-  notifier.on('timeout', function (notifierObject, options) {
-    // Triggers if `wait: true` and notification closes
-    // console.log('notifierObject: ', notifierObject)
-    // console.log('timeout options: ', options, '\n')
-  })
-
-  let details = {
-    title: 'Brave Ad: ' + immediateWinner,
-    // subtitle: 'Current cat: ' + immediateWinner + ' : ' + arbitraryKey,
-    message: notificationText,
-    open: notificationUrl, // 'https://brave.com?ad_origin=' + winnerOverTime,
-    sound: true,
-    wait: true,
-    timeout: 25,
-    closeLabel: 'BraveClose',
-    actions: ['Action1', 'Action2'],
-    dropdownLabel: 'Brave Actions',
-    // icon: 'Terminal Icon', // Absolute Path to Triggering Icon
-    // icon: samples[1],
-    // contentImage: samples[2]
-    // appIcon: //appears in macOS sample but not parent doc. doesn't seem to do anything
-  }
-
-  let cb = function (err, response, metadata) {
-    if (err) {
-        // console.log('BAT Ad Notification Error: ', err)
-    }
-
-    if (response) {
-        // it seemed like we get 'closed' for `closed`
-        // and 'activate' for `action1`, `action2`, and `clicked body`
-        // console.log('BAT Ad Notification Response: ', response)
-    }
-
-    if (metadata) {
-        // console.log('BAT Ad Notification Metadata: ', metadata)
-    }
+  if (!notificationText || !notificationUrl) {
+    allGood = false
   }
 
   // Object
-  if (allgood) {
+  if (allGood) {
     appActions.onUserModelDemoValue('Add shown')
-    notifier.notify(details, cb)
+    windowActions.onNativeNotificationOpen(
+      windowId,
+      `Brave Ad: ${immediateWinner}`,
+      {
+        body: notificationText,
+        data: {
+          notificationUrl,
+          notificationId: notificationTypes.ADS
+        }
+      }
+    )
   }
 
   return state
