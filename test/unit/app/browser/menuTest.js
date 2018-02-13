@@ -44,7 +44,7 @@ describe('menu reducer unit tests', function () {
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('../../js/l10n', fakeLocale)
     mockery.registerMock('../common/lib/menuUtil', fakeMenuUtil)
-    menuReducer = require('../../../../app/browser/menu')
+    menuReducer = require('../../../../app/browser/reducers/menuReducer')
   })
 
   after(function () {
