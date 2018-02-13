@@ -770,6 +770,18 @@ const api = {
     }
   },
 
+  discard: (tabId) => {
+    const tab = webContentsCache.getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.discard()
+    } else {
+      console.error(
+        `Asked for tab ${tabId} to be discarded but ` +
+        (tab ? 'tab was not in cache' : 'tab was discarded')
+      )
+    }
+  },
+
   loadURL: (action) => {
     action = makeImmutable(action)
     const tabId = action.get('tabId')
