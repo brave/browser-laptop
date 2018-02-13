@@ -286,7 +286,7 @@ app.on('ready', () => {
             appActions.hideNotification(message)
           }
         }
-        if (prefsRestartLastValue[config] === undefined) {
+        if (prefsRestartLastValue[config] === undefined && typeof value === 'boolean') {
           prefsRestartLastValue[config] = value
         }
       }
