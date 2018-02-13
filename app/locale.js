@@ -256,6 +256,7 @@ var rendererIdentifiers = function () {
     'downloadPaused',
     'noDownloads',
     'torrentDesc',
+    'multiSelectionBookmarks',
     // Caption buttons in titlebar (min/max/close - Windows only)
     'windowCaptionButtonMinimize',
     'windowCaptionButtonMaximize',
@@ -415,7 +416,8 @@ exports.init = function (language) {
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'countries.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'locales.properties'),
       path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'preferences.properties'),
-      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'downloads.properties')
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'downloads.properties'),
+      path.join(__dirname, 'extensions', 'brave', 'locales', lang, 'bookmarks.properties')
       )
   }
 
