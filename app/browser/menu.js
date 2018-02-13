@@ -20,7 +20,7 @@ const settings = require('../../js/constants/settings')
 
 // State
 const {getByTabId} = require('../common/state/tabState')
-const tabState = require('../../app/common/state/tabState')
+const tabState = require('../common/state/tabState')
 const appStore = require('../../js/stores/appStore')
 
 // Actions
@@ -485,7 +485,7 @@ const createHelpSubmenu = () => {
   return submenu
 }
 
-const createDebugSubmenu = () => {
+const createDebugSubmenu = (state) => {
   return [
     {
       // Makes future renderer processes pause when they are created until a debugger appears.
@@ -533,6 +533,13 @@ const createDebugSubmenu = () => {
         const win = BrowserWindow.getActiveWindow()
         appActions.noReportStateModeClicked(win.id)
       }
+    }, {
+      label: 'Allow manual tab discarding',
+      type: 'checkbox',
+      checked: !!getSetting(settings.DEBUG_ALLOW_MANUAL_TAB_DISCARD),
+      click: function (menuItem, browserWindow, e) {
+        appActions.changeSetting(settings.DEBUG_ALLOW_MANUAL_TAB_DISCARD, menuItem.checked)
+      }
     }
   ]
 }
@@ -570,7 +577,7 @@ const createMenu = (state) => {
   ]
 
   if (process.env.NODE_ENV === 'development' || process.env.BRAVE_ENABLE_DEBUG_MENU !== undefined) {
-    template.push({ label: 'Debug', submenu: createDebugSubmenu() })
+    template.push({ label: 'Debug', submenu: createDebugSubmenu(state) })
   }
 
   if (isDarwin) {
@@ -660,6 +667,9 @@ const doAction = (state, action) => {
       if (action.key === settings.SHOW_BOOKMARKS_TOOLBAR) {
         // Update the checkbox next to "Bookmarks Toolbar" (Bookmarks menu)
         setMenuItemChecked(state, locale.translation('bookmarksToolbar'), action.value)
+      }
+      if (action.key === settings.DEBUG_ALLOW_MANUAL_TAB_DISCARD) {
+        setMenuItemChecked(state, 'Allow manual tab discarding', action.value)
       }
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:

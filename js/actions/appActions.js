@@ -221,6 +221,13 @@ const appActions = {
     })
   },
 
+  discardTabRequested: function (tabId) {
+    dispatch({
+      actionType: appConstants.APP_DISCARD_TAB_REQUESTED,
+      tabId
+    })
+  },
+
   /**
    * A request for a new tab has been made with the specified createProperties
    * @param {Object} createProperties

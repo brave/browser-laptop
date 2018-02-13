@@ -119,6 +119,13 @@ const tabsReducer = (state, action, immutableAction) => {
       state = tabs.closeOtherTabs(state, tabId)
       break
     }
+    case appConstants.APP_DISCARD_TAB_REQUESTED: {
+      const tabId = action.get('tabId')
+      setImmediate(() => {
+        tabs.discard(tabId)
+      })
+      break
+    }
     case appConstants.APP_CREATE_TAB_REQUESTED:
       if (action.getIn(['createProperties', 'windowId']) == null) {
         const senderWindowId = action.getIn(['senderWindowId'])
