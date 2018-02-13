@@ -55,6 +55,18 @@ const api = {
    */
   clearTabbedWindow: function (windowId) {
     activeTabsByWindow.delete(windowId)
+  },
+
+  /**
+   * Replace all intances of `oldTabId` with `newTabId` in
+   * active tab history for each window
+   */
+  tabIdChanged: function (oldTabId, newTabId) {
+    for (const [windowId, windowActiveTabs] of activeTabsByWindow) {
+      if (windowActiveTabs && windowActiveTabs.length) {
+        activeTabsByWindow.set(windowId, windowActiveTabs.map(previousTabId => (previousTabId === oldTabId) ? newTabId : previousTabId))
+      }
+    }
   }
 }
 

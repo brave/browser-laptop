@@ -24,6 +24,7 @@ const tabActionConsts = require('../../common/constants/tabAction')
 const flash = require('../../../js/flash')
 const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
 const {isSourceAboutUrl, isTargetAboutUrl, isNavigatableAboutPage} = require('../../../js/lib/appUrlUtil')
+const {shouldDebugTabEvents} = require('../../cmdLine')
 
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
@@ -149,6 +150,19 @@ const tabsReducer = (state, action, immutableAction) => {
     case appConstants.APP_TAB_UPDATED:
       state = tabState.maybeCreateTab(state, action)
       // tabs.debugTabs(state)
+      break
+    case appConstants.APP_TAB_REPLACED:
+      if (action.get('isPermanent')) {
+        if (shouldDebugTabEvents) {
+          console.log('APP_TAB_REPLACED before')
+          tabs.debugTabs(state)
+        }
+        state = tabState.replaceTabValue(state, action.get('oldTabId'), action.get('newTabValue'))
+        if (shouldDebugTabEvents) {
+          console.log('APP_TAB_REPLACED after')
+          tabs.debugTabs(state)
+        }
+      }
       break
     case appConstants.APP_TAB_CLOSE_REQUESTED:
       {
@@ -335,7 +349,7 @@ const tabsReducer = (state, action, immutableAction) => {
         break
       }
     case appConstants.APP_FRAME_CHANGED:
-      state = tabState.updateFrame(state, action)
+      state = tabState.updateFrame(state, action, shouldDebugTabEvents)
       break
     case windowConstants.WINDOW_SET_FRAME_ERROR:
       {

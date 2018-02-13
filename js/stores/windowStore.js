@@ -175,14 +175,21 @@ const newFrame = (state, frameOpts) => {
 const frameTabIdChanged = (state, action) => {
   action = makeImmutable(action)
   const oldTabId = action.get('oldTabId')
-  const newTabId = action.get('newTabId')
+  const newTabValue = action.get('newTabValue')
+  const newTabId = newTabValue.get('tabId')
   if (newTabId == null || oldTabId === newTabId) {
+    console.error('Invalid action arguments for frameTabIdChanged')
     return state
   }
 
   let newFrameProps = new Immutable.Map()
   newFrameProps = newFrameProps.set('tabId', newTabId)
-  const index = frameStateUtil.getFrameIndex(state, action.getIn(['frameProps', 'key']))
+  const frame = frameStateUtil.getFrameByTabId(state, oldTabId)
+  if (!frame) {
+    console.error(`Could not find frame with tabId ${oldTabId} in order to replace with new tabId ${newTabId}`)
+    return state
+  }
+  const index = frameStateUtil.getFrameIndex(state, frame.get('key'))
   state = state.mergeIn(['frames', index], newFrameProps)
   state = frameStateUtil.deleteTabInternalIndex(state, oldTabId)
   state = frameStateUtil.updateFramesInternalIndex(state, index)
@@ -261,7 +268,7 @@ const doAction = (action) => {
       }
       // We should not emit here because the Window already know about the change on startup.
       return
-    case windowConstants.WINDOW_FRAME_TAB_ID_CHANGED:
+    case appConstants.APP_TAB_REPLACED:
       windowState = frameTabIdChanged(windowState, action)
       break
     case windowConstants.WINDOW_FRAME_GUEST_INSTANCE_ID_CHANGED:
