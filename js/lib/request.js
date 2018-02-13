@@ -99,7 +99,7 @@ module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
  * https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
  * @param {string} url - url to fetch
  * @param {Object} options - options to pass to window.fetch
- * @param {Function(Object)} callback
+ * @param {Function({url: string, title: string, image: string, error: string})} callback
  */
 module.exports.fetchPublisherInfo = (url, options, callback) => {
   if (!backgroundPageWebContents) {
