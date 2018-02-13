@@ -131,8 +131,10 @@ braveUAWhitelist.forEach((domain) => {
   module.exports.siteHacks[domain] = {
     onBeforeSendHeaders: function (details) {
       let userAgent = details.requestHeaders['User-Agent']
-      userAgent = [userAgent.split('Chrome')[0], 'Brave Chrome', userAgent.split('Chrome')[1]].join('')
-      details.requestHeaders['User-Agent'] = userAgent
+      if (typeof userAgent === 'string') {
+        userAgent = [userAgent.split('Chrome')[0], 'Brave Chrome', userAgent.split('Chrome')[1]].join('')
+        details.requestHeaders['User-Agent'] = userAgent
+      }
       return {
         requestHeaders: details.requestHeaders
       }
