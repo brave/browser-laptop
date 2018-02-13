@@ -230,7 +230,8 @@ module.exports = {
     'general.is-default-browser': null,
     'notification-add-funds-timestamp': null,
     'notification-reconcile-soon-timestamp': null,
-
+    // debug
+    'debug.manual-tab-discard.enabled': false,
     // DEPRECATED settings
     // DO NOT REMOVE OR CHANGE THESE VALUES
     // ########################

@@ -221,6 +221,13 @@ const appActions = {
     })
   },
 
+  discardTabRequested: function (tabId) {
+    dispatch({
+      actionType: appConstants.APP_DISCARD_TAB_REQUESTED,
+      tabId
+    })
+  },
+
   /**
    * A request for a new tab has been made with the specified createProperties
    * @param {Object} createProperties
@@ -758,14 +765,14 @@ const appActions = {
   },
 
   /**
-   * Dispatch a message to copy data URL to clipboard
+   * Dispatch a message to copy image
    **/
-  dataURLCopied: function (dataURL, html, text) {
+  copyImage: function (tabId, x, y) {
     dispatch({
-      actionType: appConstants.APP_DATA_URL_COPIED,
-      dataURL,
-      html,
-      text
+      actionType: appConstants.APP_COPY_IMAGE,
+      tabId,
+      x,
+      y
     })
   },
 

@@ -90,7 +90,7 @@ class AddFundsWizardAddress extends React.Component {
           data-l10n-args={JSON.stringify({
             currencyName: this.currencyName,
             currency: this.currency
-          } || {})}
+          })}
         />
         <div className={css(styles.address__main)}>
           <main className={css(styles.address__main__inputBox)}>
@@ -107,14 +107,14 @@ class AddFundsWizardAddress extends React.Component {
                 data-l10n-args={JSON.stringify({
                   currency: this.currency,
                   funds: this.props.minAmount
-                } || {})}
+                })}
                 className={css(
                   styles.address__main__text_small,
                   styles.address__main__inputBox__text
                 )}
               />
               <p data-l10n-id={this.footerNote}
-                data-l10n-args={JSON.stringify({currency: this.currency} || {})}
+                data-l10n-args={JSON.stringify({currency: this.currency})}
                 className={css(
                   styles.address__main__text_small,
                   styles.address__main__inputBox__text

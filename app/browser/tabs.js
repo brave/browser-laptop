@@ -737,6 +737,13 @@ const api = {
     }
   },
 
+  copyImageAt: (tabId, x, y) => {
+    const tab = webContentsCache.getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.copyImageAt(x, y)
+    }
+  },
+
   setActive: (tabId) => {
     let tab = webContentsCache.getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
@@ -760,6 +767,18 @@ const api = {
       } else {
         tab.reload(ignoreCache)
       }
+    }
+  },
+
+  discard: (tabId) => {
+    const tab = webContentsCache.getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.discard()
+    } else {
+      console.error(
+        `Asked for tab ${tabId} to be discarded but ` +
+        (tab ? 'tab was not in cache' : 'tab was discarded')
+      )
     }
   },
 

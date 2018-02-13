@@ -26,7 +26,6 @@ const {getSetting} = require('./settings')
 const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
 const {isIntermediateAboutPage, isUrl, aboutUrls} = require('./lib/appUrlUtil')
-const {getBase64FromImageUrl} = require('./lib/imageUtil')
 const urlParse = require('../app/common/urlParse')
 const {getCurrentWindow} = require('../app/renderer/currentWindow')
 const extensionState = require('../app/common/state/extensionState')
@@ -550,6 +549,19 @@ function tabTemplateInit (frameProps) {
     }
   }, CommonMenu.separatorMenuItem)
 
+  // debug options, only in development
+  if (getSetting(settings.DEBUG_ALLOW_MANUAL_TAB_DISCARD) === true) {
+    template.push(
+      {
+        label: 'Discard',
+        click: (item) => {
+          appActions.discardTabRequested(tabId)
+        }
+      },
+      CommonMenu.separatorMenuItem
+    )
+  }
+
   template.push(Object.assign({},
     CommonMenu.reopenLastClosedTabItem(),
     { enabled: closedFrames ? closedFrames.size > 0 : false }
@@ -947,14 +959,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
       {
         label: locale.translation('copyImage'),
         click: (item) => {
-          if (nodeProps.srcURL) {
-            if (urlParse(nodeProps.srcURL).protocol === 'data:') {
-              appActions.dataURLCopied(nodeProps.srcURL, `<img src='${nodeProps.srcURL}>`, nodeProps.srcURL)
-            } else {
-              getBase64FromImageUrl(nodeProps.srcURL).then((dataURL) =>
-                appActions.dataURLCopied(dataURL, `<img src='${nodeProps.srcURL}>`, nodeProps.srcURL))
-            }
-          }
+          appActions.copyImage(frame.get('tabId'), nodeProps.x, nodeProps.y)
         }
       },
       copyAddressMenuItem('copyImageAddress', nodeProps.srcURL)

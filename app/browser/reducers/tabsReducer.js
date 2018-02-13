@@ -119,6 +119,13 @@ const tabsReducer = (state, action, immutableAction) => {
       state = tabs.closeOtherTabs(state, tabId)
       break
     }
+    case appConstants.APP_DISCARD_TAB_REQUESTED: {
+      const tabId = action.get('tabId')
+      setImmediate(() => {
+        tabs.discard(tabId)
+      })
+      break
+    }
     case appConstants.APP_CREATE_TAB_REQUESTED:
       if (action.getIn(['createProperties', 'windowId']) == null) {
         const senderWindowId = action.getIn(['senderWindowId'])
@@ -259,6 +266,11 @@ const tabsReducer = (state, action, immutableAction) => {
     case appConstants.APP_INSPECT_ELEMENT:
       setImmediate(() => {
         tabs.inspectElement(action.get('tabId'), action.get('x'), action.get('y'))
+      })
+      break
+    case appConstants.APP_COPY_IMAGE:
+      setImmediate(() => {
+        tabs.copyImageAt(action.get('tabId'), action.get('x'), action.get('y'))
       })
       break
     case appConstants.APP_LOAD_URL_REQUESTED:
