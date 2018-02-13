@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 // -SCL COMMENTS BELOW
 // This was written as "aspirational." Most has not been tested
 // State should capture
@@ -9,7 +10,7 @@
 // 3. ad served, time, value (3 month buffer)
 // 4. error (something went wrong)
 // 5. page classification scores, score, url, (time) (3 month buffer)
-// 6. usermodel unidle time (last time browser woke up)
+// 6. userModel unidle time (last time browser woke up)
 // at present, searching and shopping states need to be initialized and properly set
 // there is still missing something in the reducer which calls them at the right time,
 // unless we want to just overload the APP_TEXT_SCRAPER_DATA_AVAILABLE section and test for all shoppiness there
@@ -18,23 +19,20 @@
 // END SCL COMMENTS
 
 'use strict'
-// constants
-const Immutable = require('immutable')
-const assert = require('assert') // validateState uses this
 
-// State
-// const pageDataState = require('./pageDataState') // stuff like last closedTab
+const Immutable = require('immutable')
+const assert = require('assert')
 
 // utilities
-const {makeImmutable, isMap} = require('../../common/state/immutableUtil') // needed?
-const urlUtil = require('../../../js/lib/urlutil') //  used to check valid URL: test
+const {makeImmutable, isMap} = require('../../common/state/immutableUtil')
+const urlUtil = require('../../../js/lib/urlutil')
 
 const maxRowsInPageScoreHistory = 5
 
 const validateState = function (state) {
   state = makeImmutable(state)
   assert.ok(isMap(state), 'state must be an Immutable.Map')
-  assert.ok(isMap(state.get('usermodel')), 'state must contain an Immutable.Map of usermodel')
+  assert.ok(isMap(state.get('userModel')), 'state must contain an Immutable.Map of userModel')
   return state
 }
 
@@ -45,27 +43,26 @@ const userModelState = {
       return state
     }
 
-    return state.setIn(['usermodel', key], value)
+    return state.setIn(['userModel', key], value)
   },
 
   getUserModelValue: (state, key) => {
     state = validateState(state)
-    return state.getIn(['usermodel', key]) || Immutable.Map()
+    return state.getIn(['userModel', key])
   },
 
   appendPageScoreToHistoryAndRotate: (state, pageScore) => {
-    const stateKey = ['usermodel', 'pagescorehistory']
+    state = validateState(state)
+    const stateKey = ['userModel', 'pageScoreHistory']
 
     let previous = state.getIn(stateKey)
 
     if (!Immutable.List.isList(previous)) {
       console.warn('Previously stored page score history is not a List.')
-      previous = Immutable.fromJS([])
+      previous = Immutable.List()
     }
 
-    let ringbuf = previous
-
-    ringbuf = ringbuf.push(Immutable.List(pageScore))
+    let ringbuf = previous.push(Immutable.List(pageScore))
 
     let n = ringbuf.size
 
@@ -76,73 +73,62 @@ const userModelState = {
       ringbuf = ringbuf.slice(diff)
     }
 
-    // ringbuf = Immutable.fromJS(ringbuf)
-
     state = state.setIn(stateKey, ringbuf)
 
     return state
   },
 
   getPageScoreHistory: (state, mutable = false) => {
-    let history = state.getIn(['usermodel', 'pagescorehistory']) || []
+    state = validateState(state)
+    let history = state.getIn(['userModel', 'pageScoreHistory']) || []
 
     if (!mutable) {
       return history // immutable version
     }
 
-    let plain = []
-
-    for (let i = 0; i < history.size; i++) {
-      let row = history.get(i)
-      plain.push(row.toJS())
-    }
-
-    return plain // mutable version
+    return history.toJS() // mutable version
   },
 
   removeAllHistory: (state) => {
-    state = makeImmutable(state)
-    state = state.setIn(['usermodel', 'pagescorehistory'], Immutable.List())
-    state = state.setIn(['usermodel'], Immutable.Map())
+    state = validateState(state)
+    state = state.setIn(['userModel'], Immutable.Map())
     return state
   },
 
   // later maybe include a search term and history
   flagSearchState: (state, url, score) => {
     state = validateState(state)
-    if (url == null) { // I think isURL isn't truthy on nulls
+    if (url == null || !urlUtil.isURL(url)) { // bum url; log this?
       return state
     }
 
-    if (!urlUtil.isURL(url)) { // bum url; log this?
-      return state
-    }
     const date = new Date().getTime()
-    state.setIn(['usermodel', 'searchactivity'], true)
-    state.setIn(['usermodel', 'searchurl'], url)  // can we check this here?
-    state.setIn(['usermodel', 'score'], score)
-    state.setIn(['usermodel', 'lastsearchtime'], date)
+    state = state
+      .setIn(['userModel', 'searchActivity'], true)
+      .setIn(['userModel', 'searchUrl'], url)  // can we check this here?
+      .setIn(['userModel', 'score'], score)
+      .setIn(['userModel', 'lastSearchTime'], date)
+
     return state
   },
 
   // user has stopped searching for things
-  unflagSearchState: (state, url) => {
+  unFlagSearchState: (state, url) => {
     state = validateState(state)
-    if (url == null) {
-      return state
-    }
-    if (!urlUtil.isURL(url)) { // bum url; log this?
+    if (url == null || !urlUtil.isURL(url)) { // bum url; log this?
       return state
     }
 
     // if you're still at the same url, you're still searching; maybe this should log an error
-    if (state.getIn(['usermodel', 'searchurl']) === url) {
+    if (state.getIn(['userModel', 'searchUrl']) === url) {
       return state
     }
 
     const date = new Date().getTime()
-    state.setIn(['usermodel', 'searchactivity'], false) // toggle off date probably more useful
-    state.setIn(['usermodel', 'lastsearchtime'], date)
+    state = state
+      .setIn(['userModel', 'searchActivity'], false) // toggle off date probably more useful
+      .setIn(['userModel', 'lastSearchTime'], date)
+
     return state
   },
 
@@ -150,59 +136,63 @@ const userModelState = {
   flagShoppingState: (state, url) => {
     state = validateState(state)
     const date = new Date().getTime()
-    state.setIn(['usermodel', 'shopactivity'], true) // never hit; I think design is wrong
-    state.setIn(['usermodel', 'shopurl'], url)
-    state.setIn(['usermodel', 'lastshoptime'], date)
+
+    state = state
+      .setIn(['userModel', 'shopActivity'], true) // never hit; I think design is wrong
+      .setIn(['userModel', 'shopUrl'], url)
+      .setIn(['userModel', 'lastShopTime'], date)
+
     return state
   },
 
   getSearchState: (state) => {
     state = validateState(state)
-    return state.getIn(['usermodel', 'searchactivity'])
+    return state.getIn(['userModel', 'searchActivity'])
   },
 
   getShoppingState: (state) => {
     state = validateState(state)
-    return state.getIn(['usermodel', 'shopactivity'])
+    return state.getIn(['userModel', 'shopActivity'])
   },
 
-  unflagShoppingState: (state) => {
+  unFlagShoppingState: (state) => {
     state = validateState(state)
-    state.setIn(['usermodel', 'shopactivity'], false)
+    state = state.setIn(['userModel', 'shopActivity'], false)
     return state
   },
 
   flagUserBuyingSomething: (state, url) => {
+    state = validateState(state)
     const date = new Date().getTime()
-    state.setIn(['usermodel', 'purchasetime'], date)
-    state.setIn(['usermodel', 'purchaseurl'], url)
-    state.setIn(['usermodel', 'purchaseactive'], true)
+    state = state
+      .setIn(['userModel', 'purchaseTime'], date)
+      .setIn(['userModel', 'purchaseUrl'], url)
+      .setIn(['userModel', 'purchaseActive'], true)
+
     return state
   },
 
   setUrlActive: (state, url) => {
-    if (url == null) {
-      return state
-    }
-    if (!urlUtil.isURL(url)) { // bum url; log this?
-      return state
-    }
     state = validateState(state)
-    return state.setIn(['usermodel', 'url'], url)
+    if (url == null || !urlUtil.isURL(url)) { // bum url; log this?
+      return state
+    }
+
+    return state.setIn(['userModel', 'url'], url)
   },
 
-  setUrlClass: (state, url, pageclass) => {
+  setUrlClass: (state, url, pageClass) => {
     state = validateState(state)
-    if (url == null || pageclass == null) {
+    if (url == null || pageClass == null || !urlUtil.isURL(url)) { // bum url; log this?
       return state
     }
-    if (!urlUtil.isURL(url)) { // bum url; log this?
-      return state
-    }
+
     const date = new Date().getTime()
-    state.setIn(['usermodel', 'updated'], date)
-    state.setIn(['usermodel', 'url'], url)
-    state.setIn(['usermodel', 'pageclass'], pageclass)
+    state = state
+      .setIn(['userModel', 'updated'], date)
+      .setIn(['userModel', 'url'], url)
+      .setIn(['userModel', 'pageClass'], pageClass)
+
     return state
   },
 
@@ -210,58 +200,62 @@ const userModelState = {
   // we served what
   // potential fun stuff to put here; length of ad-view, some kind of
   // signatures on ad-hash and length of ad view
-  setServedAd: (state, adserved, adclass) => {
+  setServedAd: (state, adServed, adClass) => {
     state = validateState(state)
-    if (adserved == null) {
+    if (adServed == null) {
       return state
     }
+
     const date = new Date().getTime()
-    state.setIn(['usermodel', 'lastadtime'], date)
-    state.setIn(['usermodel', 'adserved'], adserved)
-    state.setIn(['usermodel', 'adclass'], adclass)
+    state = state
+      .setIn(['userModel', 'lastAdTime'], date)
+      .setIn(['userModel', 'adServed'], adServed)
+      .setIn(['userModel', 'adClass'], adClass)
+
     return state
   },
 
   getLastServedAd: (state) => {
     state = validateState(state)
-    const retval = {
-      lastadtime: state.getIn(['usermodel', 'lastadtime']),
-      lastadserved: state.getIn(['usermodel', 'adserved']),
-      lastadclass: state.getIn(['usermodel', 'adclass'])
+    const result = {
+      lastAdTime: state.getIn(['userModel', 'lastAdTime']),
+      lastAdServed: state.getIn(['userModel', 'adServed']),
+      lastAdClass: state.getIn(['userModel', 'adClass'])
     }
-    return Immutable.Map(retval) || Immutable.Map()
+
+    return Immutable.fromJS(result) || Immutable.Map()
   },
 
   setLastUserActivity: (state) => {
     state = validateState(state)
     const date = new Date().getTime()
-    state.setIn(['usermodel', 'lastuseractivity'], date)
+    state = state.setIn(['userModel', 'lastUserActivity'], date)
     return state
   },
 
   setAdFrequency: (state, freq) => {
-    state.setIn(['usermodel', 'adfrequency'], freq)
+    state = validateState(state)
+    state = state.setIn(['userModel', 'adFrequency'], freq)
+    return state
   },
 
   setLastUserIdleStopTime: (state) => {
     state = validateState(state)
     const date = new Date().getTime()
-    state.setIn(['usermodel', 'lastuseridlestoptime'], date)
+    state = state.setIn(['userModel', 'lastUserIdleStopTime'], date)
     return state
   },
 
   setUserModelError: (state, error, caller) => {
     state = validateState(state)
-    if (error == null && caller == null) {
-      return state.setIn(['ledger', 'info', 'error'], null)
-    }
 
-    return state.setIn(['ledger', 'info', 'error'], Immutable.fromJS({
+    state = state.setIn(['userModel', 'error'], Immutable.fromJS({
       caller: caller,
       error: error
-    })) // copy pasta from ledger
-  }
+    }))
 
+    return state
+  }
 }
 
 module.exports = userModelState
