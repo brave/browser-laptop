@@ -17,13 +17,15 @@ echo "Installer path is: $installerPath"
 echo "Username is: $userName"
 echo "Installation app path is: $installationAppPath"
 
-# Fix the permissions on installed .app so that updater has permissions to write new version
-# by default pkg with install the .app with root:wheel owner and 'drwxr-xr-x' permission.
+# Fix the permissions on installed .app so that updater has permissions to write new contents.
+# By default pkg with install the .app with root:wheel owner and 'drwxr-xr-x' permission.
 # Since the app is run by the user, and the updater built-in to electron does not successfully
 # escalate to root permissions, updating will fail.
-# We'll allow all standard users of the machine permissions to run and update the app.
+# We'll allow all admin users of the machine permissions to update the app, as well as the installing-user
+# (who may not be an admin).
 sudo chmod -R 775 "$installationAppPath"
-sudo chgrp -R staff "$installationAppPath"
+sudo chown -R $USER "$installationAppPath"
+sudo chgrp -R admin "$installationAppPath"
 
 # Detect if installer contained a referral promotion code within the filename
 if [[ $installerPath =~ $installerPathPromoCodeRegex ]]; then
