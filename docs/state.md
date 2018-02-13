@@ -635,6 +635,32 @@ AppStore
     status: string, // updateStatus from js/constants/updateStatus.js
     verbose: boolean // whether to show update UI for checking, downloading, and errors
   },
+  userModel: {
+    adClass: any,
+    adFrequency: any,
+    adServed: any,
+    error: {
+      caller: string,
+      error: string
+    }
+    lastAdTime: any,
+    lastSearchTime: any,
+    lastShopTime: any,
+    lastUserActivity: any,
+    lastUserIdleStopTime: any,
+    pageScoreHistory: Array,
+    score: any,
+    searchActivity: any,
+    searchUrl: any,
+    shopActivity: any,
+    shopUrl: any,
+    pageClass: any,
+    purchaseActive: any,
+    purchaseTime: any,
+    purchaseUrl: any,
+    updated: any,
+    url: any
+  },
   visits: [{
     endTime: number, // datetime.getTime()
     location: string,

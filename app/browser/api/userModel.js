@@ -5,10 +5,6 @@
 'use strict'
 const um = require('@brave-intl/bat-usermodel')
 
-let matrixData
-let priorData
-let sampleAdFeed
-
 // Actions
 const appActions = require('../../../js/actions/appActions')
 const windowActions = require('../../../js/actions/windowActions')
@@ -21,18 +17,14 @@ const notificationTypes = require('../../common/constants/notificationTypes')
 
 // Utils
 const urlUtil = require('../../../js/lib/urlutil')
+const ledgerUtil = require('../../common/lib/ledgerUtil')
 
-// Definitions
-const miliseconds = {
-  year: 365 * 24 * 60 * 60 * 1000,
-  week: 7 * 24 * 60 * 60 * 1000,
-  day: 24 * 60 * 60 * 1000,
-  hour: 60 * 60 * 1000,
-  minute: 60 * 1000,
-  second: 1000
-}
+const truncateUrl = require('truncate-url')
 
-/* do things */
+let matrixData
+let priorData
+let sampleAdFeed
+
 const initialize = (state) => {
   // TODO turn back on?
   // state = userModelState.setAdFrequency(state, 15)
@@ -83,12 +75,12 @@ const saveCachedInfo = (state) => {
 const testShoppingData = (state, url) => {
   const hostname = urlUtil.getHostname(url)
   const lastShopState = userModelState.getSearchState(state)
-  // console.log('testShoppingdata:', [url, lastShopState])
+
   if (hostname === 'amazon.com') {
     const score = 1.0   // eventually this will be more sophisticated than if(), but amazon is always a shopping destination
     state = userModelState.flagShoppingState(state, url, score)
   } else if (hostname !== 'amazon.com' && lastShopState) {
-    state = userModelState.unflagShoppingState(state)
+    state = userModelState.unFlagShoppingState(state)
   }
   return state
 }
@@ -100,37 +92,42 @@ const testSearchState = (state, url) => {
     const score = 1.0  // eventually this will be more sophisticated than if(), but google is always a search destination
     state = userModelState.flagSearchState(state, url, score)
   } else if (hostname !== 'google.com' && lastSearchState) {
-    state = userModelState.unflagSearchState(state, url)
+    state = userModelState.unFlagSearchState(state, url)
   }
   return state
 }
 
-const recordUnidle = (state) => {
+const recordUnIdle = (state) => {
   state = userModelState.setLastUserIdleStopTime(state)
   return state
 }
 
 function cleanLines (x) {
-  // split each: ['the quick', 'when in'] -> [['the', 'quick'], ['when', 'in']]
-  x = x.map(x => x.split(/\s+/))
-  // flatten: [[a,b], [c,d]] -> [a, b, c, d]
-  x = x.reduce((x, y) => x.concat(y), [])
-  // lowecase each
-  x = x.map(x => x.toLowerCase())
-  x = x.map(x => x.trim())
+  if (x == null) {
+    return []
+  }
+
   return x
+    .map(x => x.split(/\s+/)) // split each: ['the quick', 'when in'] -> [['the', 'quick'], ['when', 'in']]
+    .reduce((x, y) => x.concat(y), []) // flatten: [[a,b], [c,d]] -> [a, b, c, d]
+    .map(x => x.toLowerCase().trim())
 }
 
 function randomKey (dictionary) {
-  var keys = Object.keys(dictionary)
+  const keys = Object.keys(dictionary)
   return keys[keys.length * Math.random() << 0]
 }
 
 const classifyPage = (state, action, windowId) => {
   // console.log('data in', action)// run NB on the code
 
-  let headers = action.get('scrapedData').get('headers')
-  let body = action.get('scrapedData').get('body')
+  let headers = action.getIn(['scrapedData', 'headers'])
+  let body = action.getIn(['scrapedData', 'body'])
+  let url = action.getIn(['scrapedData', 'url'])
+
+  if (!headers) {
+    return state
+  }
 
   headers = cleanLines(headers)
   body = cleanLines(body)
@@ -165,8 +162,12 @@ const classifyPage = (state, action, windowId) => {
   let indexOfMax = um.vectorIndexOfMax(scores)
 
   let winnerOverTime = catNames[indexOfMax]
+  let maxLength = 40
+  let shortUrl = truncateUrl(url, maxLength)
 
-  console.log('Current Page Class: ', immediateWinner, ' Moving Average of Classes: ', winnerOverTime)
+  let logString = 'Current Page [' + shortUrl + '] Class: ' + immediateWinner + ' Moving Average of Classes: ' + winnerOverTime
+  console.log(logString)
+  appActions.onUserModelDemoValue(['log item: ', logString])
 
   let bundle = sampleAdFeed
   let arbitraryKey
@@ -176,17 +177,16 @@ const classifyPage = (state, action, windowId) => {
   let allGood = true
 
   if (bundle) {
-    let result = bundle['categories'][immediateWinner]
+    const result = bundle['categories'][immediateWinner]
     arbitraryKey = randomKey(result)
 
-    let entry = result[arbitraryKey]
-    let payload = entry
+    const payload = result[arbitraryKey]
 
     if (payload) {
       notificationText = payload['notificationText']
       notificationUrl = payload['notificationURL']
     } else {
-      console.warn('BAT Ads: Couldn\'t read ad data for display.')
+      console.warn('BAT Ads: Could not read ad data for display.')
     }
   }
 
@@ -196,7 +196,7 @@ const classifyPage = (state, action, windowId) => {
 
   // Object
   if (allGood) {
-    appActions.onUserModelDemoValue('Add shown')
+    appActions.onUserModelDemoValue(`Ads shown: ${immediateWinner}`)
     windowActions.onNativeNotificationOpen(
       windowId,
       `Brave Ad: ${immediateWinner}`,
@@ -213,23 +213,19 @@ const classifyPage = (state, action, windowId) => {
   return state
 }
 
-const dummyLog = (state) => {
-  console.log('boing')
-  return state
-}
 // this needs a place where it can be called from in the reducer. when to check?
 const checkReadyAdServe = (state) => {
   const lastAd = userModelState.getLastServedAd(state)
-  const prevadserv = lastAd.lastadtime
-  const prevadid = lastAd.lastadserved
+  const prevAdServ = lastAd.lastadtime
+  const prevAdId = lastAd.lastadserved
   const date = new Date().getTime()
-  const timeSinceLastAd = date - prevadserv
+  const timeSinceLastAd = date - prevAdServ
   // make sure you're not serving one too quickly or the same one as last time
-  const shoppingp = userModelState.getShoppingState(state)
+  const shopping = userModelState.getShoppingState(state)
   /* is the user shopping (this needs to be recency thing) define ad by the
    running average class */
   const ad = 1
-  if (shoppingp && (ad !== prevadid) && (timeSinceLastAd > miliseconds.hour)) {
+  if (shopping && (ad !== prevAdId) && (timeSinceLastAd > ledgerUtil.milliseconds.hour)) {
     serveAdNow(state, ad)
   }
 }
@@ -260,10 +256,10 @@ const getMethods = () => {
     testSearchState,
     classifyPage,
     checkReadyAdServe,
-    recordUnidle,
+    recordUnIdle,
     serveAdNow,
-    changeAdFrequency,
-    dummyLog
+    changeAdFrequency
+
   }
 
   let privateMethods = {}
