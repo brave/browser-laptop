@@ -134,6 +134,7 @@
     "string.prototype.startswith": "^0.2.0",
     "tablesort": "5.0.2",
     "tldjs": "^2.3.1",
+    "truncate-url": "^1.0.0",
     "underscore": "1.8.3",
     "url-loader": "~0.6.2",
     "v8-compile-cache": "^1.1.0",

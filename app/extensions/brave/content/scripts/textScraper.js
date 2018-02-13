@@ -3,15 +3,20 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 if(chrome.contentSettings.BATads == "allow") {
-  const headers = Array.prototype.map.call(document.querySelectorAll('h1, h2, h3, h4'), function(xx) {return xx.textContent;})
-  const body = Array.prototype.map.call(document.querySelectorAll('p'), function(xx) {return xx.textContent;})
-  const scrapeResults = {headers: headers, body: body, url: window.location.href}
+  debugger
+  const headers = Array.prototype.map.call(document.querySelectorAll('h1, h2, h3, h4'), function(element) {return element.textContent;})
+  const body = Array.prototype.map.call(document.querySelectorAll('p'), function(element) {return element.textContent;})
+  const scrapeResults = {
+    headers: headers,
+    body: body,
+    url: window.location.href
+  }
 
   chrome.ipcRenderer.send('dispatch-action', JSON.stringify([{
     actionType: 'app-text-scraper-data-available',
     location: window.location.href,
     scrapedData: scrapeResults
-  }])) 
+  }]))
 }
 
 
