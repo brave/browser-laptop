@@ -8,8 +8,16 @@ const electron = require('electron')
 const session = electron.session
 const underscore = require('underscore')
 const urlParse = require('../../app/common/urlParse')
+const ipc = electron.ipcMain
 
 var cachedDefaultSession = null
+var backgroundPageWebContents = null
+
+if (ipc) {
+  ipc.on('got-background-page-webcontents', (e) => {
+    backgroundPageWebContents = e.sender
+  })
+}
 
 const getDefaultSession = () => {
   if (!cachedDefaultSession) {
@@ -83,4 +91,26 @@ module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
       }
     })
   }
+}
+
+/**
+ * Fetches url, title, and image for a publishers site (Youtube, Twitch, etc.)
+ * See
+ * https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
+ * @param {string} url - url to fetch
+ * @param {Object} options - options to pass to window.fetch
+ * @param {Function(Object)} callback
+ */
+module.exports.fetchPublisherInfo = (url, options, callback) => {
+  if (!backgroundPageWebContents) {
+    callback({
+      url,
+      error: 'Background page web contents not initialized.'
+    })
+    return
+  }
+  backgroundPageWebContents.send('fetch-publisher-info', url, options)
+  ipc.once('got-publisher-info-' + url, (e, response) => {
+    callback(response)
+  })
 }
