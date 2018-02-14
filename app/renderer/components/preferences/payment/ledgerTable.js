@@ -27,6 +27,7 @@ const aboutActions = require('../../../../../js/about/aboutActions')
 const urlUtil = require('../../../../../js/lib/urlutil')
 const {SettingCheckbox, SiteSettingCheckbox} = require('../../common/settings')
 const locale = require('../../../../../js/l10n')
+const ledgerUtil = require('../../../../common/lib/ledgerUtil')
 
 class LedgerTable extends ImmutableComponent {
   get synopsis () {
@@ -153,6 +154,25 @@ class LedgerTable extends ImmutableComponent {
     ]
   }
 
+  getImage (faviconURL, providerName, publisherKey) {
+    if (!faviconURL && providerName) {
+      faviconURL = ledgerUtil.getDefaultMediaFavicon(providerName)
+    }
+
+    if (!faviconURL) {
+      return <span className={css(styles.siteData__anchor__icon_default)}>
+        <span className={globalStyles.appIcons.defaultIcon} />
+      </span>
+    }
+
+    return <img
+      className={css(styles.siteData__anchor__icon_favicon)}
+      src={faviconURL}
+      alt=''
+      onError={this.onFaviconError.bind(null, faviconURL, publisherKey)}
+    />
+  }
+
   getRow (synopsis) {
     const faviconURL = synopsis.get('faviconURL')
     const views = synopsis.get('views')
@@ -162,6 +182,7 @@ class LedgerTable extends ImmutableComponent {
     const publisherURL = synopsis.get('publisherURL')
     const percentage = pinned ? this.pinPercentageValue(synopsis) : synopsis.get('percentage')
     const publisherKey = synopsis.get('publisherKey')
+    const providerName = synopsis.get('providerName')
     const siteName = synopsis.get('siteName')
     const defaultAutoInclude = this.enabledForSite(synopsis)
 
@@ -178,11 +199,7 @@ class LedgerTable extends ImmutableComponent {
       {
         html: <div className={css(styles.siteData)}>
           <a className={css(styles.siteData__anchor)} href={publisherURL} rel='noopener' target='_blank' tabIndex={-1}>
-            {
-              faviconURL
-                ? <img className={css(styles.siteData__anchor__icon_favicon)} src={faviconURL} alt='' onError={this.onFaviconError.bind(null, faviconURL, publisherKey)} />
-                : <span className={css(styles.siteData__anchor__icon_default)}><span className={globalStyles.appIcons.defaultIcon} /></span>
-            }
+            { this.getImage(faviconURL, providerName, publisherKey) }
             <span className={css(styles.siteData__anchor__url)} title={siteName} data-test-id='siteName'>{siteName}</span>
           </a>
         </div>,

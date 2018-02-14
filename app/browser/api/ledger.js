@@ -315,6 +315,7 @@ const getPublisherData = (result, scorekeeper) => {
     verified: result.options.verified || false,
     exclude: result.options.exclude || false,
     publisherKey: result.publisherKey,
+    providerName: result.providerName,
     siteName: result.publisherKey,
     views: result.visits,
     duration: duration,
@@ -1387,7 +1388,7 @@ const roundtrip = (params, options, callback) => {
     : typeof params.server !== 'undefined' ? params.server
       : typeof options.server === 'string' ? urlParse(options.server) : options.server
   const binaryP = options.binaryP
-  const rawP = binaryP || options.rawP
+  const rawP = binaryP || options.rawP || options.scrapeP
 
   if (!params.method) params.method = 'GET'
   parts = underscore.extend(underscore.pick(parts, ['protocol', 'hostname', 'port']),
@@ -2399,10 +2400,15 @@ const onMediaRequest = (state, xhr, type, tabId) => {
 
   const parsed = ledgerUtil.getMediaData(xhr, type)
   const mediaId = ledgerUtil.getMediaId(parsed, type)
-  const mediaKey = ledgerUtil.getMediaKey(mediaId, type)
-  let duration = ledgerUtil.getMediaDuration(parsed, type)
 
-  if (mediaId == null || duration == null || mediaKey == null) {
+  if (mediaId == null) {
+    return state
+  }
+
+  const mediaKey = ledgerUtil.getMediaKey(mediaId, type)
+  let duration = ledgerUtil.getMediaDuration(state, parsed, mediaKey, type)
+
+  if (duration == null || mediaKey == null) {
     return state
   }
 
@@ -2422,9 +2428,14 @@ const onMediaRequest = (state, xhr, type, tabId) => {
     currentMediaKey = mediaKey
   }
 
+  const stateData = ledgerUtil.generateMediaCacheData(parsed, type)
   const cache = ledgerVideoCache.getDataByVideoId(state, mediaKey)
 
   if (!cache.isEmpty()) {
+    if (!stateData.isEmpty()) {
+      state = ledgerVideoCache.mergeCacheByVideoId(state, mediaKey, stateData)
+    }
+
     const publisherKey = cache.get('publisher')
     const publisher = ledgerState.getPublisher(state, publisherKey)
     if (!publisher.isEmpty() && publisher.has('providerName')) {
@@ -2434,6 +2445,10 @@ const onMediaRequest = (state, xhr, type, tabId) => {
         ignoreMinTime: true
       })
     }
+  }
+
+  if (!stateData.isEmpty()) {
+    state = ledgerVideoCache.setCacheByVideoId(state, mediaKey, stateData)
   }
 
   const options = underscore.extend({roundtrip: module.exports.roundtrip}, clientOptions)
@@ -2513,7 +2528,7 @@ const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
     .set('publisher', publisherKey)
 
   // Add to cache
-  state = ledgerVideoCache.setCacheByVideoId(state, mediaKey, cacheObject)
+  state = ledgerVideoCache.mergeCacheByVideoId(state, mediaKey, cacheObject)
 
   state = module.exports.saveVisit(state, publisherKey, {
     duration,

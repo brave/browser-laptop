@@ -803,11 +803,7 @@ describe('ledger api unit tests', function () {
           cache: {
             ledgerVideos: {
               'youtube_kLiLOkzLetE': {
-                publisher: 'youtube#channel:UCFNTTISby1c_H-rm5Ww5rZg',
-                faviconName: 'Brave',
-                providerName: 'Youtube',
-                faviconURL: 'data:image/jpeg;base64,...',
-                publisherURL: 'https://brave.com'
+                publisher: 'youtube#channel:UCFNTTISby1c_H-rm5Ww5rZg'
               }
             }
           },
@@ -846,11 +842,7 @@ describe('ledger api unit tests', function () {
           cache: {
             ledgerVideos: {
               'youtube_kLiLOkzLetE': {
-                publisher: 'youtube#channel:UCFNTTISby1c_H-rm5Ww5rZg',
-                faviconName: 'Brave',
-                providerName: 'Youtube',
-                faviconURL: 'data:image/jpeg;base64,...',
-                publisherURL: 'https://brave.com'
+                publisher: 'youtube#channel:UCFNTTISby1c_H-rm5Ww5rZg'
               }
             }
           },
