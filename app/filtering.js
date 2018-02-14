@@ -684,14 +684,13 @@ const filterableProtocols = ['http:', 'https:', 'ws:', 'wss:', 'magnet:', 'file:
 function shouldIgnoreUrl (details) {
   // data:, is a special origin from SecurityOrigin::urlWithUniqueSecurityOrigin
   // and usually occurs when there is an https in an http main frame
-  if (details.firstPartyUrl === 'data:,' || details.url === 'data:,') {
+  if (details.firstPartyUrl === 'data:,') {
     return false
   }
 
   // Ensure host is well-formed (RFC 1035) and has a non-empty hostname
   try {
-    // firstPartyUrl can be empty in some cases so fallback to the url
-    const firstPartyUrl = urlParse(details.firstPartyUrl || details.url)
+    const firstPartyUrl = urlParse(details.firstPartyUrl)
     if (!filterableProtocols.includes(firstPartyUrl.protocol)) {
       return true
     }
