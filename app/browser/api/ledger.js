@@ -5,7 +5,7 @@
 'use strict'
 
 const acorn = require('acorn')
-const moment = require('moment')
+const format = require('date-fns/format')
 const Immutable = require('immutable')
 const electron = require('electron')
 const ipc = electron.ipcMain
@@ -999,7 +999,7 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
 }
 
 const backupKeys = (state, backupAction) => {
-  const date = moment().format('L')
+  const date = format(new Date(), 'MM/DD/YYYY')
   const passphrase = ledgerState.getInfoProp(state, 'passphrase')
 
   const messageLines = [

@@ -5,7 +5,8 @@
 'use strict'
 
 const Immutable = require('immutable')
-const moment = require('moment')
+const format = require('date-fns/format')
+const distanceInWordsToNow = require('date-fns/distance_in_words_to_now')
 const BigNumber = require('bignumber.js')
 const queryString = require('querystring')
 
@@ -82,13 +83,11 @@ const formatCurrentBalance = (ledgerData) => {
 }
 
 const formattedTimeFromNow = (timestamp) => {
-  moment.locale(navigator.language)
-  return moment(new Date(timestamp)).fromNow()
+  return distanceInWordsToNow(new Date(timestamp), {locale: navigator.language})
 }
 
-const formattedDateFromTimestamp = (timestamp, format) => {
-  moment.locale(navigator.language)
-  return moment(new Date(timestamp)).format(format)
+const formattedDateFromTimestamp = (timestamp, dateFormat) => {
+  return format(new Date(timestamp), dateFormat, {locale: navigator.language})
 }
 
 const walletStatus = (ledgerData) => {

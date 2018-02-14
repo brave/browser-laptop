@@ -95,6 +95,7 @@
     "bloodhound-js": "brave/bloodhound",
     "clipboard-copy": "^1.0.0",
     "compare-versions": "^3.0.1",
+    "date-fns": "^1.29.0",
     "deepmerge": "^2.0.1",
     "electron-localshortcut": "^0.6.0",
     "electron-squirrel-startup": "brave/electron-squirrel-startup",

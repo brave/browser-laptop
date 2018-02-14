@@ -17,7 +17,7 @@ const urlParse = require('url').parse
 const WALLET_RECOVERY_FILE_BASENAME = 'brave_wallet_recovery.txt'
 const PASSPHRASE_TRANSLATION_KEY = 'ledgerBackupText4'
 
-const moment = require('moment')
+const format = require('date-fns/format')
 
 let translationsCache = null
 
@@ -91,7 +91,7 @@ let generateAndSaveRecoveryFile = function (recoveryFilePath, passphrase) {
   let recoveryFileContents = ''
 
   if (typeof passphrase === 'string') {
-    const date = moment().format('L')
+    const date = format(new Date(), 'MM/DD/YYYY')
 
     const messageLines = [
       translationsCache['ledgerBackupText1'],

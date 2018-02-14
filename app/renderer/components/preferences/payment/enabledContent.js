@@ -4,7 +4,7 @@
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
-const moment = require('moment')
+const addMonths = require('date-fns/add_months')
 const Immutable = require('immutable')
 
 // util
@@ -179,7 +179,7 @@ class EnabledContent extends ImmutableComponent {
     let l10nDataId = 'statusNextReconcileDate'
 
     if (!nextReconcileDateRelative) {
-      nextReconcileDateRelative = formattedDateFromTimestamp(moment().add(1, 'months'), 'MMMM Do')
+      nextReconcileDateRelative = formattedDateFromTimestamp(addMonths(Date.now(), 1), 'MMMM Do')
     } else {
       const timestamp = ledgerData.get('reconcileStamp')
       const now = new Date().getTime()
