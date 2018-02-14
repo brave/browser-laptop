@@ -6,6 +6,7 @@ const path = require('path')
 const querystring = require('querystring')
 const React = require('react')
 const ReactDOM = require('react-dom')
+const urlFormat = require('url').format
 const WebTorrentRemoteClient = require('webtorrent-remote/client')
 
 const App = require('./components/app')
@@ -182,12 +183,10 @@ function stop () {
 }
 
 function saveTorrentFile () {
-  const parsedUrl = new window.URL(store.torrentId)
-  const search = parsedUrl.search ? parsedUrl.search.split('&') : []
-  parsedUrl.search = search.concat(['download=true']).join('&')
-
+  const parsedUrl = urlParse(store.torrentId, true)
+  parsedUrl.query.download = true
   const name = path.basename(parsedUrl.pathname) || 'untitled.torrent'
-  const href = parsedUrl.href
+  const href = urlFormat(parsedUrl)
 
   const a = document.createElement('a')
   a.rel = 'noopener'
