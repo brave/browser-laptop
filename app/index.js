@@ -16,7 +16,7 @@ const telemetry = require('./telemetry')
 telemetry.setCheckpoint('init')
 
 const handleUncaughtError = (stack, message) => {
-  muon.crashReporter.setCrashKeyValue('javascript-info', JSON.stringify({stack, message}))
+  muon.crashReporter.setJavascriptInfoCrashValue(JSON.stringify({stack, message}))
   muon.crashReporter.dumpWithoutCrashing()
 
   if (!ready) {
