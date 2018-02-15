@@ -213,6 +213,10 @@ class UrlBar extends React.Component {
     }
   }
 
+  onUrlBarIconContainerClick () {
+    windowActions.setSiteInfoVisible(true)
+  }
+
   onBlur (e) {
     windowActions.urlBarOnBlur(getCurrentWindowId(), e.target.value, this.props.urlbarLocation, eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm']))
   }
@@ -497,13 +501,13 @@ class UrlBar extends React.Component {
 
   render () {
     const urlbarIconContainer = this.props.evCert
-    ? (<div className='urlbarIconContainer'>
+    ? (<div onClick={this.onUrlBarIconContainerClick} className='urlbarIconContainer'>
       <UrlBarIcon
         titleMode={this.props.titleMode}
       />
       {this.showEvCert}
     </div>)
-    : (<div className='urlbarIconContainer'>
+    : (<div onClick={this.onUrlBarIconContainerClick} className='urlbarIconContainer'>
       <UrlBarIcon
         titleMode={this.props.titleMode}
       />
@@ -513,13 +517,13 @@ class UrlBar extends React.Component {
         urlbarForm: true,
         [css(styles.urlbarForm_wide)]: this.props.isWideURLbarEnabled,
         noBorderRadius: this.props.publisherButtonVisible
-      })}
+      })} 
       id='urlbar'
     >
       {urlbarIconContainer}
       {
         this.props.titleMode
-        ? <div id='titleBar' data-test-id='titleBar'>
+        ? <div id='titleBar' data-test-id='titleBar' >
           <span><strong>{this.props.hostValue}</strong></span>
           <span>{this.props.hostValue && this.titleValue ? ' | ' : ''}</span>
           <span>{this.titleValue}</span>
