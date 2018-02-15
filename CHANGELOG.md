@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.20.42](https://github.com/brave/browser-laptop/releases/tag/v0.20.42dev)
+
+ - Fixed websites randomly being unpinned under Payments. ([#13102](https://github.com/brave/browser-laptop/issues/13102))
+ - Fixed incorrect keyboard shortcuts being used for session tabs. ([#13000](https://github.com/brave/browser-laptop/issues/13000))
+ - Fixed AltGr + Number shortcuts opening new session tabs. ([#12956](https://github.com/brave/browser-laptop/issues/12956))
+ - Fixed Copying and Pasting images. ([#7388](https://github.com/brave/browser-laptop/issues/7388))
+ - Upgraded to muon 4.8.2. ([#12641](https://github.com/brave/browser-laptop/issues/13041))
+ - Upgraded to Chromium 64.0.3282.140. ([#12521](https://github.com/brave/browser-laptop/issues/13149))
+
 ## [0.20.30](https://github.com/brave/browser-laptop/releases/tag/v0.20.30dev)
 
  - Fixed restoring tabs at startup causing slow performance. ([#12976](https://github.com/brave/browser-laptop/issues/12976))
