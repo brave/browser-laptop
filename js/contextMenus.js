@@ -358,7 +358,7 @@ const siteSingleDetailTemplate = (siteKey, type, activeFrame) => {
     })
 
     template.push({
-      label: 'Delete Domain from History',
+      label: locale.translation('deleteDomainFromHistory'),
       click: () => {
         const domain = urlParse(siteDetail.get('location')).hostname
         appActions.removeHistoryDomain(domain)

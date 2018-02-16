@@ -60,6 +60,7 @@ var rendererIdentifiers = function () {
     'deleteBookmarks',
     'deleteHistoryEntry',
     'deleteHistoryEntries',
+    'deleteDomainFromHistory',
     'deleteLedgerEntry',
     'ledgerBackupText1',
     'ledgerBackupText2',
