@@ -364,7 +364,8 @@ const showPromotionNotification = (state) => {
     (
       getSetting(settings.PAYMENTS_ENABLED) &&
       !getSetting(settings.PAYMENTS_NOTIFICATIONS)
-    )
+    ) ||
+    !getSetting(settings.PAYMENTS_ALLOW_PROMOTIONS)
   ) {
     return
   }
