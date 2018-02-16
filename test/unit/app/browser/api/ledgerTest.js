@@ -19,6 +19,7 @@ describe('ledger api unit tests', function () {
   let ledgerNotificationsApi
   let ledgerState
   let updateState
+  let ledgerUtil
   let isBusy = false
   let ledgerClient
   let ledgerPublisher
@@ -204,6 +205,7 @@ describe('ledger api unit tests', function () {
     })
 
     ledgerNotificationsApi = require('../../../../../app/browser/api/ledgerNotifications')
+    ledgerUtil = require('../../../../../app/common/lib/ledgerUtil')
     ledgerState = require('../../../../../app/common/state/ledgerState')
     updateState = require('../../../../../app/common/state/updateState')
     updater = require('../../../../../app/updater')
@@ -365,12 +367,17 @@ describe('ledger api unit tests', function () {
       describe('prune synopsis', function () {
         let pruneSynopsisSpy, appActionsSpy
 
-        beforeEach(function () {
+        before(function () {
           pruneSynopsisSpy = sinon.spy(ledgerApi, 'pruneSynopsis')
           appActionsSpy = sinon.spy(appActions, 'onPruneSynopsis')
         })
 
         afterEach(function () {
+          pruneSynopsisSpy.reset()
+          appActionsSpy.reset()
+        })
+
+        after(function () {
           pruneSynopsisSpy.restore()
           appActionsSpy.restore()
         })
@@ -396,6 +403,104 @@ describe('ledger api unit tests', function () {
           ledgerApi.synopsisNormalizer(defaultAppState, null, false, true)
           assert(pruneSynopsisSpy.calledOnce)
           assert(appActionsSpy.calledOnce)
+        })
+      })
+
+      describe('only pinned items with total below 100%', function () {
+        let normalizePinnedSpy, roundToTargetSpy, visiblePStub
+
+        const dataState = defaultAppState
+          .setIn(['ledger', 'synopsis', 'publishers'], Immutable.fromJS({
+            'site1': {
+              options: {
+                exclude: false
+              },
+              pinPercentage: 30,
+              scores: {
+                concave: 9.249426617127623,
+                visits: 3
+              },
+              weight: 30
+            },
+            'site2': {
+              options: {
+                exclude: false
+              },
+              pinPercentage: 20,
+              scores: {
+                concave: 3.249426617127623,
+                visits: 3
+              },
+              weight: 20
+            },
+            'site3': {
+              options: {
+                exclude: false
+              },
+              pinPercentage: 20,
+              scores: {
+                concave: 1.249426617127623,
+                visits: 3
+              },
+              weight: 20
+            }
+          }))
+
+        const expectedSate = dataState
+          .setIn(['ledger', 'about', 'synopsis'], Immutable.Map())
+          .setIn(['ledger', 'about', 'synopsisOptions'], Immutable.Map())
+
+        before(function () {
+          normalizePinnedSpy = sinon.spy(ledgerApi, 'normalizePinned')
+          roundToTargetSpy = sinon.spy(ledgerApi, 'roundToTarget')
+          visiblePStub = sinon.stub(ledgerUtil, 'visibleP', () => true)
+        })
+
+        afterEach(function () {
+          normalizePinnedSpy.reset()
+          roundToTargetSpy.reset()
+        })
+
+        after(function () {
+          normalizePinnedSpy.restore()
+          roundToTargetSpy.restore()
+          visiblePStub.restore()
+        })
+
+        it('changed publisher is not known', function () {
+          let result = ledgerApi.synopsisNormalizer(dataState, null)
+          assert(normalizePinnedSpy.calledOnce)
+          assert(roundToTargetSpy.calledOnce)
+          result = result.setIn(['ledger', 'about', 'synopsis'], {})
+          const newState = expectedSate
+            .setIn(['ledger', 'synopsis', 'publishers', 'site1', 'pinPercentage'], 43)
+            .setIn(['ledger', 'synopsis', 'publishers', 'site1', 'weight'], 42.857142857142854)
+            .setIn(['ledger', 'synopsis', 'publishers', 'site2', 'pinPercentage'], 29)
+            .setIn(['ledger', 'synopsis', 'publishers', 'site2', 'weight'], 28.57142857142857)
+            .setIn(['ledger', 'synopsis', 'publishers', 'site3', 'pinPercentage'], 28)
+            .setIn(['ledger', 'synopsis', 'publishers', 'site3', 'weight'], 28.57142857142857)
+            .setIn(['siteSettings', 'https?://site1', 'ledgerPinPercentage'], 43)
+            .setIn(['siteSettings', 'https?://site2', 'ledgerPinPercentage'], 29)
+            .setIn(['siteSettings', 'https?://site3', 'ledgerPinPercentage'], 28)
+          assert.deepEqual(result.toJS(), newState.toJS())
+        })
+
+        it('changed publisher is known', function () {
+          let result = ledgerApi.synopsisNormalizer(dataState, 'site2')
+          assert(normalizePinnedSpy.calledOnce)
+          assert(roundToTargetSpy.calledOnce)
+          result = result.setIn(['ledger', 'about', 'synopsis'], {})
+          const newState = expectedSate
+            .setIn(['ledger', 'synopsis', 'publishers', 'site1', 'pinPercentage'], 48)
+            .setIn(['ledger', 'synopsis', 'publishers', 'site1', 'weight'], 48)
+            .setIn(['ledger', 'synopsis', 'publishers', 'site2', 'pinPercentage'], 20)
+            .setIn(['ledger', 'synopsis', 'publishers', 'site2', 'weight'], 20)
+            .setIn(['ledger', 'synopsis', 'publishers', 'site3', 'pinPercentage'], 32)
+            .setIn(['ledger', 'synopsis', 'publishers', 'site3', 'weight'], 32)
+            .setIn(['siteSettings', 'https?://site1', 'ledgerPinPercentage'], 48)
+            .setIn(['siteSettings', 'https?://site2', 'ledgerPinPercentage'], 20)
+            .setIn(['siteSettings', 'https?://site3', 'ledgerPinPercentage'], 32)
+          assert.deepEqual(result.toJS(), newState.toJS())
         })
       })
     })
