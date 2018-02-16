@@ -13,7 +13,7 @@ const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
 const {makeImmutable, makeJS} = require('../common/state/immutableUtil')
 const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
-const {isSessionPartition} = require('../../js/state/frameStateUtil')
+const {isSessionPartition, isPrivatePartition} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/lib/urlutil')
 const settingsStore = require('../../js/settings')
 const settings = require('../../js/constants/settings')
@@ -81,6 +81,8 @@ const updateTab = (tabId, changeInfo = {}) => {
 }
 
 const getPartitionNumber = (partition) => {
+  if (isPrivatePartition(partition))
+    return 0
   return Number(partition.split('persist:partition-')[1] || 0)
 }
 
@@ -94,7 +96,7 @@ const getPartition = (createProperties) => {
   if (createProperties.partition) {
     partition = createProperties.partition
   } else if (createProperties.isPrivate) {
-    partition = 'default'
+    partition = 'partition-private'
   } else if (createProperties.isPartitioned) {
     partition = `persist:partition-${incrementPartitionNumber()}`
   } else if (createProperties.partitionNumber) {

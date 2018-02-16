@@ -21,7 +21,7 @@ const settings = require('../js/constants/settings')
 const userPrefs = require('../js/state/userPrefs')
 const config = require('../js/constants/config')
 const locale = require('./locale')
-const {isSessionPartition} = require('../js/state/frameStateUtil')
+const {isSessionPartition, isPrivatePartition} = require('../js/state/frameStateUtil')
 const ipcMain = electron.ipcMain
 const app = electron.app
 const path = require('path')
@@ -96,7 +96,7 @@ module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
  * @param {object} session Session to add webRequest filtering on
  */
 function registerForBeforeRequest (session, partition) {
-  const isPrivate = module.exports.isPrivate(partition)
+  const isPrivate = isPrivatePartition(partition)
   session.webRequest.onBeforeRequest((details, muonCb) => {
     if (process.env.NODE_ENV === 'development') {
       let page = appUrlUtil.getGenDir(details.url)
@@ -226,7 +226,7 @@ function registerForBeforeRequest (session, partition) {
  * @param {object} session Session to add webRequest filtering on
  */
 function registerForBeforeRedirect (session, partition) {
-  const isPrivate = module.exports.isPrivate(partition)
+  const isPrivate = isPrivatePartition(partition)
   // Note that onBeforeRedirect listener doesn't take a callback
   session.webRequest.onBeforeRedirect(function (details) {
     // Using an electron binary which isn't from Brave
@@ -298,7 +298,7 @@ function registerForBeforeSendHeaders (session, partition) {
   // For efficiency, avoid calculating these settings on every request. This means the
   // browser must be restarted for changes to take effect.
   const sendDNT = getSetting(settings.DO_NOT_TRACK)
-  const isPrivate = module.exports.isPrivate(partition)
+  const isPrivate = isPrivatePartition(partition)
 
   session.webRequest.onBeforeSendHeaders(function (details, muonCb) {
     // Using an electron binary which isn't from Brave
@@ -351,7 +351,7 @@ function registerForBeforeSendHeaders (session, partition) {
  * @param {object} session Session to add webRequest filtering on
  */
 function registerForHeadersReceived (session, partition) {
-  const isPrivate = module.exports.isPrivate(partition)
+  const isPrivate = isPrivatePartition(partition)
   session.webRequest.onHeadersReceived(function (details, muonCb) {
     // Using an electron binary which isn't from Brave
     if (shouldIgnoreUrl(details)) {
@@ -391,7 +391,7 @@ function registerForHeadersReceived (session, partition) {
  * @param {string} partition name of the partition
  */
 function registerPermissionHandler (session, partition) {
-  const isPrivate = module.exports.isPrivate(partition)
+  const isPrivate = isPrivatePartition(partition)
   // Keep track of per-site permissions granted for this session.
   let permissions = null
   session.setPermissionRequestHandler((origin, mainFrameUrl, permissionTypes, muonCb) => {
@@ -677,7 +677,7 @@ const initPartition = (partition) => {
 
   let ses = session.fromPartition(partition, options)
   fns.forEach((fn) => {
-    fn(ses, partition, module.exports.isPrivate(partition))
+    fn(ses, partition, isPrivatePartition(partition))
   })
   ses.on('register-navigator-handler', (e, protocol, location) => {
     appActions.navigatorHandlerRegistered(ses.partition, protocol, location)
@@ -721,10 +721,6 @@ function shouldIgnoreUrl (details) {
     console.warn('Error parsing ' + details.url)
   }
   return true
-}
-
-module.exports.isPrivate = (partition) => {
-  return !partition.startsWith('persist:')
 }
 
 module.exports.init = (state, action, store) => {
