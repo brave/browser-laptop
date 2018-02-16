@@ -147,11 +147,37 @@ const updatePinnedTabs = (win, appState) => {
   }
 }
 
-function showDeferredShowWindow (win) {
-  if (shouldDebugWindowEvents) {
-    console.log(`Window [${win.id}] showDeferredShowWindow`)
+function refocusFocusedWindow () {
+  const focusedWindow = BrowserWindow.getFocusedWindow()
+  if (focusedWindow) {
+    if (shouldDebugWindowEvents) {
+      console.log('focusing on window', focusedWindow.id)
+    }
+    focusedWindow.focus()
   }
-  win.show()
+}
+
+function showDeferredShowWindow (win) {
+  // were we asked to make the window active / foreground?
+  const shouldShowInactive = win.webContents.browserWindowOptions.inactive
+  if (shouldShowInactive) {
+    // we were asked NOT to show the window active.
+    // we should maintain focus on the window which already has it
+    if (shouldDebugWindowEvents) {
+      console.log('showing deferred window inactive', win.id)
+    }
+    win.showInactive()
+    // Whilst the window will not have focus, it will potentially be
+    // on top of the window which already had focus,
+    // so re-focus the focused window.
+    setImmediate(refocusFocusedWindow)
+  } else {
+    // we were asked to show the window active
+    if (shouldDebugWindowEvents) {
+      console.log('showing deferred window active', win.id)
+    }
+    win.show()
+  }
   if (win.__shouldFullscreen) {
     // this timeout helps with an issue that
     // when a user is loading from state, and
@@ -160,6 +186,9 @@ function showDeferredShowWindow (win) {
     // spaces because macOS has switched away from the desktop space
     setTimeout(() => {
       win.setFullScreen(true)
+      if (shouldShowInactive) {
+        setImmediate(refocusFocusedWindow)
+      }
     }, 100)
   } else if (win.__shouldMaximize) {
     win.maximize()

@@ -77,6 +77,9 @@ ipc.on(messages.INITIALIZE_WINDOW, (e, mem) => {
   const windowValue = message.windowValue
 
   currentWindow.setWindowId(windowValue.id)
+  if (process.env.NODE_ENV === 'development') {
+    console.debug(`This Window's ID is:`, windowValue.id)
+  }
   const newState = Immutable.fromJS(message.windowState) || windowStore.getState()
 
   appStoreRenderer.state = Immutable.fromJS(message.appState)
