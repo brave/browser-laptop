@@ -517,13 +517,13 @@ class UrlBar extends React.Component {
         urlbarForm: true,
         [css(styles.urlbarForm_wide)]: this.props.isWideURLbarEnabled,
         noBorderRadius: this.props.publisherButtonVisible
-      })} 
+      })}
       id='urlbar'
     >
       {urlbarIconContainer}
       {
         this.props.titleMode
-        ? <div id='titleBar' data-test-id='titleBar' >
+        ? <div id='titleBar' data-test-id='titleBar'>
           <span><strong>{this.props.hostValue}</strong></span>
           <span>{this.props.hostValue && this.titleValue ? ' | ' : ''}</span>
           <span>{this.titleValue}</span>
