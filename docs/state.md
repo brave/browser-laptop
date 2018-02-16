@@ -35,7 +35,6 @@ AppStore
       sites: [string], // list of sites to be used on gridLayout. Defaults to 6 Brave-related sites; see data/newTabData.js => topSites
       updatedStamp: number, // timestamp for when the data was last updated
       torEnabled: boolean, // whether Tor private tabs is enabled
-      torAvailable: boolean, // whether a Tor process is available
     },
     preferences: {
       recoverySucceeded: (boolean|undefined),

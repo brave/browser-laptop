@@ -25,13 +25,6 @@ const aboutNewTabReducer = (state, action) => {
     case appConstants.APP_TOP_SITE_DATA_AVAILABLE:
       state = aboutNewTabState.setSites(state, action.topSites)
       break
-    case appConstants.APP_TOR_AVAILABLE:
-      state = aboutNewTabState.mergeDetails(state, {
-        newTabPageDetail: {
-          torAvailable: action.value
-        }
-      })
-      break
     case appConstants.APP_CHANGE_NEW_TAB_DETAIL:
       state = aboutNewTabState.mergeDetails(state, action)
       if (action.refresh) {
