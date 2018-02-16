@@ -49,21 +49,20 @@ function getFrames (state) {
 }
 
 function getSortedFrames (state) {
-  return state.get('frames').sort(comparatorByKeyAsc)
+  return state.get('frames', Immutable.List()).sort(comparatorByKeyAsc)
 }
 
 function getSortedFrameKeys (state) {
-  return state.get('frames')
-    .sort(comparatorByKeyAsc)
+  return getSortedFrames(state)
     .map(frame => frame.get('key'))
 }
 
 function getPinnedFrames (state) {
-  return state.get('frames').filter((frame) => frame.get('pinnedLocation'))
+  return state.get('frames', Immutable.List()).filter((frame) => frame.get('pinnedLocation'))
 }
 
 function getNonPinnedFrames (state) {
-  return state.get('frames').filter((frame) => !frame.get('pinnedLocation')) || Immutable.List()
+  return state.get('frames', Immutable.List()).filter((frame) => !frame.get('pinnedLocation'))
 }
 
 function getFrameIndex (state, frameKey) {
@@ -202,7 +201,8 @@ const getTabIdByFrameKey = (state, frameKey) => {
 
 function getActiveFrame (state) {
   const activeFrameIndex = getActiveFrameIndex(state)
-  return state.get('frames').get(activeFrameIndex)
+  const frames = state.get('frames')
+  return frames ? frames.get(activeFrameIndex) : null
 }
 
 // Returns the same as the active frame's location, but returns the requested
@@ -331,7 +331,7 @@ const frameOptsFromFrame = (frame) => {
 * @return Immutable top level application state ready to merge back in
 */
 function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, insertionIndex) {
-  const frames = state.get('frames')
+  const frames = state.get('frames', Immutable.List())
 
   const location = frameOpts.location // page url
   const displayURL = frameOpts.displayURL == null ? location : frameOpts.displayURL

@@ -17,15 +17,20 @@ const {makeImmutable} = require('../common/state/immutableUtil')
 const {getPinnedTabsByWindowId} = require('../common/state/tabState')
 const messages = require('../../js/constants/messages')
 const settings = require('../../js/constants/settings')
+const appConfig = require('../../js/constants/appConfig')
 const config = require('../../js/constants/config')
 const appDispatcher = require('../../js/dispatcher/appDispatcher')
 const platformUtil = require('../common/lib/platformUtil')
+const browserWindowUtil = require('../common/lib/browserWindowUtil')
 const windowState = require('../common/state/windowState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
 const {zoomLevel} = require('../common/constants/toolbarUserInterfaceScale')
+const { shouldDebugWindowEvents } = require('../cmdLine')
 const activeTabHistory = require('./activeTabHistory')
 
 const isDarwin = platformUtil.isDarwin()
+const isWindows = platformUtil.isWindows()
+
 const {app, BrowserWindow, ipcMain} = electron
 
 // TODO(bridiver) - set window uuid
@@ -33,6 +38,8 @@ let currentWindows = {}
 const windowPinnedTabStateMemoize = new WeakMap()
 const publicEvents = new EventEmitter()
 let lastCreatedWindowIsRendererWindow = false
+const renderedWindows = new WeakSet()
+let bufferWindowId
 
 const getWindowState = (win) => {
   if (win.isFullScreen()) {
@@ -100,7 +107,13 @@ const updatePinnedTabs = (win, appState) => {
   const statePinnedSites = pinnedSitesState.getSites(appState)
   // no need to continue if we've already processed this state for this window
   if (windowPinnedTabStateMemoize.get(win) === statePinnedSites) {
+    if (shouldDebugWindowEvents) {
+      console.log(`not running updatePinnedTabs for win ${win.id} since nothing changed since last time`)
+    }
     return
+  }
+  if (shouldDebugWindowEvents) {
+    console.log(`performing updatePinnedTabs for win ${win.id} since state did change since last time`)
   }
   // cache that this state has been updated for this window,
   // so we do not repeat the operation until
@@ -135,6 +148,9 @@ const updatePinnedTabs = (win, appState) => {
 }
 
 function showDeferredShowWindow (win) {
+  if (shouldDebugWindowEvents) {
+    console.log(`Window [${win.id}] showDeferredShowWindow`)
+  }
   win.show()
   if (win.__shouldFullscreen) {
     // this timeout helps with an issue that
@@ -154,6 +170,38 @@ function showDeferredShowWindow (win) {
   win.__shouldMaximize = undefined
 }
 
+function openFramesInWindow (win, frames, activeFrameKey) {
+  if (frames && frames.length) {
+    let frameIndex = -1
+    for (const frame of frames) {
+      frameIndex++
+      if (frame.guestInstanceId) {
+        appActions.newWebContentsAdded(win.id, frame)
+      } else {
+        appActions.createTabRequested({
+          windowId: win.id,
+          url: frame.location || frame.src || frame.provisionalLocation || frame.url,
+          partitionNumber: frame.partitionNumber,
+          isPrivate: frame.isPrivate,
+          active: activeFrameKey ? frame.key === activeFrameKey : true,
+          discarded: frame.unloaded,
+          title: frame.title,
+          faviconUrl: frame.icon,
+          index: frameIndex
+        }, false, true)
+      }
+    }
+  }
+}
+
+function markWindowCreationTime (windowId) {
+  console.time(`windowRender:${windowId}`)
+}
+
+function markWindowRenderTime (windowId) {
+  console.timeEnd(`windowRender:${windowId}`)
+}
+
 const api = {
   init: (state, action) => {
     app.on('browser-window-created', function (event, win) {
@@ -164,6 +212,16 @@ const api = {
       }
       lastCreatedWindowIsRendererWindow = false
       let windowId = -1
+      if (shouldDebugWindowEvents) {
+        console.log(`Window created`)
+        // output console log for each event the tab receives
+        const oldEmit = win.emit
+        win.emit = function () {
+          const eventWindowId = win && !win.isDestroyed() ? win.id : `probably ${windowId}`
+          console.log(`Window [${eventWindowId}] event '${arguments[0]}'`)
+          oldEmit.apply(win, arguments)
+        }
+      }
       const updateWindowMove = debounce(updateWindow, 100)
       const updateWindowDebounce = debounce(updateWindow, 5)
       const onWindowResizeDebounce = debounce(onWindowResize, 5)
@@ -286,6 +344,8 @@ const api = {
         updateWindowDebounce(windowId)
       })
     })
+    // create a buffer window
+    api.getOrCreateBufferWindow()
     // TODO(bridiver) - handle restoring windows
     // windowState.getWindows(state).forEach((win) => {
     //   console.log('restore', win.toJS())
@@ -298,7 +358,7 @@ const api = {
     setImmediate(() => {
       const state = appStore.getState()
       for (let windowId in currentWindows) {
-        if (currentWindows[windowId].__ready) {
+        if (currentWindows[windowId].__ready && currentWindows[windowId] !== api.getBufferWindow()) {
           updatePinnedTabs(currentWindows[windowId], state)
         }
       }
@@ -363,8 +423,10 @@ const api = {
     setImmediate(() => {
       const win = currentWindows[windowId]
       if (win && !win.isDestroyed()) {
-        const state = appStore.getState()
-        updatePinnedTabs(win, state)
+        if (win !== api.getBufferWindow()) {
+          const state = appStore.getState()
+          updatePinnedTabs(win, state)
+        }
         win.__ready = true
         win.emit(messages.WINDOW_RENDERER_READY)
       }
@@ -372,10 +434,15 @@ const api = {
   },
 
   windowRendered: (windowIdOrWin) => {
-    setImmediate(() => {
-      const win = windowIdOrWin instanceof electron.BrowserWindow
+    const win = windowIdOrWin instanceof electron.BrowserWindow
         ? windowIdOrWin
         : currentWindows[windowIdOrWin]
+    if (shouldDebugWindowEvents) {
+      markWindowRenderTime(win.id)
+      console.log(`Window [${win.id}] rendered`)
+    }
+    renderedWindows.add(win)
+    setImmediate(() => {
       if (win && win.__showWhenRendered && !win.isDestroyed() && !win.isVisible()) {
         // window is hidden by default until we receive 'ready' message,
         // so show it now
@@ -389,7 +456,13 @@ const api = {
     try {
       setImmediate(() => {
         if (win && !win.isDestroyed()) {
-          win.close()
+          // do not allow the Buffer Window to be automatically closed
+          // e.g. when it has no tabs open
+          // In order to fully close the Buffer Window, first it will
+          // have to be detached from being the Buffer Window
+          if (win.id !== bufferWindowId) {
+            win.close()
+          }
         }
       })
     } catch (e) {
@@ -397,11 +470,93 @@ const api = {
     }
   },
 
+  /** Specialist function for providing an existing window for
+  * Buffer Window. Normally this should not be used as one
+  * will automatically be created with `getOrCreateBufferWindow`
+  */
+  setWindowIsBufferWindow: (dragBufferWindowId) => {
+    // close existing buffer window if it exists
+    const existingBufferWindow = api.getBufferWindow()
+    if (existingBufferWindow) {
+      api.closeBufferWindow()
+    }
+    bufferWindowId = dragBufferWindowId
+  },
+
+  clearBufferWindow: (createPinnedTabs = true) => {
+    const bufferWindow = api.getBufferWindow()
+    bufferWindowId = null
+    // Pinned tabs are not created for buffer windows.
+    // Now that this window is no longer a buffer window,
+    // create the pinned tabs unless explicitly told not to.
+    if (createPinnedTabs) {
+      const state = appStore.getState()
+      updatePinnedTabs(bufferWindow, state)
+    }
+  },
+
+  closeBufferWindow: () => {
+    const win = api.getBufferWindow()
+    if (win) {
+      if (shouldDebugWindowEvents) {
+        console.log(`Buffer Window [${win.id}] requested to be closed`)
+      }
+      win.close()
+      cleanupWindow(bufferWindowId)
+      bufferWindowId = null
+    } else {
+      if (shouldDebugWindowEvents) {
+        console.log('closeBufferWindow: nothing to close')
+      }
+    }
+  },
+
+  getBufferWindow: () => {
+    const win = currentWindows[bufferWindowId]
+    if (win && !win.isDestroyed()) {
+      return win
+    } else {
+      bufferWindowId = null
+    }
+  },
+
+  getOrCreateBufferWindow: function (options = { }) {
+    // only if we don't have one already
+    let win = api.getBufferWindow()
+    if (!win) {
+      options = Object.assign({ fullscreen: false, show: false }, options)
+      win = api.createWindow(options, null, false, null)
+      bufferWindowId = win.id
+      if (shouldDebugWindowEvents) {
+        console.log(`getOrCreateBufferWindow: created buffer window: ${win.id}`)
+      }
+    } else {
+      if (shouldDebugWindowEvents) {
+        console.log(`getOrCreateBufferWindow: already had buffer window ${win.id}`)
+      }
+    }
+    return win
+  },
+
   createWindow: function (windowOptionsIn, parentWindow, maximized, frames, immutableState = Immutable.Map(), hideUntilRendered = true, cb = null) {
     const defaultOptions = {
       // hide the window until the window reports that it is rendered
       show: true,
-      fullscreenable: true
+      fullscreenable: true,
+      // Neither a frame nor a titlebar
+      // frame: false,
+      // A frame but no title bar and windows buttons in titlebar 10.10 OSX and up only?
+      titleBarStyle: 'hidden-inset',
+      autoHideMenuBar: isDarwin || getSetting(settings.AUTO_HIDE_MENU),
+      title: appConfig.name,
+      frame: !isWindows,
+      minWidth: 480,
+      minHeight: 300,
+      webPreferences: {
+        // XXX: Do not edit without security review
+        sharedWorker: true,
+        partition: 'default'
+      }
     }
     const windowOptions = Object.assign(
       defaultOptions,
@@ -423,6 +578,58 @@ const api = {
     if (showWhenRendered && isDarwin && parentWindow && parentWindow.isFullScreen()) {
       windowOptions.fullscreen = true
     }
+    // use a buffer window if scenario is compatible
+    // determining when to use a buffer window and when to create a brand new window
+    const bufferWindow = api.getBufferWindow()
+    // can't use buffer window if one does not exist yet
+    let canUseBufferWindow = !!bufferWindow
+    // can't use buffer window if one does not exist
+    if (!canUseBufferWindow && shouldDebugWindowEvents) {
+      console.log('createWindow: not using buffer window because one did not exist')
+    }
+    // can't use buffer window if it has not finished rendering
+    if (canUseBufferWindow && !renderedWindows.has(bufferWindow)) {
+      canUseBufferWindow = false
+      if (shouldDebugWindowEvents) {
+        console.log('createWindow: not using buffer window because it has not completed render yet')
+      }
+    }
+    // can't use buffer window if we find incompatible options that we do not know how to set for buffer windows
+    // (those options would be fine for new windows passed in to BrowserWindow ctor)
+    if (canUseBufferWindow && !browserWindowUtil.canSetAllPropertiesOnExistingWindow(windowOptionsIn)) {
+      canUseBufferWindow = false
+      if (shouldDebugWindowEvents) {
+        console.log('createWindow: not using buffer window due to unsupported window creation options', windowOptionsIn)
+      }
+    }
+    // handle using a buffer window as the 'new' window
+    if (canUseBufferWindow) {
+      bufferWindow.webContents.browserWindowOptions.disposition = windowOptionsIn.disposition
+      if (shouldDebugWindowEvents) {
+        console.log('createWindow: using buffer window for new window, and setting properties', windowOptionsIn)
+      }
+      // detach buffer window (pinned tabs will be created)
+      api.clearBufferWindow()
+      // make a new buffer window to replace this one
+      setImmediate(() => {
+        if (shouldDebugWindowEvents) {
+          console.log('creating replacement buffer window...')
+        }
+        api.getOrCreateBufferWindow()
+      })
+      // set desired properties
+      browserWindowUtil.setPropertiesOnExistingWindow(bufferWindow, windowOptionsIn)
+      // create frames for 'new' window
+      openFramesInWindow(bufferWindow, frames, immutableState.get('activeFrameKey'))
+      // make fullscreen if applicable, as above
+      if (windowOptions.fullscreen) {
+        bufferWindow.setFullScreen(true)
+      }
+      if (maximized) {
+        bufferWindow.maximize()
+      }
+      return
+    }
     // if delaying window show, remember if the window should be opened fullscreen
     // and remove the fullscreen property for now
     // (otherwise the window will be shown immediately by macOS / muon)
@@ -438,8 +645,12 @@ const api = {
     // tabbed renderer window
     lastCreatedWindowIsRendererWindow = true
     const win = new electron.BrowserWindow(windowOptions)
+
     win.loadURL(appUrlUtil.getBraveExtIndexHTML())
 
+    if (shouldDebugWindowEvents) {
+      markWindowCreationTime(win.id)
+    }
     // TODO: pass UUID
     publicEvents.emit('new-window-state', win.id, immutableState)
     // let the windowReady handler know to show the window
