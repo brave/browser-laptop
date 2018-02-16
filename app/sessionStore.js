@@ -39,7 +39,7 @@ const {navigatableTypes} = require('../js/lib/appUrlUtil')
 const {isDataUrl, parseFaviconDataUrl} = require('../js/lib/urlutil')
 const Channel = require('./channel')
 const BuildConfig = require('./buildConfig')
-const {isImmutable, isMap, makeImmutable, deleteImmutablePaths} = require('./common/state/immutableUtil')
+const {isImmutable, makeImmutable, deleteImmutablePaths} = require('./common/state/immutableUtil')
 const {getSetting} = require('../js/settings')
 const platformUtil = require('./common/lib/platformUtil')
 const historyUtil = require('./common/lib/historyUtil')
@@ -78,7 +78,10 @@ module.exports.saveAppState = (immutablePayload, isShutdown) => {
     if (immutablePayload.get('perWindowState')) {
       if (savePerWindowState) {
         immutablePayload.get('perWindowState').forEach((immutableWndPayload, i) => {
-          const frames = immutableWndPayload.get('frames').filter((frame) => !frame.get('isPrivate'))
+          let frames = immutableWndPayload.get('frames')
+          if (frames) {
+            frames = frames.filter((frame) => !frame.get('isPrivate'))
+          }
           immutableWndPayload = immutableWndPayload.set('frames', frames)
           immutablePayload = immutablePayload.setIn(['perWindowState', i], immutableWndPayload)
         })
@@ -304,12 +307,18 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
     immutableData = immutableData.deleteIn(['ui', 'about', 'preferences', 'recoverySucceeded'])
   } catch (e) {}
 
-  const perWindowStateList = immutableData.get('perWindowState')
+  let perWindowStateList = immutableData.get('perWindowState')
   if (perWindowStateList) {
-    perWindowStateList.forEach((immutablePerWindowState, i) => {
-      const cleanedImmutablePerWindowState = module.exports.cleanPerWindowData(immutablePerWindowState, isShutdown)
-      immutableData = immutableData.setIn(['perWindowState', i], cleanedImmutablePerWindowState)
-    })
+    // Clean window state (e.g. remove private tabs and UI state)
+    perWindowStateList = perWindowStateList.map(
+      (immutablePerWindowState) => module.exports.cleanPerWindowData(immutablePerWindowState, isShutdown)
+    )
+    // Do not save window state if it has no tabs,
+    // e.g. if the only tabs were private tabs, or the window was a buffer window.
+    perWindowStateList = perWindowStateList.filter(
+      (immutablePerWindowState) => immutablePerWindowState.hasIn(['frames', 0])
+    )
+    immutableData = immutableData.set('perWindowState', perWindowStateList)
   }
   const clearAutocompleteData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOCOMPLETE_DATA) === true
   if (clearAutocompleteData) {
@@ -426,18 +435,6 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
 
   if (immutableData.hasIn(['ledger', 'locations'])) {
     immutableData = immutableData.deleteIn(['ledger', 'locations'])
-  }
-
-  // Remove windowState from perWindowState if there are no frames
-  // ex: if window only had a single private tab, let's remove it (they aren't saved)
-  if (perWindowStateList) {
-    perWindowStateList.forEach((immutablePerWindowState, i) => {
-      if (isMap(immutablePerWindowState) && immutablePerWindowState.has('frames')) {
-        if (!immutablePerWindowState.get('frames').size) {
-          immutableData = immutableData.deleteIn(['perWindowState', i])
-        }
-      }
-    })
   }
 
   try {
