@@ -85,14 +85,11 @@ module.exports.newPrivateTabMenuItem = () => {
       // Check if Tor is available
       const useTor = getSetting(settings.USE_TOR_PRIVATE_TABS)
       if (useTor) {
-        const cb = (success) => {
-          ensureAtLeastOneWindow({
-            url: 'about:newtab',
-            isPrivate: true,
-            isTor: success
-          })
-        }
-        appActions.checkTorAvailable(cb)
+        ensureAtLeastOneWindow({
+          url: 'about:newtab',
+          isPrivate: true,
+          isTor: true
+        })
       } else {
         ensureAtLeastOneWindow({
           url: 'about:newtab',

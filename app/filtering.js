@@ -16,7 +16,6 @@ const downloadStates = require('../js/constants/downloadStates')
 const urlParse = require('./common/urlParse')
 const getSetting = require('../js/settings').getSetting
 const appUrlUtil = require('../js/lib/appUrlUtil')
-const {request} = require('../js/lib/request')
 const siteSettings = require('../js/state/siteSettings')
 const settings = require('../js/constants/settings')
 const userPrefs = require('../js/state/userPrefs')
@@ -42,7 +41,7 @@ const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 const beforeRedirectFilteringFns = []
 const headersReceivedFilteringFns = []
-let partitionsToInitialize = ['default', 'tor-test']
+let partitionsToInitialize = ['default']
 let initializedPartitions = {}
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
@@ -644,47 +643,6 @@ function registerForMagnetHandler (session) {
   }
 }
 
-/**
- * Checks that a Tor proxy is available on socks5 port 9050
- * @param {Function(boolean)} cb - callback with result of tor availability
- */
-module.exports.checkTorAvailable = (cb) => {
-  const ses = registeredSessions['tor-test']
-  if (!ses) {
-    initPartition('tor-test')
-    module.exports.checkTorAvailable(cb)
-    return
-  }
-
-  const proxyConfig = {
-    proxyRules: 'socks5://127.0.0.1:9050,direct://'
-  }
-  ses.setProxy(proxyConfig, () => {
-    request('https://check.torproject.org/?TorButton=true', (err, response, body) => {
-      let success = null
-      if (err) {
-        console.log('Could not check Tor status', err)
-      } else if (body && body.includes('id="TorCheckResult" target="success"')) {
-        // success
-        console.log('Tor is running!')
-        success = true
-      } else if (body && body.includes('id="TorCheckResult" target="failure"')) {
-        // we are not using Tor
-        console.log('Tor is not running.')
-        success = false
-      } else {
-        // unknown error
-        console.log('Bad response from check.torproject.org. HTTP status:',
-          response.statusCode)
-      }
-      appActions.torAvailable(success)
-      if (cb) {
-        cb(success)
-      }
-    }, ses)
-  })
-}
-
 module.exports.setTorNewIdentity = (url, tabId) => {
   const ses = session.fromPartition('persist:tor')
   if (!ses || !url) {
@@ -704,7 +662,6 @@ function initSession (ses, partition) {
 
 const initPartition = (partition) => {
   const isTorPartition = partition === 'persist:tor'
-  const isTorTestPartition = partition === 'tor-test'
   // Partitions can only be initialized once the app is ready
   if (!app.isReady()) {
     partitionsToInitialize.push(partition)
@@ -714,16 +671,6 @@ const initPartition = (partition) => {
     return
   }
   initializedPartitions[partition] = true
-
-  if (isTorTestPartition) {
-    // This partition is only used to check for Tor proxy availability
-    let ses = session.fromPartition(partition, {
-      parent_partition: '',
-      cache: false
-    })
-    registeredSessions[partition] = ses
-    return
-  }
 
   let fns = [initSession,
     userPrefs.init,
