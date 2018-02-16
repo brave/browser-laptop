@@ -81,17 +81,13 @@ function getRewrittenUrl (url) {
 function applyRuleset (url, applicableRule) {
   var i, ruleset, exclusion, rule, fromPattern, newUrl, exclusionPattern
   ruleset = applicableRule.ruleset
-  // If the rule is default_off or has a specified platform, ignore it.
-  if (ruleset.$.default_off || ruleset.$.platform) {
-    return null
-  }
   exclusion = ruleset.exclusion
   rule = ruleset.rule
   // If covered by an exclusion, callback the original URL without trying any
   // more rulesets.
   if (exclusion) {
     for (i = 0; i < exclusion.length; ++i) {
-      exclusionPattern = new RegExp(exclusion[i].$.pattern)
+      exclusionPattern = new RegExp(exclusion[i].pattern)
       if (exclusionPattern.test(url)) {
         return null
       }
@@ -99,12 +95,12 @@ function applyRuleset (url, applicableRule) {
   }
   // Find the first rule that triggers a substitution
   for (i = 0; i < rule.length; ++i) {
-    fromPattern = new RegExp(rule[i].$.from)
-    newUrl = url.replace(fromPattern, rule[i].$.to)
+    fromPattern = new RegExp(rule[i].from)
+    newUrl = url.replace(fromPattern, rule[i].to)
     if (newUrl !== url) {
       return {
         redirectURL: newUrl,
-        ruleset: ruleset.$.f
+        ruleset: ruleset.name
       }
     }
   }
@@ -210,5 +206,6 @@ function canonicalizeUrl (url) {
  * Loads HTTPS Everywhere
  */
 module.exports.init = () => {
-  dataFile.init(module.exports.resourceName, undefined, startHttpsEverywhere, loadRulesets)
+  // Force redownload on startup for update from <0.21.x to 0.21.x or higher.
+  dataFile.init(module.exports.resourceName, undefined, startHttpsEverywhere, loadRulesets, true)
 }
