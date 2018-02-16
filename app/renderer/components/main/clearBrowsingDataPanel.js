@@ -48,11 +48,9 @@ class ClearBrowsingDataPanel extends React.Component {
     this.onHide()
 
     if (
-      (this.props.browserHistory &&
-      this.props.allSiteCookiesNoLocalStorage &&
-      this.props.cachedImagesAndFiles) ||
-      this.props.allSiteCookies
-
+      this.props.browserHistory &&
+      (this.props.allSiteCookiesNoLocalStorage || this.props.allSiteCookies) &&
+      this.props.cachedImagesAndFiles
     ) {
       ipc.send(messages.PREFS_RESTART)
     }
