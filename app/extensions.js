@@ -326,7 +326,7 @@ let generateEthwalletManifest = () => {
         38: 'ethereum-48.png',
         19: 'ethereum-16.png'
       },
-      default_popup: 'index.html',
+      default_popup: 'ethwallet-popup.html',
       default_title: 'Ethereum Wallet'
     },
     incognito: 'split',
