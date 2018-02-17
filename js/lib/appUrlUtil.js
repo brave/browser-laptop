@@ -126,7 +126,7 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:styles': module.exports.getBraveExtUrl('about-styles.html'),
   'about:contributions': module.exports.getBraveExtUrl('about-contributions.html'),
   'about:welcome': module.exports.getBraveExtUrl('about-welcome.html'),
-  'about:ethwallet': module.exports.getEthwalletExtUrl('')
+  'about:ethwallet': ethwalletOrigin
 })
 
 module.exports.isIntermediateAboutPage = (location) =>
@@ -277,8 +277,8 @@ function getPath (input) {
   if (typeof input !== 'string') {
     return ''
   }
-  if (input.startsWith('about:ethwallet')) {
-    return input.split('/')[1]
+  if (input.startsWith('about:ethwallet/')) {
+    return input.split('about:ethwallet/')[1]
   } else if (input.startsWith(ethwalletOrigin)) {
     return input.split(ethwalletOrigin)[1]
   }
