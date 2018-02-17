@@ -37,6 +37,57 @@ describe('appUrlUtil test', function () {
         'chrome-extension://fmdpfempfmekjkcfdehndghogpnpjeno/')
     })
   })
+  describe('getEthwalletExtUrl', function () {
+    it('arg', function () {
+      assert.equal(appUrlUtil.getEthwalletExtUrl('index.html'),
+        'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp/index.html')
+    })
+    it('no arg', function () {
+      assert.equal(appUrlUtil.getEthwalletExtUrl(),
+        'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp/')
+    })
+  })
+  describe('getBaseUrl', function () {
+    it('no arg', function () {
+      assert.equal(appUrlUtil.getBaseUrl(), '')
+    })
+    it('builtin URL', function () {
+      assert.equal(appUrlUtil.getBaseUrl('about:preferences#security?abc=123'), 'about:preferences')
+      assert.equal(appUrlUtil.getBaseUrl('about:preferences?abc=123'), 'about:preferences')
+    })
+    it('ethwallet URL', function () {
+      assert.equal(appUrlUtil.getBaseUrl('about:ethwallet/test'), 'about:ethwallet')
+      assert.equal(appUrlUtil.getBaseUrl('chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp/index.html'), 'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp/')
+    })
+  })
+  describe('getSourceAboutUrl', function () {
+    it('no arg', function () {
+      assert.equal(appUrlUtil.getSourceAboutUrl(), undefined)
+    })
+    it('basic URL', function () {
+      assert.equal(appUrlUtil.getSourceAboutUrl('https://brave.com'), undefined)
+    })
+    it('about URLs', function () {
+      assert.equal(appUrlUtil.getSourceAboutUrl('chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp/index.html'), 'about:ethwallet/index.html')
+      assert.equal(appUrlUtil.getSourceAboutUrl('chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp/'), 'about:ethwallet')
+      assert.equal(appUrlUtil.getSourceAboutUrl('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-preferences.html'), 'about:preferences')
+      assert.equal(appUrlUtil.getSourceAboutUrl('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-preferences.html#security'), 'about:preferences#security')
+    })
+  })
+  describe('getTargetAboutUrl', function () {
+    it('no arg', function () {
+      assert.equal(appUrlUtil.getTargetAboutUrl(), undefined)
+    })
+    it('basic URL', function () {
+      assert.equal(appUrlUtil.getTargetAboutUrl('https://brave.com'), undefined)
+    })
+    it('aboutURLs', function () {
+      assert.equal(appUrlUtil.getTargetAboutUrl('about:blank'), 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-blank.html')
+      assert.equal(appUrlUtil.getTargetAboutUrl('about:preferences#test?123'), 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-preferences.html#test?123')
+      assert.equal(appUrlUtil.getTargetAboutUrl('about:ethwallet'), 'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp/index.html')
+      assert.equal(appUrlUtil.getTargetAboutUrl('about:ethwallet/index.html'), 'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp/index.html')
+    })
+  })
   describe('aboutUrls', function () {
     it('about:about', function () {
       assert.equal(appUrlUtil.aboutUrls.get('about:about'),

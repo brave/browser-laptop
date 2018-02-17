@@ -58,6 +58,7 @@ Brave.tar.bz2
 app/extensions/gen
 app/extensions/brave/gen
 app/extensions/torrent/gen
+app/extensions/ethwallet
 *.pfx
 js/constants/buildConfig.js
 

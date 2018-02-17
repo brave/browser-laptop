@@ -629,12 +629,14 @@ class AboutPreferences extends React.Component {
       settings: this.state.settings.set(key, value)
     })
     aboutActions.changeSetting(key, value)
+    console.log('on change setting', key, value)
     const settingsRequiringRestart = [
       settings.HARDWARE_ACCELERATION_ENABLED,
       settings.DO_NOT_TRACK,
       settings.LANGUAGE,
       settings.PDFJS_ENABLED,
       settings.TORRENT_VIEWER_ENABLED,
+      settings.ETHWALLET_ENABLED,
       settings.SMOOTH_SCROLL_ENABLED,
       settings.SITE_ISOLATION_ENABLED,
       settings.SEND_CRASH_REPORTS,

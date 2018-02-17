@@ -294,6 +294,37 @@ let generateTorrentManifest = () => {
   }
 }
 
+let generateEthwalletManifest = () => {
+  let cspDirectives = {
+    'default-src': '\'self\'',
+    'style-src': '\'self\' \'unsafe-inline\'',
+    'connect-src': 'blob: \'self\' http://localhost:* https://min-api.cryptocompare.com https://mini-api.cryptocompare.com',
+    'img-src': '\'self\' data:',
+    'script-src': '\'sha256-7B6rTuXUsu9shBeECmDFH4h7RDsfogQ3kIonJnIL40o=\' \'sha256-dHk4wOUZR8kQPod/eH4V2U8eAnISQFg5bqkG8wdrqiA=\' \'self\''
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    // allow access to webpack dev server resources
+    let devServer = 'localhost:' + process.env.npm_package_config_port
+    cspDirectives['default-src'] += ' http://' + devServer + ' ' + 'ws://' + devServer
+  }
+
+  return {
+    name: 'Ethereum Wallet',
+    description: l10n.translation('ethwalletDesc'),
+    manifest_version: 2,
+    version: '1.0',
+    content_security_policy: concatCSP(cspDirectives),
+    icons: {
+      128: 'ethereum-128.png',
+      48: 'ethereum-48.png',
+      16: 'ethereum-16.png'
+    },
+    incognito: 'split',
+    key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzrdMUtpj4PkN7uoeRC7pXsJyNC65iCWJObISzDQ/mCXerD3ATL54Y8TCkE1mS9O2tiZFY+og4g0GqLjT/M9GJ/Rjlj6cQqIaa9MnQ65H789V6rqPlTQyrd3udIylPJbr5aJ9RvuMcX8BKpT7SKcYvRSwZblKQ/OZ/a/5ylfM+QPyS5ZzooEq921I8eB4JF80aic/3cdU+Xmpyo/jdEe804/MemQ6kqlErXdNaFVU7fQ3lvCzWWcI+I3A1QbKSC2+G1HiToxllxU1gv+rAOsoHYwSkL2ZBTPkvnVBuV5vTS91GF3jGF9TMbw4m3TRNPJZkU32nfJy2JNaa1Ssnws+bQIDAQAB'
+  }
+}
+
 let generateSyncManifest = () => {
   let cspDirectives = {
     'default-src': '\'self\'',
@@ -507,7 +538,7 @@ module.exports.init = () => {
     }
     if (!extensionInfo.isLoaded(extensionId) && !extensionInfo.isLoading(extensionId)) {
       extensionInfo.setState(extensionId, extensionStates.LOADING)
-      if (extensionId === config.braveExtensionId || extensionId === config.torrentExtensionId || extensionId === config.cryptoTokenExtensionId || extensionId === config.syncExtensionId) {
+      if (extensionId === config.braveExtensionId || extensionId === config.torrentExtensionId || extensionId === config.ethwalletExtensionId || extensionId === config.cryptoTokenExtensionId || extensionId === config.syncExtensionId) {
         session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
         return
       }
@@ -554,6 +585,14 @@ module.exports.init = () => {
   loadExtension(config.cryptoTokenExtensionId, getComponentExtensionsPath('cryptotoken'), {}, 'component')
   extensionInfo.setState(config.syncExtensionId, extensionStates.REGISTERED)
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
+
+  if (getSetting(settings.ETHWALLET_ENABLED)) {
+    extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
+    loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
+  } else {
+    extensionInfo.setState(config.ethwalletExtensionId, extensionStates.DISABLED)
+    extensionActions.extensionDisabled(config.ethwalletExtensionId)
+  }
 
   if (getSetting(settings.TORRENT_VIEWER_ENABLED)) {
     extensionInfo.setState(config.torrentExtensionId, extensionStates.REGISTERED)
