@@ -596,7 +596,11 @@ module.exports.init = () => {
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
   if (getSetting(settings.ETHWALLET_ENABLED)) {
-    var geth = spawn(path.join(__dirname, 'Geth/unpacked/geth'), ['--rpc', '--rpccorsdomain', 'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp'])
+    var gethArgs = ['--light', '--rpc', '--rpccorsdomain', 'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp']
+    if (process.env.ETHEREUM_NETWORK === 'ropsten') {
+      gethArgs.push('--testnet')
+    }
+    var geth = spawn(path.join(__dirname, 'Geth/unpacked/geth'), gethArgs)
     geth.stdout.on('data', (data) => {
       console.warn(data.toString())
     })
