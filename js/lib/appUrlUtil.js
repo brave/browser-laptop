@@ -6,7 +6,6 @@ const Immutable = require('immutable')
 const path = require('path')
 const UrlUtil = require('./urlutil')
 const config = require('../constants/config')
-const urlParse = require('../../app/common/urlParse')
 
 const ethwalletOrigin = 'chrome-extension://' + config.ethwalletExtensionId + '/'
 
@@ -284,7 +283,6 @@ function getPath (input) {
     return input.split(ethwalletOrigin)[1]
   }
 }
-
 
 module.exports.navigatableTypes = ['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'chrome-devtools:', 'file:', 'view-source:', 'ftp:', 'magnet:']
 
