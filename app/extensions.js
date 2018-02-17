@@ -17,6 +17,7 @@ const path = require('path')
 const l10n = require('../js/l10n')
 const {bravifyText} = require('./renderer/lib/extensionsUtil')
 const {componentUpdater, session} = require('electron')
+const {spawn} = require('child_process')
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -587,6 +588,10 @@ module.exports.init = () => {
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
   if (getSetting(settings.ETHWALLET_ENABLED)) {
+    var geth = spawn('geth', ['--rpc', '--rpccorsdomain', '"chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp"'])
+    geth.stdout.on('data', (data) => {
+      console.warn(data.toString())
+    })
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
     loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
   } else {

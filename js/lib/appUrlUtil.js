@@ -295,7 +295,6 @@ function getPath (input) {
   }
 }
 
-
 module.exports.navigatableTypes = ['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'chrome-devtools:', 'file:', 'view-source:', 'ftp:', 'magnet:']
 
 /**
