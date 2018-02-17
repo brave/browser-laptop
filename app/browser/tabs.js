@@ -626,7 +626,7 @@ const api = {
         // forget last active trail in window tab
         // is detaching from
         const oldTab = getTabValue(oldTabId)
-        const detachedFromWindowId = oldTab.get('windowId')
+        const detachedFromWindowId = oldTab ? oldTab.get('windowId') : undefined
         if (detachedFromWindowId != null) {
           activeTabHistory.clearTabFromWindow(detachedFromWindowId, oldTabId)
         }
