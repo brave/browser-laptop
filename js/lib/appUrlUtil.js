@@ -9,8 +9,6 @@ const config = require('../constants/config')
 const isDarwin = require('../../app/common/lib/platformUtil').isDarwin()
 const urlParse = require('../../app/common/urlParse')
 
-const ethwalletOrigin = 'chrome-extension://' + config.ethwalletExtensionId + '/'
-
 module.exports.fileUrl = (filePath) => {
   // It's preferrable to call path.resolve but it's not available
   // because process.cwd doesn't exist in renderers like in file URL
@@ -57,14 +55,6 @@ module.exports.getTorrentExtUrl = function (relativeUrl) {
   }
 
   return 'chrome-extension://' + config.torrentExtensionId + '/' + relativeUrl
-}
-
-module.exports.getEthwalletExtUrl = function (relativeUrl) {
-  if (relativeUrl === undefined) {
-    relativeUrl = ''
-  }
-
-  return ethwalletOrigin + relativeUrl
 }
 
 module.exports.getExtensionsPath = function (extensionDir) {
@@ -136,8 +126,7 @@ module.exports.aboutUrls = new Immutable.Map({
   'about:styles': module.exports.getBraveExtUrl('about-styles.html'),
   'about:contributions': module.exports.getBraveExtUrl('about-contributions.html'),
   'about:printkeys': module.exports.getBraveExtUrl('about-printkeys.html'),
-  'about:welcome': module.exports.getBraveExtUrl('about-welcome.html'),
-  'about:ethwallet': ethwalletOrigin
+  'about:welcome': module.exports.getBraveExtUrl('about-welcome.html')
 })
 
 module.exports.isIntermediateAboutPage = (location) =>
@@ -161,18 +150,12 @@ const aboutUrlsReverse = new Immutable.Map(module.exports.aboutUrls.reduce((obj,
  * about:blank -> http://localhost:8000/about-blank/index.html
  */
 module.exports.getTargetAboutUrl = function (input) {
-  let url = module.exports.aboutUrls.get(getBaseUrl(input))
+  const url = module.exports.aboutUrls.get(getBaseUrl(input))
   if (!url) {
     return url
   }
-  const path = getPath(input)
-  url = path ? [url, path].join('') : url
   const hash = getHash(input)
-  url = hash ? [url, hash].join('#') : url
-  if (url === ethwalletOrigin) {
-    url = url + 'index.html'
-  }
-  return url
+  return hash && url ? [url, hash].join('#') : url
 }
 
 /**
@@ -181,15 +164,12 @@ module.exports.getTargetAboutUrl = function (input) {
  * http://localhost:8000/about-blank.html -> about:blank
  */
 module.exports.getSourceAboutUrl = function (input) {
-  let url = aboutUrlsReverse.get(getBaseUrl(input))
+  const url = aboutUrlsReverse.get(getBaseUrl(input))
   if (!url) {
     return url
   }
-  const path = getPath(input)
-  url = path ? [url, path].join('/') : url
   const hash = getHash(input)
-  url = hash ? [url, hash].join('#') : url
-  return url
+  return hash ? [url, hash].join('#') : url
 }
 
 /**
@@ -260,18 +240,8 @@ module.exports.isUrl = function (input) {
  * Gets base url from an about: url or its target mapping.
  */
 function getBaseUrl (input) {
-  if (typeof input !== 'string') {
-    return ''
-  }
-  input = input.split(/#|\?/)[0]
-  if (input.startsWith('about:ethwallet')) {
-    input = 'about:ethwallet'
-  } else if (input.startsWith(ethwalletOrigin)) {
-    input = ethwalletOrigin
-  }
-  return input
+  return (typeof input === 'string') ? input.split(/#|\?/)[0] : ''
 }
-
 module.exports.getBaseUrl = getBaseUrl
 
 /**
@@ -279,20 +249,6 @@ module.exports.getBaseUrl = getBaseUrl
  */
 function getHash (input) {
   return (typeof input === 'string') ? input.split('#')[1] : ''
-}
-
-/**
- * Gets path for ethwallet URLs
- */
-function getPath (input) {
-  if (typeof input !== 'string') {
-    return ''
-  }
-  if (input.startsWith('about:ethwallet/')) {
-    return input.split('about:ethwallet/')[1]
-  } else if (input.startsWith(ethwalletOrigin)) {
-    return input.split(ethwalletOrigin)[1]
-  }
 }
 
 module.exports.navigatableTypes = ['http:', 'https:', 'about:', 'chrome:', 'chrome-extension:', 'chrome-devtools:', 'file:', 'view-source:', 'ftp:', 'magnet:']
