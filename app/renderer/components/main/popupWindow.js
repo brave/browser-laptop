@@ -47,8 +47,22 @@ class PopupWindow extends React.Component {
       })
       webview.addEventListener('did-attach', () => {
         webview.enablePreferredSizeMode(true)
+        if (this.isWalletPopup) {
+          webview.style.height = '750px'
+          webview.style.width = '800px'
+          windowActions.setPopupWindowDetail(Immutable.fromJS({
+            left: this.props.left,
+            top: this.props.top,
+            height: 750,
+            width: 800,
+            src: this.props.src
+          }))
+        }
       })
       webview.addEventListener('preferred-size-changed', () => {
+        if (this.isWalletPopup) {
+          return
+        }
         webview.getPreferredSize((preferredSize) => {
           const width = preferredSize.width
           const height = preferredSize.height
@@ -72,6 +86,10 @@ class PopupWindow extends React.Component {
     if (e.keyCode === KeyCodes.ESC) {
       windowActions.setPopupWindowDetail()
     }
+  }
+
+  get isWalletPopup () {
+    return this.props.src && this.props.src.startsWith('chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp/')
   }
 
   mergeProps (state, ownProps) {
@@ -142,6 +160,7 @@ const styles = StyleSheet.create({
     padding: 0,
     position: 'absolute',
     userSelect: 'none',
+    overflowY: 'auto',
     zIndex: globalStyles.zindex.zindexPopupWindow
   },
 
