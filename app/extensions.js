@@ -321,6 +321,14 @@ let generateEthwalletManifest = () => {
       48: 'ethereum-48.png',
       16: 'ethereum-16.png'
     },
+    browser_action: {
+      default_icon: {
+        38: 'ethereum-48.png',
+        19: 'ethereum-16.png'
+      },
+      default_popup: 'index.html',
+      default_title: 'Ethereum Wallet'
+    },
     incognito: 'split',
     key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzrdMUtpj4PkN7uoeRC7pXsJyNC65iCWJObISzDQ/mCXerD3ATL54Y8TCkE1mS9O2tiZFY+og4g0GqLjT/M9GJ/Rjlj6cQqIaa9MnQ65H789V6rqPlTQyrd3udIylPJbr5aJ9RvuMcX8BKpT7SKcYvRSwZblKQ/OZ/a/5ylfM+QPyS5ZzooEq921I8eB4JF80aic/3cdU+Xmpyo/jdEe804/MemQ6kqlErXdNaFVU7fQ3lvCzWWcI+I3A1QbKSC2+G1HiToxllxU1gv+rAOsoHYwSkL2ZBTPkvnVBuV5vTS91GF3jGF9TMbw4m3TRNPJZkU32nfJy2JNaa1Ssnws+bQIDAQAB'
   }
@@ -588,7 +596,7 @@ module.exports.init = () => {
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
   if (getSetting(settings.ETHWALLET_ENABLED)) {
-    var geth = spawn('geth', ['--rpc', '--rpccorsdomain', '"chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp"'])
+    var geth = spawn('geth', ['--rpc', '--rpccorsdomain', 'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp'])
     geth.stdout.on('data', (data) => {
       console.warn(data.toString())
     })
