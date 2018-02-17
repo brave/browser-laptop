@@ -573,6 +573,13 @@ module.exports.init = () => {
     geth.stdout.on('data', (data) => {
       console.warn(data.toString())
     })
+    geth.on('exit', function (code, signal) {
+      geth.stdout.destroy();
+    });
+    geth.on('close', function (code, signal) {
+      geth.stdout.destroy();
+    });
+    
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
     loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
   } else {
