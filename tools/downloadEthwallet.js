@@ -1,6 +1,5 @@
 'use strict'
 
-const fs = require('fs')
 const path = require('path')
 const {removeSync, ensureDirSync, copySync} = require('fs-extra')
 
