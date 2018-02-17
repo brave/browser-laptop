@@ -569,7 +569,7 @@ module.exports.init = () => {
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
   if (getSetting(settings.ETHWALLET_ENABLED)) {
-    var geth = spawn('geth', ['--rpc', '--rpccorsdomain', '"chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp"'])
+    var geth = spawn('geth', ['--rpc', '--rpccorsdomain', 'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp'])
     geth.stdout.on('data', (data) => {
       console.warn(data.toString())
     })
