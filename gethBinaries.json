@@ -1,0 +1,115 @@
+{
+    "clients": {
+        "Geth": {
+            "platforms": {
+                "linux": {
+                    "ia32": {
+                        "bin": "geth",
+                        "commands": {
+                            "sanity": {
+                                "args": [
+                                    "version"
+                                ],
+                                "output": [
+                                    "Geth",
+                                    "1.8.0"
+                                ]
+                            }
+                        },
+                        "download": {
+                            "bin": "geth-linux-386-1.8.0-5f540757/geth",
+                            "sha256": "0e93dc1a730cfea24f3b33c151b515055b450e70552e069bd7337f865f0aceb5",
+                            "type": "tar",
+                            "url": "https://gethstore.blob.core.windows.net/builds/geth-linux-386-1.8.0-5f540757.tar.gz"
+                        }
+                    },
+                    "x64": {
+                        "bin": "geth",
+                        "commands": {
+                            "sanity": {
+                                "args": [
+                                    "version"
+                                ],
+                                "output": [
+                                    "Geth",
+                                    "1.8.0"
+                                ]
+                            }
+                        },
+                        "download": {
+                            "bin": "geth-linux-amd64-1.8.0-5f540757/geth",
+                            "sha256": "58b4264340eb8aac496cca284f25525620f35292e388f4d4b2961a1e9b062315",
+                            "type": "tar",
+                            "url": "https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.8.0-5f540757.tar.gz"
+                        }
+                    }
+                },
+                "mac": {
+                    "x64": {
+                        "bin": "geth",
+                        "commands": {
+                            "sanity": {
+                                "args": [
+                                    "version"
+                                ],
+                                "output": [
+                                    "Geth",
+                                    "1.8.0"
+                                ]
+                            }
+                        },
+                        "download": {
+                            "bin": "geth-darwin-amd64-1.8.0-5f540757/geth",
+                            "sha256": "4d5cf36f64b9e131b9b550144abe0b82dc57028da2e97bf435583f2091d790ea",
+                            "type": "tar",
+                            "url": "https://gethstore.blob.core.windows.net/builds/geth-darwin-amd64-1.8.0-5f540757.tar.gz"
+                        }
+                    }
+                },
+                "win": {
+                    "ia32": {
+                        "bin": "geth.exe",
+                        "commands": {
+                            "sanity": {
+                                "args": [
+                                    "version"
+                                ],
+                                "output": [
+                                    "Geth",
+                                    "1.8.0"
+                                ]
+                            }
+                        },
+                        "download": {
+                            "bin": "geth-windows-386-1.8.0-5f540757\\geth.exe",
+                            "sha256": "efd7174fb624b4633a1a4185c6cbed9d9db03e4b9169d66379a3e9d79883d0f0",
+                            "type": "zip",
+                            "url": "https://gethstore.blob.core.windows.net/builds/geth-windows-386-1.8.0-5f540757.zip"
+                        }
+                    },
+                    "x64": {
+                        "bin": "geth.exe",
+                        "commands": {
+                            "sanity": {
+                                "args": [
+                                    "version"
+                                ],
+                                "output": [
+                                    "Geth",
+                                    "1.8.0"
+                                ]
+                            }
+                        },
+                        "download": {
+                            "bin": "geth-windows-amd64-1.8.0-5f540757\\geth.exe",
+                            "sha256": "34c00bd6764880f737ea6550b7602d97e33fd75b4d08661366f7c507912f6106",
+                            "type": "zip",
+                            "url": "https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-1.8.0-5f540757.zip"
+                        }
+                    }
+                }
+            },
+            "version": "1.8.0"
+        }
+    }
+}

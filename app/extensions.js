@@ -596,9 +596,15 @@ module.exports.init = () => {
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
   if (getSetting(settings.ETHWALLET_ENABLED)) {
-    var geth = spawn('geth', ['--rpc', '--rpccorsdomain', 'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp'])
+    var geth = spawn(path.join(__dirname, 'Geth/unpacked/geth'), ['--rpc', '--rpccorsdomain', 'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp'])
     geth.stdout.on('data', (data) => {
       console.warn(data.toString())
+    })
+    geth.on('exit', function (code, signal) {
+      geth.stdout.destroy()
+    })
+    geth.on('close', function (code, signal) {
+      geth.stdout.destroy()
     })
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
     loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')

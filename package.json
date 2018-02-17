@@ -169,6 +169,7 @@
     "empty-port": "0.0.2",
     "enzyme": "^2.9.1",
     "eslint-plugin-flowtype": "^2.40.1",
+    "ethereum-client-binaries": "^1.6.2",
     "flow-bin": "^0.53.1",
     "font-awesome-webpack": "~0.0.4",
     "git-rev-sync": "^1.8.0",

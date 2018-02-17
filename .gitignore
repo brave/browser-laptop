@@ -85,3 +85,5 @@ signature_generator.py
 
 # binaries
 app/extensions/bin
+# geth binary download
+app/Geth
