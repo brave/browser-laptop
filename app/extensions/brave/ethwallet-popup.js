@@ -1,10 +1,13 @@
 const ipc = window.chrome.ipcRenderer
+let batAddress = null
+const indexUrl = `${window.location.origin}/index.html`
 
 ipc.send('get-popup-bat-balance')
-ipc.on('popup-bat-balance', (e, amount) => {
+ipc.on('popup-bat-balance', (e, amount, walletAddress) => {
   if (amount) {
     document.getElementById('batBalance').innerText = `Brave Wallet Balance: ${amount} BAT`
   }
+  batAddress = walletAddress
 })
 
 const doAction = (message, args) => {
@@ -15,7 +18,22 @@ const doAction = (message, args) => {
 document.getElementById('openEthwallet').onclick = () => {
   doAction('app-create-tab-requested', {
     createProperties: {
-      url: window.location.origin + '/index.html'
+      url: indexUrl
     }
   })
+}
+
+document.getElementById('transferFunds').onclick = () => {
+  const sendUrl = `${window.location.origin}/#!send/${batAddress || ''}`
+  doAction('app-create-tab-requested', {
+    createProperties: {
+      url: indexUrl
+    }
+  })
+  // Meteor can't load sendUrl until indexUrl has already been loaded :(
+  setTimeout(() => {
+    doAction('app-load-url-in-active-tab-requested', {
+      url: sendUrl
+    })
+  }, 1000)
 }
