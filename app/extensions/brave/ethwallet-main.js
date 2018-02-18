@@ -3,6 +3,7 @@
 const ipc = window.chrome.ipcRenderer
 
 window.addEventListener('load', () => {
+  document.body.style.zoom = '120%'
   ipc.send('ethwallet-index-loaded')
 })
 
