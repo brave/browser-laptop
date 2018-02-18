@@ -20,7 +20,7 @@ const {app, componentUpdater, session, ipcMain} = require('electron')
 const {spawn} = require('child_process')
 const ledgerState = require('./common/state/ledgerState')
 
-const tmpFile = "/tmp/test"
+const tmpFile = '/tmp/test'
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -616,8 +616,8 @@ module.exports.init = () => {
       }
     })
     ipcMain.on('create-wallet', (e, args) => {
-      var pwd = JSON.parse(args)[0];
-      fs.writeFileSync(tmpFile, pwd);
+      var pwd = JSON.parse(args)[0]
+      fs.writeFileSync(tmpFile, pwd)
       var createAccountArgs = ['account', 'new', '--password', tmpFile]
       if (process.env.ETHEREUM_NETWORK === 'ropsten') {
         createAccountArgs.unshift('--testnet')
