@@ -604,7 +604,9 @@ module.exports.init = () => {
       '--rpccorsdomain',
       'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp',
       '--datadir',
-      path.join(app.getPath('userData'), 'ethereum')
+      path.join(app.getPath('userData'), 'ethereum'),
+      '--ipcpath',
+      path.join(app.getPath('userData'), 'ethereum', 'geth.ipc')
     ]
     if (process.env.ETHEREUM_NETWORK === 'ropsten') {
       gethArgs.push('--testnet')
