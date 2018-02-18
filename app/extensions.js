@@ -16,7 +16,7 @@ const fs = require('fs')
 const path = require('path')
 const l10n = require('../js/l10n')
 const {bravifyText} = require('./renderer/lib/extensionsUtil')
-const {componentUpdater, session, ipcMain} = require('electron')
+const {app, componentUpdater, session, ipcMain} = require('electron')
 const {spawn} = require('child_process')
 const ledgerState = require('./common/state/ledgerState')
 
@@ -570,7 +570,14 @@ module.exports.init = () => {
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
   if (getSetting(settings.ETHWALLET_ENABLED)) {
-    var gethArgs = ['--light', '--rpc', '--rpccorsdomain', 'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp']
+    var gethArgs = [
+      '--light',
+      '--rpc',
+      '--rpccorsdomain',
+      'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp',
+      '--datadir',
+      path.join(app.getPath('userData'), 'ethereum')
+    ]
     if (process.env.ETHEREUM_NETWORK === 'ropsten') {
       gethArgs.push('--testnet')
     }
