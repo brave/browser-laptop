@@ -48,7 +48,7 @@ class PopupWindow extends React.Component {
       webview.addEventListener('did-attach', () => {
         webview.enablePreferredSizeMode(true)
         if (this.isWalletPopup) {
-          const height = 120
+          const height = 260
           const width = 280
           webview.style.height = height + 'px'
           webview.style.width = width + 'px'

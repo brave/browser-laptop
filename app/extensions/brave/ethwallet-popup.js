@@ -19,6 +19,11 @@ const doAction = (message, args) => {
   ipc.send('dispatch-action', JSON.stringify([args]))
 }
 
+document.getElementById('createEthWallet').onclick = () => {
+  var pwd = document.getElementById("pwd").value;
+  ipc.send('create-wallet', JSON.stringify([pwd]));
+}
+
 document.getElementById('openEthwallet').onclick = () => {
   doAction('app-create-tab-requested', {
     createProperties: {
