@@ -8,7 +8,7 @@ const clientBinaries = fs.readFileSync('gethBinaries.json')
 const config = JSON.parse(clientBinaries)
 const mgr = new Manager(config)
 
-const GETH_BIN_PATH = path.join('app', 'bin')
+const GETH_BIN_PATH = path.join('app', 'extensions', 'bin')
 
 const oldPath = process.env.PATH
 

@@ -83,4 +83,4 @@ app/extensions/brave/content/scripts/sync.js
 signature_generator.py
 
 # geth binary download
-app/bin/geth*
+app/extensions/bin/geth*

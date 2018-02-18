@@ -576,9 +576,9 @@ module.exports.init = () => {
     }
     var geth
     if (process.platform === 'win32') {
-      geth = spawn(path.join(__dirname, 'bin/geth.exe'), gethArgs)
+      geth = spawn(path.join(getExtensionsPath('bin'), 'geth.exe'), gethArgs)
     } else {
-      geth = spawn(path.join(__dirname, 'bin/geth'), gethArgs)
+      geth = spawn(path.join(getExtensionsPath('bin'), 'geth'), gethArgs)
     }
     geth.stdout.on('data', (data) => {
       console.warn(data.toString())
