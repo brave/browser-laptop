@@ -642,8 +642,7 @@ module.exports.init = () => {
         popupWebContents.send('ethwallet-index-loaded')
       }
     })
-    ipcMain.on('create-wallet', (e, args) => {
-      var pwd = JSON.parse(args)[0]
+    ipcMain.on('create-wallet', (e, pwd) => {
       fs.writeFileSync(tmpFile, pwd)
       var createAccountArgs = ['account', 'new', '--password', tmpFile]
       if (process.env.ETHEREUM_NETWORK === 'ropsten') {
