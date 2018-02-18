@@ -20,18 +20,24 @@
       input {
         font-size: 14px;
         margin-left: 8px;
-        margin-top: 5px;
+        margin-bottom: 5px;
         width: 130px;
       }
       #label {
         font-size: 14px;
         color: white;
       }
+      .hidden {
+        display: none;
+      }
+      .visible {
+        display: block;
+      }
     </style>
     <script src="ethwallet-popup.js" async></script>
   </head>
   <body>
-      <div id="appContainer">
+      <div id="appContainer" class="visible">
           <div id='batBalance'></div>
           <div>
             <button id="openEthwallet">Open Ethereum Wallet</button>
@@ -40,14 +46,14 @@
             <button id="transferFunds">Transfer Funds to Brave Wallet...</button>
           </div>
           <div>
-            <button>Create ETH Wallet</button>
-	    <div>
-              <span id="label">Password: </span>
-              <input type="password" id="pwd" />
-              <button id="createEthWallet">Create</button>
-            </div>
-          <div>
+            <button id="createWallet">Create Ethereum Wallet</button>
           </div>
+      </div>
+      <div id="create" class="hidden">
+        <p id="label">Enter Wallet Password: </p>
+        <input type="password" id="pwd" />
+        <button id="createEthWallet">Create</button>
+        <button id="back">Back</button>
       </div>
   </body>
 </html>
