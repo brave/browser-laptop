@@ -16,7 +16,7 @@ const fs = require('fs')
 const path = require('path')
 const l10n = require('../js/l10n')
 const {bravifyText} = require('./renderer/lib/extensionsUtil')
-const {componentUpdater, session, ipcMain} = require('electron')
+const {app, componentUpdater, session, ipcMain} = require('electron')
 const {spawn} = require('child_process')
 const ledgerState = require('./common/state/ledgerState')
 
@@ -597,15 +597,22 @@ module.exports.init = () => {
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
   if (getSetting(settings.ETHWALLET_ENABLED)) {
-    var gethArgs = ['--light', '--rpc', '--rpccorsdomain', 'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp']
+    var gethArgs = [
+      '--light',
+      '--rpc',
+      '--rpccorsdomain',
+      'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp',
+      '--datadir',
+      path.join(app.getPath('userData'), 'ethereum')
+    ]
     if (process.env.ETHEREUM_NETWORK === 'ropsten') {
       gethArgs.push('--testnet')
     }
     var geth
     if (process.platform === 'win32') {
-      geth = spawn(path.join(__dirname, 'bin/geth.exe'), gethArgs)
+      geth = spawn(path.join(getExtensionsPath('bin'), 'geth.exe'), gethArgs)
     } else {
-      geth = spawn(path.join(__dirname, 'bin/geth'), gethArgs)
+      geth = spawn(path.join(getExtensionsPath('bin'), 'geth'), gethArgs)
     }
     geth.stdout.on('data', (data) => {
       console.warn(data.toString())
@@ -618,12 +625,20 @@ module.exports.init = () => {
     })
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
     loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
+    let popupWebContents = null
     ipcMain.on('get-popup-bat-balance', (e) => {
       const appState = appStore.getState()
       const ledgerInfo = ledgerState.getInfoProps(appState)
+      popupWebContents = e.sender
       e.sender.send('popup-bat-balance',
         ledgerInfo.get('balance'),
         ledgerInfo.getIn(['addresses', 'BAT']))
+    })
+    // Forward index load messages to the popup
+    ipcMain.on('ethwallet-index-loaded', () => {
+      if (popupWebContents) {
+        popupWebContents.send('ethwallet-index-loaded')
+      }
     })
   } else {
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.DISABLED)
