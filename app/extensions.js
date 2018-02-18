@@ -19,6 +19,7 @@ const {bravifyText} = require('./renderer/lib/extensionsUtil')
 const {app, componentUpdater, session, ipcMain} = require('electron')
 const {spawn} = require('child_process')
 const ledgerState = require('./common/state/ledgerState')
+const net = require('net')
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -641,35 +642,17 @@ module.exports.init = () => {
       }
     })
     ipcMain.on('create-wallet', (e, pwd) => {
-      const createAccountArgs = [
-        'account',
-        'new',
-        '--datadir',
-        path.join(app.getPath('userData'), 'ethereum')
-      ]
-      if (process.env.ETHEREUM_NETWORK === 'ropsten') {
-        createAccountArgs.push('--testnet')
-      }
+      var client = net.createConnection(path.join(app.getPath('userData'), 'ethereum', 'geth.ipc'))
 
-      if (process.platform === 'win32') {
-        geth = spawn(path.join(getExtensionsPath('bin'), 'geth.exe'), createAccountArgs)
-      } else {
-        geth = spawn(path.join(getExtensionsPath('bin'), 'geth'), createAccountArgs)
-      }
+      client.on('connect', () => {
+        client.write(JSON.stringify({ 'method': 'personal_newAccount', 'params': [pwd], 'id': 1, 'jsonrpc': '2.0' }))
+      })
 
-      geth.stdin.setEncoding('utf-8')
-      let count = 0
-      geth.stdout.on('data', (data) => {
-        if (count < 2) {
-          geth.stdin.write(pwd + '\n')
-        }
-        count = count + 1
-        if (count == 2) {
-          geth.stdin.end()
-          appActions.createTabRequested({
-            url: `chrome-extension://${config.ethwalletExtensionId}/index.html`
-          })
-        }
+      client.on('data', (data) => {
+        client.end()
+        appActions.createTabRequested({
+          url: `chrome-extension://${config.ethwalletExtensionId}/index.html`
+        })
       })
     })
   } else {
