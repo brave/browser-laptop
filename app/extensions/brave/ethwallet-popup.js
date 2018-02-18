@@ -6,9 +6,11 @@ const indexUrl = `${window.location.origin}/index.html`
 
 ipc.send('get-popup-bat-balance')
 ipc.on('popup-bat-balance', (e, amount, walletAddress) => {
+  /*
   if (amount) {
     document.getElementById('batBalance').innerText = `Brave Wallet Balance: ${amount} BAT`
   }
+  */
   batAddress = walletAddress
 })
 
