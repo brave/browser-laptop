@@ -621,7 +621,9 @@ module.exports.init = () => {
     ipcMain.on('get-popup-bat-balance', (e) => {
       const appState = appStore.getState()
       const ledgerInfo = ledgerState.getInfoProps(appState)
-      e.sender.send('popup-bat-balance', ledgerInfo.get('balance'))
+      e.sender.send('popup-bat-balance',
+        ledgerInfo.get('balance'),
+        ledgerInfo.getIn(['addresses', 'BAT']))
     })
   } else {
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.DISABLED)
