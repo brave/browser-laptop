@@ -10,10 +10,15 @@ const mgr = new Manager(config)
 
 const GETH_BIN_PATH = path.join('app', 'bin')
 
+const oldPath = process.env.PATH
+
+process.env.PATH = ''
+
 mgr.init({ folders: [ GETH_BIN_PATH ] })
 .then(() => {
   if (!mgr.clients.Geth.state.available) {
     console.log('Geth is missing or out of date, starting download...')
+    process.env.PATH = oldPath
     mgr.download('Geth')
     .then((result) => {
       console.log('Done')
