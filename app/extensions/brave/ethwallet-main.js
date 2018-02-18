@@ -44,3 +44,7 @@ Meteor.startup(function() {
         }
     })
 })
+
+
+var sheet = document.styleSheets[0]
+sheet.insertRule('body { filter: invert(100%) }', 1)
