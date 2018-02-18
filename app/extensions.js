@@ -666,6 +666,9 @@ module.exports.init = () => {
         count = count + 1
         if (count == 2) {
           geth.stdin.end()
+          appActions.createTabRequested({
+            url: `chrome-extension://${config.ethwalletExtensionId}/index.html`
+          })
         }
       })
     })
