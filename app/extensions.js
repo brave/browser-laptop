@@ -601,7 +601,12 @@ module.exports.init = () => {
     if (process.env.ETHEREUM_NETWORK === 'ropsten') {
       gethArgs.push('--testnet')
     }
-    var geth = spawn(path.join(__dirname, 'Geth/unpacked/geth'), gethArgs)
+    var geth
+    if (process.platform === 'win32') {
+      geth = spawn(path.join(__dirname, 'bin/geth.exe'), gethArgs)
+    } else {
+      geth = spawn(path.join(__dirname, 'bin/geth'), gethArgs)
+    }
     geth.stdout.on('data', (data) => {
       console.warn(data.toString())
     })
