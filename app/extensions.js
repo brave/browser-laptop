@@ -652,9 +652,6 @@ module.exports.init = () => {
 
       client.on('data', (data) => {
         client.end()
-        appActions.createTabRequested({
-          url: `chrome-extension://${config.ethwalletExtensionId}/index.html`
-        })
       })
     })
   } else {

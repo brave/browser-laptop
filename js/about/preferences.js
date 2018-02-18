@@ -629,7 +629,6 @@ class AboutPreferences extends React.Component {
       settings: this.state.settings.set(key, value)
     })
     aboutActions.changeSetting(key, value)
-    console.log('on change setting', key, value)
     const settingsRequiringRestart = [
       settings.HARDWARE_ACCELERATION_ENABLED,
       settings.DO_NOT_TRACK,
