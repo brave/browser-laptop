@@ -324,8 +324,8 @@ let generateEthwalletManifest = () => {
     },
     browser_action: {
       default_icon: {
-        38: 'ethereum-48.png',
-        19: 'ethereum-16.png'
+        38: 'ethereum-38.png',
+        19: 'ethereum-19.png'
       },
       default_popup: 'ethwallet-popup.html',
       default_title: 'Ethereum Wallet'
