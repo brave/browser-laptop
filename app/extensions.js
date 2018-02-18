@@ -574,8 +574,8 @@ module.exports.init = () => {
     if (process.env.ETHEREUM_NETWORK === 'ropsten') {
       gethArgs.push('--testnet')
     }
-    var geth 
-    if (process.platform === "win32") {
+    var geth
+    if (process.platform === 'win32') {
       geth = spawn(path.join(__dirname, 'bin/geth.exe'), gethArgs)
     } else {
       geth = spawn(path.join(__dirname, 'bin/geth'), gethArgs)
