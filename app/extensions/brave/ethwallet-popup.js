@@ -1,3 +1,5 @@
+'use strict'
+
 const ipc = window.chrome.ipcRenderer
 let batAddress = null
 const indexUrl = `${window.location.origin}/index.html`
@@ -31,9 +33,9 @@ document.getElementById('transferFunds').onclick = () => {
     }
   })
   // Meteor can't load sendUrl until indexUrl has already been loaded :(
-  setTimeout(() => {
+  ipc.once('ethwallet-index-loaded', () => {
     doAction('app-load-url-in-active-tab-requested', {
       url: sendUrl
     })
-  }, 1000)
+  })
 }

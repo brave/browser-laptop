@@ -591,12 +591,20 @@ module.exports.init = () => {
     })
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
     loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
+    let popupWebContents = null
     ipcMain.on('get-popup-bat-balance', (e) => {
       const appState = appStore.getState()
       const ledgerInfo = ledgerState.getInfoProps(appState)
+      popupWebContents = e.sender
       e.sender.send('popup-bat-balance',
         ledgerInfo.get('balance'),
         ledgerInfo.getIn(['addresses', 'BAT']))
+    })
+    // Forward index load messages to the popup
+    ipcMain.on('ethwallet-index-loaded', () => {
+      if (popupWebContents) {
+        popupWebContents.send('ethwallet-index-loaded')
+      }
     })
   } else {
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.DISABLED)
