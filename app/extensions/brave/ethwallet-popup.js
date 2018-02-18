@@ -20,22 +20,22 @@ const doAction = (message, args) => {
 }
 
 document.getElementById('createEthWallet').onclick = () => {
-  var pwd = document.getElementById("pwd").value;
-  ipc.send('create-wallet', JSON.stringify([pwd]));
+  var pwd = document.getElementById('pwd').value
+  ipc.send('create-wallet', pwd)
 }
 
-document.getElementById('createWallet').onclick = () => { 
-   document.getElementById("create").classList.add('visible');
-   document.getElementById("create").classList.remove('hidden');
-   document.getElementById("appContainer").classList.add('hidden');
-   document.getElementById("appContainer").classList.remove('visible');
+document.getElementById('createWallet').onclick = () => {
+   document.getElementById("create").classList.add('visible')
+   document.getElementById("create").classList.remove('hidden')
+   document.getElementById("appContainer").classList.add('hidden')
+   document.getElementById("appContainer").classList.remove('visible')
 }
 
-document.getElementById('back').onclick = () => { 
-   document.getElementById("create").classList.remove('visible');
-   document.getElementById("create").classList.add('hidden');
-   document.getElementById("appContainer").classList.remove('hidden');
-   document.getElementById("appContainer").classList.add('visible');
+document.getElementById('back').onclick = () => {
+   document.getElementById("create").classList.remove('visible')
+   document.getElementById("create").classList.add('hidden')
+   document.getElementById("appContainer").classList.remove('hidden')
+   document.getElementById("appContainer").classList.add('visible')
 }
 
 document.getElementById('openEthwallet').onclick = () => {

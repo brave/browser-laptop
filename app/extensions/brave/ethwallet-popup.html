@@ -13,18 +13,20 @@
         padding: 10px;
         margin: 10px;
         margin-left: 8px;
-        margin-top: 5px;
+        margin-top: 6px;
         text-align: center;
         width: 250px;
       }
       input {
-        font-size: 14px;
+        font-size: 15px;
         margin-left: 8px;
-        margin-bottom: 5px;
-        width: 130px;
+        margin-bottom: 8px;
+        margin-top: 8px;
+        width: 240px;
       }
       #label {
         font-size: 14px;
+        margin-left: 8px;
         color: white;
       }
       .hidden {
@@ -46,14 +48,20 @@
             <button id="transferFunds">Transfer Funds to Brave Wallet...</button>
           </div>
           <div>
-            <button id="createWallet">Create Ethereum Wallet</button>
+            <button id="createWallet">Create Ethereum Wallet...</button>
           </div>
       </div>
       <div id="create" class="hidden">
-        <p id="label">Enter Wallet Password: </p>
-        <input type="password" id="pwd" />
-        <button id="createEthWallet">Create</button>
-        <button id="back">Back</button>
+        <div id="label">Enter Wallet Password: </div>
+        <div>
+          <input type="password" id="pwd" />
+        </div>
+        <div>
+          <button id="createEthWallet">Create</button>
+        </div>
+        <div>
+          <button id="back">Back</button>
+        </div>
       </div>
   </body>
 </html>
