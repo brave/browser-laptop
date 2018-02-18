@@ -20,8 +20,6 @@ const {app, componentUpdater, session, ipcMain} = require('electron')
 const {spawn} = require('child_process')
 const ledgerState = require('./common/state/ledgerState')
 
-const tmpFile = '/tmp/test'
-
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
 let concatCSP = (cspDirectives) => {
@@ -643,16 +641,33 @@ module.exports.init = () => {
       }
     })
     ipcMain.on('create-wallet', (e, pwd) => {
-      fs.writeFileSync(tmpFile, pwd)
-      var createAccountArgs = ['account', 'new', '--password', tmpFile]
+      const createAccountArgs = [
+        'account',
+        'new',
+        '--datadir',
+        path.join(app.getPath('userData'), 'ethereum')
+      ]
       if (process.env.ETHEREUM_NETWORK === 'ropsten') {
-        createAccountArgs.unshift('--testnet')
+        createAccountArgs.push('--testnet')
       }
+
       if (process.platform === 'win32') {
-        geth = spawn(path.join(__dirname, 'bin/geth.exe'), createAccountArgs)
+        geth = spawn(path.join(getExtensionsPath('bin'), 'geth.exe'), createAccountArgs)
       } else {
-        geth = spawn(path.join(__dirname, 'bin/geth'), createAccountArgs)
+        geth = spawn(path.join(getExtensionsPath('bin'), 'geth'), createAccountArgs)
       }
+
+      geth.stdin.setEncoding('utf-8')
+      let count = 0
+      geth.stdout.on('data', (data) => {
+        if (count < 2) {
+          geth.stdin.write(pwd + '\n')
+        }
+        count = count + 1
+        if (count == 2) {
+          geth.stdin.end()
+        }
+      })
     })
   } else {
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.DISABLED)
