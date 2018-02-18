@@ -17,6 +17,16 @@
         text-align: center;
         width: 250px;
       }
+      input {
+        font-size: 14px;
+        margin-left: 8px;
+        margin-top: 5px;
+        width: 130px;
+      }
+      #label {
+        font-size: 14px;
+        color: white;
+      }
     </style>
     <script src="ethwallet-popup.js" async></script>
   </head>
@@ -28,6 +38,15 @@
           </div>
           <div>
             <button id="transferFunds">Transfer Funds to Brave Wallet...</button>
+          </div>
+          <div>
+            <button>Create ETH Wallet</button>
+	    <div>
+              <span id="label">Password: </span>
+              <input type="password" id="pwd" />
+              <button id="createEthWallet">Create</button>
+            </div>
+          <div>
           </div>
       </div>
   </body>
