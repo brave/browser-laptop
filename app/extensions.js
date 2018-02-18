@@ -16,8 +16,9 @@ const fs = require('fs')
 const path = require('path')
 const l10n = require('../js/l10n')
 const {bravifyText} = require('./renderer/lib/extensionsUtil')
-const {componentUpdater, session} = require('electron')
+const {componentUpdater, session, ipcMain} = require('electron')
 const {spawn} = require('child_process')
+const ledgerState = require('./common/state/ledgerState')
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -612,6 +613,11 @@ module.exports.init = () => {
     })
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
     loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
+    ipcMain.on('get-popup-bat-balance', (e) => {
+      const appState = appStore.getState()
+      const ledgerInfo = ledgerState.getInfoProps(appState)
+      e.sender.send('popup-bat-balance', ledgerInfo.get('balance'))
+    })
   } else {
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.DISABLED)
     extensionActions.extensionDisabled(config.ethwalletExtensionId)
