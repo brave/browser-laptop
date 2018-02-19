@@ -26,6 +26,7 @@ const getSetting = require('../../../../../js/settings').getSetting
 const aboutActions = require('../../../../../js/about/aboutActions')
 const urlUtil = require('../../../../../js/lib/urlutil')
 const {SettingCheckbox, SiteSettingCheckbox} = require('../../common/settings')
+const locale = require('../../../../../js/l10n')
 
 class LedgerTable extends ImmutableComponent {
   get synopsis () {
@@ -100,7 +101,10 @@ class LedgerTable extends ImmutableComponent {
   }
 
   banSite (hostPattern) {
-    aboutActions.changeSiteSetting(hostPattern, 'ledgerPaymentsShown', false)
+    const confMsg = locale.translation('banSiteConfirmation')
+    if (window.confirm(confMsg)) {
+      aboutActions.changeSiteSetting(hostPattern, 'ledgerPaymentsShown', false)
+    }
   }
 
   togglePinSite (hostPattern, pinned, percentage) {
