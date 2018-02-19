@@ -12,6 +12,7 @@ function FakeWindow (id) {
   this.webContents = Object.assign(new EventEmitter())
   this.webContents.send = this.webContents.emit
   this._isVisible = false
+  this.webContents.browserWindowOptions = { }
 }
 
 util.inherits(FakeWindow, EventEmitter)
