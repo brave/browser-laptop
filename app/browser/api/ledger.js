@@ -1488,12 +1488,7 @@ const getStateInfo = (state, parsedData) => {
   }
 
   if (parsedData.properties && parsedData.properties.wallet && parsedData.properties.wallet.keyinfo) {
-    let seed = parsedData.properties.wallet.keyinfo.seed
-    if (!(seed instanceof Uint8Array)) {
-      seed = new Uint8Array(Object.values(seed))
-    }
-
-    parsedData.properties.wallet.keyinfo.seed = seed
+    parsedData.properties.wallet.keyinfo.seed = uintKeySeed(parsedData.properties.wallet.keyinfo.seed)
   }
 
   const newInfo = {
