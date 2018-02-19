@@ -233,6 +233,7 @@ var rendererIdentifiers = function () {
     'dappDetected',
     'dappDismiss',
     'dappEnableExtension',
+    'banSiteConfirmation',
     // other
     'passwordsManager',
     'extensionsManager',
