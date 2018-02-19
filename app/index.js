@@ -208,6 +208,7 @@ app.on('ready', () => {
         appActions.newWindow()
       }
     } else {
+      const lastIndex = loadedPerWindowImmutableState.size - 1
       loadedPerWindowImmutableState
         .sort((a, b) => {
           let comparison = 0
@@ -222,8 +223,12 @@ app.on('ready', () => {
 
           return comparison
         })
-        .forEach((wndState) => {
-          appActions.newWindow(undefined, undefined, wndState)
+        .forEach((wndState, i) => {
+          const isLastWindow = i === lastIndex
+          if (CmdLine.shouldDebugWindowEvents && isLastWindow) {
+            console.log(`The restored window which should get focus has ${wndState.get('frames').size} frames`)
+          }
+          appActions.newWindow(undefined, isLastWindow ? undefined : { inactive: true }, wndState, true)
         })
     }
     process.emit(messages.APP_INITIALIZED)

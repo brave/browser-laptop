@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global performance */
-
 const appDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
 const appActions = require('../actions/appActions')
@@ -752,21 +750,18 @@ const doAction = (action) => {
         }
         break
       }
-    case windowConstants.WINDOW_ON_WINDOW_UPDATE:
     case appConstants.APP_WINDOW_READY:
-      {
-        const oldInfo = windowState.get('windowInfo', Immutable.Map())
-        let windowValue = makeImmutable(action.windowValue)
-
-        if (windowValue.get('focused')) {
-          windowValue = windowValue.set('focusTime', performance.timing.navigationStart + performance.now())
-        }
-        windowState = windowState.set('windowInfo', oldInfo.merge(windowValue))
-        break
-      }
     case appConstants.APP_WINDOW_UPDATED:
     case appConstants.APP_WINDOW_RESIZED:
-      windowState = windowState.set('windowInfo', action.windowValue)
+      let windowValue = makeImmutable(action.windowValue)
+      const oldInfo = windowState.get('windowInfo', Immutable.Map())
+      // detect if window is newly focused
+      if (windowValue.get('focused') && !oldInfo.get('focused')) {
+        // record time of focus so we can make sure the window
+        // z-index is restored on app-restart
+        windowValue = windowValue.set('focusTime', new Date().getTime())
+      }
+      windowState = windowState.set('windowInfo', oldInfo.merge(windowValue))
       break
     case windowConstants.WINDOW_TAB_MOVE_INCREMENTAL_REQUESTED:
       const sourceFrame = frameStateUtil.getActiveFrame(windowState)
