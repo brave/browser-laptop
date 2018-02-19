@@ -1659,6 +1659,13 @@ const appActions = {
     })
   },
 
+  onPublishersOptionUpdate: function (publishersArray) {
+    dispatch({
+      actionType: appConstants.APP_ON_PUBLISHERS_OPTION_UPDATE,
+      publishersArray
+    })
+  },
+
   onLedgerWalletCreate: function () {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_WALLET_CREATE

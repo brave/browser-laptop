@@ -587,7 +587,7 @@ const inspectP = (db, path, publisher, property, key, callback) => {
 }
 
 // TODO rename function name
-const verifiedP = (state, publisherKey, callback) => {
+const verifiedP = (state, publisherKey, callback, lastUpdate) => {
   const clientCallback = (err, result) => {
     if (err) {
       console.error(`Error verifying publisher ${publisherKey}: `, err.toString())
@@ -596,7 +596,7 @@ const verifiedP = (state, publisherKey, callback) => {
 
     if (callback) {
       if (result) {
-        callback(null, result)
+        callback(null, result, lastUpdate)
       } else {
         callback(err, {})
       }
@@ -747,6 +747,47 @@ const saveVisit = (state, publisherKey, options) => {
   return state
 }
 
+const onVerifiedPStatus = (error, result, lastUpdate) => {
+  if (error || result == null) {
+    return
+  }
+
+  if (!Array.isArray(result)) {
+    result = [result]
+  }
+
+  if (result.length === 0) {
+    return
+  }
+
+  const data = result.reduce((publishers, item) => {
+    if (item.err) {
+      return publishers
+    }
+
+    const publisherKey = item.publisher
+    let verified = false
+    if (item && item.properties) {
+      verified = !!item.properties.verified
+      savePublisherOption(publisherKey, 'verified', verified)
+    }
+
+    savePublisherOption(publisherKey, 'verifiedTimestamp', lastUpdate)
+
+    publishers.push({
+      publisherKey,
+      verified,
+      verifiedTimestamp: lastUpdate
+    })
+
+    return publishers
+  }, [])
+
+  if (data && data.length > 0) {
+    appActions.onPublishersOptionUpdate(data)
+  }
+}
+
 const checkVerifiedStatus = (state, publisherKeys, publisherTimestamp) => {
   if (publisherKeys == null) {
     return state
@@ -756,35 +797,22 @@ const checkVerifiedStatus = (state, publisherKeys, publisherTimestamp) => {
     publisherKeys = [publisherKeys]
   }
 
-  const checkKeys = []
   const lastUpdate = parseInt(publisherTimestamp || ledgerState.getLedgerValue(state, 'publisherTimestamp'))
-
-  publisherKeys.forEach(key => {
+  const checkKeys = publisherKeys.reduce((init, key) => {
     const lastPublisherUpdate = parseInt(ledgerState.getPublisherOption(state, key, 'verifiedTimestamp') || 0)
 
     if (lastUpdate > lastPublisherUpdate) {
-      checkKeys.push(key)
+      init.push(key)
     }
-  })
+
+    return init
+  }, [])
 
   if (checkKeys.length === 0) {
     return state
   }
 
-  state = module.exports.verifiedP(state, checkKeys, (error, result) => {
-    if (!error) {
-      const publisherKey = result.publisher
-
-      if (result && result.properties && result.properties) {
-        const verified = !!result.properties.verified
-        appActions.onPublisherOptionUpdate(publisherKey, 'verified', verified)
-        savePublisherOption(publisherKey, 'verified', verified)
-      }
-
-      appActions.onPublisherOptionUpdate(publisherKey, 'verifiedTimestamp', lastUpdate)
-      savePublisherOption(publisherKey, 'verifiedTimestamp', lastUpdate)
-    }
-  })
+  state = module.exports.verifiedP(state, checkKeys, onVerifiedPStatus, lastUpdate)
 
   return state
 }
@@ -2733,9 +2761,7 @@ const onPublisherTimestamp = (state, oldTimestamp, newTimestamp) => {
     return
   }
 
-  publishers.forEach((publisher, key) => {
-    module.exports.checkVerifiedStatus(state, key, newTimestamp)
-  })
+  module.exports.checkVerifiedStatus(state, Array.from(publishers.keys()), newTimestamp)
 }
 
 const checkReferralActivity = (state) => {
@@ -2906,7 +2932,8 @@ const getMethods = () => {
       activityRoundTrip,
       pathName,
       onReferralInit,
-      onReferralCodeRead
+      onReferralCodeRead,
+      onVerifiedPStatus
     }
   }
 
