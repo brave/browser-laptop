@@ -222,6 +222,11 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerState.setPublisherOption(state, key, prop, value)
         break
       }
+    case appConstants.APP_ON_PUBLISHERS_OPTION_UPDATE:
+      {
+        state = ledgerState.setPublishersOption(state, action.get('publishersArray'))
+        break
+      }
     case appConstants.APP_ON_LEDGER_WALLET_CREATE:
       {
         ledgerApi.boot()

@@ -52,7 +52,6 @@ describe('ledger api unit tests', function () {
   let ledgersetPromotionSpy
   let ledgergetPromotionSpy
   let ledgerSetTimeUntilReconcile
-  let onPublisherOptionUpdate
 
   const defaultAppState = Immutable.fromJS({
     cache: {
@@ -101,7 +100,6 @@ describe('ledger api unit tests', function () {
     onLedgerCallbackSpy = sinon.spy(appActions, 'onLedgerCallback')
     onBitcoinToBatBeginTransitionSpy = sinon.spy(appActions, 'onBitcoinToBatBeginTransition')
     onChangeSettingSpy = sinon.spy(appActions, 'changeSetting')
-    onPublisherOptionUpdate = sinon.spy(appActions, 'onPublisherOptionUpdate')
     mockery.registerMock('fs', fs)
 
     // default to tab state which should be tracked
@@ -558,12 +556,12 @@ describe('ledger api unit tests', function () {
     })
 
     describe('checkVerifiedStatus', function () {
-      let verifiedPSpy
+      let verifiedPSpy, onPublishersOptionUpdateSpy
       let returnValue = false
 
       before(function () {
-        onPublisherOptionUpdate.reset()
         verifiedPSpy = sinon.spy(ledgerApi, 'verifiedP')
+        onPublishersOptionUpdateSpy = sinon.spy(appActions, 'onPublishersOptionUpdate')
 
         ledgerApi.setClient({
           publisherInfo: function (publisherKey, callback) {
@@ -590,12 +588,12 @@ describe('ledger api unit tests', function () {
       afterEach(function () {
         returnValue = false
         verifiedPSpy.reset()
-        onPublisherOptionUpdate.reset()
+        onPublishersOptionUpdateSpy.reset()
       })
 
       after(function () {
         verifiedPSpy.restore()
-        onPublisherOptionUpdate.restore()
+        onPublishersOptionUpdateSpy.restore()
         ledgerApi.setClient(undefined)
       })
 
@@ -622,8 +620,7 @@ describe('ledger api unit tests', function () {
 
         const result = ledgerApi.checkVerifiedStatus(newState, 'test.io')
         assert.deepEqual(result.toJS(), newState.toJS())
-        assert(verifiedPSpy.calledOnce)
-        assert(onPublisherOptionUpdate.withArgs('test.io', 'verified', true).calledOnce)
+        assert(verifiedPSpy.withArgs(sinon.match.any, ['test.io'], sinon.match.any, 20).calledOnce)
       })
 
       it('change publisher verified status from true to false', function () {
@@ -634,8 +631,7 @@ describe('ledger api unit tests', function () {
 
         const result = ledgerApi.checkVerifiedStatus(newState, 'test.io')
         assert.deepEqual(result.toJS(), newState.toJS())
-        assert(verifiedPSpy.calledOnce)
-        assert(onPublisherOptionUpdate.withArgs('test.io', 'verified', false).calledOnce)
+        assert(verifiedPSpy.withArgs(sinon.match.any, ['test.io'], sinon.match.any, 20).calledOnce)
       })
 
       it('handle multiple publishers', function () {
@@ -653,9 +649,7 @@ describe('ledger api unit tests', function () {
           'test.io'
         ])
         assert.deepEqual(result.toJS(), newState.toJS())
-        assert(verifiedPSpy.withArgs(sinon.match.any, ['test1.io', 'test.io'], sinon.match.any).calledOnce)
-        assert.deepEqual(onPublisherOptionUpdate.getCall(0).args, ['test1.io', 'verified', false])
-        assert.deepEqual(onPublisherOptionUpdate.getCall(2).args, ['test.io', 'verified', false])
+        assert(verifiedPSpy.withArgs(sinon.match.any, ['test1.io', 'test.io'], sinon.match.any, 20).calledOnce)
       })
     })
 
@@ -2088,7 +2082,7 @@ describe('ledger api unit tests', function () {
 
     it('check publishers', function () {
       ledgerApi.onPublisherTimestamp(stateWithData, 10, 20)
-      assert(checkVerifiedStatusSpy.withArgs(sinon.match.any, 'clifton.io', 20).calledOnce)
+      assert(checkVerifiedStatusSpy.withArgs(sinon.match.any, ['clifton.io'], 20).calledOnce)
     })
 
     it('check multiple publishers', function () {
@@ -2098,8 +2092,7 @@ describe('ledger api unit tests', function () {
         }))
       ledgerApi.onPublisherTimestamp(multiple, 10, 20)
 
-      assert.equal(checkVerifiedStatusSpy.getCall(0).args[1], 'clifton.io')
-      assert.equal(checkVerifiedStatusSpy.getCall(1).args[1], 'brave.com')
+      assert(checkVerifiedStatusSpy.withArgs(sinon.match.any, ['clifton.io', 'brave.com'], 20).calledOnce)
     })
   })
 
@@ -2501,6 +2494,98 @@ describe('ledger api unit tests', function () {
       const returnedState = ledgerApi.referralCheck(state)
       assert.deepEqual(returnedState.toJS(), expectedState.toJS())
       assert(deleteUpdatePropSpy.calledOnce)
+    })
+  })
+
+  describe('onVerifiedPStatus', function () {
+    let onPublishersOptionUpdateSpy
+
+    before(function () {
+      onPublishersOptionUpdateSpy = sinon.spy(appActions, 'onPublishersOptionUpdate')
+    })
+
+    afterEach(function () {
+      onPublishersOptionUpdateSpy.reset()
+    })
+
+    after(function () {
+      onPublishersOptionUpdateSpy.restore()
+    })
+
+    it('null case', function () {
+      ledgerApi.onVerifiedPStatus()
+      assert(onPublishersOptionUpdateSpy.notCalled)
+    })
+
+    it('on error', function () {
+      ledgerApi.onVerifiedPStatus('error')
+      assert(onPublishersOptionUpdateSpy.notCalled)
+    })
+
+    it('convert regular object into array', function () {
+      ledgerApi.onVerifiedPStatus(null, {
+        SLD: 'clifton.io',
+        RLD: '',
+        QLD: '',
+        publisher: 'clifton.io',
+        properties: { timestamp: '6509162935841980427', verified: true }
+      }, 100)
+      assert(onPublishersOptionUpdateSpy.withArgs([
+        {
+          publisherKey: 'clifton.io',
+          verified: true,
+          verifiedTimestamp: 100
+        }
+      ]).calledOnce)
+    })
+
+    it('all publishers has errors', function () {
+      ledgerApi.onVerifiedPStatus(null, [
+        {
+          publisher: 'https://clifton.io/',
+          err: 'error'
+        },
+        {
+          publisher: 'https://brianbondy.com/',
+          err: 'error'
+        }
+      ], 100)
+      assert(onPublishersOptionUpdateSpy.notCalled)
+    })
+
+    it('publishers are ok', function () {
+      ledgerApi.onVerifiedPStatus(null, [
+        {
+          SLD: 'clifton.io',
+          RLD: '',
+          QLD: '',
+          publisher: 'clifton.io',
+          properties: { timestamp: '6509162935841980427', verified: true }
+        },
+        {
+          publisher: 'https://test.com/',
+          err: 'error'
+        },
+        {
+          SLD: 'brianbondy.com',
+          RLD: '',
+          QLD: '',
+          publisher: 'brianbondy.com',
+          properties: { timestamp: '6509162935841940427', verified: false }
+        }
+      ], 100)
+      assert(onPublishersOptionUpdateSpy.withArgs([
+        {
+          publisherKey: 'clifton.io',
+          verified: true,
+          verifiedTimestamp: 100
+        },
+        {
+          publisherKey: 'brianbondy.com',
+          verified: false,
+          verifiedTimestamp: 100
+        }
+      ]).calledOnce)
     })
   })
 })
