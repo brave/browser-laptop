@@ -1166,12 +1166,17 @@ const initSynopsis = (state) => {
   }
 
   const publishers = ledgerState.getPublishers(state)
+
   for (let item of publishers) {
     const publisherKey = item[0]
-    excludeP(publisherKey, (unused, exclude) => {
-      appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
-      savePublisherOption(publisherKey, 'exclude', exclude)
-    })
+    const publisher = item[1] || Immutable.Map()
+
+    if (!publisher.getIn(['options', 'exclude'])) {
+      excludeP(publisherKey, (unused, exclude) => {
+        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+        savePublisherOption(publisherKey, 'exclude', exclude)
+      })
+    }
   }
 
   state = updatePublisherInfo(state)
