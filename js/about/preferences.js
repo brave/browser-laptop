@@ -17,10 +17,12 @@ const {SettingTextbox} = require('../../app/renderer/components/common/textbox')
 const {SettingDropdown} = require('../../app/renderer/components/common/dropdown')
 const {DefaultSectionTitle} = require('../../app/renderer/components/common/sectionTitle')
 const BrowserButton = require('../../app/renderer/components/common/browserButton')
+const SitePermissionsPage = require('../../app/renderer/components/preferences/sitePermissionsPage')
 
 // Tabs
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
 const TabsTab = require('../../app/renderer/components/preferences/tabsTab')
+const ShieldsTab = require('../../app/renderer/components/preferences/shieldsTab')
 const SyncTab = require('../../app/renderer/components/preferences/syncTab')
 const PluginsTab = require('../../app/renderer/components/preferences/pluginsTab')
 const ExtensionsTab = require('../../app/renderer/components/preferences/extensionsTab')
@@ -43,16 +45,6 @@ const getSetting = require('../settings').getSetting
 const SortableTable = require('../../app/renderer/components/common/sortableTable')
 const searchProviders = require('../data/searchProviders')
 
-const adblock = appConfig.resourceNames.ADBLOCK
-const cookieblock = appConfig.resourceNames.COOKIEBLOCK
-const cookieblockAll = appConfig.resourceNames.COOKIEBLOCK_ALL
-const fingerprintingProtection = appConfig.resourceNames.FINGERPRINTING_PROTECTION
-const fingerprintingProtectionAll = appConfig.resourceNames.FINGERPRINTING_PROTECTION_ALL
-const adInsertion = appConfig.resourceNames.AD_INSERTION
-const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
-const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
-const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
-const noScript = appConfig.resourceNames.NOSCRIPT
 const flash = appConfig.resourceNames.FLASH
 
 const isDarwin = navigator.platform === 'MacIntel'
@@ -81,17 +73,6 @@ const permissionNames = {
   'flash': ['boolean', 'number'],
   'widevine': ['boolean', 'number'],
   'autoplay': ['boolean']
-}
-
-const braveryPermissionNames = {
-  'ledgerPaymentsShown': ['boolean', 'number'],
-  'shieldsUp': ['boolean'],
-  'adControl': ['string'],
-  'cookieControl': ['string'],
-  'safeBrowsing': ['boolean'],
-  'httpsEverywhere': ['boolean'],
-  'fingerprintingProtection': ['string'],
-  'noScript': ['boolean', 'number']
 }
 
 class GeneralTab extends ImmutableComponent {
@@ -328,228 +309,6 @@ class SearchTab extends ImmutableComponent {
   }
 }
 
-class SitePermissionsPage extends React.Component {
-  hasEntryForPermission (name) {
-    return this.props.siteSettings.some((value) => {
-      return value.get && this.props.names[name] ? this.props.names[name].includes(typeof value.get(name)) : false
-    })
-  }
-
-  isPermissionsNonEmpty () {
-    // Check whether there is at least one permission set
-    return this.props.siteSettings.some((value) => {
-      if (value && value.get) {
-        for (let name in this.props.names) {
-          const granted = value.get(name)
-          if (this.props.names[name].includes(typeof granted)) {
-            if (this.props.defaults) {
-              return this.props.defaults.get(name) !== granted
-            } else {
-              return true
-            }
-          }
-        }
-      }
-      return false
-    })
-  }
-
-  deletePermission (name, hostPattern) {
-    aboutActions.removeSiteSetting(hostPattern, name)
-  }
-
-  clearPermissions (name) {
-    aboutActions.clearSiteSettings(name)
-  }
-
-  render () {
-    return this.isPermissionsNonEmpty()
-    ? <div id='sitePermissionsPage'>
-      <DefaultSectionTitle data-l10n-id={this.props.defaults ? 'sitePermissionsExceptions' : 'sitePermissions'} />
-      <ul className='sitePermissions'>
-        {
-          Object.keys(this.props.names).map((name) =>
-            this.hasEntryForPermission(name)
-            ? <li>
-              <div>
-                <span data-l10n-id={name} className='permissionName' />
-                <span className='clearAll'>
-                  (
-                  <span className='clearAllLink' data-l10n-id='clearAll'
-                    onClick={this.clearPermissions.bind(this, name)} />
-                  )
-                </span>
-              </div>
-              <ul>
-                {
-                  this.props.siteSettings.map((value, hostPattern) => {
-                    if (!value.size) {
-                      return null
-                    }
-                    const granted = value.get(name)
-                    if (this.props.defaults &&
-                        this.props.defaults.get(name) === granted &&
-                        granted !== undefined) {
-                      return null
-                    }
-                    let statusText = ''
-                    let statusArgs
-                    if (this.props.names[name].includes(typeof granted)) {
-                      if (name === 'flash') {
-                        if (granted === 1) {
-                          // Flash is allowed just one time
-                          statusText = 'allowOnce'
-                        } else if (granted === false) {
-                          // Flash installer is never intercepted
-                          statusText = 'alwaysDeny'
-                        } else {
-                          // Show the number of days/hrs/min til expiration
-                          statusText = 'flashAllowAlways'
-                          statusArgs = {
-                            time: new Date(granted).toLocaleString()
-                          }
-                        }
-                      } else if (name === 'widevine') {
-                        if (granted === 1) {
-                          statusText = 'alwaysAllow'
-                        } else if (granted === 0) {
-                          statusText = 'allowOnce'
-                        } else {
-                          statusText = 'alwaysDeny'
-                        }
-                      } else if (name === 'noScript' && typeof granted === 'number') {
-                        if (granted === 1) {
-                          statusText = 'allowUntilRestart'
-                        } else if (granted === 0) {
-                          statusText = 'allowOnce'
-                        }
-                      } else if (typeof granted === 'string') {
-                        statusText = granted
-                      } else if (!this.props.defaults) {
-                        statusText = granted ? 'alwaysAllow' : 'alwaysDeny'
-                      } else {
-                        statusText = granted ? 'on' : 'off'
-                      }
-                      return <div className='permissionItem'>
-                        <span className='fa fa-times permissionAction'
-                          onClick={this.deletePermission.bind(this, name, hostPattern)} />
-                        <span className='permissionHost'>{hostPattern + ': '}</span>
-                        <span className='permissionStatus'
-                          data-l10n-id={statusText}
-                          data-l10n-args={statusArgs ? JSON.stringify(statusArgs) : null} />
-                      </div>
-                    }
-                    return null
-                  })
-                }
-              </ul>
-            </li>
-            : null)
-        }
-      </ul>
-    </div>
-    : null
-  }
-}
-
-class ShieldsTab extends ImmutableComponent {
-  constructor () {
-    super()
-    this.onChangeAdControl = this.onChangeAdControl.bind(this)
-    this.onToggleHTTPSE = this.onToggleSetting.bind(this, httpsEverywhere)
-    this.onToggleSafeBrowsing = this.onToggleSetting.bind(this, safeBrowsing)
-    this.onToggleNoScript = this.onToggleSetting.bind(this, noScript)
-  }
-  onChangeAdControl (e) {
-    if (e.target.value === 'showBraveAds') {
-      aboutActions.setResourceEnabled(adblock, true)
-      aboutActions.setResourceEnabled(trackingProtection, true)
-      aboutActions.setResourceEnabled(adInsertion, true)
-    } else if (e.target.value === 'blockAds') {
-      aboutActions.setResourceEnabled(adblock, true)
-      aboutActions.setResourceEnabled(trackingProtection, true)
-      aboutActions.setResourceEnabled(adInsertion, false)
-    } else {
-      aboutActions.setResourceEnabled(adblock, false)
-      aboutActions.setResourceEnabled(trackingProtection, false)
-      aboutActions.setResourceEnabled(adInsertion, false)
-    }
-  }
-  onChangeCookieControl (e) {
-    aboutActions.setResourceEnabled(cookieblock, e.target.value === 'block3rdPartyCookie')
-    aboutActions.setResourceEnabled(cookieblockAll, e.target.value === 'blockAllCookies')
-  }
-  onChangeFingerprintingProtection (e) {
-    aboutActions.setResourceEnabled(fingerprintingProtection, e.target.value === 'block3rdPartyFingerprinting')
-    aboutActions.setResourceEnabled(fingerprintingProtectionAll, e.target.value === 'blockAllFingerprinting')
-  }
-  onToggleSetting (setting, e) {
-    aboutActions.setResourceEnabled(setting, e.target.value)
-  }
-  render () {
-    return <div id='shieldsContainer'>
-      <DefaultSectionTitle data-l10n-id='braveryDefaults' />
-      <SettingsList>
-        <SettingItem dataL10nId='adControl'>
-          <SettingDropdown
-            value={this.props.braveryDefaults.get('adControl')}
-            onChange={this.onChangeAdControl}>
-            <option data-l10n-id='showBraveAds' value='showBraveAds' />
-            <option data-l10n-id='blockAds' value='blockAds' />
-            <option data-l10n-id='allowAdsAndTracking' value='allowAdsAndTracking' />
-          </SettingDropdown>
-        </SettingItem>
-        <SettingItem dataL10nId='cookieControl'>
-          <SettingDropdown
-            value={this.props.braveryDefaults.get('cookieControl')}
-            onChange={this.onChangeCookieControl}>
-            <option data-l10n-id='block3rdPartyCookie' value='block3rdPartyCookie' />
-            <option data-l10n-id='allowAllCookies' value='allowAllCookies' />
-            <option data-l10n-id='blockAllCookies' value='blockAllCookies' />
-          </SettingDropdown>
-        </SettingItem>
-        <SettingItem dataL10nId='fingerprintingProtection'>
-          <SettingDropdown
-            value={this.props.braveryDefaults.get('fingerprintingProtection')}
-            onChange={this.onChangeFingerprintingProtection}>
-            <option data-l10n-id='block3rdPartyFingerprinting' value='block3rdPartyFingerprinting' />
-            <option data-l10n-id='allowAllFingerprinting' value='allowAllFingerprinting' />
-            <option data-l10n-id='blockAllFingerprinting' value='blockAllFingerprinting' />
-          </SettingDropdown>
-        </SettingItem>
-        <SettingCheckbox checked={this.props.braveryDefaults.get('httpsEverywhere')} dataL10nId='httpsEverywhere' onChange={this.onToggleHTTPSE} />
-        <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScriptPref' onChange={this.onToggleNoScript} />
-        <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
-        {/* TODO: move this inline style to Aphrodite once refactored */}
-        <div style={{marginTop: '15px'}}>
-          <BrowserButton
-            primaryColor
-            l10nId='manageAdblockSettings'
-            onClick={aboutActions.createTabRequested.bind(null, {
-              url: 'about:adblock'
-            })} />
-        </div>
-      </SettingsList>
-      <DefaultSectionTitle data-l10n-id='shieldsPanelOptions' />
-      <SettingsList>
-        <SettingCheckbox dataL10nId='blockedCountBadge' prefKey={settings.BLOCKED_COUNT_BADGE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
-        <SettingCheckbox
-          dataL10nId='compactBraveryPanel'
-          dataTestId='compactBraveryPanelSwitch'
-          prefKey={settings.COMPACT_BRAVERY_PANEL}
-          settings={this.props.settings}
-          onChangeSetting={this.props.onChangeSetting}
-        />
-      </SettingsList>
-      <SitePermissionsPage siteSettings={this.props.siteSettings}
-        names={braveryPermissionNames}
-        defaults={this.props.braveryDefaults.merge({
-          ledgerPaymentsShown: true, shieldsUp: true})
-        } />
-    </div>
-  }
-}
-
 class SecurityTab extends ImmutableComponent {
   constructor (e) {
     super()
@@ -684,6 +443,7 @@ class AboutPreferences extends React.Component {
       bitcoinOverlayVisible: false,
       qrcodeOverlayVisible: false,
       paymentHistoryOverlayVisible: false,
+      deletedSitesOverlayVisible: false,
       advancedSettingsOverlayVisible: false,
       ledgerBackupOverlayVisible: false,
       ledgerRecoveryOverlayVisible: false,
@@ -951,6 +711,7 @@ class AboutPreferences extends React.Component {
           bitcoinOverlayVisible={this.state.bitcoinOverlayVisible}
           qrcodeOverlayVisible={this.state.qrcodeOverlayVisible}
           paymentHistoryOverlayVisible={this.state.paymentHistoryOverlayVisible}
+          deletedSitesOverlayVisible={this.state.deletedSitesOverlayVisible}
           advancedSettingsOverlayVisible={this.state.advancedSettingsOverlayVisible}
           ledgerBackupOverlayVisible={this.state.ledgerBackupOverlayVisible}
           ledgerRecoveryOverlayVisible={this.state.ledgerRecoveryOverlayVisible}
