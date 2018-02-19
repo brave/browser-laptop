@@ -23,6 +23,7 @@ const {makeImmutable} = require('../../common/state/immutableUtil')
 const frameStateUtil = require('../../../js/state/frameStateUtil')
 const menuUtil = require('../../common/lib/menuUtil')
 const locale = require('../../locale')
+const {getAllRendererWindows} = require('../windows')
 
 let closedFrames = new Immutable.OrderedMap()
 let lastClosedUrl = null
@@ -38,17 +39,17 @@ const menuReducer = (state, action) => {
         const frame = frameStateUtil.getFrameByTabId(state, action.tabId)
         if (frame) {
           menu.setCurrentLocation(frame.location)
-          menu.setMenuItemChecked(state, locale.translation('bookmarkPage'), menu.isCurrentLocationBookmarked(state))
+          menu.setMenuItemAttribute(state, locale.translation('bookmarkPage'), 'checked', menu.isCurrentLocationBookmarked(state))
         }
         break
       }
     case appConstants.APP_CHANGE_SETTING:
       if (action.key === settings.SHOW_BOOKMARKS_TOOLBAR) {
         // Update the checkbox next to "Bookmarks Toolbar" (Bookmarks menu)
-        menu.setMenuItemChecked(state, locale.translation('bookmarksToolbar'), action.value)
+        menu.setMenuItemAttribute(state, locale.translation('bookmarksToolbar'), 'checked', action.value)
       }
       if (action.key === settings.DEBUG_ALLOW_MANUAL_TAB_DISCARD) {
-        menu.setMenuItemChecked(state, 'Allow manual tab discarding', action.value)
+        menu.setMenuItemAttribute(state, 'Allow manual tab discarding', 'checked', action.value)
       }
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
@@ -118,6 +119,17 @@ const menuReducer = (state, action) => {
         if (clickedMenuItem) {
           const focusedWindow = BrowserWindow.getFocusedWindow()
           clickedMenuItem.click(clickedMenuItem, focusedWindow, focusedWindow.webContents)
+        }
+        break
+      }
+    case appConstants.APP_WINDOW_CLOSED:
+    case appConstants.APP_WINDOW_CREATED:
+      {
+        const windowCount = getAllRendererWindows().length
+        if (action.actionType === appConstants.APP_WINDOW_CLOSED && windowCount === 0) {
+          menu.updateShareMenuItems(state, false)
+        } else if (action.actionType === appConstants.APP_WINDOW_CREATED && windowCount === 1) {
+          menu.updateShareMenuItems(state, true)
         }
         break
       }
