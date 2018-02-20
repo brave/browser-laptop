@@ -12,6 +12,8 @@ const tabActionConsts = require('../../../../../app/common/constants/tabAction')
 
 require('../../../braveUnit')
 
+let getSettingsValue = true
+
 const windowState = Immutable.fromJS({
   activeFrameKey: 2,
   searchDetail: {},
@@ -111,6 +113,9 @@ describe('urlBarReducer', function () {
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('../../../js/stores/appStoreRenderer', fakeAppStoreRenderer)
     mockery.registerMock('./stores/appStoreRenderer', fakeAppStoreRenderer)
+    mockery.registerMock('../../../js/settings', { getSetting: (settingKey) => {
+      return getSettingsValue
+    }})
     urlBarReducer = require('../../../../../app/renderer/reducers/urlBarReducer')
   })
   after(function () {
@@ -215,11 +220,6 @@ describe('urlBarReducer', function () {
       })
       mockery.registerMock('electron', fakeElectron)
       mockery.registerMock('../../../js/stores/appStoreRenderer', fakeAppStoreRenderer)
-      mockery.registerMock('../../../js/settings', { getSetting: (settingKey, settingsCollection, value) => {
-        switch (settingKey) {
-          default: return true
-        }
-      }})
       this.suggestionClickHandlers = {
         navigateSiteClickHandler: sinon.mock()
       }
@@ -264,10 +264,17 @@ describe('urlBarReducer', function () {
         const hasCustomSearchProvider = newState.hasIn(['frames', 1, 'navbar', 'urlbar', 'searchDetail'])
         assert.equal(hasCustomSearchProvider, false)
       })
-      it('searches using default search provider in Private Tabs', () => {
+      it('searches using custom search provider in Private Tabs with Tor enabled', () => {
+        const newState = urlBarReducer(stateWithPrivateTab, action)
+        const hasCustomSearchProvider = newState.hasIn(['frames', 1, 'navbar', 'urlbar', 'searchDetail'])
+        assert.equal(hasCustomSearchProvider, true)
+      })
+      it('searches using default search provider in Private Tabs without Tor enabled', () => {
+        getSettingsValue = false
         const newState = urlBarReducer(stateWithPrivateTab, action)
         const hasCustomSearchProvider = newState.hasIn(['frames', 1, 'navbar', 'urlbar', 'searchDetail'])
         assert.equal(hasCustomSearchProvider, false)
+        getSettingsValue = true
       })
 
       it('searches using Private Search provider in Private Tabs, with relevant setting value', () => {

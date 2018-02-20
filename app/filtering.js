@@ -644,7 +644,7 @@ function registerForMagnetHandler (session) {
 }
 
 module.exports.setTorNewIdentity = (url, tabId) => {
-  const ses = session.fromPartition('persist:tor')
+  const ses = session.fromPartition(appConfig.tor.partition)
   if (!ses || !url) {
     return
   }
@@ -661,7 +661,7 @@ function initSession (ses, partition) {
 }
 
 const initPartition = (partition) => {
-  const isTorPartition = partition === 'persist:tor'
+  const isTorPartition = partition === appConfig.tor.partition
   // Partitions can only be initialized once the app is ready
   if (!app.isReady()) {
     partitionsToInitialize.push(partition)

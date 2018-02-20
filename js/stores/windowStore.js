@@ -352,7 +352,7 @@ const doAction = (action) => {
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
       if (!action.location) {
         windowState = windowState.set('closedFrames', new Immutable.List())
-      } else {
+      } else if (windowState.get('closedFrames')) {
         windowState = windowState.set('closedFrames',
           windowState.get('closedFrames').filterNot((frame) => frame.get('location') === action.location))
       }
