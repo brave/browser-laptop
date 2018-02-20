@@ -148,6 +148,10 @@ ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
   const tabId = tab.getId()
   aboutTabs[tabId] = {}
 
+  if (shouldDebugTabEvents) {
+    console.log(`Tab [${tabId}] ABOUT_COMPONENT_INITIALIZED`)
+  }
+
   const url = getSourceAboutUrl(tab.getURL())
   const location = getBaseUrl(url)
   if (location === 'about:preferences') {
@@ -188,6 +192,10 @@ const sendAboutDetails = (tabId, type, value, shared = false) => {
   if (aboutTabs[tabId] && !aboutTabs[tabId][type].get(value)) {
     const tab = webContentsCache.getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
+      if (shouldDebugTabEvents) {
+        console.log(`Tab [${tabId}] sendAboutDetails(${type})`)
+      }
+
       if (shared) {
         const handle = muon.shared_memory.create(makeJS(value))
         tab.sendShared(type, handle)
@@ -196,6 +204,28 @@ const sendAboutDetails = (tabId, type, value, shared = false) => {
       }
       aboutTabs[tabId][type] = new WeakMap()
       aboutTabs[tabId][type].set(value, true)
+    } else {
+      if (shouldDebugTabEvents) {
+        const isNull = !tab
+        const isDestroyed = tab && tab.isDestroyed()
+        const reason = isNull
+          ? 'tab is null'
+          : isDestroyed
+            ? 'tab is destroyed'
+            : ''
+        console.log(`Tab [${tabId}] skipping sendAboutDetails(${type}); ${reason}`)
+      }
+    }
+  } else {
+    if (shouldDebugTabEvents) {
+      const tabFalsey = !aboutTabs[tabId]
+      const tabHasValue = aboutTabs[tabId] && !!aboutTabs[tabId][type].get(value)
+      const reason = tabFalsey
+        ? 'tab is falsey'
+        : tabHasValue
+          ? 'tab has a value'
+          : ''
+      console.log(`Tab [${tabId}] skipping sendAboutDetails(${type}); ${reason}`)
     }
   }
 }
@@ -204,6 +234,9 @@ const updateAboutDetails = (tabId) => {
   const appState = appStore.getState()
   const tabValue = tabState.getByTabId(appState, tabId)
   if (!tabValue) {
+    if (shouldDebugTabEvents) {
+      console.log(`Tab [${tabId}] updateAboutDetails - unable to get tabValue from tabState`)
+    }
     return
   }
 
@@ -760,13 +793,21 @@ const api = {
 
   reload: (tabId, ignoreCache = false) => {
     const tab = webContentsCache.getWebContents(tabId)
+    let isIntermediate = false
     if (tab && !tab.isDestroyed()) {
       // TODO(bridiver) - removeEntryAtIndex for intermediate about pages after loading
-      if (isIntermediateAboutPage(getSourceAboutUrl(tab.getURL()))) {
+      isIntermediate = isIntermediateAboutPage(getSourceAboutUrl(tab.getURL()))
+      if (isIntermediate) {
         tab.goToOffset(-1)
       } else {
         tab.reload(ignoreCache)
       }
+    }
+
+    if (shouldDebugTabEvents) {
+      const isNull = !tab
+      const isDestroyed = tab && tab.isDestroyed()
+      console.log(`Tab [${tabId}] reload - ignoreCache=${ignoreCache}, tab null: ${isNull}, tab.isDestroyed: ${isDestroyed}, isIntermediateAboutPage: ${isIntermediate}`)
     }
   },
 
