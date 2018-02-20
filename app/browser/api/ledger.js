@@ -1804,10 +1804,13 @@ const uintKeySeed = (currentSeed) => {
     return currentSeed
   }
 
+  if (currentSeed instanceof Object) {
+    return new Uint8Array(Object.values(currentSeed))
+  }
+
   try {
     currentSeed.toJSON()
-    const seed = new Uint8Array(Object.values(currentSeed))
-    currentSeed = seed
+    return new Uint8Array(Object.values(currentSeed))
   } catch (err) { }
 
   return currentSeed
