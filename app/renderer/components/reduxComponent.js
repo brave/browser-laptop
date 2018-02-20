@@ -33,14 +33,6 @@ const mergePropsImpl = (stateProps, ownProps) => {
   return Object.assign({}, stateProps, ownProps)
 }
 
-const buildPropsImpl = (props, componentType, mergeStateToProps) => {
-  const fn = mergeStateToProps || mergePropsImpl
-  // use memoized function to help state equality checks
-  // since map.set('a', 1) !== map.set('a', 1)
-  // ...in other words, they have to actually be the same reference
-  return fn(selectComponentState(), props)
-}
-
 const checkParam = function (old, next, prop) {
   return isList(next[prop])
     ? !isSameHashCode(next[prop], old[prop])
@@ -121,8 +113,7 @@ class ReduxComponent extends ImmutableComponent {
   constructor (componentType, mergeStateToProps, props) {
     super(props)
     this.componentType = componentType
-    this.mergeStateToProps = mergeStateToProps
-    this.state = this.buildProps(this.props)
+    this.state = this.buildProps(this.props, mergeStateToProps || mergePropsImpl)
     this.checkForUpdates = this.checkForUpdates.bind(this)
     this.dontCheck = true
   }
@@ -181,8 +172,37 @@ class ReduxComponent extends ImmutableComponent {
     return mergePropsImpl(stateProps, ownProps)
   }
 
-  buildProps (props = this.props) {
-    return buildPropsImpl(props, this.componentType, this.mergeStateToProps)
+  buildProps (props = this.props, mergeStateToProps) {
+    // use memoized function which combines appState and windowState to help state equality checks
+    // since map.set('a', 1) !== map.set('a', 1)
+    // ...in other words, they have to actually be the same reference
+    const appState = selectComponentState()
+    // mergeStateToProps can be a function that returns a props object,
+    // or a factory function which returns another function which then returns a props object
+    // So the first time we run it, we may need to unwrap
+    if (!this.mergeStateToProps) {
+      // handle first run
+      if (!mergeStateToProps) {
+        throw new Error('No mergePropsToState function provided.')
+      }
+      // get initial result from fn
+      let mergedProps = mergeStateToProps(appState, props)
+      if (typeof mergedProps === 'function') {
+        // provided function is a factory function,
+        // so store the generated function and run it
+        // to get the first result
+        this.mergeStateToProps = mergedProps
+        mergedProps = mergedProps(appState, props)
+      } else {
+        // provided function is simple
+        this.mergeStateToProps = mergeStateToProps
+      }
+      // return first generated props
+      return mergedProps
+    } else {
+      // handle non-first-run, run saved function to get latest props
+      return this.mergeStateToProps(appState, props)
+    }
   }
 
   render () {

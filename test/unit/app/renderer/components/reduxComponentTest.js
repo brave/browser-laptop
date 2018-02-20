@@ -198,4 +198,31 @@ describe('ReduxComponent', function () {
     // make sure the exact same state object is given to each component
     assert.strictEqual(component1State, component2State, 'Each component state is strict equal')
   })
+
+  it('accepts generator function as mergeProps', function () {
+    const testProps = {
+      testProp: 'testValue',
+      testDeepProps: {
+        testDeepProp: 4
+      }
+    }
+    const realMergeProps = sinon.stub().returns(Object.assign({}, testProps))
+    const mergePropsGenerator = sinon.stub().returns(realMergeProps)
+    class ComponentPropsLogger extends React.Component {
+      render () {
+        return null
+      }
+    }
+    const renderFn = sinon.stub(ComponentPropsLogger.prototype, 'render').returns(null)
+    let Component = ReduxComponent.connect(ComponentPropsLogger, mergePropsGenerator)
+    mount(<Component />)
+    assert.equal(renderFn.callCount, 1, 'react component render was called once')
+    const actualRenderThis = renderFn.thisValues[0]
+    assert.isOk(actualRenderThis, 'react component render was providing a `this`')
+    assert.deepEqual(actualRenderThis.props, testProps, 'result of mergeProps was provided as `this.props` in react component render')
+    // update store to make sure generated mergeProps function is called again, and not the generator
+    appStoreEmitter.emit('change')
+    assert.equal(realMergeProps.callCount, 2, 'generated mergeProps function was called again after a store update')
+    assert.equal(mergePropsGenerator.callCount, 1, 'mergeProps generator function was only called once in order to generate mergeProps function')
+  })
 })
