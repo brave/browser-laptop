@@ -479,6 +479,13 @@ const isFirstFrameKeyInTabPage = (state, frameKey) => {
   return firstFrame && firstFrame.get('key') === frameKey
 }
 
+/**
+ * Check if frame is tor private tab
+ */
+function isTor (frame) {
+  return !!(frame && frame.get('isPrivate') && getSetting(settings.USE_TOR_PRIVATE_TABS))
+}
+
 const getTabPageIndex = (state) => {
   const tabPageIndex = state.getIn(['ui', 'tabs', 'tabPageIndex'], 0)
   const previewTabPageIndex = state.getIn(['ui', 'tabs', 'previewTabPageIndex'])
@@ -798,6 +805,7 @@ module.exports = {
   onFindBarHide,
   getTotalBlocks,
   isPinned,
+  isTor,
   isFirstFrameKeyInTabPage,
   getTabPageIndex,
   updateTabPageIndex,

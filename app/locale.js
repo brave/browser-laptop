@@ -154,7 +154,6 @@ var rendererIdentifiers = function () {
     'showAll',
     'newPrivateTab',
     'newSessionTab',
-    'newTorIdentity',
     'newWindow',
     'reopenLastClosedTab',
     'print',
@@ -288,8 +287,10 @@ var rendererIdentifiers = function () {
     'corruptedOverlayMessage',
     'corruptedOverlayText',
     // Tor
+    'newTorIdentity',
     'torCheckError',
-    'torCheckFailure'
+    'torCheckFailure',
+    'promotionClaimedErrorTitle'
   ].concat(countryCodes).concat(availableLanguages)
 }
 

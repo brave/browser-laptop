@@ -485,4 +485,23 @@ describe('urlutil', function () {
       assert.deepEqual(result, {data: 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU//5ErkJggg==', ext: 'png'})
     })
   })
+
+  describe('isOnionUrl', function () {
+    it('null url', function () {
+      const result = urlUtil.isOnionUrl(null)
+      assert.equal(result, false)
+    })
+    it('regular url', function () {
+      const result = urlUtil.isOnionUrl('http://bing.com')
+      assert.equal(result, false)
+    })
+    it('onion url', function () {
+      const result = urlUtil.isOnionUrl('https://facebookcorewwwi.onion/')
+      assert.equal(result, true)
+    })
+    it('weird onion url', function () {
+      const result = urlUtil.isOnionUrl('hTtpS://ABCDEF.onioN/?test=1#abc')
+      assert.equal(result, true)
+    })
+  })
 })

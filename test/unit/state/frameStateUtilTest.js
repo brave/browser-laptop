@@ -492,4 +492,29 @@ describe('frameStateUtil', function () {
       assert.equal(result, true)
     })
   })
+
+  describe('isTor', function () {
+    before(function () {
+      getSettingsValue = true
+    })
+    const frame1 = Immutable.Map({isPrivate: true})
+    const frame2 = Immutable.Map({isPrivate: false})
+    const frame3 = Immutable.Map({foobar: false})
+    it('null frame case', function () {
+      assert.equal(frameStateUtil.isTor(null), false)
+    })
+    it('other frame case', function () {
+      assert.equal(frameStateUtil.isTor(frame3), false)
+    })
+    it('regular frame case', function () {
+      assert.equal(frameStateUtil.isTor(frame2), false)
+    })
+    it('tor frame case', function () {
+      assert.equal(frameStateUtil.isTor(frame1), true)
+    })
+    it('tor disabled case', function () {
+      getSettingsValue = false
+      assert.equal(frameStateUtil.isTor(frame1), false)
+    })
+  })
 })
