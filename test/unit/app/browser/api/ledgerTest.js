@@ -2201,6 +2201,41 @@ describe('ledger api unit tests', function () {
       173
     ])
 
+    const object = {
+      0: 32,
+      1: 87,
+      2: 30,
+      3: 26,
+      4: 223,
+      5: 56,
+      6: 224,
+      7: 31,
+      8: 213,
+      9: 136,
+      10: 248,
+      11: 95,
+      12: 136,
+      13: 56,
+      14: 250,
+      15: 78,
+      16: 179,
+      17: 121,
+      18: 255,
+      19: 162,
+      20: 195,
+      21: 39,
+      22: 143,
+      23: 136,
+      24: 18,
+      25: 140,
+      26: 49,
+      27: 216,
+      28: 221,
+      29: 154,
+      30: 78,
+      31: 173
+    }
+
     const uint = new Uint8Array(Object.values(buff))
 
     it('null case', function () {
@@ -2213,8 +2248,13 @@ describe('ledger api unit tests', function () {
       assert.deepStrictEqual(result, uint)
     })
 
-    it('seed needs to be converted', function () {
+    it('seed needs to be converted (buffer)', function () {
       const result = ledgerApi.uintKeySeed(buff)
+      assert.deepStrictEqual(result, uint)
+    })
+
+    it('seed needs to be converted (object)', function () {
+      const result = ledgerApi.uintKeySeed(object)
       assert.deepStrictEqual(result, uint)
     })
   })
