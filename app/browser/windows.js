@@ -334,6 +334,16 @@ const api = {
       win.once('closed', () => {
         appActions.windowClosed(windowId)
         cleanupWindow(windowId)
+        // if we have a bufferWindow, the 'window-all-closed'
+        // event will not fire once the last window is closed,
+        // so close the buffer window if this is the last closed window
+        // apart from the buffer window
+        if (!platformUtil.isDarwin() && api.getBufferWindow()) {
+          const remainingWindows = api.getAllRendererWindows().filter(win => win !== api.getBufferWindow())
+          if (!remainingWindows.length) {
+            api.closeBufferWindow()
+          }
+        }
       })
       win.on('blur', () => {
         appActions.windowBlurred(windowId)
