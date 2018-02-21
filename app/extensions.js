@@ -301,9 +301,9 @@ let generateEthwalletManifest = () => {
   let cspDirectives = {
     'default-src': '\'self\'',
     'style-src': '\'self\' \'unsafe-inline\'',
-    'connect-src': 'blob: \'self\' http://localhost:* https://min-api.cryptocompare.com https://mini-api.cryptocompare.com',
+    'connect-src': 'blob: \'self\' ws://localhost:* http://localhost:* https://min-api.cryptocompare.com https://mini-api.cryptocompare.com',
     'img-src': '\'self\' data:',
-    'script-src': '\'sha256-7B6rTuXUsu9shBeECmDFH4h7RDsfogQ3kIonJnIL40o=\' \'sha256-dHk4wOUZR8kQPod/eH4V2U8eAnISQFg5bqkG8wdrqiA=\' \'self\''
+    'script-src': '\'unsafe-eval\' \'unsafe-inline\' \'sha256-7B6rTuXUsu9shBeECmDFH4h7RDsfogQ3kIonJnIL40o\' \'sha256-zgjB35Pd2ax7Wwfk9iKnAH8r+gNrD2cHpxDkH81DHzw=\' \'safe\' \'self\''
   }
 
   if (process.env.NODE_ENV === 'development') {
