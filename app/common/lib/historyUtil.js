@@ -160,8 +160,8 @@ const mergeSiteDetails = (oldDetail, newDetail) => {
 }
 
 const getDetailFromFrame = (frame) => {
-  if (frame == null) {
-    return Immutable.Map()
+  if (frame == null || !frame.has('location')) {
+    return null
   }
 
   return makeImmutable({
