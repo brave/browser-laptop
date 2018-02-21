@@ -374,12 +374,6 @@ AppStore
       }
     }
   },
-  migrations: {
-    batMercuryTimestamp: integer, // when session is upgraded (and this new schema added)
-    btc2BatTimestamp: integer, // when call was made to backend to convert BTC => BAT
-    btc2BatNotifiedTimestamp: integer, // when user was shown "wallet upgraded" notification
-    btc2BatTransitionPending: boolean // true if user is being shown transition screen
-  },
   menu: {
     template: object // used on Windows and by our tests: template object with Menubar control
   },

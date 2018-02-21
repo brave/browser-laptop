@@ -165,8 +165,6 @@ class PaymentsTab extends ImmutableComponent {
 
   render () {
     const enabled = this.props.ledgerData.get('created')
-    const inTransition = this.props.ledgerData.getIn(['migration', 'btc2BatTransitionPending']) === true
-    const enableSettings = enabled && !inTransition
     const deletedSites = this.deletedSites
     const showDeletedSites = deletedSites.length > 0
 
@@ -333,11 +331,11 @@ class PaymentsTab extends ImmutableComponent {
                   <a className={css(
                     styles.switchWrap__mainIcons,
                     styles.mainIcons__settingsIcon,
-                    !enableSettings && styles.mainIcons__settingsIconDisabled
+                    !enabled && styles.mainIcons__settingsIconDisabled
                   )}
-                    data-test-id={!enableSettings ? 'advancedSettingsButtonLoading' : 'advancedSettingsButton'}
+                    data-test-id={!enabled ? 'advancedSettingsButtonLoading' : 'advancedSettingsButton'}
                     data-l10n-id='advancedSettingsIcon'
-                    onClick={enableSettings ? this.props.showOverlay.bind(this, 'advancedSettings') : () => {}}
+                    onClick={enabled ? this.props.showOverlay.bind(this, 'advancedSettings') : () => {}}
                   />
                 </div>
               </div>
