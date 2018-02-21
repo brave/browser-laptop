@@ -360,23 +360,28 @@ const tabsReducer = (state, action, immutableAction) => {
       }
       break
     case appConstants.APP_WINDOW_READY: {
+      // Get the window's id from the action or the sender
       if (!action.getIn(['createProperties', 'windowId'])) {
         const senderWindowId = action.getIn(['senderWindowId'])
         if (senderWindowId) {
           action = action.setIn(['createProperties', 'windowId'], senderWindowId)
         }
       }
-
-      const welcomeScreenProperties = {
-        'url': 'about:welcome',
-        'windowId': action.getIn(['createProperties', 'windowId'])
-      }
-
-      const shouldShowWelcomeScreen = state.getIn(['about', 'welcome', 'showOnLoad'])
-      if (shouldShowWelcomeScreen) {
-        setImmediate(() => tabs.create(welcomeScreenProperties))
-        // We only need to run welcome screen once
-        state = state.setIn(['about', 'welcome', 'showOnLoad'], false)
+      // Show welcome tab in first window on first start,
+      // but not in the buffer window.
+      const windowId = action.getIn(['createProperties', 'windowId'])
+      const bufferWindow = windows.getBufferWindow()
+      if (!bufferWindow || bufferWindow.id !== windowId) {
+        const welcomeScreenProperties = {
+          url: 'about:welcome',
+          windowId
+        }
+        const shouldShowWelcomeScreen = state.getIn(['about', 'welcome', 'showOnLoad'])
+        if (shouldShowWelcomeScreen) {
+          setImmediate(() => tabs.create(welcomeScreenProperties))
+          // We only need to run welcome screen once
+          state = state.setIn(['about', 'welcome', 'showOnLoad'], false)
+        }
       }
       break
     }
