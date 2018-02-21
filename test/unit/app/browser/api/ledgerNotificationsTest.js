@@ -11,19 +11,17 @@ const settings = require('../../../../../js/constants/settings')
 
 describe('ledgerNotifications unit test', function () {
   let fakeClock
-  let ledgerApi
   let ledgerNotificationsApi
   let appAction
 
   let paymentsEnabled
-  let paymentsNotifications
+  let paymentsNotifications = true
   let paymentsMinVisitTime = 5000
   let paymentsContributionAmount = 25
   let paymentsAllowPromotions = true
 
   const defaultAppState = Immutable.fromJS({
-    ledger: {},
-    migrations: {}
+    ledger: {}
   })
 
   before(function () {
@@ -58,7 +56,6 @@ describe('ledgerNotifications unit test', function () {
     })
 
     fakeClock = sinon.useFakeTimers()
-    ledgerApi = require('../../../../../app/browser/api/ledger')
     ledgerNotificationsApi = require('../../../../../app/browser/api/ledgerNotifications')
     appAction = require('../../../../../js/actions/appActions')
   })
@@ -91,224 +88,6 @@ describe('ledgerNotifications unit test', function () {
       ledgerNotificationsApi.setTimeOut(0)
       ledgerNotificationsApi.init()
       assert(ledgerNotificationsApi.getTimeOut(0))
-    })
-  })
-
-  describe('onLaunch', function () {
-    let showBraveWalletUpdatedStub
-    let transitionWalletToBatStub
-    beforeEach(function () {
-      showBraveWalletUpdatedStub = sinon.stub(ledgerNotificationsApi, 'showBraveWalletUpdated')
-      transitionWalletToBatStub = sinon.stub(ledgerApi, 'transitionWalletToBat')
-    })
-    afterEach(function () {
-      showBraveWalletUpdatedStub.restore()
-      transitionWalletToBatStub.restore()
-    })
-
-    describe('with BAT Mercury', function () {
-      let ledgerStateWithBalance
-
-      before(function () {
-        ledgerStateWithBalance = defaultAppState.merge(Immutable.fromJS({
-          ledger: {
-            info: {
-              balance: 200
-            }
-          },
-          firstRunTimestamp: 12345,
-          migrations: {
-            batMercuryTimestamp: 12345,
-            btc2BatTimestamp: 12345,
-            btc2BatNotifiedTimestamp: 12345
-          }
-        }))
-      })
-
-      describe('with wallet update message', function () {
-        describe('when payment notifications are disabled', function () {
-          before(function () {
-            paymentsEnabled = true
-            paymentsNotifications = false
-          })
-          it('does not notify the user', function () {
-            const targetSession = ledgerStateWithBalance
-              .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-              .setIn(['migrations', 'btc2BatTimestamp'], 54321)
-              .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
-            ledgerNotificationsApi.onLaunch(targetSession)
-            assert(showBraveWalletUpdatedStub.notCalled)
-          })
-        })
-
-        describe('when payments are disabled', function () {
-          before(function () {
-            paymentsEnabled = false
-            paymentsNotifications = true
-          })
-          it('does not notify the user', function () {
-            const targetSession = ledgerStateWithBalance
-              .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-              .setIn(['migrations', 'btc2BatTimestamp'], 54321)
-              .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
-            ledgerNotificationsApi.onLaunch(targetSession)
-            assert(showBraveWalletUpdatedStub.notCalled)
-          })
-        })
-
-        describe('user does not have funds', function () {
-          before(function () {
-            paymentsEnabled = true
-            paymentsNotifications = true
-          })
-          it('does not notify the user', function () {
-            const targetSession = ledgerStateWithBalance
-              .setIn(['ledger', 'info', 'balance'], 0)
-              .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-              .setIn(['migrations', 'btc2BatTimestamp'], 54321)
-              .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
-            ledgerNotificationsApi.onLaunch(targetSession)
-            assert(showBraveWalletUpdatedStub.notCalled)
-          })
-        })
-
-        describe('user did not have a session before BAT Mercury', function () {
-          before(function () {
-            paymentsEnabled = true
-            paymentsNotifications = true
-          })
-          it('does not notify the user', function () {
-            ledgerNotificationsApi.onLaunch(ledgerStateWithBalance)
-            assert(showBraveWalletUpdatedStub.notCalled)
-          })
-        })
-
-        describe('user has not had the wallet transitioned from BTC to BAT', function () {
-          before(function () {
-            paymentsEnabled = true
-            paymentsNotifications = true
-          })
-          it('does not notify the user', function () {
-            const targetSession = ledgerStateWithBalance
-              .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-              .setIn(['migrations', 'btc2BatTimestamp'], 32145)
-              .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
-            ledgerNotificationsApi.onLaunch(targetSession)
-            assert(showBraveWalletUpdatedStub.notCalled)
-          })
-        })
-
-        describe('user has already seen the notification', function () {
-          before(function () {
-            paymentsEnabled = true
-            paymentsNotifications = true
-          })
-          it('does not notify the user', function () {
-            const targetSession = ledgerStateWithBalance
-              .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-              .setIn(['migrations', 'btc2BatTimestamp'], 54321)
-              .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 54321)
-            ledgerNotificationsApi.onLaunch(targetSession)
-            assert(showBraveWalletUpdatedStub.notCalled)
-          })
-        })
-
-        describe('when payment notifications are enabled, payments are enabled, user has funds, user had wallet before BAT Mercury, wallet has been transitioned, and user not been shown message yet', function () {
-          before(function () {
-            paymentsEnabled = true
-            paymentsNotifications = true
-          })
-          it('notifies the user', function () {
-            const targetSession = ledgerStateWithBalance
-              .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-              .setIn(['migrations', 'btc2BatTimestamp'], 54321)
-              .setIn(['migrations', 'btc2BatNotifiedTimestamp'], 32145)
-            ledgerNotificationsApi.onLaunch(targetSession)
-            assert(showBraveWalletUpdatedStub.calledOnce)
-          })
-        })
-      })
-
-      describe('with the wallet transition from bitcoin to BAT', function () {
-        describe('when payment notifications are disabled', function () {
-          before(function () {
-            paymentsEnabled = true
-            paymentsNotifications = false
-          })
-          it('calls ledger.transitionWalletToBat', function () {
-            const targetSession = ledgerStateWithBalance
-              .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-              .setIn(['migrations', 'btc2BatTimestamp'], 32145)
-            ledgerNotificationsApi.onLaunch(targetSession)
-            assert(transitionWalletToBatStub.calledOnce)
-          })
-        })
-
-        describe('when payments are disabled', function () {
-          before(function () {
-            paymentsEnabled = false
-            paymentsNotifications = true
-          })
-          it('does not call ledger.transitionWalletToBat', function () {
-            ledgerNotificationsApi.onLaunch(ledgerStateWithBalance)
-            assert(transitionWalletToBatStub.notCalled)
-          })
-        })
-
-        describe('user does not have funds', function () {
-          before(function () {
-            paymentsEnabled = true
-            paymentsNotifications = true
-          })
-          it('calls ledger.transitionWalletToBat', function () {
-            const ledgerStateWithoutBalance = ledgerStateWithBalance
-              .setIn(['ledger', 'info', 'balance'], 0)
-              .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-              .setIn(['migrations', 'btc2BatTimestamp'], 32145)
-            ledgerNotificationsApi.onLaunch(ledgerStateWithoutBalance)
-            assert(transitionWalletToBatStub.calledOnce)
-          })
-        })
-
-        describe('user did not have a session before BAT Mercury', function () {
-          before(function () {
-            paymentsEnabled = true
-            paymentsNotifications = true
-          })
-          it('does not call ledger.transitionWalletToBat', function () {
-            ledgerNotificationsApi.onLaunch(ledgerStateWithBalance)
-            assert(transitionWalletToBatStub.notCalled)
-          })
-        })
-
-        describe('user has already upgraded', function () {
-          before(function () {
-            paymentsEnabled = true
-            paymentsNotifications = true
-          })
-          it('does not call ledger.transitionWalletToBat', function () {
-            const ledgerStateSeenNotification = ledgerStateWithBalance
-              .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-              .setIn(['migrations', 'btc2BatTimestamp'], 54321)
-            ledgerNotificationsApi.onLaunch(ledgerStateSeenNotification)
-            assert(transitionWalletToBatStub.notCalled)
-          })
-        })
-
-        describe('when payments are enabled and user had wallet before BAT Mercury', function () {
-          before(function () {
-            paymentsEnabled = true
-            paymentsNotifications = true
-          })
-          it('calls ledger.transitionWalletToBat', function () {
-            const targetSession = ledgerStateWithBalance
-              .setIn(['migrations', 'batMercuryTimestamp'], 32145)
-              .setIn(['migrations', 'btc2BatTimestamp'], 32145)
-            ledgerNotificationsApi.onLaunch(targetSession)
-            assert(transitionWalletToBatStub.calledOnce)
-          })
-        })
-      })
     })
   })
 

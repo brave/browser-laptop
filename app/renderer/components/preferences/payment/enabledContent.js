@@ -28,7 +28,6 @@ const LedgerTable = require('./ledgerTable')
 // style
 const globalStyles = require('../../styles/global')
 const {paymentStylesVariables} = require('../../styles/payment')
-const {loaderAnimation} = require('../../styles/animations')
 const closeButton = require('../../../../../img/toolbar/stoploading_btn.svg')
 const cx = require('../../../../../js/lib/classSet')
 
@@ -287,36 +286,9 @@ class EnabledContent extends ImmutableComponent {
     const ledgerData = this.props.ledgerData
     const walletStatusText = walletStatus(ledgerData)
     const contributionAmount = ledgerState.getContributionAmount(null, ledgerData.get('contributionAmount'), this.props.settings)
-    const inTransition = ledgerData.getIn(['migration', 'btc2BatTransitionPending']) === true
     const amountList = ledgerData.get('monthlyAmounts') || ledgerUtil.defaultMonthlyAmounts
 
     return <section className={css(styles.enabledContent)}>
-      <div className={css(
-        styles.enabledContent__loader,
-        inTransition && styles.enabledContent__loader_show
-      )}>
-        <div className={css(styles.enabledContent__loader__text)}>
-          <p data-l10n-id='leaderLoaderText1' />
-          <p data-l10n-id='leaderLoaderText2' />
-        </div>
-        <div className={css(styles.enabledContent__loader__wrap)}>
-          <div className={css(
-            styles.enabledContent__loader__wrap__line,
-            styles.enabledContent__loader__wrap__line_1,
-            !inTransition && styles.enabledContent__loader__wrap__line_off
-          )} />
-          <div className={css(
-            styles.enabledContent__loader__wrap__line,
-            styles.enabledContent__loader__wrap__line_2,
-            !inTransition && styles.enabledContent__loader__wrap__line_off
-          )} />
-          <div className={css(
-            styles.enabledContent__loader__wrap__line,
-            styles.enabledContent__loader__wrap__line_3,
-            !inTransition && styles.enabledContent__loader__wrap__line_off
-          )} />
-        </div>
-      </div>
       <div className={css(styles.enabledContent__walletBar)} data-test-id='walletBar'>
         <div className={css(gridStyles.row1col1, styles.enabledContent__walletBar__title)} data-l10n-id='monthlyBudget' />
         <div className={css(gridStyles.row1col2, styles.enabledContent__walletBar__title)} data-l10n-id='accountBalance' />
@@ -489,69 +461,6 @@ const styles = StyleSheet.create({
   enabledContent__footer__separator: {
     display: 'inline-block',
     padding: '0 10px'
-  },
-
-  enabledContent__loader: {
-    background: '#fafafa',
-    zIndex: 3,
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    width: '100%',
-    height: '100%',
-    margin: 0,
-    opacity: 0,
-    transform: 'translateX(-1000%)',
-    transition: 'opacity .4s ease-out, transform .1s .4s ease'
-  },
-
-  enabledContent__loader_show: {
-    opacity: 1,
-    transform: 'translateX(0)',
-    transition: 'opacity .4s ease-out'
-  },
-
-  enabledContent__loader__text: {
-    textAlign: 'center',
-    padding: '50px 0 20px',
-    display: 'block',
-    color: '#444'
-  },
-
-  enabledContent__loader__wrap: {
-    width: '45px',
-    left: 0,
-    right: 0,
-    margin: '50px auto 0'
-  },
-
-  enabledContent__loader__wrap__line: {
-    display: 'inline-block',
-    width: '15px',
-    height: '15px',
-    borderRadius: '15px',
-    animationName: [loaderAnimation],
-    animationDuration: '.6s',
-    animationIterationCount: 'infinite'
-  },
-
-  enabledContent__loader__wrap__line_1: {
-    backgroundColor: '#FF5000',
-    animationDelay: '.1s'
-  },
-
-  enabledContent__loader__wrap__line_2: {
-    backgroundColor: '#9E1F63',
-    animationDelay: '.2s'
-  },
-
-  enabledContent__loader__wrap__line_3: {
-    backgroundColor: '#662D91',
-    animationDelay: '.3s'
-  },
-
-  enabledContent__loader__wrap__line_off: {
-    animationName: 'none'
   },
 
   enabledContent__grant: {
