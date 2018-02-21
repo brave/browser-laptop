@@ -8,6 +8,7 @@ const {STATE_SITES} = require('../../../js/constants/stateConstants')
 const historyUtil = require('../lib/historyUtil')
 const urlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable, isMap} = require('./immutableUtil')
+const shouldLogWarnings = process.env.NODE_ENV !== 'production'
 
 const validateState = function (state) {
   state = makeImmutable(state)
@@ -33,8 +34,20 @@ const historyState = {
   },
 
   addSite: (state, siteDetail) => {
+    if (!siteDetail) {
+      if (shouldLogWarnings) {
+        console.error('historyState:addSite siteDetail was null')
+      }
+      return state
+    }
     let sites = historyState.getSites(state)
     let siteKey = historyUtil.getKey(siteDetail)
+    if (!siteKey) {
+      if (shouldLogWarnings) {
+        console.log('historyState:addSite siteKey was null for siteDetail:', (siteDetail && siteDetail.toJS) ? siteDetail.toJS() : siteDetail)
+      }
+      return state
+    }
     siteDetail = makeImmutable(siteDetail)
 
     const oldSite = sites.get(siteKey)
