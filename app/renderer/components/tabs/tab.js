@@ -311,6 +311,7 @@ class Tab extends React.Component {
     props.partOfFullPageSet = partOfFullPageSet
     props.showAudioTopBorder = audioState.showAudioTopBorder(currentWindow, frameKey, isPinned)
     props.centralizeTabIcons = tabUIState.centralizeTabIcons(currentWindow, frameKey, isPinned)
+    props.guestInstanceId = frame.get('guestInstanceId')
     // required only so that context menu shows correct state (mute vs unmute)
     props.isAudioMuted = audioState.isAudioMuted(currentWindow, frameKey)
     props.isAudio = audioState.canPlayAudio(currentWindow, frameKey)
@@ -403,6 +404,7 @@ class Tab extends React.Component {
       onMouseLeave={this.onMouseLeave}
       data-test-id='tab-area'
       data-tab-id={this.props.tabId}
+      data-guest-instance-id={this.props.guestInstanceId}
       data-frame-key={this.props.frameKey}
       ref={elementRef => { this.elementRef = elementRef }}
       >

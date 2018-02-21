@@ -290,10 +290,10 @@ const windowActions = {
    *
    * @param {number} frameProps - The frame props to center around
    */
-  setTabPageIndexByFrame: function (frameProps) {
+  setTabPageIndexByFrame: function (tabId) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_TAB_PAGE_INDEX,
-      frameProps
+      tabId
     })
   },
 

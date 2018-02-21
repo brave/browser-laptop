@@ -48,6 +48,10 @@ function getFrames (state) {
   return state.get('frames')
 }
 
+function getFrameKeys (state) {
+  return state.get('frames', Immutable.List()).map(frame => frame.get('key'))
+}
+
 function getSortedFrames (state) {
   return state.get('frames', Immutable.List()).sort(comparatorByKeyAsc)
 }
@@ -770,6 +774,7 @@ module.exports = {
   isPrivatePartition,
   isSessionPartition,
   getFrames,
+  getFrameKeys,
   getSortedFrames,
   getPinnedFrames,
   getNonPinnedFrames,
