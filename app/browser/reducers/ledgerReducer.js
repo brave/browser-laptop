@@ -13,7 +13,6 @@ const settings = require('../../../js/constants/settings')
 // State
 const ledgerState = require('../../common/state/ledgerState')
 const pageDataState = require('../../common/state/pageDataState')
-const migrationState = require('../../common/state/migrationState')
 const updateState = require('../../common/state/updateState')
 
 // Utils
@@ -230,10 +229,6 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_LEDGER_WALLET_CREATE:
       {
         ledgerApi.boot()
-        if (ledgerApi.getNewClient() === null) {
-          state = migrationState.setConversionTimestamp(state, new Date().getTime())
-          state = migrationState.setTransitionStatus(state, false)
-        }
         break
       }
     case appConstants.APP_ON_BOOT_STATE_FILE:
@@ -305,22 +300,6 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_LEDGER_INIT_READ:
       {
         state = ledgerApi.onInitRead(state, action.parsedData)
-        break
-      }
-    case appConstants.APP_ON_BTC_TO_BAT_NOTIFIED:
-      {
-        state = migrationState.setNotifiedTimestamp(state, new Date().getTime())
-        break
-      }
-    case appConstants.APP_ON_BTC_TO_BAT_BEGIN_TRANSITION:
-      {
-        state = migrationState.setTransitionStatus(state, true)
-        break
-      }
-    case appConstants.APP_ON_BTC_TO_BAT_TRANSITIONED:
-      {
-        state = migrationState.setConversionTimestamp(state, new Date().getTime())
-        state = migrationState.setTransitionStatus(state, false)
         break
       }
     case appConstants.APP_ON_LEDGER_QR_GENERATED:

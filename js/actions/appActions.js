@@ -1825,24 +1825,6 @@ const appActions = {
     })
   },
 
-  onBitcoinToBatNotified: function () {
-    dispatch({
-      actionType: appConstants.APP_ON_BTC_TO_BAT_NOTIFIED
-    })
-  },
-
-  onBitcoinToBatTransitioned: function () {
-    dispatch({
-      actionType: appConstants.APP_ON_BTC_TO_BAT_TRANSITIONED
-    })
-  },
-
-  onBitcoinToBatBeginTransition: function () {
-    dispatch({
-      actionType: appConstants.APP_ON_BTC_TO_BAT_BEGIN_TRANSITION
-    })
-  },
-
   onPublisherTimestamp: function (timestamp, updateList) {
     dispatch({
       actionType: appConstants.APP_ON_PUBLISHER_TIMESTAMP,

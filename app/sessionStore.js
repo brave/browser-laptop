@@ -1084,12 +1084,6 @@ module.exports.defaultAppState = () => {
         publishers: {}
       },
       promotion: {}
-    },
-    migrations: {
-      batMercuryTimestamp: now,
-      btc2BatTimestamp: now,
-      btc2BatNotifiedTimestamp: now,
-      btc2BatTransitionPending: false
     }
   }
 }

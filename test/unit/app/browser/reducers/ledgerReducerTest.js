@@ -88,8 +88,7 @@ describe('ledgerReducer unit tests', function () {
     ledgerReducer = require('../../../../../app/browser/reducers/ledgerReducer')
 
     appState = Immutable.fromJS({
-      ledger: {},
-      migrations: {}
+      ledger: {}
     })
   })
 
@@ -286,9 +285,6 @@ describe('ledgerReducer unit tests', function () {
     })
     it('calls ledgerApi.boot', function () {
       assert(bootSpy.calledOnce)
-    })
-    it('returns a non-modified state, if no transition in progress', function () {
-      assert.deepEqual(returnedState, appState)
     })
   })
 
@@ -529,42 +525,6 @@ describe('ledgerReducer unit tests', function () {
     })
     it('returns a modified state', function () {
       assert.notDeepEqual(returnedState, appState)
-    })
-  })
-
-  describe('APP_ON_BTC_TO_BAT_NOTIFIED', function () {
-    before(function () {
-      returnedState = ledgerReducer(appState, Immutable.fromJS({
-        actionType: appConstants.APP_ON_BTC_TO_BAT_NOTIFIED
-      }))
-    })
-    it('sets the notification timestamp', function () {
-      assert.notDeepEqual(returnedState, appState)
-      assert(returnedState.getIn(['migrations', 'btc2BatNotifiedTimestamp']))
-    })
-  })
-
-  describe('APP_ON_BTC_TO_BAT_TRANSITIONED', function () {
-    before(function () {
-      returnedState = ledgerReducer(appState, Immutable.fromJS({
-        actionType: appConstants.APP_ON_BTC_TO_BAT_TRANSITIONED
-      }))
-    })
-    it('sets the timestamp', function () {
-      assert.notDeepEqual(returnedState, appState)
-      assert(returnedState.getIn(['migrations', 'btc2BatTimestamp']))
-    })
-  })
-
-  describe('APP_ON_BTC_TO_BAT_BEGIN_TRANSITION', function () {
-    before(function () {
-      returnedState = ledgerReducer(appState, Immutable.fromJS({
-        actionType: appConstants.APP_ON_BTC_TO_BAT_BEGIN_TRANSITION
-      }))
-    })
-    it('sets the state variable', function () {
-      assert.notDeepEqual(returnedState, appState)
-      assert.equal(returnedState.getIn(['migrations', 'btc2BatTransitionPending']), true)
     })
   })
 
