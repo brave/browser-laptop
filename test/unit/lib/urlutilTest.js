@@ -299,6 +299,9 @@ describe('urlutil', function () {
     it('returns the punycode URL when given a valid URL', function () {
       assert.equal(urlUtil.getPunycodeUrl('http://brave:brave@ebаy.com:1234/brave#brave'), 'http://brave:brave@xn--eby-7cd.com:1234/brave#brave')
     })
+    it('returns the punycode URL when given a URL contains @', function () {
+      assert.equal(urlUtil.getPunycodeUrl('ebаy.com/@ebаy.com'), 'xn--eby-7cd.com/@xn--eby-7cd.com')
+    })
   })
 
   describe('isPotentialPhishingUrl', function () {
