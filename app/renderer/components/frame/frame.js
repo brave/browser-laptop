@@ -620,8 +620,17 @@ class Frame extends React.Component {
         // calling with setTimeout is an ugly hack for a race condition
         // with setTitle. We either need to delay this call until the title is
         // or add a way to update it
+        // However, it's possible that the frame could be destroyed, or in a bad
+        // way by then, so make sure we do a null check.
         setTimeout(() => {
-          appActions.addHistorySite(historyUtil.getDetailFromFrame(this.frame))
+          const siteDetail = historyUtil.getDetailFromFrame(this.frame)
+          if (siteDetail) {
+            appActions.addHistorySite(siteDetail)
+          } else if (process.env.NODE_ENV !== 'production') {
+            // log, in case we decide we want these entries to go in to the history
+            // but do not send a null entry to history as it will be rejected
+            console.error('frame: siteDetail was null when calling addHistorySite')
+          }
         }, 250)
       }
 
