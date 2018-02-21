@@ -108,6 +108,7 @@ class UrlBar extends React.Component {
         break
       case KeyCodes.ENTER:
         e.preventDefault()
+
         let location = this.urlInput ? this.getValue() : this.props.urlbarLocation
 
         if (location === null || location.length === 0) {
@@ -122,7 +123,10 @@ class UrlBar extends React.Component {
               ((typeof this.props.activeIndex === 'number' && this.props.activeIndex >= 0) ||
               (this.props.urlbarLocationSuffix && this.props.autocompleteEnabled))) {
             // Hack to make alt enter open a new tab for url bar suggestions when hitting enter on them.
+
+            // Suggest to restore() url from original tab if quick-new-tab open
             if (e.altKey) {
+              // this.restore();
               if (isDarwin) {
                 e.metaKey = true
               } else {
@@ -489,7 +493,7 @@ class UrlBar extends React.Component {
   }
 
   get showEvCert () {
-    if (this.props.titleMode) {
+    if (this.props.titleMode || this.props.isActive) {
       return null
     }
     return <span className='evCert' title={this.props.evCert}> {this.props.evCert} </span>

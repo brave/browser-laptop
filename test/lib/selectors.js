@@ -109,6 +109,7 @@ module.exports = {
   recoverWallet: '[data-test-id="recoverLedgerButton"]',
   recoverWalletFromFileButton: '[data-test-id="recoverFromFileButton"]',
   recoveryOverlayOkButton: '[data-test-id="recoveryOverlayOkButton"]',
+  recoveryOverlayErrorButton: '[data-test-id="recoveryOverlayErrorButton"]',
   saveWalletFile: '[data-test-id="saveRecoveryFileButton"]',
   balanceRecovered: '[data-test-id="balanceRecoveredMessage"]',
   balanceNotRecovered: '[data-test-id="ledgerRecoveryFailedMessage"]',
