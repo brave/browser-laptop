@@ -16,7 +16,10 @@ const fs = require('fs')
 const path = require('path')
 const l10n = require('../js/l10n')
 const {bravifyText} = require('./renderer/lib/extensionsUtil')
-const {componentUpdater, session} = require('electron')
+const {app, componentUpdater, session, ipcMain} = require('electron')
+const {spawn} = require('child_process')
+const ledgerState = require('./common/state/ledgerState')
+const net = require('net')
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -267,6 +270,45 @@ let generateTorrentManifest = () => {
   }
 }
 
+let generateEthwalletManifest = () => {
+  let cspDirectives = {
+    'default-src': '\'self\'',
+    'style-src': '\'self\' \'unsafe-inline\'',
+    'connect-src': 'blob: \'self\' http://localhost:* https://min-api.cryptocompare.com https://mini-api.cryptocompare.com',
+    'img-src': '\'self\' data:',
+    'script-src': '\'sha256-7B6rTuXUsu9shBeECmDFH4h7RDsfogQ3kIonJnIL40o=\' \'sha256-dHk4wOUZR8kQPod/eH4V2U8eAnISQFg5bqkG8wdrqiA=\' \'self\''
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    // allow access to webpack dev server resources
+    let devServer = 'localhost:' + process.env.npm_package_config_port
+    cspDirectives['default-src'] += ' http://' + devServer + ' ' + 'ws://' + devServer
+  }
+
+  return {
+    name: 'Ethereum Wallet',
+    description: l10n.translation('ethwalletDesc'),
+    manifest_version: 2,
+    version: '1.0',
+    content_security_policy: concatCSP(cspDirectives),
+    icons: {
+      128: 'ethereum-128.png',
+      48: 'ethereum-48.png',
+      16: 'ethereum-16.png'
+    },
+    browser_action: {
+      default_icon: {
+        38: 'ethereum-38.png',
+        19: 'ethereum-19.png'
+      },
+      default_popup: 'ethwallet-popup.html',
+      default_title: 'Ethereum Wallet'
+    },
+    incognito: 'split',
+    key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzrdMUtpj4PkN7uoeRC7pXsJyNC65iCWJObISzDQ/mCXerD3ATL54Y8TCkE1mS9O2tiZFY+og4g0GqLjT/M9GJ/Rjlj6cQqIaa9MnQ65H789V6rqPlTQyrd3udIylPJbr5aJ9RvuMcX8BKpT7SKcYvRSwZblKQ/OZ/a/5ylfM+QPyS5ZzooEq921I8eB4JF80aic/3cdU+Xmpyo/jdEe804/MemQ6kqlErXdNaFVU7fQ3lvCzWWcI+I3A1QbKSC2+G1HiToxllxU1gv+rAOsoHYwSkL2ZBTPkvnVBuV5vTS91GF3jGF9TMbw4m3TRNPJZkU32nfJy2JNaa1Ssnws+bQIDAQAB'
+  }
+}
+
 let generateSyncManifest = () => {
   let cspDirectives = {
     'default-src': '\'self\'',
@@ -480,7 +522,7 @@ module.exports.init = () => {
     }
     if (!extensionInfo.isLoaded(extensionId) && !extensionInfo.isLoading(extensionId)) {
       extensionInfo.setState(extensionId, extensionStates.LOADING)
-      if (extensionId === config.braveExtensionId || extensionId === config.torrentExtensionId || extensionId === config.cryptoTokenExtensionId || extensionId === config.syncExtensionId) {
+      if (extensionId === config.braveExtensionId || extensionId === config.torrentExtensionId || extensionId === config.ethwalletExtensionId || extensionId === config.cryptoTokenExtensionId || extensionId === config.syncExtensionId) {
         session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
         return
       }
@@ -527,6 +569,68 @@ module.exports.init = () => {
   loadExtension(config.cryptoTokenExtensionId, path.join(process.resourcesPath, 'cryptotoken'), {}, 'component')
   extensionInfo.setState(config.syncExtensionId, extensionStates.REGISTERED)
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
+
+  if (getSetting(settings.ETHWALLET_ENABLED)) {
+    var gethArgs = [
+      '--light',
+      '--rpc',
+      '--rpccorsdomain',
+      'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp',
+      '--datadir',
+      path.join(app.getPath('userData'), 'ethereum'),
+      '--ipcpath',
+      path.join(app.getPath('userData'), 'ethereum', 'geth.ipc')
+    ]
+    if (process.env.ETHEREUM_NETWORK === 'ropsten') {
+      gethArgs.push('--testnet')
+    }
+    var geth
+    if (process.platform === 'win32') {
+      geth = spawn(path.join(getExtensionsPath('bin'), 'geth.exe'), gethArgs)
+    } else {
+      geth = spawn(path.join(getExtensionsPath('bin'), 'geth'), gethArgs)
+    }
+    geth.stdout.on('data', (data) => {
+      console.warn(data.toString())
+    })
+    geth.on('exit', function (code, signal) {
+      geth.stdout.destroy()
+    })
+    geth.on('close', function (code, signal) {
+      geth.stdout.destroy()
+    })
+    extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
+    loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
+    let popupWebContents = null
+    ipcMain.on('get-popup-bat-balance', (e) => {
+      const appState = appStore.getState()
+      const ledgerInfo = ledgerState.getInfoProps(appState)
+      popupWebContents = e.sender
+      e.sender.send('popup-bat-balance',
+        ledgerInfo.get('balance'),
+        ledgerInfo.getIn(['addresses', 'BAT']))
+    })
+    // Forward index load messages to the popup
+    ipcMain.on('ethwallet-index-loaded', () => {
+      if (popupWebContents) {
+        popupWebContents.send('ethwallet-index-loaded')
+      }
+    })
+    ipcMain.on('create-wallet', (e, pwd) => {
+      var client = net.createConnection(path.join(app.getPath('userData'), 'ethereum', 'geth.ipc'))
+
+      client.on('connect', () => {
+        client.write(JSON.stringify({ 'method': 'personal_newAccount', 'params': [pwd], 'id': 1, 'jsonrpc': '2.0' }))
+      })
+
+      client.on('data', (data) => {
+        client.end()
+      })
+    })
+  } else {
+    extensionInfo.setState(config.ethwalletExtensionId, extensionStates.DISABLED)
+    extensionActions.extensionDisabled(config.ethwalletExtensionId)
+  }
 
   if (getSetting(settings.TORRENT_VIEWER_ENABLED)) {
     extensionInfo.setState(config.torrentExtensionId, extensionStates.REGISTERED)

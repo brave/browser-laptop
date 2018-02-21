@@ -659,7 +659,7 @@ const api = {
         // forget last active trail in window tab
         // is detaching from
         const oldTab = getTabValue(oldTabId)
-        const detachedFromWindowId = oldTab.get('windowId')
+        const detachedFromWindowId = oldTab ? oldTab.get('windowId') : undefined
         if (detachedFromWindowId != null) {
           activeTabHistory.clearTabFromWindow(detachedFromWindowId, oldTabId)
         }
@@ -845,6 +845,9 @@ const api = {
   },
 
   loadURLInActiveTab: (state, windowId, url) => {
+    if (windowId == null) {
+      windowId = BrowserWindow.getActiveWindow().id
+    }
     const tabValue = tabState.getActiveTab(state, windowId)
     if (tabValue) {
       api.loadURLInTab(state, tabValue.get('tabId'), url)

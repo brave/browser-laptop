@@ -57,6 +57,7 @@ Brave.tar.bz2
 app/extensions/gen
 app/extensions/brave/gen
 app/extensions/torrent/gen
+app/extensions/ethwallet
 *.pfx
 js/constants/buildConfig.js
 
@@ -80,3 +81,6 @@ app/extensions/brave/content/scripts/sync.js
 
 # script used for signing for widevine
 signature_generator.py
+
+# geth binary download
+app/extensions/bin/geth*
