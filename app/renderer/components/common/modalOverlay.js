@@ -52,6 +52,7 @@ class ModalOverlay extends ImmutableComponent {
     var close = null
     var title = null
     var subTitle = null
+    var titleImage = null
 
     const customDialogClassesStr = this.props.customDialogClasses ? this.props.customDialogClasses : ''
     const customDialogHeaderClassesStr = this.props.customDialogHeaderClasses ? this.props.customDialogHeaderClasses : ''
@@ -66,11 +67,15 @@ class ModalOverlay extends ImmutableComponent {
           testId='modalCloseButton'
           onClick={this.props.onHide}
         /> : null)
+      titleImage = (this.props.titleImage
+        ? <img className={css(styles.dialog__header__image)}
+          src={this.props.titleImage} /> : null)
       title = (this.props.title
         ? <div className={cx({
           [css(styles.dialog__header__title)]: true,
           [customTitleClassesStr]: true
         })} data-l10n-id={this.props.title}
+          data-l10n-args={JSON.stringify(this.props.titleArgs)}
         /> : null)
       subTitle = (this.props.subTitle
         ? <aside className={css(styles.dialog__header__subTitle)}>
@@ -88,13 +93,17 @@ class ModalOverlay extends ImmutableComponent {
 
     return <section className={cx({
       [css(styles.dialog)]: true,
+      [css(styles.dialog_gray)]: this.props.grayOverlay,
       [customDialogClassesStr]: true
     })}>
 
       <header className={cx({
         [css(styles.dialog__header)]: true,
-        [customDialogHeaderClassesStr]: true
-      })}>
+        [customDialogHeaderClassesStr]: true,
+        [css(styles.dialog__header_white)]: this.props.grayOverlay
+      })}
+        style={this.props.titleImage ? {justifyContent: 'start'} : null}>
+        {titleImage}
         {title}
         {subTitle}
         {close}
@@ -106,6 +115,7 @@ class ModalOverlay extends ImmutableComponent {
       })}>
         <div className={cx({
           [css(styles.dialog__body)]: true,
+          [css(styles.dialog__body_gray)]: this.props.grayOverlay,
           [customDialogBodyClassesStr]: true
         })}>
           {this.props.content}
@@ -167,12 +177,25 @@ const styles = StyleSheet.create({
     zIndex: globalStyles.zindex.zindexDialogs
   },
 
+  dialog_gray: {
+    background: '#eee'
+  },
+
   dialog__header: {
     padding: `25px ${globalStyles.spacing.modalDialogPaddingHorizontal}`,
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center'
   },
+
+  dialog__header_white: {
+    padding: '25px 50px 0px'
+  },
+
+  dialog__header__image: {
+    marginRight: '20px'
+  },
+
   dialog__header__close: {
     display: 'inline-block',
     position: 'absolute',
@@ -219,6 +242,10 @@ const styles = StyleSheet.create({
   dialog__body: {
     background: '#fff',
     padding: `${globalStyles.spacing.dialogInsideMargin} ${globalStyles.spacing.modalDialogPaddingHorizontal}`
+  },
+
+  dialog__body_gray: {
+    background: '#eee'
   },
 
   dialog__footer: {
