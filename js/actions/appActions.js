@@ -1074,6 +1074,16 @@ const appActions = {
     })
   },
 
+  /**
+   * Tells the store that user has finish setting up Sync
+   */
+  syncSetupCompleted: function (isCompleted) {
+    dispatch({
+      actionType: appConstants.APP_SETUP_SYNC_COMPLETED,
+      isCompleted
+    })
+  },
+
   /*
    * Will pop up an alert/confirm/prompt for a given tab. Window is still usable.
    * @param {number} tabId - The tabId
