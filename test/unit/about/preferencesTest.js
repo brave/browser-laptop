@@ -65,6 +65,11 @@ describe('Preferences component unittest', function () {
     mockery.registerMock('../../../../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
     // Mock image from addFundsDialogFooter
     mockery.registerMock('../../../../../extensions/brave/img/ledger/uphold_logo_medium.png')
+    mockery.registerMock('../../../extensions/brave/img/sync/circle_of_sync_landing_graphic.svg')
+    mockery.registerMock('../../../extensions/brave/img/sync/device_type_phone-tablet.svg')
+    mockery.registerMock('../../../extensions/brave/img/sync/device_type_computer.svg')
+    mockery.registerMock('../../../extensions/brave/img/sync/add_device_titleicon.svg')
+    mockery.registerMock('../../../extensions/brave/img/sync/synccode_titleicon.svg')
 
     mockery.registerMock('electron', fakeElectron)
 
