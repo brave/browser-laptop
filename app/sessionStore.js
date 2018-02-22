@@ -1025,7 +1025,8 @@ module.exports.defaultAppState = () => {
       lastFetchTimestamp: 0,
       objectsById: {},
       pendingRecords: {},
-      lastConfirmedRecordTimestamp: 0
+      lastConfirmedRecordTimestamp: 0,
+      setupCompleted: false
     },
     cache: {
       bookmarkLocation: undefined,

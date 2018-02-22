@@ -609,6 +609,9 @@ const handleAppAction = (action) => {
       appState = appState.setIn(['sync', 'devices'], {})
       appState = appState.setIn(['sync', 'objectsById'], {})
       break
+    case appConstants.APP_SETUP_SYNC_COMPLETED:
+      appState = appState.setIn(['sync', 'setupCompleted'], action.isCompleted)
+      break
     case appConstants.APP_SET_VERSION_INFO:
       if (action.name && action.version) {
         appState = appState.setIn(['about', 'brave', 'versionInformation', action.name], action.version)
