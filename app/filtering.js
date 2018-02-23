@@ -776,13 +776,12 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
   if (resourceName === 'pdfjs') {
     return getSetting(settings.PDFJS_ENABLED, settingsState)
   }
-  if (resourceName === 'webtorrent') {
-    return getSetting(settings.TORRENT_VIEWER_ENABLED, settingsState)
-  }
 
   if (resourceName === 'webtorrent') {
     const extension = extensionState.getExtensionById(appState, config.torrentExtensionId)
-    return extension !== undefined ? extension.get('enabled') : false
+    const torrentEnabled = getSetting(settings.TORRENT_VIEWER_ENABLED, settingsState)
+    const extensionEnabled = extension !== undefined ? extension.get('enabled') : false
+    return extensionEnabled && torrentEnabled
   }
 
   if (resourceName === 'ledger') {
