@@ -850,6 +850,17 @@ const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo 
   return state
 }
 
+const onFavIconReceived = (state, publisherKey, blob) => {
+  if (publisherKey == null) {
+    return state
+  }
+
+  state = ledgerState.setPublishersProp(state, publisherKey, 'faviconURL', blob)
+  module.exports.savePublisherData(publisherKey, 'faviconURL', blob)
+
+  return state
+}
+
 const getFavIcon = (state, publisherKey, page) => {
   let publisher = ledgerState.getPublisher(state, publisherKey)
   const protocol = page.get('protocol')
@@ -921,7 +932,7 @@ const fetchFavIcon = (publisherKey, url, redirects) => {
       underscore.keys(fileTypes).forEach((fileType) => {
         if (matchP) return
         if (
-          prefix.length >= fileTypes[fileType].length ||
+          prefix.length < fileTypes[fileType].length ||
           fileTypes[fileType].compare(prefix, 0, fileTypes[fileType].length) !== 0
         ) {
           return
@@ -936,10 +947,6 @@ const fetchFavIcon = (publisherKey, url, redirects) => {
     } else if (tail > 0 && (tail + 8 >= blob.length)) return
 
     appActions.onFavIconReceived(publisherKey, blob)
-
-    if (synopsis.publishers && synopsis.publishers[publisherKey]) {
-      synopsis.publishers[publisherKey].faviconURL = blob
-    }
   })
 }
 
@@ -2367,6 +2374,31 @@ const migration = (state) => {
   return state
 }
 
+const setPublishersOptions = (state, publishersArray) => {
+  if (!publishersArray || publishersArray.size === 0) {
+    return state
+  }
+
+  publishersArray.forEach(publisherData => {
+    const publisherKey = publisherData.get('publisherKey')
+
+    if (publisherKey == null) {
+      return state
+    }
+
+    for (const data of publisherData) {
+      const prop = data[0]
+      const value = data[1]
+      if (prop !== 'publisherKey') {
+        state = ledgerState.setPublisherOption(state, publisherKey, prop, value)
+        module.exports.savePublisherOption(publisherKey, prop, value)
+      }
+    }
+  })
+
+  return state
+}
+
 // for synopsis variable handling only
 const deleteSynopsisPublisher = (publisherKey) => {
   delete synopsis.publishers[publisherKey]
@@ -2377,15 +2409,31 @@ const saveOptionSynopsis = (prop, value) => {
 }
 
 const savePublisherOption = (publisherKey, prop, value) => {
-  if (synopsis && synopsis.publishers && synopsis.publishers[publisherKey] && synopsis.publishers[publisherKey].options) {
-    synopsis.publishers[publisherKey].options[prop] = value
+  if (!synopsis || !synopsis.publishers || !publisherKey) {
+    return
   }
+
+  if (!synopsis.publishers[publisherKey]) {
+    synopsis.publishers[publisherKey] = {}
+  }
+
+  if (!synopsis.publishers[publisherKey].options) {
+    synopsis.publishers[publisherKey].options = {}
+  }
+
+  synopsis.publishers[publisherKey].options[prop] = value
 }
 
 const savePublisherData = (publisherKey, prop, value) => {
-  if (synopsis && synopsis.publishers && synopsis.publishers[publisherKey]) {
-    synopsis.publishers[publisherKey][prop] = value
+  if (!synopsis || !synopsis.publishers || !publisherKey) {
+    return
   }
+
+  if (!synopsis.publishers[publisherKey]) {
+    synopsis.publishers[publisherKey] = {}
+  }
+
+  synopsis.publishers[publisherKey][prop] = value
 }
 
 const deleteSynopsis = () => {
@@ -2511,10 +2559,10 @@ const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
     }
   }
 
-  synopsis.publishers[publisherKey].faviconName = faviconName
-  synopsis.publishers[publisherKey].faviconURL = faviconURL
-  synopsis.publishers[publisherKey].publisherURL = publisherURL
-  synopsis.publishers[publisherKey].providerName = providerName
+  savePublisherData(publisherKey, 'faviconName', faviconName)
+  savePublisherData(publisherKey, 'faviconURL', faviconURL)
+  savePublisherData(publisherKey, 'publisherURL', publisherURL)
+  savePublisherData(publisherKey, 'providerName', providerName)
   state = ledgerState.setPublishersProp(state, publisherKey, 'faviconName', faviconName)
   state = ledgerState.setPublishersProp(state, publisherKey, 'faviconURL', faviconURL)
   state = ledgerState.setPublishersProp(state, publisherKey, 'publisherURL', publisherURL)
@@ -2746,6 +2794,7 @@ const getMethods = () => {
     deleteSynopsis,
     normalizePinned,
     roundToTarget,
+    onFavIconReceived,
     savePublisherData,
     pruneSynopsis,
     onMediaRequest,
@@ -2759,6 +2808,7 @@ const getMethods = () => {
     onPublisherTimestamp,
     checkVerifiedStatus,
     checkReferralActivity,
+    setPublishersOptions,
     referralCheck,
     roundtrip
   }

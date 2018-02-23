@@ -200,7 +200,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_FAVICON_RECEIVED:
       {
-        state = ledgerState.setPublishersProp(state, action.get('publisherKey'), 'faviconURL', action.get('blob'))
+        state = ledgerApi.onFavIconReceived(state, action.get('publisherKey'), action.get('blob'))
         state = ledgerApi.updatePublisherInfo(state)
         break
       }
@@ -223,7 +223,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_PUBLISHERS_OPTION_UPDATE:
       {
-        state = ledgerState.setPublishersOption(state, action.get('publishersArray'))
+        state = ledgerApi.setPublishersOptions(state, action.get('publishersArray'))
         break
       }
     case appConstants.APP_ON_LEDGER_WALLET_CREATE:

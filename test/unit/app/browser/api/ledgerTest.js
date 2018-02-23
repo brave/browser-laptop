@@ -2430,4 +2430,237 @@ describe('ledger api unit tests', function () {
       ]).calledOnce)
     })
   })
+
+  describe('setPublishersOptions', function () {
+    let savePublisherOptionSpy
+
+    before(function () {
+      savePublisherOptionSpy = sinon.spy(ledgerApi, 'savePublisherOption')
+    })
+
+    afterEach(function () {
+      savePublisherOptionSpy.reset()
+    })
+
+    after(function () {
+      savePublisherOptionSpy.restore()
+    })
+
+    it('null case', function () {
+      const result = ledgerApi.setPublishersOptions(defaultAppState)
+      assert(savePublisherOptionSpy.notCalled)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+    })
+
+    it('publisher list is empty', function () {
+      const result = ledgerApi.setPublishersOptions(defaultAppState, Immutable.List())
+      assert(savePublisherOptionSpy.notCalled)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+    })
+
+    it('publisher is missing publisherKey', function () {
+      const result = ledgerApi.setPublishersOptions(defaultAppState, Immutable.fromJS([
+        {
+          verified: true,
+          verifiedTimestamp: 100
+        }
+      ]))
+      assert(savePublisherOptionSpy.notCalled)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+    })
+
+    it('publisher list is ok', function () {
+      const result = ledgerApi.setPublishersOptions(defaultAppState, Immutable.fromJS([
+        {
+          publisherKey: 'clifton.io',
+          verified: true,
+          verifiedTimestamp: 100
+        },
+        {
+          publisherKey: 'brianbondy.com',
+          verified: false,
+          verifiedTimestamp: 200
+        }
+      ]))
+      const expectedState = defaultAppState
+        .setIn(['ledger', 'synopsis', 'publishers'], Immutable.fromJS({
+          'clifton.io': {
+            options: {
+              verified: true,
+              verifiedTimestamp: 100
+            }
+          },
+          'brianbondy.com': {
+            options: {
+              verified: false,
+              verifiedTimestamp: 200
+            }
+          }
+        }))
+
+      assert(savePublisherOptionSpy.withArgs('clifton.io', 'verified', true).calledOnce)
+      assert(savePublisherOptionSpy.withArgs('clifton.io', 'verifiedTimestamp', 100).calledOnce)
+      assert(savePublisherOptionSpy.withArgs('brianbondy.com', 'verified', false).calledOnce)
+      assert(savePublisherOptionSpy.withArgs('brianbondy.com', 'verifiedTimestamp', 200).calledOnce)
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+  })
+
+  describe('onFavIconReceived', function () {
+    let savePublisherDataSpy, setPublishersPropSpy
+    const publisherKey = 'clifton.io'
+    const icon = 'blob'
+
+    before(function () {
+      savePublisherDataSpy = sinon.spy(ledgerApi, 'savePublisherData')
+      setPublishersPropSpy = sinon.spy(ledgerState, 'setPublishersProp')
+    })
+
+    afterEach(function () {
+      savePublisherDataSpy.reset()
+      setPublishersPropSpy.reset()
+    })
+
+    after(function () {
+      savePublisherDataSpy.restore()
+      setPublishersPropSpy.restore()
+    })
+
+    it('null case', function () {
+      const result = ledgerApi.onFavIconReceived(defaultAppState)
+      assert(savePublisherDataSpy.notCalled)
+      assert(setPublishersPropSpy.notCalled)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+    })
+
+    it('icon is saved', function () {
+      const expectedSate = defaultAppState
+        .setIn(['ledger', 'synopsis', 'publishers', publisherKey, 'faviconURL'], icon)
+      const result = ledgerApi.onFavIconReceived(defaultAppState, publisherKey, icon)
+      assert(setPublishersPropSpy.withArgs(sinon.match.any, publisherKey, 'faviconURL', icon).calledOnce)
+      assert(savePublisherDataSpy.calledOnce)
+      assert.deepEqual(result.toJS(), expectedSate.toJS())
+    })
+  })
+
+  describe('savePublisherOption', function () {
+    const expectedSynopsis = {
+      options: {},
+      publishers: {
+        'clifton.io': {
+          options: {
+            excluded: true
+          }
+        }
+      }
+    }
+
+    after(() => {
+      ledgerApi.setSynopsis(undefined)
+    })
+
+    it('null case', function () {
+      ledgerApi.setSynopsis(undefined)
+      ledgerApi.savePublisherOption()
+      assert.equal(ledgerApi.getSynopsis(), undefined)
+    })
+
+    it('publishers object is missing', function () {
+      ledgerApi.setSynopsis({
+        options: {}
+      })
+      ledgerApi.savePublisherOption('clifton.io', 'excluded', true)
+      assert.deepEqual(ledgerApi.getSynopsis(), {
+        options: {}
+      })
+    })
+
+    it('publisher is missing in the synopsis', function () {
+      ledgerApi.setSynopsis({
+        options: {},
+        publishers: {}
+      })
+      ledgerApi.savePublisherOption('clifton.io', 'excluded', true)
+      assert.deepEqual(ledgerApi.getSynopsis(), expectedSynopsis)
+    })
+
+    it('options is missing in the synopsis', function () {
+      ledgerApi.setSynopsis({
+        options: {},
+        publishers: {
+          'clifton.io': {}
+        }
+      })
+      ledgerApi.savePublisherOption('clifton.io', 'excluded', true)
+      assert.deepEqual(ledgerApi.getSynopsis(), expectedSynopsis)
+    })
+
+    it('option already exists', function () {
+      ledgerApi.setSynopsis({
+        options: {},
+        publishers: {
+          'clifton.io': {
+            options: {
+              excluded: false
+            }
+          }
+        }
+      })
+      ledgerApi.savePublisherOption('clifton.io', 'excluded', true)
+      assert.deepEqual(ledgerApi.getSynopsis(), expectedSynopsis)
+    })
+  })
+
+  describe('savePublisherData', function () {
+    const expectedSynopsis = {
+      options: {},
+      publishers: {
+        'clifton.io': {
+          faviconURL: 'data'
+        }
+      }
+    }
+
+    after(() => {
+      ledgerApi.setSynopsis(undefined)
+    })
+
+    it('null case', function () {
+      ledgerApi.setSynopsis(undefined)
+      ledgerApi.savePublisherData()
+      assert.equal(ledgerApi.getSynopsis(), undefined)
+    })
+
+    it('publishers object is missing', function () {
+      ledgerApi.setSynopsis({
+        options: {}
+      })
+      ledgerApi.savePublisherData('clifton.io', 'faviconURL', 'data')
+      assert.deepEqual(ledgerApi.getSynopsis(), {
+        options: {}
+      })
+    })
+
+    it('publisher is missing in the synopsis', function () {
+      ledgerApi.setSynopsis({
+        options: {},
+        publishers: {}
+      })
+      ledgerApi.savePublisherData('clifton.io', 'faviconURL', 'data')
+      assert.deepEqual(ledgerApi.getSynopsis(), expectedSynopsis)
+    })
+
+    it('publisher already exists', function () {
+      ledgerApi.setSynopsis({
+        options: {},
+        publishers: {
+          'clifton.io': {
+            faviconURL: 'oldData'
+          }
+        }
+      })
+      ledgerApi.savePublisherData('clifton.io', 'faviconURL', 'data')
+      assert.deepEqual(ledgerApi.getSynopsis(), expectedSynopsis)
+    })
+  })
 })
