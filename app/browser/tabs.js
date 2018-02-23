@@ -73,7 +73,7 @@ const getTabValue = function (tabId) {
 const updateTab = (tabId, changeInfo = {}) => {
   let tabValue = getTabValue(tabId)
   if (shouldDebugTabEvents) {
-    console.log('tab updated from muon', { tabId, changeIndex: changeInfo.index, changeActive: changeInfo.active, newIndex: tabValue && tabValue.get('index'), newActive: tabValue && tabValue.get('active') })
+    console.log(`Tab [${tabId}] updated from muon`, changeInfo, { newIndex: tabValue && tabValue.get('index'), newActive: tabValue && tabValue.get('active') })
   }
   if (tabValue) {
     appActions.tabUpdated(tabValue, makeImmutable(changeInfo))
@@ -988,6 +988,9 @@ const api = {
       }
 
       const doCreate = () => {
+        if (shouldDebugTabEvents) {
+          console.log('Creating tab with properties: ', createProperties)
+        }
         extensions.createTab(createProperties, (tab) => {
           cb && cb(tab)
         })

@@ -98,48 +98,42 @@ const pinnedSiteState = {
   },
 
   /**
-   * Moves the specified pinned site from one location to another
+   * Moves the specified pinned site from one position to another
    *
-   * @param state The application state Immutable map
+  * @param state The application state Immutable map
    * @param sourceKey The site key to move
-   * @param destinationKey The site key to move to
-   * @param prepend Whether the destination detail should be prepended or not
+   * @param newOrder The new position to move to
    * @return The new state Immutable object
    */
-  reOrderSite: (state, sourceKey, destinationKey, prepend) => {
-    state = validateState(state)
-    let sites = state.get(STATE_SITES.PINNED_SITES)
+  moveSiteToNewOrder: (state, sourceKey, newOrder, shouldDebug = false) => {
+    const sites = state.get(STATE_SITES.PINNED_SITES)
+    if (shouldDebug) {
+      console.log('moveSiteToNewOrder pinnedSites before', sites.toJS())
+    }
     let sourceSite = sites.get(sourceKey, Immutable.Map())
-    const destinationSite = sites.get(destinationKey, Immutable.Map())
-
-    if (sourceSite.isEmpty()) {
+    if (sourceSite.isEmpty() || sourceSite.get('order') === newOrder) {
+      if (shouldDebug) {
+        console.log('NO CHANGE')
+      }
       return state
     }
-
-    const sourceSiteIndex = sourceSite.get('order')
-    const destinationSiteIndex = destinationSite.get('order')
-    let newIndex = destinationSiteIndex + (prepend ? 0 : 1)
-    if (destinationSiteIndex > sourceSiteIndex) {
-      --newIndex
-    }
-
-    state = state.set(STATE_SITES.PINNED_SITES, state.get(STATE_SITES.PINNED_SITES).map((site, index) => {
+    const sourceSiteOrder = sourceSite.get('order')
+    state = state.set(STATE_SITES.PINNED_SITES, sites.map((site, index) => {
       const siteOrder = site.get('order')
-      if (index === sourceKey) {
-        return site
+      if (index === sourceKey && siteOrder !== newOrder) {
+        return site.set('order', newOrder)
       }
-
-      if (siteOrder >= newIndex && siteOrder < sourceSiteIndex) {
+      if (siteOrder >= newOrder && siteOrder < sourceSiteOrder) {
         return site.set('order', siteOrder + 1)
-      } else if (siteOrder <= newIndex && siteOrder > sourceSiteIndex) {
+      } else if (siteOrder <= newOrder && siteOrder > sourceSiteOrder) {
         return site.set('order', siteOrder - 1)
       }
-
       return site
     }))
-
-    sourceSite = sourceSite.set('order', newIndex)
-    return state.setIn([STATE_SITES.PINNED_SITES, sourceKey], sourceSite)
+    if (shouldDebug) {
+      console.log('moveSiteToNewOrder pinnedSites after', state.get(STATE_SITES.PINNED_SITES).toJS())
+    }
+    return state
   }
 }
 
