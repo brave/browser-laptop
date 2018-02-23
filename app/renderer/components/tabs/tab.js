@@ -341,6 +341,7 @@ class Tab extends React.Component {
       onMouseEnter={this.onMouseEnter}
       onMouseLeave={this.onMouseLeave}
       data-test-id='tab-area'
+      data-tab-id={this.props.tabId}
       data-frame-key={this.props.frameKey}
       ref={elementRef => { this.elementRef = elementRef }}
       >
