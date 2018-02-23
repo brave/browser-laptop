@@ -28,7 +28,7 @@ class PinnedInput extends ImmutableComponent {
   pinPercentage (hostPattern, event) {
     let value = parseInt(event.target.value)
 
-    if (value < 1) {
+    if (value < 1 || !value) {
       value = 1
       this.textInput.value = 1
     }
