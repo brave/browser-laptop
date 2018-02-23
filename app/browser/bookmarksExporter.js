@@ -43,7 +43,7 @@ const showDialog = (state) => {
       personal = createBookmarkArray(state)
       other = createBookmarkArray(state, -1, false)
       try {
-        fs.writeFileSync(fileName, createBookmarkHTML(personal, other))
+        fs.writeFileSync(fileNames[0], createBookmarkHTML(personal, other))
       } catch (e) {
         console.log('Error exporting bookmarks: ', e)
       }
