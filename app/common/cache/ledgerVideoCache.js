@@ -33,7 +33,24 @@ const setCacheByVideoId = (state, key, data) => {
   return state.setIn(['cache', 'ledgerVideos', key], data)
 }
 
+const mergeCacheByVideoId = (state, key, data) => {
+  state = validateState(state)
+
+  if (key == null || data == null) {
+    return state
+  }
+
+  data = makeImmutable(data)
+
+  if (data.isEmpty()) {
+    return state
+  }
+
+  return state.mergeIn(['cache', 'ledgerVideos', key], data)
+}
+
 module.exports = {
   getDataByVideoId,
-  setCacheByVideoId
+  setCacheByVideoId,
+  mergeCacheByVideoId
 }

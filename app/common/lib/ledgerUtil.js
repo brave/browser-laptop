@@ -13,16 +13,19 @@ const queryString = require('querystring')
 // State
 const siteSettingsState = require('../state/siteSettingsState')
 const ledgerState = require('../state/ledgerState')
+const ledgerVideoCache = require('../cache/ledgerVideoCache')
 
 // Constants
 const settings = require('../../../js/constants/settings')
 const ledgerMediaProviders = require('../constants/ledgerMediaProviders')
+const twitchEvents = require('../constants/twitchEvents')
 
 // Utils
 const {responseHasContent} = require('./httpUtil')
 const urlUtil = require('../../../js/lib/urlutil')
 const getSetting = require('../../../js/settings').getSetting
 const urlParse = require('../urlParse')
+
 /**
  * Is page an actual page being viewed by the user? (not an error page, etc)
  * If the page is invalid, we don't want to collect usage info.
@@ -221,6 +224,26 @@ const getMediaId = (data, type) => {
         id = data.docid
         break
       }
+    case ledgerMediaProviders.TWITCH:
+      {
+        if (
+          ([
+            twitchEvents.MINUTE_WATCHED,
+            twitchEvents.START,
+            twitchEvents.PLAY_PAUSE,
+            twitchEvents.SEEK
+          ].includes(data.event)) &&
+          data.properties
+        ) {
+          id = data.properties.channel
+          let vod = data.properties.vod
+
+          if (vod) {
+            vod = vod.replace('v', '')
+            id += `_vod_${vod}`
+          }
+        }
+      }
   }
 
   return id
@@ -241,16 +264,39 @@ const getMediaData = (xhr, type) => {
     return result
   }
 
+  const parsedUrl = urlParse(xhr)
+  const query = parsedUrl && parsedUrl.query
+
+  if (!parsedUrl || !query) {
+    return null
+  }
+
   switch (type) {
     case ledgerMediaProviders.YOUTUBE:
       {
-        const parsedUrl = urlParse(xhr)
-        let query = null
-
-        if (parsedUrl && parsedUrl.query) {
-          query = queryString.parse(parsedUrl.query)
+        result = queryString.parse(parsedUrl.query)
+        break
+      }
+    case ledgerMediaProviders.TWITCH:
+      {
+        result = queryString.parse(parsedUrl.query)
+        if (!result.data) {
+          result = null
+          break
         }
-        result = query
+
+        let obj = Buffer.from(result.data, 'base64').toString('utf8')
+        if (obj == null) {
+          result = null
+          break
+        }
+
+        try {
+          result = JSON.parse(obj)
+        } catch (error) {
+          result = null
+          console.error(error.toString())
+        }
         break
       }
   }
@@ -258,16 +304,139 @@ const getMediaData = (xhr, type) => {
   return result
 }
 
-const getMediaDuration = (data, type) => {
+const getMediaDuration = (state, data, mediaKey, type) => {
   let duration = 0
+
+  if (data == null) {
+    return duration
+  }
+
   switch (type) {
-    case ledgerMediaProviders.YOUTUBE: {
-      duration = getYouTubeDuration(data)
-      break
-    }
+    case ledgerMediaProviders.YOUTUBE:
+      {
+        duration = getYouTubeDuration(data)
+        break
+      }
+    case ledgerMediaProviders.TWITCH:
+      {
+        duration = getTwitchDuration(state, data, mediaKey)
+        break
+      }
   }
 
   return duration
+}
+
+const generateMediaCacheData = (parsed, type) => {
+  let data = Immutable.Map()
+
+  if (parsed == null) {
+    return data
+  }
+
+  switch (type) {
+    case ledgerMediaProviders.TWITCH:
+      {
+        data = generateTwitchCacheData(parsed)
+        break
+      }
+  }
+
+  return data
+}
+
+const generateTwitchCacheData = (parsed) => {
+  if (parsed == null) {
+    return Immutable.Map()
+  }
+
+  if (parsed.properties) {
+    return Immutable.fromJS({
+      event: parsed.event,
+      time: parsed.properties.time
+    })
+  }
+
+  return Immutable.fromJS({
+    event: parsed.event
+  })
+}
+
+const getDefaultMediaFavicon = (providerName) => {
+  let image = null
+
+  if (!providerName) {
+    return image
+  }
+
+  providerName = providerName.toLowerCase()
+
+  switch (providerName) {
+    case ledgerMediaProviders.YOUTUBE:
+      {
+        image = require('../../../img/mediaProviders/youtube.png')
+        break
+      }
+    case ledgerMediaProviders.TWITCH:
+      {
+        image = require('../../../img/mediaProviders/twitch.svg')
+        break
+      }
+  }
+
+  return image
+}
+
+const getTwitchDuration = (state, data, mediaKey) => {
+  if (data == null || mediaKey == null || !data.properties) {
+    return 0
+  }
+
+  const previousData = ledgerVideoCache.getDataByVideoId(state, mediaKey)
+  const twitchMinimumSeconds = 10
+
+  if (previousData.isEmpty() && data.event === twitchEvents.START) {
+    return twitchMinimumSeconds * milliseconds.second
+  }
+
+  const oldMedia = ledgerVideoCache.getDataByVideoId(state, mediaKey)
+  let time = 0
+  const currentTime = parseFloat(data.properties.time)
+  const oldTime = parseFloat(previousData.get('time'))
+
+  if (
+    data.event === twitchEvents.PLAY_PAUSE &&
+    oldMedia.get('event') !== twitchEvents.PLAY_PAUSE
+  ) {
+    // User paused a video
+    time = currentTime - oldTime
+  } else if (previousData.get('event') === twitchEvents.START) {
+    // From video play event to x event
+    time = currentTime - oldTime - twitchMinimumSeconds
+  } else if (data.event === twitchEvents.MINUTE_WATCHED) {
+    // Minute watched event
+    time = currentTime - oldTime
+  } else if (data.event === twitchEvents.SEEK && oldMedia.get('event') !== twitchEvents.PLAY_PAUSE) {
+    // Vod seek event
+    time = currentTime - oldTime
+  }
+
+  if (isNaN(time)) {
+    return 0
+  }
+
+  if (time < 0) {
+    return 0
+  }
+
+  if (time > 120) {
+    time = 120 // 2 minutes
+  }
+
+  // we get seconds back, so we need to convert it into ms
+  time = time * milliseconds.second
+
+  return Math.floor(time)
 }
 
 const getYouTubeDuration = (data) => {
@@ -294,7 +463,7 @@ const getYouTubeDuration = (data) => {
   return parseInt(time)
 }
 
-const getMediaProvider = (url) => {
+const getMediaProvider = (url, firstPartyUrl, referrer) => {
   let provider = null
 
   if (url == null) {
@@ -303,7 +472,18 @@ const getMediaProvider = (url) => {
 
   // Youtube
   if (url.startsWith('https://www.youtube.com/api/stats/watchtime?')) {
-    provider = ledgerMediaProviders.YOUTUBE
+    return ledgerMediaProviders.YOUTUBE
+  }
+
+  // Twitch
+  if (
+    (
+      (firstPartyUrl && firstPartyUrl.startsWith('https://www.twitch.tv/')) ||
+      (referrer && referrer.startsWith('https://player.twitch.tv/'))
+    ) &&
+    url.startsWith('https://api.mixpanel.com/')
+  ) {
+    return ledgerMediaProviders.TWITCH
   }
 
   return provider
@@ -339,14 +519,18 @@ const getMethods = () => {
     getMediaData,
     getMediaKey,
     milliseconds,
-    defaultMonthlyAmounts
+    defaultMonthlyAmounts,
+    getDefaultMediaFavicon,
+    generateMediaCacheData
   }
 
   let privateMethods = {}
 
   if (process.env.NODE_ENV === 'test') {
     privateMethods = {
-      getYouTubeDuration
+      getYouTubeDuration,
+      getTwitchDuration,
+      generateTwitchCacheData
     }
   }
 
