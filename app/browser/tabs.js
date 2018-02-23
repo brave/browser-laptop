@@ -467,6 +467,9 @@ const api = {
     })
 
     process.on('add-new-contents', (e, source, newTab, disposition, size, userGesture) => {
+      if (shouldDebugTabEvents) {
+        console.log(`Contents [${newTab.getId()}] process:add-new-contents`, {userGesture, isBackground: newTab.isBackgroundPage(), disposition})
+      }
       if (userGesture === false) {
         e.preventDefault()
         return
@@ -491,7 +494,10 @@ const api = {
       }
 
       const tabId = newTab.getId()
+
+      // update our webContents Map with the openerTabId
       webContentsCache.updateWebContents(tabId, newTab, openerTabId)
+
       let newTabValue = getTabValue(newTab.getId())
 
       let windowId
@@ -558,6 +564,10 @@ const api = {
         return
       }
       const tabId = tab.getId()
+
+      // This is the first and most consistent event for WebContents so cache the item in the Map.
+      // Not all contents will get the 'add-new-contents' event (e.g. replaced contents during tab discard).
+      webContentsCache.updateWebContents(tabId, tab, null)
 
       // command-line flag --debug-tab-events
       if (shouldDebugTabEvents) {
@@ -639,6 +649,29 @@ const api = {
               activeTabHistory.setActiveTabForWindow(windowId, tabId)
             }
           }
+        }
+      })
+
+      tab.on('tab-replaced-at', (e, windowId, tabIndex, newContents) => {
+        // if not a placeholder, new contents is permanent replacement, e.g. tab has been discarded
+        // if is a placeholder, new contents is temporary, and should not be used for tab ID
+        const isPlaceholder = newContents.isPlaceholder()
+        const newTabId = newContents.getId()
+
+        if (shouldDebugTabEvents) {
+          if (isPlaceholder) {
+            console.log(`Tab [${tabId}] got a new placeholder (${newTabId}), not updating state.`)
+          } else {
+            console.log(`Tab [${tabId}] permanently changed to tabId ${newTabId}. Updating state references...`)
+          }
+        }
+
+        // update state
+        appActions.tabReplaced(tabId, getTabValue(newTabId), getTabValue(tabId).get('windowId'), !isPlaceholder)
+        if (!isPlaceholder) {
+          // update in-memory caches
+          webContentsCache.tabIdChanged(tabId, newTabId)
+          activeTabHistory.tabIdChanged(tabId, newTabId)
         }
       })
 
@@ -914,6 +947,9 @@ const api = {
   },
 
   closeTab: (tabId, forceClosePinned = false) => {
+    if (shouldDebugTabEvents) {
+      console.log(`[${tabId}] tabs.closeTab(forceClosePinned: ${forceClosePinned})`)
+    }
     const tabValue = getTabValue(tabId)
     if (!tabValue) {
       return false
@@ -979,12 +1015,6 @@ const api = {
       const preventAutoDiscard = createProperties.pinned || !isRegularContent
       if (preventAutoDiscard) {
         createProperties.autoDiscardable = false
-      } else {
-        // (temporarily) forced autoDiscardable to ALWAYS false due to
-        // inability to switch to auto-discarded tabs.
-        // See https://github.com/brave/browser-laptop/issues/10673
-        // remove this forced 'else' condition when #10673 is resolved
-        createProperties.autoDiscardable = false
       }
 
       const doCreate = () => {
@@ -1042,6 +1072,9 @@ const api = {
   },
 
   moveTo: (state, tabId, frameOpts, browserOpts, toWindowId) => {
+    if (shouldDebugTabEvents) {
+      console.log(`Tab ${tabId}] tabs.moveTo(window: ${toWindowId})`)
+    }
     frameOpts = makeImmutable(frameOpts)
     browserOpts = makeImmutable(browserOpts)
     const tab = webContentsCache.getWebContents(tabId)
@@ -1071,8 +1104,24 @@ const api = {
         return
       }
 
-      // detach from current window
+      // perform detach from current window
+      // and handle at `did-detach`
       tab.detach(() => {
+        if (shouldDebugTabEvents) {
+          console.log(`Tab [${tabId}] detached tab guestinstance id`, tab.guestInstanceId)
+        }
+        frameOpts = frameOpts.set('guestInstanceId', tab.guestInstanceId)
+        // handle tab has made it to the new window
+        tab.once('did-attach', () => {
+          if (shouldDebugTabEvents) {
+            console.log(`Tab [${tabId}] attached to a new window, so setting the desired index`)
+          }
+          // put the tab in the desired index position
+          const index = frameOpts.get('index')
+          if (index !== undefined) {
+            api.setTabIndex(tabId, frameOpts.get('index'))
+          }
+        })
         // handle tab has detached from window
         // handle tab was the active tab of the window
         if (tabValue.get('active')) {
@@ -1082,7 +1131,12 @@ const api = {
             api.setActive(nextActiveTabIdForOldWindow)
           }
         }
+        // tell another window to add the tab, this will cause the tab to render a webview and
+        // then attach to that window
         if (toWindowId == null || toWindowId === -1) {
+          if (shouldDebugTabEvents) {
+            console.log('creating new window for detached tab')
+          }
           // move tab to a new window
           frameOpts = frameOpts.set('index', 0)
           appActions.newWindow(frameOpts, browserOpts)
@@ -1091,14 +1145,6 @@ const api = {
           // specified window
           appActions.newWebContentsAdded(toWindowId, frameOpts, tabValue)
         }
-        // handle tab has made it to the new window
-        tab.once('did-attach', () => {
-          // put the tab in the desired index position
-          const index = frameOpts.get('index')
-          if (index !== undefined) {
-            api.setTabIndex(tabId, frameOpts.get('index'))
-          }
-        })
       })
     }
   },

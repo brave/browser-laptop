@@ -404,6 +404,31 @@ const tabState = {
     return state.set('tabs', tabs.delete(index).insert(index, tabValue))
   },
 
+  replaceTabValue: (state, tabId, newTabValue) => {
+    state = validateState(state)
+    newTabValue = makeImmutable(newTabValue)
+    // update tab
+    const index = getTabInternalIndexByTabId(state, tabId)
+    const oldTabValue = state.getIn(['tabs', index])
+    if (index == null || index === -1) {
+      console.error(`tabState: cannot replace tab ${tabId} as tab's index did not exist in state`, { index })
+      return state
+    }
+    let mergedTabValue = oldTabValue.mergeDeep(newTabValue)
+    if (mergedTabValue.has('frame')) {
+      mergedTabValue = mergedTabValue.mergeIn(['frame'], {
+        tabId: newTabValue.get('tabId'),
+        guestInstanceId: newTabValue.get('guestInstanceId')
+      })
+    }
+    mergedTabValue = mergedTabValue.set('windowId', oldTabValue.get('windowId'))
+    state = state.set('tabs', state.get('tabs').delete(index).insert(index, mergedTabValue))
+    // update tabId at tabsInternal index
+    state = deleteTabsInternalIndex(state, oldTabValue)
+    state = updateTabsInternalIndex(state, 0)
+    return state
+  },
+
   removeTabField: (state, field) => {
     state = makeImmutable(state)
 
@@ -417,17 +442,28 @@ const tabState = {
     return state.set('tabs', tabs)
   },
 
-  updateFrame: (state, action) => {
+  updateFrame: (state, action, shouldDebugTabEvents = false) => {
     state = validateState(state)
     action = validateAction(action)
     const tabId = action.getIn(['frame', 'tabId'])
+
     if (!tabId) {
+      if (shouldDebugTabEvents) {
+        console.log(`Tab [${tabId}] frame changed for tab - no tabId provided!`)
+      }
       return state
     }
 
     let tabValue = tabState.getByTabId(state, tabId)
     if (!tabValue) {
+      if (shouldDebugTabEvents) {
+        console.log(`Tab [${tabId}] frame changed for tab - tab not found in state, probably a temporary frame`)
+      }
       return state
+    }
+
+    if (shouldDebugTabEvents) {
+      console.log(`Tab [${tabId}] frame changed for tab`)
     }
 
     const bookmarkUtil = require('../lib/bookmarkUtil')
