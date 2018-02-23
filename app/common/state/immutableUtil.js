@@ -45,6 +45,22 @@ const api = {
       return defaultValue
     }
     return api.isImmutable(obj) ? obj.toJS() : obj
+  },
+
+  findNullKeyPaths (state, pathToState = []) {
+    let nullKeys = [ ]
+    if (!Immutable.Map.isMap(state) && !Immutable.List.isList(state)) {
+      return nullKeys
+    }
+    for (const key of state.keySeq()) {
+      const keyPath = [...pathToState, key]
+      if (key === null) {
+        nullKeys.push(keyPath)
+      }
+      // recursive, to find deep keys
+      nullKeys.push(...api.findNullKeyPaths(state.get(key), keyPath))
+    }
+    return nullKeys
   }
 }
 
