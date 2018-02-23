@@ -246,6 +246,7 @@ module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
     }
     return immutableFrame
   }
+
   const clearHistory = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_HISTORY) === true
   if (clearHistory) {
     immutablePerWindowData = immutablePerWindowData.set('closedFrames', Immutable.List())
