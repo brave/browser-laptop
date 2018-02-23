@@ -6,6 +6,23 @@ require('../../../braveUnit')
 const settings = require('../../../../../js/constants/settings')
 const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
 
+const baseState = Immutable.fromJS({
+  cache: {
+    ledgerVideos: {}
+  }
+})
+const stateWithData = Immutable.fromJS({
+  cache: {
+    ledgerVideos: {
+      'twitch_test': {
+        publisher: 'twitch#author:test',
+        event: 'video-play',
+        time: 1519279886
+      }
+    }
+  }
+})
+
 describe('ledgerUtil unit test', function () {
   let ledgerUtil
   let fakeLevel
@@ -28,6 +45,8 @@ describe('ledgerUtil unit test', function () {
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('level', fakeLevel)
+    mockery.registerMock('../../../img/mediaProviders/youtube.png', 'youtube.png')
+    mockery.registerMock('../../../img/mediaProviders/twitch.svg', 'twitch.svg')
 
     mockery.registerMock('../../../js/settings', {
       getSetting: (settingKey) => {
@@ -380,7 +399,7 @@ describe('ledgerUtil unit test', function () {
     })
 
     it('unknown type', function () {
-      const result = ledgerUtil.getMediaData({}, 'test')
+      const result = ledgerUtil.getMediaId({}, 'test')
       assert.equal(result, null)
     })
 
@@ -393,6 +412,78 @@ describe('ledgerUtil unit test', function () {
       it('id is provided', function () {
         const result = ledgerUtil.getMediaId({docid: 'kLiLOkzLetE'}, ledgerMediaProviders.YOUTUBE)
         assert.equal(result, 'kLiLOkzLetE')
+      })
+    })
+
+    describe('Twitch', function () {
+      it('null case', function () {
+        const result = ledgerUtil.getMediaId(null, ledgerMediaProviders.TWITCH)
+        assert.equal(result, null)
+      })
+
+      it('event is not correct', function () {
+        const result = ledgerUtil.getMediaId({
+          event: 'wrong'
+        }, ledgerMediaProviders.TWITCH)
+        assert.equal(result, null)
+      })
+
+      it('properties are missing', function () {
+        const result = ledgerUtil.getMediaId({
+          event: 'minute-watched'
+        }, ledgerMediaProviders.TWITCH)
+        assert.equal(result, null)
+      })
+
+      it('content is a live stream', function () {
+        const result = ledgerUtil.getMediaId({
+          event: 'minute-watched',
+          properties: {
+            channel: 'tchannel'
+          }
+        }, ledgerMediaProviders.TWITCH)
+        assert.equal(result, 'tchannel')
+      })
+
+      it('content is a vod', function () {
+        const result = ledgerUtil.getMediaId({
+          event: 'minute-watched',
+          properties: {
+            channel: 'tchannel',
+            vod: 'v12343234'
+          }
+        }, ledgerMediaProviders.TWITCH)
+        assert.equal(result, 'tchannel_vod_12343234')
+      })
+
+      it('event is video-play', function () {
+        const result = ledgerUtil.getMediaId({
+          event: 'video-play',
+          properties: {
+            channel: 'tchannel'
+          }
+        }, ledgerMediaProviders.TWITCH)
+        assert.equal(result, 'tchannel')
+      })
+
+      it('event is player_click_playpause', function () {
+        const result = ledgerUtil.getMediaId({
+          event: 'player_click_playpause',
+          properties: {
+            channel: 'tchannel'
+          }
+        }, ledgerMediaProviders.TWITCH)
+        assert.equal(result, 'tchannel')
+      })
+
+      it('event is vod_seek', function () {
+        const result = ledgerUtil.getMediaId({
+          event: 'vod_seek',
+          properties: {
+            channel: 'tchannel'
+          }
+        }, ledgerMediaProviders.TWITCH)
+        assert.equal(result, 'tchannel')
       })
     })
   })
@@ -408,14 +499,16 @@ describe('ledgerUtil unit test', function () {
       assert.equal(result, null)
     })
 
-    it('id is null', function () {
-      const result = ledgerUtil.getMediaKey(null, ledgerMediaProviders.YOUTUBE)
-      assert.equal(result, null)
-    })
+    describe('YouTube', function () {
+      it('id is null', function () {
+        const result = ledgerUtil.getMediaKey(null, ledgerMediaProviders.YOUTUBE)
+        assert.equal(result, null)
+      })
 
-    it('data is ok', function () {
-      const result = ledgerUtil.getMediaKey('kLiLOkzLetE', ledgerMediaProviders.YOUTUBE)
-      assert.equal(result, 'youtube_kLiLOkzLetE')
+      it('data is ok', function () {
+        const result = ledgerUtil.getMediaKey('kLiLOkzLetE', ledgerMediaProviders.YOUTUBE)
+        assert.equal(result, 'youtube_kLiLOkzLetE')
+      })
     })
   })
 
@@ -430,14 +523,14 @@ describe('ledgerUtil unit test', function () {
       assert.equal(result, null)
     })
 
+    it('query is not present', function () {
+      const result = ledgerUtil.getMediaData('https://youtube.com', ledgerMediaProviders.YOUTUBE)
+      assert.equal(result, null)
+    })
+
     describe('Youtube', function () {
       it('null case', function () {
         const result = ledgerUtil.getMediaData(null, ledgerMediaProviders.YOUTUBE)
-        assert.equal(result, null)
-      })
-
-      it('query is not present', function () {
-        const result = ledgerUtil.getMediaData('https://youtube.com', ledgerMediaProviders.YOUTUBE)
         assert.equal(result, null)
       })
 
@@ -447,6 +540,33 @@ describe('ledgerUtil unit test', function () {
           docid: 'kLiLOkzLetE',
           st: '11.338',
           et: '21.339'
+        })
+      })
+    })
+
+    describe('Twitch', function () {
+      it('null case', function () {
+        const result = ledgerUtil.getMediaData(null, ledgerMediaProviders.TWITCH)
+        assert.equal(result, null)
+      })
+
+      it('data is missing', function () {
+        const result = ledgerUtil.getMediaData('https://api.mixpanel.com', ledgerMediaProviders.TWITCH)
+        assert.equal(result, null)
+      })
+
+      it('data is empty string', function () {
+        const result = ledgerUtil.getMediaData('https://api.mixpanel.com?data=', ledgerMediaProviders.TWITCH)
+        assert.equal(result, null)
+      })
+
+      it('obj is parsed correctly', function () {
+        const result = ledgerUtil.getMediaData('https://api.mixpanel.com?data=eyJldmVudCI6Im1pbnV0ZS13YXRjaGVkIiwicHJvcGVydGllcyI6eyJjaGFubmVsIjoidHcifX0=', ledgerMediaProviders.TWITCH)
+        assert.deepEqual(result, {
+          event: 'minute-watched',
+          properties: {
+            channel: 'tw'
+          }
         })
       })
     })
@@ -490,6 +610,30 @@ describe('ledgerUtil unit test', function () {
       const result = ledgerUtil.getMediaProvider('https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=11.338&et=21.339')
       assert.equal(result, ledgerMediaProviders.YOUTUBE)
     })
+
+    describe('twitch', function () {
+      it('we only have url', function () {
+        const result = ledgerUtil.getMediaProvider('https://api.mixpanel.com/?data=lll')
+        assert.equal(result, null)
+      })
+
+      it('video is on twitch.tv', function () {
+        const result = ledgerUtil.getMediaProvider(
+          'https://api.mixpanel.com/?data=lll',
+          'https://www.twitch.tv/'
+        )
+        assert.equal(result, ledgerMediaProviders.TWITCH)
+      })
+
+      it('video is embeded', function () {
+        const result = ledgerUtil.getMediaProvider(
+          'https://api.mixpanel.com/?data=lll',
+          'https://www.site.tv/',
+          'https://player.twitch.tv/'
+        )
+        assert.equal(result, ledgerMediaProviders.TWITCH)
+      })
+    })
   })
 
   describe('milliseconds', function () {
@@ -527,6 +671,171 @@ describe('ledgerUtil unit test', function () {
   describe('defaultMonthlyAmounts', function () {
     it('should match', function () {
       assert.deepEqual(ledgerUtil.defaultMonthlyAmounts.toJS(), [5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0])
+    })
+  })
+
+  describe('getDefaultMediaFavicon', function () {
+    it('null case', function () {
+      const result = ledgerUtil.getDefaultMediaFavicon()
+      assert.equal(result, null)
+    })
+
+    it('youtube', function () {
+      const result = ledgerUtil.getDefaultMediaFavicon('YouTube')
+      assert.equal(result, 'youtube.png')
+    })
+
+    it('twitch', function () {
+      const result = ledgerUtil.getDefaultMediaFavicon('Twitch')
+      assert.equal(result, 'twitch.svg')
+    })
+  })
+
+  describe('generateTwitchCacheData', function () {
+    it('null check', function () {
+      const result = ledgerUtil.generateTwitchCacheData()
+      assert.deepEqual(result.toJS(), {})
+    })
+
+    it('properties are missing', function () {
+      const result = ledgerUtil.generateTwitchCacheData({
+        event: 'video-play',
+        channel: 'test'
+      })
+      assert.deepEqual(result.toJS(), {
+        event: 'video-play'
+      })
+    })
+
+    it('properties are present', function () {
+      const result = ledgerUtil.generateTwitchCacheData({
+        event: 'video-play',
+        properties: {
+          time: 100,
+          minute_logged: 1
+        },
+        channel: 'test'
+      })
+      assert.deepEqual(result.toJS(), {
+        event: 'video-play',
+        time: 100
+      })
+    })
+  })
+
+  describe('getTwitchDuration', function () {
+    it('null case', function () {
+      const result = ledgerUtil.getTwitchDuration()
+      assert.deepEqual(result, 0)
+    })
+
+    it('we just video playing', function () {
+      const result = ledgerUtil.getTwitchDuration(baseState, {
+        event: 'video-play',
+        properties: {
+          time: '1223fa'
+        }
+      }, 'twitch_test')
+      assert.deepEqual(result, 10000)
+    })
+
+    it('properties are missing', function () {
+      const result = ledgerUtil.getTwitchDuration(baseState, {
+        event: 'minute-watched',
+        properties: {
+          time: '1223fa'
+        }
+      }, 'twitch_test')
+      assert.deepEqual(result, 0)
+    })
+
+    it('current time is not a number', function () {
+      const result = ledgerUtil.getTwitchDuration(stateWithData, {
+        event: 'minute-watched',
+        properties: {
+          time: '1223fa'
+        }
+      }, 'twitch_test')
+      assert.deepEqual(result, 0)
+    })
+
+    it('user paused a video', function () {
+      const result = ledgerUtil.getTwitchDuration(stateWithData, {
+        event: 'player_click_playpause',
+        properties: {
+          time: 1519279926
+        }
+      }, 'twitch_test')
+      assert.deepEqual(result, 40000)
+    })
+
+    it('first minute watched', function () {
+      const result = ledgerUtil.getTwitchDuration(stateWithData, {
+        event: 'minute-watched',
+        properties: {
+          time: 1519279926
+        }
+      }, 'twitch_test')
+      assert.deepEqual(result, 30000)
+    })
+
+    it('second minute watched', function () {
+      const state = stateWithData
+        .setIn(['cache', 'ledgerVideos', 'twitch_test', 'event'], 'minute-watched')
+
+      const result = ledgerUtil.getTwitchDuration(state, {
+        event: 'minute-watched',
+        properties: {
+          time: 1519279926
+        }
+      }, 'twitch_test')
+      assert.deepEqual(result, 40000)
+    })
+
+    it('vod seeked', function () {
+      const state = stateWithData
+        .setIn(['cache', 'ledgerVideos', 'twitch_test', 'event'], 'minute-watched')
+
+      const result = ledgerUtil.getTwitchDuration(state, {
+        event: 'vod_seek',
+        properties: {
+          time: 1519279926
+        }
+      }, 'twitch_test')
+      assert.deepEqual(result, 40000)
+    })
+
+    it('end time is negative', function () {
+      const result = ledgerUtil.getTwitchDuration(stateWithData, {
+        event: 'minute-watched',
+        properties: {
+          time: 1519249926
+        }
+      }, 'twitch_test')
+      assert.deepEqual(result, 0)
+    })
+
+    it('end time is more then 2 minutes', function () {
+      const result = ledgerUtil.getTwitchDuration(stateWithData, {
+        event: 'minute-watched',
+        properties: {
+          time: 1519449926
+        }
+      }, 'twitch_test')
+      assert.deepEqual(result, 120000)
+    })
+
+    it('we need to floor end time', function () {
+      const state = stateWithData
+        .setIn(['cache', 'ledgerVideos', 'twitch_test', 'event'], 'minute-watched')
+
+      const result = ledgerUtil.getTwitchDuration(state, {
+        event: 'minute-watched',
+        properties: {
+          time: 1519279926.74353453
+        }
+      }, 'twitch_test')
+      assert.deepEqual(result, 40743)
     })
   })
 })

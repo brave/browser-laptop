@@ -26,6 +26,7 @@ const getSetting = require('../../../../../js/settings').getSetting
 const aboutActions = require('../../../../../js/about/aboutActions')
 const urlUtil = require('../../../../../js/lib/urlutil')
 const {SettingCheckbox, SiteSettingCheckbox} = require('../../common/settings')
+const ledgerUtil = require('../../../../common/lib/ledgerUtil')
 
 class LedgerTable extends ImmutableComponent {
   get synopsis () {
@@ -149,6 +150,25 @@ class LedgerTable extends ImmutableComponent {
     ]
   }
 
+  getImage (faviconURL, providerName, publisherKey) {
+    if (!faviconURL && providerName) {
+      faviconURL = ledgerUtil.getDefaultMediaFavicon(providerName)
+    }
+
+    if (!faviconURL) {
+      return <span className={css(styles.defaultIcon)}>
+        <span className={globalStyles.appIcons.defaultIcon} />
+      </span>
+    }
+
+    return <img
+      className={css(styles.favicon)}
+      src={faviconURL}
+      alt=''
+      onError={this.onFaviconError.bind(null, faviconURL, publisherKey)}
+    />
+  }
+
   getRow (synopsis) {
     const faviconURL = synopsis.get('faviconURL')
     const views = synopsis.get('views')
@@ -158,6 +178,7 @@ class LedgerTable extends ImmutableComponent {
     const publisherURL = synopsis.get('publisherURL')
     const percentage = pinned ? this.pinPercentageValue(synopsis) : synopsis.get('percentage')
     const publisherKey = synopsis.get('publisherKey')
+    const providerName = synopsis.get('providerName')
     const siteName = synopsis.get('siteName')
     const defaultAutoInclude = this.enabledForSite(synopsis)
 
@@ -174,11 +195,7 @@ class LedgerTable extends ImmutableComponent {
       {
         html: <div>
           <a className={css(styles.siteData)} href={publisherURL} rel='noopener' target='_blank' tabIndex={-1}>
-            {
-              faviconURL
-                ? <img className={css(styles.favicon)} src={faviconURL} alt='' onError={this.onFaviconError.bind(null, faviconURL, publisherKey)} />
-                : <span className={css(styles.defaultIcon)}><span className={globalStyles.appIcons.defaultIcon} /></span>
-            }
+            { this.getImage(faviconURL, providerName, publisherKey) }
             <span className={css(styles.url)} data-test-id='siteName'>{siteName}</span>
           </a>
         </div>,

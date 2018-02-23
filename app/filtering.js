@@ -115,10 +115,19 @@ function registerForBeforeRequest (session, partition) {
     }
 
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
+    const url = details.url
     // this can happen if the tab is closed and the webContents is no longer available
     if (!firstPartyUrl) {
       muonCb({ cancel: true })
       return
+    }
+
+    if (!isPrivate && module.exports.isResourceEnabled('ledger') && module.exports.isResourceEnabled('ledgerMedia')) {
+      // Ledger media
+      const provider = ledgerUtil.getMediaProvider(url, firstPartyUrl, details.referrer)
+      if (provider) {
+        appActions.onLedgerMediaData(url, provider, details.tabId)
+      }
     }
 
     for (let i = 0; i < beforeRequestFilteringFns.length; i++) {
@@ -201,21 +210,12 @@ function registerForBeforeRequest (session, partition) {
       }
     }
     // Redirect to non-script version of DDG when it's blocked
-    const url = details.url
     if (details.resourceType === 'mainFrame' &&
       url.startsWith('https://duckduckgo.com/?q') &&
     module.exports.isResourceEnabled('noScript', url, isPrivate)) {
       muonCb({redirectURL: url.replace('?q=', 'html?q=')})
     } else {
       muonCb({})
-    }
-
-    if (module.exports.isResourceEnabled('ledger') && module.exports.isResourceEnabled('ledgerMedia')) {
-      // Ledger media
-      const provider = ledgerUtil.getMediaProvider(url)
-      if (provider) {
-        appActions.onLedgerMediaData(url, provider, details.tabId)
-      }
     }
   })
 }

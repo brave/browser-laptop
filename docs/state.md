@@ -93,6 +93,7 @@ AppStore
     ledgerVideos: {
       [mediaKey]: {
         publisher: string // publisher key
+        beatData: object // data that we get from a heartbeat
       }
     }
   }
@@ -346,6 +347,7 @@ AppStore
       publishers: {
         [publisherId]: {
           duration: number,
+          faviconName: string,
           faviconURL: string,
           options: {
             exclude: boolean,
@@ -355,6 +357,8 @@ AppStore
           },
           pinPercentage: number,
           protocol: string,
+          publisherURL: string,
+          providerName: string,
           scores: {
             concave: number,
             visits: number
