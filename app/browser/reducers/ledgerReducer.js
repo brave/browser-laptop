@@ -54,6 +54,11 @@ const ledgerReducer = (state, action, immutableAction) => {
         )
         break
       }
+    case appConstants.APP_ON_FILE_RECOVERY_KEYS:
+      {
+        state = ledgerApi.fileRecoveryKeys(state, action.get('file'))
+        break
+      }
     case appConstants.APP_SHUTTING_DOWN:
       {
         state = ledgerApi.quit(state)

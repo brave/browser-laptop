@@ -96,6 +96,7 @@ const messages = {
   EXTENSIONS_UPDATED: _,
   ADBLOCK_UPDATED: _,
   DOWNLOADS_UPDATED: _,
+  PRINTKEYS_UPDATED: _,
   NEWTAB_DATA_UPDATED: _,
   VERSION_INFORMATION_UPDATED: _,
   // About pages from contentScript
