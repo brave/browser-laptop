@@ -36,7 +36,7 @@ const urlUtil = require('../lib/urlutil')
 const buildConfig = require('../constants/buildConfig')
 
 // state helpers
-const {makeImmutable} = require('../../app/common/state/immutableUtil')
+const {makeImmutable, findNullKeyPaths} = require('../../app/common/state/immutableUtil')
 const basicAuthState = require('../../app/common/state/basicAuthState')
 const extensionState = require('../../app/common/state/extensionState')
 const aboutNewTabState = require('../../app/common/state/aboutNewTabState')
@@ -80,8 +80,27 @@ class AppStore extends EventEmitter {
 
   emitChanges () {
     if (this.lastEmittedState && this.lastEmittedState !== appState) {
-      const d = diff(this.lastEmittedState, appState)
-      if (!d.isEmpty()) {
+      let d
+      try {
+        d = diff(this.lastEmittedState, appState)
+      } catch (e) {
+        console.error('Error getting a diff from latest state.')
+        // one possible reason immutablediff can throw an error
+        // is due to null keys, so let's log any that we find
+        const nullKeyPaths = findNullKeyPaths(appState)
+        const error = (typeof e === 'object')
+          ? e
+          : (typeof e === 'string')
+            ? new Error(e)
+            : new Error()
+        for (let keyPath of nullKeyPaths) {
+          keyPath = keyPath.map(key => key === null ? 'null' : key)
+          const message = ` State path had null entry! Path was: [${keyPath.join(', ')}].`
+          error.message += message
+        }
+        throw error
+      }
+      if (d && !d.isEmpty()) {
         BrowserWindow.getAllWindows().forEach((wnd) => {
           if (wnd.webContents && !wnd.webContents.isDestroyed()) {
             wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() })

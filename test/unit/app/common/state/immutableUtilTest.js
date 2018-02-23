@@ -148,4 +148,32 @@ describe('immutableUtil unit test', function () {
       assert.deepEqual(immutableUtil.deleteImmutablePaths(data, [['a', 'a1'], 'c']).toJS(), {a: {a2: 8}, d: 5})
     })
   })
+  describe('findNullKeyPaths', function () {
+    it('finds maps which have a null key', function () {
+      const data = Immutable.fromJS({
+        normal: {
+          key1: 'value'
+        },
+        bad: { },
+        anotherBad: {
+          deeper: { }
+        },
+        null: {
+          badParent: 'value4'
+        },
+        nullValue: null
+      })
+      .setIn(['bad', null], 'value2')
+      .setIn(['anotherBad', 'deeper', null], 'value3')
+      .set(null, Immutable.fromJS({badParent: 'value4'}))
+
+      const expectedNullPaths = [
+        ['bad', null],
+        ['anotherBad', 'deeper', null],
+        [null]
+      ]
+      const actualNullPaths = immutableUtil.findNullKeyPaths(data)
+      assert.deepEqual(actualNullPaths, expectedNullPaths)
+    })
+  })
 })
