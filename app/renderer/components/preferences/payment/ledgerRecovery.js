@@ -31,8 +31,10 @@ class LedgerRecoveryContent extends ImmutableComponent {
     this.props.handleRecoveryKeyChange(e.target.value)
   }
 
-  clearRecoveryStatus () {
-    this.props.hideAdvancedOverlays()
+  clearRecoveryStatus (success) {
+    if (success) {
+      this.props.hideAdvancedOverlays()
+    }
     appActions.resetRecoverStatus()
   }
 
@@ -57,7 +59,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
             <BrowserButton secondaryColor
               l10nId='ok'
               testId='recoveryOverlayOkButton'
-              onClick={this.clearRecoveryStatus.bind(this)}
+              onClick={this.clearRecoveryStatus.bind(this, true)}
             />
           </section>
           : null
@@ -73,7 +75,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
             <BrowserButton secondaryColor
               l10nId='ok'
               testId='recoveryOverlayErrorButton'
-              onClick={this.clearRecoveryStatus.bind(this)}
+              onClick={this.clearRecoveryStatus.bind(this, false)}
             />
           </section>
           : null
@@ -89,7 +91,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
             <BrowserButton secondaryColor
               l10nId='ok'
               testId='recoveryOverlayErrorButton'
-              onClick={this.clearRecoveryStatus.bind(this)}
+              onClick={this.clearRecoveryStatus.bind(this, false)}
             />
           </section>
           : null

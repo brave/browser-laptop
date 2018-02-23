@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 
 const Brave = require('../lib/brave')
-const {urlInput, paymentsWelcomePage, paymentsTab, walletSwitch, backupWallet, recoverWallet, saveWalletFile, advancedSettingsButton, recoverWalletFromFileButton, balanceRecovered, balanceNotRecovered, recoveryOverlayOkButton} = require('../lib/selectors')
+const {urlInput, paymentsWelcomePage, paymentsTab, walletSwitch, backupWallet, recoverWallet, saveWalletFile, advancedSettingsButton, recoverWalletFromFileButton, balanceRecovered, balanceNotRecovered, recoveryOverlayOkButton, modalOverlay, recoveryOverlayErrorButton} = require('../lib/selectors')
 const messages = require('../../js/constants/messages')
 
 const assert = require('assert')
@@ -185,5 +185,15 @@ describe.skip('Advanced payment panel tests', function () {
     context.cleanSessionStoreAfterEach = true
     yield this.app.client
       .waitForVisible(balanceNotRecovered, ledgerAPIWaitTimeout)
+  })
+
+  it('keeps ledger recovery modal open if there was a recovery error', function * () {
+    generateAndSaveRecoveryFile(context.recoveryFilePathname, '')
+    yield recoverWalletFromFile(this.app.client)
+    yield this.app.client
+      .waitForVisible(balanceNotRecovered, ledgerAPIWaitTimeout)
+      .click(recoveryOverlayErrorButton)
+      .pause(1000)
+      .waitForVisible(modalOverlay, ledgerAPIWaitTimeout)
   })
 })
