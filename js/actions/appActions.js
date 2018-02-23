@@ -1779,15 +1779,6 @@ const appActions = {
     })
   },
 
-  onPinnedTabReorder: function (siteKey, destinationKey, prepend) {
-    dispatch({
-      actionType: appConstants.APP_ON_PINNED_TAB_REORDER,
-      siteKey,
-      destinationKey,
-      prepend
-    })
-  },
-
   /**
    * Dispatches a message that bookmark calculation was done
    * @param bookmarkList {Object} - Object is a list of bookmarks with key, width and parentFolderId as a property

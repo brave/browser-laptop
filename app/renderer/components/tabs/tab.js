@@ -323,6 +323,7 @@ class Tab extends React.Component {
       onMouseEnter={this.onMouseEnter}
       onMouseLeave={this.onMouseLeave}
       data-test-id='tab-area'
+      data-tab-id={this.props.tabId}
       data-frame-key={this.props.frameKey}>
       {
         this.props.isActive && this.props.notificationBarActive

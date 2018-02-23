@@ -7,8 +7,10 @@ const mockery = require('mockery')
 const Immutable = require('immutable')
 const assert = require('assert')
 const sinon = require('sinon')
-
+const fakeElectron = require('../../../lib/fakeElectron')
+const fakeAdBlock = require('../../../lib/fakeAdBlock')
 const appConstants = require('../../../../../js/constants/appConstants')
+
 require('../../../braveUnit')
 
 describe('pinnedSitesReducer unit test', function () {
@@ -40,24 +42,53 @@ describe('pinnedSitesReducer unit test', function () {
       windowId: 1,
       windowUUID: 'uuid',
       url: 'https://brave.com/',
-      title: 'Brave'
+      title: 'Brave',
+      partitionNumber: 0,
+      pinned: true,
+      index: 0
+    }, {
+      tabId: 2,
+      windowId: 1,
+      windowUUID: 'uuid',
+      url: 'https://petemill.com/',
+      title: 'Brave',
+      partitionNumber: 0,
+      pinned: true,
+      index: 1
+    }, {
+      tabId: 3,
+      windowId: 1,
+      windowUUID: 'uuid',
+      url: 'https://clifton.io/',
+      title: 'Brave',
+      partitionNumber: 0,
+      pinned: true,
+      index: 2
     }],
     tabsInternal: {
       index: {
+        3: 2,
+        2: 1,
         1: 0
       }
     },
     pinnedSites: {
       'https://brave.com/|0': {
         location: 'https://brave.com/',
-        order: 0,
+        order: 2, // changed to 0
         title: 'Brave',
         partitionNumber: 0
       },
       'https://clifton.io/|0': {
         location: 'https://clifton.io/',
-        order: 1,
+        order: 0, // changed to 1
         title: 'Clifton',
+        partitionNumber: 0
+      },
+      'https://petemill.com/|0': {
+        location: 'https://petemill.com/',
+        order: 1, // changed to 2
+        title: 'Pete',
         partitionNumber: 0
       }
     }
@@ -69,6 +100,8 @@ describe('pinnedSitesReducer unit test', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
+    mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('ad-block', fakeAdBlock)
     pinnedSitesReducer = require('../../../../../app/browser/reducers/pinnedSitesReducer')
     pinnedSitesState = require('../../../../../app/common/state/pinnedSitesState')
   })
@@ -151,6 +184,44 @@ describe('pinnedSitesReducer unit test', function () {
       assert.equal(spyRemove.calledOnce, true)
       assert.deepEqual(newState.toJS(), state.toJS())
     })
+
+    it('reorder pinned site', function () {
+      // for this test there are three tabs, in completely different
+      // order than the 'pinned sites' state, but we only learn
+      // about each tab index change one at a time
+      // i.e. tabs are at b:0 p:1 c:2 but pinned state has c:0 p:1 b:2
+      //      and we learn about b moving to 0 first, then c moving to 2
+      // first tab
+      const actualFirst = pinnedSitesReducer(stateWithData, {
+        actionType: appConstants.APP_TAB_UPDATED,
+        changeInfo: {
+          index: 1 // irrelevant
+        },
+        tabValue: {
+          tabId: 1 // b
+        }
+      })
+      let expectedFirstState = stateWithData
+        .setIn(['pinnedSites', 'https://clifton.io/|0', 'order'], 1)
+        .setIn(['pinnedSites', 'https://brave.com/|0', 'order'], 0)
+        .setIn(['pinnedSites', 'https://petemill.com/|0', 'order'], 2)
+      assert.deepEqual(actualFirst.toJS(), expectedFirstState.toJS())
+      // second tab (it was swapped with)
+      const actualSecond = pinnedSitesReducer(actualFirst, {
+        actionType: appConstants.APP_TAB_UPDATED,
+        changeInfo: {
+          index: 1 // irrelevant
+        },
+        tabValue: {
+          tabId: 3 // c
+        }
+      })
+      let expectedSecondState = stateWithData
+        .setIn(['pinnedSites', 'https://clifton.io/|0', 'order'], 2)
+        .setIn(['pinnedSites', 'https://brave.com/|0', 'order'], 0)
+        .setIn(['pinnedSites', 'https://petemill.com/|0', 'order'], 1)
+      assert.deepEqual(actualSecond.toJS(), expectedSecondState.toJS())
+    })
   })
 
   describe('APP_CREATE_TAB_REQUESTED', function () {
@@ -181,49 +252,6 @@ describe('pinnedSitesReducer unit test', function () {
       const expectedState = state.setIn(['pinnedSites', 'https://brave.com/|0'], Immutable.fromJS({
         location: 'https://brave.com/',
         order: 0
-      }))
-      assert.equal(spy.calledOnce, true)
-      assert.deepEqual(newState.toJS(), expectedState.toJS())
-    })
-  })
-
-  describe('APP_ON_PINNED_TAB_REORDER', function () {
-    let spy
-
-    afterEach(function () {
-      spy.restore()
-    })
-
-    it('null case', function () {
-      spy = sinon.spy(pinnedSitesState, 'reOrderSite')
-      const newState = pinnedSitesReducer(state, {
-        actionType: appConstants.APP_ON_PINNED_TAB_REORDER
-      })
-      assert.equal(spy.notCalled, true)
-      assert.deepEqual(newState.toJS(), state.toJS())
-    })
-
-    it('check if works', function () {
-      spy = sinon.spy(pinnedSitesState, 'reOrderSite')
-      const newState = pinnedSitesReducer(stateWithData, {
-        actionType: appConstants.APP_ON_PINNED_TAB_REORDER,
-        siteKey: 'https://clifton.io/|0',
-        destinationKey: 'https://brave.com/|0',
-        prepend: true
-      })
-      const expectedState = state.setIn(['pinnedSites'], Immutable.fromJS({
-        'https://clifton.io/|0': {
-          location: 'https://clifton.io/',
-          order: 0,
-          title: 'Clifton',
-          partitionNumber: 0
-        },
-        'https://brave.com/|0': {
-          location: 'https://brave.com/',
-          order: 1,
-          title: 'Brave',
-          partitionNumber: 0
-        }
       }))
       assert.equal(spy.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())

@@ -90,7 +90,7 @@ describe('pinnedTabs', function () {
         .windowByUrl(Brave.browserWindowUrl)
         .waitForExist('[data-test-id="tab"][data-frame-key="4"]')
         // change pinned tabs order
-        .movePinnedTabByFrameKey(3, 2, true)
+        .moveTabByFrameKey(3, 2, true)
         // check the move worked
         .waitForExist('[data-test-id="tab-area"][data-frame-key="3"] + [data-test-id="tab-area"][data-frame-key="2"]')
         // create another tab and pin it

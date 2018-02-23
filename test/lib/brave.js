@@ -10,7 +10,6 @@ const path = require('path')
 const fs = require('fs-extra')
 const os = require('os')
 const {getTargetAboutUrl, isSourceAboutUrl, getBraveExtIndexHTML} = require('../../js/lib/appUrlUtil')
-const pinnedSiteUtils = require('../../app/common/lib/pinnedSitesUtil')
 
 var chaiAsPromised = require('chai-as-promised')
 chai.should()
@@ -643,36 +642,6 @@ var exports = {
       return this.execute(function (sourceKey, destinationKey, prepend) {
         return devTools('electron').testData.windowActions.moveTab(sourceKey, destinationKey, prepend)
       }, sourceKey, destinationKey, prepend)
-    })
-
-    this.app.client.addCommand('movePinnedTabByFrameKey', async function (sourceKey, destinationKey, prepend, windowId = 1) {
-      logVerbose(`movePinnedTabByFrameKey(${sourceKey}, ${destinationKey}, ${prepend})`)
-      // get info on tabs to move
-      const state = await this.getAppState()
-      const sourceTab = state.value.tabs.find(tab => tab.windowId === windowId && tab.frame.key === sourceKey)
-      if (!sourceTab) {
-        throw new Error(`movePinnedTabByIndex could not find source tab with key ${sourceKey} in window ${windowId}`)
-      }
-      const destinationTab = state.value.tabs.find(tab => tab.windowId === windowId && tab.frame.key === destinationKey)
-      if (!destinationTab) {
-        throw new Error(`movePinnedTabByIndex could not find destination tab with key ${destinationKey} in window ${windowId}`)
-      }
-      const sourceTabSiteDetail = Immutable.fromJS({
-        location: sourceTab.url,
-        partitionNumber: sourceTab.partitionNumber
-      })
-      const destinationTabSiteDetail = Immutable.fromJS({
-        location: destinationTab.url,
-        paritionNumber: destinationTab.partitionNumber
-      })
-      // do actual move
-      await this.moveTabByFrameKey(sourceKey, destinationKey, prepend)
-      // notify pinned tabs have changed, required for state change
-      const sourcePinKey = pinnedSiteUtils.getKey(sourceTabSiteDetail)
-      const destinationPinKey = pinnedSiteUtils.getKey(destinationTabSiteDetail)
-      return this.execute(function (sourcePinKey, destinationPinKey, prepend) {
-        return devTools('appActions').onPinnedTabReorder(sourcePinKey, destinationPinKey, prepend)
-      }, sourcePinKey, destinationPinKey, prepend)
     })
 
     this.app.client.addCommand('moveTabIncrementally', function (moveNext, windowId = 1) {

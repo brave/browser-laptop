@@ -125,7 +125,10 @@ const updatePinnedTabs = (win, appState) => {
   // tabs are sites our window already has pinned
   // for each site which should be pinned, find if it's already pinned
   const statePinnedSitesOrdered = statePinnedSites.sort((a, b) => a.get('order') - b.get('order'))
+  // pinned sites should always be at the front of the window tab indexes, starting with 0
+  let pinnedSiteIndex = -1
   for (const site of statePinnedSitesOrdered.values()) {
+    pinnedSiteIndex++
     const existingPinnedTabIdx = pinnedWindowTabs.findIndex(tab => siteMatchesTab(site, tab))
     if (existingPinnedTabIdx !== -1) {
       // if it's already pinned we don't need to consider the tab in further searches
@@ -135,6 +138,7 @@ const updatePinnedTabs = (win, appState) => {
       appActions.createTabRequested({
         url: site.get('location'),
         partitionNumber: site.get('partitionNumber'),
+        index: pinnedSiteIndex,
         pinned: true,
         active: false,
         windowId
