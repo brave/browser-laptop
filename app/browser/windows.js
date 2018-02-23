@@ -25,7 +25,7 @@ const browserWindowUtil = require('../common/lib/browserWindowUtil')
 const windowState = require('../common/state/windowState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
 const {zoomLevel} = require('../common/constants/toolbarUserInterfaceScale')
-const { shouldDebugWindowEvents } = require('../cmdLine')
+const { shouldDebugWindowEvents, shouldDebugTabEvents } = require('../cmdLine')
 const activeTabHistory = require('./activeTabHistory')
 
 const isDarwin = platformUtil.isDarwin()
@@ -131,6 +131,16 @@ const updatePinnedTabs = (win, appState) => {
     pinnedSiteIndex++
     const existingPinnedTabIdx = pinnedWindowTabs.findIndex(tab => siteMatchesTab(site, tab))
     if (existingPinnedTabIdx !== -1) {
+      // make sure it's at the correct index
+      const tab = pinnedWindowTabs.get(existingPinnedTabIdx)
+      const tabIndex = tab.get('index')
+      if (tabIndex !== pinnedSiteIndex) {
+        const tabId = tab.get('tabId')
+        if (shouldDebugTabEvents) {
+          console.log(`Tab [${tabId}] in window ${win.id} is pinned but at the wrong index of ${tabIndex} when it should be ${pinnedSiteIndex}. Requesting change...`)
+        }
+        appActions.tabIndexChangeRequested(tabId, pinnedSiteIndex)
+      }
       // if it's already pinned we don't need to consider the tab in further searches
       pinnedWindowTabs = pinnedWindowTabs.remove(existingPinnedTabIdx)
     } else {

@@ -14,6 +14,7 @@ const windowConstants = require('../../../js/constants/windowConstants')
 
 // State
 const windowState = require('../../common/state/windowState')
+const tabState = require('../../common/state/tabState')
 
 // Utils
 const windows = require('../windows')
@@ -297,13 +298,6 @@ const windowsReducer = (state, action, immutableAction) => {
       break
     case appConstants.APP_WINDOW_RENDERED:
       windows.windowRendered(action.get('windowId'))
-      break
-    case appConstants.APP_TAB_UPDATED:
-      if (immutableAction.getIn(['changeInfo', 'pinned']) != null) {
-        setImmediate(() => {
-          windows.pinnedTabsChanged()
-        })
-      }
       break
     case appConstants.APP_CLOSE_WINDOW:
       windows.closeWindow(action.get('windowId'))

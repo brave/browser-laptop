@@ -22,7 +22,7 @@ require('../../braveUnit')
 describe('window API unit tests', function () {
   let windows, appActions
   let appStore
-  let defaultState, createTabState, tabCloseState
+  let defaultState, createTabState, tabCloseState, reorderTabState
   const windowCreateTimeout = 5000
   let browserWindowSpy
   let browserShowSpy
@@ -44,6 +44,15 @@ describe('window API unit tests', function () {
       windowId: 1,
       pinned: true
     }
+
+    const tab2 = {
+      id: 2,
+      url: 'https://another-pinned-tab.com',
+      paritionNumber: 0,
+      windowId: 1,
+      pinned: true
+    }
+
     const pinned1 = {
       'https://pinned-tab.com|0|0': {
         location: 'https://pinned-tab.com',
@@ -55,9 +64,18 @@ describe('window API unit tests', function () {
     const pinned2 = {
       'https://another-pinned-tab.com|0|0': {
         location: 'https://another-pinned-tab.com',
-        partitionNumber: pinned1.partitionNumber,
-        title: pinned1.title,
-        order: pinned1.order
+        partitionNumber: 0,
+        title: 'Another title',
+        order: 1
+      }
+    }
+
+    const pinned3 = {
+      'https://another-pinned-tab.com|0|0': {
+        location: 'https://another-pinned-tab.com',
+        partitionNumber: 0,
+        title: 'A third title',
+        order: 2
       }
     }
 
@@ -74,6 +92,14 @@ describe('window API unit tests', function () {
     tabCloseState = Immutable.fromJS({
       pinnedSites: {},
       tabs: [tab1]
+    })
+
+    reorderTabState = Immutable.fromJS({
+      pinnedSites: Object.assign({}, pinned1, pinned3),
+      tabs: [
+        Object.assign({ }, tab2, {index: 0}),
+        Object.assign({ }, tab1, {index: 1})
+      ]
     })
 
     appStore = {
@@ -122,7 +148,7 @@ describe('window API unit tests', function () {
 
   describe('privateMethods', function () {
     let updatePinnedTabs
-    let createTabRequestedSpy, tabCloseRequestedSpy
+    let createTabRequestedSpy, tabCloseRequestedSpy, indexChangeRequestedSpy
 
     const win = {
       id: 1,
@@ -141,10 +167,12 @@ describe('window API unit tests', function () {
     beforeEach(function () {
       createTabRequestedSpy = sinon.spy(appActions, 'createTabRequested')
       tabCloseRequestedSpy = sinon.spy(appActions, 'tabCloseRequested')
+      indexChangeRequestedSpy = sinon.spy(appActions, 'tabIndexChangeRequested')
     })
     afterEach(function () {
       createTabRequestedSpy.restore()
       tabCloseRequestedSpy.restore()
+      indexChangeRequestedSpy.restore()
       appStore.getState = () => Immutable.fromJS(defaultState)
     })
 
@@ -174,6 +202,11 @@ describe('window API unit tests', function () {
         // should not ask for a new tab
         updatePinnedTabs(win, createTabStateClone)
         assert.equal(createTabRequestedSpy.callCount, 1)
+      })
+
+      it('asks for tab to be re-ordered if the pinned site is in a different order', function () {
+        updatePinnedTabs(win, reorderTabState)
+        assert.equal(indexChangeRequestedSpy.callCount, 2)
       })
     })
 

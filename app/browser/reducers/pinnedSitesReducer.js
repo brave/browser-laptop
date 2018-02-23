@@ -8,6 +8,9 @@ const Immutable = require('immutable')
 const pinnedSitesState = require('../../common/state/pinnedSitesState')
 const tabState = require('../../common/state/tabState')
 
+// API
+const windows = require('../windows')
+
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
 const {STATE_SITES} = require('../../../js/constants/stateConstants')
@@ -40,6 +43,10 @@ const pinnedSitesReducer = (state, action, immutableAction) => {
             state = pinnedSitesState.removePinnedSite(state, siteDetail)
           }
           state = syncUtil.updateObjectCache(state, siteDetail, STATE_SITES.PINNED_SITES)
+          // make sure it's synced with other windows
+          setImmediate(() => {
+            windows.pinnedTabsChanged()
+          })
         } else if (action.getIn(['changeInfo', 'index']) != null && tabState.isTabPinned(state, tabId)) {
           // The tab index changed and tab is already pinned.
           // We cannot rely on the index reported by muon as pinned tabs may not always start at 0,
@@ -70,6 +77,9 @@ const pinnedSitesReducer = (state, action, immutableAction) => {
           if (newState !== state) {
             state = newState
             // make sure it's synced
+            setImmediate(() => {
+              windows.pinnedTabsChanged()
+            })
             const newSite = pinnedSitesState.getSite(state, siteKey)
             state = syncUtil.updateObjectCache(state, newSite, STATE_SITES.PINNED_SITES)
           }
