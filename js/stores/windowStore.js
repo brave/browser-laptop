@@ -355,7 +355,7 @@ const doAction = (action) => {
         windowState = windowState.set('closedFrames', new Immutable.List())
       } else {
         windowState = windowState.set('closedFrames',
-          windowState.get('closedFrames').filterNot((frame) => frame.get('location') === action.location))
+          windowState.get('closedFrames', Immutable.List()).filterNot((frame) => frame.get('location') === action.location))
       }
       break
     case windowConstants.WINDOW_SET_PREVIEW_TAB_PAGE_INDEX:

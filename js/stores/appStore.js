@@ -328,7 +328,7 @@ const handleAppAction = (action) => {
         break
       }
     case appConstants.APP_SHOW_NOTIFICATION:
-      let notifications = appState.get('notifications')
+      let notifications = appState.get('notifications', Immutable.List())
       notifications = notifications.filterNot((notification) => {
         let message = notification.get('message')
         // action.detail is a regular mutable object only when running tests
@@ -359,7 +359,7 @@ const handleAppAction = (action) => {
       appState = appState.set('notifications', notifications)
       break
     case appConstants.APP_HIDE_NOTIFICATION:
-      appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
+      appState = appState.set('notifications', appState.get('notifications', Immutable.List()).filterNot((notification) => {
         return notification.get('message') === action.message
       }))
       break
@@ -374,7 +374,7 @@ const handleAppAction = (action) => {
         const tabsInOrigin = tabState.getTabs(appState).find((tabValue) =>
           urlUtil.getOrigin(tabValue.get('url')) === origin && tabValue.get('tabId') !== immutableAction.get('tabId'))
         if (!tabsInOrigin) {
-          appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
+          appState = appState.set('notifications', appState.get('notifications', Immutable.List()).filterNot((notification) => {
             return notification.get('frameOrigin') === origin
           }))
         }
