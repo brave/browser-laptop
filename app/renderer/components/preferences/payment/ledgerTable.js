@@ -156,13 +156,13 @@ class LedgerTable extends ImmutableComponent {
     }
 
     if (!faviconURL) {
-      return <span className={css(styles.defaultIcon)}>
+      return <span className={css(styles.siteData__anchor__icon_default)}>
         <span className={globalStyles.appIcons.defaultIcon} />
       </span>
     }
 
     return <img
-      className={css(styles.favicon)}
+      className={css(styles.siteData__anchor__icon_favicon)}
       src={faviconURL}
       alt=''
       onError={this.onFaviconError.bind(null, faviconURL, publisherKey)}
@@ -193,10 +193,10 @@ class LedgerTable extends ImmutableComponent {
         value: verified ? (this.enabledForSite(synopsis) ? 2 : 1) : 0
       },
       {
-        html: <div>
-          <a className={css(styles.siteData)} href={publisherURL} rel='noopener' target='_blank' tabIndex={-1}>
+        html: <div className={css(styles.siteData)}>
+          <a className={css(styles.siteData__anchor)} href={publisherURL} rel='noopener' target='_blank' tabIndex={-1}>
             { this.getImage(faviconURL, providerName, publisherKey) }
-            <span className={css(styles.url)} data-test-id='siteName'>{siteName}</span>
+            <span className={css(styles.siteData__anchor__url)} title={siteName} data-test-id='siteName'>{siteName}</span>
           </a>
         </div>,
         value: publisherKey
@@ -350,9 +350,9 @@ class LedgerTable extends ImmutableComponent {
 const verifiedBadge = (icon) => ({
   height: '20px',
   width: '20px',
-  marginRight: '-10px',
   display: 'block',
-  background: `url(${icon}) center no-repeat`
+  background: `url(${icon}) center no-repeat`,
+  margin: 'auto'
 })
 
 const gridStyles = StyleSheet.create({
@@ -391,7 +391,8 @@ const styles = StyleSheet.create({
   },
 
   verifiedTd: {
-    padding: '0 0 0 15px'
+    paddingRight: 0,
+    paddingLeft: 0
   },
 
   percTd: {
@@ -413,20 +414,27 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
 
-  defaultIcon: {
+  siteData__anchor: {
+    width: '430px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    textAlign: 'left'
+  },
+
+  siteData__anchor__icon_favicon: {
+    width: globalStyles.spacing.iconSize,
+    height: globalStyles.spacing.iconSize
+  },
+
+  siteData__anchor__icon_default: {
     fontSize: '15px',
     width: globalStyles.spacing.iconSize,
     textAlign: 'center'
   },
 
-  favicon: {
-    width: globalStyles.spacing.iconSize,
-    height: globalStyles.spacing.iconSize
-  },
-
-  url: {
-    padding: '0 6px',
-    textAlign: 'left'
+  siteData__anchor__url: {
+    paddingLeft: '6px'
   },
 
   hideExcludedSites: {
