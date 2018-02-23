@@ -433,13 +433,9 @@ class Frame extends React.Component {
   }
 
   addEventListeners () {
-    this.webview.addEventListener('tab-id-changed', (e) => {
-      if (this.frame.isEmpty()) {
-        return
-      }
-
-      windowActions.frameTabIdChanged(this.frame, this.props.tabId, e.tabID)
-    }, { passive: true })
+    // Webview also exposes the 'tab-id-changed' event, with e.tabID as the new tabId.
+    // We don't handle that event anymore, in favor of tab-replaced-at in the browser process.
+    // Keeping this comment here as it is not documented - petemill.
     this.webview.addEventListener('guest-ready', (e) => {
       if (this.frame.isEmpty()) {
         return
@@ -938,6 +934,9 @@ class Frame extends React.Component {
     const transitionClassName = this.getTransitionStateClassName(this.props.transitionState)
     return <div
       data-partition={this.props.partition}
+      data-tab-id={this.props.tabId}
+      data-frame-key={this.props.frameKey}
+      data-guest-id={this.props.guestInstanceId}
       data-test-id='frameWrapper'
       data-test2-id={this.props.isActive ? 'activeFrame' : null}
       data-test3-id={this.props.isPreview ? 'previewFrame' : null}

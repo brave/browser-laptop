@@ -305,6 +305,18 @@ const appActions = {
     })
   },
 
+  tabReplaced: function (oldTabId, newTabValue, windowId, isPermanent) {
+    dispatch({
+      actionType: appConstants.APP_TAB_REPLACED,
+      oldTabId,
+      newTabValue,
+      isPermanent,
+      queryInfo: {
+        windowId
+      }
+    })
+  },
+
   /**
    * Dispatches a message to the store to set a new frame as the active frame.
    *
