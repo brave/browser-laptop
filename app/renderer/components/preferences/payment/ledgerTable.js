@@ -183,7 +183,7 @@ class LedgerTable extends ImmutableComponent {
                 ? <img className={css(styles.siteData__anchor__icon_favicon)} src={faviconURL} alt='' onError={this.onFaviconError.bind(null, faviconURL, publisherKey)} />
                 : <span className={css(styles.siteData__anchor__icon_default)}><span className={globalStyles.appIcons.defaultIcon} /></span>
             }
-            <span className={css(styles.siteData__anchor__url)} data-test-id='siteName'>{siteName}</span>
+            <span className={css(styles.siteData__anchor__url)} title={siteName} data-test-id='siteName'>{siteName}</span>
           </a>
         </div>,
         value: publisherKey
@@ -410,6 +410,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     flex: '1',
     alignItems: 'center'
+  },
+
+  siteData__anchor: {
+    width: '430px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
   },
 
   siteData__anchor__icon_favicon: {
