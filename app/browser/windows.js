@@ -25,7 +25,7 @@ const browserWindowUtil = require('../common/lib/browserWindowUtil')
 const windowState = require('../common/state/windowState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
 const {zoomLevel} = require('../common/constants/toolbarUserInterfaceScale')
-const { shouldDebugWindowEvents } = require('../cmdLine')
+const { shouldDebugWindowEvents, disableBufferWindow } = require('../cmdLine')
 const activeTabHistory = require('./activeTabHistory')
 
 const isDarwin = platformUtil.isDarwin()
@@ -564,6 +564,12 @@ const api = {
   },
 
   getOrCreateBufferWindow: function (options = { }) {
+    if (disableBufferWindow) {
+      if (shouldDebugWindowEvents) {
+        console.log(`getOrCreateBufferWindow: buffer window disabled, not creating one.`)
+      }
+      return
+    }
     // only if we don't have one already
     let win = api.getBufferWindow()
     if (!win) {
