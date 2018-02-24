@@ -37,6 +37,7 @@ describe('ledgerState unit test', function () {
       useCleanCache: true
     })
 
+    mockery.registerMock('../../../js/actions/appActions', appActions)
     mockery.registerMock('../../../js/settings', {
       getSetting: (settingKey) => {
         switch (settingKey) {
@@ -160,6 +161,14 @@ describe('ledgerState unit test', function () {
       let hideNotificationSpy
       before(function () {
         hideNotificationSpy = sinon.spy(appActions, 'hideNotification')
+      })
+
+      afterEach(function () {
+        hideNotificationSpy.reset()
+      })
+
+      after(function () {
+        hideNotificationSpy.restore()
       })
 
       it('we have existing promotion, but is empty', function () {
