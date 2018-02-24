@@ -341,7 +341,10 @@ const api = {
         // if we have a bufferWindow, the 'window-all-closed'
         // event will not fire once the last window is closed,
         // so close the buffer window if this is the last closed window
-        // apart from the buffer window
+        // apart from the buffer window.
+        // This would mean that the last window to close is the buffer window, but
+        // that will not get saved to state as the last-closed window which should be restored
+        // since we won't save state if there are no frames.
         if (!platformUtil.isDarwin() && api.getBufferWindow()) {
           const remainingWindows = api.getAllRendererWindows().filter(win => win !== api.getBufferWindow())
           if (!remainingWindows.length) {

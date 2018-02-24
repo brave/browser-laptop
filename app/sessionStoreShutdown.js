@@ -218,7 +218,10 @@ ipcMain.on(messages.RESPONSE_WINDOW_STATE, (evt, mem) => {
 })
 
 ipcMain.on(messages.LAST_WINDOW_STATE, (evt, data) => {
-  if (data) {
+  // Remember last window (that was not buffer window, i.e. had frames).
+  // When the last tab of a window closes, the window is closed before the tab closes, so
+  // a used closing window will almost always have at least 1 frame.
+  if (data && data.frames && data.frames.length) {
     immutableLastWindowClosedState = Immutable.fromJS(data)
   }
 })
