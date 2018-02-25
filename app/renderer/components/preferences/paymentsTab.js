@@ -184,6 +184,7 @@ class PaymentsTab extends ImmutableComponent {
       {
         this.enabled && this.props.deletedSitesOverlayVisible && showDeletedSites
         ? <ModalOverlay
+          customDialogBodyWrapperClasses={css(styles.payments__deleted__wrapper)}
           title={'deletedSitesHeader'}
           content={this.deletedSitesContent(deletedSites)}
           footer={this.deletedSitesFooter}
@@ -513,6 +514,12 @@ const styles = StyleSheet.create({
     // TODO: Add 'position: relative' and 'bottom: 1px' for macOS (en_US) only.
     paddingLeft: '.75ch',
     color: globalStyles.color.braveOrange
+  },
+
+  payments__deleted__wrapper: {
+    maxHeight: '500px',
+    borderRadius: 0,
+    overflowY: 'scroll'
   }
 })
 
