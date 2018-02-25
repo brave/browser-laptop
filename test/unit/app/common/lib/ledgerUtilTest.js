@@ -242,7 +242,7 @@ describe('ledgerUtil unit test', function () {
 
     it('custom format for amount lower then 0.01', function () {
       const result = ledgerUtil.formatCurrentBalance(ledgerData.set('converted', '0.004'))
-      assert.equal(result, '5.00 BAT (<.01 USD)')
+      assert.equal(result, '5.00 BAT (< 0.01 USD)')
     })
   })
 
