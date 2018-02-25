@@ -8,19 +8,13 @@ const {app} = require('electron')
 const version = app.getVersion()
 const channel = Channel.channel()
 
-const crashKeys = {
-  '_version': version,
-  'channel': channel
-}
-
 const initCrashKeys = () => {
   // set muon-app-version switch to pass version to renderer processes
   app.commandLine.appendSwitch('muon-app-version', version)
   app.commandLine.appendSwitch('muon-app-channel', channel)
 
-  for (let key in crashKeys) {
-    muon.crashReporter.setCrashKeyValue(key, crashKeys[key])
-  }
+  muon.crashReporter.setVersionCrashValue(version)
+  muon.crashReporter.setChannelCrashValue(channel)
 }
 
 exports.init = (enabled) => {
