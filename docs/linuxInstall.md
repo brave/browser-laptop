@@ -40,12 +40,18 @@ Verify the `/etc/apt/sources.list.d/brave-*.list` file lists a new repository an
  grep lsb_release /etc/apt/sources.list.d/brave*
  ```
 
+
 Finally, install Brave:
 ```
 sudo apt update
 sudo apt install brave
 ```
 
+If you get this error when updating, you need an additional package.
+> E: Some files failed to download. They have been ignored, or old ones used instead.  
+ ```
+sudo apt-get install apt-transport-https
+ ```
 To install the latest `brave-beta` which often has early staging builds:
 
 ```
