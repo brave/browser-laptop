@@ -103,14 +103,11 @@ module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
  */
 module.exports.fetchPublisherInfo = (url, options, callback) => {
   if (!backgroundPageWebContents) {
-    callback({
-      url,
-      error: 'Background page web contents not initialized.'
-    })
+    callback(new Error('Background page web contents not initialized.'), { url })
     return
   }
   backgroundPageWebContents.send('fetch-publisher-info', url, options)
   ipc.once('got-publisher-info-' + url, (e, response) => {
-    callback(response)
+    callback(response.error, response.body)
   })
 }

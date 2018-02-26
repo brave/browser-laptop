@@ -2663,4 +2663,35 @@ describe('ledger api unit tests', function () {
       assert.deepEqual(ledgerApi.getSynopsis(), expectedSynopsis)
     })
   })
+
+  describe('roundTripFromWindow', function () {
+    let fetchPublisherInfoSpy
+
+    before(() => {
+      fetchPublisherInfoSpy = sinon.spy(request, 'fetchPublisherInfo')
+    })
+
+    afterEach(() => {
+      fetchPublisherInfoSpy.reset()
+    })
+
+    after(() => {
+      fetchPublisherInfoSpy.restore()
+    })
+
+    it('null case', function () {
+      ledgerApi.roundTripFromWindow()
+      assert(fetchPublisherInfoSpy.notCalled)
+    })
+
+    it('url is missing', function () {
+      ledgerApi.roundTripFromWindow({})
+      assert(fetchPublisherInfoSpy.notCalled)
+    })
+
+    it('fetch is called', function () {
+      ledgerApi.roundTripFromWindow({url: 'test.com'}, () => true)
+      assert(fetchPublisherInfoSpy.withArgs('test.com', sinon.match.any, sinon.match.any))
+    })
+  })
 })

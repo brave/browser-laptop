@@ -38,7 +38,7 @@ let generateBraveManifest = () => {
     manifest_version: 2,
     version: '1.0',
     background: {
-      scripts: [ 'content/scripts/requestHandler.js', 'content/scripts/idleHandler.js' ],
+      scripts: [ 'content/scripts/metaScraper.js', 'content/scripts/requestHandler.js', 'content/scripts/idleHandler.js' ],
       persistent: true
     },
     content_scripts: [
@@ -198,7 +198,7 @@ let generateBraveManifest = () => {
     'style-src': '\'self\' \'unsafe-inline\'',
     'font-src': '\'self\' data:',
     'img-src': '* data: file://*',
-    'connect-src': 'https://www.youtube.com https://www.twitch.tv',
+    'connect-src': 'https://www.youtube.com',
     'frame-src': '\'self\' https://brave.com'
   }
 
