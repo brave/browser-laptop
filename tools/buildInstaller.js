@@ -128,7 +128,8 @@ if (isDarwin) {
     'cd ..',
     'build ' +
       `--prepackaged="${buildDir}/${appName}.app" ` +
-      `--config=res/${channel}/builderConfig.json `,
+      `--config=res/${channel}/builderConfig.json ` +
+      '--publish=never',
 
     // Create an update zip
     'ditto -c -k --sequesterRsrc --keepParent ' + buildDir + `/${appName}.app dist/${appName}-` + VersionInfo.braveVersion + '.zip'
