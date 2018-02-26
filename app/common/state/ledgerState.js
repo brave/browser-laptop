@@ -192,32 +192,6 @@ const ledgerState = {
     return state.setIn(['ledger', 'synopsis', 'publishers', key, 'options', prop], value)
   },
 
-  setPublishersOption: (state, publishersArray) => {
-    state = validateState(state)
-
-    if (!publishersArray || publishersArray.size === 0) {
-      return state
-    }
-
-    publishersArray.forEach(publisherData => {
-      const publisherKey = publisherData.get('publisherKey')
-
-      if (publisherKey == null) {
-        return
-      }
-
-      for (const data of publisherData) {
-        const prop = data[0]
-        const value = data[1]
-        if (prop !== 'publisherKey') {
-          state = ledgerState.setPublisherOption(state, publisherKey, prop, value)
-        }
-      }
-    })
-
-    return state
-  },
-
   getPublisherOption: (state, key, prop) => {
     state = validateState(state)
 
