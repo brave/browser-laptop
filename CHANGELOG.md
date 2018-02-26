@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.20.46](https://github.com/brave/browser-laptop/releases/tag/v0.20.46dev)
+
+ - Fixed YouTube videos lagging while playing. ([#13079](https://github.com/brave/browser-laptop/issues/13079))
+ - Fixed several performance issues. ([#13087](https://github.com/brave/browser-laptop/issues/13087))
+ - Fixed about: pages not working after long usage. ([#12828](https://github.com/brave/browser-laptop/issues/12828))
+ - Fixed back button not working after long usage. ([#13157](https://github.com/brave/browser-laptop/issues/13157))
+ - Fixed reload button not working after long usage. ([#12333](https://github.com/brave/browser-laptop/issues/12333))
+
 ## [0.20.42](https://github.com/brave/browser-laptop/releases/tag/v0.20.42dev)
 
  - Fixed websites randomly being unpinned under Payments. ([#13102](https://github.com/brave/browser-laptop/issues/13102))
