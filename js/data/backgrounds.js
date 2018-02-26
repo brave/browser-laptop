@@ -79,7 +79,7 @@ module.exports = [
     "author": "Serge Ramelli",
     "link": "https://www.photoserge.com/"
   }, {
-    "name": "Paris:Conciergeri",
+    "name": "Paris:Conciergerie",
     "source": "https://s3.amazonaws.com/brave-backgrounds/Phoyoserge_ParisConciergeri.jpg",
     "author": "Serge Ramelli",
     "link": "https://www.photoserge.com/"
@@ -89,7 +89,7 @@ module.exports = [
     "author": "Serge Ramelli",
     "link": "https://www.photoserge.com/"
   }, {
-    "name": "Paris:The Seant",
+    "name": "Paris:The Senate",
     "source": "https://s3.amazonaws.com/brave-backgrounds/Phoyoserge_TheSeantParis.jpg",
     "author": "Serge Ramelli",
     "link": "https://www.photoserge.com/"
