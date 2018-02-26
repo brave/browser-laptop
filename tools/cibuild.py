@@ -37,7 +37,12 @@ def run_script(script, args=[]):
   sys.stderr.write('\nRunning ' + script +'\n')
   sys.stderr.flush()
   script = os.path.join(SOURCE_ROOT, 'tools', script)
-  subprocess.check_call([sys.executable, script] + args)
+  try:
+    output = subprocess.check_output([sys.executable, script] + args, stderr=subprocess.STDOUT)
+    print output
+  except subprocess.CalledProcessError as e:
+    print e.output
+    raise e
 
 
 PLATFORM = {

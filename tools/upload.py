@@ -9,6 +9,7 @@ BROWSER_LAPTOP_REPO = 'brave/browser-laptop'
 TARGET_ARCH= os.environ['TARGET_ARCH'] if os.environ.has_key('TARGET_ARCH') else 'x64'
 
 def main():
+  print('Running upload...')
   github = GitHub(auth_token())
   releases = github.repos(BROWSER_LAPTOP_REPO).releases.get()
   tag = 'v' + json.load(open('package.json'))['version']
@@ -20,7 +21,7 @@ def main():
   release = create_or_get_release_draft(github, releases, tag,
                                         tag_exists)
   for f in get_files_to_upload():
-    upload_browser_laptop(github,release, f)
+    upload_browser_laptop(github, release, f)
 
 def get_channel_display_name():
   d = {'dev': 'Release', 'beta': 'Beta', 'developer': 'Developer', 'nightly': 'Nightly'}
@@ -36,6 +37,7 @@ def get_files_to_upload():
 
 def upload_browser_laptop(github, release, file_path):
   filename = os.path.basename(file_path)
+  print('upload_browser_laptop: ' + filename)
   try:
     for asset in release['assets']:
       if asset['name'] == filename:
