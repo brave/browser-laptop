@@ -489,7 +489,7 @@ class UrlBar extends React.Component {
   }
 
   get showEvCert () {
-    if (this.props.titleMode) {
+    if (this.props.titleMode || this.props.isActive) {
       return null
     }
     return <span className='evCert' title={this.props.evCert}> {this.props.evCert} </span>
