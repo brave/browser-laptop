@@ -52,7 +52,6 @@ class UrlBar extends React.Component {
     this.lastVal = ''
     this.lastSuffix = ''
     this.isOnComposition = false
-    this.isChanging = false
     this.onFocus = this.onFocus.bind(this)
     this.onBlur = this.onBlur.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
@@ -110,8 +109,6 @@ class UrlBar extends React.Component {
       case KeyCodes.ENTER:
         e.preventDefault()
 
-        // navigating, don't hide ev anymore
-        this.isChanging = false
         let location = this.urlInput ? this.getValue() : this.props.urlbarLocation
 
         if (location === null || location.length === 0) {
@@ -215,8 +212,6 @@ class UrlBar extends React.Component {
   }
 
   onClick () {
-    // setup for hiding ev on active url bar
-    this.isChanging = true
     if (this.props.isSelected) {
       windowActions.setUrlBarActive(true)
     }
@@ -224,9 +219,6 @@ class UrlBar extends React.Component {
 
   onBlur (e) {
     windowActions.urlBarOnBlur(getCurrentWindowId(), e.target.value, this.props.urlbarLocation, eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm']))
-
-    // set ev back. Can't do it on ESC keycode or it won't get the isChanging signal again
-    this.isChanging = false
   }
 
   updateAutocomplete (newValue) {
@@ -501,7 +493,7 @@ class UrlBar extends React.Component {
   }
 
   get showEvCert () {
-    if (this.props.titleMode || this.isChanging) {
+    if (this.props.titleMode || this.props.isActive) {
       return null
     }
     return <span className='evCert' title={this.props.evCert}> {this.props.evCert} </span>
