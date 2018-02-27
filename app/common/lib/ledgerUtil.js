@@ -227,12 +227,7 @@ const getMediaId = (data, type) => {
     case ledgerMediaProviders.TWITCH:
       {
         if (
-          ([
-            twitchEvents.MINUTE_WATCHED,
-            twitchEvents.START,
-            twitchEvents.PLAY_PAUSE,
-            twitchEvents.SEEK
-          ].includes(data.event)) &&
+          Object.values(twitchEvents).includes(data.event) &&
           data.properties
         ) {
           id = data.properties.channel
@@ -327,7 +322,7 @@ const getMediaDuration = (state, data, mediaKey, type) => {
   return duration
 }
 
-const generateMediaCacheData = (parsed, type) => {
+const generateMediaCacheData = (state, parsed, type, mediaKey) => {
   let data = Immutable.Map()
 
   if (parsed == null) {
@@ -337,7 +332,7 @@ const generateMediaCacheData = (parsed, type) => {
   switch (type) {
     case ledgerMediaProviders.TWITCH:
       {
-        data = generateTwitchCacheData(parsed)
+        data = generateTwitchCacheData(state, parsed, mediaKey)
         break
       }
   }
@@ -345,20 +340,57 @@ const generateMediaCacheData = (parsed, type) => {
   return data
 }
 
-const generateTwitchCacheData = (parsed) => {
+const generateTwitchCacheData = (state, parsed, mediaKey) => {
   if (parsed == null) {
     return Immutable.Map()
+  }
+
+  const statusConst = {
+    playing: 'playing',
+    paused: 'paused'
+  }
+
+  const previousData = ledgerVideoCache.getDataByVideoId(state, mediaKey)
+  let status = statusConst.playing
+
+  if (
+    (
+      parsed.event === twitchEvents.PLAY_PAUSE &&
+      previousData.get('event') !== twitchEvents.PLAY_PAUSE
+    ) || // user clicked pause (we need to exclude seeking while paused)
+    (
+      parsed.event === twitchEvents.PLAY_PAUSE &&
+      previousData.get('event') === twitchEvents.PLAY_PAUSE &&
+      previousData.get('status') === statusConst.playing
+    ) || // user clicked pause as soon as he clicked played
+    (
+      parsed.event === twitchEvents.SEEK &&
+      previousData.get('status') === statusConst.paused
+    ) // seeking video while it is paused
+  ) {
+    status = statusConst.paused
+  }
+
+  // User pauses a video, then seek it and play it again
+  if (
+    parsed.event === twitchEvents.PLAY_PAUSE &&
+    previousData.get('event') === twitchEvents.SEEK &&
+    previousData.get('status') === statusConst.paused
+  ) {
+    status = statusConst.playing
   }
 
   if (parsed.properties) {
     return Immutable.fromJS({
       event: parsed.event,
-      time: parsed.properties.time
+      time: parsed.properties.time,
+      status
     })
   }
 
   return Immutable.fromJS({
-    event: parsed.event
+    event: parsed.event,
+    status
   })
 }
 
@@ -393,31 +425,42 @@ const getTwitchDuration = (state, data, mediaKey) => {
   }
 
   const previousData = ledgerVideoCache.getDataByVideoId(state, mediaKey)
+  const oldEvent = previousData.get('event')
   const twitchMinimumSeconds = 10
 
-  if (previousData.isEmpty() && data.event === twitchEvents.START) {
+  if (data.event === twitchEvents.START && oldEvent === twitchEvents.START) {
+    return 0
+  }
+
+  if (data.event === twitchEvents.START) {
     return twitchMinimumSeconds * milliseconds.second
   }
 
-  const oldMedia = ledgerVideoCache.getDataByVideoId(state, mediaKey)
   let time = 0
   const currentTime = parseFloat(data.properties.time)
   const oldTime = parseFloat(previousData.get('time'))
+  const currentEvent = data.event
 
-  if (
-    data.event === twitchEvents.PLAY_PAUSE &&
-    oldMedia.get('event') !== twitchEvents.PLAY_PAUSE
-  ) {
-    // User paused a video
-    time = currentTime - oldTime
-  } else if (previousData.get('event') === twitchEvents.START) {
+  if (oldEvent === twitchEvents.START) {
     // From video play event to x event
     time = currentTime - oldTime - twitchMinimumSeconds
-  } else if (data.event === twitchEvents.MINUTE_WATCHED) {
-    // Minute watched event
-    time = currentTime - oldTime
-  } else if (data.event === twitchEvents.SEEK && oldMedia.get('event') !== twitchEvents.PLAY_PAUSE) {
-    // Vod seek event
+  } else if (
+    currentEvent === twitchEvents.MINUTE_WATCHED || // Minute watched
+    currentEvent === twitchEvents.BUFFER_EMPTY || // Run out of buffer
+    currentEvent === twitchEvents.VIDEO_ERROR || // Video has some problems
+    currentEvent === twitchEvents.END || // Video ended
+    (currentEvent === twitchEvents.SEEK && previousData.get('status') !== 'paused') || // Vod seek
+    (
+      currentEvent === twitchEvents.PLAY_PAUSE &&
+      (
+        (
+          oldEvent !== twitchEvents.PLAY_PAUSE &&
+          oldEvent !== twitchEvents.SEEK
+        ) ||
+        previousData.get('status') === 'playing'
+      )
+    ) // User paused a video
+  ) {
     time = currentTime - oldTime
   }
 
@@ -436,7 +479,7 @@ const getTwitchDuration = (state, data, mediaKey) => {
   // we get seconds back, so we need to convert it into ms
   time = time * milliseconds.second
 
-  return Math.floor(time)
+  return time
 }
 
 const getYouTubeDuration = (data) => {
