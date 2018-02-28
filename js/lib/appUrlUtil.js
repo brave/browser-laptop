@@ -6,6 +6,7 @@ const Immutable = require('immutable')
 const path = require('path')
 const UrlUtil = require('./urlutil')
 const config = require('../constants/config')
+const isDarwin = require('../../app/common/lib/platformUtil').isDarwin()
 
 module.exports.fileUrl = (filePath) => {
   // It's preferrable to call path.resolve but it's not available
@@ -60,6 +61,14 @@ module.exports.getExtensionsPath = function (extensionDir) {
     // the path is different for release builds because extensions are not in the asar file
     ? path.join(__dirname, '..', '..', '..', 'extensions', extensionDir)
     : path.join(__dirname, '..', '..', 'app', 'extensions', extensionDir)
+}
+
+module.exports.getComponentExtensionsPath = function (extensionDir) {
+  if (isDarwin) {
+    return path.join(process.resourcesPath, '../Frameworks/Brave Framework.framework/Resources/', extensionDir)
+  } else {
+    return path.join(process.resourcesPath, extensionDir)
+  }
 }
 
 module.exports.getGenDir = function (url) {
