@@ -76,6 +76,7 @@ dnf group install "Development Tools" "C Development Tools and Libraries"
 
 ````
 sudo eopkg install -c system.devel
+sudo eopkg install gconf
 ````
 
 
