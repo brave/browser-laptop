@@ -39,6 +39,7 @@ const syncPhoneTabletImage = require('../../../extensions/brave/img/sync/device_
 const syncComputerImage = require('../../../extensions/brave/img/sync/device_type_computer.svg')
 const syncPlusImage = require('../../../extensions/brave/img/sync/add_device_titleicon.svg')
 const syncCodeImage = require('../../../extensions/brave/img/sync/synccode_titleicon.svg')
+const syncHandImage = require('../../../extensions/brave/img/sync/hand_image.png')
 const syncPassphraseInputSize = 16
 
 class SyncTab extends ImmutableComponent {
@@ -471,19 +472,32 @@ class SyncTab extends ImmutableComponent {
 
   get chainCodeOverlayFooter () {
     return (
-      <div>
-        <BrowserButton groupedItem secondaryColor
-          l10nId='backWithArrow'
-          testId='cancelButton'
-          onClick={this.chainCodeOverlayPreviousAction.bind(this)}
+      <div className={css(styles.syncOverlayFooter_split)}>
+        <BrowserButton secondaryColor
+          l10nId='syncTypeSecurityCode'
+          onClick={this.chainCodeOverlayUseCameraInstead.bind(this)}
         />
-        <BrowserButton groupedItem primaryColor
-          l10nId='nextWithArrow'
-          testId='syncResetButton'
-          onClick={this.chainCodeOverlayNextAction.bind(this)}
-        />
+        <div>
+          <BrowserButton groupedItem secondaryColor
+            l10nId='backWithArrow'
+            testId='cancelButton'
+            onClick={this.chainCodeOverlayPreviousAction.bind(this)}
+          />
+          <BrowserButton groupedItem primaryColor
+            l10nId='nextWithArrow'
+            testId='syncResetButton'
+            onClick={this.chainCodeOverlayNextAction.bind(this)}
+          />
+        </div>
       </div>
     )
+  }
+
+  chainCodeOverlayUseCameraInstead () {
+    // hide current modal
+    this.props.hideOverlay('syncChainCode')
+    // open chain code modal
+    this.props.showOverlay('syncScanCode')
   }
 
   chainCodeOverlayPreviousAction () {
@@ -507,19 +521,16 @@ class SyncTab extends ImmutableComponent {
   get scanCodeOverlayContent () {
     return (
       <div>
-        <Grid gap={0} columns={2} padding='0 90px'>
+        <Grid gap={0} columns={2}>
           <Column><p data-l10n-id='syncScanDescription' /></Column>
-          <Column size={1}>
+          <Column size={1} verticalAlign='center'>
+            <img src={syncHandImage} />
+          </Column>
+          <Column size={1} align='center' verticalAlign='center'>
             <img className={css(styles.syncOverlayBody__syncQRImg)}
               src={this.props.syncData.get('seedQr')}
               data-l10n-id='syncQRImg'
               data-test-id='syncQRImg'
-            />
-          </Column>
-          <Column size={1}>
-            <p
-              data-l10n-id='syncScanCamera'
-              className={css(styles.syncOverlayBody__syncQRImg__description)}
             />
           </Column>
         </Grid>
@@ -530,7 +541,8 @@ class SyncTab extends ImmutableComponent {
   get scanCodeOverlayFooter () {
     return (
       <div className={css(styles.syncOverlayFooter_split)}>
-        <BrowserButton l10nId='syncNoCamera'
+        <BrowserButton secondaryColor
+          l10nId='syncTypeSecurityCode'
           onClick={this.scanCodeOverlayNoCameraAvailable.bind(this)}
         />
         <div>
@@ -695,8 +707,10 @@ class SyncTab extends ImmutableComponent {
   }
 
   enableRestore (e) {
-    if (e.target.value) {
-      this.setState({wordCount: e.target.value.trim().split(' ').length})
+    if (e.target.value.length > 0) {
+      const wordCount = e.target.value
+        .trim().replace(/\s+/gi, ' ').split(' ').length
+      this.setState({wordCount})
     } else {
       this.setState({wordCount: 0})
     }
@@ -905,12 +919,6 @@ const styles = StyleSheet.create({
     margin: '30px 0'
   },
 
-  sync__button_center: {
-    // display: 'block',
-    // marginLeft: 'auto',
-    // marginRight: 'auto'
-  },
-
   settingsListContainerMargin__top: {
     marginTop: globalStyles.spacing.settingsListContainerMargin
   },
@@ -980,19 +988,6 @@ const styles = StyleSheet.create({
     resize: 'none'
   },
 
-  listItem__passphrase: {
-    margin: `${globalStyles.spacing.dialogInsideMargin} 0`,
-
-    // See ledgerBackup.js
-    cursor: 'text',
-    userSelect: 'text', // #11641
-    color: globalStyles.color.braveDarkOrange
-  },
-
-  syncOverlayBody__mainDescription: {
-    marginLeft: '90px'
-  },
-
   syncOverlayBody__listWrapper: {
     listStyle: 'none'
   },
@@ -1002,18 +997,7 @@ const styles = StyleSheet.create({
   },
 
   syncOverlayBody__syncQRImg: {
-    margin: '20px 20px 0 0'
-  },
-
-  syncOverlayBody__syncQRImg__description: {
-    marginTop: '2em',
-    fontSize: '16px'
-  },
-
-  syncOverlayBody__label: {
-    // TODO: refactor preferences.less
-    // See: .settingsList .settingItem > *:not(.switchControl)
-    marginBottom: `${globalStyles.spacing.modalPanelHeaderMarginBottom} !important`
+    margin: '20px 0'
   },
 
   syncOverlayBody__form: {
@@ -1036,26 +1020,6 @@ const styles = StyleSheet.create({
 
   syncOverlayBody__formBottomMargin: {
     marginBottom: globalStyles.spacing.dialogInsideMargin
-  },
-
-  syncOverlayBody__passphraseInput: {
-    background: globalStyles.color.lightGray,
-    borderRadius: '4px',
-    boxShadow: 'inset 0 1px 1px rgba(0, 0, 0, 0.1)',
-    boxSizing: 'border-box',
-    border: 'solid 1px rgba(0, 0, 0, 0.2)',
-    fontSize: '14px',
-    height: '2em',
-    outline: 'none',
-    padding: '0.4em',
-    margin: '0.4em 0.4em 0.4em 0',
-    width: 'calc(25% - 0.8em)',
-    color: 'rgb(68, 68, 68)',
-    textAlign: 'center',
-
-    ':focus': {
-      background: '#fff'
-    }
   },
 
   syncOverlayBody__select: {
