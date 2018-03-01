@@ -301,6 +301,12 @@ describe('Window store unit tests', function () {
         location: 'https://brave.com'
       }
 
+      afterEach(function () {
+        reducers.forEach((reducer) => {
+          mockery.deregisterMock(reducer)
+        })
+      })
+
       it('does not throw exception when `closedFrames` is missing from windowState', function () {
         const fakeReducer = (state, action) => {
           return Immutable.fromJS({})
