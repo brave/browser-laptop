@@ -1075,6 +1075,16 @@ const appActions = {
   },
 
   /**
+   * Dispatches a message to stop syncing the requested device.
+   */
+  removeSyncDevice: function (deviceId) {
+    dispatch({
+      actionType: appConstants.APP_REMOVE_SYNC_DEVICE,
+      deviceId
+    })
+  },
+
+  /**
    * Tells the store that user has finish setting up Sync
    */
   syncSetupCompleted: function (isCompleted) {

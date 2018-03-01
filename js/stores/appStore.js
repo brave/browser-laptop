@@ -34,6 +34,7 @@ const {HrtimeLogger} = require('../../app/common/lib/logUtil')
 const platformUtil = require('../../app/common/lib/platformUtil')
 const urlUtil = require('../lib/urlutil')
 const buildConfig = require('../constants/buildConfig')
+const {getSetting} = require('../../js/settings')
 
 // state helpers
 const {makeImmutable, findNullKeyPaths} = require('../../app/common/state/immutableUtil')
@@ -555,6 +556,7 @@ const handleAppAction = (action) => {
       }
       break
     case appConstants.APP_SAVE_SYNC_DEVICES:
+      const hasMainDevice = appState.getIn(['sync', 'devices']).some(device => device.get('mainDevice'))
       for (let deviceId of Object.keys(action.devices)) {
         const device = action.devices[deviceId]
         if (device.lastRecordTimestamp) {
@@ -562,6 +564,9 @@ const handleAppAction = (action) => {
         }
         if (device.name) {
           appState = appState.setIn(['sync', 'devices', deviceId, 'name'], device.name)
+        }
+        if (!hasMainDevice && getSetting(settings.SYNC_DEVICE_NAME) === device.name) {
+          appState = appState.setIn(['sync', 'devices', deviceId, 'mainDevice'], true)
         }
       }
       break
@@ -608,6 +613,9 @@ const handleAppAction = (action) => {
       appState = setOriginalSeed(appState, bookmarkFoldersState.getFolders(appState))
       appState = appState.setIn(['sync', 'devices'], {})
       appState = appState.setIn(['sync', 'objectsById'], {})
+      break
+    case appConstants.APP_REMOVE_SYNC_DEVICE:
+      appState = appState.deleteIn(['sync', 'devices', action.deviceId])
       break
     case appConstants.APP_SETUP_SYNC_COMPLETED:
       appState = appState.setIn(['sync', 'setupCompleted'], action.isCompleted)

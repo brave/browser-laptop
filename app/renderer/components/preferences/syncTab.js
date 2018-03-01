@@ -39,6 +39,8 @@ const syncComputerImage = require('../../../extensions/brave/img/sync/device_typ
 const syncPlusImage = require('../../../extensions/brave/img/sync/add_device_titleicon.svg')
 const syncCodeImage = require('../../../extensions/brave/img/sync/synccode_titleicon.svg')
 const syncHandImage = require('../../../extensions/brave/img/sync/hand_image.png')
+const syncRemoveImage = require('../../../extensions/brave/img/sync/remove_device_titleicon.svg')
+const removeIcon = require('../../../extensions/brave/img/ledger/icon_remove.svg')
 const syncPassphraseInputSize = 16
 
 class SyncTab extends ImmutableComponent {
@@ -52,8 +54,12 @@ class SyncTab extends ImmutableComponent {
     this.onCopy = this.copyPassphraseToClipboard.bind(this)
     this.state = {
       wordCount: 0,
+      deviceIdToRemove: '',
+      deviceNameToRemove: '',
+      isRemovingMainDevice: '',
       currentDeviceOption: ''
     }
+    this.onRemove = this.removeSyncDevice.bind(this)
   }
 
   get setupError () {
@@ -202,6 +208,17 @@ class SyncTab extends ImmutableComponent {
       {
         html: new Date(device.get('lastRecordTimestamp')).toLocaleDateString(),
         value: device.get('lastRecordTimestamp')
+      },
+      {
+        html: <span
+          id={id}
+          data-main-device={device.get('mainDevice')}
+          data-device-name={device.get('name')}
+          data-l10n-id='syncRemoveDevice'
+          className={css(styles.actionIcons__icon, styles.actionIcons__icon_remove)}
+          onClick={this.onClickSyncRemoveButton.bind(this)}
+        />,
+        value: ''
       }
     ])
   }
@@ -741,6 +758,42 @@ class SyncTab extends ImmutableComponent {
     </section>
   }
 
+  get removeOverlayContent () {
+    return (
+      <Grid gap={0} columns={1} padding='0 77px'>
+        <Column>
+          {
+          this.state.isRemovingMainDevice
+            ? (
+              <div>
+                <p
+                  className={css(styles.settingsListContainerMargin__bottom)} data-l10n-id='syncRemoveActiveDeviceWarning1'
+                />
+                <p data-l10n-id='syncRemoveActiveDeviceWarning2' />
+              </div>
+            )
+            : <p data-l10n-id='syncRemoveOtherDeviceWarning' />
+          }
+        </Column>
+      </Grid>
+    )
+  }
+
+  get removeOverlayFooter () {
+    return <section>
+      <BrowserButton groupedItem secondaryColor
+        l10nId='cancel'
+        testId='cancelButton'
+        onClick={this.props.hideOverlay.bind(this, 'syncRemove')}
+      />
+      <BrowserButton groupedItem primaryColor
+        l10nId='syncRemove'
+        testId='syncRemoveButton'
+        onClick={this.onRemove}
+      />
+    </section>
+  }
+
   enableRestore (e) {
     if (e.target.value.length > 0) {
       const wordCount = e.target.value
@@ -906,6 +959,18 @@ class SyncTab extends ImmutableComponent {
           content={this.removeOrResetOverlayContent}
           footer={this.removeOrResetOverlayFooter}
           onHide={this.onHideAnyRemovalOverlay.bind(this)} />
+        : null
+      }
+      {
+        this.props.syncRemoveOverlayVisible
+        ? <ModalOverlay
+          whiteOverlay
+          title={'syncRemoveDeviceModal'}
+          titleImage={syncRemoveImage}
+          titleArgs={{device: this.state.deviceNameToRemove}}
+          content={this.removeOverlayContent}
+          footer={this.removeOverlayFooter}
+          onHide={this.props.hideOverlay.bind(this, 'syncRemove')} />
         : null
       }
       <section className={css(styles.settingsListContainerMargin__bottom)}>
