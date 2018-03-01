@@ -314,6 +314,13 @@ class Tab extends React.Component {
     // required only so that context menu shows correct state (mute vs unmute)
     props.isAudioMuted = audioState.isAudioMuted(currentWindow, frameKey)
     props.isAudio = audioState.canPlayAudio(currentWindow, frameKey)
+    props.visualTabIdDebug = getSetting(settings.DEBUG_VERBOSE_TAB_INFO)
+    if (props.visualTabIdDebug) {
+      props.frameIndex = frame.get('index')
+      const tab = tabState.getByTabId(state, tabId)
+      props.tabIndex = tab && tab.get('index')
+      props.frameStateInternalIndex = frameStateUtil.getIndexByTabId(currentWindow, tabId)
+    }
 
     // used in other functions
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
@@ -438,6 +445,14 @@ class Tab extends React.Component {
         )}>
           <Favicon tabId={this.props.tabId} />
           <AudioTabIcon tabId={this.props.tabId} />
+          {
+            this.props.visualTabIdDebug &&
+            <span className={css(styles.tabArea__tab__tabIdDebug)}>
+              <span>[t:{this.props.tabId},(g:{this.props.guestInstanceId})]</span>
+              <span>[f:{this.props.frameKey}:#{this.props.frameStateInternalIndex}]</span>
+              <span>[fi:{this.props.frameIndex},ti:{this.props.tabIndex}]</span>
+            </span>
+          }
           <TabTitle tabId={this.props.tabId} />
         </div>
         <PrivateIcon tabId={this.props.tabId} />
@@ -690,6 +705,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 0,
     margin: 0
+  },
+
+  tabArea__tab__tabIdDebug: {
+    fontSize: '8px',
+    display: 'flex',
+    flexDirection: 'column',
+    flexWrap: 'wrap'
   }
 })
 
