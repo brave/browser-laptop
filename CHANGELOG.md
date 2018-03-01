@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.21.18](https://github.com/brave/browser-laptop/releases/tag/v0.21.18dev)
+
+ - Added the ability to pay Twitch publishers with BAT. ([#13139](https://github.com/brave/browser-laptop/issues/13139))
+ - There are three things related to Twitch that will be fixed or improved later: i) Paused videos are currently counted for watch time, ii) favicons associated with streams are not shown in the payments panel when watching live video, iii) calculating watch time will be improved when seeking.
+ - Added the ability to sort publishers using the verified publisher column under payments. ([#10752](https://github.com/brave/browser-laptop/issues/10752))
+ - Moved publishers that have been deleted from payments into a new dialog. ([#12833](https://github.com/brave/browser-laptop/issues/12833))
+ - Fixed localization issue when backing up recovery key. ([#13311](https://github.com/brave/browser-laptop/issues/13311))
+ - Fixed favicons not being consistently displayed under payments. ([#13281](https://github.com/brave/browser-laptop/issues/13281))
+ - Fixed publisher pinning issue when brave profile has been corrupted. ([#13134](https://github.com/brave/browser-laptop/issues/13134))
+ - Fixed the actions column under payments being clickable as it's not sortable. ([#13074](https://github.com/brave/browser-laptop/issues/13074))
+ - Fixed token promotions notifying users who have disabled promotion notifications in the advanced settings.  ([#13021](https://github.com/brave/browser-laptop/issues/13021))
+ - Fixed "show notifications" under advanced settings being re-enabled when disabling/enabling payments. ([#12817](https://github.com/brave/browser-laptop/issues/12817))
+ - Fixed publishers being auto included under payments even though "show only included sites" has been disabled. ([#12766](https://github.com/brave/browser-laptop/issues/12766))
+ - Fixed incorrect decimal value being displayed when balance under payments is below a certain amount. ([#12666](https://github.com/brave/browser-laptop/issues/12666))
+ - Fixed pinned publishers not always being displayed under payments. ([#12584](https://github.com/brave/browser-laptop/issues/12584))
+ - Fixed "never include" wording under context menu when right clicking on publishers under payments. ([#12296](https://github.com/brave/browser-laptop/issues/12296))
+ - Fixed incorrect amount being deducted from wallet during payment processing. ([#12183](https://github.com/brave/browser-laptop/issues/12183))
+ - Fixed manually entered values for publishers under payments not being retained. ([#11238](https://github.com/brave/browser-laptop/issues/11238))
+
 ## [0.20.46](https://github.com/brave/browser-laptop/releases/tag/v0.20.46dev)
 
  - Fixed YouTube videos lagging while playing. ([#13079](https://github.com/brave/browser-laptop/issues/13079))
