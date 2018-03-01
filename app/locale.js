@@ -256,6 +256,9 @@ var rendererIdentifiers = function () {
     'noDownloads',
     'torrentDesc',
     'multiSelectionBookmarks',
+    // global sync
+    'thisDevice',
+    'invalidCode',
     // Caption buttons in titlebar (min/max/close - Windows only)
     'windowCaptionButtonMinimize',
     'windowCaptionButtonMaximize',

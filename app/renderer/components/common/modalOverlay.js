@@ -93,14 +93,14 @@ class ModalOverlay extends ImmutableComponent {
 
     return <section className={cx({
       [css(styles.dialog)]: true,
-      [css(styles.dialog_gray)]: this.props.grayOverlay,
+      [css(styles.dialog_white)]: this.props.whiteOverlay,
       [customDialogClassesStr]: true
     })}>
 
       <header className={cx({
         [css(styles.dialog__header)]: true,
         [customDialogHeaderClassesStr]: true,
-        [css(styles.dialog__header_white)]: this.props.grayOverlay
+        [css(styles.dialog__header_white)]: this.props.whiteOverlay
       })}
         style={this.props.titleImage ? {justifyContent: 'start'} : null}>
         {titleImage}
@@ -115,7 +115,7 @@ class ModalOverlay extends ImmutableComponent {
       })}>
         <div className={cx({
           [css(styles.dialog__body)]: true,
-          [css(styles.dialog__body_gray)]: this.props.grayOverlay,
+          [css(styles.dialog__body_white)]: this.props.whiteOverlay,
           [customDialogBodyClassesStr]: true
         })}>
           {this.props.content}
@@ -177,8 +177,8 @@ const styles = StyleSheet.create({
     zIndex: globalStyles.zindex.zindexDialogs
   },
 
-  dialog_gray: {
-    background: '#eee'
+  dialog_white: {
+    background: '#fff'
   },
 
   dialog__header: {
@@ -189,7 +189,8 @@ const styles = StyleSheet.create({
   },
 
   dialog__header_white: {
-    padding: '25px 50px 0px'
+    padding: '25px 50px 0px',
+    background: '#fff'
   },
 
   dialog__header__image: {
@@ -244,8 +245,8 @@ const styles = StyleSheet.create({
     padding: `${globalStyles.spacing.dialogInsideMargin} ${globalStyles.spacing.modalDialogPaddingHorizontal}`
   },
 
-  dialog__body_gray: {
-    background: '#eee'
+  dialog__body_white: {
+    background: '#fff'
   },
 
   dialog__footer: {
