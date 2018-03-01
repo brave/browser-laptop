@@ -555,8 +555,11 @@ class SyncTab extends ImmutableComponent {
     this.props.hideOverlay('syncChainCode')
     this.props.hideOverlay('syncDevicesList')
     this.props.hideOverlay('syncAdd')
-    // cancel sync without warning as user didn't complete setup
-    this.onReset(false)
+
+    if (!this.isSetup) {
+      // cancel sync without warning as user didn't complete setup
+      this.onReset(false)
+    }
   }
 
   scanCodeOverlayNoCameraAvailable () {
