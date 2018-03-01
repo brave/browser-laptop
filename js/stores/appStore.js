@@ -328,41 +328,48 @@ const handleAppAction = (action) => {
         break
       }
     case appConstants.APP_SHOW_NOTIFICATION:
-      let notifications = appState.get('notifications')
-      notifications = notifications.filterNot((notification) => {
-        let message = notification.get('message')
-        // action.detail is a regular mutable object only when running tests
-        return action.detail.get
-          ? message === action.detail.get('message')
-          : message === action.detail['message']
-      })
-
-      // Insert notification next to those with the same style, or at the end
-      let insertIndex = notifications.size
-      const style = action.detail.get
-        ? action.detail.get('options').get('style')
-        : action.detail['options']['style']
-      if (style) {
-        const styleIndex = notifications.findLastIndex((notification) => {
-          return notification.get('options').get('style') === style
+      {
+        let notifications = appState.get('notifications', Immutable.List()) || Immutable.List()
+        notifications = notifications.filterNot((notification) => {
+          let message = notification.get('message')
+          // action.detail is a regular mutable object only when running tests
+          return action.detail.get
+            ? message === action.detail.get('message')
+            : message === action.detail['message']
         })
-        if (styleIndex > -1) {
-          insertIndex = styleIndex
-        } else {
-          // Insert after the last notification with a style
-          insertIndex = notifications.findLastIndex((notification) => {
-            return typeof notification.get('options').get('style') === 'string'
-          }) + 1
+
+        // Insert notification next to those with the same style, or at the end
+        let insertIndex = notifications.size
+        const style = action.detail
+          ? action.detail.get
+            ? action.detail.get('options').get('style')
+            : action.detail['options']['style']
+          : undefined
+        if (style) {
+          const styleIndex = notifications.findLastIndex((notification) => {
+            return notification.get('options').get('style') === style
+          })
+          if (styleIndex > -1) {
+            insertIndex = styleIndex
+          } else {
+            // Insert after the last notification with a style
+            insertIndex = notifications.findLastIndex((notification) => {
+              return typeof notification.get('options').get('style') === 'string'
+            }) + 1
+          }
         }
+        notifications = notifications.insert(insertIndex, Immutable.fromJS(action.detail))
+        appState = appState.set('notifications', notifications)
+        break
       }
-      notifications = notifications.insert(insertIndex, Immutable.fromJS(action.detail))
-      appState = appState.set('notifications', notifications)
-      break
     case appConstants.APP_HIDE_NOTIFICATION:
-      appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
-        return notification.get('message') === action.message
-      }))
-      break
+      {
+        const notifications = appState.get('notifications', Immutable.List()) || Immutable.List()
+        appState = appState.set('notifications', notifications.filterNot((notification) => {
+          return notification.get('message') === action.message
+        }))
+        break
+      }
     case appConstants.APP_TAB_CLOSE_REQUESTED:
       const tabValue = tabState.getByTabId(appState, immutableAction.get('tabId'))
       if (!tabValue) {
@@ -374,7 +381,8 @@ const handleAppAction = (action) => {
         const tabsInOrigin = tabState.getTabs(appState).find((tabValue) =>
           urlUtil.getOrigin(tabValue.get('url')) === origin && tabValue.get('tabId') !== immutableAction.get('tabId'))
         if (!tabsInOrigin) {
-          appState = appState.set('notifications', appState.get('notifications').filterNot((notification) => {
+          const notifications = appState.get('notifications', Immutable.List()) || Immutable.List()
+          appState = appState.set('notifications', notifications.filterNot((notification) => {
             return notification.get('frameOrigin') === origin
           }))
         }

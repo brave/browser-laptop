@@ -295,6 +295,70 @@ describe('Window store unit tests', function () {
       })
     })
 
+    describe('WINDOW_CLEAR_CLOSED_FRAMES', function () {
+      const demoAction = {
+        actionType: windowConstants.WINDOW_CLEAR_CLOSED_FRAMES,
+        location: 'https://brave.com'
+      }
+
+      afterEach(function () {
+        reducers.forEach((reducer) => {
+          mockery.deregisterMock(reducer)
+        })
+      })
+
+      it('does not throw exception when `closedFrames` is missing from windowState', function () {
+        const fakeReducer = (state, action) => {
+          return Immutable.fromJS({})
+        }
+        reducers.forEach((reducer) => {
+          mockery.registerMock(reducer, fakeReducer)
+        })
+        doAction(demoAction)
+      })
+
+      it('does not throw exception when `closedFrames` is undefined', function () {
+        const fakeReducer = (state, action) => {
+          return Immutable.fromJS({closedFrames: undefined})
+        }
+        reducers.forEach((reducer) => {
+          mockery.registerMock(reducer, fakeReducer)
+        })
+        doAction(demoAction)
+      })
+
+      it('does not throw exception when `closedFrames` is null', function () {
+        const fakeReducer = (state, action) => {
+          return Immutable.fromJS({closedFrames: null})
+        }
+        reducers.forEach((reducer) => {
+          mockery.registerMock(reducer, fakeReducer)
+        })
+        doAction(demoAction)
+      })
+
+      it('removes the specified location from closedFrames', function () {
+        const fakeReducer = (state, action) => {
+          return Immutable.fromJS({
+            closedFrames: [{
+              location: 'https://example.com'
+            }, {
+              location: 'https://brave.com'
+            }]
+          })
+        }
+        reducers.forEach((reducer) => {
+          mockery.registerMock(reducer, fakeReducer)
+        })
+        doAction(demoAction)
+
+        // get the updated windowState (AFTER doAction runs)
+        windowStore = require('../../../../js/stores/windowStore.js')
+        const windowState = windowStore.getState()
+        assert.equal(windowState.get('closedFrames').size, 1)
+      })
+    })
+
     // TODO: add your tests if you modify windowStore.js :)
   })
 })
