@@ -71,6 +71,8 @@ describe('Preferences component unittest', function () {
     mockery.registerMock('../../../extensions/brave/img/sync/add_device_titleicon.svg')
     mockery.registerMock('../../../extensions/brave/img/sync/synccode_titleicon.svg')
     mockery.registerMock('../../../extensions/brave/img/sync/hand_image.png')
+    mockery.registerMock('../../../extensions/brave/img/ledger/icon_remove.svg')
+    mockery.registerMock('../../../extensions/brave/img/sync/remove_device_titleicon.svg')
 
     mockery.registerMock('electron', fakeElectron)
 
