@@ -25,7 +25,7 @@ const browserWindowUtil = require('../common/lib/browserWindowUtil')
 const windowState = require('../common/state/windowState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
 const {zoomLevel} = require('../common/constants/toolbarUserInterfaceScale')
-const { shouldDebugWindowEvents } = require('../cmdLine')
+const { shouldDebugWindowEvents, disableBufferWindow } = require('../cmdLine')
 const activeTabHistory = require('./activeTabHistory')
 
 const isDarwin = platformUtil.isDarwin()
@@ -341,7 +341,10 @@ const api = {
         // if we have a bufferWindow, the 'window-all-closed'
         // event will not fire once the last window is closed,
         // so close the buffer window if this is the last closed window
-        // apart from the buffer window
+        // apart from the buffer window.
+        // This would mean that the last window to close is the buffer window, but
+        // that will not get saved to state as the last-closed window which should be restored
+        // since we won't save state if there are no frames.
         if (!platformUtil.isDarwin() && api.getBufferWindow()) {
           const remainingWindows = api.getAllRendererWindows().filter(win => win !== api.getBufferWindow())
           if (!remainingWindows.length) {
@@ -564,6 +567,12 @@ const api = {
   },
 
   getOrCreateBufferWindow: function (options = { }) {
+    if (disableBufferWindow) {
+      if (shouldDebugWindowEvents) {
+        console.log(`getOrCreateBufferWindow: buffer window disabled, not creating one.`)
+      }
+      return
+    }
     // only if we don't have one already
     let win = api.getBufferWindow()
     if (!win) {
