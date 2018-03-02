@@ -182,6 +182,10 @@ var rendererIdentifiers = function () {
     'lookupSelection',
     'publisherMediaName',
     'addToPublisherList',
+    // Renderer tooltips
+    'flashToolTip',
+    'txFlashToolTip',
+    'syncToolTip',
     // Other identifiers
     'aboutBlankTitle',
     'urlCopied',

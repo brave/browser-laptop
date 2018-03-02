@@ -13,7 +13,7 @@ const ModalOverlay = require('../common/modalOverlay')
 const BrowserButton = require('../common/browserButton')
 const {SettingsList, SettingItem, SettingCheckbox} = require('../common/settings')
 const SortableTable = require('../common/sortableTable')
-
+const locale = require('../../../../js/l10n')
 const {
   SectionTitleLabelWrapper,
   AboutPageSectionTitle,
@@ -450,6 +450,17 @@ class SyncTab extends ImmutableComponent {
     }
     window.alert('Invalid input code; please try again or create a new profile.')
   }
+  faqCircle (url, tooltip) {
+    let tooltipTranslation = locale.translation(tooltip)
+    return <a className={cx({
+      fa: true,
+      'fa-question-circle': true,
+      [css(styles.sync__faq__switch__moreInfo)]: true
+    })}
+      href={url}
+      title={tooltipTranslation}
+      rel='noopener' target='_blank' />
+  }
 
   showSyncNewDevice () {
     this.props.showOverlay('syncNewDevice')
@@ -502,12 +513,13 @@ class SyncTab extends ImmutableComponent {
 
         <div className={css(styles.settingsListContainerMargin__bottom)}>
           <span className='settingsListTitle' data-l10n-id='syncTitleMessage' />
-          <a href='https://github.com/brave/sync/wiki/Design' rel='noopener' target='_blank'>
+          {this.faqCircle('https://github.com/brave/sync/wiki/Design', 'syncToolTip')}
+          {/* <a href='https://github.com/brave/sync/wiki/Design' rel='noopener' target='_blank' title={tooltipTranslation}>
             <span className={cx({
               fa: true,
               'fa-question-circle': true
             })} />
-          </a>
+          </a> */}
           <div className={cx({
             settingsListTitle: true,
             [css(styles.subText)]: true
@@ -645,6 +657,15 @@ const styles = StyleSheet.create({
   },
   syncOverlayBody__formBottomMargin: {
     marginBottom: globalStyles.spacing.dialogInsideMargin
+  },
+  sync__faq__switch__moreInfo: {
+    color: globalStyles.color.commonTextColor,
+    position: 'relative',
+    cursor: 'pointer',
+    fontSize: globalStyles.plugins.fontSize.regular,
+    ':hover': {
+      textDecoration: 'none !important'
+    }
   }
 })
 
