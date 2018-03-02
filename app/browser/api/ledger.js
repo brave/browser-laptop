@@ -37,7 +37,7 @@ const config = require('../../../js/constants/buildConfig')
 const tabs = require('../../browser/tabs')
 const locale = require('../../locale')
 const getSetting = require('../../../js/settings').getSetting
-const {fileUrl, getSourceAboutUrl, isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
+const {getSourceAboutUrl, isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 const urlParse = require('../../common/urlParse')
 const ruleSolver = require('../../extensions/brave/content/scripts/pageInformation')
 const request = require('../../../js/lib/request')
@@ -48,6 +48,7 @@ const ledgerNotifications = require('./ledgerNotifications')
 const ledgerVideoCache = require('../../common/cache/ledgerVideoCache')
 const updater = require('../../updater')
 const promoCodeFirstRunStorage = require('../../promoCodeFirstRunStorage')
+const appUrlUtil = require('../../../js/lib/appUrlUtil')
 
 // Caching
 let locationDefault = 'NOOP'
@@ -250,7 +251,7 @@ const onBootStateFile = (state) => {
 }
 
 const promptForRecoveryKeyFile = () => {
-  const defaultRecoveryKeyFilePath = path.join(electron.app.getPath('userData'), '/brave_wallet_recovery.txt')
+  const defaultRecoveryKeyFilePath = path.join(electron.app.getPath('downloads'), '/brave_wallet_recovery.txt')
   if (process.env.SPECTRON) {
     // skip the dialog for tests
     console.log(`for test, trying to recover keys from path: ${defaultRecoveryKeyFilePath}`)
@@ -264,7 +265,7 @@ const promptForRecoveryKeyFile = () => {
       extensions: [['txt']],
       includeAllFiles: false
     }, (files) => {
-      return (files && files.length ? files[0] : null)
+      appActions.onFileRecoveryKeys((files && files.length ? files[0] : null))
     })
   }
 }
@@ -1056,37 +1057,54 @@ const backupKeys = (state, backupAction) => {
   ]
 
   const message = messageLines.join(os.EOL)
-  const filePath = path.join(electron.app.getPath('userData'), '/brave_wallet_recovery.txt')
+  const defaultFilePath = path.join(electron.app.getPath('downloads'), '/brave_wallet_recovery.txt')
 
   const fs = require('fs')
-  fs.writeFile(filePath, message, (err) => {
-    if (err) {
-      console.error(err)
-    } else {
-      tabs.create({url: fileUrl(filePath)}, (webContents) => {
-        if (backupAction === 'print') {
-          webContents.print({silent: false, printBackground: false})
-        } else {
-          webContents.downloadURL(fileUrl(filePath), true)
-        }
-      })
+
+  if (backupAction === 'print') {
+    tabs.create({url: appUrlUtil.aboutUrls.get('about:printkeys')})
+    return
+  }
+
+  const dialog = electron.dialog
+  const BrowserWindow = electron.BrowserWindow
+
+  dialog.showDialog(BrowserWindow.getFocusedWindow(), {
+    type: 'select-saveas-file',
+    defaultPath: defaultFilePath,
+    extensions: [['txt']],
+    includeAllFiles: false
+  }, (files) => {
+    const file = files && files.length ? files[0] : null
+    if (file) {
+      try {
+        fs.writeFileSync(file, message)
+      } catch (e) {
+        console.error('Problem saving backup keys')
+      }
     }
   })
+}
+
+const fileRecoveryKeys = (state, recoveryKeyFile) => {
+  if (!recoveryKeyFile) {
+    // user canceled from dialog, we abort without error
+    return state
+  }
+
+  const result = loadKeysFromBackupFile(state, recoveryKeyFile)
+  const recoveryKey = result.recoveryKey || ''
+  state = result.state
+
+  return recoverKeys(state, false, recoveryKey)
 }
 
 const recoverKeys = (state, useRecoveryKeyFile, key) => {
   let recoveryKey
 
   if (useRecoveryKeyFile) {
-    let recoveryKeyFile = promptForRecoveryKeyFile()
-    if (!recoveryKeyFile) {
-      // user canceled from dialog, we abort without error
-      return state
-    }
-
-    const result = loadKeysFromBackupFile(state, recoveryKeyFile)
-    recoveryKey = result.recoveryKey || ''
-    state = result.state
+    promptForRecoveryKeyFile()
+    return state
   }
 
   if (!recoveryKey) {
@@ -2804,6 +2822,7 @@ const getMethods = () => {
     claimPromotion,
     onPromotionResponse,
     getBalance,
+    fileRecoveryKeys,
     getPromotion,
     onPublisherTimestamp,
     checkVerifiedStatus,

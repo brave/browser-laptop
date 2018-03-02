@@ -1916,6 +1916,13 @@ const appActions = {
     })
   },
 
+  onFileRecoveryKeys: function (file) {
+    dispatch({
+      actionType: appConstants.APP_ON_FILE_RECOVERY_KEYS,
+      file
+    })
+  },
+
   checkReferralActivity: function () {
     dispatch({
       actionType: appConstants.APP_CHECK_REFERRAL_ACTIVITY
