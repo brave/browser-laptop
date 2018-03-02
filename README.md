@@ -73,6 +73,14 @@ dnf install rpm-build
 dnf group install "Development Tools" "C Development Tools and Libraries"
 ````
 
+#### On Solus
+
+````
+sudo eopkg install -c system.devel
+sudo eopkg install gconf
+````
+
+
 ### Installation
 
 After installing the prerequisites:
