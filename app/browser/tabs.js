@@ -307,6 +307,11 @@ const updateAboutDetails = (tabId) => {
     sendAboutDetails(tabId, messages.DOWNLOADS_UPDATED, {
       downloads: downloads.toJS()
     })
+  } else if (location === 'about:printkeys') {
+    const phrase = ledgerState.getInfoProp(appState, 'passphrase')
+    sendAboutDetails(tabId, messages.PRINTKEYS_UPDATED, {
+      passphrase: phrase
+    })
   } else if (location === 'about:passwords') {
     autofill.getAutofillableLogins((result) => {
       sendAboutDetails(tabId, messages.PASSWORD_DETAILS_UPDATED, result)
