@@ -7,7 +7,6 @@ const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 const _ = null
 const windowConstants = {
   WINDOW_SET_NAVBAR_INPUT: _,
-  WINDOW_CLOSE_FRAME: _,
   WINDOW_CLOSE_FRAMES: _,
   WINDOW_SET_FOCUSED_FRAME: _,
   WINDOW_SET_PREVIEW_TAB_PAGE_INDEX: _,

@@ -68,11 +68,20 @@ const getTabValue = function (tabId) {
   }
 }
 
+const detachTab = (evt, tabId, index, windowId) => {
+  activeTabHistory.clearTabFromWindow(windowId, tabId)
+  // tell the old window the frame is gone from it
+  // as when it is not attached to a webview, it will not get
+  // a temporary new contents
+  appActions.tabRemovedFromWindow(tabId, windowId)
+}
+
 const updateTab = (tabId, changeInfo = {}) => {
   let tabValue = getTabValue(tabId)
   if (shouldDebugTabEvents) {
     console.log(`Tab [${tabId}] updated from muon. changeInfo:`, changeInfo, 'currentValues:', { newIndex: tabValue && tabValue.get('index'), newActive: tabValue && tabValue.get('active'), windowId: tabValue && tabValue.get('windowId') })
   }
+
   if (tabValue) {
     appActions.tabUpdated(tabValue, makeImmutable(changeInfo))
   }
@@ -621,6 +630,8 @@ const api = {
         appActions.tabWillAttach(tab.getId())
       })
 
+      tab.on('tab-detached-at', detachTab)
+
       tab.on('set-active', (sender, isActive) => {
         if (isActive) {
           const tabValue = getTabValue(tabId)
@@ -673,13 +684,7 @@ const api = {
       })
 
       tab.on('did-detach', (e, oldTabId) => {
-        // forget last active trail in window tab
-        // is detaching from
-        const oldTab = getTabValue(oldTabId)
-        const detachedFromWindowId = oldTab.get('windowId')
-        if (detachedFromWindowId != null) {
-          activeTabHistory.clearTabFromWindow(detachedFromWindowId, oldTabId)
-        }
+
       })
 
       tab.on('did-attach', (e, tabId) => {
@@ -1059,9 +1064,8 @@ const api = {
         return
       }
 
-      // perform detach from current window
-      // and handle at `did-detach`
-      tab.detach(() => {
+      // handler to perform attachment to new window
+      const onceDetached = () => {
         if (shouldDebugTabEvents) {
           console.log(`Tab [${tabId}] detached tab guestinstance id`, tab.guestInstanceId)
         }
@@ -1096,11 +1100,19 @@ const api = {
           frameOpts = frameOpts.set('index', 0)
           appActions.newWindow(frameOpts, browserOpts)
         } else {
-          // ask for tab to be attached (via frame state and webview) to
+          // Ask for tab to be attached (via frame state and webview) to
           // specified window
           appActions.newWebContentsAdded(toWindowId, frameOpts, tabValue)
         }
-      })
+      }
+
+      if (tab.attached) {
+        // perform detach from current window
+        tab.detach(onceDetached)
+      } else {
+        // not attached, just move to new window
+        onceDetached()
+      }
     }
   },
 
