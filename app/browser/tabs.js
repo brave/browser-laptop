@@ -71,7 +71,7 @@ const getTabValue = function (tabId) {
 const updateTab = (tabId, changeInfo = {}) => {
   let tabValue = getTabValue(tabId)
   if (shouldDebugTabEvents) {
-    console.log(`Tab [${tabId}] updated from muon`, changeInfo, { newIndex: tabValue && tabValue.get('index'), newActive: tabValue && tabValue.get('active') })
+    console.log(`Tab [${tabId}] updated from muon. changeInfo:`, changeInfo, 'currentValues:', { newIndex: tabValue && tabValue.get('index'), newActive: tabValue && tabValue.get('active'), windowId: tabValue && tabValue.get('windowId') })
   }
   if (tabValue) {
     appActions.tabUpdated(tabValue, makeImmutable(changeInfo))
@@ -183,14 +183,14 @@ const getBookmarksData = (state) => {
     .set('bookmarkFolders', bookmarkFoldersState.getFolders(state))
     .set('bookmarkOrder', bookmarkOrderCache.getOrderCache(state))
 }
-
+const shouldDebugAboutData = false
 const sendAboutDetails = (tabId, type, value, shared = false) => {
   // use a weak map to avoid holding references to large objects that will never be equal to anything
   aboutTabs[tabId][type] = aboutTabs[tabId][type] || new WeakMap()
   if (aboutTabs[tabId] && !aboutTabs[tabId][type].get(value)) {
     const tab = webContentsCache.getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
-      if (shouldDebugTabEvents) {
+      if (shouldDebugAboutData) {
         console.log(`Tab [${tabId}] sendAboutDetails(${type})`)
       }
 
@@ -203,7 +203,7 @@ const sendAboutDetails = (tabId, type, value, shared = false) => {
       aboutTabs[tabId][type] = new WeakMap()
       aboutTabs[tabId][type].set(value, true)
     } else {
-      if (shouldDebugTabEvents) {
+      if (shouldDebugAboutData) {
         const isNull = !tab
         const isDestroyed = tab && tab.isDestroyed()
         const reason = isNull
@@ -215,7 +215,7 @@ const sendAboutDetails = (tabId, type, value, shared = false) => {
       }
     }
   } else {
-    if (shouldDebugTabEvents) {
+    if (shouldDebugAboutData) {
       const tabFalsey = !aboutTabs[tabId]
       const tabHasValue = aboutTabs[tabId] && !!aboutTabs[tabId][type].get(value)
       const reason = tabFalsey
@@ -529,7 +529,7 @@ const api = {
 
     process.on('chrome-tabs-updated', (tabId, changeInfo) => {
       if (shouldDebugTabEvents) {
-        console.log(`tab [${tabId} via process] chrome-tabs-updated`)
+        console.log(`tab [${tabId} via process] chrome-tabs-updated`, changeInfo)
       }
       updateTab(tabId, changeInfo)
     })
@@ -615,6 +615,9 @@ const api = {
       })
 
       tab.on('will-attach', (e, windowWebContents) => {
+        if (shouldDebugTabEvents) {
+          console.log('will-attach', windowWebContents.id, tab.tabValue().windowId)
+        }
         appActions.tabWillAttach(tab.getId())
       })
 
