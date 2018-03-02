@@ -492,4 +492,40 @@ describe('frameStateUtil', function () {
       assert.equal(result, true)
     })
   })
+
+  describe('partition utils', function () {
+    it('getPartitionNumber', function () {
+      const getPartitionNumber = frameStateUtil.getPartitionNumber
+      assert.equal(getPartitionNumber(''), 0)
+      assert.equal(getPartitionNumber('1'), 0)
+      assert.equal(getPartitionNumber('partition-1'), -1)
+      assert.equal(getPartitionNumber('partition-222'), -222)
+      assert.equal(getPartitionNumber('partition-222.1'), 0)
+      assert.equal(getPartitionNumber('persist:partition-1'), 1)
+      assert.equal(getPartitionNumber('unpersist:partition-1'), 0)
+      assert.equal(getPartitionNumber('persist:partition-10'), 10)
+      assert.equal(getPartitionNumber('persist:partition'), 0)
+    })
+    it('isPrivatePartition', function () {
+      const isPrivatePartition = frameStateUtil.isPrivatePartition
+      assert.equal(isPrivatePartition(''), true)
+      assert.equal(isPrivatePartition('partition-1'), true)
+      assert.equal(isPrivatePartition('persist:partition-1'), false)
+    })
+    it('isSessionPartition', function () {
+      const isSessionPartition = frameStateUtil.isSessionPartition
+      assert.equal(isSessionPartition(''), false)
+      assert.equal(isSessionPartition('default'), false)
+      assert.equal(isSessionPartition('partition-1'), true)
+      assert.equal(isSessionPartition('persist:partition-1'), true)
+    })
+    it('getPartitionFromNumber', function () {
+      const getPartitionFromNumber = frameStateUtil.getPartitionFromNumber
+      assert.equal(getPartitionFromNumber(0, true), 'default')
+      assert.equal(getPartitionFromNumber(0, false), 'persist:default')
+      assert.equal(getPartitionFromNumber(1, true), 'partition-1')
+      assert.equal(getPartitionFromNumber(-10, true), 'partition-10')
+      assert.equal(getPartitionFromNumber(1, false), 'persist:partition-1')
+    })
+  })
 })

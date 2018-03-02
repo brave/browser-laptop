@@ -52,7 +52,7 @@ describe('partitionState unit tests', function () {
       assert.equal(partitionState.isPartitionTab(), false)
     })
 
-    it('returns true if partition number is defined', function * () {
+    it('returns true if partition number is positive', function * () {
       const partitionNumber = 1337
       const state = defaultState
         .setIn(['frames', index, 'partitionNumber'], partitionNumber)
@@ -65,6 +65,22 @@ describe('partitionState unit tests', function () {
       const result = partitionState.isPartitionTab(state, frameKey)
       assert.equal(result, false)
     })
+
+    it('returns false if partition number is 0', function * () {
+      const partitionNumber = 0
+      const state = defaultState
+        .setIn(['frames', index, 'partitionNumber'], partitionNumber)
+      const result = partitionState.isPartitionTab(state, frameKey)
+      assert.equal(result, false)
+    })
+
+    it('returns false if partition number is negative', function * () {
+      const partitionNumber = -10
+      const state = defaultState
+        .setIn(['frames', index, 'partitionNumber'], partitionNumber)
+      const result = partitionState.isPartitionTab(state, frameKey)
+      assert.equal(result, false)
+    })
   })
 
   describe('getPartitionNumber', function () {
@@ -72,8 +88,10 @@ describe('partitionState unit tests', function () {
       assert.equal(partitionState.getPartitionNumber(), 0)
     })
 
-    it('returns zero if frame is null/undefined', function * () {
-      assert.equal(partitionState.getPartitionNumber(), 0)
+    it('returns zero if partition number is null/undefined', function * () {
+      const state = defaultState
+        .setIn(['frames', index, 'partitionNumber'], null)
+      assert.equal(partitionState.getPartitionNumber(state, frameKey), 0)
     })
 
     it('can remove _partition_ string and keep the partition number', function * () {
@@ -95,8 +113,14 @@ describe('partitionState unit tests', function () {
   })
 
   describe('getMaxAllowedPartitionNumber', function () {
-    it('returns false if frame is null/undefined', function () {
-      assert.equal(partitionState.getMaxAllowedPartitionNumber(), false)
+    it('returns zero if frame is null/undefined', function () {
+      assert.equal(partitionState.getMaxAllowedPartitionNumber(), 0)
+    })
+
+    it('returns zero if partition number is null/undefined', function * () {
+      const state = defaultState
+        .setIn(['frames', index, 'partitionNumber'], null)
+      assert.equal(partitionState.getMaxAllowedPartitionNumber(state, frameKey), 0)
     })
 
     it('returns partition number', function * () {

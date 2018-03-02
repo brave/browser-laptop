@@ -105,7 +105,7 @@ class SiteInfo extends React.Component {
   }
 
   get partitionInfo () {
-    if (this.props.partitionNumber) {
+    if (this.props.partitionNumber > 0) {
       // Figure out the partition info display
       let l10nArgs = {
         partitionNumber: this.props.partitionNumber

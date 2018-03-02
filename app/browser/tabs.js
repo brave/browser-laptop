@@ -13,7 +13,7 @@ const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
 const {makeImmutable, makeJS} = require('../common/state/immutableUtil')
 const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
-const {isSessionPartition} = require('../../js/state/frameStateUtil')
+const {isSessionPartition, getPartitionNumber, getPartitionFromNumber} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/lib/urlutil')
 const settingsStore = require('../../js/settings')
 const settings = require('../../js/constants/settings')
@@ -42,7 +42,10 @@ const activeTabHistory = require('./activeTabHistory')
 
 let adBlockRegions
 let currentPartitionNumber = 0
-const incrementPartitionNumber = () => ++currentPartitionNumber
+let currentPrivatePartitionNumber = 0
+const incrementPartitionNumber = (isPrivate) => isPrivate
+  ? ++currentPrivatePartitionNumber
+  : ++currentPartitionNumber
 
 const normalizeUrl = function (url) {
   if (isSourceAboutUrl(url)) {
@@ -80,28 +83,26 @@ const updateTab = (tabId, changeInfo = {}) => {
   }
 }
 
-const getPartitionNumber = (partition) => {
-  return Number(partition.split('persist:partition-')[1] || 0)
-}
-
 /**
  * Obtains the current partition.
  * Warning: This function has global side effects in that it increments the
  * global next partition number if isPartitioned is passed into the create options.
  */
 const getPartition = (createProperties) => {
-  let partition = session.defaultSession.partition
   if (createProperties.partition) {
-    partition = createProperties.partition
-  } else if (createProperties.isPrivate) {
-    partition = 'default'
-  } else if (createProperties.isPartitioned) {
-    partition = `persist:partition-${incrementPartitionNumber()}`
-  } else if (createProperties.partitionNumber) {
-    partition = `persist:partition-${createProperties.partitionNumber}`
+    return createProperties.partition
   }
-
-  return partition
+  if (createProperties.partitionNumber) {
+    return getPartitionFromNumber(createProperties.partitionNumber,
+      createProperties.isPrivate)
+  }
+  if (createProperties.isPrivate) {
+    return getPartitionFromNumber(incrementPartitionNumber(true), true)
+  }
+  if (createProperties.isPartitioned) {
+    return getPartitionFromNumber(incrementPartitionNumber(false), false)
+  }
+  return session.defaultSession.partition
 }
 
 const needsPartitionAssigned = (createProperties) => {
