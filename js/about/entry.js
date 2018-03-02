@@ -31,6 +31,9 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
   case 'about:bookmarks':
     getElementOp = import('../../app/renderer/about/bookmarks/bookmarks')
     break
+  case 'about:printkeys':
+    getElementOp = import('../../app/renderer/about/ledger/printKeys')
+    break
   case 'about:certerror':
     getElementOp = import('./certerror')
     break
