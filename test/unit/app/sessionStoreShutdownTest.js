@@ -36,6 +36,16 @@ describe('sessionStoreShutdown unit tests', function () {
   const FakeWindow = require('../lib/fakeWindow')
   const fakeAdBlock = require('../lib/fakeAdBlock')
 
+  const testRestorableWindowFrames = [
+    {
+      key: 1,
+      partitionNumber: 0,
+      src: 'https://brave.com',
+      location: 'https://brave.com',
+      unloaded: true
+    }
+  ]
+
   before(function () {
     this.clock = sinon.useFakeTimers()
     mockery.enable({
@@ -120,20 +130,31 @@ describe('sessionStoreShutdown unit tests', function () {
     })
 
     it('works for first closed window', function () {
-      const windowState = { a: 1, frames: [] }
+      const windowState = { a: 1, frames: testRestorableWindowFrames }
       fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState)
       process.emit(messages.UNDO_CLOSED_WINDOW)
       assert(this.newWindowStub.calledOnce)
       assert.deepEqual(this.newWindowStub.getCall(0).args[2].toJS(), windowState)
     })
     it('works for subsequent windows', function () {
-      const windowState1 = { b: 1, frames: [] }
-      const windowState2 = { x: 2, frames: [] }
+      const windowState1 = { b: 1, frames: testRestorableWindowFrames }
+      const windowState2 = { x: 2, frames: testRestorableWindowFrames }
       fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState1)
       fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState2)
       process.emit(messages.UNDO_CLOSED_WINDOW)
       assert(this.newWindowStub.calledOnce)
       assert.deepEqual(this.newWindowStub.getCall(0).args[2].toJS(), windowState2)
+    })
+    // test for buffer window close (only case a window will be closed with no frames,
+    // since closing the last tab of a window closes the window with tab still there)
+    it('ignores windows with no frames', function () {
+      const windowState1 = { b: 1, frames: testRestorableWindowFrames }
+      const windowState2 = { x: 2, frames: [] }
+      fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState1)
+      fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState2)
+      process.emit(messages.UNDO_CLOSED_WINDOW)
+      assert(this.newWindowStub.calledOnce)
+      assert.deepEqual(this.newWindowStub.getCall(0).args[2].toJS(), windowState1)
     })
   })
 
@@ -182,10 +203,11 @@ describe('sessionStoreShutdown unit tests', function () {
       })
       it('remembers last closed window with no windows (Win32)', function (cb) {
         isWindows = true
-        const windowState = Immutable.fromJS({ a: 1 })
+        const windowState = { a: 1, frames: testRestorableWindowFrames }
         fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState)
         fakeElectron.app.emit('window-all-closed')
         const saveAppStateStub = sinon.stub(sessionStore, 'saveAppState', (state) => {
+          console.log(state.toJS())
           isWindows = false
           assert.equal(saveAppStateStub.calledOnce, true)
           saveAppStateStub.restore()
@@ -198,7 +220,7 @@ describe('sessionStoreShutdown unit tests', function () {
         this.clock.tick(1)
       })
       it('remembers last closed window with no windows (Linux)', function (cb) {
-        const windowState = Immutable.fromJS({ a: 1 })
+        const windowState = { a: 1, frames: testRestorableWindowFrames }
         fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState)
         fakeElectron.app.emit('window-all-closed')
         const saveAppStateStub = sinon.stub(sessionStore, 'saveAppState', (state) => {
@@ -214,7 +236,7 @@ describe('sessionStoreShutdown unit tests', function () {
       })
       it('remembers last closed window with no windows (macOS)', function (cb) {
         isDarwin = true
-        const windowState = Immutable.fromJS({ a: 1 })
+        const windowState = Immutable.fromJS({ a: 1, frames: testRestorableWindowFrames })
         fakeElectron.ipcMain.send(messages.LAST_WINDOW_STATE, {}, windowState)
         fakeElectron.app.emit('window-all-closed')
         const saveAppStateStub = sinon.stub(sessionStore, 'saveAppState', (state) => {

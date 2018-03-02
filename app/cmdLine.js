@@ -23,6 +23,7 @@ const debugTabEventsFlagName = '--debug-tab-events'
 let appInitialized = false
 let newWindowURL
 const debugWindowEventsFlagName = '--debug-window-events'
+const disableBufferWindowFlagName = '--disable-buffer-window'
 
 const focusOrOpenWindow = function (url) {
   // don't try to do anything if the app hasn't been initialized
@@ -172,5 +173,6 @@ const api = module.exports = {
   },
 
   shouldDebugTabEvents: process.argv.includes(debugTabEventsFlagName),
-  shouldDebugWindowEvents: process.argv.includes(debugWindowEventsFlagName)
+  shouldDebugWindowEvents: process.argv.includes(debugWindowEventsFlagName),
+  disableBufferWindow: process.argv.includes(disableBufferWindowFlagName)
 }
