@@ -280,7 +280,9 @@ var rendererIdentifiers = function () {
     'promotionGeneralErrorText',
     'promotionClaimedErrorMessage',
     'promotionClaimedErrorText',
-    'promotionClaimedErrorTitle'
+    'promotionClaimedErrorTitle',
+    'aboutToAutofill',
+    'autofillWarning'
   ].concat(countryCodes).concat(availableLanguages)
 }
 

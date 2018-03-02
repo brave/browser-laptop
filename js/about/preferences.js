@@ -379,6 +379,12 @@ class SecurityTab extends ImmutableComponent {
       <DefaultSectionTitle data-l10n-id='autofillSettings' />
       <SettingsList>
         <SettingCheckbox dataL10nId='enableAutofill' prefKey={settings.AUTOFILL_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox
+          dataL10nId='enableAutofillConfirm'
+          prefKey={settings.AUTOFILL_CONFIRM_ENABLED}
+          settings={this.props.settings}
+          disabled={!getSetting(settings.AUTOFILL_ENABLED, this.props.settings)}
+          onChangeSetting={this.props.onChangeSetting} />
         {/* TODO: move this inline style to Aphrodite once refactored */}
         <div style={{marginTop: '15px'}}>
           <BrowserButton

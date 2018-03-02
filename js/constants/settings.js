@@ -54,6 +54,7 @@ const settings = {
   SITE_ISOLATION_ENABLED: 'security.site-isolation-enabled',
   // Autofill
   AUTOFILL_ENABLED: 'privacy.autofill-enabled',
+  AUTOFILL_CONFIRM_ENABLED: 'privacy.autofill-confirm-enabled',
   // Payments Tab
   PAYMENTS_ALLOW_MEDIA_PUBLISHERS: 'payments.allow-media-publishers',
   PAYMENTS_ALLOW_NON_VERIFIED: 'payments.allow-non-verified-publishers',
