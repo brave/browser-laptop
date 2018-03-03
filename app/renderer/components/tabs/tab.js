@@ -572,7 +572,6 @@ const styles = StyleSheet.create({
     // has a new layer, so that the tab title text is rendered with subpixel antialiasing
     // that knows about both the foreground and background colors
     display: 'flex',
-    paddingBottom: 0, // explicitly defined for transition on active
     transition: ['background-color', 'color', 'border']
       .map(prop => `${prop} var(--tab-transit-duration) var(--tab-transit-easing) 0s`)
       .join(','),
@@ -654,7 +653,7 @@ const styles = StyleSheet.create({
     flex: '1',
     minWidth: '0', // @see https://bugzilla.mozilla.org/show_bug.cgi?id=1108514#c5
     // can't do 'ancestor:hover child' selector in aphrodite, so cascade a variable
-    margin: `0 6px 0 ${globalStyles.spacing.defaultTabMargin}`, // bring the right margin closer as we do fade-out
+    margin: `calc(var(--tab-border-width, 0) * -1px) 6px 0 ${globalStyles.spacing.defaultTabMargin}`, // bring the right margin closer as we do fade-out
     overflow: 'visible'
   },
 

@@ -102,8 +102,9 @@ const styles = StyleSheet.create({
 
     // This element is set as border-box so it does not
     // take into account the borders as width gutter, so we
-    // increase its size by 1px to include the top border
-    height: `calc(${globalStyles.spacing.tabsToolbarHeight} + 1px)`
+    // increase its size by 1px to include the top border.
+    // This MUST result in an even number so we support veritcal centering.
+    height: globalStyles.spacing.tabsToolbarHeight
   },
 
   tabsToolbar__button_menu: {
