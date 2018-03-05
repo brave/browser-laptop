@@ -1673,6 +1673,18 @@ const lockInContributionAmount = (state, balance) => {
   }
 }
 
+const setNewTimeUntilReconcile = (newReconcileTime = null) => {
+  client.setTimeUntilReconcile(newReconcileTime, (err, stateResult) => {
+    if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
+
+    if (!stateResult) {
+      return
+    }
+
+    appActions.onTimeUntilReconcile(stateResult)
+  })
+}
+
 const onWalletProperties = (state, body) => {
   if (body == null) {
     return state
@@ -2133,15 +2145,7 @@ const onInitRead = (state, parsedData) => {
 
     let ledgerWindow = (ledgerState.getSynopsisOption(state, 'numFrames') - 1) * ledgerState.getSynopsisOption(state, 'frameSize')
     if (typeof timeUntilReconcile === 'number' && timeUntilReconcile < -ledgerWindow) {
-      client.setTimeUntilReconcile(null, (err, stateResult) => {
-        if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
-
-        if (!stateResult) {
-          return
-        }
-
-        appActions.onTimeUntilReconcile(stateResult)
-      })
+      setNewTimeUntilReconcile()
     }
   } catch (ex) {
     console.error('ledger client creation error(1): ', ex)
@@ -2241,6 +2245,11 @@ const run = (state, delayTime) => {
 
   if (typeof delayTime === 'undefined' || !client) {
     return
+  }
+
+  const publishers = ledgerState.getPublisher(state)
+  if (publishers.isEmpty() && client.isReadyToReconcile(synopsis)) {
+    setNewTimeUntilReconcile()
   }
 
   let winners
@@ -2672,15 +2681,7 @@ const onPromotionResponse = (state, status) => {
   const minTimestamp = ledgerState.getPromotionProp(state, 'minimumReconcileTimestamp')
 
   if (minTimestamp > currentTimestamp) {
-    client.setTimeUntilReconcile(minTimestamp, (err, stateResult) => {
-      if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
-
-      if (!stateResult) {
-        return
-      }
-
-      appActions.onTimeUntilReconcile(stateResult)
-    })
+    setNewTimeUntilReconcile(minTimestamp)
   }
 
   if (togglePromotionTimeoutId) {
