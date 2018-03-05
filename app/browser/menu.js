@@ -292,14 +292,6 @@ const createHistorySubmenu = () => {
       }
     },
     CommonMenu.separatorMenuItem,
-    /*
-    {
-      label: locale.translation('showAllHistory'),
-      accelerator: 'CmdOrCtrl+Y',
-      visible: false
-    },
-    CommonMenu.separatorMenuItem,
-    */
     {
       label: locale.translation('clearBrowsingData'),
       accelerator: 'Shift+CmdOrCtrl+Delete',
