@@ -25,7 +25,7 @@ require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const tranformVersionInfoToString = (versionInformation) =>
   versionInformation
-    .reduce((coll, version, name) => `${coll} \n${name}: ${version}`, '')
+  .reduce((coll, version, name) => `${coll}${name}: ${version}\n`, '')
 
 class AboutBrave extends React.Component {
   constructor (props) {
