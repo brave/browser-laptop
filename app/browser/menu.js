@@ -215,19 +215,6 @@ const createViewSubmenu = () => {
       }
     },
     CommonMenu.separatorMenuItem,
-    /*
-    {
-      label: locale.translation('toolbars'),
-      visible: false
-      submenu: [
-        {label: 'Favorites Bar', accelerator: 'Alt+CmdOrCtrl+B'},
-        {label: 'Tab Bar'},
-        {label: 'Address Bar', accelerator: 'Alt+CmdOrCtrl+A'},
-        {label: 'Tab Previews', accelerator: 'Alt+CmdOrCtrl+P'}
-      ]
-    },
-    CommonMenu.separatorMenuItem,
-    */
     {
       label: locale.translation('stop'),
       accelerator: isDarwin ? 'Cmd+.' : 'Esc',
@@ -238,31 +225,6 @@ const createViewSubmenu = () => {
     CommonMenu.reloadPageMenuItem(),
     CommonMenu.cleanReloadMenuItem(),
     CommonMenu.separatorMenuItem,
-    /*
-    {
-      label: locale.translation('readingView'),
-      visible: false,
-      accelerator: 'Alt+CmdOrCtrl+R'
-    }, {
-      label: locale.translation('tabManager'),
-      visible: false,
-      accelerator: 'Alt+CmdOrCtrl+M'
-    },
-    CommonMenu.separatorMenuItem,
-    {
-      label: locale.translation('textEncoding'),
-      visible: false
-      submenu: [
-        {label: 'Autodetect', submenu: []},
-        CommonMenu.separatorMenuItem,
-        {label: 'Unicode'},
-        {label: 'Western'},
-        CommonMenu.separatorMenuItem,
-        {label: 'etc...'}
-      ]
-    },
-    CommonMenu.separatorMenuItem,
-    */
     {
       label: locale.translation('toggleDeveloperTools'),
       accelerator: isDarwin ? 'Cmd+Alt+I' : 'Ctrl+Shift+I',
@@ -330,14 +292,6 @@ const createHistorySubmenu = () => {
       }
     },
     CommonMenu.separatorMenuItem,
-    /*
-    {
-      label: locale.translation('showAllHistory'),
-      accelerator: 'CmdOrCtrl+Y',
-      visible: false
-    },
-    CommonMenu.separatorMenuItem,
-    */
     {
       label: locale.translation('clearBrowsingData'),
       accelerator: 'Shift+CmdOrCtrl+Delete',
