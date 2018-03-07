@@ -23,7 +23,7 @@ const Immutable = require('immutable')
 const dragTypes = require('../../../js/constants/dragTypes')
 const tabActionConsts = require('../../common/constants/tabAction')
 const flash = require('../../../js/flash')
-const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
+const {frameOptsFromFrame, isTor} = require('../../../js/state/frameStateUtil')
 const {isSourceAboutUrl, isTargetAboutUrl, isNavigatableAboutPage} = require('../../../js/lib/appUrlUtil')
 const {shouldDebugTabEvents} = require('../../cmdLine')
 
@@ -34,6 +34,9 @@ const getWebRTCPolicy = (state, tabId) => {
   const tabValue = tabState.getByTabId(state, tabId)
   if (tabValue == null) {
     return WEBRTC_DEFAULT
+  }
+  if (isTor(tabValue)) {
+    return WEBRTC_DISABLE_NON_PROXY
   }
   const allSiteSettings = siteSettingsState.getAllSiteSettings(state, tabValue.get('incognito') === true)
   const tabSiteSettings =

@@ -6,6 +6,7 @@ const Immutable = require('immutable')
 
 // Constants
 const config = require('../constants/config')
+const appConfig = require('../constants/appConfig')
 const settings = require('../constants/settings')
 
 // Actions
@@ -480,10 +481,10 @@ const isFirstFrameKeyInTabPage = (state, frameKey) => {
 }
 
 /**
- * Check if frame is tor private tab
+ * Check if frame or tab object is associated with a tor private tab
  */
 function isTor (frame) {
-  return !!(frame && frame.get('isPrivate') && getSetting(settings.USE_TOR_PRIVATE_TABS))
+  return !!(frame && frame.get('partition') === appConfig.tor.partition)
 }
 
 const getTabPageIndex = (state) => {
