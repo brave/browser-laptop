@@ -232,6 +232,7 @@ class BraveryPanel extends React.Component {
     props.isBlockedScriptsShown = braveryPanelDetail.get('expandNoScript')
     props.isBlockingFingerprinting = props.blockedFingerprinting.size > 0
     props.isFpShown = braveryPanelDetail.get('expandFp')
+    props.isTor = frameStateUtil.isTor(activeFrame)
 
     // used in other functions
     props.lastCommittedURL = lastCommittedURL
@@ -621,6 +622,16 @@ class BraveryPanel extends React.Component {
                 />
               </div>
             </section>
+            : null
+          }
+          {
+            this.props.isTor
+            ? <div className={css(
+              styles.braveryPanel__body__footer__edit,
+              this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__footer__edit
+            )}
+              data-l10n-id='braveryTorWarning'
+            />
             : null
           }
           <hr className={css(

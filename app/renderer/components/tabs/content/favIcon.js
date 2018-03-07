@@ -23,10 +23,6 @@ const {spinKeyframes, opacityIncreaseElementKeyframes} = require('../../styles/a
 
 const defaultIconSvg = require('../../../../extensions/brave/img/tabs/default.svg')
 const loadingIconSvg = require('../../../../extensions/brave/img/tabs/loading.svg')
-const settings = require('../../../../../js/constants/settings')
-const {getSetting} = require('../../../../../js/settings')
-const appConfig = require('../../../../../js/constants/appConfig')
-const domUtil = require('../../../lib/domUtil')
 
 const isLocalFavicon = (favicon) => {
   if (!favicon) {
