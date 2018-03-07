@@ -12,6 +12,11 @@ chrome.webFrame.setGlobal("navigator.getBattery", function () {
   return new Promise((resolve, reject) => { reject(new Error('navigator.getBattery not supported.')) })
 })
 
+// bluetooth is not currently supported
+executeScript("window.Navigator.prototype.__defineGetter__('bluetooth', () => { return undefined })")
+// webusb also not supported yet
+executeScript("window.Navigator.prototype.__defineGetter__('usb', () => { return undefined })")
+
 if (chrome.contentSettings.doNotTrack == 'allow') {
   executeScript("window.Navigator.prototype.__defineGetter__('doNotTrack', () => { return 1 })")
 }
