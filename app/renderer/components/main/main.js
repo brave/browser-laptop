@@ -42,6 +42,10 @@ const ContextMenu = require('../common/contextMenu/contextMenu')
 const PopupWindow = require('./popupWindow')
 const NoScriptInfo = require('./noScriptInfo')
 const CheckDefaultBrowserDialog = require('./checkDefaultBrowserDialog')
+const ModalOverlay = require('../common/modalOverlay')
+const BrowserButton = require('../common/browserButton')
+const {SettingsList, SettingCheckbox, SettingItem} = require('../common/settings')
+const {SettingDropdown} = require('../common/dropdown')
 
 // Constants
 const appConfig = require('../../../../js/constants/appConfig')
@@ -75,6 +79,7 @@ const isWindows = platformUtil.isWindows()
 const isLinux = platformUtil.isLinux()
 
 const {StyleSheet, css} = require('aphrodite/no-important')
+const commonStyles = require('../styles/commonStyles')
 const globalStyles = require('../styles/global')
 
 class Main extends React.Component {
@@ -530,6 +535,33 @@ class Main extends React.Component {
     contextMenus.onTabsToolbarContextMenu(this.props.title, this.props.location, undefined, undefined, e)
   }
 
+  get reporterContent () {
+    return <SettingsList>
+      <SettingItem dataL10nId='reporterUrlLabel' itemClassName={css(styles.reporter_wrapper)}>
+        <input className={css(
+          commonStyles.formControl,
+          commonStyles.textbox,
+          commonStyles.textbox__outlineable,
+          commonStyles.textbox__isSettings
+        )}
+          placeholder={this.defaultDeviceName} />
+      </SettingItem>
+      <SettingItem dataL10nId='reporterReasonLabel' itemClassName={css(styles.reporter_wrapper)}>
+        <SettingDropdown>
+          <option data-l10n-id='reporterNotLoading' value='notLoading' />
+          <option data-l10n-id='reporterClicksNotWorking' value='clicksNotWorking' />
+          <option data-l10n-id='reporterPageCrashes' value='pageCrashes' />
+        </SettingDropdown>
+      </SettingItem>
+      <SettingItem itemClassName={css(styles.reporter_wrapper, styles.reporter_wrapper__checkbox)}>
+        <SettingCheckbox dataL10nId='reporterBraveVersion' />
+      </SettingItem>
+      <SettingItem itemClassName={css(styles.reporter_wrapper, styles.reporter_wrapper__checkbox)}>
+        <SettingCheckbox dataL10nId='reporterOSData' />
+      </SettingItem>
+    </SettingsList>
+  }
+
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
@@ -729,6 +761,13 @@ class Main extends React.Component {
           ? <NotificationBar />
           : null
         }
+        <ModalOverlay
+          title={'reporterTitle'}
+          content={this.reporterContent}
+          footer={<BrowserButton primaryColor
+            l10nId='reporterFooterButton'
+          />}
+        />
         {
           this.props.showFindBar
           ? <FindBar />
@@ -780,6 +819,17 @@ const styles = StyleSheet.create({
 
   tabPagesWrap_allowDragging: {
     WebkitAppRegion: 'drag'
+  },
+
+  reporter_wrapper: {
+    color: '#444444',
+    fontSize: '0.9em',
+    margin: '1.2em 2px 4px',
+    padding: '0 10px 10px 0'
+  },
+
+  reporter_wrapper__checkbox: {
+    padding: '0 10px 0 0'
   }
 })
 
