@@ -135,7 +135,7 @@ signatureMax = Math.ceil(signatureMax * 1.5)
 
 if (ipc) {
   ipc.on(messages.LEDGER_PUBLISHER, (event, location) => {
-    if (!synopsis || event.sender.session === electron.session.fromPartition('default') || !tldjs.isValid(location)) {
+    if (!synopsis || event.sender.session === electron.session.fromPartition('default') || !tldjs.isValid(tldjs.getDomain(location))) {
       event.returnValue = {}
       return
     }
