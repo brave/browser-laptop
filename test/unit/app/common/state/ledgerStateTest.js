@@ -36,8 +36,6 @@ describe('ledgerState unit test', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
-
-    mockery.registerMock('../../../js/actions/appActions', appActions)
     mockery.registerMock('../../../js/settings', {
       getSetting: (settingKey) => {
         switch (settingKey) {
@@ -52,8 +50,13 @@ describe('ledgerState unit test', function () {
         return false
       }
     })
-
+    mockery.registerMock('../../../js/actions/appActions', appActions)
     ledgerState = require('../../../../../app/common/state/ledgerState')
+  })
+
+  after(function () {
+    mockery.deregisterAll()
+    mockery.disable()
   })
 
   describe('setLedgerValue', function () {
@@ -162,13 +165,11 @@ describe('ledgerState unit test', function () {
       before(function () {
         hideNotificationSpy = sinon.spy(appActions, 'hideNotification')
       })
-
-      afterEach(function () {
-        hideNotificationSpy.reset()
-      })
-
       after(function () {
         hideNotificationSpy.restore()
+      })
+      afterEach(function () {
+        hideNotificationSpy.reset()
       })
 
       it('we have existing promotion, but is empty', function () {
