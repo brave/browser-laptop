@@ -39,7 +39,9 @@ class AddFundsDialog extends React.Component {
       case 'batContribMatching':
         return <BatContribMatching />
       case 'addFundsWizardMain':
-        return <AddFundsWizardMain />
+        return <AddFundsWizardMain
+          buyForm={this.props.buyForm}
+        />
       case 'addFundsWizardAddress':
         return (
           <AddFundsWizardAddress

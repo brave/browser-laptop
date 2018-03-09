@@ -1755,6 +1755,12 @@ const onWalletProperties = (state, body) => {
     }
   }
 
+  // buy form
+  const form = body.get('buyForm')
+  if (form) {
+    state = ledgerState.setInfoProp(state, 'buyForm', form)
+  }
+
   if (clientOptions.verboseP) {
     console.log('\nWalletProperties refreshes payment info')
   }
