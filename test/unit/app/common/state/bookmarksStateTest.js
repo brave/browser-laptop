@@ -164,6 +164,11 @@ describe('bookmarkState unit test', function () {
     bookmarksState = require('../../../../../app/common/state/bookmarksState')
   })
 
+  after(function () {
+    mockery.deregisterAll()
+    mockery.disable()
+  })
+
   describe('updateFavicon', function () {
     it('updates the favicon for all matching entries', function () {
       const processedState = bookmarksState.updateFavicon(stateWithData, 'https://brave.com/', 'https://brave.com/favicon.ico')
