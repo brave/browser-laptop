@@ -1,4 +1,4 @@
-/* global before, describe, it */
+/* global before, after, describe, it */
 
 require('../../../braveUnit')
 const assert = require('assert')
@@ -20,6 +20,10 @@ describe('adBlockUtil test', function () {
     })
     mockery.registerMock('ad-block', fakeAdBlock)
     shouldDoAdBlockCheck = require('../../../../../app/browser/ads/adBlockUtil').shouldDoAdBlockCheck
+  })
+  after(function () {
+    mockery.deregisterAll()
+    mockery.disable()
   })
   describe('shouldDoAdBlockCheck', function () {
     it('http protocol allows ad block checks', function () {

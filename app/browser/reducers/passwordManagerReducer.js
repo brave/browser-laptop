@@ -50,9 +50,9 @@ const savePassword = (username, origin, tabId) => {
     })
   }
 
-  const webContents = getWebContents(tabId)
-
   passwordCallbacks[message] = (buttonIndex) => {
+    const webContents = getWebContents(tabId)
+
     delete passwordCallbacks[message]
     appActions.hideNotification(message)
 
@@ -61,13 +61,17 @@ const savePassword = (username, origin, tabId) => {
       return
     }
     if (buttonIndex === 2) {
-      // never save
-      webContents.neverSavePassword()
+      if (webContents && !webContents.isDestroyed()) {
+        // never save
+        webContents.neverSavePassword()
+      }
       return
     }
 
-    // save password
-    webContents.savePassword()
+    if (webContents && !webContents.isDestroyed()) {
+      // save password
+      webContents.savePassword()
+    }
   }
 }
 
@@ -96,18 +100,22 @@ const updatePassword = (username, origin, tabId) => {
     })
   }
 
-  const webContents = getWebContents(tabId)
-
   passwordCallbacks[message] = (buttonIndex) => {
+    const webContents = getWebContents(tabId)
+
     delete passwordCallbacks[message]
     appActions.hideNotification(message)
 
     if (buttonIndex === 0) {
-      webContents.updatePassword()
+      if (webContents && !webContents.isDestroyed()) {
+        webContents.updatePassword()
+      }
       return
     }
-    // never save
-    webContents.noUpdatePassword()
+    if (webContents && !webContents.isDestroyed()) {
+      // never save
+      webContents.noUpdatePassword()
+    }
   }
 }
 
