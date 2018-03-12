@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-const {makeImmutable} = require('./immutableUtil')
+const {makeImmutable, removeDuplicatedEntriesFromList} = require('./immutableUtil')
 const topSites = require('../../browser/api/topSites')
 const newTabData = require('../../../js/data/newTabData')
 /**
@@ -36,10 +36,20 @@ const aboutNewTabState = {
     if (!props) {
       return state
     }
-    // list is only empty if there's no pinning interaction.
-    // in this case we include the default pinned top sites list
     if (state.getIn(['about', 'newtab', 'pinnedTopSites']).isEmpty()) {
+      // list is only empty if there's no pinning interaction.
+      // in this case we include the default pinned top sites list
       state = state.setIn(['about', 'newtab', 'pinnedTopSites'], defaultPinnedSite)
+    } else {
+      // if list is not empty there's a considerable chance that
+      // due to a bug in previous versions (see #12941) the user
+      // is not able to use topSites as there are duplicated pinned sites.
+      // in this case, dedupe them all
+      const pinnedTopSites = aboutNewTabState.getPinnedTopSites(state)
+      state = state.setIn(
+        ['about', 'newtab', 'pinnedTopSites'],
+        removeDuplicatedEntriesFromList(pinnedTopSites, 'location', true)
+      )
     }
     state = state.mergeIn(['about', 'newtab'], props.newTabPageDetail)
     return state.setIn(['about', 'newtab', 'updatedStamp'], new Date().getTime())
