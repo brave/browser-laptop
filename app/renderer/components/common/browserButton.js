@@ -168,8 +168,8 @@ const styles = StyleSheet.create({
 
   browserButton_primaryColor: {
     background: globalStyles.button.primary.background,
-    borderLeft: '2px solid transparent',
-    borderRight: '2px solid transparent',
+    borderLeft: `2px solid ${globalStyles.button.primary.gradientColor1}`,
+    borderRight: `2px solid ${globalStyles.button.primary.gradientColor2}`,
     borderTop: `2px solid ${globalStyles.button.primary.gradientColor1}`,
     borderBottom: `2px solid ${globalStyles.button.primary.gradientColor2}`,
     cursor: 'pointer',
