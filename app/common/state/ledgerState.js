@@ -288,6 +288,11 @@ const ledgerState = {
       if (paymentId) {
         newData = newData.set('paymentId', paymentId)
       }
+
+      const transactions = ledgerState.getInfoProp(state, 'transactions')
+      if (transactions) {
+        newData = newData.set('transactions', transactions)
+      }
     }
 
     return state.setIn(['ledger', 'info'], newData)
