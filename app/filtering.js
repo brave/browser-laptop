@@ -364,6 +364,12 @@ function registerForHeadersReceived (session, partition) {
       muonCb({ cancel: true })
       return
     }
+
+    if (firstPartyUrl !== details.url) {
+      delete details.responseHeaders['Strict-Transport-Security']
+      delete details.responseHeaders['strict-transport-security']
+    }
+
     for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
       let results = headersReceivedFilteringFns[i](details, isPrivate)
       if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl, isPrivate)) {
