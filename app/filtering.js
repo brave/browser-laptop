@@ -367,7 +367,7 @@ function registerForHeadersReceived (session, partition) {
 
     let trackingHeaders = ['Strict-Transport-Security', 'Expect-CT', 'Public-Key-Pins']
     if (firstPartyUrl !== details.url) {
-      trackingHeaders.forEach(function(header){
+      trackingHeaders.forEach(function (header) {
         delete details.responseHeaders[header]
         delete details.responseHeaders[header.toLowerCase()]
       })
