@@ -825,8 +825,14 @@ module.exports.runPreMigrations = (data) => {
   if (data.lastAppVersion) {
     // Force WidevineCdm to be upgraded when last app version <= 0.18.25
     let runWidevineCleanup = false
+    let runHSTSCleanup = false
 
     try { runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1 } catch (e) {}
+    try { runHSTSCleanup = compareVersions(data.lastAppVersion, '0.22.00') < 1 } catch (e) {}
+
+    if (runHSTSCleanup) {
+      filtering.clearHSTSData()
+    }
 
     if (runWidevineCleanup) {
       const fs = require('fs-extra')

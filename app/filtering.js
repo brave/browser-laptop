@@ -365,9 +365,12 @@ function registerForHeadersReceived (session, partition) {
       return
     }
 
+    let trackingHeaders = ['Strict-Transport-Security', 'Expect-CT', 'Public-Key-Pins']
     if (firstPartyUrl !== details.url) {
-      delete details.responseHeaders['Strict-Transport-Security']
-      delete details.responseHeaders['strict-transport-security']
+      trackingHeaders.forEach(function(header){
+        delete details.responseHeaders[header]
+        delete details.responseHeaders[header.toLowerCase()]
+      }
     }
 
     for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
@@ -846,6 +849,15 @@ module.exports.clearStorageData = () => {
     let ses = registeredSessions[partition]
     setImmediate(() => {
       ses.clearStorageData.bind(ses)(() => {})
+    })
+  }
+}
+
+module.exports.clearHSTSData = () => {
+  for (let partition in registeredSessions) {
+    let ses = registeredSessions[partition]
+    setImmediate(() => {
+      ses.clearHSTSData.bind(ses)(() => {})
     })
   }
 }
