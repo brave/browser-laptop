@@ -213,6 +213,17 @@ module.exports.historyMenuItem = () => {
   }
 }
 
+module.exports.historyTimeSpentMenuItem = () => {
+  return {
+    label: locale.translation('showTimeSpentHistory'),
+    click: function (item, focusedWindow) {
+      ensureAtLeastOneWindow({
+        url: 'about:timespent'
+      })
+    }
+  }
+}
+
 module.exports.downloadsMenuItem = () => {
   return {
     label: locale.translation('downloadsManager'),

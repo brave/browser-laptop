@@ -305,7 +305,8 @@ const createHistorySubmenu = () => {
 
   submenu.push(
     CommonMenu.separatorMenuItem,
-    CommonMenu.historyMenuItem()
+    CommonMenu.historyMenuItem(),
+    CommonMenu.historyTimeSpentMenuItem()
   )
 
   return submenu
