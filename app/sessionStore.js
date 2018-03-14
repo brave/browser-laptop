@@ -586,6 +586,10 @@ const sortBookmarkOrder = (bookmarkOrder) => {
   return newOrder
 }
 
+module.exports.clearHSTSData = (data) => {
+    filtering.clearHSTSData()
+}
+
 module.exports.runPreMigrations = (data) => {
   // autofill data migration
   if (data.autofill) {
@@ -823,16 +827,16 @@ module.exports.runPreMigrations = (data) => {
   }
 
   if (data.lastAppVersion) {
-    // Force WidevineCdm to be upgraded when last app version <= 0.18.25
-    let runWidevineCleanup = false
     let runHSTSCleanup = false
-
-    try { runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1 } catch (e) {}
     try { runHSTSCleanup = compareVersions(data.lastAppVersion, '0.22.00') < 1 } catch (e) {}
 
     if (runHSTSCleanup) {
-      filtering.clearHSTSData()
+      module.exports.clearHSTSData()
     }
+
+    // Force WidevineCdm to be upgraded when last app version <= 0.18.25
+    let runWidevineCleanup = false
+    try { runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1 } catch (e) {}
 
     if (runWidevineCleanup) {
       const fs = require('fs-extra')
