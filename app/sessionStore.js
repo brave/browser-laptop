@@ -931,7 +931,6 @@ module.exports.loadAppState = () => {
 
     try {
       data = fs.readFileSync(getStoragePath())
-      console.warn(data)
     } catch (e) {}
 
     let loaded = false
