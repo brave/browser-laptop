@@ -367,9 +367,10 @@ function registerForHeadersReceived (session, partition) {
 
     let parsedTargetUrl = urlParse(details.url || '')
     let parsedFirstPartyUrl = urlParse(firstPartyUrl)
-    let trackingHeaders = ['Strict-Transport-Security', 'Expect-CT', 'Public-Key-Pins']
+    const trackableSecurityHeaders = ['Strict-Transport-Security', 'Expect-CT',
+      'Public-Key-Pins', 'Public-Key-Pins-Report-Only']
     if (isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
-      trackingHeaders.forEach(function (header) {
+      trackableSecurityHeaders.forEach(function (header) {
         delete details.responseHeaders[header]
         delete details.responseHeaders[header.toLowerCase()]
       })
