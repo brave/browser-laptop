@@ -586,10 +586,6 @@ const sortBookmarkOrder = (bookmarkOrder) => {
   return newOrder
 }
 
-module.exports.clearHSTSData = (data) => {
-  filtering.clearHSTSData()
-}
-
 module.exports.runPreMigrations = (data) => {
   // autofill data migration
   if (data.autofill) {
@@ -831,7 +827,7 @@ module.exports.runPreMigrations = (data) => {
     try { runHSTSCleanup = compareVersions(data.lastAppVersion, '0.22.00') < 1 } catch (e) {}
 
     if (runHSTSCleanup) {
-      module.exports.clearHSTSData()
+      filtering.clearHSTSData()
     }
 
     // Force WidevineCdm to be upgraded when last app version <= 0.18.25

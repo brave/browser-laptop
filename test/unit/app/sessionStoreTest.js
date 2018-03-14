@@ -12,7 +12,9 @@ const compareVersions = require('compare-versions')
 require('../braveUnit')
 
 describe('sessionStore unit tests', function () {
+  let filtering
   let sessionStore
+
   let shutdownClearHistory = false
   let shutdownClearAutocompleteData = false
   let shutdownClearAutofillData = false
@@ -91,6 +93,7 @@ describe('sessionStore unit tests', function () {
       }
     })
     mockery.registerMock('./filtering', fakeFiltering)
+    filtering = require('./filtering')
     sessionStore = require('../../../app/sessionStore')
   })
 
@@ -800,7 +803,7 @@ describe('sessionStore unit tests', function () {
       localeInitSpy = sinon.spy(fakeLocale, 'init')
       backupSessionStub = sinon.stub(sessionStore, 'backupSession')
       runImportDefaultSettings = sinon.spy(sessionStore, 'runImportDefaultSettings')
-      clearHSTSDataSpy = sinon.spy(sessionStore, 'clearHSTSData')
+      clearHSTSDataSpy = sinon.spy(filtering, 'clearHSTSData')
     })
 
     after(function () {
