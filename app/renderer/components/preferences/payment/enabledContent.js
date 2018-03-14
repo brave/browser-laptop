@@ -139,7 +139,9 @@ class EnabledContent extends ImmutableComponent {
     let prevReconcileDateValue
     let text
 
-    if (!walletCreated || !walletHasReconcile || !walletHasTransactions) {
+    if (ledgerData.get('status') === 'contributionInProgress') {
+      text = 'paymentInProgress'
+    } else if (!walletCreated || !walletHasReconcile || !walletHasTransactions) {
       text = 'noPaymentHistory'
     } else {
       text = 'viewPaymentHistory'

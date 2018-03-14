@@ -1499,12 +1499,12 @@ const roundtrip = (params, options, callback) => {
 
 const observeTransactions = (state, transactions) => {
   if (!transactions) {
-    return
+    return state
   }
 
   const current = ledgerState.getInfoProp(state, 'transactions')
   if (current && current.size === transactions.length) {
-    return
+    return state
   }
 
   // Notify the user of new transactions.
@@ -1512,10 +1512,13 @@ const observeTransactions = (state, transactions) => {
     if (transactions.length > 0) {
       const newestTransaction = transactions[0]
       if (newestTransaction && newestTransaction.contribution) {
+        state = ledgerState.setAboutProp(state, 'status', '')
         ledgerNotifications.showPaymentDone(newestTransaction.contribution.fiat)
       }
     }
   }
+
+  return state
 }
 
 // TODO convert this function and related ones to immutable
@@ -1545,6 +1548,12 @@ const getStateInfo = (state, parsedData) => {
     creating: !parsedData.properties.wallet,
     reconcileFrequency: parsedData.properties.days,
     reconcileStamp: parsedData.reconcileStamp
+  }
+
+  const oldReconcileStamp = ledgerState.getInfoProp(state, 'reconcileStamp')
+
+  if (oldReconcileStamp && newInfo.reconcileStamp > oldReconcileStamp) {
+    state = ledgerState.setAboutProp(state, 'status', 'contributionInProgress')
   }
 
   let passphrase = ledgerClient.prototype.getWalletPassphrase(parsedData)
@@ -1583,7 +1592,7 @@ const getStateInfo = (state, parsedData) => {
       {ballots: ballots}))
   }
 
-  observeTransactions(state, transactions)
+  state = observeTransactions(state, transactions)
   return ledgerState.setInfoProp(state, 'transactions', Immutable.fromJS(transactions))
 }
 
@@ -2205,7 +2214,7 @@ const run = (state, delayTime) => {
       let result = ''
 
       fields.forEach((field) => {
-        const max = (result.length > 0) ? 9 : 19
+        const max = (result.length > 0) ? 45 : 19
 
         if (typeof field !== 'string') field = field.toString()
         if (field.length < max) {

@@ -263,7 +263,7 @@ const updateAboutDetails = (tabId) => {
   if (location === 'about:contributions' || onPaymentsPage) {
     const ledgerInfo = ledgerState.getInfoProps(appState)
     const preferencesData = appState.getIn(['about', 'preferences'], Immutable.Map())
-    const synopsis = appState.getIn(['ledger', 'about'])
+    const synopsis = ledgerState.getAboutData(appState)
     const migration = appState.get('migrations')
     const wizardData = ledgerState.geWizardData(appState)
     const ledgerData = ledgerInfo

@@ -330,6 +330,7 @@ AppStore
       }
     }
     publisherTimestamp: number, // timestamp of last publisher update in the database
+    status: string, // ledger status
     synopsis: {
       options: {
         emptyScores: {
