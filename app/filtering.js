@@ -370,7 +370,7 @@ function registerForHeadersReceived (session, partition) {
       trackingHeaders.forEach(function(header){
         delete details.responseHeaders[header]
         delete details.responseHeaders[header.toLowerCase()]
-      }
+      })
     }
 
     for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
