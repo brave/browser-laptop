@@ -1408,6 +1408,77 @@ const clientprep = () => {
   _internal.verboseP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_VERBOSE)
 }
 
+/**
+ * This callback that we do it in roundtrips
+ *
+ * @callback roundtripCallback
+ * @param {Error|null} error - error when doing a request, null if no errors
+ * @param {object} response - response object that we get from request.request
+ * @param {any} payload - data that we get from the request
+ */
+
+/**
+ * Round trip for fetching data (scrap data from html) inside window process
+ * @param {object} params - contains params from roundtrip
+ * @param {string} params.url - url of the site that we want to scrap
+ * @param {string} params.verboseP - tells us if we want to log the process or not
+ * @param {roundtripCallback} callback - The callback that handles the response
+ */
+const roundTripFromWindow = (params, callback) => {
+  if (!callback) {
+    return
+  }
+
+  if (!params || !params.url) {
+    if (params && params.verboseP) {
+      console.log(`We are missing url. Params ${JSON.stringify(params)}`)
+    }
+
+    callback(new Error('Url is missing'))
+    return
+  }
+
+  request.fetchPublisherInfo(params.url, {
+    method: 'GET',
+    responseType: 'text',
+    headers: {
+      'content-type': 'application/json; charset=utf-8'
+    }
+  }, (error, body) => {
+    if (error) {
+      if (params.verboseP) {
+        console.log(`roundTripFromWindow error: ${error.toString()}`)
+      }
+      return callback(error)
+    }
+
+    if (params.verboseP) {
+      console.log(`roundTripFromWindow success: ${JSON.stringify(body)}`)
+    }
+
+    return callback(null, null, body)
+  })
+}
+
+/**
+ * Round trip function for executing actions
+ * from the bat libraries (mostly server calls)
+ * @param {object} params - params that are directly tied to request.request
+ * @param {string} params.server - server url
+ * @param {string} params.method - HTTP method (GET, PUT, etc)
+ * @param {object} params.payload - payload that we want to send to the server
+ * @param {object} params.headers - HTTP headers
+ * @param {string} params.path - relative path to requested url
+ * @param {object} options
+ * @param {boolean} options.verboseP - tells us if we want to log the process or not
+ * @param {object} options.headers - headers that are used in the request.request
+ * @param {string} options.server - server url
+ * @param {boolean} options.binaryP - are we receiving binary payload back
+ * @param {boolean} options.rawP - are we receiving raw payload back
+ * @param {boolean} options.scrapeP - are we doping scraping
+ * @param {boolean} options.windowP - do we want to run this request in the window process
+ * @param {roundtripCallback} callback - The callback that handles the response
+ */
 const roundtrip = (params, options, callback) => {
   let parts = typeof params.server === 'string' ? urlParse(params.server)
     : typeof params.server !== 'undefined' ? params.server
@@ -1434,6 +1505,11 @@ const roundtrip = (params, options, callback) => {
     parts.search = parts.path.substring(i)
   } else {
     parts.pathname = parts.path
+  }
+
+  if (options.windowP) {
+    roundTripFromWindow({url: urlFormat(parts), verboseP: options.verboseP}, callback)
+    return
   }
 
   options = {
@@ -2869,6 +2945,7 @@ const getMethods = () => {
       activityRoundTrip,
       pathName,
       onReferralInit,
+      roundTripFromWindow,
       onReferralCodeRead,
       onVerifiedPStatus
     }
