@@ -38,6 +38,7 @@ describe('sessionStore unit tests', function () {
     }
   }
   const fakeFiltering = {
+    clearHSTSData: () => {},
     clearStorageData: () => {},
     clearCache: () => {},
     clearHistory: () => {}
