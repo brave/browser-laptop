@@ -818,8 +818,7 @@ describe('sessionStore unit tests', function () {
         it('clearHSTSData is not invoked', function () {
           let exampleState = sessionStore.defaultAppState()
           exampleState.lastAppVersion = '0.23'
-          assert.equal(exampleState.lastAppVersion, '0.23')
-          const returnedAppState = sessionStore.runPreMigrations(exampleState)
+          sessionStore.runPreMigrations(exampleState)
           assert.equal(clearHSTSDataSpy.notCalled, true)
         })
       })
@@ -828,8 +827,7 @@ describe('sessionStore unit tests', function () {
         it('clearHSTSData is calledOnce', function () {
           let exampleState = sessionStore.defaultAppState()
           exampleState.lastAppVersion = '0.21'
-          assert.equal(exampleState.lastAppVersion, '0.21')
-          const returnedAppState = sessionStore.runPreMigrations(exampleState)
+          sessionStore.runPreMigrations(exampleState)
           assert.equal(clearHSTSDataSpy.calledOnce, true)
         })
       })

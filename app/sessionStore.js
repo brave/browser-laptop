@@ -587,7 +587,7 @@ const sortBookmarkOrder = (bookmarkOrder) => {
 }
 
 module.exports.clearHSTSData = (data) => {
-    filtering.clearHSTSData()
+  filtering.clearHSTSData()
 }
 
 module.exports.runPreMigrations = (data) => {
