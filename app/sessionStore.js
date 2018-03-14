@@ -832,7 +832,12 @@ module.exports.runPreMigrations = (data) => {
 
     // Force WidevineCdm to be upgraded when last app version <= 0.18.25
     let runWidevineCleanup = false
-    try { runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1 } catch (e) {}
+    let formatPublishers = false
+
+    try {
+      runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1
+      formatPublishers = compareVersions(data.lastAppVersion, '0.22.3') < 1
+    } catch (e) {}
 
     if (runWidevineCleanup) {
       const fs = require('fs-extra')
@@ -842,6 +847,23 @@ module.exports.runPreMigrations = (data) => {
           console.error(`Could not remove ${wvExtPath}`)
         }
       })
+    }
+
+    if (formatPublishers) {
+      const publishers = data.ledger.synopsis.publishers
+
+      if (publishers && Object.keys(publishers).length > 0) {
+        Object.entries(publishers).forEach((item) => {
+          const publisherKey = item[0]
+          const publisher = item[1]
+          const siteKey = `https?://${publisherKey}`
+          if (data.siteSettings[siteKey] == null || publisher.faviconName == null) {
+            return
+          }
+
+          data.siteSettings[siteKey].siteName = publisher.faviconName
+        })
+      }
     }
 
     // Bookmark cache was generated wrongly on and before 0.20.25 from 0.19.x upgrades

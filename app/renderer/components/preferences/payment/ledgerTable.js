@@ -101,10 +101,11 @@ class LedgerTable extends ImmutableComponent {
     return synopsis.get('pinPercentage')
   }
 
-  banSite (hostPattern) {
+  banSite (hostPattern, siteName) {
     const confMsg = locale.translation('banSiteConfirmation')
     if (window.confirm(confMsg)) {
       aboutActions.changeSiteSetting(hostPattern, 'ledgerPaymentsShown', false)
+      aboutActions.changeSiteSetting(hostPattern, 'siteName', siteName)
     }
   }
 
@@ -258,7 +259,7 @@ class LedgerTable extends ImmutableComponent {
             styles.actionIcons__icon,
             styles.actionIcons__icon_remove
           )}
-            onClick={this.banSite.bind(this, this.getHostPattern(synopsis))}
+            onClick={this.banSite.bind(this, this.getHostPattern(synopsis), siteName)}
           />
         </div>,
         value: ''
