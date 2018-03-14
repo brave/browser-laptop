@@ -23,7 +23,7 @@ switch (TEST_DIR) {
     }
     // Intentionally no break, because perf tests also run the below
   default: // eslint-disable-line
-    cmd.push(`mocha "test/${TEST_DIR}/**/*Test.js"`)
+    cmd.push(`mocha "test/${TEST_DIR}/**/*Test.js" --globals chrome,DOMParser,XMLSerializer`)
 }
 
 execute(cmd, process.env, (err) => {
