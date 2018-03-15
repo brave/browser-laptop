@@ -118,6 +118,21 @@ function randomKey (dictionary) {
   return keys[keys.length * Math.random() << 0]
 }
 
+const goAheadAndShowTheAd = (windowId, categoryName, notificationText, notificationUrl) => {
+  appActions.onUserModelDemoValue(`Ads shown: ${categoryName}`)
+  windowActions.onNativeNotificationOpen(
+      windowId,
+      `Brave Ad: ${categoryName}`,
+    {
+      body: notificationText,
+      data: {
+        notificationUrl,
+        notificationId: notificationTypes.ADS
+      }
+    }
+    )
+}
+
 const classifyPage = (state, action, windowId) => {
   // console.log('data in', action)// run NB on the code
 
@@ -148,12 +163,13 @@ const classifyPage = (state, action, windowId) => {
   }
 
   const pageScore = um.NBWordVec(words, matrixData, priorData)
+
+  state = userModelState.appendPageScoreToHistoryAndRotate(state, pageScore)
+
   let catNames = priorData['names']
 
   let immediateMax = um.vectorIndexOfMax(pageScore)
   let immediateWinner = catNames[immediateMax]
-
-  state = userModelState.appendPageScoreToHistoryAndRotate(state, pageScore)
 
   let mutable = true
   let history = userModelState.getPageScoreHistory(state, mutable)
@@ -163,11 +179,29 @@ const classifyPage = (state, action, windowId) => {
 
   let winnerOverTime = catNames[indexOfMax]
   let maxLength = 40
-  let shortUrl = truncateUrl(url, maxLength)
 
+  let shortUrl = truncateUrl(url, maxLength)
   let logString = 'Current Page [' + shortUrl + '] Class: ' + immediateWinner + ' Moving Average of Classes: ' + winnerOverTime
   console.log(logString)
   appActions.onUserModelDemoValue(['log item: ', logString])
+
+  return state
+}
+
+const basicCheckReadyAdServe = (state, windowId) => {
+  if (!priorData) {
+    return state
+  }
+
+  let catNames = priorData['names']
+  /// ////////////////////////////////
+
+  let mutable = true
+  let history = userModelState.getPageScoreHistory(state, mutable)
+
+  let scores = um.deriveCategoryScores(history)
+  let indexOfMax = um.vectorIndexOfMax(scores)
+  let winnerOverTime = catNames[indexOfMax]
 
   let bundle = sampleAdFeed
   let arbitraryKey
@@ -177,7 +211,7 @@ const classifyPage = (state, action, windowId) => {
   let allGood = true
 
   if (bundle) {
-    const result = bundle['categories'][immediateWinner]
+    const result = bundle['categories'][winnerOverTime]
     arbitraryKey = randomKey(result)
 
     const payload = result[arbitraryKey]
@@ -194,20 +228,15 @@ const classifyPage = (state, action, windowId) => {
     allGood = false
   }
 
-  // Object
+  if (!userModelState.allowedToShowAdBasedOnHistory(state)) {
+    allGood = false
+    appActions.onUserModelDemoValue(['log item: ', 'prevented from showing ad based on history'])
+  }
+
   if (allGood) {
-    appActions.onUserModelDemoValue(`Ads shown: ${immediateWinner}`)
-    windowActions.onNativeNotificationOpen(
-      windowId,
-      `Brave Ad: ${immediateWinner}`,
-      {
-        body: notificationText,
-        data: {
-          notificationUrl,
-          notificationId: notificationTypes.ADS
-        }
-      }
-    )
+    goAheadAndShowTheAd(windowId, winnerOverTime, notificationText, notificationUrl)
+    appActions.onUserModelDemoValue(['log item: ', 'ad shown', winnerOverTime, notificationText, notificationUrl])
+    state = userModelState.appendAdShownToAdHistory(state)
   }
 
   return state
@@ -255,6 +284,7 @@ const getMethods = () => {
     saveCachedInfo,
     testSearchState,
     classifyPage,
+    basicCheckReadyAdServe,
     checkReadyAdServe,
     recordUnIdle,
     serveAdNow,

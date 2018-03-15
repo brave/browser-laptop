@@ -31,6 +31,7 @@ const settings = require('../../../js/constants/settings')
 
 // State
 const tabState = require('../../common/state/tabState')
+const windows = require('../windows')
 const userModelState = require('../../common/state/userModelState')
 
 // Utils
@@ -78,8 +79,13 @@ const userModelReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_IDLE_STATE_CHANGED: // TODO where to set this globally
       {
-        if (action.has('idleState') && action.get('idleState') !== 'active') {
+        console.log('idle state changed. action: ', action)
+
+        const activeWindowId = windows.getActiveWindowId()
+
+        if (action.has('idleState') && action.get('idleState') === 'active') {
           state = userModel.recordUnIdle(state)
+          state = userModel.basicCheckReadyAdServe(state, activeWindowId)
         }
         break
       }
