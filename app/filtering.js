@@ -15,6 +15,7 @@ const hostContentSettings = require('./browser/contentSettings/hostContentSettin
 const downloadStates = require('../js/constants/downloadStates')
 const urlParse = require('./common/urlParse')
 const getSetting = require('../js/settings').getSetting
+const {getExtensionsPath} = require('../js/lib/appUrlUtil')
 const appUrlUtil = require('../js/lib/appUrlUtil')
 const siteSettings = require('../js/state/siteSettings')
 const settings = require('../js/constants/settings')
@@ -691,6 +692,11 @@ const initPartition = (partition) => {
     options.isolated_storage = true
     options.parent_partition = ''
     options.tor_proxy = 'socks5://127.0.0.1:9050'
+    if (process.platform === 'win32') {
+      options.tor_path = '"' + path.join(getExtensionsPath('bin'), 'tor.exe') + '"'
+    } else {
+      options.tor_path = path.join(getExtensionsPath('bin'), 'tor')
+    }
   }
 
   let ses = session.fromPartition(partition, options)
