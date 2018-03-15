@@ -18,7 +18,7 @@ const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const { makeImmutable } = require('../../app/common/state/immutableUtil')
-const {aboutUrls, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
+const {isSourceAboutUrl, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
 const assert = require('assert')
 const contextMenuState = require('../../app/common/state/contextMenuState')
 const appStoreRenderer = require('./appStoreRenderer')
@@ -100,7 +100,7 @@ class WindowStore extends EventEmitter {
 
 const addToHistory = (frameProps) => {
   let history = frameProps.get('history') || Immutable.fromJS([])
-  if (!aboutUrls.get(frameProps.get('location'))) {
+  if (!isSourceAboutUrl(frameProps.get('location'))) {
     history = history.push(frameProps.get('location'))
   }
   return history.slice(-10)
