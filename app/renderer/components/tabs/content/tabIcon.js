@@ -32,6 +32,7 @@ class TabIcon extends ImmutableComponent {
       draggable={this.props.draggable}
       onClick={this.props.onClick}
       style={this.props.style}
+      title={this.props.title}
       {...altProps}
     >
       {
