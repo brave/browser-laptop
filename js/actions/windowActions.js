@@ -963,20 +963,6 @@ const windowActions = {
   },
 
   /**
-   * Used to get response details (such as the HTTP response code) from a response
-   * See `eventStore.js` for an example use-case
-   * @param {number} tabId - the tab id to set
-   * @param {Object} details - object containing response details
-   */
-  gotResponseDetails: function (tabId, details) {
-    dispatch({
-      actionType: windowConstants.WINDOW_GOT_RESPONSE_DETAILS,
-      tabId,
-      details
-    })
-  },
-
-  /**
    * Fired when the mouse clicks or hovers over a bookmark folder in the bookmarks toolbar
    * @param {number} folderId - from the siteDetail for the bookmark folder
    *   If set to null, no menu is open. If set to -1, mouse is over a bookmark, not a folder

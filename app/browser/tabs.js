@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const appActions = require('../../js/actions/appActions')
-const windowActions = require('../../js/actions/windowActions')
 const tabActions = require('../common/actions/tabActions')
 const config = require('../../js/constants/config')
 const Immutable = require('immutable')
@@ -713,12 +712,6 @@ const api = {
 
       tab.on('update-password', (e, username, origin) => {
         appActions.updatePassword(username, origin, tabId)
-      })
-
-      tab.on('did-get-response-details', (evt, status, newURL, originalURL, httpResponseCode, requestMethod, referrer, headers, resourceType) => {
-        if (resourceType === 'mainFrame') {
-          windowActions.gotResponseDetails(tabId, {status, newURL, originalURL, httpResponseCode, requestMethod, referrer, resourceType})
-        }
       })
 
       tab.on('media-started-playing', (e) => {
