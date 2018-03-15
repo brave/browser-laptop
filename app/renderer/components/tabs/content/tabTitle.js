@@ -59,9 +59,9 @@ const styles = StyleSheet.create({
     flex: 1,
     userSelect: 'none',
     fontSize: globalStyles.fontSize.tabTitle,
-    lineHeight: '1',
     fontWeight: 400,
     minWidth: 0, // see https://stackoverflow.com/a/36247448/4902448
+    lineHeight: globalStyles.spacing.tabsToolbarHeight,
     width: '-webkit-fill-available',
     marginLeft: '6px',
     // Fade any overflow text out,

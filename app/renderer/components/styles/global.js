@@ -151,7 +151,7 @@ const globalStyles = {
     navbarHeight: '36px',
     downloadsBarHeight: '60px',
     // This includes the toolbar's borders
-    tabsToolbarHeight: '30px',
+    tabsToolbarHeight: '29px',
     tabPagesHeight: '7px',
     bookmarkHangerMaxWidth: '350px',
     bookmarksToolbarHeight: '24px',

@@ -661,20 +661,21 @@ const styles = StyleSheet.create({
   },
 
   tabArea__tab__identity: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    overflow: 'visible',
-    display: 'flex',
     flex: '1',
     minWidth: '0', // @see https://bugzilla.mozilla.org/show_bug.cgi?id=1108514#c5
-    // can't do 'ancestor:hover child' selector in aphrodite, so cascade a variable
     margin: `calc(var(--tab-border-width, 0) * -1px) 6px 0 ${globalStyles.spacing.defaultTabMargin}`, // bring the right margin closer as we do fade-out
+    // make sure title text is not cut off, but is also vertically centered
+    // by giving it full height of favicon
+    height: theme.tab.identityHeight,
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     overflow: 'visible'
   },
 
   tabArea__tab__identity_centered: {
-    justifyContent: 'center',
     flex: 'auto',
+    justifyContent: 'center',
     padding: 0,
     margin: 0
   }

@@ -145,6 +145,7 @@
       borderColor: '#bbb',
       borderWidth: 1,
       color: '#222',
+      identityHeight: globalStyles.spacing.iconSize,
       defaultFaviconColor: globalStyles.color.mediumGray,
       defaultFaviconColorLight: '#fff',
 
