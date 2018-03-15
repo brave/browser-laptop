@@ -4,6 +4,7 @@
 
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
+const aphroditeInject = require('aphrodite/lib/inject')
 const Immutable = require('immutable')
 
 // Components
@@ -232,6 +233,14 @@ class Tab extends React.Component {
   }
 
   componentDidMount () {
+    // Workaround the fact that aphrodite will not inject style rules until some time
+    // after css([rules]) is called.
+    // This causes CSS transitions to fire on the changes from the default values to the
+    // specified initial values, which definitely should not happen.
+    // Ensuring styles are written to DOM before this element is rendered
+    // means the element will not be rendered first with 0 rules.
+    // See https://codepen.io/petemill/pen/rdeqqv for a reproduction.
+    aphroditeInject.flushToStyleTag()
     // unobserve tabs that we don't need. This will
     // likely be made by onObserve method but added again as
     // just to double-check
