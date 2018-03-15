@@ -18,7 +18,7 @@ const util = {
 
     const notification = new Notification(title, options)
     if (timeout) {
-      setTimeout(notification.close.bind(notification), 5000)
+      setTimeout(notification.close.bind(notification), timeout)
     }
 
     notification.addEventListener('click', (e) => {

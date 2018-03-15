@@ -28,11 +28,43 @@ const {makeImmutable, isMap} = require('../../common/state/immutableUtil')
 const urlUtil = require('../../../js/lib/urlutil')
 
 const maxRowsInPageScoreHistory = 5
+const maxRowsInAdsShownHistory = 6 // this
+const timeSecondsWindowForAdsShownHistory = 24 * 60 * 60
 
 const validateState = function (state) {
   state = makeImmutable(state)
   assert.ok(isMap(state), 'state must be an Immutable.Map')
   assert.ok(isMap(state.get('userModel')), 'state must contain an Immutable.Map of userModel')
+  return state
+}
+
+const unixTimeNowSeconds = function () {
+  return Math.round(+new Date() / 1000)
+}
+
+const appendToRingBufferUnderKey = (state, key, item, maxRows) => {
+  state = validateState(state)
+
+  let previous = state.getIn(key)
+
+  if (!Immutable.List.isList(previous)) {
+    console.warn('Previously stored page score history is not a List.')
+    previous = Immutable.List()
+  }
+
+  let ringbuf = previous.push(item)
+
+  let n = ringbuf.size
+
+  // this is the "rolling window"
+  // in general, this is triggered w/ probability 1
+  if (n > maxRows) {
+    let diff = n - maxRows
+    ringbuf = ringbuf.slice(diff)
+  }
+
+  state = state.setIn(key, ringbuf)
+
   return state
 }
 
@@ -52,30 +84,39 @@ const userModelState = {
   },
 
   appendPageScoreToHistoryAndRotate: (state, pageScore) => {
-    state = validateState(state)
     const stateKey = ['userModel', 'pageScoreHistory']
+    const wrappedScore = Immutable.List(pageScore)
+    return appendToRingBufferUnderKey(state, stateKey, wrappedScore, maxRowsInPageScoreHistory)
+  },
 
-    let previous = state.getIn(stateKey)
+  appendAdShownToAdHistory: (state) => {
+    const stateKey = ['userModel', 'adsShownHistory']
+    var unixTime = unixTimeNowSeconds()
+    return appendToRingBufferUnderKey(state, stateKey, unixTime, maxRowsInAdsShownHistory)
+  },
 
-    if (!Immutable.List.isList(previous)) {
-      console.warn('Previously stored page score history is not a List.')
-      previous = Immutable.List()
+  allowedToShowAdBasedOnHistory: (state) => {
+    let history = state.getIn(['userModel', 'adsShownHistory']) || []
+
+    let n = history.size
+
+    if (n < maxRowsInAdsShownHistory) {
+      return true
     }
 
-    let ringbuf = previous.push(Immutable.List(pageScore))
+    let oldest = null
 
-    let n = ringbuf.size
+    if (n > 0) {
+      oldest = history.get(0)
 
-    // this is the "rolling window"
-    // in general, this is triggered w/ probability 1
-    if (n > maxRowsInPageScoreHistory) {
-      let diff = n - maxRowsInPageScoreHistory
-      ringbuf = ringbuf.slice(diff)
+      let delta = unixTimeNowSeconds() - oldest
+
+      if (delta < timeSecondsWindowForAdsShownHistory) {
+        return false
+      }
     }
 
-    state = state.setIn(stateKey, ringbuf)
-
-    return state
+    return true
   },
 
   getPageScoreHistory: (state, mutable = false) => {
