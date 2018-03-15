@@ -22,6 +22,7 @@ const ipc = window.chrome.ipcRenderer
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
+require('../../app/renderer/components/styles/globalSelectors')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 const {
@@ -30,12 +31,13 @@ const {
 } = require('../../app/renderer/components/common/sectionTitle')
 
 // Stylesheets
-require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 // TODO(bsclifton): this button is currently hidden (along with column icon)
 // When ready, this can be shown again (by updating style in history.less)
 // When that happens, be sure to also show the ::before (which has trash can icon)
+//
+// UPDATE(jasonrsadler): button can be shown again by updating styles.deleteEntry
 class DeleteHistoryEntryButton extends ImmutableComponent {
   constructor () {
     super()
@@ -48,7 +50,12 @@ class DeleteHistoryEntryButton extends ImmutableComponent {
     // TODO(bsclifton): delete the selected entry
   }
   render () {
-    return <div className='fa fa-times deleteEntry' onClick={this.onClick} />
+    return <div className={cx({
+      fa: true,
+      'fa-times': true,
+      [css(styles.deleteEntry)]: true
+    })}
+      onClick={this.onClick} />
   }
 }
 
@@ -96,7 +103,7 @@ class HistoryDay extends ImmutableComponent {
         rowObjects={this.props.entries}
         totalRowObjects={this.props.totalEntries.toJS()}
         tableID={this.props.tableID}
-        columnClassNames={['time', 'title', 'domain']}
+        columnClassNames={[css(styles.time), css([styles.title, styles.td__nth__2]), css(styles.domain)]}
         addHoverClass
         multiSelect
         stateOwner={this.props.stateOwner}
@@ -114,7 +121,7 @@ class GroupedHistoryList extends React.Component {
     const entriesByDay = historyUtil.groupEntriesByDay(this.props.history, userLanguage)
     const totalEntries = historyUtil.totalEntries(entriesByDay)
     let index = 0
-    return <list className='historyList'>
+    return <list>
       {
         entriesByDay.map((groupedEntry) =>
           <HistoryDay
@@ -207,29 +214,44 @@ class AboutHistory extends React.Component {
     this.refs.historySearch.focus()
   }
   render () {
-    return <div className='siteDetailsPage' onClick={this.onClick}>
+    return <div className={cx({
+      [css(styles.site__details__page)]: true
+    })} onClick={this.onClick}>
       <div className={cx({
-        siteDetailsPageHeader: true,
+        [css(styles.site__details__page__header)]: true,
         [css(styles.history__header)]: true
       })}>
         <AboutPageSectionTitle data-l10n-id='history' />
-        <div className='headerActions'>
+        <div className={css(styles.history__header__actions)}>
           <BrowserButton primaryColor
             l10nId='clearBrowsingDataNow'
             testId='clearBrowsingDataButton'
             onClick={this.clearBrowsingDataNow}
           />
-          <input type='text' className='searchInput' ref='historySearch' id='historySearch' value={this.state.search} onChange={this.onChangeSearch} data-l10n-id='historySearch' />
+          <input type='text' className={css(styles.history__search__input)}
+            ref='historySearch'
+            id='historySearch'
+            value={this.state.search}
+            onChange={this.onChangeSearch}
+            data-l10n-id='historySearch' />
           {
             this.state.search
-            ? <span onClick={this.onClearSearchText} className='fa fa-close searchInputClear' />
-            : <span className='fa fa-search searchInputPlaceholder' />
+            ? <span onClick={this.onClearSearchText}
+              className={cx({
+                fa: true,
+                'fa-close': true,
+                [css(styles.history__search__input__clear)]: true
+              })} />
+              : <span className={cx({
+                fa: true,
+                'fa-search': true,
+                [css(styles.history__search__input__placeholder)]: true
+              })} />
           }
         </div>
       </div>
 
       <div className={cx({
-        siteDetailsPageContent: true,
         [css(commonStyles.siteDetailsPageContent, commonStyles.noMarginLeft)]: true
       })}>
         <GroupedHistoryList
@@ -247,6 +269,14 @@ class AboutHistory extends React.Component {
 }
 
 const styles = StyleSheet.create({
+
+  deleteEntry: {
+    display: 'none',
+    '&:hover': {
+      color: globalStyles.color.gray
+    }
+  },
+
   history__header: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -255,7 +285,77 @@ const styles = StyleSheet.create({
 
   subTitleMargin: {
     marginLeft: globalStyles.spacing.aboutPageSectionPadding
+  },
+
+  site__details__page__header: {
+    padding: `0 ${globalStyles.spacing.aboutPageSectionPadding}`
+  },
+
+  history__header__actions: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+
+  history__search__input: {
+    padding: '5px',
+    marginLeft: '12px',
+    fontSize: '16px',
+    minWidth: '280px'
+  },
+
+  history__search__input__placeholder: {
+    color: globalStyles.color.gray,
+    fontFamily: 'FontAwesome',
+    left: '-25px',
+    margin: 0,
+    padding: 0,
+    position: 'relative',
+    width: 0
+  },
+
+  history__search__input__clear: {
+    color: globalStyles.color.gray,
+    margin: 0,
+    padding: 0,
+    width: 0,
+    position: 'relative',
+    left: '-25px'
+  },
+
+  site__details__page: {
+    minWidth: '704px',
+    margin: 0,
+    paddingTop: '24px',
+    userSelect: 'none',
+    sortableTable: {
+      userSelect: 'none'
+    }
+  },
+
+  time: {
+    fontSize: '11pt',
+    fontWeight: 800,
+    textAlign: 'center',
+    width: '154px',
+    whiteSpace: 'nowrap'
+  },
+
+  title: {
+    fontSize: '11pt',
+    maxWidth: '415px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  },
+
+  domain: {
+    fontSize: '11pt'
+  },
+
+  td__nth__2: {
+    ':nth-of-type(2)': {
+      width: '60%'
+    }
   }
 })
-
 module.exports = <AboutHistory />

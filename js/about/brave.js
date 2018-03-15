@@ -11,8 +11,9 @@ const aboutActions = require('./aboutActions')
 
 const ipc = window.chrome.ipcRenderer
 
-const cx = require('../lib/classSet')
 const {StyleSheet, css} = require('aphrodite/no-important')
+const globalStyles = require('../../app/renderer/components/styles/global')
+require('../../app/renderer/components/styles/globalSelectors')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
 const {
@@ -20,7 +21,7 @@ const {
   AboutPageSectionSubTitle
 } = require('../../app/renderer/components/common/sectionTitle')
 
-require('../../less/about/history.less')
+// require('../../less/about/history.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const tranformVersionInfoToString = (versionInformation) =>
@@ -44,17 +45,14 @@ class AboutBrave extends React.Component {
   }
 
   render () {
-    return <div className='siteDetailsPage'>
-      <div className='siteDetailsPageHeader'>
+    return <div className={css(styles.site__details__page)}>
+      <div className={css(styles.site__details__page__header)}>
         <AboutPageSectionTitle data-l10n-id='aboutBrave' />
         <div data-l10n-id='braveInfo' />
       </div>
 
-      <div className={cx({
-        siteDetailsPageContent: true,
-        aboutBrave: true,
-        [css(commonStyles.siteDetailsPageContent)]: true
-      })}>
+      <div className={css(styles.site__details__page__content, styles.about__brave, commonStyles.siteDetailsPageContent)}>
+
         <AboutPageSectionSubTitle data-l10n-id='releaseNotes' />
 
         <div>
@@ -100,6 +98,34 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'baseline',
     width: '400px'
+  },
+
+  about__brave: {
+    ':nth-child(1n) > table': {
+      userSelect: 'text',
+      width: '400px',
+      ':nth-child(1n) > td': {
+        cursor: 'auto',
+        paddingLeft: '8px'
+      }
+    }
+  },
+
+  site__details__page: {
+    minWidth: '704px',
+    margin: 0,
+    paddingTop: '24px'
+  },
+
+  site__details__page__header: {
+    padding: `0 ${globalStyles.spacing.aboutPageSectionPadding}`
+  },
+
+  site__details__page__content: {
+    borderTop: '0px',
+    marginTop: '24px',
+    display: 'block',
+    clear: 'both'
   }
 })
 

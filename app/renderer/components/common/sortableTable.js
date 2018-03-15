@@ -8,6 +8,10 @@ const tableSort = require('tablesort')
 
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
+require('../styles/globalSelectors')
+
+// for styling parent focus, etc
+require('../styles/parentExtension')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
@@ -408,7 +412,7 @@ class SortableTable extends React.Component {
 
     // Optionally add class to each row for easy hover styling
     if (this.props.addHoverClass) {
-      rowAttributes.className = 'rowHover'
+      rowAttributes.className = css(styles.tr__rowHover)
     }
 
     // Bindings for multi-select-specific event handlers
@@ -493,7 +497,7 @@ class SortableTable extends React.Component {
           classes.push(this.props.rowClassNames[i])
         }
       }
-      if (this.stateOwner.state.selection.includes(this.getGlobalIndex(currentIndex))) classes.push('selected')
+      if (this.stateOwner.state.selection.includes(this.getGlobalIndex(currentIndex))) classes.push(css(styles.tr__rowHover, styles.row__selected))
 
       return row.length
         ? <tr {...rowAttributes}
@@ -533,8 +537,8 @@ class SortableTable extends React.Component {
     return <table
       {...this.getTableAttributes()}
       className={cx({
-        sort: !this.sortingDisabled,
-        sortableTable: true,
+        [css(styles.sort)]: !this.sortingDisabled,
+        [css(styles.sortable__table)]: true,
         [this.props.tableClassNames]: !!this.props.tableClassNames,
         [css(styles.table, this.props.fillAvailable && styles.table_fillAvailable)]: true
       })}
@@ -591,6 +595,14 @@ class SortableTable extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  sort: {
+    ':hover': {
+      ':nth-child(1n) > th': {
+        color: 'black'
+      }
+    }
+  },
+
   // By default the width and margin are not specified.
   // It can be specified by setting css to tableClassNames.
   // See 'styles.devices__devicesList' on syncTab.js for example.
@@ -600,7 +612,27 @@ const styles = StyleSheet.create({
     borderSpacing: 0,
 
     // #10434: Enable border on the table by default
-    borderCollapse: 'collapse'
+    borderCollapse: 'collapse',
+    ':nth-child(1n) > thead > tr > th[aria-sort="ascending"]': {
+      ':after': {
+        fontSize: '8pt',
+        marginLeft: '4px',
+        position: 'relative',
+        bottom: '2px',
+        fontFamily: 'FontAwesome',
+        content: '\'\\f077\''
+      }
+    },
+    ':nth-child(1n) > thead > tr > th[aria-sort="descending"]': {
+      ':after': {
+        fontSize: '8pt',
+        marginLeft: '4px',
+        position: 'relative',
+        bottom: '2px',
+        fontFamily: 'FontAwesome',
+        content: '\'\\f078\''
+      }
+    }
   },
 
   // Setting 'fillAvailable' maximizes the width of the table.
@@ -617,14 +649,8 @@ const styles = StyleSheet.create({
     fontWeight: 300,
     padding: globalStyles.sortableTable.cell.normal.padding,
     whiteSpace: 'nowrap',
-
-    // Up/down arrow
-    ':after': {
-      fontFamily: 'FontAwesome',
-      fontSize: '8pt',
-      marginLeft: '4px',
-      position: 'relative',
-      bottom: '2px'
+    ':hover': {
+      color: 'black'
     },
 
     ':first-child': {
@@ -675,6 +701,32 @@ const styles = StyleSheet.create({
     paddingRight: `${globalStyles.sortableTable.cell.small.padding}`,
     paddingLeft: `${globalStyles.sortableTable.cell.small.padding}`,
     height: '1.5rem'
+  },
+
+  tr__rowHover: {
+    ':hover': {
+      background: globalStyles.color.lightGray
+    }
+  },
+
+  row__selected: {
+    backgroundColor: 'rgb(204, 204, 204)',
+    ':hover': {
+      background: globalStyles.color.braveOrange,
+
+      // hacks until aphrodite supports child selectors/combinators
+      // history
+      ':nth-child(1n) > td': {
+        color: 'white'
+      },
+      ':nth-child(1n) > td > div': {
+        color: 'white'
+      },
+      // bookmarks
+      ':nth-child(1n) > td > div > span:nth-child(3)': { // select the url portion
+        color: 'white !important'
+      }
+    }
   }
 })
 
