@@ -116,12 +116,12 @@ class AudioTabIcon extends React.Component {
 const styles = StyleSheet.create({
   icon_audio: {
     overflow: 'hidden',
-    margin: '0 -2px 0 2px',
+    margin: '1px -2px 0 2px', // get centered with funky font awesome sizing
     color: theme.tab.icon.audio.color,
-    fontSize: '13px',
-
-    // Override default properties
-    zIndex: globalStyles.zindex.zindexTabsAudioTopBorder
+    fontSize: '14px',
+    ':hover': {
+      color: theme.tab.icon.audio.hoverColor
+    }
   }
 })
 

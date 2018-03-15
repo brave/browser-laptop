@@ -208,7 +208,8 @@
         },
 
         audio: {
-          color: '#256ea9'
+          color: '#2377bb',
+          hoverColor: '#3b566b'
         },
 
         close: {
