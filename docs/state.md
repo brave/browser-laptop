@@ -93,7 +93,10 @@ AppStore
     ledgerVideos: {
       [mediaKey]: {
         publisher: string // publisher key
-        beatData: object // data that we get from a heartbeat
+        // Twitch
+        event: string, // event that was send to Twitch
+        time: number, // timestamp that we will log in the ledger
+        status: string // playing status: playing or paused
       }
     }
   }
