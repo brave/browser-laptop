@@ -260,7 +260,7 @@ const updateAboutDetails = (tabId) => {
     sendAboutDetails(tabId, messages.BRAVERY_DEFAULTS_UPDATED, braveryDefaults)
     sendAboutDetails(tabId, messages.SETTINGS_UPDATED, appSettings)
   }
-  if (location === 'about:contributions' || onPaymentsPage) {
+  if (location === 'about:contributions' || location === 'about:timespent' || onPaymentsPage) {
     const ledgerInfo = ledgerState.getInfoProps(appState)
     const preferencesData = appState.getIn(['about', 'preferences'], Immutable.Map())
     const synopsis = appState.getIn(['ledger', 'about'])
