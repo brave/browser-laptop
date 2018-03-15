@@ -3,10 +3,15 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const events = {
+  BUFFER_EMPTY: 'buffer-empty',
+  BUFFER_REFILL: 'buffer-refill',
   MINUTE_WATCHED: 'minute-watched',
-  START: 'video-play',
+  PLAY_MANIFEST: 'video_play_master_manifest',
   PLAY_PAUSE: 'player_click_playpause',
-  SEEK: 'vod_seek'
+  SEEK: 'player_click_vod_seek',
+  START: 'video-play',
+  END: 'video_end',
+  VIDEO_ERROR: 'video_error'
 }
 
 module.exports = events

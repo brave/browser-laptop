@@ -2537,6 +2537,10 @@ const onMediaRequest = (state, xhr, type, tabId) => {
   const parsed = ledgerUtil.getMediaData(xhr, type)
   const mediaId = ledgerUtil.getMediaId(parsed, type)
 
+  if (clientOptions.loggingP) {
+    console.log('Media request', parsed, `Media id: ${mediaId}`)
+  }
+
   if (mediaId == null) {
     return state
   }
@@ -2556,6 +2560,9 @@ const onMediaRequest = (state, xhr, type, tabId) => {
   if (!ledgerPublisher) {
     ledgerPublisher = require('bat-publisher')
   }
+  if (clientOptions.loggingP) {
+    console.log('LOGGED EVENT', parsed, `Media id: ${mediaId}`, `Media key: ${mediaKey}`, `Duration: ${duration}ms (${duration / 1000}s)`)
+  }
 
   let revisited = true
   const activeTabId = tabState.getActiveTabId(state)
@@ -2564,8 +2571,11 @@ const onMediaRequest = (state, xhr, type, tabId) => {
     currentMediaKey = mediaKey
   }
 
-  const stateData = ledgerUtil.generateMediaCacheData(parsed, type)
+  const stateData = ledgerUtil.generateMediaCacheData(state, parsed, type, mediaKey)
   const cache = ledgerVideoCache.getDataByVideoId(state, mediaKey)
+  if (clientOptions.loggingP) {
+    console.log('Media cache data: ', stateData.toJS())
+  }
 
   if (!cache.isEmpty()) {
     if (!stateData.isEmpty()) {
