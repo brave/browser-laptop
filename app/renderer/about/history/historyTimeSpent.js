@@ -17,16 +17,24 @@ class HistoryTimeSpent extends React.Component {
       ledgerData: Immutable.Map()
     }
     ipc.on(messages.LEDGER_UPDATED, (e, ledgerData) => {
-      console.log(ledgerData)
       this.setState({ledgerData: Immutable.fromJS(ledgerData)})
     })
   }
 
+  renderPublisher = (url, faviconURL) => {
+    return <p>
+      <img src={faviconURL} width={16} height={16} />
+      {url}
+    </p>
+  }
+
   renderRow = (row, index) => {
-    const {duration, percentage, publisherKey, publisherURL, views} = row.toJS()
+    const {duration, percentage, publisherKey, publisherURL, views, faviconURL} = row.toJS()
     return <tr key={publisherKey}>
       <td>{index + 1}</td>
-      <td>{publisherURL}</td>
+      <td>
+        {this.renderPublisher(publisherURL, faviconURL)}
+      </td>
       <td>{views}</td>
       <td>{distanceInWordsStrict(subMilliseconds(new Date(), duration), new Date())}</td>
       <td>{percentage}</td>
@@ -40,7 +48,6 @@ class HistoryTimeSpent extends React.Component {
       return <h2>No data available</h2>
     }
     const sortedPublishers = synopsis.sortBy(publisher => publisher.get('score') * -1)
-    console.log(sortedPublishers.toJS()) // is always empty
 
     return <section>
       <h1>Time spent</h1>
