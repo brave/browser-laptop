@@ -384,12 +384,23 @@ const appActions = {
 
   /**
    * Removes a site from the site list
-   * @param {string|Immutable.List} historyKey - Hisotry item key that we want to remove, can be list of keys as well
+   * @param {string|Immutable.List} historyKey - History item key that we want to remove, can be list of keys as well
    */
   removeHistorySite: function (historyKey) {
     dispatch({
       actionType: appConstants.APP_REMOVE_HISTORY_SITE,
       historyKey
+    })
+  },
+
+  /**
+   * Removes all sites for the given domain from the site list
+   * @param {string} domain - Domain of the sites we want to remove
+   */
+  removeHistoryDomain: function (domain) {
+    dispatch({
+      actionType: appConstants.APP_REMOVE_HISTORY_DOMAIN,
+      domain
     })
   },
 

@@ -19,6 +19,7 @@ const appConstants = {
   APP_ADD_HISTORY_SITE: _,
   APP_SET_STATE: _,
   APP_REMOVE_HISTORY_SITE: _,
+  APP_REMOVE_HISTORY_DOMAIN: _,
   APP_MERGE_DOWNLOAD_DETAIL: _, // Sets an individual download detail
   APP_CLEAR_COMPLETED_DOWNLOADS: _, // Removes all completed downloads
   APP_SET_DATA_FILE_ETAG: _,
