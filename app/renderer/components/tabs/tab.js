@@ -166,9 +166,14 @@ class Tab extends React.Component {
     // In case there's a tab preview happening, cancel the preview
     // when mouse is over a tab
     windowActions.setTabPageHoverState(this.props.tabPageIndex, false)
+    // cache offset position for hover radial grandient
+    if (this.tabNode) {
+      const tabBounds = this.tabNode.getBoundingClientRect()
+      this.tabOffsetLeft = tabBounds.left
+    }
   }
 
-  onMouseMove () {
+  onMouseMove (e) {
     // dispatch a message to the store so it can delay
     // and preview the tab based on mouse idle time
     clearTimeout(this.mouseTimeout)
@@ -177,6 +182,17 @@ class Tab extends React.Component {
         windowActions.setTabHoverState(this.props.frameKey, true, true)
       },
       getSetting(settings.TAB_PREVIEW_TIMING))
+    // fancy radial gradient mouse tracker
+    if (this.elementRef) {
+      // only update position once per render frame
+      if (!this.nextFrameSetTabMouseX) {
+        var x = e.pageX - this.tabOffsetLeft
+        this.nextFrameSetTabMouseX = window.requestAnimationFrame(() => {
+          this.nextFrameSetTabMouseX = null
+          this.elementRef.style.setProperty('--tab-mouse-x', `${x}px`)
+        })
+      }
+    }
   }
 
   onAuxClick (e) {
@@ -452,14 +468,16 @@ const styles = StyleSheet.create({
     '--tab-background': theme.tab.background,
     '--tab-color': theme.tab.color,
     '--tab-border-color': theme.tab.borderColor,
+    '--tab-background-hover': theme.tab.hover.background,
     '--tab-default-icon-color': theme.tab.defaultFaviconColor,
     ':hover': {
-      '--tab-background': `var(--tab-background-hover, ${theme.tab.hover.background})`,
+      '--tab-background': `var(--tab-background-hover)`,
       '--tab-color': `var(--tab-color-hover, ${theme.tab.color})`,
       '--tab-default-icon-color': `var(--tab-default-icon-color-hover, ${theme.tab.defaultFaviconColor})`,
       '--tab-border-color': `var(--tab-border-color-hover, ${theme.tab.borderColor})`,
       '--tab-transit-duration': theme.tab.transitionDurationIn,
-      '--tab-transit-easing': theme.tab.transitionEasingIn
+      '--tab-transit-easing': theme.tab.transitionEasingIn,
+      '--tab-mouse-opacity': '1'
     }
   },
 
@@ -491,6 +509,7 @@ const styles = StyleSheet.create({
     '--tab-background': theme.tab.active.background,
     '--tab-background-hover': theme.tab.hover.active.background,
     '--tab-border-color-bottom': 'var(--tab-background)',
+    '--tab-mouse-opacity': '0 !important'
     '--tab-transit-duration': theme.tab.transitionDurationIn,
     '--tab-transit-easing': theme.tab.transitionEasingIn
   },
@@ -562,12 +581,35 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     position: 'relative',
     color: `var(--tab-color, ${theme.tab.color})`,
-    borderBottom: `solid var(--tab-border-width, ${theme.tab.borderWidth}px) var(--tab-border-color-bottom, var(--tab-border-color))`
+    borderBottom: `solid var(--tab-border-width, ${theme.tab.borderWidth}px) var(--tab-border-color-bottom, var(--tab-border-color))`,
+
+    // mouse-tracking radial gradient
+    '::before': {
+      content: '" "',
+      position: 'absolute',
+      left: 'var(--tab-mouse-x)',
+      top: 0,
+      bottom: 0,
+      width: 'calc(190px * var(--tab-mouse-opacity, 0))',
+      background: `radial-gradient(
+        circle farthest-corner,
+        var(--tab-background-hover),
+        transparent
+      )`,
+      filter: 'brightness(var(--tab-mouse-brightness, 106%))',
+      transform: 'translateX(-50%)',
+      transition: 'opacity var(--tab-transit-duration) ease, width 0s linear var(--tab-transit-duration)',
+      opacity: 'var(--tab-mouse-opacity, 0)'
+    },
+    ':hover:before': {
+      // Show immediately, and fade-in opacity,
+      // but when leaving, wait for fade-out to finish before hiding.
+      transitionDelay: '0s'
+    }
   },
 
   tabArea__tab_audioTopBorder: {
-    '::before': {
-      zIndex: globalStyles.zindex.zindexTabsAudioTopBorder,
+    '::after': {
       content: `''`,
       display: 'block',
       position: 'absolute',

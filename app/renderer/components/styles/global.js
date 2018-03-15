@@ -231,7 +231,6 @@ const globalStyles = {
     zindexWindowIsPreview: '1100',
     zindexDownloadsBar: '1000',
     zindexTabs: '1000',
-    zindexTabsAudioTopBorder: '1001',
     zindexTabsThumbnail: '1100',
     zindexNavigationBar: '2000',
     zindexUrlbarNotLegend: '2100',
