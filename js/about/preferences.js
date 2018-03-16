@@ -446,7 +446,7 @@ class AboutPreferences extends React.Component {
       syncQRVisible: true,
       syncScanCodeOverlayVisible: false,
       syncChainCodeOverlayVisible: false,
-      syncDevicesListOverlayVisible: false,
+      syncQRPassphraseOverlayVisible: false,
       syncResetOverlayVisible: false,
       syncRestoreEnabled: false,
       preferenceTab: this.tabFromCurrentHash,
@@ -670,7 +670,7 @@ class AboutPreferences extends React.Component {
           syncNewDeviceOverlayVisible={this.state.syncNewDeviceOverlayVisible}
           syncScanCodeOverlayVisible={this.state.syncScanCodeOverlayVisible}
           syncChainCodeOverlayVisible={this.state.syncChainCodeOverlayVisible}
-          syncDevicesListOverlayVisible={this.state.syncDevicesListOverlayVisible}
+          syncQRPassphraseOverlayVisible={this.state.syncQRPassphraseOverlayVisible}
           syncResetOverlayVisible={this.state.syncResetOverlayVisible}
         />
         break
