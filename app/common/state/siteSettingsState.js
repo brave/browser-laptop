@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
-
+const { createSelector } = require('reselect')
 // Constants
 const appConfig = require('../../../js/constants/appConfig')
 
@@ -13,16 +13,24 @@ const siteSettings = require('../../../js/state/siteSettings')
 // Utils
 const {getHostPattern} = require('../../../js/lib/urlutil')
 
+const getAllSiteSettings = state => state.get('siteSettings')
+
 const api = {
+  getAllAndTemporarySiteSettingsSelector: createSelector(
+    getAllSiteSettings,
+    state => state.get('temporarySiteSettings'),
+    (allSiteSettings, temporarySiteSettings) => allSiteSettings.mergeDeep(temporarySiteSettings)
+  ),
+
   getAllSiteSettings: (state, isPrivate) => {
     if (isPrivate) {
-      return state.get('siteSettings').mergeDeep(state.get('temporarySiteSettings'))
+      return api.getAllAndTemporarySiteSettingsSelector(state)
     }
-    return state.get('siteSettings')
+    return getAllSiteSettings(state)
   },
 
   getSettingsByHost: (state, url) => {
-    const siteSettings = state.get('siteSettings')
+    const siteSettings = getAllSiteSettings(state)
     const hostPattern = getHostPattern(url)
 
     return siteSettings ? siteSettings.get(hostPattern) : Immutable.Map()

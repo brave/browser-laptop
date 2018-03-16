@@ -1,19 +1,36 @@
 const ipc = require('electron').ipcRenderer
+const React = require('react')
 const appStore = require('../../../js/stores/appStoreRenderer')
 const ImmutableComponent = require('./immutableComponent')
-const React = require('react')
 const windowStore = require('../../../js/stores/windowStore')
 const {isList, isSameHashCode} = require('../../common/state/immutableUtil')
 const messages = require('../../../js/constants/messages')
 
+// Memozing appState.set('currentWindow', windowState)
+// is not so much for performance of this specific operation,
+// but for the ability to equality check with the === operator
+// inside component state selection, in order to very quickly
+// check for each component if anything has changed.
+// Otherwise each component would have a different state object (with the same properties)
+// since, previously, we were appending currentWindow to appState for each component individually
+// whenever either state changes.
+function createMemoizeComponentState () {
+  let lastAppState
+  let lastWindowState
+  let state
+  return function getOrComputeCombinedState () {
+    if (lastAppState !== appStore.state || lastWindowState !== windowStore.state) {
+      state = appStore.state.set('currentWindow', windowStore.state)
+      lastAppState = appStore.state
+      lastWindowState = windowStore.state
+    }
+    return state
+  }
+}
+const selectComponentState = createMemoizeComponentState()
+
 const mergePropsImpl = (stateProps, ownProps) => {
   return Object.assign({}, stateProps, ownProps)
-}
-
-const buildPropsImpl = (props, componentType, mergeStateToProps) => {
-  const fn = mergeStateToProps || mergePropsImpl
-  const state = appStore.state.set('currentWindow', windowStore.state)
-  return fn(state, props)
 }
 
 const checkParam = function (old, next, prop) {
@@ -65,20 +82,21 @@ ipc.on(messages.DEBUG_REACT_PROFILE, (e, args) => {
       // sort by time taken
       let toLogArray = []
       for (const componentName in toLog) {
-        const { totalTime, invocations } = toLog[componentName]
-        toLogArray.push({ componentName, totalTime, invocations })
+        const { totalTime, wastedTime, invocations } = toLog[componentName]
+        toLogArray.push({ componentName, totalTime, wastedTime, invocations })
       }
-      toLogArray.sort((a, b) => b.totalTime - a.totalTime)
+      toLogArray.sort((a, b) => b.wastedTime - a.wastedTime)
       // get a pretty table in the format of: component-name : details
       toLog = { }
-      for (const {componentName, totalTime, invocations} of toLogArray) {
-        toLog[componentName] = { totalTime, invocations }
+      for (const {componentName, totalTime, wastedTime, invocations} of toLogArray) {
+        toLog[componentName] = { totalTime, wastedTime, invocations }
       }
       const totalBlockingTime = toLogArray.reduce((total, current) => total + current.totalTime, 0)
+      const totalBlockingTimeWasted = toLogArray.reduce((total, current) => total + current.wastedTime, 0)
       // Log time spent, but only if there was time spent in mergeProps.
       // App may have been inactive and we don't want to log '0' every 10 seconds, if so.
       if (totalBlockingTime) {
-        console.log(`MergeProps history over the last 10 seconds (total UI blocking time = ${totalBlockingTime}ms): `)
+        console.log(`MergeProps history over the last 10 seconds (total UI blocking time = ${totalBlockingTime}ms, wasted = ${totalBlockingTimeWasted}ms): `)
         console.table(toLog)
       }
     }
@@ -96,8 +114,7 @@ class ReduxComponent extends ImmutableComponent {
   constructor (componentType, mergeStateToProps, props) {
     super(props)
     this.componentType = componentType
-    this.mergeStateToProps = mergeStateToProps
-    this.state = this.buildProps(this.props)
+    this.state = this.buildProps(this.props, mergeStateToProps || mergePropsImpl)
     this.checkForUpdates = this.checkForUpdates.bind(this)
     this.dontCheck = true
   }
@@ -107,24 +124,29 @@ class ReduxComponent extends ImmutableComponent {
       const t0 = isProfiling && window.performance.now()
       const newState = this.buildProps(this.props)
       const t1 = isProfiling && window.performance.now()
-      if (didPropsChange(this.state, newState)) {
+      const propsDidChange = didPropsChange(this.state, newState)
+      // only set state on the component if properties are different
+      if (propsDidChange) {
         this.setState(newState)
-      } else if (isProfiling) {
-        // log time used up in mergeProps where nothing changed
-        const timeTaken = t1 - t0
-        mergePropsWasteMs += timeTaken
       }
       // log how much total time was taken, whether something changed or not,
       // so we can asses which Components mergeProps functions are taking the most time
       if (isProfiling) {
+        const timeTaken = t1 - t0
         const componentName = this.componentType.name
         let componentMergePropsHistory = mergePropsComponentHistory[componentName]
         if (!componentMergePropsHistory) {
-          componentMergePropsHistory = { totalTime: 0, invocations: 0 }
+          componentMergePropsHistory = { totalTime: 0, invocations: 0, wastedTime: 0 }
           mergePropsComponentHistory[componentName] = componentMergePropsHistory
         }
         componentMergePropsHistory.invocations++
-        componentMergePropsHistory.totalTime += (t1 - t0)
+        componentMergePropsHistory.totalTime += timeTaken
+        if (!propsDidChange) {
+          // log total time used up in mergeProps where nothing changed
+          mergePropsWasteMs += timeTaken
+          // log component's wasted time separately
+          componentMergePropsHistory.wastedTime += timeTaken
+        }
       }
     }
   }
@@ -156,8 +178,37 @@ class ReduxComponent extends ImmutableComponent {
     return mergePropsImpl(stateProps, ownProps)
   }
 
-  buildProps (props = this.props) {
-    return buildPropsImpl(props, this.componentType, this.mergeStateToProps)
+  buildProps (props = this.props, mergeStateToProps) {
+    // use memoized function which combines appState and windowState to help state equality checks
+    // since map.set('a', 1) !== map.set('a', 1)
+    // ...in other words, they have to actually be the same reference
+    const appState = selectComponentState()
+    // mergeStateToProps can be a function that returns a props object,
+    // or a factory function which returns another function which then returns a props object
+    // So the first time we run it, we may need to unwrap
+    if (!this.mergeStateToProps) {
+      // handle first run
+      if (!mergeStateToProps) {
+        throw new Error('No mergePropsToState function provided.')
+      }
+      // get initial result from fn
+      let mergedProps = mergeStateToProps(appState, props)
+      if (typeof mergedProps === 'function') {
+        // provided function is a factory function,
+        // so store the generated function and run it
+        // to get the first result
+        this.mergeStateToProps = mergedProps
+        mergedProps = mergedProps(appState, props)
+      } else {
+        // provided function is simple
+        this.mergeStateToProps = mergeStateToProps
+      }
+      // return first generated props
+      return mergedProps
+    } else {
+      // handle non-first-run, run saved function to get latest props
+      return this.mergeStateToProps(appState, props)
+    }
   }
 
   render () {

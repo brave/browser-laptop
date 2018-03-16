@@ -5,6 +5,7 @@
 const React = require('react')
 const Immutable = require('immutable')
 const ipc = require('electron').ipcRenderer
+const { createSelector } = require('reselect')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -30,6 +31,7 @@ const tabState = require('../../../common/state/tabState')
 const tabMessageBoxState = require('../../../common/state/tabMessageBoxState')
 
 // Utils
+const { generateWindowStateSelector } = require('../../../common/state/windowState')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const cx = require('../../../../js/lib/classSet')
@@ -855,70 +857,88 @@ class Frame extends React.Component {
   }
 
   mergeProps (state, ownProps) {
-    const currentWindow = state.get('currentWindow')
-    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
-    const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
+    // generate selector for this frame
+    const frameKey = ownProps.frameKey
+    const getFrameSelector = generateWindowStateSelector(windowState => frameStateUtil.getFrameByKey(windowState, frameKey)) || Immutable.Map()
+    const allSiteSettingsSelector = createSelector(
+      state => state,
+      createSelector(
+        getFrameSelector,
+        frame => frame.get('isPrivate', false)
+      ),
+      (state, isPrivate) => siteSettingsState.getAllSiteSettings(state, isPrivate)
+    )
+    const frameSiteSettingsSelector = createSelector(
+      (state) => getFrameSelector(state).get('location'),
+      allSiteSettingsSelector,
+      (location, allSettings) => siteSettings.getSiteSettingsForURL(allSettings, location) || Immutable.Map()
+    )
 
-    const location = frame.get('location')
-    const origin = tabState.getVisibleOrigin(state, tabId)
-    const isPrivate = frame.get('isPrivate', false)
+    return (state, ownProps) => {
+      const currentWindow = state.get('currentWindow')
+      const frame = getFrameSelector(state)
+      const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
 
-    const allSiteSettings = siteSettingsState.getAllSiteSettings(state, isPrivate)
-    const frameSiteSettings = siteSettings.getSiteSettingsForURL(allSiteSettings, location) || Immutable.Map()
+      const location = frame.get('location')
+      const origin = tabState.getVisibleOrigin(state, tabId)
 
-    const contextMenu = currentWindow.get('contextMenuDetail')
-    const tab = tabId && tabId > -1 && tabState.getByTabId(state, tabId)
+      const allSiteSettings = allSiteSettingsSelector(state)
+      const frameSiteSettings = frameSiteSettingsSelector(state)
 
-    const props = {}
-    // used in renderer
-    props.transitionState = ownProps.transitionState
-    props.partition = frameStateUtil.getPartition(frame)
-    props.isFullScreen = frame.get('isFullScreen')
-    props.isPreview = frame.get('key') === currentWindow.get('previewFrameKey')
-    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frame.get('key'))
-    props.showFullScreenWarning = frame.get('showFullScreenWarning')
-    props.location = location
-    props.isDefaultNewTabLocation = location === 'about:newtab'
-    props.isBlankLocation = location === 'about:blank'
-    props.tabId = tabId
-    props.showMessageBox = tabMessageBoxState.hasMessageBoxDetail(state, tabId)
-    props.isFocused = isFocused(state)
+      const contextMenu = currentWindow.get('contextMenuDetail')
+      const tab = tabId && tabId > -1 && tabState.getByTabId(state, tabId)
 
-    // used in other functions
-    props.frameKey = ownProps.frameKey
-    props.origin = origin
-    props.runInsecureContent = frameSiteSettings.get('runInsecureContent')
-    props.noScript = frameSiteSettings.get('noScript')
-    props.noScriptExceptions = frameSiteSettings.get('noScriptExceptions')
-    props.widevine = frameSiteSettings.get('widevine')
-    props.flash = frameSiteSettings.get('flash')
-    props.urlBarFocused = frame && frame.getIn(['navbar', 'urlbar', 'focused'])
-    props.isAutFillContextMenu = contextMenu && contextMenu.get('type') === 'autofill'
-    props.isSecure = frame.getIn(['security', 'isSecure'])
-    props.findbarShown = frame.get('findbarShown')
-    props.findDetailCaseSensitivity = frame.getIn(['findDetail', 'caseSensitivity'], undefined)
-    props.findDetailSearchString = frame.getIn(['findDetail', 'searchString'])
-    props.findDetailInternalFindStatePresent = frame.getIn(['findDetail', 'internalFindStatePresent'])
-    props.isPrivate = frame.get('isPrivate')
-    props.activeShortcut = frame.get('activeShortcut')
-    props.shortcutDetailsUsername = frame.getIn(['activeShortcutDetails', 'username'])
-    props.shortcutDetailsPassword = frame.getIn(['activeShortcutDetails', 'password'])
-    props.shortcutDetailsOrigin = frame.getIn(['activeShortcutDetails', 'origin'])
-    props.shortcutDetailsAction = frame.getIn(['activeShortcutDetails', 'action'])
-    props.provisionalLocation = frame.get('provisionalLocation')
-    props.src = frame.get('src')
-    props.guestInstanceId = frame.get('guestInstanceId')
-    props.aboutDetailsUrl = frame.getIn(['aboutDetails', 'url'])
-    props.aboutDetailsFrameKey = frame.getIn(['aboutDetails', 'frameKey'])
-    props.aboutDetailsErrorCode = frame.getIn(['aboutDetails', 'errorCode'])
-    props.unloaded = frame.get('unloaded')
-    props.isWidevineEnabled = state.get('widevine') && state.getIn(['widevine', 'enabled'])
-    props.siteZoomLevel = frameSiteSettings.get('zoomLevel')
-    props.hasAllSiteSettings = !!allSiteSettings
-    props.tabUrl = tab && tab.get('url')
-    props.partitionNumber = frame.get('partitionNumber')
+      const props = {}
+      // used in renderer
+      props.transitionState = ownProps.transitionState
+      props.partition = frameStateUtil.getPartition(frame)
+      props.isFullScreen = frame.get('isFullScreen')
+      props.isPreview = frame.get('key') === currentWindow.get('previewFrameKey')
+      props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frame.get('key'))
+      props.showFullScreenWarning = frame.get('showFullScreenWarning')
+      props.location = location
+      props.isDefaultNewTabLocation = location === 'about:newtab'
+      props.isBlankLocation = location === 'about:blank'
+      props.tabId = tabId
+      props.showMessageBox = tabMessageBoxState.hasMessageBoxDetail(state, tabId)
+      props.isFocused = isFocused(state)
 
-    return props
+      // used in other functions
+      props.frameKey = ownProps.frameKey
+      props.origin = origin
+      props.runInsecureContent = frameSiteSettings.get('runInsecureContent')
+      props.noScript = frameSiteSettings.get('noScript')
+      props.noScriptExceptions = frameSiteSettings.get('noScriptExceptions')
+      props.widevine = frameSiteSettings.get('widevine')
+      props.flash = frameSiteSettings.get('flash')
+      props.urlBarFocused = frame && frame.getIn(['navbar', 'urlbar', 'focused'])
+      props.isAutFillContextMenu = contextMenu && contextMenu.get('type') === 'autofill'
+      props.isSecure = frame.getIn(['security', 'isSecure'])
+      props.findbarShown = frame.get('findbarShown')
+      props.findDetailCaseSensitivity = frame.getIn(['findDetail', 'caseSensitivity'], undefined)
+      props.findDetailSearchString = frame.getIn(['findDetail', 'searchString'])
+      props.findDetailInternalFindStatePresent = frame.getIn(['findDetail', 'internalFindStatePresent'])
+      props.isPrivate = frame.get('isPrivate')
+      props.activeShortcut = frame.get('activeShortcut')
+      props.shortcutDetailsUsername = frame.getIn(['activeShortcutDetails', 'username'])
+      props.shortcutDetailsPassword = frame.getIn(['activeShortcutDetails', 'password'])
+      props.shortcutDetailsOrigin = frame.getIn(['activeShortcutDetails', 'origin'])
+      props.shortcutDetailsAction = frame.getIn(['activeShortcutDetails', 'action'])
+      props.provisionalLocation = frame.get('provisionalLocation')
+      props.src = frame.get('src')
+      props.guestInstanceId = frame.get('guestInstanceId')
+      props.aboutDetailsUrl = frame.getIn(['aboutDetails', 'url'])
+      props.aboutDetailsFrameKey = frame.getIn(['aboutDetails', 'frameKey'])
+      props.aboutDetailsErrorCode = frame.getIn(['aboutDetails', 'errorCode'])
+      props.unloaded = frame.get('unloaded')
+      props.isWidevineEnabled = state.get('widevine') && state.getIn(['widevine', 'enabled'])
+      props.siteZoomLevel = frameSiteSettings.get('zoomLevel')
+      props.hasAllSiteSettings = !!allSiteSettings
+      props.tabUrl = tab && tab.get('url')
+      props.partitionNumber = frame.get('partitionNumber')
+
+      return props
+    }
   }
 
   getTransitionStateClassName (stateName) {
