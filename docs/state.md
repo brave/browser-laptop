@@ -674,7 +674,7 @@ WindowStore
   },
   cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
   closedFrames: [], // holds the same type of frame objects as frames
-  contextMenuDetail: {
+  contextMenuDetail: { // currently using uuid hack to avoid serializing click function in template
     bottom: number, // the bottom position of the context menu
     left: number, // the left position of the context menu
     maxHeight: number, // the maximum height of the context menu

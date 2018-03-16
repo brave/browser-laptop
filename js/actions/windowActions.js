@@ -536,9 +536,16 @@ const windowActions = {
    * @param {Object} detail - The context menu detail
    */
   setContextMenuDetail: function (detail) {
+    // TODO(darkdh): This is a hack to prevent dispatch from serializing
+    // click function in template. `contextMenuDetail` is just a uuid to trigger
+    // state update for new menu
+    const Immutable = require('immutable')
+    const contextMenuState = require('../../app/common/state/contextMenuState')
+    let state = contextMenuState.setContextMenu(Immutable.Map(), detail)
+    const contextMenuDetail = state.get('contextMenuDetail')
     dispatch({
       actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL,
-      detail
+      contextMenuDetail
     })
   },
 
@@ -938,20 +945,6 @@ const windowActions = {
     dispatch({
       actionType: windowConstants.WINDOW_SET_LAST_FOCUSED_SELECTOR,
       selector
-    })
-  },
-
-  /**
-   * Used to get response details (such as the HTTP response code) from a response
-   * See `eventStore.js` for an example use-case
-   * @param {number} tabId - the tab id to set
-   * @param {Object} details - object containing response details
-   */
-  gotResponseDetails: function (tabId, details) {
-    dispatch({
-      actionType: windowConstants.WINDOW_GOT_RESPONSE_DETAILS,
-      tabId,
-      details
     })
   },
 

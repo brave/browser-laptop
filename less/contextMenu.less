@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 @import "variables.less";
 
@@ -70,7 +70,10 @@
 }
 
 .contextMenuItem {
-  max-width: 420px;
+  // vvvv do not remove. fixes #13373
+  max-width: inherit;
+  min-width: inherit;
+  // ^^^^ end of fix for #13373
   padding: 6px 10px 6px 20px;
   &.hasIcon {
     padding-left: 10px;
@@ -125,7 +128,7 @@
     }
   }
 
- &:not([disabled]) {
+&:not([disabled]) {
     &:not(.contextMenuSeparator) {
       &:hover {
         background-color: lighten(@menuSelectionColor, 5%);
