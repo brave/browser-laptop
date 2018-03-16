@@ -104,7 +104,10 @@ class PinnedTabs extends React.Component {
 const styles = StyleSheet.create({
   pinnedTabs: {
     height: '-webkit-fill-available',
+    display: 'flex',
+    alignItems: 'stretch',
     boxSizing: 'border-box',
+    position: 'relative',
     marginLeft: 0,
     marginTop: 0
   }

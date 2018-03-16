@@ -120,8 +120,7 @@ class Favicon extends React.Component {
             !this.props.favicon &&
             css(
               styles.icon__symbol_default,
-              this.props.showIconAtReducedSize && styles.icon__symbol_default_reducedSize,
-              themeLight && styles.icon__symbol_default_colorLight
+              this.props.showIconAtReducedSize && styles.icon__symbol_default_reducedSize
             )
           )
       } />
@@ -130,7 +129,8 @@ class Favicon extends React.Component {
 
 const styles = StyleSheet.create({
   icon_fav: {
-    backgroundImage: 'var(--faviconsrc)'
+    backgroundImage: 'var(--faviconsrc)',
+    overflow: 'visible'
   },
 
   icon_favLight: {
@@ -151,7 +151,6 @@ const styles = StyleSheet.create({
   icon__symbol_loading: {
     position: 'absolute',
     left: 0,
-    willChange: 'transform',
     backgroundImage: `url(${loadingIconSvg})`,
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'top left',
@@ -170,15 +169,11 @@ const styles = StyleSheet.create({
     WebkitMaskPosition: 'center',
     WebkitMaskImage: `url(${defaultIconSvg})`,
     WebkitMaskSize: '14px',
-    backgroundColor: theme.tab.icon.symbol.default.backgroundColor
+    backgroundColor: 'var(--tab-default-icon-color)'
   },
 
   icon__symbol_default_reducedSize: {
     WebkitMaskSize: '10px'
-  },
-
-  icon__symbol_default_colorLight: {
-    backgroundColor: theme.tab.icon.symbol.default.light.backgroundColor
   }
 })
 
