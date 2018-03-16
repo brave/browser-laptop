@@ -18,11 +18,11 @@
 
     filter: {
       makeWhite: 'brightness(0) invert(1)',
-      whiteShadow: 'drop-shadow(0px 0px 2px rgb(255, 255, 255))'
+      whiteShadow: 'drop-shadow(-10px 0px 12px rgb(255, 255, 255))'
     },
 
     tabsToolbar: {
-      backgroundColor: '#ddd',
+      backgroundColor: '#CDD1D5',
 
       border: {
         color: '#bbb'
@@ -64,34 +64,61 @@
     },
 
     tab: {
-      transition: `
-      background-color 150ms cubic-bezier(0.26, 0.63, 0.39, 0.65),
-      color 150ms cubic-bezier(0.26, 0.63, 0.39, 0.65)
-    `,
-      background: '#ddd',
+      transitionDurationOut: '400ms',
+      transitionDurationIn: '200ms',
+      transitionEasingOut: 'ease-in',
+      transitionEasingIn: 'ease-out',
+      background: 'rgb(205,209,213)',
       borderColor: '#bbb',
-      color: '#5a5a5a',
+      borderWidth: 1,
+      color: '#222',
+      identityHeight: globalStyles.spacing.iconSize,
+      defaultFaviconColor: globalStyles.color.mediumGray,
+      defaultFaviconColorLight: '#fff',
 
-      hover: {
-        background: 'rgba(255, 255, 255, 0.4)'
+      closeButton: {
+        background: 'transparent',
+        borderRadius: '2px',
+        active: {
+          background: '#cb2c00'
+        },
+        hover: {
+          color: 'white',
+          background: '#fd4f01'
+        }
       },
 
-      forWindows: {
-        color: '#555'
+      hover: {
+        background: 'rgb(219,221,223)',
+        active: {
+          background: 'rgb(243,243,243)'
+        },
+        private: {
+          background: 'rgb(225,223,238)',
+          borderColor: 'rgba(75, 60, 110, .7)'
+        }
       },
 
       active: {
-        background: 'rgba(255, 255, 255, 0.8)',
-
+        background: 'rgb(233,233,234)',
+        colorLight: 'rgb(255, 255, 255)',
+        colorDark: '#222',
         private: {
-          background: '#4b3c6e',
-          color: '#fff'
+          background: 'rgb(75,60,110)',
+          color: '#fff',
+          defaultFaviconColor: '#fff'
         }
       },
 
       private: {
-        background: '#d9d6e0',
+        background: 'rgb(217,213,228)',
         color: '#4b3c6e'
+      },
+
+      preview: {
+        background: 'rgb(240,240,240)',
+        boxShadow: '0 -2px 12px rgba(0, 0, 0, 0.22)',
+        scale: '1.06'
       },
 
       icon: {
@@ -108,7 +135,8 @@
         },
 
         audio: {
-          color: '#69B9F9'
+          color: '#2377bb',
+          hoverColor: '#3b566b'
         },
 
         close: {
@@ -116,15 +144,7 @@
         },
 
         symbol: {
-          color: globalStyles.color.black100,
-
-          default: {
-            backgroundColor: globalStyles.color.mediumGray,
-
-            light: {
-              backgroundColor: globalStyles.color.white100
-            }
-          }
+          color: globalStyles.color.black100
         }
       }
     },

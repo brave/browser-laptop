@@ -61,8 +61,8 @@ class PrivateIcon extends React.Component {
     )
     if (shouldTransitionIn) {
       this.element.animate(opacityIncreaseElementKeyframes, {
-        duration: 200,
-        easing: 'linear'
+        duration: 120,
+        easing: 'ease-out'
       })
     }
   }
@@ -76,19 +76,11 @@ class PrivateIcon extends React.Component {
       return null
     }
 
-    const privateProps = StyleSheet.create({
-      icon_private_color: {
-        backgroundColor: this.props.isActive
-          ? theme.tab.icon.private.background.active
-          : theme.tab.icon.private.background.notActive
-      }
-    })
-
     return <TabIcon
       data-test-id='privateIcon'
       className={[
         styles.icon_private,
-        privateProps.icon_private_color
+        this.props.isActive && styles.icon_private_active
       ]}
       ref={this.setRef}
     />
@@ -106,7 +98,12 @@ const styles = StyleSheet.create({
     // Override default properties
     backgroundSize: 0,
     height: globalStyles.spacing.sessionIconSize,
-    width: globalStyles.spacing.sessionIconSize
+    width: globalStyles.spacing.sessionIconSize,
+    backgroundColor: theme.tab.icon.private.background.notActive
+  },
+
+  icon_private_active: {
+    backgroundColor: theme.tab.icon.private.background.active
   }
 })
 

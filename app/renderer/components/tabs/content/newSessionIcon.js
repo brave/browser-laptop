@@ -69,8 +69,8 @@ class NewSessionIcon extends React.Component {
     }
     if (shouldTransitionIn) {
       this.element.animate(opacityIncreaseElementKeyframes, {
-        duration: 200,
-        easing: 'linear'
+        duration: 120,
+        easing: 'ease-out'
       })
     }
   }
@@ -88,19 +88,11 @@ class NewSessionIcon extends React.Component {
       return null
     }
 
-    const newSessionProps = StyleSheet.create({
-      newSession__indicator: {
-        filter: this.props.isActive && this.props.textIsWhite
-          ? 'invert(100%)'
-          : 'none'
-      }
-    })
-
     return <TabIcon symbol
       data-test-id='newSessionIcon'
       className={[
         styles.icon_newSession,
-        newSessionProps.newSession__indicator
+        this.props.isActive && this.props.textIsWhite && styles.icon_newSession_active_light
       ]}
       symbolContent={this.props.partitionNumber}
       l10nArgs={{partitionNumber: this.props.partitionNumber}}
@@ -118,6 +110,10 @@ const styles = StyleSheet.create({
 
     // Override default properties
     backgroundSize: globalStyles.spacing.newSessionIconSize
+  },
+
+  icon_newSession_active_light: {
+    filter: 'invert(100%)'
   }
 })
 
