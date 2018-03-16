@@ -10,6 +10,7 @@ const {getWebContents} = require('../webContentsCache')
 const appConstants = require('../../../js/constants/appConstants')
 const windowConstants = require('../../../js/constants/windowConstants')
 const settings = require('../../../js/constants/settings')
+const tabActionConstants = require('../../common/constants/tabAction')
 
 // State
 const ledgerState = require('../../common/state/ledgerState')
@@ -365,7 +366,7 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.pageDataChanged(state)
         break
       }
-    case windowConstants.FINISH_NAVIGATION:
+    case tabActionConstants.FINISH_NAVIGATION:
       {
         if (!getSetting(settings.PAYMENTS_ENABLED)) {
           break
