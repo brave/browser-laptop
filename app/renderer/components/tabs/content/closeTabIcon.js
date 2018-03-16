@@ -4,11 +4,10 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const {StyleSheet} = require('aphrodite/no-important')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
-const TabIcon = require('./tabIcon')
 
 // State helpers
 const tabState = require('../../../../common/state/tabState')
@@ -19,9 +18,6 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 // Styles
 const globalStyles = require('../../styles/global')
 const {theme} = require('../../styles/theme')
-const {opacityIncreaseElementKeyframes} = require('../../styles/animations')
-
-const closeTabSvg = require('../../../../extensions/brave/img/tabs/close_btn.svg')
 
 class CloseTabIcon extends React.Component {
   constructor (props) {
@@ -49,88 +45,76 @@ class CloseTabIcon extends React.Component {
     return props
   }
 
-  componentDidMount (props) {
-    this.transitionIfRequired()
-  }
-
-  componentDidUpdate (prevProps) {
-    this.transitionIfRequired(prevProps)
-  }
-
-  transitionIfRequired (prevProps) {
-    const shouldTransitionIn = (
-      // need to have the element created already
-      this.element &&
-      // no icon is showing if pinned tab
-      !this.props.isPinned &&
-      // should show the icon
-      // TODO: if we want to animate the unmounting of the component (when
-      // tab is unhovered), then we should use https://github.com/reactjs/react-transition-group
-      // For now, we'll just not do anything since we can't - the element
-      // will have already been removed
-      this.props.showCloseIcon &&
-      // state has changed
-      (!prevProps || this.props.showCloseIcon !== prevProps.showCloseIcon)
-    )
-    if (shouldTransitionIn) {
-      this.element.animate(opacityIncreaseElementKeyframes, {
-        duration: 200,
-        easing: 'linear'
-      })
-    }
-  }
-
   setRef (ref) {
     this.element = ReactDOM.findDOMNode(ref)
   }
 
   render () {
-    if (this.props.isPinned || !this.props.showCloseIcon) {
+    if (this.props.isPinned || !this.props.showCloseIcon) { // <-- comment out to always show, in order to view in inspector
       return null
     }
 
-    return <TabIcon
+    return <div
       data-test-id='closeTabIcon'
       data-test2-id={this.props.showCloseIcon ? 'close-icon-on' : 'close-icon-off'}
-      className={[
-        styles.icon_close,
-        this.props.centralizeTabIcons && styles.icon_close_centered
-      ]}
-      l10nId='closeTabButton'
+      className={css(
+        styles.closeIcon,
+        this.props.centralizeTabIcons && styles.closeIcon_centered
+      )}
+      data-l10n-id='closeTabButton'
       onClick={this.props.onClick}
       onDragStart={this.onDragStart}
       draggable='true'
       ref={this.setRef}
-    />
+    >
+      <svg className={css(styles.closeIcon__graphic)} xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'>
+        <path className={css(styles.closeIcon__line)} fill='none' stroke='#000' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.29' d='M11.5 4.5l-7 7m7 0l-7-7' />
+      </svg>
+    </div>
   }
 }
 
 const styles = StyleSheet.create({
-  icon_close: {
-    marginRight: globalStyles.spacing.defaultTabMargin,
-    backgroundImage: `url(${closeTabSvg})`,
-
-    // Override default properties
-    backgroundSize: globalStyles.spacing.closeIconSize,
+  closeIcon: {
+    '--close-line-color': 'var(--tab-color)',
+    boxSizing: 'border-box',
+    alignSelf: 'center',
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: theme.tab.closeButton.borderRadius,
+    background: theme.tab.closeButton.background,
+    marginRight: `calc(${globalStyles.spacing.defaultTabMargin} - 2px)`,
     width: globalStyles.spacing.closeIconSize,
     height: globalStyles.spacing.closeIconSize,
-
-    // mask icon to gray to avoid calling another icon on hover
-    transition: 'filter 150ms linear',
-    filter: theme.tab.icon.close.filter,
-
+    zIndex: globalStyles.zindex.zindexTabsThumbnail,
     ':hover': {
-      filter: 'none'
+      '--close-line-color': theme.tab.closeButton.hover.color,
+      background: theme.tab.closeButton.hover.background,
+      '--close-transit-duration': theme.tab.transitionDurationIn,
+      '--close-transit-timing': theme.tab.transitionEasingIn
+    },
+    ':active': {
+      background: theme.tab.closeButton.active.background
     }
   },
 
-  icon_close_centered: {
+  closeIcon__graphic: {
+    flex: 1
+  },
+
+  closeIcon__line: {
+    stroke: 'var(--close-line-color)'
+  },
+
+  closeIcon_centered: {
     position: 'absolute',
-    left: 0,
+    left: `calc(50% - (${globalStyles.spacing.closeIconSize} / 2))`,
     right: 0,
-    top: 0,
+    top: `calc(50% - (${globalStyles.spacing.closeIconSize} / 2))`,
     bottom: 0,
-    margin: 'auto'
+    margin: 0
   }
 })
 

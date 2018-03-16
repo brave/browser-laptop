@@ -149,6 +149,7 @@ class Tabs extends React.Component {
     const props = {}
     // used in renderer
     props.previewTabPageIndex = currentWindow.getIn(['ui', 'tabs', 'previewTabPageIndex'])
+    props.previewTabFrameKey = frameStateUtil.getPreviewFrameKey(currentWindow)
     props.currentTabs = currentTabs
     props.partOfFullPageSet = currentTabs.size === tabsPerTabPage
     props.onNextPage = currentTabs.size >= tabsPerTabPage && totalPages > pageIndex + 1
@@ -165,6 +166,7 @@ class Tabs extends React.Component {
   }
 
   render () {
+    const isTabPreviewing = this.props.previewTabFrameKey != null
     this.tabRefs = []
     return <div className={css(styles.tabs)}
       data-test-id='tabs'
@@ -173,7 +175,8 @@ class Tabs extends React.Component {
       <span className={css(
         styles.tabs__tabStrip,
         (this.props.previewTabPageIndex != null) && styles.tabs__tabStrip_isPreview,
-        this.props.shouldAllowWindowDrag && styles.tabs__tabStrip_allowDragging
+        this.props.shouldAllowWindowDrag && styles.tabs__tabStrip_allowDragging,
+        isTabPreviewing && styles.tabs__tabStrip_isTabPreviewing
       )}
         data-test-preview-tab={this.props.previewTabPageIndex != null}
         onDragOver={this.onDragOver}
@@ -232,7 +235,6 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     display: 'flex',
     flex: 1,
-    overflow: 'auto',
     padding: 0,
     height: '-webkit-fill-available',
     position: 'relative',
@@ -244,7 +246,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     flex: 1,
     zIndex: globalStyles.zindex.zindexTabs,
-    overflow: 'hidden'
+    position: 'relative'
+  },
+
+  tabs__tabStrip_isTabPreviewing: {
+    overflow: 'initial'
   },
 
   tabs__tabStrip_isPreview: globalStyles.animations.tabFadeIn,

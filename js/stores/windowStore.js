@@ -16,6 +16,7 @@ const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
+const color = require('../lib/color')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const { makeImmutable } = require('../../app/common/state/immutableUtil')
 const {aboutUrls, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
@@ -397,10 +398,13 @@ const doAction = (action) => {
       {
         const frameKey = action.frameProps.get('key')
         if (action.themeColor !== undefined) {
-          windowState = windowState.setIn(frameStateUtil.frameStatePath(windowState, frameKey).concat(['themeColor']), action.themeColor)
+          // remove alpha channel
+          const solidColor = color.removeAlphaChannelForBackground(action.themeColor, 255, 255, 255)
+          windowState = windowState.setIn(frameStateUtil.frameStatePath(windowState, frameKey).concat(['themeColor']), solidColor)
         }
         if (action.computedThemeColor !== undefined) {
-          windowState = windowState.setIn(frameStateUtil.frameStatePath(windowState, frameKey).concat(['computedThemeColor']), action.computedThemeColor)
+          const solidColor = color.removeAlphaChannelForBackground(action.computedThemeColor, 255, 255, 255)
+          windowState = windowState.setIn(frameStateUtil.frameStatePath(windowState, frameKey).concat(['computedThemeColor']), solidColor)
         }
         break
       }

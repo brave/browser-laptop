@@ -156,7 +156,7 @@ describe('audioState unit tests', function () {
       const state = defaultState
         .setIn(['frames', index, 'audioPlaybackActive'], false)
         .setIn(['frames', index, 'audioMuted'], false)
-        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at45)
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at46)
       const result = audioState.showAudioTopBorder(state, frameKey, false)
       assert.equal(result, false)
     })
