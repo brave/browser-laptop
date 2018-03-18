@@ -40,7 +40,8 @@ describe('sessionStore unit tests', function () {
   const fakeFiltering = {
     clearStorageData: () => {},
     clearCache: () => {},
-    clearHistory: () => {}
+    clearHistory: () => {},
+    clearCookies: () => {}
   }
   const fakeTabState = {
     getPersistentState: (data) => { return makeImmutable(data) }

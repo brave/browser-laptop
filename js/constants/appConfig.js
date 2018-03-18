@@ -220,6 +220,11 @@ module.exports = {
     'shutdown.clear-autocomplete-data': false,
     'shutdown.clear-autofill-data': false,
     'shutdown.clear-site-settings': false,
+    // Previously, cookies have been defined as all pieces of store data.
+    // The clear-cookies-no-local-storage shutdown option will trigger
+    // the removal of actual cookies only, in the case other pieces of data
+    // should be preserved.
+    'shutdown-clear-cookies-no-local-storage': false,
     'extensions.pocket.enabled': false,
     'extensions.vimium.enabled': false,
     'extensions.honey.enabled': false,
