@@ -16,7 +16,7 @@ switch (TEST_DIR) {
     cmd.push('bash tools/codecov.sh')
     break
   default:
-    cmd.push(`mocha "test/${TEST_DIR}/**/*Test.js" --globals chrome,DOMParser,XMLSerializer`)
+    cmd.push(`mocha "test/${TEST_DIR}/**/*Test.js"`)
 }
 
 execute(cmd, process.env, (err) => {

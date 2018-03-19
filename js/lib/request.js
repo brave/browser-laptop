@@ -8,15 +8,6 @@ const electron = require('electron')
 const session = electron.session
 const underscore = require('underscore')
 const urlParse = require('../../app/common/urlParse')
-const ipc = electron.ipcMain
-
-var backgroundPageWebContents = null
-
-if (ipc) {
-  ipc.on('got-background-page-webcontents', (e) => {
-    backgroundPageWebContents = e.sender
-  })
-}
 
 /**
  * Sends a network request using Chromium's networks stack instead of Node's.
@@ -83,23 +74,4 @@ module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
       }
     })
   }
-}
-
-/**
- * Fetches url, title, and image for a publishers site (Youtube, Twitch, etc.)
- * See
- * https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
- * @param {string} url - url to fetch
- * @param {Object} options - options to pass to window.fetch
- * @param {Function({url: string, title: string, image: string, error: string})} callback
- */
-module.exports.fetchPublisherInfo = (url, options, callback) => {
-  if (!backgroundPageWebContents) {
-    callback(new Error('Background page web contents not initialized.'), { url })
-    return
-  }
-  backgroundPageWebContents.send('fetch-publisher-info', url, options)
-  ipc.once('got-publisher-info-' + url, (e, response) => {
-    callback(response.error, response.body)
-  })
 }
