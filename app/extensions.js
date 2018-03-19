@@ -4,7 +4,7 @@ const extensionActions = require('./common/actions/extensionActions')
 const config = require('../js/constants/config')
 const appConfig = require('../js/constants/appConfig')
 const {fileUrl} = require('../js/lib/appUrlUtil')
-const {getExtensionsPath, getBraveExtUrl, getBraveExtIndexHTML} = require('../js/lib/appUrlUtil')
+const {getComponentExtensionsPath, getExtensionsPath, getBraveExtUrl, getBraveExtIndexHTML} = require('../js/lib/appUrlUtil')
 const {getSetting} = require('../js/settings')
 const settings = require('../js/constants/settings')
 const extensionStates = require('../js/constants/extensionStates')
@@ -516,7 +516,7 @@ module.exports.init = () => {
   loadExtension(config.braveExtensionId, getExtensionsPath('brave'), generateBraveManifest(), 'component')
   // Cryptotoken extension is loaded from electron_resources.pak
   extensionInfo.setState(config.cryptoTokenExtensionId, extensionStates.REGISTERED)
-  loadExtension(config.cryptoTokenExtensionId, path.join(process.resourcesPath, 'cryptotoken'), {}, 'component')
+  loadExtension(config.cryptoTokenExtensionId, getComponentExtensionsPath('cryptotoken'), {}, 'component')
   extensionInfo.setState(config.syncExtensionId, extensionStates.REGISTERED)
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
