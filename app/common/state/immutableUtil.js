@@ -61,6 +61,26 @@ const api = {
       nullKeys.push(...api.findNullKeyPaths(state.get(key), keyPath))
     }
     return nullKeys
+  },
+
+  removeDuplicatedEntriesFromList (state, value, keepNullIndexes = false) {
+    return state.reduce((accumulator, currentValue) => {
+      const skipElement = accumulator.find(element => {
+        if (keepNullIndexes) {
+          if (element == null || currentValue == null) {
+            accumulator.push(null)
+            return true
+          }
+        }
+        return element.get(value) === currentValue.get(value)
+      })
+
+      if (!skipElement) {
+        accumulator.push(currentValue)
+      }
+
+      return accumulator
+    }, [])
   }
 }
 

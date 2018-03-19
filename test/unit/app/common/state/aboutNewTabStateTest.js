@@ -4,6 +4,7 @@
 
 /* global describe, it, before, after */
 const aboutNewTabState = require('../../../../../app/common/state/aboutNewTabState')
+const {aboutNewTabMaxEntries} = require('../../../../../app/browser/api/topSites')
 const Immutable = require('immutable')
 const assert = require('assert')
 const sinon = require('sinon')
@@ -90,6 +91,39 @@ describe('aboutNewTabState unit test', function () {
       const state = aboutNewTabState.mergeDetails(defaultAppState, action)
       const updatedValue = state.getIn(['about', 'newtab', 'testing123'])
       assert.equal(updatedValue, 'TEST STRING')
+    })
+
+    it('prevents pinnedTopSites from being duplicated while keeping empty spaces', function () {
+      const action = {newTabPageDetail: {}}
+      const fakePinnedSites = [
+        {location: 'https://cliftonforthecliftonthrone.com'},
+        {location: 'https://cliftonforthecliftonthrone.com'},
+        undefined,
+        {location: 'https://ichoosearizona.com'}
+      ]
+
+      const badState = defaultAppState.mergeIn(
+        ['about', 'newtab', 'pinnedTopSites'],
+        fakePinnedSites
+      )
+
+      const state = aboutNewTabState.mergeDetails(badState, action)
+      const updatedValue = state.getIn(['about', 'newtab', 'pinnedTopSites'])
+      const expectedDedupedValue = [
+        {location: 'https://cliftonforthecliftonthrone.com'},
+        null,
+        null,
+        {location: 'https://ichoosearizona.com'}
+      ]
+
+      // ensure other entries are filled up as well in the expected result
+      const nullArray = []
+      for (let i = 0; i < (aboutNewTabMaxEntries - expectedDedupedValue.length); i++) {
+        nullArray.push(null)
+      }
+      const expectedValue = expectedDedupedValue.concat(nullArray)
+
+      assert.deepEqual(JSON.stringify(updatedValue), JSON.stringify(expectedValue))
     })
   })
 
