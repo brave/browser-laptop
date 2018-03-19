@@ -187,7 +187,7 @@ let generateBraveManifest = () => {
     'style-src': '\'self\' \'unsafe-inline\'',
     'font-src': '\'self\' data:',
     'img-src': '* data: file://*',
-    'connect-src': 'https://www.youtube.com',
+    'connect-src': '\'self\' https://www.youtube.com',
     'frame-src': '\'self\' https://brave.com'
   }
 
@@ -195,8 +195,8 @@ let generateBraveManifest = () => {
     // allow access to webpack dev server resources
     let devServer = 'localhost:' + process.env.npm_package_config_port
     cspDirectives['default-src'] = '\'self\' http://' + devServer
-    cspDirectives['connect-src'] = cspDirectives['connect-src'] + [
-      ' \'self\'',
+    cspDirectives['connect-src'] = [
+      cspDirectives['connect-src'],
       'http://' + devServer,
       'ws://' + devServer
     ].join(' ')
