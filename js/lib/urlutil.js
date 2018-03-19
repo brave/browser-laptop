@@ -470,7 +470,10 @@ const UrlUtil = {
       if (parsed.protocol === 'about:') {
         return [parsed.protocol, parsed.path].join('')
       }
-      return parsed.origin.replace(/\/+$/, '')
+      if (parsed.origin.length !== 0) {
+        return parsed.origin.replace(/\/+$/, '')
+      }
+      return parsed.href.replace(/\/+$/, '')
     }
     if (parsed.host && parsed.protocol) {
       return parsed.slashes ? [parsed.protocol, parsed.host].join('//') : [parsed.protocol, parsed.host].join('')
