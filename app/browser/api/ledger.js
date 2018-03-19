@@ -325,7 +325,7 @@ const getPublisherData = (result, scorekeeper) => {
     minutesSpent: 0,
     secondsSpent: 0,
     faviconURL: result.faviconURL,
-    score: result.scores[scorekeeper],
+    score: result.scores ? result.scores[scorekeeper] : 0,
     pinPercentage: result.pinPercentage,
     weight: result.pinPercentage
   }
@@ -437,7 +437,7 @@ const synopsisNormalizer = (state, changedPublisher, returnState = true, prune =
       dataPinned.push(getPublisherData(publisher, scorekeeper))
     } else if (ledgerUtil.stickyP(state, publisher.publisherKey)) {
       // unpinned
-      unPinnedTotal += publisher.scores[scorekeeper]
+      unPinnedTotal += publisher.scores ? publisher.scores[scorekeeper] : 0
       dataUnPinned.push(publisher)
     } else {
       // excluded
