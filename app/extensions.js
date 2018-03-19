@@ -206,7 +206,8 @@ let generateBraveManifest = () => {
     // allow access to webpack dev server resources
     let devServer = 'localhost:' + process.env.npm_package_config_port
     cspDirectives['default-src'] = '\'self\' http://' + devServer
-    cspDirectives['connect-src'] = cspDirectives['connect-src'] + [
+    cspDirectives['connect-src'] = [
+      cspDirectives['connect-src'],
       'http://' + devServer,
       'ws://' + devServer
     ].join(' ')
