@@ -123,7 +123,7 @@
     "react-dom": "^15.5.4",
     "react-select": "^0.9.1",
     "react-transition-group": "^2.2.1",
-    "sha3": "hferreiro/node-sha3",
+    "sha3": "brave/node-sha3",
     "snazzy": "^7.0.0",
     "string.prototype.endswith": "^0.2.0",
     "string.prototype.startswith": "^0.2.0",
