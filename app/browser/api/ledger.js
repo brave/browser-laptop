@@ -1069,7 +1069,14 @@ const backupKeys = (state, backupAction) => {
         if (backupAction === 'print') {
           webContents.print({silent: false, printBackground: false})
         } else {
-          webContents.downloadURL(fileUrl(filePath), true)
+          const dialog = electron.dialog
+          dialog.showSaveDialog({
+            defaultPath: filePath,
+            filters: [{
+              name: 'TXT files',
+              extensions: ['txt']
+            }]
+          })
         }
       })
     }
