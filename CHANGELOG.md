@@ -1,11 +1,11 @@
 # Changelog
 
-## [0.21.19](https://github.com/brave/browser-laptop/releases/tag/v0.21.19dev)
+## [0.21.24](https://github.com/brave/browser-laptop/releases/tag/v0.21.24dev)
 
- - Fixed possible session loss during upgrades. ([#11576](https://github.com/brave/browser-laptop/issues/11576))
+ - Fixed bugs with ledger session corruption. ([#13330](https://github.com/brave/browser-laptop/issues/13330))
  - Fixed possible error when trying to save password. ([#13408](https://github.com/brave/browser-laptop/issues/13408))
  - Fixed tab refresh not releasing memory. ([#13273](https://github.com/brave/browser-laptop/issues/13273))
- - Upgraded to muon 4.9.2. ([#13357](https://github.com/brave/browser-laptop/issues/13357))
+ - Upgraded to muon 4.9.3. ([#13357](https://github.com/brave/browser-laptop/issues/13357))
  - Upgraded to Chromium 65.0.3325.162. ([#13358](https://github.com/brave/browser-laptop/issues/13358))
 
 ## [0.21.18](https://github.com/brave/browser-laptop/releases/tag/v0.21.18dev)
