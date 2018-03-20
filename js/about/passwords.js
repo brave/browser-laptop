@@ -161,8 +161,8 @@ class AboutPasswords extends React.Component {
   }
 
   onClear () {
-    const msg = 'Are you sure you want to delete all saved passwords? ' +
-      'This cannot be undone.'
+    const locale = require('../../js/l10n')
+    const msg = locale.translation('confirmClearPasswords')
     if (window.confirm(msg)) {
       aboutActions.clearPasswords()
     }
