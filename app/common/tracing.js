@@ -52,7 +52,7 @@ exports.trace = (obj, ...args) => {
       }
       return function (...fnArgs) {
         metadata.name = propKey
-        muon.crashReporter.setCrashKeyValue('javascript-info', JSON.stringify(metadata))
+        muon.crashReporter.setJavascriptInfoCrashValue(JSON.stringify(metadata))
         let result, end, exception
         const start = timer.now()
         try {
@@ -64,7 +64,7 @@ exports.trace = (obj, ...args) => {
           metadata.stack = e.stack != null ? e.stack : e.name + ': ' + e.message
           exception = e
         }
-        muon.crashReporter.setCrashKeyValue('javascript-info', JSON.stringify(metadata))
+        muon.crashReporter.setJavascriptInfoCrashValue(JSON.stringify(metadata))
         if (exception) {
           muon.crashReporter.dumpWithoutCrashing()
           throw exception

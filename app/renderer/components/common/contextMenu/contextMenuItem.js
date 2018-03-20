@@ -304,7 +304,8 @@ const styles = StyleSheet.create({
   },
 
   item: {
-    maxWidth: '420px',
+    maxWidth: 'inherit',
+    minWidth: 'inherit',
     paddingTop: '6px',
     paddingRight: '10px',
     paddingBottom: '6px',
