@@ -5,6 +5,7 @@ const HelpfulHints = require('./helpfulHints')
 
 const {StyleSheet, css} = require('aphrodite')
 const globalStyles = require('../styles/global')
+const { theme } = require('../styles/theme')
 
 // Icons
 const iconGeneral = require('../../../extensions/brave/img/preferences/browser_prefs_general.svg')
@@ -89,7 +90,7 @@ class PreferenceNavigation extends ImmutableComponent {
 const navIcon = icon => ({WebkitMask: `url(${icon}) no-repeat 0 0`})
 const styles = StyleSheet.create({
   prefAside: {
-    background: `linear-gradient(${globalStyles.color.gray}, ${globalStyles.color.mediumGray})`,
+    background: theme.preferences.navigationBackground,
     boxShadow: globalStyles.shadow.insetShadow,
     position: 'fixed',
     zIndex: '600',
