@@ -185,7 +185,7 @@ class Tab extends React.Component {
       },
       getSetting(settings.TAB_PREVIEW_TIMING))
     // fancy radial gradient mouse tracker
-    if (this.elementRef) {
+    if (this.elementRef && !this.props.isActive) {
       // only update position once per render frame
       if (!this.nextFrameSetTabMouseX) {
         var x = e.pageX - this.tabOffsetLeft
@@ -586,18 +586,20 @@ const styles = StyleSheet.create({
 
   tabArea_private_active: {
     '--tab-background': theme.tab.active.private.background,
-    '--tab-color': theme.tab.active.private.color,
     '--tab-background-hover': theme.tab.active.private.background,
+    '--tab-color': theme.tab.active.private.color,
     '--tab-color-hover': theme.tab.active.private.color,
-    '--tab-default-icon-color': theme.tab.active.private.defaultFaviconColor
+    '--tab-default-icon-color': theme.tab.active.private.defaultFaviconColor,
+    '--tab-default-icon-color-hover': theme.tab.active.private.defaultFaviconColor
   },
 
   tabArea_themed: {
-    '--tab-color': `var(--theme-color-fg)`,
     '--tab-background': `var(--theme-color-bg)`,
     '--tab-background-hover': 'var(--theme-color-bg)',
+    '--tab-color': `var(--theme-color-fg)`,
     '--tab-color-hover': 'var(--theme-color-fg)',
-    '--tab-default-icon-color': 'var(--theme-color-default-icon)'
+    '--tab-default-icon-color': 'var(--theme-color-default-icon)',
+    '--tab-default-icon-color-hover': 'var(--theme-color-default-icon)'
   },
 
   tabArea__tab: {
