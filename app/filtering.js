@@ -581,12 +581,6 @@ function registerForDownloadListener (session) {
     const hostWebContents = webContents.hostWebContents || webContents
     const win = BrowserWindow.fromWebContents(hostWebContents) || BrowserWindow.getFocusedWindow()
 
-    // TODO(bridiver) - move this fix to muon
-    const controller = webContents.controller()
-    if (controller && controller.isValid() && controller.isInitialNavigation()) {
-      webContents.forceClose()
-    }
-
     item.setPrompt(getSetting(settings.DOWNLOAD_ALWAYS_ASK) || false)
 
     const downloadId = item.getGuid()
