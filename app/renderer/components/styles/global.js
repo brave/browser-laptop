@@ -391,7 +391,6 @@ globalStyles.color.chromeBorderColor = globalStyles.color.chromePrimary
 globalStyles.color.chromeControlsWarningBackground = globalStyles.color.chromePrimary
 globalStyles.color.audioColor = globalStyles.color.highlightBlue
 globalStyles.color.focusUrlbarOutline = globalStyles.color.highlightBlue
-globalStyles.color.siteSecureColor = globalStyles.color.buttonColor
 globalStyles.color.loadTimeColor = globalStyles.color.highlightBlue
 globalStyles.color.activeTabDefaultColor = globalStyles.color.chromePrimary
 

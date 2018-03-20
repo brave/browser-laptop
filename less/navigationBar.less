@@ -574,8 +574,6 @@
   }
 }
 
-@urlbarFormHeight: 25px;
-
 .urlbarForm {
   position: relative; // PR #6485
   width: 0; // Fixes #4298
@@ -618,8 +616,7 @@
     color: @chromeText;
 
     // #4922
-    // TODO: replace this value with a CSS variable to add a dark UI.
-    background: #fff;
+    background: @chromeControlsBackground2;
   }
 
   @media (max-width: @breakpointNarrowViewport) {
@@ -824,7 +821,7 @@
       justify-content: center;
       height: @urlbarFormHeight;
       min-height: @urlbarFormHeight;
-      margin: 0 5px;
+      margin-right: 5px;
       max-width: 40%;
 
       .urlbarIcon {
@@ -834,7 +831,7 @@
         background-position: center;
         position: relative;
         bottom: -1px;
-        margin-left: 3px;
+        padding: 5px 0px 5px 5px;
 
         // about:newtab
         &.fa-search {
@@ -862,8 +859,10 @@
 
       .evCert {
         font-size: 12px;
-        color: forestgreen;
-        padding: 5px;
+        font-weight: 500;
+        color: @siteEVColor;
+        padding-left: 5px;
+        padding-right: 5px;
         border-right: 1px solid #ccc;
         overflow: hidden;
         text-overflow: ellipsis;
