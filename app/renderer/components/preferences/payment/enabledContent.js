@@ -506,8 +506,10 @@ const styles = StyleSheet.create({
 
   enabledContent__grant_text: {
     fontSize: '16px',
-    color: '#9b9b9b',
-    maxWidth: '600px'
+    color: '#828282',
+    maxWidth: '700px',
+    lineHeight: '25px',
+    padding: '5px'
   },
 
   enabledContent__grant_button: {
