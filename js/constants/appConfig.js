@@ -19,7 +19,7 @@ module.exports = {
   name: 'Brave',
   contactUrl: 'mailto:support+laptop@brave.com',
   quitTimeout: isTest ? 3 * 1000 : 10 * 1000,
-  sessionSaveInterval: 1000 * 60 * 5,
+  sessionSaveInterval: process.env.BRAVE_SESSION_SAVE_INTERVAL * 1000 || 1000 * 60 * 5,
   resourceNames: {
     ADBLOCK: 'adblock',
     SAFE_BROWSING: 'safeBrowsing',
