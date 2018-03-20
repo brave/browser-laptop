@@ -1058,20 +1058,41 @@ const backupKeys = (state, backupAction) => {
   ]
 
   const message = messageLines.join(os.EOL)
-  const filePath = path.join(electron.app.getPath('userData'), '/brave_wallet_recovery.txt')
-
   const fs = require('fs')
-  fs.writeFile(filePath, message, (err) => {
-    if (err) {
-      console.error(err)
-    } else {
-      tabs.create({url: fileUrl(filePath)}, (webContents) => {
-        if (backupAction === 'print') {
+
+  // below is a temp work-around
+  // this will be properly fixed in 0.22.x with https://github.com/brave/browser-laptop/pull/13279
+  if (backupAction === 'print') {
+    const filePath = path.join(electron.app.getPath('userData'), '/brave_wallet_recovery.txt')
+    fs.writeFile(filePath, message, (err) => {
+      if (err) {
+        console.error(err)
+      } else {
+        tabs.create({url: fileUrl(filePath)}, (webContents) => {
           webContents.print({silent: false, printBackground: false})
-        } else {
-          webContents.downloadURL(fileUrl(filePath), true)
-        }
-      })
+        })
+      }
+    })
+    return
+  }
+
+  const defaultFilePath = path.join(electron.app.getPath('downloads'), '/brave_wallet_recovery.txt')
+  const dialog = electron.dialog
+  const BrowserWindow = electron.BrowserWindow
+
+  dialog.showSaveDialog(BrowserWindow.getFocusedWindow(), {
+    defaultPath: defaultFilePath,
+    filters: [{
+      name: 'TXT',
+      extensions: ['txt']
+    }]
+  }, (fileName) => {
+    if (fileName) {
+      try {
+        fs.writeFileSync(fileName, message)
+      } catch (e) {
+        console.error('Problem saving backup keys', e)
+      }
     }
   })
 }
