@@ -2243,9 +2243,6 @@ const onInitRead = (state, parsedData) => {
   module.exports.setPaymentInfo(contributionAmount)
   module.exports.getBalance(state)
 
-  // Show relevant browser notifications on launch
-  state = ledgerNotifications.onLaunch(state)
-
   return state
 }
 
