@@ -591,6 +591,10 @@ class Frame extends React.Component {
           // update the load state; otherwise it will not show the security
           // icon.
           return
+        } else if (!(getBaseUrl === getTargetAboutUrl('about:newtab'))) {
+          // If on the same page, don't reset the state
+          // Fixes a security icon when downloading an item
+          return
         }
         windowActions.onWebviewLoadStart(this.frame, e.url)
       }
