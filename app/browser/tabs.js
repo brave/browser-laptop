@@ -271,6 +271,7 @@ const updateAboutDetails = (tabId) => {
       .set('wizardData', wizardData)
       .set('migration', migration)
       .set('promotion', ledgerState.getAboutPromotion(appState))
+      .set('tabId', tabId)
     sendAboutDetails(tabId, messages.LEDGER_UPDATED, ledgerData)
   } else if (url === 'about:preferences#sync' || location === 'about:contributions' || onPaymentsPage) {
     const sync = appState.get('sync', Immutable.Map())

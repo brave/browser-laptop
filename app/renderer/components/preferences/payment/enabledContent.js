@@ -7,41 +7,49 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const addMonths = require('date-fns/add_months')
 const Immutable = require('immutable')
 
-// util
-const {batToCurrencyString, formatCurrentBalance, formattedDateFromTimestamp, walletStatus} = require('../../../../common/lib/ledgerUtil')
-const {l10nErrorText} = require('../../../../common/lib/httpUtil')
-const ledgerUtil = require('../../../../common/lib/ledgerUtil')
-const {changeSetting} = require('../../../lib/settingsUtil')
-const settings = require('../../../../../js/constants/settings')
-const locale = require('../../../../../js/l10n')
-
-// State
-const ledgerState = require('../../../../common/state/ledgerState')
-
-// components
+// Components
 const ImmutableComponent = require('../../immutableComponent')
 const BrowserButton = require('../../common/browserButton')
 const {FormTextbox} = require('../../common/textbox')
 const {FormDropdown} = require('../../common/dropdown')
 const LedgerTable = require('./ledgerTable')
 
-// style
-const globalStyles = require('../../styles/global')
-const {paymentStylesVariables} = require('../../styles/payment')
-const closeButton = require('../../../../../img/toolbar/stoploading_btn.svg')
-const cx = require('../../../../../js/lib/classSet')
+// State
+const ledgerState = require('../../../../common/state/ledgerState')
 
 // Actions
 const appActions = require('../../../../../js/actions/appActions')
 
+// Constants
+const ledgerStatuses = require('../../../../common/constants/ledgerStatuses')
+const settings = require('../../../../../js/constants/settings')
+
+// Utils
+const {
+  batToCurrencyString,
+  formatCurrentBalance,
+  formattedDateFromTimestamp,
+  walletStatus
+} = require('../../../../common/lib/ledgerUtil')
+const {l10nErrorText} = require('../../../../common/lib/httpUtil')
+const ledgerUtil = require('../../../../common/lib/ledgerUtil')
+const {changeSetting} = require('../../../lib/settingsUtil')
+const locale = require('../../../../../js/l10n')
+
+// Styles
+const globalStyles = require('../../styles/global')
+const cx = require('../../../../../js/lib/classSet')
+const {paymentStylesVariables} = require('../../styles/payment')
+const closeButton = require('../../../../../img/toolbar/stoploading_btn.svg')
+
 // TODO: report when funds are too low
-// TODO: support non-USD currency
 class EnabledContent extends ImmutableComponent {
   constructor (props) {
     super(props)
     this.claimButton = this.claimButton.bind(this)
     this.onClaimClick = this.onClaimClick.bind(this)
-    this.closeClick = this.closeClick.bind(this)
+    this.closePromotionClick = this.closePromotionClick.bind(this)
+    this.recoverStatusClick = this.recoverStatusClick.bind(this)
   }
 
   walletButton () {
@@ -139,7 +147,7 @@ class EnabledContent extends ImmutableComponent {
     let prevReconcileDateValue
     let text
 
-    if (ledgerData.get('status') === 'contributionInProgress') {
+    if (ledgerData.get('status') === ledgerStatuses.IN_PROGRESS) {
       text = 'paymentInProgress'
     } else if (!walletCreated || !walletHasReconcile || !walletHasTransactions) {
       text = 'noPaymentHistory'
@@ -201,7 +209,7 @@ class EnabledContent extends ImmutableComponent {
     </section>
   }
 
-  closeClick () {
+  closePromotionClick () {
     const promo = this.props.ledgerData.get('promotion') || Immutable.Map()
     const status = promo.get('promotionStatus')
     if (status && !promo.has('claimedTimestamp')) {
@@ -215,55 +223,105 @@ class EnabledContent extends ImmutableComponent {
     }
   }
 
+  recoverStatusClick () {
+    appActions.loadURLInActiveTabRequested(
+      this.props.ledgerData.get('tabId'),
+      'about:preferences#payments?ledgerRecoveryOverlayVisible'
+    )
+  }
+
   statusMessage () {
     const promo = this.props.ledgerData.get('promotion') || Immutable.Map()
+    const status = this.props.ledgerData.get('status') || ''
     const successText = promo.getIn(['panel', 'successText'])
-    let status = promo.get('promotionStatus')
+    const promotionStatus = promo.get('promotionStatus')
+    let isPromotion = true
 
-    if ((!successText || !promo.has('claimedTimestamp')) && !status) {
-      return
+    if ((!successText || !promo.has('claimedTimestamp')) && !promotionStatus) {
+      isPromotion = false
+      if (status.length === 0) {
+        return
+      }
     }
 
-    let title = successText.get('title')
-    let message = successText.get('message')
-    let text = promo.getIn(['panel', 'disclaimer'])
+    let title, message, text, rightButton, leftButton, showClose
 
-    if (status) {
+    if (isPromotion) {
+      showClose = true
+      title = successText.get('title')
+      message = successText.get('message')
+      text = promo.getIn(['panel', 'disclaimer'])
+      rightButton = <BrowserButton
+        secondaryColor
+        l10nId={'paymentHistoryOKText'}
+        custom={styles.enabledContent__overlay_button}
+        onClick={this.closePromotionClick}
+      />
+
+      if (promotionStatus) {
+        switch (promotionStatus) {
+          case 'generalError':
+            {
+              title = locale.translation('promotionGeneralErrorTitle')
+              message = locale.translation('promotionGeneralErrorMessage')
+              text = locale.translation('promotionGeneralErrorText')
+              break
+            }
+          case 'expiredError':
+            {
+              title = locale.translation('promotionClaimedErrorTitle')
+              message = locale.translation('promotionClaimedErrorMessage')
+              text = locale.translation('promotionClaimedErrorText')
+              break
+            }
+        }
+      }
+    } else {
       switch (status) {
-        case 'generalError':
+        case ledgerStatuses.CORRUPTED_SEED:
           {
-            title = locale.translation('promotionGeneralErrorTitle')
-            message = locale.translation('promotionGeneralErrorMessage')
-            text = locale.translation('promotionGeneralErrorText')
+            showClose = false
+            title = locale.translation('corruptedOverlayTitle')
+            message = locale.translation('corruptedOverlayMessage')
+            text = locale.translation('corruptedOverlayText')
+            leftButton = <a
+              data-l10n-id='corruptedOverlayFAQ'
+              className={css(styles.enabledContent__overlay_link)}
+              href='https://brave.com/faq-payments#corrupted-wallet'
+              target='_blank'
+            />
+            rightButton = <BrowserButton
+              secondaryColor
+              l10nId={'corruptedOverlayButton'}
+              custom={styles.enabledContent__overlay_button}
+              onClick={this.recoverStatusClick}
+            />
             break
           }
-        case 'expiredError':
+        default:
           {
-            title = locale.translation('promotionClaimedErrorTitle')
-            message = locale.translation('promotionClaimedErrorMessage')
-            text = locale.translation('promotionClaimedErrorText')
-            break
+            return
           }
       }
     }
 
-    return <div className={cx({[css(styles.enabledContent__grant)]: true, 'enabledContent__grant': true})}>
-      <div
-        className={css(styles.enabledContent__grant_close)}
-        onClick={this.closeClick}
-      />
-      <p className={css(styles.enabledContent__grant_title)}>
-        <span className={css(styles.enabledContent__grant_bold)}>{title}</span> {message}
+    return <div className={cx({[css(styles.enabledContent__overlay)]: true, 'enabledContent__overlay': true})}>
+      {
+        showClose ? <div
+          className={css(styles.enabledContent__overlay_close)}
+          onClick={this.closePromotionClick}
+          /> : null
+      }
+      <p className={css(styles.enabledContent__overlay_title)}>
+        <span className={css(styles.enabledContent__overlay_bold)}>{title}</span> {message}
       </p>
-      <p className={css(styles.enabledContent__grant_text)}>
+      <p className={css(styles.enabledContent__overlay_text)}>
         {text}
       </p>
-      <BrowserButton
-        secondaryColor
-        l10nId={'paymentHistoryOKText'}
-        custom={styles.enabledContent__grant_button}
-        onClick={this.closeClick}
-      />
+      <div className={css(styles.enabledContent__overlay_buttons)}>
+        <div className={css(gridStyles.row1col1, styles.enabledContent__overlay_buttons_left)}>{leftButton}</div>
+        <div className={css(gridStyles.row1col2, styles.enabledContent__overlay_buttons_right)}>{rightButton}</div>
+      </div>
     </div>
   }
 
@@ -465,7 +523,7 @@ const styles = StyleSheet.create({
     padding: '0 10px'
   },
 
-  enabledContent__grant: {
+  enabledContent__overlay: {
     position: 'absolute',
     zIndex: 3,
     top: 0,
@@ -474,12 +532,12 @@ const styles = StyleSheet.create({
     minHeight: '159px',
     background: '#f3f3f3',
     borderRadius: '8px',
-    padding: '30px 50px 20px',
+    padding: '27px 50px 17px',
     boxSizing: 'border-box',
     boxShadow: '4px 6px 3px #dadada'
   },
 
-  enabledContent__grant_close: {
+  enabledContent__overlay_close: {
     position: 'absolute',
     right: '15px',
     top: '15px',
@@ -495,27 +553,50 @@ const styles = StyleSheet.create({
     }
   },
 
-  enabledContent__grant_title: {
+  enabledContent__overlay_title: {
     color: '#5f5f5f',
     fontSize: '20px',
     display: 'block',
     marginBottom: '10px'
   },
 
-  enabledContent__grant_bold: {
+  enabledContent__overlay_bold: {
     color: '#ff5500'
   },
 
-  enabledContent__grant_text: {
+  enabledContent__overlay_text: {
     fontSize: '16px',
     color: '#828282',
     maxWidth: '700px',
     lineHeight: '25px',
-    padding: '5px'
+    padding: '5px 5px 5px 0'
   },
 
-  enabledContent__grant_button: {
+  enabledContent__overlay_buttons: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr'
+  },
+
+  enabledContent__overlay_buttons_left: {
+    marginLeft: 0
+  },
+
+  enabledContent__overlay_buttons_right: {
+    marginRight: 0
+  },
+
+  enabledContent__overlay_button: {
     float: 'right'
+  },
+
+  enabledContent__overlay_link: {
+    color: '#5f5f5f',
+    fontSize: '16px',
+    textDecoration: 'none',
+
+    ':hover': {
+      textDecoration: 'underline'
+    }
   },
 
   enabledContent__walletBar: {

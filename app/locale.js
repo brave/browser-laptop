@@ -281,7 +281,10 @@ var rendererIdentifiers = function () {
     'promotionGeneralErrorText',
     'promotionClaimedErrorMessage',
     'promotionClaimedErrorText',
-    'promotionClaimedErrorTitle'
+    'promotionClaimedErrorTitle',
+    'corruptedOverlayTitle',
+    'corruptedOverlayMessage',
+    'corruptedOverlayText'
   ].concat(countryCodes).concat(availableLanguages)
 }
 

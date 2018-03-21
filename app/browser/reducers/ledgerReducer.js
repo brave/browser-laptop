@@ -250,7 +250,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_LEDGER_PAYMENTS_PRESENT:
       {
-        ledgerApi.paymentPresent(state, action.get('tabId'), action.get('present'))
+        state = ledgerApi.paymentPresent(state, action.get('tabId'), action.get('present'))
         break
       }
     case appConstants.APP_ON_ADD_FUNDS_CLOSED:
