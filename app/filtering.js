@@ -860,7 +860,7 @@ module.exports.clearHSTSData = () => {
   for (let partition in registeredSessions) {
     let ses = registeredSessions[partition]
     setImmediate(() => {
-      ses.clearHSTSData()
+      ses.clearHSTSData.bind(ses)(() => {})
     })
   }
 }

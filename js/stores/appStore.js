@@ -411,7 +411,6 @@ const handleAppAction = (action) => {
       }
       if (clearData.get('allSiteCookies')) {
         filtering.clearStorageData()
-        filtering.clearHSTSData()
       }
       if (clearData.get('autocompleteData')) {
         autofill.clearAutocompleteData()
