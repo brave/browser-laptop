@@ -234,7 +234,6 @@ describe('ledger api unit tests', function () {
 
     describe('onInitRead', function () {
       let parsedLedgerData
-      let onLaunchSpy
       let setPaymentInfoSpy
       before(function () {
         parsedLedgerData = {
@@ -249,18 +248,11 @@ describe('ledger api unit tests', function () {
         contributionAmount = 10
       })
       before(function () {
-        onLaunchSpy = sinon.spy(ledgerNotificationsApi, 'onLaunch')
         setPaymentInfoSpy = sinon.spy(ledgerApi, 'setPaymentInfo')
       })
       after(function () {
-        onLaunchSpy.restore()
         setPaymentInfoSpy.restore()
         ledgerApi.setSynopsis(undefined)
-      })
-      it('calls notifications.onLaunch', function () {
-        onLaunchSpy.reset()
-        ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
-        assert(onLaunchSpy.calledOnce)
       })
       it('calls setPaymentInfo with contribution amount', function () {
         setPaymentInfoSpy.reset()

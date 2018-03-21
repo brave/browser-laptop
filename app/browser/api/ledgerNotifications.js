@@ -43,12 +43,6 @@ const sufficientBalanceToReconcile = (state) => {
   const budget = ledgerState.getContributionAmount(state)
   return balance + unconfirmed >= budget
 }
-const hasFunds = (state) => {
-  const balance = getSetting(settings.PAYMENTS_ENABLED)
-    ? Number(ledgerState.getInfoProp(state, 'balance') || 0)
-    : 0
-  return balance > 0
-}
 const shouldShowNotificationReviewPublishers = () => {
   const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP)
   return !nextTime || (new Date().getTime() > nextTime)
@@ -66,22 +60,6 @@ const init = () => {
   intervalTimeout = setInterval(() => {
     appActions.onLedgerNotificationInterval()
   }, pollingInterval)
-}
-
-const onLaunch = (state) => {
-  const enabled = getSetting(settings.PAYMENTS_ENABLED)
-  if (!enabled) {
-    return state
-  }
-
-  if (hasFunds(state)) {
-    // Don't bother processing the rest, which are only
-    if (!getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
-      return state
-    }
-  }
-
-  return state
 }
 
 const onInterval = (state) => {
@@ -359,7 +337,6 @@ const getMethods = () => {
   const publicMethods = {
     showPaymentDone,
     init,
-    onLaunch,
     onInterval,
     onPromotionReceived,
     removePromotionNotification,
