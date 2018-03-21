@@ -149,7 +149,7 @@ describe('downloadItem component', function () {
         appActions.downloadRedownloaded.restore()
       })
 
-      testButton('[data-test-id="copyLinkButton"]', Object.values(downloadStates), function (button) {
+      testButton('[data-test-id="copyLinkButton"]', [downloadStates.PENDING, downloadStates.IN_PROGRESS, downloadStates.RESUMING, downloadStates.PAUSED, downloadStates.COMPLETED, downloadStates.CANCELLED, downloadStates.INTERRUPTED, downloadStates.UNAUTHORIZED], function (button) {
         const spy = sinon.spy(appActions, 'downloadCopiedToClipboard')
         button.simulate('click')
         assert(spy.withArgs(downloadId).calledOnce)

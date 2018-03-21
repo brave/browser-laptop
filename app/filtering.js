@@ -631,6 +631,14 @@ function registerForDownloadListener (session) {
       }
       updateDownloadState(win, downloadId, item, state)
     })
+
+    item.on('dangerous', function (e) {
+      var state = downloadStates.SAFE_BROWSING_BLOCKED
+      if (!item.getSavePath()) {
+        return
+      }
+      updateDownloadState(win, downloadId, item, state)
+    })
   })
 }
 

@@ -562,6 +562,11 @@ const api = {
         }
       }
 
+      tab.on('safebrowsing-hit', () => {
+        let safeBrowsingURL = getTargetAboutUrl('about:safebrowsing')
+        tab.loadURL(safeBrowsingURL)
+      })
+
       tab.on('did-start-navigation', (e, navigationHandle) => {
         if (!tab.isDestroyed() && navigationHandle.isValid() && navigationHandle.isInMainFrame()) {
           const controller = tab.controller()
