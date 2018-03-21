@@ -596,4 +596,17 @@ describe('ledgerState unit test', function () {
       })
     })
   })
+
+  describe('setAboutProp', function () {
+    it('null case', function () {
+      const result = ledgerState.setAboutProp(defaultState)
+      assert.deepEqual(result.toJS(), defaultState.toJS())
+    })
+
+    it('prop is set', function () {
+      const result = ledgerState.setAboutProp(defaultState, 'status', 'ok')
+      const expectedState = defaultState.setIn(['ledger', 'about', 'status'], 'ok')
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+  })
 })
