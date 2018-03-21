@@ -376,11 +376,7 @@ const configuredLanguages = {
 }
 
 // Dynamic filling of the  array of locale
-for (var local in configuredLanguages) {
-	if (availableLanguages.indexOf(configuredLanguages[local]) === -1) {
-		availableLanguages.push(configuredLanguages[local])
-	}
-}
+availableLanguages = [...new Set(Object.values(configuredLanguages))]
 
 // Return the default locale in xx-XX format I.e. pt-BR
 const defaultLocale = function () {
