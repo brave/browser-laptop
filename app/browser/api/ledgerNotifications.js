@@ -168,6 +168,11 @@ const onDynamicResponse = (message, actionId, activeWindow) => {
         appActions.onPromotionRemind()
         break
       }
+    case 'noThanks':
+      {
+        appActions.changeSetting(settings.PAYMENTS_ALLOW_PROMOTIONS, false)
+        break
+      }
   }
 
   appActions.hideNotification(message)
@@ -300,6 +305,13 @@ const showPromotionNotification = (state) => {
 
   const data = notification.toJS()
   data.position = 'global'
+
+  if (data.buttons) {
+    data.buttons.unshift({
+      text: locale.translation('noThanks'),
+      buttonActionId: 'noThanks'
+    })
+  }
 
   appActions.showNotification(data)
 }
