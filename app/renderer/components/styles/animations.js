@@ -42,8 +42,6 @@ const widthIncreaseElementKeyframes = (start, end) => ({
   width: [start, end]
 })
 
-
-
 const tabFadeInKeyframes = {
   '0%': {
     opacity: 0.5
