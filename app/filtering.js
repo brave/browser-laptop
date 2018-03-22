@@ -495,9 +495,10 @@ function registerPermissionHandler (session, partition) {
         }
       }
 
-      let permissionUrl = origin;
-      if (permission === 'openExternal')
+      let permissionUrl = origin
+      if (permission === 'openExternal') {
         permissionUrl = mainFrameUrl
+      }
 
       // Display 'Brave Browser' if the origin is null; ex: when a mailto: link
       // is opened in a new tab via right-click
