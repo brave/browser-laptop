@@ -1,6 +1,7 @@
 const appActions = require('../../js/actions/appActions')
 const tabMessageBoxState = require('../common/state/tabMessageBoxState')
 const {makeImmutable} = require('../common/state/immutableUtil')
+const locale = require('../../app/locale')
 
 // callbacks for alert, confirm, etc.
 let messageBoxCallbacks = {}
@@ -21,7 +22,7 @@ const tabMessageBox = {
       const detail = {
         message,
         title,
-        buttons: ['ok'],
+        buttons: [locale.translation('messageBoxOk')],
         suppress: false,
         showSuppress: shouldDisplaySuppressCheckbox
       }
@@ -35,7 +36,7 @@ const tabMessageBox = {
       const detail = {
         message,
         title,
-        buttons: ['ok', 'cancel'],
+        buttons: [locale.translation('messageBoxOk'), locale.translation('messageBoxCancel')],
         cancelId: 1,
         suppress: false,
         showSuppress: shouldDisplaySuppressCheckbox
@@ -45,10 +46,20 @@ const tabMessageBox = {
     })
 
     process.on('window-prompt', (webContents, extraData, title, message, defaultPromptText,
-          shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, muonCb) => {
-      console.warn('window.prompt is not supported yet')
-      let suppress = false
-      muonCb(null, '', suppress)
+         shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, muonCb) => {
+      const tabId = webContents.getId()
+      const detail = {
+        message,
+        title,
+        buttons: [locale.translation('messageBoxOk'), locale.translation('messageBoxCancel')],
+        cancelId: 1,
+        suppress: false,
+        allowInput: true,
+        defaultPromptText,
+        showSuppress: shouldDisplaySuppressCheckbox
+      }
+
+      tabMessageBox.show(tabId, detail, muonCb)
     })
 
     return state
@@ -70,6 +81,7 @@ const tabMessageBox = {
     const muonCb = messageBoxCallbacks[tabId]
     let suppress = false
     let result = true
+    let input = ''
     state = tabMessageBoxState.removeDetail(state, action)
     if (muonCb) {
       cleanupCallback(tabId)
@@ -80,7 +92,10 @@ const tabMessageBox = {
         if (detail.has('result')) {
           result = detail.get('result')
         }
-        muonCb(result, '', suppress)
+        if (detail.has('input')) {
+          input = detail.get('input')
+        }
+        muonCb(result, input, suppress)
       } else {
         muonCb(false, '', false)
       }
