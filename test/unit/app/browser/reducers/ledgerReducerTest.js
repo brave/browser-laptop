@@ -343,9 +343,6 @@ describe('ledgerReducer unit tests', function () {
     it('calls ledgerApi.paymentPresent', function () {
       assert(paymentPresentSpy.withArgs(appState, 123, true).calledOnce)
     })
-    it('returns an ununmodified state', function () {
-      assert.deepEqual(returnedState, appState)
-    })
   })
 
   describe('APP_ON_ADD_FUNDS_CLOSED', function () {

@@ -31,6 +31,7 @@ const updateState = require('../../common/state/updateState')
 // Constants
 const settings = require('../../../js/constants/settings')
 const messages = require('../../../js/constants/messages')
+const ledgerStatuses = require('../../common/constants/ledgerStatuses')
 
 // Utils
 const config = require('../../../js/constants/buildConfig')
@@ -179,11 +180,25 @@ const paymentPresent = (state, tabId, present) => {
     }
 
     appActions.onPromotionGet()
+
+    state = checkSeed(state)
     getPublisherTimestamp(true)
   } else if (balanceTimeoutId) {
     clearTimeout(balanceTimeoutId)
     balanceTimeoutId = false
   }
+
+  return state
+}
+
+const checkSeed = (state) => {
+  const seed = ledgerState.getInfoProp(state, 'passphrase')
+
+  if (seed && !client.isValidPassPhrase(seed)) {
+    state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.CORRUPTED_SEED)
+  }
+
+  return state
 }
 
 const getPublisherTimestamp = (updateList) => {
@@ -1629,7 +1644,7 @@ const getStateInfo = (state, parsedData) => {
   const oldReconcileStamp = ledgerState.getInfoProp(state, 'reconcileStamp')
 
   if (oldReconcileStamp && newInfo.reconcileStamp > oldReconcileStamp) {
-    state = ledgerState.setAboutProp(state, 'status', 'contributionInProgress')
+    state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.IN_PROGRESS)
   }
 
   let passphrase = ledgerClient.prototype.getWalletPassphrase(parsedData)
@@ -2957,7 +2972,8 @@ const getMethods = () => {
       onReferralInit,
       roundTripFromWindow,
       onReferralCodeRead,
-      onVerifiedPStatus
+      onVerifiedPStatus,
+      checkSeed
     }
   }
 
