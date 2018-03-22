@@ -240,7 +240,7 @@ const onBootStateFile = (state) => {
   }
 
   if (client.sync(callback) === true) {
-    run(random.randomInt({min: ledgerUtil.milliseconds.minute, max: 10 * ledgerUtil.milliseconds.minute}))
+    run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 10 * ledgerUtil.milliseconds.minute}))
   }
 
   module.exports.getBalance(state)
@@ -2315,7 +2315,7 @@ const run = (state, delayTime) => {
     })
   }
 
-  if (typeof delayTime === 'undefined' || !client) {
+  if (state == null || typeof delayTime === 'undefined' || !client) {
     return
   }
 
