@@ -2736,4 +2736,37 @@ describe('ledger api unit tests', function () {
       assert.equal(clientBallotsSpy.calledOnce, true)
     })
   })
+
+  describe('checkSeed', function () {
+    let valid = false
+
+    before(() => {
+      ledgerApi.setClient({
+        isValidPassPhrase: () => valid
+      })
+    })
+
+    it('seed is null', function () {
+      const result = ledgerApi.checkSeed(defaultAppState)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+    })
+
+    it('seed is valid', function () {
+      valid = true
+      const state = defaultAppState
+        .setIn(['ledger', 'info', 'passphrase'], 'auten nobbling uncharitable decimation sayee unartful biter floodlight scholar cherubical fadable reconnoiter courtesan concussing asymmetrical test')
+      const result = ledgerApi.checkSeed(state)
+      assert.deepEqual(result.toJS(), state.toJS())
+      valid = false
+    })
+
+    it('seed is invalid', function () {
+      const state = defaultAppState
+        .setIn(['ledger', 'info', 'passphrase'], 'a')
+      const exptedState = state
+        .setIn(['ledger', 'about', 'status'], 'corruptedSeed')
+      const result = ledgerApi.checkSeed(state)
+      assert.deepEqual(result.toJS(), exptedState.toJS())
+    })
+  })
 })
