@@ -178,7 +178,7 @@ class SettingItemIcon extends ImmutableComponent {
 
 const styles = StyleSheet.create({
   icon: {
-    backgroundColor: '#5a5a5a',
+    backgroundColor: 'rgb(90, 90, 98)',
     height: '16px',
     width: '16px',
     display: 'inline-block',
