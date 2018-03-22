@@ -1009,11 +1009,10 @@ const api = {
       if (preventLazyLoad) {
         createProperties.discarded = false
       }
-      // Similarly, autoDiscardable will happen for regular tabs (not about: tabs)
-      const preventAutoDiscard = createProperties.pinned || !isRegularContent
-      if (preventAutoDiscard) {
-        createProperties.autoDiscardable = false
-      }
+      // autoDiscardable can happen for all tabs
+      // TODO(petemill): if there are schemes / Urls that should not be autodiscarded
+      // then the flag should be exposed from muon and set on each URL change for a tab
+      createProperties.autoDiscardable = true
 
       const doCreate = () => {
         if (shouldDebugTabEvents) {
