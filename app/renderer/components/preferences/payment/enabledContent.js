@@ -229,8 +229,8 @@ class EnabledContent extends ImmutableComponent {
   }
 
   recoverStatusClick () {
-    appActions.loadURLInActiveTabRequested(
-      this.props.ledgerData.get('tabId'),
+    appActions.loadURLRequested(
+      parseInt(this.props.ledgerData.get('tabId')),
       'about:preferences#payments?ledgerRecoveryOverlayVisible'
     )
   }
