@@ -103,6 +103,9 @@ describe('ledger api unit tests', function () {
     // ledger client stubbing
     ledgerClient = sinon.stub()
     ledgerClientObject = {
+      ballots: function () {
+        return 1
+      },
       sync: function (callback) { return false },
       getBraveryProperties: function () {
         return {
@@ -2684,6 +2687,53 @@ describe('ledger api unit tests', function () {
     it('fetch is called', function () {
       ledgerApi.roundTripFromWindow({url: 'test.com'}, () => true)
       assert(fetchPublisherInfoSpy.withArgs('test.com', sinon.match.any, sinon.match.any))
+    })
+  })
+
+  describe('BSCrun', function () {
+    let clientBallotsSpy
+
+    before(() => {
+      ledgerApi.setSynopsis({
+        toJSON: () => {
+          return {
+            publishers: {
+              'clifton.io': {
+                visits: 1
+              }
+            }
+          }
+        },
+        winners: () => {
+          return []
+        }
+      })
+      ledgerApi.setClient(ledgerClientObject)
+      clientBallotsSpy = sinon.spy(ledgerClientObject, 'ballots')
+    })
+
+    afterEach(() => {
+      clientBallotsSpy.reset()
+    })
+
+    after(() => {
+      clientBallotsSpy.restore()
+      ledgerApi.setSynopsis(undefined)
+    })
+
+    it('exits if state is undefined', function () {
+      ledgerApi.run(undefined, 10)
+      assert.equal(clientBallotsSpy.notCalled, true)
+    })
+
+    it('exits if delayTime is undefined', function () {
+      ledgerApi.run(defaultAppState)
+      assert.equal(clientBallotsSpy.notCalled, true)
+    })
+
+    it('gets balance count from client', function () {
+      ledgerApi.run(defaultAppState, 10)
+      assert.equal(clientBallotsSpy.calledOnce, true)
     })
   })
 })
