@@ -25,7 +25,7 @@
       backgroundColor: '#CDD1D5',
 
       border: {
-        color: '#bbb'
+        color: 'rgb(187, 187, 191)'
       },
 
       button: {
@@ -38,14 +38,14 @@
 
       tabs: {
         navigation: {
-          borderColor: '#bbb'
+          borderColor: 'rgb(187, 187, 191)'
         }
       }
     },
 
     tabPage: {
       backgroundColor: '#fff',
-      borderColor: '#bbb',
+      borderColor: 'rgb(187, 187, 191)',
 
       hover: {
         backgroundColor: globalStyles.color.braveOrange,
@@ -69,7 +69,7 @@
       transitionEasingOut: 'ease-in',
       transitionEasingIn: 'ease-out',
       background: 'rgb(205,209,213)',
-      borderColor: '#bbb',
+      borderColor: 'rgb(187, 187, 191)',
       borderWidth: 1,
       color: '#222',
       identityHeight: globalStyles.spacing.iconSize,
@@ -150,7 +150,7 @@
     },
 
     findBar: {
-      backgroundColor: '#F7F7F7',
+      backgroundColor: globalStyles.color.modalVeryLightGray,
       color: globalStyles.color.highlightBlue,
 
       border: {
@@ -166,7 +166,7 @@
       },
 
       find: {
-        color: '#555'
+        color: 'rgb(85, 85, 90)'
       },
 
       close: {
@@ -181,5 +181,13 @@
       newTabBackground: '#222',
       privateTabBackground: globalStyles.color.privateTabBackgroundActive,
       privateTabBackground2: '#000'
+    },
+
+    preferences: {
+      navigationBackground: `linear-gradient(
+        rgb(164, 167, 171),
+        rgb(94, 96, 99)
+      )`,
+      navigationSectionSelectedColor: 'rgb(101, 101, 107)'
     }
   }

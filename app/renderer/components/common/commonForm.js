@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
 
   commonForm: {
-    background: globalStyles.color.commonFormBackgroundColor,
+    background: globalStyles.color.modalVeryLightGray,
     color: globalStyles.color.commonTextColor,
     padding: 0,
     top: '40px',

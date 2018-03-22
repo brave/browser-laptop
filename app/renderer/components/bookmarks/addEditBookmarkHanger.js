@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
       position: 'absolute',
       width: 0,
       height: 0,
-      border: `8px solid ${globalStyles.color.commonFormBackgroundColor}`,
+      border: `8px solid ${globalStyles.color.modalVeryLightGray}`,
       boxShadow: globalStyles.shadow.bookmarkHangerArrowUpShadow,
       transformOrigin: '0 0',
       transform: 'rotate(135deg)'
