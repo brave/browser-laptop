@@ -302,7 +302,7 @@ class Tab extends React.Component {
     props.isPinnedTab = isPinned
     props.isPrivateTab = privateState.isPrivateTab(currentWindow, frameKey)
     props.isActive = !!frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
-    props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
+    props.tabWidth = isPinned ? null : currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.isPreview = frameKey === previewFrameKey /* || frameKey === 2 */ // <-- uncomment to force 1 preview tab for style inspection
     props.anyTabIsPreview = previewFrameKey != null
     props.themeColor = tabUIState.getThemeColor(currentWindow, frameKey)
