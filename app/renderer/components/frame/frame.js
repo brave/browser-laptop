@@ -216,8 +216,10 @@ class Frame extends React.Component {
     }
 
     this.onPropsChanged(prevProps)
-    if (this.webContents && this.props.isActive && !prevProps.isActive && !this.props.urlBarFocused) {
-      this.webContents.focus()
+    if (this.props.isActive && !prevProps.isActive && !this.props.urlBarFocused) {
+      if (this.webContents && !this.webContents.isDestroyed()) {
+        this.webContents.focus()
+      }
     }
 
     // make sure the webview content updates to
