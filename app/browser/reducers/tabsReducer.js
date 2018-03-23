@@ -25,6 +25,7 @@ const flash = require('../../../js/flash')
 const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
 const {isSourceAboutUrl, isTargetAboutUrl, isNavigatableAboutPage} = require('../../../js/lib/appUrlUtil')
 const {shouldDebugTabEvents} = require('../../cmdLine')
+const appActions = require('../../../js/actions/appActions')
 
 const WEBRTC_DEFAULT = 'default'
 const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
@@ -199,18 +200,21 @@ const tabsReducer = (state, action, immutableAction) => {
             const isPinned = tabState.isTabPinned(state, tabId)
             const nonPinnedTabs = tabState.getNonPinnedTabsByWindowId(state, windowId)
             const pinnedTabs = tabState.getPinnedTabsByWindowId(state, windowId)
+            const tabsRemaining = nonPinnedTabs.size > 1 || (nonPinnedTabs.size > 0 && pinnedTabs.size > 0)
 
-            if (nonPinnedTabs.size > 1 ||
-              (nonPinnedTabs.size > 0 && pinnedTabs.size > 0)) {
-              setImmediate(() => {
-                if (isPinned) {
-                  // if a tab is pinned, unpin before closing
-                  state = tabs.pin(state, tabId, false)
-                }
-                tabs.closeTab(tabId, action.get('forceClosePinned'))
+            setImmediate(() => {
+              if (isPinned) {
+                // if a tab is pinned, unpin before closing
+                state = tabs.pin(state, tabId, false)
+              }
+              tabs.closeTab(tabId, action.get('forceClosePinned'))
+            })
+            // If there are no remaining tabs, create a new one and set it to about:newtab
+            if (!tabsRemaining) {
+              appActions.createTabRequested({
+                url: 'about:newtab',
+                windowId: windowId
               })
-            } else {
-              windows.closeWindow(windowId)
             }
           }
         }
