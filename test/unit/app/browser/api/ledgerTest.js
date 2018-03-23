@@ -130,6 +130,7 @@ describe('ledger api unit tests', function () {
       getPaymentId: function () {
         return 'payementIdGoesHere'
       },
+      memo: () => {},
       properties: {
         wallet: {
           paymentId: 12345
