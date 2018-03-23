@@ -2344,12 +2344,37 @@ const run = (state, delayTime) => {
   const ballots = client.ballots()
   const data = (synopsis) && (ballots > 0) && synopsisNormalizer(state, null, false, true)
 
+  let map = null
+
   if (data) {
     let weights = []
+    map = {}
+
     data.forEach((datum) => {
-      weights.push({publisher: datum.publisherKey, weight: datum.weight / 100.0})
+      map[datum.publisherKey] = {
+        verified: datum.verified,
+        exclude: datum.exclude,
+        score: datum.score,
+        pinPercentage: datum.pinPercentage,
+        percentage: datum.percentage,
+        votes: 0,
+        weight: datum.weight
+      }
+
+      weights.push({
+        publisher: datum.publisherKey,
+        pinPercentage: datum.pinPercentage,
+        weight: datum.weight / 100.0
+      })
     })
-    winners = synopsis.winners(ballots, weights)
+
+    winners = synopsis.winners(ballots, weights) || []
+
+    winners.forEach((winner) => {
+      if (map[winner]) map[winner].votes++
+    })
+
+    client.memo('run:ballots', Object.values(map))
   }
 
   if (!winners) winners = []
@@ -2362,6 +2387,9 @@ const run = (state, delayTime) => {
       const result = client.vote(winner)
       if (result) stateData = result
     })
+    if (!stateData && map) {
+      stateData = client.state
+    }
     if (stateData) muonWriter(statePath, stateData)
   } catch (ex) {
     console.error('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
