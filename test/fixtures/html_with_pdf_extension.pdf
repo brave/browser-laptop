@@ -1,0 +1,9 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>HTML using .pdf Extension</title>
+</head>
+<body>
+  Many URLs use .pdf in the resource extension, but serve HTML (github, dropbox, etc).
+</body>
+</html>

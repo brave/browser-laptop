@@ -210,22 +210,6 @@ module.exports = {
     }
   },
 
-  'toPDFJSLocation': {
-    'pdf': (test) => {
-      const baseUrl = 'chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/'
-      test.equal(urlUtil().toPDFJSLocation('http://abc.com/test.pdf'), baseUrl + 'content/web/viewer.html?file=http%3A%2F%2Fabc.com%2Ftest.pdf')
-    },
-    'non-pdf': (test) => {
-      test.equal(urlUtil().toPDFJSLocation('http://abc.com/test.pdf.txt'), 'http://abc.com/test.pdf.txt')
-    },
-    'file url': (test) => {
-      test.equal(urlUtil().toPDFJSLocation('file://abc.com/test.pdf.txt'), 'file://abc.com/test.pdf.txt')
-    },
-    'empty': (test) => {
-      test.equal(urlUtil().toPDFJSLocation(''), '')
-    }
-  },
-
   'getPDFViewerUrl': {
     'regular url': (test) => {
       const baseUrl = 'chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/content/web/viewer.html?file='

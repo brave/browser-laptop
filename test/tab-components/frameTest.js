@@ -2,6 +2,7 @@
 
 const Brave = require('../lib/brave')
 const {urlInput,
+  activeTabTitle,
   pinnedTabsTabs,
   backButtonEnabled,
   backButtonDisabled,
@@ -277,6 +278,15 @@ describe('frame tests', function () {
         .tabByIndex(0)
         .url(url)
         .waitForVisible('#viewerContainer')
+    })
+
+    it('loads HTML properly despite having .pdf extension', function * () {
+      let url = Brave.server.url('html_with-pdf_extension.pdf')
+      yield this.app.client
+        .windowByUrl(Brave.browserWindowUrl)
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitForTextValue(activeTabTitle, 'HTML using .pdf Extension')
     })
   })
 })
