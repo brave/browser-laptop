@@ -652,7 +652,7 @@ const api = {
         // if is a placeholder, new contents is temporary, and should not be used for tab ID
         const isPlaceholder = newContents.isPlaceholder()
         const newTabId = newContents.getId()
-
+        const tabValue = getTabValue(newTabId)
         if (shouldDebugTabEvents) {
           if (isPlaceholder) {
             console.log(`Tab [${tabId}] got a new placeholder (${newTabId}), not updating state.`)
@@ -662,7 +662,7 @@ const api = {
         }
 
         // update state
-        appActions.tabReplaced(tabId, getTabValue(newTabId), getTabValue(tabId).get('windowId'), !isPlaceholder)
+        appActions.tabReplaced(tabId, tabValue, tabValue.get('windowId'), !isPlaceholder)
         if (!isPlaceholder) {
           // update in-memory caches
           webContentsCache.tabIdChanged(tabId, newTabId)
