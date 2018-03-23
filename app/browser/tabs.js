@@ -64,6 +64,7 @@ const getTabValue = function (tabId) {
     tabValue = tabValue.set('guestInstanceId', tab.guestInstanceId)
     tabValue = tabValue.set('partition', tab.session.partition)
     tabValue = tabValue.set('partitionNumber', getPartitionNumber(tab.session.partition))
+    tabValue = tabValue.set('isPlaceholder', tab.isPlaceholder())
     return tabValue.set('tabId', tabId)
   }
 }

@@ -186,6 +186,7 @@ const frameTabIdChanged = (state, action) => {
   let newFrameProps = new Immutable.Map()
   newFrameProps = newFrameProps.set('tabId', newTabId)
   newFrameProps = newFrameProps.set('guestInstanceId', newTabValue.get('guestInstanceId'))
+  newFrameProps = newFrameProps.set('isPlaceholder', newTabValue.get('isPlaceholder'))
   const frame = frameStateUtil.getFrameByTabId(state, oldTabId)
   if (!frame) {
     console.error(`Could not find frame with tabId ${oldTabId} in order to replace with new tabId ${newTabId}`)
