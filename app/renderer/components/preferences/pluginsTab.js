@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
+const ipc = require('electron').ipcRenderer
 const ImmutableComponent = require('../immutableComponent')
 const aboutActions = require('../../../../js/about/aboutActions')
 const getSetting = require('../../../../js/settings').getSetting
@@ -12,6 +13,7 @@ const platformUtil = require('../../../common/lib/platformUtil')
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
 const isWindows = platformUtil.isWindows()
+const messages = require('../../../../js/constants/messages')
 
 const WidevineInfo = require('../main/widevineInfo')
 const flash = appConfig.resourceNames.FLASH
@@ -24,25 +26,35 @@ const {SettingsList, SettingCheckbox} = require('../common/settings')
 const {DefaultSectionTitle} = require('../common/sectionTitle')
 
 class PluginsTab extends ImmutableComponent {
+  constructor (props) {
+    super(props)
+    this.onToggleFlash = this.onTogglePlugin.bind(this, 'flash')
+    this.onToggleWidevine = this.onTogglePlugin.bind(this, 'widevine')
+  }
+
   get flashInstalled () {
     return getSetting(settings.FLASH_INSTALLED, this.props.settings)
   }
 
-  onToggleFlash (e) {
-    aboutActions.setResourceEnabled(flash, e.target.value)
-    if (e.target.value !== true) {
-      // When flash is disabled, clear flash approvals
-      aboutActions.clearSiteSettings('flash', {
-        temporary: true
-      })
-      aboutActions.clearSiteSettings('flash', {
-        temporary: false
-      })
+  onTogglePlugin (plugin, e) {
+    switch (plugin) {
+      case 'widevine':
+        aboutActions.setResourceEnabled(widevine, e.target.value)
+        break
+      case 'flash':
+        aboutActions.setResourceEnabled(flash, e.target.value)
+        if (e.target.value !== true) {
+          // When flash is disabled, clear flash approvals
+          aboutActions.clearSiteSettings('flash', {
+            temporary: true
+          })
+          aboutActions.clearSiteSettings('flash', {
+            temporary: false
+          })
+        }
+        break
     }
-  }
-
-  onToggleWidevine (e) {
-    aboutActions.setResourceEnabled(widevine, e.target.value)
+    ipc.send(messages.PREFS_RESTART)
   }
 
   infoCircle (url) {
