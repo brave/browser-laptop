@@ -281,11 +281,16 @@ describe('frame tests', function () {
     })
 
     it('loads HTML properly despite having .pdf extension', function * () {
-      let url = Brave.server.url('html_with-pdf_extension.pdf')
+      // Add custom headers for this request, so we can override the
+      // default mime type that will otherwise get added for a .pdf file.
+      let customHeaders = { 'Content-Type': 'text/html; charset=utf-8' }
+      let url = Brave.server.url('html_with_pdf_extension.pdf')
+      Brave.server.defineHeaders(url, customHeaders)
+
       yield this.app.client
-        .windowByUrl(Brave.browserWindowUrl)
         .tabByIndex(0)
-        .loadUrl(url)
+        .url(url)
+        .waitForUrl(url)
         .waitForTextValue(activeTabTitle, 'HTML using .pdf Extension')
     })
   })
