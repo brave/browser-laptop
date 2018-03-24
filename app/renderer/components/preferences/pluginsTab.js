@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ipc = require('electron').ipcRenderer
 const ImmutableComponent = require('../immutableComponent')
 const aboutActions = require('../../../../js/about/aboutActions')
 const getSetting = require('../../../../js/settings').getSetting
@@ -13,7 +12,6 @@ const platformUtil = require('../../../common/lib/platformUtil')
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
 const isWindows = platformUtil.isWindows()
-const messages = require('../../../../js/constants/messages')
 
 const WidevineInfo = require('../main/widevineInfo')
 const flash = appConfig.resourceNames.FLASH
@@ -54,7 +52,7 @@ class PluginsTab extends ImmutableComponent {
         }
         break
     }
-    ipc.send(messages.PREFS_RESTART)
+    aboutActions.requireRestart()
   }
 
   infoCircle (url) {
