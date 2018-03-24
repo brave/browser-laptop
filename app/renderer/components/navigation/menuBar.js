@@ -120,6 +120,17 @@ class MenuBar extends React.Component {
     }
   }
 
+  invokeEnter ()
+  {
+
+    if (contextMenuIndex === null &&
+        template.get(selectedIndex).has('submenu')) {
+      e.stopPropagation()
+      windowActions.setContextMenuSelectedIndex([0])
+      showContextMenu(this.getMenubarItemBounds(selectedIndex), template.get(selectedIndex).get('submenu').toJS(), this.props.lastFocusedSelector)
+    }
+  }
+
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
 

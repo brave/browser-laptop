@@ -500,6 +500,13 @@ const doAction = (action) => {
         }
         break
       }
+      case windowConstants.WINDOW_SHOW_SUBMENU:
+        if (action.contextMenuDetail) {
+          windowState = windowState.set('contextMenuDetail', action.contextMenuDetail)
+        } else {
+          windowState = windowState.delete('contextMenuDetail')
+        }
+        break
     case windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
       if (action.contextMenuDetail) {
         windowState = windowState.set('contextMenuDetail', action.contextMenuDetail)

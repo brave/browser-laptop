@@ -935,6 +935,17 @@ const windowActions = {
   },
 
   /**
+   * (Windows only)
+   *
+   */
+  showSubmenu: function (index) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SHOW_SUBMENU,
+      index
+    })
+  },
+
+  /**
    * Used to track selected index of a context menu
    * Needed because arrow keys can be used to navigate the context menu
    * @param {number} index - zero based index of the item.

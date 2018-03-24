@@ -130,6 +130,7 @@ class Main extends React.Component {
     if (this.props.showCustomTitleBar) {
       document.addEventListener('keyup', (e) => {
         switch (e.which) {
+
           case keyCodes.LEFT:
           case keyCodes.RIGHT:
           case keyCodes.PRINT_SCREEN:
@@ -144,11 +145,25 @@ class Main extends React.Component {
              - no other key is being pushed simultaneously
              - since initial keydown, ALT has been the only key pressed
             */
+            console.log(this.lastKeyPressed)
+            console.log("alt key pressed")
+
             if (e.location === keyLocations.DOM_KEY_LOCATION_RIGHT ||
                 this.lastKeyPressed !== keyCodes.ALT ||
                 Object.keys(this.keydown).length > 1 ||
                 this.keydownHistory.length > 0) {
-              break
+
+                  if(this.lastKeyPressed === 70)
+                  {console.log("f key pressed")
+                    windowActions.setMenuBarSelectedIndex(0)
+                    windowActions.showSubmenu(0)
+
+                  }
+                  else {
+                    console.log("ran away")
+                    break
+                  }
+
             }
 
             e.preventDefault()
@@ -180,11 +195,13 @@ class Main extends React.Component {
 
         // For ALT menu processing
         if (Object.keys(this.keydown).length > 1) {
+          console.log("it's been hit")
           this.keydownHistory.push(e.which)
         } else {
           this.keydownHistory = []
         }
         delete this.keydown[e.which]
+
       })
 
       document.addEventListener('focus', () => {
