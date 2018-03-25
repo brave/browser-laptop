@@ -148,7 +148,17 @@ class Main extends React.Component {
                 this.lastKeyPressed !== keyCodes.ALT ||
                 Object.keys(this.keydown).length > 1 ||
                 this.keydownHistory.length > 0) {
-              break
+
+                  if(this.lastKeyPressed === 70)
+                  {
+                    console.log("f key pressed")
+                  }
+                  else
+                  {
+                    console.log("ran away")
+                    break
+                   }
+
             }
 
             e.preventDefault()
