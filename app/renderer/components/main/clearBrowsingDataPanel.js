@@ -4,7 +4,6 @@
 
 const React = require('react')
 const Immutable = require('immutable')
-const ipc = require('electron').ipcRenderer
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -19,9 +18,7 @@ const {
 // Actions
 const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
-
-// Constants
-const messages = require('../../../../js/constants/messages')
+const aboutActions = require('../../../../js/about/aboutActions')
 
 class ClearBrowsingDataPanel extends React.Component {
   constructor (props) {
@@ -51,7 +48,7 @@ class ClearBrowsingDataPanel extends React.Component {
       this.props.browserHistory &&
       this.props.cachedImagesAndFiles
     ) {
-      ipc.send(messages.PREFS_RESTART)
+      aboutActions.requireRestart()
     }
   }
 
