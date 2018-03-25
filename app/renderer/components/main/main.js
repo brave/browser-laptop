@@ -186,6 +186,7 @@ class Main extends React.Component {
           {
             windowActions.toggleMenubarVisible(true)
             windowActions.setMenuBarSelectedIndex(0)
+            //windowActions.openSubMenu()
             //windowActions.clickMenubarSubmenu()
             console.log("f key pressed")
           }

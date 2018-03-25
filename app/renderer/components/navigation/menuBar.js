@@ -32,6 +32,7 @@ class MenuBar extends React.Component {
   constructor (props) {
     super(props)
     this.onKeyDown = this.onKeyDown.bind(this)
+    //add funciton here to run with openSubMenu
   }
 
   componentWillMount () {
