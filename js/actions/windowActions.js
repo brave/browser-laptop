@@ -938,10 +938,11 @@ const windowActions = {
    * (Windows only)
    *
    */
-  showSubmenu: function (index) {
+  showSubmenu: function (index, isVisible) {
     dispatch({
       actionType: windowConstants.WINDOW_SHOW_SUBMENU,
-      index
+      index,
+      isVisible
     })
   },
 

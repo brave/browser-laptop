@@ -689,6 +689,7 @@ const doAction = (state, action) => {
     case windowConstants.WINDOW_CLICK_MENUBAR_SUBMENU:
       {
         const clickedMenuItem = menuUtil.getMenuItem(appMenu, action.label)
+        console.log(clickedMenuItem)
         if (clickedMenuItem) {
           const focusedWindow = BrowserWindow.getFocusedWindow()
           clickedMenuItem.click(clickedMenuItem, focusedWindow, focusedWindow.webContents)

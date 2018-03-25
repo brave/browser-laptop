@@ -155,9 +155,10 @@ class Main extends React.Component {
 
                   if(this.lastKeyPressed === 70)
                   {console.log("f key pressed")
+                  console.log(this.props.menubarSelectedIndex)
                     windowActions.setMenuBarSelectedIndex(0)
-                    windowActions.showSubmenu(0)
-
+                    windowActions.setContextMenuDetail()
+                    windowActions.showSubmenu(0, true)
                   }
                   else {
                     console.log("ran away")
@@ -189,6 +190,7 @@ class Main extends React.Component {
               e.preventDefault()
               windowActions.setMenuBarSelectedIndex()
               windowActions.setContextMenuDetail()
+
             }
             break
         }
