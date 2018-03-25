@@ -148,17 +148,7 @@ class Main extends React.Component {
                 this.lastKeyPressed !== keyCodes.ALT ||
                 Object.keys(this.keydown).length > 1 ||
                 this.keydownHistory.length > 0) {
-
-                  if(this.lastKeyPressed === 70)
-                  {
-                    console.log("f key pressed")
-                  }
-                  else
-                  {
-                    console.log("ran away")
-                    break
-                   }
-
+                  break
             }
 
             e.preventDefault()
@@ -190,10 +180,25 @@ class Main extends React.Component {
 
         // For ALT menu processing
         if (Object.keys(this.keydown).length > 1) {
+          //console.log(e.which)
           this.keydownHistory.push(e.which)
+          if(this.lastKeyPressed === keyCodes.F)
+          {
+            windowActions.toggleMenubarVisible(true)
+            windowActions.setMenuBarSelectedIndex(0)
+            //windowActions.clickMenubarSubmenu()
+            console.log("f key pressed")
+          }
+          else
+          {
+            console.log("ran away")
+           }
+
         } else {
           this.keydownHistory = []
         }
+
+
         delete this.keydown[e.which]
       })
 

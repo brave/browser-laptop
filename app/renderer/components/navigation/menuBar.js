@@ -60,6 +60,7 @@ class MenuBar extends React.Component {
   }
 
   onKeyDown (e) {
+    console.log(e.which)
     const selectedIndex = this.props.selectedIndex
     const template = this.props.template
     const contextMenuIndex = this.props.contextMenuSelectedIndex
