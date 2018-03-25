@@ -34,11 +34,10 @@ const WidevinePanel = require('./widevinePanel')
 const AutofillAddressPanel = require('../autofill/autofillAddressPanel')
 const AutofillCreditCardPanel = require('../autofill/autofillCreditCardPanel')
 const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
-const AddEditBookmarkFolder = require('../bookmarks/addEditBookmarkFolder')
 const LoginRequired = require('./loginRequired')
 const ReleaseNotes = require('./releaseNotes')
 const BookmarksToolbar = require('../bookmarks/bookmarksToolbar')
-const ContextMenu = require('../common/contextMenu/contextMenu')
+const ContextMenu = require('../common/contextMenu')
 const PopupWindow = require('./popupWindow')
 const NoScriptInfo = require('./noScriptInfo')
 const CheckDefaultBrowserDialog = require('./checkDefaultBrowserDialog')
@@ -53,6 +52,7 @@ const keyLocations = require('../../../common/constants/keyLocations')
 // State handling
 const basicAuthState = require('../../../common/state/basicAuthState')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const siteUtil = require('../../../../js/state/siteUtil')
 const searchProviders = require('../../../../js/data/searchProviders')
 const defaultBrowserState = require('../../../common/state/defaultBrowserState')
 const shieldState = require('../../../common/state/shieldState')
@@ -68,14 +68,10 @@ const eventUtil = require('../../../../js/lib/eventUtil')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId, isMaximized, isFocused, isFullScreen} = require('../../currentWindow')
 const platformUtil = require('../../../common/lib/platformUtil')
-const urlUtil = require('../../../../js/lib/urlutil')
 const {hasBraveDragData} = require('../../../../js/dndData')
 const isDarwin = platformUtil.isDarwin()
 const isWindows = platformUtil.isWindows()
 const isLinux = platformUtil.isLinux()
-
-const {StyleSheet, css} = require('aphrodite/no-important')
-const globalStyles = require('../styles/global')
 
 class Main extends React.Component {
   constructor (props) {
@@ -232,38 +228,18 @@ class Main extends React.Component {
       if (trackingFingers) {
         deltaX = deltaX + e.deltaX
         deltaY = deltaY + e.deltaY
-        const distanceThresholdX = getSetting(settings.SWIPE_NAV_DISTANCE)
-        const percent = Math.abs(deltaX) / distanceThresholdX
-        if (isSwipeOnRightEdge) {
-          if (percent > 1) {
-            appActions.swipedRight(1)
-          } else {
-            appActions.swipedRight(percent)
-          }
-        } else if (isSwipeOnLeftEdge) {
-          if (percent > 1) {
-            appActions.swipedLeft(1)
-          } else {
-            appActions.swipedLeft(percent)
-          }
-        }
         time = (new Date()).getTime() - startTime
       }
     }, { passive: true })
 
     ipc.on('scroll-touch-end', () => {
-      const distanceThresholdX = getSetting(settings.SWIPE_NAV_DISTANCE)
-      const distanceThresholdY = 101
-      const timeThreshold = 80
-      if (trackingFingers && time > timeThreshold && Math.abs(deltaY) < distanceThresholdY) {
-        if (deltaX > distanceThresholdX && isSwipeOnRightEdge) {
+      if (trackingFingers && time > 30 && Math.abs(deltaY) < 80) {
+        if (deltaX > 70 && isSwipeOnRightEdge) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        } else if (deltaX < -distanceThresholdX && isSwipeOnLeftEdge) {
+        } else if (deltaX < -70 && isSwipeOnLeftEdge) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         }
       }
-      appActions.swipedLeft(0)
-      appActions.swipedRight(0)
       trackingFingers = false
       deltaX = 0
       deltaY = 0
@@ -342,8 +318,9 @@ class Main extends React.Component {
 
     // If the tab changes or was closed, exit out of full screen to give a better
     // picture of what's happening.
+	//This has been disabled as it appears to mess around with how videos on netflix resize themself (https://github.com/brave/browser-laptop/issues/12870)
     if (prevProps.tabId !== this.props.tabId && this.props.isFullScreen) {
-      windowActions.setFullScreen(this.props.tabId, false)
+     // windowActions.setFullScreen(this.props.tabId, false)
     }
   }
 
@@ -443,11 +420,14 @@ class Main extends React.Component {
 
     window.addEventListener('focus', () => {
       windowActions.setFocusedFrame(this.props.location, this.props.tabId)
+      windowActions.onFocus(getCurrentWindowId())
       // For whatever reason other elements are preserved but webviews are not.
       if (document.activeElement && document.activeElement.tagName === 'BODY') {
         webviewActions.setWebviewFocused()
       }
     }, { passive: true })
+
+    windowActions.onFocus(getCurrentWindowId())
 
     // disable dnd by default
     window.addEventListener('dragover', function (event) {
@@ -480,6 +460,7 @@ class Main extends React.Component {
     const self = this
     window.onblur = () => {
       self.resetAltMenuProcessing()
+      windowActions.onBlur(getCurrentWindowId())
     }
   }
 
@@ -536,45 +517,42 @@ class Main extends React.Component {
     const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
     const nonPinnedFrames = frameStateUtil.getNonPinnedFrames(currentWindow)
     const tabsPerPage = Number(getSetting(settings.TABS_PER_PAGE))
-    const activeOrigin = !activeFrame.isEmpty() ? urlUtil.getOrigin(activeFrame.get('location')) : null
+    const activeOrigin = !activeFrame.isEmpty() ? siteUtil.getOrigin(activeFrame.get('location')) : null
     const widevinePanelDetail = currentWindow.get('widevinePanelDetail', Immutable.Map())
     const loginRequiredDetails = basicAuthState.getLoginRequiredDetail(state, activeTabId)
-    const focused = isFocused(state)
 
     const props = {}
     // used in renderer
     props.isFullScreen = activeFrame.get('isFullScreen', false)
-    props.isMaximized = isMaximized(state) || isFullScreen(state)
+    props.isMaximized = isMaximized() || isFullScreen()
     props.captionButtonsVisible = isWindows
-    props.showContextMenu = currentWindow.has('contextMenuDetail')
-    props.showPopupWindow = currentWindow.has('popupWindowDetail')
+    props.showContextMenu = !!currentWindow.get('contextMenuDetail')
+    props.showPopupWindow = !!currentWindow.get('popupWindowDetail')
     props.showSiteInfo = currentWindow.getIn(['ui', 'siteInfo', 'isVisible']) &&
       !isSourceAboutUrl(activeFrame.get('location'))
     props.showBravery = shieldState.braveShieldsEnabled(activeFrame) &&
       !!currentWindow.get('braveryPanelDetail')
-    props.showClearData = currentWindow.getIn(['ui', 'isClearBrowsingDataPanelVisible'], false)
-    props.showImportData = currentWindow.has('importBrowserDataDetail')
+    props.showClearData = !!currentWindow.getIn(['ui', 'isClearBrowsingDataPanelVisible'])
+    props.showImportData = !!currentWindow.get('importBrowserDataDetail')
     props.showWidevine = currentWindow.getIn(['widevinePanelDetail', 'shown']) && !isLinux
-    props.showAutoFillAddress = currentWindow.has('autofillAddressDetail')
-    props.showAutoFillCC = currentWindow.has('autofillCreditCardDetail')
+    props.showAutoFillAddress = !!currentWindow.get('autofillAddressDetail')
+    props.showAutoFillCC = !!currentWindow.get('autofillCreditCardDetail')
     props.showLogin = !!loginRequiredDetails
-    props.showBookmarkHanger = currentWindow.has('bookmarkDetail') &&
+    props.showBookmarkHanger = currentWindow.get('bookmarkDetail') &&
       !currentWindow.getIn(['bookmarkDetail', 'isBookmarkHanger'])
-    props.showBookmarkFolderDialog = currentWindow.has('bookmarkFolderDetail')
     props.showNoScript = currentWindow.getIn(['ui', 'noScriptInfo', 'isVisible']) &&
-      urlUtil.getOrigin(activeFrame.get('location'))
+      siteUtil.getOrigin(activeFrame.get('location'))
     props.showReleaseNotes = currentWindow.getIn(['ui', 'releaseNotes', 'isVisible'])
-    props.showCheckDefault = focused && defaultBrowserState.shouldDisplayDialog(state)
+    props.showCheckDefault = isFocused() && defaultBrowserState.shouldDisplayDialog(state)
     props.showUpdate = updateState.isUpdateVisible(state)
     props.showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
-    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, focused)
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused())
     props.isSinglePage = nonPinnedFrames.size <= tabsPerPage
     props.showTabPages = nonPinnedFrames.size > tabsPerPage
     props.showNotificationBar = activeOrigin && state.get('notifications').filter((item) =>
         item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true).size > 0
     props.showFindBar = activeFrame.get('findbarShown') && !activeFrame.get('isFullScreen')
     props.sortedFrames = frameStateUtil.getSortedFrameKeys(currentWindow)
-    props.hasFramePreview = currentWindow.get('previewFrameKey') != null
     props.showDownloadBar = currentWindow.getIn(['ui', 'downloadsToolbar', 'isVisible']) &&
       state.get('downloads') && state.get('downloads').size > 0
     props.title = activeFrame.get('title')
@@ -592,7 +570,7 @@ class Main extends React.Component {
     props.tabId = activeTabId
     props.location = activeFrame.get('location')
     props.isWidevineReady = state.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])
-    props.widevineLocation = urlUtil.getOrigin(widevinePanelDetail.get('location'))
+    props.widevineLocation = siteUtil.getOrigin(widevinePanelDetail.get('location'))
     props.widevineRememberSettings = widevinePanelDetail.get('alsoAddRememberSiteSetting') ? 1 : 0
 
     return props
@@ -618,12 +596,7 @@ class Main extends React.Component {
         ? <PopupWindow />
         : null
       }
-      <div className={
-          cx({
-            top: true,
-            allowDragging: this.props.shouldAllowWindowDrag
-          })
-        }
+      <div className='top'
         onMouseEnter={windowActions.setMouseInTitlebar.bind(null, true)}
         onMouseLeave={windowActions.setMouseInTitlebar.bind(null, false)}
         >
@@ -677,11 +650,6 @@ class Main extends React.Component {
           : null
         }
         {
-          this.props.showBookmarkFolderDialog
-            ? <AddEditBookmarkFolder />
-            : null
-        }
-        {
           this.props.showNoScript
             ? <NoScriptInfo />
             : null
@@ -709,21 +677,18 @@ class Main extends React.Component {
           ? <BookmarksToolbar />
           : null
         }
-        {
-          this.props.isSinglePage
-          ? null
-          : <div className={css(
-            styles.tabPagesWrap,
-            this.props.shouldAllowWindowDrag && styles.tabPagesWrap_allowDragging
-          )}
-            onContextMenu={this.onTabContextMenu}>
-            {
-              this.props.showTabPages
-              ? <TabPages />
-              : null
-            }
-          </div>
-        }
+        <div className={cx({
+          tabPages: true,
+          allowDragging: this.props.shouldAllowWindowDrag,
+          singlePage: this.props.isSinglePage
+        })}
+          onContextMenu={this.onTabContextMenu}>
+          {
+            this.props.showTabPages
+            ? <TabPages />
+            : null
+          }
+        </div>
         <TabsToolbar key='tab-bar' />
         {
           this.props.showNotificationBar
@@ -737,10 +702,7 @@ class Main extends React.Component {
         }
       </div>
       <div className='mainContainer'>
-        <TransitionGroup className={cx({
-          tabContainer: true,
-          hasFramePreview: this.props.hasFramePreview
-        })}>
+        <TransitionGroup className='tabContainer'>
           {
             this.props.sortedFrames.map((frameKey) =>
               <Transition
@@ -770,21 +732,5 @@ class Main extends React.Component {
     </div>
   }
 }
-
-const styles = StyleSheet.create({
-  tabPagesWrap: {
-    background: 'none',
-    display: 'flex',
-    justifyContent: 'center',
-    height: globalStyles.spacing.tabPagesHeight,
-    margin: `${globalStyles.spacing.navbarMenubarMargin} 0 ${globalStyles.spacing.navbarMenubarMargin} 0`,
-    position: 'relative',
-    zIndex: globalStyles.zindex.zindexTabs
-  },
-
-  tabPagesWrap_allowDragging: {
-    WebkitAppRegion: 'drag'
-  }
-})
 
 module.exports = ReduxComponent.connect(Main)
