@@ -500,12 +500,35 @@ const doAction = (action) => {
         }
         break
       }
+      case windowConstants.WINDOW_SHOW_SUBMENU:
+
+      windowState = windowState.setIn(['ui', 'menubar', 'selectedIndex'], 0)
+      windowState = windowState.setIn(['ui', 'menuBar', 'isVisible'], true)
+
+
+        /*template.get(0).has('submenu')
+        windowActions.setContextMenuSelectedIndex([0])
+        showContextMenu(this.getMenubarItemBounds(selectedIndex), template.get(selectedIndex).get('submenu').toJS(), this.props.lastFocusedSelector)
+
+      windowState = windowState.set('contextMenuDetail', makeImmutable({
+    left: rect.left,
+    top: rect.bottom,
+    template: submenu.map((submenuItem) => {
+      return bindClickHandler(submenuItem, lastFocusedSelector)
+    })
+  })
+)*/
+      //console.log(action)
+      console.log(windowState)
+      break
     case windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
       if (action.contextMenuDetail) {
         windowState = windowState.set('contextMenuDetail', action.contextMenuDetail)
       } else {
         windowState = windowState.delete('contextMenuDetail')
       }
+      //console.log(action)
+      //console.log(windowState)
       break
     case windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
       if (!action.detail) {
