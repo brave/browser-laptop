@@ -684,6 +684,7 @@ const doAction = (state, action) => {
         if (clearData.get('browserHistory')) {
           createMenu(state)
         }
+        doAction({actionType: appConstants.APP_CLEAR_CLOSED_FRAMES})
         break
       }
     case windowConstants.WINDOW_CLICK_MENUBAR_SUBMENU:

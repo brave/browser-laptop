@@ -425,6 +425,22 @@ const handleAppAction = (action) => {
       }
       appState = appState.set('tempClearBrowsingData', Immutable.Map())
       appState = appState.set('clearBrowsingDataDefaults', clearData)
+      //double check to make sure it gets called
+      handleAppAction({actionType: appConstants.APP_CLEAR_CLOSED_FRAMES})
+      break
+    case appConstants.APP_CLEAR_CLOSED_FRAMES:
+      console.log("Hello")
+      if (!action.location) {
+        console.log("if")
+        //'closedframes' tags need to be replaced with targeted submenu items
+        appState = appState.set('closedFrames', new Immutable.List())
+      } else {
+        console.log("else")
+        const closedFrames = appState.get('closedFrames', Immutable.List()) || Immutable.List()
+        appState = appState.set('closedFrames',
+        closedFrames.filterNot((frame) => frame.get('location') === action.location)
+        )
+      }
       break
     case appConstants.APP_ON_TOGGLE_BROWSING_DATA:
       appState = appState.setIn(['tempClearBrowsingData', action.property], action.newValue)
