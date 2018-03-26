@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
     zIndex: 3,
     top: 0,
     left: 0,
-    width: '100%',
+    width: 'calc(100% - 4px)',
     minHeight: '159px',
     background: '#f3f3f3',
     borderRadius: '8px',
@@ -589,6 +589,12 @@ const styles = StyleSheet.create({
     padding: '5px 5px 5px 0'
   },
 
+  enabledContent__overlay_buttons: {
+    marginTop: '10px',
+    gridTemplateColumns: '1fr 1fr',
+    display: 'grid'
+  },
+
   enabledContent__overlay_buttons_left: {
     marginLeft: 0
   },
@@ -605,6 +611,8 @@ const styles = StyleSheet.create({
     color: '#5f5f5f',
     fontSize: '16px',
     textDecoration: 'none',
+    position: 'relative',
+    top: '4px',
 
     ':hover': {
       textDecoration: 'underline'
