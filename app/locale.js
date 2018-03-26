@@ -211,12 +211,6 @@ var rendererIdentifiers = function () {
     'smartphoneTitle',
     'updateLater',
     'updateHello',
-    'siteIsolation',    //add
-    'useSiteIsolation',
-    'privateTabsSearchSettingsTitle',
-    'useDuckDuckGoForPrivateSearch',
-    'enableFlashSubtext',
-    'enableFlash',
     // notifications
     'notificationPasswordWithUserName',
     'notificationUpdatePasswordWithUserName',
