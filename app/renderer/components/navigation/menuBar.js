@@ -61,7 +61,7 @@ class MenuBar extends React.Component {
   }
 
   onKeyDown (e) {
-    console.log(e.which)
+    //console.log(e.which)
     const selectedIndex = this.props.selectedIndex
     const template = this.props.template
     const contextMenuIndex = this.props.contextMenuSelectedIndex
@@ -69,8 +69,15 @@ class MenuBar extends React.Component {
     if (!template || !template.get(selectedIndex)) {
       return
     }
-
+    if (e.key === 'f' && e.altKey) {
+        windowActions.setMenuBarSelectedIndex(0)
+        windowActions.setContextMenuSelectedIndex([0])
+        showContextMenu(this.getMenubarItemBounds(selectedIndex), template.get(selectedIndex).get('submenu').toJS(), this.props.lastFocusedSelector)
+      return
+    }
+//console.log(e.key)
     switch (e.which) {
+
       case keyCodes.LEFT:
       case keyCodes.RIGHT:
         if (contextMenuIndex !== null) {
