@@ -4,10 +4,10 @@
 
 'use strict'
 const um = require('@brave-intl/bat-usermodel')
+const path = require('path')
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
-const windowActions = require('../../../js/actions/windowActions')
 
 // State
 const userModelState = require('../../common/state/userModelState')
@@ -18,8 +18,6 @@ const notificationTypes = require('../../common/constants/notificationTypes')
 // Utils
 const urlUtil = require('../../../js/lib/urlutil')
 const ledgerUtil = require('../../common/lib/ledgerUtil')
-
-const truncateUrl = require('truncate-url')
 
 let matrixData
 let priorData
@@ -118,19 +116,23 @@ function randomKey (dictionary) {
   return keys[keys.length * Math.random() << 0]
 }
 
-const goAheadAndShowTheAd = (windowId, categoryName, notificationText, notificationUrl) => {
-  appActions.onUserModelDemoValue(`Ads shown: ${categoryName}`)
-  windowActions.onNativeNotificationOpen(
-      windowId,
-      `Brave Ad: ${categoryName}`,
+const goAheadAndShowTheAd = (windowId, notificationTitle, notificationText, notificationUrl) => {
+  appActions.nativeNotificationCreate(
+    windowId,
     {
-      body: notificationText,
+      title: notificationTitle,
+      message: notificationText,
+      icon: path.join(__dirname, '../../../img/BAT_icon.png'),
+      sound: true,
+      timeout: 60,
+      wait: true,
       data: {
+        windowId,
         notificationUrl,
         notificationId: notificationTypes.ADS
       }
     }
-    )
+  )
 }
 
 const classifyPage = (state, action, windowId) => {
@@ -178,12 +180,8 @@ const classifyPage = (state, action, windowId) => {
   let indexOfMax = um.vectorIndexOfMax(scores)
 
   let winnerOverTime = catNames[indexOfMax]
-  let maxLength = 40
 
-  let shortUrl = truncateUrl(url, maxLength)
-  let logString = 'Current Page [' + shortUrl + '] Class: ' + immediateWinner + ' Moving Average of Classes: ' + winnerOverTime
-  console.log(logString)
-  appActions.onUserModelDemoValue(['log item: ', logString])
+  appActions.onUserModelLog('Site visited', {url, 'class': immediateWinner, 'average': winnerOverTime})
 
   return state
 }
@@ -205,37 +203,42 @@ const basicCheckReadyAdServe = (state, windowId) => {
 
   let bundle = sampleAdFeed
   let arbitraryKey
+
   let notificationText
   let notificationUrl
+  let advertiser
 
   let allGood = true
 
   if (bundle) {
     const result = bundle['categories'][winnerOverTime]
-    arbitraryKey = randomKey(result)
+    if (result) {
+      arbitraryKey = randomKey(result)
 
-    const payload = result[arbitraryKey]
+      const payload = result[arbitraryKey]
 
-    if (payload) {
-      notificationText = payload['notificationText']
-      notificationUrl = payload['notificationURL']
-    } else {
-      console.warn('BAT Ads: Could not read ad data for display.')
+      if (payload) {
+        notificationText = payload['notificationText']
+        notificationUrl = payload['notificationURL']
+        advertiser = payload['advertiser']
+      } else {
+        console.warn('BAT Ads: Could not read ad data for display.')
+      }
     }
   }
 
-  if (!notificationText || !notificationUrl) {
+  if (!notificationText || !notificationUrl || !advertiser) {
     allGood = false
   }
 
   if (!userModelState.allowedToShowAdBasedOnHistory(state)) {
     allGood = false
-    appActions.onUserModelDemoValue(['log item: ', 'prevented from showing ad based on history'])
+    appActions.onUserModelLog('Ad prevented', {notificationUrl})
   }
 
   if (allGood) {
-    goAheadAndShowTheAd(windowId, winnerOverTime, notificationText, notificationUrl)
-    appActions.onUserModelDemoValue(['log item: ', 'ad shown', winnerOverTime, notificationText, notificationUrl])
+    goAheadAndShowTheAd(windowId, advertiser, notificationText, notificationUrl)
+    appActions.onUserModelLog('Ad shown', {notificationUrl, notificationText, winnerOverTime, advertiser})
     state = userModelState.appendAdShownToAdHistory(state)
   }
 
@@ -288,7 +291,8 @@ const getMethods = () => {
     checkReadyAdServe,
     recordUnIdle,
     serveAdNow,
-    changeAdFrequency
+    changeAdFrequency,
+    goAheadAndShowTheAd
 
   }
 
