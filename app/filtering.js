@@ -548,11 +548,6 @@ function registerPermissionHandler (session, partition) {
         // The Brave extension and PDFJS are always allowed to open files in an external app
         isPDFOrigin || isBraveOrigin)) {
         response.push(true)
-      } else if (
-        permission === 'notifications' &&
-        origin.startsWith(`chrome://brave`)
-      ) {
-        response.push(true)
       } else {
         const permissionName = permission + 'Permission'
         let isAllowed

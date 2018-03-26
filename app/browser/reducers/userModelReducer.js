@@ -36,7 +36,7 @@ const userModelState = require('../../common/state/userModelState')
 
 // Utils
 const userModel = require('../api/userModel')
-const demoApi = require('../../browser/api/demo')
+const demoApi = require('../api/userModelLog')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 
 const userModelReducer = (state, action, immutableAction) => {
@@ -45,6 +45,12 @@ const userModelReducer = (state, action, immutableAction) => {
     case appConstants.APP_SET_STATE: // performed once on app startup
       {
         state = userModel.initialize(state)
+
+        // TODO remove, only for testing
+        // setTimeout(() => {
+        //   const activeWindowId = windows.getActiveWindowId()
+        //   userModel.goAheadAndShowTheAd(activeWindowId, 'My category', 'This is text', 'https://www.google.com')
+        // }, 10000)
         break
       }
     case appConstants.APP_TAB_UPDATED: // kind of worthless; fires too often
@@ -79,7 +85,7 @@ const userModelReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_IDLE_STATE_CHANGED: // TODO where to set this globally
       {
-        console.log('idle state changed. action: ', action)
+        console.log('idle state changed. action: ', action.toJS())
 
         const activeWindowId = windows.getActiveWindowId()
 
@@ -133,9 +139,9 @@ const userModelReducer = (state, action, immutableAction) => {
         }
         break
       }
-    case appConstants.APP_ON_USERMODEL_DEMO_VALUE:
+    case appConstants.APP_ON_USERMODEL_LOG:
       {
-        demoApi.appendValue(action.get('value'))
+        demoApi.appendValue(action.get('eventName'), action.get('data'))
         break
       }
   }
