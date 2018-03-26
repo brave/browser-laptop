@@ -1160,6 +1160,12 @@ const onWalletRecovery = (state, error, result) => {
     state = ledgerState.setInfoProp(state, 'walletQR', Immutable.Map())
     state = ledgerState.setInfoProp(state, 'addresses', Immutable.Map())
 
+    const status = ledgerState.getAboutProp(state, 'status')
+
+    if (status === ledgerStatuses.CORRUPTED_SEED) {
+      state = ledgerState.setAboutProp(state, 'status', '')
+    }
+
     callback(error, result)
 
     if (balanceTimeoutId) {
@@ -1647,9 +1653,13 @@ const getStateInfo = (state, parsedData) => {
     state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.IN_PROGRESS)
   }
 
-  let passphrase = ledgerClient.prototype.getWalletPassphrase(parsedData)
-  if (passphrase) {
-    newInfo.passphrase = passphrase.join(' ')
+  try {
+    let passphrase = ledgerClient.prototype.getWalletPassphrase(parsedData)
+    if (passphrase) {
+      newInfo.passphrase = passphrase.join(' ')
+    }
+  } catch (e) {
+    console.error(e)
   }
 
   state = ledgerState.mergeInfoProp(state, newInfo)

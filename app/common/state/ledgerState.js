@@ -570,6 +570,16 @@ const ledgerState = {
     }
 
     return state.setIn(['ledger', 'about', prop], value)
+  },
+
+  getAboutProp: (state, prop) => {
+    state = validateState(state)
+
+    if (prop == null) {
+      return null
+    }
+
+    return state.getIn(['ledger', 'about', prop])
   }
 }
 
