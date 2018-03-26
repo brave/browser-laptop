@@ -7,14 +7,20 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
+// comment out to not use pooled webview (2x webviews):
 const WebviewDisplay = require('../../pooledWebviewDisplay')
+// uncomment in to use 1x webview (for debugging):
 // const WebviewDisplay = require('../../webviewDisplay')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
+const webviewActions = require('../../../../js/actions/webviewActions')
 
 // state
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
+
+// utils
+const {isFocused} = require('../../currentWindow')
 
 class GuestInstanceRenderer extends React.Component {
   constructor (props) {
@@ -32,19 +38,24 @@ class GuestInstanceRenderer extends React.Component {
       tabId: frame && frame.get('tabId'),
       isDefaultNewTabLocation: location === 'about:newtab',
       isBlankLocation: location === 'about:blank',
-      isPlaceholder: frame && frame.get('isPlaceholder')
+      isPlaceholder: frame && frame.get('isPlaceholder'),
+      windowIsFocused: isFocused(state),
+      frameKey,
+      frameLocation: frame && frame.get('location'),
+      urlBarFocused: frame && frame.getIn(['navbar', 'urlbar', 'focused'])
     }
     return props
   }
 
   componentDidMount () {
-    const nextGuestInstanceId = this.props.guestInstanceId
-    if (nextGuestInstanceId != null && this.webviewDisplay) {
+    const nextTabId = this.props.nextTabId
+    if (nextTabId != null && this.webviewDisplay) {
       console.log(`(mount) Going to display tab ${this.props.tabId}, guest instance ID ${this.props.guestInstanceId}`)
-      this.webviewDisplay.attachActiveTab(nextGuestInstanceId)
+      this.webviewDisplay.attachActiveTab(nextTabId)
     } else {
-      console.log('could not attach on mount', nextGuestInstanceId, this.webviewDisplay)
+      console.log('could not attach on mount', nextTabId, this.webviewDisplay)
     }
+    this.onPropsChanged()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -56,6 +67,17 @@ class GuestInstanceRenderer extends React.Component {
         console.log('placeholder, not showing')
       }
     }
+    this.onPropsChanged(prevProps)
+  }
+
+  onPropsChanged (prevProps = {}) {
+    // update state of which frame is currently being viewed
+    if (this.props.tabId !== prevProps.tabId && this.props.windowIsFocused) {
+      windowActions.setFocusedFrame(this.props.frameLocation, this.props.tabId)
+    }
+    if (this.props.tabId !== prevProps.tabId && !this.props.urlBarFocused) {
+      webviewActions.setWebviewFocused()
+    }
   }
 
   setWebviewRef (containerElement) {
@@ -66,8 +88,10 @@ class GuestInstanceRenderer extends React.Component {
         classNameWebview: css(styles.guestInstanceRenderer__webview),
         classNameWebviewAttached: css(styles.guestInstanceRenderer__webview_attached),
         classNameWebviewAttaching: css(styles.guestInstanceRenderer__webview_attaching),
-        onFocus: this.onFocus.bind(this)
+        onFocus: this.onFocus.bind(this),
+        onZoomChange: this.onUpdateZoom.bind(this)
       })
+      webviewActions.init(this.webviewDisplay)
       if (this.props && this.props.guestInstanceId != null) {
         this.webviewDisplay.attachActiveTab(this.props.guestInstanceId)
       }
@@ -86,6 +110,10 @@ class GuestInstanceRenderer extends React.Component {
       windowActions.setTabPageIndexByFrame(this.props.tabId)
       windowActions.tabOnFocus(this.props.tabId)
     }
+  }
+
+  onUpdateZoom (zoomPercent) {
+    windowActions.setLastZoomPercentage(this.props.frameKey, zoomPercent)
   }
 
   render () {

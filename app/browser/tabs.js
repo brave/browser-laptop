@@ -35,7 +35,7 @@ const historyState = require('../common/state/historyState')
 const siteSettingsState = require('../common/state/siteSettingsState')
 const bookmarkOrderCache = require('../common/cache/bookmarkOrderCache')
 const ledgerState = require('../common/state/ledgerState')
-const {getWindow} = require('./windows')
+const {getWindow, notifyWindowWebContentsAdded} = require('./windows')
 const activeTabHistory = require('./activeTabHistory')
 
 let adBlockRegions
@@ -80,7 +80,7 @@ const detachTab = (evt, tabId, index, windowId) => {
 const updateTab = (tabId, changeInfo = {}) => {
   let tabValue = getTabValue(tabId)
   if (shouldDebugTabEvents) {
-    console.log(`Tab [${tabId}] updated from muon. changeInfo:`, changeInfo, 'currentValues:', { newIndex: tabValue && tabValue.get('index'), newActive: tabValue && tabValue.get('active'), windowId: tabValue && tabValue.get('windowId') })
+    console.log(`Tab [${tabId}] updated from muon. changeInfo:`, changeInfo, 'currentValues:', { newIndex: tabValue && tabValue.get('index'), newActive: tabValue && tabValue.get('active'), windowId: tabValue && tabValue.get('windowId'), isPlaceholder: tabValue.get('isPlaceholder') })
   }
 
   if (tabValue) {
@@ -525,8 +525,11 @@ const api = {
         const windowOpts = makeImmutable(size)
         appActions.newWindow(makeImmutable(frameOpts), windowOpts)
       } else {
-        // TODO(bridiver) - use tabCreated in place of newWebContentsAdded
-        appActions.newWebContentsAdded(windowId, frameOpts, newTabValue)
+        // Unfortunately we rely on tab events in the renderer window process
+        // so use an IPC call here to notify that process of the new tab to track.
+        // TODO: move all events to browser process (this module) and do not handle all
+        // tab events inside the window.
+        notifyWindowWebContentsAdded(windowId, frameOpts, newTabValue.toJS())
       }
     })
 
@@ -1103,7 +1106,7 @@ const api = {
         } else {
           // Ask for tab to be attached (via frame state and webview) to
           // specified window
-          appActions.newWebContentsAdded(toWindowId, frameOpts, tabValue)
+          notifyWindowWebContentsAdded(toWindowId, frameOpts, tabValue.toJS())
         }
       }
 

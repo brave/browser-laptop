@@ -6,6 +6,7 @@ const mapValuesByKeys = require('../lib/functional').mapValuesByKeys
 
 const _ = null
 const windowConstants = {
+  WINDOW_NEW_FRAME: _,
   WINDOW_SET_NAVBAR_INPUT: _,
   WINDOW_CLOSE_FRAMES: _,
   WINDOW_SET_FOCUSED_FRAME: _,

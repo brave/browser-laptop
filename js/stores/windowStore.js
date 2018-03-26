@@ -5,6 +5,7 @@
 const appDispatcher = require('../dispatcher/appDispatcher')
 const EventEmitter = require('events').EventEmitter
 const appActions = require('../actions/appActions')
+const webviewActions = require('../actions/webviewActions')
 const appConstants = require('../constants/appConstants')
 const windowConstants = require('../constants/windowConstants')
 const config = require('../constants/config')
@@ -45,11 +46,8 @@ let lastEmittedState
 
 const CHANGE_EVENT = 'change'
 
-const focusWebview = (framePath) => {
-  windowState = windowState.mergeIn(framePath, {
-    activeShortcut: 'focus-webview',
-    activeShortcutDetails: null
-  })
+const focusWebview = () => {
+  webviewActions.setWebviewFocused()
 }
 
 let currentKey = 0
@@ -112,7 +110,6 @@ const newFrame = (state, frameOpts) => {
     frameOpts = {}
   }
   frameOpts = frameOpts.toJS ? frameOpts.toJS() : frameOpts
-
   // handle tabs.create properties
   let insertionIndex = frameOpts.index !== undefined
     ? frameOpts.index
@@ -270,7 +267,7 @@ const doAction = (action) => {
       currentKey = frameStateUtil.getFrames(windowState).reduce((previousVal, frame) => Math.max(previousVal, frame.get('key')), 0)
       const activeFrame = frameStateUtil.getActiveFrame(windowState)
       if (activeFrame && activeFrame.get('location') !== 'about:newtab') {
-        focusWebview(frameStateUtil.activeFrameStatePath(windowState))
+        focusWebview()
       }
       // We should not emit here because the Window already know about the change on startup.
       return
@@ -329,7 +326,7 @@ const doAction = (action) => {
         // For about:newtab we want to have the urlbar focused, not the new frame.
         // Otherwise we want to focus the new tab when it is a new frame in the foreground.
         if (action.location !== getTargetAboutUrl('about:newtab')) {
-          focusWebview(statePath)
+          focusWebview()
         }
         break
       }
@@ -413,13 +410,6 @@ const doAction = (action) => {
         }
         break
       }
-    case windowConstants.WINDOW_FRAME_SHORTCUT_CHANGED:
-      const framePath = action.frameProps ? ['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))] : frameStateUtil.activeFrameStatePath(windowState)
-      windowState = windowState.mergeIn(framePath, {
-        activeShortcut: action.activeShortcut,
-        activeShortcutDetails: action.activeShortcutDetails
-      })
-      break
     case windowConstants.WINDOW_SET_FIND_DETAIL:
       {
         const frameIndex = frameStateUtil.getFrameIndex(windowState, action.frameKey)
@@ -535,7 +525,7 @@ const doAction = (action) => {
       windowState = windowState.setIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), 'icon'], action.favicon)
       break
     case windowConstants.WINDOW_SET_LAST_ZOOM_PERCENTAGE:
-      windowState = windowState.setIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), 'lastZoomPercentage'], action.percentage)
+      windowState = windowState.setIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameKey), 'lastZoomPercentage'], action.percentage)
       break
     case windowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
@@ -739,6 +729,7 @@ const doAction = (action) => {
     case windowConstants.WINDOW_TAB_MOUSE_LEAVE:
       windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
       break
+    case windowConstants.WINDOW_NEW_FRAME:
     case appConstants.APP_NEW_WEB_CONTENTS_ADDED:
       if (!action.frameOpts) {
         break
@@ -853,36 +844,6 @@ ipc.on(messages.SHORTCUT_OPEN_CLEAR_BROWSING_DATA_PANEL, (e) => {
     actionType: windowConstants.WINDOW_SET_CLEAR_BROWSING_DATA_VISIBLE,
     isVisible: true
   })
-})
-
-const frameShortcuts = ['stop', 'reload', 'zoom-in', 'zoom-out', 'zoom-reset', 'toggle-dev-tools', 'clean-reload', 'view-source', 'mute', 'save', 'print', 'show-findbar', 'find-next', 'find-prev']
-frameShortcuts.forEach((shortcut) => {
-  // Listen for actions on the active frame
-  ipc.on(`shortcut-active-frame-${shortcut}`, (e, args) => {
-    if (shortcut === 'toggle-dev-tools') {
-      appActions.toggleDevTools(frameStateUtil.getActiveFrameTabId(windowState))
-    } else {
-      const framePath = frameStateUtil.activeFrameStatePath(windowState)
-      if (framePath) {
-        windowState = windowState.mergeIn(framePath, {
-          activeShortcut: shortcut,
-          activeShortcutDetails: args
-        })
-        emitChanges()
-      }
-    }
-  })
-  // Listen for actions on frame N
-  if (['reload', 'mute'].includes(shortcut)) {
-    ipc.on(`shortcut-frame-${shortcut}`, (e, i, args) => {
-      const path = ['frames', frameStateUtil.getFrameIndex(windowState, i)]
-      windowState = windowState.mergeIn(path, {
-        activeShortcut: shortcut,
-        activeShortcutDetails: args
-      })
-      emitChanges()
-    })
-  }
 })
 
 appDispatcher.registerLocalCallback(doAction)

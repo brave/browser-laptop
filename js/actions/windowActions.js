@@ -164,6 +164,14 @@ const windowActions = {
     })
   },
 
+  newFrame: function (frameOpts, tabValue) {
+    dispatch({
+      actionType: windowConstants.WINDOW_NEW_FRAME,
+      frameOpts,
+      tabValue
+    })
+  },
+
   /**
    * Dispatches a message to close multiple frames
    * @param {Object[]} framePropsList - The properties of all frames to close
@@ -424,23 +432,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to the store to indicate that the pending frame shortcut info should be updated.
-   *
-   * @param {Object} frameProps - Properties of the frame in question
-   * @param {string} activeShortcut - The text for the new shortcut. Usually this is null to clear info which was previously
-   * set from an IPC call.
-   * @param {string} activeShortcutDetails - Parameters for the shortcut action
-   */
-  frameShortcutChanged: function (frameProps, activeShortcut, activeShortcutDetails) {
-    dispatch({
-      actionType: windowConstants.WINDOW_FRAME_SHORTCUT_CHANGED,
-      frameProps,
-      activeShortcut,
-      activeShortcutDetails
-    })
-  },
-
-  /**
    * Dispatches a message to set the find-in-page details.
    * @param {Object} frameKey - Frame key of the frame in question
    * @param {Object} findDetail - the find details
@@ -626,13 +617,13 @@ const windowActions = {
    * Dispatches a message to store the last zoom percentage.
    * This is mainly just used to trigger updates throughout React.
    *
-   * @param {object} frameProps - The frame to set blocked info on
+   * @param {object} frameKey - The frame to set blocked info on
    * @param {number} percentage - The new zoom percentage
    */
-  setLastZoomPercentage: function (frameProps, percentage) {
+  setLastZoomPercentage: function (frameKey, percentage) {
     dispatch({
       actionType: windowConstants.WINDOW_SET_LAST_ZOOM_PERCENTAGE,
-      frameProps,
+      frameKey,
       percentage
     })
   },

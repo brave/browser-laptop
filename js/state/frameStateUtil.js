@@ -324,8 +324,6 @@ const frameOptsFromFrame = (frame) => {
   return frame
     .delete('key')
     .delete('parentFrameKey')
-    .delete('activeShortcut')
-    .delete('activeShortcutDetails')
     .delete('index')
     .deleteIn(['navbar', 'urlbar', 'suggestions'])
 }

@@ -4,20 +4,20 @@
 
 'use strict'
 
-const getWebview = (key) =>
-  key
-  ? document.querySelector(`webview[data-frame-key="${key}"]`)
-  : document.querySelector('.frameWrapper.isActive webview')
+let webviewDisplay
+const getWebview = () => webviewDisplay && webviewDisplay.getActiveWebview()
 
 const webviewActions = {
+
+  init: function (mainWindowWebviewDisplay) {
+    webviewDisplay = mainWindowWebviewDisplay
+  },
+
   /**
    * Puts the webview in focus
    */
   setWebviewFocused: function () {
-    const webview = getWebview()
-    if (webview) {
-      webview.focus()
-    }
+    webviewDisplay && webviewDisplay.focusActiveWebview()
   },
 
   /**
@@ -40,8 +40,8 @@ const webviewActions = {
     }
   },
 
-  findInPage: function (searchString, caseSensitivity, forward, findNext, webview) {
-    webview = webview || getWebview()
+  findInPage: function (searchString, caseSensitivity, forward, findNext) {
+    webview = getWebview()
     if (!webview) {
       return
     }

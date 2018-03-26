@@ -3,6 +3,11 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const remote = require('electron').remote
+const {
+  getTargetAboutUrl,
+  getBaseUrl
+} = require('../../js/lib/appUrlUtil')
+const debounce = require('../../js/lib/debounce')
 
 let i = 0
 
@@ -27,7 +32,7 @@ function ensurePaintWebviewSubsequentAttach (webview, cb = () => {}) {
 const animationFrame = () => new Promise(window.requestAnimationFrame)
 
 module.exports = class WebviewDisplay {
-  constructor ({ containerElement, classNameWebview, classNameWebviewAttached, classNameWebviewAttaching, onFocus, shouldRemoveOnDestroy = false }) {
+  constructor ({ containerElement, classNameWebview, classNameWebviewAttached, classNameWebviewAttaching, onFocus, onZoomChange, shouldRemoveOnDestroy = false }) {
     if (!containerElement) {
       throw new Error('Must pass a valid containerElement to WebviewDisplay constructor')
     }
@@ -36,7 +41,8 @@ module.exports = class WebviewDisplay {
     this.classNameWebview = classNameWebview
     this.classNameWebviewAttached = classNameWebviewAttached
     this.classNameWebviewAttaching = classNameWebviewAttaching
-    this.onFocus = onFocus
+    this.onFocus = onFocus || (() => {})
+    this.onZoomChange = onZoomChange || (() => {})
     this.webviewPool = []
     // when contents are destroyed, don't remove the webview immediately,
     // wait for a potential new view to be displayed before removing.
@@ -76,12 +82,44 @@ module.exports = class WebviewDisplay {
     if (this.onFocus) {
       webview.addEventListener('focus', this.onFocus)
     }
-    webview.addEventListener('tab-id-changed', (e) => {
-      console.log('webview tab-id-changed to tabId', e.tabID)
+    // support focusing on active tab when navigation complete
+    webview.addEventListener('did-navigate', (e) => {
+      // do not steal focus if is new tab page, or if we're about to
+      // switch away
+      const isNewTabPage = getBaseUrl(e.url) === getTargetAboutUrl('about:newtab')
+      const isSwitchingAway = this.attachingToGuestInstanceId && this.attachingToGuestInstanceId !== this.activeGuestInstanceId
+      if (!isNewTabPage && !isSwitchingAway) {
+        webview.focus()
+      }
     })
+    let wheelDeltaY
+    const performZoom = debounce(() => {
+      if (wheelDeltaY > 0) {
+        webview.zoomIn()
+        this.onZoomChange(webview.getZoomPercent())
+      } else if (wheelDeltaY < 0) {
+        webview.zoomOut()
+        this.onZoomChange(webview.getZoomPercent())
+      }
+      wheelDeltaY = 0
+    }, 20)
+    webview.addEventListener('mousewheel', (e) => {
+      if (e.ctrlKey) {
+        e.preventDefault()
+        wheelDeltaY = (wheelDeltaY || 0) + e.wheelDeltaY
+        performZoom()
+      } else {
+        wheelDeltaY = 0
+      }
+    })
+    const debugEvents = ['tab-replaced-at', 'tab-id-changed', 'will-attach', 'did-attach', 'did-detach', 'will-detach', 'console-message']
+    for (const event of debugEvents) {
+      webview.addEventListener(event, () => {
+        console.log(`<webview> event ${event}`, webview)
+      })
+    }
     return webview
   }
-
 
   attachActiveTab (tabId) {
     console.log(`attachActiveTab`, tabId)
@@ -192,6 +230,11 @@ module.exports = class WebviewDisplay {
       if (pendingGuestInstanceId !== tabId) {
         console.log('swapWebviewOnAttach - another attach pending, continuing with that attach request')
         this.swapWebviewOnAttach(pendingGuestInstanceId, this.getPooledWebview(), this.attachedWebview)
+      } else {
+        if (this.shouldFocusOnAttach) {
+          this.shouldFocusOnAttach = false
+          toAttachWebview.focus()
+        }
       }
     }
 
@@ -272,6 +315,18 @@ module.exports = class WebviewDisplay {
       // another workaround for not getting did-attach on webview, set a timeout and then hide / show view
       timeoutHandleBumpView = window.setTimeout(ensurePaintWebviewFirstAttach.bind(null, toAttachWebview), 2000)
     })
+  }
+
+  getActiveWebview () {
+    return this.attachedWebview
+  }
+
+  focusActiveWebview () {
+    if (!this.attachingToGuestInstanceId && this.attachedWebview) {
+      this.attachedWebview.focus()
+    } else if (this.attachingToGuestInstanceId) {
+      this.shouldFocusOnAttach = true
+    }
   }
 
   removePendingWebviews () {

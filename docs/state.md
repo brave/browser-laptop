@@ -708,8 +708,6 @@ WindowStore
   createdFaviconDirectory: boolean, // whether the ledger-favicons directory has been created already in the appData directory
   frames: [{
     aboutDetails: object, // details for about pages
-    activeShortcut: string, // set by the application store when the component should react to a shortcut
-    activeShortcutDetails: object, // additional parameters for the active shortcut action if any
     adblock: {
       blocked: Array<string>
     },

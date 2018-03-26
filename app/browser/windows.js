@@ -211,7 +211,7 @@ function openFramesInWindow (win, frames, activeFrameKey) {
     for (const frame of frames) {
       frameIndex++
       if (frame.guestInstanceId) {
-        appActions.newWebContentsAdded(win.id, frame)
+        api.notifyWindowWebContentsAdded(win.id, frame)
       } else {
         appActions.createTabRequested({
           windowId: win.id,
@@ -834,6 +834,19 @@ const api = {
         !win.isDestroyed() &&
         (includingBufferWindow || win !== api.getBufferWindow())
       )
+  },
+
+  notifyWindowWebContentsAdded (windowId, frame, tabValue) {
+    const win = api.getWindow(windowId)
+    if (!win || win.isDestroyed()) {
+      console.error(`notifyWindowWebContentsAdded, no window for id ${windowId}`)
+      return
+    }
+    if (!win.webContents || win.webContents.isDestroyed()) {
+      console.error(`notifyWindowWebContentsAdded, no window webContents for id ${windowId}`)
+      return
+    }
+    win.webContents.send('new-web-contents-added', frame, tabValue)
   },
 
   on: (...args) => publicEvents.on(...args),

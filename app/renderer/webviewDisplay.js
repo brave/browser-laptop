@@ -28,9 +28,14 @@ module.exports = class SingleWebviewDisplay {
     containerElement.appendChild(this.webview)
   }
 
-  attachActiveTab (guestInstanceId) {
-    console.log('webviewDisplay: attaching guest id', guestInstanceId)
-    this.webview.attachGuest(guestInstanceId)
+  attachActiveTab (tabId) {
+    console.log('webviewDisplay: attaching tab id', tabId)
+    require('electron').remote.getWebContents(tabId, (webContents) => {
+      if (!webContents || webContents.isDestroyed()) {
+        return
+      }
+      this.webview.attachGuest(webContents.guestInstanceId)
+    })
     this.isAttached = true
     // TODO(petemill) remove ugly workaround as <webview> will often not paint guest unless
     // size has changed or forced to.
@@ -46,5 +51,13 @@ module.exports = class SingleWebviewDisplay {
     console.log('creating a webview')
     const webview = document.createElement('webview')
     return webview
+  }
+
+  focusActiveWebview () {
+
+  }
+
+  getActiveWebview () {
+    return this.webview
   }
 }
