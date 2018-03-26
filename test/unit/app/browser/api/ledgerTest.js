@@ -614,21 +614,21 @@ describe('ledger api unit tests', function () {
         })
         it('does nothing if tab is private', function () {
           const xhr2 = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=20.338&et=21.339'
-          ledgerApi.onMediaRequest(cacheAppState, xhr2, ledgerMediaProviders.YOUTUBE, 1)
+          ledgerApi.onMediaRequest(cacheAppState, xhr2, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 1}))
           assert(mediaSpy.notCalled)
           assert(saveVisitSpy.notCalled)
         })
       })
 
       it('set currentMediaKey when it is different than saved', function () {
-        ledgerApi.onMediaRequest(defaultAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
+        ledgerApi.onMediaRequest(defaultAppState, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 1}))
         assert.equal(ledgerApi.getCurrentMediaKey(), videoId)
         assert(mediaSpy.calledOnce)
         assert(saveVisitSpy.notCalled)
       })
 
       it('get data from cache, if we have publisher in synopsis', function () {
-        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
+        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 1}))
         assert(mediaSpy.notCalled)
         assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
           duration: 10001,
@@ -641,14 +641,14 @@ describe('ledger api unit tests', function () {
         const state = defaultAppState.setIn(['cache', 'ledgerVideos', videoId], Immutable.fromJS({
           publisher: publisherKey
         }))
-        ledgerApi.onMediaRequest(state, xhr, ledgerMediaProviders.YOUTUBE, 1)
+        ledgerApi.onMediaRequest(state, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 1}))
         assert(mediaSpy.calledOnce)
         assert(saveVisitSpy.notCalled)
       })
 
       it('revisited if visiting the same media in the same tab', function () {
         // first call, revisit false
-        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
+        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 1}))
         assert.equal(ledgerApi.getCurrentMediaKey(), videoId)
         assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
           duration: 10001,
@@ -657,7 +657,7 @@ describe('ledger api unit tests', function () {
         }).calledOnce)
 
         // second call, revisit true
-        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
+        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 1}))
         assert(mediaSpy.notCalled)
         assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
           duration: 10001,
@@ -669,7 +669,7 @@ describe('ledger api unit tests', function () {
       it('revisited if visiting media in the background tab', function () {
         // first call, revisit false
         ledgerApi.setCurrentMediaKey('11')
-        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 10)
+        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 10}))
         assert.equal(ledgerApi.getCurrentMediaKey(), '11')
         assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
           duration: 10001,
@@ -689,7 +689,7 @@ describe('ledger api unit tests', function () {
             }
           }))
 
-        ledgerApi.onMediaRequest(badState, xhr, ledgerMediaProviders.YOUTUBE, 10)
+        ledgerApi.onMediaRequest(badState, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 10}))
         assert(mediaSpy.calledOnce)
         assert(saveVisitSpy.notCalled)
       })
