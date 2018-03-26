@@ -38,7 +38,7 @@ const bookmarkOrderCache = require('../common/cache/bookmarkOrderCache')
 const ledgerState = require('../common/state/ledgerState')
 const {getWindow, notifyWindowWebContentsAdded} = require('./windows')
 const activeTabHistory = require('./activeTabHistory')
-const demoApi = require('../browser/api/demo')
+const demoApi = require('./api/userModelLog')
 
 let adBlockRegions
 let currentPartitionNumber = 0

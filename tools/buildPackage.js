@@ -162,9 +162,13 @@ if (isDarwin) {
   const macAppName = `${appName}.app`
   cmds.push('mkdirp ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten'))
   cmds.push('ncp ' + path.join('node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem') + ' ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem'))
+  cmds.push('mkdirp ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'brave-node-notifier', 'vendor'))
+  cmds.push('ncp ' + path.join('node_modules', 'brave-node-notifier', 'vendor') + ' ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'brave-node-notifier', 'vendor'))
 } else {
   cmds.push('mkdirp ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten'))
   cmds.push('ncp ' + path.join('node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem') + ' ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem'))
+  cmds.push('mkdirp ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'brave-node-notifier', 'vendor'))
+  cmds.push('ncp ' + path.join('node_modules', 'brave-node-notifier', 'vendor') + ' ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'brave-node-notifier', 'vendor'))
 }
 
 execute(cmds, env, (err) => {

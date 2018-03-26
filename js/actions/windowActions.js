@@ -1068,17 +1068,6 @@ const windowActions = {
     })
   },
 
-  onNativeNotificationOpen: function (windowId, title, options) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_NATIVE_NOTIFICATION_OPEN,
-      title,
-      options,
-      queryInfo: {
-        windowId
-      }
-    })
-  },
-
   onSiteDetailMenu: function (bookmarkKey, type) {
     dispatch({
       actionType: windowConstants.WINDOW_ON_SITE_DETAIL_MENU,
