@@ -24,7 +24,7 @@ const Immutable = require('immutable')
 const assert = require('assert')
 
 // utilities
-const {makeImmutable, isMap} = require('../../common/state/immutableUtil')
+const {makeImmutable, makeJS, isMap} = require('../../common/state/immutableUtil')
 const urlUtil = require('../../../js/lib/urlutil')
 
 const maxRowsInPageScoreHistory = 5
@@ -124,10 +124,10 @@ const userModelState = {
     let history = state.getIn(['userModel', 'pageScoreHistory']) || []
 
     if (!mutable) {
-      return history // immutable version
+      return makeImmutable(history) // immutable version
     }
 
-    return history.toJS() // mutable version
+    return makeJS(history) // mutable version
   },
 
   removeAllHistory: (state) => {

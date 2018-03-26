@@ -1887,6 +1887,16 @@ const appActions = {
     })
   },
 
+  nativeNotificationCreate: function (windowId, options) {
+    dispatch({
+      actionType: appConstants.APP_NATIVE_NOTIFICATION_CREATE,
+      options,
+      queryInfo: {
+        windowId
+      }
+    })
+  },
+
   saveLedgerPromotion: function (promotion) {
     dispatch({
       actionType: appConstants.APP_SAVE_LEDGER_PROMOTION,
@@ -1976,10 +1986,11 @@ const appActions = {
     })
   },
 
-  onUserModelDemoValue: function (value) {
+  onUserModelLog: function (eventName, data) {
     dispatch({
-      actionType: appConstants.APP_ON_USERMODEL_DEMO_VALUE,
-      value
+      actionType: appConstants.APP_ON_USERMODEL_LOG,
+      eventName,
+      data
     })
   },
 

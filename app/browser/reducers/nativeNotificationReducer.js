@@ -4,37 +4,24 @@
 
 'use strict'
 
-const Immutable = require('immutable')
-
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
-const notificationTypes = require('../../common/constants/notificationTypes')
 
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
-const tabs = require('../tabs')
+const notificationUtil = require('../../renderer/lib/notificationUtil')
 
-const flashReducer = (state, action, immutableAction) => {
+const nativeNotifications = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
-    case appConstants.APP_ON_NATIVE_NOTIFICATION_CLICK:
+    case appConstants.APP_NATIVE_NOTIFICATION_CREATE:
       {
-        const data = action.get('data')
-        switch (data.get('notificationId')) {
-          case notificationTypes.ADS:
-            {
-              // TODO what we want to open, for now we just open ad url
-              tabs.maybeCreateTab(state, Immutable.fromJS({
-                url: data.get('notificationUrl'),
-                windowId: action.get('senderWindowId')
-              }))
-              break
-            }
-        }
+        notificationUtil.createNotification(action.get('options'))
         break
       }
   }
+
   return state
 }
 
-module.exports = flashReducer
+module.exports = nativeNotifications
