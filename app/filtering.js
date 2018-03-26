@@ -431,31 +431,31 @@ function registerPermissionHandler (session, partition) {
     const isPDFOrigin = mainFrameOrigin.startsWith(`${pdfjsOrigin}/`)
     let settings
     let tempSettings
-    if (requestingUrl === appUrlUtil.getBraveExtIndexHTML() || isPDFOrigin || isBraveOrigin) {
+    let requestingOrigin = getOrigin(requestingUrl)
+
+    if (requestingOrigin === appUrlUtil.getBraveExtIndexHTML() || isPDFOrigin || isBraveOrigin) {
       // lookup, display and store site settings by the origin alias
-      requestingUrl = isPDFOrigin ? 'PDF Viewer' : 'Brave Browser'
+      requestingOrigin = isPDFOrigin ? 'PDF Viewer' : 'Brave Browser'
       // display on all tabs
       mainFrameOrigin = null
       // Lookup by exact host pattern match since 'Brave Browser' is not
       // a parseable URL
-      settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), requestingUrl)
-      tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), requestingUrl)
-    } else if (requestingUrl.startsWith('magnet:')) {
+      settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), requestingOrigin)
+      tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), requestingOrigin)
+    } else if (requestingOrigin.startsWith('magnet:')) {
       // Show "Allow magnet URL to open an external application?", instead of
       // "Allow null to open an external application?"
       // This covers an edge case where you open a magnet link tab, then disable Torrent Viewer
       // and restart Brave. I don't think it needs localization. See 'Brave Browser' above.
-      requestingUrl = 'Magnet URL'
+      requestingOrigin = 'Magnet URL'
     } else {
-      // Strip trailing slash
-      requestingUrl = getOrigin(requestingUrl)
-      settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), requestingUrl)
-      tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), requestingUrl)
+      settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), requestingOrigin)
+      tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), requestingOrigin)
     }
 
     let response = []
 
-    if (requestingUrl == null) {
+    if (requestingOrigin == null) {
       response = new Array(permissionTypes.length)
       response.fill(false, 0, permissionTypes.length)
       muonCb(response)
@@ -497,7 +497,7 @@ function registerPermissionHandler (session, partition) {
 
       // Display 'Brave Browser' if the origin is null; ex: when a mailto: link
       // is opened in a new tab via right-click
-      const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, getOrigin(requestingUrl) || 'Brave Browser').replace(/{{\s*permission\s*}}/, permissions[permission].action)
+      const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, requestingOrigin || 'Brave Browser').replace(/{{\s*permission\s*}}/, permissions[permission].action)
 
       // If this is a duplicate, clear the previous callback and use the new one
       if (permissionCallbacks[message]) {
@@ -513,7 +513,7 @@ function registerPermissionHandler (session, partition) {
           ],
           frameOrigin: getOrigin(mainFrameOrigin),
           options: {
-            persist: !!requestingUrl,
+            persist: !!requestingOrigin,
             index: i
           },
           message
@@ -530,7 +530,7 @@ function registerPermissionHandler (session, partition) {
           response[index] = result
           if (persist) {
             // remember site setting for this host
-            appActions.changeSiteSetting(requestingUrl, permission + 'Permission', result, isPrivate)
+            appActions.changeSiteSetting(requestingOrigin, permission + 'Permission', result, isPrivate)
           }
           if (response.length === permissionTypes.length) {
             permissionCallbacks[message] = null
