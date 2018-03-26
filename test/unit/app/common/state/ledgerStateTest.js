@@ -609,4 +609,17 @@ describe('ledgerState unit test', function () {
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
   })
+
+  describe('getAboutProp', function () {
+    it('null case', function () {
+      const result = ledgerState.getAboutProp(defaultState)
+      assert.equal(result, null)
+    })
+
+    it('prop is set', function () {
+      const state = defaultState.setIn(['ledger', 'about', 'status'], 'corrupted')
+      const result = ledgerState.getAboutProp(state, 'status')
+      assert.equal(result, 'corrupted')
+    })
+  })
 })
