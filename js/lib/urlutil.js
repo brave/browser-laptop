@@ -87,8 +87,31 @@ const UrlUtil = {
     }
   },
 
-  isImageAddress (url) {
+  isImageAddress: function (url) {
     return (url.match(/\.(jpeg|jpg|gif|png|bmp)$/))
+  },
+
+  isDate: function (input) {
+    // Date.parse can aggressively attempt to convert strings
+    // to a date object, so a we should ensure that inputs that start
+    // with a '/' (local file path) or with a letter are not considered
+    // date representations
+    if (input.startsWith('/') || /^[a-zA-Z]$/.test(input.charAt(0))) {
+      return false
+    }
+
+    let parts = input.split('.')
+    let _isDate = !isNaN(Date.parse(input))
+
+    // Date.parse does not recognize dot delimited dates in
+    // the format of DD.MM.YYYY
+    // For the sake of eliminating false negatives, this converts
+    // them in to MM.DD.YYYY format and attempts to parse it in that format
+    if (!_isDate && parts.length === 3) {
+      return !isNaN(Date.parse(parts[1], parts[0], parts[2]))
+    } else {
+      return _isDate
+    }
   },
 
   /**
@@ -116,12 +139,20 @@ const UrlUtil = {
     const case3Reg = /[?./\s:]/
     // for cases, data:uri, view-source:uri and about
     const case4Reg = /^(data|view-source|mailto|about|chrome-extension|chrome-devtools|magnet|chrome):.*/
+    // for cases:
+    // - division expressions
+    // - arbitrary combinations of forward slashes and digits (should be deferred to a search engine)
+    // - (DOES NOT AFFECT) file urls only containing a number (/34/2/)
+    const case5Reg = /^\d[\d?=/\s]+$/
 
     let str = input.trim()
     const scheme = UrlUtil.getScheme(str)
 
     if (str.toLowerCase() === 'localhost') {
       return false
+    }
+    if (case5Reg.test(str)) {
+      return true
     }
     if (case1Reg.test(str)) {
       return true
@@ -135,6 +166,9 @@ const UrlUtil = {
     }
     if (scheme && (scheme !== fileScheme)) {
       return !caseDomain.test(str + '/')
+    }
+    if (UrlUtil.isDate(str)) {
+      return true
     }
     str = UrlUtil.prependScheme(str)
     return !UrlUtil.canParseURL(str)
