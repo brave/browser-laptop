@@ -281,7 +281,6 @@ class Main extends React.Component {
     if (this.lastLoadedSearchProviders === undefined || engine !== this.lastLoadedSearchProviders) {
       entries.forEach((entry) => {
         if (entry.name === engine) {
-        if (entry.name === engine) {
           appActions.defaultSearchEngineLoaded(Immutable.fromJS({
             searchURL: entry.search,
             privateSearchURL: entry.privateSearch,
@@ -321,7 +320,7 @@ class Main extends React.Component {
     // picture of what's happening.
 	//This has been disabled as it appears to mess around with how videos on netflix resize themself (https://github.com/brave/browser-laptop/issues/12870)
     /*if (prevProps.tabId !== this.props.tabId && this.props.isFullScreen) {
-      windowActions.setFullScreen(this.props.tabId, false)
+     // windowActions.setFullScreen(this.props.tabId, false)
     }*/
   }
 
