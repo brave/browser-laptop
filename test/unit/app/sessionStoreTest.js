@@ -12,7 +12,9 @@ const compareVersions = require('compare-versions')
 require('../braveUnit')
 
 describe('sessionStore unit tests', function () {
+  let filtering
   let sessionStore
+
   let shutdownClearHistory = false
   let shutdownClearAutocompleteData = false
   let shutdownClearAutofillData = false
@@ -38,6 +40,7 @@ describe('sessionStore unit tests', function () {
     }
   }
   const fakeFiltering = {
+    clearHSTSData: () => {},
     clearStorageData: () => {},
     clearCache: () => {},
     clearHistory: () => {}
@@ -90,6 +93,7 @@ describe('sessionStore unit tests', function () {
       }
     })
     mockery.registerMock('./filtering', fakeFiltering)
+    filtering = require('./filtering')
     sessionStore = require('../../../app/sessionStore')
   })
 
@@ -789,6 +793,7 @@ describe('sessionStore unit tests', function () {
     let localeInitSpy
     let backupSessionStub
     let runImportDefaultSettings
+    let clearHSTSDataSpy
 
     before(function () {
       runPreMigrationsSpy = sinon.spy(sessionStore, 'runPreMigrations')
@@ -798,6 +803,7 @@ describe('sessionStore unit tests', function () {
       localeInitSpy = sinon.spy(fakeLocale, 'init')
       backupSessionStub = sinon.stub(sessionStore, 'backupSession')
       runImportDefaultSettings = sinon.spy(sessionStore, 'runImportDefaultSettings')
+      clearHSTSDataSpy = sinon.spy(filtering, 'clearHSTSData')
     })
 
     after(function () {
@@ -807,6 +813,27 @@ describe('sessionStore unit tests', function () {
       runPostMigrationsSpy.restore()
       localeInitSpy.restore()
       backupSessionStub.restore()
+      clearHSTSDataSpy.restore()
+    })
+
+    describe('check clearHSTSData invocations', function () {
+      describe('if lastAppVersion is 0.23', function () {
+        it('clearHSTSData is not invoked', function () {
+          let exampleState = sessionStore.defaultAppState()
+          exampleState.lastAppVersion = '0.23'
+          sessionStore.runPreMigrations(exampleState)
+          assert.equal(clearHSTSDataSpy.notCalled, true)
+        })
+      })
+
+      describe('if lastAppVersion is 0.21', function () {
+        it('clearHSTSData is calledOnce', function () {
+          let exampleState = sessionStore.defaultAppState()
+          exampleState.lastAppVersion = '0.21'
+          sessionStore.runPreMigrations(exampleState)
+          assert.equal(clearHSTSDataSpy.calledOnce, true)
+        })
+      })
     })
 
     describe('when reading the session file', function () {
