@@ -20,6 +20,7 @@ const windowStore = require('../../../../js/stores/windowStore')
 
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
+const globalStyles = require('../styles/global')
 
 // Utils
 const dnd = require('../../../../js/dnd')
@@ -71,18 +72,22 @@ class PinnedTabs extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const pinnedFrames = frameStateUtil.getPinnedFrames(currentWindow) || Immutable.List()
+    const previewFrameKey = frameStateUtil.getPreviewFrameKey(currentWindow)
 
     const props = {}
     // used in renderer
     props.pinnedTabs = pinnedFrames.map((frame) => frame.get('key'))
-
+    props.isPreviewingPinnedTab = previewFrameKey && props.pinnedTabs.some(key => key === previewFrameKey)
     return props
   }
 
   render () {
     this.tabRefs = []
     return <div
-      className={css(styles.pinnedTabs)}
+      className={css(
+        styles.pinnedTabs,
+        this.props.isPreviewingPinnedTab && styles.pinnedTabs_previewing
+      )}
       data-test-id='pinnedTabs'
       onDragOver={this.onDragOver}
       onDrop={this.onDrop}
@@ -110,6 +115,10 @@ const styles = StyleSheet.create({
     position: 'relative',
     marginLeft: 0,
     marginTop: 0
+  },
+
+  pinnedTabs_previewing: {
+    zIndex: globalStyles.zindex.zindexTabs + 1
   }
 })
 
