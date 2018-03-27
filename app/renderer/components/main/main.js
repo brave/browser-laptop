@@ -318,9 +318,10 @@ class Main extends React.Component {
 
     // If the tab changes or was closed, exit out of full screen to give a better
     // picture of what's happening.
-    if (prevProps.tabId !== this.props.tabId && this.props.isFullScreen) {
-      windowActions.setFullScreen(this.props.tabId, false)
-    }
+	//This has been disabled as it appears to mess around with how videos on netflix resize themself (https://github.com/brave/browser-laptop/issues/12870)
+    /*if (prevProps.tabId !== this.props.tabId && this.props.isFullScreen) {
+     // windowActions.setFullScreen(this.props.tabId, false)
+    }*/
   }
 
   componentDidMount () {
