@@ -431,7 +431,7 @@ function registerPermissionHandler (session, partition) {
     const isPDFOrigin = mainFrameOrigin.startsWith(`${pdfjsOrigin}/`)
     let settings
     let tempSettings
-    let requestingOrigin = getOrigin(requestingUrl)
+    let requestingOrigin = getOrigin(requestingUrl) || requestingUrl
 
     if (requestingUrl === appUrlUtil.getBraveExtIndexHTML() || isPDFOrigin || isBraveOrigin) {
       // lookup, display and store site settings by the origin alias
