@@ -126,7 +126,7 @@ function registerForBeforeRequest (session, partition) {
       // Ledger media
       const provider = ledgerUtil.getMediaProvider(url, firstPartyUrl, details.referrer)
       if (provider) {
-        appActions.onLedgerMediaData(url, provider, details.tabId)
+        appActions.onLedgerMediaData(url, provider, details)
       }
     }
 

@@ -2578,12 +2578,17 @@ const deleteSynopsis = () => {
 }
 
 let currentMediaKey = null
-const onMediaRequest = (state, xhr, type, tabId) => {
+const onMediaRequest = (state, xhr, type, details) => {
   if (!xhr || type == null) {
     return state
   }
 
-  const parsed = ledgerUtil.getMediaData(xhr, type)
+  const tabId = details.get('tabId')
+  const parsed = ledgerUtil.getMediaData(xhr, type, details)
+  if (parsed == null) {
+    return state
+  }
+
   const mediaId = ledgerUtil.getMediaId(parsed, type)
 
   if (clientOptions.loggingP) {
