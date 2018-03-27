@@ -106,7 +106,7 @@ class Navigator extends React.Component {
     const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
     const activeTab = tabState.getByTabId(state, activeTabId) || Immutable.Map()
     const activeTabShowingMessageBox = !!(!activeTab.isEmpty() && tabState.isShowingMessageBox(state, activeTabId))
-    const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame)
+    const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrame.get('isPrivate'))
     const activeSiteSettings = siteSettings.getSiteSettingsForURL(allSiteSettings, activeFrame.get('location'))
     const braverySettings = siteSettings.activeSettings(activeSiteSettings, state, appConfig)
     const enabledExtensions = extensionState.getEnabledExtensions(state)
