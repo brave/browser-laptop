@@ -278,9 +278,10 @@ const api = {
           LocalShortcuts.unregister(win)
         })
         win.webContents.on('tab-inserted-at', (e, contents, index, active) => {
-          appActions.tabInsertedToTabStrip(win.id, contents.getId(), index)
+          const tabId = contents.getId()
+          appActions.tabInsertedToTabStrip(win.id, tabId, index)
           if (shouldDebugWindowEvents) {
-            console.log(`window had ${!active && 'in'}active tab inserted at index ${index}`)
+            console.log(`window ${win.id} had ${!active ? 'in' : ''}active tab ${tabId} inserted at index ${index}`)
           }
         })
         win.on('scroll-touch-begin', function (e) {

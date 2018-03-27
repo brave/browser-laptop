@@ -173,6 +173,18 @@ const windowActions = {
   },
 
   /**
+   * Dispatches a message to close a frame
+   *
+   * @param {Object} frameKey - Frame key of the frame to close
+   */
+  closeFrame: function (frameKey) {
+    dispatch({
+      actionType: windowConstants.WINDOW_CLOSE_FRAME,
+      frameKey
+    })
+  },
+
+  /**
    * Dispatches a message to close multiple frames
    * @param {Object[]} framePropsList - The properties of all frames to close
    */

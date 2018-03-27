@@ -69,14 +69,6 @@ const getTabValue = function (tabId) {
   }
 }
 
-const detachTab = (evt, tabId, index, windowId) => {
-  activeTabHistory.clearTabFromWindow(windowId, tabId)
-  // tell the old window the frame is gone from it
-  // as when it is not attached to a webview, it will not get
-  // a temporary new contents
-  appActions.tabRemovedFromWindow(tabId, windowId)
-}
-
 const updateTab = (tabId, changeInfo = {}) => {
   let tabValue = getTabValue(tabId)
   if (shouldDebugTabEvents) {
@@ -634,7 +626,20 @@ const api = {
         appActions.tabWillAttach(tab.getId())
       })
 
-      tab.on('tab-detached-at', detachTab)
+      tab.on('tab-detached-at', () => {
+        const tabValue = getTabValue(tabId)
+        const windowId = tabValue.get('windowId')
+        if (shouldDebugTabEvents) {
+          console.log(`tab ${tabId} detached from (probably wrong) window ${windowId}`)
+        }
+        // TODO: get correct windowId detached from in order to update state
+        // For now this is handled on the renderer
+        //activeTabHistory.clearTabFromWindow(windowId, tabId)
+        // tell the old window the frame is gone from it
+        // as when it is not attached to a webview, it will not get
+        // a temporary new contents
+        //appActions.tabRemovedFromWindow(tabId, windowId)
+      })
 
       tab.on('set-active', (sender, isActive) => {
         if (isActive) {
