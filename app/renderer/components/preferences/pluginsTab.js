@@ -24,25 +24,35 @@ const {SettingsList, SettingCheckbox} = require('../common/settings')
 const {DefaultSectionTitle} = require('../common/sectionTitle')
 
 class PluginsTab extends ImmutableComponent {
+  constructor (props) {
+    super(props)
+    this.onToggleFlash = this.onTogglePlugin.bind(this, 'flash')
+    this.onToggleWidevine = this.onTogglePlugin.bind(this, 'widevine')
+  }
+
   get flashInstalled () {
     return getSetting(settings.FLASH_INSTALLED, this.props.settings)
   }
 
-  onToggleFlash (e) {
-    aboutActions.setResourceEnabled(flash, e.target.value)
-    if (e.target.value !== true) {
-      // When flash is disabled, clear flash approvals
-      aboutActions.clearSiteSettings('flash', {
-        temporary: true
-      })
-      aboutActions.clearSiteSettings('flash', {
-        temporary: false
-      })
+  onTogglePlugin (plugin, e) {
+    switch (plugin) {
+      case 'widevine':
+        aboutActions.setResourceEnabled(widevine, e.target.value)
+        break
+      case 'flash':
+        aboutActions.setResourceEnabled(flash, e.target.value)
+        if (e.target.value !== true) {
+          // When flash is disabled, clear flash approvals
+          aboutActions.clearSiteSettings('flash', {
+            temporary: true
+          })
+          aboutActions.clearSiteSettings('flash', {
+            temporary: false
+          })
+        }
+        break
     }
-  }
-
-  onToggleWidevine (e) {
-    aboutActions.setResourceEnabled(widevine, e.target.value)
+    aboutActions.requireRestart()
   }
 
   infoCircle (url) {

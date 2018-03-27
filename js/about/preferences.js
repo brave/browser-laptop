@@ -604,7 +604,7 @@ class AboutPreferences extends React.Component {
       settings.SPELLCHECK_LANGUAGES
     ]
     if (settingsRequiringRestart.includes(key)) {
-      ipc.send(messages.PREFS_RESTART, key, value)
+      aboutActions.requireRestart(key, value)
     }
     if (key === settings.PAYMENTS_ENABLED && value === true) {
       this.createWallet()
