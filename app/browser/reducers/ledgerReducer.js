@@ -418,7 +418,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_LEDGER_MEDIA_DATA:
       {
-        state = ledgerApi.onMediaRequest(state, action.get('url'), action.get('type'), action.get('tabId'))
+        state = ledgerApi.onMediaRequest(state, action.get('url'), action.get('type'), action.get('details'))
         break
       }
     case appConstants.APP_ON_PRUNE_SYNOPSIS:
