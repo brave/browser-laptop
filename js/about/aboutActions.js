@@ -105,8 +105,8 @@ const aboutActions = {
   /**
    * Dispatches a message to trigger a browser restart notification
    */
-  requireRestart: function () {
-    ipc.send(messages.PREFS_RESTART)
+  requireRestart: function (key = null, value = null) {
+    ipc.send(messages.PREFS_RESTART, key, value)
   },
 
   /**
