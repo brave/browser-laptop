@@ -11,7 +11,7 @@ user-session=ubuntu
 greeter-session=unity-greeter' >/etc/lightdm/lightdm.conf"
 sudo apt-get install -y git
 sudo apt-get install -y curl
-curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 sudo apt-get install -y nodejs
 sudo npm install -g node-gyp@3.2.1
 sudo service lightdm start
