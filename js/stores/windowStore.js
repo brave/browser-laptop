@@ -317,15 +317,23 @@ const doAction = (action) => {
           runInsecureContent: false
         })
         // Update loading UI
-        windowState = windowState.mergeIn(statePath('frames'), {
+        const isNewTabUrl = action.location === getTargetAboutUrl('about:newtab')
+        const frameUpdatedData = {
           loading: true,
           provisionalLocation: action.location,
           startLoadTime: new Date().getTime(),
           endLoadTime: null
-        })
+        }
+        // Optimization to prevent flash of tab color
+        // when creating new tabs.
+        if (isNewTabUrl) {
+          frameUpdatedData.themeColor = '#222222'
+          frameUpdatedData.computedThemeColor = undefined
+        }
+        windowState = windowState.mergeIn(statePath('frames'), frameUpdatedData)
         // For about:newtab we want to have the urlbar focused, not the new frame.
         // Otherwise we want to focus the new tab when it is a new frame in the foreground.
-        if (action.location !== getTargetAboutUrl('about:newtab')) {
+        if (!isNewTabUrl) {
           focusWebview()
         }
         break

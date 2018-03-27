@@ -83,7 +83,6 @@ const frameReducer = (state, action, immutableAction) => {
     case appConstants.APP_TAB_INSERTED_TO_TAB_STRIP: {
       const tabId = immutableAction.get('tabId')
       const index = frameStateUtil.getIndexByTabId(state, tabId)
-      let frame = frameStateUtil.getFrameByTabId(state, tabId)
       if (index === -1) {
         console.error('frame not found for tab inserted to tab strip', tabId, state.get('frames').toJS())
         break
@@ -228,24 +227,28 @@ const frameReducer = (state, action, immutableAction) => {
       if (!framePath) {
         break
       }
-      state = state.mergeIn(framePath, {
+      const isNewTabUrl = action.location === 'about:newtab'
+      let frameUpdateData = {
         location: action.location
-      })
+      }
       if (!action.isNavigatedInPage) {
-        state = state.mergeIn(framePath, {
+        frameUpdateData = {
           adblock: {},
           audioPlaybackActive: false,
-          computedThemeColor: undefined,
           httpsEverywhere: {},
           icon: undefined,
           location: action.location,
           noScript: {},
-          themeColor: undefined,
           title: '',
           trackingProtection: {},
           fingerprintingProtection: {}
-        })
+        }
+        if (!isNewTabUrl) {
+          frameUpdateData.computedThemeColor = undefined
+          frameUpdateData.themeColor = undefined
+        }
       }
+      state = state.mergeIn(framePath, frameUpdateData)
       // For potential phishing pages, show a warning
       state = state.setIn(['ui', 'siteInfo', 'isVisible'],
         isPotentialPhishingUrl(action.location) && frameStateUtil.isFrameKeyActive(state, action.key))
