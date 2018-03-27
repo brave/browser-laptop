@@ -442,12 +442,6 @@ function registerPermissionHandler (session, partition) {
       // a parseable URL
       settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), requestingOrigin)
       tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), requestingOrigin)
-    } else if (requestingOrigin.startsWith('magnet:')) {
-      // Show "Allow magnet URL to open an external application?", instead of
-      // "Allow null to open an external application?"
-      // This covers an edge case where you open a magnet link tab, then disable Torrent Viewer
-      // and restart Brave. I don't think it needs localization. See 'Brave Browser' above.
-      requestingOrigin = 'Magnet URL'
     } else {
       settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), requestingOrigin)
       tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), requestingOrigin)
@@ -469,7 +463,7 @@ function registerPermissionHandler (session, partition) {
       if (!permissions[permission]) {
         console.warn('WARNING: got unregistered permission request', permission)
         response.push(false)
-      } else if (permission === 'fullscreen' &&
+      } else if (permission === 'fullscreen' && mainFrameOrigin &&
         // The Torrent Viewer extension is always allowed to show fullscreen media
         mainFrameOrigin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
         response.push(true)
