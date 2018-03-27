@@ -862,9 +862,15 @@ const api = {
     if (tab && !tab.isDestroyed()) {
       let url = normalizeUrl(action.get('url'))
       // We only allow loading URLs explicitly when the origin is
-      // the same for pinned tabs.  This is to help preserve a users
-      // pins.
-      if (tab.pinned && getOrigin(tab.getURL()) !== getOrigin(url)) {
+      // the same for pinned tabs, or it's an intermediate error.
+      // This is to help preserve a users pins.
+      if (
+        tab.pinned &&
+        // is different origin
+        getOrigin(tab.getURL()) !== getOrigin(url) &&
+        // is not error page
+        !isIntermediateAboutPage(action.get('url'))
+      ) {
         api.create({
           url,
           partition: tab.session.partition
