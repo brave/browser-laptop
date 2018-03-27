@@ -860,11 +860,12 @@ const api = {
     const tabId = action.get('tabId')
     const tab = webContentsCache.getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
-      let url = normalizeUrl(action.get('url'))
+      const url = normalizeUrl(action.get('url'))
+      const currentUrl = tab.getURL()
       // We only allow loading URLs explicitly when the origin is
       // the same for pinned tabs.  This is to help preserve a users
       // pins.
-      if (tab.pinned && getOrigin(tab.getURL()) !== getOrigin(url)) {
+      if (tab.pinned && getOrigin(currentUrl) !== getOrigin(url)) {
         api.create({
           url,
           partition: tab.session.partition
@@ -872,7 +873,12 @@ const api = {
         return
       }
 
-      tab.loadURL(url)
+      const reloadMatchingUrl = action.get('reloadMatchingUrl') || false
+      if (reloadMatchingUrl && currentUrl === url) {
+        tab.reload(true)
+      } else {
+        tab.loadURL(url)
+      }
     }
   },
 
