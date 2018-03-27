@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
       left: 'var(--tab-mouse-x)',
       top: 0,
       bottom: 0,
-      width: 'calc(190px * var(--tab-mouse-opacity, 0))',
+      width: 'calc(100% * var(--tab-mouse-opacity, 0))',
       background: `radial-gradient(
         circle farthest-corner,
         var(--tab-background-hover),
