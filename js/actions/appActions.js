@@ -255,12 +255,14 @@ const appActions = {
    * A request for a URL load
    * @param {number} tabId - the tab ID to load the URL inside of
    * @param {string} url - The url to load
+   * @param {boolean} reloadMatchingUrl - would you like to force reload provided tab
    */
-  loadURLRequested: function (tabId, url) {
+  loadURLRequested: function (tabId, url, reloadMatchingUrl) {
     dispatch({
       actionType: appConstants.APP_LOAD_URL_REQUESTED,
       tabId,
-      url
+      url,
+      reloadMatchingUrl
     })
   },
 
