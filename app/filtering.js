@@ -486,6 +486,9 @@ function registerPermissionHandler (session, partition) {
       if (!permissions[permission]) {
         console.warn('WARNING: got unregistered permission request', permission)
         response.push(false)
+      } else if (permission === 'geolocation' && partition === appConfig.tor.partition) {
+        // Never allow geolocation in Tor mode
+        response.push(false)
       } else if (isFullscreen && mainFrameOrigin &&
         // The Torrent Viewer extension is always allowed to show fullscreen media
         mainFrameOrigin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
