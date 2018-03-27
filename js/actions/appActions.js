@@ -1897,12 +1897,12 @@ const appActions = {
     })
   },
 
-  onLedgerMediaData: function (url, type, tabId) {
+  onLedgerMediaData: function (url, type, details) {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_MEDIA_DATA,
       url,
       type,
-      tabId
+      details
     })
   },
 
