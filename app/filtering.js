@@ -433,7 +433,7 @@ function registerPermissionHandler (session, partition) {
     let tempSettings
     let requestingOrigin = getOrigin(requestingUrl)
 
-    if (requestingOrigin === appUrlUtil.getBraveExtIndexHTML() || isPDFOrigin || isBraveOrigin) {
+    if (requestingUrl === appUrlUtil.getBraveExtIndexHTML() || isPDFOrigin || isBraveOrigin) {
       // lookup, display and store site settings by the origin alias
       requestingOrigin = isPDFOrigin ? 'PDF Viewer' : 'Brave Browser'
       // display on all tabs
