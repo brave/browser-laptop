@@ -364,18 +364,6 @@ function registerForHeadersReceived (session, partition) {
       muonCb({ cancel: true })
       return
     }
-
-    let parsedTargetUrl = urlParse(details.url || '')
-    let parsedFirstPartyUrl = urlParse(firstPartyUrl)
-    const trackableSecurityHeaders = ['Strict-Transport-Security', 'Expect-CT',
-      'Public-Key-Pins', 'Public-Key-Pins-Report-Only']
-    if (isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
-      trackableSecurityHeaders.forEach(function (header) {
-        delete details.responseHeaders[header]
-        delete details.responseHeaders[header.toLowerCase()]
-      })
-    }
-
     for (let i = 0; i < headersReceivedFilteringFns.length; i++) {
       let results = headersReceivedFilteringFns[i](details, isPrivate)
       if (!module.exports.isResourceEnabled(results.resourceName, firstPartyUrl, isPrivate)) {
@@ -840,15 +828,6 @@ module.exports.clearStorageData = () => {
     let ses = registeredSessions[partition]
     setImmediate(() => {
       ses.clearStorageData.bind(ses)(() => {})
-    })
-  }
-}
-
-module.exports.clearHSTSData = () => {
-  for (let partition in registeredSessions) {
-    let ses = registeredSessions[partition]
-    setImmediate(() => {
-      ses.clearHSTSData.bind(ses)(() => {})
     })
   }
 }
