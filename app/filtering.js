@@ -446,33 +446,26 @@ function registerPermissionHandler (session, partition) {
       const isOpenExternal = permission === 'openExternal'
 
       let requestingOrigin
-      let settings
-      let tempSettings
 
       if (requestingUrl === appUrlUtil.getBraveExtIndexHTML() || isPDFOrigin || isBraveOrigin) {
         // lookup, display and store site settings by the origin alias
         requestingOrigin = isPDFOrigin ? 'PDF Viewer' : 'Brave Browser'
         // display on all tabs
         mainFrameOrigin = null
-        // Lookup by exact host pattern match since 'Brave Browser' is not
-        // a parseable URL
-        settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), requestingOrigin)
-        tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), requestingOrigin)
       } else if (isOpenExternal) {
         // Open external is a special case since we want to apply the permission
         // for the entire scheme to avoid cluttering the saved permissions. See
         // https://github.com/brave/browser-laptop/issues/13642
         const protocol = urlParse(requestingUrl).protocol
         requestingOrigin = protocol ? `${protocol} URLs` : requestingUrl
-        // Lookup by exact host pattern match since getSiteSettingsForURL
-        // does not correctly handle protocols without slashes like mailto:
-        settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), requestingOrigin)
-        tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), requestingOrigin)
       } else {
         requestingOrigin = getOrigin(requestingUrl) || requestingUrl
-        settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), requestingOrigin)
-        tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), requestingOrigin)
       }
+
+      // Look up by host pattern since requestingOrigin is not necessarily
+      // a parseable URL
+      const settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), requestingOrigin)
+      const tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), requestingOrigin)
 
       if (!permissions[permission]) {
         console.warn('WARNING: got unregistered permission request', permission)
