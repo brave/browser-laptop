@@ -823,15 +823,9 @@ module.exports.runPreMigrations = (data) => {
   }
 
   if (data.lastAppVersion) {
-    let runHSTSCleanup = false
-    try { runHSTSCleanup = compareVersions(data.lastAppVersion, '0.22.00') < 1 } catch (e) {}
-
-    if (runHSTSCleanup) {
-      filtering.clearHSTSData()
-    }
-
     // Force WidevineCdm to be upgraded when last app version <= 0.18.25
     let runWidevineCleanup = false
+
     try { runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1 } catch (e) {}
 
     if (runWidevineCleanup) {
