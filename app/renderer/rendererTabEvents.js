@@ -58,11 +58,7 @@ const api = module.exports = {
   handleTabEvent (tabId, eventType, e) {
     switch (eventType) {
       case 'tab-detached-at': {
-        const frame = getFrameByTabId(tabId)
-        if (!frame) {
-          break
-        }
-        windowActions.closeFrame(frame.get('frameKey'))
+        windowActions.removeFrame(tabId)
         break
       }
       case 'content-blocked': {

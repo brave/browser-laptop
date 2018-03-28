@@ -20,7 +20,7 @@ const webviewActions = require('../../../../js/actions/webviewActions')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 // utils
-const {isFocused} = require('../../currentWindow')
+const {getCurrentWindowId, isFocused} = require('../../currentWindow')
 
 class GuestInstanceRenderer extends React.Component {
   constructor (props) {
@@ -32,10 +32,11 @@ class GuestInstanceRenderer extends React.Component {
     const frameKey = ownProps.frameKey
     const frame = frameStateUtil.getFrameByKey(state.get('currentWindow'), frameKey)
     const location = frame && frame.get('location')
+    const frameIsInWindow = frame && frame.get('tabStripWindowId') === getCurrentWindowId()
 
     const props = {
-      guestInstanceId: frame && frame.get('guestInstanceId'),
-      tabId: frame && frame.get('tabId'),
+      guestInstanceId: frameIsInWindow && frame.get('guestInstanceId'),
+      tabId: frameIsInWindow && frame.get('tabId'),
       isDefaultNewTabLocation: location === 'about:newtab',
       isBlankLocation: location === 'about:blank',
       isPlaceholder: frame && frame.get('isPlaceholder'),
@@ -48,17 +49,14 @@ class GuestInstanceRenderer extends React.Component {
   }
 
   componentDidMount () {
-    const nextTabId = this.props.nextTabId
-    if (nextTabId != null && this.webviewDisplay) {
-      console.log(`(mount) Going to display tab ${this.props.tabId}, guest instance ID ${this.props.guestInstanceId}`)
-      this.webviewDisplay.attachActiveTab(nextTabId)
-    } else {
-      console.log('could not attach on mount', nextTabId, this.webviewDisplay)
-    }
     this.onPropsChanged()
   }
 
   componentDidUpdate (prevProps, prevState) {
+    this.onPropsChanged(prevProps)
+  }
+
+  onPropsChanged (prevProps = {}) {
     // attach new guest instance
     if (this.webviewDisplay && this.props.tabId && prevProps.tabId !== this.props.tabId) {
       if (!this.props.isPlaceholder) {
@@ -67,10 +65,6 @@ class GuestInstanceRenderer extends React.Component {
         console.log('placeholder, not showing')
       }
     }
-    this.onPropsChanged(prevProps)
-  }
-
-  onPropsChanged (prevProps = {}) {
     // update state of which frame is currently being viewed
     if (this.props.tabId !== prevProps.tabId && this.props.windowIsFocused) {
       windowActions.setFocusedFrame(this.props.frameLocation, this.props.tabId)

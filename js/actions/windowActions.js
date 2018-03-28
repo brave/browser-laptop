@@ -177,10 +177,10 @@ const windowActions = {
    *
    * @param {Object} frameKey - Frame key of the frame to close
    */
-  closeFrame: function (frameKey) {
+  removeFrame: function (tabId) {
     dispatch({
-      actionType: windowConstants.WINDOW_CLOSE_FRAME,
-      frameKey
+      actionType: windowConstants.WINDOW_REMOVE_FRAME,
+      tabId
     })
   },
 

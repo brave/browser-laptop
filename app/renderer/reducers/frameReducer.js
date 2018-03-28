@@ -92,7 +92,7 @@ const frameReducer = (state, action, immutableAction) => {
       })
       break
     }
-    case appConstants.APP_TAB_REMOVED_FROM_WINDOW:
+    case windowConstants.WINDOW_REMOVE_FRAME:
     case appConstants.APP_TAB_CLOSED: {
       const tabId = immutableAction.get('tabId')
       const frame = frameStateUtil.getFrameByTabId(state, tabId)

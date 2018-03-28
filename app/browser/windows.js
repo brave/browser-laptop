@@ -27,6 +27,7 @@ const pinnedSitesState = require('../common/state/pinnedSitesState')
 const {zoomLevel} = require('../common/constants/toolbarUserInterfaceScale')
 const { shouldDebugWindowEvents, disableBufferWindow, disableDeferredWindowLoad } = require('../cmdLine')
 const activeTabHistory = require('./activeTabHistory')
+const webContentsCache = require('./webContentsCache')
 
 const isDarwin = platformUtil.isDarwin()
 const isWindows = platformUtil.isWindows()
@@ -210,8 +211,12 @@ function openFramesInWindow (win, frames, activeFrameKey) {
     let frameIndex = -1
     for (const frame of frames) {
       frameIndex++
-      if (frame.guestInstanceId) {
+      if (frame.tabId != null && frame.guestInstanceId != null) {
         api.notifyWindowWebContentsAdded(win.id, frame)
+        const tab = webContentsCache.getWebContents(frame.tabId)
+        if (tab && !tab.isDestroyed()) {
+          tab.moveTo(frameIndex, win.id)
+        }
       } else {
         appActions.createTabRequested({
           windowId: win.id,
@@ -283,6 +288,17 @@ const api = {
           if (shouldDebugWindowEvents) {
             console.log(`window ${win.id} had ${!active ? 'in' : ''}active tab ${tabId} inserted at index ${index}`)
           }
+        })
+        win.webContents.on('tab-strip-empty', () => {
+          // must wait for pending tabs to be attached to new window before closing
+          // TODO(petemill): race condition if multiple different tabs are moved at the same time
+          // ...tab-strip-empty may fire before all of those tabs are inserted to new window
+          win.webContents.once('detached-tab-new-window', () => {
+            if (shouldDebugWindowEvents) {
+              console.log('departing tab made it to new window')
+            }
+            api.closeWindow(win.id)
+          })
         })
         win.on('scroll-touch-begin', function (e) {
           win.webContents.send('scroll-touch-begin')
