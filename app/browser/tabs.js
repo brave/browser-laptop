@@ -40,6 +40,8 @@ const ledgerState = require('../common/state/ledgerState')
 const {getWindow} = require('./windows')
 const activeTabHistory = require('./activeTabHistory')
 const path = require('path')
+const {channel} = require('../channel')
+const fs = require('fs')
 
 let adBlockRegions
 let currentPartitionNumber = 0
@@ -1019,9 +1021,36 @@ const api = {
           createProperties.parent_partition = ''
         }
         if (createProperties.isTor) {
+          // TODO(riastradh): Duplicate logic in app/filtering.js.
           createProperties.isolated_storage = true
           createProperties.parent_partition = ''
-          createProperties.tor_proxy = 'socks5://127.0.0.1:9050'
+          let portno
+          switch (channel()) {
+            case 'dev':
+            case '':
+            default:
+              portno = 9250
+              break
+            case 'beta':
+              portno = 9260
+              break
+            case 'nightly':
+              portno = 9270
+              break
+            case 'developer':
+              portno = 9280
+              break
+          }
+          console.log(`channel ${channel()} tor port ${portno}`)
+          createProperties.tor_proxy = `socks5://127.0.0.1:${portno}`
+          const etcDir = getExtensionsPath('etc')
+          try {
+            fs.mkdirSync(path.join(etcDir, 'tor'), 0o0700)
+          } catch (e) {
+            // TODO(riastradh): Report errors other than EEXIST.
+          }
+          createProperties.tor_data_dir = path.join(etcDir, 'tor', 'data')
+          console.log(`tor_data_dir ${createProperties.tor_data_dir}`)
           if (process.platform === 'win32') {
             createProperties.tor_path = '"' + path.join(getExtensionsPath('bin'), 'tor.exe') + '"'
           } else {

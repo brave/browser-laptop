@@ -35,6 +35,8 @@ const extensionState = require('./common/state/extensionState')
 const ledgerUtil = require('./common/lib/ledgerUtil')
 const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
 const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
+const {channel} = require('./channel')
+const fs = require('fs')
 
 let appStore = null
 
@@ -700,9 +702,35 @@ const initPartition = (partition) => {
     options.parent_partition = ''
   }
   if (isTorPartition) {
+    // TODO(riastradh): Duplicate logic in app/browser/tabs.js.
     options.isolated_storage = true
     options.parent_partition = ''
-    options.tor_proxy = 'socks5://127.0.0.1:9050'
+    let portno
+    switch (channel()) {
+      case 'dev':
+      case '':
+      default:
+        portno = 9250
+        break
+      case 'beta':
+        portno = 9260
+        break
+      case 'nightly':
+        portno = 9270
+        break
+      case 'developer':
+        portno = 9280
+        break
+    }
+    console.log(`channel ${channel()} tor port ${portno}`)
+    options.tor_proxy = `socks5://127.0.0.1:${portno}`
+    const etcDir = getExtensionsPath('etc')
+    try {
+      fs.mkdirSync(path.join(etcDir, 'tor'), 0o0700)
+    } catch (e) {
+      // TODO(riastradh): Report errors other than EEXIST.
+    }
+    options.tor_data_dir = path.join(etcDir, 'tor', 'data')
     if (process.platform === 'win32') {
       options.tor_path = '"' + path.join(getExtensionsPath('bin'), 'tor.exe') + '"'
     } else {
