@@ -414,6 +414,15 @@ const createBookmarksSubmenu = (state) => {
     submenu = submenu.concat(bookmarks)
   }
 
+  const otherBookmarks = menuUtil.createOtherBookmarkTemplateItems(state)
+  if (otherBookmarks.length > 0) {
+    submenu.push(CommonMenu.separatorMenuItem)
+    submenu.push({
+      label: locale.translation('otherBookmarks'),
+      submenu: otherBookmarks
+    })
+  }
+
   return submenu
 }
 
