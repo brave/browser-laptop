@@ -134,6 +134,7 @@ var rendererIdentifiers = function () {
     'recentlyClosed',
     'recentlyVisited',
     'bookmarks',
+    'otherBookmarks',
     'addToFavoritesBar',
     'window',
     'minimize',
