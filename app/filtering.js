@@ -722,15 +722,14 @@ const initPartition = (partition) => {
         portno = 9280
         break
     }
-    console.log(`channel ${channel()} tor port ${portno}`)
     options.tor_proxy = `socks5://127.0.0.1:${portno}`
-    const etcDir = getExtensionsPath('etc')
+    const userDataDir = app.getPath('userData')
     try {
-      fs.mkdirSync(path.join(etcDir, 'tor'), 0o0700)
+      fs.mkdirSync(path.join(userDataDir, 'tor'), 0o0700)
     } catch (e) {
       // TODO(riastradh): Report errors other than EEXIST.
     }
-    options.tor_data_dir = path.join(etcDir, 'tor', 'data')
+    options.tor_data_dir = path.join(userDataDir, 'tor', 'data')
     if (process.platform === 'win32') {
       options.tor_path = '"' + path.join(getExtensionsPath('bin'), 'tor.exe') + '"'
     } else {
