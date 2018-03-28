@@ -429,27 +429,9 @@ function registerPermissionHandler (session, partition) {
     const appState = appStore.getState()
     const isBraveOrigin = mainFrameOrigin.startsWith(`chrome-extension://${config.braveExtensionId}/`)
     const isPDFOrigin = mainFrameOrigin.startsWith(`${pdfjsOrigin}/`)
-    let settings
-    let tempSettings
-    let requestingOrigin = getOrigin(requestingUrl) || requestingUrl
-
-    if (requestingUrl === appUrlUtil.getBraveExtIndexHTML() || isPDFOrigin || isBraveOrigin) {
-      // lookup, display and store site settings by the origin alias
-      requestingOrigin = isPDFOrigin ? 'PDF Viewer' : 'Brave Browser'
-      // display on all tabs
-      mainFrameOrigin = null
-      // Lookup by exact host pattern match since 'Brave Browser' is not
-      // a parseable URL
-      settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), requestingOrigin)
-      tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), requestingOrigin)
-    } else {
-      settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), requestingOrigin)
-      tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), requestingOrigin)
-    }
-
     let response = []
 
-    if (requestingOrigin == null) {
+    if (!requestingUrl) {
       response = new Array(permissionTypes.length)
       response.fill(false, 0, permissionTypes.length)
       muonCb(response)
@@ -460,17 +442,49 @@ function registerPermissionHandler (session, partition) {
       const responseSizeThisIteration = response.length
       const permission = permissionTypes[i]
       const alwaysAllowFullscreen = module.exports.alwaysAllowFullscreen() === fullscreenOption.ALWAYS_ALLOW
+      const isFullscreen = permission === 'fullscreen'
+      const isOpenExternal = permission === 'openExternal'
+
+      let requestingOrigin
+      let settings
+      let tempSettings
+
+      if (requestingUrl === appUrlUtil.getBraveExtIndexHTML() || isPDFOrigin || isBraveOrigin) {
+        // lookup, display and store site settings by the origin alias
+        requestingOrigin = isPDFOrigin ? 'PDF Viewer' : 'Brave Browser'
+        // display on all tabs
+        mainFrameOrigin = null
+        // Lookup by exact host pattern match since 'Brave Browser' is not
+        // a parseable URL
+        settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), requestingOrigin)
+        tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), requestingOrigin)
+      } else if (isOpenExternal) {
+        // Open external is a special case since we want to apply the permission
+        // for the entire scheme to avoid cluttering the saved permissions. See
+        // https://github.com/brave/browser-laptop/issues/13642
+        const protocol = urlParse(requestingUrl).protocol
+        requestingOrigin = protocol ? `${protocol} URLs` : requestingUrl
+        // Lookup by exact host pattern match since getSiteSettingsForURL
+        // does not correctly handle protocols without slashes like mailto:
+        settings = siteSettings.getSiteSettingsForHostPattern(appState.get('siteSettings'), requestingOrigin)
+        tempSettings = siteSettings.getSiteSettingsForHostPattern(appState.get('temporarySiteSettings'), requestingOrigin)
+      } else {
+        requestingOrigin = getOrigin(requestingUrl) || requestingUrl
+        settings = siteSettings.getSiteSettingsForURL(appState.get('siteSettings'), requestingOrigin)
+        tempSettings = siteSettings.getSiteSettingsForURL(appState.get('temporarySiteSettings'), requestingOrigin)
+      }
+
       if (!permissions[permission]) {
         console.warn('WARNING: got unregistered permission request', permission)
         response.push(false)
-      } else if (permission === 'fullscreen' && mainFrameOrigin &&
+      } else if (isFullscreen && mainFrameOrigin &&
         // The Torrent Viewer extension is always allowed to show fullscreen media
         mainFrameOrigin.startsWith('chrome-extension://' + config.torrentExtensionId)) {
         response.push(true)
-      } else if (permission === 'fullscreen' && alwaysAllowFullscreen) {
+      } else if (isFullscreen && alwaysAllowFullscreen) {
         // Always allow fullscreen if setting is ON
         response.push(true)
-      } else if (permission === 'openExternal' && (
+      } else if (isOpenExternal && (
         // The Brave extension and PDFJS are always allowed to open files in an external app
         isPDFOrigin || isBraveOrigin)) {
         response.push(true)
@@ -489,9 +503,7 @@ function registerPermissionHandler (session, partition) {
         }
       }
 
-      // Display 'Brave Browser' if the origin is null; ex: when a mailto: link
-      // is opened in a new tab via right-click
-      const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, requestingOrigin || 'Brave Browser').replace(/{{\s*permission\s*}}/, permissions[permission].action)
+      const message = locale.translation('permissionMessage').replace(/{{\s*host\s*}}/, requestingOrigin).replace(/{{\s*permission\s*}}/, permissions[permission].action)
 
       // If this is a duplicate, clear the previous callback and use the new one
       if (permissionCallbacks[message]) {
