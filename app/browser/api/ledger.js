@@ -193,8 +193,13 @@ const paymentPresent = (state, tabId, present) => {
 
 const checkSeed = (state) => {
   const seed = ledgerState.getInfoProp(state, 'passphrase')
+  let localClient = client
 
-  if (seed && !client.isValidPassPhrase(seed)) {
+  if (!localClient) {
+    localClient = require('bat-client')
+  }
+
+  if (seed && localClient && !localClient.isValidPassPhrase(seed)) {
     state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.CORRUPTED_SEED)
   }
 
