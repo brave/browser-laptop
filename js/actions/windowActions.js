@@ -53,36 +53,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to change the frame tabId
-   * @param {Object} frameProps - The frame properties
-   * @param {Number} oldTabId - the current tabId
-   * @param {Number} newTabId - the new tabId
-   */
-  frameTabIdChanged: function (frameProps, oldTabId, newTabId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_FRAME_TAB_ID_CHANGED,
-      frameProps,
-      oldTabId,
-      newTabId
-    })
-  },
-
-  /**
-   * Dispatches a message when the guestInstanceId changes for a frame
-   * @param {Object} frameProps - The frame properties
-   * @param {Number} oldGuestInstanceId - the current guestInstanceId
-   * @param {Number} newGuestInstanceId - the new guestInstanceId
-   */
-  frameGuestInstanceIdChanged: function (frameProps, oldGuestInstanceId, newGuestInstanceId) {
-    dispatch({
-      actionType: windowConstants.WINDOW_FRAME_GUEST_INSTANCE_ID_CHANGED,
-      frameProps,
-      oldGuestInstanceId,
-      newGuestInstanceId
-    })
-  },
-
-  /**
    * Dispatches a message to set the frame error state
    * @param {Object} frameProps - The frame properties
    * @param {Object} errorDetails - The error properties

@@ -170,16 +170,15 @@ const newFrame = (state, frameOpts) => {
   return state
 }
 
-const frameTabIdChanged = (state, action) => {
+const frameTabReplaced = (state, action) => {
   action = makeImmutable(action)
   const oldTabId = action.get('oldTabId')
   const newTabValue = action.get('newTabValue')
   const newTabId = newTabValue.get('tabId')
   if (newTabId == null || oldTabId === newTabId) {
-    console.error('Invalid action arguments for frameTabIdChanged')
+    console.error('Invalid action arguments for frameTabReplaced')
     return state
   }
-
   let newFrameProps = new Immutable.Map()
   newFrameProps = newFrameProps.set('tabId', newTabId)
   newFrameProps = newFrameProps.set('guestInstanceId', newTabValue.get('guestInstanceId'))
@@ -194,19 +193,6 @@ const frameTabIdChanged = (state, action) => {
   state = frameStateUtil.deleteTabInternalIndex(state, oldTabId)
   state = frameStateUtil.updateFramesInternalIndex(state, index)
   return state
-}
-
-const frameGuestInstanceIdChanged = (state, action) => {
-  action = makeImmutable(action)
-  const oldGuestInstanceId = action.get('oldGuestInstanceId')
-  const newGuestInstanceId = action.get('newGuestInstanceId')
-  if (oldGuestInstanceId === newGuestInstanceId) {
-    return state
-  }
-  console.log('Frame guest instance id changed', { oldGuestInstanceId, newGuestInstanceId })
-  return state.mergeIn(['frames', frameStateUtil.getFrameIndex(state, action.getIn(['frameProps', 'key']))], {
-    guestInstanceId: newGuestInstanceId
-  })
 }
 
 function handleChangeSettingAction (state, settingKey, settingValue) {
@@ -272,10 +258,7 @@ const doAction = (action) => {
       // We should not emit here because the Window already know about the change on startup.
       return
     case appConstants.APP_TAB_REPLACED:
-      windowState = frameTabIdChanged(windowState, action)
-      break
-    case windowConstants.WINDOW_FRAME_GUEST_INSTANCE_ID_CHANGED:
-      windowState = frameGuestInstanceIdChanged(windowState, action)
+      windowState = frameTabReplaced(windowState, action)
       break
     case windowConstants.WINDOW_SET_FRAME_ERROR:
       const frameKey = action.frameProps.get('key')
