@@ -142,6 +142,13 @@ const windowActions = {
     })
   },
 
+  frameGuestReady: function (tabId) {
+    dispatch({
+      actionType: windowConstants.WINDOW_FRAME_GUEST_READY,
+      tabId
+    })
+  },
+
   /**
    * Dispatches a message to close a frame
    *

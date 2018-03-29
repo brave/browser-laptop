@@ -765,7 +765,7 @@ class Main extends React.Component {
           ? <FullScreenWarning location={this.props.location} />
           : null
         }
-        <GuestInstanceRenderer frameKey={this.props.previewFrameKey != null ? this.props.previewFrameKey : this.props.activeFrameKey} />
+        <GuestInstanceRenderer isPreview={!!this.props.previewFrameKey} frameKey={this.props.previewFrameKey != null ? this.props.previewFrameKey : this.props.activeFrameKey} />
         <HrefPreview frameKey={this.props.activeFrameKey} />
         {
           this.props.showMessageBox

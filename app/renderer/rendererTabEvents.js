@@ -61,6 +61,10 @@ const api = module.exports = {
         windowActions.removeFrame(tabId)
         break
       }
+      case 'guest-ready': {
+        windowActions.frameGuestReady(tabId)
+        break
+      }
       case 'content-blocked': {
         if (e.details[0] === 'javascript' && e.details[1]) {
           windowActions.setBlockedBy(tabId, 'noScript', e.details[1])
