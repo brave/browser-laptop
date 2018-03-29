@@ -1971,9 +1971,11 @@ const appActions = {
     })
   },
 
-  setTorNewIdentity: function () {
+  setTorNewIdentity: function (tabId, url) {
     dispatch({
-      actionType: appConstants.APP_SET_TOR_NEW_IDENTITY
+      actionType: appConstants.APP_SET_TOR_NEW_IDENTITY,
+      tabId,
+      url
     })
   },
 

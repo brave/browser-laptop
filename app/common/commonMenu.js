@@ -100,15 +100,6 @@ module.exports.newPrivateTabMenuItem = () => {
   }
 }
 
-module.exports.newTorIdentityMenuItem = () => {
-  return {
-    label: locale.translation('newTorIdentity'),
-    click: function (item, focusedWindow) {
-      appActions.setTorNewIdentity()
-    }
-  }
-}
-
 module.exports.newPartitionedTabMenuItem = () => {
   const newPartitionedMenuItem = (partitionNumber) => ({
     label: `${locale.translation('newSessionTab')} ${partitionNumber}`,
