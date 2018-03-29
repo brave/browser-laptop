@@ -36,6 +36,10 @@ class LedgerRecoveryContent extends ImmutableComponent {
       this.props.hideAdvancedOverlays()
     }
     appActions.resetRecoverStatus()
+    appActions.loadURLRequested(
+      parseInt(this.props.ledgerData.get('tabId')),
+      'about:preferences#payments'
+    )
   }
 
   render () {
