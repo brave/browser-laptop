@@ -137,6 +137,10 @@ const frameReducer = (state, action, immutableAction) => {
       }
       let frames = state.get('frames')
       const index = tab.get('index')
+      // stop being fullscreen if made inactive and was fullscreen
+      if (changeInfo.get('active') === false && frame.get('isFullScreen')) {
+        setImmediate(() => appActions.tabSetFullScreen(tabId, false))
+      }
       // If front end doesn't know about this tabId, then do nothing!
       let sourceFrameIndex = frameStateUtil.getIndexByTabId(state, tabId)
       if (sourceFrameIndex == null) {
@@ -283,7 +287,7 @@ const frameReducer = (state, action, immutableAction) => {
       })
       break
 
-    case windowConstants.WINDOW_SET_FULL_SCREEN:
+    case appConstants.APP_TAB_SET_FULL_SCREEN:
       state = setFullScreen(state, action)
       break
     // TODO(bbondy): We should remove this window action completely and just go directly to

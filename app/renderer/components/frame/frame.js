@@ -101,20 +101,6 @@ class Frame extends React.Component {
   //   return zoom
   // }
 
-
-  enterHtmlFullScreen () {
-    if (this.webContents) {
-      this.webContents.executeScriptInTab(config.braveExtensionId, 'document.documentElement.webkitRequestFullScreen()', {})
-      this.webContents.focus()
-    }
-  }
-
-  exitHtmlFullScreen () {
-    if (this.webContents) {
-      this.webContents.executeScriptInTab(config.braveExtensionId, 'document.webkitExitFullscreen()', {})
-    }
-  }
-
   componentDidUpdate (prevProps) {
 
     // tab id changed
@@ -122,17 +108,6 @@ class Frame extends React.Component {
       console.log('cdu frame tab id changed', this.props.tabId)
       this.unregisterEventListener(prevProps.tabId)
       this.registerEventListener(this.props.tabId)
-    }
-
-    // make sure the webview content updates to
-    // match the fullscreen state of the frame
-    if (prevProps.isFullScreen !== this.props.isFullScreen ||
-      (this.props.isFullScreen && !this.props.isActive)) {
-      if (this.props.isFullScreen && this.props.isActive) {
-        this.enterHtmlFullScreen()
-      } else {
-        this.exitHtmlFullScreen()
-      }
     }
   }
 

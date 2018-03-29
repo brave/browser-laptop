@@ -118,22 +118,6 @@ const windowActions = {
     })
   },
 
-  /**
-   * Dispatches a message to the store to indicate that the webview entered full screen mode.
-   *
-   * @param {Object} tabId - Tab id of the frame to put in full screen
-   * @param {boolean} isFullScreen - true if the webview is entering full screen mode.
-   * @param {boolean} showFullScreenWarning - true if a warning about entering full screen should be shown.
-   */
-  setFullScreen: function (tabId, isFullScreen, showFullScreenWarning) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_FULL_SCREEN,
-      tabId,
-      isFullScreen,
-      showFullScreenWarning
-    })
-  },
-
   newFrame: function (frameOpts, tabValue) {
     dispatch({
       actionType: windowConstants.WINDOW_NEW_FRAME,

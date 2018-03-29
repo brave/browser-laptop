@@ -210,7 +210,7 @@ class Main extends React.Component {
 
   exitFullScreen () {
     if (this.props.isFullScreen) {
-      windowActions.setFullScreen(this.props.tabId, false)
+      appActions.tabSetFullScreen(this.props.tabId, false)
     }
   }
 
@@ -347,7 +347,7 @@ class Main extends React.Component {
     // If the tab changes or was closed, exit out of full screen to give a better
     // picture of what's happening.
     if (prevProps.tabId !== this.props.tabId && this.props.isFullScreen) {
-      windowActions.setFullScreen(this.props.tabId, false)
+      appActions.tabSetFullScreen(this.props.tabId, false)
     }
   }
 

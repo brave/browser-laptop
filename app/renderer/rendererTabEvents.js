@@ -207,26 +207,6 @@ const api = module.exports = {
         }
         break
       }
-      case 'enter-html-full-screen': {
-        const frame = getFrameByTabId(tabId)
-        if (frame.isEmpty()) {
-          break
-        }
-        windowActions.setFullScreen(tabId, true, true)
-        // disable the fullscreen warning after 5 seconds
-        setTimeout(() => {
-          windowActions.setFullScreen(tabId, undefined, false)
-        }, 5000)
-        break
-      }
-      case 'leave-html-full-screen': {
-        const frame = getFrameByTabId(tabId)
-        if (frame.isEmpty()) {
-          break
-        }
-        windowActions.setFullScreen(tabId, false)
-        break
-      }
       case 'did-change-theme-color': {
         const themeColor = e.themeColor
         const frame = getFrameByTabId(tabId)

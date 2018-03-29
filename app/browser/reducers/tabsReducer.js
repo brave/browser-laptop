@@ -341,6 +341,14 @@ const tabsReducer = (state, action, immutableAction) => {
         tabs.setTabIndex(action.get('tabId'), action.get('index'))
       })
       break
+    case appConstants.APP_TAB_SET_FULL_SCREEN: {
+      const isFullscreen = action.get('isFullScreen')
+      const tabId = action.get('tabId')
+      if (isFullscreen === true || isFullscreen === false) {
+        tabs.setFullScreen(tabId, isFullscreen)
+      }
+      break
+    }
     case appConstants.APP_TAB_TOGGLE_DEV_TOOLS:
       setImmediate(() => {
         tabs.toggleDevTools(action.get('tabId'))

@@ -23,6 +23,7 @@ const aboutHistoryState = require('../common/state/aboutHistoryState')
 const aboutNewTabState = require('../common/state/aboutNewTabState')
 const appStore = require('../../js/stores/appStore')
 const appConfig = require('../../js/constants/appConfig')
+const config = require('../../js/constants/config')
 const {newTabMode} = require('../common/constants/settingsEnums')
 const {tabCloseAction} = require('../common/constants/settingsEnums')
 const webContentsCache = require('./webContentsCache')
@@ -699,6 +700,27 @@ const api = {
         appActions.updatePassword(username, origin, tabId)
       })
 
+      tab.on('enter-html-full-screen', () => {
+        let tabValue = getTabValue(tabId)
+        if (!tabValue) {
+          return
+        }
+        const windowId = tabValue.get('windowId')
+        appActions.tabSetFullScreen(tabId, true, true, windowId)
+        // disable the fullscreen warning after 5 seconds
+        setTimeout(() => {
+          appActions.tabSetFullScreen(tabId, undefined, false, windowId)
+        }, 5000)
+      })
+
+      tab.on('leave-html-full-screen', () => {
+        let tabValue = getTabValue(tabId)
+        if (!tabValue) {
+          return
+        }
+        appActions.tabSetFullScreen(tabId, false)
+      })
+
       tab.on('media-started-playing', (e) => {
         let tabValue = getTabValue(tabId)
         if (tabValue) {
@@ -1114,6 +1136,17 @@ const api = {
     if (tab && !tab.isDestroyed()) {
       tab.setWebRTCIPHandlingPolicy(policy)
     }
+  },
+
+  setFullScreen (tabId, isFullScreen) {
+    const tab = webContentsCache.getWebContents(tabId)
+    if (!tab || tab.isDestroyed()) {
+      return
+    }
+    const script = isFullScreen
+      ? 'document.documentElement.webkitRequestFullScreen()'
+      : 'document.webkitExitFullscreen()'
+    tab.executeScriptInTab(config.braveExtensionId, script, {})
   },
 
   goBack: (tabId) => {

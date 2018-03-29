@@ -205,12 +205,15 @@ const appActions = {
    * @param {boolean} isFullScreen - true if the webview is entering full screen mode.
    * @param {boolean} showFullScreenWarning - true if a warning about entering full screen should be shown.
    */
-  tabSetFullScreen: function (tabId, isFullScreen, showFullScreenWarning) {
+  tabSetFullScreen: function (tabId, isFullScreen, showFullScreenWarning, windowId) {
     dispatch({
       actionType: appConstants.APP_TAB_SET_FULL_SCREEN,
       tabId,
       isFullScreen,
-      showFullScreenWarning
+      showFullScreenWarning,
+      queryInfo: {
+        windowId
+      }
     })
   },
 
