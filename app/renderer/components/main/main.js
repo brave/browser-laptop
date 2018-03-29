@@ -18,7 +18,6 @@ const {getSetting} = require('../../../../js/settings')
 
 // Components
 const Navigator = require('../navigation/navigator')
-const Frame = require('../frame/frame')
 const GuestInstanceRenderer = require('../frame/guestInstanceRenderer')
 const TabPages = require('../tabs/tabPages')
 const TabsToolbar = require('../tabs/tabsToolbar')
@@ -547,13 +546,11 @@ class Main extends React.Component {
 
     const props = {}
     // used in renderer
-
     props.activeFrameKey = activeFrame.get('key')
     if (window.activeFrameKey !== props.activeFrameKey) {
       window.activeFrameKey = props.activeFrameKey
     }
     props.previewFrameKey = frameStateUtil.getPreviewFrameKey(currentWindow)
-
     props.isFullScreen = activeFrame.get('isFullScreen', false)
     props.showFullScreenWarning = activeFrame.get('showFullScreenWarning')
     props.isMaximized = isMaximized(state) || isFullScreen(state)
@@ -585,7 +582,6 @@ class Main extends React.Component {
     props.showNotificationBar = activeOrigin && state.get('notifications').filter((item) =>
         item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true).size > 0
     props.showFindBar = activeFrame.get('findbarShown') && !activeFrame.get('isFullScreen')
-    props.frameKeys = frameStateUtil.getFrameKeys(currentWindow)
     props.showDownloadBar = currentWindow.getIn(['ui', 'downloadsToolbar', 'isVisible']) &&
       state.get('downloads') && state.get('downloads').size > 0
     props.title = activeFrame.get('title')
@@ -752,14 +748,6 @@ class Main extends React.Component {
         mainContainer: true,
         hasFramePreview: this.props.previewFrameKey != null
       })}>
-        {
-          this.props.frameKeys.map((frameKey) =>
-            <Frame
-              key={frameKey}
-              frameKey={frameKey}
-            />
-          )
-        }
         {
           this.props.isFullScreen && this.props.showFullScreenWarning
           ? <FullScreenWarning location={this.props.location} />
