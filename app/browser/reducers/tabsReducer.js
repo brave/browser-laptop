@@ -63,6 +63,37 @@ const getWebRTCPolicy = (state, tabId) => {
   }
 }
 
+function expireContentSettings (state, tabId, origin) {
+  // Expired Flash settings should be deleted when the webview is
+  // navigated or closed. Same for NoScript's allow-once option.
+  const tabValue = tabState.getByTabId(state, tabId)
+  const isPrivate = tabValue.get('incognito') === true
+  const allSiteSettings = siteSettingsState.getAllSiteSettings(state, isPrivate)
+  const tabSiteSettings =
+    siteSettings.getSiteSettingsForURL(allSiteSettings, tabValue.get('url'))
+  if (!tabSiteSettings) {
+    return
+  }
+  const originFlashEnabled = tabSiteSettings.get('flash')
+  const originWidevineEnabled = tabSiteSettings.get('widevine')
+  const originNoScriptEnabled = tabSiteSettings.get('noScript')
+  const originNoScriptExceptions = tabSiteSettings.get('noScriptExceptions')
+  if (typeof originFlashEnabled === 'number') {
+    if (originFlashEnabled < Date.now()) {
+      appActions.removeSiteSetting(origin, 'flash', isPrivate)
+    }
+  }
+  if (originWidevineEnabled === 0) {
+    appActions.removeSiteSetting(origin, 'widevine', isPrivate)
+  }
+  if (originNoScriptEnabled === 0) {
+    appActions.removeSiteSetting(origin, 'noScript', isPrivate)
+  }
+  if (originNoScriptExceptions) {
+    appActions.noScriptExceptionsAdded(origin, originNoScriptExceptions.map(value => value === 0 ? false : value))
+  }
+}
+
 const tabsReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
@@ -70,7 +101,13 @@ const tabsReducer = (state, action, immutableAction) => {
     case tabActionConsts.START_NAVIGATION:
       {
         const tabId = action.get('tabId')
+        const originalOrigin = tabState.getVisibleOrigin(state, tabId)
         state = tabState.setNavigationState(state, tabId, action.get('navigationState'))
+        const newOrigin = tabState.getVisibleOrigin(state, tabId)
+        // For cross-origin navigation, clear temp approvals
+        if (originalOrigin !== newOrigin) {
+          expireContentSettings(state, tabId, originalOrigin)
+        }
         setImmediate(() => {
           tabs.setWebRTCIPHandlingPolicy(tabId, getWebRTCPolicy(state, tabId))
         })
@@ -256,6 +293,8 @@ const tabsReducer = (state, action, immutableAction) => {
         // But still check for no tabId because on tab detach there's a dummy tabId
         const tabValue = tabState.getByTabId(state, tabId)
         if (tabValue) {
+          const lastOrigin = tabState.getVisibleOrigin(state, tabId)
+          expireContentSettings(state, tabId, lastOrigin)
           const windowIdOfTabBeingRemoved = tabState.getWindowId(state, tabId)
           state = tabs.updateTabsStateForWindow(state, windowIdOfTabBeingRemoved)
         }

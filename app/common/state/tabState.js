@@ -656,7 +656,8 @@ const tabState = {
 
   getVisibleOrigin: (state, tabId) => {
     const entry = tabState.getVisibleEntry(state, tabId)
-    const origin = entry ? entry.get('origin') : ''
+    // plain js in browser, immutable in renderer
+    const origin = entry ? entry.get ? entry.get('origin') : entry.origin : ''
     // TODO(bridiver) - all origins in browser-laptop should be changed to have a trailing slash to match chromium
     return (origin || '').replace(/\/$/, '')
   },

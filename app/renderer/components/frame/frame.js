@@ -90,30 +90,6 @@ class Frame extends React.Component {
   }
 
 
-  expireContentSettings (props) {
-    // Expired Flash settings should be deleted when the webview is
-    // navigated or closed. Same for NoScript's allow-once option.
-    if (typeof props.flash === 'number') {
-      if (props.flash < Date.now()) {
-        appActions.removeSiteSetting(props.origin, 'flash', props.isPrivate)
-      }
-    }
-    if (props.widevine === 0) {
-      appActions.removeSiteSetting(props.origin, 'widevine', props.isPrivate)
-    }
-    if (props.noScript === 0) {
-      appActions.removeSiteSetting(props.origin, 'noScript', props.isPrivate)
-    }
-    if (props.noScriptExceptions) {
-      appActions.noScriptExceptionsAdded(props.origin, props.noScriptExceptions.map(value => value === 0 ? false : value))
-    }
-  }
-
-  componentWillUnmount () {
-    this.expireContentSettings(this.props)
-  }
-
-
   componentDidMount () {
     this.addEventListeners()
   }
@@ -153,11 +129,6 @@ class Frame extends React.Component {
     }
 
     this.lastFrame = this.frame.delete('lastAccessedTime')
-
-    // For cross-origin navigation, clear temp approvals
-    if (this.props.origin !== prevProps.origin) {
-      this.expireContentSettings(prevProps)
-    }
 
     // make sure the webview content updates to
     // match the fullscreen state of the frame
