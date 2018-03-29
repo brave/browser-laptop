@@ -153,3 +153,7 @@ frameShortcuts.forEach((shortcut) => {
     })
   }
 })
+
+// emit frame changes back to browser
+const renderFrameTracker = require('../app/renderer/rendererFrameTracker')
+renderFrameTracker()

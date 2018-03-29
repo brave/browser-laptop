@@ -107,10 +107,10 @@ const appActions = {
    * Frame props changed
    * @param {Object} frame
    */
-  frameChanged: function (frame) {
+  framesChanged: function (frames) {
     dispatch({
-      actionType: appConstants.APP_FRAME_CHANGED,
-      frame
+      actionType: appConstants.APP_FRAMES_CHANGED,
+      frames
     })
   },
 
@@ -195,6 +195,22 @@ const appActions = {
       actionType: appConstants.APP_TAB_PAGE_CLOSE_MENU_ITEM_CLICKED,
       tabPageIndex,
       windowId
+    })
+  },
+
+    /**
+   * Dispatches a message to the store to indicate that the webview entered full screen mode.
+   *
+   * @param {Object} tabId - Tab id of the frame to put in full screen
+   * @param {boolean} isFullScreen - true if the webview is entering full screen mode.
+   * @param {boolean} showFullScreenWarning - true if a warning about entering full screen should be shown.
+   */
+  tabSetFullScreen: function (tabId, isFullScreen, showFullScreenWarning) {
+    dispatch({
+      actionType: appConstants.APP_TAB_SET_FULL_SCREEN,
+      tabId,
+      isFullScreen,
+      showFullScreenWarning
     })
   },
 

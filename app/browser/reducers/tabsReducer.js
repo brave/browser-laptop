@@ -417,8 +417,10 @@ const tabsReducer = (state, action, immutableAction) => {
         }
         break
       }
-    case appConstants.APP_FRAME_CHANGED:
-      state = tabState.updateFrame(state, action, shouldDebugTabEvents)
+    case appConstants.APP_FRAMES_CHANGED:
+      for (const frameAction of action.get('frames').valueSeq()) {
+        state = tabState.updateFrame(state, frameAction, shouldDebugTabEvents)
+      }
       break
     case windowConstants.WINDOW_SET_FRAME_ERROR:
       {

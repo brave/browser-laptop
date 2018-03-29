@@ -124,12 +124,6 @@ class Frame extends React.Component {
       this.registerEventListener(this.props.tabId)
     }
 
-    if (!this.frame.isEmpty() && !this.frame.delete('lastAccessedTime').equals(this.lastFrame)) {
-      appActions.frameChanged(this.frame)
-    }
-
-    this.lastFrame = this.frame.delete('lastAccessedTime')
-
     // make sure the webview content updates to
     // match the fullscreen state of the frame
     if (prevProps.isFullScreen !== this.props.isFullScreen ||
