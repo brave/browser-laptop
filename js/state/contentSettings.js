@@ -19,6 +19,9 @@ const {getSetting} = require('../settings')
 const {autoplayOption} = require('../../app/common/constants/settingsEnums')
 const {getFlashResourceId} = require('../flash')
 
+// Widevine not supported yet on linux
+const widevineResourceId = `widevinecdmadapter.${process.platform === 'darwin' ? 'plugin' : 'dll'}`
+
 // backward compatibility with appState siteSettings
 const parseSiteSettingsPattern = (pattern) => {
   if (pattern === 'file:///') {
@@ -152,7 +155,7 @@ const getDefaultPluginSettings = (braveryDefaults, appSettings, appConfig) => {
     },
     {
       setting: 'block',
-      resourceId: appConfig.widevine.resourceId,
+      resourceId: widevineResourceId,
       primaryPattern: '*'
     },
     // allow autodetction of flash install by adobe
@@ -317,7 +320,7 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
       contentSettings = addContentSettings(contentSettings, 'flashAllowed', primaryPattern, '*', 'allow', getFlashResourceId())
     }
     if (typeof siteSetting.get('widevine') === 'number' && braveryDefaults.get('widevine')) {
-      contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow', appConfig.widevine.resourceId)
+      contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow', widevineResourceId)
     }
     if (typeof siteSetting.get('autoplay') === 'boolean') {
       contentSettings = addContentSettings(contentSettings, 'autoplay', primaryPattern, '*', siteSetting.get('autoplay') ? 'allow' : 'block')
