@@ -781,6 +781,9 @@ const api = {
   },
 
   setActive: (tabId) => {
+    if (shouldDebugTabEvents) {
+      console.log(`tabs.setActive: ${tabId}`)
+    }
     let tab = webContentsCache.getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       tab.setActive(true)
