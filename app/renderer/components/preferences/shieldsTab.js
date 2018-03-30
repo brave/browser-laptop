@@ -27,6 +27,7 @@ const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
+const disableWebRTC = appConfig.resourceNames.DISABLE_WEBRTC
 const noScript = appConfig.resourceNames.NOSCRIPT
 
 const braveryPermissionNames = {
@@ -34,6 +35,7 @@ const braveryPermissionNames = {
   'adControl': ['string'],
   'cookieControl': ['string'],
   'safeBrowsing': ['boolean'],
+  'disableWebRTC': ['boolean'],
   'httpsEverywhere': ['boolean'],
   'fingerprintingProtection': ['string'],
   'noScript': ['boolean', 'number']
@@ -45,6 +47,7 @@ class ShieldsTab extends ImmutableComponent {
     this.onChangeAdControl = this.onChangeAdControl.bind(this)
     this.onToggleHTTPSE = this.onToggleSetting.bind(this, httpsEverywhere)
     this.onToggleSafeBrowsing = this.onToggleSetting.bind(this, safeBrowsing)
+    this.onToggleDisableWebRTC = this.onToggleSetting.bind(this, disableWebRTC)
     this.onToggleNoScript = this.onToggleSetting.bind(this, noScript)
   }
   onChangeAdControl (e) {
@@ -107,6 +110,7 @@ class ShieldsTab extends ImmutableComponent {
         <SettingCheckbox checked={this.props.braveryDefaults.get('httpsEverywhere')} dataL10nId='httpsEverywhere' onChange={this.onToggleHTTPSE} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScriptPref' onChange={this.onToggleNoScript} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
+        <SettingCheckbox checked={this.props.braveryDefaults.get('disableWebRTC')} dataL10nId='disableWebRTC' onChange={this.onToggleDisableWebRTC} />
         {/* TODO: move this inline style to Aphrodite once refactored */}
         <div style={{marginTop: '15px'}}>
           <BrowserButton
