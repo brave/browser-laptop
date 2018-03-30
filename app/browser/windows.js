@@ -490,6 +490,9 @@ const api = {
     renderedWindows.add(win)
     setImmediate(() => {
       if (win && win.__showWhenRendered && !win.isDestroyed() && !win.isVisible()) {
+        if (shouldDebugWindowEvents) {
+          console.log('rendered window so showing window')
+        }
         // window is hidden by default until we receive 'ready' message,
         // so show it now
         showDeferredShowWindow(win)
@@ -705,6 +708,7 @@ const api = {
 
     if (shouldDebugWindowEvents) {
       markWindowCreationTime(win.id)
+      console.log(`createWindow: new BrowserWindow with ID ${win.id} created with options`, windowOptions)
     }
     // TODO: pass UUID
     publicEvents.emit('new-window-state', win.id, immutableState)
@@ -720,6 +724,9 @@ const api = {
       // in those cases, we want to still show it, so that the user can find the error message
       setTimeout(() => {
         if (win && !win.isDestroyed() && !win.isVisible()) {
+          if (shouldDebugWindowEvents) {
+            console.log('deferred-show window passed timeout, so showing deferred')
+          }
           showDeferredShowWindow(win)
         }
       }, config.windows.timeoutToShowWindowMs)
