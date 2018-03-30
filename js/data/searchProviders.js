@@ -47,7 +47,7 @@ module.exports = { "providers" :
       "base" : "https://fireball.com",
       "image" : "https://fireball.com/favicon.ico",
       "localImage" : getFaviconUrl('fireball'),
-      "search" : "https://fireball.com/?q={searchTerms}&t=brave",
+      "search" : "https://fireball.com/?q={searchTerms}",
       "autocomplete" : "https://fireball.com/search/?q={searchTerms}",
       "shortcut" : ":f"
     },
