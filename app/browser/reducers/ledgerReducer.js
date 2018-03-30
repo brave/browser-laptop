@@ -18,6 +18,7 @@ const pageDataState = require('../../common/state/pageDataState')
 const updateState = require('../../common/state/updateState')
 
 // Utils
+const windows = require('../windows')
 const ledgerApi = require('../../browser/api/ledger')
 const ledgerNotifications = require('../../browser/api/ledgerNotifications')
 const {makeImmutable} = require('../../common/state/immutableUtil')
@@ -460,8 +461,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_REFERRAL_CODE_READ:
       {
-        state = updateState.setUpdateProp(state, 'referralDownloadId', action.get('downloadId'))
-        state = updateState.setUpdateProp(state, 'referralPromoCode', action.get('promoCode'))
+        state = ledgerApi.onReferralRead(state, action.get('body'), windows.getActiveWindowId())
         break
       }
     case appConstants.APP_ON_REFERRAL_CODE_FAIL:
@@ -472,6 +472,11 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_CHECK_REFERRAL_ACTIVITY:
       {
         state = ledgerApi.checkReferralActivity(state)
+        break
+      }
+    case appConstants.APP_ON_FETCH_REFERRAL_HEADERS:
+      {
+        state = ledgerApi.onFetchReferralHeaders(state, action.get('error'), action.get('response'), action.get('body'))
         break
       }
     case appConstants.APP_ON_REFERRAL_ACTIVITY:

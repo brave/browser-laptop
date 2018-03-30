@@ -603,7 +603,19 @@ AppStore
       notes: string // release notes for the active update
     },
     referralDownloadId: string, // download ID that is returned from the referral server
+    referralHeaders: [{
+      domains: Array<string>,
+      headers: [{
+        domains: Array<string>,
+        headers: { [headerName]: string },
+        cookieNames: Array<string>,
+        expiration: number
+      }],
+      cookieNames: Array<string>,
+      expiration: number
+    }],
     referralTimestamp: number, // timestamp when referral was accumulated (after ~30 days)
+    referralPage: string, // page that we open when browser starts
     referralPromoCode: string, // promo code for the referral
     status: string, // updateStatus from js/constants/updateStatus.js
     verbose: boolean // whether to show update UI for checking, downloading, and errors
