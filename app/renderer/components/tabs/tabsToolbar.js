@@ -77,7 +77,7 @@ class TabsToolbar extends React.Component {
       <BrowserButton
         iconOnly
         isMaskImage
-        size={globalStyles.spacing.tabsToolbarHeight}
+        size={`calc(${globalStyles.spacing.tabsToolbarHeight} - 1px)`}
         custom={styles.tabsToolbar__button_menu}
         l10nId='menuButton'
         testId='menuButton'
