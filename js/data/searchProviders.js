@@ -43,6 +43,15 @@ module.exports = { "providers" :
       "shortcut" : ":d"
     },
     {
+      "name" : "Fireball",
+      "base" : "https://fireball.com",
+      "image" : "https://fireball.com/favicon.ico",
+      "localImage" : getFaviconUrl('fireball'),
+      "search" : "https://fireball.com/?q={searchTerms}",
+      "autocomplete" : "https://fireball.com/search/?q={searchTerms}",
+      "shortcut" : ":f"
+    },
+    {
       "name" : "GitHub",
       "base" : "https://github.com/search",
       "image" : "https://assets-cdn.github.com/favicon.ico",
