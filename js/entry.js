@@ -84,39 +84,12 @@ ipc.on(messages.INITIALIZE_WINDOW, (e, mem) => {
 
   appStoreRenderer.state = Immutable.fromJS(message.appState)
   windowStore.state = newState
-  generateTabs(newState, message.frames, windowValue.id)
   appActions.windowReady(windowValue.id, windowValue)
   ReactDOM.render(<Window />, document.getElementById('appContainer'), fireOnReactRender.bind(null, windowValue))
 })
 
 const fireOnReactRender = (windowValue) => {
   appActions.windowRendered(windowValue.id)
-}
-
-const generateTabs = (windowState, frames, windowId) => {
-  const activeFrameKey = windowState.get('activeFrameKey')
-  if (frames && frames.length) {
-    frames.forEach((frame, i) => {
-      if (frame.guestInstanceId) {
-        newWebContentsAdded(frame)
-      } else {
-        appActions.createTabRequested({
-          url: frame.location || frame.src || frame.provisionalLocation || frame.url,
-          partitionNumber: frame.partitionNumber,
-          isPrivate: frame.isPrivate,
-          active: activeFrameKey ? frame.key === activeFrameKey : true,
-          discarded: frame.unloaded,
-          title: frame.title,
-          faviconUrl: frame.icon,
-          index: i
-        }, false, true /* isRestore */)
-      }
-    })
-  }
-}
-
-function newWebContentsAdded (frameOpts, newTabValue) {
-  windowActions.newFrame(frameOpts, newTabValue)
 }
 
 // listen for tab events
@@ -133,11 +106,8 @@ electron.remote.registerAllWindowTabEvents(e => {
   }
 })
 
-// windowStore.addChangeListener(() => {
-//   console.log('window store changes, check frames...')
-// })
 ipc.on('new-web-contents-added', (e, frameOpts, newTabValue) => {
-  newWebContentsAdded(frameOpts, newTabValue)
+  windowActions.newFrame(frameOpts, newTabValue)
 })
 
 // listen for shortcuts

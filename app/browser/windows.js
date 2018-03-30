@@ -657,6 +657,16 @@ const api = {
       defaultOptions,
       windowOptionsIn
     )
+    // validate activeFrameKey if provided
+    let activeFrameKey = immutableState.get('activeFrameKey')
+    if (frames && frames.length && activeFrameKey) {
+      const keyIsValid = frames.some(frame => frame.key === activeFrameKey)
+      if (!keyIsValid) {
+        // make first frame active if invalid key provided
+        activeFrameKey = frames[0].key
+      }
+      immutableState = immutableState.set('activeFrameKey', activeFrameKey)
+    }
     // will only hide until rendered if the options specify to show window
     // so that a caller can control showing the window themselves with the option { show: false }
     const showWhenRendered = hideUntilRendered && windowOptions.show
@@ -800,13 +810,10 @@ const api = {
           width: size[0]
         },
         appState: appStore.getLastEmittedState().toJS(),
-        windowState,
-        // TODO: dispatch frame create action on appStore, as this is what the window does anyway
-        // ...and do it after the window has rendered
-        frames
+        windowState
       })
-
       e.sender.sendShared(messages.INITIALIZE_WINDOW, mem)
+      openFramesInWindow(win, frames, windowState && windowState.activeFrameKey)
       // TODO: remove callback, use store action, returning a new window UUID from this function
       if (cb) {
         cb()
