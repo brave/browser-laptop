@@ -25,7 +25,7 @@ const browserWindowUtil = require('../common/lib/browserWindowUtil')
 const windowState = require('../common/state/windowState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
 const {zoomLevel} = require('../common/constants/toolbarUserInterfaceScale')
-const { shouldDebugWindowEvents, disableBufferWindow } = require('../cmdLine')
+const { shouldDebugWindowEvents, disableBufferWindow, disableDeferredWindowLoad } = require('../cmdLine')
 const activeTabHistory = require('./activeTabHistory')
 
 const isDarwin = platformUtil.isDarwin()
@@ -163,7 +163,9 @@ function refocusFocusedWindow () {
 
 function showDeferredShowWindow (win) {
   // were we asked to make the window active / foreground?
-  const shouldShowInactive = win.webContents.browserWindowOptions.inactive
+  // note: do not call win.showInactive if there is no other active window, otherwise this window will
+  // never get an entry in taskbar on Windows
+  const shouldShowInactive = win.webContents.browserWindowOptions.inactive && BrowserWindow.getFocusedWindow()
   if (shouldShowInactive) {
     // we were asked NOT to show the window active.
     // we should maintain focus on the window which already has it
@@ -490,6 +492,9 @@ const api = {
     renderedWindows.add(win)
     setImmediate(() => {
       if (win && win.__showWhenRendered && !win.isDestroyed() && !win.isVisible()) {
+        if (shouldDebugWindowEvents) {
+          console.log('rendered window so showing window')
+        }
         // window is hidden by default until we receive 'ready' message,
         // so show it now
         showDeferredShowWindow(win)
@@ -591,6 +596,9 @@ const api = {
   },
 
   createWindow: function (windowOptionsIn, parentWindow, maximized, frames, immutableState = Immutable.Map(), hideUntilRendered = true, cb = null) {
+    if (disableDeferredWindowLoad) {
+      hideUntilRendered = false
+    }
     const defaultOptions = {
       // hide the window until the window reports that it is rendered
       show: true,
@@ -702,6 +710,7 @@ const api = {
 
     if (shouldDebugWindowEvents) {
       markWindowCreationTime(win.id)
+      console.log(`createWindow: new BrowserWindow with ID ${win.id} created with options`, windowOptions)
     }
     // TODO: pass UUID
     publicEvents.emit('new-window-state', win.id, immutableState)
@@ -717,6 +726,9 @@ const api = {
       // in those cases, we want to still show it, so that the user can find the error message
       setTimeout(() => {
         if (win && !win.isDestroyed() && !win.isVisible()) {
+          if (shouldDebugWindowEvents) {
+            console.log('deferred-show window passed timeout, so showing deferred')
+          }
           showDeferredShowWindow(win)
         }
       }, config.windows.timeoutToShowWindowMs)
