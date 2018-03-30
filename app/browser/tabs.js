@@ -40,7 +40,7 @@ const ledgerState = require('../common/state/ledgerState')
 const {getWindow} = require('./windows')
 const activeTabHistory = require('./activeTabHistory')
 const path = require('path')
-const {channel} = require('../channel')
+const {getTorSocksProxy} = require('../channel')
 const fs = require('fs')
 
 let adBlockRegions
@@ -1024,24 +1024,7 @@ const api = {
           // TODO(riastradh): Duplicate logic in app/filtering.js.
           createProperties.isolated_storage = true
           createProperties.parent_partition = ''
-          let portno
-          switch (channel()) {
-            case 'dev':
-            case '':
-            default:
-              portno = 9250
-              break
-            case 'beta':
-              portno = 9260
-              break
-            case 'nightly':
-              portno = 9270
-              break
-            case 'developer':
-              portno = 9280
-              break
-          }
-          createProperties.tor_proxy = `socks5://127.0.0.1:${portno}`
+          createProperties.tor_proxy = getTorSocksProxy()
           const userDataDir = app.getPath('userData')
           try {
             fs.mkdirSync(path.join(userDataDir, 'tor'), 0o0700)

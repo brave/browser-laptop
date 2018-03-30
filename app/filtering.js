@@ -35,7 +35,7 @@ const extensionState = require('./common/state/extensionState')
 const ledgerUtil = require('./common/lib/ledgerUtil')
 const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
 const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
-const {channel} = require('./channel')
+const {getTorSocksProxy} = require('./channel')
 const fs = require('fs')
 
 let appStore = null
@@ -705,24 +705,7 @@ const initPartition = (partition) => {
     // TODO(riastradh): Duplicate logic in app/browser/tabs.js.
     options.isolated_storage = true
     options.parent_partition = ''
-    let portno
-    switch (channel()) {
-      case 'dev':
-      case '':
-      default:
-        portno = 9250
-        break
-      case 'beta':
-        portno = 9260
-        break
-      case 'nightly':
-        portno = 9270
-        break
-      case 'developer':
-        portno = 9280
-        break
-    }
-    options.tor_proxy = `socks5://127.0.0.1:${portno}`
+    options.tor_proxy = getTorSocksProxy()
     const userDataDir = app.getPath('userData')
     try {
       fs.mkdirSync(path.join(userDataDir, 'tor'), 0o0700)
