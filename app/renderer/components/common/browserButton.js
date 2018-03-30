@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     display: 'inline-block',
     borderRadius: '2px',
     textAlign: 'center',
-    transition: '.1s opacity, .1s background',
+    transition: '.12s opacity ease, .12s background ease, .12s color ease',
     userSelect: 'none',
     backgroundSize: '16px',
     backgroundPosition: 'center center',

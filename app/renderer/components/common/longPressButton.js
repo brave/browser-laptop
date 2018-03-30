@@ -86,7 +86,10 @@ class LongPressButton extends ImmutableComponent {
       ref={(node) => { this.buttonNode = node }}
       onMouseDown={this.onMouseDown}
       onMouseUp={this.onMouseUp}
-      onMouseLeave={this.onMouseLeave} />
+      onMouseLeave={this.onMouseLeave}
+    >
+      {this.props.children}
+    </button>
   }
 }
 
