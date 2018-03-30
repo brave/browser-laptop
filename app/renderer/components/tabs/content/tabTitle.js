@@ -14,11 +14,6 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const tabUIState = require('../../../../common/state/tabUIState')
 const tabState = require('../../../../common/state/tabState')
 
-// Utils
-const platformUtil = require('../../../../common/lib/platformUtil')
-const isWindows = platformUtil.isWindows()
-const isDarwin = platformUtil.isDarwin()
-
 // Styles
 const globalStyles = require('../../styles/global')
 
@@ -29,14 +24,10 @@ class TabTitle extends React.Component {
     const frameKey = frameStateUtil.getFrameKeyByTabId(currentWindow, tabId)
 
     const props = {}
-    props.isWindows = isWindows
-    props.isDarwin = isDarwin
     props.isPinned = tabState.isTabPinned(state, tabId)
     props.showTabTitle = titleState.showTabTitle(currentWindow, frameKey)
     props.displayTitle = titleState.getDisplayTitle(currentWindow, frameKey)
     props.addExtraGutter = tabUIState.addExtraGutterToTitle(currentWindow, frameKey)
-    props.isTextWhite = tabUIState.checkIfTextColor(currentWindow, frameKey, 'white')
-    props.gradientColor = tabUIState.getTabEndIconBackgroundColor(currentWindow, frameKey)
     props.tabId = tabId
 
     return props
@@ -46,22 +37,12 @@ class TabTitle extends React.Component {
     if (this.props.isPinned || !this.props.showTabTitle) {
       return null
     }
-    const perPageGradient = StyleSheet.create({
-      tab__title_gradient: {
-        '::after': {
-          background: this.props.gradientColor
-        }
-      }
-    })
-
-    return <div data-test-id='tabTitle'
+    return <div
+      data-test-id='tabTitle'
+      data-text={this.props.displayTitle}
       className={css(
         styles.tab__title,
-        !this.props.isPinned && perPageGradient.tab__title_gradient,
-        this.props.addExtraGutter && styles.tab__title_extraGutter,
-        (this.props.isDarwin && this.props.isTextWhite) && styles.tab__title_isDarwin,
-        // Windows specific style
-        this.props.isWindows && styles.tab__title_isWindows
+        this.props.addExtraGutter && styles.tab__title_extraGutter
       )}>
       {this.props.displayTitle}
     </div>
@@ -78,33 +59,56 @@ const styles = StyleSheet.create({
     flex: 1,
     userSelect: 'none',
     fontSize: globalStyles.fontSize.tabTitle,
-    lineHeight: '1.6',
+    fontWeight: 400,
     minWidth: 0, // see https://stackoverflow.com/a/36247448/4902448
-    marginLeft: '4px',
+    lineHeight: globalStyles.spacing.tabsToolbarHeight,
+    width: '-webkit-fill-available',
+    marginLeft: '6px',
+    // Fade any overflow text out,
+    // but use a technique which preserves:
+    // 1. Sub-pixel colored antialized text - e.g. background-clip: text does not use this.
+    //    (with color - zoom in 20x on mac and you'll see)
+    // 2. Background and text color transition with no artifacts left over due to a
+    //    pseudo element gradient fade which cannot transition (cannot transition linear gradient color)
     overflow: 'hidden',
-
-    // this enable us to have gradient text
-    '::after': {
-      zIndex: globalStyles.zindex.zindexTabs,
-      content: '""',
+    position: 'relative',
+    color: 'transparent',
+    // the text, rendered as normal, but cut off early
+    '::before': {
       position: 'absolute',
+      display: 'block',
+      overflow: 'hidden',
+      top: 0,
+      left: 0,
+      right: 'calc(18% - 1px)',
       bottom: 0,
+      fontWeight: 'inherit',
+      content: 'attr(data-text)',
+      color: 'var(--tab-color)',
+      transition: `color var(--tab-transit-duration) var(--tab-transit-easing)`
+    },
+    // the fade-out using background gradient clipped to text
+    // and only starting off where actual text is cut off
+    '::after': {
+      position: 'absolute',
+      display: 'block',
+      top: 0,
+      left: 0,
       right: 0,
-      width: '-webkit-fill-available',
-      height: '-webkit-fill-available',
-      // add a pixel margin so the box-shadow of the
-      // webview is not covered by the gradient
-      marginBottom: '1px'
+      bottom: 0,
+      fontWeight: 'inherit',
+      content: 'attr(data-text)',
+      // restrict background-size to a tiny portion of the text as background-clip: text means
+      // no sub-pixel antializing
+      background: `linear-gradient(
+        to right,
+        var(--tab-color) 0,
+        transparent 100%
+      ) right top / 18% 100% no-repeat`,
+      WebkitBackgroundClip: 'text !important', // !important is neccessary because aphrodite will put this at top of ruleset :-(
+      color: 'transparent',
+      transition: `background 0s var(--tab-transit-easing) var(--tab-transit-duration)`
     }
-  },
-
-  tab__title_isDarwin: {
-    fontWeight: '400'
-  },
-
-  tab__title_isWindows: {
-    fontWeight: '500',
-    fontSize: globalStyles.fontSize.tabTitle
   },
 
   tab__title_extraGutter: {

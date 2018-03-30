@@ -93,7 +93,10 @@ AppStore
     ledgerVideos: {
       [mediaKey]: {
         publisher: string // publisher key
-        beatData: object // data that we get from a heartbeat
+        // Twitch
+        event: string, // event that was send to Twitch
+        time: number, // timestamp that we will log in the ledger
+        status: string // playing status: playing or paused
       }
     }
   }
@@ -330,6 +333,7 @@ AppStore
       }
     }
     publisherTimestamp: number, // timestamp of last publisher update in the database
+    status: string, // ledger status
     synopsis: {
       options: {
         emptyScores: {
@@ -674,7 +678,7 @@ WindowStore
   },
   cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
   closedFrames: [], // holds the same type of frame objects as frames
-  contextMenuDetail: {
+  contextMenuDetail: { // currently using uuid hack to avoid serializing click function in template
     bottom: number, // the bottom position of the context menu
     left: number, // the left position of the context menu
     maxHeight: number, // the maximum height of the context menu

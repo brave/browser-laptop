@@ -28,4 +28,6 @@ if (isDarwin) {
   )
 }
 
-execute(cmds, env, console.log.bind(null, 'done'))
+if (cmds.length > 0) {
+  execute(cmds, env, console.log.bind(null, 'done'))
+}

@@ -4,11 +4,13 @@
 
 const Immutable = require('immutable')
 const {BrowserWindow} = require('electron')
+const {getWebContents} = require('../webContentsCache')
 
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
 const windowConstants = require('../../../js/constants/windowConstants')
 const settings = require('../../../js/constants/settings')
+const tabActionConstants = require('../../common/constants/tabAction')
 
 // State
 const ledgerState = require('../../common/state/ledgerState')
@@ -248,7 +250,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_LEDGER_PAYMENTS_PRESENT:
       {
-        ledgerApi.paymentPresent(state, action.get('tabId'), action.get('present'))
+        state = ledgerApi.paymentPresent(state, action.get('tabId'), action.get('present'))
         break
       }
     case appConstants.APP_ON_ADD_FUNDS_CLOSED:
@@ -369,22 +371,20 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.pageDataChanged(state)
         break
       }
-    case windowConstants.WINDOW_GOT_RESPONSE_DETAILS:
+    case tabActionConstants.FINISH_NAVIGATION:
       {
         if (!getSetting(settings.PAYMENTS_ENABLED)) {
           break
         }
 
-        // Only capture response for the page (not sub resources, like images, JavaScript, etc)
-        if (action.getIn(['details', 'resourceType']) === 'mainFrame') {
-          const pageUrl = action.getIn(['details', 'newURL'])
-
-          // create a page view event if this is a page load on the active tabId
-          const lastActiveTabId = pageDataState.getLastActiveTabId(state)
-          const tabId = action.get('tabId')
+        // create a page view event if this is a page load on the active tabId
+        const lastActiveTabId = pageDataState.getLastActiveTabId(state)
+        const tabId = action.get('tabId')
+        const tab = getWebContents(tabId)
+        if (tab && !tab.isDestroyed()) {
           if (!lastActiveTabId || tabId === lastActiveTabId) {
             state = ledgerApi.pageDataChanged(state, {
-              location: pageUrl,
+              location: tab.getURL(),
               tabId
             })
           }
@@ -418,7 +418,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_LEDGER_MEDIA_DATA:
       {
-        state = ledgerApi.onMediaRequest(state, action.get('url'), action.get('type'), action.get('tabId'))
+        state = ledgerApi.onMediaRequest(state, action.get('url'), action.get('type'), action.get('details'))
         break
       }
     case appConstants.APP_ON_PRUNE_SYNOPSIS:

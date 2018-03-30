@@ -5,6 +5,7 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 const {StyleSheet} = require('aphrodite/no-important')
+const locale = require('../../../../../js/l10n')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
@@ -108,6 +109,7 @@ class AudioTabIcon extends React.Component {
       className={styles.icon_audio}
       symbol={this.audioIcon}
       onClick={this.toggleMute}
+      title={locale.translation(this.props.audioPlaying ? 'muteTab' : 'unmuteTab')}
       ref={this.setRef}
     />
   }
@@ -116,12 +118,12 @@ class AudioTabIcon extends React.Component {
 const styles = StyleSheet.create({
   icon_audio: {
     overflow: 'hidden',
-    margin: '0 -2px 0 2px',
+    margin: '1px -2px 0 2px', // get centered with funky font awesome sizing
     color: theme.tab.icon.audio.color,
-    fontSize: '13px',
-
-    // Override default properties
-    zIndex: globalStyles.zindex.zindexTabsAudioTopBorder
+    fontSize: '14px',
+    ':hover': {
+      color: theme.tab.icon.audio.hoverColor
+    }
   }
 })
 

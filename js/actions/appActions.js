@@ -255,12 +255,14 @@ const appActions = {
    * A request for a URL load
    * @param {number} tabId - the tab ID to load the URL inside of
    * @param {string} url - The url to load
+   * @param {boolean} reloadMatchingUrl - would you like to force reload provided tab
    */
-  loadURLRequested: function (tabId, url) {
+  loadURLRequested: function (tabId, url, reloadMatchingUrl) {
     dispatch({
       actionType: appConstants.APP_LOAD_URL_REQUESTED,
       tabId,
-      url
+      url,
+      reloadMatchingUrl
     })
   },
 
@@ -384,12 +386,23 @@ const appActions = {
 
   /**
    * Removes a site from the site list
-   * @param {string|Immutable.List} historyKey - Hisotry item key that we want to remove, can be list of keys as well
+   * @param {string|Immutable.List} historyKey - History item key that we want to remove, can be list of keys as well
    */
   removeHistorySite: function (historyKey) {
     dispatch({
       actionType: appConstants.APP_REMOVE_HISTORY_SITE,
       historyKey
+    })
+  },
+
+  /**
+   * Removes all sites for the given domain from the site list
+   * @param {string} domain - Domain of the sites we want to remove
+   */
+  removeHistoryDomain: function (domain) {
+    dispatch({
+      actionType: appConstants.APP_REMOVE_HISTORY_DOMAIN,
+      domain
     })
   },
 
@@ -1886,12 +1899,12 @@ const appActions = {
     })
   },
 
-  onLedgerMediaData: function (url, type, tabId) {
+  onLedgerMediaData: function (url, type, details) {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_MEDIA_DATA,
       url,
       type,
-      tabId
+      details
     })
   },
 

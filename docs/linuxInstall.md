@@ -138,6 +138,13 @@ install the dependency for you:
 sudo apt-get -f install
 ```
 
+## Solus
+
+Install Brave through eopkg:
+```
+sudo eopkg install brave
+```
+
 ## Fedora x86_64:
 
 To install Brave using dnf:

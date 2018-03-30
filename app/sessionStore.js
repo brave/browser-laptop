@@ -823,9 +823,15 @@ module.exports.runPreMigrations = (data) => {
   }
 
   if (data.lastAppVersion) {
+    let runHSTSCleanup = false
+    try { runHSTSCleanup = compareVersions(data.lastAppVersion, '0.22.00') < 1 } catch (e) {}
+
+    if (runHSTSCleanup) {
+      filtering.clearHSTSData()
+    }
+
     // Force WidevineCdm to be upgraded when last app version <= 0.18.25
     let runWidevineCleanup = false
-
     try { runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1 } catch (e) {}
 
     if (runWidevineCleanup) {
@@ -845,11 +851,17 @@ module.exports.runPreMigrations = (data) => {
       if (data.cache) {
         delete data.cache.bookmarkLocation
       }
+    }
 
-      // pinned top sites were stored in the wrong position in 0.19.x
-      // allowing duplicated items. See #12941
-      // in this case eliminate pinned items so they can be properly
-      // populated in their own indexes
+    // pinned top sites were stored in the wrong position in 0.19.x
+    // and on some updates ranging from 0.20.x/0.21.x
+    // allowing duplicated items. See #12941
+    let pinnedTopSitesCleanup = false
+    try {
+      pinnedTopSitesCleanup = compareVersions(data.lastAppVersion, '0.22.00') < 1
+    } catch (e) {}
+
+    if (pinnedTopSitesCleanup) {
       if (data.about.newtab.pinnedTopSites) {
         // Empty array is currently set to include default pinned sites
         // which we avoid given the user already have a profile

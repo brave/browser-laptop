@@ -227,12 +227,7 @@ const getMediaId = (data, type) => {
     case ledgerMediaProviders.TWITCH:
       {
         if (
-          ([
-            twitchEvents.MINUTE_WATCHED,
-            twitchEvents.START,
-            twitchEvents.PLAY_PAUSE,
-            twitchEvents.SEEK
-          ].includes(data.event)) &&
+          Object.values(twitchEvents).includes(data.event) &&
           data.properties
         ) {
           id = data.properties.channel
@@ -257,7 +252,7 @@ const getMediaKey = (id, type) => {
   return `${type.toLowerCase()}_${id}`
 }
 
-const getMediaData = (xhr, type) => {
+const getMediaData = (xhr, type, details) => {
   let result = null
 
   if (xhr == null || type == null) {
@@ -267,36 +262,58 @@ const getMediaData = (xhr, type) => {
   const parsedUrl = urlParse(xhr)
   const query = parsedUrl && parsedUrl.query
 
-  if (!parsedUrl || !query) {
+  if (!parsedUrl) {
     return null
   }
 
   switch (type) {
     case ledgerMediaProviders.YOUTUBE:
       {
-        result = queryString.parse(parsedUrl.query)
+        if (!query) {
+          return null
+        }
+
+        result = queryString.parse(query)
         break
       }
     case ledgerMediaProviders.TWITCH:
       {
-        result = queryString.parse(parsedUrl.query)
-        if (!result.data) {
+        const data = details.getIn(['uploadData', 0, 'bytes'])
+        if (!data) {
           result = null
           break
         }
 
-        let obj = Buffer.from(result.data, 'base64').toString('utf8')
+        let params = Buffer.from(data).toString('utf8') || ''
+        const paramQuery = queryString.parse(params)
+
+        if (!paramQuery || !paramQuery.data) {
+          result = null
+          break
+        }
+
+        let obj = Buffer.from(paramQuery.data, 'base64').toString('utf8')
         if (obj == null) {
           result = null
           break
         }
 
+        let parsed
         try {
-          result = JSON.parse(obj)
+          parsed = JSON.parse(obj)
         } catch (error) {
           result = null
-          console.error(error.toString())
+          console.error(error.toString(), obj)
+          break
         }
+
+        if (!Array.isArray(parsed)) {
+          result = null
+          break
+        }
+
+        result = parsed[0]
+
         break
       }
   }
@@ -327,7 +344,7 @@ const getMediaDuration = (state, data, mediaKey, type) => {
   return duration
 }
 
-const generateMediaCacheData = (parsed, type) => {
+const generateMediaCacheData = (state, parsed, type, mediaKey) => {
   let data = Immutable.Map()
 
   if (parsed == null) {
@@ -337,7 +354,7 @@ const generateMediaCacheData = (parsed, type) => {
   switch (type) {
     case ledgerMediaProviders.TWITCH:
       {
-        data = generateTwitchCacheData(parsed)
+        data = generateTwitchCacheData(state, parsed, mediaKey)
         break
       }
   }
@@ -345,20 +362,57 @@ const generateMediaCacheData = (parsed, type) => {
   return data
 }
 
-const generateTwitchCacheData = (parsed) => {
+const generateTwitchCacheData = (state, parsed, mediaKey) => {
   if (parsed == null) {
     return Immutable.Map()
+  }
+
+  const statusConst = {
+    playing: 'playing',
+    paused: 'paused'
+  }
+
+  const previousData = ledgerVideoCache.getDataByVideoId(state, mediaKey)
+  let status = statusConst.playing
+
+  if (
+    (
+      parsed.event === twitchEvents.PLAY_PAUSE &&
+      previousData.get('event') !== twitchEvents.PLAY_PAUSE
+    ) || // user clicked pause (we need to exclude seeking while paused)
+    (
+      parsed.event === twitchEvents.PLAY_PAUSE &&
+      previousData.get('event') === twitchEvents.PLAY_PAUSE &&
+      previousData.get('status') === statusConst.playing
+    ) || // user clicked pause as soon as he clicked played
+    (
+      parsed.event === twitchEvents.SEEK &&
+      previousData.get('status') === statusConst.paused
+    ) // seeking video while it is paused
+  ) {
+    status = statusConst.paused
+  }
+
+  // User pauses a video, then seek it and play it again
+  if (
+    parsed.event === twitchEvents.PLAY_PAUSE &&
+    previousData.get('event') === twitchEvents.SEEK &&
+    previousData.get('status') === statusConst.paused
+  ) {
+    status = statusConst.playing
   }
 
   if (parsed.properties) {
     return Immutable.fromJS({
       event: parsed.event,
-      time: parsed.properties.time
+      time: parsed.properties.time,
+      status
     })
   }
 
   return Immutable.fromJS({
-    event: parsed.event
+    event: parsed.event,
+    status
   })
 }
 
@@ -393,31 +447,51 @@ const getTwitchDuration = (state, data, mediaKey) => {
   }
 
   const previousData = ledgerVideoCache.getDataByVideoId(state, mediaKey)
+
+  // remove duplicate events
+  if (
+    previousData.get('event') === data.event &&
+    previousData.get('time') === data.properties.time
+  ) {
+    return null
+  }
+
+  const oldEvent = previousData.get('event')
   const twitchMinimumSeconds = 10
 
-  if (previousData.isEmpty() && data.event === twitchEvents.START) {
+  if (data.event === twitchEvents.START && oldEvent === twitchEvents.START) {
+    return 0
+  }
+
+  if (data.event === twitchEvents.START) {
     return twitchMinimumSeconds * milliseconds.second
   }
 
-  const oldMedia = ledgerVideoCache.getDataByVideoId(state, mediaKey)
   let time = 0
   const currentTime = parseFloat(data.properties.time)
   const oldTime = parseFloat(previousData.get('time'))
+  const currentEvent = data.event
 
-  if (
-    data.event === twitchEvents.PLAY_PAUSE &&
-    oldMedia.get('event') !== twitchEvents.PLAY_PAUSE
-  ) {
-    // User paused a video
-    time = currentTime - oldTime
-  } else if (previousData.get('event') === twitchEvents.START) {
+  if (oldEvent === twitchEvents.START) {
     // From video play event to x event
     time = currentTime - oldTime - twitchMinimumSeconds
-  } else if (data.event === twitchEvents.MINUTE_WATCHED) {
-    // Minute watched event
-    time = currentTime - oldTime
-  } else if (data.event === twitchEvents.SEEK && oldMedia.get('event') !== twitchEvents.PLAY_PAUSE) {
-    // Vod seek event
+  } else if (
+    currentEvent === twitchEvents.MINUTE_WATCHED || // Minute watched
+    currentEvent === twitchEvents.BUFFER_EMPTY || // Run out of buffer
+    currentEvent === twitchEvents.VIDEO_ERROR || // Video has some problems
+    currentEvent === twitchEvents.END || // Video ended
+    (currentEvent === twitchEvents.SEEK && previousData.get('status') !== 'paused') || // Vod seek
+    (
+      currentEvent === twitchEvents.PLAY_PAUSE &&
+      (
+        (
+          oldEvent !== twitchEvents.PLAY_PAUSE &&
+          oldEvent !== twitchEvents.SEEK
+        ) ||
+        previousData.get('status') === 'playing'
+      )
+    ) // User paused a video
+  ) {
     time = currentTime - oldTime
   }
 
@@ -436,7 +510,7 @@ const getTwitchDuration = (state, data, mediaKey) => {
   // we get seconds back, so we need to convert it into ms
   time = time * milliseconds.second
 
-  return Math.floor(time)
+  return time
 }
 
 const getYouTubeDuration = (data) => {
@@ -481,7 +555,10 @@ const getMediaProvider = (url, firstPartyUrl, referrer) => {
       (firstPartyUrl && firstPartyUrl.startsWith('https://www.twitch.tv/')) ||
       (referrer && referrer.startsWith('https://player.twitch.tv/'))
     ) &&
-    url.startsWith('https://api.mixpanel.com/')
+    (
+      url.includes('.ttvnw.net/v1/segment/') ||
+      url.includes('https://ttvnw.net/v1/segment/')
+    )
   ) {
     return ledgerMediaProviders.TWITCH
   }

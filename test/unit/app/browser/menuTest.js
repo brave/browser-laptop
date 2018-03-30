@@ -30,6 +30,9 @@ describe('menu reducer unit tests', function () {
       createBookmarkTemplateItems: (sites) => {
         return []
       },
+      createOtherBookmarkTemplateItems: (sites) => {
+        return []
+      },
       getMenuItem: (menu, label) => {
         return {
           click: () => {}

@@ -60,6 +60,7 @@ var rendererIdentifiers = function () {
     'deleteBookmarks',
     'deleteHistoryEntry',
     'deleteHistoryEntries',
+    'deleteDomainFromHistory',
     'deleteLedgerEntry',
     'ledgerBackupText1',
     'ledgerBackupText2',
@@ -133,6 +134,7 @@ var rendererIdentifiers = function () {
     'recentlyClosed',
     'recentlyVisited',
     'bookmarks',
+    'otherBookmarks',
     'addToFavoritesBar',
     'window',
     'minimize',
@@ -280,7 +282,10 @@ var rendererIdentifiers = function () {
     'promotionGeneralErrorText',
     'promotionClaimedErrorMessage',
     'promotionClaimedErrorText',
-    'promotionClaimedErrorTitle'
+    'promotionClaimedErrorTitle',
+    'corruptedOverlayTitle',
+    'corruptedOverlayMessage',
+    'corruptedOverlayText'
   ].concat(countryCodes).concat(availableLanguages)
 }
 

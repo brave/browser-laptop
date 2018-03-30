@@ -130,6 +130,15 @@ module.exports.createBookmarkTemplateItems = (state) => {
 }
 
 /**
+ * Used to create bookmarks and bookmark folder entries for "Other Bookamrks" in the "Bookmarks" menu
+ *
+ * @param state The application state
+ */
+module.exports.createOtherBookmarkTemplateItems = (state) => {
+  return createBookmarkTemplateItems(state, -1)
+}
+
+/**
  * @param {string} key within closedFrames, i.e. a URL
  * @return {string}
  */

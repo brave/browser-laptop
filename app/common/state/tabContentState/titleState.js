@@ -8,6 +8,7 @@
  const partitionState = require('../tabContentState/partitionState')
  const privateState = require('../tabContentState/privateState')
  const frameStateUtil = require('../../../../js/state/frameStateUtil')
+ const tabUIState = require('../tabUIState')
 
  // Utils
  const {isEntryIntersected} = require('../../../../app/renderer/lib/observerUtil')
@@ -26,11 +27,13 @@
    const isActive = frameStateUtil.isFrameKeyActive(state, frameKey)
    const isPartition = partitionState.isPartitionTab(state, frameKey)
    const isPrivate = privateState.isPrivateTab(state, frameKey)
-   const secondaryIconVisible = !isNewTabPage && (isPartition || isPrivate || isActive)
+   const secondaryIconVisible = !isNewTabPage &&
+    (isPartition || isPrivate || isActive) &&
+    tabUIState.showTabEndIcon(state, frameKey)
 
    // If title is being intersected by ~half with other icons visible
    // such as closeTab (activeTab) or session icons, do not show it
-   if (isEntryIntersected(state, 'tabs', intersection.at45) && secondaryIconVisible) {
+   if (isEntryIntersected(state, 'tabs', intersection.at46) && secondaryIconVisible) {
      return false
    }
 

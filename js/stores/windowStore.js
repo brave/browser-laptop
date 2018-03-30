@@ -16,6 +16,7 @@ const messages = require('../constants/messages')
 const debounce = require('../lib/debounce')
 const getSetting = require('../settings').getSetting
 const UrlUtil = require('../lib/urlutil')
+const color = require('../lib/color')
 const {l10nErrorText} = require('../../app/common/lib/httpUtil')
 const { makeImmutable } = require('../../app/common/state/immutableUtil')
 const {aboutUrls, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
@@ -397,10 +398,13 @@ const doAction = (action) => {
       {
         const frameKey = action.frameProps.get('key')
         if (action.themeColor !== undefined) {
-          windowState = windowState.setIn(frameStateUtil.frameStatePath(windowState, frameKey).concat(['themeColor']), action.themeColor)
+          // remove alpha channel
+          const solidColor = color.removeAlphaChannelForBackground(action.themeColor, 255, 255, 255)
+          windowState = windowState.setIn(frameStateUtil.frameStatePath(windowState, frameKey).concat(['themeColor']), solidColor)
         }
         if (action.computedThemeColor !== undefined) {
-          windowState = windowState.setIn(frameStateUtil.frameStatePath(windowState, frameKey).concat(['computedThemeColor']), action.computedThemeColor)
+          const solidColor = color.removeAlphaChannelForBackground(action.computedThemeColor, 255, 255, 255)
+          windowState = windowState.setIn(frameStateUtil.frameStatePath(windowState, frameKey).concat(['computedThemeColor']), solidColor)
         }
         break
       }
@@ -480,21 +484,28 @@ const doAction = (action) => {
       windowState = windowState.delete('bookmarkFolderDetail')
       break
     case windowConstants.WINDOW_AUTOFILL_SELECTION_CLICKED:
+      windowState = contextMenuState.setContextMenu(windowState)
       ipc.send('autofill-selection-clicked', action.tabId, action.value, action.frontEndId, action.index)
-      windowState = windowState.delete('contextMenuDetail')
       break
     case windowConstants.WINDOW_AUTOFILL_POPUP_HIDDEN:
-      if (!action.detail &&
-          windowState.getIn(['contextMenuDetail', 'type']) === 'autofill' &&
-          windowState.getIn(['contextMenuDetail', 'tabId']) === action.tabId) {
-        windowState = windowState.delete('contextMenuDetail')
-        if (action.notify) {
-          ipc.send('autofill-popup-hidden', action.tabId)
+      {
+        const contextMenuDetail = contextMenuState.getContextMenu(windowState)
+        if (!action.detail &&
+            contextMenuDetail.get('type') === 'autofill' &&
+            contextMenuDetail.get('tabId') === action.tabId) {
+          windowState = contextMenuState.setContextMenu(windowState)
+          if (action.notify) {
+            ipc.send('autofill-popup-hidden', action.tabId)
+          }
         }
+        break
       }
-      break
     case windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL:
-      windowState = contextMenuState.setContextMenu(windowState, action.detail)
+      if (action.contextMenuDetail) {
+        windowState = windowState.set('contextMenuDetail', action.contextMenuDetail)
+      } else {
+        windowState = windowState.delete('contextMenuDetail')
+      }
       break
     case windowConstants.WINDOW_SET_POPUP_WINDOW_DETAIL:
       if (!action.detail) {
