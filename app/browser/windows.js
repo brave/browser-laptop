@@ -163,7 +163,9 @@ function refocusFocusedWindow () {
 
 function showDeferredShowWindow (win) {
   // were we asked to make the window active / foreground?
-  const shouldShowInactive = win.webContents.browserWindowOptions.inactive
+  // note: do not call win.showInactive if there is no other active window, otherwise this window will
+  // never get an entry in taskbar on Windows
+  const shouldShowInactive = win.webContents.browserWindowOptions.inactive && BrowserWindow.getFocusedWindow()
   if (shouldShowInactive) {
     // we were asked NOT to show the window active.
     // we should maintain focus on the window which already has it
