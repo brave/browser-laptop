@@ -25,7 +25,7 @@ const browserWindowUtil = require('../common/lib/browserWindowUtil')
 const windowState = require('../common/state/windowState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
 const {zoomLevel} = require('../common/constants/toolbarUserInterfaceScale')
-const { shouldDebugWindowEvents, disableBufferWindow } = require('../cmdLine')
+const { shouldDebugWindowEvents, disableBufferWindow, disableDeferredWindowLoad } = require('../cmdLine')
 const activeTabHistory = require('./activeTabHistory')
 
 const isDarwin = platformUtil.isDarwin()
@@ -591,6 +591,9 @@ const api = {
   },
 
   createWindow: function (windowOptionsIn, parentWindow, maximized, frames, immutableState = Immutable.Map(), hideUntilRendered = true, cb = null) {
+    if (disableDeferredWindowLoad) {
+      hideUntilRendered = false
+    }
     const defaultOptions = {
       // hide the window until the window reports that it is rendered
       show: true,
