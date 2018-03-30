@@ -151,13 +151,12 @@ const updatePinnedTabs = (win, appState) => {
   }
 }
 
-function refocusFocusedWindow () {
-  const focusedWindow = BrowserWindow.getFocusedWindow()
-  if (focusedWindow) {
+function refocusFocusedWindow (win) {
+  if (win && !win.isDestroyed()) {
     if (shouldDebugWindowEvents) {
-      console.log('focusing on window', focusedWindow.id)
+      console.log('focusing on window', win.id)
     }
-    focusedWindow.focus()
+    win.focus()
   }
 }
 
@@ -165,18 +164,19 @@ function showDeferredShowWindow (win) {
   // were we asked to make the window active / foreground?
   // note: do not call win.showInactive if there is no other active window, otherwise this window will
   // never get an entry in taskbar on Windows
-  const shouldShowInactive = win.webContents.browserWindowOptions.inactive && BrowserWindow.getFocusedWindow()
+  const currentlyFocused = BrowserWindow.getFocusedWindow()
+  const shouldShowInactive = win.webContents.browserWindowOptions.inactive && currentlyFocused
   if (shouldShowInactive) {
     // we were asked NOT to show the window active.
     // we should maintain focus on the window which already has it
     if (shouldDebugWindowEvents) {
       console.log('showing deferred window inactive', win.id)
     }
-    win.showInactive()
+    win.show()
     // Whilst the window will not have focus, it will potentially be
     // on top of the window which already had focus,
     // so re-focus the focused window.
-    setImmediate(refocusFocusedWindow)
+    setImmediate(refocusFocusedWindow.bind(null, currentlyFocused))
   } else {
     // we were asked to show the window active
     if (shouldDebugWindowEvents) {
@@ -193,7 +193,7 @@ function showDeferredShowWindow (win) {
     setTimeout(() => {
       win.setFullScreen(true)
       if (shouldShowInactive) {
-        setImmediate(refocusFocusedWindow)
+        setImmediate(refocusFocusedWindow.bind(null, currentlyFocused))
       }
     }, 100)
   } else if (win.__shouldMaximize) {
