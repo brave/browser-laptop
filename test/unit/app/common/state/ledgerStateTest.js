@@ -622,4 +622,71 @@ describe('ledgerState unit test', function () {
       assert.equal(result, 'corrupted')
     })
   })
+
+  describe('getVerifiedPublisherLocation', function () {
+    it('null case', function () {
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState)
+      assert.equal(result, null)
+    })
+    it('empty string', function () {
+      const url = ''
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
+      assert.equal(result, null)
+    })
+    it('url shortener', function () {
+      const url = 'https://www.duckduckgo.com'
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
+      assert.equal(result, 'duckduckgo.com')
+    })
+    it('url shortner with sub levels', function () {
+      const url = 'https://brianbondywww.com/projects/'
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
+      assert.equal(result, 'brianbondywww.com')
+    })
+    it('url shortner with sub levels', function () {
+      const url = 'https://www.brianbondywww.com/projects/'
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
+      assert.equal(result, 'brianbondywww.com')
+    })
+    it('url shortner with sub levels', function () {
+      const url = 'https://www2.brianbondy.com/projects/'
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
+      assert.equal(result, 'brianbondy.com')
+    })
+    it('url shortner with sub levels', function () {
+      const url = 'https://subdomain.brianbondy.com/projects/'
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
+      assert.equal(result, 'brianbondy.com')
+    })
+    it('url shortener with multi sublevels', function () {
+      const url = 'https://www.coindesk.com/market-center/ethereum'
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
+      assert.equal(result, 'coindesk.com')
+    })
+    it('url shortener with any protocol', function () {
+      const url = 'anything://www.this.any.site.com'
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
+      assert.equal(result, 'site.com')
+    })
+    it('url shortener with any protocol [ccTLD]', function () {
+      const url = 'anything://www.this.any.site.co.jp'
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
+      assert.equal(result, 'site.co.jp')
+    })
+    it('url shortener with any protocol with sublevels', function () {
+      const url = 'anything://www.this.any.site.co.jp/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v'
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
+      assert.equal(result, 'site.co.jp')
+    })
+    it('url shortener with any protocol with sublevels ultra log', function () {
+      const url = 'anything://www.this.any.site.co.jp/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/.com/r/s/t/u/v'
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
+      assert.equal(result, 'site.co.jp')
+    })
+    it('url shortener with any protocol confusion', function () {
+      const url = 'anything://www.2.www.ww.www.this.any.site.com.org.com'
+      const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
+      assert.equal(result, 'org.com')
+    })
+  })
 })

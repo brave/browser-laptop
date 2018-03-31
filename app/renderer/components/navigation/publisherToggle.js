@@ -59,7 +59,7 @@ class PublisherToggle extends React.Component {
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const location = activeFrame.get('location', '')
     const locationId = getBaseUrl(location)
-    const publisherKey = ledgerState.getLocationProp(state, locationId, 'publisher')
+    const publisherKey = ledgerState.getVerifiedPublisherLocation(state, locationId)
 
     const props = {}
     // used in renderer
