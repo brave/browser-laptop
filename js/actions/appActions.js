@@ -939,13 +939,11 @@ const appActions = {
    * Dispatches a message to enable/disable a site's shield settings
    * @param {number} tabId = The tabId
    */
-  toggleShields: function (tabId, value, lastCommittedURL, isPrivate) {
+  toggleShields: function (frame, value) {
     dispatch({
       actionType: appConstants.APP_TOGGLE_SHIELDS,
-      tabId,
-      value,
-      lastCommittedURL,
-      isPrivate
+      frame,
+      value
     })
   },
 

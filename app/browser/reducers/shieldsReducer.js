@@ -15,27 +15,27 @@ const appConstants = require('../../../js/constants/appConstants')
 // Utils
 const urlParse = require('../../common/urlParse')
 const urlUtil = require('../../../js/lib/urlutil')
+const frameStateUtil = require('../../../js/state/frameStateUtil')
 
 const shieldsReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_TOGGLE_SHIELDS:
       {
-        const tabId = action.get('tabId')
+        const frame = action.get('frame')
         const value = action.get('value')
-        const isPrivate = action.get('isPrivate')
-        const lastCommittedURL = action.get('lastCommittedURL')
 
-        if (!tabId || !lastCommittedURL) {
+        if (!frame) {
           break
         }
 
+        const lastCommittedURL = frameStateUtil.getLastCommittedURL(frame)
         const parsedUrl = urlParse(lastCommittedURL)
         const ruleKey = (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:')
         ? `https?://${parsedUrl.host}` : urlUtil.getOrigin(lastCommittedURL)
 
-        appActions.changeSiteSetting(ruleKey, 'shieldsUp', value, isPrivate)
-        appActions.loadURLRequested(tabId, lastCommittedURL)
+        appActions.changeSiteSetting(ruleKey, 'shieldsUp', !value, frame.get('isPrivate'))
+        appActions.loadURLRequested(frame.get('tabId'), lastCommittedURL)
         break
       }
   }

@@ -38,9 +38,7 @@ const platformUtil = require('../app/common/lib/platformUtil')
 const bookmarkFoldersUtil = require('../app/common/lib/bookmarkFoldersUtil')
 const historyUtil = require('../app/common/lib/historyUtil')
 const {makeImmutable} = require('../app/common/state/immutableUtil')
-const appConfig = require('./constants/appConfig')
-const siteSettings = require('./state/siteSettings')
-const siteSettingsState = require('../app/common/state/siteSettingsState')
+const {braveShieldsUp} = require('../app/common/state/shieldState')
 
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
@@ -1129,26 +1127,24 @@ function mainTemplateInit (nodeProps, frame, tab) {
   }
 
   if (!isAboutPage) {
-    const lastCommittedURL = frameStateUtil.getLastCommittedURL(activeFrame)
-    const allSiteSettings = siteSettingsState.getAllSiteSettings(appStoreRenderer.state, isPrivate)
-    const activeSiteSettings = siteSettings.getSiteSettingsForURL(allSiteSettings, lastCommittedURL)
-    const braverySettings = siteSettings.activeSettings(activeSiteSettings, appStoreRenderer.state, appConfig)
-    const shieldsUp = braverySettings.shieldsUp
-    template.push(
-      {
-        label: locale.translation('inspectElement'),
-        click: () => {
-          appActions.inspectElement(frame.get('tabId'), nodeProps.x, nodeProps.y)
-        }
-      },
-      CommonMenu.separatorMenuItem,
-      {
-        label: shieldsUp ? locale.translation('disableShields') : locale.translation('enableShields'),
-        click: () => {
-          appActions.toggleShields(frame.get('tabId'), !shieldsUp, lastCommittedURL, isPrivate)
-        }
+    template.push({
+      label: locale.translation('inspectElement'),
+      click: () => {
+        appActions.inspectElement(frame.get('tabId'), nodeProps.x, nodeProps.y)
       }
-    )
+    })
+    if (activeFrame) {
+      const shieldsUp = braveShieldsUp(appStoreRenderer.state, activeFrame)
+      template.push(
+        CommonMenu.separatorMenuItem,
+        {
+          label: shieldsUp ? locale.translation('disableShields') : locale.translation('enableShields'),
+          click: () => {
+            appActions.toggleShields(activeFrame, shieldsUp)
+          }
+        }
+      )
+    }
   }
 
   const extensionContextMenus = isPrivate
