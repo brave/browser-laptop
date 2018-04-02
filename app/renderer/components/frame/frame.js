@@ -584,18 +584,12 @@ class Frame extends React.Component {
       if (this.frame.isEmpty()) {
         return
       }
-    
-      const isNewPage = getBaseUrl(e.url) === getTargetAboutUrl('about:newtab')
       if (e.isMainFrame && !e.isErrorPage && !e.isFrameSrcDoc) {
         if (e.url && e.url.startsWith(appConfig.noScript.twitterRedirectUrl) &&
           this.props.noScript === true) {
           // This result will be canceled immediately by sitehacks, so don't
           // update the load state; otherwise it will not show the security
           // icon.
-          return
-        } else if (!isNewPage) {
-          // If not new page, don't reset the state
-          // Fixes a security icon when downloading an item
           return
         }
         windowActions.onWebviewLoadStart(this.frame, e.url)
