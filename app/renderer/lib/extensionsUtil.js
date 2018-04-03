@@ -21,6 +21,7 @@ const vimium = config.vimiumExtensionId
 const honey = config.honeyExtensionId
 const pinterest = config.pinterestExtensionId
 const metamask = config.metamaskExtensionId
+const betterttv = config.betterttvExtensionId
 
 /**
  * Stores dummy data for all known extensions based on vault-updater extension manifest.
@@ -79,6 +80,12 @@ const dummyData = [
     name: 'MetaMask',
     description: 'metamaskDesc',
     icon: 'img/extensions/metamask-128.png'
+  },
+  {
+    id: betterttv,
+    name: 'BetterTTV',
+    description: 'betterttvDesc',
+    icon: 'img/extensions/betterttv-128.png'
   }
   // {
   //   id: metamask,
@@ -177,6 +184,8 @@ module.exports.getExtensionKey = (extensionId) => {
     case metamask:
       extensionSetting = settings.METAMASK_ENABLED
       break
+    case betterttv:
+      extensionSetting = settings.BETTERTTV_ENABLED
     default:
       break
   }
