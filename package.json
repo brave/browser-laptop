@@ -92,6 +92,7 @@
     "bat-client": "^2.1.2",
     "bat-publisher": "^2.0.15",
     "bignumber.js": "^4.0.4",
+    "bip39": "^2.5.0",
     "bloodhound-js": "brave/bloodhound",
     "brave-ui": "^0.5.0",
     "clipboard-copy": "^1.0.0",
