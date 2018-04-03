@@ -1,0 +1,50 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/xenial64"
+  # This requires the vagrant-disksize plugin, to install use:
+  # vagrant plugin install vagrant-disksize
+  if Vagrant.has_plugin?('vagrant-disksize')
+    config.disksize.size = '100GB'
+  else
+     puts 'Vagrant plugin vagrant-disksize required, please install it using the command `vagrant plugin install vagrant-disksize` and retry.'
+     abort
+  end
+  config.vm.provision "shell", path: "script.sh", privileged: false
+  config.vm.provider "virtualbox" do |v|
+    v.gui = true
+    v.memory = 8192
+    v.customize ["modifyvm", :id, "--cpus", "2"]
+    v.customize ["modifyvm", :id, "--vram", "128"]
+  end
+
+  config.vm.synced_folder "../../../../", "/home/vagrant/browser-laptop", type: "rsync",
+    rsync__exclude: ["/node_modules/"],
+    rsync__args: ["--delete", "-z", "-r"]
+
+  if Dir.exist?(File.dirname(__FILE__) + "/../../../../../electron")
+    config.vm.synced_folder "../../../../../electron", "/home/vagrant/electron", type: "rsync",
+      rsync__exclude: ["/out/", "/node_modules/", "/external_binaries/", "/vendor/"],
+      rsync__args: ["--delete", "-z", "-r"]
+  end
+
+  if Dir.exist?(File.dirname(__FILE__) + "/../../../../../libchromiumcontent")
+    # config.vm.provision "shell", inline: "cd /home/vagrant/libchromiumcontent && script/bootstrap", privileged: false
+    # config.vm.provision "shell", inline: "cd /home/vagrant/libchromiumcontent && script/update -t x64", privileged: false
+    # config.vm.provision "shell", inline:
+    #   "cd /home/vagrant/electron && script/bootstrap.py -v --libcc_source_path ../libchromiumcontent/dist/main/src --libcc_shared_library_path ../libchromiumcontent/dist/main/shared_library --libcc_static_library_path ../libchromiumcontent/dist/main/static_library",
+    #   privileged: false
+    config.vm.synced_folder "../../../../../libchromiumcontent", "/home/vagrant/libchromiumcontent", type: "rsync",
+      rsync__exclude: ["/dist/", "/vendor/depot_tools/", "/vendor/python-patch/", "/vendor/chromium/src/"],
+      rsync__args: ["--delete", "-z", "-r"]
+  end
+
+    # vendor/chromium/src/build/install-build-deps.sh
+end
+
+
+# vagrant box add ubuntu/trusty64 --box-version 20150609.0.9
+# cd ~/.vagrant.d/boxes/ubuntu-VAGRANTSLASH-trusty64/20150609.0.9/virtualbox/
+# VBoxManage clonehd box-disk1.vmdk tmp-disk.vdi --format vdi
+# VBoxManage modifyhd tmp-disk.vdi --resize 100000
+# VBoxManage clonehd tmp-disk.vdi resized-disk.vmdk --format vmdk
+# rm tmp-disk.vdi box-disk1.vmdk
+# mv resized-disk.vmdk box-disk1.vmdk
