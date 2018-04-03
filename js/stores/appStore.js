@@ -34,6 +34,7 @@ const {HrtimeLogger} = require('../../app/common/lib/logUtil')
 const platformUtil = require('../../app/common/lib/platformUtil')
 const urlUtil = require('../lib/urlutil')
 const buildConfig = require('../constants/buildConfig')
+const {shouldDebugStoreActions} = require('../../app/cmdLine')
 
 // state helpers
 const {makeImmutable, findNullKeyPaths} = require('../../app/common/state/immutableUtil')
@@ -232,6 +233,10 @@ const handleAppAction = (action) => {
   if (!initialized) {
     console.error('Action called before state was initialized: ' + action.actionType)
     return
+  }
+
+  if (shouldDebugStoreActions) {
+    console.log('action:', action.actionType)
   }
 
   let immutableAction = Immutable.Map()

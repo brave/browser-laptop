@@ -257,7 +257,11 @@ const immediatelyEmittedActions = [
 
 // Register callback to handle all updates
 const doAction = (action) => {
-  // console.log(action.actionType, action, windowState.toJS())
+  let t0
+  if (windowState.get('debugStoreActions')) {
+    t0 = window.performance.now()
+    console.log(`%caction-start %c${action.actionType}`, 'color: #aaa', 'font-weight: bold', action)
+  }
   windowState = applyReducers(windowState, action, makeImmutable(action))
   switch (action.actionType) {
     case windowConstants.WINDOW_SET_STATE:
@@ -804,7 +808,9 @@ const doAction = (action) => {
     default:
       break
   }
-
+  if (windowState.get('debugStoreActions')) {
+    console.log(`%caction-end %dms, activeFrameKey: %d, frames:`, 'color: #aaa', window.performance.now() - t0, windowState.get('activeFrameKey'), windowState.get('frames', Immutable.List()).toJS())
+  }
   // Some events must be emitted right away, such as bound countrols
   if (immediatelyEmittedActions.includes(action.actionType)) {
     windowStore.emitChanges()
