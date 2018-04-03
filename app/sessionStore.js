@@ -824,7 +824,7 @@ module.exports.runPreMigrations = (data) => {
 
   if (data.lastAppVersion) {
     let runHSTSCleanup = false
-    try { runHSTSCleanup = compareVersions(data.lastAppVersion, '0.22.00') < 1 } catch (e) {}
+    try { runHSTSCleanup = compareVersions(data.lastAppVersion, '0.22.13') < 1 } catch (e) {}
 
     if (runHSTSCleanup) {
       filtering.clearHSTSData()
