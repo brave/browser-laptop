@@ -56,6 +56,7 @@ class BraveryPanel extends React.Component {
     this.onToggleCookieControl = this.onToggleSiteSetting.bind(this, 'cookieControl')
     this.onToggleHTTPSE = this.onToggleSiteSetting.bind(this, 'httpsEverywhere')
     this.onToggleFp = this.onToggleSiteSetting.bind(this, 'fingerprintingProtection')
+    this.onToggleDisableWebRTC = this.onToggleSiteSetting.bind(this, 'disableWebRTC')
     this.onReload = this.onReload.bind(this)
     this.onEditGlobal = this.onEditGlobal.bind(this)
     this.onInfoClick = this.onInfoClick.bind(this)
@@ -216,6 +217,7 @@ class BraveryPanel extends React.Component {
     props.fingerprintingProtection = braverySettings.fingerprintingProtection
     props.cookieControl = braverySettings.cookieControl
     props.safeBrowsing = braverySettings.safeBrowsing
+    props.disableWebRTC = braverySettings.disableWebRTC
     props.isCompactBraveryPanel = getSetting(settings.COMPACT_BRAVERY_PANEL)
     props.adsBlockedStat = props.blockedAds.size + props.blockedByTrackingList.size
     props.scriptsBlockedStat = props.blockedScripts.size
@@ -619,6 +621,18 @@ class BraveryPanel extends React.Component {
                   disabled={!this.props.shieldsUp}
                   testId='safeBrowsingSwitch'
                 />
+
+                <SwitchControl customStyleWrapper={[
+                  !this.props.isCompactBraveryPanel && gridStyles.row6col2,
+                  this.props.isCompactBraveryPanel && gridStyles.row10col1,
+                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
+                ]}
+                  onClick={this.onToggleDisableWebRTC}
+                  rightl10nId='disableWebRTC'
+                  checkedOn={this.props.disableWebRTC}
+                  disabled={!this.props.shieldsUp}
+                  testId='webRTCSwitch'
+                />
               </div>
             </section>
             : null
@@ -731,6 +745,10 @@ const gridStyles = StyleSheet.create({
     gridRow: 6,
     gridColumn: 1
   },
+  row6col2: {
+    gridRow: 6,
+    gridColumn: 2
+  },
   row7col1: {
     gridRow: 7,
     gridColumn: 1
@@ -740,6 +758,10 @@ const gridStyles = StyleSheet.create({
     gridColumn: 1
   },
   row9col1: {
+    gridRow: 9,
+    gridColumn: 1
+  },
+  row10col1: {
     gridRow: 9,
     gridColumn: 1
   }

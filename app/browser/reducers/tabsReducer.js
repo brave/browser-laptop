@@ -39,7 +39,7 @@ const getWebRTCPolicy = (state, tabId) => {
     siteSettings.getSiteSettingsForURL(allSiteSettings, tabValue.get('url'))
   const activeSiteSettings = siteSettings.activeSettings(tabSiteSettings, state, appConfig)
 
-  if (!activeSiteSettings || activeSiteSettings.fingerprintingProtection !== true) {
+  if (!activeSiteSettings || activeSiteSettings.disableWebRTC !== true) {
     return WEBRTC_DEFAULT
   } else {
     return WEBRTC_DISABLE_NON_PROXY
