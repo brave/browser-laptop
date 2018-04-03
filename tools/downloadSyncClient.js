@@ -6,7 +6,7 @@ const request = require('request')
 
 const filename = path.join(__dirname, '..',
   'app', 'extensions', 'brave', 'content', 'scripts', 'sync.js')
-const releaseUrl = 'https://api.github.com/repos/brave/sync/releases/latest'
+const releaseUrl = 'https://api.github.com/repos/brave-experiments/synchronicity/releases/latest'
 
 request({
   url: releaseUrl,

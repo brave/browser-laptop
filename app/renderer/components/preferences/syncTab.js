@@ -11,8 +11,10 @@ const niceware = require('niceware')
 // Components
 const ModalOverlay = require('../common/modalOverlay')
 const BrowserButton = require('../common/browserButton')
-const {SettingsList, SettingItem, SettingCheckbox} = require('../common/settings')
+const {SettingsList, SettingCheckbox} = require('../common/settings')
 const SortableTable = require('../common/sortableTable')
+const {Grid, Column} = require('brave-ui')
+const ClipboardButton = require('../common/clipboardButton')
 
 const {
   SectionTitleLabelWrapper,
@@ -22,6 +24,7 @@ const {
 } = require('../common/sectionTitle')
 
 const aboutActions = require('../../../../js/about/aboutActions')
+const appActions = require('../../../../js/actions/appActions')
 const tabActions = require('../../../common/actions/tabActions')
 const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
@@ -31,6 +34,15 @@ const cx = require('../../../../js/lib/classSet')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const commonStyles = require('../styles/commonStyles')
 const globalStyles = require('../styles/global')
+const syncDevicesImage = require('../../../extensions/brave/img/sync/circle_of_sync_landing_graphic.svg')
+const syncPhoneTabletImage = require('../../../extensions/brave/img/sync/device_type_phone-tablet.svg')
+const syncComputerImage = require('../../../extensions/brave/img/sync/device_type_computer.svg')
+const syncPlusImage = require('../../../extensions/brave/img/sync/add_device_titleicon.svg')
+const syncCodeImage = require('../../../extensions/brave/img/sync/synccode_titleicon.svg')
+const syncHandImage = require('../../../extensions/brave/img/sync/hand_image.png')
+const syncRemoveImage = require('../../../extensions/brave/img/sync/remove_device_titleicon.svg')
+const removeIcon = require('../../../extensions/brave/img/ledger/icon_remove.svg')
+const syncPassphraseInputSize = 16
 
 class SyncTab extends ImmutableComponent {
   constructor () {
@@ -40,6 +52,15 @@ class SyncTab extends ImmutableComponent {
     this.onReset = this.reset.bind(this)
     this.onRestore = this.restoreSyncProfile.bind(this)
     this.enableRestore = this.enableRestore.bind(this)
+    this.onCopy = this.copyPassphraseToClipboard.bind(this)
+    this.state = {
+      wordCount: 0,
+      deviceIdToRemove: '',
+      deviceNameToRemove: '',
+      isRemovingMainDevice: '',
+      currentDeviceOption: ''
+    }
+    this.onRemove = this.removeSyncDevice.bind(this)
   }
 
   get setupError () {
@@ -47,7 +68,12 @@ class SyncTab extends ImmutableComponent {
   }
 
   get isSetup () {
-    return !this.setupError && this.props.syncData.get('seed') instanceof Immutable.List && this.props.syncData.get('seed').size === 32
+    return (
+      this.props.syncData.get('setupCompleted') &&
+      !this.setupError &&
+      this.props.syncData.get('seed') instanceof Immutable.List &&
+      this.props.syncData.get('seed').size === 32
+    )
   }
 
   get enabled () {
@@ -91,45 +117,112 @@ class SyncTab extends ImmutableComponent {
     if (this.setupError) {
       return null
     }
-    // displayed before a sync userId has been created
-    return <section className={css(styles.setupContent)}>
-      <BrowserButton groupedItem primaryColor
-        l10nId='syncStart'
-        testId='syncStartButton'
-        onClick={this.props.showOverlay.bind(this, 'syncStart')}
-      />
-      <BrowserButton groupedItem secondaryColor
-        l10nId='syncAdd'
-        testId='syncAddButton'
-        onClick={this.props.showOverlay.bind(this, 'syncAdd')}
-      />
-    </section>
+
+    return (
+      <div className={css(styles.syncContainer)}>
+        <Grid>
+          <Column size={6}>
+            <img className={css(styles.sync__image)} src={syncDevicesImage} />
+          </Column>
+          <Column size={6}>
+            <SectionTitleLabelWrapper>
+              <AboutPageSectionTitle data-l10n-id='syncTitle' />
+              <SectionLabelTitle>beta</SectionLabelTitle>
+            </SectionTitleLabelWrapper>
+            <Column>
+              <p
+                data-l10n-id='syncWelcome1'
+                className={css(styles.syncContainer__text_big)}
+              />
+              <p
+                data-l10n-id='syncWelcome2'
+                className={css(styles.syncContainer__text_small)}
+              />
+            </Column>
+            <Column>
+              <section className={css(styles.setupContent)}>
+                <BrowserButton groupedItem primaryColor
+                  l10nId='syncStart'
+                  testId='syncStartButton'
+                  onClick={this.setupSync.bind(this)}
+                />
+                <BrowserButton groupedItem secondaryColor
+                  l10nId='syncAddCode'
+                  testId='syncAddCodeButton'
+                  onClick={this.props.showOverlay.bind(this, 'syncAdd')}
+                />
+              </section>
+            </Column>
+          </Column>
+        </Grid>
+      </div>
+    )
+  }
+
+  setupSync () {
+    this.setupSyncProfile(true)
+    this.props.showOverlay('syncStart')
   }
 
   get postSetupContent () {
-    return <SettingsList>
-      <div className={css(styles.device__box)}>
-        <SettingCheckbox
-          className={css(styles.device__item)}
-          dataL10nId='syncEnable'
-          prefKey={settings.SYNC_ENABLED}
-          settings={this.props.settings}
-          onChangeSetting={this.toggleSync}
-        />
-        <div className={css(styles.device__item)}>
-          <span className={css(styles.device__syncDeviceLabel)} data-l10n-id='syncDeviceName' />
-          <div className={css(styles.device__deviceName)}>
-            {getSetting(settings.SYNC_DEVICE_NAME, this.props.settings)}
-          </div>
+    return (
+      <div>
+        <SectionTitleLabelWrapper>
+          <AboutPageSectionTitle data-l10n-id='syncTitle' />
+          <SectionLabelTitle>beta</SectionLabelTitle>
+        </SectionTitleLabelWrapper>
+
+        <div className={css(styles.settingsListContainerMargin__bottom)}>
+          <span className='settingsListTitle' data-l10n-id='syncTitleMessage' />
+          <a href='https://github.com/brave/sync/wiki/Design' rel='noopener' target='_blank'>
+            <span className={cx({
+              fa: true,
+              'fa-question-circle': true
+            })} />
+          </a>
+          <div
+            data-l10n-id='syncBetaMessage'
+            className={cx({
+              settingsListTitle: true,
+              [css(styles.subText)]: true
+            })}
+          />
         </div>
+        <SettingsList>
+          <div className={css(styles.device__box)}>
+            <SettingCheckbox
+              className={css(styles.device__item)}
+              dataL10nId='syncEnable'
+              prefKey={settings.SYNC_ENABLED}
+              settings={this.props.settings}
+              onChangeSetting={this.toggleSync}
+            />
+            <div className={css(styles.device__item)}>
+              <span className={css(styles.device__syncDeviceLabel)} data-l10n-id='syncDeviceName' />
+              <div className={css(styles.device__deviceName)}>
+                {getSetting(settings.SYNC_DEVICE_NAME, this.props.settings)}
+              </div>
+            </div>
+          </div>
+          {this.enabled ? this.devicesContent : null}
+          <BrowserButton primaryColor
+            l10nId='syncNewDeviceButton'
+            l10nArgs={{device: this.defaultDeviceName}}
+            testId='syncNewDeviceButton'
+            onClick={this.props.showOverlay.bind(this, 'syncStart')}
+          />
+        </SettingsList>
       </div>
-      {this.enabled ? this.devicesContent : null}
-      <BrowserButton primaryColor
-        l10nId='syncNewDevice'
-        testId='syncNewDeviceButton'
-        onClick={this.props.showOverlay.bind(this, 'syncNewDevice')}
-      />
-    </SettingsList>
+    )
+  }
+
+  onClickSyncRemoveButton (e) {
+    // create a temporary state to host the device to be removed
+    this.setState({deviceIdToRemove: e.target.id})
+    this.setState({deviceNameToRemove: e.target.dataset.deviceName})
+    this.setState({isRemovingMainDevice: e.target.dataset.mainDevice})
+    // hide the current modal
+    this.props.showOverlay('syncRemove')
   }
 
   get devicesTableRows () {
@@ -147,6 +240,17 @@ class SyncTab extends ImmutableComponent {
       {
         html: new Date(device.get('lastRecordTimestamp')).toLocaleString(),
         value: device.get('lastRecordTimestamp')
+      },
+      {
+        html: <span
+          id={id}
+          data-main-device={device.get('mainDevice')}
+          data-device-name={device.get('name')}
+          data-l10n-id='syncRemoveDevice'
+          className={css(styles.actionIcons__icon, styles.actionIcons__icon_remove)}
+          onClick={this.onClickSyncRemoveButton.bind(this)}
+        />,
+        value: ''
       }
     ])
   }
@@ -154,13 +258,31 @@ class SyncTab extends ImmutableComponent {
   get devicesContent () {
     return <section className={css(styles.settingsListContainerMargin__top)}>
       <DefaultSectionTitle data-l10n-id='syncDevices' data-test-id='syncDevices' />
-      <SortableTable
-        headings={['id', 'syncDeviceName', 'syncDeviceLastActive']}
-        defaultHeading='syncDeviceLastActive'
-        defaultHeadingSortOrder='desc'
-        rows={this.devicesTableRows}
-        tableClassNames={css(styles.devices__devicesList)}
-      />
+      <Grid gap={0} columns={2}>
+        <Column size={1}>
+          <SortableTable
+            headings={['id', 'syncDeviceName', 'syncDeviceLastActive', 'remove']}
+            defaultHeading='syncDeviceLastActive'
+            defaultHeadingSortOrder='desc'
+            rows={this.devicesTableRows}
+            tableClassNames={css(styles.devices__devicesList)}
+          />
+        </Column>
+        <Column size={1}>
+          <BrowserButton
+            secondaryColor
+            l10nId='syncAddDevice'
+            onClick={this.props.showOverlay.bind(this, 'syncStart')}
+            custom={styles.sync__button_block}
+          />
+          <BrowserButton
+            secondaryColor
+            l10nId='syncViewCode'
+            onClick={this.props.showOverlay.bind(this, 'syncQRPassphrase')}
+            custom={styles.sync__button_block}
+           />
+        </Column>
+      </Grid>
     </section>
   }
 
@@ -202,10 +324,14 @@ class SyncTab extends ImmutableComponent {
     </ul>
   }
 
-  get passphraseContent () {
-    if (!this.isSetup) {
-      return null
+  copyPassphraseToClipboard () {
+    if (!this.passphraseDisplay) {
+      return
     }
+    appActions.clipboardTextCopied(this.passphraseDisplay.value)
+  }
+
+  get passphraseContent () {
     const seed = Buffer.from(this.props.syncData.get('seed').toJS())
     const passphrase = niceware.bytesToPassphrase(seed)
     const words = [
@@ -214,67 +340,31 @@ class SyncTab extends ImmutableComponent {
       passphrase.slice(8, 12).join(' '),
       passphrase.slice(12, 16).join(' ')
     ]
-    return this.props.syncPassphraseVisible
-      ? <ul className={css(styles.syncOverlayBody__listWrapper)}>
-        <li className={css(
-          styles.syncOverlayBody__listItem,
-          commonStyles.noMarginBottom,
-          commonStyles.noMarginLeft
-        )}>
-          <BrowserButton secondaryColor
-            l10nId='syncHidePassphrase'
-            testId='syncHidePassphraseButton'
-            onClick={this.props.hidePassphrase}
-          />
-          <pre data-test-id='syncPassphrase'
-            className={css(
-              styles.passphrase,
-              styles.listItem__passphrase,
-              commonStyles.noMarginBottom
-            )}>{words.join('\n')}</pre>
-        </li>
-      </ul>
-      : <ul className={css(styles.syncOverlayBody__listWrapper)}>
-        <li className={css(
-          styles.syncOverlayBody__listItem,
-          commonStyles.noMarginBottom,
-          commonStyles.noMarginLeft
-        )}>
-          <BrowserButton secondaryColor
-            l10nId='syncShowPassphrase'
-            testId='syncShowPassphraseButton'
-            onClick={this.props.showPassphrase}
-          />
-        </li>
-      </ul>
-  }
 
-  get newOverlayContent () {
-    return <ol>
-      <li className={css(
-        styles.syncOverlayBody__listItem,
-        commonStyles.noMarginTop
-      )} data-l10n-id='syncNewDevice1' />
-      <li className={css(styles.syncOverlayBody__listItem)}>
-        <div data-l10n-id='syncNewDevice2' />
-        {this.qrcodeContent}
-      </li>
-      <li className={css(
-        styles.syncOverlayBody__listItem,
-        commonStyles.noMarginBottom
-      )}>
-        <div data-l10n-id='syncNewDevice3' />
-        {this.passphraseContent}
-      </li>
-    </ol>
-  }
-
-  get newOverlayFooter () {
-    return <BrowserButton secondaryColor
-      l10nId='done'
-      testId='doneButton'
-      onClick={this.props.hideOverlay.bind(this, 'syncNewDevice')}
-    />
+    return (
+      <div className={css(styles.syncOverlayBody__form)}>
+        <textarea className={css(
+          commonStyles.formControl,
+          commonStyles.textArea,
+          styles.passphrase,
+          styles.textArea__passphrase
+        )}
+          disabled
+          spellCheck='false'
+          value={words.join(' ').replace(',', ' ')}
+          ref={(node) => { this.passphraseDisplay = node }}
+        />
+        <div className={css(styles.syncOverlayBody__form__wordCount)}>
+          <div>
+            <span data-l10n-id='wordCount' /> {syncPassphraseInputSize}
+          </div>
+          <ClipboardButton
+            leftTooltip
+            copyAction={this.onCopy}
+          />
+        </div>
+      </div>
+    )
   }
 
   get defaultDeviceName () {
@@ -289,25 +379,36 @@ class SyncTab extends ImmutableComponent {
       : getSetting(settings.SYNC_DEVICE_NAME, this.props.settings)
   }
 
-  deviceNameInputContent (hasAutoFocus = false) {
-    return <SettingItem>
-      <div className={css(styles.syncOverlayBody__label)} data-l10n-id='syncDeviceNameInput' />
-      <input className={css(
-        commonStyles.formControl,
-        commonStyles.textbox,
-        commonStyles.textbox__outlineable,
-        commonStyles.textbox__isSettings
-      )}
-        autoFocus={hasAutoFocus}
-        spellCheck='false'
-        ref={(node) => { this.deviceNameInput = node }}
-        placeholder={this.defaultDeviceName} />
-    </SettingItem>
-  }
-
+  /**
+   * Sync Start Overlay
+   */
   get startOverlayContent () {
     return <section className={css(styles.syncOverlayBody__formBottomMargin)}>
-      {this.deviceNameInputContent(true)}
+      <Grid gap={0} columns={2} padding='0 90px'>
+        <Column><span data-l10n-id='syncChooseDevice' /></Column>
+        <Column size={1} align='center' verticalAlign='center' direction='column'>
+          <img className={css(
+            styles.sync__image,
+            styles.sync__image_start
+          )} src={syncPhoneTabletImage} />
+          <BrowserButton primaryColor
+            l10nId='syncPhoneOrTablet'
+            testId='syncPhoneOrTablet'
+            onClick={this.onClickSyncScanCodeButton.bind(this)}
+          />
+        </Column>
+        <Column size={1} align='center' verticalAlign='center' direction='column'>
+          <img className={css(
+            styles.sync__image,
+            styles.sync__image_start
+          )} src={syncComputerImage} />
+          <BrowserButton primaryColor
+            l10nId='computer'
+            testId='syncComputer'
+            onClick={this.onClickSyncChainCodeButton.bind(this)}
+          />
+        </Column>
+      </Grid>
     </section>
   }
 
@@ -321,33 +422,299 @@ class SyncTab extends ImmutableComponent {
 
   get addOverlayContent () {
     return <section>
-      <div className={css(styles.syncOverlayBody__label)} data-l10n-id='syncEnterPassphrase' />
-      <div className={css(styles.syncOverlayBody__form)}>
-        <textarea className={css(
-          commonStyles.formControl,
-          commonStyles.textArea,
-          styles.passphrase,
-          styles.textArea__passphrase
-        )}
-          spellCheck='false'
-          autoFocus
-          ref={(node) => { this.passphraseInput = node }}
-          onChange={this.enableRestore}
-        />
-      </div>
-      <div className={css(styles.syncOverlayBody__formBottomMargin)}>
-        {this.deviceNameInputContent()}
-      </div>
+      <Grid gap={0} padding='0 0 0 90px'>
+        <Column>
+          <div
+            data-l10n-id='syncEnterPassphrase'
+            className={css(styles.syncOverlayBody__formBottomMargin)}
+          />
+          <div className={css(styles.syncOverlayBody__form)}>
+            <textarea className={css(
+              commonStyles.formControl,
+              commonStyles.textArea,
+              styles.passphrase,
+              styles.textArea__passphrase
+            )}
+              spellCheck='false'
+              autoFocus
+              ref={(node) => { this.passphraseInput = node }}
+              onChange={this.enableRestore}
+            />
+            <div className={css(styles.syncOverlayBody__form__wordCount)}>
+              <span data-l10n-id='wordCount' /> {this.state.wordCount}
+            </div>
+          </div>
+        </Column>
+      </Grid>
     </section>
   }
 
   get addOverlayFooter () {
-    return <BrowserButton primaryColor
-      l10nId='syncCreate'
-      testId='syncCreateButton'
-      onClick={this.onRestore}
-      disabled={this.props.syncRestoreEnabled === false}
-    />
+    return (
+      <div>
+        <BrowserButton groupedItem secondaryColor
+          l10nId='cancel'
+          testId='cancelButton'
+          onClick={this.addOverlayCancelAction.bind(this)}
+        />
+        <BrowserButton groupedItem primaryColor
+          disabled={this.props.syncRestoreEnabled === false}
+          l10nId='syncConfirm'
+          testId='syncConfirmButton'
+          onClick={this.addOverlayConfirmAction.bind(this)}
+        />
+      </div>
+    )
+  }
+
+  addOverlayCancelAction () {
+    this.props.hideOverlay('syncAdd')
+  }
+
+  addOverlayConfirmAction () {
+    // close possible current modal
+    this.props.hideOverlay('syncChainCode')
+    this.props.hideOverlay('syncAdd')
+    // verify if you can restore sync
+    this.restoreSyncProfile()
+  }
+
+  onClickSyncChainCodeButton () {
+    this.setState({currentDeviceOption: 'computer'})
+    // close current modal
+    this.props.hideOverlay('syncStart')
+    // open chain code modal
+    this.props.showOverlay('syncChainCode')
+  }
+
+  onClickSyncScanCodeButton () {
+    this.setState({currentDeviceOption: 'mobile'})
+    // close current modal
+    this.props.hideOverlay('syncStart')
+    // open scan code modal
+    this.props.showOverlay('syncScanCode')
+  }
+
+  /**
+   * Sync Chain Code Overlay
+   */
+  get chainCodeOverlayContent () {
+    this.checkDeviceUpdatesFor('syncChainCode')
+    return (
+      <Grid gap={0} columns={1} padding='0 90px'>
+        <Column>
+          <p data-l10n-id='syncChainCodeDescription1' />
+          <p data-l10n-id='syncChainCodeDescription2' />
+          <p
+            data-l10n-id='syncChainCodeDescription3'
+            className={css(
+              styles.settingsListContainerMargin__top,
+              styles.settingsListContainerMargin__bottom
+            )}
+          />
+          {this.passphraseContent}
+        </Column>
+      </Grid>
+    )
+  }
+
+  get chainCodeOverlayFooter () {
+    return (
+      <div className={css(styles.syncOverlayFooter_split)}>
+        <BrowserButton secondaryColor
+          l10nId='syncScanQRCode'
+          onClick={this.chainCodeOverlayUseCameraInstead.bind(this)}
+        />
+        <div>
+          <BrowserButton groupedItem secondaryColor
+            l10nId='backWithArrow'
+            testId='cancelButton'
+            onClick={this.chainCodeOverlayPreviousAction.bind(this)}
+          />
+          <BrowserButton groupedItem primaryColor
+            l10nId={
+            this.props.syncData.get('devices').size < 2
+              ? 'syncLookingForDevice'
+              : 'done'
+            }
+            testId='syncLookingForDevice'
+            disabled={this.props.syncData.get('devices').size < 2}
+            onClick={this.chainCodeOverlayNextAction.bind(this)}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  chainCodeOverlayUseCameraInstead () {
+    // hide current modal
+    this.props.hideOverlay('syncChainCode')
+    // open chain code modal
+    this.props.showOverlay('syncScanCode')
+  }
+
+  chainCodeOverlayPreviousAction () {
+    // hide current modal
+    this.props.hideOverlay('syncChainCode')
+    // open previous modal
+    this.props.showOverlay('syncStart')
+  }
+
+  chainCodeOverlayNextAction () {
+    // close current modal
+    this.props.hideOverlay('syncChainCode')
+    this.props.hideOverlay('syncAdd')
+  }
+
+  /**
+   * Sync Scan Code (QR code) Overlay
+   */
+  get scanCodeOverlayContent () {
+    this.checkDeviceUpdatesFor('syncScanCode')
+    return (
+      <div>
+        <Grid gap={0} columns={2}>
+          <Column><p data-l10n-id='syncScanDescription' /></Column>
+          <Column size={1} verticalAlign='center'>
+            <img src={syncHandImage} />
+          </Column>
+          <Column size={1} align='center' verticalAlign='center'>
+            <img className={css(styles.syncOverlayBody__syncQRImg)}
+              src={this.props.syncData.get('seedQr')}
+              data-l10n-id='syncQRImg'
+              data-test-id='syncQRImg'
+            />
+          </Column>
+        </Grid>
+      </div>
+    )
+  }
+
+  get scanCodeOverlayFooter () {
+    return (
+      <div className={css(styles.syncOverlayFooter_split)}>
+        <BrowserButton secondaryColor
+          l10nId='syncTypeSecurityCode'
+          onClick={this.scanCodeOverlayNoCameraAvailable.bind(this)}
+        />
+        <div>
+          <BrowserButton groupedItem secondaryColor
+            l10nId='backWithArrow'
+            testId='cancelButton'
+            onClick={this.scanCodeOverlayPreviousAction.bind(this)}
+          />
+          <BrowserButton groupedItem primaryColor
+            l10nId={
+              this.props.syncData.get('devices').size < 2
+                ? 'syncLookingForDevice'
+                : 'done'
+              }
+            testId='syncLookingForDevice'
+            disabled={this.props.syncData.get('devices').size < 2}
+            onClick={this.scanCodeOverlayNextAction.bind(this)}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  onHideAnySetupOverlay () {
+    // hide every setup modal
+    this.props.hideOverlay('syncScanCode')
+    this.props.hideOverlay('syncChainCode')
+    this.props.hideOverlay('syncQRPassphrase')
+    this.props.hideOverlay('syncAdd')
+
+    if (!this.isSetup) {
+      // cancel sync without warning as user didn't complete setup
+      this.onReset(false)
+    }
+  }
+
+  scanCodeOverlayNoCameraAvailable () {
+    // hide current modal
+    this.props.hideOverlay('syncScanCode')
+    // open chain code modal
+    this.props.showOverlay('syncChainCode')
+  }
+
+  scanCodeOverlayPreviousAction () {
+    // hide current modal
+    this.props.hideOverlay('syncScanCode')
+    // open previous modal
+    this.props.showOverlay('syncStart')
+  }
+
+  checkDeviceUpdatesFor (modalName) {
+    const devices = this.props.syncData.get('devices')
+    const isSetupCompleted = this.props.syncData.get('setupCompleted')
+
+    // if setup is completed there's no need to check for updates
+    if (isSetupCompleted) {
+      return
+    }
+
+    if (devices.isEmpty()) {
+      // Update modal after 5s to check if new device is already fetch
+      setTimeout(() => this.forceUpdate(), 5000)
+    }
+
+    // the only way to finish sync setup is
+    // to have >= 2 devices in the list
+    if (devices.size >= 2) {
+      appActions.syncSetupCompleted(true)
+      // close current modal
+      this.props.hideOverlay(modalName)
+    }
+  }
+
+  scanCodeOverlayNextAction () {
+    // close current modal
+    this.props.hideOverlay('syncScanCode')
+  }
+
+  /**
+   * QR and Passphrase Overlay
+   */
+  get qrPassphraseOverlayContent () {
+    return (
+      <Grid gap={0} columns={4} padding='30px 0'>
+        <Column size={1} verticalAlign='center'>
+          <h3 data-l10n-id='syncQRCode' />
+        </Column>
+        <Column size={3} verticalAlign='center'>
+          <h3 data-l10n-id='syncWordCode' />
+        </Column>
+        <Column size={1} verticalAlign='center'>
+          <img className={css(
+            styles.syncOverlayBody__syncQRImg,
+            styles.syncOverlayBody__syncQRImg_small
+          )}
+            src={this.props.syncData.get('seedQr')}
+            data-l10n-id='syncQRImg'
+            data-test-id='syncQRImg'
+          />
+        </Column>
+        <Column size={3} verticalAlign='center'>
+          {this.passphraseContent}
+        </Column>
+      </Grid>
+    )
+  }
+
+  get qrPassphraseOverlayFooter () {
+    return (
+      <BrowserButton groupedItem primaryColor
+        l10nId='done'
+        testId='qrPassphraseDoneAction'
+        onClick={this.qrPassphraseOverlayDoneAction.bind(this)}
+      />
+    )
+  }
+
+  qrPassphraseOverlayDoneAction () {
+    // close current modal
+    this.props.hideOverlay('syncQRPassphrase')
   }
 
   get resetOverlayContent () {
@@ -379,7 +746,51 @@ class SyncTab extends ImmutableComponent {
     </section>
   }
 
+  get removeOverlayContent () {
+    return (
+      <Grid gap={0} columns={1} padding='0 77px'>
+        <Column>
+          {
+          this.state.isRemovingMainDevice
+            ? (
+              <div>
+                <p
+                  className={css(styles.settingsListContainerMargin__bottom)} data-l10n-id='syncRemoveActiveDeviceWarning1'
+                />
+                <p data-l10n-id='syncRemoveActiveDeviceWarning2' />
+              </div>
+            )
+            : <p data-l10n-id='syncRemoveOtherDeviceWarning' />
+          }
+        </Column>
+      </Grid>
+    )
+  }
+
+  get removeOverlayFooter () {
+    return <section>
+      <BrowserButton groupedItem secondaryColor
+        l10nId='cancel'
+        testId='cancelButton'
+        onClick={this.props.hideOverlay.bind(this, 'syncRemove')}
+      />
+      <BrowserButton groupedItem primaryColor
+        l10nId='syncRemove'
+        testId='syncRemoveButton'
+        onClick={this.onRemove}
+      />
+    </section>
+  }
+
   enableRestore (e) {
+    if (e.target.value.length > 0) {
+      const wordCount = e.target.value
+        .trim().replace(/\s+/gi, ' ').split(' ').length
+      this.setState({wordCount})
+    } else {
+      this.setState({wordCount: 0})
+    }
+
     if (this.props.syncRestoreEnabled === false && e.target.value) {
       this.props.enableSyncRestore(true)
     } else if (this.props.syncRestoreEnabled && !e.target.value) {
@@ -387,13 +798,19 @@ class SyncTab extends ImmutableComponent {
     }
   }
 
-  reset () {
+  reset (needsConfirmDialog = true) {
     const locale = require('../../../../js/l10n')
     const msg = locale.translation('areYouSure')
-    if (window.confirm(msg)) {
+    if (needsConfirmDialog && window.confirm(msg)) {
       aboutActions.resetSync()
+      appActions.syncSetupCompleted(false)
+      this.retry()
       this.props.hideOverlay('syncReset')
+      return
     }
+    aboutActions.resetSync()
+    appActions.syncSetupCompleted(false)
+    this.retry()
   }
 
   retry () {
@@ -401,11 +818,9 @@ class SyncTab extends ImmutableComponent {
     tabActions.reload()
   }
 
-  setupSyncProfile (isRestoring) {
-    this.props.onChangeSetting(settings.SYNC_DEVICE_NAME,
-      this.deviceNameInput.value || this.defaultDeviceName)
-    this.toggleSync(settings.SYNC_ENABLED, true, isRestoring)
-    this.props.hideOverlay('syncStart')
+  setupSyncProfile (shouldSetup, isRestoring) {
+    this.props.onChangeSetting(settings.SYNC_DEVICE_NAME, this.defaultDeviceName)
+    this.toggleSync(settings.SYNC_ENABLED, shouldSetup, isRestoring)
   }
 
   toggleSync (key, value, isRestoring = false) {
@@ -413,6 +828,21 @@ class SyncTab extends ImmutableComponent {
     if (!isRestoring) {
       aboutActions.reloadSyncExtension()
     }
+  }
+
+  removeSyncDevice (e) {
+    const targetDeviceId = this.state.deviceIdToRemove
+    const isMainDevice = this.state.isRemovingMainDevice
+
+    // if it's the main device, reset sync completely
+    if (isMainDevice) {
+      aboutActions.resetSync()
+      appActions.syncSetupCompleted(false)
+    } else {
+      appActions.removeSyncDevice(targetDeviceId)
+    }
+    // hide the current overlay
+    this.props.hideOverlay('syncRemove')
   }
 
   restoreSyncProfile () {
@@ -428,6 +858,7 @@ class SyncTab extends ImmutableComponent {
         // QR code and device ID are set after sync restarts
         aboutActions.saveSyncInitData(Array.from(inputCode))
         this.setupSyncProfile(true)
+        appActions.syncSetupCompleted(true)
         return
       }
     }
@@ -437,67 +868,97 @@ class SyncTab extends ImmutableComponent {
   render () {
     return <section data-test-id='syncContainer'>
       {
-      this.isSetup && this.props.syncNewDeviceOverlayVisible
+      this.props.syncStartOverlayVisible
         ? <ModalOverlay
-          title={'syncNewDevice'}
-          content={this.newOverlayContent}
-          footer={this.newOverlayFooter}
-          onHide={this.props.hideOverlay.bind(this, 'syncNewDevice')} />
-        : null
-      }
-      {
-      !this.isSetup && this.props.syncStartOverlayVisible
-        ? <ModalOverlay
-          title={'syncStart'}
+          grayOverlay
+          title='syncNewDeviceTitle'
+          titleArgs={{device: this.defaultDeviceName}}
+          titleImage={syncPlusImage}
           content={this.startOverlayContent}
-          footer={this.startOverlayFooter}
           onHide={this.props.hideOverlay.bind(this, 'syncStart')} />
         : null
       }
       {
-      !this.isSetup && this.props.syncAddOverlayVisible
+      this.props.syncAddOverlayVisible
         ? <ModalOverlay
-          title={'syncAdd'}
+          grayOverlay
+          title='syncAddCode'
+          titleImage={syncCodeImage}
           content={this.addOverlayContent}
           footer={this.addOverlayFooter}
-          onHide={this.props.hideOverlay.bind(this, 'syncAdd')} />
+          onHide={this.onHideAnySetupOverlay.bind(this)} />
         : null
       }
       {
-      this.isSetup && this.props.syncResetOverlayVisible
+      this.props.syncScanCodeOverlayVisible
         ? <ModalOverlay
+          grayOverlay
+          title={
+            this.state.currentDeviceOption === 'mobile'
+              ? 'syncScanMobile'
+              : 'syncScanComputer'
+          }
+          titleImage={syncPlusImage}
+          content={this.scanCodeOverlayContent}
+          footer={this.scanCodeOverlayFooter}
+          onHide={this.onHideAnySetupOverlay.bind(this)} />
+        : null
+      }
+      {
+        this.props.syncChainCodeOverlayVisible
+        ? <ModalOverlay
+          grayOverlay
+          title={
+            this.state.currentDeviceOption === 'mobile'
+              ? 'syncChainCodeMobile'
+              : 'syncChainCodeComputer'
+          }
+          titleArgs={{deviceType: 'syncChainCode'}}
+          titleImage={syncPlusImage}
+          content={this.chainCodeOverlayContent}
+          footer={this.chainCodeOverlayFooter}
+          onHide={this.onHideAnySetupOverlay.bind(this)} />
+        : null
+      }
+      {
+        this.props.syncQRPassphraseOverlayVisible
+        ? <ModalOverlay
+          grayOverlay
+          content={this.qrPassphraseOverlayContent}
+          footer={this.qrPassphraseOverlayFooter}
+          onHide={this.onHideAnySetupOverlay.bind(this)} />
+        : null
+      }
+      {
+      this.props.syncResetOverlayVisible
+        ? <ModalOverlay
+          grayOverlay
           title={'syncReset'}
           content={this.resetOverlayContent}
           footer={this.resetOverlayFooter}
           onHide={this.props.hideOverlay.bind(this, 'syncReset')} />
         : null
       }
+      {
+        this.props.syncRemoveOverlayVisible
+        ? <ModalOverlay
+          grayOverlay
+          title={'syncRemoveDeviceModal'}
+          titleImage={syncRemoveImage}
+          titleArgs={{device: this.state.deviceNameToRemove}}
+          content={this.removeOverlayContent}
+          footer={this.removeOverlayFooter}
+          onHide={this.props.hideOverlay.bind(this, 'syncRemove')} />
+        : null
+      }
       <section className={css(styles.settingsListContainerMargin__bottom)}>
-        <SectionTitleLabelWrapper>
-          <AboutPageSectionTitle data-l10n-id='syncTitle' />
-          <SectionLabelTitle>beta</SectionLabelTitle>
-        </SectionTitleLabelWrapper>
-
-        <div className={css(styles.settingsListContainerMargin__bottom)}>
-          <span className='settingsListTitle' data-l10n-id='syncTitleMessage' />
-          <a href='https://github.com/brave/sync/wiki/Design' rel='noopener' target='_blank'>
-            <span className={cx({
-              fa: true,
-              'fa-question-circle': true
-            })} />
-          </a>
-          <div className={cx({
-            settingsListTitle: true,
-            [css(styles.subText)]: true
-          })} data-l10n-id='syncBetaMessage' />
-          {
-            this.setupError
-            ? this.errorContent
-            : this.isSetup
-              ? this.postSetupContent
-              : this.setupContent
-          }
-        </div>
+        {
+          this.setupError
+          ? this.errorContent
+          : this.isSetup
+            ? this.postSetupContent
+            : this.setupContent
+        }
       </section>
       {
         this.isSetup && this.enabled
@@ -536,17 +997,47 @@ class SyncTab extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
+  syncContainer: {
+    margin: '40px 0 0',
+    height: '-webkit-fill-available',
+    maxWidth: '800px'
+  },
+
+  syncContainer__text_big: {
+    fontSize: '20px',
+    margin: '20px 0'
+  },
+
+  syncContainer__text_small: {
+    fontSize: '15px'
+  },
+
+  sync__image: {
+    display: 'block',
+    margin: 'auto',
+    maxWidth: '100%'
+  },
+
+  sync__image_start: {
+    width: '120px',
+    height: '100px',
+    margin: '30px 0'
+  },
+
   settingsListContainerMargin__top: {
     marginTop: globalStyles.spacing.settingsListContainerMargin
   },
+
   settingsListContainerMargin__bottom: {
     marginBottom: globalStyles.spacing.settingsListContainerMargin
   },
+
   passphrase: {
     // See: https://github.com/Khan/aphrodite#object-key-ordering
     fontSize: '18px',
     fontFamily: 'monospace'
   },
+
   subText: {
     color: globalStyles.color.gray,
     fontSize: '.9rem',
@@ -556,6 +1047,7 @@ const styles = StyleSheet.create({
   setupContent: {
     marginTop: globalStyles.spacing.dialogInsideMargin
   },
+
   errorContent__setupError: {
     color: globalStyles.color.braveDarkOrange,
     fontWeight: 'bold',
@@ -573,12 +1065,15 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     width: '600px'
   },
+
   device__item: {
     flex: 1
   },
+
   device__syncDeviceLabel: {
     fontSize: '.9rem'
   },
+
   device__deviceName: {
     marginTop: `calc(${globalStyles.spacing.panelPadding} / 2)`
   },
@@ -589,40 +1084,104 @@ const styles = StyleSheet.create({
   },
 
   textArea__passphrase: {
-    width: '80%',
-    height: '100px'
-  },
-
-  listItem__passphrase: {
-    margin: `${globalStyles.spacing.dialogInsideMargin} 0`,
-
-    // See ledgerBackup.js
-    cursor: 'text',
-    userSelect: 'text', // #11641
-    color: globalStyles.color.braveDarkOrange
+    width: '100%',
+    height: '120px',
+    borderTopLeftRadius: '4px',
+    borderTopRightRadius: '4px',
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    resize: 'none'
   },
 
   syncOverlayBody__listWrapper: {
     listStyle: 'none'
   },
+
   syncOverlayBody__listItem: {
     margin: globalStyles.spacing.dialogInsideMargin
   },
 
   syncOverlayBody__syncQRImg: {
-    position: 'relative',
-    right: globalStyles.spacing.dialogInsideMargin
+    margin: '20px 0'
   },
-  syncOverlayBody__label: {
-    // TODO: refactor preferences.less
-    // See: .settingsList .settingItem > *:not(.switchControl)
-    marginBottom: `${globalStyles.spacing.modalPanelHeaderMarginBottom} !important`
+
+  syncOverlayBody__syncQRImg_small: {
+    maxWidth: '90%'
   },
+
   syncOverlayBody__form: {
-    marginBottom: globalStyles.spacing.settingsListContainerMargin
+    border: '1px solid #000',
+    borderRadius: '4px',
+    padding: '2px',
+    width: '100%'
   },
+
+  syncOverlayBody__form__wordCount: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomLeftRadius: '4px',
+    borderBottomRightRadius: '4px',
+    padding: '5px 10px',
+    background: 'rgba(0, 0, 0, 0.1)',
+    fontSize: '13px',
+    fontWeight: 'bold'
+  },
+
   syncOverlayBody__formBottomMargin: {
     marginBottom: globalStyles.spacing.dialogInsideMargin
+  },
+
+  syncOverlayBody__select: {
+    borderRadius: '4px',
+    boxShadow: '0px 2px 8px -5px rgba(0, 0, 0, 1)',
+    display: 'block',
+    color: 'rgb(68, 68, 68)',
+    fontSize: '14px',
+    border: 'solid 1px rgba(0, 0, 0, 0.2)',
+    outline: 'none',
+    padding: '0.4em',
+    width: '100%',
+    maxWidth: '100%',
+    margin: '20px 0 0'
+  },
+
+  syncOverlayBody__text: {
+    marginBottom: '30px',
+    display: 'block'
+  },
+
+  syncOverlayBody__text_bold: {
+    marginRight: '10px',
+    fontWeight: 'bold'
+  },
+
+  syncOverlayFooter_split: {
+    display: 'flex',
+    flex: 1,
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+
+  actionIcons__icon: {
+    backgroundColor: '#c4c5c5',
+    width: '1rem',
+    height: '1rem',
+    display: 'inline-block',
+
+    ':hover': {
+      backgroundColor: globalStyles.color.buttonColor
+    }
+  },
+
+  actionIcons__icon_remove: {
+    '-webkit-mask-image': `url(${removeIcon})`
+  },
+
+  sync__button_block: {
+    display: 'block',
+    margin: '0 15px 15px',
+    minWidth: '160px'
   }
 })
 
