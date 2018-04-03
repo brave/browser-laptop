@@ -1127,7 +1127,7 @@ module.exports.defaultAppState = () => {
       },
       preferences: {},
       welcome: {
-        showOnLoad: !['test', 'development'].includes(process.env.NODE_ENV)
+        showOnLoad: !['test', 'development'].includes(process.env.NODE_ENV) || process.env.BRAVE_SHOW_FIRST_RUN_WELCOME
       }
     },
     trackingProtection: {
