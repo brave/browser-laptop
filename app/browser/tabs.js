@@ -1031,7 +1031,6 @@ const api = {
           } catch (e) {
             // TODO(riastradh): Report errors other than EEXIST.
           }
-          createProperties.tor_data_dir = path.join(userDataDir, 'tor', 'data')
           if (process.platform === 'win32') {
             createProperties.tor_path = '"' + path.join(getExtensionsPath('bin'), 'tor.exe') + '"'
           } else {

@@ -712,7 +712,6 @@ const initPartition = (partition) => {
     } catch (e) {
       // TODO(riastradh): Report errors other than EEXIST.
     }
-    options.tor_data_dir = path.join(userDataDir, 'tor', 'data')
     if (process.platform === 'win32') {
       options.tor_path = '"' + path.join(getExtensionsPath('bin'), 'tor.exe') + '"'
     } else {
