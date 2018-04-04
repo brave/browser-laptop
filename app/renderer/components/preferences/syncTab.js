@@ -7,6 +7,7 @@ const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
 const Immutable = require('immutable')
 const niceware = require('niceware')
+const bip39 = require('bip39')
 
 // Components
 const ModalOverlay = require('../common/modalOverlay')
@@ -41,7 +42,6 @@ const syncCodeImage = require('../../../extensions/brave/img/sync/synccode_title
 const syncHandImage = require('../../../extensions/brave/img/sync/hand_image.png')
 const syncRemoveImage = require('../../../extensions/brave/img/sync/remove_device_titleicon.svg')
 const removeIcon = require('../../../extensions/brave/img/ledger/icon_remove.svg')
-const syncPassphraseInputSize = 16
 
 class SyncTab extends ImmutableComponent {
   constructor () {
@@ -301,13 +301,17 @@ class SyncTab extends ImmutableComponent {
 
   get passphraseContent () {
     const seed = Buffer.from(this.props.syncData.get('seed').toJS())
-    const passphrase = niceware.bytesToPassphrase(seed)
-    const words = [
-      passphrase.slice(0, 4).join(' '),
-      passphrase.slice(4, 8).join(' '),
-      passphrase.slice(8, 12).join(' '),
-      passphrase.slice(12, 16).join(' ')
-    ]
+    let passphrase = seed && bip39.entropyToMnemonic(seed.toString('hex'))
+    let wordCount = 0
+
+    if (passphrase) {
+      if (typeof passphrase === 'string') {
+        passphrase = passphrase.split(' ')
+      }
+      if (Array.isArray(passphrase)) {
+        wordCount = passphrase.length
+      }
+    }
 
     return (
       <div className={css(
@@ -322,12 +326,12 @@ class SyncTab extends ImmutableComponent {
         )}
           disabled
           spellCheck='false'
-          value={words.join(' ').replace(',', ' ')}
+          value={passphrase.join(' ').replace(',', ' ')}
           ref={(node) => { this.passphraseDisplay = node }}
         />
         <div className={css(styles.syncOverlayBody__form__wordCount)}>
           <div>
-            <span data-l10n-id='wordCount' /> {syncPassphraseInputSize}
+            <span data-l10n-id='wordCount' /> {wordCount}
           </div>
           <ClipboardButton
             leftTooltip
@@ -795,19 +799,12 @@ class SyncTab extends ImmutableComponent {
   }
 
   enableRestore (e) {
+    let wordCount = 0
     if (e.target.value.length > 0) {
-      const wordCount = e.target.value
-        .trim().replace(/\s+/gi, ' ').split(' ').length
-      this.setState({wordCount})
-    } else {
-      this.setState({wordCount: 0})
+      wordCount = e.target.value.trim().replace(/\s+/gi, ' ').split(' ').length
     }
-
-    if (this.props.syncRestoreEnabled === false && e.target.value) {
-      this.props.enableSyncRestore(true)
-    } else if (this.props.syncRestoreEnabled && !e.target.value) {
-      this.props.enableSyncRestore(false)
-    }
+    this.setState({wordCount})
+    this.props.enableSyncRestore(e.target.value && (wordCount === 16 || wordCount === 24))
   }
 
   reset (needsConfirmDialog = true) {
@@ -860,13 +857,22 @@ class SyncTab extends ImmutableComponent {
 
   restoreSyncProfile () {
     if (this.passphraseInput.value) {
-      let text = this.passphraseInput.value.toLowerCase().replace(/,/g, ' ').replace(/\s+/g, ' ').trim()
+      const text = this.passphraseInput.value.toLowerCase().replace(/,/g, ' ').replace(/\s+/g, ' ').trim()
+      const words = text.split(' ')
       let inputCode = ''
+
       try {
-        inputCode = window.niceware.passphraseToBytes(text.split(' '))
+        if (words.length === 24) {
+          inputCode = Buffer.from(bip39.mnemonicToEntropy(text), 'hex')
+        } else if (words.length === 16) {
+          inputCode = window.niceware.passphraseToBytes(words)
+        } else {
+          throw new Error('Expecting 24 or 16 words in passphrase (received ' + words.length + ')')
+        }
       } catch (e) {
-        console.error('Could not convert niceware passphrase', e)
+        console.error('Could not convert passphrase', e)
       }
+
       if (inputCode && inputCode.length === 32) {
         // QR code and device ID are set after sync restarts
         aboutActions.saveSyncInitData(Array.from(inputCode))
