@@ -20,7 +20,9 @@ describe('tabsReducer unit tests', function () {
       useCleanCache: true
     })
     this.state = Immutable.fromJS({
-      settings: [],
+      settings: {
+        'advanced.webrtc.policy': 'disable_non_proxied_udp'
+      },
       tabs: [{
         tabId: 1,
         index: 0,
@@ -80,7 +82,7 @@ describe('tabsReducer unit tests', function () {
       isDevToolsFocused: (tabId) => {
         return tabId === 1
       },
-      setWebRTCIPHandlingPolicy: sinon.mock(),
+      setWebRTCIPHandlingPolicy: sinon.spy(),
       toggleDevTools: sinon.mock(),
       closeTab: sinon.mock(),
       moveTo: sinon.mock(),
@@ -158,7 +160,9 @@ describe('tabsReducer unit tests', function () {
     })
 
     it('updates the setWebRTCIPHandlingPolicy', function () {
-      assert(this.tabsAPI.setWebRTCIPHandlingPolicy.calledOnce)
+      assert.deepEqual(this.tabsAPI.setWebRTCIPHandlingPolicy.args, [
+        [1, 'disable_non_proxied_udp']
+      ])
     })
   })
 
