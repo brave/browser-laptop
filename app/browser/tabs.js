@@ -73,7 +73,13 @@ const getTabValue = function (tabId) {
 const updateTab = (tabId, changeInfo = {}) => {
   let tabValue = getTabValue(tabId)
   if (shouldDebugTabEvents) {
-    console.log(`Tab [${tabId}] updated from muon. changeInfo:`, changeInfo, 'currentValues:', { newIndex: tabValue && tabValue.get('index'), newActive: tabValue && tabValue.get('active'), windowId: tabValue && tabValue.get('windowId'), isPlaceholder: tabValue.get('isPlaceholder') })
+    console.log(`Tab [${tabId}] updated from muon. changeInfo:`, changeInfo, 'currentValues:', {
+      newIndex: tabValue && tabValue.get('index'),
+      newActive: tabValue && tabValue.get('active'),
+      windowId: tabValue && tabValue.get('windowId'),
+      isPlaceholder: tabValue && tabValue.get('isPlaceholder'),
+      guestInstanceId: tabValue && tabValue.get('guestInstanceId')
+    })
   }
 
   if (tabValue) {
