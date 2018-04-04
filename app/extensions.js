@@ -468,7 +468,7 @@ module.exports.init = () => {
       manifest = {
         name: 'PDF Viewer',
         manifest_version: 2,
-        version: '1.9.457',
+        version: '1.9.459',
         description: 'Uses HTML5 to display PDF files directly in the browser.',
         icons: {
           '128': 'icon128.png',
