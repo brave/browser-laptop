@@ -51,6 +51,8 @@ class GuestInstanceRenderer extends React.Component {
       isPlaceholder: frame && frame.get('isPlaceholder'),
       windowIsFocused: isFocused(state),
       frameKey,
+      frameIsReady,
+      frameIsInWindow,
       frameLocation: frame && frame.get('location'),
       urlBarFocused: frame && frame.getIn(['navbar', 'urlbar', 'focused'])
     }
@@ -130,7 +132,7 @@ class GuestInstanceRenderer extends React.Component {
 
   render () {
     const debugInfo = this.props.displayDebugInfo
-      ? `WindowId: ${getCurrentWindowId()}, TabId: ${this.props.tabId}, GuestId: ${this.props.guestInstanceId}, FrameKey: ${this.props.frameKey}, activeFrameKey: ${this.props.activeFrameKey}, windowIsFocused: ${this.props.windowIsFocused}`
+      ? `WindowId: ${getCurrentWindowId()}, TabId: ${this.props.tabId}, GuestId: ${this.props.guestInstanceId}, FrameKey: ${this.props.frameKey}, frameIsReady: ${this.props.frameIsReady}, frameIsInWindow: ${this.props.frameIsInWindow}, activeFrameKey: ${this.props.activeFrameKey}, windowIsFocused: ${this.props.windowIsFocused}`
       : null
     return (
       <div
