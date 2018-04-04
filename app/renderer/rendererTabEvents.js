@@ -150,7 +150,6 @@ const api = module.exports = {
               // icon.
               break
           }
-          console.log(tabId, 'loadStart', e.url)
           windowActions.onWebviewLoadStart(frame, e.url)
         }
         break
@@ -295,7 +294,6 @@ const api = module.exports = {
 }
 
 function handleTabIpcMessage(tabId, e) {
-  console.log('tab ipc message: ', e.channel)
   let method = () => {}
   switch (e.channel) {
     case messages.GOT_CANVAS_FINGERPRINTING: {
@@ -400,7 +398,6 @@ function loadEnd (tabId, frame, savePage, url, inPageNav) {
   if (frame.isEmpty()) {
     return
   }
-  console.log(tabId, 'loadEnd', url, frame.toJS())
   windowActions.onWebviewLoadEnd(frame, url)
   const parsedUrl = urlParse(url)
   if (!allowRunningWidevinePlugin(tabId, frame)) {

@@ -42,6 +42,7 @@ class GuestInstanceRenderer extends React.Component {
 
     const props = {
       displayDebugInfo: getSetting(settings.DEBUG_VERBOSE_TAB_INFO),
+      debugTabEvents: state.getIn(['currentWindow', 'debugTabEvents']),
       activeFrameKey: state.getIn(['currentWindow', 'activeFrameKey']),
       guestInstanceId: frameIsInWindow && frameIsReady && frame.get('guestInstanceId'),
       tabId: frameIsInWindow && frameIsReady && frame.get('tabId'),
@@ -64,15 +65,24 @@ class GuestInstanceRenderer extends React.Component {
     this.onPropsChanged(prevProps)
   }
 
+  debugLog (...messages) {
+    if (this.props.debugTabEvents) {
+      console.log(...messages)
+    }
+  }
+
   onPropsChanged (prevProps = {}) {
     // attach new guest instance
+    this.webviewDisplay.shouldLogEvents = this.props.debugTabEvents
     if (this.webviewDisplay && this.props.tabId && prevProps.tabId !== this.props.tabId) {
+      this.debugLog('guestInstanceRenderer, attach tab', this.props.tabId, 'guest', this.props.guestInstanceId, this.props.isPlaceholder)
       if (!this.props.isPlaceholder) {
         this.webviewDisplay.attachActiveTab(this.props.tabId)
-      } else {
-        console.log('placeholder, not showing')
+      } else if (this.props.debugTabEvents) {
+        this.debugLog('placeholder, not showing')
       }
     }
+    this.webviewDisplay.debugTabEvents = this.props.debugTabEvents
     // update state of which frame is currently being viewed
     if (this.props.tabId !== prevProps.tabId && this.props.windowIsFocused) {
       windowActions.setFocusedFrame(this.props.frameLocation, this.props.tabId)

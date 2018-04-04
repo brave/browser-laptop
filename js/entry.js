@@ -37,6 +37,7 @@ const messages = require('./constants/messages')
 const l10n = require('./l10n')
 const currentWindow = require('../app/renderer/currentWindow')
 
+let shouldDebugTabEvents = false
 webFrame.setPageScaleLimits(1, 1)
 
 l10n.init()
@@ -80,10 +81,12 @@ ipc.on(messages.INITIALIZE_WINDOW, (e, mem) => {
   if (process.env.NODE_ENV === 'development') {
     console.debug(`This Window's ID is:`, windowValue.id)
   }
-  const newState = Immutable.fromJS(message.windowState) || windowStore.getState()
 
+  const newState = Immutable.fromJS(message.windowState) || windowStore.getState()
   appStoreRenderer.state = Immutable.fromJS(message.appState)
   windowStore.state = newState
+  shouldDebugTabEvents = message.windowState.debugTabEvents
+
   appActions.windowReady(windowValue.id, windowValue)
   ReactDOM.render(<Window />, document.getElementById('appContainer'), fireOnReactRender.bind(null, windowValue))
 })
@@ -98,6 +101,9 @@ const rendererTabEvents = require('../app/renderer/rendererTabEvents')
 electron.remote.registerAllWindowTabEvents(e => {
   const eventName = e.type
   const tabId = e.eventTabId
+  if (shouldDebugTabEvents) {
+    console.log(`%ctab event %d %c${eventName}`, 'color: #8b8bb1', tabId, 'color: #4545d4; font-weight: bold')
+  }
   try {
     rendererTabEvents.handleTabEvent(tabId, eventName, e)
   } catch (e) {
@@ -107,6 +113,9 @@ electron.remote.registerAllWindowTabEvents(e => {
 })
 
 ipc.on('new-web-contents-added', (e, frameOpts, newTabValue) => {
+  if (shouldDebugTabEvents) {
+    console.log(`ipc new-web-contents-added`, frameOpts, newTabValue)
+  }
   windowActions.newFrame(frameOpts, newTabValue)
 })
 

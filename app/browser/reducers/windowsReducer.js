@@ -24,7 +24,7 @@ const BrowserWindow = electron.BrowserWindow
 const firstDefinedValue = require('../../../js/lib/functional').firstDefinedValue
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
-const { shouldDebugStoreActions } = require('../../cmdLine')
+const { shouldDebugStoreActions, shouldDebugTabEvents } = require('../../cmdLine')
 
 // TODO cleanup all this createWindow crap
 function isModal (browserOpts) {
@@ -48,6 +48,7 @@ function clearFramesFromWindowState (windowState) {
 function setInitialWindowState (windowState) {
   return windowState
     .set('debugStoreActions', shouldDebugStoreActions)
+    .set('debugTabEvents', shouldDebugTabEvents)
 }
 
 /**
