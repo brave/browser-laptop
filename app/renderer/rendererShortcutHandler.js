@@ -216,6 +216,7 @@ function onFindAgain (frameKey, forward) {
   if (searchString) {
     const caseSensitivity = frame.getIn(['findDetail', 'caseSensitivity'], undefined)
     const findDetailInternalFindStatePresent = frame.getIn(['findDetail', 'internalFindStatePresent'])
-    webviewActions.findInPage(searchString, caseSensitivity, forward, findDetailInternalFindStatePresent)
+    const tabId = frameStateUtil.getTabIdByFrameKey(windowStore.state, frameKey)
+    tabActions.findInPageRequest(tabId, searchString, caseSensitivity, forward, findDetailInternalFindStatePresent)
   }
 }

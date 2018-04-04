@@ -38,31 +38,6 @@ const webviewActions = {
     if (webview) {
       webview.showDefinitionForSelection()
     }
-  },
-
-  findInPage: function (searchString, caseSensitivity, forward, findNext) {
-    const webview = getWebview()
-    if (!webview) {
-      return
-    }
-
-    if (searchString) {
-      webview.findInPage(searchString, {
-        matchCase: caseSensitivity,
-        forward,
-        findNext
-      })
-    } else {
-      webview.stopFindInPage('clearSelection')
-    }
-  },
-
-  stopFindInPage: function () {
-    const webview = getWebview()
-    if (!webview) {
-      return
-    }
-    webview.stopFindInPage('keepSelection')
   }
 }
 

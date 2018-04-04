@@ -194,7 +194,7 @@ const api = module.exports = {
         const findBarShown = frame.get('findbarShown')
         // hide the find bar if it's showing
         if (findBarShown) {
-          frameStateUtil.onFindBarHide(frameKey)
+          frameStateUtil.onFindBarHide(frameKey, tabId)
         }
         // hide notifications
         for (let message in getFrameNotificationCallbacks(frameKey)) {

@@ -35,6 +35,22 @@ const tabActions = {
         windowId
       }
     })
+  },
+
+  findInPageRequest (tabId, searchString, caseSensitivity, forward, findNext) {
+    dispatchAction(tabActionConstants.FIND_IN_PAGE_REQUEST, {
+      tabId,
+      searchString,
+      caseSensitivity,
+      forward,
+      findNext
+    })
+  },
+
+  stopFindInPageRequest (tabId) {
+    dispatchAction(tabActionConstants.STOP_FIND_IN_PAGE_REQUEST, {
+      tabId
+    })
   }
 }
 

@@ -121,6 +121,28 @@ const tabsReducer = (state, action, immutableAction) => {
         })
         break
       }
+    case tabActionConsts.FIND_IN_PAGE_REQUEST:
+      {
+        const tabId = tabState.resolveTabId(state, action.get('tabId'))
+        setImmediate(() => {
+          tabs.findInPage(
+            tabId,
+            action.get('searchString'),
+            action.get('caseSensitivity'),
+            action.get('forward'),
+            action.get('findNext')
+          )
+        })
+        break
+      }
+    case tabActionConsts.STOP_FIND_IN_PAGE_REQUEST:
+      {
+        const tabId = tabState.resolveTabId(state, action.get('tabId'))
+        setImmediate(() => {
+          tabs.stopFindInPage(tabId)
+        })
+        break
+      }
     case appConstants.APP_SET_STATE:
       state = tabs.init(state, action)
       break

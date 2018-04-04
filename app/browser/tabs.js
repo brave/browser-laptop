@@ -1162,6 +1162,36 @@ const api = {
     tab.executeScriptInTab(config.braveExtensionId, script, {})
   },
 
+  findInPage (tabId, searchString, caseSensitivity, forward, findNext) {
+    const tab = webContentsCache.getWebContents(tabId)
+    if (shouldDebugTabEvents) {
+      console.log(`tabs.findInPage: ${tabId}, ${searchString}, ${caseSensitivity}, ${forward}, ${findNext}`)
+    }
+    if (!tab || tab.isDestroyed()) {
+      return
+    }
+    if (searchString) {
+      tab.findInPage(searchString, {
+        matchCase: caseSensitivity,
+        forward,
+        findNext
+      })
+    } else {
+      tab.stopFindInPage('clearSelection')
+    }
+  },
+
+  stopFindInPage (tabId) {
+    const tab = webContentsCache.getWebContents(tabId)
+    if (shouldDebugTabEvents) {
+      console.log(`tabs.stopFindInPage: ${tabId}`)
+    }
+    if (!tab || tab.isDestroyed()) {
+      return
+    }
+    tab.stopFindInPage('keepSelection')
+  },
+
   goBack: (tabId) => {
     const tab = webContentsCache.getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
