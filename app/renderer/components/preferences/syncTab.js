@@ -865,7 +865,7 @@ class SyncTab extends ImmutableComponent {
         if (words.length === 24) {
           inputCode = Buffer.from(bip39.mnemonicToEntropy(text), 'hex')
         } else if (words.length === 16) {
-          inputCode = window.niceware.passphraseToBytes(words)
+          inputCode = niceware.passphraseToBytes(words)
         } else {
           throw new Error('Expecting 24 or 16 words in passphrase (received ' + words.length + ')')
         }
