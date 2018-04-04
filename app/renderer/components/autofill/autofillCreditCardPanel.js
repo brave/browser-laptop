@@ -111,6 +111,11 @@ class AutofillCreditCardPanel extends React.Component {
     const currentWindow = state.get('currentWindow')
     const detail = currentWindow.get('autofillCreditCardDetail', Immutable.Map())
 
+    const cardRexEx = /^[0-9]{13,19}$/
+    const visaCard = /^(4)[0-9]{12,18}$/
+    const americanCard = /^(34|37)[0-9]{13}$/
+    const masterCard = /^(51|52|53|54|55)[0-9]{14}$/
+
     const props = {}
     props.name = detail.get('name', '')
     props.card = detail.get('card', '')
@@ -118,7 +123,12 @@ class AutofillCreditCardPanel extends React.Component {
     props.year = detail.get('year')
     props.guid = detail.get('guid', '-1')
     props.disableSaveButton = detail.isEmpty() ||
-      (!detail.get('name') && !detail.get('card'))
+      (!detail.get('name') && !detail.get('card')) ||
+      (!cardRexEx.test(detail.get('card')) && !visaCard.test(detail.get('card')) ||
+       !masterCard.test(detail.get('card')) && !americanCard.test(detail.get('card')))
+    props.visa = visaCard.test(detail.get('card'))
+    props.master = masterCard.test(detail.get('card'))
+    props.american = americanCard.test(detail.get('card'))
 
     return props
   }
@@ -164,6 +174,15 @@ class AutofillCreditCardPanel extends React.Component {
                   onKeyDown={this.onKeyDown}
                   onChange={this.onCardChange}
                 />
+                <div hidden={!this.props.visa}>
+                  Visa
+                </div>
+                <div hidden={!this.props.american}>
+                  American
+                </div>
+                <div hidden={!this.props.master}>
+                  Master
+                </div>
               </div>
             </div>
           </div>
