@@ -1618,6 +1618,17 @@ const appActions = {
     })
   },
 
+  onDropBookmark: function (bookmark, droppedOnKey, isFolder, isDroppedOn, isRightSide) {
+    dispatch({
+      actionType: appConstants.APP_ON_DROP_BOOKMARK,
+      bookmark,
+      droppedOnKey,
+      isFolder,
+      isDroppedOn,
+      isRightSide
+    })
+  },
+
   noReportStateModeClicked: function (windowId) {
     dispatch({
       actionType: appConstants.APP_DEBUG_NO_REPORT_STATE_MODE_CLICKED,

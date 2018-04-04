@@ -64,6 +64,15 @@ const getDNDBookmarkData = (state, bookmarkKey) => {
   return data.get('draggingOverKey') === bookmarkKey ? data : Immutable.Map()
 }
 
+const getClosestFromPos = (dnd, refs, clientX, sourceKey) => {
+  return dnd.closestFromXOffset(refs.filter((bookmarkRef) => {
+    if (!bookmarkRef) {
+      return false
+    }
+    return bookmarkRef.props.bookmarkKey !== sourceKey
+  }), clientX)
+}
+
 const getDetailFromFrame = (frame) => {
   if (frame == null) {
     return null
@@ -226,6 +235,7 @@ module.exports = {
   showOnlyFavicon,
   showFavicon,
   getDNDBookmarkData,
+  getClosestFromPos,
   getDetailFromFrame,
   isLocationBookmarked,
   toCreateProperties,

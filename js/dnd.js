@@ -127,6 +127,10 @@ module.exports.isLeftSide = (domNode, clientX) => {
   return clientX < boundingRect.left + ((boundingRect.right - boundingRect.left) / 2)
 }
 
+module.exports.isRightSide = (domNode, clientX) => {
+  return !module.exports.isLeftSide(domNode, clientX)
+}
+
 module.exports.isMiddle = (domNode, clientX) => {
   const boundingRect = domNode.getBoundingClientRect()
   const isLeft = clientX < boundingRect.left + ((boundingRect.right - boundingRect.left) / 3)

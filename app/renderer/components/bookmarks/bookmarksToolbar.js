@@ -22,7 +22,6 @@ const bookmarkToolbarState = require('../../../common/state/bookmarkToolbarState
 
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
-const siteTags = require('../../../../js/constants/siteTags')
 
 // Utils
 const {isFocused} = require('../../currentWindow')
@@ -50,83 +49,28 @@ class BookmarksToolbar extends React.Component {
 
   onDrop (e) {
     e.preventDefault()
-    const getClosestFromPos = (clientX, sourceKey) =>
-      dnd.closestFromXOffset(this.bookmarkRefs.filter((bookmarkRef) => {
-        if (!bookmarkRef) {
-          return false
-        }
-        return bookmarkRef.props.bookmarkKey !== sourceKey
-      }), e.clientX)
-    let bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
+    const bookmark = dnd.prepareBookmarkDataFromCompatible(e.dataTransfer)
     if (bookmark) {
-      // Figure out the droppedOn element filtering out the source drag item
-      let bookmarkKey = bookmark.get('key')
-      let tabDrop = false
+      const droppedOn = bookmarkUtil.getClosestFromPos(
+        dnd,
+        this.bookmarkRefs,
+        e.clientX,
+        bookmark.get('key')
+      )
+      const currentNode = ReactDOM.findDOMNode(droppedOn.selectedRef)
+      const isRightSide = dnd.isRightSide(currentNode, e.clientX)
 
-      // When we have key null is only when we are getting data from TAB transfer type
-      if (bookmarkKey == null) {
-        tabDrop = true
+      if (droppedOn && droppedOn.selectedRef) {
+        appActions.onDropBookmark(
+          bookmark,
+          droppedOn.selectedRef.props.bookmarkKey,
+          droppedOn.selectedRef.state.isFolder,
+          droppedOn.isDroppedOn,
+          isRightSide
+        )
       }
-
-      const droppedOn = getClosestFromPos(e.clientX, bookmarkKey)
-      if (droppedOn.selectedRef) {
-        const isRightSide = !dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
-        const droppedOnKey = droppedOn.selectedRef.props.bookmarkKey
-        const isDestinationParent = droppedOn.selectedRef.state.isFolder && droppedOn && droppedOn.isDroppedOn
-        if (tabDrop) {
-          const parentKey = isDestinationParent ? droppedOnKey : null
-          bookmark = bookmark.set('parentFolderId', parentKey)
-          appActions.addBookmark(bookmark)
-        } else {
-          if (bookmark.get('type') === siteTags.BOOKMARK_FOLDER) {
-            appActions.moveBookmarkFolder(bookmarkKey, droppedOnKey, isRightSide, isDestinationParent)
-          } else {
-            appActions.moveBookmark(bookmarkKey, droppedOnKey, isRightSide, isDestinationParent)
-          }
-        }
-        dnd.onDragEnd()
-      }
-      return
+      dnd.onDragEnd()
     }
-
-    const droppedOn = getClosestFromPos(e.clientX, undefined)
-    let isLeftSide = false
-    let closestKey
-    if (droppedOn.selectedRef) {
-      closestKey = droppedOn.selectedRef.props.bookmarkKey
-      isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOn.selectedRef), e.clientX)
-    }
-
-    const droppedHTML = e.dataTransfer.getData('text/html')
-    if (droppedHTML) {
-      const parser = new window.DOMParser()
-      const doc = parser.parseFromString(droppedHTML, 'text/html')
-      const a = doc.querySelector('a')
-      if (a && a.href) {
-        appActions.addBookmark(Immutable.fromJS({
-          title: a.innerText,
-          location: e.dataTransfer.getData('text/plain')
-        }), closestKey, isLeftSide)
-        return
-      }
-    }
-
-    if (e.dataTransfer.files.length > 0) {
-      Array.from(e.dataTransfer.items).forEach((item) => {
-        item.getAsString((name) => appActions.addBookmark(Immutable.fromJS({
-          location: item.type,
-          title: name
-        }), closestKey, isLeftSide))
-      })
-      return
-    }
-
-    e.dataTransfer.getData('text/uri-list')
-      .split('\n')
-      .map((x) => x.trim())
-      .filter((x) => !x.startsWith('#') && x.length > 0)
-      .forEach((url) =>
-        appActions.addBookmark(Immutable.fromJS({ location: url }), closestKey, isLeftSide))
   }
 
   onDragEnter (e) {
