@@ -264,7 +264,7 @@ const onBootStateFile = (state) => {
   }
 
   if (client.sync(callback) === true) {
-    run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 10 * ledgerUtil.milliseconds.minute}))
+    run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute}))
   }
 
   module.exports.getBalance(state)
@@ -1974,7 +1974,7 @@ const callback = (err, result, delayTime) => {
     if (!client) return
 
     if (typeof delayTime === 'undefined') {
-      delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 10 * ledgerUtil.milliseconds.minute})
+      delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute})
     }
   }
 
@@ -2359,7 +2359,7 @@ const onTimeUntilReconcile = (state, stateResult) => {
 
 const onLedgerFirstSync = (state, parsedData) => {
   if (client.sync(callback) === true) {
-    run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 10 * ledgerUtil.milliseconds.minute}))
+    run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute}))
   }
 
   return cacheRuleSet(state, parsedData.ruleset)
@@ -2482,7 +2482,7 @@ const run = (state, delayTime) => {
       delayTime = false
     }
     if (delayTime === false) {
-      delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 10 * ledgerUtil.milliseconds.minute})
+      delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute})
     }
   }
 
@@ -2531,7 +2531,7 @@ const onNetworkConnected = (state) => {
   }
 
   if (client.sync(callback) === true) {
-    const delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 10 * ledgerUtil.milliseconds.minute})
+    const delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute})
     run(state, delayTime)
   }
 
