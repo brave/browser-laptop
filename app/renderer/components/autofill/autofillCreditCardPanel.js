@@ -115,6 +115,7 @@ class AutofillCreditCardPanel extends React.Component {
     const visaCard = /^(4)[0-9]{12,18}$/
     const americanCard = /^(34|37)[0-9]{13}$/
     const masterCard = /^(51|52|53|54|55)[0-9]{14}$/
+    const discoverCard = /^(6011|64|65)[0-9]{14,17}$/
 
     const props = {}
     props.name = detail.get('name', '')
@@ -124,11 +125,12 @@ class AutofillCreditCardPanel extends React.Component {
     props.guid = detail.get('guid', '-1')
     props.disableSaveButton = detail.isEmpty() ||
       (!detail.get('name') && !detail.get('card')) ||
-      (!cardRexEx.test(detail.get('card')) && !visaCard.test(detail.get('card')) ||
+      (!cardRexEx.test(detail.get('card')) && !visaCard.test(detail.get('card')) &&
        !masterCard.test(detail.get('card')) && !americanCard.test(detail.get('card')))
     props.visa = visaCard.test(detail.get('card'))
     props.master = masterCard.test(detail.get('card'))
     props.american = americanCard.test(detail.get('card'))
+    props.discover = discoverCard.test(detail.get('card'))
 
     return props
   }
@@ -182,6 +184,9 @@ class AutofillCreditCardPanel extends React.Component {
                 </div>
                 <div hidden={!this.props.master}>
                   Master
+                </div>
+                <div hidden={!this.props.discover}>
+                  Discover
                 </div>
               </div>
             </div>
