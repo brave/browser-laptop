@@ -111,6 +111,7 @@ class AutofillCreditCardPanel extends React.Component {
     const currentWindow = state.get('currentWindow')
     const detail = currentWindow.get('autofillCreditCardDetail', Immutable.Map())
 
+    // const cardRexEx = /^[0-9]{3,4}[" "-]{0,1}[0-9]{3,4}[" "-]{0,1}[0-9]{3,4}[" "-]{0,1}[0-9]{1,7}$/
     const cardRexEx = /^[0-9]{13,19}$/
     const visaCard = /^(4)[0-9]{12,18}$/
     const americanCard = /^(34|37)[0-9]{13}$/

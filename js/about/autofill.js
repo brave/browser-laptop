@@ -84,6 +84,7 @@ class CreditCardItem extends ImmutableComponent {
 
   render () {
     const creditCard = this.props.creditCard
+    
     const visaCard = /^(4)[0-9]{12,18}$/
     const masterCard = /^(51|52|53|54|55)[0-9]{14}$/
     const americanCard = /^(34|37)[0-9]{13}$/
@@ -122,6 +123,8 @@ class CreditCardItem extends ImmutableComponent {
       <td>
         <span className={cx({
           fa: true,
+          'fa-credit-card-alt': (!visaCard.test(creditCard.get('card')) && !masterCard.test(creditCard.get('card'))
+            && !americanCard.test(creditCard.get('card')) && !discoverCard.test(creditCard.get('card')))  ? true : null,
           'fa-cc-visa': visaCard.test(creditCard.get('card')) ? true : null,
           'fa-cc-mastercard': masterCard.test(creditCard.get('card')) ? true : null,
           'fa-cc-amex': americanCard.test(creditCard.get('card')) ? true : null,
