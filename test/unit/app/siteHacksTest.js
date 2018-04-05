@@ -1,7 +1,8 @@
-/* global describe, before, after, it */
+/* global describe, before, beforeEach, after, it */
 const mockery = require('mockery')
 const assert = require('assert')
 const sinon = require('sinon')
+const Immutable = require('immutable')
 
 require('../braveUnit')
 
@@ -9,9 +10,9 @@ describe('siteHacks unit tests', function () {
   let siteHacks
   let siteHacksData
   let beforeSendCB
-  // let beforeRequestCB
   let urlParse
   let filtering
+  let appState
   const fakeElectron = require('../lib/fakeElectron')
   const fakeAdBlock = require('../lib/fakeAdBlock')
   const fakeFiltering = {
@@ -44,6 +45,9 @@ describe('siteHacks unit tests', function () {
     mockery.registerMock('./filtering', fakeFiltering)
     siteHacksData = require('../../../js/data/siteHacks')
     mockery.registerMock('../js/data/siteHacks', siteHacksData)
+    mockery.registerMock('../js/stores/appStore', {
+      getState: () => appState
+    })
 
     siteHacks = require('../../../app/siteHacks')
   })
@@ -87,7 +91,6 @@ describe('siteHacks unit tests', function () {
         onBeforeSendHeadersSpy = sinon.spy(siteHacksData.siteHacks['adobe.com'], 'onBeforeSendHeaders')
 
         if (typeof beforeSendCB === 'function') {
-          // result = beforeSendCB(details)
           beforeSendCB(details)
         }
       })
@@ -110,14 +113,190 @@ describe('siteHacks unit tests', function () {
     it('calls Filtering.registerBeforeRequestFilteringCB', function () {
       assert.equal(beforeRequestSpy.calledOnce, true)
     })
+  })
 
-    // describe('in the callback passed into registerBeforeRequestFilteringCB', function () {
-    //   let result
-    //   before(function () {
-    //     if (typeof beforeRequestCB === 'function') {
-    //       result = beforeRequestCB()
-    //     }
-    //   })
-    // })
+  describe('setReferralHeaders', function () {
+    const headers = [
+      {
+        domains: [ 'test.com', 'domain.si' ],
+        headers: { 'X-Brave-Partner': 'partner', 'X-something': 'ok' },
+        cookieNames: [],
+        expiration: 0
+      }
+    ]
+
+    beforeEach(() => {
+      siteHacks.resetReferralHeaders(null)
+    })
+
+    it('headers are missing', function () {
+      siteHacks.setReferralHeaders(null)
+      assert.equal(siteHacks.getReferralHeaders(), null)
+    })
+
+    it('headers are immutable list', function () {
+      siteHacks.setReferralHeaders(Immutable.fromJS(headers))
+      assert.deepEqual(siteHacks.getReferralHeaders(), headers)
+    })
+
+    it('headers are regular array', function () {
+      siteHacks.setReferralHeaders(headers)
+      assert.deepEqual(siteHacks.getReferralHeaders(), headers)
+    })
+
+    it('headers is single object', function () {
+      siteHacks.setReferralHeaders({
+        domains: [ 'test.com', 'domain.si' ],
+        headers: { 'X-Brave-Partner': 'partner', 'X-something': 'ok' },
+        cookieNames: [],
+        expiration: 0
+      })
+      assert.deepEqual(siteHacks.getReferralHeaders(), headers)
+    })
+  })
+
+  describe('beforeHeaders', function () {
+    describe('referral headers', function () {
+      const details = {
+        resourceType: 'mainFrame',
+        requestHeaders: {
+          'User-Agent': 'Brave Chrome/60.0.3112.101'
+        },
+        url: 'https://test.com',
+        tabId: 1
+      }
+
+      const detailExpected = {
+        cancel: undefined,
+        customCookie: undefined,
+        requestHeaders: undefined,
+        resourceName: 'siteHacks'
+      }
+
+      const headers = [
+        {
+          domains: [ 'test.com', 'domain.si' ],
+          headers: { 'X-Brave-Partner': 'partner' },
+          cookieNames: [],
+          expiration: 0
+        }
+      ]
+
+      beforeEach(() => {
+        siteHacks.resetReferralHeaders()
+        appState = null
+      })
+
+      describe('are not set', function () {
+        it('app state is null', function () {
+          const result = siteHacks.beforeHeaders(details)
+          assert.deepEqual(result, detailExpected)
+          assert.equal(siteHacks.getReferralHeaders(), null)
+        })
+
+        it('headers are now set', function () {
+          appState = Immutable.fromJS({
+            updates: {
+              referralHeaders: headers
+            }
+          })
+
+          const expectedReturn = {
+            cancel: undefined,
+            customCookie: undefined,
+            requestHeaders: {
+              'X-Brave-Partner': 'partner',
+              'User-Agent': 'Brave Chrome/60.0.3112.101'
+            },
+            resourceName: 'siteHacks'
+          }
+
+          const result = siteHacks.beforeHeaders(details)
+          assert.deepEqual(result, expectedReturn)
+          assert.deepEqual(siteHacks.getReferralHeaders(), headers)
+        })
+      })
+
+      describe('are set', function () {
+        it('domains are missing', function () {
+          siteHacks.setReferralHeaders({
+            headers: { 'X-Brave-Partner': 'partner' },
+            cookieNames: [],
+            expiration: 0
+          })
+
+          const result = siteHacks.beforeHeaders(details)
+          assert.deepEqual(result, detailExpected)
+        })
+
+        it('domain is not in the headers', function () {
+          siteHacks.setReferralHeaders({
+            domains: [ 'domain.si' ],
+            headers: { 'X-Brave-Partner': 'partner' },
+            cookieNames: [],
+            expiration: 0
+          })
+
+          const result = siteHacks.beforeHeaders(details)
+          assert.deepEqual(result, detailExpected)
+        })
+
+        it('headers are missing', function () {
+          siteHacks.setReferralHeaders({
+            domains: [ 'test.com' ],
+            cookieNames: [],
+            expiration: 0
+          })
+
+          const result = siteHacks.beforeHeaders(details)
+          assert.deepEqual(result, detailExpected)
+        })
+
+        it('header is set', function () {
+          siteHacks.setReferralHeaders({
+            domains: [ 'test.com', 'domain.si' ],
+            headers: { 'X-Brave-Partner': 'partner' },
+            cookieNames: [],
+            expiration: 0
+          })
+
+          const expectedReturn = {
+            resourceName: 'siteHacks',
+            requestHeaders: {
+              'X-Brave-Partner': 'partner',
+              'User-Agent': 'Brave Chrome/60.0.3112.101'
+            },
+            customCookie: undefined,
+            cancel: undefined
+          }
+
+          const result = siteHacks.beforeHeaders(details)
+          assert.deepEqual(result, expectedReturn)
+        })
+
+        it('multiple headers are set', function () {
+          siteHacks.setReferralHeaders({
+            domains: [ 'test.com', 'domain.si' ],
+            headers: { 'X-Brave-Partner': 'partner', 'X-something': 'ok' },
+            cookieNames: [],
+            expiration: 0
+          })
+
+          const expectedReturn = {
+            cancel: undefined,
+            customCookie: undefined,
+            requestHeaders: {
+              'X-Brave-Partner': 'partner',
+              'X-something': 'ok',
+              'User-Agent': 'Brave Chrome/60.0.3112.101'
+            },
+            resourceName: 'siteHacks'
+          }
+
+          const result = siteHacks.beforeHeaders(details)
+          assert.deepEqual(result, expectedReturn)
+        })
+      })
+    })
   })
 })

@@ -2278,16 +2278,6 @@ describe('ledger api unit tests', function () {
       roundtripSpy.restore()
     })
 
-    it('null case', function () {
-      ledgerApi.onReferralCodeRead()
-      assert(roundtripSpy.notCalled)
-    })
-
-    it('code is empty', function () {
-      ledgerApi.onReferralCodeRead('')
-      assert(roundtripSpy.notCalled)
-    })
-
     it('code is correct', function () {
       ledgerApi.onReferralCodeRead('aaa101')
       assert(roundtripSpy.calledOnce)
@@ -2768,6 +2758,118 @@ describe('ledger api unit tests', function () {
         .setIn(['ledger', 'about', 'status'], 'corruptedSeed')
       const result = ledgerApi.checkSeed(state)
       assert.deepEqual(result.toJS(), exptedState.toJS())
+    })
+  })
+
+  describe('onReferralRead', function () {
+    let setUpdatePropSpy
+
+    before(function () {
+      setUpdatePropSpy = sinon.spy(updateState, 'setUpdateProp')
+    })
+
+    afterEach(function () {
+      setUpdatePropSpy.reset()
+    })
+
+    after(function () {
+      setUpdatePropSpy.restore()
+    })
+
+    it('body data is not immutable', function () {
+      ledgerApi.onReferralRead(defaultAppState, {
+        download_id: 1,
+        referral_code: 'code'
+      })
+      assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralDownloadId', 1).calledOnce)
+      assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPromoCode', 'code').calledOnce)
+    })
+
+    it('download id and referral code is saved', function () {
+      ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({
+        download_id: 1,
+        referral_code: 'code'
+      }))
+      assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralDownloadId', 1).calledOnce)
+      assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPromoCode', 'code').calledOnce)
+    })
+
+    describe('headers', function () {
+      const headers = Immutable.fromJS({
+        domains: [ 'test.com', 'domain.si' ],
+        headers: { 'X-Brave-Partner': 'partner' },
+        cookieNames: [],
+        expiration: 0
+      })
+
+      it('headers are missing', function () {
+        ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({}))
+        assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralHeaders', sinon.match.any).notCalled)
+      })
+
+      it('headers are saved', function () {
+        ledgerApi.onReferralRead(defaultAppState, headers)
+        assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralHeaders', headers.get('headers')).calledOnce)
+      })
+    })
+
+    describe('landing page', function () {
+      let createTabRequestedSpy
+      const url = 'https://clifton.io'
+
+      before(function () {
+        createTabRequestedSpy = sinon.spy(appActions, 'createTabRequested')
+      })
+
+      afterEach(function () {
+        createTabRequestedSpy.reset()
+      })
+
+      after(function () {
+        createTabRequestedSpy.restore()
+      })
+
+      it('page is missing', function () {
+        ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({
+          download_id: 1,
+          referral_code: 'code'
+        }))
+        assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPage', sinon.match.any).notCalled)
+        assert(createTabRequestedSpy.notCalled)
+      })
+
+      it('page is not an url', function () {
+        ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({
+          download_id: 1,
+          referral_code: 'code',
+          offer_page_url: 'adasdsadsad'
+        }))
+        assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPage', sinon.match.any).notCalled)
+        assert(createTabRequestedSpy.notCalled)
+      })
+
+      it('window is not initialized yet', function () {
+        ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({
+          download_id: 1,
+          referral_code: 'code',
+          offer_page_url: url
+        }), -1)
+        assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPage', url).calledOnce)
+        assert(createTabRequestedSpy.notCalled)
+      })
+
+      it('window is ready', function () {
+        ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({
+          download_id: 1,
+          referral_code: 'code',
+          offer_page_url: url
+        }), 1)
+        assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPage', null).calledOnce)
+        assert(createTabRequestedSpy.withArgs({
+          url,
+          windowId: 1
+        }).calledOnce)
+      })
     })
   })
 })

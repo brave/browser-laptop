@@ -4,25 +4,34 @@
 
 'use strict'
 
-const appConfig = require('../../../js/constants/appConfig')
-const appConstants = require('../../../js/constants/appConstants')
-const tabs = require('../tabs')
-const windows = require('../windows')
-const {getWebContents} = require('../webContentsCache')
 const {BrowserWindow} = require('electron')
+const Immutable = require('immutable')
+
+// Actions
+const windowActions = require('../../../js/actions/windowActions')
+
+// State
 const tabState = require('../../common/state/tabState')
 const siteSettings = require('../../../js/state/siteSettings')
 const siteSettingsState = require('../../common/state/siteSettingsState')
+const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
+const updateState = require('../../common/state/updateState')
+
+// Constants
+const appConfig = require('../../../js/constants/appConfig')
+const appConstants = require('../../../js/constants/appConstants')
 const windowConstants = require('../../../js/constants/windowConstants')
-const windowActions = require('../../../js/actions/windowActions')
+const dragTypes = require('../../../js/constants/dragTypes')
+const tabActionConsts = require('../../common/constants/tabAction')
+
+// Utils
+const tabs = require('../tabs')
+const windows = require('../windows')
+const {getWebContents} = require('../webContentsCache')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const {getFlashResourceId} = require('../../../js/flash')
 const {l10nErrorText} = require('../../common/lib/httpUtil')
-const Immutable = require('immutable')
-const dragTypes = require('../../../js/constants/dragTypes')
-const tabActionConsts = require('../../common/constants/tabAction')
 const flash = require('../../../js/flash')
-const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
 const {isSourceAboutUrl, isTargetAboutUrl, isNavigatableAboutPage} = require('../../../js/lib/appUrlUtil')
 const {shouldDebugTabEvents} = require('../../cmdLine')
 
@@ -395,6 +404,16 @@ const tabsReducer = (state, action, immutableAction) => {
           setImmediate(() => tabs.create(welcomeScreenProperties))
           // We only need to run welcome screen once
           state = state.setIn(['about', 'welcome', 'showOnLoad'], false)
+        }
+
+        // Show promotion
+        const page = updateState.getUpdateProp(state, 'referralPage') || null
+        if (page) {
+          setImmediate(() => tabs.create({
+            url: page,
+            windowId
+          }))
+          state = updateState.setUpdateProp(state, 'referralPage', null)
         }
       }
       break
