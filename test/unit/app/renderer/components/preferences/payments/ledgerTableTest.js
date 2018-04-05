@@ -16,36 +16,31 @@ const fivePublishers = {
     [
       'https?://times.com',
       Immutable.Map({
-        ledgerPayments: true,
-        ledgerPinPercentage: 10
+        ledgerPayments: true
       })
     ],
     [
       'https?://cnn.com',
       Immutable.Map({
-        ledgerPayments: true,
-        ledgerPinPercentage: 15
+        ledgerPayments: true
       })
     ],
     [
       'https?://brianbondy.com',
       Immutable.Map({
-        ledgerPayments: true,
-        ledgerPinPercentage: 0
+        ledgerPayments: true
       })
     ],
     [
       'https?://github.com',
       Immutable.Map({
-        ledgerPayments: true,
-        ledgerPinPercentage: 0
+        ledgerPayments: true
       })
     ],
     [
       'https?://clifton.io',
       Immutable.Map({
-        ledgerPayments: true,
-        ledgerPinPercentage: 0
+        ledgerPayments: true
       })
     ]
   ]),
@@ -161,8 +156,7 @@ describe('LedgerTable component', function () {
       [
         'https?://times.com',
         Immutable.Map({
-          ledgerPayments: true,
-          ledgerPinPercentage: 0
+          ledgerPayments: true
         })
       ]
     ])
@@ -202,22 +196,19 @@ describe('LedgerTable component', function () {
       [
         'https?://times.com',
         Immutable.Map({
-          ledgerPayments: true,
-          ledgerPinPercentage: 10
+          ledgerPayments: true
         })
       ],
       [
         'https?://cnn.com',
         Immutable.Map({
-          ledgerPayments: true,
-          ledgerPinPercentage: 15
+          ledgerPayments: true
         })
       ],
       [
         'https?://brianbondy.com',
         Immutable.Map({
-          ledgerPayments: true,
-          ledgerPinPercentage: 0
+          ledgerPayments: true
         })
       ]
     ])
@@ -291,15 +282,13 @@ describe('LedgerTable component', function () {
       [
         'https?://times.com',
         Immutable.Map({
-          ledgerPayments: true,
-          ledgerPinPercentage: 10
+          ledgerPayments: true
         })
       ],
       [
         'https?://cnn.com',
         Immutable.Map({
-          ledgerPayments: true,
-          ledgerPinPercentage: 15
+          ledgerPayments: true
         })
       ]
     ])
@@ -357,8 +346,7 @@ describe('LedgerTable component', function () {
       [
         'https?://times.com',
         Immutable.Map({
-          ledgerPayments: true,
-          ledgerPinPercentage: 42
+          ledgerPayments: true
         })
       ]
     ])
@@ -398,37 +386,32 @@ describe('LedgerTable component', function () {
       [
         'https?://times.com',
         Immutable.Map({
-          ledgerPayments: true,
-          ledgerPinPercentage: 10
+          ledgerPayments: true
         })
       ],
       [
         'https?://cnn.com',
         Immutable.Map({
           ledgerPayments: true,
-          ledgerPinPercentage: 15,
           ledgerPaymentsShown: false
         })
       ],
       [
         'https?://brianbondy.com',
         Immutable.Map({
-          ledgerPayments: true,
-          ledgerPinPercentage: 0
+          ledgerPayments: true
         })
       ],
       [
         'https?://github.com',
         Immutable.Map({
-          ledgerPayments: true,
-          ledgerPinPercentage: 0
+          ledgerPayments: true
         })
       ],
       [
         'https?://clifton.io',
         Immutable.Map({
           ledgerPayments: true,
-          ledgerPinPercentage: 0,
           ledgerPaymentsShown: false
         })
       ]

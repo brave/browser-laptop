@@ -16,8 +16,6 @@ const settings = require('../../../js/constants/settings')
 
 // Utils
 const getSetting = require('../../../js/settings').getSetting
-const siteSettings = require('../../../js/state/siteSettings')
-const urlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable, isMap} = require('../../common/state/immutableUtil')
 
 const validateState = function (state) {
@@ -354,24 +352,6 @@ const ledgerState = {
       caller: caller,
       error: error
     }))
-  },
-
-  changePinnedValues: (state, publishers) => {
-    state = validateState(state)
-    if (publishers == null) {
-      return state
-    }
-
-    publishers = makeImmutable(publishers)
-    publishers.forEach((item) => {
-      const publisherKey = item.get('publisherKey')
-      const pattern = urlUtil.getHostPattern(publisherKey)
-      const percentage = item.get('pinPercentage')
-      let newSiteSettings = siteSettings.mergeSiteSetting(state.get('siteSettings'), pattern, 'ledgerPinPercentage', percentage)
-      state = state.set('siteSettings', newSiteSettings)
-    })
-
-    return state
   },
 
   /**
