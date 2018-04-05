@@ -50,6 +50,10 @@ const ledgerVideoCache = require('../../common/cache/ledgerVideoCache')
 const updater = require('../../updater')
 const promoCodeFirstRunStorage = require('../../promoCodeFirstRunStorage')
 const appUrlUtil = require('../../../js/lib/appUrlUtil')
+const urlutil = require('../../../js/lib/urlutil')
+const windowState = require('../../common/state/windowState')
+const {makeImmutable, makeJS, isList} = require('../../common/state/immutableUtil')
+const siteHacks = require('../../siteHacks')
 
 // Caching
 let locationDefault = 'NOOP'
@@ -99,7 +103,7 @@ const clientOptions = {
   environment: process.env.LEDGER_ENVIRONMENT || 'production'
 }
 
-var platforms = {
+const platforms = {
   'darwin': 'osx',
   'win32x64': 'winx64',
   'win32ia32': 'winia32',
@@ -2059,6 +2063,7 @@ const onCallback = (state, result, delayTime) => {
 
 const onReferralCodeRead = (code) => {
   if (!code) {
+    fetchReferralHeaders()
     return
   }
 
@@ -2087,7 +2092,7 @@ const onReferralInit = (err, response, body) => {
   }
 
   if (body && body.download_id) {
-    appActions.onReferralCodeRead(body.download_id, body.referral_code)
+    appActions.onReferralCodeRead(body)
     promoCodeFirstRunStorage
       .removePromoCode()
       .catch(error => {
@@ -2101,6 +2106,60 @@ const onReferralInit = (err, response, body) => {
   if (clientOptions.verboseP) {
     console.error(`Referral check was not successful ${body}`)
   }
+}
+
+const onReferralRead = (state, body, activeWindowId) => {
+  body = makeImmutable(body)
+
+  if (body.has('offer_page_url')) {
+    const url = body.get('offer_page_url')
+    if (urlutil.isURL(url)) {
+      if (activeWindowId === windowState.WINDOW_ID_NONE) {
+        state = updateState.setUpdateProp(state, 'referralPage', url)
+      } else {
+        appActions.createTabRequested({
+          url,
+          windowId: activeWindowId
+        })
+        state = updateState.setUpdateProp(state, 'referralPage', null)
+      }
+    }
+  }
+
+  if (body.has('headers')) {
+    const headers = body.get('headers')
+    state = updateState.setUpdateProp(state, 'referralHeaders', headers)
+    siteHacks.setReferralHeaders(headers)
+  }
+
+  state = updateState.setUpdateProp(state, 'referralDownloadId', body.get('download_id'))
+  state = updateState.setUpdateProp(state, 'referralPromoCode', body.get('referral_code'))
+
+  return state
+}
+
+const fetchReferralHeaders = () => {
+  module.exports.roundtrip({
+    server: referralServer,
+    method: 'GET',
+    path: '/promo/custom-headers'
+  }, {}, appActions.onFetchReferralHeaders)
+}
+
+const onFetchReferralHeaders = (state, err, response, body) => {
+  if (err) {
+    if (clientOptions.verboseP) {
+      console.error(makeJS(err))
+    }
+    return state
+  }
+
+  if (body && isList(body)) {
+    state = updateState.setUpdateProp(state, 'referralHeaders', body)
+    siteHacks.setReferralHeaders(body)
+  }
+
+  return state
 }
 
 const initialize = (state, paymentsEnabled) => {
@@ -2138,8 +2197,14 @@ const initialize = (state, paymentsEnabled) => {
         if (clientOptions.verboseP) {
           console.error('read error: ' + error.toString())
         }
+        fetchReferralHeaders()
       })
+  } else {
+    fetchReferralHeaders()
   }
+
+  // Get referral headers every day
+  setInterval(() => fetchReferralHeaders, (24 * ledgerUtil.milliseconds.hour))
 
   if (!paymentsEnabled) {
     client = null
@@ -2978,7 +3043,9 @@ const getMethods = () => {
     checkReferralActivity,
     setPublishersOptions,
     referralCheck,
-    roundtrip
+    roundtrip,
+    onFetchReferralHeaders,
+    onReferralRead
   }
 
   let privateMethods = {}
