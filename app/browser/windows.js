@@ -348,7 +348,7 @@ const api = {
         // that will not get saved to state as the last-closed window which should be restored
         // since we won't save state if there are no frames.
         if (!platformUtil.isDarwin() && api.getBufferWindow()) {
-          const remainingWindows = api.getAllRendererWindows().filter(win => win !== api.getBufferWindow())
+          const remainingWindows = api.getAllRendererWindows()
           if (!remainingWindows.length) {
             api.closeBufferWindow()
           }
@@ -784,21 +784,31 @@ const api = {
     return currentWindows[windowId]
   },
 
-  getActiveWindowId: () => {
-    if (BrowserWindow.getFocusedWindow()) {
-      return BrowserWindow.getFocusedWindow().id
+  getActiveWindow: () => {
+    const focusedWindow = BrowserWindow.getFocusedWindow()
+    if (api.getAllRendererWindows().includes(focusedWindow)) {
+      return focusedWindow
     }
-    return windowState.WINDOW_ID_NONE
+    return null
+  },
+
+  getActiveWindowId: () => {
+    const activeWindow = api.getActiveWindow()
+    return activeWindow ? activeWindow.id : windowState.WINDOW_ID_NONE
   },
 
   /**
    * Provides an array of all Browser Windows which are actual
    * main windows (not background workers), and are not destroyed
    */
-  getAllRendererWindows: () => {
+  getAllRendererWindows: (includingBufferWindow = false) => {
     return Object.keys(currentWindows)
       .map(key => currentWindows[key])
-      .filter(win => win && !win.isDestroyed())
+      .filter(win =>
+        win &&
+        !win.isDestroyed() &&
+        (includingBufferWindow || win !== api.getBufferWindow())
+      )
   },
 
   on: (...args) => publicEvents.on(...args),
