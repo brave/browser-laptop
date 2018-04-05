@@ -84,6 +84,11 @@ class CreditCardItem extends ImmutableComponent {
 
   render () {
     const creditCard = this.props.creditCard
+    const visaCard = /^(4)[0-9]{12,18}$/
+    const masterCard = /^(51|52|53|54|55)[0-9]{14}$/
+    const americanCard = /^(34|37)[0-9]{13}$/
+    const discoverCard = /^(6011|64|65)[0-9]{14,17}$/
+
     return <tr className='autofillItem'>
       <td className='autofillActions'>
         <span className={cx({
@@ -113,6 +118,15 @@ class CreditCardItem extends ImmutableComponent {
           data-test-id='EditCreditCard'
           title='Edit creditCard'
           onClick={this.onEdit} />
+      </td>
+      <td>
+        <span className={cx({
+          fa: true,
+          'fa-cc-visa': visaCard.test(creditCard.get('card')) ? true : null,
+          'fa-cc-mastercard': masterCard.test(creditCard.get('card')) ? true : null,
+          'fa-cc-amex': americanCard.test(creditCard.get('card')) ? true : null,
+          'fa-cc-discover': discoverCard.test(creditCard.get('card')) ? true : null
+        })} />
       </td>
     </tr>
   }
