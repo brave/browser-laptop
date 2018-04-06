@@ -52,6 +52,31 @@ describe('cmdLine', function () {
       const result = this.cmdLine.getFirstRunPromoCode(args)
       assert.equal(result, promoCode)
     })
+
+    it('finds and parses promo code when we have multiple downloads', function () {
+      const promoCode = 'pem001 (1)'
+      const validPromoCodeInstallerPath = `d:\\my\\location\\on-disk\\in-a-folder-tes301\\Setup-Brave-x64-${promoCode}.exe`
+      const args = [...initialArgs, key, validPromoCodeInstallerPath, '--other', 'arg', '--and-another']
+      const result = this.cmdLine.getFirstRunPromoCode(args)
+      assert.equal(result, 'pem001')
+    })
+
+    it('finds and parses promo code 2', function () {
+      const promoCode = 'org-name'
+      const validPromoCodeInstallerPath = `d:\\my\\location\\on-disk\\in-a-folder-tes301\\Setup-Brave-x64-${promoCode}.exe`
+      const args = [...initialArgs, key, validPromoCodeInstallerPath, '--other', 'arg', '--and-another']
+      const result = this.cmdLine.getFirstRunPromoCode(args)
+      assert.equal(result, promoCode)
+    })
+
+    it('finds and parses promo code 2 when we have multiple downloads', function () {
+      const promoCode = 'org-name (1)'
+      const validPromoCodeInstallerPath = `d:\\my\\location\\on-disk\\in-a-folder-tes301\\Setup-Brave-x64-${promoCode}.exe`
+      const args = [...initialArgs, key, validPromoCodeInstallerPath, '--other', 'arg', '--and-another']
+      const result = this.cmdLine.getFirstRunPromoCode(args)
+      assert.equal(result, 'org-name')
+    })
+
     it(`does not find promo code when there isn't one`, function () {
       const noPromoCodeInstallerPath = `d:\\my\\location\\on-disk\\in-a-folder-tes301\\Setup-Brave-x64.exe`
       const args = [...initialArgs, key, noPromoCodeInstallerPath, '--other', 'arg', '--and-another']
