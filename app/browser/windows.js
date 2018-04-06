@@ -25,7 +25,7 @@ const browserWindowUtil = require('../common/lib/browserWindowUtil')
 const windowState = require('../common/state/windowState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
 const {zoomLevel} = require('../common/constants/toolbarUserInterfaceScale')
-const { shouldDebugWindowEvents, disableBufferWindow, disableDeferredWindowLoad } = require('../cmdLine')
+const { shouldDebugWindowEvents, shouldDebugTabEvents, shouldDebugStoreActions, disableBufferWindow, disableDeferredWindowLoad } = require('../cmdLine')
 const activeTabHistory = require('./activeTabHistory')
 const webContentsCache = require('./webContentsCache')
 
@@ -212,6 +212,9 @@ function openFramesInWindow (win, frames, activeFrameKey) {
     for (const frame of frames) {
       frameIndex++
       if (frame.tabId != null && frame.guestInstanceId != null) {
+        if (shouldDebugTabEvents) {
+          console.log('notifyWindowWebContentsAdded: on window create with existing tab', win.id)
+        }
         api.notifyWindowWebContentsAdded(win.id, frame)
         const tab = webContentsCache.getWebContents(frame.tabId)
         if (tab && !tab.isDestroyed()) {
@@ -798,7 +801,11 @@ const api = {
 
       const position = win.getPosition()
       const size = win.getSize()
-      const windowState = (immutableState && immutableState.toJS()) || undefined
+
+      const windowState = (immutableState && immutableState.toJS()) || { }
+      windowState.debugTabEvents = shouldDebugTabEvents
+      windowState.debugStoreActions = shouldDebugStoreActions
+
       const mem = muon.shared_memory.create({
         windowValue: {
           disposition: windowOptions.disposition,

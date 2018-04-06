@@ -24,7 +24,6 @@ const BrowserWindow = electron.BrowserWindow
 const firstDefinedValue = require('../../../js/lib/functional').firstDefinedValue
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
-const { shouldDebugStoreActions, shouldDebugTabEvents } = require('../../cmdLine')
 
 // TODO cleanup all this createWindow crap
 function isModal (browserOpts) {
@@ -43,12 +42,6 @@ function clearFramesFromWindowState (windowState) {
   return windowState
     .set('frames', Immutable.List())
     .set('tabs', Immutable.List())
-}
-
-function setInitialWindowState (windowState) {
-  return windowState
-    .set('debugStoreActions', shouldDebugStoreActions)
-    .set('debugTabEvents', shouldDebugTabEvents)
 }
 
 /**
@@ -169,7 +162,6 @@ const handleCreateWindowAction = (state, action = Immutable.Map()) => {
   const frameOpts = (action.get('frameOpts') || Immutable.Map()).toJS()
   let browserOpts = (action.get('browserOpts') || Immutable.Map()).toJS()
   let immutableWindowState = action.get('restoredState') || Immutable.Map()
-  immutableWindowState = setInitialWindowState(immutableWindowState)
   state = setDefaultWindowSize(state)
   const defaults = windowDefaults(state)
   const isMaximized = setMaximized(state, browserOpts, immutableWindowState)
