@@ -106,13 +106,10 @@ class GuestInstanceRenderer extends React.Component {
         onZoomChange: this.onUpdateZoom.bind(this)
       })
       webviewActions.init(this.webviewDisplay)
-      if (this.props && this.props.guestInstanceId != null) {
-        this.webviewDisplay.attachActiveTab(this.props.guestInstanceId)
-      }
+      // treat the container as main frame position for mouse position
       containerElement.addEventListener('mouseenter', (e) => {
         windowActions.onFrameMouseEnter()
       }, { passive: true })
-
       containerElement.addEventListener('mouseleave', (e) => {
         windowActions.onFrameMouseLeave()
       }, { passive: true })
