@@ -528,6 +528,9 @@ const api = {
         // so use an IPC call here to notify that process of the new tab to track.
         // TODO: move all events to browser process (this module) and do not handle all
         // tab events inside the window.
+        if (shouldDebugTabEvents) {
+          console.log('notifyWindowWebContentsAdded: on tab creation in existing window', windowId)
+        }
         notifyWindowWebContentsAdded(windowId, frameOpts, newTabValue.toJS())
       }
     })
@@ -1124,6 +1127,9 @@ const api = {
       return
     }
     api.willBeRemovedFromWindow(tabId, currentWindowId)
+    if (shouldDebugTabEvents) {
+      console.log('notifyWindowWebContentsAdded: on tab move to existing window', toWindowId)
+    }
     notifyWindowWebContentsAdded(toWindowId, frameOpts.toJS(), tabValue.toJS())
     tab.moveTo(toIndex, toWindowId)
   },
