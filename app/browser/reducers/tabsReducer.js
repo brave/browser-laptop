@@ -12,6 +12,7 @@ const windowActions = require('../../../js/actions/windowActions')
 
 // State
 const tabState = require('../../common/state/tabState')
+const windowState = require('../../common/state/windowState')
 const siteSettings = require('../../../js/state/siteSettings')
 const siteSettingsState = require('../../common/state/siteSettingsState')
 const {frameOptsFromFrame} = require('../../../js/state/frameStateUtil')
@@ -23,6 +24,7 @@ const appConstants = require('../../../js/constants/appConstants')
 const windowConstants = require('../../../js/constants/windowConstants')
 const dragTypes = require('../../../js/constants/dragTypes')
 const tabActionConsts = require('../../common/constants/tabAction')
+const appActions = require('../../../js/actions/appActions')
 
 // Utils
 const tabs = require('../tabs')
@@ -141,8 +143,16 @@ const tabsReducer = (state, action, immutableAction) => {
         const senderWindowId = action.getIn(['senderWindowId'])
         if (senderWindowId != null) {
           action = action.setIn(['createProperties', 'windowId'], senderWindowId)
-        } else if (BrowserWindow.getActiveWindow()) {
-          action = action.setIn(['createProperties', 'windowId'], BrowserWindow.getActiveWindow().id)
+        } else {
+          // no specified window, so use active one, or create one
+          const activeWindowId = windows.getActiveWindowId()
+          if (activeWindowId === windowState.WINDOW_ID_NONE) {
+            setImmediate(() => appActions.newWindow(action.get('createProperties')))
+            // this action will get dispatched again
+            // once the new window is ready to have tabs
+            break
+          }
+          action = action.setIn(['createProperties', 'windowId'], activeWindowId)
         }
       }
 
