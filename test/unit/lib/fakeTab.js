@@ -17,6 +17,7 @@ function FakeTab (id, windowId, guestInstanceId = nextGuestInstanceId++) {
   this._isDestroyed = false
   this._canGoBack = false
   this._canGoForward = false
+  this._isPlaceholder = false
 }
 
 util.inherits(FakeTab, EventEmitter)
@@ -44,6 +45,10 @@ proto.canGoBack = function () {
 
 proto.canGoForward = function () {
   return this._canGoForward
+}
+
+proto.isPlaceholder = function () {
+  return this._isPlaceholder
 }
 
 module.exports = FakeTab
