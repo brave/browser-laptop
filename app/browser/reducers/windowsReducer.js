@@ -316,10 +316,7 @@ const windowsReducer = (state, action, immutableAction) => {
     case appConstants.APP_WINDOW_CREATED:
     case appConstants.APP_WINDOW_RESIZED:
       {
-        const bookmarkToolbarState = require('../../common/state/bookmarkToolbarState')
         state = windowState.maybeCreateWindow(state, action)
-        const windowId = action.getIn(['windowValue', 'windowId'], windowState.WINDOW_ID_NONE)
-        state = bookmarkToolbarState.setToolbar(state, windowId)
         break
       }
     case appConstants.APP_TAB_STRIP_EMPTY:
