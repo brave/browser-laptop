@@ -633,17 +633,6 @@ const appActions = {
     })
   },
 
-  /**ADDED
-   * Dispatches a message to the store to clear closed frames
-   * @param {string=} location - only clear frames with this location
-   */
-  clearClosedFrames: function (location) {
-    dispatch({
-      actionType: appConstants.APP_CLEAR_CLOSED_FRAMES,
-      location
-    })
-  },
-
   /**
    * Import browser data specified in selected
    * @param {object} selected - the browser data to import as per doc/state.md's importBrowserDataSelected

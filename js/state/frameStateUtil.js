@@ -120,12 +120,6 @@ function getTabIdsByNonPinnedDisplayIndex (state) {
     .map((frame) => frame.get('tabId'))
 }
 
-/*function clearClosedFrames (state) {
-  const frames = state.get('frames')
-  frames = Immutable.List()
-  return frames
-}*/
-
 /**
 * Obtains the display index for the specified tab ID excluding pins
 */

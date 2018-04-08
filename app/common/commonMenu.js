@@ -117,12 +117,24 @@ module.exports.newWindowMenuItem = () => {
   }
 }
 
-module.exports.reopenLastClosedTabItem = () => {
+module.exports.reopenLastClosedTabItem = (isDisabled) => {
   return {
     label: locale.translation('reopenLastClosedTab'),
     accelerator: 'Shift+CmdOrCtrl+T',
+    enabled: !isDisabled,
     click: function (item, focusedWindow) {
       module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_UNDO_CLOSED_FRAME])
+    }
+  }
+}
+
+module.exports.reopenLastClosedWindow = (isDisabled) => {
+  return {
+    label: locale.translation('reopenLastClosedWindow'),
+    accelerator: 'Alt+Shift+CmdOrCtrl+T',
+    enabled: !isDisabled,
+    click: function (item) {
+      process.emit(messages.UNDO_CLOSED_WINDOW)
     }
   }
 }

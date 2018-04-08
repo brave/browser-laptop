@@ -34,7 +34,6 @@ const appConstants = {
   APP_REMOVE_SITE_SETTING: _,
   APP_CLEAR_SITE_SETTINGS: _,
   APP_ON_CLEAR_BROWSING_DATA: _,
-  APP_CLEAR_CLOSED_FRAMES: _,
   APP_IMPORT_BROWSER_DATA: _,
   APP_SHOW_NOTIFICATION: _, /** @param {Object} detail */
   APP_HIDE_NOTIFICATION: _, /** @param {string} message */
