@@ -78,7 +78,7 @@ const calcTextList = (list) => {
   }
 
   let paramList = JSON.stringify(list.take(take))
-    .replace(/'/g, '!')
+    .replace(/'/g, '\\\'') //single quotes are allowed in urls - RFC 3986.
     .replace(/\\"/g, '!')
     .replace(/\\\\/g, '//')
 
