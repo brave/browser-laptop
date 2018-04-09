@@ -86,9 +86,10 @@ class CreditCardItem extends ImmutableComponent {
     const creditCard = this.props.creditCard
     
     const visaCard = /^(4)[0-9]{12,18}$/
-    const masterCard = /^(51|52|53|54|55)[0-9]{14}$/
+    const masterCard = /^5[1-5][0-9]{14}$/
     const americanCard = /^(34|37)[0-9]{13}$/
     const discoverCard = /^(6011|64|65)[0-9]{14,17}$/
+    const jcbCard = /^35[2-8][0-9][0-9]{12,15}$/   //^(3528-3589){1}[0-9]{12,15}$/
 
     return <tr className='autofillItem'>
       <td className='autofillActions'>
@@ -124,11 +125,13 @@ class CreditCardItem extends ImmutableComponent {
         <span className={cx({
           fa: true,
           'fa-credit-card-alt': (!visaCard.test(creditCard.get('card')) && !masterCard.test(creditCard.get('card'))
-            && !americanCard.test(creditCard.get('card')) && !discoverCard.test(creditCard.get('card')))  ? true : null,
+            && !americanCard.test(creditCard.get('card')) && !discoverCard.test(creditCard.get('card'))
+            && !jcbCard.test(creditCard.get('card'))) ? true : null,
           'fa-cc-visa': visaCard.test(creditCard.get('card')) ? true : null,
           'fa-cc-mastercard': masterCard.test(creditCard.get('card')) ? true : null,
           'fa-cc-amex': americanCard.test(creditCard.get('card')) ? true : null,
-          'fa-cc-discover': discoverCard.test(creditCard.get('card')) ? true : null
+          'fa-cc-discover': discoverCard.test(creditCard.get('card')) ? true : null,
+          'fa-cc-jcb': jcbCard.test(creditCard.get('card')) ? true : null
         })} />
       </td>
     </tr>

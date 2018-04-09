@@ -115,8 +115,13 @@ class AutofillCreditCardPanel extends React.Component {
     const cardRexEx = /^[0-9]{13,19}$/
     const visaCard = /^(4)[0-9]{12,18}$/
     const americanCard = /^(34|37)[0-9]{13}$/
-    const masterCard = /^(51|52|53|54|55)[0-9]{14}$/
+    const masterCard = /^5[1-5][0-9]{14}$/
     const discoverCard = /^(6011|64|65)[0-9]{14,17}$/
+    const jcbCard = /^35[2-8][0-9][0-9]{12,15}$/
+    const dinersEnRouteCard = /^(2014|2149)[0-9]{11}$/
+    const dinersInternationalCard = /^36[0-9]{12,17}$/
+    const chinaUnionPayCard = /^(62)[0-9]{14,17}$/
+    
 
     const props = {}
     props.name = detail.get('name', '')
@@ -127,11 +132,17 @@ class AutofillCreditCardPanel extends React.Component {
     props.disableSaveButton = detail.isEmpty() ||
       (!detail.get('name') && !detail.get('card')) ||
       (!cardRexEx.test(detail.get('card')) && !visaCard.test(detail.get('card')) &&
-       !masterCard.test(detail.get('card')) && !americanCard.test(detail.get('card')))
+       !masterCard.test(detail.get('card')) && !americanCard.test(detail.get('card')) &&
+       !chinaUnionPayCard.test(detail.get('card')) && !jcbCard.test(detail.get('card')) &&
+       !dinersEnRouteCard.test(detail.get('card')) && !dinersInternationalCard.test(detail.get('card')))
     props.visa = visaCard.test(detail.get('card'))
     props.master = masterCard.test(detail.get('card'))
     props.american = americanCard.test(detail.get('card'))
     props.discover = discoverCard.test(detail.get('card'))
+    props.jcb = jcbCard.test(detail.get('card'))
+    props.chinaUnion = chinaUnionPayCard.test(detail.get('card'))
+    props.dinersEnRoute = dinersEnRouteCard.test(detail.get('card'))
+    props.dinersInter = dinersInternationalCard.test(detail.get('card'))
 
     return props
   }
@@ -188,6 +199,18 @@ class AutofillCreditCardPanel extends React.Component {
                 </div>
                 <div hidden={!this.props.discover}>
                   Discover
+                </div>
+                <div hidden={!this.props.jcb}>
+                  JCB
+                </div>
+                <div hidden={!this.props.chinaUnion}>
+                  China Union Pay
+                </div>
+                <div hidden={!this.props.dinersEnRoute}>
+                  Dinners En Route
+                </div>
+                <div hidden={!this.props.dinersInter}>
+                  Dinners International
                 </div>
               </div>
             </div>
