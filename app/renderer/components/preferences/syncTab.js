@@ -6,8 +6,7 @@
 const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
 const Immutable = require('immutable')
-const niceware = require('niceware')
-const bip39 = require('bip39')
+const passphraseUtil = require('brave-crypto').passphrase
 
 // Components
 const ModalOverlay = require('../common/modalOverlay')
@@ -301,7 +300,7 @@ class SyncTab extends ImmutableComponent {
 
   get passphraseContent () {
     const seed = Buffer.from(this.props.syncData.get('seed').toJS())
-    let passphrase = seed && bip39.entropyToMnemonic(seed.toString('hex'))
+    let passphrase = seed && passphraseUtil.fromBytesOrHex(seed)
     let wordCount = 0
 
     if (passphrase) {
@@ -804,7 +803,9 @@ class SyncTab extends ImmutableComponent {
       wordCount = e.target.value.trim().replace(/\s+/gi, ' ').split(' ').length
     }
     this.setState({wordCount})
-    this.props.enableSyncRestore(e.target.value && (wordCount === 16 || wordCount === 24))
+    this.props.enableSyncRestore(e.target.value &&
+      (wordCount === passphraseUtil.NICEWARE_32_BYTE_WORD_COUNT ||
+       wordCount === passphraseUtil.BIP39_32_BYTE_WORD_COUNT))
   }
 
   reset (needsConfirmDialog = true) {
@@ -858,17 +859,10 @@ class SyncTab extends ImmutableComponent {
   restoreSyncProfile () {
     if (this.passphraseInput.value) {
       const text = this.passphraseInput.value.toLowerCase().replace(/,/g, ' ').replace(/\s+/g, ' ').trim()
-      const words = text.split(' ')
-      let inputCode = ''
+      let inputCode
 
       try {
-        if (words.length === 24) {
-          inputCode = Buffer.from(bip39.mnemonicToEntropy(text), 'hex')
-        } else if (words.length === 16) {
-          inputCode = niceware.passphraseToBytes(words)
-        } else {
-          throw new Error('Expecting 24 or 16 words in passphrase (received ' + words.length + ')')
-        }
+        inputCode = passphraseUtil.toBytes32(text)
       } catch (e) {
         console.error('Could not convert passphrase', e)
       }
