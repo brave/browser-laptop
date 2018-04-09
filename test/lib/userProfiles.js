@@ -10,7 +10,7 @@ const addBookmarksN = function (total) {
     const buffer = Buffer.alloc(2)
     for (let n = 0; n < total; n++) {
       buffer.writeUInt16BE(n)
-      const string = passphrase.fromBytesOrHex(buffer)[0]
+      const string = passphrase.fromBytesOrHex(buffer).split(' ')[0]
       data.push({
         location: `https://www.${string}.com`,
         title: string,
@@ -32,7 +32,7 @@ const addTabsN = function (total) {
     const buffer = Buffer.alloc(2)
     for (let n = 0; n < total; n++) {
       buffer.writeUInt16BE(n)
-      const string = passphrase.fromBytesOrHex(buffer)[0]
+      const string = passphrase.fromBytesOrHex(buffer).split(' ')[0]
       data.push({
         active: false,
         discarded: true,
