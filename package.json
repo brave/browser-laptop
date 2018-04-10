@@ -85,6 +85,7 @@
   },
   "homepage": "https://www.brave.com/",
   "dependencies": {
+    "@brave/sync-client": "^0.1.0",
     "acorn": "3.2.0",
     "aphrodite": "1.1.0",
     "async": "^2.0.1",
