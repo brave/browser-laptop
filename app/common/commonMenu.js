@@ -14,25 +14,12 @@ const communityURL = 'https://community.brave.com/'
 const isDarwin = process.platform === 'darwin'
 const electron = require('electron')
 
-let BrowserWindow
-if (process.type === 'browser') {
-  BrowserWindow = electron.BrowserWindow
-} else {
-  BrowserWindow = electron.remote.BrowserWindow
-}
-
 const ensureAtLeastOneWindow = (frameOpts) => {
-  if (process.type === 'browser') {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      appActions.newWindow(frameOpts || {})
-      return
-    }
-  }
-
-  if (!frameOpts) {
-    return
-  }
-
+  // If this action is dispatched from a renderer window (windows)
+  // it will create the tab in the current window
+  // If it was dispatched by the browser (mac / linux)
+  // then it will create the tab in the active window
+  // or a new window if there is no active window
   appActions.createTabRequested(frameOpts)
 }
 

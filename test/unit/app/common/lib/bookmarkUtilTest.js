@@ -497,8 +497,7 @@ describe('bookmarkUtil unit test', function () {
         themeColor: undefined,
         type: siteTags.BOOKMARK,
         key: 'https://brave.com|0|0',
-        skipSync: null,
-        width: 0
+        skipSync: null
       }
 
       assert.deepEqual(bookmarkUtil.buildBookmark(state, bookmark).toJS(), expectedResult)
@@ -527,8 +526,7 @@ describe('bookmarkUtil unit test', function () {
         themeColor: '#000',
         type: siteTags.BOOKMARK,
         key: 'https://brave.com|0|0',
-        skipSync: null,
-        width: 0
+        skipSync: null
       }
 
       assert.deepEqual(bookmarkUtil.buildBookmark(newState, bookmark).toJS(), expectedResult)
@@ -550,8 +548,7 @@ describe('bookmarkUtil unit test', function () {
         themeColor: '#FFF',
         type: siteTags.BOOKMARK,
         key: 'https://brave.com/|0|0',
-        skipSync: null,
-        width: 0
+        skipSync: null
       }
 
       assert.deepEqual(bookmarkUtil.buildBookmark(stateWithData, bookmark).toJS(), expectedResult)
@@ -573,8 +570,7 @@ describe('bookmarkUtil unit test', function () {
         themeColor: 'rgb(59, 89, 152)',
         type: siteTags.BOOKMARK,
         key: 'https://www.facebook.com/BraveSoftware/|0|0',
-        skipSync: null,
-        width: 0
+        skipSync: null
       }
 
       assert.deepEqual(bookmarkUtil.buildBookmark(stateWithData, bookmark).toJS(), expectedResult)
