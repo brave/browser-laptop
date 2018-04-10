@@ -788,22 +788,4 @@ describe('bookmarkFoldersState unit test', function () {
       assert(findBookmarkSpy.calledOnce)
     })
   })
-
-  describe('setWidth', function () {
-    it('null case', function () {
-      const result = bookmarkFoldersState.setWidth(stateWithData)
-      assert.deepEqual(result.toJS(), stateWithData.toJS())
-    })
-
-    it('parse width', function () {
-      const result = bookmarkFoldersState.setWidth(stateWithData, '1', 'dsfsdfds')
-      assert.deepEqual(result.toJS(), stateWithData.toJS())
-    })
-
-    it('set width', function () {
-      const result = bookmarkFoldersState.setWidth(stateWithData, '1', 100)
-      const expectedResult = stateWithData.setIn(['bookmarkFolders', '1', 'width'], 100)
-      assert.deepEqual(result.toJS(), expectedResult.toJS())
-    })
-  })
 })

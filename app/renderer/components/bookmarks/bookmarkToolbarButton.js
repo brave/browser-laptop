@@ -242,6 +242,7 @@ class BookmarkToolbarButton extends React.Component {
       draggable
       ref={(node) => { this.bookmarkNode = node }}
       title={hoverTitle}
+      data-bookmark-key={this.props.bookmarkKey}
       onClick={this.onClick}
       onMouseOver={this.onMouseOver}
       onDragStart={this.onDragStart}
@@ -312,21 +313,22 @@ module.exports = ReduxComponent.connect(BookmarkToolbarButton)
 
 const styles = StyleSheet.create({
   bookmarkToolbarButton: {
-    display: 'flex',
-    alignItems: 'center',
+    WebkitAppRegion: 'no-drag',
     boxSizing: 'border-box',
     borderRadius: '3px',
     color: globalStyles.color.mediumGray,
     cursor: 'default',
     fontSize: globalStyles.spacing.bookmarksItemFontSize,
     lineHeight: '1.3',
-    margin: `auto ${globalStyles.spacing.bookmarksItemMargin}`,
+    // margin-bottom hides the second row of items on the bookmark bar
+    margin: `0 ${globalStyles.spacing.bookmarksItemMargin} 0 ${globalStyles.spacing.bookmarksItemMargin}`,
     maxWidth: globalStyles.spacing.bookmarksItemMaxWidth,
     padding: `2px ${globalStyles.spacing.bookmarksItemPadding}`,
     textOverflow: 'ellipsis',
     userSelect: 'none',
     whiteSpace: 'nowrap',
-    WebkitAppRegion: 'no-drag',
+    display: 'flex',
+    alignItems: 'center',
 
     ':hover': {
       background: '#fff',

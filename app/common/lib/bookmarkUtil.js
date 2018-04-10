@@ -198,8 +198,7 @@ const buildBookmark = (state, bookmarkDetail) => {
     themeColor: dataItem.get('themeColor'),
     type: siteTags.BOOKMARK,
     key: key,
-    skipSync: bookmarkDetail.get('skipSync', null),
-    width: 0
+    skipSync: bookmarkDetail.get('skipSync', null)
   })
 }
 
