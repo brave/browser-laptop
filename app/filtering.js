@@ -800,6 +800,10 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
     return getSetting(settings.PAYMENTS_ALLOW_MEDIA_PUBLISHERS, settingsState)
   }
 
+  if (resourceName === 'firewall') {
+    return siteSettings.braveryDefaults(appState, appConfig).firewall
+  }
+
   const braverySettings = getBraverySettingsForUrl(url, appState, isPrivate)
 
   // If full shields are down never enable extra protection

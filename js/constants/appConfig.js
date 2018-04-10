@@ -34,7 +34,8 @@ module.exports = {
     COOKIEBLOCK: 'cookieblock', // block 3p cookies and referer
     COOKIEBLOCK_ALL: 'cookieblockAll', // block all cookies and referer
     SITEHACK: 'siteHacks',
-    WEBTORRENT: 'webtorrent'
+    WEBTORRENT: 'webtorrent',
+    FIREWALL: 'firewall'
     // ... other optional resource files are identified by uuid such as for regional adblock
   },
   cookieblock: {
@@ -95,6 +96,9 @@ module.exports = {
   },
   webtorrent: {
     enabled: true
+  },
+  firewall: {
+    enabled: false
   },
   adInsertion: {
     enabled: false,
