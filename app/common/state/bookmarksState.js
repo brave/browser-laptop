@@ -290,16 +290,6 @@ const bookmarksState = {
 
     const cache = bookmarkOrderCache.getBookmarksByParentId(state, folderKey)
     return cache.map((item) => bookmarksState.getBookmark(state, item.get('key')))
-  },
-
-  setWidth: (state, key, width) => {
-    width = parseFloat(width)
-
-    if (key == null || isNaN(width)) {
-      return state
-    }
-
-    return state.setIn([STATE_SITES.BOOKMARKS, key, 'width'], width)
   }
 }
 

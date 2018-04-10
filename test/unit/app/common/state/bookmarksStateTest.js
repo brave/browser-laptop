@@ -314,24 +314,6 @@ describe('bookmarkState unit test', function () {
     })
   })
 
-  describe('setWidth', function () {
-    it('null case', function () {
-      const result = bookmarksState.setWidth(stateWithData)
-      assert.deepEqual(result.toJS(), stateWithData.toJS())
-    })
-
-    it('parse width', function () {
-      const result = bookmarksState.setWidth(stateWithData, '1', 'dsfsdfds')
-      assert.deepEqual(result.toJS(), stateWithData.toJS())
-    })
-
-    it('set width', function () {
-      const result = bookmarksState.setWidth(stateWithData, '1', 100)
-      const expectedResult = stateWithData.setIn(['bookmarks', '1', 'width'], 100)
-      assert.deepEqual(result.toJS(), expectedResult.toJS())
-    })
-  })
-
   describe('getBookmarksWithFolders', function () {
     let getBookmarksWithFoldersSpy
     before(function () {
