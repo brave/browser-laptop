@@ -26,11 +26,7 @@ const UrlUtil = require('../../js/lib/urlutil')
 const {isFrameError, isAborted} = require('../common/lib/httpUtil')
 const {
   aboutUrls,
-  isSourceMagnetUrl,
-  isTargetAboutUrl,
-  getTargetAboutUrl,
-  getBaseUrl,
-  isIntermediateAboutPage
+  isTargetAboutUrl
 } = require('../../js/lib/appUrlUtil')
 const urlParse = require('../common/urlParse')
 const locale = require('../../js/l10n')
@@ -43,7 +39,7 @@ const frameNotificationCallbacks = new Map()
 // Counter for detecting PDF URL redirect loops
 const frameReloadCounter = new Map()
 
-function getFrameByTabId(tabId) {
+function getFrameByTabId (tabId) {
   return frameStateUtil.getFrameByTabId(windowStore.state, tabId) || Immutable.Map()
 }
 
@@ -54,8 +50,33 @@ function getTab (tabId) {
   return appStore.state.get('tabs').find((tab) => tab.get('tabId') === tabId)
 }
 
+const eventsWithNoAction = ['tab-inserted-at', 'will-destroy', 'destroyed']
+
 const api = module.exports = {
-  handleTabEvent (tabId, eventType, e) {
+  handleTabEvent (tabId, eventType, e, shouldDebug = false, frame = getFrameByTabId(tabId)) {
+    // we don't care about certain events
+    if (eventsWithNoAction.includes(eventType)) {
+      return
+    }
+    // If frame is not in state yet, queue the event.
+    // Whilst any actions dispatched by this function will reach the store
+    // *after* the frame creation event, some of these events require the frame to
+    // already exist in order to make some processing decisions,
+    // though that should be refactored so that the state-processing is done in
+    // the reducers.
+    if (!frame || frame.isEmpty()) {
+      if (shouldDebug) {
+        console.debug('%cNo frame for event yet, queueing until later', 'color: red', tabId, eventType)
+      }
+      windowStore.once(`new-frame-${tabId}`, (newFrame) => {
+        if (shouldDebug) {
+          console.debug('%cFrame now exists, re-running event handler', 'color: green', tabId, eventType)
+        }
+        api.handleTabEvent(tabId, eventType, e, shouldDebug, newFrame)
+      })
+      return
+    }
+
     switch (eventType) {
       case 'tab-detached-at': {
         windowActions.removeFrame(tabId)
@@ -75,17 +96,11 @@ const api = module.exports = {
         break
       }
       case 'did-block-run-insecure-content': {
-        const frame = getFrameByTabId(tabId)
-        if (!frame.isEmpty()) {
-          windowActions.setBlockedRunInsecureContent(frame, e.details[0])
-        }
+        windowActions.setBlockedRunInsecureContent(frame, e.details[0])
         break
       }
       case 'context-menu': {
-        const frame = getFrameByTabId(tabId)
-        if (!frame.isEmpty()) {
-          contextMenus.onMainContextMenu(e.params, frame, getTab(tabId))
-        }
+        contextMenus.onMainContextMenu(e.params, frame, getTab(tabId))
         e.preventDefault()
         e.stopPropagation()
         break
@@ -99,9 +114,7 @@ const api = module.exports = {
         break
       }
       case 'page-favicon-updated': {
-        const frame = getFrameByTabId(tabId)
-        if (!frame.isEmpty() &&
-            e.favicons &&
+        if (e.favicons &&
             e.favicons.length > 0 &&
             // Favicon changes lead to recalculation of top site data so only fire
             // this when needed.  Some sites update favicons very frequently.
@@ -120,10 +133,7 @@ const api = module.exports = {
         break
       }
       case 'show-autofill-popup': {
-        const frame = getFrameByTabId(tabId)
-        if (!frame.isEmpty()) {
-          contextMenus.onShowAutofillMenu(e.suggestions, e.rect, frame)
-        }
+        contextMenus.onShowAutofillMenu(e.suggestions, e.rect, frame)
         break
       }
       case 'hide-autofill-popup': {
@@ -135,9 +145,7 @@ const api = module.exports = {
         break
       }
       case 'load-start': {
-        const frame = getFrameByTabId(tabId)
         if (
-          !frame.isEmpty() &&
           e.isMainFrame &&
           !e.isErrorPage &&
           !e.isFrameSrcDoc
@@ -145,17 +153,16 @@ const api = module.exports = {
           if (e.url &&
             e.url.startsWith(appConfig.noScript.twitterRedirectUrl) &&
             getSiteSettings(frame).get('noScript')) {
-              // This result will be canceled immediately by sitehacks, so don't
-              // update the load state; otherwise it will not show the security
-              // icon.
-              break
+            // This result will be canceled immediately by sitehacks, so don't
+            // update the load state; otherwise it will not show the security
+            // icon.
+            break
           }
           windowActions.onWebviewLoadStart(frame, e.url)
         }
         break
       }
       case 'did-fail-provisional-load': {
-        const frame = getFrameByTabId(tabId)
         if (e.isMainFrame) {
           loadEnd(tabId, frame, false, e.validatedURL, false)
           loadFail(tabId, frame, e, true, e.currentURL)
@@ -163,7 +170,6 @@ const api = module.exports = {
         break
       }
       case 'did-fail-load': {
-        const frame = getFrameByTabId(tabId)
         if (e.isMainFrame) {
           loadEnd(tabId, frame, false, e.validatedURL, false)
           loadFail(tabId, frame, e, false, e.validatedURL)
@@ -171,7 +177,6 @@ const api = module.exports = {
         break
       }
       case 'did-finish-load': {
-        const frame = getFrameByTabId(tabId)
         loadEnd(tabId, frame, true, e.validatedURL, false)
         if (getSiteSettings(frame).get('runInsecureContent')) {
           const origin = tabState.getVisibleOrigin(appStore.state, tabId)
@@ -181,15 +186,13 @@ const api = module.exports = {
         break
       }
       case 'did-navigate-in-page': {
-        const frame = getFrameByTabId(tabId)
-        if (!frame.isEmpty() && e.isMainFrame) {
+        if (e.isMainFrame) {
           windowActions.setNavigated(e.url, frame.get('key'), true, tabId)
           loadEnd(tabId, frame, true, e.url, true)
         }
         break
       }
       case 'did-navigate': {
-        const frame = getFrameByTabId(tabId)
         const frameKey = frame.get('key')
         const findBarShown = frame.get('findbarShown')
         // hide the find bar if it's showing
@@ -201,17 +204,11 @@ const api = module.exports = {
           appActions.hideNotification(message)
         }
         clearFrameNotificationCallbacks(frameKey)
-        if (!frame.isEmpty()) {
-          windowActions.setNavigated(e.url, frameKey, false, tabId)
-        }
+        windowActions.setNavigated(e.url, frameKey, false, tabId)
         break
       }
       case 'did-change-theme-color': {
         const themeColor = e.themeColor
-        const frame = getFrameByTabId(tabId)
-        if (frame.isEmpty()) {
-          break
-        }
         // Due to a bug in Electron, after navigating to a page with a theme color
         // to a page without a theme color, the background is sent to us as black
         // even know there is no background. To work around this we just ignore
@@ -220,10 +217,6 @@ const api = module.exports = {
         break
       }
       case 'found-in-page': {
-        const frame = getFrameByTabId(tabId)
-        if (frame.isEmpty()) {
-          break
-        }
         if (e.result !== undefined && (e.result.matches !== undefined || e.result.activeMatchOrdinal !== undefined)) {
           const frameKey = frame.get('key')
           if (e.result.matches === 0) {
@@ -242,10 +235,6 @@ const api = module.exports = {
         break
       }
       case 'security-style-changed': {
-        const frame = getFrameByTabId(tabId)
-        if (frame.isEmpty()) {
-          break
-        }
         let isSecure = null
         let runInsecureContent = getSiteSettings(frame).get('runInsecureContent')
         let evCert = null
@@ -286,21 +275,17 @@ const api = module.exports = {
         break
       }
       case 'ipc-message': {
-        handleTabIpcMessage(tabId, e)
+        handleTabIpcMessage(tabId, frame, e)
         break
       }
     }
   }
 }
 
-function handleTabIpcMessage(tabId, e) {
+function handleTabIpcMessage (tabId, frame, e) {
   let method = () => {}
   switch (e.channel) {
     case messages.GOT_CANVAS_FINGERPRINTING: {
-      const frame = getFrameByTabId(tabId)
-      if (frame.isEmpty()) {
-        return
-      }
       method = (detail) => {
         const provisionalLocation = frame.get('provisionalLocation')
         const description = [detail.type, detail.scriptUrl || provisionalLocation].join(': ')
@@ -309,19 +294,11 @@ function handleTabIpcMessage(tabId, e) {
       break
     }
     case messages.THEME_COLOR_COMPUTED: {
-      const frame = getFrameByTabId(tabId)
-      if (frame.isEmpty()) {
-        return
-      }
       method = (computedThemeColor) =>
         windowActions.setThemeColor(frame, undefined, computedThemeColor || null)
       break
     }
     case messages.CONTEXT_MENU_OPENED: {
-      const frame = getFrameByTabId(tabId)
-      if (frame.isEmpty()) {
-        return
-      }
       method = (nodeProps, contextMenuType) => {
         contextMenus.onMainContextMenu(nodeProps, frame, getTab(tabId), contextMenuType)
       }
@@ -341,7 +318,6 @@ function handleTabIpcMessage(tabId, e) {
     }
     case messages.RELOAD: {
       method = () => {
-        const frame = getFrameByTabId(tabId)
         const location = frame.get('location')
         const frameKey = frame.get('key')
         if (!frameReloadCounter.has(frameKey)) {
@@ -441,9 +417,6 @@ function loadEnd (tabId, frame, savePage, url, inPageNav) {
 }
 
 function loadFail (tabId, frame, e, provisionLoadFailure, url) {
-  if (frame.isEmpty()) {
-    return
-  }
   if (isFrameError(e.errorCode)) {
     // temporary workaround for https://github.com/brave/browser-laptop/issues/1817
     if (e.validatedURL === aboutUrls.get('about:newtab') ||
@@ -596,4 +569,3 @@ function getFrameNotificationCallbacks (frameKey, message, cb) {
 function clearFrameNotificationCallbacks (frameKey) {
   frameNotificationCallbacks.delete(frameKey)
 }
-

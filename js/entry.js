@@ -102,10 +102,10 @@ electron.remote.registerAllWindowTabEvents(e => {
   const eventName = e.type
   const tabId = e.eventTabId
   if (shouldDebugTabEvents) {
-    console.log(`%ctab event %d %c${eventName}`, 'color: #8b8bb1', tabId, 'color: #4545d4; font-weight: bold')
+    console.log(`%ctab event %d %c${eventName + (eventName === 'ipc-message' ? `: ${e.channel}` : '')}`, 'color: #8b8bb1', tabId, 'color: #4545d4; font-weight: bold', e)
   }
   try {
-    rendererTabEvents.handleTabEvent(tabId, eventName, e)
+    rendererTabEvents.handleTabEvent(tabId, eventName, e, shouldDebugTabEvents)
   } catch (e) {
     console.error(`Error handling event ${eventName} for tab ${tabId}`)
     console.error(e)

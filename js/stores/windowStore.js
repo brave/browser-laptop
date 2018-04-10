@@ -721,7 +721,6 @@ const doAction = (action) => {
       windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
       break
     case windowConstants.WINDOW_NEW_FRAME:
-    case appConstants.APP_NEW_WEB_CONTENTS_ADDED:
       if (!action.frameOpts) {
         break
       }
@@ -734,6 +733,19 @@ const doAction = (action) => {
         action.frameOpts.icon = action.frameOpts.icon || tabValue.get('favIconUrl')
       }
       windowState = newFrame(windowState, action.frameOpts)
+      setImmediate(() => {
+        // Inform subscribers that we now have a frame
+        // representation of a tab.
+        // Note that this is only required since we have some
+        // code that should be performed in state reducers
+        // but is performed in event handlers and requires up-to-date
+        // knowledge of frames in the state.
+        const tabId = action.frameOpts.tabId
+        if (tabId != null) {
+          const frame = frameStateUtil.getFrameByTabId(windowState, tabId)
+          windowStore.emit(`new-frame-${tabId}`, frame)
+        }
+      })
       break
     case appConstants.APP_CHANGE_SETTING:
       windowState = handleChangeSettingAction(windowState, action.key, action.value)
