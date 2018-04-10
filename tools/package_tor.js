@@ -1,6 +1,7 @@
 var execute = require('./lib/execute')
 const path = require('path')
 const fs = require('fs')
+const unzip = require('unzip')
 
 var cmds = []
 
@@ -51,12 +52,17 @@ if (isDarwin) {
   cmds.push('sha512sum -c tor.hash')
 }
 
-cmds.push('chmod +x ' + path.join(torPath, 'tor'))
+if (!isWindows) {
+  cmds.push('chmod +x ' + path.join(torPath, 'tor'))
+}
 cmds.push('rm -f tor.hash')
 execute(cmds, '', (err) => {
   if (err) {
     console.error('package tor failed', err)
     process.exit(1)
+  }
+  if (isWindows) {
+    fs.createReadStream(path.join(torPath, 'tor')).pipe(unzip.Extract({ path: torPath }))
   }
   console.log('done')
 })
