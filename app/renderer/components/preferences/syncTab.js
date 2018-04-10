@@ -432,6 +432,7 @@ class SyncTab extends ImmutableComponent {
 
   get addOverlayFooter () {
     return (
+
       <div>
         <BrowserButton groupedItem secondaryColor
           l10nId='cancel'
@@ -488,6 +489,22 @@ class SyncTab extends ImmutableComponent {
               styles.settingsListContainerMargin__bottom
             )}
           />
+          {
+            this.state.currentDeviceOption === 'mobile'
+            ? (
+              <p className={css(
+                styles.syncContainer__text,
+                styles.settingsListContainerMargin__bottom
+              )}>
+                <span
+                  className={css(styles.syncOverlayFooter__text_bold)}
+                  data-l10n-id='syncPrivateKeyWarning1'
+                />
+                <span data-l10n-id='syncPrivateKeyWarning2' />
+              </p>
+            )
+            : null
+          }
           {this.passphraseContent}
         </Column>
       </Grid>
@@ -497,7 +514,8 @@ class SyncTab extends ImmutableComponent {
   get chainCodeOverlayFooter () {
     return (
       <div className={css(
-        this.state.currentDeviceOption === 'mobile' && styles.syncOverlayFooter_split
+        this.state.currentDeviceOption === 'mobile' && styles.syncOverlayFooter_split,
+        this.state.currentDeviceOption === 'computer' && styles.syncOverlayFooter_notice
       )}>
         {
           this.state.currentDeviceOption === 'mobile'
@@ -505,9 +523,17 @@ class SyncTab extends ImmutableComponent {
             l10nId='syncScanQRCode'
             onClick={this.chainCodeOverlayUseCameraInstead.bind(this)}
           />
-          : null
+          : <span className={css(styles.syncOverlayFooter_notice__text)}>
+            <span
+              className={css(styles.syncOverlayFooter__text_bold)}
+              data-l10n-id='syncPrivateKeyWarning1'
+            />
+            <span data-l10n-id='syncPrivateKeyWarning2' />
+          </span>
         }
-        <div>
+        <div className={css(
+          this.state.currentDeviceOption === 'computer' && styles.syncOverlayFooter_notice__buttons
+        )}>
           <BrowserButton groupedItem secondaryColor
             l10nId='backWithArrow'
             testId='cancelButton'
@@ -696,11 +722,23 @@ class SyncTab extends ImmutableComponent {
 
   get qrPassphraseOverlayFooter () {
     return (
-      <BrowserButton groupedItem primaryColor
-        l10nId='done'
-        testId='qrPassphraseDoneAction'
-        onClick={this.qrPassphraseOverlayDoneAction.bind(this)}
-      />
+      <div className={css(
+        styles.syncOverlayFooter_notice,
+        styles.syncOverlayFooter_notice_spaced
+      )}>
+        <span className={css(styles.syncOverlayFooter_notice__text)}>
+          <span
+            className={css(styles.syncOverlayFooter__text_bold)}
+            data-l10n-id='syncPrivateKeyWarning1'
+          />
+          <span data-l10n-id='syncPrivateKeyWarning2' />
+        </span>
+        <BrowserButton groupedItem primaryColor
+          l10nId='done'
+          testId='qrPassphraseDoneAction'
+          onClick={this.qrPassphraseOverlayDoneAction.bind(this)}
+        />
+      </div>
     )
   }
 
@@ -1186,6 +1224,7 @@ const styles = StyleSheet.create({
     marginRight: '10px',
     fontWeight: 'bold'
   },
+
   syncOverlayBody__text_center: {
     margin: 'auto'
   },
@@ -1195,6 +1234,31 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center'
+  },
+
+  syncOverlayFooter__text_bold: {
+    fontWeight: 'bold'
+  },
+
+  syncOverlayFooter_notice: {
+    fontSize: '13px',
+    width: '-webkit-fill-available',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginLeft: '90px'
+  },
+
+  syncOverlayFooter_notice_spaced: {
+    marginLeft: '150px'
+  },
+
+  syncOverlayFooter_notice__text: {
+    maxWidth: '50%'
+  },
+
+  syncOverlayFooter_notice__buttons: {
+    display: 'flex'
   },
 
   actionIcons__icon: {
