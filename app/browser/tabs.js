@@ -4,11 +4,10 @@
 
 const appActions = require('../../js/actions/appActions')
 const tabActions = require('../common/actions/tabActions')
-const config = require('../../js/constants/config')
 const Immutable = require('immutable')
 const { shouldDebugTabEvents } = require('../cmdLine')
 const tabState = require('../common/state/tabState')
-const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
+const {app, extensions, session, ipcMain} = require('electron')
 const {makeImmutable, makeJS} = require('../common/state/immutableUtil')
 const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
@@ -435,29 +434,6 @@ const createNavigationState = (navigationHandle, controller) => {
     pendingEntry: fixDisplayURL(controller.getPendingEntry(), controller),
     canGoBack: controller.canGoBack(),
     canGoForward: controller.canGoForward()
-  })
-}
-
-let backgroundProcess = null
-let backgroundProcessTimer = null
-/**
- * Execute script in the browser tab
- * @param win{object} - window in which we want to execute script
- * @param debug{boolean} - would you like to close window or not
- * @param script{string} - script that you want to execute
- * @param cb{function} - function that we call after script is completed
- */
-const runScript = (win, debug, script, cb) => {
-  win.webContents.executeScriptInTab(config.braveExtensionId, script, {}, (err, url, result) => {
-    cb(err, url, result)
-    if (!debug) {
-      backgroundProcessTimer = setTimeout(() => {
-        if (backgroundProcess) {
-          win.close()
-          backgroundProcess = null
-        }
-      }, 2 * 60 * 1000) // 2 min
-    }
   })
 }
 
@@ -1045,34 +1021,6 @@ const api = {
       }
       doCreate()
     })
-  },
-
-  /**
-   * Execute script in the background browser window
-   * @param script{string} - script that we want to run
-   * @param cb{function} - function that we want to call when script is done
-   * @param debug{boolean} - would you like to keep browser window when script is done
-   */
-  executeScriptInBackground: (script, cb, debug = false) => {
-    if (backgroundProcessTimer) {
-      clearTimeout(backgroundProcessTimer)
-    }
-
-    if (backgroundProcess === null) {
-      backgroundProcess = new BrowserWindow({
-        show: debug,
-        webPreferences: {
-          partition: 'default'
-        }
-      })
-
-      backgroundProcess.webContents.on('did-finish-load', () => {
-        runScript(backgroundProcess, debug, script, cb)
-      })
-      backgroundProcess.loadURL('about:blank')
-    } else {
-      runScript(backgroundProcess, debug, script, cb)
-    }
   },
 
   moveTo: (state, tabId, frameOpts, browserOpts, toWindowId) => {

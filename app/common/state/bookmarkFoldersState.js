@@ -198,17 +198,6 @@ const bookmarkFoldersState = {
       append
     )
     return state
-  },
-
-  setWidth: (state, key, width) => {
-    state = validateState(state)
-    width = parseFloat(width)
-
-    if (key == null || isNaN(width)) {
-      return state
-    }
-
-    return state.setIn([STATE_SITES.BOOKMARK_FOLDERS, key, 'width'], width)
   }
 }
 

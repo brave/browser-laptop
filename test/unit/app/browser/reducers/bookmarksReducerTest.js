@@ -15,17 +15,13 @@ const siteTags = require('../../../../../js/constants/siteTags')
 require('../../../braveUnit')
 
 describe('bookmarksReducer unit test', function () {
-  let bookmarksReducer, bookmarksState, bookmarkLocationCache, bookmarkToolbarState
+  let bookmarksReducer, bookmarksState, bookmarkLocationCache
 
   const state = Immutable.fromJS({
     windows: [
       {
         windowId: 1,
-        width: 100,
-        bookmarksToolbar: {
-          toolbar: [],
-          other: []
-        }
+        width: 100
       }
     ],
     bookmarks: {},
@@ -42,11 +38,7 @@ describe('bookmarksReducer unit test', function () {
     windows: [
       {
         windowId: 1,
-        width: 100,
-        bookmarksToolbar: {
-          toolbar: [],
-          other: []
-        }
+        width: 100
       }
     ],
     bookmarks: {
@@ -144,11 +136,6 @@ describe('bookmarksReducer unit test', function () {
     tabs: []
   })
 
-  const fakeTextCalc = {
-    calcText: () => true,
-    calcTextList: () => true
-  }
-
   before(function () {
     mockery.enable({
       warnOnReplace: false,
@@ -157,11 +144,9 @@ describe('bookmarksReducer unit test', function () {
     })
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
-    mockery.registerMock('../../browser/api/textCalc', fakeTextCalc)
     bookmarksReducer = require('../../../../../app/browser/reducers/bookmarksReducer')
     bookmarksState = require('../../../../../app/common/state/bookmarksState')
     bookmarkLocationCache = require('../../../../../app/common/cache/bookmarkLocationCache')
-    bookmarkToolbarState = require('../../../../../app/common/state/bookmarkToolbarState')
   })
 
   after(function () {
@@ -187,27 +172,23 @@ describe('bookmarksReducer unit test', function () {
   })
 
   describe('APP_ADD_BOOKMARK', function () {
-    let spy, spyCalc
+    let spy
 
     afterEach(function () {
       spy.restore()
-      spyCalc.restore()
     })
 
     it('null case', function () {
       spy = sinon.spy(bookmarksState, 'addBookmark')
-      spyCalc = sinon.spy(fakeTextCalc, 'calcText')
       const newState = bookmarksReducer(state, {
         actionType: appConstants.APP_ADD_BOOKMARK
       })
       assert.equal(spy.notCalled, true)
-      assert.equal(spyCalc.notCalled, true)
       assert.deepEqual(state, newState)
     })
 
     it('bookmark data is map (single bookmark)', function () {
       spy = sinon.spy(bookmarksState, 'addBookmark')
-      spyCalc = sinon.spy(fakeTextCalc, 'calcText')
       const newState = bookmarksReducer(state, {
         actionType: appConstants.APP_ADD_BOOKMARK,
         siteDetail: {
@@ -228,8 +209,7 @@ describe('bookmarksReducer unit test', function () {
             themeColor: undefined,
             title: 'Clifton',
             type: siteTags.BOOKMARK,
-            key: 'https://clifton.io/|0|0',
-            width: 0
+            key: 'https://clifton.io/|0|0'
           }
         }))
         .setIn(['cache', 'bookmarkLocation'], Immutable.fromJS({
@@ -247,13 +227,11 @@ describe('bookmarksReducer unit test', function () {
           ]
         }))
       assert.equal(spy.calledOnce, true)
-      assert.equal(spyCalc.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
     })
 
     it('bookmark data is list (multiple bookmarks)', function () {
       spy = sinon.spy(bookmarksState, 'addBookmark')
-      spyCalc = sinon.spy(fakeTextCalc, 'calcTextList')
       const newState = bookmarksReducer(state, {
         actionType: appConstants.APP_ADD_BOOKMARK,
         siteDetail: [
@@ -282,8 +260,7 @@ describe('bookmarksReducer unit test', function () {
             themeColor: undefined,
             title: 'Clifton',
             type: siteTags.BOOKMARK,
-            key: 'https://clifton.io/|0|0',
-            width: 0
+            key: 'https://clifton.io/|0|0'
           },
           'https://brianbondy.com/|0|0': {
             favicon: undefined,
@@ -295,8 +272,7 @@ describe('bookmarksReducer unit test', function () {
             themeColor: undefined,
             title: 'Bondy',
             type: siteTags.BOOKMARK,
-            key: 'https://brianbondy.com/|0|0',
-            width: 0
+            key: 'https://brianbondy.com/|0|0'
           }
         }))
         .setIn(['cache', 'bookmarkLocation'], Immutable.fromJS({
@@ -322,7 +298,6 @@ describe('bookmarksReducer unit test', function () {
           ]
         }))
       assert.equal(spy.callCount, 2)
-      assert.equal(spyCalc.callCount, 1)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
     })
 
@@ -404,8 +379,7 @@ describe('bookmarksReducer unit test', function () {
           partitionNumber: 0,
           skipSync: null,
           themeColor: undefined,
-          type: 'bookmark',
-          width: 0
+          type: 'bookmark'
         },
         'https://www.bridiver.io|0|0': {
           lastAccessedTime: 0,
@@ -444,39 +418,33 @@ describe('bookmarksReducer unit test', function () {
   })
 
   describe('APP_EDIT_BOOKMARK', function () {
-    let spy, spyCalc
+    let spy
 
     afterEach(function () {
       spy.restore()
-      spyCalc.restore()
     })
 
     it('null case', function () {
       spy = sinon.spy(bookmarksState, 'editBookmark')
-      spyCalc = sinon.spy(fakeTextCalc, 'calcText')
       const newState = bookmarksReducer(state, {
         actionType: appConstants.APP_EDIT_BOOKMARK
       })
       assert.equal(spy.notCalled, true)
-      assert.equal(spyCalc.notCalled, true)
       assert.deepEqual(state, newState)
     })
 
     it('bookmark data is missing', function () {
       spy = sinon.spy(bookmarksState, 'editBookmark')
-      spyCalc = sinon.spy(fakeTextCalc, 'calcText')
       const newState = bookmarksReducer(state, {
         actionType: appConstants.APP_EDIT_BOOKMARK,
         editKey: 'https://clifton.io|0|0'
       })
       assert.equal(spy.notCalled, true)
-      assert.equal(spyCalc.notCalled, true)
       assert.deepEqual(state, newState)
     })
 
     it('bookmark key is missing', function () {
       spy = sinon.spy(bookmarksState, 'editBookmark')
-      spyCalc = sinon.spy(fakeTextCalc, 'calcText')
       const newState = bookmarksReducer(state, {
         actionType: appConstants.APP_EDIT_BOOKMARK,
         siteDetail: {
@@ -485,13 +453,11 @@ describe('bookmarksReducer unit test', function () {
         }
       })
       assert.equal(spy.notCalled, true)
-      assert.equal(spyCalc.notCalled, true)
       assert.deepEqual(state, newState)
     })
 
     it('bookmark data is correct', function () {
       spy = sinon.spy(bookmarksState, 'editBookmark')
-      spyCalc = sinon.spy(fakeTextCalc, 'calcText')
       const newState = bookmarksReducer(stateWithData, {
         actionType: appConstants.APP_EDIT_BOOKMARK,
         siteDetail: {
@@ -502,33 +468,28 @@ describe('bookmarksReducer unit test', function () {
       const expectedState = stateWithData
         .setIn(['bookmarks', 'https://clifton.io/|0|0', 'title'], 'Bondy')
       assert.equal(spy.calledOnce, true)
-      assert.equal(spyCalc.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
     })
   })
 
   describe('APP_MOVE_BOOKMARK', function () {
-    let spy, spyToolbar
+    let spy
 
     afterEach(function () {
       spy.restore()
-      spyToolbar.restore()
     })
 
     it('null case', function () {
       spy = sinon.spy(bookmarksState, 'moveBookmark')
-      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
       const newState = bookmarksReducer(state, {
         actionType: appConstants.APP_MOVE_BOOKMARK
       })
       assert.equal(spy.notCalled, true)
-      assert.equal(spyToolbar.notCalled, true)
       assert.deepEqual(state, newState)
     })
 
     it('data is correct', function () {
       spy = sinon.spy(bookmarksState, 'moveBookmark')
-      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
       const newState = bookmarksReducer(stateWithData, {
         actionType: appConstants.APP_MOVE_BOOKMARK,
         bookmarkKey: 'https://clifton.io/|0|0',
@@ -548,58 +509,29 @@ describe('bookmarksReducer unit test', function () {
             type: siteTags.BOOKMARK
           }
         ]))
-        .setIn(['windows', 0, 'bookmarksToolbar', 'toolbar'], Immutable.fromJS([
-          'https://clifton.io/|0|0',
-          'https://brave.com/|0|0'
-        ]))
       assert.equal(spy.calledOnce, true)
-      assert.equal(spyToolbar.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
-    })
-
-    it('bookmark is moved from folder to another folder', function () {
-      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
-      bookmarksReducer(stateWithData, {
-        actionType: appConstants.APP_MOVE_BOOKMARK,
-        bookmarkKey: 'https://brianbondy.com/|0|1',
-        destinationKey: 'https://test.com/|0|2'
-      })
-      assert.equal(spyToolbar.notCalled, true)
-    })
-
-    it('bookmark is moved from toolbar to another folder', function () {
-      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
-      bookmarksReducer(stateWithData, {
-        actionType: appConstants.APP_MOVE_BOOKMARK,
-        bookmarkKey: 'https://clifton.io/|0|0',
-        destinationKey: 'https://test.com/|0|2'
-      })
-      assert.equal(spyToolbar.calledOnce, true)
     })
   })
 
   describe('APP_REMOVE_BOOKMARK', function () {
-    let spy, spyToolbar
+    let spy
 
     afterEach(function () {
       spy.restore()
-      spyToolbar.restore()
     })
 
     it('null case', function () {
       spy = sinon.spy(bookmarksState, 'removeBookmark')
-      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
       const newState = bookmarksReducer(state, {
         actionType: appConstants.APP_REMOVE_BOOKMARK
       })
       assert.equal(spy.notCalled, true)
-      assert.equal(spyToolbar.notCalled, true)
       assert.deepEqual(state, newState)
     })
 
     it('check if delete is working', function () {
       spy = sinon.spy(bookmarksState, 'removeBookmark')
-      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
       const newState = bookmarksReducer(stateWithData, {
         actionType: appConstants.APP_REMOVE_BOOKMARK,
         bookmarkKey: 'https://clifton.io/|0|0'
@@ -614,87 +546,7 @@ describe('bookmarksReducer unit test', function () {
         ]))
         .deleteIn(['bookmarks', 'https://clifton.io/|0|0'])
         .deleteIn(['cache', 'bookmarkLocation', 'https://clifton.io/'])
-        .setIn(['windows', 0, 'bookmarksToolbar', 'toolbar'], Immutable.fromJS([
-          'https://brave.com/|0|0'
-        ]))
       assert.equal(spy.calledOnce, true)
-      assert.equal(spyToolbar.calledOnce, true)
-      assert.deepEqual(newState.toJS(), expectedState.toJS())
-    })
-  })
-
-  describe('APP_ON_BOOKMARK_WIDTH_CHANGED', function () {
-    let spy, spyToolbar
-
-    afterEach(function () {
-      spy.restore()
-      spyToolbar.restore()
-    })
-
-    it('null case', function () {
-      spy = sinon.spy(bookmarksState, 'setWidth')
-      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
-      const newState = bookmarksReducer(state, {
-        actionType: appConstants.APP_ON_BOOKMARK_WIDTH_CHANGED
-      })
-      assert.equal(spy.notCalled, true)
-      assert.equal(spyToolbar.notCalled, true)
-      assert.deepEqual(state, newState)
-    })
-
-    it('we update multiple items', function () {
-      spy = sinon.spy(bookmarksState, 'setWidth')
-      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
-      const newState = bookmarksReducer(stateWithData, {
-        actionType: appConstants.APP_ON_BOOKMARK_WIDTH_CHANGED,
-        bookmarkList: Immutable.fromJS([
-          {
-            key: 'https://brave.com/|0|0',
-            width: 10,
-            parentFolderId: 0
-          },
-          {
-            key: 'https://clifton.io/|0|0',
-            width: 15,
-            parentFolderId: 0
-          },
-          {
-            key: 'https://brianbondy.com/|0|1',
-            width: 20,
-            parentFolderId: 69
-          }
-        ])
-      })
-      assert.equal(spy.callCount, 3)
-      assert.equal(spyToolbar.calledOnce, true)
-      const expectedState = stateWithData
-        .setIn(['bookmarks', 'https://brave.com/|0|0', 'width'], 10)
-        .setIn(['bookmarks', 'https://clifton.io/|0|0', 'width'], 15)
-        .setIn(['bookmarks', 'https://brianbondy.com/|0|1', 'width'], 20)
-        .setIn(['windows', 0, 'bookmarksToolbar', 'toolbar'], Immutable.fromJS([
-          'https://brave.com/|0|0',
-          'https://clifton.io/|0|0'
-        ]))
-      assert.deepEqual(newState.toJS(), expectedState.toJS())
-    })
-
-    it('we update one and trigger toolbar update', function () {
-      spy = sinon.spy(bookmarksState, 'setWidth')
-      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbars')
-      const newState = bookmarksReducer(stateWithData, {
-        actionType: appConstants.APP_ON_BOOKMARK_WIDTH_CHANGED,
-        bookmarkList: Immutable.fromJS([
-          {
-            key: 'https://brianbondy.com/|0|1',
-            width: 20,
-            parentFolderId: 1
-          }
-        ])
-      })
-      assert.equal(spy.callCount, 1)
-      assert.equal(spyToolbar.notCalled, true)
-      const expectedState = stateWithData
-        .setIn(['bookmarks', 'https://brianbondy.com/|0|1', 'width'], 20)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
     })
   })
