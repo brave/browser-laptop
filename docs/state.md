@@ -547,6 +547,7 @@ AppStore
     devices: {
       [deviceId]: {
         name: string,
+        mainDevice: boolean, // whether or not this device is the main device
         lastRecordTimestamp: number // last seen Sync record from this device
       }
     },
