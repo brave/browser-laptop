@@ -11,26 +11,6 @@ const debounce = require('../../js/lib/debounce')
 
 let i = 0
 
-function ensurePaintWebviewFirstAttach (webview, cb = () => {}) {
-  window.requestAnimationFrame(() => {
-    webview.style.display = 'none'
-    window.requestAnimationFrame(() => {
-      webview.style.display = ''
-      window.requestAnimationFrame(cb)
-    })
-  })
-}
-
-function ensurePaintWebviewSubsequentAttach (webview, cb = () => {}) {
-  webview.style.top = '1px'
-  window.requestAnimationFrame(() => {
-    webview.style.top = ''
-    cb()
-  })
-}
-
-const animationFrame = () => new Promise(window.requestAnimationFrame)
-
 module.exports = class WebviewDisplay {
   constructor ({ containerElement, classNameWebview, classNameWebviewAttached, classNameWebviewAttaching, onFocus, onZoomChange, shouldRemoveOnDestroy = false }) {
     if (!containerElement) {
@@ -168,23 +148,9 @@ module.exports = class WebviewDisplay {
 
     this.attachingToTabId = tabId
     const t0 = window.performance.now()
-    let timeoutHandleBumpView = null
     const fnEnd = () => {
       if (this.shouldLogEvents) {
         console.groupEnd()
-      }
-    }
-    // fn for guest did attach, and workaround to force paint
-    const onToAttachDidAttach = () => {
-      this.debugLog(`swapWebviewOnAttach: webview did-attach ${window.performance.now() - t0}ms`)
-      // TODO(petemill) remove ugly workaround as <webview>
-      // will often not paint guest unless
-      // size has changed or forced to.
-      if (!toAttachWebview.isSubsequentAttach) {
-        toAttachWebview.isSubsequentAttach = true
-        ensurePaintWebviewFirstAttach(toAttachWebview, showAttachedView)
-      } else {
-        ensurePaintWebviewSubsequentAttach(toAttachWebview, showAttachedView)
       }
     }
 
@@ -215,11 +181,10 @@ module.exports = class WebviewDisplay {
 
       // At the point where we are attached to the guest we *still* want to be displaying.
       // So, show it.
+      // TODO: remove attaching class name, since we no longer need to
+      // wait for tab to paint and have an async gap between adding attaching
+      // class and attached class.
       toAttachWebview.classList.add(this.classNameWebviewAttaching)
-      // (takes about 3 frames to paint fully and avoid a white flash)
-      await animationFrame()
-      await animationFrame()
-      await animationFrame()
       this.debugLog('swapWebviewOnAttach: unregisterEvents', tabId)
       remote.unregisterEvents(tabId, tabEventHandler)
       this.debugLog(`swapWebviewOnAttach: webview finished waiting for paint, showing... ${window.performance.now() - t0}ms`)
@@ -293,7 +258,6 @@ module.exports = class WebviewDisplay {
         case 'will-destroy':
         case 'destroyed':
           // don't need to bump view
-          clearTimeout(timeoutHandleBumpView)
           remote.unregisterEvents(tabId, tabEventHandler)
           onDestroyedInsteadOfAttached()
           break
@@ -304,10 +268,9 @@ module.exports = class WebviewDisplay {
           // when did-detach happens after did-attach but before
           // we're done displaying
           if (!handled) {
-            // don't need to bump view
-            clearTimeout(timeoutHandleBumpView)
-            onToAttachDidAttach()
             handled = true
+            // don't need to bump view
+            showAttachedView()
           }
           break
         case 'did-detach':
@@ -334,8 +297,6 @@ module.exports = class WebviewDisplay {
       // setImmediate is a bit of a hacky way to ensure that registerEvents handler is registered
       setImmediate(() => toAttachWebview.attachGuest(guestInstanceId, webContents))
       this.debugLog(`swapWebviewOnAttach: Waiting.... ${window.performance.now() - t0}ms`)
-      // another workaround for not getting did-attach on webview, set a timeout and then hide / show view
-      timeoutHandleBumpView = window.setTimeout(ensurePaintWebviewFirstAttach.bind(null, toAttachWebview), 2000)
     })
   }
 

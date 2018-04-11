@@ -2,24 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-function ensurePaintWebviewFirstAttach (webview) {
-  window.requestAnimationFrame(() => {
-    webview.style.display = 'none'
-    window.requestAnimationFrame(() => {
-      webview.style.display = ''
-    })
-  })
-}
-
-function ensurePaintWebviewSubsequentAttach (webview) {
-  window.requestAnimationFrame(() => {
-    webview.style.top = '1px'
-    window.requestAnimationFrame(() => {
-      webview.style.top = ''
-    })
-  })
-}
-
 module.exports = class SingleWebviewDisplay {
   constructor ({containerElement, classNameWebview}) {
     this.isAttached = false
@@ -34,17 +16,9 @@ module.exports = class SingleWebviewDisplay {
       if (!webContents || webContents.isDestroyed()) {
         return
       }
-      this.webview.attachGuest(webContents.guestInstanceId)
+      this.webview.attachGuest(webContents.guestInstanceId, webContents)
     })
     this.isAttached = true
-    // TODO(petemill) remove ugly workaround as <webview> will often not paint guest unless
-    // size has changed or forced to.
-    if (!this.isSubsequent) {
-      this.isSubsequent = true
-      ensurePaintWebviewFirstAttach(this.webview)
-    } else {
-      ensurePaintWebviewSubsequentAttach(this.webview)
-    }
   }
 
   createWebview () {
