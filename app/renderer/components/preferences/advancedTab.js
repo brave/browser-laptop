@@ -11,6 +11,7 @@ const locale = require('../../../../js/l10n')
 
 // Actions
 const {getSetting} = require('../../../../js/settings')
+const aboutActions = require('../../../../js/about/aboutActions')
 
 // Components
 const {SettingsList, SettingItem, SettingCheckbox} = require('../common/settings')
@@ -19,6 +20,7 @@ const {DefaultSectionTitle} = require('../common/sectionTitle')
 
 // Constants
 const settings = require('../../../../js/constants/settings')
+const webrtcConstants = require('../../../../js/constants/webrtcConstants')
 const {scaleSize} = require('../../../common/constants/toolbarUserInterfaceScale')
 
 // Utils
@@ -153,6 +155,30 @@ class AdvancedTab extends ImmutableComponent {
           />
           {this.spellCheckLanguages}
         </SettingsList>
+        <DefaultSectionTitle data-l10n-id='webrtcPolicy' />
+        <SettingsList>
+          <SettingDropdown
+            value={(
+              getSetting(settings.WEBRTC_POLICY, this.props.settings)
+            )}
+            onChange={changeSetting.bind(
+              null,
+              this.props.onChangeSetting,
+              settings.WEBRTC_POLICY
+            )}>
+            {
+              Object.keys(webrtcConstants)
+                .map((policy) => <option data-l10n-id={policy} value={webrtcConstants[policy]} />)
+            }
+          </SettingDropdown>
+          <div
+            className={css(styles.link)}
+            data-l10n-id='webrtcPolicyExplanation'
+            onClick={aboutActions.createTabRequested.bind(null, {
+              url: 'https://cs.chromium.org/chromium/src/content/public/common/webrtc_ip_handling_policy.h'
+            })}
+          />
+        </SettingsList>
       </main>
       <footer className={css(styles.moreInfo)}>
         <div data-l10n-id='requiresRestart' className={css(commonStyles.requiresRestart)} />
@@ -177,6 +203,13 @@ const styles = StyleSheet.create({
 
   swipeNavigation__longLabel: {
     marginLeft: '5px'
+  },
+
+  link: {
+    cursor: 'pointer',
+    fontSize: '14px',
+    lineHeight: '3em',
+    textDecoration: 'underline'
   },
 
   moreInfo: {

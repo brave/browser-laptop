@@ -22,9 +22,11 @@ const updateState = require('../../common/state/updateState')
 const appConfig = require('../../../js/constants/appConfig')
 const appConstants = require('../../../js/constants/appConstants')
 const windowConstants = require('../../../js/constants/windowConstants')
+const webrtcConstants = require('../../../js/constants/webrtcConstants')
 const dragTypes = require('../../../js/constants/dragTypes')
 const tabActionConsts = require('../../common/constants/tabAction')
 const appActions = require('../../../js/actions/appActions')
+const settings = require('../../../js/constants/settings')
 
 // Utils
 const tabs = require('../tabs')
@@ -37,23 +39,27 @@ const flash = require('../../../js/flash')
 const {isSourceAboutUrl, isTargetAboutUrl, isNavigatableAboutPage} = require('../../../js/lib/appUrlUtil')
 const {shouldDebugTabEvents} = require('../../cmdLine')
 
-const WEBRTC_DEFAULT = 'default'
-const WEBRTC_DISABLE_NON_PROXY = 'disable_non_proxied_udp'
-
 const getWebRTCPolicy = (state, tabId) => {
+  const webrtcSetting = state.getIn(['settings', settings.WEBRTC_POLICY])
+  if (webrtcSetting && webrtcSetting !== webrtcConstants.default) {
+    // Global webrtc setting overrides fingerprinting shield setting
+    return webrtcSetting
+  }
+
   const tabValue = tabState.getByTabId(state, tabId)
   if (tabValue == null) {
-    return WEBRTC_DEFAULT
+    return webrtcConstants.default
   }
+
   const allSiteSettings = siteSettingsState.getAllSiteSettings(state, tabValue.get('incognito') === true)
   const tabSiteSettings =
     siteSettings.getSiteSettingsForURL(allSiteSettings, tabValue.get('url'))
   const activeSiteSettings = siteSettings.activeSettings(tabSiteSettings, state, appConfig)
 
   if (!activeSiteSettings || activeSiteSettings.fingerprintingProtection !== true) {
-    return WEBRTC_DEFAULT
+    return webrtcConstants.default
   } else {
-    return WEBRTC_DISABLE_NON_PROXY
+    return webrtcConstants.disableNonProxiedUdp
   }
 }
 
