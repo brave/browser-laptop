@@ -35,6 +35,7 @@ const appConfig = require('../constants/appConfig')
 const preferenceTabs = require('../constants/preferenceTabs')
 const messages = require('../constants/messages')
 const settings = require('../constants/settings')
+const webrtcConstants = require('../constants/webrtcConstants')
 const {changeSetting} = require('../../app/renderer/lib/settingsUtil')
 const {passwordManagers, extensionIds} = require('../constants/passwordManagers')
 const {startsWithOption, newTabMode, bookmarksToolbarMode, fullscreenOption, autoplayOption} = require('../../app/common/constants/settingsEnums')
@@ -414,6 +415,30 @@ class SecurityTab extends ImmutableComponent {
       <SettingsList>
         <SettingCheckbox dataL10nId='useSiteIsolation' prefKey={settings.SITE_ISOLATION_ENABLED} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
+      <DefaultSectionTitle data-l10n-id='webrtcPolicy' />
+      <SettingsList>
+        <SettingDropdown
+          value={(
+            getSetting(settings.WEBRTC_POLICY, this.props.settings)
+          )}
+          onChange={changeSetting.bind(
+            null,
+            this.props.onChangeSetting,
+            settings.WEBRTC_POLICY
+          )}>
+          {
+            Object.keys(webrtcConstants)
+              .map((policy) => <option data-l10n-id={policy} value={webrtcConstants[policy]} />)
+          }
+        </SettingDropdown>
+        <div
+          className={css(styles.link)}
+          data-l10n-id='webrtcPolicyExplanation'
+          onClick={aboutActions.createTabRequested.bind(null, {
+            url: 'https://cs.chromium.org/chromium/src/content/public/common/webrtc_ip_handling_policy.h'
+          })}
+        />
+      </SettingsList>
       <DefaultSectionTitle data-l10n-id='firewall' />
       <SettingsList>
         <SettingCheckbox dataL10nId='useFirewall' checked={this.props.braveryDefaults.get(firewall)} onChange={this.onToggleFirewall} />
@@ -765,6 +790,13 @@ const styles = StyleSheet.create({
 
   searchShortcutEntry: {
     fontSize: '1rem'
+  },
+
+  link: {
+    cursor: 'pointer',
+    fontSize: '14px',
+    lineHeight: '3em',
+    textDecoration: 'underline'
   }
 })
 
