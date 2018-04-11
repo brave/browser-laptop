@@ -123,7 +123,7 @@ const frameReducer = (state, action, immutableAction) => {
     case appConstants.APP_TAB_UPDATED:
       // This case will be fired for both tab creation and tab update.
       const tab = immutableAction.get('tabValue')
-      const changeInfo = immutableAction.get('changeInfo')
+      const changeInfo = immutableAction.get('changeInfo') || Immutable.Map()
       if (!tab) {
         break
       }
