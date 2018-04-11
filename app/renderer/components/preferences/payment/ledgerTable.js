@@ -100,8 +100,9 @@ class LedgerTable extends ImmutableComponent {
     return synopsis.get('pinPercentage')
   }
 
-  banSite (hostPattern) {
+  banSite (hostPattern, siteName) {
     aboutActions.changeSiteSetting(hostPattern, 'ledgerPaymentsShown', false)
+    aboutActions.changeSiteSetting(hostPattern, 'siteName', siteName)
   }
 
   togglePinSite (hostPattern, pinned, percentage) {
@@ -245,7 +246,7 @@ class LedgerTable extends ImmutableComponent {
             data-test-pinned={pinned}
           />
           <span className={css(styles.mainIcon, styles.removeIcon)}
-            onClick={this.banSite.bind(this, this.getHostPattern(synopsis))}
+            onClick={this.banSite.bind(this, this.getHostPattern(synopsis), siteName)}
           />
         </span>,
         value: ''

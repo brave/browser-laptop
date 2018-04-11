@@ -144,7 +144,15 @@ class PaymentsTab extends ImmutableComponent {
       }
 
       if (['boolean', 'number'].includes(typeof granted)) {
-        sites.push(hostPattern)
+        let siteName = null
+        if (value.has('siteName')) {
+          siteName = value.get('siteName')
+        }
+
+        sites.push({
+          siteName,
+          hostPattern
+        })
       }
     })
 
