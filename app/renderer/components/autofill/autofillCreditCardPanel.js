@@ -110,19 +110,21 @@ class AutofillCreditCardPanel extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const detail = currentWindow.get('autofillCreditCardDetail', Immutable.Map())
-
-    // const cardRexEx = /^[0-9]{3,4}[" "-]{0,1}[0-9]{3,4}[" "-]{0,1}[0-9]{3,4}[" "-]{0,1}[0-9]{1,7}$/
-    const cardRexEx = /^[0-9]{13,19}$/
-    const visaCard = /^(4)[0-9]{12,18}$/
-    const americanCard = /^(34|37)[0-9]{13}$/
-    const masterCard = /^5[1-5][0-9]{14}$/
-    const discoverCard = /^(6011|64|65)[0-9]{14,17}$/
-    const jcbCard = /^35[2-8][0-9][0-9]{12,15}$/
-    const dinersEnRouteCard = /^(2014|2149)[0-9]{11}$/
-    const dinersInternationalCard = /^36[0-9]{12,17}$/
-    const chinaUnionPayCard = /^(62)[0-9]{14,17}$/
-    
-
+    const cardTypes = [
+      { regExp: /^(4)[0-9]{12,18}$/, name: 'Visa' },
+      { regExp: /^(34|37)[0-9]{13}$/, name: 'AmericanExpress' },
+      { regExp: /^5[1-5][0-9]{14}$/, name: 'Mastercard' },
+      { regExp: /^6(0|4|5)[0-9]{14,17 }$/, name: 'Discover' },
+      { regExp: /^35[2-8][0-9][0-9]{12,15}$/, name: 'JCB' },
+      { regExp: /^(2014|2149)[0-9]{11}$/, name: 'Diners EnRoute' },
+      { regExp: /^36[0-9]{12,17}$/, name: 'Diners International' },
+      { regExp: /^(62)[0-9]{14,17}$/, name: 'China Union Pay' },
+      { regExp: /^[0-9]{13,19}$/, name: 'Default' }
+    ]
+    let isValidCreditCard = false
+    for (let i = 0; i < cardTypes.length; ++i) {
+      isValidCreditCard = isValidCreditCard || cardTypes[i].regExp.test(detail.get('card'))
+    }
     const props = {}
     props.name = detail.get('name', '')
     props.card = detail.get('card', '')
@@ -130,20 +132,7 @@ class AutofillCreditCardPanel extends React.Component {
     props.year = detail.get('year')
     props.guid = detail.get('guid', '-1')
     props.disableSaveButton = detail.isEmpty() ||
-      (!detail.get('name') && !detail.get('card')) ||
-      (!cardRexEx.test(detail.get('card')) && !visaCard.test(detail.get('card')) &&
-       !masterCard.test(detail.get('card')) && !americanCard.test(detail.get('card')) &&
-       !chinaUnionPayCard.test(detail.get('card')) && !jcbCard.test(detail.get('card')) &&
-       !dinersEnRouteCard.test(detail.get('card')) && !dinersInternationalCard.test(detail.get('card')))
-    props.visa = visaCard.test(detail.get('card'))
-    props.master = masterCard.test(detail.get('card'))
-    props.american = americanCard.test(detail.get('card'))
-    props.discover = discoverCard.test(detail.get('card'))
-    props.jcb = jcbCard.test(detail.get('card'))
-    props.chinaUnion = chinaUnionPayCard.test(detail.get('card'))
-    props.dinersEnRoute = dinersEnRouteCard.test(detail.get('card'))
-    props.dinersInter = dinersInternationalCard.test(detail.get('card'))
-
+    (!detail.get('name') && !detail.get('card')) || !isValidCreditCard
     return props
   }
 
@@ -188,30 +177,6 @@ class AutofillCreditCardPanel extends React.Component {
                   onKeyDown={this.onKeyDown}
                   onChange={this.onCardChange}
                 />
-                <div hidden={!this.props.visa}>
-                  Visa
-                </div>
-                <div hidden={!this.props.american}>
-                  American
-                </div>
-                <div hidden={!this.props.master}>
-                  Master
-                </div>
-                <div hidden={!this.props.discover}>
-                  Discover
-                </div>
-                <div hidden={!this.props.jcb}>
-                  JCB
-                </div>
-                <div hidden={!this.props.chinaUnion}>
-                  China Union Pay
-                </div>
-                <div hidden={!this.props.dinersEnRoute}>
-                  Dinners En Route
-                </div>
-                <div hidden={!this.props.dinersInter}>
-                  Dinners International
-                </div>
               </div>
             </div>
           </div>
