@@ -154,7 +154,8 @@ describe('ledger api unit tests', function () {
       },
       getPromotion: () => {},
       setPromotion: () => {},
-      setTimeUntilReconcile: () => {}
+      setTimeUntilReconcile: () => {},
+      isReadyToReconcile: () => {}
     }
     window.getWalletPassphrase = (parsedData) => {
       return walletPassphraseReturn
