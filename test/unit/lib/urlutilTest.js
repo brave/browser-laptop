@@ -482,4 +482,38 @@ describe('urlutil', function () {
       assert.deepEqual(result, {data: 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU//5ErkJggg==', ext: 'png'})
     })
   })
+
+  describe('isUrlPDF', function () {
+    it('null case', function () {
+      const result = urlUtil.isUrlPDF(null)
+      assert.equal(result, false)
+    })
+
+    it('url is not pdf', function () {
+      const result = urlUtil.isUrlPDF('https://clifton.io')
+      assert.equal(result, false)
+    })
+
+    it('url is pdf', function () {
+      const result = urlUtil.isUrlPDF('chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/http://www.test.com/test.pdf')
+      assert.equal(result, true)
+    })
+  })
+
+  describe('getUrlFromPDFUrl', function () {
+    it('null case', function () {
+      const result = urlUtil.getUrlFromPDFUrl(null)
+      assert.equal(result, null)
+    })
+
+    it('url is not PDF', function () {
+      const result = urlUtil.getUrlFromPDFUrl('https://clifton.io')
+      assert.equal(result, 'https://clifton.io')
+    })
+
+    it('url is pdf', function () {
+      const result = urlUtil.getUrlFromPDFUrl('chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/http://www.test.com/test.pdf')
+      assert.equal(result, 'http://www.test.com/test.pdf')
+    })
+  })
 })

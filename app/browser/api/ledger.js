@@ -54,6 +54,7 @@ const urlutil = require('../../../js/lib/urlutil')
 const windowState = require('../../common/state/windowState')
 const {makeImmutable, makeJS, isList} = require('../../common/state/immutableUtil')
 const siteHacks = require('../../siteHacks')
+const UrlUtil = require('../../../js/lib/urlutil')
 
 // Caching
 let locationDefault = 'NOOP'
@@ -982,11 +983,19 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
 
   let info = pageDataState.getLastInfo(state)
   const tabId = viewData.tabId || pageDataState.getLastActiveTabId(state)
-  const location = viewData.location || locationDefault
+  let location = viewData.location || locationDefault
 
   if (!synopsis) {
     state = addNewLocation(state, locationDefault, tabId)
     return state
+  }
+
+  if (UrlUtil.isUrlPDF(location)) {
+    location = UrlUtil.getLocationIfPDF(location)
+    info = Immutable.fromJS({
+      key: location,
+      location: location
+    })
   }
 
   const realUrl = getSourceAboutUrl(location) || location

@@ -15,6 +15,7 @@ const punycode = require('punycode/')
 const urlParse = require('../../app/common/urlParse')
 const urlFormat = require('url').format
 const pdfjsExtensionId = require('../constants/config').PDFJSExtensionId
+const pdfjsBaseUrl = `chrome-extension://${pdfjsExtensionId}/`
 
 /**
  * A simple class for parsing and dealing with URLs.
@@ -334,7 +335,7 @@ const UrlUtil = {
    * @return {string}
    */
   getLocationIfPDF: function (url) {
-    if (!url || url.indexOf(`chrome-extension://${pdfjsExtensionId}/`) === -1) {
+    if (!UrlUtil.isUrlPDF(url)) {
       return url
     }
 
@@ -346,11 +347,22 @@ const UrlUtil = {
         return query.file
       }
     }
-    return url.replace(`chrome-extension://${pdfjsExtensionId}/`, '')
+    return UrlUtil.getUrlFromPDFUrl(url)
+  },
+
+  isUrlPDF: function (url) {
+    return (url && url.startsWith(pdfjsBaseUrl)) || false
+  },
+
+  getUrlFromPDFUrl: function (url) {
+    if (!UrlUtil.isUrlPDF(url)) {
+      return url
+    }
+
+    return url.replace(pdfjsBaseUrl, '')
   },
 
   getPDFViewerUrl: function (url) {
-    const pdfjsBaseUrl = `chrome-extension://${pdfjsExtensionId}/`
     const viewerBaseUrl = `${pdfjsBaseUrl}content/web/viewer.html`
     return `${viewerBaseUrl}?file=${encodeURIComponent(url)}`
   },
