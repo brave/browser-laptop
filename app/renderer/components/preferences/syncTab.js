@@ -253,44 +253,6 @@ class SyncTab extends ImmutableComponent {
     </section>
   }
 
-  get qrcodeContent () {
-    if (!this.isSetup) {
-      return null
-    }
-    return this.props.syncQRVisible
-      ? <section>
-        <ul className={css(styles.syncOverlayBody__listWrapper)}>
-          <li className={css(
-            styles.syncOverlayBody__listItem,
-            commonStyles.noMarginLeft
-          )}>
-            <BrowserButton secondaryColor
-              l10nId='syncHideQR'
-              testId='syncHideQRButton'
-              onClick={this.props.hideQR}
-            />
-          </li>
-        </ul>
-        <img className={css(styles.syncOverlayBody__syncQRImg)}
-          src={this.props.syncData.get('seedQr')}
-          data-l10n-id='syncQRImg'
-          data-test-id='syncQRImg'
-        />
-      </section>
-    : <ul className={css(styles.syncOverlayBody__listWrapper)}>
-      <li className={css(
-        styles.syncOverlayBody__listItem,
-        commonStyles.noMarginLeft
-      )}>
-        <BrowserButton secondaryColor
-          l10nId='syncShowQR'
-          testId='syncShowQRButton'
-          onClick={this.props.showQR}
-        />
-      </li>
-    </ul>
-  }
-
   copyPassphraseToClipboard () {
     if (!this.passphraseDisplay) {
       return
@@ -597,6 +559,15 @@ class SyncTab extends ImmutableComponent {
               data-l10n-id='syncQRImg'
               data-test-id='syncQRImg'
             />
+          </Column>
+          <Column>
+            <p className={css(styles.syncContainer__text)}>
+              <span
+                className={css(styles.syncOverlayFooter__text_bold)}
+                data-l10n-id='syncPrivateKeyWarning1'
+              />
+              <span data-l10n-id='syncPrivateKeyWarning2' />
+            </p>
           </Column>
         </Grid>
       </div>
