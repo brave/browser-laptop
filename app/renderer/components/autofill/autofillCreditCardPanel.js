@@ -177,18 +177,6 @@ class AutofillCreditCardPanel extends React.Component {
                   onKeyDown={this.onKeyDown}
                   onChange={this.onCardChange}
                 />
-                <div hidden={!this.props.visa}>
-                  Visa
-                </div>
-                <div hidden={!this.props.american}>
-                  American
-                </div>
-                <div hidden={!this.props.master}>
-                  Master
-                </div>
-                <div hidden={!this.props.discover}>
-                  Discover
-                </div>
               </div>
             </div>
           </div>
