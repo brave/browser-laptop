@@ -512,6 +512,7 @@ AppStore
   siteSettings: {
     [hostPattern]: {
       adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)
+      autoplay: boolean,
       cookieControl: string, // (block3rdPartyCookie | allowAllCookies | blockAllCookies)
       fingerprintingProtection: string, // (block3rdPartyFingerprinting | allowAllFingerprinting | blockAllFingerprinting)
       flash: (number|boolean), // approval expiration time if allowed, false if never allow
@@ -530,14 +531,14 @@ AppStore
       openExternalPermission: boolean,
       pointerLockPermission: boolean,
       protocolRegistrationPermission: boolean,
-      skipSync: boolean, // Set for objects FETCHed by sync
       runInsecureContent: boolean, // allow active mixed content
       safeBrowsing: boolean,
+      siteName: string, // display name of the publisher
+      skipSync: boolean, // Set for objects FETCHed by sync
       savePasswords: boolean, // only false or undefined/null
       shieldsUp: boolean,
       widevine: (number|boolean), // false = block widevine, 0 = allow once, 1 = allow always
-      zoomLevel: number,
-      autoplay: boolean,
+      zoomLevel: number
     }
   },
   defaultSiteSettingsListImported: boolean,
