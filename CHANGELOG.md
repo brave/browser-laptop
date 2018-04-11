@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.22.16](https://github.com/brave/browser-laptop/releases/tag/v0.22.16dev)
+ - Improvements to the referral program. ([#13754](https://github.com/brave/browser-laptop/issues/13754))
+
 ## [0.22.13](https://github.com/brave/browser-laptop/releases/tag/v0.22.13dev)
 
  - Added a new recovery dialog with information when detecting corrupted seed. ([#13424](https://github.com/brave/browser-laptop/issues/13424))
