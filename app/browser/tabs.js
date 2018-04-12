@@ -41,7 +41,6 @@ const {getWindow} = require('./windows')
 const activeTabHistory = require('./activeTabHistory')
 const path = require('path')
 const {getTorSocksProxy} = require('../channel')
-const fs = require('fs')
 
 let adBlockRegions
 let currentPartitionNumber = 0
@@ -1025,12 +1024,6 @@ const api = {
           createProperties.isolated_storage = true
           createProperties.parent_partition = ''
           createProperties.tor_proxy = getTorSocksProxy()
-          const userDataDir = app.getPath('userData')
-          try {
-            fs.mkdirSync(path.join(userDataDir, 'tor'), 0o0700)
-          } catch (e) {
-            // TODO(riastradh): Report errors other than EEXIST.
-          }
           if (process.platform === 'win32') {
             createProperties.tor_path = '"' + path.join(getExtensionsPath('bin'), 'tor.exe') + '"'
           } else {

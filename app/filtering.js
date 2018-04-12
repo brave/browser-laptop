@@ -36,7 +36,6 @@ const ledgerUtil = require('./common/lib/ledgerUtil')
 const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
 const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
 const {getTorSocksProxy} = require('./channel')
-const fs = require('fs')
 
 let appStore = null
 
@@ -706,12 +705,6 @@ const initPartition = (partition) => {
     options.isolated_storage = true
     options.parent_partition = ''
     options.tor_proxy = getTorSocksProxy()
-    const userDataDir = app.getPath('userData')
-    try {
-      fs.mkdirSync(path.join(userDataDir, 'tor'), 0o0700)
-    } catch (e) {
-      // TODO(riastradh): Report errors other than EEXIST.
-    }
     if (process.platform === 'win32') {
       options.tor_path = '"' + path.join(getExtensionsPath('bin'), 'tor.exe') + '"'
     } else {
