@@ -116,6 +116,9 @@ const UrlUtil = {
     const case4Reg = /^(data|view-source|mailto|about|chrome-extension|chrome-devtools|magnet|chrome):.*/
 
     let str = input.trim()
+
+    str = str.replace(/\s([^\s]+)$/, '%20')
+
     const scheme = UrlUtil.getScheme(str)
 
     if (str.toLowerCase() === 'localhost') {
