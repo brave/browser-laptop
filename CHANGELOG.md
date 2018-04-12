@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.22.16](https://github.com/brave/browser-laptop/releases/tag/v0.22.16dev)
+## [0.22.17](https://github.com/brave/browser-laptop/releases/tag/v0.22.17dev)
  - Improvements to the referral program. ([#13754](https://github.com/brave/browser-laptop/issues/13754))
 
 ## [0.22.13](https://github.com/brave/browser-laptop/releases/tag/v0.22.13dev)
