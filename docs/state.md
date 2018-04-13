@@ -548,6 +548,7 @@ AppStore
     devices: {
       [deviceId]: {
         name: string,
+        mainDevice: boolean, // whether or not this device is the main device
         lastRecordTimestamp: number // last seen Sync record from this device
       }
     },
@@ -561,6 +562,8 @@ AppStore
         record: object, // Sync record sent with SEND_SYNC_RECORDS
       }
     },
+    lastConfirmedRecordTimestamp: number, // the last computed time sync record was confirmed
+    setupCompleted: boolean, // whether or not sync setup has finished
     seed: Array.<number>,
     seedQr: string, // data URL of QR code representing the seed
     setupError: string? // indicates that an error occurred during sync setup

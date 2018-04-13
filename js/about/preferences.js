@@ -464,9 +464,12 @@ class AboutPreferences extends React.Component {
       syncStartOverlayVisible: false,
       syncAddOverlayVisible: false,
       syncNewDeviceOverlayVisible: false,
-      syncQRVisible: false,
-      syncPassphraseVisible: false,
+      syncQRVisible: true,
+      syncScanCodeOverlayVisible: false,
+      syncChainCodeOverlayVisible: false,
+      syncQRPassphraseOverlayVisible: false,
       syncResetOverlayVisible: false,
+      syncRemoveOverlayVisible: false,
       syncRestoreEnabled: false,
       preferenceTab: this.tabFromCurrentHash,
       hintNumber: this.getNextHintNumber(),
@@ -687,29 +690,11 @@ class AboutPreferences extends React.Component {
           syncStartOverlayVisible={this.state.syncStartOverlayVisible}
           syncAddOverlayVisible={this.state.syncAddOverlayVisible}
           syncNewDeviceOverlayVisible={this.state.syncNewDeviceOverlayVisible}
-          syncQRVisible={this.state.syncQRVisible}
-          showQR={() => {
-            this.setState({
-              syncQRVisible: true
-            })
-          }}
-          hideQR={() => {
-            this.setState({
-              syncQRVisible: false
-            })
-          }}
-          syncPassphraseVisible={this.state.syncPassphraseVisible}
-          showPassphrase={() => {
-            this.setState({
-              syncPassphraseVisible: true
-            })
-          }}
-          hidePassphrase={() => {
-            this.setState({
-              syncPassphraseVisible: false
-            })
-          }}
+          syncScanCodeOverlayVisible={this.state.syncScanCodeOverlayVisible}
+          syncChainCodeOverlayVisible={this.state.syncChainCodeOverlayVisible}
+          syncQRPassphraseOverlayVisible={this.state.syncQRPassphraseOverlayVisible}
           syncResetOverlayVisible={this.state.syncResetOverlayVisible}
+          syncRemoveOverlayVisible={this.state.syncRemoveOverlayVisible}
         />
         break
       case preferenceTabs.SHIELDS:
