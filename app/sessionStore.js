@@ -19,6 +19,7 @@ const Immutable = require('immutable')
 const app = electron.app
 const compareVersions = require('compare-versions')
 const merge = require('deepmerge')
+const {execSync} = require('child_process')
 
 // Constants
 const UpdateStatus = require('../js/constants/updateStatus')
@@ -823,6 +824,30 @@ module.exports.runPreMigrations = (data) => {
   }
 
   if (data.lastAppVersion) {
+    try {
+      // with version 0.22.13, any file downloaded (including the update itself) would get
+      // quarantined on macOS (per work done with https://github.com/brave/muon/pull/484)
+      // this functionality was then reverted with https://github.com/brave/muon/pull/570
+      //
+      // To fix the executable, we need to manually un-quarantine the Brave executable so that it works as expected
+      if (process.platform === 'darwin' && compareVersions(data.lastAppVersion, '0.22.13') === 0) {
+        let runningAppPath
+        const appDirectories = app.getPath('exe').split(path.sep)
+        // Remove the `Contents`/`MacOS`/`Brave` parts from path
+        if (appDirectories.length > 3) {
+          runningAppPath = path.join(...appDirectories.slice(0, appDirectories.length - 3))
+        }
+
+        execSync('xattr -d com.apple.quarantine /Applications/Brave.app || true')
+        if (runningAppPath) {
+          execSync(`xattr -d com.apple.quarantine ${runningAppPath} || true`)
+        }
+        console.log('Update was downloaded from 0.22.13; Quarantine attribute has been removed')
+      }
+    } catch (e) {
+      console.error('Update was downloaded from 0.22.13; failed to remove quarantine attribute: ', e)
+    }
+
     let runHSTSCleanup = false
     try { runHSTSCleanup = compareVersions(data.lastAppVersion, '0.22.13') < 1 } catch (e) {}
 
