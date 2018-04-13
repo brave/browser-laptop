@@ -86,8 +86,9 @@ const styles = StyleSheet.create({
   },
 
   tabIcon_symbol_content: {
-    fontSize: '8px',
+    fontSize: '11px',
     fontWeight: 'bold',
+    marginLeft: '4px',
     justifyContent: 'flex-end',
     color: theme.tab.icon.symbol.color
   }
