@@ -835,12 +835,12 @@ module.exports.runPreMigrations = (data) => {
         const appDirectories = app.getPath('exe').split(path.sep)
         // Remove the `Contents`/`MacOS`/`Brave` parts from path
         if (appDirectories.length > 3) {
-          runningAppPath = path.join(...appDirectories.slice(0, appDirectories.length - 3))
+          runningAppPath = path.sep + path.join(...appDirectories.slice(0, appDirectories.length - 3))
         }
 
         execSync('xattr -d com.apple.quarantine /Applications/Brave.app || true')
         if (runningAppPath) {
-          execSync(`xattr -d com.apple.quarantine ${runningAppPath} || true`)
+          execSync(`xattr -d com.apple.quarantine "${runningAppPath}" || true`)
         }
         console.log('Update was downloaded from 0.22.13; Quarantine attribute has been removed')
       }
