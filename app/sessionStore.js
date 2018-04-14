@@ -823,29 +823,44 @@ module.exports.runPreMigrations = (data) => {
     delete data.sites
   }
 
-  if (data.lastAppVersion) {
-    try {
-      // with version 0.22.13, any file downloaded (including the update itself) would get
-      // quarantined on macOS (per work done with https://github.com/brave/muon/pull/484)
-      // this functionality was then reverted with https://github.com/brave/muon/pull/570
-      //
-      // To fix the executable, we need to manually un-quarantine the Brave executable so that it works as expected
-      if (process.platform === 'darwin' && compareVersions(data.lastAppVersion, '0.22.13') === 0) {
-        let runningAppPath
-        const appDirectories = app.getPath('exe').split(path.sep)
-        // Remove the `Contents`/`MacOS`/`Brave` parts from path
-        if (appDirectories.length > 3) {
-          runningAppPath = path.sep + path.join(...appDirectories.slice(0, appDirectories.length - 3))
+  if (data.lastAppVersion || data.quarantineNeeded) {
+    // with version 0.22.13, any file downloaded (including the update itself) would get
+    // quarantined on macOS (per work done with https://github.com/brave/muon/pull/484)
+    // this functionality was then reverted with https://github.com/brave/muon/pull/570
+    //
+    // To fix the executable, we need to manually un-quarantine the Brave executable so that it works as expected
+    if (process.platform === 'darwin' && (compareVersions(data.lastAppVersion, '0.22.13') === 0 || data.quarantineNeeded)) {
+      const unQuarantine = (appPath) => {
+        try {
+          execSync(`xattr -d com.apple.quarantine "${appPath}"`)
+          console.log(`Quarantine attribute has been removed from ${appPath}`)
+        } catch (e) {
+          console.error(`Failed to remove quarantine attribute from ${appPath}: `, e)
         }
-
-        execSync('xattr -d com.apple.quarantine /Applications/Brave.app || true')
-        if (runningAppPath) {
-          execSync(`xattr -d com.apple.quarantine "${runningAppPath}" || true`)
-        }
-        console.log('Update was downloaded from 0.22.13; Quarantine attribute has been removed')
       }
-    } catch (e) {
-      console.error('Update was downloaded from 0.22.13; failed to remove quarantine attribute: ', e)
+
+      console.log('Update was downloaded from 0.22.13' + data.quarantineNeeded ? ' (first launch after auto-update)' : '')
+
+      // Un-quarantine default path
+      const defaultAppPath = '/Applications/Brave.app'
+      unQuarantine(defaultAppPath)
+
+      // Un-quarantine custom path
+      const appPath = app.getPath('exe')
+      const appIndex = appPath.indexOf('.app') + '.app'.length
+      if (appPath && appIndex > 4) {
+        // Remove the `Contents`/`MacOS`/`Brave` parts from path
+        const runningAppPath = appPath.substring(0, appIndex)
+        if (runningAppPath.startsWith('/private/var/folders')) {
+          // This is true when Squirrel re-launches Brave after an auto-update
+          // File system is read-only; the xattr command would fail
+          data.quarantineNeeded = true
+        } else if (runningAppPath !== defaultAppPath) {
+          // Path is the installed location
+          unQuarantine(runningAppPath)
+          data.quarantineNeeded = false
+        }
+      }
     }
 
     let runHSTSCleanup = false

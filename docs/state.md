@@ -825,6 +825,7 @@ WindowStore
     top: number // the top position of the popup window
   },
   previewFrameKey: number,
+  quarantineNeeded: boolean, // true if quarantine needed after auto-launching
   searchResults: array, // autocomplete server results if enabled
   ui: {
     bookmarksToolbar: {
