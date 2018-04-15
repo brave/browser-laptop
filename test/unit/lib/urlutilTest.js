@@ -104,10 +104,9 @@ describe('urlutil', function () {
       it('should search for dog cat in google', function () {
         assert.equal(urlUtil.isNotURL(' https://www.google.ca/search?q=dog cat '), false)
       })
-        it('should open the dog cat.txt file', function () {
+      it('should open the dog cat.txt file', function () {
         assert.equal(urlUtil.isNotURL(' /Users/yalong/Projects/OSD600/browser-laptop/dog cat.txt '), false)
-       })
-      
+      })
     })
 
     describe('returns true when input:', function () {
