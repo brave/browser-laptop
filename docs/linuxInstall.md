@@ -166,21 +166,13 @@ wget -O brave.rpm https://laptop-updates.brave.com/latest/fedora64
 sudo dnf install ./brave.rpm
 ```
 
-## OpenSUSE AMD64:
+## openSUSE AMD64:
 
 To install Brave using zypper:
 ```
 sudo rpmkeys --import https://s3-us-west-2.amazonaws.com/brave-rpm-release/keys.asc
-sudo zypper install lsb
-sudo zypper addrepo --type yast2 https://s3-us-west-2.amazonaws.com/brave-rpm-release/x86_64/ brave-rpm-release
-sudo zypper ref
+sudo zypper addrepo --refresh https://s3-us-west-2.amazonaws.com/brave-rpm-release/x86_64/ brave-rpm-release
 sudo zypper install brave
-```
-
-To update Brave using zypper:
-```
-sudo zypper ref
-sudo zypper update brave
 ```
 
 If zypper throws an error similar to
