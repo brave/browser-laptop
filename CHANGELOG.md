@@ -1,7 +1,8 @@
 # Changelog
 
-## [0.22.17](https://github.com/brave/browser-laptop/releases/tag/v0.22.17dev)
+## [0.22.21](https://github.com/brave/browser-laptop/releases/tag/v0.22.21dev)
  - Improvements to the referral program. ([#13754](https://github.com/brave/browser-laptop/issues/13754))
+ - Reverted quarantine feature for macOS. ([#13826](https://github.com/brave/browser-laptop/issues/13826))
 
 ## [0.22.13](https://github.com/brave/browser-laptop/releases/tag/v0.22.13dev)
 
