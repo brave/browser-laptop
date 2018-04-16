@@ -27,6 +27,9 @@ const store = {
   errorMessage: null
 }
 
+// Hostname of the webtorrent server
+const webtorrentServerHostname = 'localhost'
+
 let client, server
 
 init()
@@ -135,7 +138,9 @@ function initTorrent (torrent) {
   server = torrent.createServer({
     // Only allow requests from this origin ('chrome-extension://...) so websites
     // cannot violate same-origin policy by reading contents of active torrents.
-    origin: window.location.origin
+    origin: window.location.origin,
+    // Use hostname option to mitigate DNS rebinding (#12616)
+    hostname: webtorrentServerHostname
   })
   server.listen(onServerListening)
 
@@ -148,7 +153,7 @@ function initTorrent (torrent) {
 }
 
 function onServerListening () {
-  store.serverUrl = 'http://localhost:' + server.address().port
+  store.serverUrl = `http://${webtorrentServerHostname}:${server.address().port}`
   update()
 }
 
