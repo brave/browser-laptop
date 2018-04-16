@@ -19,11 +19,6 @@ def main():
   release = get_draft(repo, get_tag())
   commit_tag = get_commit_tag(get_version())
 
-  print("Found draft {}, release this? [y/n]".format(release['tag_name']))
-  if raw_input() != 'y':
-    print("Ok, not releasing")
-    exit(1)
-
   print("[INFO] Releasing {}".format(release['tag_name']))
   publish_release(repo, release['id'], get_tag(), commit_tag)
 
