@@ -25,7 +25,6 @@ const dragTypes = require('../../../../js/constants/dragTypes')
 const settings = require('../../../../js/constants/settings')
 
 // Utils
-const cx = require('../../../../js/lib/classSet')
 const contextMenus = require('../../../../js/contextMenus')
 const {getCurrentWindowId, isFocused} = require('../../currentWindow')
 const dnd = require('../../../../js/dnd')
@@ -35,8 +34,6 @@ const {getSetting} = require('../../../../js/settings')
 
 const globalStyles = require('../styles/global')
 const {theme} = require('../styles/theme')
-
-const newTabButton = require('../../../../img/toolbar/newtab_btn.svg')
 
 class Tabs extends React.Component {
   constructor (props) {
@@ -149,6 +146,7 @@ class Tabs extends React.Component {
     const props = {}
     // used in renderer
     props.previewTabPageIndex = currentWindow.getIn(['ui', 'tabs', 'previewTabPageIndex'])
+    props.previewTabFrameKey = frameStateUtil.getPreviewFrameKey(currentWindow)
     props.currentTabs = currentTabs
     props.partOfFullPageSet = currentTabs.size === tabsPerTabPage
     props.onNextPage = currentTabs.size >= tabsPerTabPage && totalPages > pageIndex + 1
@@ -165,6 +163,7 @@ class Tabs extends React.Component {
   }
 
   render () {
+    const isTabPreviewing = this.props.previewTabFrameKey != null
     this.tabRefs = []
     return <div className={css(styles.tabs)}
       data-test-id='tabs'
@@ -173,7 +172,8 @@ class Tabs extends React.Component {
       <span className={css(
         styles.tabs__tabStrip,
         (this.props.previewTabPageIndex != null) && styles.tabs__tabStrip_isPreview,
-        this.props.shouldAllowWindowDrag && styles.tabs__tabStrip_allowDragging
+        this.props.shouldAllowWindowDrag && styles.tabs__tabStrip_allowDragging,
+        isTabPreviewing && styles.tabs__tabStrip_isTabPreviewing
       )}
         data-test-preview-tab={this.props.previewTabPageIndex != null}
         onDragOver={this.onDragOver}
@@ -202,7 +202,7 @@ class Tabs extends React.Component {
         {
           this.props.onNextPage
             ? <BrowserButton
-              iconClass={globalStyles.appIcons.next}
+              iconClass={`${globalStyles.appIcons.next} ${css(styles.tabs__tabStrip__navigation__icon)}`}
               size='21px'
               custom={[styles.tabs__tabStrip__navigation, styles.tabs__tabStrip__navigation_next]}
               onClick={this.onNextPage}
@@ -210,18 +210,20 @@ class Tabs extends React.Component {
             : null
         }
         <LongPressButton
-          className={cx({
-            browserButton: true,
-            navbutton: true,
-            [css(styles.tabs__tabStrip__newTabButton)]: true
-          })}
+          className={css(
+            styles.tabs__tabStrip__newTabButton
+          )}
           label='+'
           l10nId='newTabButton'
           testId='newTabButton'
           disabled={false}
           onClick={this.newTab}
           onLongPress={this.onNewTabLongPress}
-        />
+        >
+          <svg className={css(styles.tabs__tabStrip__newTabButton__icon)} xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14.14 14.14'>
+            <path className={css(styles.tabs__tabStrip__newTabButton__icon__line)} d='M7.07 1v12.14M13.14 6.86H1' />
+          </svg>
+        </LongPressButton>
       </span>
     </div>
   }
@@ -232,7 +234,6 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     display: 'flex',
     flex: 1,
-    overflow: 'auto',
     padding: 0,
     height: '-webkit-fill-available',
     position: 'relative',
@@ -244,7 +245,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     flex: 1,
     zIndex: globalStyles.zindex.zindexTabs,
-    overflow: 'hidden'
+    position: 'relative'
+  },
+
+  tabs__tabStrip_isTabPreviewing: {
+    overflow: 'initial'
   },
 
   tabs__tabStrip_isPreview: globalStyles.animations.tabFadeIn,
@@ -255,8 +260,14 @@ const styles = StyleSheet.create({
 
   tabs__tabStrip__navigation: {
     fontSize: '21px',
-    height: globalStyles.spacing.tabsToolbarHeight,
-    lineHeight: globalStyles.spacing.tabsToolbarHeight
+    height: 'auto',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+
+  tabs__tabStrip__navigation__icon: {
+    lineHeight: 0
   },
 
   tabs__tabStrip__navigation_prev: {
@@ -273,23 +284,34 @@ const styles = StyleSheet.create({
   },
 
   tabs__tabStrip__newTabButton: {
-    background: theme.tabsToolbar.button.backgroundColor,
-    minWidth: globalStyles.spacing.tabsToolbarHeight,
-    minHeight: globalStyles.spacing.tabsToolbarHeight,
-    lineHeight: globalStyles.spacing.tabsToolbarHeight,
-    WebkitMaskImage: `url(${newTabButton})`,
-    WebkitMaskRepeat: 'no-repeat',
-    WebkitMaskPosition: 'center',
-    WebkitMaskSize: '12px 12px',
-    WebkitMaskOrigin: 'border',
-
-    // no-drag is applied to the button and tab area
+    '--new-tab-button-line-color': theme.tabsToolbar.button.backgroundColor,
+    // no-drag is applied to each button and tab
     WebkitAppRegion: 'no-drag',
-
+    // don't look like a native button
+    WebkitAppearance: 'none',
+    border: 'none',
+    background: 'none',
+    // ensure it's a square
+    width: globalStyles.spacing.tabsToolbarHeight,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     ':hover': {
-      opacity: 1.0,
-      backgroundColor: theme.tabsToolbar.button.onHover.backgroundColor
+      '--new-tab-button-line-color': theme.tabsToolbar.button.onHover.backgroundColor
     }
+  },
+
+  tabs__tabStrip__newTabButton__icon: {
+    width: '12px'
+  },
+
+  tabs__tabStrip__newTabButton__icon__line: {
+    fill: 'none',
+    stroke: 'var(--new-tab-button-line-color)',
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+    'stroke-width': '2px',
+    transition: '.12s stroke ease'
   }
 })
 

@@ -64,7 +64,6 @@ describe('Tabs content - CloseTabIcon', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    mockery.registerMock('../../../../extensions/brave/img/tabs/close_btn.svg')
     windowStore = require('../../../../../../../js/stores/windowStore')
     appStore = require('../../../../../../../js/stores/appStoreRenderer')
     CloseTabIcon = require('../../../../../../../app/renderer/components/tabs/content/closeTabIcon')

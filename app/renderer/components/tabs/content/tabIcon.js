@@ -32,6 +32,7 @@ class TabIcon extends ImmutableComponent {
       draggable={this.props.draggable}
       onClick={this.props.onClick}
       style={this.props.style}
+      title={this.props.title}
       {...altProps}
     >
       {
@@ -67,6 +68,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0, // must keep set width and height and not crop self
 
     // Default background properties
     backgroundSize: globalStyles.spacing.iconSize,
@@ -74,7 +76,6 @@ const styles = StyleSheet.create({
     backgroundRepeat: 'no-repeat',
 
     // Default animation properties
-    willChange: 'opacity',
     animationFillMode: 'forwards'
   },
 
@@ -85,8 +86,9 @@ const styles = StyleSheet.create({
   },
 
   tabIcon_symbol_content: {
-    fontSize: '8px',
+    fontSize: '11px',
     fontWeight: 'bold',
+    marginLeft: '4px',
     justifyContent: 'flex-end',
     color: theme.tab.icon.symbol.color
   }

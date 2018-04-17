@@ -38,5 +38,5 @@
    if (ratio == null) {
      return state.getIn(['ui', component, 'intersectionRatio']) < noIntersection
    }
-   return state.getIn(['ui', component, 'intersectionRatio']) <= ratio
+   return state.getIn(['ui', component, 'intersectionRatio']) < ratio
  }

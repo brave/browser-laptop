@@ -485,4 +485,81 @@ describe('urlutil', function () {
       assert.deepEqual(result, {data: 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU//5ErkJggg==', ext: 'png'})
     })
   })
+
+  describe('isInternalUrl', function () {
+    it('null scenario', function () {
+      const result = urlUtil.isInternalUrl(null)
+      assert.equal(result, false)
+    })
+    it('localhost', function () {
+      const result = urlUtil.isInternalUrl('http://localhost:399/abc')
+      assert.equal(result, true)
+    })
+    it('localhost.com', function () {
+      const result = urlUtil.isInternalUrl('http://localhost.com:399/abc')
+      assert.equal(result, false)
+    })
+    it('invalid URL', function () {
+      const result = urlUtil.isInternalUrl('adsf')
+      assert.equal(result, false)
+    })
+    it('local IP', function () {
+      const result = urlUtil.isInternalUrl('http://192.168.1.255:3000')
+      assert.equal(result, true)
+      const result2 = urlUtil.isInternalUrl('http://127.0.0.1/')
+      assert.equal(result2, true)
+    })
+    it('remote IP', function () {
+      const result = urlUtil.isInternalUrl('http://54.0.0.1:3000')
+      assert.equal(result, false)
+    })
+    it('local IPv6', function () {
+      const result = urlUtil.isInternalUrl('https://[::1]:3000')
+      assert.equal(result, true)
+      const result2 = urlUtil.isInternalUrl('http://[fe80::c12:79e9:bd20:31e1]/')
+      assert.equal(result2, true)
+    })
+    it('remote IPv6', function () {
+      const result = urlUtil.isInternalUrl('http://[2001:4860:4860::8888]:8000')
+      assert.equal(result, false)
+    })
+    it('.local URL', function () {
+      const result = urlUtil.isInternalUrl('https://adsf.local')
+      assert.equal(result, true)
+    })
+  })
+
+  describe('isUrlPDF', function () {
+    it('null case', function () {
+      const result = urlUtil.isUrlPDF(null)
+      assert.equal(result, false)
+    })
+
+    it('url is not pdf', function () {
+      const result = urlUtil.isUrlPDF('https://clifton.io')
+      assert.equal(result, false)
+    })
+
+    it('url is pdf', function () {
+      const result = urlUtil.isUrlPDF('chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/http://www.test.com/test.pdf')
+      assert.equal(result, true)
+    })
+  })
+
+  describe('getUrlFromPDFUrl', function () {
+    it('null case', function () {
+      const result = urlUtil.getUrlFromPDFUrl(null)
+      assert.equal(result, null)
+    })
+
+    it('url is not PDF', function () {
+      const result = urlUtil.getUrlFromPDFUrl('https://clifton.io')
+      assert.equal(result, 'https://clifton.io')
+    })
+
+    it('url is pdf', function () {
+      const result = urlUtil.getUrlFromPDFUrl('chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/http://www.test.com/test.pdf')
+      assert.equal(result, 'http://www.test.com/test.pdf')
+    })
+  })
 })

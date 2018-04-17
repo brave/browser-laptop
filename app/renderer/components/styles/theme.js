@@ -44,14 +44,14 @@
 
     filter: {
       makeWhite: 'brightness(0) invert(1)',
-      whiteShadow: 'drop-shadow(0px 0px 2px rgb(255, 255, 255))'
+      whiteShadow: 'drop-shadow(-10px 0px 12px rgb(255, 255, 255))'
     },
 
     tabsToolbar: {
-      backgroundColor: '#ddd',
+      backgroundColor: '#CDD1D5',
 
       border: {
-        color: '#bbb'
+        color: 'rgb(187, 187, 191)'
       },
 
       button: {
@@ -64,14 +64,14 @@
 
       tabs: {
         navigation: {
-          borderColor: '#bbb'
+          borderColor: 'rgb(187, 187, 191)'
         }
       }
     },
 
     tabPage: {
       backgroundColor: '#fff',
-      borderColor: '#bbb',
+      borderColor: 'rgb(187, 187, 191)',
 
       hover: {
         backgroundColor: globalStyles.color.braveOrange,
@@ -99,7 +99,7 @@
       item: {
         separator: {
           hr: {
-            backgroundColor: '#bbb'
+            backgroundColor: 'rgb(187, 187, 191)'
           }
         },
 
@@ -109,7 +109,7 @@
         },
 
         disabled: {
-          color: '#bbb'
+          color: 'rgb(187, 187, 191)'
         },
 
         icon: {
@@ -130,41 +130,68 @@
       },
 
       single: {
-        backgroundColor: 'rgba(238, 238, 238, 1)',
+        backgroundColor: 'rgba(238, 238, 240, 1)',
         borderColor: 'rgba(204, 204, 204, 0.54)',
         boxShadowColor: 'rgba(0, 0, 0, 0.5)'
       }
     },
 
     tab: {
-      transition: `
-      background-color 150ms cubic-bezier(0.26, 0.63, 0.39, 0.65),
-      color 150ms cubic-bezier(0.26, 0.63, 0.39, 0.65)
-    `,
-      background: '#ddd',
-      borderColor: '#bbb',
-      color: '#5a5a5a',
+      transitionDurationOut: '400ms',
+      transitionDurationIn: '200ms',
+      transitionEasingOut: 'ease-in',
+      transitionEasingIn: 'ease-out',
+      background: 'rgb(205,209,213)',
+      borderColor: 'rgb(187, 187, 191)',
+      borderWidth: 1,
+      color: '#222',
+      identityHeight: globalStyles.spacing.iconSize,
+      defaultFaviconColor: globalStyles.color.mediumGray,
+      defaultFaviconColorLight: '#fff',
 
-      hover: {
-        background: 'rgba(255, 255, 255, 0.4)'
+      closeButton: {
+        background: 'transparent',
+        borderRadius: '2px',
+        active: {
+          background: '#cb2c00'
+        },
+        hover: {
+          color: 'white',
+          background: '#fd4f01'
+        }
       },
 
-      forWindows: {
-        color: '#555'
+      hover: {
+        background: 'rgb(219,221,223)',
+        active: {
+          background: 'rgb(243,243,243)'
+        },
+        private: {
+          background: 'rgb(225,223,238)',
+          borderColor: 'rgba(75, 60, 110, .7)'
+        }
       },
 
       active: {
-        background: 'rgba(255, 255, 255, 0.8)',
-
+        background: 'rgb(233,233,234)',
+        colorLight: 'rgb(255, 255, 255)',
+        colorDark: '#222',
         private: {
-          background: '#4b3c6e',
-          color: '#fff'
+          background: 'rgb(75,60,110)',
+          color: '#fff',
+          defaultFaviconColor: '#fff'
         }
       },
 
       private: {
-        background: '#d9d6e0',
+        background: 'rgb(217,213,228)',
         color: '#4b3c6e'
+      },
+
+      preview: {
+        background: 'rgb(240,240,240)',
+        boxShadow: '0 -2px 12px rgba(0, 0, 0, 0.22)',
+        scale: '1.06'
       },
 
       icon: {
@@ -181,7 +208,8 @@
         },
 
         audio: {
-          color: '#69B9F9'
+          color: '#2377bb',
+          hoverColor: '#3b566b'
         },
 
         close: {
@@ -189,21 +217,13 @@
         },
 
         symbol: {
-          color: globalStyles.color.black100,
-
-          default: {
-            backgroundColor: globalStyles.color.mediumGray,
-
-            light: {
-              backgroundColor: globalStyles.color.white100
-            }
-          }
+          color: globalStyles.color.black100
         }
       }
     },
 
     findBar: {
-      backgroundColor: '#F7F7F7',
+      backgroundColor: globalStyles.color.modalVeryLightGray,
       color: globalStyles.color.highlightBlue,
 
       border: {
@@ -219,7 +239,7 @@
       },
 
       find: {
-        color: '#555'
+        color: 'rgb(85, 85, 90)'
       },
 
       close: {
@@ -239,7 +259,7 @@
     switchControl: {
       label: {
         top: {
-          color: '#bbb'
+          color: 'rgb(187, 187, 190)'
         }
       },
 
@@ -260,5 +280,13 @@
           backgroundColor: '#fff'
         }
       }
+    },
+
+    preferences: {
+      navigationBackground: `linear-gradient(
+        rgb(164, 167, 171),
+        rgb(94, 96, 99)
+      )`,
+      navigationSectionSelectedColor: 'rgb(101, 101, 107)'
     }
   }

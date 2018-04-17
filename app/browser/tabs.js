@@ -3,13 +3,11 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const appActions = require('../../js/actions/appActions')
-const windowActions = require('../../js/actions/windowActions')
 const tabActions = require('../common/actions/tabActions')
-const config = require('../../js/constants/config')
 const Immutable = require('immutable')
 const { shouldDebugTabEvents } = require('../cmdLine')
 const tabState = require('../common/state/tabState')
-const {app, BrowserWindow, extensions, session, ipcMain} = require('electron')
+const {app, extensions, session, ipcMain} = require('electron')
 const {makeImmutable, makeJS} = require('../common/state/immutableUtil')
 const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
@@ -263,7 +261,7 @@ const updateAboutDetails = (tabId) => {
   if (location === 'about:contributions' || onPaymentsPage) {
     const ledgerInfo = ledgerState.getInfoProps(appState)
     const preferencesData = appState.getIn(['about', 'preferences'], Immutable.Map())
-    const synopsis = appState.getIn(['ledger', 'about'])
+    const synopsis = ledgerState.getAboutData(appState)
     const migration = appState.get('migrations')
     const wizardData = ledgerState.geWizardData(appState)
     const ledgerData = ledgerInfo
@@ -272,6 +270,7 @@ const updateAboutDetails = (tabId) => {
       .set('wizardData', wizardData)
       .set('migration', migration)
       .set('promotion', ledgerState.getAboutPromotion(appState))
+      .set('tabId', tabId)
     sendAboutDetails(tabId, messages.LEDGER_UPDATED, ledgerData)
   } else if (url === 'about:preferences#sync' || location === 'about:contributions' || onPaymentsPage) {
     const sync = appState.get('sync', Immutable.Map())
@@ -435,29 +434,6 @@ const createNavigationState = (navigationHandle, controller) => {
     pendingEntry: fixDisplayURL(controller.getPendingEntry(), controller),
     canGoBack: controller.canGoBack(),
     canGoForward: controller.canGoForward()
-  })
-}
-
-let backgroundProcess = null
-let backgroundProcessTimer = null
-/**
- * Execute script in the browser tab
- * @param win{object} - window in which we want to execute script
- * @param debug{boolean} - would you like to close window or not
- * @param script{string} - script that you want to execute
- * @param cb{function} - function that we call after script is completed
- */
-const runScript = (win, debug, script, cb) => {
-  win.webContents.executeScriptInTab(config.braveExtensionId, script, {}, (err, url, result) => {
-    cb(err, url, result)
-    if (!debug) {
-      backgroundProcessTimer = setTimeout(() => {
-        if (backgroundProcess) {
-          win.close()
-          backgroundProcess = null
-        }
-      }, 2 * 60 * 1000) // 2 min
-    }
   })
 }
 
@@ -715,12 +691,6 @@ const api = {
         appActions.updatePassword(username, origin, tabId)
       })
 
-      tab.on('did-get-response-details', (evt, status, newURL, originalURL, httpResponseCode, requestMethod, referrer, headers, resourceType) => {
-        if (resourceType === 'mainFrame') {
-          windowActions.gotResponseDetails(tabId, {status, newURL, originalURL, httpResponseCode, requestMethod, referrer, resourceType})
-        }
-      })
-
       tab.on('media-started-playing', (e) => {
         let tabValue = getTabValue(tabId)
         if (tabValue) {
@@ -866,11 +836,12 @@ const api = {
     const tabId = action.get('tabId')
     const tab = webContentsCache.getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
-      let url = normalizeUrl(action.get('url'))
+      const url = normalizeUrl(action.get('url'))
+      const currentUrl = tab.getURL()
       // We only allow loading URLs explicitly when the origin is
       // the same for pinned tabs.  This is to help preserve a users
       // pins.
-      if (tab.pinned && getOrigin(tab.getURL()) !== getOrigin(url)) {
+      if (tab.pinned && getOrigin(currentUrl) !== getOrigin(url)) {
         api.create({
           url,
           partition: tab.session.partition
@@ -878,7 +849,12 @@ const api = {
         return
       }
 
-      tab.loadURL(url)
+      const reloadMatchingUrl = action.get('reloadMatchingUrl') || false
+      if (reloadMatchingUrl && currentUrl === url) {
+        tab.reload(true)
+      } else {
+        tab.loadURL(url)
+      }
     }
   },
 
@@ -1016,11 +992,10 @@ const api = {
       if (preventLazyLoad) {
         createProperties.discarded = false
       }
-      // Similarly, autoDiscardable will happen for regular tabs (not about: tabs)
-      const preventAutoDiscard = createProperties.pinned || !isRegularContent
-      if (preventAutoDiscard) {
-        createProperties.autoDiscardable = false
-      }
+      // autoDiscardable can happen for all tabs
+      // TODO(petemill): if there are schemes / Urls that should not be autodiscarded
+      // then the flag should be exposed from muon and set on each URL change for a tab
+      createProperties.autoDiscardable = true
 
       const doCreate = () => {
         if (shouldDebugTabEvents) {
@@ -1046,34 +1021,6 @@ const api = {
       }
       doCreate()
     })
-  },
-
-  /**
-   * Execute script in the background browser window
-   * @param script{string} - script that we want to run
-   * @param cb{function} - function that we want to call when script is done
-   * @param debug{boolean} - would you like to keep browser window when script is done
-   */
-  executeScriptInBackground: (script, cb, debug = false) => {
-    if (backgroundProcessTimer) {
-      clearTimeout(backgroundProcessTimer)
-    }
-
-    if (backgroundProcess === null) {
-      backgroundProcess = new BrowserWindow({
-        show: debug,
-        webPreferences: {
-          partition: 'default'
-        }
-      })
-
-      backgroundProcess.webContents.on('did-finish-load', () => {
-        runScript(backgroundProcess, debug, script, cb)
-      })
-      backgroundProcess.loadURL('about:blank')
-    } else {
-      runScript(backgroundProcess, debug, script, cb)
-    }
   },
 
   moveTo: (state, tabId, frameOpts, browserOpts, toWindowId) => {
@@ -1413,7 +1360,29 @@ const api = {
     return state
   },
   forgetTab: (tabId) => {
-    webContentsCache.cleanupWebContents(tabId)
+    const tab = webContentsCache.getWebContents(tabId)
+    if (!tab) {
+      // perhaps tab was set to be null, but other cache data still exists
+      webContentsCache.cleanupWebContents(tabId)
+      return
+    }
+    // Do not remove tab until it is destroyed, as we still need to refer to it,
+    // even though state has let us know it does not care about the tab anymore
+    // But, we do this here in case state still needs to refer to tab
+    // after it is destroyed, for a brief time.
+    if (tab.isDestroyed()) {
+      if (shouldDebugTabEvents) {
+        console.log(`Tab [${tabId}] forgetTab: is already destroyed, cleaning up webContents from cache immediately`)
+      }
+      webContentsCache.cleanupWebContents(tabId)
+    } else {
+      tab.once('destroyed', function () {
+        if (shouldDebugTabEvents) {
+          console.log(`Tab [${tabId}] forgetTab: 'destroyed' emitted, cleaning up webContents from cache`)
+        }
+        webContentsCache.cleanupWebContents(tabId)
+      })
+    }
   }
 }
 

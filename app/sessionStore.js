@@ -19,6 +19,7 @@ const Immutable = require('immutable')
 const app = electron.app
 const compareVersions = require('compare-versions')
 const merge = require('deepmerge')
+const {execSync} = require('child_process')
 
 // Constants
 const UpdateStatus = require('../js/constants/updateStatus')
@@ -823,10 +824,45 @@ module.exports.runPreMigrations = (data) => {
   }
 
   if (data.lastAppVersion) {
+    try {
+      // with version 0.22.13, any file downloaded (including the update itself) would get
+      // quarantined on macOS (per work done with https://github.com/brave/muon/pull/484)
+      // this functionality was then reverted with https://github.com/brave/muon/pull/570
+      //
+      // To fix the executable, we need to manually un-quarantine the Brave executable so that it works as expected
+      if (process.platform === 'darwin' && compareVersions(data.lastAppVersion, '0.22.13') === 0) {
+        let runningAppPath
+        const appDirectories = app.getPath('exe').split(path.sep)
+        // Remove the `Contents`/`MacOS`/`Brave` parts from path
+        if (appDirectories.length > 3) {
+          runningAppPath = path.sep + path.join(...appDirectories.slice(0, appDirectories.length - 3))
+        }
+
+        execSync('xattr -d com.apple.quarantine /Applications/Brave.app || true')
+        if (runningAppPath) {
+          execSync(`xattr -d com.apple.quarantine "${runningAppPath}" || true`)
+        }
+        console.log('Update was downloaded from 0.22.13; Quarantine attribute has been removed')
+      }
+    } catch (e) {
+      console.error('Update was downloaded from 0.22.13; failed to remove quarantine attribute: ', e)
+    }
+
+    let runHSTSCleanup = false
+    try { runHSTSCleanup = compareVersions(data.lastAppVersion, '0.22.13') < 1 } catch (e) {}
+
+    if (runHSTSCleanup) {
+      filtering.clearHSTSData()
+    }
+
     // Force WidevineCdm to be upgraded when last app version <= 0.18.25
     let runWidevineCleanup = false
+    let formatPublishers = false
 
-    try { runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1 } catch (e) {}
+    try {
+      runWidevineCleanup = compareVersions(data.lastAppVersion, '0.18.25') < 1
+      formatPublishers = compareVersions(data.lastAppVersion, '0.22.3') < 1
+    } catch (e) {}
 
     if (runWidevineCleanup) {
       const fs = require('fs-extra')
@@ -838,6 +874,23 @@ module.exports.runPreMigrations = (data) => {
       })
     }
 
+    if (formatPublishers) {
+      const publishers = data.ledger.synopsis.publishers
+
+      if (publishers && Object.keys(publishers).length > 0) {
+        Object.entries(publishers).forEach((item) => {
+          const publisherKey = item[0]
+          const publisher = item[1]
+          const siteKey = `https?://${publisherKey}`
+          if (data.siteSettings[siteKey] == null || publisher.faviconName == null) {
+            return
+          }
+
+          data.siteSettings[siteKey].siteName = publisher.faviconName
+        })
+      }
+    }
+
     // Bookmark cache was generated wrongly on and before 0.20.25 from 0.19.x upgrades
     let runCacheClean = false
     try { runCacheClean = compareVersions(data.lastAppVersion, '0.20.25') < 1 } catch (e) {}
@@ -845,11 +898,17 @@ module.exports.runPreMigrations = (data) => {
       if (data.cache) {
         delete data.cache.bookmarkLocation
       }
+    }
 
-      // pinned top sites were stored in the wrong position in 0.19.x
-      // allowing duplicated items. See #12941
-      // in this case eliminate pinned items so they can be properly
-      // populated in their own indexes
+    // pinned top sites were stored in the wrong position in 0.19.x
+    // and on some updates ranging from 0.20.x/0.21.x
+    // allowing duplicated items. See #12941
+    let pinnedTopSitesCleanup = false
+    try {
+      pinnedTopSitesCleanup = compareVersions(data.lastAppVersion, '0.22.00') < 1
+    } catch (e) {}
+
+    if (pinnedTopSitesCleanup) {
       if (data.about.newtab.pinnedTopSites) {
         // Empty array is currently set to include default pinned sites
         // which we avoid given the user already have a profile

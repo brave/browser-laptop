@@ -13,7 +13,7 @@ const appConstants = require('../../../../../js/constants/appConstants')
 require('../../../braveUnit')
 
 describe('windowsReducer unit test', function () {
-  let windowsReducer, bookmarkToolbarState
+  let windowsReducer
   const fakeElectron = Object.assign({}, require('../../../lib/fakeElectron'))
 
   const fakeWindowState = {
@@ -22,8 +22,7 @@ describe('windowsReducer unit test', function () {
 
   const state = Immutable.fromJS({
     windows: [],
-    defaultWindowParams: {},
-    bookmarks: {}
+    defaultWindowParams: {}
   })
 
   before(function () {
@@ -36,7 +35,6 @@ describe('windowsReducer unit test', function () {
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('../../common/state/windowState', fakeWindowState)
     windowsReducer = require('../../../../../app/browser/reducers/windowsReducer')
-    bookmarkToolbarState = require('../../../../../app/common/state/bookmarkToolbarState')
   })
 
   after(function () {
@@ -44,16 +42,14 @@ describe('windowsReducer unit test', function () {
   })
 
   describe('APP_WINDOW_CREATED', function () {
-    let spy, spyToolbar
+    let spy
 
     afterEach(function () {
       spy.restore()
-      spyToolbar.restore()
     })
 
     it('check if functions are called', function () {
       spy = sinon.spy(fakeWindowState, 'maybeCreateWindow')
-      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbar')
       windowsReducer(state, {
         actionType: appConstants.APP_WINDOW_CREATED,
         windowValue: Immutable.fromJS({
@@ -61,21 +57,18 @@ describe('windowsReducer unit test', function () {
         })
       })
       assert.equal(spy.calledOnce, true)
-      assert.equal(spyToolbar.calledOnce, true)
     })
   })
 
   describe('APP_WINDOW_RESIZED', function () {
-    let spy, spyToolbar
+    let spy
 
     afterEach(function () {
       spy.restore()
-      spyToolbar.restore()
     })
 
     it('check if functions are called', function () {
       spy = sinon.spy(fakeWindowState, 'maybeCreateWindow')
-      spyToolbar = sinon.spy(bookmarkToolbarState, 'setToolbar')
       windowsReducer(state, {
         actionType: appConstants.APP_WINDOW_RESIZED,
         windowValue: Immutable.fromJS({
@@ -83,7 +76,6 @@ describe('windowsReducer unit test', function () {
         })
       })
       assert.equal(spy.calledOnce, true)
-      assert.equal(spyToolbar.calledOnce, true)
     })
   })
 })

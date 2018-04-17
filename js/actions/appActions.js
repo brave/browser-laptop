@@ -255,12 +255,14 @@ const appActions = {
    * A request for a URL load
    * @param {number} tabId - the tab ID to load the URL inside of
    * @param {string} url - The url to load
+   * @param {boolean} reloadMatchingUrl - would you like to force reload provided tab
    */
-  loadURLRequested: function (tabId, url) {
+  loadURLRequested: function (tabId, url, reloadMatchingUrl) {
     dispatch({
       actionType: appConstants.APP_LOAD_URL_REQUESTED,
       tabId,
-      url
+      url,
+      reloadMatchingUrl
     })
   },
 
@@ -384,12 +386,23 @@ const appActions = {
 
   /**
    * Removes a site from the site list
-   * @param {string|Immutable.List} historyKey - Hisotry item key that we want to remove, can be list of keys as well
+   * @param {string|Immutable.List} historyKey - History item key that we want to remove, can be list of keys as well
    */
   removeHistorySite: function (historyKey) {
     dispatch({
       actionType: appConstants.APP_REMOVE_HISTORY_SITE,
       historyKey
+    })
+  },
+
+  /**
+   * Removes all sites for the given domain from the site list
+   * @param {string} domain - Domain of the sites we want to remove
+   */
+  removeHistoryDomain: function (domain) {
+    dispatch({
+      actionType: appConstants.APP_REMOVE_HISTORY_DOMAIN,
+      domain
     })
   },
 
@@ -1804,28 +1817,6 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message that bookmark calculation was done
-   * @param bookmarkList {Object} - Object is a list of bookmarks with key, width and parentFolderId as a property
-   */
-  onBookmarkWidthChanged: function (bookmarkList) {
-    dispatch({
-      actionType: appConstants.APP_ON_BOOKMARK_WIDTH_CHANGED,
-      bookmarkList
-    })
-  },
-
-  /**
-   * Dispatches a message that bookmark calculation was done
-   * @param folderList {Object} - Object is a list of folders with key, width and parentFolderId as a property
-   */
-  onBookmarkFolderWidthChanged: function (folderList) {
-    dispatch({
-      actionType: appConstants.APP_ON_BOOKMARK_FOLDER_WIDTH_CHANGED,
-      folderList
-    })
-  },
-
-  /**
    * Dispatches a message that window was resized
    * @param windowValue - window properties
    * @param windowId - id of the window that we want to update
@@ -1898,12 +1889,12 @@ const appActions = {
     })
   },
 
-  onLedgerMediaData: function (url, type, tabId) {
+  onLedgerMediaData: function (url, type, details) {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_MEDIA_DATA,
       url,
       type,
-      tabId
+      details
     })
   },
 
@@ -1914,17 +1905,25 @@ const appActions = {
     })
   },
 
-  onReferralCodeRead: function (downloadId, promoCode) {
+  onReferralCodeRead: function (body) {
     dispatch({
       actionType: appConstants.APP_ON_REFERRAL_CODE_READ,
-      downloadId,
-      promoCode
+      body
     })
   },
 
   onReferralCodeFail: function () {
     dispatch({
       actionType: appConstants.APP_ON_REFERRAL_CODE_FAIL
+    })
+  },
+
+  onFetchReferralHeaders: function (error, response, body) {
+    dispatch({
+      actionType: appConstants.APP_ON_FETCH_REFERRAL_HEADERS,
+      error,
+      response,
+      body
     })
   },
 

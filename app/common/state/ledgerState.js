@@ -288,6 +288,11 @@ const ledgerState = {
       if (paymentId) {
         newData = newData.set('paymentId', paymentId)
       }
+
+      const transactions = ledgerState.getInfoProp(state, 'transactions')
+      if (transactions) {
+        newData = newData.set('transactions', transactions)
+      }
     }
 
     return state.setIn(['ledger', 'info'], newData)
@@ -513,15 +518,15 @@ const ledgerState = {
   // TODO (optimization) don't have two almost identical object in state (synopsi->publishers and about->synopsis)
   saveAboutSynopsis: (state, publishers) => {
     state = validateState(state)
+    state = ledgerState.setAboutProp(state, 'synopsis', publishers)
+    state = ledgerState.setAboutProp(state, 'synopsisOptions', ledgerState.getSynopsisOptions(state))
+
     return state
-      .setIn(['ledger', 'about', 'synopsis'], publishers)
-      .setIn(['ledger', 'about', 'synopsisOptions'], ledgerState.getSynopsisOptions(state))
   },
 
   setAboutSynopsisOptions: (state) => {
     state = validateState(state)
-    return state
-      .setIn(['ledger', 'about', 'synopsisOptions'], ledgerState.getSynopsisOptions(state))
+    return ledgerState.setAboutProp(state, 'synopsisOptions', ledgerState.getSynopsisOptions(state))
   },
 
   getAboutData: (state) => {
@@ -555,6 +560,26 @@ const ledgerState = {
     }
 
     return promotion
+  },
+
+  setAboutProp: (state, prop, value) => {
+    state = validateState(state)
+
+    if (prop == null) {
+      return state
+    }
+
+    return state.setIn(['ledger', 'about', prop], value)
+  },
+
+  getAboutProp: (state, prop) => {
+    state = validateState(state)
+
+    if (prop == null) {
+      return null
+    }
+
+    return state.getIn(['ledger', 'about', prop])
   }
 }
 

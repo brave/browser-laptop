@@ -1,0 +1,7 @@
+.element--ad,
+.container--bannerAd,
+#brass-rail,
+.ad.module,
+iframe[src*="smartads.epl"] {
+    display: none !important;
+}

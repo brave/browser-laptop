@@ -31,6 +31,7 @@ const updateState = require('../../common/state/updateState')
 // Constants
 const settings = require('../../../js/constants/settings')
 const messages = require('../../../js/constants/messages')
+const ledgerStatuses = require('../../common/constants/ledgerStatuses')
 
 // Utils
 const config = require('../../../js/constants/buildConfig')
@@ -49,6 +50,11 @@ const ledgerVideoCache = require('../../common/cache/ledgerVideoCache')
 const updater = require('../../updater')
 const promoCodeFirstRunStorage = require('../../promoCodeFirstRunStorage')
 const appUrlUtil = require('../../../js/lib/appUrlUtil')
+const urlutil = require('../../../js/lib/urlutil')
+const windowState = require('../../common/state/windowState')
+const {makeImmutable, makeJS, isList} = require('../../common/state/immutableUtil')
+const siteHacks = require('../../siteHacks')
+const UrlUtil = require('../../../js/lib/urlutil')
 
 // Caching
 let locationDefault = 'NOOP'
@@ -98,7 +104,7 @@ const clientOptions = {
   environment: process.env.LEDGER_ENVIRONMENT || 'production'
 }
 
-var platforms = {
+const platforms = {
   'darwin': 'osx',
   'win32x64': 'winx64',
   'win32ia32': 'winia32',
@@ -135,7 +141,7 @@ signatureMax = Math.ceil(signatureMax * 1.5)
 
 if (ipc) {
   ipc.on(messages.LEDGER_PUBLISHER, (event, location) => {
-    if (!synopsis || event.sender.session === electron.session.fromPartition('default') || !tldjs.isValid(location)) {
+    if (!synopsis || event.sender.session === electron.session.fromPartition('default') || !tldjs.isValid(tldjs.getDomain(location))) {
       event.returnValue = {}
       return
     }
@@ -179,11 +185,30 @@ const paymentPresent = (state, tabId, present) => {
     }
 
     appActions.onPromotionGet()
+
+    state = checkSeed(state)
     getPublisherTimestamp(true)
   } else if (balanceTimeoutId) {
     clearTimeout(balanceTimeoutId)
     balanceTimeoutId = false
   }
+
+  return state
+}
+
+const checkSeed = (state) => {
+  const seed = ledgerState.getInfoProp(state, 'passphrase')
+  let localClient = client
+
+  if (!localClient) {
+    localClient = require('bat-client')
+  }
+
+  if (seed && localClient && !localClient.isValidPassPhrase(seed)) {
+    state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.CORRUPTED_SEED)
+  }
+
+  return state
 }
 
 const getPublisherTimestamp = (updateList) => {
@@ -240,7 +265,7 @@ const onBootStateFile = (state) => {
   }
 
   if (client.sync(callback) === true) {
-    run(random.randomInt({min: ledgerUtil.milliseconds.minute, max: 10 * ledgerUtil.milliseconds.minute}))
+    run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute}))
   }
 
   module.exports.getBalance(state)
@@ -325,7 +350,7 @@ const getPublisherData = (result, scorekeeper) => {
     minutesSpent: 0,
     secondsSpent: 0,
     faviconURL: result.faviconURL,
-    score: result.scores[scorekeeper],
+    score: result.scores ? result.scores[scorekeeper] : 0,
     pinPercentage: result.pinPercentage,
     weight: result.pinPercentage
   }
@@ -437,7 +462,7 @@ const synopsisNormalizer = (state, changedPublisher, returnState = true, prune =
       dataPinned.push(getPublisherData(publisher, scorekeeper))
     } else if (ledgerUtil.stickyP(state, publisher.publisherKey)) {
       // unpinned
-      unPinnedTotal += publisher.scores[scorekeeper]
+      unPinnedTotal += publisher.scores ? publisher.scores[scorekeeper] : 0
       dataUnPinned.push(publisher)
     } else {
       // excluded
@@ -958,11 +983,19 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
 
   let info = pageDataState.getLastInfo(state)
   const tabId = viewData.tabId || pageDataState.getLastActiveTabId(state)
-  const location = viewData.location || locationDefault
+  let location = viewData.location || locationDefault
 
   if (!synopsis) {
     state = addNewLocation(state, locationDefault, tabId)
     return state
+  }
+
+  if (UrlUtil.isUrlPDF(location)) {
+    location = UrlUtil.getLocationIfPDF(location)
+    info = Immutable.fromJS({
+      key: location,
+      location: location
+    })
   }
 
   const realUrl = getSourceAboutUrl(location) || location
@@ -1144,6 +1177,12 @@ const onWalletRecovery = (state, error, result) => {
     // remove old QR codes and addresses
     state = ledgerState.setInfoProp(state, 'walletQR', Immutable.Map())
     state = ledgerState.setInfoProp(state, 'addresses', Immutable.Map())
+
+    const status = ledgerState.getAboutProp(state, 'status')
+
+    if (status === ledgerStatuses.CORRUPTED_SEED) {
+      state = ledgerState.setAboutProp(state, 'status', '')
+    }
 
     callback(error, result)
 
@@ -1408,6 +1447,77 @@ const clientprep = () => {
   _internal.verboseP = ledgerClient.prototype.boolion(process.env.LEDGER_PUBLISHER_VERBOSE)
 }
 
+/**
+ * This callback that we do it in roundtrips
+ *
+ * @callback roundtripCallback
+ * @param {Error|null} error - error when doing a request, null if no errors
+ * @param {object} response - response object that we get from request.request
+ * @param {any} payload - data that we get from the request
+ */
+
+/**
+ * Round trip for fetching data (scrap data from html) inside window process
+ * @param {object} params - contains params from roundtrip
+ * @param {string} params.url - url of the site that we want to scrap
+ * @param {string} params.verboseP - tells us if we want to log the process or not
+ * @param {roundtripCallback} callback - The callback that handles the response
+ */
+const roundTripFromWindow = (params, callback) => {
+  if (!callback) {
+    return
+  }
+
+  if (!params || !params.url) {
+    if (params && params.verboseP) {
+      console.log(`We are missing url. Params ${JSON.stringify(params)}`)
+    }
+
+    callback(new Error('Url is missing'))
+    return
+  }
+
+  request.fetchPublisherInfo(params.url, {
+    method: 'GET',
+    responseType: 'text',
+    headers: {
+      'content-type': 'application/json; charset=utf-8'
+    }
+  }, (error, body) => {
+    if (error) {
+      if (params.verboseP) {
+        console.log(`roundTripFromWindow error: ${error.toString()}`)
+      }
+      return callback(error)
+    }
+
+    if (params.verboseP) {
+      console.log(`roundTripFromWindow success: ${JSON.stringify(body)}`)
+    }
+
+    return callback(null, null, body)
+  })
+}
+
+/**
+ * Round trip function for executing actions
+ * from the bat libraries (mostly server calls)
+ * @param {object} params - params that are directly tied to request.request
+ * @param {string} params.server - server url
+ * @param {string} params.method - HTTP method (GET, PUT, etc)
+ * @param {object} params.payload - payload that we want to send to the server
+ * @param {object} params.headers - HTTP headers
+ * @param {string} params.path - relative path to requested url
+ * @param {object} options
+ * @param {boolean} options.verboseP - tells us if we want to log the process or not
+ * @param {object} options.headers - headers that are used in the request.request
+ * @param {string} options.server - server url
+ * @param {boolean} options.binaryP - are we receiving binary payload back
+ * @param {boolean} options.rawP - are we receiving raw payload back
+ * @param {boolean} options.scrapeP - are we doping scraping
+ * @param {boolean} options.windowP - do we want to run this request in the window process
+ * @param {roundtripCallback} callback - The callback that handles the response
+ */
 const roundtrip = (params, options, callback) => {
   let parts = typeof params.server === 'string' ? urlParse(params.server)
     : typeof params.server !== 'undefined' ? params.server
@@ -1434,6 +1544,11 @@ const roundtrip = (params, options, callback) => {
     parts.search = parts.path.substring(i)
   } else {
     parts.pathname = parts.path
+  }
+
+  if (options.windowP) {
+    roundTripFromWindow({url: urlFormat(parts), verboseP: options.verboseP}, callback)
+    return
   }
 
   options = {
@@ -1499,12 +1614,12 @@ const roundtrip = (params, options, callback) => {
 
 const observeTransactions = (state, transactions) => {
   if (!transactions) {
-    return
+    return state
   }
 
   const current = ledgerState.getInfoProp(state, 'transactions')
   if (current && current.size === transactions.length) {
-    return
+    return state
   }
 
   // Notify the user of new transactions.
@@ -1512,10 +1627,13 @@ const observeTransactions = (state, transactions) => {
     if (transactions.length > 0) {
       const newestTransaction = transactions[0]
       if (newestTransaction && newestTransaction.contribution) {
+        state = ledgerState.setAboutProp(state, 'status', '')
         ledgerNotifications.showPaymentDone(newestTransaction.contribution.fiat)
       }
     }
   }
+
+  return state
 }
 
 // TODO convert this function and related ones to immutable
@@ -1547,9 +1665,19 @@ const getStateInfo = (state, parsedData) => {
     reconcileStamp: parsedData.reconcileStamp
   }
 
-  let passphrase = ledgerClient.prototype.getWalletPassphrase(parsedData)
-  if (passphrase) {
-    newInfo.passphrase = passphrase.join(' ')
+  const oldReconcileStamp = ledgerState.getInfoProp(state, 'reconcileStamp')
+
+  if (oldReconcileStamp && newInfo.reconcileStamp > oldReconcileStamp) {
+    state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.IN_PROGRESS)
+  }
+
+  try {
+    let passphrase = ledgerClient.prototype.getWalletPassphrase(parsedData)
+    if (passphrase) {
+      newInfo.passphrase = passphrase.join(' ')
+    }
+  } catch (e) {
+    console.error(e)
   }
 
   state = ledgerState.mergeInfoProp(state, newInfo)
@@ -1583,7 +1711,7 @@ const getStateInfo = (state, parsedData) => {
       {ballots: ballots}))
   }
 
-  observeTransactions(state, transactions)
+  state = observeTransactions(state, transactions)
   return ledgerState.setInfoProp(state, 'transactions', Immutable.fromJS(transactions))
 }
 
@@ -1671,6 +1799,18 @@ const lockInContributionAmount = (state, balance) => {
       appActions.changeSetting(settings.PAYMENTS_CONTRIBUTION_AMOUNT, defaultFromConfig)
     }
   }
+}
+
+const setNewTimeUntilReconcile = (newReconcileTime = null) => {
+  client.setTimeUntilReconcile(newReconcileTime, (err, stateResult) => {
+    if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
+
+    if (!stateResult) {
+      return
+    }
+
+    appActions.onTimeUntilReconcile(stateResult)
+  })
 }
 
 const onWalletProperties = (state, body) => {
@@ -1855,7 +1995,7 @@ const callback = (err, result, delayTime) => {
     if (!client) return
 
     if (typeof delayTime === 'undefined') {
-      delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 10 * ledgerUtil.milliseconds.minute})
+      delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute})
     }
   }
 
@@ -1944,6 +2084,7 @@ const onCallback = (state, result, delayTime) => {
 
 const onReferralCodeRead = (code) => {
   if (!code) {
+    fetchReferralHeaders()
     return
   }
 
@@ -1972,7 +2113,7 @@ const onReferralInit = (err, response, body) => {
   }
 
   if (body && body.download_id) {
-    appActions.onReferralCodeRead(body.download_id, body.referral_code)
+    appActions.onReferralCodeRead(body)
     promoCodeFirstRunStorage
       .removePromoCode()
       .catch(error => {
@@ -1986,6 +2127,60 @@ const onReferralInit = (err, response, body) => {
   if (clientOptions.verboseP) {
     console.error(`Referral check was not successful ${body}`)
   }
+}
+
+const onReferralRead = (state, body, activeWindowId) => {
+  body = makeImmutable(body)
+
+  if (body.has('offer_page_url')) {
+    const url = body.get('offer_page_url')
+    if (urlutil.isURL(url)) {
+      if (activeWindowId === windowState.WINDOW_ID_NONE) {
+        state = updateState.setUpdateProp(state, 'referralPage', url)
+      } else {
+        appActions.createTabRequested({
+          url,
+          windowId: activeWindowId
+        })
+        state = updateState.setUpdateProp(state, 'referralPage', null)
+      }
+    }
+  }
+
+  if (body.has('headers')) {
+    const headers = body.get('headers')
+    state = updateState.setUpdateProp(state, 'referralHeaders', headers)
+    siteHacks.setReferralHeaders(headers)
+  }
+
+  state = updateState.setUpdateProp(state, 'referralDownloadId', body.get('download_id'))
+  state = updateState.setUpdateProp(state, 'referralPromoCode', body.get('referral_code'))
+
+  return state
+}
+
+const fetchReferralHeaders = () => {
+  module.exports.roundtrip({
+    server: referralServer,
+    method: 'GET',
+    path: '/promo/custom-headers'
+  }, {}, appActions.onFetchReferralHeaders)
+}
+
+const onFetchReferralHeaders = (state, err, response, body) => {
+  if (err) {
+    if (clientOptions.verboseP) {
+      console.error(makeJS(err))
+    }
+    return state
+  }
+
+  if (body && isList(body)) {
+    state = updateState.setUpdateProp(state, 'referralHeaders', body)
+    siteHacks.setReferralHeaders(body)
+  }
+
+  return state
 }
 
 const initialize = (state, paymentsEnabled) => {
@@ -2023,8 +2218,14 @@ const initialize = (state, paymentsEnabled) => {
         if (clientOptions.verboseP) {
           console.error('read error: ' + error.toString())
         }
+        fetchReferralHeaders()
       })
+  } else {
+    fetchReferralHeaders()
   }
+
+  // Get referral headers every day
+  setInterval(() => fetchReferralHeaders, (24 * ledgerUtil.milliseconds.hour))
 
   if (!paymentsEnabled) {
     client = null
@@ -2133,15 +2334,7 @@ const onInitRead = (state, parsedData) => {
 
     let ledgerWindow = (ledgerState.getSynopsisOption(state, 'numFrames') - 1) * ledgerState.getSynopsisOption(state, 'frameSize')
     if (typeof timeUntilReconcile === 'number' && timeUntilReconcile < -ledgerWindow) {
-      client.setTimeUntilReconcile(null, (err, stateResult) => {
-        if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
-
-        if (!stateResult) {
-          return
-        }
-
-        appActions.onTimeUntilReconcile(stateResult)
-      })
+      setNewTimeUntilReconcile()
     }
   } catch (ex) {
     console.error('ledger client creation error(1): ', ex)
@@ -2167,9 +2360,6 @@ const onInitRead = (state, parsedData) => {
   module.exports.setPaymentInfo(contributionAmount)
   module.exports.getBalance(state)
 
-  // Show relevant browser notifications on launch
-  state = ledgerNotifications.onLaunch(state)
-
   return state
 }
 
@@ -2182,7 +2372,7 @@ const onTimeUntilReconcile = (state, stateResult) => {
 
 const onLedgerFirstSync = (state, parsedData) => {
   if (client.sync(callback) === true) {
-    run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 10 * ledgerUtil.milliseconds.minute}))
+    run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute}))
   }
 
   return cacheRuleSet(state, parsedData.ruleset)
@@ -2205,7 +2395,7 @@ const run = (state, delayTime) => {
       let result = ''
 
       fields.forEach((field) => {
-        const max = (result.length > 0) ? 9 : 19
+        const max = (result.length > 0) ? 45 : 19
 
         if (typeof field !== 'string') field = field.toString()
         if (field.length < max) {
@@ -2239,20 +2429,50 @@ const run = (state, delayTime) => {
     })
   }
 
-  if (typeof delayTime === 'undefined' || !client) {
+  if (state == null || typeof delayTime === 'undefined' || !client) {
     return
+  }
+
+  const publishers = ledgerState.getPublisher(state)
+  if (publishers.isEmpty() && client.isReadyToReconcile(synopsis)) {
+    setNewTimeUntilReconcile()
   }
 
   let winners
   const ballots = client.ballots()
   const data = (synopsis) && (ballots > 0) && synopsisNormalizer(state, null, false, true)
 
+  let map = null
+
   if (data) {
     let weights = []
+    map = {}
+
     data.forEach((datum) => {
-      weights.push({publisher: datum.publisherKey, weight: datum.weight / 100.0})
+      map[datum.publisherKey] = {
+        verified: datum.verified,
+        exclude: datum.exclude,
+        score: datum.score,
+        pinPercentage: datum.pinPercentage,
+        percentage: datum.percentage,
+        votes: 0,
+        weight: datum.weight
+      }
+
+      weights.push({
+        publisher: datum.publisherKey,
+        pinPercentage: datum.pinPercentage,
+        weight: datum.weight / 100.0
+      })
     })
-    winners = synopsis.winners(ballots, weights)
+
+    winners = synopsis.winners(ballots, weights) || []
+
+    winners.forEach((winner) => {
+      if (map[winner]) map[winner].votes++
+    })
+
+    client.memo('run:ballots', Object.values(map))
   }
 
   if (!winners) winners = []
@@ -2265,6 +2485,9 @@ const run = (state, delayTime) => {
       const result = client.vote(winner)
       if (result) stateData = result
     })
+    if (!stateData && map) {
+      stateData = client.state
+    }
     if (stateData) muonWriter(statePath, stateData)
   } catch (ex) {
     console.error('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
@@ -2277,7 +2500,7 @@ const run = (state, delayTime) => {
       delayTime = false
     }
     if (delayTime === false) {
-      delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 10 * ledgerUtil.milliseconds.minute})
+      delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute})
     }
   }
 
@@ -2326,7 +2549,7 @@ const onNetworkConnected = (state) => {
   }
 
   if (client.sync(callback) === true) {
-    const delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 10 * ledgerUtil.milliseconds.minute})
+    const delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute})
     run(state, delayTime)
   }
 
@@ -2459,13 +2682,22 @@ const deleteSynopsis = () => {
 }
 
 let currentMediaKey = null
-const onMediaRequest = (state, xhr, type, tabId) => {
+const onMediaRequest = (state, xhr, type, details) => {
   if (!xhr || type == null) {
     return state
   }
 
-  const parsed = ledgerUtil.getMediaData(xhr, type)
+  const tabId = details.get('tabId')
+  const parsed = ledgerUtil.getMediaData(xhr, type, details)
+  if (parsed == null) {
+    return state
+  }
+
   const mediaId = ledgerUtil.getMediaId(parsed, type)
+
+  if (clientOptions.loggingP) {
+    console.log('Media request', parsed, `Media id: ${mediaId}`)
+  }
 
   if (mediaId == null) {
     return state
@@ -2486,6 +2718,9 @@ const onMediaRequest = (state, xhr, type, tabId) => {
   if (!ledgerPublisher) {
     ledgerPublisher = require('bat-publisher')
   }
+  if (clientOptions.loggingP) {
+    console.log('LOGGED EVENT', parsed, `Media id: ${mediaId}`, `Media key: ${mediaKey}`, `Duration: ${duration}ms (${duration / 1000}s)`)
+  }
 
   let revisited = true
   const activeTabId = tabState.getActiveTabId(state)
@@ -2494,8 +2729,11 @@ const onMediaRequest = (state, xhr, type, tabId) => {
     currentMediaKey = mediaKey
   }
 
-  const stateData = ledgerUtil.generateMediaCacheData(parsed, type)
+  const stateData = ledgerUtil.generateMediaCacheData(state, parsed, type, mediaKey)
   const cache = ledgerVideoCache.getDataByVideoId(state, mediaKey)
+  if (clientOptions.loggingP) {
+    console.log('Media cache data: ', stateData.toJS())
+  }
 
   if (!cache.isEmpty()) {
     if (!stateData.isEmpty()) {
@@ -2672,15 +2910,7 @@ const onPromotionResponse = (state, status) => {
   const minTimestamp = ledgerState.getPromotionProp(state, 'minimumReconcileTimestamp')
 
   if (minTimestamp > currentTimestamp) {
-    client.setTimeUntilReconcile(minTimestamp, (err, stateResult) => {
-      if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
-
-      if (!stateResult) {
-        return
-      }
-
-      appActions.onTimeUntilReconcile(stateResult)
-    })
+    setNewTimeUntilReconcile(minTimestamp)
   }
 
   if (togglePromotionTimeoutId) {
@@ -2829,7 +3059,9 @@ const getMethods = () => {
     checkReferralActivity,
     setPublishersOptions,
     referralCheck,
-    roundtrip
+    roundtrip,
+    onFetchReferralHeaders,
+    onReferralRead
   }
 
   let privateMethods = {}
@@ -2869,8 +3101,10 @@ const getMethods = () => {
       activityRoundTrip,
       pathName,
       onReferralInit,
+      roundTripFromWindow,
       onReferralCodeRead,
-      onVerifiedPStatus
+      onVerifiedPStatus,
+      checkSeed
     }
   }
 

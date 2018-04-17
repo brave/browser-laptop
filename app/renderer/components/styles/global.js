@@ -32,14 +32,14 @@ const globalStyles = {
     noIntersection: 1,
     at75: 0.75,
     at60: 0.6,
-    at45: 0.45,
+    at46: 0.46,
     at40: 0.4,
     at30: 0.3,
     at20: 0.20,
     at12: 0.125
   },
   color: {
-    commonTextColor: '#3b3b3b',
+    commonTextColor: 'rgb(59, 59, 62)',
     linkColor: '#0099CC',
     highlightBlue: '#37A9FD',
     privateTabBackground: '#665296',
@@ -61,18 +61,18 @@ const globalStyles = {
     progressBarColor: '#3498DB',
     siteInsecureColor: '#C63626',
     siteEVColor: 'green',
-    buttonColor: '#5a5a5a',
+    buttonColor: 'rgb(90, 90, 98)',
     braveOrange: 'rgb(255, 80, 0)',
     braveLightOrange: '#FF7A1D',
     braveMediumOrange: 'rgb(232, 72, 0)',
     braveDarkOrange: '#D44600',
-    veryLightGray: 'rgb(250, 250, 250)',
-    lightGray: 'rgb(236, 236, 236)',
-    gray: 'rgb(153, 153, 153)',
-    mediumGray: 'rgb(101, 101, 101)',
-    darkGray: 'rgb(68, 68, 68)',
-    modalVeryLightGray: 'rgb(247, 247, 247)',
-    modalLightGray: 'rgb(231, 231, 231)',
+    veryLightGray: 'rgb(250, 250, 251)',
+    lightGray: 'rgb(236, 236, 239)',
+    gray: 'rgb(153, 153, 157)',
+    mediumGray: 'rgb(101, 101, 107)',
+    darkGray: 'rgb(68, 68, 72)',
+    modalVeryLightGray: 'rgb(247, 247, 249)',
+    modalLightGray: 'rgb(231, 231, 234)',
     white25: 'rgba(255, 255, 255, 0.25)',
     white50: 'rgba(255, 255, 255, 0.5)',
     white100: 'rgba(255, 255, 255, 1)',
@@ -93,7 +93,7 @@ const globalStyles = {
     notificationItemColor: '#f1e9e5',
     notificationBottomBorderColor: '#ff5500',
     almostInvisible: 'rgba(255,255,255,0.01)',
-    urlBarOutline: '#bbb',
+    urlBarOutline: 'rgb(187, 187, 191)',
     alphaWhite: 'rgba(255,255,255,0.8)'
   },
   typography: {
@@ -150,10 +150,11 @@ const globalStyles = {
     buttonWidth: '25px',
     navbarHeight: '36px',
     downloadsBarHeight: '60px',
-    tabsToolbarHeight: '26px',
+    // This includes the toolbar's borders
+    tabsToolbarHeight: '29px',
     tabPagesHeight: '7px',
     bookmarkHangerMaxWidth: '350px',
-    bookmarksToolbarHeight: '24px',
+    bookmarksToolbarHeight: '19px',
     bookmarksToolbarWithFaviconsHeight: '24px',
     bookmarksFileIconSize: '13px',
     bookmarksFolderIconSize: '15px',
@@ -165,7 +166,7 @@ const globalStyles = {
     bookmarksToolbarPadding: '10px',
     bookmarksItemFontSize: '11px',
     bookmarksToolbarButtonDraggingMargin: '25px',
-    bookmarksToolbarOverflowButtonWidth: '25px',
+    bookmarksToolbarOverflowButtonWidth: '14px',
     navbarMenubarMargin: '7px',
     navbarButtonSpacing: '4px',
     navbarButtonWidth: '20px',
@@ -176,12 +177,12 @@ const globalStyles = {
     aboutPageDetailsPageWidth: '704px',
     aboutPageSectionPadding: '24px',
     aboutPageSectionMargin: '10px',
-    defaultTabMargin: '6px',
+    defaultTabMargin: '10px',
     defaultIconPadding: '2px',
     iconSize: '16px',
-    sessionIconSize: '15px',
-    closeIconSize: '13px',
-    newSessionIconSize: '13px',
+    sessionIconSize: '14px',
+    closeIconSize: '14px',
+    newSessionIconSize: '14px',
     narrowIconSize: '12px',
     dialogWidth: '422px',
     dialogSmallWidth: '350px',
@@ -231,7 +232,6 @@ const globalStyles = {
     zindexWindowIsPreview: '1100',
     zindexDownloadsBar: '1000',
     zindexTabs: '1000',
-    zindexTabsAudioTopBorder: '1001',
     zindexTabsThumbnail: '1100',
     zindexNavigationBar: '2000',
     zindexUrlbarNotLegend: '2100',
@@ -303,7 +303,7 @@ const globalStyles = {
   },
 
   button: {
-    color: '#5a5a5a',
+    color: 'rgb(90, 90, 98)',
 
     default: {
       color: '#fff',
@@ -322,11 +322,11 @@ const globalStyles = {
 
     secondary: {
       gradientColor1: '#fff',
-      gradientColor2: '#ececec',
-      background: 'linear-gradient(#fff, #ececec)',
-      color: '#666',
-      hoverColor: '#444',
-      borderHoverColor: 'rgb(153, 153, 153)'
+      gradientColor2: 'rgb(236, 236, 239)',
+      background: 'linear-gradient(#fff, rgb(236, 236, 239))',
+      color: 'rgb(101, 101, 107)',
+      hoverColor: 'rgb(68, 68, 72)',
+      borderHoverColor: 'rgb(153, 153, 157)'
     },
 
     subtle: {
@@ -345,11 +345,11 @@ const globalStyles = {
   },
 
   braveryPanel: {
-    color: '#3b3b3b',
+    color: 'rgb(59, 59, 62)',
 
     header: {
-      color: '#fafafa',
-      background: '#808080',
+      color: '#fff',
+      background: 'rgb(128, 128, 133)',
       switchControlTopTextColor: '#d3d3d3',
       border: '1px solid #aaa'
     },
@@ -359,10 +359,10 @@ const globalStyles = {
     },
 
     body: {
-      background: '#eee',
+      background: 'rgb(239, 239, 241)',
 
       hr: {
-        background: '#ccc'
+        background: 'rgb(204, 204, 214)'
       }
     }
   },
@@ -391,7 +391,6 @@ globalStyles.color.chromeBorderColor = globalStyles.color.chromePrimary
 globalStyles.color.chromeControlsWarningBackground = globalStyles.color.chromePrimary
 globalStyles.color.audioColor = globalStyles.color.highlightBlue
 globalStyles.color.focusUrlbarOutline = globalStyles.color.highlightBlue
-globalStyles.color.siteSecureColor = globalStyles.color.buttonColor
 globalStyles.color.loadTimeColor = globalStyles.color.highlightBlue
 globalStyles.color.activeTabDefaultColor = globalStyles.color.chromePrimary
 

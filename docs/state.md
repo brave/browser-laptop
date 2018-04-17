@@ -63,8 +63,7 @@ AppStore
       parentFolderId: number,
       partitionNumber: number, // optionally specifies a specific session
       skipSync: boolean,
-      title: string,
-      width: float // bookmark text width
+      title: string
     }
   },
   bookmarkFolders: {
@@ -75,8 +74,7 @@ AppStore
       originalSeed: Array.<number>, // only set for bookmarks that have been synced before a sync profile reset
       parentFolderId: number, // set for bookmarks and bookmark folders only
       skipSync: boolean, // Set for objects FETCHed by sync
-      title: string,
-      width: float // bookmark folder text width
+      title: string
     }
   },
   cache: {
@@ -93,7 +91,10 @@ AppStore
     ledgerVideos: {
       [mediaKey]: {
         publisher: string // publisher key
-        beatData: object // data that we get from a heartbeat
+        // Twitch
+        event: string, // event that was send to Twitch
+        time: number, // timestamp that we will log in the ledger
+        status: string // playing status: playing or paused
       }
     }
   }
@@ -330,6 +331,7 @@ AppStore
       }
     }
     publisherTimestamp: number, // timestamp of last publisher update in the database
+    status: string, // ledger status
     synopsis: {
       options: {
         emptyScores: {
@@ -510,6 +512,7 @@ AppStore
   siteSettings: {
     [hostPattern]: {
       adControl: string, // (showBraveAds | blockAds | allowAdsAndTracking)
+      autoplay: boolean,
       cookieControl: string, // (block3rdPartyCookie | allowAllCookies | blockAllCookies)
       fingerprintingProtection: string, // (block3rdPartyFingerprinting | allowAllFingerprinting | blockAllFingerprinting)
       flash: (number|boolean), // approval expiration time if allowed, false if never allow
@@ -528,14 +531,14 @@ AppStore
       openExternalPermission: boolean,
       pointerLockPermission: boolean,
       protocolRegistrationPermission: boolean,
-      skipSync: boolean, // Set for objects FETCHed by sync
       runInsecureContent: boolean, // allow active mixed content
       safeBrowsing: boolean,
+      siteName: string, // display name of the publisher
+      skipSync: boolean, // Set for objects FETCHed by sync
       savePasswords: boolean, // only false or undefined/null
       shieldsUp: boolean,
       widevine: (number|boolean), // false = block widevine, 0 = allow once, 1 = allow always
-      zoomLevel: number,
-      autoplay: boolean,
+      zoomLevel: number
     }
   },
   defaultSiteSettingsListImported: boolean,
@@ -599,7 +602,19 @@ AppStore
       notes: string // release notes for the active update
     },
     referralDownloadId: string, // download ID that is returned from the referral server
+    referralHeaders: [{
+      domains: Array<string>,
+      headers: [{
+        domains: Array<string>,
+        headers: { [headerName]: string },
+        cookieNames: Array<string>,
+        expiration: number
+      }],
+      cookieNames: Array<string>,
+      expiration: number
+    }],
     referralTimestamp: number, // timestamp when referral was accumulated (after ~30 days)
+    referralPage: string, // page that we open when browser starts
     referralPromoCode: string, // promo code for the referral
     status: string, // updateStatus from js/constants/updateStatus.js
     verbose: boolean // whether to show update UI for checking, downloading, and errors
@@ -615,10 +630,6 @@ AppStore
   },
   windows: [{
     // persistent properties
-    bookmarksToolbar: {
-      toolbar: Array<string>, // bookmark and folder keys that we want to display
-      other: Array<string> // bookmark and folder keys that we display in more menu (limited to 100)
-    },
     focused: boolean,
     height: number,
     left: number,
@@ -674,7 +685,7 @@ WindowStore
   },
   cleanedOnShutdown: boolean, // whether app data was successfully cleared on shutdown
   closedFrames: [], // holds the same type of frame objects as frames
-  contextMenuDetail: {
+  contextMenuDetail: { // currently using uuid hack to avoid serializing click function in template
     bottom: number, // the bottom position of the context menu
     left: number, // the left position of the context menu
     maxHeight: number, // the maximum height of the context menu

@@ -6,11 +6,9 @@ const Immutable = require('immutable')
 
 // State
 const bookmarksState = require('../../common/state/bookmarksState')
-const bookmarkToolbarState = require('../../common/state/bookmarkToolbarState')
 
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
-const siteTags = require('../../../js/constants/siteTags')
 const {STATE_SITES} = require('../../../js/constants/stateConstants')
 
 // Utils
@@ -18,7 +16,6 @@ const {makeImmutable} = require('../../common/state/immutableUtil')
 const syncUtil = require('../../../js/state/syncUtil')
 const bookmarkUtil = require('../../common/lib/bookmarkUtil')
 const bookmarkLocationCache = require('../../common/cache/bookmarkLocationCache')
-const textCalc = require('../../browser/api/textCalc')
 
 const bookmarksReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -44,12 +41,10 @@ const bookmarksReducer = (state, action, immutableAction) => {
             state = syncUtil.updateObjectCache(state, bookmarkDetail, STATE_SITES.BOOKMARKS)
             bookmarkList = bookmarkList.push(bookmarkDetail)
           })
-          textCalc.calcTextList(bookmarkList)
         } else {
           const bookmarkDetail = bookmarkUtil.buildBookmark(state, bookmark)
           state = bookmarksState.addBookmark(state, bookmarkDetail, closestKey, !isLeftSide)
           state = syncUtil.updateObjectCache(state, bookmarkDetail, STATE_SITES.BOOKMARKS)
-          textCalc.calcText(bookmarkDetail, siteTags.BOOKMARK)
         }
 
         state = bookmarkUtil.updateActiveTabBookmarked(state)
@@ -72,12 +67,8 @@ const bookmarksReducer = (state, action, immutableAction) => {
         const bookmarkDetail = bookmarkUtil.buildEditBookmark(oldBookmark, bookmark)
         state = bookmarksState.editBookmark(state, oldBookmark, bookmarkDetail)
         state = syncUtil.updateObjectCache(state, bookmark, STATE_SITES.BOOKMARKS)
-        textCalc.calcText(bookmarkDetail, siteTags.BOOKMARK)
 
         state = bookmarkUtil.updateActiveTabBookmarked(state)
-        if (oldBookmark.get('parentFolderId') !== bookmarkDetail.get('parentFolderId')) {
-          state = bookmarkToolbarState.setToolbars(state)
-        }
         break
       }
     case appConstants.APP_MOVE_BOOKMARK:
@@ -87,8 +78,6 @@ const bookmarksReducer = (state, action, immutableAction) => {
         if (key == null) {
           break
         }
-
-        const oldBookmark = bookmarksState.getBookmark(state, key)
 
         state = bookmarksState.moveBookmark(
           state,
@@ -100,14 +89,6 @@ const bookmarksReducer = (state, action, immutableAction) => {
 
         const destinationDetail = bookmarksState.findBookmark(state, action.get('destinationKey'))
         state = syncUtil.updateObjectCache(state, destinationDetail, STATE_SITES.BOOKMARKS)
-
-        if (
-          destinationDetail.get('parentFolderId') === 0 ||
-          action.get('destinationKey') === 0 ||
-          oldBookmark.get('parentFolderId') === 0
-        ) {
-          state = bookmarkToolbarState.setToolbars(state)
-        }
         break
       }
     case appConstants.APP_REMOVE_BOOKMARK:
@@ -121,34 +102,10 @@ const bookmarksReducer = (state, action, immutableAction) => {
           action.get('bookmarkKey', Immutable.List()).forEach((key) => {
             state = bookmarksState.removeBookmark(state, key)
           })
-          state = bookmarkToolbarState.setToolbars(state)
         } else {
-          const bookmark = bookmarksState.getBookmark(state, bookmarkKey)
           state = bookmarksState.removeBookmark(state, bookmarkKey)
-          if (bookmark.get('parentFolderId') === 0) {
-            state = bookmarkToolbarState.setToolbars(state)
-          }
         }
         state = bookmarkUtil.updateActiveTabBookmarked(state)
-        break
-      }
-    case appConstants.APP_ON_BOOKMARK_WIDTH_CHANGED:
-      {
-        if (action.get('bookmarkList', Immutable.List()).isEmpty()) {
-          break
-        }
-
-        let updateToolbar = false
-        action.get('bookmarkList').forEach(item => {
-          state = bookmarksState.setWidth(state, item.get('key'), item.get('width'))
-          if (item.get('parentFolderId') === 0) {
-            updateToolbar = true
-          }
-        })
-
-        if (updateToolbar) {
-          state = bookmarkToolbarState.setToolbars(state)
-        }
         break
       }
   }

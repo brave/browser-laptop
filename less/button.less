@@ -34,7 +34,7 @@ span.buttonSeparator {
   border-radius: @borderRadius;
   margin: 0 3px;
   text-align: center;
-  transition: .1s opacity, .1s background;
+  transition: .12s opacity ease, .12s background ease;
   user-select: none;
   user-select: none;
 
@@ -82,7 +82,8 @@ span.buttonSeparator {
 
   &.primaryButton {
     background: linear-gradient(@braveLightOrange, @braveOrange);
-    border: 2px solid transparent;
+    border-left: 2px solid @braveLightOrange;
+    border-right: 2px solid @braveOrange;
     border-top: 2px solid @braveLightOrange;
     border-bottom: 2px solid @braveOrange;
     box-shadow: @buttonShadow;

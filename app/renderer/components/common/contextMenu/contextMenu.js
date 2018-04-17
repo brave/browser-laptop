@@ -15,6 +15,9 @@ const windowActions = require('../../../../../js/actions/windowActions')
 // Constants
 const keyCodes = require('../../../../common/constants/keyCodes')
 
+// State
+const contextMenuState = require('../../../../common/state/contextMenuState')
+
 // Utils
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const {separatorMenuItem} = require('../../../../common/commonMenu')
@@ -218,7 +221,7 @@ class ContextMenu extends React.Component {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const selectedIndex = currentWindow.getIn(['ui', 'contextMenu', 'selectedIndex'], null)
-    const contextMenuDetail = currentWindow.get('contextMenuDetail', Immutable.Map())
+    const contextMenuDetail = contextMenuState.getContextMenu(currentWindow)
 
     const props = {}
     props.lastZoomPercentage = activeFrame.get('lastZoomPercentage')

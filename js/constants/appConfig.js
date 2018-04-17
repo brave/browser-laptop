@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 const Immutable = require('immutable')
 const {getTargetAboutUrl} = require('../lib/appUrlUtil')
+const webrtcConstants = require('./webrtcConstants')
 
 // BRAVE_UPDATE_HOST should be set to the host name for the auto-updater server
 const updateHost = process.env.BRAVE_UPDATE_HOST || 'https://laptop-updates.brave.com'
@@ -19,7 +20,7 @@ module.exports = {
   name: 'Brave',
   contactUrl: 'mailto:support+laptop@brave.com',
   quitTimeout: isTest ? 3 * 1000 : 10 * 1000,
-  sessionSaveInterval: 1000 * 60 * 5,
+  sessionSaveInterval: process.env.BRAVE_SESSION_SAVE_INTERVAL * 1000 || 1000 * 60 * 5,
   resourceNames: {
     ADBLOCK: 'adblock',
     SAFE_BROWSING: 'safeBrowsing',
@@ -34,7 +35,8 @@ module.exports = {
     COOKIEBLOCK: 'cookieblock', // block 3p cookies and referer
     COOKIEBLOCK_ALL: 'cookieblockAll', // block all cookies and referer
     SITEHACK: 'siteHacks',
-    WEBTORRENT: 'webtorrent'
+    WEBTORRENT: 'webtorrent',
+    FIREWALL: 'firewall'
     // ... other optional resource files are identified by uuid such as for regional adblock
   },
   cookieblock: {
@@ -95,6 +97,9 @@ module.exports = {
   },
   webtorrent: {
     enabled: true
+  },
+  firewall: {
+    enabled: false
   },
   adInsertion: {
     enabled: false,
@@ -213,6 +218,7 @@ module.exports = {
     'advanced.toolbar-ui-scale': 'normal',
     'advanced.swipe-nav-distance': 101,
     'advanced.payments-allow-promotions': true,
+    'advanced.webrtc.policy': webrtcConstants.default,
     'shutdown.clear-history': false,
     'shutdown.clear-downloads': false,
     'shutdown.clear-cache': false,

@@ -164,6 +164,11 @@ describe('bookmarkState unit test', function () {
     bookmarksState = require('../../../../../app/common/state/bookmarksState')
   })
 
+  after(function () {
+    mockery.deregisterAll()
+    mockery.disable()
+  })
+
   describe('updateFavicon', function () {
     it('updates the favicon for all matching entries', function () {
       const processedState = bookmarksState.updateFavicon(stateWithData, 'https://brave.com/', 'https://brave.com/favicon.ico')
@@ -306,24 +311,6 @@ describe('bookmarkState unit test', function () {
       assert.deepEqual(result.toJS(), stateWithData.getIn(['bookmarkFolders', '1']).toJS())
       assert(getBookmarkSpy.calledOnce)
       assert(getFolderSpy.calledOnce)
-    })
-  })
-
-  describe('setWidth', function () {
-    it('null case', function () {
-      const result = bookmarksState.setWidth(stateWithData)
-      assert.deepEqual(result.toJS(), stateWithData.toJS())
-    })
-
-    it('parse width', function () {
-      const result = bookmarksState.setWidth(stateWithData, '1', 'dsfsdfds')
-      assert.deepEqual(result.toJS(), stateWithData.toJS())
-    })
-
-    it('set width', function () {
-      const result = bookmarksState.setWidth(stateWithData, '1', 100)
-      const expectedResult = stateWithData.setIn(['bookmarks', '1', 'width'], 100)
-      assert.deepEqual(result.toJS(), expectedResult.toJS())
     })
   })
 

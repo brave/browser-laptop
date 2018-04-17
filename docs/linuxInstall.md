@@ -20,7 +20,7 @@ Once `snapd` is installed, installing Brave looks like this:
     snap install brave
 ```
 
-## Debian (Jessie) and Ubuntu (Artful, Zesty, Yakkety, Xenial, and Trusty) AMD64:
+## Debian (Jessie, Stretch) and Ubuntu (Artful, Zesty, Yakkety, Xenial, and Trusty) AMD64:
 
 In the terminal to be used for the below commands, prime the `sudo` command (enter your password once).
 ```
@@ -136,6 +136,13 @@ If there are dependency errors during `dpkg -i`, the following command will
 install the dependency for you:
 ```
 sudo apt-get -f install
+```
+
+## Solus
+
+Install Brave through eopkg:
+```
+sudo eopkg install brave
 ```
 
 ## Fedora x86_64:

@@ -5,6 +5,7 @@ const Immutable = require('immutable')
 require('../../../braveUnit')
 const settings = require('../../../../../js/constants/settings')
 const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
+const twitchEvents = require('../../../../../app/common/constants/twitchEvents')
 
 const baseState = Immutable.fromJS({
   cache: {
@@ -16,7 +17,7 @@ const stateWithData = Immutable.fromJS({
     ledgerVideos: {
       'twitch_test': {
         publisher: 'twitch#author:test',
-        event: 'video-play',
+        event: twitchEvents.START,
         time: 1519279886
       }
     }
@@ -430,14 +431,14 @@ describe('ledgerUtil unit test', function () {
 
       it('properties are missing', function () {
         const result = ledgerUtil.getMediaId({
-          event: 'minute-watched'
+          event: twitchEvents.MINUTE_WATCHED
         }, ledgerMediaProviders.TWITCH)
         assert.equal(result, null)
       })
 
       it('content is a live stream', function () {
         const result = ledgerUtil.getMediaId({
-          event: 'minute-watched',
+          event: twitchEvents.MINUTE_WATCHED,
           properties: {
             channel: 'tchannel'
           }
@@ -447,43 +448,13 @@ describe('ledgerUtil unit test', function () {
 
       it('content is a vod', function () {
         const result = ledgerUtil.getMediaId({
-          event: 'minute-watched',
+          event: twitchEvents.MINUTE_WATCHED,
           properties: {
             channel: 'tchannel',
             vod: 'v12343234'
           }
         }, ledgerMediaProviders.TWITCH)
         assert.equal(result, 'tchannel_vod_12343234')
-      })
-
-      it('event is video-play', function () {
-        const result = ledgerUtil.getMediaId({
-          event: 'video-play',
-          properties: {
-            channel: 'tchannel'
-          }
-        }, ledgerMediaProviders.TWITCH)
-        assert.equal(result, 'tchannel')
-      })
-
-      it('event is player_click_playpause', function () {
-        const result = ledgerUtil.getMediaId({
-          event: 'player_click_playpause',
-          properties: {
-            channel: 'tchannel'
-          }
-        }, ledgerMediaProviders.TWITCH)
-        assert.equal(result, 'tchannel')
-      })
-
-      it('event is vod_seek', function () {
-        const result = ledgerUtil.getMediaId({
-          event: 'vod_seek',
-          properties: {
-            channel: 'tchannel'
-          }
-        }, ledgerMediaProviders.TWITCH)
-        assert.equal(result, 'tchannel')
       })
     })
   })
@@ -545,25 +516,57 @@ describe('ledgerUtil unit test', function () {
     })
 
     describe('Twitch', function () {
+      const url = 'https://video-edge-f0f586.sjc01.hls.ttvnw.net/v1/segment/CuDNI7xCy5CGJ8g7G3thdHT26OW_DhnEuVw0tRGN-DKhJxrRTeGe...'
+
       it('null case', function () {
         const result = ledgerUtil.getMediaData(null, ledgerMediaProviders.TWITCH)
         assert.equal(result, null)
       })
 
+      it('uploadData is missing', function () {
+        const result = ledgerUtil.getMediaData(url, ledgerMediaProviders.TWITCH, Immutable.fromJS({
+          firstPartyUrl: 'https://www.twitch.tv/videos/241926348'
+        }))
+        assert.equal(result, null)
+      })
+
+      it('bytes is missing', function () {
+        const result = ledgerUtil.getMediaData(url, ledgerMediaProviders.TWITCH, Immutable.fromJS({
+          firstPartyUrl: 'https://www.twitch.tv/videos/241926348',
+          uploadData: []
+        }))
+        assert.equal(result, null)
+      })
+
       it('data is missing', function () {
-        const result = ledgerUtil.getMediaData('https://api.mixpanel.com', ledgerMediaProviders.TWITCH)
+        const result = ledgerUtil.getMediaData(url, ledgerMediaProviders.TWITCH, Immutable.fromJS({
+          firstPartyUrl: 'https://www.twitch.tv/videos/241926348',
+          uploadData: [{
+            bytes: new Uint8Array([116, 101, 115, 116])
+          }]
+        }))
         assert.equal(result, null)
       })
 
       it('data is empty string', function () {
-        const result = ledgerUtil.getMediaData('https://api.mixpanel.com?data=', ledgerMediaProviders.TWITCH)
+        const result = ledgerUtil.getMediaData(url, ledgerMediaProviders.TWITCH, Immutable.fromJS({
+          firstPartyUrl: 'https://www.twitch.tv/videos/241926348',
+          uploadData: [{
+            bytes: new Uint8Array([100, 97, 116, 97, 61])
+          }]
+        }))
         assert.equal(result, null)
       })
 
       it('obj is parsed correctly', function () {
-        const result = ledgerUtil.getMediaData('https://api.mixpanel.com?data=eyJldmVudCI6Im1pbnV0ZS13YXRjaGVkIiwicHJvcGVydGllcyI6eyJjaGFubmVsIjoidHcifX0=', ledgerMediaProviders.TWITCH)
+        const result = ledgerUtil.getMediaData(url, ledgerMediaProviders.TWITCH, Immutable.fromJS({
+          firstPartyUrl: 'https://www.twitch.tv/videos/241926348',
+          uploadData: [{
+            bytes: new Uint8Array([100, 97, 116, 97, 61, 87, 51, 115, 105, 90, 88, 90, 108, 98, 110, 81, 105, 79, 105, 74, 116, 97, 87, 53, 49, 100, 71, 85, 116, 100, 50, 70, 48, 89, 50, 104, 108, 90, 67, 73, 115, 73, 110, 66, 121, 98, 51, 66, 108, 99, 110, 82, 112, 90, 88, 77, 105, 79, 110, 115, 105, 89, 50, 104, 104, 98, 109, 53, 108, 98, 67, 73, 54, 73, 110, 82, 51, 73, 110, 49, 57, 88, 81, 61, 61])
+          }]
+        }))
         assert.deepEqual(result, {
-          event: 'minute-watched',
+          event: twitchEvents.MINUTE_WATCHED,
           properties: {
             channel: 'tw'
           }
@@ -613,13 +616,13 @@ describe('ledgerUtil unit test', function () {
 
     describe('twitch', function () {
       it('we only have url', function () {
-        const result = ledgerUtil.getMediaProvider('https://api.mixpanel.com/?data=lll')
+        const result = ledgerUtil.getMediaProvider('https://ttvnw.net/v1/segment/sdfsdfsdfdsf')
         assert.equal(result, null)
       })
 
       it('video is on twitch.tv', function () {
         const result = ledgerUtil.getMediaProvider(
-          'https://api.mixpanel.com/?data=lll',
+          'https://ttvnw.net/v1/segment/sdfsdfsdfdsf',
           'https://www.twitch.tv/'
         )
         assert.equal(result, ledgerMediaProviders.TWITCH)
@@ -627,7 +630,7 @@ describe('ledgerUtil unit test', function () {
 
       it('video is embeded', function () {
         const result = ledgerUtil.getMediaProvider(
-          'https://api.mixpanel.com/?data=lll',
+          'https://ttvnw.net/v1/segment/sdfsdfsdfdsf',
           'https://www.site.tv/',
           'https://player.twitch.tv/'
         )
@@ -698,27 +701,159 @@ describe('ledgerUtil unit test', function () {
     })
 
     it('properties are missing', function () {
-      const result = ledgerUtil.generateTwitchCacheData({
-        event: 'video-play',
+      const result = ledgerUtil.generateTwitchCacheData(baseState, {
+        event: twitchEvents.START,
         channel: 'test'
-      })
+      }, 'twitch_test')
+
       assert.deepEqual(result.toJS(), {
-        event: 'video-play'
+        event: twitchEvents.START,
+        status: 'playing'
       })
     })
 
     it('properties are present', function () {
-      const result = ledgerUtil.generateTwitchCacheData({
-        event: 'video-play',
+      const result = ledgerUtil.generateTwitchCacheData(baseState, {
+        event: twitchEvents.START,
         properties: {
           time: 100,
           minute_logged: 1
         },
         channel: 'test'
-      })
+      }, 'twitch_test')
+
       assert.deepEqual(result.toJS(), {
-        event: 'video-play',
-        time: 100
+        event: twitchEvents.START,
+        time: 100,
+        status: 'playing'
+      })
+    })
+
+    describe('user actions: ', function () {
+      it('start -> pause', function () {
+        const state = baseState
+          .setIn(['cache', 'ledgerVideos', 'twitch_test'], Immutable.fromJS({
+            event: twitchEvents.START,
+            status: 'playing'
+          }))
+
+        const result = ledgerUtil.generateTwitchCacheData(state, {
+          event: twitchEvents.PLAY_PAUSE,
+          channel: 'test'
+        }, 'twitch_test')
+
+        assert.deepEqual(result.toJS(), {
+          event: twitchEvents.PLAY_PAUSE,
+          status: 'paused'
+        })
+      })
+
+      it('start -> seek', function () {
+        const state = baseState
+          .setIn(['cache', 'ledgerVideos', 'twitch_test'], Immutable.fromJS({
+            event: twitchEvents.START,
+            status: 'playing'
+          }))
+
+        const result = ledgerUtil.generateTwitchCacheData(state, {
+          event: twitchEvents.SEEK,
+          channel: 'test'
+        }, 'twitch_test')
+
+        assert.deepEqual(result.toJS(), {
+          event: twitchEvents.SEEK,
+          status: 'playing'
+        })
+      })
+
+      it('play -> pause -> play', function () {
+        const state = baseState
+          .setIn(['cache', 'ledgerVideos', 'twitch_test'], Immutable.fromJS({
+            event: twitchEvents.PLAY_PAUSE,
+            status: 'paused'
+          }))
+
+        const result = ledgerUtil.generateTwitchCacheData(state, {
+          event: twitchEvents.PLAY_PAUSE,
+          channel: 'test'
+        }, 'twitch_test')
+
+        assert.deepEqual(result.toJS(), {
+          event: twitchEvents.PLAY_PAUSE,
+          status: 'playing'
+        })
+      })
+
+      it('pause -> play -> pause', function () {
+        const state = baseState
+          .setIn(['cache', 'ledgerVideos', 'twitch_test'], Immutable.fromJS({
+            event: twitchEvents.PLAY_PAUSE,
+            status: 'playing'
+          }))
+
+        const result = ledgerUtil.generateTwitchCacheData(state, {
+          event: twitchEvents.PLAY_PAUSE,
+          channel: 'test'
+        }, 'twitch_test')
+
+        assert.deepEqual(result.toJS(), {
+          event: twitchEvents.PLAY_PAUSE,
+          status: 'paused'
+        })
+      })
+
+      it('play -> pause -> seek', function () {
+        const state = baseState
+          .setIn(['cache', 'ledgerVideos', 'twitch_test'], Immutable.fromJS({
+            event: twitchEvents.PLAY_PAUSE,
+            status: 'paused'
+          }))
+
+        const result = ledgerUtil.generateTwitchCacheData(state, {
+          event: twitchEvents.SEEK,
+          channel: 'test'
+        }, 'twitch_test')
+
+        assert.deepEqual(result.toJS(), {
+          event: twitchEvents.SEEK,
+          status: 'paused'
+        })
+      })
+
+      it('pause -> seek -> play', function () {
+        const state = baseState
+          .setIn(['cache', 'ledgerVideos', 'twitch_test'], Immutable.fromJS({
+            event: twitchEvents.SEEK,
+            status: 'paused'
+          }))
+
+        const result = ledgerUtil.generateTwitchCacheData(state, {
+          event: twitchEvents.PLAY_PAUSE,
+          channel: 'test'
+        }, 'twitch_test')
+
+        assert.deepEqual(result.toJS(), {
+          event: twitchEvents.PLAY_PAUSE,
+          status: 'playing'
+        })
+      })
+
+      it('play -> seek -> pause', function () {
+        const state = baseState
+          .setIn(['cache', 'ledgerVideos', 'twitch_test'], Immutable.fromJS({
+            event: twitchEvents.SEEK,
+            status: 'playing'
+          }))
+
+        const result = ledgerUtil.generateTwitchCacheData(state, {
+          event: twitchEvents.PLAY_PAUSE,
+          channel: 'test'
+        }, 'twitch_test')
+
+        assert.deepEqual(result.toJS(), {
+          event: twitchEvents.PLAY_PAUSE,
+          status: 'paused'
+        })
       })
     })
   })
@@ -731,7 +866,7 @@ describe('ledgerUtil unit test', function () {
 
     it('we just video playing', function () {
       const result = ledgerUtil.getTwitchDuration(baseState, {
-        event: 'video-play',
+        event: twitchEvents.START,
         properties: {
           time: '1223fa'
         }
@@ -741,7 +876,7 @@ describe('ledgerUtil unit test', function () {
 
     it('properties are missing', function () {
       const result = ledgerUtil.getTwitchDuration(baseState, {
-        event: 'minute-watched',
+        event: twitchEvents.MINUTE_WATCHED,
         properties: {
           time: '1223fa'
         }
@@ -751,7 +886,7 @@ describe('ledgerUtil unit test', function () {
 
     it('current time is not a number', function () {
       const result = ledgerUtil.getTwitchDuration(stateWithData, {
-        event: 'minute-watched',
+        event: twitchEvents.MINUTE_WATCHED,
         properties: {
           time: '1223fa'
         }
@@ -761,17 +896,17 @@ describe('ledgerUtil unit test', function () {
 
     it('user paused a video', function () {
       const result = ledgerUtil.getTwitchDuration(stateWithData, {
-        event: 'player_click_playpause',
+        event: twitchEvents.PLAY_PAUSE,
         properties: {
           time: 1519279926
         }
       }, 'twitch_test')
-      assert.deepEqual(result, 40000)
+      assert.deepEqual(result, 30000)
     })
 
     it('first minute watched', function () {
       const result = ledgerUtil.getTwitchDuration(stateWithData, {
-        event: 'minute-watched',
+        event: twitchEvents.MINUTE_WATCHED,
         properties: {
           time: 1519279926
         }
@@ -781,10 +916,10 @@ describe('ledgerUtil unit test', function () {
 
     it('second minute watched', function () {
       const state = stateWithData
-        .setIn(['cache', 'ledgerVideos', 'twitch_test', 'event'], 'minute-watched')
+        .setIn(['cache', 'ledgerVideos', 'twitch_test', 'event'], twitchEvents.MINUTE_WATCHED)
 
       const result = ledgerUtil.getTwitchDuration(state, {
-        event: 'minute-watched',
+        event: twitchEvents.MINUTE_WATCHED,
         properties: {
           time: 1519279926
         }
@@ -794,10 +929,10 @@ describe('ledgerUtil unit test', function () {
 
     it('vod seeked', function () {
       const state = stateWithData
-        .setIn(['cache', 'ledgerVideos', 'twitch_test', 'event'], 'minute-watched')
+        .setIn(['cache', 'ledgerVideos', 'twitch_test', 'event'], twitchEvents.MINUTE_WATCHED)
 
       const result = ledgerUtil.getTwitchDuration(state, {
-        event: 'vod_seek',
+        event: twitchEvents.SEEK,
         properties: {
           time: 1519279926
         }
@@ -807,7 +942,7 @@ describe('ledgerUtil unit test', function () {
 
     it('end time is negative', function () {
       const result = ledgerUtil.getTwitchDuration(stateWithData, {
-        event: 'minute-watched',
+        event: twitchEvents.MINUTE_WATCHED,
         properties: {
           time: 1519249926
         }
@@ -817,7 +952,7 @@ describe('ledgerUtil unit test', function () {
 
     it('end time is more then 2 minutes', function () {
       const result = ledgerUtil.getTwitchDuration(stateWithData, {
-        event: 'minute-watched',
+        event: twitchEvents.MINUTE_WATCHED,
         properties: {
           time: 1519449926
         }
@@ -825,17 +960,17 @@ describe('ledgerUtil unit test', function () {
       assert.deepEqual(result, 120000)
     })
 
-    it('we need to floor end time', function () {
+    it('start event is send twice', function () {
       const state = stateWithData
-        .setIn(['cache', 'ledgerVideos', 'twitch_test', 'event'], 'minute-watched')
+        .setIn(['cache', 'ledgerVideos', 'twitch_test', 'event'], twitchEvents.START)
 
       const result = ledgerUtil.getTwitchDuration(state, {
-        event: 'minute-watched',
+        event: twitchEvents.START,
         properties: {
-          time: 1519279926.74353453
+          time: 1519279926
         }
       }, 'twitch_test')
-      assert.deepEqual(result, 40743)
+      assert.deepEqual(result, 0)
     })
   })
 })

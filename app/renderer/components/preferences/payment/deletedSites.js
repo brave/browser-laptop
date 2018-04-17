@@ -33,16 +33,22 @@ class DeletedSitesContent extends ImmutableComponent {
     return <div id='sitePermissionsPage'>
       <ul className={css(styles.sitePermissions__list)}>
         {
-          this.props.sites.map(hostPattern => {
+          this.props.sites.map(data => {
+            let siteName = (data.hostPattern || '').replace('?://', '://')
+
+            if (data.siteName) {
+              siteName = data.siteName
+            }
+
             return <div className={css(styles.sitePermissions__list__item)}>
               <BrowserButton
                 iconOnly
                 iconClass={globalStyles.appIcons.remove}
                 size='1rem'
                 custom={styles.sitePermissions__list__item__button}
-                onClick={this.deletePermission.bind(this, permissionName, hostPattern)}
+                onClick={this.deletePermission.bind(this, permissionName, data.hostPattern)}
               />
-              <span>{hostPattern}</span>
+              <span>{siteName}</span>
             </div>
           })
         }

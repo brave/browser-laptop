@@ -356,6 +356,14 @@ const siteSingleDetailTemplate = (siteKey, type, activeFrame) => {
         }
       }
     })
+
+    template.push({
+      label: locale.translation('deleteDomainFromHistory'),
+      click: () => {
+        const domain = urlParse(siteDetail.get('location')).hostname
+        appActions.removeHistoryDomain(domain)
+      }
+    })
   }
 
   if (type !== siteTags.HISTORY) {

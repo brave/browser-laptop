@@ -103,6 +103,13 @@ const aboutActions = {
   },
 
   /**
+   * Dispatches a message to trigger a browser restart notification
+   */
+  requireRestart: function (key = null, value = null) {
+    ipc.send(messages.PREFS_RESTART, key, value)
+  },
+
+  /**
    * Dispatched when an extension has been uninstalled
    *
    * @param {string} extensionId - the extension id

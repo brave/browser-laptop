@@ -103,6 +103,9 @@ describe('ledger api unit tests', function () {
     // ledger client stubbing
     ledgerClient = sinon.stub()
     ledgerClientObject = {
+      ballots: function () {
+        return 1
+      },
       sync: function (callback) { return false },
       getBraveryProperties: function () {
         return {
@@ -127,6 +130,7 @@ describe('ledger api unit tests', function () {
       getPaymentId: function () {
         return 'payementIdGoesHere'
       },
+      memo: () => {},
       properties: {
         wallet: {
           paymentId: 12345
@@ -150,7 +154,8 @@ describe('ledger api unit tests', function () {
       },
       getPromotion: () => {},
       setPromotion: () => {},
-      setTimeUntilReconcile: () => {}
+      setTimeUntilReconcile: () => {},
+      isReadyToReconcile: () => {}
     }
     window.getWalletPassphrase = (parsedData) => {
       return walletPassphraseReturn
@@ -234,7 +239,6 @@ describe('ledger api unit tests', function () {
 
     describe('onInitRead', function () {
       let parsedLedgerData
-      let onLaunchSpy
       let setPaymentInfoSpy
       before(function () {
         parsedLedgerData = {
@@ -249,18 +253,11 @@ describe('ledger api unit tests', function () {
         contributionAmount = 10
       })
       before(function () {
-        onLaunchSpy = sinon.spy(ledgerNotificationsApi, 'onLaunch')
         setPaymentInfoSpy = sinon.spy(ledgerApi, 'setPaymentInfo')
       })
       after(function () {
-        onLaunchSpy.restore()
         setPaymentInfoSpy.restore()
         ledgerApi.setSynopsis(undefined)
-      })
-      it('calls notifications.onLaunch', function () {
-        onLaunchSpy.reset()
-        ledgerApi.onInitRead(defaultAppState, parsedLedgerData)
-        assert(onLaunchSpy.calledOnce)
       })
       it('calls setPaymentInfo with contribution amount', function () {
         setPaymentInfoSpy.reset()
@@ -618,21 +615,21 @@ describe('ledger api unit tests', function () {
         })
         it('does nothing if tab is private', function () {
           const xhr2 = 'https://www.youtube.com/api/stats/watchtime?docid=kLiLOkzLetE&st=20.338&et=21.339'
-          ledgerApi.onMediaRequest(cacheAppState, xhr2, ledgerMediaProviders.YOUTUBE, 1)
+          ledgerApi.onMediaRequest(cacheAppState, xhr2, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 1}))
           assert(mediaSpy.notCalled)
           assert(saveVisitSpy.notCalled)
         })
       })
 
       it('set currentMediaKey when it is different than saved', function () {
-        ledgerApi.onMediaRequest(defaultAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
+        ledgerApi.onMediaRequest(defaultAppState, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 1}))
         assert.equal(ledgerApi.getCurrentMediaKey(), videoId)
         assert(mediaSpy.calledOnce)
         assert(saveVisitSpy.notCalled)
       })
 
       it('get data from cache, if we have publisher in synopsis', function () {
-        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
+        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 1}))
         assert(mediaSpy.notCalled)
         assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
           duration: 10001,
@@ -645,14 +642,14 @@ describe('ledger api unit tests', function () {
         const state = defaultAppState.setIn(['cache', 'ledgerVideos', videoId], Immutable.fromJS({
           publisher: publisherKey
         }))
-        ledgerApi.onMediaRequest(state, xhr, ledgerMediaProviders.YOUTUBE, 1)
+        ledgerApi.onMediaRequest(state, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 1}))
         assert(mediaSpy.calledOnce)
         assert(saveVisitSpy.notCalled)
       })
 
       it('revisited if visiting the same media in the same tab', function () {
         // first call, revisit false
-        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
+        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 1}))
         assert.equal(ledgerApi.getCurrentMediaKey(), videoId)
         assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
           duration: 10001,
@@ -661,7 +658,7 @@ describe('ledger api unit tests', function () {
         }).calledOnce)
 
         // second call, revisit true
-        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 1)
+        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 1}))
         assert(mediaSpy.notCalled)
         assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
           duration: 10001,
@@ -673,7 +670,7 @@ describe('ledger api unit tests', function () {
       it('revisited if visiting media in the background tab', function () {
         // first call, revisit false
         ledgerApi.setCurrentMediaKey('11')
-        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, 10)
+        ledgerApi.onMediaRequest(cacheAppState, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 10}))
         assert.equal(ledgerApi.getCurrentMediaKey(), '11')
         assert(saveVisitSpy.withArgs(cacheAppState, publisherKey, {
           duration: 10001,
@@ -693,7 +690,7 @@ describe('ledger api unit tests', function () {
             }
           }))
 
-        ledgerApi.onMediaRequest(badState, xhr, ledgerMediaProviders.YOUTUBE, 10)
+        ledgerApi.onMediaRequest(badState, xhr, ledgerMediaProviders.YOUTUBE, Immutable.fromJS({tabId: 10}))
         assert(mediaSpy.calledOnce)
         assert(saveVisitSpy.notCalled)
       })
@@ -2282,16 +2279,6 @@ describe('ledger api unit tests', function () {
       roundtripSpy.restore()
     })
 
-    it('null case', function () {
-      ledgerApi.onReferralCodeRead()
-      assert(roundtripSpy.notCalled)
-    })
-
-    it('code is empty', function () {
-      ledgerApi.onReferralCodeRead('')
-      assert(roundtripSpy.notCalled)
-    })
-
     it('code is correct', function () {
       ledgerApi.onReferralCodeRead('aaa101')
       assert(roundtripSpy.calledOnce)
@@ -2661,6 +2648,229 @@ describe('ledger api unit tests', function () {
       })
       ledgerApi.savePublisherData('clifton.io', 'faviconURL', 'data')
       assert.deepEqual(ledgerApi.getSynopsis(), expectedSynopsis)
+    })
+  })
+
+  describe('roundTripFromWindow', function () {
+    let fetchPublisherInfoSpy
+
+    before(() => {
+      fetchPublisherInfoSpy = sinon.spy(request, 'fetchPublisherInfo')
+    })
+
+    afterEach(() => {
+      fetchPublisherInfoSpy.reset()
+    })
+
+    after(() => {
+      fetchPublisherInfoSpy.restore()
+    })
+
+    it('null case', function () {
+      ledgerApi.roundTripFromWindow()
+      assert(fetchPublisherInfoSpy.notCalled)
+    })
+
+    it('url is missing', function () {
+      ledgerApi.roundTripFromWindow({})
+      assert(fetchPublisherInfoSpy.notCalled)
+    })
+
+    it('fetch is called', function () {
+      ledgerApi.roundTripFromWindow({url: 'test.com'}, () => true)
+      assert(fetchPublisherInfoSpy.withArgs('test.com', sinon.match.any, sinon.match.any))
+    })
+  })
+
+  describe('BSCrun', function () {
+    let clientBallotsSpy
+
+    before(() => {
+      ledgerApi.setSynopsis({
+        toJSON: () => {
+          return {
+            publishers: {
+              'clifton.io': {
+                visits: 1
+              }
+            }
+          }
+        },
+        winners: () => {
+          return []
+        }
+      })
+      ledgerApi.setClient(ledgerClientObject)
+      clientBallotsSpy = sinon.spy(ledgerClientObject, 'ballots')
+    })
+
+    afterEach(() => {
+      clientBallotsSpy.reset()
+    })
+
+    after(() => {
+      clientBallotsSpy.restore()
+      ledgerApi.setSynopsis(undefined)
+    })
+
+    it('exits if state is undefined', function () {
+      ledgerApi.run(undefined, 10)
+      assert.equal(clientBallotsSpy.notCalled, true)
+    })
+
+    it('exits if delayTime is undefined', function () {
+      ledgerApi.run(defaultAppState)
+      assert.equal(clientBallotsSpy.notCalled, true)
+    })
+
+    it('gets balance count from client', function () {
+      ledgerApi.run(defaultAppState, 10)
+      assert.equal(clientBallotsSpy.calledOnce, true)
+    })
+  })
+
+  describe('checkSeed', function () {
+    let valid = false
+
+    before(() => {
+      ledgerApi.setClient({
+        isValidPassPhrase: () => valid
+      })
+    })
+
+    it('seed is null', function () {
+      const result = ledgerApi.checkSeed(defaultAppState)
+      assert.deepEqual(result.toJS(), defaultAppState.toJS())
+    })
+
+    it('seed is valid', function () {
+      valid = true
+      const state = defaultAppState
+        .setIn(['ledger', 'info', 'passphrase'], 'auten nobbling uncharitable decimation sayee unartful biter floodlight scholar cherubical fadable reconnoiter courtesan concussing asymmetrical test')
+      const result = ledgerApi.checkSeed(state)
+      assert.deepEqual(result.toJS(), state.toJS())
+      valid = false
+    })
+
+    it('seed is invalid', function () {
+      const state = defaultAppState
+        .setIn(['ledger', 'info', 'passphrase'], 'a')
+      const exptedState = state
+        .setIn(['ledger', 'about', 'status'], 'corruptedSeed')
+      const result = ledgerApi.checkSeed(state)
+      assert.deepEqual(result.toJS(), exptedState.toJS())
+    })
+  })
+
+  describe('onReferralRead', function () {
+    let setUpdatePropSpy
+
+    before(function () {
+      setUpdatePropSpy = sinon.spy(updateState, 'setUpdateProp')
+    })
+
+    afterEach(function () {
+      setUpdatePropSpy.reset()
+    })
+
+    after(function () {
+      setUpdatePropSpy.restore()
+    })
+
+    it('body data is not immutable', function () {
+      ledgerApi.onReferralRead(defaultAppState, {
+        download_id: 1,
+        referral_code: 'code'
+      })
+      assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralDownloadId', 1).calledOnce)
+      assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPromoCode', 'code').calledOnce)
+    })
+
+    it('download id and referral code is saved', function () {
+      ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({
+        download_id: 1,
+        referral_code: 'code'
+      }))
+      assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralDownloadId', 1).calledOnce)
+      assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPromoCode', 'code').calledOnce)
+    })
+
+    describe('headers', function () {
+      const headers = Immutable.fromJS({
+        domains: [ 'test.com', 'domain.si' ],
+        headers: { 'X-Brave-Partner': 'partner' },
+        cookieNames: [],
+        expiration: 0
+      })
+
+      it('headers are missing', function () {
+        ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({}))
+        assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralHeaders', sinon.match.any).notCalled)
+      })
+
+      it('headers are saved', function () {
+        ledgerApi.onReferralRead(defaultAppState, headers)
+        assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralHeaders', headers.get('headers')).calledOnce)
+      })
+    })
+
+    describe('landing page', function () {
+      let createTabRequestedSpy
+      const url = 'https://clifton.io'
+
+      before(function () {
+        createTabRequestedSpy = sinon.spy(appActions, 'createTabRequested')
+      })
+
+      afterEach(function () {
+        createTabRequestedSpy.reset()
+      })
+
+      after(function () {
+        createTabRequestedSpy.restore()
+      })
+
+      it('page is missing', function () {
+        ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({
+          download_id: 1,
+          referral_code: 'code'
+        }))
+        assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPage', sinon.match.any).notCalled)
+        assert(createTabRequestedSpy.notCalled)
+      })
+
+      it('page is not an url', function () {
+        ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({
+          download_id: 1,
+          referral_code: 'code',
+          offer_page_url: 'adasdsadsad'
+        }))
+        assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPage', sinon.match.any).notCalled)
+        assert(createTabRequestedSpy.notCalled)
+      })
+
+      it('window is not initialized yet', function () {
+        ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({
+          download_id: 1,
+          referral_code: 'code',
+          offer_page_url: url
+        }), -1)
+        assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPage', url).calledOnce)
+        assert(createTabRequestedSpy.notCalled)
+      })
+
+      it('window is ready', function () {
+        ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({
+          download_id: 1,
+          referral_code: 'code',
+          offer_page_url: url
+        }), 1)
+        assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPage', null).calledOnce)
+        assert(createTabRequestedSpy.withArgs({
+          url,
+          windowId: 1
+        }).calledOnce)
+      })
     })
   })
 })

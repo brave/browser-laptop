@@ -213,6 +213,10 @@ class UrlBar extends React.Component {
     }
   }
 
+  onUrlBarIconContainerClick () {
+    windowActions.setSiteInfoVisible(true)
+  }
+
   onBlur (e) {
     windowActions.urlBarOnBlur(getCurrentWindowId(), e.target.value, this.props.urlbarLocation, eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm']))
   }
@@ -497,13 +501,13 @@ class UrlBar extends React.Component {
 
   render () {
     const urlbarIconContainer = this.props.evCert
-    ? (<div className='urlbarIconContainer'>
+    ? (<div onClick={this.onUrlBarIconContainerClick} className='urlbarIconContainer'>
       <UrlBarIcon
         titleMode={this.props.titleMode}
       />
       {this.showEvCert}
     </div>)
-    : (<div className='urlbarIconContainer'>
+    : (<div onClick={this.onUrlBarIconContainerClick} className='urlbarIconContainer'>
       <UrlBarIcon
         titleMode={this.props.titleMode}
       />

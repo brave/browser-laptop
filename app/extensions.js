@@ -4,7 +4,7 @@ const extensionActions = require('./common/actions/extensionActions')
 const config = require('../js/constants/config')
 const appConfig = require('../js/constants/appConfig')
 const {fileUrl} = require('../js/lib/appUrlUtil')
-const {getExtensionsPath, getBraveExtUrl, getBraveExtIndexHTML} = require('../js/lib/appUrlUtil')
+const {getComponentExtensionsPath, getExtensionsPath, getBraveExtUrl, getBraveExtIndexHTML} = require('../js/lib/appUrlUtil')
 const {getSetting} = require('../js/settings')
 const settings = require('../js/constants/settings')
 const extensionStates = require('../js/constants/extensionStates')
@@ -38,10 +38,18 @@ let generateBraveManifest = () => {
     manifest_version: 2,
     version: '1.0',
     background: {
-      scripts: [ 'content/scripts/idleHandler.js' ],
+      scripts: [ 'content/scripts/metaScraper.js', 'content/scripts/requestHandler.js', 'content/scripts/idleHandler.js' ],
       persistent: true
     },
     content_scripts: [
+      {
+        run_at: 'document_start',
+        all_frames: true,
+        matches: ['https://www.marketwatch.com/*'],
+        css: [
+          'content/styles/siteHack-marketwatch.com.css'
+        ]
+      },
       {
         run_at: 'document_start',
         all_frames: true,
@@ -198,6 +206,7 @@ let generateBraveManifest = () => {
     'style-src': '\'self\' \'unsafe-inline\'',
     'font-src': '\'self\' data:',
     'img-src': '* data: file://*',
+    'connect-src': '\'self\' https://www.youtube.com',
     'frame-src': '\'self\' https://brave.com'
   }
 
@@ -205,9 +214,11 @@ let generateBraveManifest = () => {
     // allow access to webpack dev server resources
     let devServer = 'localhost:' + process.env.npm_package_config_port
     cspDirectives['default-src'] = '\'self\' http://' + devServer
-    cspDirectives['connect-src'] = ['\'self\'',
+    cspDirectives['connect-src'] = [
+      cspDirectives['connect-src'],
       'http://' + devServer,
-      'ws://' + devServer].join(' ')
+      'ws://' + devServer
+    ].join(' ')
     cspDirectives['style-src'] = '\'self\' \'unsafe-inline\' http://' + devServer
     cspDirectives['font-src'] += ` http://${devServer}`
   }
@@ -465,7 +476,7 @@ module.exports.init = () => {
       manifest = {
         name: 'PDF Viewer',
         manifest_version: 2,
-        version: '1.9.457',
+        version: '1.9.459',
         description: 'Uses HTML5 to display PDF files directly in the browser.',
         icons: {
           '128': 'icon128.png',
@@ -524,7 +535,7 @@ module.exports.init = () => {
   loadExtension(config.braveExtensionId, getExtensionsPath('brave'), generateBraveManifest(), 'component')
   // Cryptotoken extension is loaded from electron_resources.pak
   extensionInfo.setState(config.cryptoTokenExtensionId, extensionStates.REGISTERED)
-  loadExtension(config.cryptoTokenExtensionId, path.join(process.resourcesPath, 'cryptotoken'), {}, 'component')
+  loadExtension(config.cryptoTokenExtensionId, getComponentExtensionsPath('cryptotoken'), {}, 'component')
   extensionInfo.setState(config.syncExtensionId, extensionStates.REGISTERED)
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
