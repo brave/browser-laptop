@@ -3,22 +3,28 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const getBaseDomain = require('../../js/lib/baseDomain').getBaseDomain
+const ip = require('ip')
 
 /**
- * baseContextHost {string} - The base host to check against
- * testHost {string} - The host to check
+ * Checks if two hosts are third party. Subdomains count as first-party to the
+ * parent domain. Uses hostname (no port).
+ * @param {host1} string - First hostname to compare
+ * @param {host2} string - Second hostname to compare
  */
-const isThirdPartyHost = (baseContextHost, testHost) => {
-  // TODO: Always return true if these are IP addresses that aren't the same
-  if (!testHost || !baseContextHost) {
+const isThirdPartyHost = (host1, host2) => {
+  if (!host1 || !host2) {
     return true
   }
-  const documentDomain = getBaseDomain(baseContextHost)
-  if (testHost.length > documentDomain.length) {
-    return (testHost.substr(testHost.length - documentDomain.length - 1) !== '.' + documentDomain)
-  } else {
-    return (testHost !== documentDomain)
+  if (host1 === host2) {
+    return false
   }
+
+  if (ip.isV4Format(host1) || ip.isV4Format(host2)) {
+    // '127.0.0.1' and '::7f00:1' are actually equal, but ignore such cases for now
+    return host1 !== host2
+  }
+
+  return getBaseDomain(host1) !== getBaseDomain(host2)
 }
 
 module.exports = isThirdPartyHost

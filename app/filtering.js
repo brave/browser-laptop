@@ -245,12 +245,13 @@ function registerForBeforeRedirect (session, partition) {
 module.exports.applyCookieSetting = (requestHeaders, url, firstPartyUrl, isPrivate) => {
   const cookieSetting = module.exports.isResourceEnabled(appConfig.resourceNames.COOKIEBLOCK, firstPartyUrl, isPrivate)
   if (cookieSetting) {
-    const parsedTargetUrl = urlParse(url || '')
-    const parsedFirstPartyUrl = urlParse(firstPartyUrl)
+    const targetHostname = urlParse(url || '').hostname
+    const firstPartyHostname = urlParse(firstPartyUrl).hostname
     const targetOrigin = getOrigin(url)
+    const referer = requestHeaders['Referer']
 
     if (cookieSetting === 'blockAllCookies' ||
-      isThirdPartyHost(parsedFirstPartyUrl.hostname, parsedTargetUrl.hostname)) {
+      isThirdPartyHost(firstPartyHostname, targetHostname)) {
       let hasCookieException = false
       const firstPartyOrigin = getOrigin(firstPartyUrl)
       if (cookieExceptions.hasOwnProperty(firstPartyOrigin)) {
@@ -268,20 +269,19 @@ module.exports.applyCookieSetting = (requestHeaders, url, firstPartyUrl, isPriva
           }
         }
       }
-      // Clear cookie and referer on third-party requests
+
+      // Clear cookie on third-party requests
       if (requestHeaders['Cookie'] &&
           firstPartyOrigin !== pdfjsOrigin && !hasCookieException) {
         requestHeaders['Cookie'] = undefined
       }
     }
 
-    const referer = requestHeaders['Referer']
     if (referer &&
         cookieSetting !== 'allowAllCookies' &&
-        !refererExceptions.includes(parsedTargetUrl.hostname) &&
-        targetOrigin !== getOrigin(referer)) {
-      // Unless the setting is 'allow all cookies', spoof the referer if it
-      // is a cross-origin referer
+        !refererExceptions.includes(targetHostname) &&
+        isThirdPartyHost(targetHostname, urlParse(referer).hostname)) {
+      // Spoof third party referer
       requestHeaders['Referer'] = targetOrigin
     }
   }

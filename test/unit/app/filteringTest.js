@@ -92,15 +92,44 @@ describe('filtering unit tests', function () {
         isResourceEnabledStub.restore()
       })
 
-      it('sets the referer to the origin', function () {
-        const url = 'https://cdnp3.stackassets.com/574db2390a12942fcef927356dadc6f9955edea9/store/fe3eb8fc014a20f2d25810b3c4f4b5b0db8695adfd7e8953721a55c51b90/sale_7217_primary_image.jpg'
-        const firstPartyUrl = 'https://slashdot.org/'
-        const requestHeaders = {
-          Referer: 'https://brave.com'
-        }
-        const result = filtering.applyCookieSetting(requestHeaders, url, firstPartyUrl, false)
+      describe('stubs referer for third-party referer', function () {
+        const firstPartyUrl = 'https://brave.com'
+        it('when the hosts are completely different', function () {
+          const url = 'https://cdnp3.stackassets.com/574db2390a12942fcef927356dadc6f9955edea9/store/fe3eb8fc014a20f2d25810b3c4f4b5b0db8695adfd7e8953721a55c51b90/sale_7217_primary_image.jpg'
+          const requestHeaders = {
+            Referer: 'https://brave.com'
+          }
+          const result = filtering.applyCookieSetting(requestHeaders, url, firstPartyUrl, false)
+          assert.equal(result.Referer, 'https://cdnp3.stackassets.com')
+        })
+        it('when the hosts have different base domains according to the PSL', function () {
+          const url = 'https://diracdeltas.github.io/foo?abc#test'
+          const requestHeaders = {
+            Referer: 'https://github.io'
+          }
+          const result = filtering.applyCookieSetting(requestHeaders, url, firstPartyUrl, false)
+          assert.equal(result.Referer, 'https://diracdeltas.github.io')
+        })
+      })
 
-        assert.equal(result.Referer, 'https://cdnp3.stackassets.com')
+      describe('does not change referer for first-party referer', function () {
+        const firstPartyUrl = 'https://brave.com'
+        it('keeps referer when hosts are the same', function () {
+          const url = 'https://test.github.io/test'
+          const requestHeaders = {
+            Referer: 'https://test.github.io/foo'
+          }
+          const result = filtering.applyCookieSetting(requestHeaders, url, firstPartyUrl, false)
+          assert.equal(result.Referer, 'https://test.github.io/foo')
+        })
+        it('keeps referer when hosts share a baseDomain', function () {
+          const url = 'https://docs.google.com'
+          const requestHeaders = {
+            Referer: 'https://2.drive.google.com/mydocument#abc'
+          }
+          const result = filtering.applyCookieSetting(requestHeaders, url, firstPartyUrl, false)
+          assert.equal(result.Referer, 'https://2.drive.google.com/mydocument#abc')
+        })
       })
 
       describe('when there is a referer exception', function () {
