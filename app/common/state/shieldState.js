@@ -23,7 +23,7 @@ function braveShieldsEnabled (frame) {
   return !(parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:')
 }
 
-function braveShieldsUp (state, frame) {
+function areBraveShieldsUp (state, frame) {
   const lastCommittedURL = frameStateUtil.getLastCommittedURL(frame)
   const allSiteSettings = siteSettingsState.getAllSiteSettings(state, frame.get('isPrivate'))
   const activeSiteSettings = siteSettings.getSiteSettingsForURL(allSiteSettings, lastCommittedURL)
@@ -33,5 +33,5 @@ function braveShieldsUp (state, frame) {
 
 module.exports = {
   braveShieldsEnabled,
-  braveShieldsUp
+  areBraveShieldsUp
 }

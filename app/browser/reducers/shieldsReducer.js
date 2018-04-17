@@ -25,11 +25,16 @@ const shieldsReducer = (state, action, immutableAction) => {
         const frame = action.get('frame')
         const value = action.get('value')
 
-        if (!frame) {
+        if (frame == null) {
           break
         }
 
         const lastCommittedURL = frameStateUtil.getLastCommittedURL(frame)
+
+        if (lastCommittedURL == null) {
+          break
+        }
+
         const parsedUrl = urlParse(lastCommittedURL)
         const ruleKey = (parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:')
         ? `https?://${parsedUrl.host}` : urlUtil.getOrigin(lastCommittedURL)

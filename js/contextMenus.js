@@ -38,7 +38,7 @@ const platformUtil = require('../app/common/lib/platformUtil')
 const bookmarkFoldersUtil = require('../app/common/lib/bookmarkFoldersUtil')
 const historyUtil = require('../app/common/lib/historyUtil')
 const {makeImmutable} = require('../app/common/state/immutableUtil')
-const {braveShieldsUp} = require('../app/common/state/shieldState')
+const {areBraveShieldsUp} = require('../app/common/state/shieldState')
 
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
@@ -1134,7 +1134,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
       }
     })
     if (activeFrame) {
-      const shieldsUp = braveShieldsUp(appStoreRenderer.state, activeFrame)
+      const shieldsUp = areBraveShieldsUp(appStoreRenderer.state, activeFrame)
       template.push(
         CommonMenu.separatorMenuItem,
         {
