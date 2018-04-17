@@ -83,6 +83,12 @@ describe('urlutil', function () {
         assert.equal(urlUtil.isNotURL('\n\nhttp://brave.com\n\n'), false)
         assert.equal(urlUtil.isNotURL('\t\thttp://brave.com\t\t'), false)
       })
+      it('contains inner spaces', function() {
+        assert.equal(urlUtil.isNotURL(' https://www.google.ca/search?q=dog cat '), false)
+      })
+      it('contains inner and outer spaces', function() {
+        assert.equal(urlUtil.isNotURL('https://www.google.ca/search?q=dog cat'), false)
+      })
       it('is a URL which contains basic auth user/pass', function () {
         assert.equal(urlUtil.isNotURL('http://username:password@example.com'), false)
       })
