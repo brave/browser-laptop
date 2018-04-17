@@ -14,6 +14,23 @@ const cleanupCallback = (tabId) => {
   return false
 }
 
+const onWindowPrompt = show => (webContents, extraData, title, message, defaultPromptText,
+                               shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, muonCb) => {
+  const tabId = webContents.getId()
+  const detail = {
+    message,
+    title,
+    buttons: [locale.translation('messageBoxOk'), locale.translation('messageBoxCancel')],
+    cancelId: 1,
+    suppress: false,
+    allowInput: true,
+    defaultPromptText,
+    showSuppress: shouldDisplaySuppressCheckbox
+  }
+
+  show(tabId, detail, muonCb)
+}
+
 const tabMessageBox = {
   init: (state, action) => {
     process.on('window-alert', (webContents, extraData, title, message, defaultPromptText,
@@ -45,22 +62,7 @@ const tabMessageBox = {
       tabMessageBox.show(tabId, detail, muonCb)
     })
 
-    process.on('window-prompt', (webContents, extraData, title, message, defaultPromptText,
-         shouldDisplaySuppressCheckbox, isBeforeUnloadDialog, isReload, muonCb) => {
-      const tabId = webContents.getId()
-      const detail = {
-        message,
-        title,
-        buttons: [locale.translation('messageBoxOk'), locale.translation('messageBoxCancel')],
-        cancelId: 1,
-        suppress: false,
-        allowInput: true,
-        defaultPromptText,
-        showSuppress: shouldDisplaySuppressCheckbox
-      }
-
-      tabMessageBox.show(tabId, detail, muonCb)
-    })
+    process.on('window-prompt', onWindowPrompt(tabMessageBox.show))
 
     return state
   },
@@ -145,3 +147,4 @@ const tabMessageBox = {
 }
 
 module.exports = tabMessageBox
+module.exports.onWindowPrompt = onWindowPrompt
