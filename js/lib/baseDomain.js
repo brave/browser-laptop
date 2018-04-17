@@ -25,7 +25,10 @@ const checkASCII = function (str) {
  * Returns base domain for specified host based on Public Suffix List.
  * Derived from Privacy Badger Chrome <https://github.com/EFForg/privacybadger>,
  * Copyright (C) 2015 Electronic Frontier Foundation and other contributors
- * @param {string} hostname The name of the host to get the base domain for
+ * TODO: Consider refactoring this into isThirdPartyHost since it's only used
+ *   for that.
+ * @param {string} hostname The name of the host to get the base domain for.
+ *   The caller must validate that this is a valid, non-IP hostname string!!
  */
 
 module.exports.getBaseDomain = function (hostname) {
@@ -42,6 +45,11 @@ module.exports.getBaseDomain = function (hostname) {
   let baseDomain = cachedBaseDomain.get(hostname)
   if (baseDomain) {
     return baseDomain
+  }
+
+  // If the hostname is a TLD, return '' for the base domain
+  if (hostname in publicSuffixes) {
+    return ''
   }
 
   // search through PSL
