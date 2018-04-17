@@ -10,7 +10,7 @@ const appActions = require('../../../../../js/actions/appActions')
 const appConstants = require('../../../../../js/constants/appConstants')
 require('../../../braveUnit')
 
-describe('APP_TOGGLE_SHIELDS', function () {
+describe('shieldsReducer unit tests', function () {
   let loadURLRequestedSpy
   let changeSiteSettingSpy
   let shieldsReducer
@@ -31,59 +31,76 @@ describe('APP_TOGGLE_SHIELDS', function () {
     changeSiteSettingSpy.restore()
   })
 
-  it('succeeds with valid action parameters', function () {
-    const initAction = {
-      frame: {
-        tabId: 123,
-        isPrivate: true,
-        location: 'https://www.brave.com'
-      },
-      value: true,
-      actionType: appConstants.APP_TOGGLE_SHIELDS
-    }
-    shieldsReducer(Immutable.Map(), initAction)
-    assert.equal(loadURLRequestedSpy.called, true)
-    assert.equal(changeSiteSettingSpy.called, true)
-  })
+  describe('APP_TOGGLE_SHIELDS', function () {
+    it('succeeds with valid action parameters', function () {
+      const initAction = {
+        frame: {
+          tabId: 123,
+          isPrivate: true,
+          location: 'https://www.brave.com'
+        },
+        value: true,
+        actionType: appConstants.APP_TOGGLE_SHIELDS
+      }
+      shieldsReducer(Immutable.Map(), initAction)
+      assert.equal(loadURLRequestedSpy.called, true)
+      assert.equal(changeSiteSettingSpy.called, true)
+    })
 
-  it('toggles the current shield status', function () {
-    const initAction = {
-      frame: {
-        tabId: 123,
-        isPrivate: true,
-        location: 'https://www.brave.com'
-      },
-      value: true,
-      actionType: appConstants.APP_TOGGLE_SHIELDS
-    }
-    shieldsReducer(Immutable.Map(), initAction)
-    assert.equal(loadURLRequestedSpy.called, true)
-    assert.equal(changeSiteSettingSpy.called, true)
-  })
+    it('toggles the current shield status', function () {
+      const initAction = {
+        frame: {
+          tabId: 123,
+          isPrivate: true,
+          location: 'https://www.brave.com'
+        },
+        value: true,
+        actionType: appConstants.APP_TOGGLE_SHIELDS
+      }
+      shieldsReducer(Immutable.Map(), initAction)
+      assert.equal(loadURLRequestedSpy.called, true)
+      assert.equal(changeSiteSettingSpy.called, true)
+    })
 
-  it('takes no action with a null frame', function () {
-    const initAction = {
-      frame: null,
-      value: false,
-      actionType: appConstants.APP_TOGGLE_SHIELDS
-    }
-    shieldsReducer(Immutable.Map(), initAction)
-    assert.equal(loadURLRequestedSpy.called, false)
-    assert.equal(changeSiteSettingSpy.called, false)
-  })
+    it('takes no action with a null frame', function () {
+      const initAction = {
+        frame: null,
+        value: false,
+        actionType: appConstants.APP_TOGGLE_SHIELDS
+      }
+      shieldsReducer(Immutable.Map(), initAction)
+      assert.equal(loadURLRequestedSpy.called, false)
+      assert.equal(changeSiteSettingSpy.called, false)
+    })
 
-  it('takes no action with a null location', function () {
-    const initAction = {
-      frame: {
-        tabId: 123,
-        isPrivate: true,
-        location: null
-      },
-      value: true,
-      actionType: appConstants.APP_TOGGLE_SHIELDS
-    }
-    shieldsReducer(Immutable.Map(), initAction)
-    assert.equal(loadURLRequestedSpy.called, false)
-    assert.equal(changeSiteSettingSpy.called, false)
+    it('takes no action with a null location', function () {
+      const initAction = {
+        frame: {
+          tabId: 123,
+          isPrivate: true,
+          location: null
+        },
+        value: true,
+        actionType: appConstants.APP_TOGGLE_SHIELDS
+      }
+      shieldsReducer(Immutable.Map(), initAction)
+      assert.equal(loadURLRequestedSpy.called, false)
+      assert.equal(changeSiteSettingSpy.called, false)
+    })
+
+    it('takes no action with a empty location', function () {
+      const initAction = {
+        frame: {
+          tabId: 123,
+          isPrivate: true,
+          location: ''
+        },
+        value: true,
+        actionType: appConstants.APP_TOGGLE_SHIELDS
+      }
+      shieldsReducer(Immutable.Map(), initAction)
+      assert.equal(loadURLRequestedSpy.called, false)
+      assert.equal(changeSiteSettingSpy.called, false)
+    })
   })
 })

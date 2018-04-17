@@ -31,7 +31,7 @@ const shieldsReducer = (state, action, immutableAction) => {
 
         const lastCommittedURL = frameStateUtil.getLastCommittedURL(frame)
 
-        if (lastCommittedURL == null) {
+        if (lastCommittedURL == null || lastCommittedURL === '') {
           break
         }
 
