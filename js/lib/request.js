@@ -49,6 +49,10 @@ module.exports.request = (options, callback) => {
     })
   }
 
+  if (typeof options.url !== 'string') {
+    return callback(new Error('URL is not valid'))
+  }
+
   if (process.env.NODE_ENV === 'development' &&
       urlParse(options.url).protocol === 'http:') {
     console.log('WARNING: requesting non-HTTPS URL', options.url)
