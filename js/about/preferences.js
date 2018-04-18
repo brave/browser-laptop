@@ -465,8 +465,6 @@ class AboutPreferences extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      bitcoinOverlayVisible: false,
-      qrcodeOverlayVisible: false,
       paymentHistoryOverlayVisible: false,
       deletedSitesOverlayVisible: false,
       advancedSettingsOverlayVisible: false,
@@ -488,9 +486,7 @@ class AboutPreferences extends React.Component {
       siteSettings: Immutable.Map(),
       braveryDefaults: Immutable.Map(),
       ledgerData: Immutable.Map(),
-      syncData: Immutable.Map(),
-      firstRecoveryKey: '',
-      secondRecoveryKey: ''
+      syncData: Immutable.Map()
     }
 
     // Similar to tabFromCurrentHash, this allows to set
@@ -647,11 +643,6 @@ class AboutPreferences extends React.Component {
   setOverlayVisible (isVisible, overlayName) {
     let stateDiff = {}
     stateDiff[`${overlayName}OverlayVisible`] = isVisible
-    if (overlayName === 'addFunds' && isVisible === false) {
-      // Hide the child overlays when the parent is closed
-      stateDiff['bitcoinOverlayVisible'] = false
-      stateDiff['qrcodeOverlayVisible'] = false
-    }
     this.setState(stateDiff)
     // Tell ledger when Add Funds overlay is closed
     if (isVisible === false && overlayName === 'addFunds') {
@@ -731,10 +722,6 @@ class AboutPreferences extends React.Component {
         tab = <PaymentsTab settings={settings} siteSettings={siteSettings}
           braveryDefaults={braveryDefaults} ledgerData={ledgerData}
           onChangeSetting={this.onChangeSetting}
-          firstRecoveryKey={this.state.firstRecoveryKey}
-          secondRecoveryKey={this.state.secondRecoveryKey}
-          bitcoinOverlayVisible={this.state.bitcoinOverlayVisible}
-          qrcodeOverlayVisible={this.state.qrcodeOverlayVisible}
           paymentHistoryOverlayVisible={this.state.paymentHistoryOverlayVisible}
           deletedSitesOverlayVisible={this.state.deletedSitesOverlayVisible}
           advancedSettingsOverlayVisible={this.state.advancedSettingsOverlayVisible}
