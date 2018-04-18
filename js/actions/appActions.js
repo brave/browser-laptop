@@ -1940,6 +1940,14 @@ const appActions = {
     })
   },
 
+  onLedgerPinPublisher: function (publisherKey, value) {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_PIN_PUBLISHER,
+      publisherKey,
+      value
+    })
+  },
+
   onLedgerMediaPublisher: function (mediaKey, response, duration, revisited) {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER,

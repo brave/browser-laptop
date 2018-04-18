@@ -48,8 +48,7 @@ module.exports.siteSettingDefaults = {
   httpsEverywhere: true,
   fingerprintingProtection: false, // boolean for backwards compatibility
   ledgerPayments: true,
-  ledgerPaymentsShown: true,
-  ledgerPinPercentage: 0
+  ledgerPaymentsShown: true
 }
 
 // Whitelist of valid browser-laptop site fields. In browser-laptop, site
