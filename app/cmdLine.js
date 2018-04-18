@@ -175,6 +175,6 @@ const api = module.exports = {
 
   shouldDebugTabEvents: process.argv.includes(debugTabEventsFlagName),
   shouldDebugWindowEvents: process.argv.includes(debugWindowEventsFlagName),
-  disableBufferWindow: process.argv.includes(disableBufferWindowFlagName),
+  disableBufferWindow: process.env.NODE_ENV === 'test' || process.argv.includes(disableBufferWindowFlagName),
   disableDeferredWindowLoad: process.argv.includes(disableDeferredWindowLoadFlagName)
 }
