@@ -97,10 +97,8 @@ class LedgerRecoveryContent extends ImmutableComponent {
           : null
       }
       <h4 className={css(styles.recoveryContent__h4)} data-l10n-id='ledgerRecoverySubtitle' />
-      <div className={css(styles.ledgerRecoveryContent)} data-l10n-id='ledgerRecoveryContent' />
       <SettingsList className={css(commonStyles.noMarginBottom)}>
         <SettingItem>
-          <h3 data-l10n-id='recoveryKey' />
           <textarea className={css(
             commonStyles.formControl,
             commonStyles.textArea,
@@ -112,6 +110,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
           />
         </SettingItem>
       </SettingsList>
+      <div className={css(styles.ledgerRecoveryContent)} data-l10n-id='ledgerRecoveryContent' />
     </section>
   }
 }
@@ -131,29 +130,34 @@ class LedgerRecoveryFooter extends ImmutableComponent {
   }
 
   render () {
-    return <div>
-      <BrowserButton groupedItem primaryColor
-        l10nId='recover'
-        testId='recoverButton'
-        onClick={this.recoverWallet}
-      />
-      <BrowserButton groupedItem primaryColor
-        l10nId='recoverFromFile'
-        testId='recoverFromFileButton'
-        onClick={this.recoverWalletFromFile}
-      />
-      <BrowserButton groupedItem secondaryColor
-        l10nId='cancel'
-        testId='cancelButton'
-        onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')}
-      />
+    return <div className={css(styles.footer__wrapper)}>
+      <div className={css(styles.footer__wrapper__left)}>
+        <BrowserButton groupedItem secondaryColor
+          l10nId='recoverFromFile'
+          testId='recoverFromFileButton'
+          onClick={this.recoverWalletFromFile}
+        />
+      </div>
+      <div>
+        <BrowserButton groupedItem secondaryColor
+          l10nId='cancel'
+          testId='cancelButton'
+          onClick={this.props.hideOverlay.bind(this, 'ledgerRecovery')}
+        />
+        <BrowserButton groupedItem primaryColor
+          l10nId='recover'
+          testId='recoverButton'
+          onClick={this.recoverWallet}
+        />
+      </div>
     </div>
   }
 }
 
 const styles = StyleSheet.create({
   recoveryContent__h4: {
-    marginBottom: globalStyles.spacing.dialogInsideMargin
+    margin: '15px 0',
+    fontSize: '17px'
   },
   recoveryContent__h3: {
     marginBottom: globalStyles.spacing.modalPanelHeaderMarginBottom
@@ -162,7 +166,9 @@ const styles = StyleSheet.create({
     height: '65px'
   },
   ledgerRecoveryContent: {
-    marginBottom: globalStyles.spacing.dialogInsideMargin
+    marginBottom: globalStyles.spacing.dialogInsideMargin,
+    fontSize: '13px',
+    marginTop: '15px'
   },
 
   recoveryOverlay: {
@@ -184,6 +190,15 @@ const styles = StyleSheet.create({
   },
   recoveryOverlay__spaceAround: {
     margin: '50px auto'
+  },
+
+  footer__wrapper: {
+    flex: 1,
+    display: 'flex'
+  },
+
+  footer__wrapper__left: {
+    flex: 1
   }
 })
 

@@ -253,7 +253,8 @@ class PaymentsTab extends ImmutableComponent {
       }
       {
         this.enabled && this.props.ledgerRecoveryOverlayVisible
-        ? <ModalOverlay title={'ledgerRecoveryTitle'}
+        ? <ModalOverlay
+          title={'ledgerRecoveryTitle'}
           content={<LedgerRecoveryContent
             ledgerData={this.props.ledgerData}
             hideAdvancedOverlays={this.props.hideAdvancedOverlays.bind(this)}
@@ -264,6 +265,7 @@ class PaymentsTab extends ImmutableComponent {
             hideOverlay={this.props.hideOverlay}
           />}
           onHide={this.props.hideOverlay.bind(this, 'ledgerRecovery')}
+          customDialogFooterClasses={css(styles.recoveryFooter)}
         />
         : null
       }
@@ -528,6 +530,10 @@ const styles = StyleSheet.create({
     maxHeight: '500px',
     borderRadius: 0,
     overflowY: 'scroll'
+  },
+
+  recoveryFooter: {
+    justifyContent: 'normal'
   }
 })
 
