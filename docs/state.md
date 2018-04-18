@@ -521,7 +521,6 @@ AppStore
       httpsEverywhere: boolean,
       ledgerPayments: boolean, // false if site should not be paid by the ledger. Defaults to true.
       ledgerPaymentsShown: boolean, // false if site should not be paid by the ledger and should not be shown in the UI. Defaults to true.
-      ledgerPinPercentage: number, // 0 if not pinned, otherwise is pinned with defined percentage
       mediaPermission: boolean,
       midiSysexPermission: boolean,
       notificationsPermission: boolean,

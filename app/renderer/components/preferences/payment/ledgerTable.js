@@ -5,28 +5,33 @@
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite')
 
-// components
+// Components
 const ImmutableComponent = require('../../immutableComponent')
 const SortableTable = require('../../common/sortableTable')
 const SwitchControl = require('../../common/switchControl')
 const BrowserButton = require('../../common/browserButton')
 const PinnedInput = require('./pinnedInput')
+const {SettingCheckbox, SiteSettingCheckbox} = require('../../common/settings')
 
-// style
+// Actions
+const appActions = require('../../../../../js/actions/appActions')
+const aboutActions = require('../../../../../js/about/aboutActions')
+
+// Constants
+const settings = require('../../../../../js/constants/settings')
+
+// Utils
+const getSetting = require('../../../../../js/settings').getSetting
+const urlUtil = require('../../../../../js/lib/urlutil')
+const ledgerUtil = require('../../../../common/lib/ledgerUtil')
+
+// Style
 const globalStyles = require('../../styles/global')
 const {paymentStylesVariables} = require('../../styles/payment')
 const verifiedGreenIcon = require('../../../../extensions/brave/img/ledger/verified_green_icon.svg')
 const verifiedWhiteIcon = require('../../../../extensions/brave/img/ledger/verified_white_icon.svg')
 const removeIcon = require('../../../../extensions/brave/img/ledger/icon_remove.svg')
 const pinIcon = require('../../../../extensions/brave/img/ledger/icon_pin.svg')
-
-// other
-const settings = require('../../../../../js/constants/settings')
-const getSetting = require('../../../../../js/settings').getSetting
-const aboutActions = require('../../../../../js/about/aboutActions')
-const urlUtil = require('../../../../../js/lib/urlutil')
-const {SettingCheckbox, SiteSettingCheckbox} = require('../../common/settings')
-const ledgerUtil = require('../../../../common/lib/ledgerUtil')
 
 class LedgerTable extends ImmutableComponent {
   get synopsis () {
@@ -39,7 +44,7 @@ class LedgerTable extends ImmutableComponent {
 
   onFaviconError (faviconURL, publisherKey) {
     console.log('missing or corrupted favicon file', faviconURL)
-    // Set the publishers favicon to null so that it gets refetched
+    // Set the publishers favicon to null so that it gets re-fetched
     aboutActions.setLedgerFavicon(publisherKey, null)
   }
 
@@ -105,7 +110,7 @@ class LedgerTable extends ImmutableComponent {
     aboutActions.changeSiteSetting(hostPattern, 'siteName', siteName)
   }
 
-  togglePinSite (hostPattern, pinned, percentage) {
+  togglePinSite (hostPattern, publisherKey, pinned, percentage) {
     if (pinned) {
       if (percentage < 1) {
         percentage = 1
@@ -113,10 +118,10 @@ class LedgerTable extends ImmutableComponent {
         percentage = Math.floor(percentage)
       }
 
-      aboutActions.changeSiteSetting(hostPattern, 'ledgerPinPercentage', percentage)
+      appActions.onLedgerPinPublisher(publisherKey, percentage)
       aboutActions.changeSiteSetting(hostPattern, 'ledgerPayments', true)
     } else {
-      aboutActions.changeSiteSetting(hostPattern, 'ledgerPinPercentage', 0)
+      appActions.onLedgerPinPublisher(publisherKey, 0)
     }
   }
 
@@ -232,7 +237,7 @@ class LedgerTable extends ImmutableComponent {
             pinned
             ? <PinnedInput
               defaultValue={percentage}
-              patern={this.getHostPattern(synopsis)}
+              publisherKey={publisherKey}
             />
             : percentage
           }
@@ -242,7 +247,7 @@ class LedgerTable extends ImmutableComponent {
       {
         html: <span>
           <span className={css(styles.mainIcon, styles.pinIcon, pinned && styles.pinnedIcon)}
-            onClick={this.togglePinSite.bind(this, this.getHostPattern(synopsis), !pinned, percentage)}
+            onClick={this.togglePinSite.bind(this, this.getHostPattern(synopsis), publisherKey, !pinned, percentage)}
             data-test-pinned={pinned}
           />
           <span className={css(styles.mainIcon, styles.removeIcon)}

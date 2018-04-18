@@ -515,9 +515,6 @@ const synopsisNormalizer = (state, changedPublisher, returnState = true, prune =
       publisher.weight = 0
       return publisher
     })
-
-    // sync app store
-    state = ledgerState.changePinnedValues(state, dataPinned)
   } else if (dataUnPinned.length === 0 && pinnedTotal < 100) {
     // when you don't have any unpinned sites and pinned total is less then 100 %
     let changedObject = dataPinned.find(publisher => publisher.publisherKey === changedPublisher)
@@ -532,9 +529,6 @@ const synopsisNormalizer = (state, changedPublisher, returnState = true, prune =
       dataPinned = module.exports.normalizePinned(dataPinned, pinnedTotal, 100, false)
       dataPinned = module.exports.roundToTarget(dataPinned, 100, 'pinPercentage')
     }
-
-    // sync app store
-    state = ledgerState.changePinnedValues(state, dataPinned)
   } else {
     // unpinned publishers
     dataUnPinned = dataUnPinned.map((result) => {
