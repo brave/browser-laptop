@@ -153,19 +153,22 @@ const ledgerReducer = (state, action, immutableAction) => {
               state = ledgerApi.verifiedP(state, publisherKey)
               break
             }
-          case 'ledgerPinPercentage':
-            {
-              const value = action.get('value')
-              const publisher = ledgerState.getPublisher(state, publisherKey)
-              if (publisher.isEmpty() || publisher.get('pinPercentage') === value) {
-                break
-              }
-              state = ledgerState.setPublishersProp(state, publisherKey, 'pinPercentage', value)
-              ledgerApi.savePublisherData(publisherKey, 'pinPercentage', value)
-              state = ledgerApi.updatePublisherInfo(state, publisherKey)
-              break
-            }
         }
+        break
+      }
+    case appConstants.APP_ON_LEDGER_PIN_PUBLISHER:
+      {
+        const value = action.get('value')
+        const publisherKey = action.get('publisherKey')
+        const publisher = ledgerState.getPublisher(state, publisherKey)
+
+        if (publisher.isEmpty() || publisher.get('pinPercentage') === value) {
+          break
+        }
+
+        state = ledgerState.setPublishersProp(state, publisherKey, 'pinPercentage', value)
+        ledgerApi.savePublisherData(publisherKey, 'pinPercentage', value)
+        state = ledgerApi.updatePublisherInfo(state, publisherKey)
         break
       }
     case appConstants.APP_REMOVE_SITE_SETTING:

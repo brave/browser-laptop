@@ -5,14 +5,14 @@
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
-// components
+// Components
 const ImmutableComponent = require('../../immutableComponent')
 
-// style
-const globalStyles = require('../../styles/global')
+// Actions
+const appActions = require('../../../../../js/actions/appActions')
 
-// other
-const aboutActions = require('../../../../../js/about/aboutActions')
+// Style
+const globalStyles = require('../../styles/global')
 
 class PinnedInput extends ImmutableComponent {
   componentDidUpdate () {
@@ -25,7 +25,7 @@ class PinnedInput extends ImmutableComponent {
     }
   }
 
-  pinPercentage (hostPattern, event) {
+  pinPercentage (publisherKey, event) {
     let value = parseInt(event.target.value)
 
     if (value < 1 || !value) {
@@ -33,7 +33,7 @@ class PinnedInput extends ImmutableComponent {
       this.textInput.value = 1
     }
 
-    aboutActions.changeSiteSetting(hostPattern, 'ledgerPinPercentage', value)
+    appActions.onLedgerPinPublisher(publisherKey, value)
     this.forceUpdate()
   }
   render () {
@@ -41,7 +41,7 @@ class PinnedInput extends ImmutableComponent {
       data-test-id='pinnedInput'
       ref={(input) => { this.textInput = input }}
       defaultValue={this.props.defaultValue}
-      onBlur={this.pinPercentage.bind(this, this.props.patern)}
+      onBlur={this.pinPercentage.bind(this, this.props.publisherKey)}
       onKeyPress={this.keyPress.bind(this)}
       className={css(styles.pinnedInput)}
     />
@@ -49,7 +49,7 @@ class PinnedInput extends ImmutableComponent {
 }
 
 const styles = StyleSheet.create({
-  // Ref: tableTd_percentage on ledgetTable.js
+  // Ref: tableTd_percentage on ledgerTable.js
   pinnedInput: {
     border: `1px solid #c4c5c5`,
     borderRadius: globalStyles.radius.borderRadius,
