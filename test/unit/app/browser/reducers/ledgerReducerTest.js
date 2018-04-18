@@ -58,7 +58,8 @@ describe('ledgerReducer unit tests', function () {
       onPromotionResponse: dummyModifyState,
       getPromotion: () => {},
       checkReferralActivity: dummyModifyState,
-      referralCheck: () => {}
+      referralCheck: () => {},
+      addNewLocation: dummyModifyState
     }
     fakeLedgerState = {
       resetSynopsis: dummyModifyState,
@@ -715,6 +716,41 @@ describe('ledgerReducer unit tests', function () {
       }))
       assert(checkReferralActivitySpy.calledOnce)
       assert.notDeepEqual(returnedState, appState)
+    })
+  })
+
+  describe('APP_ADD_PUBLISHER_TO_LEDGER', function () {
+    let addNewLocationSpy
+    let pageDataChangedSpy
+
+    beforeEach(function () {
+      addNewLocationSpy = sinon.spy(fakeLedgerApi, 'addNewLocation')
+      pageDataChangedSpy = sinon.spy(fakeLedgerApi, 'pageDataChanged')
+    })
+
+    afterEach(function () {
+      addNewLocationSpy.restore()
+      pageDataChangedSpy.restore()
+    })
+
+    it('executes', function () {
+      const newState = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ADD_PUBLISHER_TO_LEDGER,
+        location: 'https://brave.com'
+      }))
+      assert(addNewLocationSpy.calledOnce)
+      assert(pageDataChangedSpy.calledOnce)
+      assert.notDeepEqual(newState, appState)
+    })
+
+    it('takes no action with a null location', function () {
+      const newState = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ADD_PUBLISHER_TO_LEDGER,
+        location: null
+      }))
+      assert(addNewLocationSpy.notCalled)
+      assert(pageDataChangedSpy.notCalled)
+      assert.deepEqual(newState, appState)
     })
   })
 })

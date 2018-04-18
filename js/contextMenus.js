@@ -38,6 +38,7 @@ const platformUtil = require('../app/common/lib/platformUtil')
 const bookmarkFoldersUtil = require('../app/common/lib/bookmarkFoldersUtil')
 const historyUtil = require('../app/common/lib/historyUtil')
 const {makeImmutable} = require('../app/common/state/immutableUtil')
+const ledgerUtil = require('../app/common/lib/ledgerUtil')
 
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
@@ -296,6 +297,7 @@ const siteMultipleDetailTemplate = (data, type, activeFrame) => {
 const siteSingleDetailTemplate = (siteKey, type, activeFrame) => {
   const template = []
   const state = appStoreRenderer.state
+  const paymentsEnabled = getSetting(settings.PAYMENTS_ENABLED)
   let isFolder = type === siteTags.BOOKMARK_FOLDER
   let siteDetail
 
@@ -374,6 +376,17 @@ const siteSingleDetailTemplate = (siteKey, type, activeFrame) => {
       addBookmarkMenuItem('addBookmark', bookmarkUtil.getDetailFromFrame(activeFrame), siteDetail, true),
       addFolderMenuItem(siteDetail, true)
     )
+  }
+
+  if (paymentsEnabled && (type === siteTags.HISTORY || type === siteTags.BOOKMARK)) {
+    let location = siteDetail.get('location')
+    let enabled = ledgerUtil.shouldShowMenuOption(state, location)
+    if (enabled) {
+      template.push(
+        CommonMenu.separatorMenuItem,
+        addToPublisherListMenuItem(location)
+      )
+    }
   }
 
   return template
@@ -898,6 +911,15 @@ const showDefinitionMenuItem = (selectionText) => {
     label: locale.translation('lookupSelection').replace(/{{\s*selectedVariable\s*}}/, lookupText),
     click: (item) => {
       webviewActions.showDefinitionForSelection()
+    }
+  }
+}
+
+const addToPublisherListMenuItem = (location) => {
+  return {
+    label: locale.translation('addToPublisherList'),
+    click: () => {
+      appActions.addPublisherToLedger(location)
     }
   }
 }
