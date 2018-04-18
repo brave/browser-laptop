@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.22.22](https://github.com/brave/browser-laptop/releases/tag/v0.22.22dev)
+ - Fixed missing static variable on macOS for first-run referral program installs. ([#13853](https://github.com/brave/browser-laptop/issues/13853))
+
 ## [0.22.21](https://github.com/brave/browser-laptop/releases/tag/v0.22.21dev)
  - Improvements to the referral program. ([#13754](https://github.com/brave/browser-laptop/issues/13754))
  - Reverted quarantine feature for macOS. ([#13826](https://github.com/brave/browser-laptop/issues/13826))
