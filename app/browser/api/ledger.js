@@ -2687,10 +2687,28 @@ const onMediaRequest = (state, xhr, type, details) => {
     return state
   }
 
-  const tabId = details.get('tabId')
   const parsed = ledgerUtil.getMediaData(xhr, type, details)
   if (parsed == null) {
     return state
+  }
+
+  if (Array.isArray(parsed)) {
+    parsed.forEach(data => {
+      if (data) {
+        state = module.exports.processMediaData(state, data, type, details)
+      }
+    })
+  } else {
+    state = module.exports.processMediaData(state, parsed, type, details)
+  }
+
+  return state
+}
+
+const processMediaData = (state, parsed, type, details) => {
+  let tabId = tabState.TAB_ID_NONE
+  if (details) {
+    tabId = details.get('tabId')
   }
 
   const mediaId = ledgerUtil.getMediaId(parsed, type)
@@ -2774,7 +2792,7 @@ const onMediaRequest = (state, xhr, type, details) => {
 
     if (_internal.verboseP) {
       console.log('\ngetPublisherFromMediaProps mediaProps=' + JSON.stringify(mediaProps, null, 2) + '\nresponse=' +
-                  JSON.stringify(response, null, 2))
+        JSON.stringify(response, null, 2))
     }
 
     appActions.onLedgerMediaPublisher(mediaKey, response, duration, revisited)
@@ -3061,7 +3079,8 @@ const getMethods = () => {
     referralCheck,
     roundtrip,
     onFetchReferralHeaders,
-    onReferralRead
+    onReferralRead,
+    processMediaData
   }
 
   let privateMethods = {}

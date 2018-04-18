@@ -278,13 +278,27 @@ const getMediaData = (xhr, type, details) => {
       }
     case ledgerMediaProviders.TWITCH:
       {
-        const data = details.getIn(['uploadData', 0, 'bytes'])
-        if (!data) {
+        const uploadData = details.get('uploadData') || Immutable.List()
+
+        if (uploadData.size === 0) {
           result = null
           break
         }
 
-        let params = Buffer.from(data).toString('utf8') || ''
+        let params = uploadData.reduce((old, item) => {
+          const bytes = item.get('bytes')
+          let data = ''
+          if (bytes) {
+            data = Buffer.from(bytes).toString('utf8') || ''
+          }
+          return old + data
+        }, '')
+
+        if (!params || params.length === 0) {
+          result = null
+          break
+        }
+
         const paramQuery = queryString.parse(params)
 
         if (!paramQuery || !paramQuery.data) {
@@ -307,13 +321,7 @@ const getMediaData = (xhr, type, details) => {
           break
         }
 
-        if (!Array.isArray(parsed)) {
-          result = null
-          break
-        }
-
-        result = parsed[0]
-
+        result = parsed
         break
       }
   }
