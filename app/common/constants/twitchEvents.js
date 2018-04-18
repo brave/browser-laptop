@@ -6,7 +6,6 @@ const events = {
   BUFFER_EMPTY: 'buffer-empty',
   BUFFER_REFILL: 'buffer-refill',
   MINUTE_WATCHED: 'minute-watched',
-  PLAY_MANIFEST: 'video_play_master_manifest',
   PLAY_PAUSE: 'video_pause',
   SEEK: 'player_click_vod_seek',
   START: 'video-play',
