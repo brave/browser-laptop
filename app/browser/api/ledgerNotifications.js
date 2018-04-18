@@ -106,7 +106,7 @@ const onResponse = (message, buttonIndex, activeWindow) => {
       } else if (buttonIndex === 2 && activeWindow) {
         // Add funds: Open payments panel
         appActions.createTabRequested({
-          url: 'about:preferences#payments',
+          url: 'about:preferences#payments?addFundsOverlayVisible',
           windowId: activeWindow.id
         })
       }
