@@ -272,6 +272,12 @@ class LedgerTable extends ImmutableComponent {
     ]
   }
 
+  sortCheck (prevRows, currentRows) {
+    if (prevRows && currentRows) {
+      return JSON.stringify(prevRows) !== JSON.stringify(currentRows)
+    }
+  }
+
   render () {
     if (!this.synopsis || !this.synopsis.size) {
       return null
@@ -351,6 +357,7 @@ class LedgerTable extends ImmutableComponent {
           pinnedRows.map((synopsis) => this.getRow(synopsis)).toJS(),
           unPinnedRows.map((synopsis) => this.getRow(synopsis)).toJS()
         ]}
+        sortCheck={this.sortCheck}
       />
       {
         showButton
