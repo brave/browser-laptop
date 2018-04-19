@@ -4,11 +4,9 @@
 
 'use strict'
 
-const Immutable = require('immutable')
 const electron = require('electron')
 const app = electron.app
 const messages = require('../js/constants/messages')
-const BrowserWindow = electron.BrowserWindow
 const appActions = require('../js/actions/appActions')
 const urlParse = require('./common/urlParse')
 const {fileUrl} = require('../js/lib/appUrlUtil')
@@ -30,29 +28,17 @@ const focusOrOpenWindow = function (url) {
   if (!appInitialized) {
     return false
   }
-
-  let win = BrowserWindow.getFocusedWindow()
-  if (!win) {
-    win = BrowserWindow.getActiveWindow() || BrowserWindow.getAllWindows()[0]
-    if (win) {
-      if (win.isMinimized()) {
-        win.restore()
-      }
-      win.focus()
+  // create a tab and focus the tab's window
+  if (url) {
+    const tabCreateProperties = {
+      url
     }
+    // request to create tab in a new or existing window, and focus the window
+    appActions.createTabRequested(tabCreateProperties, false, false, true)
+    return true
   }
-
-  if (!win) {
-    appActions.newWindow(Immutable.fromJS({
-      location: url
-    }))
-  } else if (url) {
-    appActions.createTabRequested({
-      url,
-      windowId: win.id
-    })
-  }
-
+  // focus the active window, or create a new one with default tabs
+  appActions.focusOrCreateWindow()
   return true
 }
 

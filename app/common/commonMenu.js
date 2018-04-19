@@ -20,7 +20,7 @@ const ensureAtLeastOneWindow = (frameOpts) => {
   // If it was dispatched by the browser (mac / linux)
   // then it will create the tab in the active window
   // or a new window if there is no active window
-  appActions.createTabRequested(frameOpts)
+  appActions.createTabRequested(frameOpts, false, false, true)
 }
 
 /**
