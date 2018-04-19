@@ -531,6 +531,7 @@ class AboutPreferences extends React.Component {
       ledgerRecoveryOverlayVisible: false
     })
     this.forceUpdate()
+    this.removeParams()
   }
 
   enableSyncRestore (enabled) {
@@ -558,6 +559,16 @@ class AboutPreferences extends React.Component {
       newState[params] = true
     }
     this.setState(newState)
+  }
+
+  /**
+   * Using the history API, this removes any parameters
+   * from the current URL, leaving only the needed hash (ex #payments)
+   * This does not reload the page, it only modifies the browser history state,
+   * which replaces what is entered in the address bar
+   */
+  removeParams () {
+    window.history.replaceState(null, null, `#${this.hash}`)
   }
 
   /**
@@ -644,9 +655,12 @@ class AboutPreferences extends React.Component {
     let stateDiff = {}
     stateDiff[`${overlayName}OverlayVisible`] = isVisible
     this.setState(stateDiff)
-    // Tell ledger when Add Funds overlay is closed
-    if (isVisible === false && overlayName === 'addFunds') {
-      appActions.onAddFundsClosed()
+    if (isVisible === false) {
+      // Tell ledger when Add Funds overlay is closed
+      if (overlayName === 'addFunds') {
+        appActions.onAddFundsClosed()
+      }
+      this.removeParams()
     }
   }
 
