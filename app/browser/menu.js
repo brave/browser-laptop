@@ -29,7 +29,7 @@ const appActions = require('../../js/actions/appActions')
 // Util
 const CommonMenu = require('../common/commonMenu')
 const {makeImmutable} = require('../common/state/immutableUtil')
-const {fileUrl} = require('../../js/lib/appUrlUtil')
+const {fileUrl, aboutUrls} = require('../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../js/state/frameStateUtil')
 const menuUtil = require('../common/lib/menuUtil')
 const {getSetting} = require('../../js/settings')
@@ -611,6 +611,21 @@ const setMenuItemChecked = (state, label, checked) => {
   }
 }
 
+const setMenuItemEnabled = (state, label, enabled) => {
+  // Update electron menu (Mac / Linux)
+  const systemMenuItem = menuUtil.getMenuItem(appMenu, label)
+  systemMenuItem.enabled = enabled
+
+  // Update in-memory menu template (Windows)
+  if (isWindows) {
+    const oldTemplate = state.getIn(['menu', 'template'])
+    const newTemplate = menuUtil.setTemplateItemEnabled(oldTemplate, label, enabled)
+    if (newTemplate) {
+      appActions.setMenubarTemplate(newTemplate)
+    }
+  }
+}
+
 const doAction = (state, action) => {
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:
@@ -623,6 +638,15 @@ const doAction = (state, action) => {
         if (frame) {
           currentLocation = frame.location
           setMenuItemChecked(state, locale.translation('bookmarkPage'), isCurrentLocationBookmarked(state))
+        }
+        // Disable the "Shield settings" menu item if frame is an about page
+        action = makeImmutable(action)
+        const tabId = action.get('tabId')
+        if (tabId) {
+          const tab = getByTabId(state, tabId)
+          const frame = tab && tab.get('frame')
+          const isNonAboutPage = frame ? !aboutUrls.has(frame.get('location')) : false
+          setMenuItemEnabled(state, locale.translation('braverySite'), isNonAboutPage)
         }
         break
       }

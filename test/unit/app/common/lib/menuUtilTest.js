@@ -122,6 +122,42 @@ describe('menuUtil tests', function () {
     })
   })
 
+  describe('setTemplateItemEnabled', function () {
+    const defaultTemplate = Immutable.fromJS([
+      {
+        'label': 'Shields',
+        'submenu': [
+          {
+            'label': 'Site Shield Settings...',
+            'type': 'checkbox',
+            'enabled': false
+          }
+        ]
+      }
+    ])
+
+    it('returns the new template when enabled status is updated', function () {
+      const expectedTemplate = Immutable.fromJS([
+        {
+          'label': 'Shields',
+          'submenu': [
+            {
+              'label': 'Site Shield Settings...',
+              'type': 'checkbox',
+              'enabled': true
+            }
+          ]
+        }
+      ])
+      const newTemplate = menuUtil.setTemplateItemEnabled(defaultTemplate, 'Site Shield Settings...', true)
+      assert.deepEqual(newTemplate.toJS(), expectedTemplate.toJS())
+    })
+    it('returns null when no change is made', function () {
+      const newTemplate = menuUtil.setTemplateItemEnabled(defaultTemplate, 'Site Shield Settings...', false)
+      assert.equal(newTemplate, null)
+    })
+  })
+
   describe('createBookmarkTemplateItems', function () {
     it('returns an array of items w/ the bookmark tag', function () {
       const appState = Immutable.fromJS({
