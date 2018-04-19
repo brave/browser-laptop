@@ -37,6 +37,16 @@ const appActions = {
     })
   },
 
+  /**
+   * Dispatches an event to the main process to focus the active window,
+   * or create a new one if there is no active window.
+   */
+  focusOrCreateWindow: function () {
+    dispatch({
+      actionType: appConstants.APP_FOCUS_OR_CREATE_WINDOW
+    })
+  },
+
   windowReady: function (windowId, windowValue) {
     dispatch({
       actionType: appConstants.APP_WINDOW_READY,
@@ -235,12 +245,13 @@ const appActions = {
    * switch to it instead of creating a new one
    * @param {Boolean} isRestore when true, won't try to activate the new tab, even if the user preference indicates to
    */
-  createTabRequested: function (createProperties, activateIfOpen = false, isRestore = false) {
+  createTabRequested: function (createProperties, activateIfOpen = false, isRestore = false, focusWindow = false) {
     dispatch({
       actionType: appConstants.APP_CREATE_TAB_REQUESTED,
       createProperties,
       activateIfOpen,
-      isRestore
+      isRestore,
+      focusWindow
     })
   },
 
