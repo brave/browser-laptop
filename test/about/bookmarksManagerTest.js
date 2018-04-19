@@ -105,7 +105,7 @@ describe('about:bookmarks', function () {
         parentFolderId: 0
       })
       .tabByIndex(0)
-      .loadUrl(aboutBookmarksUrl)
+      .url(aboutBookmarksUrl)
   }
 
   describe('page content', function () {
@@ -164,11 +164,11 @@ describe('about:bookmarks', function () {
       const site = Brave.server.url(browseableSiteUrl)
       const target = '[data-test-id="sortableTable"] [data-test-id="title"][data-sort="' + browseableSiteTitle + '"]'
       yield this.app.client
+        .tabByUrl(aboutBookmarksUrl)
         .waitForVisible(target)
         .doubleClick(target)
-        .waitForUrl(site)
-        .waitForBrowserWindow()
         .waitForTabCount(2)
+        .waitForUrl(site)
     })
   })
 

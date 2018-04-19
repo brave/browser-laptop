@@ -81,10 +81,11 @@ describe('about:history', function () {
 
     it('opens a new tab with the location of the entry when double clicked', function * () {
       const site = Brave.server.url(browseableSiteUrl)
+      const target = 'table.sortableTable td.title[data-sort="' + browseableSiteTitle + '"]'
       yield this.app.client
         .tabByUrl(aboutHistoryUrl)
-        .waitForVisible('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="' + browseableSiteTitle + '"]')
-        .doubleClick('[data-test-id="sortableTable"] [data-test-id="title"][data-sort="' + browseableSiteTitle + '"]')
+        .waitForVisible(target)
+        .doubleClick(target)
         .waitForTabCount(2)
         .waitForUrl(site)
         .tabByIndex(0)
