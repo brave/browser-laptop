@@ -46,7 +46,6 @@ const batIcon = require('../../../extensions/brave/img/ledger/cryptoIcons/BAT_ic
 const getSetting = require('../../../../js/settings').getSetting
 const settings = require('../../../../js/constants/settings')
 const {formatCurrentBalance, batToCurrencyString} = require('../../../common/lib/ledgerUtil')
-const frameStateUtil = require('../../../../js/state/frameStateUtil')
 
 class PaymentsTab extends ImmutableComponent {
   constructor () {
@@ -172,22 +171,6 @@ class PaymentsTab extends ImmutableComponent {
     appActions.onChangeAddFundsDialogStep('addFundsWizardMain')
   }
 
-  hideRecoveryOverlay () {
-    this.props.hideOverlay('ledgerRecovery')
-    appActions.loadURLRequested(
-      parseInt(this.props.tabId),
-      'about:preferences#payments'
-    )
-  }
-
-  mergeProps (state, ownProps) {
-    const currentWindow = state.get('currentWindow')
-    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
-
-    const props = {}
-    props.tabId = activeFrame.get('tabId')
-  }
-
   render () {
     const enabled = this.props.ledgerData.get('created')
     const deletedSites = this.deletedSites
@@ -278,9 +261,9 @@ class PaymentsTab extends ImmutableComponent {
           />}
           footer={<LedgerRecoveryFooter
             state={this.state}
-            hideOverlay={this.hideRecoveryOverlay.bind(this)}
+            hideOverlay={this.props.hideOverlay}
           />}
-          onHide={this.hideRecoveryOverlay.bind(this)}
+          onHide={this.props.hideOverlay.bind(this, 'ledgerRecovery')}
         />
         : null
       }

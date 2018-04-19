@@ -3,12 +3,10 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // util
 const {batToCurrencyString} = require('../../../../common/lib/ledgerUtil')
-const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 
 // components
 const ImmutableComponent = require('../../immutableComponent')
@@ -38,20 +36,6 @@ class LedgerRecoveryContent extends ImmutableComponent {
       this.props.hideAdvancedOverlays()
     }
     appActions.resetRecoverStatus()
-    if (success) {
-      appActions.loadURLRequested(
-        parseInt(this.props.tabId),
-        'about:preferences#payments'
-      )
-    }
-  }
-
-  mergeProps (state, ownProps) {
-    const currentWindow = state.get('currentWindow')
-    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
-
-    const props = {}
-    props.tabId = activeFrame.get('tabId')
   }
 
   render () {
