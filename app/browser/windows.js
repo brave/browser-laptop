@@ -449,6 +449,18 @@ const api = {
     })
   },
 
+  focus: (windowId) => {
+    setImmediate(() => {
+      const win = currentWindows[windowId]
+      if (win && !win.isDestroyed()) {
+        if (win.isMinimized()) {
+          win.restore()
+        }
+        win.focus()
+      }
+    })
+  },
+
   setFullScreen: (windowId, fullScreen) => {
     setImmediate(() => {
       const win = currentWindows[windowId]
@@ -786,9 +798,16 @@ const api = {
 
   getActiveWindow: () => {
     const focusedWindow = BrowserWindow.getFocusedWindow()
-    if (api.getAllRendererWindows().includes(focusedWindow)) {
+    const allOpenWindows = api.getAllRendererWindows()
+    if (allOpenWindows.includes(focusedWindow)) {
       return focusedWindow
     }
+    // handle no active window, but do have open windows
+    if (allOpenWindows && allOpenWindows.length) {
+      // use first window
+      return allOpenWindows[0]
+    }
+    // no open windows
     return null
   },
 
