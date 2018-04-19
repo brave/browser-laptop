@@ -161,7 +161,12 @@ const tabsReducer = (state, action, immutableAction) => {
           action = action.setIn(['createProperties', 'windowId'], activeWindowId)
         }
       }
-
+      // option to focus the window the tab is being created in
+      const windowId = action.getIn(['createProperties', 'windowId'])
+      const shouldFocusWindow = action.get('focusWindow')
+      if (shouldFocusWindow && windowId) {
+        windows.focus(windowId)
+      }
       const url = action.getIn(['createProperties', 'url'])
       setImmediate(() => {
         if (action.get('activateIfOpen') ||

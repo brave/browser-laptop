@@ -158,7 +158,7 @@ function setDefaultWindowSize (state) {
   return state
 }
 
-const handleCreateWindowAction = (state, action) => {
+const handleCreateWindowAction = (state, action = Immutable.Map()) => {
   const frameOpts = (action.get('frameOpts') || Immutable.Map()).toJS()
   let browserOpts = (action.get('browserOpts') || Immutable.Map()).toJS()
   let immutableWindowState = action.get('restoredState') || Immutable.Map()
@@ -303,6 +303,14 @@ const windowsReducer = (state, action, immutableAction) => {
         setImmediate(() => {
           windows.pinnedTabsChanged()
         })
+      }
+      break
+    case appConstants.APP_FOCUS_OR_CREATE_WINDOW:
+      const activeWindowId = windows.getActiveWindowId()
+      if (activeWindowId === windowState.WINDOW_ID_NONE) {
+        state = handleCreateWindowAction(state)
+      } else {
+        windows.focus(activeWindowId)
       }
       break
     case appConstants.APP_CLOSE_WINDOW:
