@@ -2385,6 +2385,10 @@ const run = (state, delayTime) => {
       fields.forEach((field) => {
         const max = (result.length > 0) ? 45 : 19
 
+        if (!field) {
+          return
+        }
+
         if (typeof field !== 'string') field = field.toString()
         if (field.length < max) {
           let spaces = ' '.repeat(max - field.length)
@@ -2392,6 +2396,7 @@ const run = (state, delayTime) => {
         } else {
           field = field.substr(0, max)
         }
+
         result += ' ' + field
       })
 
