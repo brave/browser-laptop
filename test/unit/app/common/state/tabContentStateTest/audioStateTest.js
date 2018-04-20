@@ -160,5 +160,13 @@ describe('audioState unit tests', function () {
       const result = audioState.showAudioTopBorder(state, frameKey, false)
       assert.equal(result, false)
     })
+
+    it('return false if tab audio is mute and not pinned', function * () {
+      const state = defaultState
+        .setIn(['frames', index, 'audioPlayback'], true)
+        .setIn(['frames', index, 'audioMuted'], true)
+      const result = audioState.showAudioTopBorder(state, frameKey, false)
+      assert.equal(result, false)
+    })
   })
 })

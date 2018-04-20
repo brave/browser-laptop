@@ -49,6 +49,10 @@ module.exports.showAudioTopBorder = (state, frameKey, isPinned) => {
     return false
   }
 
+  if (module.exports.isAudioMuted(state, frameKey)) {
+    return false
+  }
+
   return (
     module.exports.canPlayAudio(state, frameKey) &&
     (isEntryIntersected(state, 'tabs') || isPinned)
