@@ -485,15 +485,11 @@ describe('Regular payment panel tests', function () {
         .waitForElementCount(addFundsWelcome, 1)
     })
 
-    it('renders the wizard when you click next button', function * () {
+    it('renders the wizard when you click next button (welcome screen shown only once)', function * () {
       yield this.app.client
         .click(addFundsButton)
         .waitForExist(modalOverlay)
         .waitForExist(addFundsDialog)
-        .waitForExist(addFundsWelcome)
-        .waitForElementCount(addFundsWelcome, 1)
-        .waitForExist(nextButton)
-        .click(nextButton)
         .waitForExist(addFundsWizard)
         .waitForElementCount(addFundsWizard, 1)
     })
