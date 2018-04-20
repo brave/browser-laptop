@@ -63,6 +63,7 @@ describe('suggestion unit tests', function () {
       assert.ok(suggestion.normalizeLocation('wowww.com') === 'wowww.com', 'location not modified')
       assert.ok(suggestion.normalizeLocation('http://www.wowww.com') === 'wowww.com', 'www. prefix removed')
       assert.ok(suggestion.normalizeLocation('https://www.wowww.com') === 'wowww.com', 'www. prefix removed')
+      assert.ok(suggestion.normalizeLocation('www.wowww.com') === 'wowww.com', 'www. prefix removed')
     })
   })
 
