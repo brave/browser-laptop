@@ -91,17 +91,27 @@ class AdvancedSettingsContent extends ImmutableComponent {
 }
 
 class AdvancedSettingsFooter extends ImmutableComponent {
+  showLedgerBackup () {
+    this.props.showOverlay('ledgerBackup')
+    this.props.setOverlayName('ledgerBackup')
+  }
+
+  showLedgerRecovery () {
+    this.props.showOverlay('ledgerRecovery')
+    this.props.setOverlayName('ledgerRecovery')
+  }
+
   render () {
     return <section>
       <BrowserButton groupedItem primaryColor
         l10nId='backupLedger'
         testId='backupLedgerButton'
-        onClick={this.props.showOverlay.bind(this, 'ledgerBackup')}
+        onClick={this.showLedgerBackup.bind(this)}
       />
       <BrowserButton groupedItem primaryColor
         l10nId='recoverLedger'
         testId='recoverLedgerButton'
-        onClick={this.props.showOverlay.bind(this, 'ledgerRecovery')}
+        onClick={this.showLedgerRecovery.bind(this)}
       />
       <BrowserButton groupedItem secondaryColor
         l10nId='done'
