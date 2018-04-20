@@ -50,22 +50,22 @@ function * before (client, siteList) {
     .waitForVisible(walletSwitch)
     .click(walletSwitch)
     .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
+    .windowByUrl(Brave.browserWindowUrl)
 
   for (let site of siteList) {
     yield client
-      .tabByIndex(0)
-      .loadUrl(site)
       .windowByUrl(Brave.browserWindowUrl)
+      .newTab({url: site})
       .waitForHistoryEntry(site, false)
-      .tabByUrl(site)
+      .waitForTabCount(2)
+      .then(() => new Promise(resolve => setTimeout(resolve, 500)))
+      .windowByUrl(Brave.browserWindowUrl)
+      .closeTabByIndex(1)
+      .waitForTabCount(1)
   }
 
   yield client
-    .tabByIndex(0)
-    .loadUrl(prefsUrl)
-    .waitForVisible(paymentsTab)
-    .click(paymentsTab)
-    .waitForVisible('[data-l10n-id="publisher"]')
+    .tabByUrl(prefsUrl)
 }
 
 function findBiggestPercentage (synopsis) {
