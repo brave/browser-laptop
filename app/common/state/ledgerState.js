@@ -17,6 +17,8 @@ const settings = require('../../../js/constants/settings')
 // Utils
 const getSetting = require('../../../js/settings').getSetting
 const {makeImmutable, isMap} = require('../../common/state/immutableUtil')
+const urlParse = require('../../common/urlParse')
+const getBaseDomain = require('../../../js/lib/baseDomain').getBaseDomain
 
 const validateState = function (state) {
   state = makeImmutable(state)
@@ -65,12 +67,28 @@ const ledgerState = {
     return state.setIn(['ledger', 'locations', url, prop], value)
   },
 
+  getVerifiedPublisherLocation: (state, url) => {
+    state = validateState(state)
+    if (url == null) {
+      return null
+    }
+
+    let publisherKey = state.getIn(['ledger', 'locations', url, 'publisher'])
+
+    if (!publisherKey) {
+      const parsedUrl = urlParse(url) || {}
+      if (parsedUrl.hostname != null) {
+        publisherKey = getBaseDomain(parsedUrl.hostname)
+      }
+    }
+    return publisherKey
+  },
+
   getLocationProp: (state, url, prop) => {
     state = validateState(state)
     if (url == null || prop == null) {
       return null
     }
-
     return state.getIn(['ledger', 'locations', url, prop])
   },
 
