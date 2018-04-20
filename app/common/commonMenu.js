@@ -15,11 +15,18 @@ const isDarwin = process.platform === 'darwin'
 const electron = require('electron')
 
 const ensureAtLeastOneWindow = (frameOpts) => {
-  // If this action is dispatched from a renderer window (windows)
-  // it will create the tab in the current window
-  // If it was dispatched by the browser (mac / linux)
+  // Handle no new tab requested, but need a window
+  // and possibly there is no window.
+  if (!frameOpts && process.type === 'browser') {
+    // focus active window, or create a new one if there are none
+    appActions.focusOrCreateWindow()
+    return
+  }
+  // If this action is dispatched from a renderer window (Windows OS),
+  // it will create the tab in the current window since the action originates from it.
+  // If it was dispatched by the browser (macOS / Linux),
   // then it will create the tab in the active window
-  // or a new window if there is no active window
+  // or a new window if there is no active window.
   appActions.createTabRequested(frameOpts, false, false, true)
 }
 
