@@ -25,7 +25,7 @@ const locale = require('../js/l10n')
 const {getSetting} = require('./settings')
 const settings = require('./constants/settings')
 const textUtils = require('./lib/text')
-const {isIntermediateAboutPage, isUrl, aboutUrls} = require('./lib/appUrlUtil')
+const {isIntermediateAboutPage, isUrl, isSourceAboutUrl} = require('./lib/appUrlUtil')
 const urlParse = require('../app/common/urlParse')
 const {getCurrentWindow} = require('../app/renderer/currentWindow')
 const extensionState = require('../app/common/state/extensionState')
@@ -38,6 +38,7 @@ const platformUtil = require('../app/common/lib/platformUtil')
 const bookmarkFoldersUtil = require('../app/common/lib/bookmarkFoldersUtil')
 const historyUtil = require('../app/common/lib/historyUtil')
 const {makeImmutable} = require('../app/common/state/immutableUtil')
+const {areBraveShieldsUp} = require('../app/common/state/shieldState')
 
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
@@ -938,8 +939,10 @@ function mainTemplateInit (nodeProps, frame, tab) {
   const isAudio = nodeProps.mediaType === 'audio'
   const isInputField = nodeProps.isEditable || nodeProps.inputFieldType !== 'none'
   const isTextSelected = nodeProps.selectionText && nodeProps.selectionText.length > 0
-  const isAboutPage = aboutUrls.has(frame.get('location'))
+  const isAboutPage = isSourceAboutUrl(frame.get('location'))
   const isPrivate = frame.get('isPrivate')
+  const activeFrameKey = windowStore.getState().get('activeFrameKey')
+  const activeFrame = windowStore.getFrame(activeFrameKey)
 
   if (isLink) {
     template = addLinkMenu(nodeProps.linkURL, frame)
@@ -978,15 +981,13 @@ function mainTemplateInit (nodeProps, frame, tab) {
         {
           label: locale.translation('searchImage'),
           click: () => {
-            let activeFrame = windowStore.getState().get('activeFrameKey')
-            let frame = windowStore.getFrame(activeFrame)
             let searchUrl = appStoreRenderer.state.getIn(['searchDetail', 'searchURL'])
               .replace('{searchTerms}', encodeURIComponent(nodeProps.srcURL))
               .replace('?q', 'byimage?image_url')
             appActions.createTabRequested({
               url: searchUrl,
               isPrivate,
-              partitionNumber: frame.get('partitionNumber')
+              partitionNumber: activeFrame.get('partitionNumber')
             })
           }
         }
@@ -1140,6 +1141,18 @@ function mainTemplateInit (nodeProps, frame, tab) {
         appActions.inspectElement(frame.get('tabId'), nodeProps.x, nodeProps.y)
       }
     })
+    if (activeFrame) {
+      const shieldsUp = areBraveShieldsUp(appStoreRenderer.state, activeFrame)
+      template.push(
+        CommonMenu.separatorMenuItem,
+        {
+          label: shieldsUp ? locale.translation('disableShields') : locale.translation('enableShields'),
+          click: () => {
+            appActions.toggleShields(activeFrame, shieldsUp)
+          }
+        }
+      )
+    }
   }
 
   const extensionContextMenus = isPrivate

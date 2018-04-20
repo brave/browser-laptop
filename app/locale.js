@@ -119,6 +119,8 @@ var rendererIdentifiers = function () {
     'tabManager',
     'textEncoding',
     'inspectElement',
+    'enableShields',
+    'disableShields',
     'toggleDeveloperTools',
     'toggleBrowserConsole',
     'toggleFullScreenView',

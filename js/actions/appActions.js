@@ -960,6 +960,18 @@ const appActions = {
   },
 
   /**
+   * Dispatches a message to enable/disable a site's shield settings
+   * @param {number} tabId = The tabId
+   */
+  toggleShields: function (frame, value) {
+    dispatch({
+      actionType: appConstants.APP_TOGGLE_SHIELDS,
+      frame,
+      value
+    })
+  },
+
+  /**
    * Dispatches a message when a tab is being cloned
    * @param {number} tabId - The tabId of the tab to clone
    * @param {object} options - object containing options such as acive, back, and forward booleans
