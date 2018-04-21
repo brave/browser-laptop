@@ -16,7 +16,9 @@ const testRunner = (successKey) => {
 
   const done = () => {
     const elem = document.createElement('div')
-    elem.id = successKey.replace(/[^a-zA-Z0-9_\-]/g, '_')
+    // selector must match the pattern used in muonTest.js
+    elem.id = successKey.replace(/[^a-zA-Z0-9_-]/g, '_')
+    // passFail is the critical element, it has to contain either 'PASS' or 'FAIL'
     const passFail = document.createElement('span')
     passFail.className = 'passFail'
     passFail.innerText = 'PASS'
@@ -36,9 +38,8 @@ const testRunner = (successKey) => {
     document.body.appendChild(elem)
   }
 
-  return [ 'equal', 'deepEqual', 'strictEqual' ].reduce((wrappedAssert, fn) => {
+  return [ 'ok', 'equal', 'deepEqual', 'strictEqual' ].reduce((wrappedAssert, fn) => {
     wrappedAssert[fn] = (actual, expected) => {
-      console.log(fn, actual, expected)
       assertWrap(fn, () => { assert[fn](actual, expected) }, actual)
     }
     return wrappedAssert

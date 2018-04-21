@@ -1,2 +1,4 @@
+const runMuonCompatibleTests = require('../runMuonCompatibleTests')
 const components = require('./urlutilTestComponents')
-require('../runMuonCompatibleTests')('urlutil', components)
+
+runMuonCompatibleTests('urlutil', components)

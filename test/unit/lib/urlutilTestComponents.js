@@ -2,7 +2,7 @@
 const urlUtil = () => require('../../../js/lib/urlutil')
 
 module.exports = {
-'getScheme': {
+  'getScheme': {
     'null for empty': (test) => {
       test.equal(urlUtil().getScheme('/file/path/to/file'), null)
     },
@@ -163,7 +163,7 @@ module.exports = {
     }
   },
 
-  'isURL':  {
+  'isURL': {
     'returns !isNotURL': (test) => {
       test.equal(urlUtil().isURL('brave.com'), !urlUtil().isNotURL('brave.com'))
       test.equal(urlUtil().isURL('brave is cool'), !urlUtil().isNotURL('brave is cool'))
@@ -321,7 +321,7 @@ module.exports = {
     'returns true when input:': {
       'is an absolute file path with scheme': (test) => {
         test.equal(urlUtil().isFileScheme('file:///file/path/to/file'), true)
-      },
+      }
     },
     'returns false when input:': {
       'is an absolute file path without scheme': (test) => {
@@ -336,7 +336,7 @@ module.exports = {
     }
   },
 
-  'getDisplayHost':{
+  'getDisplayHost': {
     'url is http': (test) => {
       const result = urlUtil().getDisplayHost('http://brave.com')
       test.equal(result, 'brave.com')
@@ -487,7 +487,7 @@ module.exports = {
     }
   },
 
-  'isInternalUrl':  {
+  'isInternalUrl': {
     'null scenario': (test) => {
       const result = urlUtil().isInternalUrl(null)
       test.equal(result, false)
