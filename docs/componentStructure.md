@@ -2,20 +2,42 @@
 
 The UI is made up of a tree like structure of React components.
 
+<!--
 All [React](https://facebook.github.io/react/) components (with the exception of the top level one named `App`) should extend `ImmutableComponent` which in turn directly extends `React.Component`.
+-->
+All [React](https://facebook.github.io/react/) components should extend `React.Component` or `ImmutableComponent` which itself extends `React.Component`.
 `ImmutableComponent` is meant to be used with [Immutable.js](http://facebook.github.io/immutable-js/) props for data.  State should be sent in from props and components should not attempt to modify state themselves.  Instead they should dispatch actions to one of the stores.
 `ImmutableComponent` allows component to figure out if any data has changed more efficiently by doing simple top level equality checks only by implementing React's `shouldComponentUpdate`.
 
 # Hierarchy
 
-- App
-  - Renderer
-    - Components
-      - Navigation
-        - [Button]
+- Window
+  - Main
+    - Navigator
+      - MenuBar
+      - [WindowCaptionButtons]
+      - BackButton
+      - FowardButton
+      - NavigationBar
+        - AddEditBookmarkHanger
+          - Dialog
+          - AddEditBookmarkForm
+            - [BrowserButton]
+            - [CommonFormSection]
+            - CommonFormDropdown
+            - CommonFormTextbox
+          - CommonFormHanger
+          - [CommonFormSection]
+        - StopButton
+        - ReloadButton
+        - HomeButton
+        - BookmarkButton
         - UrlBar
-        - html:input
-        - UrlBarSuggestions
+          - [UrlBarIcon]
+          - BrowserButton
+          - UrlBarSuggestions
+        - PublisherToggle
+      - BrowserButton
     - TabPages
       - [TabPage]
     - TabsToolbar
