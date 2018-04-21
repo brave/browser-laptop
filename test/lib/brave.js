@@ -365,7 +365,7 @@ var exports = {
     })
 
     this.app.client.addCommand('waitForTextValue', function (selector, text) {
-      logVerbose('waitForSelectedText("' + selector + '", "' + text + '")')
+      logVerbose('waitForTextValue("' + selector + '", "' + text + '")')
       return this
         .waitForVisible(selector)
         .waitUntil(function () {

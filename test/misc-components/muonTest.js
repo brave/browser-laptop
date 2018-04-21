@@ -3,6 +3,7 @@
 const Brave = require('../lib/brave')
 
 const testUrl = 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/muon-tests.html'
+const testCases = require('../muon-native').collect()
 
 function * setup (client) {
   yield client.waitForUrl(Brave.newTabUrl).waitForBrowserWindow()
@@ -16,24 +17,39 @@ describe('muon tests', function () {
       .tabByIndex(0)
       .url(testUrl)
   })
-  it('muon.url.parse', function * () {
-    yield this.app.client
-      .waitForTextValue('#urlParseSimple', 'success')
-      .waitForTextValue('#urlParseComplex', 'success')
-      .waitForTextValue('#urlParseIssue10270', 'success')
-  })
-  it('urlUtil.getOrigin', function * () {
-    yield this.app.client
-      .waitForTextValue('#getOriginSimple', 'success')
-      .waitForTextValue('#getOriginFile', 'success')
-      .waitForTextValue('#getOriginWithPort', 'success')
-      .waitForTextValue('#getOriginIP', 'success')
-      .waitForTextValue('#getOriginAbout', 'success')
-      .waitForTextValue('#getOriginNull', 'success')
-      .waitForTextValue('#getOriginInvalid', 'success')
-  })
-  it('suggestion', function * () {
-    yield this.app.client
-      .waitForTextValue('#suggestionSimpleCheck', 'success')
-  })
+
+  const makeKey = (key, ext) => `${key} → ${ext}`
+  const makeSelector = (key) => `#${key.replace(/[^a-zA-Z0-9_\-]/g, '_')}`
+
+  const executeTests = (name, successKey, tests) => {
+    const runnableTests = Object.keys(tests).filter((k) => typeof tests[k] === 'function')
+    if (runnableTests.length) {
+      for (let testName of runnableTests) {
+        it(testName, function * () {
+          const selector = makeSelector(makeKey(successKey, testName))
+          yield this.app.client.waitForVisible(selector).then(() => {
+            return this.app.client.getText(`${selector}>.passFail`).then((value) => {
+              if (Array.isArray(value)) {
+                throw new Error(`Multiple tests with same selector "${selector}", please modify their names`)
+              }
+              if (value !== 'PASS') {
+                return this.app.client.getText(`${selector}>.failure`).then((value) => {
+                  throw new Error(value)
+                })
+              }
+            })
+          })
+        })
+      }
+    }
+
+    const testGroups = Object.keys(tests).filter((k) => typeof tests[k] === 'object')
+    for (let groupKey of testGroups) {
+      describe(groupKey, () => {
+        executeTests(groupKey, makeKey(successKey, groupKey), tests[groupKey])
+      })
+    }
+  }
+
+  executeTests('muon', 'muon', testCases)
 })
