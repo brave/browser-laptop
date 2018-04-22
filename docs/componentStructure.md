@@ -206,14 +206,12 @@ Dialog box for adding/editing autofill addresses.
 **AutofillCreditCardPanel:**
 Dialog box for adding/editing credit card information.
 
-**App:**
+**Window:**
 This should be the only component which modifies state internally and does not extend `ImmutableComponent`.
 It listens to events dispatched from the application store and re-renders the component tree.
 
 **BookmarksToolbar:**
 Toolbar that displays bookmarks.
-
-**BraveNotificationBar:**
 
 **BraveryPanel:**
 Popup dialog that displays site shield settings, ad counters, and ad/cookie controls.
@@ -224,24 +222,25 @@ Appears when you click on Brave shield next to URL bar.
 Buttons such as back, forward, reload, stop, and new frame.
 
 **CheckDefaultBrowserDialog:**
-Dialog box for setting Brave as default browser
+Dialog box for setting Brave as default browser.
 
 **ClearBrowsingDataPanel:**
-Dialog box for clearing browsing data
+Dialog box for clearing browsing data.
 
 **ContextMenu:**
-
+Menu for new tabs and windows, bookmarks, downloads, settings/preferences, etc.
 
 **DownloadsBar:**
+Component that displays downloads.
 
 **FindBar:**
+Controls for finding text.
 
 **Frame:**
 Component which wraps and renders electron webviews.
 
 **ImportBrowserDataPanel:**
-
-**LoginRequired:**
+Dialog box for importing browser data.
 
 **Main:**
 Represents a browser window.
@@ -250,22 +249,24 @@ Represents a browser window.
 A collection of page navigation components such as the urlbar and back button.
 
 **Navigator:**
+Container for NavigationBar, Brave button, and window caption buttons.
 
 **NoScriptInfo:**
 
 **NotificationBar:**
+Displays notifications. e.g. Allow site to see your location, etc.
 
-**PopupWindow:**
-
-**ReleaseNotes:**
+**PinnedTabs:**
+Tab controls for pinned tabs.
 
 **SiteInfo:**
+Dialog box displaying site information: connection security, view certification.
 
 **Tab:**
-An individual tab thumbnail
+An individual tab thumbnail.
 
 **Tabs:**
-Tab controls
+Tab controls.
 
 **TabPage:**
 An individual tab page.
@@ -275,11 +276,7 @@ Tab page indicators. There are 6 tabs at most per tab page.
 This set of indicators shows you which page you are on and allows you to switch pages.
 
 **TabsToolbar:**
-
-**TabsToolbarButtons:**
-Collection of Buttons for the tab bar.
-
-**UpdateBar:**
+Collection of Tabs and PinnedTabs, and context menu button.
 
 **UrlBar:**
 The URL bar part of the navigation bar.
@@ -288,7 +285,7 @@ The URL bar part of the navigation bar.
 The suggestions that come up from when a user types into the URL bar.
 
 **WidevinePanel:**
+Dialog box for Google Widevine
 
 **WindowButton:**
 An individual button for window management such as close, maximize, minimize.
-
