@@ -13,6 +13,9 @@ const ipc = window.chrome.ipcRenderer
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 
+const isDarwin = require('../../app/common/lib/platformUtil').isDarwin()
+
+
 require('../../less/about/common.less')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
@@ -229,7 +232,14 @@ class AboutPasswords extends React.Component {
 
     return <div className={css(styles.passwordsPage)}>
       <h1 data-l10n-id='passwordsTitle' />
-      <div className={css(styles.passwordInstructions)} data-l10n-id='passwordDisableInstructions' />
+      <div className={css(styles.passwordInstructions)}> 
+        <span data-l10n-id='passwordDisableInstructions' />&nbsp;
+        <span className={css(styles.passwordInstructionsLink)}
+          data-l10n-id={isDarwin?'passwordInstructionsLinkDarwin':'passwordInstructionsLink'}
+          onClick={aboutActions.createTabRequested.bind(null, {
+            url: 'about:preferences#security'
+        })} />
+      </div>
       {
         this.isPasswordsEmpty && this.isSitesEmpty
           ? <div data-l10n-id='noPasswordsSaved' />
@@ -267,6 +277,15 @@ const styles = StyleSheet.create({
     paddingBottom: '20px',
     fontSize: '18px',
     color: 'grey'
+  },
+  passwordInstructionsLink: {
+    color: `${globalStyles.color.braveOrange}`,
+    textDecoration: 'underline',
+    cursor: 'pointer',
+
+    ':hover': {
+      color: 'black',
+    }
   },
   passwordsPageFooter: {
     padding: '10px',
