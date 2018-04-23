@@ -130,11 +130,14 @@ class EnabledContent extends ImmutableComponent {
 
   fundsAmount () {
     const ledgerData = this.props.ledgerData
+    const val = formatCurrentBalance(ledgerData) || ''
+    const big = val.length > 23
 
     return <FormTextbox
       readOnly
       data-test-id='fundsAmount'
-      value={formatCurrentBalance(ledgerData)}
+      value={val}
+      customClass={big && styles.width_input}
     />
   }
 
@@ -491,6 +494,10 @@ const gridStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   claimButton: {
     marginTop: '10px'
+  },
+
+  width_input: {
+    width: '195px'
   },
 
   iconLink: {

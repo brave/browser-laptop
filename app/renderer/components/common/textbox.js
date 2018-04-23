@@ -17,10 +17,14 @@ class Textbox extends ImmutableComponent {
       styles.textbox,
       (this.props.readonly || this.props.readOnly) ? styles.readOnly : styles.outlineable,
       this.props['data-isCommonForm'] && commonStyles.isCommonForm,
-      this.props['data-isSettings'] && styles.isSettings
+      this.props['data-isSettings'] && styles.isSettings,
+      this.props.customClass && this.props.customClass
     )
 
-    return <input type='text' className={className} {...this.props} />
+    const props = Object.assign({}, this.props)
+    delete props.customClass
+
+    return <input type='text' className={className} {...props} />
   }
 }
 
