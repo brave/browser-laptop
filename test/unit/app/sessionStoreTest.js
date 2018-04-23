@@ -1118,7 +1118,7 @@ describe('sessionStore unit tests', function () {
         before(function () {
           readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns(JSON.stringify({
             cleanedOnShutdown: true,
-            lastAppVersion: 'NOT A REAL VERSION'
+            lastAppVersion: '0.0.1'
           }))
         })
         after(function () {
