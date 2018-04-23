@@ -46,9 +46,6 @@ module.exports = {
       'is an absolute file path without scheme': (test) => {
         test.equal(urlUtil().isNotURL('/file/path/to/file'), false)
       },
-      'is an absolute file path without scheme with space in name': (test) => {
-        test.equal(urlUtil().isNotURL('/path/to/file/with space'), false)
-      },
       'is an absolute file path with scheme': (test) => {
         test.equal(urlUtil().isNotURL('file:///file/path/to/file'), false)
       },
@@ -100,15 +97,6 @@ module.exports = {
       },
       'has custom protocol': (test) => {
         test.equal(urlUtil().isNotURL('brave://test'), false)
-      },
-      'returns url with encoded space character in the query string': (test) => {
-        test.equal(urlUtil().isNotURL('https://www.google.ca/search?q=dog cat'), false)
-      },
-      'is a Windows file path without scheme': (test) => {
-        test.equal(urlUtil().isNotURL('C:\\Path\to\\file'), false)
-      },
-      'is a Windows file path without scheme with space in file name': (test) => {
-        test.equal(urlUtil().isNotURL('C:\\Path\\with\\some space'), false)
       }
     },
 
@@ -175,12 +163,6 @@ module.exports = {
     },
     'calls prependScheme': (test) => {
       test.equal(urlUtil().getUrlFromInput('/file/path/to/file'), 'file:///file/path/to/file')
-    },
-    'returns URL with file schema for Windows': (test) => {
-      test.equal(urlUtil().getUrlFromInput('C:\\path\\to\\file'), 'file:///C:/path/to/file')
-    },
-    'returns url with file schema for Windows with space character encoded': (test) => {
-      test.equal(urlUtil().getUrlFromInput('C:\\path\\to\\file name'), 'file:///C:/path/to/file%20name')
     }
   },
 
@@ -493,49 +475,6 @@ module.exports = {
       const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU//5ErkJggg=='
       const result = urlUtil().parseFaviconDataUrl(png)
       test.deepEqual(result, {data: 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU//5ErkJggg==', ext: 'png'})
-    }
-  },
-
-  'isInternalUrl': {
-    'null scenario': (test) => {
-      const result = urlUtil().isInternalUrl(null)
-      test.equal(result, false)
-    },
-    'localhost': (test) => {
-      const result = urlUtil().isInternalUrl('http://localhost:399/abc')
-      test.equal(result, true)
-    },
-    'localhost.com': (test) => {
-      const result = urlUtil().isInternalUrl('http://localhost.com:399/abc')
-      test.equal(result, false)
-    },
-    'invalid URL': (test) => {
-      const result = urlUtil().isInternalUrl('adsf')
-      test.equal(result, false)
-    },
-    'local IP': (test) => {
-      const result = urlUtil().isInternalUrl('http://192.168.1.255:3000')
-      test.equal(result, true)
-      const result2 = urlUtil().isInternalUrl('http://127.0.0.1/')
-      test.equal(result2, true)
-    },
-    'remote IP': (test) => {
-      const result = urlUtil().isInternalUrl('http://54.0.0.1:3000')
-      test.equal(result, false)
-    },
-    'local IPv6': (test) => {
-      const result = urlUtil().isInternalUrl('https://[::1]:3000')
-      test.equal(result, true)
-      const result2 = urlUtil().isInternalUrl('http://[fe80::c12:79e9:bd20:31e1]/')
-      test.equal(result2, true)
-    },
-    'remote IPv6': (test) => {
-      const result = urlUtil().isInternalUrl('http://[2001:4860:4860::8888]:8000')
-      test.equal(result, false)
-    },
-    '.local URL': (test) => {
-      const result = urlUtil().isInternalUrl('https://adsf.local')
-      test.equal(result, true)
     }
   },
 

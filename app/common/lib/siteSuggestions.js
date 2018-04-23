@@ -102,8 +102,9 @@ const tokenizeInput = (data) => {
     }
   }
 
-  if (url && isUrl(url)) {
-    const parsedUrl = urlParse(url.toLowerCase())
+  const parsedUrl = typeof url === 'string' && isUrl(url) && urlParse(url.toLowerCase())
+
+  if (parsedUrl && (parsedUrl.hash || parsedUrl.host || parsedUrl.pathname || parsedUrl.query || parsedUrl.protocol)) {
     if (parsedUrl.hash) {
       parts.push(parsedUrl.hash.slice(1))
     }
