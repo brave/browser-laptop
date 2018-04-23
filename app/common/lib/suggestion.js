@@ -124,9 +124,8 @@ const isParsedUrlSimpleDomainNameValue = (parsed) => {
  */
 const normalizeLocation = (location) => {
   if (typeof location === 'string') {
-    location = location.replace(/www\./, '')
-    location = location.replace(/^http:\/\//, '')
-    location = location.replace(/^https:\/\//, '')
+    // remove http://, https:// and www. from beginning of location string
+    location = location.replace(/^(https?:\/\/)?(www\.)?/, '')
   }
   return location
 }
@@ -250,8 +249,8 @@ const getSortByDomainForSites = (userInputLower, userInputHost) => {
     // what the user is entering as the host and the host is null.
     let host1 = s1.get('parsedUrl').host || s1.get('parsedUrl').pathname || s1.get('location') || ''
     let host2 = s2.get('parsedUrl').host || s2.get('parsedUrl').pathname || s2.get('location') || ''
-    host1 = host1.replace('www.', '')
-    host2 = host2.replace('www.', '')
+    host1 = normalizeLocation(host1)
+    host2 = normalizeLocation(host2)
 
     let pos1 = host1.indexOf(userInputHost)
     let pos2 = host2.indexOf(userInputHost)
@@ -287,8 +286,8 @@ const getSortByDomainForSites = (userInputLower, userInputHost) => {
  */
 const getSortByDomainForHosts = (userInputHost) => {
   return (host1, host2) => {
-    host1 = host1.replace('www.', '')
-    host2 = host2.replace('www.', '')
+    host1 = normalizeLocation(host1)
+    host2 = normalizeLocation(host2)
     let pos1 = host1.indexOf(userInputHost)
     let pos2 = host2.indexOf(userInputHost)
     if (pos1 !== -1 && pos2 === -1) {

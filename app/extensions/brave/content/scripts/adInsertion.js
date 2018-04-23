@@ -157,7 +157,7 @@ if (chrome.contentSettings.adInsertion == 'allow') {
 
   var host = document.location.hostname
   if (host) {
-    host = host.replace('www.', '')
+    host = host.replace(/^www\./, '')
     chrome.ipcRenderer.on('set-ad-div-candidates', (e, divHost, adDivCandidates, placeholderUrl) => {
       // don't accidentally intercept messages not intended for this host
       if (host === divHost) {
