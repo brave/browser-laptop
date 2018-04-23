@@ -150,7 +150,7 @@ module.exports = {
     'general.download-always-ask': true,
     'general.spellcheck-enabled': true,
     'general.spellcheck-languages': Immutable.fromJS(['en-US']),
-    'search.default-search-engine': 'Google',
+    'search.default-search-engine': 'DuckDuckGo',
     'search.offer-search-suggestions': false, // false by default for privacy reasons
     'search.use-alternate-private-search-engine': false, // use true for DDG search in Private Tab
     'tabs.switch-to-new-tabs': false,
