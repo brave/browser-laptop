@@ -23,8 +23,12 @@ const api = {
     if (!detail) {
       if (contextMenuDetail.get('type') === 'hamburgerMenu') {
         windowState = windowState.set('hamburgerMenuWasOpen', true)
+      } else if (contextMenuDetail.get('type') === 'onBackLongPressMenuWasOpen') {
+        console.log("setContextMenu something actually fucking worked...")
+        windowState = windowState.set('onBackLongPressMenuWasOpen', true)
       } else {
         windowState = windowState.set('hamburgerMenuWasOpen', false)
+        windowState = windowState.set('onBackLongPressMenuWasOpen', false)
       }
       contextMenuDetail = Immutable.Map()
       windowState = windowState.delete('contextMenuDetail')
@@ -34,6 +38,13 @@ const api = {
         windowState = windowState.set('contextMenuDetail', uuid())
       }
       windowState = windowState.set('hamburgerMenuWasOpen', false)
+      if (!(detail.get('type') === 'onBackLongPressMenuWasOpen' && windowState.get('onBackLongPressMenuWasOpen'))) {
+        console.log("setContextMenu something actually fucking worked...")
+        contextMenuDetail = detail
+        windowState = windowState.set('contextMenuDetail', uuid())
+      }
+      windowState = windowState.set('hamburgerMenuWasOpen', false)
+      windowState = windowState.set('onBackLongPressMenuWasOpen', false)
     }
     return windowState
   },
