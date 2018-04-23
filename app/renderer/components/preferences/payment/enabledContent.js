@@ -61,6 +61,12 @@ class EnabledContent extends ImmutableComponent {
       ? this.props.showOverlay.bind(this, 'addFunds')
       : (ledgerData.get('creating') ? () => {} : this.createWallet())
 
+    let buttonDisabled = !ledgerData.get('created')
+
+    if (buttonText === 'createWallet') {
+      buttonDisabled = false
+    }
+
     return <div>
       <BrowserButton
         primaryColor
@@ -69,7 +75,7 @@ class EnabledContent extends ImmutableComponent {
         test2Id={'addFunds'}
         l10nId={buttonText}
         onClick={onButtonClick.bind(this)}
-        disabled={!ledgerData.get('created')}
+        disabled={buttonDisabled}
       />
       <a className={cx({
         [globalStyles.appIcons.question]: true,
