@@ -38,6 +38,7 @@ const platformUtil = require('../app/common/lib/platformUtil')
 const bookmarkFoldersUtil = require('../app/common/lib/bookmarkFoldersUtil')
 const historyUtil = require('../app/common/lib/historyUtil')
 const {makeImmutable} = require('../app/common/state/immutableUtil')
+const searchProviders = require('./data/searchProviders.js').providers
 
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
@@ -872,15 +873,14 @@ const copyEmailAddressMenuItem = (location) => {
   }
 }
 
-const searchSelectionMenuItem = (location) => {
-  var searchText = textUtils.ellipse(location)
+const searchEngineMenuItem = (location, searchProvider, searchDetail) => {
   return {
-    label: locale.translation('openSearch').replace(/{{\s*selectedVariable\s*}}/, searchText),
+    label: searchProvider,
     click: (item) => {
       if (location) {
         let activeFrame = windowStore.getState().get('activeFrameKey')
         let frame = windowStore.getFrame(activeFrame)
-        let searchUrl = appStoreRenderer.state.getIn(['searchDetail', 'searchURL']).replace('{searchTerms}', encodeURIComponent(location))
+        let searchUrl = searchDetail.replace('{searchTerms}', encodeURIComponent(location))
         appActions.createTabRequested({
           url: searchUrl,
           isPrivate: frame.get('isPrivate'),
@@ -889,6 +889,18 @@ const searchSelectionMenuItem = (location) => {
         })
       }
     }
+  }
+}
+
+const searchSelectionMenuItem = (location) => {
+  var searchText = textUtils.ellipse(location)
+  const maxSearchEngines = Array(searchProviders.length)
+  const searchEngineSubmenu = Array.from(maxSearchEngines, (_, i) =>
+    searchEngineMenuItem(location, searchProviders[i].name, searchProviders[i].search))
+
+  return {
+    label: locale.translation('openSearch').replace(/{{\s*selectedVariable\s*}}/, searchText),
+    submenu: searchEngineSubmenu
   }
 }
 
