@@ -130,9 +130,12 @@ class EnabledContent extends ImmutableComponent {
 
   fundsAmount () {
     const ledgerData = this.props.ledgerData
+    const val = formatCurrentBalance(ledgerData) || ''
+    const big = val.length > 23
+
 
     return <section className={css(styles.balance)}>
-      <FormTextbox data-test-id='fundsAmount' readOnly value={formatCurrentBalance(ledgerData)} />
+      <FormTextbox data-test-id='fundsAmount' readOnly value={val} customClass={big && styles.width_input} />
       <a className={cx({
         [globalStyles.appIcons.question]: true,
         [css(styles.balance__iconLink)]: true
@@ -501,6 +504,10 @@ const styles = StyleSheet.create({
   balance: {
     display: 'flex',
     alignItems: 'center'
+  },
+
+  width_input: {
+    width: '195px'
   },
 
   balance__iconLink: {
