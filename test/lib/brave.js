@@ -637,6 +637,20 @@ var exports = {
       })
     })
 
+    this.app.client.addCommand('closeTabByUrl', function (url) {
+      return this.getAppState().then((val) => {
+        const tab = val.value.tabs.find((tab) => tab.url === url)
+
+        if (tab.tabId == null) {
+          throw new Error(`closeTabByUrl can not find tab id for url ${url}`)
+        }
+
+        return this.execute(function (tabId) {
+          devTools('appActions').tabCloseRequested(tabId)
+        }, tab.tabId)
+      })
+    })
+
     this.app.client.addCommand('moveTabByFrameKey', function (sourceKey, destinationKey, prepend) {
       logVerbose(`moveTabByFrameKey(${sourceKey}, ${destinationKey}, ${prepend})`)
       return this.execute(function (sourceKey, destinationKey, prepend) {
@@ -702,6 +716,13 @@ var exports = {
           devTools('appActions').tabActivateRequested(tabId)
         }, tab.tabId)
       })
+    })
+
+    this.app.client.addCommand('addPaymentsSite', function (url, waitForTitle = true) {
+      return this.windowByUrl(this.browserWindowUrl)
+        .newTab({ url: url, active: true })
+        .waitForHistoryEntry(url, waitForTitle)
+        .closeTabByUrl(url)
     })
 
     /**
