@@ -522,6 +522,11 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = aboutPreferencesState.setBackupStatus(state, true)
         break
       }
+    case appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE:
+      {
+        state = ledgerApi.pageDataChanged(state, {}, true)
+        break
+      }
   }
   return state
 }
