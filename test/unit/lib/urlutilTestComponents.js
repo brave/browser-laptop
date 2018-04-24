@@ -173,10 +173,10 @@ module.exports = {
 
   'isFileType': {
     'relative file': (test) => {
-      test.equal(urlUtil().isFileType('/file/abc/test.pdf', 'pdf'), true)
+      test.equal(urlUtil().isFileType('file:///file/abc/test.pdf', 'pdf'), true)
     },
     'relative path': (test) => {
-      test.equal(urlUtil().isFileType('/file/abc/test', 'pdf'), false)
+      test.equal(urlUtil().isFileType('file:///file/abc/test', 'pdf'), false)
     },
     'JPG URL': (test) => {
       test.equal(urlUtil().isFileType('http://example.com/test/ABC.JPG?a=b#test', 'jpg'), true)
@@ -365,7 +365,7 @@ module.exports = {
       test.strictEqual(urlUtil().getOrigin('https://abc.bing.com'), 'https://abc.bing.com')
     },
     'gets URL origin for url with port': (test) => {
-      test.strictEqual(urlUtil().getOrigin('https://bing.com:443/?test=1#abc'), 'https://bing.com:443')
+      test.strictEqual(urlUtil().getOrigin('https://bing.com:8000/?test=1#abc'), 'https://bing.com:8000')
     },
     'gets URL origin for IP host': (test) => {
       test.strictEqual(urlUtil().getOrigin('http://127.0.0.1:443/?test=1#abc'), 'http://127.0.0.1:443')
@@ -374,7 +374,11 @@ module.exports = {
       test.strictEqual(urlUtil().getOrigin('about:preferences#abc'), 'about:preferences')
     },
     'gets URL origin for slashless protocol URL': (test) => {
+      test.strictEqual(urlUtil().getOrigin('about:test'), 'about:test')
+      test.strictEqual(urlUtil().getOrigin('about:test/'), 'about:test')
       test.strictEqual(urlUtil().getOrigin('about:test/foo'), 'about:test')
+      test.strictEqual(urlUtil().getOrigin('about:test/foo/bar'), 'about:test')
+      test.strictEqual(urlUtil().getOrigin('about:test/foo/bar#baz'), 'about:test')
     },
     'returns null for invalid URL': (test) => {
       test.strictEqual(urlUtil().getOrigin('abc'), null)
