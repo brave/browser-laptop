@@ -28,7 +28,7 @@ class LedgerBackupContent extends ImmutableComponent {
       <div className={css(styles.ledgerBackupText_bottom)} data-l10n-id='ledgerBackupText2' />
       <div className={css(styles.ledgerBackupContent)}>
         <ClipboardButton
-          data-l10n-id='copyToClipboard'
+          data-l10n-id='Copy'
           className='fa fa-clipboard'
           copyAction={this.onCopy.bind(this, passphrase)}
         />

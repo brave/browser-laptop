@@ -8,6 +8,29 @@ const globalStyles = require('../styles/global')
 
 const BrowserButton = require('./browserButton')
 
+function isCopyButton(dataL10nId) {
+  const l10Id=dataL10nId
+  var button
+  if(l10Id == 'Copy') {
+    button = <BrowserButton groupedItem secondaryColor
+    custom={styles.clipboardButton__browserButton}
+    l10nId='Copy'        
+    testId={this.props.testId}
+    onClick={this.onClick}
+    />
+  } 
+  else {
+    button = <BrowserButton
+    iconClass={globalStyles.appIcons.clipboard}
+    custom={styles.clipboardButton__browserButton}
+    l10nId={this.props.dataL10nId ? this.props.dataL10nId : 'copyToClipboard'}
+    testId={this.props.testId}
+    onClick={this.onClick}
+  />
+  }
+  return button
+}
+
 /**
  * Represents a 'Copy to clipboard' button
  */
@@ -49,13 +72,16 @@ class ClipboardButton extends React.Component {
         onAnimationEnd={this.onAnimationEnd}
         data-l10n-id='copied'
       />
-      <BrowserButton
+
+      <isCopyButton l10Id={this.props.dataL10nId} />
+      
+      {/* <BrowserButton
         iconClass={globalStyles.appIcons.clipboard}
         custom={styles.clipboardButton__browserButton}
         l10nId={this.props.dataL10nId ? this.props.dataL10nId : 'copyToClipboard'}
         testId={this.props.testId}
         onClick={this.onClick}
-      />
+      /> */}
     </span>
   }
 }
@@ -93,7 +119,10 @@ const styles = StyleSheet.create({
   },
 
   clipboardButton__label_visible: {
-    display: 'inline',
+    display: 'block',
+    position: 'absolute',
+    bottom: '-30px',
+    marginLeft: '15px',
     animationName: animation,
     animationDuration: '2s',
     animationTimingFunction: 'cubic-bezier(0.23, 1, 0.32, 1)'
