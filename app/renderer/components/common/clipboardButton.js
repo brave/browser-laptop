@@ -9,14 +9,14 @@ const globalStyles = require('../styles/global')
 const BrowserButton = require('./browserButton')
 
 function isCopyButton(dataL10nId) {
-  const l10Id=dataL10nId
+  const l10Id = dataL10nId
   var button
-  if(l10Id == 'Copy') {
+  if (l10Id === 'Copy') {
     button = <BrowserButton groupedItem secondaryColor
-    custom={styles.clipboardButton__browserButton}
-    l10nId='Copy'        
-    testId={this.props.testId}
-    onClick={this.onClick}
+    custom = {styles.clipboardButton__browserButton}
+    l10nId = 'Copy'        
+    testId = {this.props.testId}
+    onClick = {this.onClick}
     />
   } 
   else {
