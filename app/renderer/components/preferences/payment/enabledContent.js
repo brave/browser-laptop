@@ -139,7 +139,6 @@ class EnabledContent extends ImmutableComponent {
     const val = formatCurrentBalance(ledgerData) || ''
     const big = val.length > 23
 
-
     return <section className={css(styles.balance)}>
       <FormTextbox data-test-id='fundsAmount' readOnly value={val} customClass={big && styles.width_input} />
       <a className={cx({
