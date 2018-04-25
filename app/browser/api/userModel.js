@@ -5,6 +5,7 @@
 'use strict'
 const um = require('@brave-intl/bat-usermodel')
 const path = require('path')
+const getSSID = require('detect-ssid')
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
@@ -35,6 +36,8 @@ const initialize = (state) => {
     priorData = um.getPriorDataSync()
     sampleAdFeed = um.getSampleAdFeed()
   })
+
+  state = retrieveSSID(state)
 
   return state
 }
@@ -272,6 +275,16 @@ const changeAdFrequency = (state, freq) => {
   return state
 }
 
+const retrieveSSID = (state) => {
+  getSSID((err, ssid) => {
+    if (err) return console.error(err)
+
+    console.log('\nSSID: ' + ssid)
+  })
+
+  return state  
+}
+
 const privateTest = () => {
   return 1
 }
@@ -292,8 +305,8 @@ const getMethods = () => {
     recordUnIdle,
     serveAdNow,
     changeAdFrequency,
-    goAheadAndShowTheAd
-
+    goAheadAndShowTheAd,
+    retrieveSSID
   }
 
   let privateMethods = {}

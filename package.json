@@ -102,6 +102,7 @@
     "compare-versions": "^3.0.1",
     "date-fns": "^1.29.0",
     "deepmerge": "^2.0.1",
+    "detect-ssid": "^1.0.3",
     "dtrace-provider": "brave/node-dtrace-provider",
     "electron-localshortcut": "^0.6.0",
     "electron-squirrel-startup": "brave/electron-squirrel-startup",
