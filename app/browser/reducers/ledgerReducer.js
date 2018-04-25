@@ -16,6 +16,7 @@ const tabActionConstants = require('../../common/constants/tabAction')
 const ledgerState = require('../../common/state/ledgerState')
 const pageDataState = require('../../common/state/pageDataState')
 const updateState = require('../../common/state/updateState')
+const tabState = require('../../common/state/tabState')
 
 // Utils
 const windows = require('../windows')
@@ -169,6 +170,18 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerState.setPublishersProp(state, publisherKey, 'pinPercentage', value)
         ledgerApi.savePublisherData(publisherKey, 'pinPercentage', value)
         state = ledgerApi.updatePublisherInfo(state, publisherKey)
+        break
+      }
+    case appConstants.APP_ADD_PUBLISHER_TO_LEDGER:
+      {
+        const location = action.get('location')
+
+        if (!location) {
+          break
+        }
+
+        state = ledgerApi.addNewLocation(state, location, tabState.TAB_ID_NONE, false, true)
+        state = ledgerApi.pageDataChanged(state, {}, true)
         break
       }
     case appConstants.APP_REMOVE_SITE_SETTING:

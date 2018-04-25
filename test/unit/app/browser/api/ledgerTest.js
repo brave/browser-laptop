@@ -36,6 +36,7 @@ describe('ledger api unit tests', function () {
 
   // settings
   let contributionAmount = 10
+  let paymentsMinVisits = 5
   let paymentsMinVisitTime = 5000
   let paymentsNotifications = true
   let paymentsAllowPromotions = true
@@ -79,6 +80,8 @@ describe('ledger api unit tests', function () {
                 : null
           case settings.PAYMENTS_MINIMUM_VISIT_TIME:
             return paymentsMinVisitTime
+          case settings.PAYMENTS_MINIMUM_VISITS:
+            return paymentsMinVisits
           case settings.PAYMENTS_NOTIFICATIONS:
             return paymentsNotifications
           case settings.PAYMENTS_ALLOW_PROMOTIONS:
@@ -1032,15 +1035,26 @@ describe('ledger api unit tests', function () {
   describe('when timing needs to be checked', function () {
     describe('addSiteVisit', function () {
       const fakeTabId = 7
+      const tabIdNone = -1
+      const manualAdd = true
       let stateWithLocation
+      let stateWithLocationTwo
       let fakeClock
+      let saveVisitSpy
       before(function () {
         const locationData = Immutable.fromJS({
           publisher: 'clifton.io',
           stickyP: true,
           exclude: false
         })
+        const locationDataTwo = Immutable.fromJS({
+          publisher: 'brave.com',
+          stickyP: false,
+          exclude: false
+        })
         stateWithLocation = defaultAppState.setIn(['ledger', 'locations', 'https://clifton.io/'], locationData)
+        stateWithLocationTwo = defaultAppState.setIn(['ledger', 'locations', 'https://brave.com/'], locationDataTwo)
+        saveVisitSpy = sinon.spy(ledgerApi, 'saveVisit')
       })
       beforeEach(function () {
         fakeClock = sinon.useFakeTimers()
@@ -1049,6 +1063,31 @@ describe('ledger api unit tests', function () {
       afterEach(function () {
         ledgerApi.setSynopsis(undefined)
         fakeClock.restore()
+        saveVisitSpy.restore()
+      })
+      it('duration is equal to the minimum visit time under a manual addition', function () {
+        const location = 'https://brave.com'
+        const state = ledgerApi.initialize(stateWithLocationTwo, true)
+
+        ledgerApi.addSiteVisit(state, 0, location, tabIdNone, manualAdd)
+        const calledDuration = saveVisitSpy.getCall(0).args[2].duration
+
+        assert.equal(paymentsMinVisitTime, calledDuration)
+      })
+      it('revisited is false under a manual addition', function () {
+        const location = 'https://brave.com'
+        const state = ledgerApi.initialize(stateWithLocationTwo, true)
+
+        ledgerApi.addSiteVisit(state, 0, location, tabIdNone, manualAdd)
+        const calledRevisited = saveVisitSpy.getCall(0).args[2].revisited
+
+        assert.equal(false, calledRevisited)
+      })
+      it('state is not modified on a null location under a manual addition', function () {
+        const location = null
+        const result = ledgerApi.addSiteVisit(defaultAppState, 0, location, tabIdNone, manualAdd)
+
+        assert.deepEqual(defaultAppState.toJS(), result.toJS())
       })
       it('records a visit when over the PAYMENTS_MINIMUM_VISIT_TIME threshold', function () {
         const state = ledgerApi.initialize(stateWithLocation, true)
@@ -1089,6 +1128,50 @@ describe('ledger api unit tests', function () {
         assert.notDeepEqual(result1, state)
         assert.notDeepEqual(result2, result1)
         assert(visitsByPublisher['clifton.io'])
+      })
+    })
+    describe('addNewLocation', function () {
+      const tabIdNone = -1
+      const keepInfo = false
+      const manualAdd = true
+      let addSiteVisitSpy
+      let shouldTrackTabSpy
+      before(function () {
+        addSiteVisitSpy = sinon.spy(ledgerApi, 'addSiteVisit')
+        shouldTrackTabSpy = sinon.spy(ledgerApi, 'shouldTrackTab')
+      })
+      beforeEach(function () {
+        ledgerApi.clearVisitsByPublisher()
+      })
+      after(function () {
+        addSiteVisitSpy.restore()
+        shouldTrackTabSpy.restore()
+      })
+      afterEach(function () {
+        addSiteVisitSpy.reset()
+        shouldTrackTabSpy.reset()
+        ledgerApi.setSynopsis(undefined)
+      })
+      it('does not call should track tab under a manual addition', function () {
+        const location = 'https://brave.com'
+
+        ledgerApi.addNewLocation(defaultAppState, location, tabIdNone, keepInfo, manualAdd)
+
+        assert(shouldTrackTabSpy.notCalled)
+      })
+      it('records enough visits to satisfy the minimum criteria under a manual addition', function () {
+        const location = 'https://brave.com'
+
+        ledgerApi.addNewLocation(defaultAppState, location, tabIdNone, keepInfo, manualAdd)
+
+        assert.equal(addSiteVisitSpy.callCount, paymentsMinVisits)
+      })
+      it('currentTabId is set to -1 (tabState.TAB_ID_NONE) under a manual addition', function () {
+        const location = 'https://brave.com'
+
+        ledgerApi.addNewLocation(defaultAppState, location, tabIdNone, keepInfo, manualAdd)
+
+        assert.equal(tabIdNone, addSiteVisitSpy.getCall(0).args[3])
       })
     })
   })
