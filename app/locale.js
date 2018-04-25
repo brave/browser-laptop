@@ -177,6 +177,7 @@ var rendererIdentifiers = function () {
     'forgetLearnedSpelling',
     'lookupSelection',
     'publisherMediaName',
+    'addToPublisherList',
     // Other identifiers
     'aboutBlankTitle',
     'urlCopied',

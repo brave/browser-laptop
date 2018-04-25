@@ -393,6 +393,48 @@ describe('ledgerUtil unit test', function () {
     })
   })
 
+  describe('shouldShowMenuOption', function () {
+    let ledgerState
+
+    before(function () {
+      ledgerState = Immutable.fromJS({
+        ledger: {}
+      })
+    })
+
+    it('null location', function () {
+      const result = ledgerUtil.shouldShowMenuOption(ledgerState, null)
+      assert.equal(result, false)
+    })
+
+    it('false when location is an invalid url', function () {
+      const result = ledgerUtil.shouldShowMenuOption(ledgerState, 'brave')
+      assert.equal(result, false)
+    })
+
+    it('true when location has protocol and is a valid url', function () {
+      const result = ledgerUtil.shouldShowMenuOption(ledgerState, 'https://brave.com')
+      assert.equal(result, true)
+    })
+
+    it('true when location has protocol and is a valid url', function () {
+      const result = ledgerUtil.shouldShowMenuOption(ledgerState, 'http://www.brave.com')
+      assert.equal(result, true)
+    })
+
+    it('true when location is valid and is not present in the ledger', function () {
+      const stateWithLocations = Immutable.fromJS({
+        ledger: {
+          locations: [
+            'ebay.com'
+          ]
+        }
+      })
+      const result = ledgerUtil.shouldShowMenuOption(stateWithLocations, 'https://brave.com')
+      assert.equal(result, true)
+    })
+  })
+
   describe('getMediaId', function () {
     it('null case', function () {
       const result = ledgerUtil.getMediaId()
