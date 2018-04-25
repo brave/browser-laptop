@@ -8,6 +8,7 @@ const Immutable = require('immutable')
 const moment = require('moment')
 const BigNumber = require('bignumber.js')
 const queryString = require('querystring')
+const tldjs = require('tldjs')
 
 // State
 const siteSettingsState = require('../state/siteSettingsState')
@@ -131,6 +132,22 @@ const walletStatus = (ledgerData) => {
   }
 
   return status
+}
+
+const shouldShowMenuOption = (state, location) => {
+  if (location == null) {
+    return false
+  }
+
+  const publisherKey = tldjs.getDomain(location)
+  const validUrl = urlUtil.isURL(location) && urlParse(location).protocol !== undefined
+  const isVisible = visibleP(state, publisherKey)
+
+  return (
+    validUrl &&
+    !isVisible &&
+    publisherKey != null
+  )
 }
 
 // TODO rename function
@@ -607,7 +624,8 @@ const getMethods = () => {
     milliseconds,
     defaultMonthlyAmounts,
     getDefaultMediaFavicon,
-    generateMediaCacheData
+    generateMediaCacheData,
+    shouldShowMenuOption
   }
 
   let privateMethods = {}
