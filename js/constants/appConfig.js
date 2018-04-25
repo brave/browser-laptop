@@ -189,8 +189,12 @@ module.exports = {
     'sync.type.history': false,
     'sync.type.siteSetting': true,
     'general.downloads.default-save-path': null,
-    // BATads
-    'BATads.enabled': true, // need to default it to off for merge into master
+    // BAT ads
+    'ads.enabled': false,
+    'ads.amount.day': 10,
+    'ads.amount.hour': 1,
+    'ads.place': '',
+    'ads.operating-mode': false,
     // Windows has issues with titlebar mode because it doesn't fire onMouseEnter events if you enter
     // your mouse from the top of the window.  Also users with Surface tablets or Surface books that
     // have immersive mode w/ touch makes it too hard to enter a URL.
