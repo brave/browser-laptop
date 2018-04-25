@@ -23,7 +23,7 @@ const SitePermissionsPage = require('../../app/renderer/components/preferences/s
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
 const TabsTab = require('../../app/renderer/components/preferences/tabsTab')
 const ShieldsTab = require('../../app/renderer/components/preferences/shieldsTab')
-const DemoTab = require('../../app/renderer/components/preferences/demoTab')
+const AdsTab = require('../../app/renderer/components/preferences/adsTab')
 const SyncTab = require('../../app/renderer/components/preferences/syncTab')
 const PluginsTab = require('../../app/renderer/components/preferences/pluginsTab')
 const ExtensionsTab = require('../../app/renderer/components/preferences/extensionsTab')
@@ -803,8 +803,12 @@ class AboutPreferences extends React.Component {
           languageCodes={languageCodes}
           onChangeSetting={this.onChangeSetting} />
         break
-      case preferenceTabs.DEMO:
-        tab = <DemoTab demoValue={demoValue} />
+      case preferenceTabs.ADS:
+        tab = <AdsTab
+          settings={settings}
+          onChangeSetting={this.onChangeSetting}
+          demoValue={demoValue}
+        />
         break
     }
     return <div>

@@ -16,7 +16,7 @@ const preferenceTabs = {
   PAYMENTS: _,
   ADVANCED: _,
   EXTENSIONS: _,
-  DEMO: _
+  ADS: _
 }
 
 module.exports = mapValuesByKeys(preferenceTabs)
