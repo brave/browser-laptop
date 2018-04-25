@@ -87,7 +87,7 @@ module.exports.init = (resourceName, version, startExtension, onInitDone, forceD
 
   let versionFolder = version
   const hasStagedDatFile = [appConfig.resourceNames.ADBLOCK, appConfig.resourceNames.SAFE_BROWSING].includes(resourceName)
-  if (process.env.NODE_ENV === 'development' && hasStagedDatFile) {
+  if (hasStagedDatFile && (process.env.NODE_ENV === 'development' || process.env.BRAVE_USE_STAGING_DATA_FILES !== undefined)) {
     versionFolder = `test/${versionFolder}`
   }
   const url = appConfig[resourceName].url.replace('{version}', versionFolder)
