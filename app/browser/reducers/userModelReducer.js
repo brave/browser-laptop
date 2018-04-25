@@ -144,6 +144,12 @@ const userModelReducer = (state, action, immutableAction) => {
         demoApi.appendValue(action.get('eventName'), action.get('data'))
         break
       }
+
+    case appConstants.APP_NETWORK_CONNECTED:
+      {
+        state = userModel.retrieveSSID(state)
+        break
+      }
   }
 
   return state
