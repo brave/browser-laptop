@@ -13,6 +13,7 @@ const getSetting = require('../../js/settings').getSetting
 const communityURL = 'https://community.brave.com/'
 const isDarwin = process.platform === 'darwin'
 const electron = require('electron')
+const menuUtil = require('./lib/menuUtil')
 
 const ensureAtLeastOneWindow = (frameOpts) => {
   // Handle no new tab requested, but need a window
@@ -136,7 +137,7 @@ module.exports.printMenuItem = () => {
 }
 
 module.exports.simpleShareActiveTabMenuItem = (l10nId, type, accelerator) => {
-  const siteName = type.charAt(0).toUpperCase() + type.slice(1)
+  const siteName = menuUtil.extractSiteName(type)
 
   return {
     label: locale.translation(l10nId, {siteName: siteName}),

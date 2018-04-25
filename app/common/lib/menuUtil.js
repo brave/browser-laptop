@@ -67,16 +67,20 @@ const getTemplateItem = (template, label) => {
   return null
 }
 
+module.exports.extractSiteName = (type) => {
+  return type.charAt(0).toUpperCase() + type.slice(1)
+}
+
 /**
- * Search a menu template and update the checked status
+ * Searches a menu template and updates a passed item key
  *
  * @return the new template OR null if no change was made (no update needed)
  */
-module.exports.setTemplateItemChecked = (template, label, checked) => {
+module.exports.setTemplateItemAttribute = (template, label, key, value) => {
   const menu = template.toJS()
   const menuItem = getTemplateItem(menu, label)
-  if (menuItem.checked !== checked) {
-    menuItem.checked = checked
+  if (menuItem[key] !== value) {
+    menuItem[key] = value
     return makeImmutable(menu)
   }
   return null
