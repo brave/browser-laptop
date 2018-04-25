@@ -14,12 +14,12 @@ const globalStyles = require('../../styles/global')
 
 // other
 const aboutActions = require('../../../../../js/about/aboutActions')
+const ClipboardButton = require('../../common/clipboardButton')
 
 class LedgerBackupContent extends ImmutableComponent {
-  copyToClipboard (text) {
+  onCopy (text) {
     aboutActions.setClipboard(text)
   }
-
   render () {
     const passphrase = this.props.ledgerData.get('passphrase')
 
@@ -27,10 +27,10 @@ class LedgerBackupContent extends ImmutableComponent {
       <div data-l10n-id='ledgerBackupText1' />
       <div className={css(styles.ledgerBackupText_bottom)} data-l10n-id='ledgerBackupText2' />
       <div className={css(styles.ledgerBackupContent)}>
-        <BrowserButton secondaryColor
-          l10nId='copy'
-          testId='copyButtonSecond'
-          onClick={this.copyToClipboard.bind(this, passphrase)}
+        <ClipboardButton
+          data-l10n-id='Copy'
+          className='fa fa-clipboard'
+          copyAction={this.onCopy.bind(this, passphrase)}
         />
         <div className={css(styles.ledgerBackupContent__key)}>{passphrase}</div>
       </div>
