@@ -126,7 +126,7 @@ const userModelReducer = (state, action, immutableAction) => {
     case appConstants.APP_CHANGE_SETTING:
       {
         switch (action.get('key')) {
-          case settings.USERMODEL_ENABLED:
+          case settings.ADS_ENABLED:
             {
               state = userModel.initialize(state, action.get('value'))
               break

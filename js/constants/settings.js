@@ -103,7 +103,12 @@ const settings = {
   // Debug settings
   DEBUG_ALLOW_MANUAL_TAB_DISCARD: 'debug.manual-tab-discard.enabled',
   DEBUG_VERBOSE_TAB_INFO: 'debug.verbose-tab-info.enabled',
-  USERMODEL_ENABLED: 'BATads.enabled',
+  // Ads
+  ADS_ENABLED: 'ads.enabled',
+  ADS_PER_DAY: 'ads.amount.day',
+  ADS_PER_HOUR: 'ads.amount.hour',
+  ADS_PLACE: 'ads.place',
+  ADS_OPERATING_MODE: 'ads.operating-mode',
 
   // DEPRECATED settings
   // DO NOT REMOVE OR CHANGE THESE VALUES
