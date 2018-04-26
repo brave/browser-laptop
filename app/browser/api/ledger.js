@@ -24,6 +24,7 @@ const BigNumber = require('bignumber.js')
 const appActions = require('../../../js/actions/appActions')
 
 // State
+const aboutPreferencesState = require('../../common/state/aboutPreferencesState')
 const ledgerState = require('../../common/state/ledgerState')
 const pageDataState = require('../../common/state/pageDataState')
 const updateState = require('../../common/state/updateState')
@@ -1101,7 +1102,9 @@ const backupKeys = (state, backupAction) => {
 
   if (backupAction === 'print') {
     tabs.create({url: appUrlUtil.aboutUrls.get('about:printkeys')})
-    return
+
+    // we do not check whether the user actually printed the backup word list
+    return aboutPreferencesState.setBackupStatus(state, true)
   }
 
   const dialog = electron.dialog
@@ -1117,11 +1120,13 @@ const backupKeys = (state, backupAction) => {
     if (file) {
       try {
         fs.writeFileSync(file, message)
+        appActions.onLedgerBackupSuccess()
       } catch (e) {
         console.error('Problem saving backup keys')
       }
     }
   })
+  return state
 }
 
 const fileRecoveryKeys = (state, recoveryKeyFile) => {
@@ -1841,6 +1846,9 @@ const onWalletProperties = (state, body) => {
   const balance = parseFloat(body.get('balance'))
   if (balance >= 0) {
     state = ledgerState.setInfoProp(state, 'balance', balance)
+    if (balance > 0) {
+      state = ledgerState.setInfoProp(state, 'userHasFunded', true)
+    }
     lockInContributionAmount(state, balance)
   }
 
