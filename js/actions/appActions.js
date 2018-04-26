@@ -1967,6 +1967,12 @@ const appActions = {
       duration,
       revisited
     })
+  },
+
+  onLedgerBackupSuccess: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_BACKUP_SUCCESS
+    })
   }
 }
 

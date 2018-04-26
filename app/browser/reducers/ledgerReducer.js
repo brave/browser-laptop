@@ -16,6 +16,7 @@ const tabActionConstants = require('../../common/constants/tabAction')
 const ledgerState = require('../../common/state/ledgerState')
 const pageDataState = require('../../common/state/pageDataState')
 const updateState = require('../../common/state/updateState')
+const aboutPreferencesState = require('../../common/state/aboutPreferencesState')
 const tabState = require('../../common/state/tabState')
 
 // Utils
@@ -46,7 +47,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_BACKUP_KEYS:
       {
-        ledgerApi.backupKeys(state, action.get('backupAction'))
+        state = ledgerApi.backupKeys(state, action.get('backupAction'))
         break
       }
     case appConstants.APP_RECOVER_WALLET:
@@ -511,6 +512,11 @@ const ledgerReducer = (state, action, immutableAction) => {
           action.get('duration'),
           action.get('revisited')
         )
+        break
+      }
+    case appConstants.APP_ON_LEDGER_BACKUP_SUCCESS:
+      {
+        state = aboutPreferencesState.setBackupStatus(state, true)
         break
       }
   }

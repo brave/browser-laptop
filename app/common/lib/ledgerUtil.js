@@ -596,6 +596,7 @@ const defaultMonthlyAmounts = Immutable.List([5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 
 
 const milliseconds = {
   year: 365 * 24 * 60 * 60 * 1000,
+  month: (365 * 24 * 60 * 60 * 1000) / 12,
   week: 7 * 24 * 60 * 60 * 1000,
   day: 24 * 60 * 60 * 1000,
   hour: 60 * 60 * 1000,
