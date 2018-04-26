@@ -23,7 +23,10 @@
 const Immutable = require('immutable')
 const assert = require('assert')
 
-// utilities
+// Constants
+const settings = require('../../../js/constants/settings')
+
+// Utils
 const {makeImmutable, makeJS, isMap} = require('../../common/state/immutableUtil')
 const urlUtil = require('../../../js/lib/urlutil')
 
@@ -296,6 +299,48 @@ const userModelState = {
     }))
 
     return state
+  },
+
+  setSSID: (state, value) => {
+    if (!value || value.length === 0) {
+      value = 'unknown'
+    }
+    const current = userModelState.getSSID(state)
+    state = state.setIn(['userModel', 'currentSSID'], value)
+
+    if (current !== value) {
+      const place = userModelState.getAdPlace(state)
+      let newValue = ''
+      if (place) {
+        newValue = place
+      }
+      state = state.setIn(['settings', settings.ADS_PLACE], newValue)
+    }
+
+    return state
+  },
+
+  getSSID: (state) => {
+    return state.getIn(['userModel', 'currentSSID']) || null
+  },
+
+  getAdPlace: (state) => {
+    const ssid = userModelState.getSSID(state)
+    const places = state.getIn(['userModel', 'places'])
+    if (!places || !ssid || !isMap(places)) {
+      return null
+    }
+
+    return places.get(ssid) || null
+  },
+
+  setAdPlace: (state, place) => {
+    const ssid = userModelState.getSSID(state)
+    if (!ssid) {
+      return state
+    }
+
+    return state.setIn(['userModel', 'places', ssid], place)
   }
 }
 

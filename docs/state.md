@@ -640,6 +640,7 @@ AppStore
     adClass: any,
     adFrequency: any,
     adServed: any,
+    currentSSID: string,
     error: {
       caller: string,
       error: string
@@ -656,6 +657,7 @@ AppStore
     shopActivity: any,
     shopUrl: any,
     pageClass: any,
+    places: string[],
     purchaseActive: any,
     purchaseTime: any,
     purchaseUrl: any,
