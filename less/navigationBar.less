@@ -538,9 +538,8 @@
   position: relative; // PR #6485
   width: 0; // Fixes #4298
   align-items: center;
-  justify-content: center;
   height: @urlbarFormHeight;
-  padding: 0 3px 0 3px;
+  padding: 0 3px 0 8px;
   display: flex;
   flex-grow: 1;
   border-radius: 3px;
@@ -718,12 +717,9 @@
     input {
       border: none;
       box-sizing: border-box;
-
+      line-height: 1;
       cursor: text;
-
       outline: none;
-
-
 
       // #4922: make the whole .urlbarForm clickable
 //      height: @urlbarFormHeight;
@@ -747,10 +743,18 @@
       flex-grow: 1;
       font-size: 13px;
       font-weight: normal;
+      overflow-x: hidden;
       text-overflow: ellipsis;
       min-width: 0%; // allow the navigator to shrink
       width: 100%;
-      line-height: 1;
+
+    }
+
+    .titleBar
+    {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     // Create 25x25 square and place .urlbarIcon at the center of it
@@ -758,43 +762,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      height: @urlbarFormHeight;
-      min-height: @urlbarFormHeight;
-      margin-right: 5px;
-      max-width: 40%;
-
-      .urlbarIcon {
-        color: @siteSecureColor;
-        font-size: 12px;
-        background-repeat: no-repeat;
-        background-position: center;
-        position: relative;
-        bottom: -1px;
-        padding: 5px 0px 5px 5px;
-
-        // about:newtab
-        &.fa-search {
-          position: relative;
-          bottom: 0;
-          // 50% of rgb(90, 90, 98)
-          color: rgba(90, 90, 98, 0.5);
-        }
-
-        &.fa-lock,
-        &.fa-unlock,
-        &.fa-exclamation-triangle {
-          font-size: 16px;
-          bottom: 0;
-        }
-
-        &.insecure-color {
-          color: @siteInsecureColor;
-        }
-
-        &.extendedValidation {
-          color: @siteEVColor;
-        }
-      }
+      height: 100%;
+      margin-right: 10px;
 
       .evCert {
         font-size: 12px;

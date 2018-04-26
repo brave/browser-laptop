@@ -27,8 +27,6 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const {isPotentialPhishingUrl} = require('../../../../js/lib/urlutil')
 
-const searchIconSize = 16
-
 function EncryptedIcon () {
   return <svg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14'>
     <path fill='none' className={css(iconStyles.linePath)} strokeLinecap='round' strokeLinejoin='round'
@@ -160,11 +158,13 @@ class UrlBarIcon extends React.Component {
     let icon = null
     let iconTestId = ''
     let isVeryInsecure = false
+    let isVerySecure = false
     if (this.props.activateSearchEngine) {
 
     } else if (this.props.isPotentialPhishingUrl) {
       icon = <WarningIcon />
       iconTestId = 'isPotentialPhishingUrl'
+      isVeryInsecure = true
     } else if (this.isSearch) {
       icon = <DefaultSearchIcon />
       iconTestId = 'isSearch'
@@ -175,6 +175,7 @@ class UrlBarIcon extends React.Component {
       if (this.props.isSecure === true) {
         icon = <EncryptedIcon />
         iconTestId = 'isSecure'
+        isVerySecure = true
       } else if (this.props.isSecure === 1) {
         icon = <UnencryptedIcon />
         iconTestId = 'isInsecure'
@@ -196,8 +197,8 @@ class UrlBarIcon extends React.Component {
       {...props}
       className={css(
         styles.urlBarIcon,
-        this.props.isSecure === true && styles.urlBarIcon_secure,
-        (isVeryInsecure || this.props.isPotentialPhishingUrl) && styles.urlBarIcon_warning,
+        isVerySecure && styles.urlBarIcon_secure,
+        isVeryInsecure && styles.urlBarIcon_warning,
         this.props.activateSearchEngine && styles.urlBarIcon_specificSearchEngine
       )}
       style={instanceStyles}>
@@ -206,9 +207,13 @@ class UrlBarIcon extends React.Component {
   }
 }
 
+const searchIconSize = 16
 const styles = StyleSheet.create({
   urlBarIcon: {
-    '--url-bar-icon-color': '#696970'
+    '--url-bar-icon-color': '#696970',
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center'
   },
 
   urlBarIcon_secure: {
@@ -222,8 +227,9 @@ const styles = StyleSheet.create({
   urlBarIcon_specificSearchEngine: {
     backgroundImage: 'var(--search-engine-favicon-url)',
     backgroundSize: searchIconSize,
-    width: searchIconSize,
-    height: searchIconSize
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center center',
+    width: searchIconSize
   }
 })
 
