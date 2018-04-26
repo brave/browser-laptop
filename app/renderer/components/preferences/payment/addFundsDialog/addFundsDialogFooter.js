@@ -37,6 +37,7 @@ class AddFundsDialogFooter extends React.Component {
         break
       case 'addFundsWizardAddress':
         appActions.onChangeAddFundsDialogStep('addFundsWizardMain')
+        this.props.onNavigate()
         break
       default:
         break
@@ -59,6 +60,7 @@ class AddFundsDialogFooter extends React.Component {
         // and remove the current
         // appActions.onChangeAddFundsDialogStep('batContribMatching')
         appActions.onChangeAddFundsDialogStep('addFundsWizardMain')
+        this.props.onNavigate()
         break
     }
   }
