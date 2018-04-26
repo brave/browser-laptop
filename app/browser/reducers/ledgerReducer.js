@@ -175,13 +175,16 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ADD_PUBLISHER_TO_LEDGER:
       {
+        const tabId = action.get('tabId')
         const location = action.get('location')
 
         if (!location) {
           break
         }
 
-        state = ledgerApi.addNewLocation(state, location, tabState.TAB_ID_NONE, false, true)
+        const passedTabId = tabId || tabState.TAB_ID_NONE
+
+        state = ledgerApi.addNewLocation(state, location, passedTabId, false, true)
         state = ledgerApi.pageDataChanged(state, {}, true)
         break
       }
