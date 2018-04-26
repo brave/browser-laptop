@@ -96,7 +96,7 @@ class EnabledContent extends ImmutableComponent {
             customClass={styles.place_input}
             data-test-id='adsPlace'
             value={getSetting(settings.ADS_PLACE, this.props.settings)}
-            onChange={changeSetting.bind(null, this.onChangeSetting, settings.ADS_PLACE)}
+            onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.ADS_PLACE)}
           />
         </div>
         <div className={css(gridStyles.row3col1, styles.enabledContent__walletBar__message)}>
