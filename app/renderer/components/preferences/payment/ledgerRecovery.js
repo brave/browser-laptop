@@ -20,11 +20,18 @@ const commonStyles = require('../../styles/commonStyles')
 // other
 const aboutActions = require('../../../../../js/about/aboutActions')
 const appActions = require('../../../../../js/actions/appActions')
+const keyCodes = require('../../../../../app/common/constants/keyCodes')
 
 class LedgerRecoveryContent extends ImmutableComponent {
   constructor () {
     super()
     this.handleRecoveryKeyChange = this.handleRecoveryKeyChange.bind(this)
+  }
+
+  componentDidUpdate () {
+    if (this.refs.ledgerRecoveryOverlay) {
+      this.refs.ledgerRecoveryOverlay.focus()
+    }
   }
 
   handleRecoveryKeyChange (e) {
@@ -34,6 +41,19 @@ class LedgerRecoveryContent extends ImmutableComponent {
   clearRecoveryStatus () {
     this.props.hideAdvancedOverlays()
     appActions.resetRecoverStatus()
+  }
+
+  onRecoveryOverlay (success) {
+    this.clearRecoveryStatus(success)
+    this.refs.ledgerRecoveryOverlay = null
+    this.props.setOverlayName('ledgerRecovery')
+  }
+
+  onEscape (e, status) {
+    e.stopPropagation()
+    if (e.keyCode === keyCodes.ESC) {
+      this.onRecoveryOverlay(status)
+    }
   }
 
   render () {
@@ -47,7 +67,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
     return <section>
       {
         recoverySucceeded === true
-          ? <section className={css(styles.recoveryOverlay)}>
+          ? <section className={css(styles.recoveryOverlay)} onKeyDown={(e) => this.onEscape(e, true)} ref='ledgerRecoveryOverlay' tabIndex='0'>
             <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoverySucceeded' />
             <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='balanceRecovered'
@@ -56,14 +76,14 @@ class LedgerRecoveryContent extends ImmutableComponent {
             <BrowserButton secondaryColor
               l10nId='ok'
               testId='okButton'
-              onClick={this.clearRecoveryStatus.bind(this)}
+              onClick={this.onRecoveryOverlay.bind(this, true)}
             />
           </section>
           : null
       }
       {
         (recoverySucceeded === false && recoveryError && isNetworkError)
-          ? <section className={css(styles.recoveryOverlay)}>
+          ? <section className={css(styles.recoveryOverlay)} onKeyDown={(e) => this.onEscape(e, false)} ref='ledgerRecoveryOverlay' tabIndex='0'>
             <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoveryNetworkFailedTitle' data-test-id='recoveryError' />
             <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='ledgerRecoveryNetworkFailedMessage'
@@ -71,14 +91,14 @@ class LedgerRecoveryContent extends ImmutableComponent {
             <BrowserButton secondaryColor
               l10nId='ok'
               testId='okButton'
-              onClick={this.clearRecoveryStatus.bind(this)}
+              onClick={this.onRecoveryOverlay.bind(this, false)}
             />
           </section>
           : null
       }
       {
         (recoverySucceeded === false && recoveryError && !isNetworkError)
-          ? <section className={css(styles.recoveryOverlay)}>
+          ? <section className={css(styles.recoveryOverlay)} onKeyDown={(e) => this.onEscape(e, false)} ref='ledgerRecoveryOverlay' tabIndex='0'>
             <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoveryFailedTitle' />
             <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
               data-l10n-id='ledgerRecoveryFailedMessage'
@@ -86,7 +106,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
             <BrowserButton secondaryColor
               l10nId='ok'
               testId='okButton'
-              onClick={this.clearRecoveryStatus.bind(this)}
+              onClick={this.onRecoveryOverlay.bind(this, false)}
             />
           </section>
           : null
@@ -118,10 +138,12 @@ class LedgerRecoveryFooter extends ImmutableComponent {
 
   recoverWallet () {
     aboutActions.ledgerRecoverWallet(this.props.state.recoveryKey)
+    this.props.setOverlayName('ledgerRecoveryStatus')
   }
 
   recoverWalletFromFile () {
     aboutActions.ledgerRecoverWalletFromFile()
+    this.props.setOverlayName('ledgerRecoveryStatus')
   }
 
   render () {
@@ -130,7 +152,7 @@ class LedgerRecoveryFooter extends ImmutableComponent {
         <BrowserButton groupedItem secondaryColor
           l10nId='recoverFromFile'
           testId='recoverFromFileButton'
-          onClick={this.recoverWalletFromFile}
+          onClick={this.recoverWalletFromFile.bind(this)}
         />
       </div>
       <div>
@@ -142,7 +164,7 @@ class LedgerRecoveryFooter extends ImmutableComponent {
         <BrowserButton groupedItem primaryColor
           l10nId='recover'
           testId='recoverButton'
-          onClick={this.recoverWallet}
+          onClick={this.recoverWallet.bind(this)}
         />
       </div>
     </div>
