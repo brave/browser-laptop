@@ -1834,10 +1834,11 @@ const appActions = {
    * Dispatches a message to add a given publisher to the ledger.
    * @param location - the URL of the publisher
    */
-  addPublisherToLedger: function (location) {
+  addPublisherToLedger: function (location, tabId = false) {
     dispatch({
       actionType: appConstants.APP_ADD_PUBLISHER_TO_LEDGER,
-      location
+      location,
+      tabId
     })
   },
 
