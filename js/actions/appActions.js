@@ -2012,6 +2012,13 @@ const appActions = {
     })
   },
 
+  onSSIDReceived: function (value) {
+    dispatch({
+      actionType: appConstants.APP_ON_ADS_SSID_RECEIVED,
+      value
+    })
+  },
+
   onNativeNotificationClick: function (data) {
     dispatch({
       actionType: appConstants.APP_ON_NATIVE_NOTIFICATION_CLICK,

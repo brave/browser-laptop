@@ -131,9 +131,15 @@ const userModelReducer = (state, action, immutableAction) => {
               state = userModel.initialize(state, action.get('value'))
               break
             }
+          // TODO check why this is here and fix if needed, currently is not triggered
           case settings.ADJUST_FREQ:
             {
               state = userModel.changeAdFreq(state, action.get('value'))
+              break
+            }
+          case settings.ADS_PLACE:
+            {
+              state = userModelState.setAdPlace(state, action.get('value'))
               break
             }
         }
@@ -144,10 +150,14 @@ const userModelReducer = (state, action, immutableAction) => {
         demoApi.appendValue(action.get('eventName'), action.get('data'))
         break
       }
-
     case appConstants.APP_NETWORK_CONNECTED:
       {
-        state = userModel.retrieveSSID(state)
+        userModel.retrieveSSID()
+        break
+      }
+    case appConstants.APP_ON_ADS_SSID_RECEIVED:
+      {
+        state = userModelState.setSSID(state, action.get('value'))
         break
       }
   }
