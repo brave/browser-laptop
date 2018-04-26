@@ -722,6 +722,8 @@ describe('ledgerReducer unit tests', function () {
   describe('APP_ADD_PUBLISHER_TO_LEDGER', function () {
     let addNewLocationSpy
     let pageDataChangedSpy
+    const tabIdNone = -1
+    const testTabId = 7
 
     beforeEach(function () {
       addNewLocationSpy = sinon.spy(fakeLedgerApi, 'addNewLocation')
@@ -736,7 +738,8 @@ describe('ledgerReducer unit tests', function () {
     it('executes', function () {
       const newState = ledgerReducer(appState, Immutable.fromJS({
         actionType: appConstants.APP_ADD_PUBLISHER_TO_LEDGER,
-        location: 'https://brave.com'
+        location: 'https://brave.com',
+        tabId: false
       }))
       assert(addNewLocationSpy.calledOnce)
       assert(pageDataChangedSpy.calledOnce)
@@ -746,11 +749,41 @@ describe('ledgerReducer unit tests', function () {
     it('takes no action with a null location', function () {
       const newState = ledgerReducer(appState, Immutable.fromJS({
         actionType: appConstants.APP_ADD_PUBLISHER_TO_LEDGER,
-        location: null
+        location: null,
+        tabId: false
       }))
       assert(addNewLocationSpy.notCalled)
       assert(pageDataChangedSpy.notCalled)
       assert.deepEqual(newState, appState)
+    })
+
+    it('tab Id passed is equal to tabState.TAB_ID_NONE when not added via toggle', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ADD_PUBLISHER_TO_LEDGER,
+        location: 'https://brave.com',
+        tabId: false
+      }))
+      assert.equal(tabIdNone, addNewLocationSpy.getCall(0).args[2])
+    })
+
+    it('executes when dispatched with a tab id', function () {
+      const newState = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ADD_PUBLISHER_TO_LEDGER,
+        location: 'https://brave.com',
+        tabId: testTabId
+      }))
+      assert(addNewLocationSpy.calledOnce)
+      assert(pageDataChangedSpy.calledOnce)
+      assert.notDeepEqual(newState, appState)
+    })
+
+    it('tab Id passed to addNewLocation is equal to passed tabId', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ADD_PUBLISHER_TO_LEDGER,
+        location: 'https://brave.com',
+        tabId: testTabId
+      }))
+      assert.equal(testTabId, addNewLocationSpy.getCall(0).args[2])
     })
   })
 })

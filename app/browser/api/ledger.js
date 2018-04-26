@@ -851,7 +851,7 @@ const shouldTrackTab = (state, tabId) => {
 
 const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo = false, manualAdd = false) => {
   // We always want to have the latest active tabId
-  const currentTabId = manualAdd ? tabState.TAB_ID_NONE : pageDataState.getLastActiveTabId(state)
+  const currentTabId = manualAdd ? tabId : pageDataState.getLastActiveTabId(state)
   state = pageDataState.setLastActiveTabId(state, tabId)
   if (location === currentUrl && !manualAdd) {
     return state

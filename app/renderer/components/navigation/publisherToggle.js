@@ -14,6 +14,7 @@ const BrowserButton = require('../common/browserButton')
 const appActions = require('../../../../js/actions/appActions')
 
 // State
+const tabState = require('../../../common/state/tabState')
 const ledgerState = require('../../../common/state/ledgerState')
 
 // Utils
@@ -51,18 +52,24 @@ class PublisherToggle extends React.Component {
   onAuthorizePublisher () {
     if (this.props.isVisibleInLedger) {
       appActions.changeSiteSetting(this.props.hostPattern, 'ledgerPayments', !this.props.isEnabledForPaymentsPublisher)
+    } else {
+      appActions.addPublisherToLedger(this.props.location, this.props.tabId)
+      appActions.changeSiteSetting(this.props.hostPattern, 'ledgerPayments', true)
     }
   }
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const tabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
     const location = activeFrame.get('location', '')
     const locationId = getBaseUrl(location)
     const publisherKey = ledgerState.getVerifiedPublisherLocation(state, locationId)
 
     const props = {}
     // used in renderer
+    props.tabId = tabId
+    props.location = location
     props.isVisibleInLedger = ledgerUtil.visibleP(state, publisherKey)
     props.isEnabledForPaymentsPublisher = ledgerUtil.stickyP(state, publisherKey)
     props.isVerifiedPublisher = ledgerState.getPublisherOption(state, publisherKey, 'verified')
