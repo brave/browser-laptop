@@ -31,7 +31,7 @@
 
 // Windows specific styles
 .platform--win32 {
-  div#window.frameless:not(.isFullScreen):not(.isMaximized) {
+  #window.frameless:not(.isFullScreen):not(.isMaximized) {
     border: 1px solid #000;
     box-sizing: border-box;
   }
@@ -59,10 +59,6 @@
     .navigatorWrapper .topLevelEndButtons .extraDragArea {
       width: 0;
     }
-  }
-
-  @media (max-width: @breakpointSmallWin32) {
-    #titleBar { width: 100px; }
   }
 
   @media (max-width: @breakpointTinyWin32) {
@@ -239,8 +235,6 @@
           width: 45px;
           border: 0;
           background-color: transparent;
-
-          &.fullscreen { }
 
           &.minimize {
             &:hover {
@@ -430,16 +424,6 @@
       height: 100%;
       margin: 0;
     }
-
-    .backButton {
-      background: url('../img/toolbar/back_btn.svg') center no-repeat;
-      background-size: 14px 14px;
-    }
-
-    .forwardButton {
-      background: url('../img/toolbar/forward_btn.svg') center no-repeat;
-      background-size: 14px 14px;
-    }
   }
 
   // Navigation bar at the center
@@ -450,9 +434,7 @@
     max-width: 900px;
     margin-right: @rightMargin;
 
-    &.titleMode {
-      padding-right: @centerOffset;
-    }
+
 
     @media (max-width: @breakpointNarrowViewport) {
       padding-right: 0;
@@ -460,13 +442,6 @@
 
     @media (max-width: @breakpointNarrowViewport) {
       width: 100%;
-    }
-
-    &.titleMode {
-      @media (max-width: @breakpointNarrowViewport) {
-        transition: padding @transitionDuration ease-in-out;
-        padding-right: 0;
-      }
     }
   }
 
@@ -485,14 +460,6 @@
       }
     }
   }
-}
-
-.navigationButton {
-  background-color: @buttonColor;
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  margin: 0 7px 0 0;
 }
 
 .navigationButtonContainer {
@@ -533,15 +500,6 @@
     background-size: 11px 11px;
   }
 
-  .reloadButton {
-    background: url('../img/toolbar/reload_btn.svg') center no-repeat;
-    background-size: 13px 13px;
-  }
-
-  .homeButton {
-    background: url('../img/toolbar/home_btn.svg') center no-repeat;
-    background-size: 16px 16px;
-  }
 }
 
 .navigatorWrapper {
@@ -567,7 +525,7 @@
       opacity: 0.2;
 
       &:not([disabled]) {
-        opacity: 0.85;
+        opacity: 1;
         -webkit-app-region: no-drag;
       }
     }
@@ -578,13 +536,76 @@
   position: relative; // PR #6485
   width: 0; // Fixes #4298
   align-items: center;
-  justify-content: center;
   height: @urlbarFormHeight;
-  padding: 0 10px 0 3px;
+  padding: 0 8px 0 8px;
+  margin-right: 5px;
   display: flex;
   flex-grow: 1;
-  min-width: 30px; // allow the navigator to shrink
- 
+  border-radius: 3px;
+  min-width: 0;
+
+
+  color: @chromeText;
+  background-clip: padding-box;
+  // transition: background .24s ease-in-out, border .24s ease-in-out;
+  transition-duration: var(--url-bar-progress-transition-duration, .24s);
+  --url-border-color: rgb(214,218,221);
+  // non-title-mode and not hover and not focused
+  border: 1px solid var(--url-border-color);
+  box-shadow: 0 0 0 rgba(0,0,0,.05);
+  --url-bg-color: white;
+  background-color: var(--url-bg-color);
+
+  // progress indicator
+  position: relative;
+  &:before {
+    content: ' ';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    opacity: 0;
+
+    border: none;
+    border-radius: 3px;
+    // loading-progress-bar achieved through background position
+    transition: background var(--url-bar-progress-transition-duration, .24s) ease-out, opacity .24s ease-out;
+    transition-duration: var(--url-bar-progress-transition-duration, .24s);
+    // subtle variation in loading-progress-bar gradient
+    background:  linear-gradient(to right, transparent 0%, rgba(74, 144, 226, .05) 4%, rgba(74, 144, 226, .1) 100%, rgba(74, 144, 226, .2) 196%, transparent 200%) -4% top / 200% 100% no-repeat, var(--url-bg-color) left top / 100% 100% no-repeat;
+    // default to done
+    background-position: ~"calc(200% - var(--navigation-progress-percent, 300%)) top";
+  }
+
+  &.urlBarForm_loading {
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  // title mode
+  &.urlBarForm_titleMode {
+    --url-bg-color: rgba(255, 255, 255, .4);
+    border-color: transparent;
+  }
+
+  &.urlBarForm_tabChanged {
+    --url-bar-progress-transition-duration: 0s;
+  }
+
+  // hover or focused
+  &:hover,
+  &.urlBarForm_focused {
+    box-shadow: 0 0px 3px 0 var(--url-border-color); // 0 0px 5px 0 rgba(74, 144, 226, 0.3)
+  }
+
+  // focused
+  &.urlBarForm_focused {
+    --url-border-color: rgba(74, 144, 226,.4) ;
+  }
+
+
   *:not(legend) {
     z-index: @zindexUrlbarNotLegend;
   }
@@ -605,18 +626,7 @@
   }
 
   input:focus + legend:before {
-    display: block;
-  }
-
-  #navigator:not(.titleMode) & {
-    border-radius: 0px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    box-shadow: inset 0 0 0 1px rgba(187, 187, 187, 1.0);
-    color: @chromeText;
-
-    // #4922
-    background: @chromeControlsBackground2;
+    //display: block;
   }
 
   @media (max-width: @breakpointNarrowViewport) {
@@ -633,10 +643,10 @@
   position: relative;
   user-select: none;
   z-index: @zindexNavigationBar;
-
   // #6253 #6680
   > * {
     -webkit-app-region: no-drag;
+    z-index: @zindexNavigationBarElements;
   }
 
   form {
@@ -651,116 +661,20 @@
     display: flex;
   }
 
-  &:not(.titleMode) {
-    > * {
-      animation: fadeIn .6s;
-      z-index: @zindexNavigationBarElements;
-    }
-
-    .urlbarForm {
-      &.noBorderRadius {
-        border-radius: 0;
-
-        legend:before {
-          border-radius: 0;
-        }
-      }
-    }
-
-    // Create 25x25 squares and place the buttons at the center of each container
-    .bookmarkButtonContainer,
-    .addPublisherButtonContainer {
-      border: 1px solid @urlBarOutline;
-      border-radius: @borderRadiusURL;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      height: @urlbarFormHeight;
-      width: @urlbarFormHeight;
-      min-height: @urlbarFormHeight;
-      min-width: @urlbarFormHeight;
-      -webkit-app-region: no-drag;
-    }
-
-    .bookmarkButtonContainer {
-      border-right: none;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-
-      .bookmarkButton {
-        background: url('../img/toolbar/bookmark_btn.svg') center no-repeat;
-        -webkit-mask-repeat: no-repeat;
-        background-size: 14px 14px;
-        margin: 0;
-        height: 0;
-        width: @urlbarFormHeight; // #6704
-        height: @urlbarFormHeight; // #6704
-
-        &.removeBookmarkButton {
-          background: url('../img/toolbar/bookmark_marked.svg') center no-repeat;
-          background-size: 14px 14px;
-        }
-      }
-    }
+  // Create 25x25 squares and place the buttons at the center of each container
+  .addPublisherButtonContainer {
+    border: 1px solid @urlBarOutline;
+    border-radius: @borderRadiusURL;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    height: @urlbarFormHeight;
+    width: @urlbarFormHeight;
+    min-height: @urlbarFormHeight;
+    min-width: @urlbarFormHeight;
+    -webkit-app-region: no-drag;
   }
 
-  &.titleMode {
-    &:extend(#navigator:not(.titleMode).urlbarForm);
-    animation: fadeIn 1.2s;
-    background: none;
-    // border-radius: @borderRadiusURL;
-    // box-shadow: inset 0 0 0 1px rgba(187, 187, 187, 1.0);
-
-    .urlbarForm {
-      background: none;
-    }
-
-    input {
-      display: none;
-    }
-    #titleBar {
-      display: inline-block;
-      color: @chromeText;
-      font-size: 13px;
-      max-width: 100%;
-      overflow-x: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      margin-left: 2px;
-
-      strong {
-        font-weight: 600;
-      }
-    }
-
-    .endButtons {
-      display: none;
-    }
-
-    .urlbarIcon {
-      display: inline-block;
-      opacity: 0.5;
-      position: relative;
-      left: 2px;
-      min-width: 0;
-
-      &.insecure-color {
-        color: @siteInsecureColor;
-        opacity: 1.0;
-      }
-    }
-
-    .bookmarkButton {
-      &:not(.removeBookmarkButton) {
-        display: none;
-      }
-    }
-  }
-
-  #titleBar {
-    display: none;
-    text-overflow: ellipsis;
-  }
 
   .urlbarForm {
     .loadTime {
@@ -772,6 +686,14 @@
       &.onFocus {
         display: none;
       }
+
+      &.noBorderRadius {
+        border-radius: 0;
+
+        legend:before {
+          border-radius: 0;
+        }
+      }
     }
 
     /* Disable selection of button text */
@@ -779,29 +701,15 @@
        user-select: none;
     }
 
-    .inputbar-wrapper {
-      display: flex;
-      flex: 1 1 0;
-      border-radius: 4px;
-      align-items: center;
-      justify-content: center;
-    }
-
     input {
       border: none;
       box-sizing: border-box;
-      color: #333;
-      letter-spacing: -0.125px;
+      line-height: 1;
       cursor: text;
-      flex-grow: 1;
-      font-size: 13.5px;
-      font-weight: normal;
       outline: none;
-      text-overflow: ellipsis;
-      min-width: 0%; // allow the navigator to shrink
 
       // #4922: make the whole .urlbarForm clickable
-      height: @urlbarFormHeight;
+//      height: @urlbarFormHeight;
       background: transparent;
 
       &.private {
@@ -814,48 +722,35 @@
       }
     }
 
+    input,
+    .titleBar
+    {
+      color: #333;
+      letter-spacing: -0.125px;
+      flex-grow: 1;
+      font-size: 13px;
+      font-weight: normal;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+      min-width: 0%; // allow the navigator to shrink
+      width: 100%;
+
+    }
+
+    .titleBar
+    {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     // Create 25x25 square and place .urlbarIcon at the center of it
     .urlbarIconContainer {
       display: flex;
       align-items: center;
       justify-content: center;
-      height: @urlbarFormHeight;
-      min-height: @urlbarFormHeight;
-      margin-right: 5px;
-      max-width: 40%;
-
-      .urlbarIcon {
-        color: @siteSecureColor;
-        font-size: 12px;
-        background-repeat: no-repeat;
-        background-position: center;
-        position: relative;
-        bottom: -1px;
-        padding: 5px 0px 5px 5px;
-
-        // about:newtab
-        &.fa-search {
-          position: relative;
-          bottom: 0;
-          // 50% of rgb(90, 90, 98)
-          color: rgba(90, 90, 98, 0.5);
-        }
-
-        &.fa-lock,
-        &.fa-unlock,
-        &.fa-exclamation-triangle {
-          font-size: 16px;
-          bottom: 0;
-        }
-
-        &.insecure-color {
-          color: @siteInsecureColor;
-        }
-
-        &.extendedValidation {
-          color: @siteEVColor;
-        }
-      }
+      height: 100%;
+      margin-right: 10px;
 
       .evCert {
         font-size: 12px;
