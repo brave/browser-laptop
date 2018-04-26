@@ -1,9 +1,23 @@
 # Changelog
 
+## [0.22.667](https://github.com/brave/browser-laptop/releases/tag/v0.22.667dev)
+
+ - Improved accuracy of recorded time in Brave Payments when watching Twitch. ([#13828](https://github.com/brave/browser-laptop/issues/13828))
+ - Fixed updates sometimes failing on macOS. ([#2184](https://github.com/brave/browser-laptop/issues/2184))
+ - Fixed transactions not being recorded in ledger-state.json. ([#13544](https://github.com/brave/browser-laptop/issues/13544))
+ - Fixed tabs and windows opening in minimized state when using Brave menu items while all windows have been minimized. ([#13865](https://github.com/brave/browser-laptop/issues/13865))
+ - Fixed inability to open windows using the dock on macOS when there are no Brave windows opened. ([#13860](https://github.com/brave/browser-laptop/issues/13860))
+ - Fixed inability to open hyperlinks on macOS when there are no Brave windows opened. ([#13859](https://github.com/brave/browser-laptop/issues/13859))
+ - Fixed inability to open new tabs using the file menu on macOS when there are no Brave windows opened. ([#13689](https://github.com/brave/browser-laptop/issues/13689))
+ - Upgraded to muon 5.2.6. ([#13911](https://github.com/brave/browser-laptop/issues/13911))
+ - Upgraded to Chromium 66.0.3359.117. ([#13912](https://github.com/brave/browser-laptop/issues/13912))
+
 ## [0.22.22](https://github.com/brave/browser-laptop/releases/tag/v0.22.22dev)
+
  - Fixed missing static variable on macOS for first-run referral program installs. ([#13853](https://github.com/brave/browser-laptop/issues/13853))
 
 ## [0.22.21](https://github.com/brave/browser-laptop/releases/tag/v0.22.21dev)
+
  - Improvements to the referral program. ([#13754](https://github.com/brave/browser-laptop/issues/13754))
  - Reverted quarantine feature for macOS. ([#13826](https://github.com/brave/browser-laptop/issues/13826))
 
