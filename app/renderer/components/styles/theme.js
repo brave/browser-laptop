@@ -35,6 +35,11 @@
           backgroundColor: '#555',
           color: '#fff'
         }
+      },
+
+      icons: {
+        spacing: '7px',
+        separatorColor: 'rgb(221, 220, 220)'
       }
     },
 

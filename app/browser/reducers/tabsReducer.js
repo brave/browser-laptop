@@ -113,6 +113,12 @@ const tabsReducer = (state, action, immutableAction) => {
         })
         break
       }
+    case tabActionConsts.NAVIGATION_PROGRESS_CHANGED:
+      {
+        const tabId = action.get('tabId')
+        state = tabState.setNavigationProgressPercent(state, tabId, action.get('progressPercent'))
+        break
+      }
     case tabActionConsts.RELOAD:
       {
         const tabId = tabState.resolveTabId(state, action.get('tabId'))

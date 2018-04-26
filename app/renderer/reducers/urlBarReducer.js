@@ -239,6 +239,7 @@ const urlBarReducer = (state, action) => {
       break
     case windowConstants.WINDOW_URL_BAR_ON_BLUR:
       state = setNavBarUserInput(state, action.targetValue)
+      state = navigationBarState.setFocused(state, tabId, false)
       if (!action.fromSuggestion && action.locationValue.length > 0) {
         const locationValueSuffix = navigationBarState.locationValueSuffix(state, tabId)
         setNavBarUserInput(state, action.locationValue + locationValueSuffix)

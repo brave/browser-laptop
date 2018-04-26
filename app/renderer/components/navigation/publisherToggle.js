@@ -161,13 +161,7 @@ const styles = StyleSheet.create({
     height: globalStyles.spacing.buttonHeight,
     width: globalStyles.spacing.buttonWidth,
     minHeight: globalStyles.spacing.buttonHeight,
-    minWidth: globalStyles.spacing.buttonWidth,
-    borderWidth: '1px 1px 1px 0px',
-    borderStyle: 'solid',
-    borderColor: globalStyles.color.urlBarOutline,
-    borderRadius: '0 4px 4px 0',
-    borderTopLeftRadius: '0',
-    borderBottomLeftRadius: '0'
+    minWidth: globalStyles.spacing.buttonWidth
   },
 
   noFundVerified: {

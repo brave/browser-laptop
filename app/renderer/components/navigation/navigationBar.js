@@ -10,7 +10,6 @@ const ReduxComponent = require('../reduxComponent')
 const UrlBar = require('./urlBar')
 const AddEditBookmarkHanger = require('../bookmarks/addEditBookmarkHanger')
 const PublisherToggle = require('./publisherToggle')
-const HomeButton = require('./buttons/homeButton')
 const BookmarkButton = require('./buttons/bookmarkButton')
 const ReloadButton = require('./buttons/reloadButton')
 const StopButton = require('./buttons/stopButton')
@@ -72,7 +71,7 @@ class NavigationBar extends React.Component {
     props.isLoading = loading
     props.isFocused = navbar.getIn(['urlbar', 'focused'], false)
     props.shouldRenderSuggestions = navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
-    props.showHomeButton = !props.titleMode && getSetting(settings.SHOW_HOME_BUTTON)
+
     props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherKey)
     props.activeTabId = activeTabId
     props.bookmarkKey = locationCache.get(0, false)
@@ -94,25 +93,18 @@ class NavigationBar extends React.Component {
         ? <AddEditBookmarkHanger />
         : null
       }
+
       {
-        this.props.titleMode
-        ? null
-        : this.props.isLoading
+        this.props.isLoading
           ? <StopButton isFocused={this.props.isFocused} shouldRenderSuggestions={this.props.shouldRenderSuggestions} />
           : <ReloadButton activeTabId={this.props.activeTabId} />
       }
-      {
-        this.props.showHomeButton
-        ? <HomeButton activeTabId={this.props.activeTabId} />
-        : null
-      }
+
       <BookmarkButton bookmarkKey={this.props.bookmarkKey} />
       <UrlBar titleMode={this.props.titleMode} />
       {
         this.props.showPublisherToggle
-        ? <div className='endButtons'>
-          <PublisherToggle />
-        </div>
+        ? <PublisherToggle />
         : null
       }
     </div>
