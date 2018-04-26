@@ -23,6 +23,7 @@ const ledgerUtil = require('../../common/lib/ledgerUtil')
 let matrixData
 let priorData
 let sampleAdFeed
+let currentSSID
 
 const initialize = (state) => {
   // TODO turn back on?
@@ -276,13 +277,38 @@ const changeAdFrequency = (state, freq) => {
 }
 
 const retrieveSSID = (state) => {
+  // i am consistently amazed by the lack of decent network reporting in node.js
+  // os.networkInterfaces() is useless for most things
+  // the module below has to run an OS-specific system utility to get the SSID
+  // and if we're not on WiFi, there is no reliable way to determine the actual interface in use
+
   getSSID((err, ssid) => {
     if (err) return console.error(err)
 
-    console.log('\nSSID: ' + ssid)
+    currentSSID = ssid
   })
 
-  return state  
+  return state
+}
+
+/* not sure if these methods should go here or not... */
+
+// called in order to populate the place input
+const getterSSID = (state) => {
+/* 1. look in settings: ads.places
+   2. this is an object with mapping SSID (determine via retrieve SSID) to places (entered by the user)
+   3. return ads.places[currentSSID] to populate the settings field
+*/
+}
+
+// called in order to update the current place
+const setterSSID = (state, place) => {
+  if ((!currentSSID) || (!place) || (!place.length)) return state
+
+/* 1. fetch settings: ads.places
+   2. update ads.places[currentSSID] = place
+*/
+  return state
 }
 
 const privateTest = () => {
@@ -306,7 +332,9 @@ const getMethods = () => {
     serveAdNow,
     changeAdFrequency,
     goAheadAndShowTheAd,
-    retrieveSSID
+    retrieveSSID,
+    getterSSID,
+    setterSSID
   }
 
   let privateMethods = {}
