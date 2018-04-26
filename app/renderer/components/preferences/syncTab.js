@@ -65,6 +65,11 @@ class SyncTab extends ImmutableComponent {
     </section>
   }
 
+  showSyncReset () {
+    this.props.showOverlay('syncReset')
+    this.props.setOverlayName('syncReset')
+  }
+
   get clearDataContent () {
     return <section className={css(styles.settingsListContainerMargin__bottom)}>
       <DefaultSectionTitle data-l10n-id='syncClearData' />
@@ -73,7 +78,7 @@ class SyncTab extends ImmutableComponent {
           ? <BrowserButton primaryColor
             l10nId='syncResetButton'
             testId='clearDataButton'
-            onClick={this.props.showOverlay.bind(this, 'syncReset')}
+            onClick={this.showSyncReset.bind(this)}
           />
           : <div>
             <BrowserButton primaryColor
@@ -87,6 +92,16 @@ class SyncTab extends ImmutableComponent {
     </section>
   }
 
+  showSyncStart () {
+    this.props.showOverlay('syncStart')
+    this.props.setOverlayName('syncStart')
+  }
+
+  showSyncAdd () {
+    this.props.showOverlay('syncAdd')
+    this.props.setOverlayName('syncAdd')
+  }
+
   get setupContent () {
     if (this.setupError) {
       return null
@@ -96,12 +111,12 @@ class SyncTab extends ImmutableComponent {
       <BrowserButton groupedItem primaryColor
         l10nId='syncStart'
         testId='syncStartButton'
-        onClick={this.props.showOverlay.bind(this, 'syncStart')}
+        onClick={this.showSyncStart.bind(this)}
       />
       <BrowserButton groupedItem secondaryColor
         l10nId='syncAdd'
         testId='syncAddButton'
-        onClick={this.props.showOverlay.bind(this, 'syncAdd')}
+        onClick={this.showSyncAdd.bind(this)}
       />
     </section>
   }
@@ -127,7 +142,7 @@ class SyncTab extends ImmutableComponent {
       <BrowserButton primaryColor
         l10nId='syncNewDevice'
         testId='syncNewDeviceButton'
-        onClick={this.props.showOverlay.bind(this, 'syncNewDevice')}
+        onClick={this.showSyncNewDevice.bind(this)}
       />
     </SettingsList>
   }
@@ -393,6 +408,8 @@ class SyncTab extends ImmutableComponent {
     if (window.confirm(msg)) {
       aboutActions.resetSync()
       this.props.hideOverlay('syncReset')
+    } else {
+      this.props.onNavigate()
     }
   }
 
@@ -432,6 +449,11 @@ class SyncTab extends ImmutableComponent {
       }
     }
     window.alert('Invalid input code; please try again or create a new profile.')
+  }
+
+  showSyncNewDevice () {
+    this.props.showOverlay('syncNewDevice')
+    this.props.setOverlayName('syncNewDevice')
   }
 
   render () {

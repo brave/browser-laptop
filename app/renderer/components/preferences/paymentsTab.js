@@ -102,12 +102,13 @@ class PaymentsTab extends ImmutableComponent {
     return (
       <AddFundsDialogFooter
         addFundsDialog={wizardData}
+        onNavigate={this.props.onNavigate}
         onHide={this.props.hideOverlay.bind(this, 'addFunds')}
       />
     )
   }
 
-  get getOverlayFounds () {
+  get getOverlayFunds () {
     const ledgerData = this.props.ledgerData || Immutable.Map()
     return formatCurrentBalance(ledgerData)
   }
@@ -166,6 +167,16 @@ class PaymentsTab extends ImmutableComponent {
     />
   }
 
+  showAdvancedSettings () {
+    this.props.showOverlay('advancedSettings')
+    this.props.setOverlayName('advancedSettings')
+  }
+
+  showPaymentHistory () {
+    this.props.showOverlay('paymentHistory')
+    this.props.setOverlayName('paymentHistory')
+  }
+
   hideOverlay () {
     this.props.hideOverlay('addFunds')
     appActions.onChangeAddFundsDialogStep('addFundsWizardMain')
@@ -182,7 +193,7 @@ class PaymentsTab extends ImmutableComponent {
         ? <ModalOverlay
           title={'addFundsHeader'}
           subTitle={'balance'}
-          subTitleArgs={this.getOverlayFounds}
+          subTitleArgs={this.getOverlayFunds}
           content={this.addFundsDialogContent}
           footer={this.addFundsDialogFooter}
           onHide={this.hideOverlay}
@@ -232,6 +243,7 @@ class PaymentsTab extends ImmutableComponent {
           footer={<AdvancedSettingsFooter
             showOverlay={this.props.showOverlay}
             hideOverlay={this.props.hideOverlay}
+            setOverlayName={this.props.setOverlayName}
           />}
           onHide={this.props.hideOverlay.bind(this, 'advancedSettings')}
         />
@@ -245,6 +257,7 @@ class PaymentsTab extends ImmutableComponent {
             ledgerData={this.props.ledgerData}
           />}
           footer={<LedgerBackupFooter
+            onNavigate={this.props.onNavigate}
             hideOverlay={this.props.hideOverlay}
           />}
           onHide={this.props.hideOverlay.bind(this, 'ledgerBackup')}
@@ -259,10 +272,12 @@ class PaymentsTab extends ImmutableComponent {
             ledgerData={this.props.ledgerData}
             hideAdvancedOverlays={this.props.hideAdvancedOverlays.bind(this)}
             handleRecoveryKeyChange={this.handleRecoveryKeyChange.bind(this)}
+            setOverlayName={this.props.setOverlayName}
           />}
           footer={<LedgerRecoveryFooter
             state={this.state}
             hideOverlay={this.props.hideOverlay}
+            setOverlayName={this.props.setOverlayName}
           />}
           onHide={this.props.hideOverlay.bind(this, 'ledgerRecovery')}
           customDialogFooterClasses={css(styles.recoveryFooter)}
@@ -336,7 +351,7 @@ class PaymentsTab extends ImmutableComponent {
                   )}
                     data-test-id={this.hasWalletTransaction ? 'paymentHistoryButton' : 'disabledPaymentHistoryButton'}
                     data-l10n-id='paymentHistoryIcon'
-                    onClick={(enabled && this.hasWalletTransaction) ? this.props.showOverlay.bind(this, 'paymentHistory') : () => {}}
+                    onClick={(enabled && this.hasWalletTransaction) ? this.showPaymentHistory.bind(this, 'paymentHistory') : () => {}}
                   />
                   <a className={css(
                     styles.payments__title__actions__icons__icon,
@@ -345,7 +360,7 @@ class PaymentsTab extends ImmutableComponent {
                   )}
                     data-test-id={!enabled ? 'advancedSettingsButtonLoading' : 'advancedSettingsButton'}
                     data-l10n-id='advancedSettingsIcon'
-                    onClick={enabled ? this.props.showOverlay.bind(this, 'advancedSettings') : () => {}}
+                    onClick={enabled ? this.showAdvancedSettings.bind(this) : () => {}}
                   />
                 </div>
               </div>
@@ -362,6 +377,7 @@ class PaymentsTab extends ImmutableComponent {
           showOverlay={this.props.showOverlay}
           siteSettings={this.props.siteSettings}
           showDeletedSites={showDeletedSites}
+          setOverlayName={this.props.setOverlayName}
         />
         : <DisabledContent
           ledgerData={this.props.ledgerData}

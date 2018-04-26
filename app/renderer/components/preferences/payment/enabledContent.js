@@ -52,13 +52,18 @@ class EnabledContent extends ImmutableComponent {
     this.recoverStatusClick = this.recoverStatusClick.bind(this)
   }
 
+  showAddFunds () {
+    this.props.showOverlay('addFunds')
+    this.props.setOverlayName('addFunds')
+  }
+
   walletButton () {
     const ledgerData = this.props.ledgerData
     const buttonText = ledgerData.get('created')
       ? 'addFundsTitle'
       : (ledgerData.get('creating') ? 'creatingWallet' : 'createWallet')
     const onButtonClick = ledgerData.get('created')
-      ? this.props.showOverlay.bind(this, 'addFunds')
+      ? this.showAddFunds.bind(this)
       : (ledgerData.get('creating') ? () => {} : this.createWallet())
 
     let buttonDisabled = !ledgerData.get('created')
@@ -335,13 +340,18 @@ class EnabledContent extends ImmutableComponent {
     </div>
   }
 
+  showDeletedSites () {
+    this.props.showOverlay('deletedSites')
+    this.props.setOverlayName('deletedSites')
+  }
+
   get deletedSitesLink () {
     if (this.props.showDeletedSites) {
       return <span>
         <a data-l10n-id='showDeletedSitesDialog'
           data-test-id='showDeletedSitesDialog'
           className={css(styles.enabledContent__footer__link)}
-          onClick={this.props.showOverlay.bind(this, 'deletedSites')}
+          onClick={this.showDeletedSites.bind(this)}
         />
         <span
           className={css(styles.enabledContent__footer__link, styles.enabledContent__footer__separator)}

@@ -45,6 +45,7 @@ const appActions = require('../actions/appActions')
 const getSetting = require('../settings').getSetting
 const SortableTable = require('../../app/renderer/components/common/sortableTable')
 const searchProviders = require('../data/searchProviders')
+const keyCodes = require('../../app/common/constants/keyCodes')
 
 const flash = appConfig.resourceNames.FLASH
 
@@ -456,6 +457,11 @@ class SecurityTab extends ImmutableComponent {
 class AboutPreferences extends React.Component {
   constructor (props) {
     super(props)
+    this.focusElement = null
+    this.overlayName = ''
+    this.setFocusElement = element => {
+      this.focusElement = element
+    }
     this.state = {
       paymentHistoryOverlayVisible: false,
       deletedSitesOverlayVisible: false,
@@ -643,6 +649,36 @@ class AboutPreferences extends React.Component {
     }
   }
 
+  /**
+   * Sets the overlay name listened to on escape key
+   * @param {string} name - Prefix name of the overlay
+   * @returns {void}
+   */
+  setOverlayName = (name) => {
+    this.overlayName = name
+    this.focusElement.focus()
+  }
+
+  /**
+   * Executes when navigating back and forth through a wizard dialog
+   * @returns {void}
+   */
+  onNavigate = () => {
+    this.focusElement.focus()
+  }
+
+  /**
+   * Listens for when 'escape' is pressed
+   * @param {event} e - current event
+   * @returns {void}
+   */
+  onEscape = (e) => {
+    if (e.keyCode === keyCodes.ESC && this.overlayName !== '') {
+      e.stopPropagation()
+      this.setOverlayVisible(false, this.overlayName)
+    }
+  }
+
   setOverlayVisible (isVisible, overlayName) {
     let stateDiff = {}
     stateDiff[`${overlayName}OverlayVisible`] = isVisible
@@ -651,6 +687,12 @@ class AboutPreferences extends React.Component {
       // Tell ledger when Add Funds overlay is closed
       if (overlayName === 'addFunds') {
         appActions.onAddFundsClosed()
+        appActions.onChangeAddFundsDialogStep('addFundsWizardMain')
+      } else if (overlayName === 'ledgerBackup' || overlayName === 'ledgerRecovery') {
+        this.setOverlayName('advancedSettings')
+        this.focusElement.focus()
+      } else {
+        this.setOverlayName('')
       }
       this.removeParams()
     }
@@ -697,15 +739,19 @@ class AboutPreferences extends React.Component {
           syncAddOverlayVisible={this.state.syncAddOverlayVisible}
           syncNewDeviceOverlayVisible={this.state.syncNewDeviceOverlayVisible}
           syncQRVisible={this.state.syncQRVisible}
+          setOverlayName={this.setOverlayName}
+          onNavigate={this.onNavigate}
           showQR={() => {
             this.setState({
               syncQRVisible: true
             })
+            this.onNavigate()
           }}
           hideQR={() => {
             this.setState({
               syncQRVisible: false
             })
+            this.onNavigate()
           }}
           syncPassphraseVisible={this.state.syncPassphraseVisible}
           showPassphrase={() => {
@@ -736,7 +782,10 @@ class AboutPreferences extends React.Component {
           addFundsOverlayVisible={this.state.addFundsOverlayVisible}
           showOverlay={this.setOverlayVisible.bind(this, true)}
           hideOverlay={this.setOverlayVisible.bind(this, false)}
-          hideAdvancedOverlays={this.hideAdvancedOverlays.bind(this)} />
+          hideAdvancedOverlays={this.hideAdvancedOverlays.bind(this)}
+          setOverlayName={this.setOverlayName}
+          onNavigate={this.onNavigate}
+        />
         break
       case preferenceTabs.EXTENSIONS:
         tab = <ExtensionsTab extensions={extensions} settings={settings} onChangeSetting={this.onChangeSetting} />
@@ -756,7 +805,7 @@ class AboutPreferences extends React.Component {
         changeTab={this.changeTab.bind(this)}
         refreshHint={this.refreshHint.bind(this)}
         getNextHintNumber={this.getNextHintNumber.bind(this)} />
-      <div className='prefBody'>
+      <div className='prefBody' onKeyDown={(e) => this.onEscape(e)} ref={this.setFocusElement} tabIndex='0'>
         <div className='prefTabContainer'>
           {tab}
         </div>
