@@ -7,6 +7,9 @@ const settings = require('../../../../../js/constants/settings')
 const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
 const twitchEvents = require('../../../../../app/common/constants/twitchEvents')
 
+const defaultState = Immutable.fromJS({
+  ledger: {}
+})
 const baseState = Immutable.fromJS({
   cache: {
     ledgerVideos: {}
@@ -31,6 +34,8 @@ describe('ledgerUtil unit test', function () {
   const fakeAdBlock = require('../../../lib/fakeAdBlock')
 
   // settings
+  let paymentsMinVisits
+  let paymentsMinVisitTime
   let paymentsContributionAmount = 25
 
   before(function () {
@@ -52,6 +57,10 @@ describe('ledgerUtil unit test', function () {
     mockery.registerMock('../../../js/settings', {
       getSetting: (settingKey) => {
         switch (settingKey) {
+          case settings.PAYMENTS_MINIMUM_VISITS:
+            return paymentsMinVisits
+          case settings.PAYMENTS_MINIMUM_VISIT_TIME:
+            return paymentsMinVisitTime
           case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
             return paymentsContributionAmount
         }
@@ -1081,6 +1090,105 @@ describe('ledgerUtil unit test', function () {
         }
       }, 'twitch_test')
       assert.deepEqual(result, 0)
+    })
+  })
+
+  describe('hasRequiredVisits', function () {
+    it('null case', function () {
+      paymentsMinVisits = 1
+
+      const result = ledgerUtil.hasRequiredVisits(defaultState)
+      assert.equal(result, false)
+    })
+
+    it('returns true if minimum visits is set to 1', function () {
+      paymentsMinVisits = 1
+      const publisherKey = 'brave.com'
+
+      const result = ledgerUtil.hasRequiredVisits(defaultState, publisherKey)
+      assert(result)
+    })
+
+    it('returns false if the publisher is new and minimum visits is set to > 1', function () {
+      paymentsMinVisits = 5
+      const publisherKey = 'new.com'
+
+      const result = ledgerUtil.hasRequiredVisits(defaultState, publisherKey)
+      assert.equal(result, false)
+    })
+
+    it('returns true if the publisher is new and minimum visits is set to 1', function () {
+      paymentsMinVisits = 1
+      const publisherKey = 'new.com'
+
+      const result = ledgerUtil.hasRequiredVisits(defaultState, publisherKey)
+      assert.equal(result, true)
+    })
+
+    it('returns false if the publisher is > 1 visit away from minimum visits', function () {
+      paymentsMinVisits = 5
+      const publisherVisits = 3
+      const publisherKey = 'brave.com'
+
+      const state = defaultState
+        .setIn(['ledger', 'synopsis', 'publishers', publisherKey, 'visits'], publisherVisits)
+
+      const result = ledgerUtil.hasRequiredVisits(state, publisherKey)
+      assert.equal(result, false)
+    })
+
+    it('returns true if the publisher is 1 visit away from minimum visits', function () {
+      paymentsMinVisits = 5
+      const publisherVisits = 4
+      const publisherKey = 'brave.com'
+
+      const state = defaultState
+        .setIn(['ledger', 'synopsis', 'publishers', publisherKey, 'visits'], publisherVisits)
+
+      const result = ledgerUtil.hasRequiredVisits(state, publisherKey)
+      assert.equal(result, true)
+    })
+  })
+
+  describe('getRemainingRequiredTime', function () {
+    it('null case', function () {
+      paymentsMinVisitTime = 8000
+
+      const result = ledgerUtil.getRemainingRequiredTime(defaultState)
+      assert.equal(result, paymentsMinVisitTime)
+    })
+
+    it('returns the minimum visit time if the publisher is new', function () {
+      paymentsMinVisitTime = 8000
+      const publisherKey = 'brave.com'
+
+      const result = ledgerUtil.getRemainingRequiredTime(defaultState, publisherKey)
+      assert.equal(result, paymentsMinVisitTime)
+    })
+
+    it('returns the minimum visit time if the publisher has duration >= minimum visit time', function () {
+      paymentsMinVisitTime = 8000
+      const publisherDuration = 8888
+      const publisherKey = 'brave.com'
+
+      const state = defaultState
+        .setIn(['ledger', 'synopsis', 'publishers', publisherKey, 'duration'], publisherDuration)
+
+      const result = ledgerUtil.getRemainingRequiredTime(state, publisherKey)
+      assert.equal(result, paymentsMinVisitTime)
+    })
+
+    it('returns the difference in time if the publisher has duration < minimum visit time', function () {
+      paymentsMinVisitTime = 8000
+      const expectedResult = 1500
+      const publisherDuration = 6500
+      const publisherKey = 'brave.com'
+
+      const state = defaultState
+        .setIn(['ledger', 'synopsis', 'publishers', publisherKey, 'duration'], publisherDuration)
+
+      const result = ledgerUtil.getRemainingRequiredTime(state, publisherKey)
+      assert.equal(result, expectedResult)
     })
   })
 })

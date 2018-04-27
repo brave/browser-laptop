@@ -33,6 +33,7 @@ const fundUnverifiedPublisherImage = require('../../../extensions/brave/img/urlb
 class PublisherToggle extends React.Component {
   constructor (props) {
     super(props)
+    this.mounted = false
     this.onAuthorizePublisher = this.onAuthorizePublisher.bind(this)
   }
 
@@ -58,6 +59,50 @@ class PublisherToggle extends React.Component {
     }
   }
 
+  setUpdateTimeout () {
+    const shouldSetTimeout = ledgerUtil.hasRequiredVisits(this.props.state, this.props.publisherKey)
+    const updateWait = ledgerUtil.getRemainingRequiredTime(this.props.state, this.props.publisherKey)
+    if (!this.mounted || !shouldSetTimeout) {
+      return
+    }
+    let updateTimeout = setTimeout(() => {
+      appActions.onPublisherToggleUpdate()
+    }, updateWait)
+    this.setState({updateTimeout: updateTimeout})
+  }
+
+  clearUpdateTimeout () {
+    this.state && clearTimeout(this.state.updateTimeout)
+  }
+
+  componentDidMount () {
+    this.mounted = true
+    if (!this.props.isVisibleInLedger) {
+      this.setUpdateTimeout()
+    }
+  }
+
+  componentWillUnmount () {
+    this.mounted = false
+    this.clearUpdateTimeout()
+  }
+
+  componentWillReceiveProps (newProps) {
+    if (!this.mounted) {
+      return
+    }
+    if (
+      !newProps.isVisibleInLedger &&
+      (
+        newProps.location !== this.props.location ||
+        newProps.publisherKey !== this.props.publisherKey
+      )
+    ) {
+      this.clearUpdateTimeout()
+      this.setUpdateTimeout()
+    }
+  }
+
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
@@ -68,8 +113,10 @@ class PublisherToggle extends React.Component {
 
     const props = {}
     // used in renderer
+    props.state = state
     props.tabId = tabId
     props.location = location
+    props.publisherKey = publisherKey
     props.isVisibleInLedger = ledgerUtil.visibleP(state, publisherKey)
     props.isEnabledForPaymentsPublisher = ledgerUtil.stickyP(state, publisherKey)
     props.isVerifiedPublisher = ledgerState.getPublisherOption(state, publisherKey, 'verified')
