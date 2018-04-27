@@ -25,6 +25,7 @@ const {responseHasContent} = require('./httpUtil')
 const urlUtil = require('../../../js/lib/urlutil')
 const getSetting = require('../../../js/settings').getSetting
 const urlParse = require('../urlParse')
+const {makeImmutable} = require('../state/immutableUtil')
 
 /**
  * Is page an actual page being viewed by the user? (not an error page, etc)
@@ -592,6 +593,52 @@ const getMediaProvider = (url, firstPartyUrl, referrer) => {
   return provider
 }
 
+const hasRequiredVisits = (state, publisherKey) => {
+  if (!publisherKey) {
+    return false
+  }
+
+  state = makeImmutable(state) || Immutable.Map()
+
+  const minimumVisits = parseInt(getSetting(settings.PAYMENTS_MINIMUM_VISITS))
+
+  if (minimumVisits === 1) {
+    return true
+  }
+
+  const publisher = ledgerState.getPublisher(state, publisherKey)
+  const publisherVisits = publisher.get('visits')
+
+  if (typeof publisherVisits !== 'number') {
+    return minimumVisits === 1
+  }
+
+  const visitDifference = minimumVisits - publisherVisits
+
+  return (visitDifference === 1)
+}
+
+const getRemainingRequiredTime = (state, publisherKey) => {
+  state = makeImmutable(state) || Immutable.Map()
+  const minimumVisitTime = parseInt(getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME))
+
+  if (!publisherKey) {
+    return minimumVisitTime
+  }
+
+  const publisher = ledgerState.getPublisher(state, publisherKey)
+  const publisherDuration = publisher.get('duration')
+
+  if (
+    typeof publisherDuration !== 'number' ||
+    publisherDuration >= minimumVisitTime
+  ) {
+    return minimumVisitTime
+  }
+
+  return (minimumVisitTime - publisherDuration)
+}
+
 const defaultMonthlyAmounts = Immutable.List([5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0])
 
 const milliseconds = {
@@ -626,7 +673,9 @@ const getMethods = () => {
     defaultMonthlyAmounts,
     getDefaultMediaFavicon,
     generateMediaCacheData,
-    shouldShowMenuOption
+    shouldShowMenuOption,
+    hasRequiredVisits,
+    getRemainingRequiredTime
   }
 
   let privateMethods = {}
