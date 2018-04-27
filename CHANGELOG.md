@@ -1,7 +1,8 @@
 # Changelog
 
-## [0.22.667](https://github.com/brave/browser-laptop/releases/tag/v0.22.667dev)
+## [0.22.669](https://github.com/brave/browser-laptop/releases/tag/v0.22.669dev)
 
+ - Fixed crashing when submitting online forms. ([#13947](https://github.com/brave/browser-laptop/issues/13947))
  - Improved accuracy of recorded time in Brave Payments when watching Twitch. ([#13828](https://github.com/brave/browser-laptop/issues/13828))
  - Fixed updates sometimes failing on macOS. ([#2184](https://github.com/brave/browser-laptop/issues/2184))
  - Fixed transactions not being recorded in ledger-state.json. ([#13544](https://github.com/brave/browser-laptop/issues/13544))
@@ -9,7 +10,7 @@
  - Fixed inability to open windows using the dock on macOS when there are no Brave windows opened. ([#13860](https://github.com/brave/browser-laptop/issues/13860))
  - Fixed inability to open hyperlinks on macOS when there are no Brave windows opened. ([#13859](https://github.com/brave/browser-laptop/issues/13859))
  - Fixed inability to open new tabs using the file menu on macOS when there are no Brave windows opened. ([#13689](https://github.com/brave/browser-laptop/issues/13689))
- - Upgraded to muon 5.2.6. ([#13911](https://github.com/brave/browser-laptop/issues/13911))
+ - Upgraded to muon 5.2.7. ([#13964](https://github.com/brave/browser-laptop/issues/13964))
  - Upgraded to Chromium 66.0.3359.117. ([#13912](https://github.com/brave/browser-laptop/issues/13912))
 
 ## [0.22.22](https://github.com/brave/browser-laptop/releases/tag/v0.22.22dev)
