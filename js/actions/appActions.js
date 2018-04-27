@@ -1974,6 +1974,12 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_BACKUP_SUCCESS
     })
+  },
+
+  onPublisherToggleUpdate: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE
+    })
   }
 }
 
