@@ -15,6 +15,7 @@ describe('ledgerReducer unit tests', function () {
   let appState
   let paymentsEnabled
   let returnedState
+  let fakeAboutPreferencesState
 
   before(function () {
     mockery.enable({
@@ -64,6 +65,7 @@ describe('ledgerReducer unit tests', function () {
     fakeLedgerState = {
       resetSynopsis: dummyModifyState,
       setRecoveryStatus: dummyModifyState,
+      setRecoveryInProgressStatus: dummyModifyState,
       setInfoProp: dummyModifyState,
       saveSynopsis: dummyModifyState,
       savePromotion: dummyModifyState,
@@ -75,9 +77,14 @@ describe('ledgerReducer unit tests', function () {
       onInterval: dummyModifyState,
       removePromotionNotification: () => {}
     }
+    fakeAboutPreferencesState = {
+      setRecoveryStatus: dummyModifyState,
+      setPreferencesProp: dummyModifyState
+    }
     mockery.registerMock('../../browser/api/ledger', fakeLedgerApi)
     mockery.registerMock('../../common/state/ledgerState', fakeLedgerState)
     mockery.registerMock('../../browser/api/ledgerNotifications', fakeLedgerNotifications)
+    mockery.registerMock('../../common/state/aboutPreferencesState', fakeAboutPreferencesState)
     mockery.registerMock('../../../js/settings', {
       getSetting: (settingKey, settingsCollection, value) => {
         if (settingKey === settings.PAYMENTS_ENABLED) {
@@ -144,8 +151,11 @@ describe('ledgerReducer unit tests', function () {
 
   describe('APP_RECOVER_WALLET', function () {
     let recoverKeysSpy
+    let modifiedState
+    let setPreferencesPropSpy
     before(function () {
       recoverKeysSpy = sinon.spy(fakeLedgerApi, 'recoverKeys')
+      setPreferencesPropSpy = sinon.spy(fakeAboutPreferencesState, 'setPreferencesProp')
       returnedState = ledgerReducer(appState, Immutable.fromJS({
         actionType: appConstants.APP_RECOVER_WALLET,
         useRecoveryKeyFile: 'useKeyFile',
@@ -154,9 +164,14 @@ describe('ledgerReducer unit tests', function () {
     })
     after(function () {
       recoverKeysSpy.restore()
+      setPreferencesPropSpy.restore()
+    })
+    it('calls aboutPreferencesState.setPreferencesProp', function () {
+      assert(setPreferencesPropSpy.withArgs(appState, 'recoveryInProgress', true).calledOnce)
     })
     it('calls ledgerApi.recoverKeys', function () {
-      assert(recoverKeysSpy.withArgs(appState, 'useKeyFile', 'firstKey').calledOnce)
+      modifiedState = fakeAboutPreferencesState.setPreferencesProp(appState, 'recoveryInProgress', true)
+      assert(recoverKeysSpy.withArgs(modifiedState, 'useKeyFile', 'firstKey').calledOnce)
     })
     it('returns a modified state', function () {
       assert.notDeepEqual(returnedState, appState)
@@ -510,7 +525,7 @@ describe('ledgerReducer unit tests', function () {
   describe('APP_ON_RESET_RECOVERY_STATUS', function () {
     let setRecoveryStatusSpy
     before(function () {
-      setRecoveryStatusSpy = sinon.spy(fakeLedgerState, 'setRecoveryStatus')
+      setRecoveryStatusSpy = sinon.spy(fakeAboutPreferencesState, 'setRecoveryStatus')
       returnedState = ledgerReducer(appState, Immutable.fromJS({
         actionType: appConstants.APP_ON_RESET_RECOVERY_STATUS
       }))
@@ -518,7 +533,12 @@ describe('ledgerReducer unit tests', function () {
     after(function () {
       setRecoveryStatusSpy.restore()
     })
+    /*
     it('calls ledgerApi.setRecoveryStatus', function () {
+      assert(setRecoveryStatusSpy.withArgs(appState, null).calledOnce)
+    })
+    */
+    it('calls aboutPreferencesState.setRecoveryStatus', function () {
       assert(setRecoveryStatusSpy.withArgs(appState, null).calledOnce)
     })
     it('returns a modified state', function () {

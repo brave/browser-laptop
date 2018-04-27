@@ -353,13 +353,6 @@ const ledgerState = {
   /**
    * OTHERS
    */
-  setRecoveryStatus: (state, status) => {
-    state = validateState(state)
-    const date = new Date().getTime()
-    state = state.setIn(['about', 'preferences', 'recoverySucceeded'], status)
-    return state.setIn(['about', 'preferences', 'updatedStamp'], date)
-  },
-
   setLedgerError: (state, error, caller) => {
     state = validateState(state)
     if (error == null && caller == null) {
