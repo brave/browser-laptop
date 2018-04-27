@@ -143,12 +143,26 @@ importer.on('add-bookmarks', (e, importedBookmarks, topLevelFolder) => {
     folders.push(folder)
   }
 
-  const importTopLevelFolder = {
-    title: bookmarkFoldersUtil.getNextFolderName(bookmarkFolders, topLevelFolder),
-    folderId: topLevelFolderId,
-    parentFolderId: 0
+  // If there are bookmarks or folders on bookmark toolbar, we will put imported
+  // bookmarks into "Imported from XXX" folder
+  if (bookmarksState.getBookmarksByParentId(state, 0).size > 0 ||
+      bookmarkFoldersState.getFoldersByParentId(state, 0).size > 0) {
+    const importTopLevelFolder = {
+      title: bookmarkFoldersUtil.getNextFolderName(bookmarkFolders, topLevelFolder),
+      folderId: topLevelFolderId,
+      parentFolderId: 0
+    }
+    bufferedAddFolder(importTopLevelFolder)
+  } else {
+    pathMap[topLevelFolder] = topLevelFolderId
+    pathMap['Bookmarks Toolbar'] = 0 // Firefox
+    pathMap['Bookmarks Bar'] = 0 // Chrome on mac
+    pathMap['Other Bookmarks'] = 1 // Chrome on mac
+    pathMap['Bookmarks bar'] = 0 // Chrome on win/linux
+    pathMap['Other bookmarks'] = 1 // Chrome on win/linux
+    pathMap['Bookmark Bar'] = 0 // Safari
+    pathMap['Links'] = 0 // Edge, IE
   }
-  bufferedAddFolder(importTopLevelFolder)
 
   for (let i = 0; i < importedBookmarks.length; ++i) {
     const importedBookmark = importedBookmarks[i]
