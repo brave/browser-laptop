@@ -474,6 +474,10 @@ const api = {
         return
       }
 
+      if (!newTab.isTab()) {
+        return
+      }
+
       let displayURL = newTab.getURL()
       let location = displayURL || 'about:blank'
       const openerTabId = !source.isDestroyed() ? source.getId() : -1
@@ -556,7 +560,7 @@ const api = {
     })
 
     app.on('web-contents-created', function (event, tab) {
-      if (tab.isBackgroundPage() || !tab.isGuest()) {
+      if (!tab.isTab()) {
         return
       }
       const tabId = tab.getId()
