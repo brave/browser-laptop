@@ -6,10 +6,11 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ImmutableComponent = require('../../immutableComponent')
-const {FormTextbox} = require('../../common/textbox')
+const {FormDropdown} = require('../../common/dropdown')
 
 // Constants
 const settings = require('../../../../../js/constants/settings')
+const adsPlaces = require('../../../../common/constants/adsPlaces')
 
 // Utils
 const {changeSetting} = require('../../../lib/settingsUtil')
@@ -92,12 +93,19 @@ class EnabledContent extends ImmutableComponent {
           <span className={css(styles.enabledContent__walletBar__values)}>{perHour}</span>
         </div>
         <div className={css(gridStyles.row2col3)}>
-          <FormTextbox
+          <FormDropdown
+            data-isPanel
+            data-test-id='placeSelectBox'
             customClass={styles.place_input}
-            data-test-id='adsPlace'
             value={getSetting(settings.ADS_PLACE, this.props.settings)}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.ADS_PLACE)}
-          />
+          >
+            {
+              Object.keys(adsPlaces).map(key => {
+                return <option value={key}>{adsPlaces[key]}</option>
+              })
+            }
+          </FormDropdown>
         </div>
         <div className={css(gridStyles.row3col1, styles.enabledContent__walletBar__message)}>
           lorum 1
