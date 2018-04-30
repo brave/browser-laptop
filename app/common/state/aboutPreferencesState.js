@@ -43,6 +43,14 @@ const aboutPreferencesState = {
       return state
     }
     return state.setIn(['about', 'preferences', key], value)
+  },
+
+  setRecoveryStatus: (state, status) => {
+    state = validateState(state)
+    const date = new Date().getTime()
+    state = aboutPreferencesState.setPreferencesProp(state, 'recoveryInProgress', false)
+    state = aboutPreferencesState.setPreferencesProp(state, 'recoverySucceeded', status)
+    return aboutPreferencesState.setPreferencesProp(state, 'updatedStamp', date)
   }
 }
 module.exports = aboutPreferencesState

@@ -29,6 +29,7 @@ describe('ledger api unit tests', function () {
   let request
   let walletPassphraseReturn
   let updater
+  let aboutPreferencesState
 
   // constants
   const videoId = 'youtube_kLiLOkzLetE'
@@ -198,6 +199,7 @@ describe('ledger api unit tests', function () {
     ledgerUtil = require('../../../../../app/common/lib/ledgerUtil')
     ledgerState = require('../../../../../app/common/state/ledgerState')
     updateState = require('../../../../../app/common/state/updateState')
+    aboutPreferencesState = require('../../../../../app/common/state/aboutPreferencesState')
     updater = require('../../../../../app/updater')
 
     // once everything is stubbed, load the ledger
@@ -1786,9 +1788,13 @@ describe('ledger api unit tests', function () {
         }
       }
     })
+    const stateWithAbout = defaultAppState
+      .set('about', Immutable.fromJS({
+        preferences: {}
+      }))
 
     before(function () {
-      setRecoveryStatusSpy = sinon.spy(ledgerState, 'setRecoveryStatus')
+      setRecoveryStatusSpy = sinon.spy(aboutPreferencesState, 'setRecoveryStatus')
       getBalanceSpy = sinon.spy(ledgerApi, 'getBalance')
       onLedgerCallbackSpy.reset()
       fakeClock = sinon.useFakeTimers()
@@ -1808,10 +1814,11 @@ describe('ledger api unit tests', function () {
     })
 
     it('on error', function () {
-      const result = ledgerApi.onWalletRecovery(defaultAppState, 'Wrong key')
+      const result = ledgerApi.onWalletRecovery(stateWithAbout, 'Wrong key')
       const expectedSate = defaultAppState
         .set('about', Immutable.fromJS({
           preferences: {
+            recoveryInProgress: false,
             recoverySucceeded: false,
             updatedStamp: 0
           }
@@ -1825,10 +1832,11 @@ describe('ledger api unit tests', function () {
     })
 
     it('success', function () {
-      const result = ledgerApi.onWalletRecovery(defaultAppState, null, param)
+      const result = ledgerApi.onWalletRecovery(stateWithAbout, null, param)
       const expectedSate = defaultAppState
         .set('about', Immutable.fromJS({
           preferences: {
+            recoveryInProgress: false,
             recoverySucceeded: true,
             updatedStamp: 0
           }

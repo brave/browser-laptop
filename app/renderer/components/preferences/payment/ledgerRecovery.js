@@ -62,6 +62,7 @@ class LedgerRecoveryContent extends ImmutableComponent {
     }
     const recoverySucceeded = this.props.ledgerData.get('recoverySucceeded')
     const recoveryError = this.props.ledgerData.getIn(['error', 'error'])
+    const recoveryInProgress = this.props.ledgerData.get('recoveryInProgress')
     const isNetworkError = typeof recoveryError === 'object'
 
     return <section>
@@ -106,6 +107,22 @@ class LedgerRecoveryContent extends ImmutableComponent {
             <BrowserButton secondaryColor
               l10nId='ok'
               testId='okButton'
+              onClick={this.onRecoveryOverlay.bind(this, false)}
+            />
+          </section>
+          : null
+      }
+      {
+        recoveryInProgress === true
+          ? <section className={css(styles.recoveryOverlay)} onKeyDown={(e) => this.onEscape(e, false)} ref='ledgerRecoveryOverlay' tabIndex='0'>
+            <h1 className={css(styles.recoveryOverlay__textColor)} data-l10n-id='ledgerRecoveryInProgressTitle' />
+            <p className={css(styles.recoveryOverlay__textColor, styles.recoveryOverlay__spaceAround)}
+              data-l10n-id='ledgerRecoveryInProgress'
+              data-test-id='ledgerRecoveryInProgress'
+            />
+            <BrowserButton secondaryColor
+              l10nId='cancel'
+              testId='recoveryOverlayErrorButton'
               onClick={this.onRecoveryOverlay.bind(this, false)}
             />
           </section>
