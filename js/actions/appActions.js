@@ -1987,6 +1987,12 @@ const appActions = {
     })
   },
 
+  onWalletPropertiesError: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_WALLET_PROPERTIES_ERROR
+    })
+  },
+
   onPublisherToggleUpdate: function () {
     dispatch({
       actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE

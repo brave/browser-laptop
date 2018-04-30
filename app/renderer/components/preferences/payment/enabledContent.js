@@ -313,6 +313,15 @@ class EnabledContent extends ImmutableComponent {
             />
             break
           }
+
+        case ledgerStatuses.SERVER_PROBLEM:
+          {
+            showClose = false
+            title = locale.translation('ledgerNetworkErrorTitle')
+            message = locale.translation('ledgerNetworkErrorMessage')
+            text = locale.translation('ledgerNetworkErrorText')
+            break
+          }
         default:
           {
             return
