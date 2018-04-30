@@ -310,7 +310,7 @@ const userModelState = {
 
     if (current !== value) {
       const place = userModelState.getAdPlace(state)
-      let newValue = ''
+      let newValue = 'UNDISCLOSED'
       if (place) {
         newValue = place
       }

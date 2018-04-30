@@ -193,7 +193,7 @@ module.exports = {
     'ads.enabled': false,
     'ads.amount.day': 10,
     'ads.amount.hour': 1,
-    'ads.place': '',
+    'ads.place': 'UNDISCLOSED',
     'ads.operating-mode': false,
     // Windows has issues with titlebar mode because it doesn't fire onMouseEnter events if you enter
     // your mouse from the top of the window.  Also users with Surface tablets or Surface books that
