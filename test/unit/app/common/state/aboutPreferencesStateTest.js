@@ -7,7 +7,7 @@ const assert = require('assert')
 const Immutable = require('immutable')
 const aboutPreferencesState = require('../../../../../app/common/state/aboutPreferencesState')
 
-describe('ledgerState unit test', function () {
+describe('aboutPreferencesState unit test', function () {
   // State
   const defaultState = Immutable.fromJS({
     about: {
@@ -59,6 +59,21 @@ describe('ledgerState unit test', function () {
       const state = defaultState.setIn(['about', 'preferences', 'recoverySucceeded'], new Date().getTime())
       const result = aboutPreferencesState.hasBeenBackedUp(state)
       assert.notEqual(result, null)
+    })
+  })
+
+  describe('setRecoveryStatus', function () {
+    it('updates recoverySucceeded', function () {
+      const result = aboutPreferencesState.setRecoveryStatus(defaultState, true)
+      assert.equal(result.getIn(['about', 'preferences', 'recoverySucceeded']), true)
+    })
+    it('recoveryInProgress is false when recovery is successful', function () {
+      const result = aboutPreferencesState.setRecoveryStatus(defaultState, true)
+      assert.equal(result.getIn(['about', 'preferences', 'recoveryInProgress']), false)
+    })
+    it('recoveryInProgress is false when recovery is not successful', function () {
+      const result = aboutPreferencesState.setRecoveryStatus(defaultState, false)
+      assert.equal(result.getIn(['about', 'preferences', 'recoveryInProgress']), false)
     })
   })
 })
