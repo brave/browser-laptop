@@ -1157,7 +1157,7 @@ const recoverKeys = (state, useRecoveryKeyFile, key) => {
   if (typeof recoveryKey !== 'string') {
     // calling logError sets the error object
     state = logError(state, true, 'recoverKeys')
-    state = ledgerState.setRecoveryStatus(state, false)
+    state = aboutPreferencesState.setRecoveryStatus(state, false)
     return state
   }
 
@@ -1176,7 +1176,7 @@ const onWalletRecovery = (state, error, result) => {
     // if ledgerInfo.error is not null, the wallet info will not display in UI
     // logError sets ledgerInfo.error, so we must we clear it or UI will show an error
     state = logError(state, error.toString(), 'recoveryWallet')
-    state = ledgerState.setRecoveryStatus(state, false)
+    state = aboutPreferencesState.setRecoveryStatus(state, false)
   } else {
     // convert buffer to Uint8Array
     let seed = result && result.getIn(['properties', 'wallet', 'keyinfo', 'seed'])
@@ -1200,7 +1200,7 @@ const onWalletRecovery = (state, error, result) => {
       clearTimeout(balanceTimeoutId)
     }
     module.exports.getBalance(state)
-    state = ledgerState.setRecoveryStatus(state, true)
+    state = aboutPreferencesState.setRecoveryStatus(state, true)
   }
 
   return state
