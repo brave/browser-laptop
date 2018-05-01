@@ -4,7 +4,8 @@
 
 const statuses = {
   CORRUPTED_SEED: 'corruptedSeed',
-  IN_PROGRESS: 'contributionInProgress'
+  IN_PROGRESS: 'contributionInProgress',
+  SERVER_PROBLEM: 'serverProblem'
 }
 
 module.exports = statuses
