@@ -86,7 +86,7 @@ describe('menuUtil tests', function () {
     })
   })
 
-  describe('setTemplateItemChecked', function () {
+  describe('setTemplateItemAttribute', function () {
     const defaultTemplate = Immutable.fromJS([
       {
         'label': 'Bookmarks',
@@ -113,11 +113,11 @@ describe('menuUtil tests', function () {
           ]
         }
       ])
-      const newTemplate = menuUtil.setTemplateItemChecked(defaultTemplate, 'Bookmarks Toolbar', true)
+      const newTemplate = menuUtil.setTemplateItemAttribute(defaultTemplate, 'Bookmarks Toolbar', 'checked', true)
       assert.deepEqual(newTemplate.toJS(), expectedTemplate.toJS())
     })
     it('returns null when no change is made', function () {
-      const newTemplate = menuUtil.setTemplateItemChecked(defaultTemplate, 'Bookmarks Toolbar', false)
+      const newTemplate = menuUtil.setTemplateItemAttribute(defaultTemplate, 'Bookmarks Toolbar', 'checked', false)
       assert.equal(newTemplate, null)
     })
   })
