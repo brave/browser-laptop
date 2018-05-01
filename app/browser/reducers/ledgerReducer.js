@@ -11,6 +11,7 @@ const appConstants = require('../../../js/constants/appConstants')
 const windowConstants = require('../../../js/constants/windowConstants')
 const settings = require('../../../js/constants/settings')
 const tabActionConstants = require('../../common/constants/tabAction')
+const ledgerStatuses = require('../../common/constants/ledgerStatuses')
 
 // State
 const ledgerState = require('../../common/state/ledgerState')
@@ -520,6 +521,11 @@ const ledgerReducer = (state, action, immutableAction) => {
           action.get('duration'),
           action.get('revisited')
         )
+        break
+      }
+    case appConstants.APP_ON_WALLET_PROPERTIES_ERROR:
+      {
+        state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.SERVER_PROBLEM)
         break
       }
     case appConstants.APP_ON_LEDGER_BACKUP_SUCCESS:
