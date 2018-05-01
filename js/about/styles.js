@@ -10,7 +10,12 @@ const globalStyles = require('../../app/renderer/components/styles/global')
 require('../../node_modules/font-awesome/css/font-awesome.css')
 
 const {Textbox, FormTextbox, SettingTextbox} = require('../../app/renderer/components/common/textbox')
-const {TextArea, DefaultTextArea} = require('../../app/renderer/components/common/textbox')
+
+const {
+  TextArea,
+  DefaultTextArea,
+  WordCountTextArea
+} = require('../../app/renderer/components/common/textbox')
 
 const {
   Dropdown,
@@ -171,6 +176,15 @@ class AboutStyle extends ImmutableComponent {
           <Pre><Code>
             const { '{DefaultTextArea}' } = require('../../app/renderer/components/common/textbox'){'\n'}
             &lt;DefaultTextArea />
+          </Code></Pre>
+        </Container>
+
+        <Container>
+          <h2>Word Count textarea</h2>
+          <WordCountTextArea onChangeText={() => console.log('changed!!')} />
+          <Pre><Code>
+            const { '{WordCountTextArea}' } = require('../../app/renderer/components/common/textbox'){'\n'}
+            &lt;WordCountTextArea />
           </Code></Pre>
         </Container>
 
