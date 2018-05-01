@@ -51,7 +51,6 @@ class ClipboardButton extends React.Component {
       />
       <BrowserButton
         iconClass={globalStyles.appIcons.clipboard}
-        disabled={this.props.disabled}
         custom={styles.clipboardButton__browserButton}
         l10nId={this.props.dataL10nId ? this.props.dataL10nId : 'copyToClipboard'}
         testId={this.props.testId}

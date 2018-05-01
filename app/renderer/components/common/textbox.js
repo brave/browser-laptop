@@ -6,9 +6,6 @@ const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
-const ClipboardButton = require('../common/clipboardButton')
-const appActions = require('../../../../js/actions/appActions')
-
 const globalStyles = require('../styles/global')
 const commonStyles = require('../styles/commonStyles')
 
@@ -84,65 +81,6 @@ class DefaultTextArea extends ImmutableComponent {
   }
 }
 
-class WordCountTextArea extends React.Component {
-  constructor () {
-    super()
-    this.handleCopyToClipboard = this.handleCopyToClipboard.bind(this)
-    this.handleOnChange = this.handleOnChange.bind(this)
-    this.state = { wordCount: 0 }
-  }
-
-  handleOnChange (e) {
-    let wordCount = 0
-
-    if (e.target.value.length > 0) {
-      wordCount = e.target.value.trim().replace(/\s+/gi, ' ').split(' ').length
-    }
-
-    this.setState({wordCount})
-
-    if (this.props.onChangeText) {
-      this.props.onChangeText()
-    }
-  }
-
-  handleCopyToClipboard () {
-    if (!this.textAreaBox) {
-      return
-    }
-    appActions.clipboardTextCopied(this.textAreaBox.value)
-  }
-
-  render () {
-    return (
-      <div className={css(styles.wordCountTextArea__main)}>
-        <textarea className={css(
-          commonStyles.formControl,
-          commonStyles.textArea,
-          styles.wordCountTextArea__body
-        )}
-          spellCheck='false'
-          disabled={this.props.disabled}
-          autoFocus={this.props.autoFocus}
-          value={this.props.value}
-          ref={(node) => { this.textAreaBox = node }}
-          onChange={this.handleOnChange}
-        />
-        <div className={css(styles.wordCountTextArea__footer)}>
-          <div>
-            <span data-l10n-id='wordCount' />&nbsp;{this.state.wordCount}
-          </div>
-          <ClipboardButton
-            disabled={this.props.clipboardDisabled}
-            leftTooltip
-            copyAction={this.handleCopyToClipboard}
-          />
-        </div>
-      </div>
-    )
-  }
-}
-
 const styles = StyleSheet.create({
   // Textbox
   textbox: {
@@ -210,36 +148,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
-  },
-
-  wordCountTextArea__main: {
-    background: 'rgba(0, 0, 0, 0.1)',
-    border: '1px solid #000',
-    borderRadius: '4px',
-    padding: '2px',
-    width: '100%'
-  },
-
-  wordCountTextArea__body: {
-    width: '100%',
-    height: '120px',
-    borderTopLeftRadius: '4px',
-    borderTopRightRadius: '4px',
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    resize: 'none',
-    fontSize: '18px'
-  },
-
-  wordCountTextArea__footer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomLeftRadius: '4px',
-    borderBottomRightRadius: '4px',
-    padding: '5px 10px',
-    fontSize: '13px',
-    fontWeight: 'bold'
   }
 })
 
@@ -249,6 +157,5 @@ module.exports = {
   GroupedFormTextbox,
   SettingTextbox,
   TextArea,
-  DefaultTextArea,
-  WordCountTextArea
+  DefaultTextArea
 }
