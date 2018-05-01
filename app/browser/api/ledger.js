@@ -1785,7 +1785,12 @@ const getPaymentInfo = (state) => {
 
     client.getWalletProperties(amount, currency, function (err, body) {
       if (err) {
-        console.error('getWalletProperties error: ' + err.toString())
+        if (err.message) {
+          console.error('getWalletProperties error: ' + err.message)
+        } else {
+          console.error('getWalletProperties error: ' + err.toString())
+        }
+        appActions.onWalletPropertiesError()
         return
       }
 
@@ -1824,6 +1829,11 @@ const setNewTimeUntilReconcile = (newReconcileTime = null) => {
 }
 
 const onWalletProperties = (state, body) => {
+  const currentStatus = ledgerState.getAboutProp(state, 'status')
+  if (currentStatus === ledgerStatuses.SERVER_PROBLEM) {
+    state = ledgerState.setAboutProp(state, 'status', '')
+  }
+
   if (body == null) {
     return state
   }

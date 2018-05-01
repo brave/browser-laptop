@@ -1259,7 +1259,7 @@ describe('ledger api unit tests', function () {
       })
 
       it('null case', function () {
-        ledgerApi.onWalletProperties()
+        ledgerApi.onWalletProperties(state)
         assert(generatePaymentDataSpy.notCalled)
       })
 

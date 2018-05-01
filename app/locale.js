@@ -290,7 +290,10 @@ var rendererIdentifiers = function () {
     'promotionClaimedErrorTitle',
     'corruptedOverlayTitle',
     'corruptedOverlayMessage',
-    'corruptedOverlayText'
+    'corruptedOverlayText',
+    'ledgerNetworkErrorTitle',
+    'ledgerNetworkErrorMessage',
+    'ledgerNetworkErrorText'
   ].concat(countryCodes).concat(availableLanguages)
 }
 
