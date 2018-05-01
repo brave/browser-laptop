@@ -39,6 +39,8 @@ const bookmarkUtil = require('../common/lib/bookmarkUtil')
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
 const isWindows = platformUtil.isWindows()
+const {templateUrls} = require('./share')
+const {getAllRendererWindows} = require('./windows')
 
 let appMenu = null
 let closedFrames = new Immutable.OrderedMap()
@@ -633,18 +635,26 @@ const createMenu = (state) => {
   }
 }
 
-const setMenuItemChecked = (state, label, checked) => {
-  // Update electron menu (Mac / Linux)
+const setMenuItemAttribute = (state, label, key, value) => {
   const systemMenuItem = menuUtil.getMenuItem(appMenu, label)
-  systemMenuItem.checked = checked
+  systemMenuItem[key] = value
 
   // Update in-memory menu template (Windows)
   if (isWindows) {
     const oldTemplate = state.getIn(['menu', 'template'])
-    const newTemplate = menuUtil.setTemplateItemChecked(oldTemplate, label, checked)
+    const newTemplate = menuUtil.setTemplateItemAttribute(oldTemplate, label, key, value)
     if (newTemplate) {
       appActions.setMenubarTemplate(newTemplate)
     }
+  }
+}
+
+const updateShareMenuItems = (state, enabled) => {
+  for (let key of Object.keys(templateUrls)) {
+    const siteName = menuUtil.extractSiteName(key)
+    const l10nId = key === 'email' ? 'emailPageLink' : 'sharePageLink'
+    const label = locale.translation(l10nId, {siteName: siteName})
+    setMenuItemAttribute(state, label, 'enabled', enabled)
   }
 }
 
@@ -659,17 +669,28 @@ const doAction = (state, action) => {
         const frame = frameStateUtil.getFrameByTabId(state, action.tabId)
         if (frame) {
           currentLocation = frame.location
-          setMenuItemChecked(state, locale.translation('bookmarkPage'), isCurrentLocationBookmarked(state))
+          setMenuItemAttribute(state, locale.translation('bookmarkPage'), 'checked', isCurrentLocationBookmarked(state))
+        }
+        break
+      }
+    case appConstants.APP_WINDOW_CLOSED:
+    case appConstants.APP_WINDOW_CREATED:
+      {
+        const windowCount = getAllRendererWindows().length
+        if (action.actionType === appConstants.APP_WINDOW_CLOSED && windowCount === 0) {
+          updateShareMenuItems(state, false)
+        } else if (action.actionType === appConstants.APP_WINDOW_CREATED && windowCount === 1) {
+          updateShareMenuItems(state, true)
         }
         break
       }
     case appConstants.APP_CHANGE_SETTING:
       if (action.key === settings.SHOW_BOOKMARKS_TOOLBAR) {
         // Update the checkbox next to "Bookmarks Toolbar" (Bookmarks menu)
-        setMenuItemChecked(state, locale.translation('bookmarksToolbar'), action.value)
+        setMenuItemAttribute(state, locale.translation('bookmarksToolbar'), 'checked', action.value)
       }
       if (action.key === settings.DEBUG_ALLOW_MANUAL_TAB_DISCARD) {
-        setMenuItemChecked(state, 'Allow manual tab discarding', action.value)
+        setMenuItemAttribute(state, 'Allow manual tab discarding', 'checked', action.value)
       }
       break
     case windowConstants.WINDOW_UNDO_CLOSED_FRAME:
