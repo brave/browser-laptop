@@ -105,7 +105,7 @@ class Frame extends React.Component {
   }
 
   shouldCreateWebview () {
-    return !this.webview
+    return !this.webview && (!this.props.unloaded || this.props.isActive || this.props.isPreview)
   }
 
   allowRunningWidevinePlugin () {
@@ -194,7 +194,7 @@ class Frame extends React.Component {
   }
 
   componentDidMount () {
-    this.updateWebview(this.onPropsChanged)
+    this.updateWebview(() => this.onPropsChanged())
     if (this.props.activeShortcut) {
       this.handleShortcut()
     }
