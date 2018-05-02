@@ -13,7 +13,6 @@ const getSetting = require('../../js/settings').getSetting
 const communityURL = 'https://community.brave.com/'
 const isDarwin = process.platform === 'darwin'
 const electron = require('electron')
-const menuUtil = require('./lib/menuUtil')
 
 const ensureAtLeastOneWindow = (frameOpts) => {
   // Handle no new tab requested, but need a window

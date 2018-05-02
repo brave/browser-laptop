@@ -39,7 +39,7 @@ const bookmarkUtil = require('../common/lib/bookmarkUtil')
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
 const isWindows = platformUtil.isWindows()
-const {templateUrls} = require('./share')
+const {sharel10nIds} = require('./share')
 const {getAllRendererWindows} = require('./windows')
 
 let appMenu = null
@@ -637,6 +637,11 @@ const createMenu = (state) => {
 
 const setMenuItemAttribute = (state, label, key, value) => {
   const systemMenuItem = menuUtil.getMenuItem(appMenu, label)
+
+  if (systemMenuItem == null) {
+    return
+  }
+
   systemMenuItem[key] = value
 
   // Update in-memory menu template (Windows)
@@ -650,12 +655,10 @@ const setMenuItemAttribute = (state, label, key, value) => {
 }
 
 const updateShareMenuItems = (state, enabled) => {
-  for (let key of Object.keys(templateUrls)) {
-    const siteName = menuUtil.extractSiteName(key)
-    const l10nId = key === 'email' ? 'emailPageLink' : 'sharePageLink'
-    const label = locale.translation(l10nId, {siteName: siteName})
+  sharel10nIds.forEach((id) => {
+    const label = locale.translation(id)
     setMenuItemAttribute(state, label, 'enabled', enabled)
-  }
+  })
 }
 
 const doAction = (state, action) => {

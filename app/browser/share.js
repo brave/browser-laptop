@@ -18,6 +18,17 @@ const templateUrls = {
   reddit: 'https://reddit.com/submit?url={url}&title={title}'
 }
 
+const sharel10nIds = [
+  'emailPageLink',
+  'tweetPageLink',
+  'facebookPageLink',
+  'pinterestPageLink',
+  'googlePlusPageLink',
+  'linkedInPageLink',
+  'bufferPageLink',
+  'redditPageLink'
+]
+
 const validateShareType = (shareType) =>
   assert(templateUrls[shareType], 'The specified shareType is not recognized')
 
@@ -51,5 +62,6 @@ const simpleShareActiveTab = (state, windowId, shareType) => {
 
 module.exports = {
   simpleShareActiveTab,
-  templateUrls
+  templateUrls,
+  sharel10nIds
 }
