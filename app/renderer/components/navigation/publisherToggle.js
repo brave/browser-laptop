@@ -66,7 +66,7 @@ class PublisherToggle extends React.Component {
       return
     }
     let updateTimeout = setTimeout(() => {
-      appActions.onPublisherToggleUpdate()
+      appActions.onPublisherToggleUpdate(this.props.viewData)
     }, updateWait)
     this.setState({updateTimeout: updateTimeout})
   }
@@ -117,6 +117,7 @@ class PublisherToggle extends React.Component {
     props.tabId = tabId
     props.location = location
     props.publisherKey = publisherKey
+    props.viewData = {location, tabId}
     props.isVisibleInLedger = ledgerUtil.visibleP(state, publisherKey)
     props.isEnabledForPaymentsPublisher = ledgerUtil.stickyP(state, publisherKey)
     props.isVerifiedPublisher = ledgerState.getPublisherOption(state, publisherKey, 'verified')

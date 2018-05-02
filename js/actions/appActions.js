@@ -1993,9 +1993,10 @@ const appActions = {
     })
   },
 
-  onPublisherToggleUpdate: function () {
+  onPublisherToggleUpdate: function (viewData) {
     dispatch({
-      actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE
+      actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE,
+      viewData
     })
   }
 }
