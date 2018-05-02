@@ -481,11 +481,12 @@ const UrlUtil = {
     // parsed.origin is specific to muon.url.parse
     if (parsed.origin !== undefined) {
       if (parsed.protocol === 'about:') {
-        return [parsed.protocol, parsed.path].join('')
+        return [parsed.protocol, parsed.path.replace(/\/.*/, '')].join('')
       }
       return parsed.origin.replace(/\/+$/, '')
     }
     if (parsed.host && parsed.protocol) {
+      // parsed.slashes is specific to node's url.parse
       return parsed.slashes ? [parsed.protocol, parsed.host].join('//') : [parsed.protocol, parsed.host].join('')
     }
     return null
