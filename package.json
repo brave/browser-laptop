@@ -132,7 +132,6 @@
     "tablesort": "5.0.2",
     "tldjs": "^2.3.1",
     "underscore": "1.8.3",
-    "unzip": "^0.1.11",
     "url-loader": "~0.6.2",
     "v8-compile-cache": "^1.1.0",
     "webtorrent-remote": ">=2.1.0"
@@ -200,6 +199,7 @@
     "standard": "10.0.3",
     "style-loader": "~0.19.0",
     "uglifyjs-webpack-plugin": "^1.0.0",
+    "unzip": "^0.1.11",
     "uuid": "^3.0.1",
     "webdriverio": "4.7.1",
     "webpack": "^3.8.1",
