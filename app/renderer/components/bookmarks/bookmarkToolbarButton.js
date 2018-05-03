@@ -22,6 +22,7 @@ const bookmarksState = require('../../../common/state/bookmarksState')
 const dragTypes = require('../../../../js/constants/dragTypes')
 const {iconSize} = require('../../../../js/constants/config')
 const siteTags = require('../../../../js/constants/siteTags')
+const {bookmarksToolbarMode} = require('../../../common/constants/settingsEnums')
 
 // Utils
 const {getCurrentWindowId} = require('../../currentWindow')
@@ -175,15 +176,17 @@ class BookmarkToolbarButton extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+    const bookmarkDisplayMode = ownProps.bookmarkDisplayMode
     const bookmarkKey = ownProps.bookmarkKey
     let bookmark = bookmarksState.findBookmark(state, bookmarkKey)
 
     const draggingOverData = bookmarkUtil.getDNDBookmarkData(state, bookmarkKey)
 
     const props = {}
+
     // used in renderer
-    props.showFavicon = bookmarkUtil.showFavicon()
-    props.showOnlyFavicon = bookmarkUtil.showOnlyFavicon()
+    props.showFavicon = bookmarkUtil.showFavicon(state, bookmarkDisplayMode)
+    props.showOnlyFavicon = (bookmarkDisplayMode === bookmarksToolbarMode.FAVICONS_ONLY)
     props.favIcon = bookmark.get('favicon')
     props.title = bookmark.get('title')
     props.location = bookmark.get('location')
