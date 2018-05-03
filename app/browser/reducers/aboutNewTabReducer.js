@@ -44,6 +44,14 @@ const aboutNewTabReducer = (state, action) => {
             torEnabled: action.value
           }
         })
+        if (action.value === true) {
+          // Also enable DDG
+          state = aboutNewTabState.mergeDetails(state, {
+            newTabPageDetail: {
+              useAlternativePrivateSearchEngine: action.value
+            }
+          })
+        }
       }
   }
   return state

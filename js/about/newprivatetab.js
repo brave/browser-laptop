@@ -88,8 +88,8 @@ class NewPrivateTab extends React.Component {
                   large
                   switchClassName={css(styles.privateSearch__switch)}
                   rightLabelClassName={css(styles.sectionTitle)}
-                  checked={Boolean(this.props.newTabData.getIn(useAlternativePrivateSearchEngineDataKeys))}
-                  onChange={this.onChangePrivateSearch.bind(this)}
+                  checked={Boolean(this.props.newTabData.getIn(torEnabled))}
+                  onChange={this.onChangeTor.bind(this)}
                 />
               </div>
             </div>
