@@ -12,6 +12,7 @@ const appActions = require('../../../../../js/actions/appActions')
 const batPublisher = require('bat-publisher')
 const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
 const fs = require('fs')
+const ledgerStatuses = require('../../../../../app/common/constants/ledgerStatuses')
 
 describe('ledger api unit tests', function () {
   let ledgerApi
@@ -161,6 +162,10 @@ describe('ledger api unit tests', function () {
       isReadyToReconcile: () => {}
     }
     window.getWalletPassphrase = (parsedData) => {
+      if (walletPassphraseReturn === 'error') {
+        throw TypeError('Invalid entropy')
+      }
+
       return walletPassphraseReturn
     }
     ledgerClient.prototype.boolion = function (value) { return false }
@@ -2001,6 +2006,29 @@ describe('ledger api unit tests', function () {
             'reconcileStamp': 1
           }))
         assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+
+      it('seed is broken', function () {
+        const wrongSeed = Immutable
+          .fromJS(seedData)
+          .setIn(['properties', 'wallet', 'keyinfo', 'seed'], Buffer.from([0, 0]))
+          .toJS()
+
+        walletPassphraseReturn = 'error'
+
+        const result = ledgerApi.getStateInfo(defaultAppState, wrongSeed)
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'info'], Immutable.fromJS({
+            'created': true,
+            'creating': false,
+            'paymentId': '21951877-5998-4acf-9302-4a7b101c9188',
+            'reconcileFrequency': 30,
+            'reconcileStamp': 1
+          }))
+          .setIn(['ledger', 'about', 'status'], ledgerStatuses.CORRUPTED_SEED)
+
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+        assert(getWalletPassphraseSpy.withArgs(wrongSeed).calledOnce)
       })
     })
   })
