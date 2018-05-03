@@ -1,9 +1,16 @@
-var execute = require('./lib/execute')
+const execute = require('./lib/execute')
 const path = require('path')
 const fs = require('fs')
 const unzip = require('unzip')
+const crypto = require('crypto')
 
-var cmds = []
+/**
+ * does a hash comparison on a file to a given hash
+ */
+const verifyChecksum = (file, hash) => {
+  const filecontent = fs.readFileSync(file)
+  return hash === crypto.createHash('sha512').update(filecontent).digest('hex')
+}
 
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
@@ -15,8 +22,8 @@ if (torPath === undefined) {
   torPath = path.join('app', 'extensions', 'bin')
 }
 
-var torVersion = '0.3.2.10'
-var braveVersion = '1'
+const torVersion = '0.3.2.10'
+const braveVersion = '1'
 var torURL = torS3Prefix + 'tor-' + torVersion + '-' + process.platform + '-brave-' + braveVersion
 
 if (isWindows) {
@@ -37,32 +44,25 @@ if (isDarwin) {
   sha512Tor = '0fbd88d590069fdc243fcdcc84b8aa10caa921fc11d7e776334f0cbd5b0095b21046adfd291be61dc414c232bc1ff22e7e8142b0af1d20e71154f8de66be83ab'
 }
 
-// Windows adds " " to the file, in mac/linux " " preserves the spaces between
-// sha and file path
-cmds.push('curl -o ' + path.join(torPath, 'tor') + ' ' + torURL)
-if (isWindows) {
-  cmds.push('echo ' + sha512Tor + '  ' + path.join(torPath, 'tor') + '> tor.hash')
-} else {
-  cmds.push('echo "' + sha512Tor + '  ' + path.join(torPath, 'tor') + '" > tor.hash')
-}
-
-if (isDarwin) {
-  cmds.push('shasum -a 512 -c tor.hash')
-} else {
-  cmds.push('sha512sum -c tor.hash')
-}
-
-if (!isWindows) {
-  cmds.push('chmod +x ' + path.join(torPath, 'tor'))
-}
-cmds.push('rm -f tor.hash')
-execute(cmds, '', (err) => {
+// download the binary
+const torBinary = path.join(torPath, 'tor')
+const cmd = 'curl -o ' + torBinary + ' ' + torURL
+execute([cmd], '', (err) => {
   if (err) {
-    console.error('package tor failed', err)
+    console.error('downloading tor failed', err)
     process.exit(1)
   }
-  if (isWindows) {
-    fs.createReadStream(path.join(torPath, 'tor')).pipe(unzip.Extract({ path: torPath }))
+  // verify the checksum
+  if (!verifyChecksum(torBinary, sha512Tor)) {
+    console.error('tor checksum verification failed', err)
+    process.exit(1)
   }
+  console.log('tor binary checksum matches')
+  // unzip on windows
+  if (isWindows) {
+    fs.createReadStream(torBinary).pipe(unzip.Extract({ path: torPath }))
+  }
+  // make it executable
+  fs.chmodSync(torBinary, 0o755)
   console.log('done')
 })
