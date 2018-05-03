@@ -8,7 +8,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 class AboutWelcome extends React.Component {
   render () {
     return <iframe data-test-id='welcomeIframe'
-      className={css(styles.welcomeIframe)} src='https://brave.com/welcome.html' />
+      className={css(styles.welcomeIframe)} src='https://brave.com/ads-welcome' />
   }
 }
 
