@@ -171,20 +171,6 @@ describe('bookmarkUtil unit test', function () {
     })
   })
 
-  describe('showOnlyFavicon', function () {
-    it('BOOKMARKS_TOOLBAR_MODE is FAVICONS_ONLY', function () {
-      settingDefaultValue = bookmarksToolbarMode.FAVICONS_ONLY
-      const result = bookmarkUtil.showOnlyFavicon()
-      assert.equal(result, true)
-    })
-
-    it('BOOKMARKS_TOOLBAR_MODE is not FAVICONS_ONLY', function () {
-      settingDefaultValue = bookmarksToolbarMode.TEXT_ONLY
-      const result = bookmarkUtil.showOnlyFavicon()
-      assert.equal(result, false)
-    })
-  })
-
   describe('showFavicon', function () {
     it('BOOKMARKS_TOOLBAR_MODE is FAVICONS_ONLY', function () {
       settingDefaultValue = bookmarksToolbarMode.FAVICONS_ONLY
@@ -201,34 +187,6 @@ describe('bookmarkUtil unit test', function () {
     it('BOOKMARKS_TOOLBAR_MODE is not TEXT_AND_FAVICONS nor FAVICONS_ONLY', function () {
       settingDefaultValue = bookmarksToolbarMode.TEXT_ONLY
       const result = bookmarkUtil.showFavicon()
-      assert.equal(result, false)
-    })
-  })
-
-  describe('showOnlyText', function () {
-    it('BOOKMARKS_TOOLBAR_MODE is TEXT_ONLY', function () {
-      settingDefaultValue = bookmarksToolbarMode.TEXT_ONLY
-      const result = bookmarkUtil.showOnlyText()
-      assert.equal(result, true)
-    })
-
-    it('BOOKMARKS_TOOLBAR_MODE is not TEXT_ONLY', function () {
-      settingDefaultValue = bookmarksToolbarMode.FAVICONS_ONLY
-      const result = bookmarkUtil.showOnlyText()
-      assert.equal(result, false)
-    })
-  })
-
-  describe('showTextAndFavicon', function () {
-    it('BOOKMARKS_TOOLBAR_MODE is TEXT_AND_FAVICONS', function () {
-      settingDefaultValue = bookmarksToolbarMode.TEXT_AND_FAVICONS
-      const result = bookmarkUtil.showTextAndFavicon()
-      assert.equal(result, true)
-    })
-
-    it('BOOKMARKS_TOOLBAR_MODE is not TEXT_AND_FAVICONS', function () {
-      settingDefaultValue = bookmarksToolbarMode.TEXT_ONLY
-      const result = bookmarkUtil.showTextAndFavicon()
       assert.equal(result, false)
     })
   })
