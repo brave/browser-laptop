@@ -1981,6 +1981,13 @@ const appActions = {
     })
   },
 
+  onLedgerFuzzing: function (newStamp) {
+    dispatch({
+      actionType: appConstants.APP_ON_LEDGER_FUZZING,
+      newStamp
+    })
+  },
+
   onLedgerBackupSuccess: function () {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_BACKUP_SUCCESS

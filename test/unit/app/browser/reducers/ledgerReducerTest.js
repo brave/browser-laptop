@@ -6,6 +6,8 @@ const sinon = require('sinon')
 const appConstants = require('../../../../../js/constants/appConstants')
 const settings = require('../../../../../js/constants/settings')
 require('../../../braveUnit')
+const ledgerStatuses = require('../../../../../app/common/constants/ledgerStatuses')
+const ledgerState = require('../../../../../app/common/state/ledgerState')
 
 describe('ledgerReducer unit tests', function () {
   let ledgerReducer
@@ -66,11 +68,12 @@ describe('ledgerReducer unit tests', function () {
       resetSynopsis: dummyModifyState,
       setRecoveryStatus: dummyModifyState,
       setRecoveryInProgressStatus: dummyModifyState,
-      setInfoProp: dummyModifyState,
+      setInfoProp: ledgerState.setInfoProp,
       saveSynopsis: dummyModifyState,
       savePromotion: dummyModifyState,
       remindMeLater: dummyModifyState,
-      removePromotion: dummyModifyState
+      removePromotion: dummyModifyState,
+      setAboutProp: ledgerState.setAboutProp
     }
     fakeLedgerNotifications = {
       onPromotionReceived: dummyModifyState,
@@ -905,6 +908,65 @@ describe('ledgerReducer unit tests', function () {
       }))
       assert.equal(true, pageDataChangedSpy.getCall(0).args[2])
       assert.equal(true, pageDataChangedSpy.getCall(1).args[2])
+    })
+  })
+
+  describe('APP_ON_LEDGER_FUZZING', function () {
+    let newState
+
+    before(() => {
+      newState = appState
+        .setIn(['ledger', 'about', 'status'], ledgerStatuses.FUZZING)
+    })
+
+    it('null case', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_LEDGER_FUZZING
+      }))
+
+      assert.deepEqual(result.toJS(), newState.toJS())
+    })
+
+    it('stamp is string', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_LEDGER_FUZZING,
+        newStamp: 'str'
+      }))
+
+      assert.deepEqual(result.toJS(), newState.toJS())
+    })
+
+    it('stamp is negative', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_LEDGER_FUZZING,
+        newStamp: -10
+      }))
+
+      assert.deepEqual(result.toJS(), newState.toJS())
+    })
+
+    it('stamp is number (string)', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_LEDGER_FUZZING,
+        newStamp: '10'
+      }))
+
+      const expectedState = newState
+        .setIn(['ledger', 'info', 'reconcileStamp'], 10)
+
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('reconcile stamp is set', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_LEDGER_FUZZING,
+        newStamp: 10
+      }))
+
+      const expectedState = newState
+        .setIn(['ledger', 'info', 'reconcileStamp'], 10)
+
+      assert.deepEqual(result.toJS(), expectedState.toJS())
     })
   })
 })
