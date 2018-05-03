@@ -452,7 +452,7 @@ class SecurityTab extends ImmutableComponent {
           className={css(styles.link)}
           data-l10n-id='webrtcPolicyExplanation'
           onClick={aboutActions.createTabRequested.bind(null, {
-            url: 'https://cs.chromium.org/chromium/src/content/public/common/webrtc_ip_handling_policy.h'
+            url: 'https://github.com/brave/browser-laptop/wiki/WebRTC-Custom-Settings'
           })}
         />
       </SettingsList>
