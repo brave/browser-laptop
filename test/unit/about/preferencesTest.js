@@ -56,6 +56,9 @@ describe('Preferences component unittest', function () {
     mockery.registerMock('../../../../img/toolbar/stoploading_btn.svg')
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_payments_on.svg')
     mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_payments_off.svg')
+    mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_ads_on.svg')
+    mockery.registerMock('../../../extensions/brave/img/preferences/browser_prefs_ads_off.svg')
+    mockery.registerMock('../../../../extensions/brave/img/preferences/ads_welcome_BG.png')
     // Mocks the icon used in payments tab
     mockery.registerMock('../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
     mockery.registerMock('../../../../../img/toolbar/stoploading_btn.svg')

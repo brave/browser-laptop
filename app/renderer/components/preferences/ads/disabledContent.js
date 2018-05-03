@@ -2,68 +2,81 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
-// Components
-const ImmutableComponent = require('../../immutableComponent')
+// Actions
+const appActions = require('../../../../../js/actions/appActions')
 
-// Utils
-const cx = require('../../../../../js/lib/classSet')
+// Constants
+const settings = require('../../../../../js/constants/settings')
 
 // style
 const globalStyles = require('../../styles/global')
+const iconPaymentsOn = require('../../../../extensions/brave/img/preferences/ads_welcome_BG.png')
 
-class DisabledContent extends ImmutableComponent {
+class DisabledContent extends React.Component {
+  constructor () {
+    super()
+    this.onAgree = this.onAgree.bind(this)
+    this.onStart = this.onStart.bind(this)
+    this.state = {
+      agree: false
+    }
+  }
+
+  onAgree () {
+    this.setState({
+      agree: !this.state.agree
+    })
+  }
+
+  onStart () {
+    if (this.state.agree) {
+      appActions.changeSetting(settings.ADS_ENABLED, true)
+    }
+  }
+
   render () {
     return <section className={css(styles.disabledContent)} data-test-id='disabledContent'>
-      <div>
-        <div className={css(styles.disabledContent__wrapper)} data-test-id='paymentsMessage'>
-          <div className={cx({
-            [css(styles.disabledContent__message)]: true,
-            disabledLedgerContent: true
-          })} data-test-id='paymentsMessage'>
-            <div>
-              <h3 className={css(styles.disabledContent__message__header)}>Really good ads</h3>
-              <p className={css(styles.disabledContent__commonText)}>
-                Lorem ipsum dolor sit amet, quo in oblique detraxit singulis, prima inimicus torquatos cu duo.
-                Atqui congue denique eum ne, has dignissim consetetur ne, nam putent pericula at. Usu id euismod
-                propriae phaedrum, sententiae quaerendum mei ei. No qui sanctus epicurei, ne his quaeque efficiantur,
-                audire veritus apeirian pro ut.
-              </p>
-              <p className={css(styles.disabledContent__commonText)}>
-                Ut mea erroribus salutatus, no eruditi equidem pericula sea, no vis affert labore sanctus.
-                Sea oratio salutandi ut. Nam cu quas option complectitur.
-                Ius case reprehendunt ex.
-              </p>
-              <p className={css(styles.disabledContent__commonText)}>
-                Per te laudem altera invidunt, vitae legere interesset mel ea, tota alterum detraxit at pro.
-                Ius id dicit propriae. Cu dico copiosae dissentias sit, usu dicam scripserit ea, quo in primis suscipit.
-                Ius laudem suscipiantur eu, nominavi invenire assentior an has, ea pri inermis sententiae.
-              </p>
-            </div>
-          </div>
-          <div className={css(styles.disabledContent__message__toc)}>
-            <a
-              data-l10n-id='termsOfService'
-              data-test-id='termsOfService'
-              className={css(styles.disabledContent__message__toc__link)}
-              href='https://basicattentiontoken.org/contributor-terms-of-service/'
-              target='_blank'
-              rel='noreferrer noopener'
-            />
-          </div>
-          <div className={css(styles.disabledContent__footer)}>
-            <div className={css(styles.disabledContent__commonText)}>
-              Cu vis brute scriptorem disputationi, rebum aperiam ea mel, virtute vulputate instructior an sit.
-              Fugit accusam percipit ius at, et disputando deterruisset ius. Ex solet salutandi vis.
-              Ei harum laoreet nec, eu pro reque dicat sensibus.
-            </div>
-            <div className={css(styles.disabledContent__commonText)}>
-              Vel dicunt persius ea, cum adhuc inermis fuisset et. In nam illud efficiantur, sed an diam nominavi.
-              Magna labore appellantur ea vix, veri magna contentiones sed ne. Per ne eros sanctus adolescens.
-            </div>
-          </div>
+      <div className={css(styles.disabledContent__message)} data-test-id='paymentsMessage'>
+        <h3 className={css(styles.disabledContent__message__header)} data-l10n-id='adsWelcomeHeader' />
+        <p className={css(styles.disabledContent__message__text)}>
+          <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText1' />&nbsp;
+          <span className={css(styles.disabledContent__message_bold)} data-l10n-id='adsWelcomeText4' />&nbsp;
+          <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText5' />&nbsp;
+        </p>
+        <p className={css(styles.disabledContent__message__text)}>
+          <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText2' />&nbsp;
+          <a
+            href='https://brave.com/download'
+            target='_blank'
+            className={css(styles.disabledContent__message_white)}
+          >
+            https://brave.com/download
+          </a>.
+        </p>
+        <p className={css(styles.disabledContent__message__text)} data-l10n-id='adsWelcomeText3' />
+        <div className={css(styles.disabledContent__message__checkbox)} onClick={this.onAgree}>
+          <span className={css(styles.disabledContent__message__checkbox__box)}>
+            <span className={css(this.state.agree && styles.disabledContent__message__checkbox__box_on)} />
+          </span>
+          <span
+            className={css(
+              styles.disabledContent__message_bold,
+              styles.disabledContent__message__checkbox__text
+            )}
+            data-l10n-id='adsWelcomeAgree'
+          />
         </div>
+        <button
+          className={css(
+            styles.disabledContent__message__button,
+            this.state.agree && styles.disabledContent__message__button_on
+          )}
+          data-l10n-id='adsWelcomeStart'
+          onClick={this.onStart}
+        />
       </div>
     </section>
   }
@@ -77,44 +90,83 @@ const styles = StyleSheet.create({
     marginTop: globalStyles.spacing.panelMargin
   },
 
-  disabledContent__commonText: {
-    padding: '0.5em 0'
-  },
-
-  disabledContent__wrapper: {
-    fontSize: globalStyles.payments.fontSize.regular,
-    color: globalStyles.color.mediumGray,
-    maxWidth: '570px'
+  disabledContent__message__text: {
+    padding: '0.5em 0',
+    color: globalStyles.color.white100,
+    paddingRight: '63px'
   },
 
   disabledContent__message: {
-    backgroundColor: globalStyles.color.lightGray,
+    background: `url(${iconPaymentsOn}) no-repeat bottom right #FB542B`,
+    backgroundSize: 'contain',
     borderRadius: globalStyles.radius.borderRadiusUIbox,
     boxSizing: 'border-box',
     padding: '40px',
-    lineHeight: '1.8em'
+    lineHeight: '1.2em',
+    fontSize: '15px'
   },
 
   disabledContent__message__header: {
-    fontSize: '18px',
-    paddingBottom: '0.5em'
+    fontSize: '23px',
+    paddingBottom: '30px',
+    fontWeight: 'bold',
+    color: globalStyles.color.white100
   },
 
-  disabledContent__message__toc: {
-    display: 'flex',
-    flex: 1,
-    justifyContent: 'flex-end',
-    padding: '20px 0'
+  disabledContent__message_white: {
+    color: globalStyles.color.white100
   },
 
-  disabledContent__message__toc__link: {
-    fontSize: '13px',
-    color: '#666'
+  disabledContent__message_bold: {
+    fontWeight: 'bold',
+    color: globalStyles.color.white100
   },
 
-  disabledContent__footer: {
-    lineHeight: '1.2em',
-    padding: '20px'
+  disabledContent__message__checkbox: {
+    marginTop: '20px',
+    cursor: 'pointer'
+  },
+
+  disabledContent__message__checkbox__text: {
+    fontSize: '17px',
+    userSelect: 'none'
+  },
+
+  disabledContent__message__checkbox__box: {
+    width: '15px',
+    height: '15px',
+    display: 'inline-block',
+    border: '2px solid #FFF',
+    borderRadius: '4px',
+    marginRight: '10px',
+    position: 'relative',
+    top: '4px'
+  },
+
+  disabledContent__message__checkbox__box_on: {
+    background: '#fff',
+    width: '11px',
+    height: '11px',
+    display: 'block',
+    margin: '2px 0 0 2px'
+  },
+
+  disabledContent__message__button: {
+    background: 'none',
+    marginTop: '70px',
+    border: '2px solid #FFF',
+    borderRadius: '20px',
+    textTransform: 'uppercase',
+    color: '#FFF',
+    padding: '10px 50px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    opacity: 0.5
+  },
+
+  disabledContent__message__button_on: {
+    opacity: 1,
+    cursor: 'pointer'
   }
 })
 
