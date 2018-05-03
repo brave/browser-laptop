@@ -154,8 +154,8 @@ const globalStyles = {
     tabsToolbarHeight: '29px',
     tabPagesHeight: '7px',
     bookmarkHangerMaxWidth: '350px',
-    bookmarksToolbarHeight: '19px',
-    bookmarksToolbarWithFaviconsHeight: '24px',
+    bookmarksToolbarHeight: '20px',
+    bookmarksToolbarTextOnlyHeight: '18px',
     bookmarksFileIconSize: '13px',
     bookmarksFolderIconSize: '15px',
     bookmarksItemMaxWidth: '100px',
@@ -166,7 +166,7 @@ const globalStyles = {
     bookmarksToolbarPadding: '10px',
     bookmarksItemFontSize: '11px',
     bookmarksToolbarButtonDraggingMargin: '25px',
-    bookmarksToolbarOverflowButtonWidth: '14px',
+    bookmarksToolbarOverflowButtonWidth: '9px',
     navbarMenubarMargin: '7px',
     navbarButtonSpacing: '4px',
     navbarButtonWidth: '20px',
@@ -253,7 +253,6 @@ const globalStyles = {
     prefsPanelHeading: '23px'
   },
   appIcons: {
-    angleDoubleRight: 'fa fa-angle-double-right',
     check: 'fa fa-check',
     clipboard: 'fa fa-clipboard',
     closeTab: 'fa fa-times-circle',

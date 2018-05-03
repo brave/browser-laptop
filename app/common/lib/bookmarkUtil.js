@@ -36,23 +36,10 @@ const isBookmarkNameValid = (location) => {
   return location != null && location.trim().length > 0
 }
 
-const showOnlyText = () => {
-  const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
-  return btbMode === bookmarksToolbarMode.TEXT_ONLY
-}
+const getBookmarksToolbarMode = (appState) =>
+  getSetting(settings.BOOKMARKS_TOOLBAR_MODE, appState && appState.get('settings'))
 
-const showTextAndFavicon = () => {
-  const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
-  return btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS
-}
-
-const showOnlyFavicon = () => {
-  const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
-  return btbMode === bookmarksToolbarMode.FAVICONS_ONLY
-}
-
-const showFavicon = () => {
-  const btbMode = getSetting(settings.BOOKMARKS_TOOLBAR_MODE)
+const showFavicon = (appState, btbMode = getBookmarksToolbarMode(appState)) => {
   return btbMode === bookmarksToolbarMode.TEXT_AND_FAVICONS ||
     btbMode === bookmarksToolbarMode.FAVICONS_ONLY
 }
@@ -222,7 +209,6 @@ const buildEditBookmark = (oldBookmark, bookmarkDetail) => {
 module.exports = {
   bookmarkHangerHeading,
   isBookmarkNameValid,
-  showOnlyFavicon,
   showFavicon,
   getDNDBookmarkData,
   getDetailFromFrame,
@@ -232,8 +218,7 @@ module.exports = {
   updateTabBookmarked,
   updateActiveTabBookmarked,
   getKey,
-  showOnlyText,
-  showTextAndFavicon,
+  getBookmarksToolbarMode,
   buildBookmark,
   buildEditBookmark
 }
