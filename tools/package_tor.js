@@ -48,6 +48,9 @@ if (isWindows) {
 
 if (isDarwin) {
   cmds.push('shasum -a 512 -c tor.hash')
+} else if (isWindows) {
+  cmds.push(`certUtil -hashfile ${path.join(torPath, 'tor')} SHA512 > brave-tor-checksum.sum`)
+  cmds.push('fc tor.hash brave-tor-checksum.sum')
 } else {
   cmds.push('sha512sum -c tor.hash')
 }
