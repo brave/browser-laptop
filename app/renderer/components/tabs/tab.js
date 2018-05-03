@@ -30,6 +30,7 @@ const audioState = require('../../../common/state/tabContentState/audioState')
 const tabUIState = require('../../../common/state/tabUIState')
 const tabState = require('../../../common/state/tabState')
 const titleState = require('../../../common/state/tabContentState/titleState')
+const faviconState = require('../../../common/state/tabContentState/faviconState')
 
 // Constants
 const settings = require('../../../../js/constants/settings')
@@ -309,6 +310,9 @@ class Tab extends React.Component {
     props.title = titleState.getDisplayTitle(currentWindow, frameKey)
     props.tabPageIndex = frameStateUtil.getTabPageIndex(currentWindow)
     props.partOfFullPageSet = partOfFullPageSet
+    props.isLoading = faviconState.showLoadingIcon(currentWindow, frameKey)
+    props.isUnloaded = tabState.isTabDiscarded(state, tabId)
+    props.navigationProgressPercent = tabState.getNavigationProgressPercent(state, tabId)
     props.showAudioTopBorder = audioState.showAudioTopBorder(currentWindow, frameKey, isPinned)
     props.centralizeTabIcons = tabUIState.centralizeTabIcons(currentWindow, frameKey, isPinned)
     props.guestInstanceId = frame.get('guestInstanceId')
@@ -395,7 +399,9 @@ class Tab extends React.Component {
         (this.props.isPrivateTab && this.props.isActive) && styles.tabArea_private_active,
         // Apply themeColor if tab is active and not private
         isThemed && styles.tabArea_themed,
-        this.props.isPreview && styles.tabArea_isPreview
+        this.props.isPreview && styles.tabArea_isPreview,
+        !this.props.isActive && this.props.isLoading && styles.tabArea_isInactiveLoading,
+        this.props.isUnloaded && styles.tabArea_isUnloaded
       )}
       style={instanceStyles}
       onMouseMove={this.onMouseMove}
@@ -405,6 +411,8 @@ class Tab extends React.Component {
       data-tab-id={this.props.tabId}
       data-guest-instance-id={this.props.guestInstanceId}
       data-frame-key={this.props.frameKey}
+      data-tab-loading={this.props.isLoading}
+      data-tab-active={this.props.isActive}
       ref={elementRef => { this.elementRef = elementRef }}
       >
       {
@@ -572,6 +580,14 @@ const styles = StyleSheet.create({
     '--tab-transit-easing': theme.tab.transitionEasingIn
   },
 
+  tabArea_isInactiveLoading: {
+    '--tab-content-opacity': '.5'
+  },
+
+  tabArea_isUnloaded: {
+    '--tab-content-opacity': '.5'
+  },
+
   tabArea_siblingIsPreview: {
     // when un-previewing, if there's still another tab previewed
     // then we want to immediately have that tab on top of the last-previewed tab
@@ -698,7 +714,8 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    overflow: 'visible'
+    overflow: 'visible',
+    opacity: 'var(--tab-content-opacity, 1)'
   },
 
   tabArea__tab__identity_centered: {

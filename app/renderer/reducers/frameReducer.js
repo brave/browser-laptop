@@ -222,6 +222,11 @@ const frameReducer = (state, action, immutableAction) => {
         state = state.setIn(['frames', sourceFrameIndex, 'title'], title)
       }
 
+      const discarded = tab.get('discarded') || false
+      if (discarded !== frame.get('unloaded')) {
+        state = state.setIn(['frames', sourceFrameIndex, 'discarded'], discarded)
+      }
+
       const active = tab.get('active')
       if (active && state.get('activeFrameKey') !== frame.get('key')) {
         state = frameStateUtil.setActiveFrameKey(state, frame.get('key'))
