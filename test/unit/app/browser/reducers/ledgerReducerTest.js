@@ -79,7 +79,7 @@ describe('ledgerReducer unit tests', function () {
     }
     fakeAboutPreferencesState = {
       setRecoveryStatus: dummyModifyState,
-      setPreferencesProp: dummyModifyState
+      setRecoveryInProgress: dummyModifyState
     }
     mockery.registerMock('../../browser/api/ledger', fakeLedgerApi)
     mockery.registerMock('../../common/state/ledgerState', fakeLedgerState)
@@ -151,30 +151,62 @@ describe('ledgerReducer unit tests', function () {
 
   describe('APP_RECOVER_WALLET', function () {
     let recoverKeysSpy
-    let modifiedState
-    let setPreferencesPropSpy
+    let setRecoveryInProgressSpy
     before(function () {
       recoverKeysSpy = sinon.spy(fakeLedgerApi, 'recoverKeys')
-      setPreferencesPropSpy = sinon.spy(fakeAboutPreferencesState, 'setPreferencesProp')
-      returnedState = ledgerReducer(appState, Immutable.fromJS({
-        actionType: appConstants.APP_RECOVER_WALLET,
-        useRecoveryKeyFile: 'useKeyFile',
-        recoveryKey: 'firstKey'
-      }))
+      setRecoveryInProgressSpy = sinon.spy(fakeAboutPreferencesState, 'setRecoveryInProgress')
     })
     after(function () {
       recoverKeysSpy.restore()
-      setPreferencesPropSpy.restore()
+      setRecoveryInProgressSpy.restore()
     })
-    it('calls aboutPreferencesState.setPreferencesProp', function () {
-      assert(setPreferencesPropSpy.withArgs(appState, 'recoveryInProgress', true).calledOnce)
+
+    describe('with key file', function () {
+      before(function () {
+        returnedState = ledgerReducer(appState, Immutable.fromJS({
+          actionType: appConstants.APP_RECOVER_WALLET,
+          useRecoveryKeyFile: 'useKeyFile',
+          recoveryKey: 'firstKey'
+        }))
+      })
+      after(function () {
+        recoverKeysSpy.reset()
+        setRecoveryInProgressSpy.reset()
+      })
+      it('does not call aboutPreferencesState.setRecoveryInProgress if a recovery file is used', function () {
+        assert(setRecoveryInProgressSpy.withArgs(appState, true).notCalled)
+      })
+      it('calls ledgerApi.recoverKeys', function () {
+        assert(recoverKeysSpy.withArgs(appState, 'useKeyFile', 'firstKey').calledOnce)
+      })
+      it('returns a modified state', function () {
+        assert.notDeepEqual(returnedState, appState)
+      })
     })
-    it('calls ledgerApi.recoverKeys', function () {
-      modifiedState = fakeAboutPreferencesState.setPreferencesProp(appState, 'recoveryInProgress', true)
-      assert(recoverKeysSpy.withArgs(modifiedState, 'useKeyFile', 'firstKey').calledOnce)
-    })
-    it('returns a modified state', function () {
-      assert.notDeepEqual(returnedState, appState)
+
+    describe('without key file', function () {
+      let modifiedState
+      before(function () {
+        returnedState = ledgerReducer(appState, Immutable.fromJS({
+          actionType: appConstants.APP_RECOVER_WALLET,
+          useRecoveryKeyFile: false,
+          recoveryKey: 'firstKey'
+        }))
+      })
+      after(function () {
+        recoverKeysSpy.reset()
+        setRecoveryInProgressSpy.reset()
+      })
+      it('calls aboutPreferencesState.setRecoveryInProgress if a recovery file is not used', function () {
+        assert(setRecoveryInProgressSpy.withArgs(appState, true).calledOnce)
+      })
+      it('calls ledgerApi.recoverKeys', function () {
+        modifiedState = fakeAboutPreferencesState.setRecoveryInProgress(appState, true)
+        assert(recoverKeysSpy.withArgs(modifiedState, false, 'firstKey').calledOnce)
+      })
+      it('returns a modified state', function () {
+        assert.notDeepEqual(returnedState, appState)
+      })
     })
   })
 

@@ -160,7 +160,8 @@ describe('ledger api unit tests', function () {
       getPromotion: () => {},
       setPromotion: () => {},
       setTimeUntilReconcile: () => {},
-      isReadyToReconcile: () => isReadyToReconcile
+      isReadyToReconcile: () => isReadyToReconcile,
+      recoverWallet: () => {}
     }
     window.getWalletPassphrase = (parsedData) => {
       if (walletPassphraseReturn === 'error') {
@@ -2317,6 +2318,39 @@ describe('ledger api unit tests', function () {
         const result = ledgerApi.loadKeysFromBackupFile(undefined, 'file.txt')
         assert.equal(result.recoveryKey, 'a b d e f g h i j k l m n o p q')
       })
+    })
+  })
+
+  describe('fileRecoveryKeys', function () {
+    let stub
+    let setRecoveryInProgressSpy
+
+    before(function () {
+      setRecoveryInProgressSpy = sinon.spy(aboutPreferencesState, 'setRecoveryInProgress')
+    })
+
+    after(function () {
+      stub.restore()
+      setRecoveryInProgressSpy.restore()
+    })
+
+    it('does not modify state if there is no recovery key file', function () {
+      const result = ledgerApi.fileRecoveryKeys(defaultAppState, false)
+      assert.deepEqual(result, defaultAppState)
+    })
+
+    it('sets recovery in progress when a recovery key file is received', function () {
+      ledgerApi.setClient(ledgerClientObject)
+      stub = sinon.stub(fs, 'readFileSync', (path, options) => {
+        return 'Fake file key...'
+      })
+      const stateWithPreferences = defaultAppState
+        .setIn(['about'], Immutable.fromJS({
+          preferences: {}
+        }))
+      ledgerApi.fileRecoveryKeys(stateWithPreferences, 'file.txt')
+      assert.equal(stateWithPreferences, setRecoveryInProgressSpy.getCall(0).args[0])
+      assert.equal(true, setRecoveryInProgressSpy.getCall(0).args[1])
     })
   })
 
