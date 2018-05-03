@@ -708,9 +708,9 @@ const addSiteVisit = (state, timestamp, location, tabId, manualAdd = false) => {
 
   location = pageDataUtil.getInfoKey(location)
 
-  const locationData = ledgerState.getLocation(state, location)
   const minimumVisitTime = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
   const duration = manualAdd ? parseInt(minimumVisitTime) : new Date().getTime() - timestamp
+  const locationData = manualAdd ? Immutable.fromJS({ publisher: tldjs.getDomain(location) }) : ledgerState.getLocation(state, location)
 
   if (_internal.verboseP) {
     console.log(

@@ -1090,6 +1090,26 @@ describe('ledger api unit tests', function () {
 
         assert.equal(false, calledRevisited)
       })
+      it('saves the visit with a valid publisherKey under a manual addition', function () {
+        const location = 'https://brave.com'
+        const expectedPublisherKey = 'brave.com'
+        const state = ledgerApi.initialize(stateWithLocationTwo, true)
+
+        ledgerApi.addSiteVisit(state, 0, location, tabIdNone, manualAdd)
+        const passedPublisherKey = saveVisitSpy.getCall(0).args[1]
+
+        assert.equal(expectedPublisherKey, passedPublisherKey)
+      })
+      it('saves the visit with a valid publisherKey under a non-manual addition', function () {
+        const location = 'https://brave.com'
+        const expectedPublisherKey = 'brave.com'
+        const state = ledgerApi.initialize(stateWithLocationTwo, true)
+
+        ledgerApi.addSiteVisit(state, 0, location, fakeTabId)
+        const passedPublisherKey = saveVisitSpy.getCall(0).args[1]
+
+        assert.equal(expectedPublisherKey, passedPublisherKey)
+      })
       it('state is not modified on a null location under a manual addition', function () {
         const location = null
         const result = ledgerApi.addSiteVisit(defaultAppState, 0, location, tabIdNone, manualAdd)

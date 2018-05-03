@@ -139,15 +139,17 @@ const shouldShowMenuOption = (state, location) => {
     return false
   }
 
-  const publisherKey = tldjs.getDomain(location)
+  const publisherKey = tldjs.tldExists(location) && tldjs.getDomain(location)
   const validUrl = urlUtil.isURL(location) && urlParse(location).protocol !== undefined
-  const isVisible = visibleP(state, publisherKey)
 
-  return (
-    validUrl &&
-    !isVisible &&
-    publisherKey != null
-  )
+  if (!publisherKey || !validUrl) {
+    return false
+  }
+
+  const isVisible = visibleP(state, publisherKey)
+  const isBlocked = blockedP(state, publisherKey)
+
+  return (!isVisible && !isBlocked)
 }
 
 // TODO rename function
