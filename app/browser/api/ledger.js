@@ -1688,6 +1688,7 @@ const getStateInfo = (state, parsedData) => {
     }
   } catch (e) {
     console.error(e)
+    state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.CORRUPTED_SEED)
   }
 
   state = ledgerState.mergeInfoProp(state, newInfo)
