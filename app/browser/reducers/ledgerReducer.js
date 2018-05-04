@@ -24,7 +24,7 @@ const tabState = require('../../common/state/tabState')
 const windows = require('../windows')
 const ledgerApi = require('../../browser/api/ledger')
 const ledgerNotifications = require('../../browser/api/ledgerNotifications')
-const {makeImmutable} = require('../../common/state/immutableUtil')
+const {makeImmutable, makeJS} = require('../../common/state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
 
 const ledgerReducer = (state, action, immutableAction) => {
@@ -535,7 +535,9 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE:
       {
+        const viewData = makeJS(action.get('viewData'))
         state = ledgerApi.pageDataChanged(state, {}, true)
+        state = ledgerApi.pageDataChanged(state, viewData, true)
         break
       }
   }

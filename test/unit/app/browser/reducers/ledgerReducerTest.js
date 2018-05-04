@@ -806,4 +806,73 @@ describe('ledgerReducer unit tests', function () {
       assert.equal(testTabId, addNewLocationSpy.getCall(0).args[2])
     })
   })
+
+  describe('APP_ON_PUBLISHER_TOGGLE_UPDATE', function () {
+    let pageDataChangedSpy
+
+    beforeEach(function () {
+      pageDataChangedSpy = sinon.spy(fakeLedgerApi, 'pageDataChanged')
+    })
+
+    afterEach(function () {
+      pageDataChangedSpy.restore()
+    })
+
+    it('executes', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE,
+        viewData: {
+          location: 'https://brave.com',
+          tabId: 21
+        }
+      }))
+      assert(pageDataChangedSpy.calledTwice)
+    })
+
+    it('modifies state', function () {
+      const newState = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE,
+        viewData: {
+          location: 'https://brave.com',
+          tabId: 21
+        }
+      }))
+      assert.notDeepEqual(newState, appState)
+    })
+
+    it('passes in a empty object on first pageDataChanged call', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE,
+        viewData: {
+          location: 'https://brave.com',
+          tabId: 21
+        }
+      }))
+      assert.deepEqual({}, pageDataChangedSpy.getCall(0).args[1])
+    })
+
+    it('passes in viewData on second pageDataChanged call', function () {
+      const viewData = {
+        location: 'https://brave.com',
+        tabId: 21
+      }
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE,
+        viewData
+      }))
+      assert.deepEqual(viewData, pageDataChangedSpy.getCall(1).args[1])
+    })
+
+    it('keepInfo is set to true for both pageDataChanged calls', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE,
+        viewData: {
+          location: 'https://brave.com',
+          tabId: 21
+        }
+      }))
+      assert.equal(true, pageDataChangedSpy.getCall(0).args[2])
+      assert.equal(true, pageDataChangedSpy.getCall(1).args[2])
+    })
+  })
 })
