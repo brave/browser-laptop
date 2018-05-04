@@ -371,7 +371,8 @@ class PaymentsTab extends ImmutableComponent {
       </SectionTitleWrapper>
       {
         this.enabled
-        ? <EnabledContent settings={this.props.settings}
+        ? <EnabledContent
+          settings={this.props.settings}
           onChangeSetting={this.props.onChangeSetting}
           ledgerData={this.props.ledgerData}
           showOverlay={this.props.showOverlay}
