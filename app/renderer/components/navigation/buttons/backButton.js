@@ -93,11 +93,6 @@ class BackButton extends React.Component {
           ? 'navigationBackButtonEnabled'
           : 'navigationBackButtonDisabled'
       }
-      testId2={
-        this.props.canGoBack
-          ? 'backButtonEnabled'
-          : 'backButtonDisabled'
-      }
       l10nId={'backButton'}
       class={'backButton'}
       isNav

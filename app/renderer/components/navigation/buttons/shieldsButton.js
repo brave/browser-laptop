@@ -86,8 +86,10 @@ class ShieldsButton extends React.Component {
         )}
       >
         <NavigationButton
-          testId={this.props.shieldEnabled ? 'braveMenu' : 'braveMenuDisabled'}
-          test2Id={`shield-down-${this.props.shieldsDown}`}
+          testId={
+            (this.props.shieldEnabled ? 'braveMenu' : 'braveMenuDisabled') +
+            ` shield-down-${this.props.shieldsDown}`
+          }
           l10nId={'braveMenu'}
           disabled={this.props.activeTabShowingMessageBox}
           onClick={this.onBraveMenu}
