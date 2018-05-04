@@ -46,6 +46,7 @@ class TabsToolbar extends React.Component {
     const props = {}
     // used in renderer
     props.hasPinnedTabs = !pinnedTabs.isEmpty()
+    props.hasPreview = (frameStateUtil.getPreviewFrameKey(currentWindow) != null)
 
     // used in other functions
     props.activeFrameKey = activeFrame.get('key')
@@ -56,7 +57,11 @@ class TabsToolbar extends React.Component {
   }
 
   render () {
-    return <div className={css(styles.tabsToolbar)}
+    return <div
+      className={css(
+        styles.tabsToolbar,
+        this.props.hasPreview && styles.tabsToolbar_hasPreview
+      )}
       data-test-id='tabsToolbar'
       onContextMenu={this.onContextMenu}
     >
@@ -72,22 +77,41 @@ class TabsToolbar extends React.Component {
 
 const styles = StyleSheet.create({
   tabsToolbar: {
-    boxSizing: 'border-box',
+    paddingTop: '2px',
+    boxSizing: 'content-box',
     backgroundColor: theme.tabsToolbar.backgroundColor,
     display: 'flex',
     userSelect: 'none',
     WebkitAppRegion: 'no-drag',
 
-    // Default border styles
-    borderWidth: '1px 0 0 0',
-    borderStyle: 'solid',
-    borderColor: theme.tabsToolbar.border.color,
-
     // This element is set as border-box so it does not
     // take into account the borders as width gutter, so we
     // increase its size by 1px to include the top border.
     // This MUST result in an even number so we support veritcal centering.
-    height: globalStyles.spacing.tabsToolbarHeight
+    height: globalStyles.spacing.tabsToolbarHeight,
+    position: 'relative',
+    // shadow done as pseudo element so that z-index can be controlled
+    ':after': {
+      boxShadow: 'inset 0 -1px var(--tabs-toolbar-shadow-spread, 4px) -0.5px rgba(0, 0, 0, 0.22)',
+      '--tabs-toolbar-transit-duration': theme.tab.transitionDurationOut,
+      '--tabs-toolbar-transit-easing': theme.tab.transitionEasingOut,
+      transition: `box-shadow var(--tabs-toolbar-transit-duration) var(--tabs-toolbar-transit-easing)`,
+      pointerEvents: 'none',
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      right: 0,
+      left: 0,
+      zIndex: 200,
+      display: 'block',
+      content: '" "'
+    }
+  },
+
+  tabsToolbar_hasPreview: {
+    boxShadow: 'inset 0 -3px var(--tabs-toolbar-shadow-spread, 6px) -0.5px rgba(0, 0, 0, 0.22)',
+    '--tabs-toolbar-transit-duration': theme.tab.transitionDurationIn,
+    '--tabs-toolbar-transit-easing': theme.tab.transitionEasingIn
   }
 })
 

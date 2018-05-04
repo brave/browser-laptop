@@ -233,7 +233,7 @@ class Tabs extends React.Component {
 const styles = StyleSheet.create({
   tabs: {
     boxSizing: 'border-box',
-    display: 'flex',
+    display: 'contents',
     flex: 1,
     padding: 0,
     height: '-webkit-fill-available',
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   },
 
   tabs__tabStrip: {
-    display: 'flex',
+    display: 'contents',
     flex: 1,
     zIndex: globalStyles.zindex.zindexTabs,
     position: 'relative'

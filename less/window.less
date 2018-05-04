@@ -50,8 +50,8 @@ html,
   display: flex;
   flex-direction: row;
   flex-grow: 1;
-  box-shadow: 0 -1px 0 rgb(187, 187, 191);
   width: 100%;
+  z-index: 350; // on top of active tab but underneath preview tab
   position: relative;
 
   &:after {
@@ -67,7 +67,7 @@ html,
     transition: opacity .4s ease-in; // TODO: get from theme.tab
     pointer-events: none;
     will-change: opacity;
-    z-index: 1100;
+    z-index: 110;
   }
   &.hasFramePreview::after {
     transition-timing-function: ease-out; // TODO: get from theme.tab
@@ -105,22 +105,22 @@ html,
   --frame-zIndex-delay: 0s;
   transition: visibility 0s linear var(--visibility-delay), z-index 0s linear var(--frame-zIndex-delay);
   // active frame z-index
-  z-index: 1000;
+  z-index: 100;
 
   .hasFramePreview &.isActive {
     // Move to below preview frame, but do so as part of 'preview' entry animation
     // so that it is clear which frame is being previewed and which is active.
-    z-index: 993;
+    z-index: 93;
     --frame-zIndex-delay: .2s;
   }
 
   &:not(.isActive) {
     // non-active always lower than active
-    z-index: 990;
+    z-index: 90;
   }
   &.isPreview {
     background: #222;
-    z-index: 995;
+    z-index: 95;
   }
   // show frame when active or preview
   &.isActive,
