@@ -18,7 +18,7 @@ const tabState = require('../../../common/state/tabState')
 const ledgerState = require('../../../common/state/ledgerState')
 
 // Utils
-const {getHostPattern} = require('../../../../js/lib/urlutil')
+const {getHostPattern, getUrlFromPDFUrl} = require('../../../../js/lib/urlutil')
 const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const ledgerUtil = require('../../../common/lib/ledgerUtil')
@@ -107,7 +107,7 @@ class PublisherToggle extends React.Component {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const tabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
-    const location = activeFrame.get('location', '')
+    const location = getUrlFromPDFUrl(activeFrame.get('location', ''))
     const locationId = getBaseUrl(location)
     const publisherKey = ledgerState.getVerifiedPublisherLocation(state, locationId)
 
