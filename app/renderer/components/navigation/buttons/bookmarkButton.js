@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     stroke: 'var(--bookmark-icon-line-color)',
     transition: ['fill', 'stroke'].map(prop => `${prop} .12s var(--bookmark-icon-transit-easing)`).join(', '),
     paddingLeft: theme.navigator.icons.spacing,
-    borderLeft: `1px solid ${theme.navigator.icons.separatorColor}`
+    paddingTop: '1px'
   }
 })
 
