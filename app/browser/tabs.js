@@ -641,6 +641,7 @@ const api = {
       })
 
       tab.on('set-active', (sender, isActive) => {
+        updateTab(tab.getId(), { active: isActive })
         if (isActive) {
           const tabValue = getTabValue(tabId)
           if (tabValue) {
