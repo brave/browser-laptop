@@ -12,6 +12,7 @@ const windowActions = require('../../../../js/actions/windowActions')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
+const BrowserButton = require('../common/browserButton')
 const NavigationBar = require('./navigationBar')
 const MenuBar = require('./menuBar')
 const WindowCaptionButtons = require('./buttons/windowCaptionButtons')
@@ -36,6 +37,7 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const siteSettings = require('../../../../js/state/siteSettings')
 const cx = require('../../../../js/lib/classSet')
 const {getSetting} = require('../../../../js/settings')
+const contextMenus = require('../../../../js/contextMenus')
 
 // Constants
 const appConfig = require('../../../../js/constants/appConfig')
@@ -43,6 +45,8 @@ const settings = require('../../../../js/constants/settings')
 
 // Styles
 const globalStyles = require('../styles/global')
+const {theme} = require('../styles/theme')
+const menuButton = require('../../../../img/toolbar/menu_btn.svg')
 
 class Navigator extends React.Component {
   constructor (props) {
@@ -50,6 +54,7 @@ class Navigator extends React.Component {
     this.onDoubleClick = this.onDoubleClick.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
+    this.onHamburgerMenu = this.onHamburgerMenu.bind(this)
   }
 
   get extensionButtons () {
@@ -90,6 +95,10 @@ class Navigator extends React.Component {
     return !this.props.isMaximized
       ? windowActions.shouldMaximize(getCurrentWindowId())
       : windowActions.shouldMinimize(getCurrentWindowId())
+  }
+
+  onHamburgerMenu (e) {
+    contextMenus.onHamburgerMenu(this.props.activeFrameLocation, e)
   }
 
   mergeProps (state, ownProps) {
@@ -199,6 +208,15 @@ class Navigator extends React.Component {
                 : null
             }
             <ShieldsButton />
+            <BrowserButton
+              iconOnly
+              isMaskImage
+              size={`calc(${globalStyles.spacing.tabsToolbarHeight} - 1px)`}
+              custom={styles.navigatorWrapper__button_menu}
+              l10nId='menuButton'
+              testId='menuButton'
+              onClick={this.onHamburgerMenu}
+            />
             {
               this.props.isCaptionButton
                 ? <span className='buttonSeparator' />
@@ -235,6 +253,20 @@ const styles = StyleSheet.create({
     display: 'none'
   },
 
+  navigatorWrapper__button_menu: {
+    backgroundColor: theme.tabsToolbar.button.backgroundColor,
+    WebkitMaskImage: `url(${menuButton})`,
+    WebkitMaskRepeat: 'no-repeat',
+    WebkitMaskPosition: 'center',
+    WebkitMaskSize: '12px 12px',
+    WebkitMaskOrigin: 'border',
+    margin: '0 5px 0 0',
+
+    ':hover': {
+      opacity: 1.0,
+      backgroundColor: theme.tabsToolbar.button.onHover.backgroundColor
+    }
+  }
 
 })
 

@@ -10,7 +10,6 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ReduxComponent = require('../reduxComponent')
 const Tabs = require('./tabs')
 const PinnedTabs = require('./pinnedTabs')
-const BrowserButton = require('../common/browserButton')
 
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
@@ -19,13 +18,10 @@ const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const globalStyles = require('../styles/global')
 const {theme} = require('../styles/theme')
 
-const menuButton = require('../../../../img/toolbar/menu_btn.svg')
-
 class TabsToolbar extends React.Component {
   constructor (props) {
     super(props)
     this.onContextMenu = this.onContextMenu.bind(this)
-    this.onHamburgerMenu = this.onHamburgerMenu.bind(this)
   }
 
   onContextMenu (e) {
@@ -40,10 +36,6 @@ class TabsToolbar extends React.Component {
       undefined,
       e
     )
-  }
-
-  onHamburgerMenu (e) {
-    contextMenus.onHamburgerMenu(this.props.activeFrameLocation, e)
   }
 
   mergeProps (state, ownProps) {
@@ -74,15 +66,6 @@ class TabsToolbar extends React.Component {
         : null
       }
       <Tabs />
-      <BrowserButton
-        iconOnly
-        isMaskImage
-        size={`calc(${globalStyles.spacing.tabsToolbarHeight} - 1px)`}
-        custom={styles.tabsToolbar__button_menu}
-        l10nId='menuButton'
-        testId='menuButton'
-        onClick={this.onHamburgerMenu}
-      />
     </div>
   }
 }
@@ -105,21 +88,6 @@ const styles = StyleSheet.create({
     // increase its size by 1px to include the top border.
     // This MUST result in an even number so we support veritcal centering.
     height: globalStyles.spacing.tabsToolbarHeight
-  },
-
-  tabsToolbar__button_menu: {
-    backgroundColor: theme.tabsToolbar.button.backgroundColor,
-    WebkitMaskImage: `url(${menuButton})`,
-    WebkitMaskRepeat: 'no-repeat',
-    WebkitMaskPosition: 'center',
-    WebkitMaskSize: '12px 12px',
-    WebkitMaskOrigin: 'border',
-    marginRight: '5px',
-
-    ':hover': {
-      opacity: 1.0,
-      backgroundColor: theme.tabsToolbar.button.onHover.backgroundColor
-    }
   }
 })
 
