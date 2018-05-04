@@ -96,7 +96,7 @@ const formattedDateFromTimestamp = (timestamp, format) => {
   return moment(new Date(timestamp)).format(format)
 }
 
-const walletStatus = (ledgerData) => {
+const walletStatus = (ledgerData, settings) => {
   let status = {}
 
   if (ledgerData == null) {
@@ -111,7 +111,7 @@ const walletStatus = (ledgerData) => {
     const transactions = ledgerData.get('transactions')
     const pendingFunds = Number(ledgerData.get('unconfirmed') || 0)
     const balance = Number(ledgerData.get('balance') || 0)
-    const minBalance = ledgerState.getContributionAmount(null, ledgerData.get('contributionAmount'))
+    const minBalance = ledgerState.getContributionAmount(null, ledgerData.get('contributionAmount'), settings)
 
     if (pendingFunds + balance < minBalance) {
       status.id = 'insufficientFundsStatus'

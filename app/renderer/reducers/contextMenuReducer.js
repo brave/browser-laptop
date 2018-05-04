@@ -402,12 +402,12 @@ const showBookmarkFolderInit = (state, parentBookmarkFolderKey) => {
       }
     }]
   }
-  return bookmarkItemsInit(state, items)
+  return bookmarkItemsInit(appState, state, items)
 }
 
-const bookmarkItemsInit = (state, items) => {
+const bookmarkItemsInit = (appState, state, items) => {
   const activeFrame = frameStateUtil.getActiveFrame(state) || Immutable.Map()
-  const showFavicon = bookmarkUtil.showFavicon()
+  const showFavicon = bookmarkUtil.showFavicon(appState)
   const template = []
   for (let site of items) {
     const siteKey = site.get('key')
@@ -483,7 +483,7 @@ const onMoreBookmarksMenu = (state, action) => {
     newSites = newSites.push(bookmarksState.findBookmark(appState, key))
   }
 
-  const menuTemplate = bookmarkItemsInit(state, newSites)
+  const menuTemplate = bookmarkItemsInit(appState, state, newSites)
 
   menuTemplate.push({
     l10nLabelId: 'moreBookmarks',

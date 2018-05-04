@@ -31,6 +31,7 @@ describe('ledger api unit tests', function () {
   let walletPassphraseReturn
   let updater
   let aboutPreferencesState
+  let isReadyToReconcile = false
 
   // constants
   const videoId = 'youtube_kLiLOkzLetE'
@@ -159,7 +160,7 @@ describe('ledger api unit tests', function () {
       getPromotion: () => {},
       setPromotion: () => {},
       setTimeUntilReconcile: () => {},
-      isReadyToReconcile: () => {}
+      isReadyToReconcile: () => isReadyToReconcile
     }
     window.getWalletPassphrase = (parsedData) => {
       if (walletPassphraseReturn === 'error') {
@@ -2155,6 +2156,40 @@ describe('ledger api unit tests', function () {
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
     })
+
+    describe('status', function () {
+      it('null case', function () {
+        const result = ledgerApi.onCallback(defaultAppState, null)
+        assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+
+      it('reconcile is not in progress', function () {
+        const result = ledgerApi.onCallback(defaultAppState, Immutable.fromJS({
+          properties: {}
+        }))
+        assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+
+      it('reconcile is in progress (first time)', function () {
+        const result = ledgerApi.onCallback(defaultAppState, Immutable.fromJS({
+          currentReconcile: {
+            timestamp: 0
+          }
+        }))
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'about', 'status'], ledgerStatuses.IN_PROGRESS)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+
+      it('reconcile is in progress (second time)', function () {
+        const result = ledgerApi.onCallback(defaultAppState, Immutable.fromJS({
+          currentReconcile: {
+            timestamp: 1
+          }
+        }))
+        assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+    })
   })
 
   describe('uintKeySeed', function () {
@@ -2875,50 +2910,110 @@ describe('ledger api unit tests', function () {
     })
   })
 
-  describe('BSCrun', function () {
-    let clientBallotsSpy
+  describe('run', function () {
+    describe('ballots', function () {
+      let clientBallotsSpy
 
-    before(() => {
-      ledgerApi.setSynopsis({
-        toJSON: () => {
-          return {
-            publishers: {
-              'clifton.io': {
-                visits: 1
+      before(() => {
+        ledgerApi.setSynopsis({
+          toJSON: () => {
+            return {
+              publishers: {
+                'clifton.io': {
+                  visits: 1
+                }
               }
             }
+          },
+          winners: () => {
+            return []
           }
-        },
-        winners: () => {
-          return []
-        }
+        })
+        ledgerApi.setClient(ledgerClientObject)
+        clientBallotsSpy = sinon.spy(ledgerClientObject, 'ballots')
       })
-      ledgerApi.setClient(ledgerClientObject)
-      clientBallotsSpy = sinon.spy(ledgerClientObject, 'ballots')
+
+      afterEach(() => {
+        clientBallotsSpy.reset()
+      })
+
+      after(() => {
+        clientBallotsSpy.restore()
+        ledgerApi.setSynopsis(undefined)
+      })
+
+      it('exits if state is undefined', function () {
+        ledgerApi.run(undefined, 10)
+        assert.equal(clientBallotsSpy.notCalled, true)
+      })
+
+      it('exits if delayTime is undefined', function () {
+        ledgerApi.run(defaultAppState)
+        assert.equal(clientBallotsSpy.notCalled, true)
+      })
+
+      it('gets balance count from client', function () {
+        ledgerApi.run(defaultAppState, 10)
+        assert.equal(clientBallotsSpy.calledOnce, true)
+      })
     })
 
-    afterEach(() => {
-      clientBallotsSpy.reset()
-    })
+    describe('publishers check', function () {
+      before(() => {
+        ledgerApi.setClient(ledgerClientObject)
+        ledgerSetTimeUntilReconcile.reset()
+      })
 
-    after(() => {
-      clientBallotsSpy.restore()
-      ledgerApi.setSynopsis(undefined)
-    })
+      afterEach(() => {
+        ledgerSetTimeUntilReconcile.reset()
+        isReadyToReconcile = false
+      })
 
-    it('exits if state is undefined', function () {
-      ledgerApi.run(undefined, 10)
-      assert.equal(clientBallotsSpy.notCalled, true)
-    })
+      it('null check', function () {
+        ledgerApi.run(defaultAppState, 10)
+        assert(ledgerSetTimeUntilReconcile.notCalled)
+      })
 
-    it('exits if delayTime is undefined', function () {
-      ledgerApi.run(defaultAppState)
-      assert.equal(clientBallotsSpy.notCalled, true)
-    })
+      it('synopsis is broken', function () {
+        const state = defaultAppState
+          .setIn(['ledger', 'about', 'synopsis'], 'test')
+        ledgerApi.run(state, 10)
+        assert(ledgerSetTimeUntilReconcile.notCalled)
+      })
 
-    it('gets balance count from client', function () {
-      ledgerApi.run(defaultAppState, 10)
-      assert.equal(clientBallotsSpy.calledOnce, true)
+      it('table is empty and we are not ready to reconcile', function () {
+        const state = defaultAppState
+          .setIn(['ledger', 'about', 'synopsis'], Immutable.fromJS([{
+            publisherKey: 'clifton.io'
+          }]))
+        ledgerApi.run(state, 10)
+        assert(ledgerSetTimeUntilReconcile.notCalled)
+      })
+
+      it('table is not empty and we are not ready to reconcile', function () {
+        const state = defaultAppState
+          .setIn(['ledger', 'about', 'synopsis'], Immutable.fromJS([{
+            publisherKey: 'clifton.io'
+          }]))
+        ledgerApi.run(state, 10)
+        assert(ledgerSetTimeUntilReconcile.notCalled)
+      })
+
+      it('table is not empty and we are ready to reconcile', function () {
+        isReadyToReconcile = true
+        const state = defaultAppState
+          .setIn(['ledger', 'about', 'synopsis'], Immutable.fromJS([{
+            publisherKey: 'clifton.io'
+          }]))
+        ledgerApi.run(state, 10)
+        assert(ledgerSetTimeUntilReconcile.notCalled)
+      })
+
+      it('table is empty and we are ready to reconcile', function () {
+        isReadyToReconcile = true
+        ledgerApi.run(defaultAppState, 10)
+        assert(ledgerSetTimeUntilReconcile.calledOnce)
+      })
     })
   })
 
