@@ -60,8 +60,9 @@ execute([cmd], '', (err) => {
   console.log('tor binary checksum matches')
   // unzip on windows
   if (isWindows) {
-    fs.chmodSync(torBinary, 0o755)
     fs.createReadStream(torBinary).pipe(unzip.Extract({ path: torPath }))
   }
+  // make it executable
+  fs.chmodSync(torBinary, 0o755)
   console.log('done')
 })
