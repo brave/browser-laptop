@@ -24,7 +24,7 @@ if (torPath === undefined) {
 
 const torVersion = '0.3.2.10'
 const braveVersion = '1'
-const torURL = torS3Prefix + 'tor-' + torVersion + '-' + process.platform + '-brave-' + braveVersion
+var torURL = torS3Prefix + 'tor-' + torVersion + '-' + process.platform + '-brave-' + braveVersion
 
 if (isWindows) {
   torURL += '.zip'
