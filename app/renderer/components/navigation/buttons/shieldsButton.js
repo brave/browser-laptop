@@ -128,7 +128,11 @@ const styles = StyleSheet.create({
     '--shields-line-color': '#FB552A',
     WebkitAppRegion: 'no-drag',
     position: 'relative',
-    transition: 'opacity .24s ease-in-out'
+    transition: 'opacity .24s ease-in-out',
+    margin: '0 0 0 5px',
+    ':hover': {
+      '--shields-counter-opacity': 'transparent'
+    }
   },
 
   braveMenu_disabled: {
@@ -156,35 +160,32 @@ const styles = StyleSheet.create({
   },
 
   braveMenu__button: {
-    ':active': {
-     // '--shields-fill-color': 'var(--shields-line-color)'
-    }
+    marginLeft: 0,
+    marginRight: 0
   },
 
   braveMenu__iconPath: {
     fill: 'var(--shields-fill-color)',
     stroke: 'var(--shields-line-color)',
-    transition: 'stroke .24s ease-in-out, fill .24s ease-in-oute'
+    transition: 'stroke .24s ease-in-out, fill .24s ease-in-out'
   },
 
   braveMenu__counter: {
-    left: 'calc(50% - 1px)',
-    top: '14px',
     position: 'absolute',
-    color: theme.navigator.braveMenu.counter.color,
-    borderRadius: '2.5px',
-    padding: '1px 2px',
-    pointerEvents: 'none',
-    font: '6pt "Arial Narrow"',
+    right: 0,
+    left: 0,
+    bottom: '-6px',
     textAlign: 'center',
-    background: theme.navigator.braveMenu.counter.backgroundColor,
-    minWidth: '10px',
-    WebkitUserSelect: 'none'
+    pointerEvents: 'none',
+    fontSize: '8px',
+    WebkitUserSelect: 'none',
+    background: 'var(--shields-counter-background)',
+    color: 'var(--shields-counter-opacity, var(--shields-line-color))',
+    transition: 'color .24s ease-in-out'
   },
 
   braveMenu__counter_right: {
-    left: 'auto',
-    right: '2px'
+
   },
 
   braveMenu__counter_subtleShowUp: globalStyles.animations.subtleShowUp

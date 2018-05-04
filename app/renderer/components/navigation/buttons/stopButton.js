@@ -8,6 +8,7 @@ const ipc = require('electron').ipcRenderer
 
 // Components
 const ImmutableComponent = require('../../immutableComponent')
+const NavigationButton = require('./navigationButton')
 
 // Constants
 const messages = require('../../../../../js/constants/messages')
@@ -28,12 +29,15 @@ class StopButton extends ImmutableComponent {
   }
 
   render () {
-    return <span className='navigationButtonContainer'>
-      <button data-l10n-id='stopButton'
-        className='normalizeButton navigationButton stopButton'
-        onClick={this.onStop}
-      />
-    </span>
+    return <NavigationButton
+      l10nId='stopButton'
+      onClick={this.onStop}
+    >
+      <svg xmlns='http://www.w3.org/2000/svg' width='14' height='13' viewBox='0 0 14 13'>
+        <path fill='none' stroke='#6D7276' strokeLinecap='round' strokeLinejoin='round'
+          strokeWidth='1.291' d='M13.0056494 1L1 12.2328009m12.01-.0023371L1 1' />
+      </svg>
+    </NavigationButton>
   }
 }
 
