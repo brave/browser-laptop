@@ -1675,12 +1675,6 @@ const getStateInfo = (state, parsedData) => {
     reconcileStamp: parsedData.reconcileStamp
   }
 
-  const oldReconcileStamp = ledgerState.getInfoProp(state, 'reconcileStamp')
-
-  if (oldReconcileStamp && newInfo.reconcileStamp > oldReconcileStamp) {
-    state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.IN_PROGRESS)
-  }
-
   try {
     let passphrase = ledgerClient.prototype.getWalletPassphrase(parsedData)
     if (passphrase) {
@@ -2033,6 +2027,10 @@ const onCallback = (state, result, delayTime) => {
   if (!result) {
     run(state, delayTime)
     return state
+  }
+
+  if (result.getIn(['currentReconcile', 'timestamp']) === 0) {
+    state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.IN_PROGRESS)
   }
 
   const newAddress = result.getIn(['properties', 'wallet', 'addresses', 'BAT'])
@@ -2462,8 +2460,8 @@ const run = (state, delayTime) => {
     return
   }
 
-  const publishers = ledgerState.getPublisher(state)
-  if (publishers.isEmpty() && client.isReadyToReconcile(synopsis)) {
+  const publishers = ledgerState.getAboutProp(state, 'synopsis') || Immutable.List()
+  if (isList(publishers) && publishers.isEmpty() && client.isReadyToReconcile(synopsis)) {
     setNewTimeUntilReconcile()
   }
 
