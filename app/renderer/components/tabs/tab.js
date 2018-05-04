@@ -474,22 +474,24 @@ class Tab extends React.Component {
 
 const styles = StyleSheet.create({
   tabArea: {
+    cusor: 'default',
     boxSizing: 'border-box',
     position: 'relative',
     overflow: 'hidden',
     flex: '1 1 0',
-    '--tab-margin-top': `-${theme.tab.borderWidth}px`,
     // put the top border underneath tab-stip top border, and
     // the left border underneath the previous tab's right border
-    margin: `var(--tab-margin-top) 0 0 -${theme.tab.borderWidth}px`,
+    margin: `0 0 0 -${theme.tab.borderWidth}px`,
+    borderRadius: '2px 2px 0 0',
     border: `solid var(--tab-border-width, ${theme.tab.borderWidth}px) var(--tab-border-color)`,
+    borderTopColor: 'var(--tab-background) !important',
     // Border bottom is added to the tabArea__tab so that we do not get
     // 45-degree angles when the bottom border is different color from the side borders.
     // This could change when we can put the tab's background on this element,
     // which can happen when tab dragging does not introduce a left/right 'space' when a tab
     // is dragged over.
     borderBottomWidth: `0 !important`, // aphrodite puts this above the border defined in the previous line, so use important :-(
-    zIndex: 100,
+    zIndex: 100, // underneath toolbar shadow
     transformOrigin: 'bottom center',
     minWidth: 0,
     width: 0,
@@ -559,8 +561,13 @@ const styles = StyleSheet.create({
     '--tab-color': theme.tab.active.colorDark,
     '--tab-background': theme.tab.active.background,
     '--tab-background-hover': theme.tab.hover.active.background,
+    '--tab-border-color': 'var(--tab-background)',
+    '--tab-border-color-hover': 'var(--tab-background)',
     '--tab-border-color-bottom': 'var(--tab-background)',
-    '--tab-mouse-opacity': '0 !important'
+    '--tab-mouse-opacity': '0 !important',
+    // on top of toolbar shadow but underneath preview
+    zIndex: 300,
+    boxShadow: '0 2px 4px -0.5px rgba(0, 0, 0, 0.3)'
   },
 
   tabArea_isPreview: {
@@ -570,9 +577,11 @@ const styles = StyleSheet.create({
     '--tab-color-hover': theme.tab.active.colorDark,
     '--tab-border-color': theme.tab.preview.background,
     '--tab-border-color-hover': theme.tab.preview.background,
-    zIndex: 110,
+    // on top of toolbar shadow and preview
+    zIndex: 400,
     transform: `scale(${theme.tab.preview.scale})`,
     boxShadow: theme.tab.preview.boxShadow,
+    borderRadius: '3px 3px 0 0',
     // want the zindex to change immediately when previewing, but delay when un-previewing
     '--tab-zindex-delay': '0s',
     '--tab-zindex-duration': '0s',
@@ -593,8 +602,8 @@ const styles = StyleSheet.create({
     // then we want to immediately have that tab on top of the last-previewed tab
     // but have the last previewed tab wait to be underneath the next tab in the DOM
     '--tab-zindex-delay': '0s',
-    '--tab-zindex-duration': '2s',
-    willChange: 'transform'
+    '--tab-zindex-duration': '2s'
+    // willChange: 'transform'
   },
 
   tabArea_isActive_siblingIsPreview: {
@@ -639,7 +648,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     position: 'relative',
     color: `var(--tab-color, ${theme.tab.color})`,
-    borderBottom: `solid var(--tab-border-width, ${theme.tab.borderWidth}px) var(--tab-border-color-bottom, var(--tab-border-color))`,
+    borderBottom: `solid var(--tab-border-width, ${theme.tab.borderWidth}px) transparent`,
 
     // mouse-tracking radial gradient
     '::before': {

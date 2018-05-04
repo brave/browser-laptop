@@ -56,7 +56,7 @@
       backgroundColor: '#CDD1D5',
 
       border: {
-        color: 'rgb(187, 187, 191)'
+        color: '#CDD1D5'
       },
 
       button: {
@@ -195,7 +195,7 @@
 
       preview: {
         background: 'rgb(240,240,240)',
-        boxShadow: '0 -2px 12px rgba(0, 0, 0, 0.22)',
+        boxShadow: '0 -2px 6px -0.5px rgba(0, 0, 0, 0.3)',
         scale: '1.06'
       },
 

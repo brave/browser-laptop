@@ -146,6 +146,8 @@ const styles = StyleSheet.create({
   // notificationBar
   notificationBar: {
     '-webkit-app-region': 'no-drag',
+    position: 'relative',
+    zIndex: 500,
     display: 'inline-block',
     boxSizing: 'border-box',
     width: '100%',
@@ -164,7 +166,6 @@ const styles = StyleSheet.create({
   notificationBar__notificationItem: {
     backgroundColor: globalStyles.color.notificationItemColor,
     boxSizing: 'border-box',
-    boxShadow: `0 -1px 0 ${theme.tabsToolbar.border.color}`,
     lineHeight: '24px',
     padding: '8px 20px'
   },
