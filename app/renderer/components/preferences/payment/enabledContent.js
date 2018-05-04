@@ -373,7 +373,7 @@ class EnabledContent extends ImmutableComponent {
 
   render () {
     const ledgerData = this.props.ledgerData
-    const walletStatusText = walletStatus(ledgerData)
+    const walletStatusText = walletStatus(ledgerData, this.props.settings)
     const contributionAmount = ledgerState.getContributionAmount(null, ledgerData.get('contributionAmount'), this.props.settings)
     const amountList = ledgerData.get('monthlyAmounts') || ledgerUtil.defaultMonthlyAmounts
 
