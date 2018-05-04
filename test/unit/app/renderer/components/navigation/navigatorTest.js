@@ -111,17 +111,17 @@ describe('Navigator component unit tests', function () {
       wrapper = mount(<Navigator />)
     })
 
-    it('both back/forward navigationButtonContainers are enabled', function () {
+    it('both back/forward buttons are enabled', function () {
       assert.equal(wrapper.find('[data-test-id="navigationBackButtonEnabled"]').length, 1)
       assert.equal(wrapper.find('[data-test-id="navigationForwardButtonEnabled"]').length, 1)
     })
 
     it('back navigation button is enabled', function () {
-      assert.equal(wrapper.find('[data-test-id="backButtonEnabled"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="navigationBackButtonEnabled"]').length, 1)
     })
 
     it('forward navigation button is enabled', function () {
-      assert.equal(wrapper.find('[data-test-id="forwardButtonEnabled"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="navigationForwardButtonEnabled"]').length, 1)
     })
   })
 
@@ -141,21 +141,21 @@ describe('Navigator component unit tests', function () {
       wrapper = mount(<Navigator />)
     })
 
-    it('disables both back/forward navigationButtonContainers', function () {
+    it('disables both back/forward buttons', function () {
       assert.equal(wrapper.find('[data-test-id="navigationBackButtonDisabled"]').length, 1)
       assert.equal(wrapper.find('[data-test-id="navigationForwardButtonDisabled"]').length, 1)
     })
 
     it('disables the back navigation button', function () {
-      assert.equal(wrapper.find('[data-test-id="backButtonDisabled"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="navigationBackButtonDisabled"]').length, 1)
     })
 
     it('disables the forward navigation button', function () {
-      assert.equal(wrapper.find('[data-test-id="forwardButtonDisabled"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="navigationForwardButtonDisabled"]').length, 1)
     })
 
     it('disables the lion icon', function () {
-      const node = wrapper.find('[data-test-id="braveMenu"]').getDOMNode()
+      const node = wrapper.find('[data-test-id~="braveMenu"]').getDOMNode()
       assert.equal(node.disabled, true)
     })
   })
@@ -168,7 +168,7 @@ describe('Navigator component unit tests', function () {
 
     it('lion icon is shown by default', function () {
       const wrapper = mount(<Navigator />)
-      const node = wrapper.find('[data-test-id="braveMenu"]').getDOMNode()
+      const node = wrapper.find('[data-test-id~="braveMenu"]').getDOMNode()
       assert.equal(node.disabled, false)
     })
 
