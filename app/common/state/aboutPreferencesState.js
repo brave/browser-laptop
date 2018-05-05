@@ -45,10 +45,15 @@ const aboutPreferencesState = {
     return state.setIn(['about', 'preferences', key], value)
   },
 
+  setRecoveryInProgress: (state, inProgress) => {
+    state = validateState(state)
+    return aboutPreferencesState.setPreferencesProp(state, 'recoveryInProgress', inProgress)
+  },
+
   setRecoveryStatus: (state, status) => {
     state = validateState(state)
     const date = new Date().getTime()
-    state = aboutPreferencesState.setPreferencesProp(state, 'recoveryInProgress', false)
+    state = aboutPreferencesState.setRecoveryInProgress(state, false)
     state = aboutPreferencesState.setPreferencesProp(state, 'recoverySucceeded', status)
     return aboutPreferencesState.setPreferencesProp(state, 'updatedStamp', date)
   }
