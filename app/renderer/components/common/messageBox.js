@@ -46,6 +46,12 @@ class MessageBox extends React.Component {
     document.addEventListener('keydown', this.onKeyDown)
   }
 
+  componentDidMount () {
+    if (this.props.allowInput) {
+      this.inputRef.select()
+    }
+  }
+
   componentWillUnmount () {
     document.removeEventListener('keydown', this.onKeyDown)
   }
@@ -165,6 +171,9 @@ class MessageBox extends React.Component {
             this.props.allowInput && (
               <PromptTextBox
                 value={this.state.textInput}
+                inputRef={ref => {
+                  this.inputRef = ref
+                }}
                 onChange={e => {
                   this.setState({
                     textInput: e.target.value

@@ -26,9 +26,11 @@ class Textbox extends ImmutableComponent {
     )
 
     const props = Object.assign({}, this.props)
+    const ref = this.props.inputRef
     delete props.customClass
+    delete props.inputRef
 
-    return <input type='text' className={className} {...props} />
+    return <input type='text' className={className} {...props} ref={ref} />
   }
 }
 
