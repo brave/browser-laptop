@@ -6,6 +6,7 @@ require('../../../braveUnit')
 const settings = require('../../../../../js/constants/settings')
 const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
 const twitchEvents = require('../../../../../app/common/constants/twitchEvents')
+const urlUtil = require('../../../../../js/lib/urlutil')
 
 const defaultState = Immutable.fromJS({
   ledger: {}
@@ -407,7 +408,8 @@ describe('ledgerUtil unit test', function () {
 
     before(function () {
       ledgerState = Immutable.fromJS({
-        ledger: {}
+        ledger: {},
+        siteSettings: {}
       })
     })
 
@@ -419,6 +421,34 @@ describe('ledgerUtil unit test', function () {
     it('false when location is an invalid url', function () {
       const result = ledgerUtil.shouldShowMenuOption(ledgerState, 'brave')
       assert.equal(result, false)
+    })
+
+    it('false if url contains a bad domain', function () {
+      const result = ledgerUtil.shouldShowMenuOption(ledgerState, 'https://foobar.bananas')
+      assert.equal(result, false)
+    })
+
+    it('false if a publisher key can not be deduced', function () {
+      const result = ledgerUtil.shouldShowMenuOption(ledgerState, 'bravecom/about')
+      assert.equal(result, false)
+    })
+
+    it('false when the publisher has been deleted from the ledger', function () {
+      const publisherKey = 'brave.com'
+      const hostPattern = urlUtil.getHostPattern(publisherKey)
+      const modifiedState = ledgerState
+        .setIn(['siteSettings', hostPattern, 'ledgerPaymentsShown'], false)
+      const result = ledgerUtil.shouldShowMenuOption(modifiedState, 'https://brave.com')
+      assert.equal(result, false)
+    })
+
+    it('true if the publisher has not been deleted from the ledger', function () {
+      const publisherKey = 'foo.com'
+      const hostPattern = urlUtil.getHostPattern(publisherKey)
+      const modifiedState = ledgerState
+        .setIn(['siteSettings', hostPattern, 'ledgerPaymentsShown'], false)
+      const result = ledgerUtil.shouldShowMenuOption(modifiedState, 'https://brave.com')
+      assert.equal(result, true)
     })
 
     it('true when location has protocol and is a valid url', function () {
