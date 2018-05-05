@@ -1135,6 +1135,7 @@ const fileRecoveryKeys = (state, recoveryKeyFile) => {
     return state
   }
 
+  state = aboutPreferencesState.setRecoveryInProgress(state, true)
   const result = loadKeysFromBackupFile(state, recoveryKeyFile)
   const recoveryKey = result.recoveryKey || ''
   state = result.state

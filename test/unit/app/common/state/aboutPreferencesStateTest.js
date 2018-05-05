@@ -65,15 +65,25 @@ describe('aboutPreferencesState unit test', function () {
   describe('setRecoveryStatus', function () {
     it('updates recoverySucceeded', function () {
       const result = aboutPreferencesState.setRecoveryStatus(defaultState, true)
-      assert.equal(result.getIn(['about', 'preferences', 'recoverySucceeded']), true)
+      assert.equal(aboutPreferencesState.getPreferencesProp(result, 'recoverySucceeded'), true)
     })
     it('recoveryInProgress is false when recovery is successful', function () {
       const result = aboutPreferencesState.setRecoveryStatus(defaultState, true)
-      assert.equal(result.getIn(['about', 'preferences', 'recoveryInProgress']), false)
+      assert.equal(aboutPreferencesState.getPreferencesProp(result, 'recoveryInProgress'), false)
     })
     it('recoveryInProgress is false when recovery is not successful', function () {
       const result = aboutPreferencesState.setRecoveryStatus(defaultState, false)
-      assert.equal(result.getIn(['about', 'preferences', 'recoveryInProgress']), false)
+      assert.equal(aboutPreferencesState.getPreferencesProp(result, 'recoveryInProgress'), false)
+    })
+  })
+
+  describe('setRecoveryInProgress', function () {
+    it('updates recoveryInProgress', function () {
+      const result = aboutPreferencesState.setRecoveryInProgress(defaultState, true)
+      assert.equal(aboutPreferencesState.getPreferencesProp(result, 'recoveryInProgress'), true)
+
+      const nextResult = aboutPreferencesState.setRecoveryInProgress(defaultState, false)
+      assert.equal(aboutPreferencesState.getPreferencesProp(nextResult, 'recoveryInProgress'), false)
     })
   })
 })
