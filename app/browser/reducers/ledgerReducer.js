@@ -53,16 +53,14 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_RECOVER_WALLET:
       {
-        state = aboutPreferencesState.setPreferencesProp(
-          state,
-          'recoveryInProgress',
-          true
-        )
-        state = ledgerApi.recoverKeys(
-          state,
-          action.get('useRecoveryKeyFile'),
-          action.get('recoveryKey')
-        )
+        const recoveryKey = action.get('recoveryKey')
+        const useRecoveryKeyFile = action.get('useRecoveryKeyFile')
+
+        if (!useRecoveryKeyFile) {
+          state = aboutPreferencesState.setRecoveryInProgress(state, true)
+        }
+
+        state = ledgerApi.recoverKeys(state, useRecoveryKeyFile, recoveryKey)
         break
       }
     case appConstants.APP_ON_FILE_RECOVERY_KEYS:
