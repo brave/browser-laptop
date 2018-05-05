@@ -34,24 +34,21 @@ class GuestInstanceRenderer extends React.Component {
 
   mergeProps (state, ownProps) {
     const frameKey = ownProps.frameKey
-    const isPreview = ownProps.isPreview
     const frame = frameStateUtil.getFrameByKey(state.get('currentWindow'), frameKey)
     const location = frame && frame.get('location')
-    const frameIsReady = isPreview || (frame && frame.get('guestIsReady') === true)
     const frameIsInWindow = frame && frame.get('tabStripWindowId') === getCurrentWindowId()
 
     const props = {
       displayDebugInfo: getSetting(settings.DEBUG_VERBOSE_TAB_INFO),
       debugTabEvents: state.getIn(['currentWindow', 'debugTabEvents']),
       activeFrameKey: state.getIn(['currentWindow', 'activeFrameKey']),
-      guestInstanceId: frameIsInWindow && frameIsReady && frame.get('guestInstanceId'),
-      tabId: frameIsInWindow && frameIsReady && frame.get('tabId'),
+      guestInstanceId: frame && frame.get('guestInstanceId'),
+      tabId: frame && frame.get('tabId'),
       isDefaultNewTabLocation: location === 'about:newtab',
       isBlankLocation: location === 'about:blank',
       isPlaceholder: frame && frame.get('isPlaceholder'),
       windowIsFocused: isFocused(state),
       frameKey,
-      frameIsReady,
       frameIsInWindow,
       frameLocation: frame && frame.get('location'),
       urlBarFocused: frame && frame.getIn(['navbar', 'urlbar', 'focused'])
@@ -73,11 +70,17 @@ class GuestInstanceRenderer extends React.Component {
     }
   }
 
+  getReadyToAttachTabId (props = {}) {
+    return props.frameIsInWindow && props.tabId
+  }
+
   onPropsChanged (prevProps = {}) {
     // attach new guest instance
     this.webviewDisplay.shouldLogEvents = this.props.debugTabEvents
-    if (this.webviewDisplay && this.props.tabId && prevProps.tabId !== this.props.tabId) {
-      this.debugLog('guestInstanceRenderer, attach tab', this.props.tabId, 'guest', this.props.guestInstanceId, this.props.isPlaceholder)
+    const toAttachTabId = this.getReadyToAttachTabId(this.props)
+    const lastAttachTabId = this.getReadyToAttachTabId(prevProps)
+    if (this.webviewDisplay && toAttachTabId && lastAttachTabId !== toAttachTabId) {
+      this.debugLog('guestInstanceRenderer, attach tab', toAttachTabId, 'guest', this.props.guestInstanceId, this.props.isPlaceholder)
       if (!this.props.isPlaceholder) {
         this.webviewDisplay.attachActiveTab(this.props.tabId)
       } else if (this.props.debugTabEvents) {
@@ -129,7 +132,7 @@ class GuestInstanceRenderer extends React.Component {
 
   render () {
     const debugInfo = this.props.displayDebugInfo
-      ? `WindowId: ${getCurrentWindowId()}, TabId: ${this.props.tabId}, GuestId: ${this.props.guestInstanceId}, FrameKey: ${this.props.frameKey}, frameIsReady: ${this.props.frameIsReady}, frameIsInWindow: ${this.props.frameIsInWindow}, activeFrameKey: ${this.props.activeFrameKey}, windowIsFocused: ${this.props.windowIsFocused}`
+      ? `WindowId: ${getCurrentWindowId()}, TabId: ${this.props.tabId}, GuestId: ${this.props.guestInstanceId}, FrameKey: ${this.props.frameKey}, guestIsReady: ${this.props.guestIsReady}, frameIsInWindow: ${this.props.frameIsInWindow}, activeFrameKey: ${this.props.activeFrameKey}, windowIsFocused: ${this.props.windowIsFocused}`
       : null
     return (
       <div

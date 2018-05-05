@@ -106,20 +106,6 @@ const frameReducer = (state, action, immutableAction) => {
       }
       break
     }
-    case windowConstants.WINDOW_FRAME_GUEST_READY: {
-      const tabId = immutableAction.get('tabId')
-      const index = frameStateUtil.getIndexByTabId(state, tabId)
-      let frame = frameStateUtil.getFrameByTabId(state, tabId)
-      if (index === -1) {
-        console.error('frame not found for tab inserted to tab strip', tabId, state.get('frames').toJS())
-        break
-      }
-      state = state.mergeIn(['frames', index], {
-        guestIsReady: true
-      })
-      break
-      break
-    }
     case appConstants.APP_TAB_UPDATED:
       // This case will be fired for both tab creation and tab update.
       const tab = immutableAction.get('tabValue')
