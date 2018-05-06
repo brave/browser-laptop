@@ -30,35 +30,34 @@ def sanity_check(repo, tag):
     raise(UserWarning("Draft with tag {} already exists".format(tag)))
 
 def upload_browser_laptop(github, release, file_path):
-    filename = os.path.basename(file_path)
-    print('[INFO] Uploading: ' + filename)
+  filename = os.path.basename(file_path)
+  print('[INFO] Uploading: ' + filename)
 
-    # Upload the file.
-    with open(file_path, 'rb') as f:
-        if filename == 'RELEASES':
-          filename = 'RELEASES-{0}'.format(TARGET_ARCH)
-        upload_io_to_github(github, release,
-            filename, f, 'application/octet-stream')
+  # Upload the file.
+  with open(file_path, 'rb') as f:
+    if filename == 'RELEASES':
+      filename = 'RELEASES-{0}'.format(TARGET_ARCH)
+    upload_io_to_github(github, release,
+                        filename, f, 'application/octet-stream')
 
 def create_release_draft(repo, tag):
-    name = '{0} {1}'.format(release_name(), tag)
-    # TODO: Parse release notes from CHANGELOG.md
-    body = '(placeholder)'
-    data = dict(tag_name=tag, name=name, body=body, draft=True)
-    return repo.releases.post(data=data)
+  name = '{0} {1}'.format(release_name(), tag)
+  # TODO: Parse release notes from CHANGELOG.md
+  body = '(placeholder)'
+  data = dict(tag_name=tag, name=name, body=body, draft=True)
+  return repo.releases.post(data=data)
 
 def get_files_to_upload():
-    matches = []
-    for root, dirnames, filenames in os.walk('dist'):
-        for filename in filenames:
-          matches.append(os.path.join(root, filename))
-    return matches
+  matches = []
+  for root, dirnames, filenames in os.walk('dist'):
+    for filename in filenames:
+      matches.append(os.path.join(root, filename))
+  return matches
 
 def upload_io_to_github(github, release, name, io, content_type):
-    params = {'name': name}
-    headers = {'Content-Type': content_type}
-    github.releases(release['id']).assets.post(
-        params=params, headers=headers, data=io, verify=False)
+  params = {'name': name}
+  headers = {'Content-Type': content_type}
+  github.releases(release['id']).assets.post(params=params, headers=headers, data=io, verify=False)
 
 if __name__ == '__main__':
   import sys
