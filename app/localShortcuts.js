@@ -26,6 +26,8 @@ module.exports.register = (win) => {
     ['CmdOrCtrl+9', messages.SHORTCUT_SET_ACTIVE_FRAME_TO_LAST],
     ['CmdOrCtrl+G', messages.SHORTCUT_ACTIVE_FRAME_FIND_NEXT],
     ['CmdOrCtrl+Shift+G', messages.SHORTCUT_ACTIVE_FRAME_FIND_PREV],
+    ['F3', messages.SHORTCUT_ACTIVE_FRAME_FIND_NEXT],
+    ['Shift+F3', messages.SHORTCUT_ACTIVE_FRAME_FIND_PREV],
     ['CmdOrCtrl+Alt+J', messages.SHORTCUT_ACTIVE_FRAME_TOGGLE_DEV_TOOLS],
     ['CmdOrCtrl+Shift+=', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_IN],
     ['CmdOrCtrl+Shift+-', messages.SHORTCUT_ACTIVE_FRAME_ZOOM_OUT]
