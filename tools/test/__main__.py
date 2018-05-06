@@ -5,6 +5,7 @@
 
 import unittest
 
+from test_helpers import *
 from test_publish import *
 from test_upload import *
 

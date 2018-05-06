@@ -5,6 +5,7 @@
 
 import os
 import json
+import traceback
 
 BROWSER_LAPTOP_REPO = 'brave/browser-laptop'
 TARGET_ARCH= os.environ['TARGET_ARCH'] if os.environ.has_key('TARGET_ARCH') else 'x64'
@@ -40,3 +41,16 @@ def get_releases_by_tag(repo, tag_name, include_drafts=False):
     return [r for r in repo.releases.get() if r['tag_name'] == tag_name]
   else:
     return [r for r in repo.releases.get() if r['tag_name'] == tag_name and not r['draft']]
+
+def retry_func(try_func, catch, retries, catch_func=None):
+  for count in range(0, retries + 1):
+    try:
+      ret = try_func(count)
+      break
+    except catch as e:
+      print('[ERROR] Caught exception {}, {} retries left. {}'.format(catch, count, e.message))
+      if catch_func:
+        catch_func(count)
+      if count >= retries:
+        raise e
+  return ret

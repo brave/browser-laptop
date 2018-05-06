@@ -37,15 +37,23 @@ def upload_browser_laptop(github, release, file_path):
   with open(file_path, 'rb') as f:
     if filename == 'RELEASES':
       filename = 'RELEASES-{0}'.format(TARGET_ARCH)
-    upload_io_to_github(github, release,
-                        filename, f, 'application/octet-stream')
+
+    retry_func(
+      lambda x: upload_io_to_github(github, release, filename, f, 'application/octet-stream'),
+      catch=requests.exceptions.ConnectionError, retries=3
+    )
 
 def create_release_draft(repo, tag):
   name = '{0} {1}'.format(release_name(), tag)
   # TODO: Parse release notes from CHANGELOG.md
   body = '(placeholder)'
   data = dict(tag_name=tag, name=name, body=body, draft=True)
-  return repo.releases.post(data=data)
+
+  release = retry_func(
+    lambda run: repo.releases.post(data=data),
+    catch=requests.exceptions.ConnectionError, retries=3
+  )
+  return release
 
 def get_files_to_upload():
   matches = []
@@ -54,10 +62,13 @@ def get_files_to_upload():
       matches.append(os.path.join(root, filename))
   return matches
 
-def upload_io_to_github(github, release, name, io, content_type):
-  params = {'name': name}
-  headers = {'Content-Type': content_type}
-  github.releases(release['id']).assets.post(params=params, headers=headers, data=io, verify=False)
+def upload_io_to_github(github, release, name, io, content_type, retries=3):
+  io.seek(0)
+  github.releases(release['id']).assets.post(
+    params={'name': name},
+    headers={'Content-Type': content_type},
+    data=io, verify=False
+  )
 
 if __name__ == '__main__':
   import sys
