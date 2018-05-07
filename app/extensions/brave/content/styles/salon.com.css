@@ -1,0 +1,8 @@
+body {
+    height: auto !important;
+    overflow: auto !important;
+}
+
+#adblock-wrapper {
+    display: none !important;
+}
