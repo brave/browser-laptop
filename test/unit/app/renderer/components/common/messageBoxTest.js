@@ -41,6 +41,25 @@ let appState = Immutable.fromJS({
   }
 })
 
+const createAppState = detail => Immutable.fromJS({
+  windows: [{
+    windowId: 1,
+    windowUUID: 'uuid'
+  }],
+  tabs: [{
+    tabId: tabId,
+    windowId: 1,
+    windowUUID: 'uuid',
+    url: 'https://brave.com',
+    messageBoxDetail: detail
+  }],
+  tabsInternal: {
+    index: {
+      1: 0
+    }
+  }
+})
+
 describe('MessageBox component unit tests', function () {
   before(function () {
     mockery.enable({
@@ -60,7 +79,7 @@ describe('MessageBox component unit tests', function () {
 
   describe('Rendering', function () {
     before(function () {
-      appStoreRenderer.state = Immutable.fromJS(appState)
+      appStoreRenderer.state = createAppState(detail1)
     })
     it('renders itself inside a dialog component', function () {
       const wrapper = mount(
@@ -96,6 +115,19 @@ describe('MessageBox component unit tests', function () {
         />
       )
       assert.equal(wrapper.find('button[data-l10n-id="Cancel"][data-test-id="secondaryColor"]').length, 1)
+    })
+
+    it('renders the PromptTextBox when input is allowed', function () {
+      appStoreRenderer.state = createAppState(Object.assign({}, detail1, {
+        allowInput: true
+      }))
+      const wrapper = mount(
+        <MessageBox
+          tabId={tabId}
+          allowInput
+        />
+      )
+      assert.equal(wrapper.find('PromptTextBox').length, 1)
     })
 
     it('hides the suppress checkbox if showSuppress is false', function () {
@@ -153,6 +185,28 @@ describe('MessageBox component unit tests', function () {
       const response = {
         suppress: detail1.suppress,
         result: false
+      }
+      wrapper.find('button[data-l10n-id="Cancel"][data-test-id="secondaryColor"]').simulate('click')
+      assert.equal(spy.withArgs(tabId, response).calledOnce, true)
+      appActions.tabMessageBoxDismissed.restore()
+    })
+
+    it('calls appActions.tabMessageBoxDismissed with input input is allowed', function () {
+      const expectedInput = 'some input'
+      appStoreRenderer.state = createAppState(Object.assign({}, detail1, {
+        allowInput: true,
+        defaultPromptText: expectedInput
+      }))
+      const spy = sinon.spy(appActions, 'tabMessageBoxDismissed')
+      const wrapper = mount(
+        <MessageBox
+          tabId={tabId}
+        />
+      )
+      const response = {
+        suppress: detail1.suppress,
+        result: false,
+        input: expectedInput
       }
       wrapper.find('button[data-l10n-id="Cancel"][data-test-id="secondaryColor"]').simulate('click')
       assert.equal(spy.withArgs(tabId, response).calledOnce, true)

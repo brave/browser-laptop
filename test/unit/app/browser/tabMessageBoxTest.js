@@ -38,8 +38,13 @@ describe('tabMessageBox unit tests', function () {
       useCleanCache: true
     })
 
+    const fakeLocale = {
+      translation: (token) => { return token }
+    }
+
     mockery.registerMock('electron', require('../../lib/fakeElectron'))
     mockery.registerMock('../common/state/tabMessageBoxState', fakeMessageBoxState)
+    mockery.registerMock('../../../js/l10n', fakeLocale)
     tabMessageBox = require('../../../../app/browser/tabMessageBox')
     appActions = require('../../../../js/actions/appActions')
 
@@ -222,6 +227,49 @@ describe('tabMessageBox unit tests', function () {
         const callbacks = tabMessageBox.getCallbacks()
         assert.equal(callbacks[exampleTabId], undefined)
       })
+    })
+  })
+
+  describe('onWindowPrompt', () => {
+    const tabId = '123'
+    const webContents = {
+      getId: () => tabId
+    }
+    const extraData = undefined
+    const title = 'some title'
+    const message = 'some message'
+    const defaultPromptText = 'some prompt text'
+    const shouldDisplaySuppressCheckbox = true
+    const isBeforeUnloadDialog = undefined
+    const isReload = undefined
+    const muonCb = 'muonCb'
+
+    it('calls tabMessageBox.show', () => {
+      const mockShow = sinon.stub()
+      const expectecDetail = {
+        message,
+        title,
+        buttons: ['MESSAGEBOXOK', 'MESSAGEBOXCANCEL'],
+        cancelId: 1,
+        suppress: false,
+        allowInput: true,
+        defaultPromptText,
+        showSuppress: shouldDisplaySuppressCheckbox
+      }
+
+      tabMessageBox.onWindowPrompt(mockShow)(
+        webContents,
+        extraData,
+        title,
+        message,
+        defaultPromptText,
+        shouldDisplaySuppressCheckbox,
+        isBeforeUnloadDialog,
+        isReload,
+        muonCb
+      )
+
+      assert.equal(mockShow.withArgs(tabId, expectecDetail, muonCb).calledOnce, true)
     })
   })
 })

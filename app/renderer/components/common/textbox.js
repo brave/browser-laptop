@@ -21,13 +21,16 @@ class Textbox extends ImmutableComponent {
       (this.props.readonly || this.props.readOnly) ? styles.readOnly : styles.outlineable,
       this.props['data-isCommonForm'] && commonStyles.isCommonForm,
       this.props['data-isSettings'] && styles.isSettings,
+      this.props['data-isPrompt'] && styles.isPrompt,
       this.props.customClass && this.props.customClass
     )
 
     const props = Object.assign({}, this.props)
+    const ref = this.props.inputRef
     delete props.customClass
+    delete props.inputRef
 
-    return <input type='text' className={className} {...props} />
+    return <input type='text' className={className} {...props} ref={ref} />
   }
 }
 
@@ -63,6 +66,12 @@ class GroupedFormTextbox extends ImmutableComponent {
 class SettingTextbox extends ImmutableComponent {
   render () {
     return <FormTextbox data-isSettings='true' {...this.props} />
+  }
+}
+
+class PromptTextBox extends ImmutableComponent {
+  render () {
+    return <FormTextbox data-isPrompt='true' {...this.props} />
   }
 }
 
@@ -160,6 +169,10 @@ const styles = StyleSheet.create({
   isSettings: {
     width: '280px'
   },
+  isPrompt: {
+    width: '100%',
+    marginBottom: '20px'
+  },
   readOnly: {
     background: globalStyles.color.lightGray,
     boxShadow: 'none',
@@ -248,6 +261,7 @@ module.exports = {
   FormTextbox,
   GroupedFormTextbox,
   SettingTextbox,
+  PromptTextBox,
   TextArea,
   DefaultTextArea,
   WordCountTextArea
