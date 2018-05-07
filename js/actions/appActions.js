@@ -1998,6 +1998,23 @@ const appActions = {
       actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE,
       viewData
     })
+  },
+
+  setTorNewIdentity: function (tabId, url) {
+    dispatch({
+      actionType: appConstants.APP_SET_TOR_NEW_IDENTITY,
+      tabId,
+      url
+    })
+  },
+
+  recreateTorTab: function (torEnabled, tabId, index) {
+    dispatch({
+      actionType: appConstants.APP_RECREATE_TOR_TAB,
+      torEnabled,
+      tabId,
+      index
+    })
   }
 }
 

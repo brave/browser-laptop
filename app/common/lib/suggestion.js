@@ -25,6 +25,14 @@ const sigmoid = (t) => {
 
 const ONE_DAY = 1000 * 60 * 60 * 24
 
+const searchSuggestionsEnabled = (state, tabId) => {
+  const frame = getFrameByTabId(state, tabId)
+  if (!frame || frame.get('isPrivate')) {
+    return false
+  }
+  return getSetting(settings.OFFER_SEARCH_SUGGESTIONS)
+}
+
 /*
  * Calculate the sorting priority for a history item based on number of
  * accesses and time since last access
@@ -563,7 +571,7 @@ const getSearchSuggestions = (state, tabId, urlLocationLower) => {
   return new Promise((resolve, reject) => {
     const mapListToElements = getMapListToElements(urlLocationLower)
     let suggestionsList = Immutable.List()
-    if (getSetting(settings.OFFER_SEARCH_SUGGESTIONS)) {
+    if (searchSuggestionsEnabled(state, tabId)) {
       const searchResults = state.get('searchResults')
       const sortHandler = getSortForSearchSuggestions(urlLocationLower)
       if (searchResults) {
@@ -629,7 +637,7 @@ const generateNewSearchXHRResults = debounce((state, windowId, tabId, input) => 
     ? frameSearchDetail.get('autocomplete')
     : searchDetail.get('autocompleteURL')
 
-  const shouldDoSearchSuggestions = getSetting(settings.OFFER_SEARCH_SUGGESTIONS) &&
+  const shouldDoSearchSuggestions = searchSuggestionsEnabled(state, tabId) &&
     autocompleteURL &&
     !isUrl(input) &&
     input.length !== 0
