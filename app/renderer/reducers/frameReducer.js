@@ -84,7 +84,12 @@ const frameReducer = (state, action, immutableAction) => {
       const tabId = immutableAction.get('tabId')
       const index = frameStateUtil.getIndexByTabId(state, tabId)
       if (index === -1) {
-        console.error('frame not found for tab inserted to tab strip', tabId, state.get('frames').toJS())
+        console.error(
+          'frame not found for tab inserted to tab strip',
+          tabId,
+          (state.get('frames') || Immutable.Map()).toJS(),
+          (state.get('framesInternal') || Immutable.Map()).toJS()
+        )
         break
       }
       state = state.mergeIn(['frames', index], {

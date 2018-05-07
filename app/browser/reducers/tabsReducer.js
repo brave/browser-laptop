@@ -528,15 +528,21 @@ const tabsReducer = (state, action, immutableAction) => {
       if (dragData && dragData.get('type') === dragTypes.TAB) {
         const frame = dragData.get('data')
         let frameOpts = frameOptsFromFrame(frame)
+        const draggingTabId = frameOpts.get('tabId')
         const browserOpts = { positionByMouseCursor: true, checkMaximized: true }
         const tabIdForIndex = dragData.getIn(['dragOverData', 'draggingOverKey'])
-        const tabForIndex = tabState.getByTabId(state, tabIdForIndex)
+        const tabForIndex = tabIdForIndex !== draggingTabId && tabState.getByTabId(state, tabIdForIndex)
         const dropWindowId = dragData.get('dropWindowId')
-        if (dropWindowId != null && dropWindowId !== -1 && tabForIndex) {
+        let newIndex = -1
+        // Set new index for new window if last dragged-over tab is in new window.
+        // Otherwise, could be over another tab's tab strip, but most recently dragged-over a tab in another window.
+        if (dropWindowId != null && dropWindowId !== -1 && tabForIndex && tabForIndex.get('windowId') === dropWindowId) {
           const prependIndexByTabId = dragData.getIn(['dragOverData', 'draggingOverLeftHalf'])
-          frameOpts = frameOpts.set('index', tabForIndex.get('index') + (prependIndexByTabId ? 0 : 1))
+          newIndex = tabForIndex.get('index') + (prependIndexByTabId ? 0 : 1)
         }
-        tabs.moveTo(state, frame.get('tabId'), frameOpts, browserOpts, dragData.get('dropWindowId'))
+        // ensure the tab never moves window with its original index
+        frameOpts = frameOpts.set('index', newIndex)
+        tabs.moveTo(state, draggingTabId, frameOpts, browserOpts, dragData.get('dropWindowId'))
       }
       break
     }

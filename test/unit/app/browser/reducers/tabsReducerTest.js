@@ -596,10 +596,12 @@ describe('tabsReducer unit tests', function () {
       assert.equal(args[0], state)  // State is passed in as first arg
       assert.equal(args[1], 1)  // tabId is 1 for first tab
       // frameOpts being dragged is for the first tab
-      assert.deepEqual(args[2].toJS(), { tabId: 1,
+      assert.deepEqual(args[2].toJS(), {
+        tabId: 1,
         windowId: 1,
         pinned: false,
-        active: true
+        active: true,
+        index: -1 // -1 specifies should go at end of tab strip
       })
       // Passes browser options for position by mouse cursor
       assert.deepEqual(args[3], {

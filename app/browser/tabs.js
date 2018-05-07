@@ -1063,12 +1063,11 @@ const api = {
   },
 
   moveTo: (state, tabId, frameOpts, browserOpts, toWindowId) => {
-
-    if (shouldDebugTabEvents) {
-      console.log(`Tab [${tabId}] tabs.moveTo(window: ${toWindowId})`)
-    }
     frameOpts = makeImmutable(frameOpts)
     browserOpts = makeImmutable(browserOpts)
+    if (shouldDebugTabEvents) {
+      console.log(`Tab [${tabId}] tabs.moveTo(window: ${toWindowId}, index: ${frameOpts.get('index')})`)
+    }
     const tab = webContentsCache.getWebContents(tabId)
     if (!tab || tab.isDestroyed()) {
       return
@@ -1125,6 +1124,7 @@ const api = {
     // invalid index? add to end of tab strip by specifying -1 index
     if (toIndex == null || toIndex === -1) {
       toIndex = -1
+      frameOpts = frameOpts.set('index', -1)
     }
     const win = getWindow(toWindowId)
     if (!win || win.isDestroyed()) {
