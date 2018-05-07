@@ -341,7 +341,21 @@ const userModelState = {
     }
 
     return state.setIn(['userModel', 'places', ssid], place)
+  },
+
+  getAdEnabledValue: (state) => {
+    return state.getIn(['settings', settings.ADS_ENABLED])
+  },
+
+  getAdUUID: (state) => {
+    // returns string or undefined
+    return state.getIn(['userModel', 'adUUID'])
+  },
+
+  setAdUUID: (state, uuid) => {
+    return state.setIn(['userModel', 'adUUID'], uuid)
   }
+
 }
 
 module.exports = userModelState

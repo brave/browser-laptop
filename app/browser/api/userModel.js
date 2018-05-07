@@ -6,6 +6,7 @@
 const um = require('@brave-intl/bat-usermodel')
 const path = require('path')
 const getSSID = require('detect-ssid')
+const uuidv4 = require('uuid/v4')
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
@@ -24,7 +25,7 @@ let matrixData
 let priorData
 let sampleAdFeed
 
-const initialize = (state) => {
+const initialize = (state, adEnabled) => {
   // TODO turn back on?
   // state = userModelState.setAdFrequency(state, 15)
 
@@ -38,6 +39,8 @@ const initialize = (state) => {
   })
 
   retrieveSSID()
+
+  state = confirmAdUUIDIfAdEnabled(state)
 
   return state
 }
@@ -65,6 +68,7 @@ const removeHistorySite = (state, action) => {
 
 const removeAllHistory = (state) => {
   state = userModelState.removeAllHistory(state)
+  state = confirmAdUUIDIfAdEnabled(state)
   return state
 }
 
@@ -288,6 +292,36 @@ const retrieveSSID = () => {
   })
 }
 
+const generateAdUUIDString = () => {
+  return uuidv4()
+}
+
+const generateAndSetAdUUIDRegardless = (state) => {
+  let uuid = generateAdUUIDString()
+  state = userModelState.setAdUUID(state, uuid)
+  return state
+}
+
+const generateAndSetAdUUIDButOnlyIfDNE = (state) => {
+  let uuid = userModelState.getAdUUID(state)
+
+  if (typeof uuid === 'undefined') {
+    state = generateAndSetAdUUIDRegardless(state)
+  }
+
+  return state
+}
+
+const confirmAdUUIDIfAdEnabled = (state) => {
+  let adEnabled = userModelState.getAdEnabledValue(state)
+
+  if (adEnabled) {
+    state = generateAndSetAdUUIDButOnlyIfDNE(state)
+  }
+
+  return state
+}
+
 const privateTest = () => {
   return 1
 }
@@ -309,7 +343,8 @@ const getMethods = () => {
     serveAdNow,
     changeAdFrequency,
     goAheadAndShowTheAd,
-    retrieveSSID
+    retrieveSSID,
+    confirmAdUUIDIfAdEnabled
   }
 
   let privateMethods = {}
