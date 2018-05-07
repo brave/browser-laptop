@@ -67,6 +67,7 @@ const userModelReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
       {
         state = userModel.removeAllHistory(state)
+        state = userModel.confirmAdUUIDIfAdEnabled(state)
         break
       }
     case appConstants.APP_TAB_ACTIVATE_REQUESTED:  // tab switching
@@ -128,7 +129,10 @@ const userModelReducer = (state, action, immutableAction) => {
         switch (action.get('key')) {
           case settings.ADS_ENABLED:
             {
-              state = userModel.initialize(state, action.get('value'))
+              let adEnabled = action.get('value')
+
+              // this reports `value` true if enabled and false if disabled
+              state = userModel.initialize(state, adEnabled)
               break
             }
           // TODO check why this is here and fix if needed, currently is not triggered
