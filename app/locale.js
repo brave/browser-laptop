@@ -241,6 +241,8 @@ var rendererIdentifiers = function () {
     'dappEnableExtension',
     'banSiteConfirmation',
     'paymentsDeleteWalletConfirmation',
+    'messageBoxOk',
+    'messageBoxCancel',
     // other
     'passwordsManager',
     'extensionsManager',

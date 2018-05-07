@@ -11,6 +11,7 @@ const ReduxComponent = require('../reduxComponent')
 const Dialog = require('./dialog')
 const BrowserButton = require('../common/browserButton')
 const SwitchControl = require('./switchControl')
+const {PromptTextBox} = require('./textbox')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -35,10 +36,19 @@ class MessageBox extends React.Component {
     super(props)
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onSuppressChanged = this.onSuppressChanged.bind(this)
+    this.state = {
+      textInput: props.defaultPromptText
+    }
   }
 
   componentWillMount () {
     document.addEventListener('keydown', this.onKeyDown)
+  }
+
+  componentDidMount () {
+    if (this.props.allowInput) {
+      this.inputRef.select()
+    }
   }
 
   componentWillUnmount () {
@@ -81,6 +91,10 @@ class MessageBox extends React.Component {
       response.result = buttonId !== this.props.cancelId
     }
 
+    if (this.props.allowInput) {
+      response.input = this.state.textInput
+    }
+
     appActions.tabMessageBoxDismissed(tabId, response)
   }
 
@@ -111,6 +125,8 @@ class MessageBox extends React.Component {
     // used in renderer
     props.tabId = tabId
     props.message = messageBoxDetail.get('message')
+    props.allowInput = messageBoxDetail.get('allowInput')
+    props.defaultPromptText = messageBoxDetail.get('defaultPromptText')
     props.suppress = tabMessageBoxState.getSuppress(state, tabId)
     props.title = tabMessageBoxState.getTitle(state, tabId)
     props.showSuppress = tabMessageBoxState.getShowSuppress(state, tabId)
@@ -149,6 +165,21 @@ class MessageBox extends React.Component {
                 onClick={this.onSuppressChanged}
               />
               : null
+          }
+          {
+            this.props.allowInput && (
+              <PromptTextBox
+                value={this.state.textInput}
+                inputRef={ref => {
+                  this.inputRef = ref
+                }}
+                onChange={e => {
+                  this.setState({
+                    textInput: e.target.value
+                  })
+                }}
+              />
+            )
           }
           <div className={css(styles.buttons)} data-test-id='msgBoxButtons'>
             {this.messageBoxButtons}
