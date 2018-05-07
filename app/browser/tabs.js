@@ -1026,11 +1026,6 @@ const api = {
         }
         extensions.createTab(createProperties, (tab) => {
           cb && cb(tab)
-          // XXX: Workaround for 'browser-context-created' not emitted for Tor
-          // browsing context
-          if (createProperties.isTor) {
-            initPartition(appConfig.tor.partition)
-          }
         })
       }
 
