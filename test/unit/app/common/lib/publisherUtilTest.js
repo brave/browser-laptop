@@ -67,5 +67,10 @@ describe('publisherUtil test', function () {
       const result = publisherUtil.shouldShowAddPublisherButton(state, 'https://brave.com', 'brave.com')
       assert.equal(result, true)
     })
+
+    it('location is pdf', function () {
+      const result = publisherUtil.shouldShowAddPublisherButton(state, 'chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/http://orimi.com/pdf-test.pdf', 'orimi.com')
+      assert.equal(result, true)
+    })
   })
 })
