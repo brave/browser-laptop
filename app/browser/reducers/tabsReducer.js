@@ -165,6 +165,15 @@ const tabsReducer = (state, action, immutableAction) => {
     case appConstants.APP_TAB_MOVED:
       state = tabs.updateTabsStateForAttachedTab(state, action.get('tabId'))
       break
+    case appConstants.APP_TAB_INSERTED_TO_TAB_STRIP: {
+      const windowId = action.get('windowId')
+      if (windowId == null) {
+        break
+      }
+      const tabId = action.get('tabId')
+      state = tabState.setTabStripWindowId(state, tabId, windowId)
+      break
+    }
     case appConstants.APP_TAB_DETACH_MENU_ITEM_CLICKED: {
       setImmediate(() => {
         const tabId = action.get('tabId')

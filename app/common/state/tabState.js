@@ -665,6 +665,21 @@ const tabState = {
   getVisibleVirtualURL: (state, tabId) => {
     const entry = tabState.getVisibleEntry(state, tabId)
     return entry ? entry.get('virtualURL') : ''
+  },
+
+  setTabStripWindowId: (state, tabId, windowId) => {
+    let path = tabState.getPathByTabId(state, tabId)
+    if (!path) {
+      console.error(`setTabStripWindowId: tab with ID ${tabId} not found!`)
+      return state
+    }
+    path = [...path, 'tabStripWindowId']
+    // handle clear window
+    if (windowId == null || windowId === -1) {
+      return state.deleteIn(path)
+    }
+    // handle set window
+    return state.setIn(path, windowId)
   }
 }
 

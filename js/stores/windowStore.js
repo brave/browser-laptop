@@ -27,6 +27,7 @@ const appStoreRenderer = require('./appStoreRenderer')
 const windowActions = require('../actions/windowActions')
 const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
 const bookmarksState = require('../../app/common/state/bookmarksState')
+const tabState = require('../../app/common/state/tabState')
 const bookmarkUtil = require('../../app/common/lib/bookmarkUtil')
 
 let windowState = Immutable.fromJS({
@@ -732,6 +733,23 @@ const doAction = (action) => {
         action.frameOpts.tabId = tabValue.get('tabId')
         action.frameOpts.icon = action.frameOpts.icon || tabValue.get('favIconUrl')
       }
+
+      // Update some properties from latest tab state as frame object has been in transit
+      // and may have missed some events.
+      // TODO: These properties should be read directly from tabState by components because
+      // of it's permanency, instead of keeping frame and tab synchronized.
+      if (action.frameOpts.tabId) {
+        const tab = tabState.getByTabId(appStoreRenderer.state, action.frameOpts.tabId)
+        if (tab) {
+          // handle tabStripWindowId changed whilst tab was being moved (avoiding non-displaying tab)
+          const existingTabStripWindowId = tab.get('tabStripWindowId')
+          if (existingTabStripWindowId && action.frameOpts.tabStripWindowId !== existingTabStripWindowId) {
+            console.warn('Frame did not have tab strip window id but tab did, setting tab property to (probably moved) frame', action.frameOpts.tabId, action.frameOpts.tabStripWindowId, existingTabStripWindowId)
+          }
+          action.frameOpts.tabStripWindowId = existingTabStripWindowId
+        }
+      }
+
       windowState = newFrame(windowState, action.frameOpts)
       setImmediate(() => {
         // Inform subscribers that we now have a frame
