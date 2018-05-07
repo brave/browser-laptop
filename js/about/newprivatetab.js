@@ -20,6 +20,7 @@ require('../../less/about/newtab.less')
 
 const useAlternativePrivateSearchEngineDataKeys = ['newTabDetail', 'useAlternativePrivateSearchEngine']
 const torEnabled = ['newTabDetail', 'torEnabled']
+const torFAQ = 'https://github.com/brave/browser-laptop/wiki/Using-Tor-in-Brave#faq'
 
 class NewPrivateTab extends React.Component {
   onChangePrivateSearch (e) {
@@ -61,6 +62,7 @@ class NewPrivateTab extends React.Component {
                 <span>
                   <h2 onClick={this.onClickPrivateSearchTitle.bind(this)} className={css(styles.privateSearch__title)}>
                     <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabSearchSectionTitle' />
+                    <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>DuckDuckGo</strong>
                   </h2>
                   <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabSearchText1' />
                 </span>
@@ -81,6 +83,7 @@ class NewPrivateTab extends React.Component {
                 <span>
                   <h2 onClick={this.onClickPrivateSearchTitle.bind(this)} className={css(styles.privateSearch__title)}>
                     <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabTorTitle' />
+                    <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight, styles.text_clickable)} onClick={aboutActions.createTabRequested.bind(null, {url: torFAQ})}>Tor</strong>
                   </h2>
                   <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabTorText1' />
                 </span>
@@ -232,6 +235,11 @@ const styles = StyleSheet.create({
   text_sectionTitleHighlight: {
     fontWeight: '600',
     marginLeft: '7px'
+  },
+
+  text_clickable: {
+    cursor: 'pointer',
+    textDecoration: 'underline'
   },
 
   privateSearch: {
