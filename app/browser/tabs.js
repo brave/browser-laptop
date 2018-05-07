@@ -28,7 +28,7 @@ const {newTabMode} = require('../common/constants/settingsEnums')
 const {tabCloseAction} = require('../common/constants/settingsEnums')
 const webContentsCache = require('./webContentsCache')
 const {FilterOptions} = require('ad-block')
-const {isResourceEnabled, initPartition} = require('../filtering')
+const {isResourceEnabled} = require('../filtering')
 const autofill = require('../autofill')
 const bookmarksState = require('../common/state/bookmarksState')
 const bookmarkFoldersState = require('../common/state/bookmarkFoldersState')
@@ -1092,11 +1092,6 @@ const api = {
         }
         extensions.createTab(createProperties, (tab) => {
           cb && cb(tab)
-          // XXX: Workaround for 'browser-context-created' not emitted for Tor
-          // browsing context
-          if (createProperties.isTor) {
-            initPartition(appConfig.tor.partition)
-          }
         })
       }
 
