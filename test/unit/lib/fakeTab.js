@@ -18,6 +18,7 @@ function FakeTab (id, windowId, guestInstanceId = nextGuestInstanceId++) {
   this._canGoBack = false
   this._canGoForward = false
   this._isPlaceholder = false
+  this._zoomPercent = 100
 }
 
 util.inherits(FakeTab, EventEmitter)
@@ -49,6 +50,10 @@ proto.canGoForward = function () {
 
 proto.isPlaceholder = function () {
   return this._isPlaceholder
+}
+
+proto.getZoomPercent = function () {
+  return this._zoomPercent
 }
 
 module.exports = FakeTab

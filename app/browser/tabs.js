@@ -66,6 +66,7 @@ const getTabValue = function (tabId) {
     tabValue = tabValue.set('partition', tab.session.partition)
     tabValue = tabValue.set('partitionNumber', getPartitionNumber(tab.session.partition))
     tabValue = tabValue.set('isPlaceholder', tab.isPlaceholder())
+    tabValue = tabValue.set('zoomPercent', tab.getZoomPercent())
     return tabValue.set('tabId', tabId)
   }
 }
@@ -1420,7 +1421,7 @@ const api = {
       // communicate those out here.
       if (newTabValue && oldTabValue) {
         const changeInfo = {}
-        const rendererAwareProps = ['index', 'pinned', 'url', 'active']
+        const rendererAwareProps = ['index', 'pinned', 'url', 'active', 'zoomPercent']
         rendererAwareProps.forEach((prop) => {
           const newPropVal = newTabValue.get(prop)
           if (oldTabValue.get(prop) !== newPropVal) {

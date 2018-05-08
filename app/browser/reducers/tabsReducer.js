@@ -143,6 +143,13 @@ const tabsReducer = (state, action, immutableAction) => {
         })
         break
       }
+    case tabActionConsts.ZOOM_CHANGED:
+      {
+        const tabId = tabState.resolveTabId(state, action.get('tabId'))
+        const zoomPercent = action.get('zoomPercent')
+        state = tabState.setZoomPercent(state, tabId, zoomPercent)
+        break
+      }
     case appConstants.APP_SET_STATE:
       state = tabs.init(state, action)
       break

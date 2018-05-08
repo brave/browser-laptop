@@ -81,6 +81,7 @@ describe('tabs API unit tests', function () {
         once: (event, cb) => {
           setImmediate(cb)
         },
+        getZoomPercent: () => 100,
         isPlaceholder: () => false
       }
       if (tabId === 1) {

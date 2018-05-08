@@ -15,6 +15,7 @@ const WebviewDisplay = require('../../pooledWebviewDisplay')
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
 const webviewActions = require('../../../../js/actions/webviewActions')
+const tabActions = require('../../../common/actions/tabActions')
 
 // state
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
@@ -105,8 +106,8 @@ class GuestInstanceRenderer extends React.Component {
         classNameWebview: css(styles.guestInstanceRenderer__webview),
         classNameWebviewAttached: css(styles.guestInstanceRenderer__webview_attached),
         classNameWebviewAttaching: css(styles.guestInstanceRenderer__webview_attaching),
-        onFocus: this.onFocus.bind(this),
-        onZoomChange: this.onUpdateZoom.bind(this)
+        onZoomChange: this.onUpdateZoom.bind(this),
+        onFocus: this.onFocus.bind(this)
       })
       webviewActions.init(this.webviewDisplay)
       // treat the container as main frame position for mouse position
@@ -127,7 +128,9 @@ class GuestInstanceRenderer extends React.Component {
   }
 
   onUpdateZoom (zoomPercent) {
-    windowActions.setLastZoomPercentage(this.props.frameKey, zoomPercent)
+    // TODO: better to respond to a muon Tab event `zoom-changed` via ZoomObserver
+    // if that is provided in the future
+    tabActions.zoomChanged(this.props.tabId, zoomPercent)
   }
 
   render () {

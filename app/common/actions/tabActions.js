@@ -51,6 +51,13 @@ const tabActions = {
     dispatchAction(tabActionConstants.STOP_FIND_IN_PAGE_REQUEST, {
       tabId
     })
+  },
+
+  zoomChanged (tabId, zoomPercent) {
+    dispatchAction(tabActionConstants.ZOOM_CHANGED, {
+      tabId,
+      zoomPercent
+    })
   }
 }
 

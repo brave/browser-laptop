@@ -522,9 +522,6 @@ const doAction = (action) => {
     case windowConstants.WINDOW_SET_FAVICON:
       windowState = windowState.setIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key')), 'icon'], action.favicon)
       break
-    case windowConstants.WINDOW_SET_LAST_ZOOM_PERCENTAGE:
-      windowState = windowState.setIn(['frames', frameStateUtil.getFrameIndex(windowState, action.frameKey), 'lastZoomPercentage'], action.percentage)
-      break
     case windowConstants.WINDOW_SET_MOUSE_IN_TITLEBAR:
       windowState = windowState.setIn(['ui', 'mouseInTitlebar'], action.mouseInTitlebar)
       break

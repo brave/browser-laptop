@@ -580,21 +580,6 @@ const windowActions = {
   },
 
   /**
-   * Dispatches a message to store the last zoom percentage.
-   * This is mainly just used to trigger updates throughout React.
-   *
-   * @param {object} frameKey - The frame to set blocked info on
-   * @param {number} percentage - The new zoom percentage
-   */
-  setLastZoomPercentage: function (frameKey, percentage) {
-    dispatch({
-      actionType: windowConstants.WINDOW_SET_LAST_ZOOM_PERCENTAGE,
-      frameKey,
-      percentage
-    })
-  },
-
-  /**
    * Saves the position of the window in the window state
    * @param {Array} position - [x, y]
    */

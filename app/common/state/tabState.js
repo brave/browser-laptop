@@ -680,6 +680,20 @@ const tabState = {
     }
     // handle set window
     return state.setIn(path, windowId)
+  },
+
+  setZoomPercent: (state, tabId, zoomPercent) => {
+    let path = tabState.getPathByTabId(state, tabId)
+    if (!path) {
+      console.error(`setZoomPercent: tab with ID ${tabId} not found!`)
+      return state
+    }
+    if (typeof zoomPercent !== 'number') {
+      console.error(`setZoomPercent: bad value for zoomPercent: ${zoomPercent}`)
+      return state
+    }
+    path = [...path, 'zoomPercent']
+    return state.setIn(path, zoomPercent)
   }
 }
 
