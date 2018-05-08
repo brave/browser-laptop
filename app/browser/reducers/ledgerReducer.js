@@ -503,6 +503,15 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.onFetchReferralHeaders(state, action.get('error'), action.get('response'), action.get('body'))
         break
       }
+    case appConstants.APP_ON_LEDGER_FUZZING:
+      {
+        state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.FUZZING)
+        const newStamp = parseInt(action.get('newStamp'))
+        if (!isNaN(newStamp) && newStamp > 0) {
+          state = ledgerState.setInfoProp(state, 'reconcileStamp', newStamp)
+        }
+        break
+      }
     case appConstants.APP_ON_REFERRAL_ACTIVITY:
       {
         state = updateState.setUpdateProp(state, 'referralTimestamp', new Date().getTime())

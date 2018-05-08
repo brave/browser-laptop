@@ -2346,7 +2346,7 @@ const onInitRead = (state, parsedData) => {
     // enables it again -> reconcileStamp is in the past.
     // In this case reset reconcileStamp to the future.
     try {
-      timeUntilReconcile = client.timeUntilReconcile(synopsis)
+      timeUntilReconcile = client.timeUntilReconcile(synopsis, onFuzzing)
     } catch (ex) {}
 
     let ledgerWindow = (ledgerState.getSynopsisOption(state, 'numFrames') - 1) * ledgerState.getSynopsisOption(state, 'frameSize')
@@ -2378,6 +2378,12 @@ const onInitRead = (state, parsedData) => {
   module.exports.getBalance(state)
 
   return state
+}
+
+const onFuzzing = () => {
+  if (client && client.state) {
+    appActions.onLedgerFuzzing(client.state.reconcileStamp)
+  }
 }
 
 const onTimeUntilReconcile = (state, stateResult) => {
@@ -2456,7 +2462,7 @@ const run = (state, delayTime) => {
   }
 
   const publishers = ledgerState.getAboutProp(state, 'synopsis') || Immutable.List()
-  if (isList(publishers) && publishers.isEmpty() && client.isReadyToReconcile(synopsis)) {
+  if (isList(publishers) && publishers.isEmpty() && client.isReadyToReconcile(synopsis, onFuzzing)) {
     setNewTimeUntilReconcile()
   }
 
@@ -2517,7 +2523,7 @@ const run = (state, delayTime) => {
 
   if (delayTime === 0) {
     try {
-      delayTime = client.timeUntilReconcile(synopsis)
+      delayTime = client.timeUntilReconcile(synopsis, onFuzzing)
     } catch (ex) {
       delayTime = false
     }
@@ -2551,7 +2557,7 @@ const run = (state, delayTime) => {
     return
   }
 
-  if (client.isReadyToReconcile(synopsis)) {
+  if (client.isReadyToReconcile(synopsis, onFuzzing)) {
     client.reconcile(uuid.v4().toLowerCase(), callback)
   }
 }

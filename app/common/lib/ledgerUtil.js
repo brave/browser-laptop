@@ -19,6 +19,7 @@ const ledgerVideoCache = require('../cache/ledgerVideoCache')
 const settings = require('../../../js/constants/settings')
 const ledgerMediaProviders = require('../constants/ledgerMediaProviders')
 const twitchEvents = require('../constants/twitchEvents')
+const ledgerStatuses = require('../constants/ledgerStatuses')
 
 // Utils
 const {responseHasContent} = require('./httpUtil')
@@ -98,6 +99,15 @@ const formattedDateFromTimestamp = (timestamp, format) => {
 
 const walletStatus = (ledgerData, settings) => {
   let status = {}
+
+  switch (ledgerData.get('status')) {
+    case ledgerStatuses.FUZZING:
+      {
+        return {
+          id: 'ledgerFuzzed'
+        }
+      }
+  }
 
   if (ledgerData == null) {
     return {
