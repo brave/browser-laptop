@@ -13,6 +13,7 @@ const fakeAdBlock = require('../../../lib/fakeAdBlock')
 const appConstants = require('../../../../../js/constants/appConstants')
 const siteTags = require('../../../../../js/constants/siteTags')
 const {STATE_SITES} = require('../../../../../js/constants/stateConstants')
+const bookmarkUtil = require('../../../../../app/common/lib/bookmarkUtil')
 require('../../../braveUnit')
 
 describe('bookmarkFoldersReducer unit test', function () {
@@ -126,6 +127,7 @@ describe('bookmarkFoldersReducer unit test', function () {
     })
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
+    mockery.registerMock('../../common/lib/bookmarkUtil', bookmarkUtil)
     bookmarkFoldersReducer = require('../../../../../app/browser/reducers/bookmarkFoldersReducer')
     bookmarkFoldersState = require('../../../../../app/common/state/bookmarkFoldersState')
   })
@@ -406,6 +408,15 @@ describe('bookmarkFoldersReducer unit test', function () {
         .deleteIn([STATE_SITES.BOOKMARK_FOLDERS, '81'])
       assert.equal(spy.calledTwice, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
+    })
+
+    it('calls bookmarkUtil.closeToolbarIfEmpty', function () {
+      spy = sinon.spy(bookmarkUtil, 'closeToolbarIfEmpty')
+      bookmarkFoldersReducer(stateWithData, {
+        actionType: appConstants.APP_REMOVE_BOOKMARK_FOLDER,
+        folderKey: '1'
+      })
+      assert.equal(spy.calledOnce, true)
     })
   })
 })

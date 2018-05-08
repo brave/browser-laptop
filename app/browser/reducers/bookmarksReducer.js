@@ -89,6 +89,7 @@ const bookmarksReducer = (state, action, immutableAction) => {
 
         const destinationDetail = bookmarksState.findBookmark(state, action.get('destinationKey'))
         state = syncUtil.updateObjectCache(state, destinationDetail, STATE_SITES.BOOKMARKS)
+        bookmarkUtil.closeToolbarIfEmpty(state)
         break
       }
     case appConstants.APP_REMOVE_BOOKMARK:
@@ -106,6 +107,7 @@ const bookmarksReducer = (state, action, immutableAction) => {
           state = bookmarksState.removeBookmark(state, bookmarkKey)
         }
         state = bookmarkUtil.updateActiveTabBookmarked(state)
+        bookmarkUtil.closeToolbarIfEmpty(state)
         break
       }
   }
