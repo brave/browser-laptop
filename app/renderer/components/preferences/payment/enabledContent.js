@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     width: '100%',
-    minHeight: '159px',
+    minHeight: '188px',
     background: '#f3f3f3',
     borderRadius: '8px',
     padding: '27px 50px 17px',
