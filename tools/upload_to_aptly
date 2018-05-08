@@ -79,5 +79,5 @@ for i in ${DIST}
 done
 
 for i in ${DIST}
-	do aptly publish snapshot -force-overwrite=true -passphrase=$PASSPHRASE -gpg-key=${GPG_KEY} ${i}-snapshot s3:${OPTION}:
+	do aptly publish snapshot -force-overwrite=true -gpg-key=${GPG_KEY} ${i}-snapshot s3:${OPTION}:
 done
