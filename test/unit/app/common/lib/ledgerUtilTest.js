@@ -7,6 +7,7 @@ const settings = require('../../../../../js/constants/settings')
 const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
 const twitchEvents = require('../../../../../app/common/constants/twitchEvents')
 const urlUtil = require('../../../../../js/lib/urlutil')
+const ledgerStatuses = require('../../../../../app/common/constants/ledgerStatuses')
 
 const defaultState = Immutable.fromJS({
   ledger: {}
@@ -265,9 +266,18 @@ describe('ledgerUtil unit test', function () {
 
   describe('walletStatus', function () {
     it('null case', function () {
-      const result = ledgerUtil.walletStatus()
+      const result = ledgerUtil.walletStatus(Immutable.Map())
       assert.deepEqual(result, {
         id: 'createWalletStatus'
+      })
+    })
+
+    it('on fuzzing', function () {
+      const result = ledgerUtil.walletStatus(Immutable.fromJS({
+        status: ledgerStatuses.FUZZING
+      }))
+      assert.deepEqual(result, {
+        id: 'ledgerFuzzed'
       })
     })
 
