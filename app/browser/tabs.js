@@ -877,11 +877,17 @@ const api = {
   setAudioMuted: (action) => {
     action = makeImmutable(action)
     const muted = action.get('muted')
+    // We're crossing into type-safe muon code so make sure args
+    // are of correct type
+    if (typeof muted !== 'boolean') {
+      return
+    }
     const tabId = action.get('tabId')
     const tab = webContentsCache.getWebContents(tabId)
-    if (tab && !tab.isDestroyed()) {
-      tab.setAudioMuted(muted)
+    if (!tab || tab.isDestroyed()) {
+      return
     }
+    tab.setAudioMuted(muted)
   },
 
   clone: (action) => {
