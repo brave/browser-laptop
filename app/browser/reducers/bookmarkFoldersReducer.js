@@ -15,6 +15,7 @@ const {STATE_SITES} = require('../../../js/constants/stateConstants')
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const syncUtil = require('../../../js/state/syncUtil')
+const bookmarkUtil = require('../../common/lib/bookmarkUtil')
 const bookmarkFolderUtil = require('../../common/lib/bookmarkFoldersUtil')
 
 const bookmarkFoldersReducer = (state, action, immutableAction) => {
@@ -82,6 +83,7 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
 
         const destinationDetail = bookmarksState.findBookmark(state, action.get('destinationKey'))
         state = syncUtil.updateObjectCache(state, destinationDetail, STATE_SITES.BOOKMARK_FOLDERS)
+        bookmarkUtil.closeToolbarIfEmpty(state)
         break
       }
     case appConstants.APP_REMOVE_BOOKMARK_FOLDER:
@@ -103,6 +105,7 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
           state = bookmarkFoldersState.removeFolder(state, folderKey)
           state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
         }
+        bookmarkUtil.closeToolbarIfEmpty(state)
         break
       }
   }

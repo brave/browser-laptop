@@ -22,6 +22,9 @@ const {getSetting} = require('../../../js/settings')
 const UrlUtil = require('../../../js/lib/urlutil')
 const {makeImmutable} = require('../state/immutableUtil')
 
+// Actions
+const appActions = require('../../../js/actions/appActions')
+
 const bookmarkHangerHeading = (editMode, isAdded) => {
   if (isAdded) {
     return 'bookmarkAdded'
@@ -206,6 +209,13 @@ const buildEditBookmark = (oldBookmark, bookmarkDetail) => {
   return newBookmark.set('key', newKey)
 }
 
+const closeToolbarIfEmpty = (state) => {
+  const bookmarkBarItemCount = bookmarksState.getBookmarksWithFolders(state, 0).size
+  if (bookmarkBarItemCount === 0 && getSetting(settings.SHOW_BOOKMARKS_TOOLBAR, state.get('settings'))) {
+    appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, false)
+  }
+}
+
 module.exports = {
   bookmarkHangerHeading,
   isBookmarkNameValid,
@@ -220,5 +230,6 @@ module.exports = {
   getKey,
   getBookmarksToolbarMode,
   buildBookmark,
-  buildEditBookmark
+  buildEditBookmark,
+  closeToolbarIfEmpty
 }

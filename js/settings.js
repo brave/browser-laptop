@@ -61,7 +61,7 @@ const getDefaultSetting = (settingKey, settingsCollection) => {
 }
 
 const resolveValue = (settingKey, settingsCollection) => {
-  if (settingsCollection && settingsCollection.constructor === Immutable.Map &&
+  if (settingsCollection && Immutable.Map.isMap(settingsCollection) &&
     settingsCollection.get(settingKey) !== undefined) {
     return settingsCollection.get(settingKey)
   }
