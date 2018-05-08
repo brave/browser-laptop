@@ -58,6 +58,13 @@ const tabActions = {
       tabId,
       zoomPercent
     })
+  },
+
+  setContentsError (tabId, errorDetails) {
+    dispatchAction(tabActionConstants.SET_CONTENTS_ERROR, {
+      tabId,
+      errorDetails
+    })
   }
 }
 

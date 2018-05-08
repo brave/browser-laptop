@@ -8,5 +8,6 @@
    START_NAVIGATION: 'tabActionsDidStartNavigation',
    FIND_IN_PAGE_REQUEST: 'tabActionsFindInPageRequest',
    STOP_FIND_IN_PAGE_REQUEST: 'tabActionsStopFindInPageRequest',
-   ZOOM_CHANGED: 'tabActionsZoomChanged'
+   ZOOM_CHANGED: 'tabActionsZoomChanged',
+   SET_CONTENTS_ERROR: 'tabActionsSetContentsError'
  }

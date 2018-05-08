@@ -24,7 +24,6 @@ const {aboutUrls, getTargetAboutUrl, newFrameUrl} = require('../lib/appUrlUtil')
 const assert = require('assert')
 const contextMenuState = require('../../app/common/state/contextMenuState')
 const appStoreRenderer = require('./appStoreRenderer')
-const windowActions = require('../actions/windowActions')
 const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersState')
 const bookmarksState = require('../../app/common/state/bookmarksState')
 const tabState = require('../../app/common/state/tabState')
@@ -777,19 +776,6 @@ const doAction = (action) => {
     case windowConstants.WINDOW_FRAME_MOUSE_LEAVE:
       windowState = windowState.setIn(['ui', 'mouseInFrame'], false)
       break
-    case windowConstants.WINDOW_ON_CERT_ERROR:
-      {
-        const frame = frameStateUtil.getFrameByTabId(windowState, action.tabId) || Immutable.Map()
-        if (frame.get('location') === action.url ||
-          frame.get('provisionalLocation') === action.url) {
-          windowActions.setFrameError(frame, {
-            url: action.url,
-            error: action.error
-          })
-          appActions.loadURLRequested(action.tabId, 'about:certerror')
-        }
-        break
-      }
     case appConstants.APP_WINDOW_READY:
     case appConstants.APP_WINDOW_UPDATED:
     case appConstants.APP_WINDOW_RESIZED:

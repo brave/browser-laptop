@@ -1035,15 +1035,6 @@ const windowActions = {
     })
   },
 
-  onCertError: function (tabId, url, error) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_CERT_ERROR,
-      tabId,
-      url,
-      error
-    })
-  },
-
   onTabPageContextMenu: function (index) {
     dispatch({
       actionType: windowConstants.WINDOW_ON_TAB_PAGE_CONTEXT_MENU,

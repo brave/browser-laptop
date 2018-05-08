@@ -468,9 +468,14 @@ const tabsReducer = (state, action, immutableAction) => {
         state = tabState.updateFrame(state, frameAction, shouldDebugTabEvents)
       }
       break
+    // TODO: convert window frame navigation status (load, error, etc)
+    // to browser actions with data on tab state. This reducer responds to
+    // actions from both at the moment (browser-side for certificate errors and
+    // renderer-side for load errors) until all can be refactored.
     case windowConstants.WINDOW_SET_FRAME_ERROR:
+    case tabActionConsts.SET_CONTENTS_ERROR:
       {
-        const tabId = action.getIn(['frameProps', 'tabId'])
+        const tabId = action.getIn(['frameProps', 'tabId']) || action.get('tabId')
         const tab = getWebContents(tabId)
         if (tab) {
           let currentIndex = tab.getCurrentEntryIndex()

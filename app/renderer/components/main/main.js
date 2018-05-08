@@ -424,10 +424,6 @@ class Main extends React.Component {
       windowActions.setRedirectedBy(details.tabId, ruleset, details.url)
     })
 
-    ipc.on(messages.CERT_ERROR, (e, details) => {
-      windowActions.onCertError(details.tabId, details.url, details.error)
-    })
-
     ipc.on(messages.SET_SECURITY_STATE, (e, tabId, securityState) => {
       windowActions.setSecurityState(tabId, securityState)
     })
