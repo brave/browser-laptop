@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global describe, it, before, after, afterEach */
+/* global describe, it, before, after, beforeEach, afterEach */
 const mockery = require('mockery')
 const Immutable = require('immutable')
 const assert = require('assert')
@@ -11,7 +11,9 @@ const fakeElectron = require('../../../lib/fakeElectron')
 const fakeAdBlock = require('../../../lib/fakeAdBlock')
 
 const appConstants = require('../../../../../js/constants/appConstants')
+const appActions = require('../../../../../js/actions/appActions')
 const siteTags = require('../../../../../js/constants/siteTags')
+const bookmarkUtil = require('../../../../../app/common/lib/bookmarkUtil')
 require('../../../braveUnit')
 
 describe('bookmarksReducer unit test', function () {
@@ -144,6 +146,8 @@ describe('bookmarksReducer unit test', function () {
     })
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
+    mockery.registerMock('../../../js/actions/appActions', appActions)
+    mockery.registerMock('../../common/lib/bookmarkUtil', bookmarkUtil)
     bookmarksReducer = require('../../../../../app/browser/reducers/bookmarksReducer')
     bookmarksState = require('../../../../../app/common/state/bookmarksState')
     bookmarkLocationCache = require('../../../../../app/common/cache/bookmarkLocationCache')
@@ -515,23 +519,45 @@ describe('bookmarksReducer unit test', function () {
   })
 
   describe('APP_REMOVE_BOOKMARK', function () {
-    let spy
+    let removeBookmarkSpy
+    let updateActiveTabBookmarkedSpy
+    let closeToolbarIfEmptySpy
+
+    beforeEach(function () {
+      removeBookmarkSpy = sinon.spy(bookmarksState, 'removeBookmark')
+      updateActiveTabBookmarkedSpy = sinon.spy(bookmarkUtil, 'updateActiveTabBookmarked')
+      closeToolbarIfEmptySpy = sinon.spy(bookmarkUtil, 'closeToolbarIfEmpty')
+    })
 
     afterEach(function () {
-      spy.restore()
+      removeBookmarkSpy.restore()
+      updateActiveTabBookmarkedSpy.restore()
+      closeToolbarIfEmptySpy.restore()
     })
 
-    it('null case', function () {
-      spy = sinon.spy(bookmarksState, 'removeBookmark')
-      const newState = bookmarksReducer(state, {
-        actionType: appConstants.APP_REMOVE_BOOKMARK
+    describe('when bookmarkKey is null', function () {
+      it('does not call removeBookmark', function () {
+        const newState = bookmarksReducer(state, {
+          actionType: appConstants.APP_REMOVE_BOOKMARK
+        })
+        assert.equal(removeBookmarkSpy.notCalled, true)
+        assert.deepEqual(state, newState)
       })
-      assert.equal(spy.notCalled, true)
-      assert.deepEqual(state, newState)
     })
 
-    it('check if delete is working', function () {
-      spy = sinon.spy(bookmarksState, 'removeBookmark')
+    describe('when bookmarkKey is a list', function () {
+      // TODO: test that removeBookmark is called multiple times
+    })
+
+    it('calls bookmarksState.removeBookmark', function () {
+      bookmarksReducer(stateWithData, {
+        actionType: appConstants.APP_REMOVE_BOOKMARK,
+        bookmarkKey: 'https://clifton.io/|0|0'
+      })
+      assert.equal(removeBookmarkSpy.calledOnce, true)
+    })
+
+    it('deletes the entry from bookmarks and cache', function () {
       const newState = bookmarksReducer(stateWithData, {
         actionType: appConstants.APP_REMOVE_BOOKMARK,
         bookmarkKey: 'https://clifton.io/|0|0'
@@ -546,8 +572,23 @@ describe('bookmarksReducer unit test', function () {
         ]))
         .deleteIn(['bookmarks', 'https://clifton.io/|0|0'])
         .deleteIn(['cache', 'bookmarkLocation', 'https://clifton.io/'])
-      assert.equal(spy.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
+    })
+
+    it('calls bookmarkUtil.updateActiveTabBookmarked', function () {
+      bookmarksReducer(stateWithData, {
+        actionType: appConstants.APP_REMOVE_BOOKMARK,
+        bookmarkKey: 'https://clifton.io/|0|0'
+      })
+      assert.equal(updateActiveTabBookmarkedSpy.calledOnce, true)
+    })
+
+    it('calls bookmarkUtil.closeToolbarIfEmpty', function () {
+      bookmarksReducer(stateWithData, {
+        actionType: appConstants.APP_REMOVE_BOOKMARK,
+        bookmarkKey: 'https://clifton.io/|0|0'
+      })
+      assert.equal(closeToolbarIfEmptySpy.calledOnce, true)
     })
   })
 })
