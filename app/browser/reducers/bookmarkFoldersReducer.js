@@ -11,11 +11,16 @@ const bookmarkFoldersState = require('../../common/state/bookmarkFoldersState')
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
 const {STATE_SITES} = require('../../../js/constants/stateConstants')
+const settings = require('../../../js/constants/settings')
+
+// Actions
+const appActions = require('../../../js/actions/appActions')
 
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const syncUtil = require('../../../js/state/syncUtil')
 const bookmarkFolderUtil = require('../../common/lib/bookmarkFoldersUtil')
+const {getSetting} = require('../../../js/settings')
 
 const bookmarkFoldersReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -82,6 +87,12 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
 
         const destinationDetail = bookmarksState.findBookmark(state, action.get('destinationKey'))
         state = syncUtil.updateObjectCache(state, destinationDetail, STATE_SITES.BOOKMARK_FOLDERS)
+
+        // close bookmark bar when going to 0
+        const bookmarkBarItemCount = bookmarksState.getBookmarksWithFolders(state, 0).size
+        if (bookmarkBarItemCount === 0 && getSetting(settings.SHOW_BOOKMARKS_TOOLBAR, state.get('settings'))) {
+          appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, false)
+        }
         break
       }
     case appConstants.APP_REMOVE_BOOKMARK_FOLDER:
@@ -102,6 +113,12 @@ const bookmarkFoldersReducer = (state, action, immutableAction) => {
           const folder = bookmarkFoldersState.getFolder(state, folderKey)
           state = bookmarkFoldersState.removeFolder(state, folderKey)
           state = syncUtil.updateObjectCache(state, folder, STATE_SITES.BOOKMARK_FOLDERS)
+        }
+
+        // close bookmark bar when going to 0
+        const bookmarkBarItemCount = bookmarksState.getBookmarksWithFolders(state, 0).size
+        if (bookmarkBarItemCount === 0 && getSetting(settings.SHOW_BOOKMARKS_TOOLBAR, state.get('settings'))) {
+          appActions.changeSetting(settings.SHOW_BOOKMARKS_TOOLBAR, false)
         }
         break
       }

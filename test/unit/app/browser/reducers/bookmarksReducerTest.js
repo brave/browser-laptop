@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* global describe, it, before, after, afterEach */
+/* global describe, it, before, after, beforeEach, afterEach */
 const mockery = require('mockery')
 const Immutable = require('immutable')
 const assert = require('assert')
@@ -11,6 +11,8 @@ const fakeElectron = require('../../../lib/fakeElectron')
 const fakeAdBlock = require('../../../lib/fakeAdBlock')
 
 const appConstants = require('../../../../../js/constants/appConstants')
+const appActions = require('../../../../../js/actions/appActions')
+const settingsConstants = require('../../../../../js/constants/settings')
 const siteTags = require('../../../../../js/constants/siteTags')
 require('../../../braveUnit')
 
@@ -31,7 +33,8 @@ describe('bookmarksReducer unit test', function () {
       bookmarkLocation: {}
     },
     historySites: {},
-    tabs: []
+    tabs: [],
+    settings: {}
   })
 
   const stateWithData = Immutable.fromJS({
@@ -133,7 +136,10 @@ describe('bookmarksReducer unit test', function () {
       }
     },
     historySites: {},
-    tabs: []
+    tabs: [],
+    settings: {
+      [settingsConstants.SHOW_BOOKMARKS_TOOLBAR]: true
+    }
   })
 
   before(function () {
@@ -144,6 +150,7 @@ describe('bookmarksReducer unit test', function () {
     })
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('ad-block', fakeAdBlock)
+    mockery.registerMock('../../../js/actions/appActions', appActions)
     bookmarksReducer = require('../../../../../app/browser/reducers/bookmarksReducer')
     bookmarksState = require('../../../../../app/common/state/bookmarksState')
     bookmarkLocationCache = require('../../../../../app/common/cache/bookmarkLocationCache')
@@ -516,13 +523,19 @@ describe('bookmarksReducer unit test', function () {
 
   describe('APP_REMOVE_BOOKMARK', function () {
     let spy
+    let onChangeSettingSpy
+
+    beforeEach(function () {
+      spy = sinon.spy(bookmarksState, 'removeBookmark')
+      onChangeSettingSpy = sinon.spy(appActions, 'changeSetting')
+    })
 
     afterEach(function () {
       spy.restore()
+      onChangeSettingSpy.restore()
     })
 
     it('null case', function () {
-      spy = sinon.spy(bookmarksState, 'removeBookmark')
       const newState = bookmarksReducer(state, {
         actionType: appConstants.APP_REMOVE_BOOKMARK
       })
@@ -531,7 +544,6 @@ describe('bookmarksReducer unit test', function () {
     })
 
     it('check if delete is working', function () {
-      spy = sinon.spy(bookmarksState, 'removeBookmark')
       const newState = bookmarksReducer(stateWithData, {
         actionType: appConstants.APP_REMOVE_BOOKMARK,
         bookmarkKey: 'https://clifton.io/|0|0'
@@ -548,6 +560,19 @@ describe('bookmarksReducer unit test', function () {
         .deleteIn(['cache', 'bookmarkLocation', 'https://clifton.io/'])
       assert.equal(spy.calledOnce, true)
       assert.deepEqual(newState.toJS(), expectedState.toJS())
+      console.log('settings', newState.get('settings').toJS(), newState.getIn(['settings', settingsConstants.SHOW_BOOKMARKS_TOOLBAR]))
+      assert.ok(onChangeSettingSpy.neverCalledWith(settingsConstants.SHOW_BOOKMARKS_TOOLBAR, false), 'bookmarks toolbar enabled setting is unaffected by removing 1 bookmark')
+    })
+
+    it('hides bookmarks toolbar when all toolbar bookmarks are removed', function () {
+      let newState = stateWithData
+      for (const bookmarkKey of stateWithData.get('bookmarks').keys()) {
+        newState = bookmarksReducer(newState, {
+          actionType: appConstants.APP_REMOVE_BOOKMARK,
+          bookmarkKey
+        })
+      }
+      assert.ok(onChangeSettingSpy.calledWith(settingsConstants.SHOW_BOOKMARKS_TOOLBAR, false))
     })
   })
 })
