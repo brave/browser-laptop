@@ -1420,6 +1420,49 @@ describe('ledger api unit tests', function () {
       })
     })
 
+    describe('getPaymentInfo', function () {
+      let onWalletPropertiesSpy
+      let getWalletPropertiesSpy
+      let getWalletPropertiesCallbackSpy
+
+      before(function () {
+        ledgerApi.setClient(ledgerClientObject)
+        onWalletPropertiesSpy = sinon.spy(appActions, 'onWalletProperties')
+        getWalletPropertiesSpy = sinon.spy(ledgerClientObject, 'getWalletProperties')
+        getWalletPropertiesCallbackSpy = sinon.spy(ledgerApi, 'getWalletPropertiesCallback')
+      })
+
+      afterEach(function () {
+        onWalletPropertiesSpy.restore()
+        getWalletPropertiesSpy.restore()
+        getWalletPropertiesCallbackSpy.restore()
+      })
+
+      after(function () {
+        onWalletPropertiesSpy.reset()
+        getWalletPropertiesSpy.reset()
+        getWalletPropertiesCallbackSpy.reset()
+      })
+
+      it('calls getWalletProperties with current amount and fee', function () {
+        const expectedProps = ledgerClientObject.getBraveryProperties()
+        ledgerApi.getPaymentInfo(defaultAppState)
+        const passedProps = getWalletPropertiesSpy.getCall(0).args
+        assert.equal(expectedProps.fee.amount, passedProps[0])
+        assert.equal(expectedProps.fee.currency, passedProps[1])
+      })
+
+      it('calls getWalletPropertiesCallback', function () {
+        ledgerApi.getPaymentInfo(defaultAppState)
+        assert(getWalletPropertiesCallbackSpy.calledOnce)
+      })
+
+      it('calls appActions.onWalletProperties', function () {
+        ledgerApi.getPaymentInfo(defaultAppState)
+        assert(onWalletPropertiesSpy.calledOnce)
+      })
+    })
+
     describe('addresses', function () {
       it('null case', function () {
         const result = ledgerApi.onWalletProperties(state, Immutable.Map())
@@ -2991,6 +3034,40 @@ describe('ledger api unit tests', function () {
     })
   })
 
+  describe('backupKeys', function () {
+    let onPrintBackupKeysSpy
+
+    before(function () {
+      onPrintBackupKeysSpy = sinon.spy(ledgerApi, 'onPrintBackupKeys')
+    })
+
+    after(function () {
+      onPrintBackupKeysSpy.restore()
+    })
+
+    afterEach(function () {
+      onPrintBackupKeysSpy.reset()
+    })
+
+    it('calls onPrintBackupKeys when backupAction is set to print', function () {
+      const stateWithPreferences = defaultAppState
+        .setIn(['about'], Immutable.fromJS({
+          preferences: {}
+        }))
+      ledgerApi.backupKeys(stateWithPreferences, 'print')
+      assert(onPrintBackupKeysSpy.calledOnce)
+    })
+
+    it('sets backupSucceeded to true when backupAction is set to print', function () {
+      const stateWithPreferences = defaultAppState
+        .setIn(['about'], Immutable.fromJS({
+          preferences: {}
+        }))
+      const result = ledgerApi.backupKeys(stateWithPreferences, 'print')
+      assert(result.getIn(['about', 'preferences', 'backupSucceeded']))
+    })
+  })
+
   describe('recoverKeys', function () {
     it('sets recoveryBalanceRecalculated to false when a recovery is started', function () {
       ledgerApi.setClient(ledgerClientObject)
@@ -4307,6 +4384,51 @@ describe('ledger api unit tests', function () {
     })
   }
   
+  describe('fetchReferralHeaders', function () {
+    const referralServer = 'https://laptop-updates.brave.com'
+    let roundtripSpy
+    let onFetchReferralHeadersSpy
+    let fetchReferralHeadersCallbackSpy
+
+    before(function () {
+      roundtripSpy = sinon.spy(ledgerApi, 'roundtrip')
+      onFetchReferralHeadersSpy = sinon.spy(appActions, 'onFetchReferralHeaders')
+      fetchReferralHeadersCallbackSpy = sinon.spy(ledgerApi, 'fetchReferralHeadersCallback')
+    })
+
+    afterEach(function () {
+      roundtripSpy.restore()
+      onFetchReferralHeadersSpy.restore()
+      fetchReferralHeadersCallbackSpy.restore()
+    })
+
+    after(function () {
+      roundtripSpy.reset()
+      onFetchReferralHeadersSpy.reset()
+      fetchReferralHeadersCallbackSpy.reset()
+    })
+
+    it('calls roundtrip with promo options', function () {
+      const expectedOptions = {
+        server: referralServer,
+        method: 'GET',
+        path: '/promo/custom-headers'
+      }
+      ledgerApi.fetchReferralHeaders()
+      assert.deepEqual(roundtripSpy.getCall(0).args[0], expectedOptions)
+    })
+
+    it('calls fetchReferralHeadersCallback', function () {
+      ledgerApi.fetchReferralHeaders()
+      assert(fetchReferralHeadersCallbackSpy.calledOnce)
+    })
+
+    it('calls appActions.onFetchReferralHeaders', function () {
+      ledgerApi.fetchReferralHeaders()
+      assert(onFetchReferralHeadersSpy.calledOnce)
+    })
+  })
+
   describe('fetchReferralHeaders', function () {
     const referralServer = 'https://laptop-updates.brave.com'
     let roundtripSpy

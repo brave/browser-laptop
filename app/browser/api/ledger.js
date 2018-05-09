@@ -1185,7 +1185,7 @@ const recoverKeys = (state, useRecoveryKeyFile, key) => {
   }
 
   state = aboutPreferencesState.setRecoveryBalanceRecalculated(state, false)
-  client.recoverWallet(null, recoveryKey, recoverWalletCallback)
+  client.recoverWallet(null, recoveryKey, module.exports.recoverWalletCallback)
 
   return state
 }
@@ -3393,7 +3393,23 @@ const getMethods = () => {
     reconcile,
     getClient: () => {
       return client
-    }
+    },
+    shouldTrackTab,
+    recoverWalletCallback,
+    getFavIcon,
+    lockInContributionAmount,
+    onPrintBackupKeys,
+    clientprep,
+    setBraveryPropertiesCallback,
+    muonWriter,
+    onInitReadAction,
+    initAccessStatePath,
+    getWalletPropertiesCallback,
+    publisherTimestampCallback,
+    setNewTimeUntilReconcileCallback,
+    fetchReferralHeadersCallback,
+    getPaymentInfo,
+    fetchReferralHeaders
   }
 
   let privateMethods = {}
