@@ -107,58 +107,6 @@ class EnabledContent extends ImmutableComponent {
             }
           </FormDropdown>
         </div>
-        <div className={css(gridStyles.row3col1, styles.enabledContent__walletBar__message)}>
-          lorum 1
-        </div>
-        <div className={css(gridStyles.row3col2, styles.enabledContent__walletBar__message)}>
-          lorum 2
-        </div>
-        <div className={css(gridStyles.row3col3, styles.enabledContent__walletBar__message)}>
-          lorum 3
-        </div>
-      </div>
-      <div className={css(styles.enabledContent__tos)}>
-        <a
-          data-l10n-id='termsOfService'
-          data-test-id='termsOfService'
-          className={css(styles.enabledContent__tos__link)}
-          href='https://basicattentiontoken.org/contributor-terms-of-service/'
-          target='_blank'
-          rel='noreferrer noopener'
-        />
-      </div>
-      <div style={{clear: 'both', paddingTop: '20px'}}>
-        <img
-          src='https://brave.com/about/images/brave_icon_512x.png'
-          alt='temp image'
-          style={{float: 'right', width: '150px', padding: '0 0 10px 20px'}}
-        />
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aliquam autem blanditiis consectetur doloribus
-        dolorum earum eveniet facilis hic id in laboriosam maiores, nihil obcaecati perspiciatis provident quas
-        quisquam quos, recusandae similique sint suscipit veniam, vero? Amet eum laboriosam officiis possimus
-        uibusdam tempore vel? Culpa, cumque deleniti ea eveniet fugiat itaque nulla quam quasi quisquam?
-        Ad blanditiis dolores eveniet exercitationem, fuga id inventore minima pariatur, qui, quidem
-        reprehenderit velit voluptates? Eaque, earum error impedit minima minus nisi non officia quia
-        repudiandae voluptate. Consequatur ex facere facilis id ipsam itaque iure maxime nemo nobis
-        officia perspiciatis quia quis, rem tenetur totam!
-        <br /> <br />
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aliquam autem blanditiis consectetur doloribus
-        dolorum earum eveniet facilis hic id in laboriosam maiores, nihil obcaecati perspiciatis provident quas
-        quisquam quos, recusandae similique sint suscipit veniam, vero? Amet eum laboriosam officiis possimus
-        uibusdam tempore vel? Culpa, cumque deleniti ea eveniet fugiat itaque nulla quam quasi quisquam?
-        Ad blanditiis dolores eveniet exercitationem, fuga id inventore minima pariatur, qui, quidem
-        reprehenderit velit voluptates? Eaque, earum error impedit minima minus nisi non officia quia
-        repudiandae voluptate. Consequatur ex facere facilis id ipsam itaque iure maxime nemo nobis
-        officia perspiciatis quia quis, rem tenetur totam!
-        <br /> <br />
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aliquam autem blanditiis consectetur doloribus
-        dolorum earum eveniet facilis hic id in laboriosam maiores, nihil obcaecati perspiciatis provident quas
-        quisquam quos, recusandae similique sint suscipit veniam, vero? Amet eum laboriosam officiis possimus
-        uibusdam tempore vel? Culpa, cumque deleniti ea eveniet fugiat itaque nulla quam quasi quisquam?
-        Ad blanditiis dolores eveniet exercitationem, fuga id inventore minima pariatur, qui, quidem
-        reprehenderit velit voluptates? Eaque, earum error impedit minima minus nisi non officia quia
-        repudiandae voluptate. Consequatur ex facere facilis id ipsam itaque iure maxime nemo nobis
-        officia perspiciatis quia quis, rem tenetur totam!
       </div>
       <details style={{marginTop: '50px'}}>
         <summary>Click to see logs</summary>
@@ -185,15 +133,6 @@ const styles = StyleSheet.create({
   enabledContent: {
     position: 'relative',
     zIndex: 2
-  },
-
-  enabledContent__tos: {
-    float: 'right',
-    padding: '5px 60px 20px'
-  },
-  enabledContent__tos__link: {
-    fontSize: '13px',
-    color: '#666'
   },
 
   enabledContent__walletBar: {
@@ -224,7 +163,7 @@ const styles = StyleSheet.create({
   },
 
   place_input: {
-    marginTop: '14px'
+    marginTop: '12px'
   }
 })
 
@@ -254,42 +193,23 @@ const gridStyles = StyleSheet.create({
   row2col1: {
     gridRow: 2,
     gridColumn: 1,
-    marginLeft: globalStyles.spacing.panelPadding
+    marginLeft: globalStyles.spacing.panelPadding,
+    marginBottom: '25px'
   },
 
   row2col2: {
     gridRow: 2,
     gridColumn: 2,
     marginRight: `calc(${globalStyles.spacing.panelPadding} / 2)`,
-    marginLeft: `calc(${globalStyles.spacing.panelPadding} / 2)`
+    marginLeft: `calc(${globalStyles.spacing.panelPadding} / 2)`,
+    marginBottom: '25px'
   },
 
   row2col3: {
     gridRow: 2,
     gridColumn: 3,
-    marginRight: globalStyles.spacing.panelPadding
-  },
-
-  row3col1: {
-    gridRow: 3,
-    gridColumn: 1,
-    marginBottom: globalStyles.spacing.panelPadding,
-    marginLeft: globalStyles.spacing.panelPadding
-  },
-
-  row3col2: {
-    gridRow: 3,
-    gridColumn: 2,
-    marginRight: `calc(${globalStyles.spacing.panelPadding} / 2)`,
-    marginBottom: globalStyles.spacing.panelPadding,
-    marginLeft: `calc(${globalStyles.spacing.panelPadding} / 2)`
-  },
-
-  row3col3: {
-    gridRow: 3,
-    gridColumn: 3,
     marginRight: globalStyles.spacing.panelPadding,
-    marginBottom: globalStyles.spacing.panelPadding
+    marginBottom: '25px'
   }
 })
 
