@@ -1183,7 +1183,6 @@ const recoverKeys = (state, useRecoveryKeyFile, key) => {
     state = aboutPreferencesState.setRecoveryStatus(state, false)
     return state
   }
-
   state = aboutPreferencesState.setRecoveryBalanceRecalculated(state, false)
   client.recoverWallet(null, recoveryKey, module.exports.recoverWalletCallback)
 

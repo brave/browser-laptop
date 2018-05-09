@@ -2991,40 +2991,6 @@ describe('ledger api unit tests', function () {
     })
   })
 
-  describe('backupKeys', function () {
-    let onPrintBackupKeysSpy
-
-    before(function () {
-      onPrintBackupKeysSpy = sinon.spy(ledgerApi, 'onPrintBackupKeys')
-    })
-
-    after(function () {
-      onPrintBackupKeysSpy.restore()
-    })
-
-    afterEach(function () {
-      onPrintBackupKeysSpy.reset()
-    })
-
-    it('calls onPrintBackupKeys when backupAction is set to print', function () {
-      const stateWithPreferences = defaultAppState
-        .setIn(['about'], Immutable.fromJS({
-          preferences: {}
-        }))
-      ledgerApi.backupKeys(stateWithPreferences, 'print')
-      assert(onPrintBackupKeysSpy.calledOnce)
-    })
-
-    it('sets backupSucceeded to true when backupAction is set to print', function () {
-      const stateWithPreferences = defaultAppState
-        .setIn(['about'], Immutable.fromJS({
-          preferences: {}
-        }))
-      const result = ledgerApi.backupKeys(stateWithPreferences, 'print')
-      assert(result.getIn(['about', 'preferences', 'backupSucceeded']))
-    })
-  })
-
   describe('recoverKeys', function () {
     it('sets recoveryBalanceRecalculated to false when a recovery is started', function () {
       ledgerApi.setClient(ledgerClientObject)
