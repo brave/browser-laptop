@@ -68,6 +68,9 @@ class AdsTab extends ImmutableComponent {
                       styles.switch__label,
                       styles.switch__label_right
                     ]}
+                    className={cx({
+                      [css(styles.payments__title__switch__checkbox)]: true
+                    })}
                   />
                   <a
                     className={cx({
@@ -188,6 +191,10 @@ const styles = StyleSheet.create({
   payments__title__switch: {
     display: 'flex',
     alignItems: 'center'
+  },
+
+  payments__title__switch__checkbox: {
+    display: 'inline-block'
   },
 
   payments__title__switch__moreInfo: {
