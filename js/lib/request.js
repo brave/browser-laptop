@@ -101,6 +101,8 @@ module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
  * Fetches url, title, and image for a publishers site (Youtube, Twitch, etc.)
  * See
  * https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
+ * WARNING: the output of this function is untrusted. You should be careful not
+ *  to execute it as code!
  * @param {string} url - url to fetch
  * @param {Object} options - options to pass to window.fetch
  * @param {Function({url: string, title: string, image: string, error: string})} callback
