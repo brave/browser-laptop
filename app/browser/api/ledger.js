@@ -229,13 +229,17 @@ const getPublisherTimestamp = (updateList) => {
     return
   }
 
-  client.publisherTimestamp((err, result) => {
-    if (err) {
-      console.error('Error while retrieving publisher timestamp', err.toString())
-      return
-    }
-    appActions.onPublisherTimestamp(result.timestamp, updateList)
-  })
+  const publisherTimestampFn = module.exports.publisherTimestampCallback.bind(updateList)
+  client.publisherTimestamp(publisherTimestampFn)
+}
+
+const publisherTimestampCallback = (updateList, err, result) => {
+  if (err || !result) {
+    console.error('Error while retrieving publisher timestamp', err.toString())
+    return
+  }
+
+  appActions.onPublisherTimestamp(result.timestamp, updateList)
 }
 
 const addFoundClosed = (state) => {
@@ -268,7 +272,6 @@ const onBootStateFile = (state) => {
   try {
     clientprep()
     client = ledgerClient(null, underscore.extend({roundtrip: module.exports.roundtrip}, clientOptions), null)
-
     getPublisherTimestamp()
   } catch (ex) {
     state = ledgerState.resetInfo(state)
@@ -276,7 +279,6 @@ const onBootStateFile = (state) => {
     console.error('ledger client boot error: ', ex)
     return state
   }
-
   if (client.sync(callback) === true) {
     run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute}))
   }
@@ -284,7 +286,6 @@ const onBootStateFile = (state) => {
   module.exports.getBalance(state)
 
   bootP = false
-
   return state
 }
 
@@ -1119,10 +1120,7 @@ const backupKeys = (state, backupAction) => {
   const fs = require('fs')
 
   if (backupAction === 'print') {
-    tabs.create({url: appUrlUtil.aboutUrls.get('about:printkeys')})
-
-    // we do not check whether the user actually printed the backup word list
-    return aboutPreferencesState.setBackupStatus(state, true)
+    return module.exports.onPrintBackupKeys(state)
   }
 
   const dialog = electron.dialog
@@ -1145,6 +1143,12 @@ const backupKeys = (state, backupAction) => {
     }
   })
   return state
+}
+
+const onPrintBackupKeys = (state) => {
+  tabs.create({url: appUrlUtil.aboutUrls.get('about:printkeys')})
+  // we do not check whether the user actually printed the backup word list
+  return aboutPreferencesState.setBackupStatus(state, true)
 }
 
 const fileRecoveryKeys = (state, recoveryKeyFile) => {
@@ -1849,25 +1853,26 @@ const getPaymentInfo = (state) => {
       amount = bravery.fee.amount
       currency = bravery.fee.currency
     }
-
-    client.getWalletProperties(amount, currency, function (err, body) {
-      if (err) {
-        if (err.message) {
-          console.error('getWalletProperties error: ' + err.message)
-        } else {
-          console.error('getWalletProperties error: ' + err.toString())
-        }
-        appActions.onWalletPropertiesError()
-        return
-      }
-
-      appActions.onWalletProperties(body)
-    })
+    client.getWalletProperties(amount, currency, module.exports.getWalletPropertiesCallback)
   } catch (ex) {
     console.error('properties error: ' + ex.toString())
   }
 
   return state
+}
+
+const getWalletPropertiesCallback = (err, body) => {
+  if (err) {
+    if (err.message) {
+      console.error('getWalletProperties error: ' + err.message)
+    } else {
+      console.error('getWalletProperties error: ' + err.toString())
+    }
+    appActions.onWalletPropertiesError()
+    return
+  }
+
+  appActions.onWalletProperties(body)
 }
 
 const lockInContributionAmount = (state, balance) => {
@@ -1884,15 +1889,17 @@ const lockInContributionAmount = (state, balance) => {
 }
 
 const setNewTimeUntilReconcile = (newReconcileTime = null) => {
-  client.setTimeUntilReconcile(newReconcileTime, (err, stateResult) => {
-    if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
+  client.setTimeUntilReconcile(newReconcileTime, module.exports.setNewTimeUntilReconcileCallback)
+}
 
-    if (!stateResult) {
-      return
-    }
+const setNewTimeUntilReconcileCallback = (err, stateResult) => {
+  if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
 
-    appActions.onTimeUntilReconcile(stateResult)
-  })
+  if (!stateResult) {
+    return
+  }
+
+  appActions.onTimeUntilReconcile(stateResult)
 }
 
 const onWalletProperties = (state, body) => {
@@ -1926,7 +1933,7 @@ const onWalletProperties = (state, body) => {
     if (balance > 0) {
       state = ledgerState.setInfoProp(state, 'userHasFunded', true)
     }
-    lockInContributionAmount(state, balance)
+    module.exports.lockInContributionAmount(state, balance)
   }
 
   // Rates
@@ -2041,13 +2048,15 @@ const setPaymentInfo = (amount) => {
   }
 
   underscore.extend(bravery.fee, { amount: amount, currency: currency })
-  client.setBraveryProperties(bravery, (err, result) => {
-    if (err) {
-      err = err.toString()
-    }
+  client.setBraveryProperties(bravery, module.exports.setBraveryPropertiesCallback)
+}
 
-    appActions.onBraveryProperties(err, result)
-  })
+const setBraveryPropertiesCallback = (err, result) => {
+  if (err) {
+    err = err.toString()
+  }
+
+  appActions.onBraveryProperties(err, result)
 }
 
 const onBraveryProperties = (state, error, result) => {
@@ -2065,7 +2074,7 @@ const onBraveryProperties = (state, error, result) => {
     if (result.properties && result.properties.wallet && result.properties.wallet.keyinfo) {
       result.properties.wallet.keyinfo.seed = uintKeySeed(result.properties.wallet.keyinfo.seed)
     }
-    muonWriter(statePath, result)
+    module.exports.muonWriter(statePath, result)
   }
 
   return state
@@ -2198,7 +2207,7 @@ const onCallback = (state, result, delayTime) => {
   }
 
   // persist the new ledger state
-  muonWriter(statePath, regularResults)
+  module.exports.muonWriter(statePath, regularResults)
 
   run(state, delayTime)
 
@@ -2290,7 +2299,11 @@ const fetchReferralHeaders = () => {
     server: referralServer,
     method: 'GET',
     path: '/promo/custom-headers'
-  }, {}, appActions.onFetchReferralHeaders)
+  }, {}, module.exports.fetchReferralHeadersCallback)
+}
+
+const fetchReferralHeadersCallback = (err, response, body) => {
+  appActions.onFetchReferralHeaders(err, response, body)
 }
 
 const onFetchReferralHeaders = (state, err, response, body) => {
@@ -2310,8 +2323,6 @@ const onFetchReferralHeaders = (state, err, response, body) => {
 }
 
 const initialize = (state, paymentsEnabled) => {
-  let fs
-
   if (!v2RulesetDB) v2RulesetDB = levelUp(pathName(v2RulesetPath))
   state = enable(state, paymentsEnabled)
 
@@ -2371,6 +2382,11 @@ const initialize = (state, paymentsEnabled) => {
     if (rule.consequent) ruleset.push(rule)
   })
   state = cacheRuleSet(state, ruleset)
+  return module.exports.initAccessStatePath(state, statePath)
+}
+
+const initAccessStatePath = (state, statePath) => {
+  let fs
 
   try {
     if (!fs) fs = require('fs')
@@ -2381,7 +2397,6 @@ const initialize = (state, paymentsEnabled) => {
         }
         return
       }
-
       fs.readFile(pathName(statePath), (err, data) => {
         if (err) {
           module.exports.disablePayments()
@@ -2389,7 +2404,7 @@ const initialize = (state, paymentsEnabled) => {
         }
 
         try {
-          appActions.onInitRead(JSON.parse(data))
+          module.exports.onInitReadAction(state, JSON.parse(data))
           if (clientOptions.verboseP) {
             console.log('\nstarting up ledger client integration')
           }
@@ -2411,6 +2426,10 @@ const initialize = (state, paymentsEnabled) => {
   }
 }
 
+const onInitReadAction = (state, parsedData) => {
+  appActions.onInitRead(parsedData)
+}
+
 const getContributionAmount = (state) => {
   return ledgerState.getContributionAmount(state)
 }
@@ -2426,12 +2445,11 @@ const onInitRead = (state, parsedData) => {
     fs.renameSync(pathName(statePath), pathName('ledger-state-btc.json'))
     state = ledgerState.resetInfo(state)
     clientprep()
-    client = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
+    client = ledgerClient(null, underscore.extend({roundtrip: module.exports.roundtrip}, clientOptions), null)
     parsedData = client.state
     getPaymentInfo(state)
-    muonWriter(statePath, parsedData)
+    module.exports.muonWriter(statePath, parsedData)
   }
-
   if (Array.isArray(parsedData.transactions)) {
     parsedData.transactions.sort((transaction1, transaction2) => {
       return transaction1.submissionStamp - transaction2.submissionStamp
@@ -2505,7 +2523,7 @@ const onFuzzing = (pushBack, pruned = false) => {
 
 const onTimeUntilReconcile = (state, stateResult) => {
   state = getStateInfo(state, stateResult.toJS()) // TODO optimize
-  muonWriter(statePath, stateResult)
+  module.exports.muonWriter(statePath, stateResult)
 
   return state
 }
@@ -2633,7 +2651,7 @@ const run = (state, delayTime) => {
     if (!stateData && map) {
       stateData = client.state
     }
-    if (stateData) muonWriter(statePath, stateData)
+    if (stateData) module.exports.muonWriter(statePath, stateData)
   } catch (ex) {
     console.error('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
   }
@@ -3340,14 +3358,26 @@ const getMethods = () => {
     onCaptchaResponse,
     shouldTrackTab,
     recoverWalletCallback,
+    getFavIcon,
+    lockInContributionAmount,
+    onPrintBackupKeys,
+    clientprep,
+    setBraveryPropertiesCallback,
+    muonWriter,
+    onInitReadAction,
+    initAccessStatePath,
+    getWalletPropertiesCallback,
+    publisherTimestampCallback,
+    setNewTimeUntilReconcileCallback,
+    fetchReferralHeadersCallback,
+    getPaymentInfo,
+    fetchReferralHeaders,
     deleteWallet,
     resetPublishers,
     clearPaymentHistory,
-    getPaymentInfo,
     synopsisNormalizer,
     cacheRuleSet,
-    disablePayments,
-    getFavIcon
+    disablePayments
   }
 
   let privateMethods = {}
