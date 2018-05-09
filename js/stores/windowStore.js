@@ -109,16 +109,24 @@ const newFrame = (state, frameOpts) => {
   if (frameOpts === undefined) {
     frameOpts = {}
   }
+  // setup debug logging
+  const shouldLogDebug = getSetting(settings.DEBUG_VERBOSE_TAB_INFO)
+  // normalize input
   frameOpts = frameOpts.toJS ? frameOpts.toJS() : frameOpts
   // handle tabs.create properties
-
+  if (shouldLogDebug) {
+    console.debug('newFrame', frameOpts)
+  }
   // Ensure valid index
   let insertionIndex = frameOpts.index != null
     ? frameOpts.index
     : 0
-
-  if (insertionIndex === -1) {
-    frameOpts.index = insertionIndex = 0
+  const highestFrameIndex = (state.get('frames') || Immutable.List()).count()
+  if (insertionIndex === -1 || insertionIndex > highestFrameIndex) {
+    if (shouldLogDebug) {
+      console.debug(`newFrame: invalid insertionIndex of ${insertionIndex} so using max index of ${highestFrameIndex}`)
+    }
+    frameOpts.index = insertionIndex = highestFrameIndex
   }
 
   if (frameOpts.partition) {
