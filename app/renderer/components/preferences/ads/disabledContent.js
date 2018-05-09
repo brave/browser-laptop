@@ -47,7 +47,7 @@ class DisabledContent extends React.Component {
           <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText5' />&nbsp;
         </p>
         <p className={css(styles.disabledContent__message__text)}>
-          <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText2' />&nbsp;
+          <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText2' />
           <a
             href='https://brave.com/download'
             target='_blank'
@@ -114,7 +114,8 @@ const styles = StyleSheet.create({
   },
 
   disabledContent__message_white: {
-    color: globalStyles.color.white100
+    color: globalStyles.color.white100,
+    display: 'inline-block'
   },
 
   disabledContent__message_bold: {
