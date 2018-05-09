@@ -86,7 +86,7 @@
   },
   "homepage": "https://www.brave.com/",
   "dependencies": {
-    "@brave-intl/bat-usermodel": "^0.1.5",
+    "@brave-intl/bat-usermodel": "^0.3.0",
     "acorn": "3.2.0",
     "aphrodite": "1.1.0",
     "async": "^2.0.1",

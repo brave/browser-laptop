@@ -178,17 +178,16 @@ const classifyPage = (state, action, windowId) => {
   let catNames = priorData['names']
 
   let immediateMax = um.vectorIndexOfMax(pageScore)
-  let immediateWinner = catNames[immediateMax]
+  let immediateWinner = catNames[immediateMax] && catNames[immediateMax].split('-')
 
   let mutable = true
   let history = userModelState.getPageScoreHistory(state, mutable)
 
   let scores = um.deriveCategoryScores(history)
   let indexOfMax = um.vectorIndexOfMax(scores)
+  let winnerOverTime = catNames[indexOfMax] && catNames[indexOfMax].split('-')
 
-  let winnerOverTime = catNames[indexOfMax]
-
-  appActions.onUserModelLog('Site visited', {url, 'class': immediateWinner, 'average': winnerOverTime})
+  appActions.onUserModelLog('Site visited', {url, immediateWinner, winnerOverTime})
 
   return state
 }
@@ -206,7 +205,8 @@ const basicCheckReadyAdServe = (state, windowId) => {
 
   let scores = um.deriveCategoryScores(history)
   let indexOfMax = um.vectorIndexOfMax(scores)
-  let winnerOverTime = catNames[indexOfMax]
+  let category = catNames[indexOfMax]
+  let winnerOverTime = category && category.split('-')[0]
 
   let bundle = sampleAdFeed
   let arbitraryKey
@@ -218,7 +218,8 @@ const basicCheckReadyAdServe = (state, windowId) => {
   let allGood = true
 
   if (bundle) {
-    const result = bundle['categories'][winnerOverTime]
+    // when catalog catches up, use winnerOverTime instead
+    const result = bundle['categories'][category]
     if (result) {
       arbitraryKey = randomKey(result)
 
@@ -240,7 +241,7 @@ const basicCheckReadyAdServe = (state, windowId) => {
 
   if (!userModelState.allowedToShowAdBasedOnHistory(state)) {
     allGood = false
-    appActions.onUserModelLog('Ad prevented', {notificationUrl})
+    appActions.onUserModelLog('Ad prevented', {notificationUrl, notificationText, winnerOverTime, advertiser})
   }
 
   if (allGood) {
