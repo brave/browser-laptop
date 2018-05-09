@@ -1185,11 +1185,7 @@ const recoverKeys = (state, useRecoveryKeyFile, key) => {
   }
 
   state = aboutPreferencesState.setRecoveryBalanceRecalculated(state, false)
-  client.recoverWallet(null, recoveryKey, (err, result) => {
-    appActions.onWalletRecovery(err, result)
-    appActions.onPromotionRemoval()
-    appActions.onPromotionGet()
-  })
+  client.recoverWallet(null, recoveryKey, recoverWalletCallback)
 
   return state
 }
