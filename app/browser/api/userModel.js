@@ -230,7 +230,7 @@ const basicCheckReadyAdServe = (state, windowId) => {
         notificationUrl = payload['notificationURL']
         advertiser = payload['advertiser']
       } else {
-        console.warn('BAT Ads: Could not read ad data for display.')
+        appActions.onUserModelLog('Ad unavailble', {category, arbitraryKey})
       }
     }
   }
@@ -287,7 +287,7 @@ const retrieveSSID = () => {
   // and if we're not on WiFi, there is no reliable way to determine the actual interface in use
 
   getSSID((err, ssid) => {
-    if (err) return console.error(err)
+    if (err) return appActions.onUserModelLog('SSID unavailble', { reason: err.toString() })
 
     appActions.onSSIDReceived(ssid)
   })
