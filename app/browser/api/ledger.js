@@ -1027,7 +1027,7 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
   let publisher = ledgerState.getPublisher(state, publisherKey)
   if (!publisher.isEmpty()) {
     if (publisher.get('faviconURL') == null) {
-      state = getFavIcon(state, publisherKey, info)
+      state = module.exports.getFavIcon(state, publisherKey, info)
     }
   } else {
     const infoPublisher = info.get('publisher')
@@ -1074,7 +1074,7 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
       }
     }
 
-    state = getFavIcon(state, publisherKey, info)
+    state = module.exports.getFavIcon(state, publisherKey, info)
   }
 
   state = addNewLocation(state, location, tabId, keepInfo)
@@ -3120,7 +3120,8 @@ const getMethods = () => {
     addNewLocation,
     addSiteVisit,
     shouldTrackTab,
-    recoverWalletCallback
+    recoverWalletCallback,
+    getFavIcon
   }
 
   let privateMethods = {}
