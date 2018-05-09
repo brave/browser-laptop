@@ -1190,6 +1190,12 @@ const recoverKeys = (state, useRecoveryKeyFile, key) => {
   return state
 }
 
+const recoverWalletCallback = (err, result) => {
+  appActions.onWalletRecovery(err, result)
+  appActions.onPromotionRemoval()
+  appActions.onPromotionGet()
+}
+
 const onWalletRecovery = (state, error, result) => {
   if (error) {
     // we reset ledgerInfo.error to what it was before (likely null)
@@ -3333,6 +3339,7 @@ const getMethods = () => {
     getCaptcha,
     onCaptchaResponse,
     shouldTrackTab,
+    recoverWalletCallback,
     deleteWallet,
     resetPublishers,
     clearPaymentHistory,
