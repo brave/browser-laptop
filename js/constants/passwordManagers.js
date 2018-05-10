@@ -8,7 +8,7 @@ const passwordManagers = {
   DASHLANE: 'Dashlane',
   LAST_PASS: 'LastPass',
   ENPASS: 'Enpass',
-  BITWARDEN: 'bitwarden',
+  BITWARDEN: 'Bitwarden',
   UNMANAGED: 'Unmanaged'
 }
 
@@ -29,7 +29,7 @@ displayNames[passwordManagers.ONE_PASSWORD] = '1Password'
 displayNames[passwordManagers.DASHLANE] = 'Dashlane'
 displayNames[passwordManagers.LAST_PASS] = 'LastPass'
 displayNames[passwordManagers.ENPASS] = 'Enpass'
-displayNames[passwordManagers.BITWARDEN] = 'bitwarden'
+displayNames[passwordManagers.BITWARDEN] = 'Bitwarden'
 displayNames[passwordManagers.UNMANAGED] = null
 
 let publicKeys = {}

@@ -35,14 +35,7 @@ const dummyData = [
     name: 'bitwarden',
     description: 'bitwardenDesc',
     icon: 'img/extensions/bitwarden-128.png'
-  },
-  // {
-  //   id: pinterest,
-  //   name: 'Pinterest Save',
-  //   description: 'pinterestDesc',
-  //   icon: 'img/extensions/pinterest-128.png'
-  // }
-  {
+  }, {
     id: dashlane,
     name: 'dashlane',
     description: 'dashlaneDesc',
@@ -53,40 +46,41 @@ const dummyData = [
   //   description: 'enpassDesc',
   //   icon: 'img/extensions/enpass-128.png'
   }, {
+    id: honey,
+    name: 'honey',
+    description: 'honeyDesc',
+    icon: 'img/extensions/honey-128.png'  
+  }, {
     id: lastpass,
     name: 'lastpass',
     description: 'lastpassDesc',
     icon: 'img/extensions/lastpass-128.png'
   }, {
+    id: metamask,
+    name: 'MetaMask',
+    description: 'metamaskDesc',
+    icon: 'img/extensions/metamask-128.png'
+  }, {
     id: onepassword,
     name: '1password',
     description: '1passwordDesc',
     icon: 'img/extensions/1password-128.png'
+  // }, {
+  //   id: pinterest,
+  //   name: 'Pinterest Save',
+  //   description: 'pinterestDesc',
+  //   icon: 'img/extensions/pinterest-128.png'
   }, {
     id: pocket,
     name: 'saveToPocket',
     description: 'saveToPocketDesc',
     icon: 'img/extensions/pocket-128.png'
-  },
-  {
-    id: honey,
-    name: 'honey',
-    description: 'honeyDesc',
-    icon: 'img/extensions/honey-128.png'
-  },
-  {
-    id: metamask,
-    name: 'MetaMask',
-    description: 'metamaskDesc',
-    icon: 'img/extensions/metamask-128.png'
+  // }, {
+  //   id: vimium,
+  //   name: 'vimium',
+  //   description: 'vimiumDesc',
+  //   icon: 'img/extensions/vimium-128.png'
   }
-  // {
-  //   id: metamask,
-  //   name: 'MetaMask',
-  //   description: 'metamaskDesc',
-  //   icon: 'img/extensions/metamask-128.png'
-  // }
-  // { id: 'vimium' // TBD }
 ]
 
 /**
