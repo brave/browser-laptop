@@ -61,6 +61,10 @@ const validateAction = function (action) {
   return action
 }
 
+const selectTabs = function (state) {
+  return state.get('tabs', Immutable.List()).filter(tab => !tab.isEmpty())
+}
+
 const matchTab = function (queryInfo, tab) {
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
   return !Object.keys(queryInfo).map((queryKey) => (tab.get(queryKey) === queryInfo[queryKey])).includes(false)
@@ -130,6 +134,9 @@ const updateTabsInternalIndex = (state, fromIndex) => {
   fromIndex = validateIndex(fromIndex)
   let tabsInternal = state.get('tabsInternal') || Immutable.Map()
   state.get('tabs').slice(fromIndex).forEach((tab, idx) => {
+    if (tab.isEmpty()) {
+      return
+    }
     const tabId = validateId('tabId', tab.get('tabId')).toString()
     if (tabId !== tabState.TAB_ID_NONE) {
       tabsInternal = tabsInternal.setIn(['index', tabId], (idx + fromIndex).toString())
@@ -171,7 +178,7 @@ const tabState = {
       return state
     }
     state = deleteTabsInternalIndex(state, tabValue)
-    state = state.set('tabs', state.get('tabs').delete(index))
+    state = state.setIn(['tabs', index], Immutable.Map())
     return updateTabsInternalIndex(state, index)
   },
 
@@ -208,12 +215,12 @@ const tabState = {
   getTabsByWindowId: (state, windowId) => {
     state = validateState(state)
     windowId = validateId('windowId', windowId)
-    return state.get('tabs').filter((tab) => tab.get('windowId') === windowId)
+    return selectTabs(state).filter((tab) => tab.get('windowId') === windowId)
   },
 
   getPinnedTabs: (state) => {
     state = validateState(state)
-    return state.get('tabs').filter((tab) => !!tab.get('pinned'))
+    return selectTabs(state).filter((tab) => !!tab.get('pinned'))
   },
 
   isTabPinned: (state, tabId) => {
@@ -225,7 +232,7 @@ const tabState = {
 
   getNonPinnedTabs: (state) => {
     state = validateState(state)
-    return state.get('tabs').filter((tab) => !tab.get('pinned'))
+    return selectTabs(state).filter((tab) => !tab.get('pinned'))
   },
 
   getPinnedTabsByWindowId: (state, windowId) => {
