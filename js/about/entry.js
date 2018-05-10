@@ -49,6 +49,9 @@ switch (getBaseUrl(getSourceAboutUrl(window.location.href))) {
   case 'about:history':
     getElementOp = import('./history')
     break
+  case 'about:timespent':
+    getElementOp = import('../../app/renderer/about/history/historyTimeSpent')
+    break
   case 'about:newtab':
     getElementOp = import('./newtab').then(module => module.AboutNewTab)
     break
