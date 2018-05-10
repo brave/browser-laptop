@@ -317,7 +317,6 @@ class Tab extends React.Component {
     props.isAudio = audioState.canPlayAudio(currentWindow, frameKey)
     props.visualTabIdDebug = getSetting(settings.DEBUG_VERBOSE_TAB_INFO)
     if (props.visualTabIdDebug) {
-      props.frameIndex = frame.get('index')
       const tab = tabState.getByTabId(state, tabId)
       props.tabIndex = tab && tab.get('index')
       props.frameStateInternalIndex = frameStateUtil.getIndexByTabId(currentWindow, tabId)
@@ -451,8 +450,8 @@ class Tab extends React.Component {
             this.props.visualTabIdDebug &&
             <span className={css(styles.tabArea__tab__tabIdDebug)}>
               <span>[t:{this.props.tabId},(g:{this.props.guestInstanceId})]</span>
-              <span>[f:{this.props.frameKey}:#{this.props.frameStateInternalIndex}]</span>
-              <span>[fi:{this.props.frameIndex},ti:{this.props.tabIndex}]</span>
+              <span>[f:{this.props.frameKey}]</span>
+              <span>#[fi:{this.props.frameStateInternalIndex},ti:{this.props.tabIndex}]</span>
             </span>
           }
           <TabTitle tabId={this.props.tabId} />

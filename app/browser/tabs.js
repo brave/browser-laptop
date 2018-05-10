@@ -630,15 +630,17 @@ const api = {
         updateTab(tabId)
       })
 
-      tab.on('tab-moved', () => {
-        appActions.tabMoved(tabId)
+      tab.on('tab-moved', (e, fromIndex, toIndex) => {
+        const tabValue = getTabValue(tabId)
+        appActions.tabMoved(tabId, fromIndex, toIndex, tabValue && tabValue.get('windowId'))
+      })
+
+      tab.on('pinned', (e, isPinned) => {
+        updateTab(tabId)
       })
 
       tab.on('will-attach', (e, windowWebContents) => {
-        if (shouldDebugTabEvents) {
-          console.log('will-attach', windowWebContents.id, tab.tabValue().windowId)
-        }
-        appActions.tabWillAttach(tab.getId())
+        // tab will attach to webview
       })
 
       tab.on('set-active', (sender, isActive) => {
@@ -681,7 +683,7 @@ const api = {
       })
 
       tab.on('did-attach', (e, tabId) => {
-        appActions.tabAttached(tab.getId())
+        // tab has been attached to a webview
       })
 
       tab.on('save-password', (e, username, origin) => {
@@ -1316,7 +1318,6 @@ const api = {
           tab.forceClose()
         }
       })
-    state = api.updateTabsStateForWindow(state, windowId)
     return state
   },
 
@@ -1338,7 +1339,6 @@ const api = {
           tab.forceClose()
         }
       })
-    state = api.updateTabsStateForWindow(state, windowId)
     return state
   },
 
@@ -1360,7 +1360,6 @@ const api = {
           tab.forceClose()
         }
       })
-    state = api.updateTabsStateForWindow(state, windowId)
     return state
   },
 
@@ -1377,7 +1376,6 @@ const api = {
           tab.forceClose()
         }
       })
-    state = api.updateTabsStateForWindow(state, windowId)
     return state
   },
 
@@ -1408,37 +1406,38 @@ const api = {
     if (!tabValue) {
       return state
     }
-    return api.updateTabsStateForWindow(state, tabValue.get('windowId'))
+    return api.updateTabIndexesForWindow(state, tabValue.get('windowId'))
   },
-  updateTabsStateForWindow: (state, windowId) => {
-    tabState.getTabsByWindowId(state, windowId).forEach((tabValue) => {
-      const tabId = tabValue.get('tabId')
 
-      const oldTabValue = tabState.getByTabId(state, tabId)
+  updateTabIndexesForWindow: (state, windowId) => {
+    const t0 = shouldDebugTabEvents ? process.hrtime() : null
+    let changesMade = 0
+    // make sure all indexes are up to date
+    const stateTabs = tabState.getTabsByWindowId(state, windowId)
+    for (const stateTab of stateTabs.values()) {
+      const tabId = stateTab.get('tabId')
       const newTabValue = getTabValue(tabId)
-
-      // For now the renderer needs to know about index and pinned changes
-      // communicate those out here.
-      if (newTabValue && oldTabValue) {
-        const changeInfo = {}
-        const rendererAwareProps = ['index', 'pinned', 'url', 'active', 'zoomPercent']
-        rendererAwareProps.forEach((prop) => {
-          const newPropVal = newTabValue.get(prop)
-          if (oldTabValue.get(prop) !== newPropVal) {
-            changeInfo[prop] = newPropVal
-          }
-        })
-        if (Object.keys(changeInfo).length > 0) {
-          updateTab(tabId, changeInfo)
+      if (!newTabValue) {
+        // This is probably the deleted tab
+        continue
+      }
+      const oldIndex = stateTab.get('index')
+      const newIndex = newTabValue.get('index')
+      if (oldIndex !== newIndex) {
+        if (shouldDebugTabEvents) {
+          console.log(`Tab [${tabId} Updating state index from ${oldIndex} to ${newIndex}`)
         }
+        state = tabState.updateTabValue(state, Immutable.Map({ tabId, index: newIndex }))
+        changesMade++
       }
-
-      if (newTabValue) {
-        state = tabState.updateTabValue(state, newTabValue, false)
-      }
-    })
+    }
+    if (shouldDebugTabEvents) {
+      const t1 = process.hrtime(t0)
+      console.info(`updateTabIndexesForWindow took: %ds %dms with ${changesMade} changes`, t1[0], t1[1] / 1000000)
+    }
     return state
   },
+
   forgetTab: (tabId) => {
     const tab = webContentsCache.getWebContents(tabId)
     if (!tab) {

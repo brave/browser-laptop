@@ -346,6 +346,8 @@ function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, 
   const isPinned = frameOpts.isPinned
   delete frameOpts.isPinned
 
+  delete frameOpts.index
+
   // TODO: longer term get rid of parentFrameKey completely instead of
   // calculating it here.
   let parentFrameKey = frameOpts.parentFrameKey

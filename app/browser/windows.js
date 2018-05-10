@@ -292,6 +292,12 @@ const api = {
             console.log(`window ${win.id} had ${!active ? 'in' : ''}active tab ${tabId} inserted at index ${index}`)
           }
         })
+        win.webContents.on('tab-detached-at', (e, index, windowId) => {
+          appActions.tabDetachedFromTabStrip(windowId, index)
+          if (shouldDebugWindowEvents) {
+            console.log(`window ${win.id} had tab at removed at index ${index}`)
+          }
+        })
         win.webContents.on('tab-strip-empty', () => {
           // must wait for pending tabs to be attached to new window before closing
           // TODO(petemill): race condition if multiple different tabs are moved at the same time

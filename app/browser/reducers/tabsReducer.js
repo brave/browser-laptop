@@ -156,19 +156,6 @@ const tabsReducer = (state, action, immutableAction) => {
     case appConstants.APP_TAB_CREATED:
       state = tabState.maybeCreateTab(state, action)
       break
-    case appConstants.APP_TAB_ATTACHED:
-      state = tabs.updateTabsStateForAttachedTab(state, action.get('tabId'))
-      break
-    case appConstants.APP_TAB_WILL_ATTACH: {
-      const tabId = action.get('tabId')
-      const tabValue = tabState.getByTabId(state, tabId)
-      if (!tabValue) {
-        break
-      }
-      const oldWindowId = tabState.getWindowId(state, tabId)
-      state = tabs.updateTabsStateForWindow(state, oldWindowId)
-      break
-    }
     case appConstants.APP_TAB_MOVED:
       state = tabs.updateTabsStateForAttachedTab(state, action.get('tabId'))
       break
@@ -179,6 +166,15 @@ const tabsReducer = (state, action, immutableAction) => {
       }
       const tabId = action.get('tabId')
       state = tabState.setTabStripWindowId(state, tabId, windowId)
+      state = tabs.updateTabIndexesForWindow(state, windowId)
+      break
+    }
+    case appConstants.APP_TAB_DETACHED_FROM_TAB_STRIP: {
+      const windowId = action.get('windowId')
+      if (windowId == null) {
+        break
+      }
+      state = tabs.updateTabIndexesForWindow(state, windowId)
       break
     }
     case appConstants.APP_TAB_DETACH_MENU_ITEM_CLICKED: {
@@ -334,7 +330,7 @@ const tabsReducer = (state, action, immutableAction) => {
           const lastOrigin = tabState.getVisibleOrigin(state, tabId)
           expireContentSettings(state, tabId, lastOrigin)
           const windowIdOfTabBeingRemoved = tabState.getWindowId(state, tabId)
-          state = tabs.updateTabsStateForWindow(state, windowIdOfTabBeingRemoved)
+          state = tabs.updateTabIndexesForWindow(state, windowIdOfTabBeingRemoved)
         }
         state = tabState.removeTabByTabId(state, tabId)
         tabs.forgetTab(tabId)

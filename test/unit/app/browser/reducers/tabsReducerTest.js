@@ -87,7 +87,7 @@ describe('tabsReducer unit tests', function () {
       closeTab: sinon.mock(),
       moveTo: sinon.mock(),
       reload: sinon.mock(),
-      updateTabsStateForWindow: sinon.mock(),
+      updateTabIndexesForWindow: sinon.mock(),
       create: sinon.mock(),
       forgetTab: sinon.spy()
     }
@@ -263,13 +263,13 @@ describe('tabsReducer unit tests', function () {
 
     afterEach(function () {
       this.removeTabByTabIdSpy.restore()
-      this.tabsAPI.updateTabsStateForWindow.reset()
+      this.tabsAPI.updateTabIndexesForWindow.reset()
     })
 
     it('calls tabState.removeTabByTabId', function () {
       tabsReducer(this.state, action)
       assert.equal(this.tabStateAPI.removeTabByTabId.getCall(0).args[1], action.tabId)
-      assert.equal(this.tabsAPI.updateTabsStateForWindow.getCall(0).args[1], 2)
+      assert.equal(this.tabsAPI.updateTabIndexesForWindow.getCall(0).args[1], 2)
       assert(this.tabsAPI.forgetTab.withArgs(5).calledOnce)
     })
 

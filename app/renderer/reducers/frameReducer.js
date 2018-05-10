@@ -78,6 +78,37 @@ const getLocation = (location) => {
   return location
 }
 
+function setFrameChangedIndex (state, frame, currentIndex, newIndex) {
+  let frames = frameStateUtil.getFrames(state)
+  if (newIndex >= frames.size) {
+    console.error(`Cannot move frame to index ${newIndex} from ${currentIndex} because it is invalid for a frame List of size ${frames.size}!`)
+    return state
+  }
+  // put the frame at the correct index
+  frames = frames
+    .splice(currentIndex, 1)
+    .splice(newIndex, 0, frame)
+  state = state.set('frames', frames)
+  state = frameStateUtil.updateFramesInternalIndex(state, Math.min(currentIndex, newIndex))
+  state = frameStateUtil.moveFrame(state, frame.get('tabId'), newIndex)
+
+  // Since the tab could have changed pages, update the tab page as well
+  const activeFrame = frameStateUtil.getActiveFrame(state)
+  // avoid the race-condition of updating the tabPage
+  // while active frame is not yet defined
+  if (activeFrame) {
+    // Update tab page index to the active tab in case the active tab changed
+    state = frameStateUtil.updateTabPageIndex(state, activeFrame.get('tabId'))
+    // after tabPageIndex is updated we need to update framesInternalIndex too
+    // TODO: really? updateTabPageIndex does not seem to change anything related
+    state = frameStateUtil
+      .updateFramesInternalIndex(state, Math.min(currentIndex, newIndex))
+  }
+  // clear preview
+  state = frameStateUtil.setPreviewFrameKey(state, null)
+  return state
+}
+
 const frameReducer = (state, action, immutableAction) => {
   switch (action.actionType) {
     case appConstants.APP_TAB_INSERTED_TO_TAB_STRIP: {
@@ -111,6 +142,23 @@ const frameReducer = (state, action, immutableAction) => {
       }
       break
     }
+    case appConstants.APP_TAB_MOVED: {
+      const tabId = immutableAction.get('tabId')
+      const newIndex = immutableAction.get('toIndex')
+      if (newIndex == null || newIndex === -1) {
+        break
+      }
+      let frame = frameStateUtil.getFrameByTabId(state, tabId)
+      if (!frame) {
+        break
+      }
+      let currentIndex = frameStateUtil.getIndexByTabId(state, tabId)
+      if (currentIndex == null || currentIndex === newIndex) {
+        break
+      }
+      state = setFrameChangedIndex(state, frame, currentIndex, newIndex)
+      break
+    }
     case appConstants.APP_TAB_UPDATED:
       // This case will be fired for both tab creation and tab update.
       const tab = immutableAction.get('tabValue')
@@ -126,7 +174,6 @@ const frameReducer = (state, action, immutableAction) => {
       if (!frame) {
         break
       }
-      let frames = state.get('frames')
       const index = tab.get('index')
       // stop being fullscreen if made inactive and was fullscreen
       if (changeInfo.get('active') === false && frame.get('isFullScreen')) {
@@ -139,31 +186,14 @@ const frameReducer = (state, action, immutableAction) => {
       }
       if (index != null &&
           index !== -1 &&
-          sourceFrameIndex !== index &&
-          // Only update the index once the frame is known.
-          // If it is not known, it will just happen later on the next update.
-          index < frameStateUtil.getFrames(state).size) {
-        frame = frame.set('index', index)
-        frames = frames
-          .splice(sourceFrameIndex, 1)
-          .splice(index, 0, frame)
-        state = state.set('frames', frames)
-        // Since the tab could have changed pages, update the tab page as well
-        state = frameStateUtil.updateFramesInternalIndex(state, Math.min(sourceFrameIndex, index))
-        state = frameStateUtil.moveFrame(state, tabId, index)
-
-        const activeFrame = frameStateUtil.getActiveFrame(state)
-        // avoid the race-condition of updating the tabPage
-        // while active frame is not yet defined
-        if (activeFrame) {
-          // Update tab page index to the active tab in case the active tab changed
-          state = frameStateUtil.updateTabPageIndex(state, activeFrame.get('tabId'))
-          // after tabPageIndex is updated we need to update framesInternalIndex too
-          state = frameStateUtil
-            .updateFramesInternalIndex(state, Math.min(sourceFrameIndex, index))
+          sourceFrameIndex !== index
+          ) {
+        const stateWithFrameMoved = setFrameChangedIndex(state, frame, sourceFrameIndex, index)
+        // move forward with new index if index change was valid
+        if (stateWithFrameMoved !== state) {
+          sourceFrameIndex = index
+          state = stateWithFrameMoved
         }
-        state = frameStateUtil.setPreviewFrameKey(state, null)
-        sourceFrameIndex = index
       }
 
       const pinned = immutableAction.getIn(['changeInfo', 'pinned'])

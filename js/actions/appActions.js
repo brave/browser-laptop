@@ -140,10 +140,15 @@ const appActions = {
    * Tab moved event fired from muon
    * @param {Object} tabValue
    */
-  tabMoved: function (tabId) {
+  tabMoved: function (tabId, fromIndex, toIndex, windowId) {
     dispatch({
       actionType: appConstants.APP_TAB_MOVED,
-      tabId
+      tabId,
+      fromIndex,
+      toIndex,
+      queryInfo: {
+        windowId
+      }
     })
   },
 
@@ -2016,6 +2021,14 @@ const appActions = {
         windowId
       },
       tabId,
+      index,
+      windowId
+    })
+  },
+
+  tabDetachedFromTabStrip: function (windowId, index) {
+    dispatch({
+      actionType: appConstants.APP_TAB_DETACHED_FROM_TAB_STRIP,
       index,
       windowId
     })
