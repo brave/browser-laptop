@@ -23,16 +23,15 @@
 const Immutable = require('immutable')
 const assert = require('assert')
 
-// Constants
 const settings = require('../../../js/constants/settings')
+const getSetting = require('../../../js/settings').getSetting
 
 // Utils
 const {makeImmutable, makeJS, isMap} = require('../../common/state/immutableUtil')
 const urlUtil = require('../../../js/lib/urlutil')
 
 const maxRowsInPageScoreHistory = 5
-const maxRowsInAdsShownHistory = 6 // this
-const timeSecondsWindowForAdsShownHistory = 24 * 60 * 60
+const maxRowsInAdsShownHistory = 99
 
 const validateState = function (state) {
   state = makeImmutable(state)
@@ -43,6 +42,26 @@ const validateState = function (state) {
 
 const unixTimeNowSeconds = function () {
   return Math.round(+new Date() / 1000)
+}
+
+const historyRespectsRollingTimeConstraint = function (history, secondsWindow, allowableAdCount) {
+  let n = history.size
+  let now = unixTimeNowSeconds()
+  let recentCount = 0
+
+  for (let i = 0; i < n; i++) {
+    let timeOfAd = history.get(i)
+    let delta = now - timeOfAd
+    if (delta < secondsWindow) {
+      recentCount++
+    }
+  }
+
+  if (recentCount > allowableAdCount) {
+    return false
+  }
+
+  return true
 }
 
 const appendToRingBufferUnderKey = (state, key, item, maxRows) => {
@@ -99,24 +118,19 @@ const userModelState = {
   },
 
   allowedToShowAdBasedOnHistory: (state) => {
-    let history = state.getIn(['userModel', 'adsShownHistory']) || []
+    const history = state.getIn(['userModel', 'adsShownHistory']) || []
 
-    let n = history.size
+    const hourWindow = 60 * 60
+    const dayWindow = 24 * hourWindow
 
-    if (n < maxRowsInAdsShownHistory) {
-      return true
-    }
+    const hourAllowed = getSetting(settings.ADS_PER_HOUR, state.settings)
+    const dayAllowed = getSetting(settings.ADS_PER_DAY, state.settings)
 
-    let oldest = null
+    const respectsHourLimit = historyRespectsRollingTimeConstraint(history, hourWindow, hourAllowed)
+    const respectsDayLimit = historyRespectsRollingTimeConstraint(history, dayWindow, dayAllowed)
 
-    if (n > 0) {
-      oldest = history.get(0)
-
-      let delta = unixTimeNowSeconds() - oldest
-
-      if (delta < timeSecondsWindowForAdsShownHistory) {
-        return false
-      }
+    if (!respectsHourLimit || !respectsDayLimit) {
+      return false
     }
 
     return true
