@@ -28,10 +28,10 @@ class EnabledContent extends ImmutableComponent {
     return <section className={css(styles.enabledContent)}>
       <div className={css(styles.enabledContent__walletBar)} data-test-id='walletBar'>
         <div className={css(gridStyles.row1col1, styles.enabledContent__walletBar__title)}>
-          Ads per hour
+          Ads per day
         </div>
         <div className={css(gridStyles.row1col2, styles.enabledContent__walletBar__title)}>
-          Ads per day
+          Ads per hour
         </div>
         <div className={css(gridStyles.row1col3, styles.enabledContent__walletBar__title)}>
           Place

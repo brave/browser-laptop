@@ -198,7 +198,6 @@ const basicCheckReadyAdServe = (state, windowId) => {
   }
 
   let catNames = priorData['names']
-  /// ////////////////////////////////
 
   let mutable = true
   let history = userModelState.getPageScoreHistory(state, mutable)
