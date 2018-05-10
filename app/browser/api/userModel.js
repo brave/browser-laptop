@@ -194,8 +194,12 @@ const classifyPage = (state, action, windowId) => {
 
 const basicCheckReadyAdServe = (state, windowId) => {
 // since this is called on APP_IDLE_STATE_CHANGE, not a good idea to log here...
-  if ((!priorData) || (!userModelState.allowedToShowAdBasedOnHistory(state))) {
-// not initialized OR not a good time to generate a notification
+  if (!priorData) {
+    return state
+  }
+
+  if (!userModelState.allowedToShowAdBasedOnHistory(state)) {
+    appActions.onUserModelLog('Ad throttled')
     return state
   }
 
