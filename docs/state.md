@@ -39,6 +39,7 @@ AppStore
       backupNotifyCount: number, // number of times user has been reminded to backup wallet
       backupNotifyTimestamp: number, // number of milliseconds from the last reminder until the next
       backupSucceeded: (boolean|undefined), // was last backup successful?
+      recoveryBalanceRecalculated: (boolean|undefined),
       recoverySucceeded: (boolean|undefined),
       updatedStamp: number
     }

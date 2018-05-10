@@ -50,6 +50,16 @@ const aboutPreferencesState = {
     return aboutPreferencesState.setPreferencesProp(state, 'recoveryInProgress', inProgress)
   },
 
+  setRecoveryBalanceRecalculated: (state, hasRecalculated) => {
+    state = validateState(state)
+    return aboutPreferencesState.setPreferencesProp(state, 'recoveryBalanceRecalculated', hasRecalculated)
+  },
+
+  getRecoveryBalanceRecalulated: (state) => {
+    state = validateState(state)
+    return aboutPreferencesState.getPreferencesProp(state, 'recoveryBalanceRecalculated') || false
+  },
+
   setRecoveryStatus: (state, status) => {
     state = validateState(state)
     const date = new Date().getTime()

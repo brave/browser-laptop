@@ -2374,6 +2374,35 @@ describe('ledger api unit tests', function () {
     })
   })
 
+  describe('recoverKeys', function () {
+    it('sets recoveryBalanceRecalculated to false when a recovery is started', function () {
+      ledgerApi.setClient(ledgerClientObject)
+      const state = ledgerApi.recoverKeys(defaultAppState
+        .setIn(['about'], Immutable.fromJS({
+          preferences: {}
+        })), false, 'fakeKey')
+      assert.equal(aboutPreferencesState.getPreferencesProp(state, 'recoveryBalanceRecalculated'), false)
+    })
+
+    it('set recoveryBalanceRecalculated to true when balance has been retrieved', function () {
+      const state = ledgerApi.onWalletProperties(defaultAppState
+        .setIn(['about'], Immutable.fromJS({
+          preferences: {
+            recoveryBalanceRecalculated: true
+          }
+        })))
+      assert.equal(aboutPreferencesState.getPreferencesProp(state, 'recoveryBalanceRecalculated'), true)
+    })
+
+    it('skips over setting recoveryBalanceRecalculated if it hasnt been set', function () {
+      const state = ledgerApi.onWalletProperties(defaultAppState
+        .setIn(['about'], Immutable.fromJS({
+          preferences: {}
+        })))
+      assert.equal(aboutPreferencesState.getPreferencesProp(state, 'recoveryBalanceRecalculated'), null)
+    })
+  })
+
   describe('checkReferralActivity', function () {
     let checkForUpdateSpy, roundtripSpy, fakeClock
 
