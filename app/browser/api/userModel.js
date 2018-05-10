@@ -193,61 +193,52 @@ const classifyPage = (state, action, windowId) => {
 }
 
 const basicCheckReadyAdServe = (state, windowId) => {
-  if (!priorData) {
+// since this is called on APP_IDLE_STATE_CHANGE, not a good idea to log here...
+  if ((!priorData) || (!userModelState.allowedToShowAdBasedOnHistory(state))) {
+// not initialized OR not a good time to generate a notification
     return state
   }
 
-  let catNames = priorData['names']
-
-  let mutable = true
-  let history = userModelState.getPageScoreHistory(state, mutable)
-
-  let scores = um.deriveCategoryScores(history)
-  let indexOfMax = um.vectorIndexOfMax(scores)
-  let category = catNames[indexOfMax]
-  let winnerOverTime = category && category.split('-')[0]
-
-  let bundle = sampleAdFeed
-  let arbitraryKey
-
-  let notificationText
-  let notificationUrl
-  let advertiser
-
-  let allGood = true
-
-  if (bundle) {
-    // when catalog catches up, use winnerOverTime instead
-    const result = bundle['categories'][category]
-    if (result) {
-      arbitraryKey = randomKey(result)
-
-      const payload = result[arbitraryKey]
-
-      if (payload) {
-        notificationText = payload['notificationText']
-        notificationUrl = payload['notificationURL']
-        advertiser = payload['advertiser']
-      } else {
-        appActions.onUserModelLog('Ad unavailble', {category, arbitraryKey})
-      }
-    }
+  const bundle = sampleAdFeed
+  if (!bundle) {
+    appActions.onUserModelLog('No ad catalog')
+    return state
   }
 
+  const catNames = priorData['names']
+  const mutable = true
+  const history = userModelState.getPageScoreHistory(state, mutable)
+  const scores = um.deriveCategoryScores(history)
+  const indexOfMax = um.vectorIndexOfMax(scores)
+  const category = catNames[indexOfMax]
+  const winnerOverTime = category && category.split('-')[0]
+
+  // when catalog catches up, use winnerOverTime instead
+  const result = bundle['categories'][category]
+  if (!result) {
+    appActions.onUserModelLog('No ads for category', {category})
+    return state
+  }
+
+  const arbitraryKey = randomKey(result)
+  const payload = result[arbitraryKey]
+  if (!payload) {
+    appActions.onUserModelLog('No ad at offset for category', {category, arbitraryKey})
+    return state
+  }
+
+  const notificationText = payload['notificationText']
+  const notificationUrl = payload['notificationURL']
+  const advertiser = payload['advertiser']
   if (!notificationText || !notificationUrl || !advertiser) {
-    allGood = false
+    appActions.onUserModelLog('Incomplete ad information',
+                              {category, arbitraryKey, notificationUrl, notificationText, advertiser})
+    return state
   }
 
-  if (!userModelState.allowedToShowAdBasedOnHistory(state)) {
-    allGood = false
-    appActions.onUserModelLog('Ad prevented', {notificationUrl, notificationText, winnerOverTime, advertiser})
-  }
-
-  if (allGood) {
-    goAheadAndShowTheAd(windowId, advertiser, notificationText, notificationUrl)
-    appActions.onUserModelLog('Ad shown', {notificationUrl, notificationText, winnerOverTime, advertiser})
-    state = userModelState.appendAdShownToAdHistory(state)
-  }
+  goAheadAndShowTheAd(windowId, advertiser, notificationText, notificationUrl)
+  appActions.onUserModelLog('Ad shown', {category, arbitraryKey, notificationUrl, notificationText, winnerOverTime, advertiser})
+  state = userModelState.appendAdShownToAdHistory(state)
 
   return state
 }
