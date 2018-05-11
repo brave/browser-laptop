@@ -358,7 +358,8 @@ const updateUserPrefs = (appState, appConfig, isPrivate = false) => {
   const braveryDefaults = siteSettings.braveryDefaults(appState, appConfig)
   const defaultUserPrefs = getDefaultUserPrefContentSettings(braveryDefaults, appState, appConfig)
 
-  return { 'content_settings': getSettingsFromSiteSettings(defaultUserPrefs, appState, appConfig, isPrivate) }
+  return { 'safebrowsing.enabled': braveryDefaults['safeBrowsingAll'],
+    'content_settings': getSettingsFromSiteSettings(defaultUserPrefs, appState, appConfig, isPrivate) }
 }
 
 const updateContentSettings = (appState, appConfig, isPrivate = false) => {

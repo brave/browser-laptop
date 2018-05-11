@@ -51,7 +51,6 @@ class BraveryPanel extends React.Component {
     this.onToggleAdvanced = this.onToggleAdvanced.bind(this)
     this.onToggleShields = this.onToggleSiteSetting.bind(this, 'shieldsUp')
     this.onToggleAdControl = this.onToggleSiteSetting.bind(this, 'adControl')
-    this.onToggleSafeBrowsing = this.onToggleSiteSetting.bind(this, 'safeBrowsing')
     this.onToggleNoScript = this.onToggleSiteSetting.bind(this, 'noScript')
     this.onToggleCookieControl = this.onToggleSiteSetting.bind(this, 'cookieControl')
     this.onToggleHTTPSE = this.onToggleSiteSetting.bind(this, 'httpsEverywhere')
@@ -215,7 +214,6 @@ class BraveryPanel extends React.Component {
     props.isFpEnabled = braverySettings.fingerprintingProtection !== 'allowAllFingerprinting'
     props.fingerprintingProtection = braverySettings.fingerprintingProtection
     props.cookieControl = braverySettings.cookieControl
-    props.safeBrowsing = braverySettings.safeBrowsing
     props.isCompactBraveryPanel = getSetting(settings.COMPACT_BRAVERY_PANEL)
     props.adsBlockedStat = props.blockedAds.size + props.blockedByTrackingList.size
     props.scriptsBlockedStat = props.blockedScripts.size
@@ -607,18 +605,6 @@ class BraveryPanel extends React.Component {
                     <option data-l10n-id='blockAllFingerprinting' data-test-id='blockAllFingerprinting' value='blockAllFingerprinting' />
                   </FormDropdown>
                 </div>
-
-                <SwitchControl customStyleWrapper={[
-                  !this.props.isCompactBraveryPanel && gridStyles.row5col2,
-                  this.props.isCompactBraveryPanel && gridStyles.row9col1,
-                  this.props.isCompactBraveryPanel && styles.braveryPanel_compact__body__advanced__control__switchControl
-                ]}
-                  onClick={this.onToggleSafeBrowsing}
-                  rightl10nId='safeBrowsing'
-                  checkedOn={this.props.safeBrowsing}
-                  disabled={!this.props.shieldsUp}
-                  testId='safeBrowsingSwitch'
-                />
               </div>
             </section>
             : null

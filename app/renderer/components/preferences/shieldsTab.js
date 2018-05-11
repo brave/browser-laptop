@@ -10,6 +10,8 @@ const {SettingDropdown} = require('../common/dropdown')
 const {DefaultSectionTitle} = require('../common/sectionTitle')
 const BrowserButton = require('../common/browserButton')
 const SitePermissionsPage = require('./sitePermissionsPage')
+const {css} = require('aphrodite')
+const commonStyles = require('../styles/commonStyles')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -27,13 +29,14 @@ const adInsertion = appConfig.resourceNames.AD_INSERTION
 const trackingProtection = appConfig.resourceNames.TRACKING_PROTECTION
 const httpsEverywhere = appConfig.resourceNames.HTTPS_EVERYWHERE
 const safeBrowsing = appConfig.resourceNames.SAFE_BROWSING
+const safeBrowsingAll = appConfig.resourceNames.SAFE_BROWSING_ALL
 const noScript = appConfig.resourceNames.NOSCRIPT
 
 const braveryPermissionNames = {
   'shieldsUp': ['boolean'],
   'adControl': ['string'],
   'cookieControl': ['string'],
-  'safeBrowsing': ['boolean'],
+  'safeBrowsingControl': ['string'],
   'httpsEverywhere': ['boolean'],
   'fingerprintingProtection': ['string'],
   'noScript': ['boolean', 'number']
@@ -44,7 +47,6 @@ class ShieldsTab extends ImmutableComponent {
     super(props)
     this.onChangeAdControl = this.onChangeAdControl.bind(this)
     this.onToggleHTTPSE = this.onToggleSetting.bind(this, httpsEverywhere)
-    this.onToggleSafeBrowsing = this.onToggleSetting.bind(this, safeBrowsing)
     this.onToggleNoScript = this.onToggleSetting.bind(this, noScript)
   }
   onChangeAdControl (e) {
@@ -72,6 +74,10 @@ class ShieldsTab extends ImmutableComponent {
   }
   onToggleSetting (setting, e) {
     appActions.setResourceEnabled(setting, e.target.value)
+  }
+  onChangeSafeBrowsingControl (e) {
+    appActions.setResourceEnabled(safeBrowsing, e.target.value === 'basicSafeBrowsing' || e.target.value === 'advancedSafeBrowsing')
+    appActions.setResourceEnabled(safeBrowsingAll, e.target.value === 'advancedSafeBrowsing')
   }
   render () {
     return <div id='shieldsContainer'>
@@ -104,9 +110,18 @@ class ShieldsTab extends ImmutableComponent {
             <option data-l10n-id='blockAllFingerprinting' value='blockAllFingerprinting' />
           </SettingDropdown>
         </SettingItem>
+        <SettingItem dataL10nId='safeBrowsingControl'>
+          <SettingDropdown
+            value={this.props.braveryDefaults.get('safeBrowsingControl')}
+            onChange={this.onChangeSafeBrowsingControl}>
+            <option data-l10n-id='advancedSafeBrowsing' value='advancedSafeBrowsing' />
+            <option data-l10n-id='basicSafeBrowsing' value='basicSafeBrowsing' />
+            <option data-l10n-id='disableSafeBrowsing' value='disableSafeBrowsing' />
+          </SettingDropdown>
+        </SettingItem>
+        <div data-l10n-id='advancedSafeBrowsingInfo' className={css(commonStyles.advancedSafeBrowsingInfo)} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('httpsEverywhere')} dataL10nId='httpsEverywhere' onChange={this.onToggleHTTPSE} />
         <SettingCheckbox checked={this.props.braveryDefaults.get('noScript')} dataL10nId='noScriptPref' onChange={this.onToggleNoScript} />
-        <SettingCheckbox checked={this.props.braveryDefaults.get('safeBrowsing')} dataL10nId='safeBrowsing' onChange={this.onToggleSafeBrowsing} />
         {/* TODO: move this inline style to Aphrodite once refactored */}
         <div style={{marginTop: '15px'}}>
           <BrowserButton

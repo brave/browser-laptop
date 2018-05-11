@@ -101,6 +101,10 @@ class DownloadItem extends React.Component {
     return this.props.downloadState === downloadStates.PAUSED
   }
 
+  get isSafeBrowsingBlocked () {
+    return this.props.downloadState === downloadStates.SAFE_BROWSING_BLOCKED
+  }
+
   mergeProps (state, ownProps) {
     const download = state.getIn(['downloads', ownProps.downloadId]) || Immutable.Map()
     const origin = getOrigin(download.get('url'))
@@ -276,12 +280,16 @@ class DownloadItem extends React.Component {
               : null
           }
           {
-            this.isCancelled || this.isInterrupted || this.isUnauthorized || this.isCompleted || this.isPaused || this.isInProgress
+            this.isCancelled || this.isInterrupted || this.isUnauthorized || this.isCompleted || this.isPaused || this.isInProgress || this.isSafeBrowsingBlocked
             ? <div className='downloadState' data-l10n-id={this.props.statel10n} data-l10n-args={JSON.stringify(l10nStateArgs)} />
             : null
           }
         </span>
-        <span className='downloadArrow fa-caret-down fa' />
+        {
+          this.isSafeBrowsingBlocked
+          ? <span className='fa fa-exclamation-triangle' />
+          : <span className='downloadArrow fa-caret-down fa' />
+        }
       </div>
     </span>
   }

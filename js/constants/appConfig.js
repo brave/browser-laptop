@@ -24,6 +24,7 @@ module.exports = {
   resourceNames: {
     ADBLOCK: 'adblock',
     SAFE_BROWSING: 'safeBrowsing',
+    SAFE_BROWSING_ALL: 'safeBrowsingAll',
     HTTPS_EVERYWHERE: 'httpsEverywhere',
     TRACKING_PROTECTION: 'trackingProtection',
     FINGERPRINTING_PROTECTION: 'fingerprintingProtection', // block 3p fingerprinting
@@ -78,6 +79,9 @@ module.exports = {
     url: 'https://s3.amazonaws.com/adblock-data/{version}/SafeBrowsingData.dat',
     // version is specified in the ad-block library
     msBetweenRechecks: 1000 * 60 * 60 * 2, // 2 hours
+    enabled: true
+  },
+  safeBrowsingAll: {
     enabled: true
   },
   trackingProtection: {

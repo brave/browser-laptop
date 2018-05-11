@@ -43,7 +43,8 @@ module.exports.siteSettingDefaults = {
   shieldsUp: true,
   adControl: 1,
   cookieControl: 0,
-  safeBrowsing: true,
+  safeBrowsing: undefined,
+  safeBrowsingControl: 0,
   noScript: false,
   httpsEverywhere: true,
   fingerprintingProtection: false, // boolean for backwards compatibility
@@ -182,11 +183,19 @@ const applySiteSettingRecord = (record) => {
     1: 'allowAllCookies',
     2: 'blockAllCookies'
   }
+  const safeBrowsingControlEnum = {
+    0: 'advancedSafeBrowsing',
+    1: 'basicSafeBrowsing',
+    2: 'disableSafeBrowsing'
+  }
+
   const getValue = (key, value) => {
     if (key === 'adControl') {
       return adControlEnum[value]
     } else if (key === 'cookieControl') {
       return cookieControlEnum[value]
+    } else if (key === 'safeBrowsingControl') {
+      return safeBrowsingControlEnum[value]
     } else if (key === 'fingerprintingProtection' && typeof value === 'boolean') {
       // TODO: Migrate from bool to enum on all platforms
       return value ? 'blockAllFingerprinting' : 'block3rdPartyFingerprinting'

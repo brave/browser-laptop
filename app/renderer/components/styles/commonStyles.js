@@ -113,6 +113,11 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginBottom: '2em'
   },
+  advancedSafeBrowsingInfo: {
+    fontStyle: 'italic',
+    marginBottom: '1.5em',
+    fontSize: '12px'
+  },
 
   // User select
   userSelect: {
