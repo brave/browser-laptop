@@ -232,6 +232,8 @@ module.exports = {
     'notification-reconcile-soon-timestamp': null,
     // debug
     'debug.manual-tab-discard.enabled': false,
+    'debug.verbose-tab-info.enabled': false,
+
     // DEPRECATED settings
     // DO NOT REMOVE OR CHANGE THESE VALUES
     // ########################

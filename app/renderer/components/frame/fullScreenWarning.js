@@ -29,7 +29,8 @@ const styles = StyleSheet.create({
     marginRight: 'auto',
     padding: '20px',
     position: 'absolute',
-    textAlign: 'center'
+    textAlign: 'center',
+    zIndex: 30
   }
 })
 

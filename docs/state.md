@@ -589,7 +589,8 @@ AppStore
       suppress: boolean, // if true, show a suppress checkbox (defaulted to not checked)
       title: string, // title is the source; ex: "brave.com says:"
     },
-    muted: boolean, // is the tab muted
+    muted: boolean, // is the tab muted,
+    zoomPercent: number, // current zoom levellast
     windowId: number // the windowId that contains the tab
     guestInstanceId: number,
     tabId: number
@@ -708,8 +709,6 @@ WindowStore
   createdFaviconDirectory: boolean, // whether the ledger-favicons directory has been created already in the appData directory
   frames: [{
     aboutDetails: object, // details for about pages
-    activeShortcut: string, // set by the application store when the component should react to a shortcut
-    activeShortcutDetails: object, // additional parameters for the active shortcut action if any
     adblock: {
       blocked: Array<string>
     },
@@ -741,7 +740,6 @@ WindowStore
     isPrivate: boolean, // private browsing tab
     key: number,
     lastAccessedTime: datetime,
-    lastZoomPercentage: number, // last value that was used for zooming
     loading: boolean,
     location: string, // the currently navigated location
     modalPromptDetail: object,
