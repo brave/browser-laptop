@@ -61,8 +61,8 @@ if (process.env.NODE_ENV === 'test') {
 
 ipc.on(messages.APP_STATE_CHANGE, (e, action) => {
   appStoreRenderer.state = action.stateDiff
-    ? appStoreRenderer.state = patch(appStoreRenderer.state, Immutable.fromJS(action.stateDiff))
-    : appStoreRenderer.state = Immutable.fromJS(action.state)
+    ? patch(appStoreRenderer.state, Immutable.fromJS(action.stateDiff))
+    : Immutable.fromJS(action.state)
 })
 
 ipc.on(messages.CLEAR_CLOSED_FRAMES, (e, location) => {

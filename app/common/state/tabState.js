@@ -472,11 +472,7 @@ const tabState = {
     if (shouldDebugTabEvents) {
       console.log(`Tab [${tabId}] frame changed for tab`)
     }
-
-    const bookmarkUtil = require('../lib/bookmarkUtil')
-    const frameLocation = action.getIn(['frame', 'location'])
-    const frameBookmarked = bookmarkUtil.isLocationBookmarked(state, frameLocation)
-    const frameValue = action.get('frame').set('bookmarked', frameBookmarked)
+    const frameValue = action.get('frame')
     tabValue = tabValue.set('frame', makeImmutable(frameValue))
     return tabState.updateTabValue(state, tabValue)
   },
