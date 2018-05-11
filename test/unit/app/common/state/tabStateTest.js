@@ -236,7 +236,7 @@ describe('tabState unit tests', function () {
     })
 
     it('returns a new immutable state with the tab for `tabId` removed if it exists', function () {
-      assert.deepEqual(tabState.removeTabByTabId(this.appState, 2).get('tabs').toJS(), [twoTabsAppState.getIn(['tabs', 0]).toJS()])
+      assert.deepEqual(tabState.removeTabByTabId(this.appState, 2).get('tabs').toJS(), [twoTabsAppState.getIn(['tabs', 0]).toJS(), {}])
     })
 
     it('returns the state unmodified if the tab for `tabId` does not exist', function () {
@@ -258,7 +258,7 @@ describe('tabState unit tests', function () {
     })
 
     it('returns a new immutable state with the tab at `index` removed if it exists', function () {
-      assert.deepEqual(tabState.removeTabByIndex(this.appState, 1).get('tabs').toJS(), [ twoTabsAppState.getIn(['tabs', 0]).toJS() ])
+      assert.deepEqual(tabState.removeTabByIndex(this.appState, 1).get('tabs').toJS(), [ twoTabsAppState.getIn(['tabs', 0]).toJS(), {} ])
     })
 
     it('returns the state unmodified if `index` is out of bounds', function () {

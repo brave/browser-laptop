@@ -35,6 +35,36 @@ const tabActions = {
         windowId
       }
     })
+  },
+
+  findInPageRequest (tabId, searchString, caseSensitivity, forward, findNext) {
+    dispatchAction(tabActionConstants.FIND_IN_PAGE_REQUEST, {
+      tabId,
+      searchString,
+      caseSensitivity,
+      forward,
+      findNext
+    })
+  },
+
+  stopFindInPageRequest (tabId) {
+    dispatchAction(tabActionConstants.STOP_FIND_IN_PAGE_REQUEST, {
+      tabId
+    })
+  },
+
+  zoomChanged (tabId, zoomPercent) {
+    dispatchAction(tabActionConstants.ZOOM_CHANGED, {
+      tabId,
+      zoomPercent
+    })
+  },
+
+  setContentsError (tabId, errorDetails) {
+    dispatchAction(tabActionConstants.SET_CONTENTS_ERROR, {
+      tabId,
+      errorDetails
+    })
   }
 }
 
