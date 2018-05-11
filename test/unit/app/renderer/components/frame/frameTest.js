@@ -47,8 +47,7 @@ describe.skip('Frame component unit tests', function () {
   const fakeWindowActions = {
     frameShortcutChanged: () => {},
     setFindbarShown: () => {},
-    setActiveFrame: () => {},
-    setLastZoomPercentage: () => {}
+    setActiveFrame: () => {}
   }
 
   const domUtil = {

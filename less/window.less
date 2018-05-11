@@ -52,31 +52,30 @@ html,
   flex-grow: 1;
   box-shadow: 0 -1px 0 rgb(187, 187, 191);
   width: 100%;
-  z-index: 1;
-  .tabContainer {
-    flex-grow: 1;
-    position: relative;
-    &:after {
-      position: absolute;
-      content: ' ';
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to top, rgb(28, 27, 27) 0%, rgba(255, 255, 255, .3) 60%);
-      display: block;
-      opacity: 0;
-      transition: opacity .2s ease-in; // TODO: get from theme.tab
-      pointer-events: none;
-      will-change: opacity;
-      z-index: 1100;
-    }
-    &.hasFramePreview::after {
-      transition-timing-function: ease-out; // TODO: get from theme.tab
-      transition-duration: .2s; // TODO: get from theme.tab
-      opacity: 1;
-    }
+  position: relative;
+
+  &:after {
+    position: absolute;
+    content: ' ';
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgb(28, 27, 27) 0%, rgba(255, 255, 255, .3) 60%);
+    display: block;
+    opacity: 0;
+    transition: opacity .4s ease-in; // TODO: get from theme.tab
+    pointer-events: none;
+    will-change: opacity;
+    z-index: 1100;
   }
+  &.hasFramePreview::after {
+    transition-timing-function: ease-out; // TODO: get from theme.tab
+    transition-duration: .2s; // TODO: get from theme.tab
+    opacity: 1;
+  }
+
+
 }
 
 .frameWrapper {
@@ -89,16 +88,7 @@ html,
 
   // Needed to be able to click and drag to select content in pages.
   user-select: none;
-  // default frame background
-  // TODO: use theme.frame.defaultBackground
-  --frame-bg: #fff;
-  // custom frame background(s)
-  &.isDefaultNewTabLocation {
-    // matches tab dashboard background
-    // will also show when about:newtab === about:blank or is Private Tab
-    // TODO: use theme.frame.newTabBackground
-    --frame-bg: #222;
-  }
+
   // Webviews can cause flickers w/ Chrome  v49 if left visible
   // in the background.  This also has a major benefit for background
   // tabs that have video and animations in them.
@@ -173,16 +163,17 @@ html,
   border-style: solid;
   border-width: 1px 1px 0 0;
   border-top-right-radius: @borderRadius;
+  max-width: 40%;
+  position: absolute;
   bottom: 0;
+  left: 0;
+  padding: 0.2em 0.5em;
+  overflow-x: hidden;
   color: @chromeText;
   font-size: @defaultFontSize;
-  left: 0;
-  max-width: 40%;
-  overflow-x: hidden;
-  padding: 0.2em 0.5em;
-  position: absolute;
   text-overflow: ellipsis;
   white-space: nowrap;
+  z-index: 30;
 
   &.right {
     left: auto;
@@ -191,23 +182,6 @@ html,
     border-top-left-radius: @borderRadius;
     border-top-right-radius: 0;
   }
-}
-
-body.fullScreen .frameWrapper.isActive {
-  z-index: @zindexWindowFullScreen;
-}
-
-/* The fullscreen notice is shown above the fullscreen element */
-body.fullScreen .banner {
-  position: absolute;
-  z-index: @zindexWindowFullScreenBanner;
-  top: 0;
-  opacity: 1;
-  transition: opacity 2s ease-in-out;
-}
-
-body.fullScreen .banner.fade {
-  opacity: 0;
 }
 
 [draggable] {

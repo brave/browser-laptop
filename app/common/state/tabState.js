@@ -61,6 +61,10 @@ const validateAction = function (action) {
   return action
 }
 
+const selectTabs = function (state) {
+  return state.get('tabs', Immutable.List()).filter(tab => !tab.isEmpty())
+}
+
 const matchTab = function (queryInfo, tab) {
   queryInfo = queryInfo.toJS ? queryInfo.toJS() : queryInfo
   return !Object.keys(queryInfo).map((queryKey) => (tab.get(queryKey) === queryInfo[queryKey])).includes(false)
@@ -130,6 +134,9 @@ const updateTabsInternalIndex = (state, fromIndex) => {
   fromIndex = validateIndex(fromIndex)
   let tabsInternal = state.get('tabsInternal') || Immutable.Map()
   state.get('tabs').slice(fromIndex).forEach((tab, idx) => {
+    if (tab.isEmpty()) {
+      return
+    }
     const tabId = validateId('tabId', tab.get('tabId')).toString()
     if (tabId !== tabState.TAB_ID_NONE) {
       tabsInternal = tabsInternal.setIn(['index', tabId], (idx + fromIndex).toString())
@@ -171,7 +178,7 @@ const tabState = {
       return state
     }
     state = deleteTabsInternalIndex(state, tabValue)
-    state = state.set('tabs', state.get('tabs').delete(index))
+    state = state.setIn(['tabs', index], Immutable.Map())
     return updateTabsInternalIndex(state, index)
   },
 
@@ -208,12 +215,12 @@ const tabState = {
   getTabsByWindowId: (state, windowId) => {
     state = validateState(state)
     windowId = validateId('windowId', windowId)
-    return state.get('tabs').filter((tab) => tab.get('windowId') === windowId)
+    return selectTabs(state).filter((tab) => tab.get('windowId') === windowId)
   },
 
   getPinnedTabs: (state) => {
     state = validateState(state)
-    return state.get('tabs').filter((tab) => !!tab.get('pinned'))
+    return selectTabs(state).filter((tab) => !!tab.get('pinned'))
   },
 
   isTabPinned: (state, tabId) => {
@@ -225,7 +232,7 @@ const tabState = {
 
   getNonPinnedTabs: (state) => {
     state = validateState(state)
-    return state.get('tabs').filter((tab) => !tab.get('pinned'))
+    return selectTabs(state).filter((tab) => !tab.get('pinned'))
   },
 
   getPinnedTabsByWindowId: (state, windowId) => {
@@ -465,11 +472,7 @@ const tabState = {
     if (shouldDebugTabEvents) {
       console.log(`Tab [${tabId}] frame changed for tab`)
     }
-
-    const bookmarkUtil = require('../lib/bookmarkUtil')
-    const frameLocation = action.getIn(['frame', 'location'])
-    const frameBookmarked = bookmarkUtil.isLocationBookmarked(state, frameLocation)
-    const frameValue = action.get('frame').set('bookmarked', frameBookmarked)
+    const frameValue = action.get('frame')
     tabValue = tabValue.set('frame', makeImmutable(frameValue))
     return tabState.updateTabValue(state, tabValue)
   },
@@ -656,7 +659,8 @@ const tabState = {
 
   getVisibleOrigin: (state, tabId) => {
     const entry = tabState.getVisibleEntry(state, tabId)
-    const origin = entry ? entry.get('origin') : ''
+    // plain js in browser, immutable in renderer
+    const origin = entry ? entry.get ? entry.get('origin') : entry.origin : ''
     // TODO(bridiver) - all origins in browser-laptop should be changed to have a trailing slash to match chromium
     return (origin || '').replace(/\/$/, '')
   },
@@ -664,6 +668,35 @@ const tabState = {
   getVisibleVirtualURL: (state, tabId) => {
     const entry = tabState.getVisibleEntry(state, tabId)
     return entry ? entry.get('virtualURL') : ''
+  },
+
+  setTabStripWindowId: (state, tabId, windowId) => {
+    let path = tabState.getPathByTabId(state, tabId)
+    if (!path) {
+      console.error(`setTabStripWindowId: tab with ID ${tabId} not found!`)
+      return state
+    }
+    path = [...path, 'tabStripWindowId']
+    // handle clear window
+    if (windowId == null || windowId === -1) {
+      return state.deleteIn(path)
+    }
+    // handle set window
+    return state.setIn(path, windowId)
+  },
+
+  setZoomPercent: (state, tabId, zoomPercent) => {
+    let path = tabState.getPathByTabId(state, tabId)
+    if (!path) {
+      console.error(`setZoomPercent: tab with ID ${tabId} not found!`)
+      return state
+    }
+    if (typeof zoomPercent !== 'number') {
+      console.error(`setZoomPercent: bad value for zoomPercent: ${zoomPercent}`)
+      return state
+    }
+    path = [...path, 'zoomPercent']
+    return state.setIn(path, zoomPercent)
   }
 }
 

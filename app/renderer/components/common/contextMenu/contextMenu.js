@@ -17,9 +17,11 @@ const keyCodes = require('../../../../common/constants/keyCodes')
 
 // State
 const contextMenuState = require('../../../../common/state/contextMenuState')
+const tabState = require('../../../../common/state/tabState')
+const appStore = require('../../../../../js/stores/appStoreRenderer')
+const { getCurrentWindowId } = require('../../../currentWindow')
 
 // Utils
-const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const {separatorMenuItem} = require('../../../../common/commonMenu')
 const {wrappingClamp} = require('../../../../common/lib/formatUtil')
 
@@ -219,12 +221,13 @@ class ContextMenu extends React.Component {
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
+
     const selectedIndex = currentWindow.getIn(['ui', 'contextMenu', 'selectedIndex'], null)
     const contextMenuDetail = contextMenuState.getContextMenu(currentWindow)
 
     const props = {}
-    props.lastZoomPercentage = activeFrame.get('lastZoomPercentage')
+    const activeTab = tabState.getActiveTab(appStore.state, getCurrentWindowId())
+    props.lastZoomPercentage = activeTab && activeTab.get('zoomPercent')
     props.contextMenuDetail = contextMenuDetail  // TODO (nejc) only primitives
     props.selectedIndex = typeof selectedIndex === 'object' &&
       Array.isArray(selectedIndex) &&

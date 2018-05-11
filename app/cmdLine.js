@@ -22,6 +22,7 @@ let newWindowURL
 const debugWindowEventsFlagName = '--debug-window-events'
 const disableBufferWindowFlagName = '--disable-buffer-window'
 const disableDeferredWindowLoadFlagName = '--show-windows-immediately'
+const debugStoreActionsFlagName = '--debug-store-actions'
 
 const focusOrOpenWindow = function (url) {
   // don't try to do anything if the app hasn't been initialized
@@ -162,5 +163,6 @@ const api = module.exports = {
   shouldDebugTabEvents: process.argv.includes(debugTabEventsFlagName),
   shouldDebugWindowEvents: process.argv.includes(debugWindowEventsFlagName),
   disableBufferWindow: process.env.NODE_ENV === 'test' || process.argv.includes(disableBufferWindowFlagName),
-  disableDeferredWindowLoad: process.argv.includes(disableDeferredWindowLoadFlagName)
+  disableDeferredWindowLoad: process.argv.includes(disableDeferredWindowLoadFlagName),
+  shouldDebugStoreActions: process.argv.includes(debugStoreActionsFlagName)
 }

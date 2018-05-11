@@ -25,8 +25,9 @@ const browserWindowUtil = require('../common/lib/browserWindowUtil')
 const windowState = require('../common/state/windowState')
 const pinnedSitesState = require('../common/state/pinnedSitesState')
 const {zoomLevel} = require('../common/constants/toolbarUserInterfaceScale')
-const { shouldDebugWindowEvents, disableBufferWindow, disableDeferredWindowLoad } = require('../cmdLine')
+const { shouldDebugWindowEvents, shouldDebugTabEvents, shouldDebugStoreActions, disableBufferWindow, disableDeferredWindowLoad } = require('../cmdLine')
 const activeTabHistory = require('./activeTabHistory')
+const webContentsCache = require('./webContentsCache')
 
 const isDarwin = platformUtil.isDarwin()
 const isWindows = platformUtil.isWindows()
@@ -210,8 +211,15 @@ function openFramesInWindow (win, frames, activeFrameKey) {
     let frameIndex = -1
     for (const frame of frames) {
       frameIndex++
-      if (frame.guestInstanceId) {
-        appActions.newWebContentsAdded(win.id, frame)
+      if (frame.tabId != null && frame.guestInstanceId != null) {
+        if (shouldDebugTabEvents) {
+          console.log('notifyWindowWebContentsAdded: on window create with existing tab', win.id)
+        }
+        api.notifyWindowWebContentsAdded(win.id, frame)
+        const tab = webContentsCache.getWebContents(frame.tabId)
+        if (tab && !tab.isDestroyed()) {
+          tab.moveTo(frameIndex, win.id)
+        }
       } else {
         appActions.createTabRequested({
           windowId: win.id,
@@ -276,6 +284,30 @@ const api = {
 
         win.once('close', () => {
           LocalShortcuts.unregister(win)
+        })
+        win.webContents.on('tab-inserted-at', (e, contents, index, active) => {
+          const tabId = contents.getId()
+          appActions.tabInsertedToTabStrip(win.id, tabId, index)
+          if (shouldDebugWindowEvents) {
+            console.log(`window ${win.id} had ${!active ? 'in' : ''}active tab ${tabId} inserted at index ${index}`)
+          }
+        })
+        win.webContents.on('tab-detached-at', (e, index, windowId) => {
+          appActions.tabDetachedFromTabStrip(windowId, index)
+          if (shouldDebugWindowEvents) {
+            console.log(`window ${win.id} had tab at removed at index ${index}`)
+          }
+        })
+        win.webContents.on('tab-strip-empty', () => {
+          // must wait for pending tabs to be attached to new window before closing
+          // TODO(petemill): race condition if multiple different tabs are moved at the same time
+          // ...tab-strip-empty may fire before all of those tabs are inserted to new window
+          win.webContents.once('detached-tab-new-window', () => {
+            if (shouldDebugWindowEvents) {
+              console.log('departing tab made it to new window')
+            }
+            api.closeWindow(win.id)
+          })
         })
         win.on('scroll-touch-begin', function (e) {
           win.webContents.send('scroll-touch-begin')
@@ -634,6 +666,16 @@ const api = {
       defaultOptions,
       windowOptionsIn
     )
+    // validate activeFrameKey if provided
+    let activeFrameKey = immutableState.get('activeFrameKey')
+    if (frames && frames.length && activeFrameKey) {
+      const keyIsValid = frames.some(frame => frame.key === activeFrameKey)
+      if (!keyIsValid) {
+        // make first frame active if invalid key provided
+        activeFrameKey = frames[0].key
+      }
+      immutableState = immutableState.set('activeFrameKey', activeFrameKey)
+    }
     // will only hide until rendered if the options specify to show window
     // so that a caller can control showing the window themselves with the option { show: false }
     const showWhenRendered = hideUntilRendered && windowOptions.show
@@ -765,7 +807,11 @@ const api = {
 
       const position = win.getPosition()
       const size = win.getSize()
-      const windowState = (immutableState && immutableState.toJS()) || undefined
+
+      const windowState = (immutableState && immutableState.toJS()) || { }
+      windowState.debugTabEvents = shouldDebugTabEvents
+      windowState.debugStoreActions = shouldDebugStoreActions
+
       const mem = muon.shared_memory.create({
         windowValue: {
           disposition: windowOptions.disposition,
@@ -777,13 +823,10 @@ const api = {
           width: size[0]
         },
         appState: appStore.getLastEmittedState().toJS(),
-        windowState,
-        // TODO: dispatch frame create action on appStore, as this is what the window does anyway
-        // ...and do it after the window has rendered
-        frames
+        windowState
       })
-
       e.sender.sendShared(messages.INITIALIZE_WINDOW, mem)
+      openFramesInWindow(win, frames, windowState && windowState.activeFrameKey)
       // TODO: remove callback, use store action, returning a new window UUID from this function
       if (cb) {
         cb()
@@ -828,6 +871,19 @@ const api = {
         !win.isDestroyed() &&
         (includingBufferWindow || win !== api.getBufferWindow())
       )
+  },
+
+  notifyWindowWebContentsAdded (windowId, frame, tabValue) {
+    const win = api.getWindow(windowId)
+    if (!win || win.isDestroyed()) {
+      console.error(`notifyWindowWebContentsAdded, no window for id ${windowId}`)
+      return
+    }
+    if (!win.webContents || win.webContents.isDestroyed()) {
+      console.error(`notifyWindowWebContentsAdded, no window webContents for id ${windowId}`)
+      return
+    }
+    win.webContents.send('new-web-contents-added', frame, tabValue)
   },
 
   on: (...args) => publicEvents.on(...args),

@@ -314,7 +314,6 @@ describe('historyUtil unit tests', function () {
         isFullScreen: false,
         isPrivate: false,
         key: 1,
-        lastZoomPercentage: 1,
         loading: true,
         location: 'https://brave.com',
         title: 'Brave'

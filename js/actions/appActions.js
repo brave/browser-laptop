@@ -107,10 +107,10 @@ const appActions = {
    * Frame props changed
    * @param {Object} frame
    */
-  frameChanged: function (frame) {
+  framesChanged: function (frames) {
     dispatch({
-      actionType: appConstants.APP_FRAME_CHANGED,
-      frame
+      actionType: appConstants.APP_FRAMES_CHANGED,
+      frames
     })
   },
 
@@ -140,10 +140,15 @@ const appActions = {
    * Tab moved event fired from muon
    * @param {Object} tabValue
    */
-  tabMoved: function (tabId) {
+  tabMoved: function (tabId, fromIndex, toIndex, windowId) {
     dispatch({
       actionType: appConstants.APP_TAB_MOVED,
-      tabId
+      tabId,
+      fromIndex,
+      toIndex,
+      queryInfo: {
+        windowId
+      }
     })
   },
 
@@ -195,6 +200,25 @@ const appActions = {
       actionType: appConstants.APP_TAB_PAGE_CLOSE_MENU_ITEM_CLICKED,
       tabPageIndex,
       windowId
+    })
+  },
+
+    /**
+   * Dispatches a message to the store to indicate that the webview entered full screen mode.
+   *
+   * @param {Object} tabId - Tab id of the frame to put in full screen
+   * @param {boolean} isFullScreen - true if the webview is entering full screen mode.
+   * @param {boolean} showFullScreenWarning - true if a warning about entering full screen should be shown.
+   */
+  tabSetFullScreen: function (tabId, isFullScreen, showFullScreenWarning, windowId) {
+    dispatch({
+      actionType: appConstants.APP_TAB_SET_FULL_SCREEN,
+      tabId,
+      isFullScreen,
+      showFullScreenWarning,
+      queryInfo: {
+        windowId
+      }
     })
   },
 
@@ -1177,23 +1201,6 @@ const appActions = {
   },
 
   /**
-   * Dispatches a message when a web contents is added
-   * @param {number} windowId - The windowId of the host window
-   * @param {object} frameOpts - frame options for the added web contents
-   * @param {object} tabValue - the created tab state
-   */
-  newWebContentsAdded: function (windowId, frameOpts, tabValue) {
-    dispatch({
-      actionType: appConstants.APP_NEW_WEB_CONTENTS_ADDED,
-      queryInfo: {
-        windowId
-      },
-      frameOpts,
-      tabValue
-    })
-  },
-
-  /**
    * Notifies the app that a drag operation started from within the app
    * @param {number} windowId - The source windowId the drag is starting from
    * @param {string} dragType - The type of data
@@ -2004,6 +2011,26 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE,
       viewData
+    })
+  },
+
+  tabInsertedToTabStrip: function (windowId, tabId, index) {
+    dispatch({
+      actionType: appConstants.APP_TAB_INSERTED_TO_TAB_STRIP,
+      queryInfo: {
+        windowId
+      },
+      tabId,
+      index,
+      windowId
+    })
+  },
+
+  tabDetachedFromTabStrip: function (windowId, index) {
+    dispatch({
+      actionType: appConstants.APP_TAB_DETACHED_FROM_TAB_STRIP,
+      index,
+      windowId
     })
   }
 }
