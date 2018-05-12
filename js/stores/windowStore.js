@@ -111,11 +111,10 @@ const newFrame = (state, frameOpts) => {
     console.debug('newFrame', frameOpts)
   }
   // Ensure valid index
-  let insertionIndex = frameOpts.index != null
-    ? frameOpts.index
-    : 0
+  let insertionIndex = frameOpts.index
   const highestFrameIndex = (state.get('frames') || Immutable.List()).count()
-  if (insertionIndex === -1 || insertionIndex > highestFrameIndex) {
+  const insertionIndexIsInvalid = (insertionIndex == null || insertionIndex < 0 || insertionIndex > highestFrameIndex)
+  if (insertionIndexIsInvalid) {
     if (shouldLogDebug) {
       console.debug(`newFrame: invalid insertionIndex of ${insertionIndex} so using max index of ${highestFrameIndex}`)
     }
