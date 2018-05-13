@@ -289,5 +289,25 @@ describe('window API unit tests', function () {
         assert.propertyVal(maximizeSpy, 'callCount', 1)
       })
     })
+
+    describe('getWindowForFileAction', function () {
+      it('returns a window object', function () {
+        const newWindow = windows.getWindowForFileAction(defaultState)
+        assert.equal(browserWindowSpy.callCount, 1)
+        assert.equal('object', typeof newWindow)
+      })
+
+      it('sets fullscreen to false', function () {
+        windows.getWindowForFileAction(defaultState)
+        const windowOptions = browserWindowSpy.args[0][0]
+        assert.isFalse(windowOptions.fullscreen)
+      })
+
+      it('does not show window by default', function () {
+        windows.getWindowForFileAction(defaultState)
+        const windowOptions = browserWindowSpy.args[0][0]
+        assert.isFalse(windowOptions.show)
+      })
+    })
   })
 })

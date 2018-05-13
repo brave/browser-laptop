@@ -22,7 +22,21 @@ describe('windowsReducer unit test', function () {
   }
 
   const fakeWindowApi = {
-    createWindow: () => {}
+    createWindow: () => {},
+    getFramesForNewWindow: () => {},
+    windowDefaults: (state) => {
+      return {
+        width: state.getIn(['defaultWindowParams', 'width']) || state.get('defaultWindowWidth'),
+        height: state.getIn(['defaultWindowParams', 'height']) || state.get('defaultWindowHeight'),
+        x: state.getIn(['defaultWindowParams', 'x']) || undefined,
+        y: state.getIn(['defaultWindowParams', 'y']) || undefined,
+        minWidth: 480,
+        minHeight: 300,
+        minModalHeight: 100,
+        minModalWidth: 100,
+        windowOffset: 20
+      }
+    }
   }
 
   const fakePlatformUtil = {
