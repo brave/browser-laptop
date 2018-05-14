@@ -54,7 +54,8 @@ def upload_browser_laptop(github, release, file_path):
       filename = 'RELEASES-{0}'.format(TARGET_ARCH)
 
     retry_func(
-      lambda x: upload_io_to_github(github, release, filename, f, 'application/octet-stream'),
+      lambda ran: upload_io_to_github(github, release, filename, f, 'application/octet-stream'),
+      catch_func=lambda ran: delete_file(github, release, filename),
       catch=requests.exceptions.ConnectionError, retries=3
     )
 
@@ -84,6 +85,19 @@ def upload_io_to_github(github, release, name, io, content_type, retries=3):
     headers={'Content-Type': content_type},
     data=io, verify=False
   )
+
+def delete_file(github, release, name, retries=3):
+  release = retry_func(
+    lambda run: github.releases(release['id']).get(),
+    catch=requests.exceptions.ConnectionError, retries=3
+  )
+  for asset in release['assets']:
+    if asset['name'] == name:
+      print("Deleting file name '{}' with asset id {}".format(name, asset['id']))
+      retry_func(
+        lambda run: github.releases.assets(asset['id']).delete(),
+        catch=requests.exceptions.ConnectionError, retries=3
+      )
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Uploads the browser-laptop build to GitHub')
