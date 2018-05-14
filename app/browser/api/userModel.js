@@ -178,14 +178,14 @@ const classifyPage = (state, action, windowId) => {
   let catNames = priorData['names']
 
   let immediateMax = um.vectorIndexOfMax(pageScore)
-  let immediateWinner = catNames[immediateMax] && catNames[immediateMax].split('-')
+  let immediateWinner = catNames[immediateMax].split('-')
 
   let mutable = true
   let history = userModelState.getPageScoreHistory(state, mutable)
 
   let scores = um.deriveCategoryScores(history)
   let indexOfMax = um.vectorIndexOfMax(scores)
-  let winnerOverTime = catNames[indexOfMax] && catNames[indexOfMax].split('-')
+  let winnerOverTime = catNames[indexOfMax].split('-')
 
   appActions.onUserModelLog('Site visited', {url, immediateWinner, winnerOverTime})
 
@@ -217,8 +217,8 @@ const basicCheckReadyAdServe = (state, windowId) => {
   const category = catNames[indexOfMax]
   const winnerOverTime = category && category.split('-')[0]
 
-  // when catalog catches up, use winnerOverTime instead
-  const result = bundle['categories'][category]
+  // when catalog catches up, use category instead
+  const result = bundle['categories'][winnerOverTime]
   if (!result) {
     appActions.onUserModelLog('No ads for category', {category})
     return state
