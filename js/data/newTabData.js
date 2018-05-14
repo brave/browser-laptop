@@ -63,6 +63,6 @@ module.exports.topSites = [
     'favicon': `${iconPath}/playstore.png`,
     'location': 'https://play.google.com/store/apps/details?id=com.brave.browser',
     'themeColor': 'rgb(241, 241, 241)',
-    'title': 'Brave Browser: Fast AdBlock – Apps for Android not Google Play'
+    'title': 'Brave Browser: Fast AdBlocker - Apps on Google Play'
   }
 ]
