@@ -128,7 +128,7 @@
     "snazzy": "^7.0.0",
     "string.prototype.endswith": "^0.2.0",
     "string.prototype.startswith": "^0.2.0",
-    "tablesort": "5.0.1",
+    "tablesort": "5.0.2",
     "tldjs": "1.6.2",
     "underscore": "1.8.3",
     "url-loader": "~0.6.2",
