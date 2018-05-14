@@ -440,7 +440,7 @@ class SecurityTab extends ImmutableComponent {
               .map((policy) => <option data-l10n-id={policy} value={webrtcConstants[policy]} />)
           }
         </SettingDropdown>
-        <div
+        <label
           className={css(styles.link)}
           data-l10n-id='webrtcPolicyExplanation'
           onClick={aboutActions.createTabRequested.bind(null, {
