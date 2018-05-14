@@ -272,6 +272,38 @@ class LedgerTable extends ImmutableComponent {
     ]
   }
 
+  /**
+   * Function used for determination if table should be sorted or not
+   * For comparison we use publisher percentage, number of views and time spent.
+   * We compare previous values with new values that we received.
+   * @param prevRows - Previous value for the table
+   * @param currentRows - New value for the table
+   * @returns {boolean} - Was something changed and if so let's trigger the sort
+   */
+  sortCheck (prevRows, currentRows) {
+    if (prevRows && currentRows && currentRows.length === prevRows.length) {
+      for (let i = 0; i < currentRows.length; i++) {
+        const newRow = currentRows[i]
+        const oldRow = prevRows[i]
+
+        for (let j = 0; j < newRow.length; j++) {
+          if (
+            newRow[j] &&
+            oldRow[j] &&
+            newRow[j][5] &&
+            newRow[j][3] &&
+            newRow[j][4] &&
+            (
+              newRow[j][5].value !== oldRow[j][5].value || // %
+              newRow[j][3].value !== oldRow[j][3].value || // views
+              newRow[j][4].value !== oldRow[j][4].value // time
+            )
+          ) return true
+        }
+      }
+    }
+  }
+
   render () {
     if (!this.synopsis || !this.synopsis.size) {
       return null
@@ -351,6 +383,7 @@ class LedgerTable extends ImmutableComponent {
           pinnedRows.map((synopsis) => this.getRow(synopsis)).toJS(),
           unPinnedRows.map((synopsis) => this.getRow(synopsis)).toJS()
         ]}
+        sortCheck={this.sortCheck}
       />
       {
         showButton
