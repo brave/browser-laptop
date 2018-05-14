@@ -34,7 +34,7 @@ curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
 echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt `lsb_release -sc` main" | sudo tee -a /etc/apt/sources.list.d/brave-`lsb_release -sc`.list
 ```
 
-Verify the `/etc/apt/sources.list.d/brave-*.list` file lists a new repository and does not contain the word `lsb_release`. If you see the word `lsb_release` you might not have `lsb_release` installed.
+Verify the `/etc/apt/sources.list.d/brave-*.list` file lists a new repository and does not contain the word `lsb_release`. If you see the word `lsb_release` you might not have `lsb_release` installed. If you're using Debian testing, you'll need to change `buster` to `stretch` in `brave-buster.list`.
  * TIP, the following command should return empty if all went well:
  ```
  grep lsb_release /etc/apt/sources.list.d/brave*
