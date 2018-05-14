@@ -1162,6 +1162,7 @@ const recoverKeys = (state, useRecoveryKeyFile, key) => {
     return state
   }
 
+  state = aboutPreferencesState.setRecoveryBalanceRecalculated(state, false)
   client.recoverWallet(null, recoveryKey, (err, result) => {
     appActions.onWalletRecovery(err, result)
     appActions.onPromotionRemoval()
@@ -1919,7 +1920,9 @@ const onWalletProperties = (state, body) => {
   }
 
   state = module.exports.generatePaymentData(state)
-
+  if (state.getIn(['about', 'preferences']) != null && aboutPreferencesState.getRecoveryBalanceRecalulated(state) === false) {
+    state = aboutPreferencesState.setRecoveryBalanceRecalculated(state, true)
+  }
   return state
 }
 
