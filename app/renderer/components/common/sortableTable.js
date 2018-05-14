@@ -12,6 +12,7 @@ const globalStyles = require('../styles/global')
 // Utils
 const cx = require('../../../../js/lib/classSet')
 const eventUtil = require('../../../../js/lib/eventUtil')
+const ImmutableUtil = require('../../../common/state/immutableUtil')
 
 tableSort.extend('number', (item) => {
   return typeof item === 'number'
@@ -32,16 +33,62 @@ class SortableTable extends React.Component {
     }
     this.counter = 0
     this.sortTable = null
+    this.dimensionCount = null
   }
   componentDidMount () {
-    this.sortTable = tableSort(this.table)
+    this.sortTable = tableSort(this.table, {
+      descending: this.props.defaultHeadingSortOrder === 'desc'
+    })
     return this.sortTable
   }
   componentDidUpdate (prevProps) {
-    if (this.props.rows &&
-      (!prevProps.rows ||
-      prevProps.rows.length !== this.props.rows.length)) {
-      this.sortTable.refresh()
+    if (this.isMultiDimensioned) {
+      let count = 0
+      if (this.dimensionCount == null && prevProps.rows) {
+        for (let i = 0; i < prevProps.rows.length; i++) {
+          if (this.props.rows[i].length > 0) {
+            count += this.props.rows[i].length
+          }
+        }
+        this.dimensionCount = count
+      }
+
+      if (!this.props.rows) {
+        this.dimensionCount = null
+        return
+      }
+
+      count = 0
+      for (let i = 0; i < this.props.rows.length; i++) {
+        if (this.props.rows[i].length > 0) {
+          count += this.props.rows[i].length
+        }
+      }
+
+      if (count !== this.dimensionCount) {
+        this.sortTable.refresh()
+        this.dimensionCount = count
+        return
+      }
+    } else {
+      if (
+        this.props.rows &&
+        (
+          !prevProps.rows ||
+          prevProps.rows.length !== this.props.rows.length
+        )
+      ) {
+        this.sortTable.refresh()
+        return
+      }
+    }
+
+    if (this.props.rows && typeof this.props.sortCheck === 'function') {
+      const shouldSort = this.props.sortCheck(prevProps.rows, this.props.rows)
+
+      if (shouldSort) {
+        this.sortTable.refresh()
+      }
     }
   }
   /**
@@ -202,11 +249,11 @@ class SortableTable extends React.Component {
       const tableID = parseInt(tableParts[0])
       const rowIndex = parseInt(tableParts[1])
       const handlerInput = this.props.totalRowObjects
-        ? (typeof this.props.totalRowObjects[parseInt(tableID)][rowIndex].toJS === 'function'
+        ? (ImmutableUtil.isImmutable(this.props.totalRowObjects[parseInt(tableID)][rowIndex])
           ? this.props.totalRowObjects[parseInt(tableID)][rowIndex].toJS()
           : this.props.totalRowObjects[parseInt(tableID)][rowIndex])
         : (this.props.rowObjects.size > 0 || this.props.rowObjects.length > 0)
-          ? (typeof this.props.rowObjects.toJS === 'function'
+          ? (ImmutableUtil.isImmutable(this.props.rowObjects)
             ? this.props.rowObjects.get(rowIndex).toJS()
             : this.props.rowObjects[rowIndex])
           : null
@@ -305,23 +352,51 @@ class SortableTable extends React.Component {
     // Object bound to this row. Not passed to multi-select handlers.
     if (this.isMultiDimensioned) {
       // Object bound to this row. Not passed to multi-select handlers.
-      handlerInput = this.props.rowObjects[bodyIndex] &&
-      (this.props.rowObjects[bodyIndex].size > 0 || this.props.rowObjects[bodyIndex].length > 0)
-        ? (typeof this.props.rowObjects[bodyIndex].toJS === 'function'
-          ? this.props.rowObjects[bodyIndex].get(index).toJS()
-          : (typeof this.props.rowObjects[bodyIndex][index].toJS === 'function'
-            ? this.props.rowObjects[bodyIndex][index].toJS()
-            : this.props.rowObjects[bodyIndex][index]))
-        : row
+      if (
+        this.props.rowObjects[bodyIndex] &&
+        (
+          this.props.rowObjects[bodyIndex].size > 0 ||
+          this.props.rowObjects[bodyIndex].length > 0
+        )
+      ) {
+        let indexObj
+        if (ImmutableUtil.isImmutable(this.props.rowObjects[bodyIndex])) {
+          indexObj = this.props.rowObjects[bodyIndex].get(index)
+        } else {
+          indexObj = this.props.rowObjects[bodyIndex][index]
+        }
+
+        handlerInput = indexObj
+
+        if (ImmutableUtil.isImmutable(indexObj)) {
+          handlerInput = indexObj.toJS()
+        }
+      } else {
+        handlerInput = row
+      }
     } else {
-      handlerInput = this.props.rowObjects &&
-      (this.props.rowObjects.size > 0 || this.props.rowObjects.length > 0)
-        ? (typeof this.props.rowObjects.toJS === 'function'
-          ? this.props.rowObjects.get(index).toJS()
-          : (typeof this.props.rowObjects[index].toJS === 'function'
-            ? this.props.rowObjects[index].toJS()
-            : this.props.rowObjects[index]))
-        : row
+      if (
+        this.props.rowObjects &&
+        (
+          this.props.rowObjects.size > 0 ||
+          this.props.rowObjects.length > 0
+        )
+      ) {
+        let indexObj
+        if (ImmutableUtil.isImmutable(this.props.rowObjects)) {
+          indexObj = this.props.rowObjects.get(index)
+        } else {
+          indexObj = this.props.rowObjects[index]
+        }
+
+        handlerInput = indexObj
+
+        if (ImmutableUtil.isImmutable(indexObj)) {
+          handlerInput = indexObj.toJS()
+        }
+      } else {
+        handlerInput = row
+      }
     }
 
     // Allow parent control to optionally specify context
@@ -473,9 +548,10 @@ class SortableTable extends React.Component {
             if (dataType === 'object' && firstEntry.value) {
               dataType = typeof firstEntry.value
             }
+            const defaultSort = (this.sortingDisabled || heading === this.props.defaultHeading) || null
             const headerClasses = {
               'sort-header': true,
-              'sort-default': this.sortingDisabled || heading === this.props.defaultHeading,
+              'sort-default': defaultSort,
               [css(styles.table__th, this.props.smallRow && styles.table__th_smallRow)]: true
             }
             const isString = typeof heading === 'string'
@@ -486,8 +562,9 @@ class SortableTable extends React.Component {
             return <th className={cx(headerClasses)}
               data-sort-method={sortMethod}
               data-sort-order={this.props.defaultHeadingSortOrder}
+              data-sort-default={defaultSort}
               data-test-id={cx({
-                'sort-default': this.sortingDisabled || heading === this.props.defaultHeading
+                'sort-default': defaultSort
               })}
               data-test2-id={heading === 'title' ? 'heading-title' : null}
             >
