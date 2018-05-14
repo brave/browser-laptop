@@ -31,7 +31,7 @@ def release_name():
   return '{0} Channel'.format(get_channel_display_name())
 
 def get_tag():
-  return 'v' + get_version() + get_channel_display_name()
+  return 'v' + get_version() + release_channel()
 
 def get_version():
   return json.load(open('package.json'))['version']

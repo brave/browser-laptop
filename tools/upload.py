@@ -3,19 +3,26 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import json
-import os
+import sys
+import argparse
 from lib.github import GitHub
 from lib.helpers import *
 import requests
 
 TARGET_ARCH= os.environ['TARGET_ARCH'] if os.environ.has_key('TARGET_ARCH') else 'x64'
 
-def main():
+def main(args):
   print('[INFO] Running upload...')
   repo = GitHub(get_env('GITHUB_TOKEN')).repos(BROWSER_LAPTOP_REPO)
 
-  sanity_check(repo, get_tag())
+  try:
+    sanity_check(repo, get_tag())
+  except UserWarning:
+    if args.force:
+      delete_release(repo, get_tag())
+    else:
+      raise
+
 
   release = create_release_draft(repo, get_tag())
   print('[INFO] Uploading release {}'.format(release['tag_name']))
@@ -28,6 +35,14 @@ def sanity_check(repo, tag):
   print('[INFO] Existing releases: {}'.format([x['tag_name'] for x in releases]))
   if releases:
     raise(UserWarning("Draft with tag {} already exists".format(tag)))
+
+def delete_release(repo, tag):
+  print('[WARN] Deleting release {}'.format(tag))
+  releases = get_releases_by_tag(repo, tag, include_drafts=True)
+  retry_func(
+    lambda run: repo.releases(releases[0]['id']).delete(),
+    catch=requests.exceptions.ConnectionError, retries=3
+  )
 
 def upload_browser_laptop(github, release, file_path):
   filename = os.path.basename(file_path)
@@ -71,5 +86,7 @@ def upload_io_to_github(github, release, name, io, content_type, retries=3):
   )
 
 if __name__ == '__main__':
-  import sys
-  sys.exit(main())
+  parser = argparse.ArgumentParser(description='Uploads the browser-laptop build to GitHub')
+  parser.add_argument('--force', action='store_true', help='Overwrite the destination release if it already exists.')
+  args = parser.parse_args()
+  sys.exit(main(args))
