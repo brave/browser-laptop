@@ -11,7 +11,6 @@ const messages = require('../../../js/constants/messages')
 const settings = require('../../../js/constants/settings')
 
 // State
-const aboutPreferencesState = require('../../common/state/aboutPreferencesState')
 const ledgerState = require('../../common/state/ledgerState')
 
 // Actions
@@ -27,30 +26,22 @@ const text = {
   paymentDone: undefined,
   addFunds: locale.translation('addFundsNotification'),
   tryPayments: locale.translation('notificationTryPayments'),
-  reconciliation: locale.translation('reconciliationNotification'),
-  backupKeys: locale.translation('backupKeys')
+  reconciliation: locale.translation('reconciliationNotification')
 }
 
-const pollingInterval = process.env.LEDGER_NOTIFICATION ? ledgerUtil.milliseconds.second * 5 : 15 * ledgerUtil.milliseconds.minute // 15 * minute default production
+const pollingInterval = 15 * ledgerUtil.milliseconds.minute // 15 * minutes
 let intervalTimeout
 const displayOptions = {
   style: 'greetingStyle',
   persist: false
 }
 const nextAddFundsTime = 3 * ledgerUtil.milliseconds.day
-let backupNotifyInterval = process.env.LEDGER_NOTIFICATION ? [2 * ledgerUtil.milliseconds.minute, 5 * ledgerUtil.milliseconds.minute] : [7 * ledgerUtil.milliseconds.day, 14 * ledgerUtil.milliseconds.day]
 
 const sufficientBalanceToReconcile = (state) => {
   const balance = Number(ledgerState.getInfoProp(state, 'balance') || 0)
   const unconfirmed = Number(ledgerState.getInfoProp(state, 'unconfirmed') || 0)
   const budget = ledgerState.getContributionAmount(state)
   return balance + unconfirmed >= budget
-}
-
-const hasFunded = (state) => {
-  return getSetting(settings.PAYMENTS_ENABLED)
-  ? ledgerState.getInfoProp(state, 'userHasFunded') || false
-  : false
 }
 const shouldShowNotificationReviewPublishers = () => {
   const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_RECONCILE_SOON_TIMESTAMP)
@@ -72,12 +63,9 @@ const init = () => {
 }
 
 const onInterval = (state) => {
-  if (process.env.LEDGER_NOTIFICATION) {
-    runDebugCounter()
-  }
   if (getSetting(settings.PAYMENTS_ENABLED)) {
     if (getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
-      state = module.exports.showEnabledNotifications(state)
+      module.exports.showEnabledNotifications(state)
     }
   } else {
     module.exports.showDisabledNotifications(state)
@@ -152,16 +140,6 @@ const onResponse = (message, buttonIndex, activeWindow) => {
       appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
       break
 
-    case text.backupKeys:
-      if (buttonIndex === 0) {
-        appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
-      } else if (buttonIndex === 2 && activeWindow) {
-        appActions.createTabRequested({
-          url: 'about:preferences#payments?ledgerBackupOverlayVisible',
-          windowId: activeWindow.id
-        })
-      }
-      break
     default:
       return
   }
@@ -205,17 +183,14 @@ const onDynamicResponse = (message, actionId, activeWindow) => {
  * a day in the future and balance is too low.
  * 24 hours prior to reconciliation, show message asking user to review
  * their votes.
- *
- * If not time to reconcile, check to show backup notification ()
  */
 const showEnabledNotifications = (state) => {
-  const now = new Date().getTime()
-  let bootStamp = ledgerState.getInfoProp(state, 'bootStamp')
   const reconcileStamp = ledgerState.getInfoProp(state, 'reconcileStamp')
   if (!reconcileStamp) {
-    return state
+    return
   }
-  if (reconcileStamp - now < ledgerUtil.milliseconds.day) {
+
+  if (reconcileStamp - new Date().getTime() < ledgerUtil.milliseconds.day) {
     if (sufficientBalanceToReconcile(state)) {
       if (shouldShowNotificationReviewPublishers()) {
         const reconcileFrequency = ledgerState.getInfoProp(state, 'reconcileFrequency')
@@ -224,38 +199,11 @@ const showEnabledNotifications = (state) => {
     } else if (shouldShowNotificationAddFunds()) {
       showAddFunds()
     }
-  } else if (reconcileStamp - now < 2 * ledgerUtil.milliseconds.day) {
+  } else if (reconcileStamp - new Date().getTime() < 2 * ledgerUtil.milliseconds.day) {
     if (sufficientBalanceToReconcile(state) && (shouldShowNotificationReviewPublishers())) {
-      showReviewPublishers(now + ledgerUtil.milliseconds.day)
-    }
-  } else if (hasFunded(state) && !aboutPreferencesState.hasBeenBackedUp(state)) {
-    const backupNotifyCount = aboutPreferencesState.getPreferencesProp(state, 'backupNotifyCount') || 0
-    const backupNotifyTimestamp = aboutPreferencesState.getPreferencesProp(state, 'backupNotifyTimestamp') || backupNotifyInterval[0]
-    if (!bootStamp) {
-      bootStamp = now
-      state = ledgerState.setInfoProp(state, 'bootStamp', bootStamp)
-    }
-    if (now - bootStamp > backupNotifyTimestamp) {
-      const nextTime = backupNotifyTimestamp + getNextBackupNotification(state, backupNotifyCount + 1, backupNotifyInterval) // set next time to notify case for remind later
-      state = aboutPreferencesState.setPreferencesProp(state, 'backupNotifyCount', (backupNotifyCount + 1))
-      state = aboutPreferencesState.setPreferencesProp(state, 'backupNotifyTimestamp', nextTime)
-      module.exports.showBackupKeys(nextTime)
-    }
-    if (process.env.LEDGER_NOTIFICATION) {
-      watchNotificationTimers(now, bootStamp, backupNotifyCount, backupNotifyTimestamp)
+      showReviewPublishers(new Date().getTime() + ledgerUtil.milliseconds.day)
     }
   }
-  return state
-}
-
-const getNextBackupNotification = (state, count, interval) => {
-  if (count >= (interval && interval.constructor === Array ? interval.length : 0)) {
-    if (process.env.LEDGER_NOTIFICATION) {
-      return ledgerUtil.milliseconds.minute
-    }
-    return ledgerUtil.milliseconds.month
-  }
-  return interval[count]
 }
 
 const showDisabledNotifications = (state) => {
@@ -276,20 +224,6 @@ const showDisabledNotifications = (state) => {
       options: displayOptions
     })
   }
-}
-
-const showBackupKeys = (nextTime) => {
-  appActions.showNotification({
-    position: 'global',
-    greeting: text.hello,
-    message: text.backupKeys,
-    buttons: [
-      {text: locale.translation('turnOffNotifications')},
-      {text: locale.translation('updateLater')},
-      {text: locale.translation('backupKeysNow'), className: 'primaryButton'}
-    ],
-    options: displayOptions
-  })
 }
 
 const showReviewPublishers = (nextTime) => {
@@ -392,16 +326,6 @@ const removePromotionNotification = (state) => {
   appActions.hideNotification(notification.get('message'))
 }
 
-const watchNotificationTimers = (now, bootStamp, backupNotifyCount, backupNotifyTimestamp) => { // for testing
-  console.log('now - bootstamp: ' + (now - bootStamp))
-  console.log('count: ' + backupNotifyCount)
-  console.log('backupNotifyTimestamp: ' + backupNotifyTimestamp)
-}
-
-const runDebugCounter = () => {
-  console.log(new Date().getTime() / ledgerUtil.milliseconds.second)
-}
-
 if (ipc) {
   ipc.on(messages.NOTIFICATION_RESPONSE, (e, message, buttonIndex, checkbox, index, buttonActionId) => {
     if (buttonActionId) {
@@ -431,10 +355,7 @@ const getMethods = () => {
     showDisabledNotifications,
     showEnabledNotifications,
     onIntervalDynamic,
-    showPromotionNotification,
-    showBackupKeys,
-    hasFunded,
-    getNextBackupNotification
+    showPromotionNotification
   }
 
   let privateMethods = {}
