@@ -8,6 +8,8 @@ const assert = require('assert')
 const sinon = require('sinon')
 const mockery = require('mockery')
 const settings = require('../../../../../js/constants/settings')
+const ledgerUtil = require('../../../../../app/common/lib/ledgerUtil')
+const aboutPreferencesState = require('../../../../../app/common/state/aboutPreferencesState')
 
 describe('ledgerNotifications unit test', function () {
   let fakeClock
@@ -21,6 +23,9 @@ describe('ledgerNotifications unit test', function () {
   let paymentsAllowPromotions = true
 
   const defaultAppState = Immutable.fromJS({
+    about: {
+      preferences: {}
+    },
     ledger: {}
   })
 
@@ -133,10 +138,90 @@ describe('ledgerNotifications unit test', function () {
 
     it('payments enabled and notifications enabled', function () {
       paymentsNotifications = true
-      ledgerNotificationsApi.onInterval(defaultAppState)
+      ledgerNotificationsApi.onInterval(defaultAppState.setIn(['ledger', 'info', 'userHasFunded'], false))
       assert(showDisabledNotificationsSpy.notCalled)
       assert(showEnabledNotificationsSpy.calledOnce)
       assert(onIntervalDynamicSpy.calledOnce)
+    })
+  })
+
+  describe('showBackupKeys', function () {
+    paymentsEnabled = true
+    paymentsNotifications = true
+    let fakeClock, showBackupKeysSpy
+    let state = defaultAppState
+      .setIn(['ledger', 'info', 'reconcileStamp'], ledgerUtil.milliseconds.year) // set to skip over reconciliation
+      .setIn(['ledger', 'info', 'userHasFunded'], true)
+
+    before(function () {
+      fakeClock = sinon.useFakeTimers()
+      showBackupKeysSpy = sinon.spy(ledgerNotificationsApi, 'showBackupKeys')
+    })
+
+    afterEach(function () {
+      showBackupKeysSpy.reset()
+    })
+
+    after(function () {
+      fakeClock.restore()
+      showBackupKeysSpy.restore()
+    })
+
+    it('not time to yet show backup keys notification for first time (not yet 7 days from funds being added)', function () {
+      fakeClock.tick(1)
+      state = ledgerNotificationsApi.showEnabledNotifications(state)
+      assert(showBackupKeysSpy.notCalled)
+    })
+
+    it('first notification (7 days from funds being added)', function () {
+      fakeClock.tick(ledgerUtil.milliseconds.day * 7 + 1)
+      state = ledgerNotificationsApi.showEnabledNotifications(state)
+      assert(showBackupKeysSpy.calledOnce, 'showBackupKeys should be called once')
+    })
+
+    it('second notification (14 days days later [21 days from funds being added])', function () {
+      fakeClock.tick(ledgerUtil.milliseconds.day * 14)
+      state = ledgerNotificationsApi.showEnabledNotifications(state)
+      assert(showBackupKeysSpy.calledOnce, 'showBackupKeys should be called once')
+    })
+
+    it('third and subsequent notification occur monthly until backup or opt out. (one day before the month, no notification)', function () {
+      fakeClock.tick(ledgerUtil.milliseconds.month - ledgerUtil.milliseconds.day)
+      state = ledgerNotificationsApi.showEnabledNotifications(state)
+      assert(showBackupKeysSpy.notCalled, 'showBackupKeys should not be called')
+    })
+
+    it('third notification after one more day of completing the month', function () {
+      fakeClock.tick(ledgerUtil.milliseconds.day)
+      state = ledgerNotificationsApi.showEnabledNotifications(state)
+      assert(showBackupKeysSpy.calledOnce, 'showBackupKeys should be called once')
+    })
+
+    it('second monthly notification (fourth notification)', function () {
+      fakeClock.tick(ledgerUtil.milliseconds.month)
+      state = ledgerNotificationsApi.showEnabledNotifications(state)
+      assert(showBackupKeysSpy.calledOnce, 'showBackupKeys should be called once')
+    })
+
+    it('day before the third monthly notification (should not notify)', function () {
+      fakeClock.tick(ledgerUtil.milliseconds.month - ledgerUtil.milliseconds.day)
+      state = ledgerNotificationsApi.showEnabledNotifications(state)
+      assert(showBackupKeysSpy.notCalled, 'showBackupKeys should not be called')
+    })
+    it('day of the third monthly notification (fifth notification)', function () {
+      fakeClock.tick(ledgerUtil.milliseconds.day)
+      state = ledgerNotificationsApi.showEnabledNotifications(state)
+      assert(showBackupKeysSpy.calledOnce, 'showBackupKeys should be called once')
+    })
+    it('day before the fourth monthly notification (sixth notification)', function () {
+      fakeClock.tick(ledgerUtil.milliseconds.month - ledgerUtil.milliseconds.day)
+      state = ledgerNotificationsApi.showEnabledNotifications(state)
+      assert(showBackupKeysSpy.notCalled, 'showBackupKeys should not be called')
+    })
+    it('day of the fourth monthly notification (sixth notification)', function () {
+      fakeClock.tick(ledgerUtil.milliseconds.day)
+      state = ledgerNotificationsApi.showEnabledNotifications(state)
+      assert(showBackupKeysSpy.calledOnce, 'showBackupKeys should be called once')
     })
   })
 
@@ -460,6 +545,65 @@ describe('ledgerNotifications unit test', function () {
       const result = ledgerNotificationsApi.sufficientBalanceToReconcile(state)
       assert.equal(result, true)
       paymentsContributionAmount = 25
+    })
+  })
+
+  describe('hasFunded', function () {
+    it('null case', function () {
+      paymentsEnabled = true
+      const result = ledgerNotificationsApi.hasFunded(defaultAppState)
+      assert.equal(result, false)
+    })
+    it('has never funded', function () {
+      paymentsEnabled = true
+      const state = defaultAppState.setIn(['ledger', 'info', 'userHasFunded'], false)
+      const result = ledgerNotificationsApi.hasFunded(state)
+      assert.equal(result, false)
+    })
+    it('user has funded', function () {
+      paymentsEnabled = true
+      const state = defaultAppState.setIn(['ledger', 'info', 'userHasFunded'], true)
+      const result = ledgerNotificationsApi.hasFunded(state)
+      assert.equal(result, true)
+    })
+  })
+
+  // result will always be the amount of time until the -next- notification
+  describe('getNextBackupNotification', function () {
+    it('user hasn\'t received any notification yet', function () {
+      const result = ledgerNotificationsApi.getNextBackupNotification(defaultAppState, aboutPreferencesState
+        .getPreferencesProp(defaultAppState, 'backupNotifyCount') || 0, [1 * ledgerUtil.milliseconds.day, 2 * ledgerUtil.milliseconds.day])
+      assert.equal(result, ledgerUtil.milliseconds.day)
+    })
+    it('user is going to receive third notification with 2 intervals specified', function () {
+      const state = aboutPreferencesState.setPreferencesProp(defaultAppState, 'backupNotifyCount', 2)
+      const result = ledgerNotificationsApi.getNextBackupNotification(state, aboutPreferencesState
+        .getPreferencesProp(state, 'backupNotifyCount') || 0, [2 * ledgerUtil.milliseconds.day, 4 * ledgerUtil.milliseconds.day])
+      assert.equal(result, (ledgerUtil.milliseconds.month))
+    })
+    it('user is going to receive third notification with 3 intervals specified', function () {
+      const state = aboutPreferencesState.setPreferencesProp(defaultAppState, 'backupNotifyCount', 2)
+      const result = ledgerNotificationsApi.getNextBackupNotification(state, aboutPreferencesState
+        .getPreferencesProp(state, 'backupNotifyCount') || 0, [2 * ledgerUtil.milliseconds.day, 4 * ledgerUtil.milliseconds.day, 10 * ledgerUtil.milliseconds.day])
+      assert.equal(result, (ledgerUtil.milliseconds.day * 10))
+    })
+    it('user is going to receive third notification with 6 intervals specified', function () {
+      const state = aboutPreferencesState.setPreferencesProp(defaultAppState, 'backupNotifyCount', 2)
+      const result = ledgerNotificationsApi.getNextBackupNotification(state, aboutPreferencesState
+        .getPreferencesProp(state, 'backupNotifyCount') || 0, [2 * ledgerUtil.milliseconds.day, 4 * ledgerUtil.milliseconds.day, 7 * ledgerUtil.milliseconds.day, 10 * ledgerUtil.milliseconds.day, 11 * ledgerUtil.milliseconds.day, 20 * ledgerUtil.milliseconds.day])
+      assert.equal(result, (ledgerUtil.milliseconds.day * 7))
+    })
+    it('user is going to receive fifth notification with 3 intervals specified', function () {
+      const state = aboutPreferencesState.setPreferencesProp(defaultAppState, 'backupNotifyCount', 4)
+      const result = ledgerNotificationsApi.getNextBackupNotification(state, aboutPreferencesState
+        .getPreferencesProp(state, 'backupNotifyCount') || 0, [100 * ledgerUtil.milliseconds.day, 20 * ledgerUtil.milliseconds.day, 10 * ledgerUtil.milliseconds.day])
+      assert.equal(result, (ledgerUtil.milliseconds.month))
+    })
+    it('user is going to receive fifth notification with 10 intervals specified', function () {
+      const state = aboutPreferencesState.setPreferencesProp(defaultAppState, 'backupNotifyCount', 4)
+      const result = ledgerNotificationsApi.getNextBackupNotification(state, aboutPreferencesState
+        .getPreferencesProp(state, 'backupNotifyCount') || 0, [100 * ledgerUtil.milliseconds.day, 20 * ledgerUtil.milliseconds.day, 10 * ledgerUtil.milliseconds.day, 7 * ledgerUtil.milliseconds.day, 23 * ledgerUtil.milliseconds.day, 2 * ledgerUtil.milliseconds.day, 8 * ledgerUtil.milliseconds.day, 9 * ledgerUtil.milliseconds.day, 11 * ledgerUtil.milliseconds.day, 70 * ledgerUtil.milliseconds.day])
+      assert.equal(result, (ledgerUtil.milliseconds.day * 23))
     })
   })
 })

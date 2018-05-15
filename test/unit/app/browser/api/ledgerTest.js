@@ -1337,6 +1337,7 @@ describe('ledger api unit tests', function () {
           balance: balance.toString()
         }))
         const expectedState = state.setIn(['ledger', 'info', 'balance'], balance)
+        .setIn(['ledger', 'info', 'userHasFunded'], true)
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
     })
@@ -1501,6 +1502,7 @@ describe('ledger api unit tests', function () {
         const expectedState = state
           .setIn(['ledger', 'info', 'probi'], probi)
           .setIn(['ledger', 'info', 'balance'], 25)
+          .setIn(['ledger', 'info', 'userHasFunded'], true)
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
 
@@ -1528,6 +1530,7 @@ describe('ledger api unit tests', function () {
           .setIn(['ledger', 'info', 'converted'], 3.5836474125)
           .setIn(['ledger', 'info', 'balance'], 25)
           .setIn(['ledger', 'info', 'probi'], probi)
+          .setIn(['ledger', 'info', 'userHasFunded'], true)
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
 
@@ -1544,6 +1547,7 @@ describe('ledger api unit tests', function () {
           .setIn(['ledger', 'info', 'converted'], 1047.8043767167208)
           .setIn(['ledger', 'info', 'balance'], 7309.6224)
           .setIn(['ledger', 'info', 'probi'], bigProbi)
+          .setIn(['ledger', 'info', 'userHasFunded'], true)
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
     })
