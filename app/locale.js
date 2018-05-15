@@ -66,8 +66,6 @@ var rendererIdentifiers = function () {
     'ledgerBackupText3',
     'ledgerBackupText4',
     'ledgerBackupText5',
-    'backupKeys',
-    'backupKeysNow',
     'editFolder',
     'editBookmark',
     'unmuteTabs',

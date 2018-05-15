@@ -36,9 +36,6 @@ AppStore
       updatedStamp: number // timestamp for when the data was last updated
     },
     preferences: {
-      backupNotifyCount: number, // number of times user has been reminded to backup wallet
-      backupNotifyTimestamp: number, // number of milliseconds from the last reminder until the next
-      backupSucceeded: (boolean|undefined), // was last backup successful?
       recoverySucceeded: (boolean|undefined),
       updatedStamp: number
     }
@@ -243,8 +240,7 @@ AppStore
         submissionStamp: number, // timestamp for this contribution
         viewingId: string, // UUIDv4 for this contribution
       }],
-      unconfirmed: string, // unconfirmed balance in BAT.toFixed(2)
-      userHasFunded: boolean // permanently true once user funds wallet
+      unconfirmed: string // unconfirmed balance in BAT.toFixed(2)
     },
     locations: {
       [url]: {

@@ -1984,12 +1984,6 @@ const appActions = {
     })
   },
 
-  onLedgerBackupSuccess: function () {
-    dispatch({
-      actionType: appConstants.APP_ON_LEDGER_BACKUP_SUCCESS
-    })
-  },
-
   onWalletPropertiesError: function () {
     dispatch({
       actionType: appConstants.APP_ON_WALLET_PROPERTIES_ERROR

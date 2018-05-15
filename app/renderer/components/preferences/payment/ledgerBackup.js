@@ -14,12 +14,10 @@ const globalStyles = require('../../styles/global')
 
 // other
 const aboutActions = require('../../../../../js/about/aboutActions')
-const appActions = require('../../../../../js/actions/appActions')
 
 class LedgerBackupContent extends ImmutableComponent {
   copyToClipboard (text) {
     aboutActions.setClipboard(text)
-    appActions.onLedgerBackupSuccess()
   }
 
   render () {
