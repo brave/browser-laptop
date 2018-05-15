@@ -111,19 +111,19 @@ describe('topSites api', function () {
         title: 'Brave Software (@brave) | Twitter',
         bookmarked: false
       },
-      { key: 'https://www.facebook.com/BraveSoftware/|0',
+      { key: 'https://github.com/brave/|0',
         count: 0,
-        favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/facebook.png',
-        location: 'https://www.facebook.com/BraveSoftware/',
-        themeColor: 'rgb(59, 89, 152)',
-        title: 'Brave Software | Facebook',
+        favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/github.png',
+        location: 'https://github.com/brave/',
+        themeColor: 'rgb(255, 255, 255)',
+        title: 'Brave Software | GitHub',
         bookmarked: false
       },
-      { key: 'https://www.youtube.com/bravesoftware/|0',
+      { key: 'https://youtube.com/bravesoftware/|0',
         count: 0,
         favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/youtube.png',
-        location: 'https://www.youtube.com/bravesoftware/',
-        themeColor: '#E62117',
+        location: 'https://youtube.com/bravesoftware/',
+        themeColor: 'rgb(255, 255, 255)',
         title: 'Brave Browser - YouTube',
         bookmarked: false
       },
@@ -148,7 +148,7 @@ describe('topSites api', function () {
         favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/playstore.png',
         location: 'https://play.google.com/store/apps/details?id=com.brave.browser',
         themeColor: 'rgb(241, 241, 241)',
-        title: 'Brave Browser: Fast AdBlock – Apps para Android no Google Play',
+        title: 'Brave Browser: Fast AdBlocker - Apps on Google Play',
         bookmarked: false
       }
     ])

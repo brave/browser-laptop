@@ -519,20 +519,20 @@ describe('bookmarkUtil unit test', function () {
 
     it('bookmark data is in topSites', function () {
       const bookmark = Immutable.fromJS({
-        title: 'Brave',
-        location: 'https://www.facebook.com/BraveSoftware/'
+        title: 'Brave Software | GitHub',
+        location: 'https://github.com/brave/'
       })
 
       const expectedResult = {
-        title: 'Brave',
-        location: 'https://www.facebook.com/BraveSoftware/',
+        title: 'Brave Software | GitHub',
+        location: 'https://github.com/brave/',
         parentFolderId: 0,
         partitionNumber: 0,
         objectId: null,
-        favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/facebook.png',
-        themeColor: 'rgb(59, 89, 152)',
+        favicon: 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/img/newtab/defaultTopSitesIcon/github.png',
+        themeColor: 'rgb(255, 255, 255)',
         type: siteTags.BOOKMARK,
-        key: 'https://www.facebook.com/BraveSoftware/|0|0',
+        key: 'https://github.com/brave/|0|0',
         skipSync: null
       }
 
