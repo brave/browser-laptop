@@ -23,8 +23,8 @@ describe('autoplayReducer unit tests', function () {
   const message = `Allow ${origin} to autoplay media?`
   const showNotificationArg = {
     buttons: [
-      {text: 'Allow'},
-      {text: 'Deny'}
+      {text: 'Deny'},
+      {text: 'Allow'}
     ],
     message,
     frameOrigin: origin,
@@ -127,7 +127,7 @@ describe('autoplayReducer unit tests', function () {
         actionType: appConstants.APP_AUTOPLAY_BLOCKED,
         tabId: tabId
       }))
-      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 0, false)
+      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 1, false)
     })
 
     it('calls local.translation', function () {
@@ -162,7 +162,7 @@ describe('autoplayReducer unit tests', function () {
         actionType: appConstants.APP_AUTOPLAY_BLOCKED,
         tabId: tabId
       }))
-      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 0, true)
+      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 1, true)
     })
 
     it('calls local.translation', function () {
@@ -197,7 +197,7 @@ describe('autoplayReducer unit tests', function () {
         actionType: appConstants.APP_AUTOPLAY_BLOCKED,
         tabId: tabId
       }))
-      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 1, false)
+      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 0, false)
     })
 
     it('calls local.translation', function () {
@@ -228,7 +228,7 @@ describe('autoplayReducer unit tests', function () {
         actionType: appConstants.APP_AUTOPLAY_BLOCKED,
         tabId: tabId
       }))
-      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 1, true)
+      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 0, true)
     })
 
     it('calls local.translation', function () {
@@ -343,7 +343,7 @@ describe('autoplayReducer unit tests', function () {
           actionType: appConstants.APP_AUTOPLAY_BLOCKED,
           tabId: tabId
         }))
-        fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 0, true)
+        fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 1, true)
         removeListenerSpy.reset()
         changeSiteSettingSpy.reset()
         autoplayReducer(Immutable.Map(), Immutable.fromJS({
@@ -379,7 +379,7 @@ describe('autoplayReducer unit tests', function () {
         actionType: appConstants.APP_AUTOPLAY_BLOCKED,
         tabId: tabId
       }))
-      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 0, false)
+      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 1, false)
       autoplayReducer(Immutable.Map(), Immutable.fromJS({
         actionType: appConstants.APP_TAB_CLOSED,
         tabId: tabId
@@ -412,7 +412,7 @@ describe('autoplayReducer unit tests', function () {
         actionType: appConstants.APP_AUTOPLAY_BLOCKED,
         tabId: tabId
       }))
-      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 0, false)
+      fakeElectron.ipcMain.send(messages.NOTIFICATION_RESPONSE, {}, message, 1, false)
       autoplayReducer(Immutable.Map(), Immutable.fromJS({
         actionType: appConstants.APP_SHUTTING_DOWN
       }))
