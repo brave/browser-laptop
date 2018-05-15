@@ -48,7 +48,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_BACKUP_KEYS:
       {
-        state = ledgerApi.backupKeys(state, action.get('backupAction'))
+        ledgerApi.backupKeys(state, action.get('backupAction'))
         break
       }
     case appConstants.APP_RECOVER_WALLET:
@@ -533,11 +533,6 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_WALLET_PROPERTIES_ERROR:
       {
         state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.SERVER_PROBLEM)
-        break
-      }
-    case appConstants.APP_ON_LEDGER_BACKUP_SUCCESS:
-      {
-        state = aboutPreferencesState.setBackupStatus(state, true)
         break
       }
     case appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE:

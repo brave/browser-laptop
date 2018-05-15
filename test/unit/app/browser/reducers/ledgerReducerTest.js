@@ -147,8 +147,8 @@ describe('ledgerReducer unit tests', function () {
     it('calls ledgerApi.backupKeys', function () {
       assert(backupKeysSpy.withArgs(appState, 'ActionGoesHere').calledOnce)
     })
-    it('returns a modified state', function () {
-      assert.notDeepEqual(returnedState, appState)
+    it('returns an ununmodified state', function () {
+      assert.deepEqual(returnedState, appState)
     })
   })
 
