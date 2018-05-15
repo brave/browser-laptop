@@ -36,8 +36,8 @@ const showAutoplayMessageBox = (state, tabId) => {
 
   appActions.showNotification({
     buttons: [
-      {text: locale.translation('allow')},
-      {text: locale.translation('deny')}
+      {text: locale.translation('deny')},
+      {text: locale.translation('allow')}
     ],
     message,
     frameOrigin: origin,
@@ -50,7 +50,7 @@ const showAutoplayMessageBox = (state, tabId) => {
     notificationCallbacks[tabId] = (e, msg, buttonIndex, persist) => {
       if (msg === message) {
         appActions.hideNotification(message)
-        if (buttonIndex === 0) {
+        if (buttonIndex === 1) {
           appActions.changeSiteSetting(origin, 'autoplay', true)
           if (tab && !tab.isDestroyed()) {
             tab.reload()
