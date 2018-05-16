@@ -46,6 +46,7 @@ let appMenu = null
 let closedFrames = new Immutable.OrderedMap()
 let lastClosedUrl = null
 let currentLocation = null
+const historyState = require('../common/state/historyState')
 
 // Submenu initialization
 const createFileSubmenu = () => {
@@ -254,7 +255,8 @@ const createViewSubmenu = () => {
   ]
 }
 
-const createHistorySubmenu = () => {
+const createHistorySubmenu = (state) => {
+  const shouldDisableReopenItems = historyState.getSites(state).size === 0
   let submenu = [
     {
       label: locale.translation('home'),
@@ -285,14 +287,8 @@ const createHistorySubmenu = () => {
       }
     },
     CommonMenu.separatorMenuItem,
-    CommonMenu.reopenLastClosedTabItem(),
-    {
-      label: locale.translation('reopenLastClosedWindow'),
-      accelerator: 'Alt+Shift+CmdOrCtrl+T',
-      click: function () {
-        process.emit(messages.UNDO_CLOSED_WINDOW)
-      }
-    },
+    CommonMenu.reopenLastClosedTabItem(shouldDisableReopenItems),
+    CommonMenu.reopenLastClosedWindow(shouldDisableReopenItems),
     CommonMenu.separatorMenuItem,
     {
       label: locale.translation('clearBrowsingData'),
@@ -313,8 +309,7 @@ const createHistorySubmenu = () => {
   return submenu
 }
 
-const updateRecentlyClosedMenuItems = (state) => {
-  // Update electron menu (Mac / Linux)
+const updateRecentlyClosedMenuItems = (state, action) => {
   menuUtil.updateRecentlyClosedMenuItems(appMenu, closedFrames)
   Menu.setApplicationMenu(appMenu)
 
@@ -325,7 +320,7 @@ const updateRecentlyClosedMenuItems = (state) => {
       const historyMenuKey = oldTemplate.findKey(value =>
         value.get('label') === locale.translation('history')
       )
-      const newSubmenuTemplate = createHistorySubmenu()
+      const newSubmenuTemplate = createHistorySubmenu(state)
       const newSubmenu = JSON.parse(JSON.stringify(newSubmenuTemplate))
       const newTemplate = oldTemplate.setIn([historyMenuKey, 'submenu'], newSubmenu)
       appActions.setMenubarTemplate(newTemplate)
@@ -534,7 +529,7 @@ const createMenu = (state) => {
     { label: locale.translation('file'), submenu: createFileSubmenu() },
     { label: locale.translation('edit'), submenu: createEditSubmenu() },
     { label: locale.translation('view'), submenu: createViewSubmenu() },
-    { label: locale.translation('history'), submenu: createHistorySubmenu() },
+    { label: locale.translation('history'), submenu: createHistorySubmenu(state) },
     { label: locale.translation('bookmarks'), submenu: createBookmarksSubmenu(state) },
     {
       label: locale.translation('bravery'),
@@ -674,7 +669,7 @@ const doAction = (state, action) => {
         closedFrames = closedFrames.delete(lastClosedUrl)
         const nextLastFrame = closedFrames.last()
         lastClosedUrl = nextLastFrame ? nextLastFrame.get('location') : null
-        updateRecentlyClosedMenuItems(state)
+        updateRecentlyClosedMenuItems(state, action)
         break
       }
     case windowConstants.WINDOW_CLEAR_CLOSED_FRAMES:
@@ -688,7 +683,7 @@ const doAction = (state, action) => {
             lastClosedUrl = null
           }
         }
-        updateRecentlyClosedMenuItems(state)
+        updateRecentlyClosedMenuItems(state, action)
         break
       }
     case appConstants.APP_TAB_CLOSE_REQUESTED:
@@ -701,7 +696,7 @@ const doAction = (state, action) => {
           if (tab && !tab.get('incognito') && frame && frameStateUtil.isValidClosedFrame(frame)) {
             lastClosedUrl = tab.get('url')
             closedFrames = closedFrames.set(tab.get('url'), tab.get('frame'))
-            updateRecentlyClosedMenuItems(state)
+            updateRecentlyClosedMenuItems(state, action)
           }
         }
         break

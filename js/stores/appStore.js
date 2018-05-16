@@ -403,7 +403,6 @@ const handleAppAction = (action) => {
       const defaults = appState.get('clearBrowsingDataDefaults')
       const temp = appState.get('tempClearBrowsingData', Immutable.Map())
       const clearData = defaults ? defaults.merge(temp) : temp
-
       if (clearData.get('browserHistory')) {
         appState = aboutNewTabState.clearTopSites(appState)
         appState = aboutHistoryState.clearHistory(appState)
