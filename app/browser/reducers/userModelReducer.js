@@ -33,6 +33,7 @@ const settings = require('../../../js/constants/settings')
 const tabState = require('../../common/state/tabState')
 const windows = require('../windows')
 const userModelState = require('../../common/state/userModelState')
+const windowState = require('../../common/state/windowState')
 
 // Utils
 const userModel = require('../api/userModel')
@@ -51,6 +52,11 @@ const userModelReducer = (state, action, immutableAction) => {
         //   const activeWindowId = windows.getActiveWindowId()
         //   userModel.goAheadAndShowTheAd(activeWindowId, 'My category', 'This is text', 'https://www.google.com')
         // }, 10000)
+        break
+      }
+    case appConstants.APP_WINDOW_UPDATED:
+      {
+        userModel.appFocused(state, !!windowState.getActiveWindow(state))
         break
       }
     case appConstants.APP_TAB_UPDATED: // kind of worthless; fires too often
