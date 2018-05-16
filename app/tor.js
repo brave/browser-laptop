@@ -135,6 +135,7 @@ class TorDaemon extends EventEmitter {
       return
     }
     this._control.close()
+    this.emit('exit')
   }
 
   // _watchEvent(event, filename)
