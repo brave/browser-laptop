@@ -37,6 +37,7 @@ const ledgerUtil = require('./common/lib/ledgerUtil')
 const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
 const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
 const {getTorSocksProxy} = require('./channel')
+const tor = require('./tor')
 
 let appStore = null
 
@@ -46,6 +47,8 @@ const beforeRedirectFilteringFns = []
 const headersReceivedFilteringFns = []
 let partitionsToInitialize = ['default', appConfig.tor.partition]
 let initializedPartitions = {}
+
+let torDaemon = new tor.TorDaemon()
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 const pdfjsOrigin = `chrome-extension://${config.PDFJSExtensionId}`
@@ -704,6 +707,7 @@ const initPartition = (partition) => {
     options.parent_partition = ''
   }
   if (isTorPartition) {
+    setupTor()
     // TODO(riastradh): Duplicate logic in app/browser/tabs.js.
     options.isolated_storage = true
     options.parent_partition = ''
@@ -731,6 +735,76 @@ const initPartition = (partition) => {
   })
 }
 module.exports.initPartition = initPartition
+
+function setupTor () {
+  // Set up the tor daemon watcher.  (NOTE: We don't actually start
+  // the tor daemon here; that happens in C++ code.  But we do talk to
+  // its control socket.)
+  torDaemon.setup((err) => {
+    if (err) {
+      console.log(`tor: failed to make directories: ${err}`)
+      return
+    }
+    torDaemon.on('exit', () => console.log('tor: daemon exited'))
+    torDaemon.on('launch', (socksAddr) => {
+      console.log(`tor: daemon listens on ${socksAddr}`)
+      const control = torDaemon.getControl()
+      const bootstrapped = (event) => {
+        const args = event.split(' ')
+        if (args[0] === 'ERR' || args[0] === 'WARN') {
+          console.log(`tor: ${event}`)
+          return
+        }
+        if (args[1] !== 'BOOTSTRAP') {
+          return
+        }
+        for (let i = 0; i < args.length; i++) {
+          const [k, v] = args[i].split('=')
+          if (k === 'PROGRESS') {
+            // TODO(riastradh): Visually update a progress bar!
+            console.log(`tor: bootstrapped ${v}%`)
+            return
+          }
+        }
+        console.log(`tor: bootstrapped but not sure how much: ${event}`)
+      }
+      control.on('async-STATUS_CLIENT', (event, extra) => {
+        bootstrapped(event)
+      })
+      control.subscribe('STATUS_CLIENT', (err) => {
+        if (err) {
+          console.log(`subscribe STATUS_CLIENT: ${err}`)
+          return
+        }
+        const getinfoLine = (status, reply) => {
+          if (status !== '250') {
+            console.log(`tor: bootstrap error: ${reply}`)
+            return
+          }
+          const prefix = 'status/bootstrap-phase='
+          if (!reply.startsWith(prefix)) {
+            console.log(`tor: GETINFO status/bootstrap-phase: ${reply}`)
+            return
+          }
+          const event = reply.slice(prefix.length)
+          bootstrapped(event)
+        }
+        control.cmd('GETINFO status/bootstrap-phase', getinfoLine,
+          (err, status, reply) => {
+            if (!err) {
+              if (status !== '250') {
+                err = new Error(`tor: ${status} ${reply}`)
+              }
+            }
+            if (err) {
+              console.log(`tor: failed to get bootstrap phase: ${err}`)
+            }
+          })
+      })
+    })
+    torDaemon.start()
+  })
+}
 
 const filterableProtocols = ['http:', 'https:', 'ws:', 'wss:', 'magnet:', 'file:']
 
