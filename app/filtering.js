@@ -48,8 +48,6 @@ const headersReceivedFilteringFns = []
 let partitionsToInitialize = ['default', appConfig.tor.partition]
 let initializedPartitions = {}
 
-let torDaemon = new tor.TorDaemon()
-
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 const pdfjsOrigin = `chrome-extension://${config.PDFJSExtensionId}`
 
@@ -740,6 +738,7 @@ function setupTor () {
   // Set up the tor daemon watcher.  (NOTE: We don't actually start
   // the tor daemon here; that happens in C++ code.  But we do talk to
   // its control socket.)
+  const torDaemon = new tor.TorDaemon()
   torDaemon.setup((err) => {
     if (err) {
       console.log(`tor: failed to make directories: ${err}`)
