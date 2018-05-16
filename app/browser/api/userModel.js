@@ -21,6 +21,8 @@ const notificationTypes = require('../../common/constants/notificationTypes')
 const urlUtil = require('../../../js/lib/urlutil')
 const ledgerUtil = require('../../common/lib/ledgerUtil')
 
+let foregroundP
+
 let matrixData
 let priorData
 let sampleAdFeed
@@ -41,6 +43,12 @@ const initialize = (state, adEnabled) => {
   retrieveSSID()
 
   state = confirmAdUUIDIfAdEnabled(state)
+
+  return state
+}
+
+const appFocused = (state, focusP) => {
+  foregroundP = focusP
 
   return state
 }
@@ -198,6 +206,11 @@ const basicCheckReadyAdServe = (state, windowId) => {
     return state
   }
 
+  if (!foregroundP) {
+    appActions.onUserModelLog('not in foreground')
+    return state
+  }
+
   if (!userModelState.allowedToShowAdBasedOnHistory(state)) {
     appActions.onUserModelLog('Ad throttled')
     return state
@@ -324,6 +337,7 @@ const privateTest = () => {
 const getMethods = () => {
   const publicMethods = {
     initialize,
+    appFocused,
     tabUpdate,
     userAction,
     removeHistorySite,
