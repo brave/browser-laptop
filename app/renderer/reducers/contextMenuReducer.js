@@ -111,6 +111,7 @@ const onTabPageMenu = function (state, action) {
 
 const openInNewTabMenuItem = (url, isPrivate, partitionNumber, openerTabId) => {
   const active = getSetting(settings.SWITCH_TO_NEW_TABS) === true
+  const isTor = isPrivate && getSetting(settings.USE_TOR_PRIVATE_TABS)
   if (Array.isArray(url) && Array.isArray(partitionNumber)) {
     return {
       label: locale.translation('openInNewTabs'),
@@ -119,6 +120,7 @@ const openInNewTabMenuItem = (url, isPrivate, partitionNumber, openerTabId) => {
           appActions.createTabRequested({
             url: url[i],
             isPrivate,
+            isTor,
             partitionNumber: partitionNumber[i],
             openerTabId,
             active
@@ -133,6 +135,7 @@ const openInNewTabMenuItem = (url, isPrivate, partitionNumber, openerTabId) => {
         appActions.createTabRequested({
           url,
           isPrivate,
+          isTor,
           partitionNumber,
           openerTabId,
           active
@@ -144,6 +147,7 @@ const openInNewTabMenuItem = (url, isPrivate, partitionNumber, openerTabId) => {
 
 const openInNewPrivateTabMenuItem = (url, openerTabId) => {
   const active = getSetting(settings.SWITCH_TO_NEW_TABS) === true
+  const isTor = getSetting(settings.USE_TOR_PRIVATE_TABS)
   if (Array.isArray(url)) {
     return {
       label: locale.translation('openInNewPrivateTabs'),
@@ -152,6 +156,7 @@ const openInNewPrivateTabMenuItem = (url, openerTabId) => {
           appActions.createTabRequested({
             url: url[i],
             isPrivate: true,
+            isTor,
             openerTabId,
             active
           })
@@ -165,6 +170,7 @@ const openInNewPrivateTabMenuItem = (url, openerTabId) => {
         appActions.createTabRequested({
           url,
           isPrivate: true,
+          isTor,
           openerTabId,
           active
         })
@@ -205,10 +211,11 @@ const openInNewSessionTabMenuItem = (url, openerTabId) => {
 }
 
 const openInNewWindowMenuItem = (location, isPrivate, partitionNumber) => {
+  const isTor = isPrivate && getSetting(settings.USE_TOR_PRIVATE_TABS)
   return {
     label: locale.translation('openInNewWindow'),
     click: () => {
-      appActions.newWindow({ location, isPrivate, partitionNumber })
+      appActions.newWindow({ location, isPrivate, isTor, partitionNumber })
     }
   }
 }
