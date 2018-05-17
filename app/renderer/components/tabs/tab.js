@@ -304,21 +304,25 @@ class Tab extends React.Component {
         this.elementRef.classList.remove(className)
       })
     }
+    const animateNoFixedTabWidth = () => {
+      this.elementRef.animate([
+        { flexBasis: `${prevProps.tabWidth}px`, flexGrow: 0, flexShrink: 0 },
+        { flexBasis: 0, flexGrow: 1, flexShrink: 1 }
+      ], {
+        duration: 250,
+        iterations: 1,
+        easing: 'ease-in-out'
+      })
+    }
+    const hasFinishedDragging = prevProps.isDragging && !this.props.isDragging
+    const hasTabWidthChangedToNone = prevProps.tabWidth && !this.props.tabWidth
     // animate tab width if it changes due to a
     // removal of a restriction when performing
     // multiple tab-closes in a row
-    if (prevProps.tabWidth && !this.props.tabWidth) {
-      window.requestAnimationFrame(() => {
-        const newWidth = this.elementRef.getBoundingClientRect().width
-        this.elementRef.animate([
-          { flexBasis: `${this.originalWidth}px`, flexGrow: 0, flexShrink: 0 },
-          { flexBasis: `${newWidth}px`, flexGrow: 0, flexShrink: 0 }
-        ], {
-          duration: 250,
-          iterations: 1,
-          easing: 'ease-in-out'
-        })
-      })
+    if (hasTabWidthChangedToNone && !this.props.partOfFullPageSet) {
+      window.requestAnimationFrame(animateNoFixedTabWidth)
+    } else if (hasFinishedDragging && hasTabWidthChangedToNone) {
+      animateNoFixedTabWidth()
     }
   }
 
