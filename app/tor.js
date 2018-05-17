@@ -298,13 +298,13 @@ class TorDaemon extends EventEmitter {
     // First, open the control port file.
     fs.open(torControlPortPath(), 'r', (err, fd) => {
       if (err) {
-        return callback(err)
+        return callback(err, null, null)
       }
 
       // Get the mtime.
       fs.fstat(fd, (err, stat) => {
         if (err) {
-          return callback(err)
+          return callback(err, null, null)
         }
 
         // Read up to 27 octets, the maximum we will ever need.
@@ -364,13 +364,13 @@ class TorDaemon extends EventEmitter {
     // First, open the control cookie file.
     fs.open(torControlCookiePath(), 'r', (err, fd) => {
       if (err) {
-        return callback(err, null)
+        return callback(err, null, null)
       }
 
       // Get the mtime.
       fs.fstat(fd, (err, stat) => {
         if (err) {
-          return callback(err, null)
+          return callback(err, null, null)
         }
 
         // Read up to 33 octets.  We should need no more than 32, so 33
