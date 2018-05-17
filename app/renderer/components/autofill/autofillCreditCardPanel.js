@@ -13,8 +13,10 @@ const Button = require('../common/button')
 const {
   CommonForm,
   CommonFormSection,
+  CommonFormTitle,
   CommonFormDropdown,
   CommonFormTextbox,
+  CommonFormButtonWrapper,
   commonFormStyles
 } = require('../common/commonForm')
 
@@ -126,9 +128,9 @@ class AutofillCreditCardPanel extends React.Component {
   render () {
     return <Dialog onHide={this.onHide} testId='autofillCreditCardPanel' isClickDismiss>
       <CommonForm onClick={this.onClick}>
-        <CommonFormSection title
-          l10nId='editCreditCard'
-          testId='manageAutofillDataTitle'
+        <CommonFormTitle
+          data-test-id='manageAutofillDataTitle'
+          data-l10n-id='editCreditCard'
         />
         <CommonFormSection>
           <div className={css(commonFormStyles.sectionWrapper)}>
@@ -200,7 +202,7 @@ class AutofillCreditCardPanel extends React.Component {
             </div>
           </div>
         </CommonFormSection>
-        <CommonFormSection buttons>
+        <CommonFormButtonWrapper>
           <Button className='whiteButton'
             l10nId='cancel'
             testId='cancelCreditCardButton'
@@ -212,11 +214,13 @@ class AutofillCreditCardPanel extends React.Component {
             testId='saveCreditCardButton'
             onClick={this.onSave}
           />
-        </CommonFormSection>
+        </CommonFormButtonWrapper>
       </CommonForm>
     </Dialog>
   }
 }
+
+module.exports = ReduxComponent.connect(AutofillCreditCardPanel)
 
 const styles = StyleSheet.create({
   // Copied from textbox.js
@@ -235,5 +239,3 @@ const styles = StyleSheet.create({
     marginLeft: `calc(${globalStyles.spacing.dialogInsideMargin} / 3)`
   }
 })
-
-module.exports = ReduxComponent.connect(AutofillCreditCardPanel)

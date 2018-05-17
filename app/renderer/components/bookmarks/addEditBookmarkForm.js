@@ -12,6 +12,7 @@ const {
   CommonFormSection,
   CommonFormDropdown,
   CommonFormTextbox,
+  CommonFormButtonWrapper,
   commonFormStyles
 } = require('../common/commonForm')
 
@@ -228,7 +229,7 @@ class AddEditBookmarkForm extends React.Component {
           </div>
         </div>
       </CommonFormSection>
-      <CommonFormSection buttons>
+      <CommonFormButtonWrapper>
         {
           this.props.editKey != null
             ? <BrowserButton groupedItem secondaryColor
@@ -248,7 +249,7 @@ class AddEditBookmarkForm extends React.Component {
           disabled={this.state.isDisabled}
           onClick={this.onSave}
         />
-      </CommonFormSection>
+      </CommonFormButtonWrapper>
     </div>
   }
 }
