@@ -116,9 +116,11 @@ function handleShortcut (frameKey, shortcut, e, args) {
 
       if (sourceLocation !== null) {
         const frame = frameStateUtil.getFrameByKey(windowStore.state, frameKey)
+        const isPrivate = frame.get('isPrivate', false)
         appActions.createTabRequested({
           url: sourceLocation,
-          isPrivate: frame.get('isPrivate', false),
+          isPrivate,
+          isTor: isPrivate && getSetting(settings.USE_TOR_PRIVATE_TABS),
           partitionNumber: frame.get('partitionNumber'),
           openerTabId: tabId,
           active: true
