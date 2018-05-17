@@ -61,7 +61,7 @@ function torControlPortPath () {
 //      authentication cookie.
 //
 function torControlCookiePath () {
-  return path.join(torDataDirPath(), 'control_auth_cookie')
+  return path.join(torWatchDirPath(), 'control_auth_cookie')
 }
 
 // TorDaemon
@@ -191,14 +191,25 @@ class TorDaemon extends EventEmitter {
 
   // _doPoll()
   //
-  //    Actually poll for whether tor has started yet.
+  //    Actually poll for whether tor has started yet.  If tor is not
+  //    ready yet, we exit via this._polled(), which either waits for
+  //    another notification or polls again in case another
+  //    notification already came in.
+  //
+  //    When is tor ready?  We need the control port _and_ the control
+  //    authentication cookie.  The tor daemon currently writes the
+  //    control port first, and _then_ the control authentication
+  //    cookie.  So we open both, and check the mtimes.  If either one
+  //    is not there, tor is not ready.  If the cookie is older, it is
+  //    stale, from an older run of tor, and so tor is not ready in
+  //    that case.
   //
   _doPoll () {
     assert(this._process)
     assert(this._control === null)
     assert(this._polling)
 
-    this._readControlPort((err, portno) => {
+    this._readControlPort((err, portno, portMtime) => {
       if (err) {
         // If there's an error, don't worry: the file may have been
         // written incompletely, and we will, with any luck, be notified
@@ -219,7 +230,7 @@ class TorDaemon extends EventEmitter {
       assert(this._control === null)
       assert(this._polling)
 
-      this._readControlCookie((err, cookie) => {
+      this._readControlCookie((err, cookie, cookieMtime) => {
         if (err) {
           console.log(`tor: failed to read control cookie: ${err}`)
           return this._polled()
@@ -235,6 +246,16 @@ class TorDaemon extends EventEmitter {
         assert(this._process)
         assert(this._control === null)
         assert(this._polling)
+
+        // Tor writes the control port first, then the auth cookie.
+        // If the auth cookie is _older_ than the control port, then
+        // it's definitely stale.  If they are the _same age_, then
+        // probably the control port is older but the file system
+        // resolution is just not enough to distinguish them.
+        if (cookieMtime < portMtime) {
+          console.log(`tor: tossing stale cookie`)
+          return this._polled()
+        }
 
         this._openControl(portno, cookie)
       })
@@ -266,49 +287,56 @@ class TorDaemon extends EventEmitter {
         return callback(err)
       }
 
-      // Read up to 27 octets, the maximum we will ever need.
-      const readlen = 'PORT=255.255.255.255:65535\n'.length
-      const buf = Buffer.alloc(readlen)
-      fs.read(fd, buf, 0, readlen, null, (err, nread, buf) => {
-        let portno = null
-        do {                    // break for cleanup
-          if (err) {
-            break
-          }
+      // Get the mtime.
+      fs.fstat(fd, (err, stat) => {
+        if (err) {
+          return callback(err)
+        }
 
-          // Make sure the line looks sensible.
-          const line = buf.slice(0, nread).toString('utf8')
-          if (!line.startsWith('PORT=') || !line.endsWith('\n')) {
-            err = new Error(`invalid control port file`)
-            break
-          }
-          if (!line.startsWith('PORT=127.0.0.1:')) {
-            err = new Error(`control port has non-local address`)
-            break
-          }
+        // Read up to 27 octets, the maximum we will ever need.
+        const readlen = 'PORT=255.255.255.255:65535\n'.length
+        const buf = Buffer.alloc(readlen)
+        fs.read(fd, buf, 0, readlen, null, (err, nread, buf) => {
+          let portno = null
+          do {                    // break for cleanup
+            if (err) {
+              break
+            }
 
-          // Parse the port number.
-          const portstr = line.slice('PORT=127.0.0.1:'.length, line.length - 1)
-          const portno0 = parseInt(portstr, 10)
-          if (isNaN(portno) || portno === 0) {
-            err = new Error(`invalid control port number`)
-            break
-          }
+            // Make sure the line looks sensible.
+            const line = buf.slice(0, nread).toString('utf8')
+            if (!line.startsWith('PORT=') || !line.endsWith('\n')) {
+              err = new Error(`invalid control port file`)
+              break
+            }
+            if (!line.startsWith('PORT=127.0.0.1:')) {
+              err = new Error(`control port has non-local address`)
+              break
+            }
 
-          // We'll take it!
-          assert(!err)
-          portno = portno0
-        } while (0)
+            // Parse the port number.
+            const portstr = line.slice('PORT=127.0.0.1:'.length, line.length - 1)
+            const portno0 = parseInt(portstr, 10)
+            if (isNaN(portno) || portno === 0) {
+              err = new Error(`invalid control port number`)
+              break
+            }
 
-        // We're done with the control port file; close it.
-        fs.close(fd, (err) => {
-          if (err) {
-            console.log(`tor: close pidfile failed: ${err}`)
-          }
+            // We'll take it!
+            assert(!err)
+            portno = portno0
+          } while (0)
+
+          // We're done with the control port file; close it.
+          fs.close(fd, (err) => {
+            if (err) {
+              console.log(`tor: close pidfile failed: ${err}`)
+            }
+          })
+
+          // And call back.
+          callback(err, portno, stat.mtime)
         })
-
-        // And call back.
-        callback(err, portno)
       })
     })
   }
@@ -324,28 +352,35 @@ class TorDaemon extends EventEmitter {
         return callback(err, null)
       }
 
-      // Read up to 33 octets.  We should need no more than 32, so 33
-      // will indicate the file is abnormally large.
-      const readlen = 33
-      const buf = Buffer.alloc(readlen)
-      fs.read(fd, buf, 0, readlen, null, (err, nread, buf) => {
-        let cookie = null
-        do {                    // break for cleanup
-          if (err) {
-            break
-          }
+      // Get the mtime.
+      fs.fstat(fd, (err, stat) => {
+        if (err) {
+          return callback(err, null)
+        }
 
-          // Check for probable truncation.
-          if (nread === readlen) {
-            err = new Error('control cookie too long')
-            break
-          }
+        // Read up to 33 octets.  We should need no more than 32, so 33
+        // will indicate the file is abnormally large.
+        const readlen = 33
+        const buf = Buffer.alloc(readlen)
+        fs.read(fd, buf, 0, readlen, null, (err, nread, buf) => {
+          let cookie = null
+          do {                    // break for cleanup
+            if (err) {
+              break
+            }
 
-          // We'll take it!
-          assert(!err)
-          cookie = buf.slice(0, nread)
-        } while (0)
-        callback(err, cookie)
+            // Check for probable truncation.
+            if (nread === readlen) {
+              err = new Error('control cookie too long')
+              break
+            }
+
+            // We'll take it!
+            assert(!err)
+            cookie = buf.slice(0, nread)
+          } while (0)
+          callback(err, cookie, stat.mtime)
+        })
       })
     })
   }
