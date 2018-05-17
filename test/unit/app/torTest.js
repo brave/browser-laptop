@@ -1,6 +1,8 @@
 /* global describe, before, after, it */
 
 const assert = require('assert')
+const child_process = require('child_process') // eslint-disable-line camelcase
+const fs = require('fs')
 const mockery = require('mockery')
 
 describe('tor unit tests', () => {
@@ -76,5 +78,141 @@ describe('tor unit tests', () => {
       tor.torControlParseKV('xfoo="bar\\"baz" quux="zot"y', 1, 26))
     assert.deepStrictEqual(['foo', Buffer.from('barbaz'), 12],
       tor.torControlParseKV('xfoo=barbaz quux=zoty', 1, 20))
+  })
+
+  const spawnTor = (torDaemon) => {
+    const argv = [
+      '-f', '-',
+      '--defaults-torrc', '/nonexistent',
+      '--ignore-missing-torrc',
+      // Set the directory authority to something that doesn't exist
+      // so tor won't actually talk to the network (much?).
+      '--dirauthority', '0.0.0.0:443 0000000000000000000000000000000000000000',
+      '--socksport', 'auto',
+      '--controlport', 'auto',
+      '--controlportwritetofile', tor.torControlPortPath(),
+      '--cookieauthentication', '1',
+      '--cookieauthfile', tor.torControlCookiePath(),
+      '--datadirectory', tor.torDataDirPath(),
+      '--log', 'notice stderr'
+    ]
+    const spawnOpts = {
+      env: {},
+      argv0: 'brave-test-tor'   // make the process easily greppable
+    }
+    const torPath = 'app/extensions/bin/tor'
+    const proc = child_process.spawn(torPath, argv, spawnOpts)
+    const bufsplit = (buf, delim) => {
+      const chunks = []
+      let i = 0
+      let j
+      while ((j = buf.indexOf(delim, i)) !== -1) {
+        chunks.push(buf.slice(i, j))
+        i = j + 1
+      }
+      if (i !== 0) {            // Trailing chunk.
+        chunks.push(buf.slice(i))
+      }
+      return chunks
+    }
+    const termify = (prefix, buf) => {
+      // TODO(riastradh): make content safe for terminal
+      const chunks = bufsplit(buf, 0x0a) // LF
+      for (let i = 0; i < chunks.length; i++) {
+        if (i + 1 === chunks.length && chunks[i].length === 0) {
+          continue
+        }
+        console.log(prefix + chunks[i])
+      }
+    }
+    proc.stderr.on('data', (chunk) => termify('tor: stderr: ', chunk))
+    proc.stdout.on('data', (chunk) => termify('tor: stdout: ', chunk))
+    proc.on('error', (err) => {
+      console.log(`error: ${err}`)
+      torDaemon.kill()
+    })
+    proc.on('exit', () => {
+      console.log(`exited`)
+      torDaemon.kill()
+    })
+    proc.stdin.end('')
+    return proc
+  }
+
+  const bravePath = () => fakeElectron.app.getPath('userData')
+  before((cb) => {
+    fs.mkdir(bravePath(), 0o700, (err) => {
+      if (err && err.code !== 'EEXIST') {
+        assert.ifError(err)
+      }
+      cb()
+    })
+  })
+  after((cb) => {
+    fs.rmdir(bravePath(), (err) => {
+      assert.ifError(!err)
+      cb()
+    })
+  })
+
+  it('tor daemon start then watch', (callback) => {
+    // TODO(riastradh): broken test
+    return callback()
+    /* eslint-disable no-unreachable */
+    const torDaemon = new tor.TorDaemon()
+    torDaemon.setup(() => {
+      const proc = spawnTor(torDaemon)
+      setTimeout(() => {
+        torDaemon.start()
+        const timeoutLaunch = setTimeout(() => {
+          assert.fail('tor daemon failed to start after 1sec')
+        }, 2000)
+        torDaemon.on('launch', (socksAddr) => {
+          clearTimeout(timeoutLaunch)
+          proc.kill('SIGTERM')
+          const timeoutKill = setTimeout(() => {
+            proc.kill('SIGKILL')
+            assert.fail('tor daemon failed to exit after 1sec')
+          }, 2000)
+          proc.on('exit', () => {
+            clearTimeout(timeoutKill)
+            torDaemon.kill()
+            callback()
+          })
+        })
+      }, 500)
+    })
+    /* eslint-enable no-unreachable */
+  })
+
+  it('tor daemon watch then start', (callback) => {
+    // TODO(riastradh): broken test
+    return callback()
+    /* eslint-disable no-unreachable */
+    const torDaemon = new tor.TorDaemon()
+    torDaemon.setup(() => {
+      torDaemon.start()
+      setTimeout(() => {
+        const proc = spawnTor(torDaemon)
+        const timeoutLaunch = setTimeout(() => {
+          console.log(`launch timeout`)
+          assert.fail('tor daemon failed to start after 1sec')
+        }, 2000)
+        torDaemon.on('launch', (socksAddr) => {
+          clearTimeout(timeoutLaunch)
+          proc.kill('SIGTERM')
+          const timeoutKill = setTimeout(() => {
+            proc.kill('SIGKILL')
+            assert.fail('tor daemon failed to exit after 1sec')
+          }, 2000)
+          proc.on('exit', () => {
+            clearTimeout(timeoutKill)
+            torDaemon.kill()
+            callback()
+          })
+        })
+      }, 500)
+    })
+    /* eslint-enable no-unreachable */
   })
 })
