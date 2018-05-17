@@ -4,6 +4,7 @@ const assert = require('assert')
 const child_process = require('child_process') // eslint-disable-line camelcase
 const fs = require('fs')
 const mockery = require('mockery')
+const rimraf = require('rimraf')
 
 describe('tor unit tests', () => {
   let tor
@@ -149,7 +150,7 @@ describe('tor unit tests', () => {
     })
   })
   after((cb) => {
-    fs.rmdir(bravePath(), (err) => {
+    rimraf(bravePath(), (err) => {
       assert.ifError(err)
       cb()
     })
