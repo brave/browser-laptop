@@ -226,6 +226,7 @@ function openFramesInWindow (win, frames, activeFrameKey) {
           url: frame.location || frame.src || frame.provisionalLocation || frame.url,
           partitionNumber: frame.partitionNumber,
           isPrivate: frame.isPrivate,
+          isTor: frame.isPrivate && getSetting(settings.USE_TOR_PRIVATE_TABS),
           active: activeFrameKey ? frame.key === activeFrameKey : true,
           discarded: frame.unloaded,
           title: frame.title,
