@@ -131,10 +131,14 @@ class TorDaemon extends EventEmitter {
   kill () {
     if (!this._process) {
       assert(this._process === null)
+      assert(this._control === null)
       console.log("tor: not running, can't kill")
       return
     }
-    this._control.close()
+    if (this._control) {
+      this._control.close()
+      this._control = null
+    }
     this.emit('exit')
   }
 
