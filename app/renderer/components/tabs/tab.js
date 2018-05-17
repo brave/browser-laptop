@@ -104,11 +104,11 @@ class Tab extends React.Component {
       // In case there's a tab preview happening, cancel the preview
       // when mouse is over a tab
       windowActions.setTabPageHoverState(this.props.tabPageIndex, false)
-    // cache offset position for hover radial grandient
-    if (this.tabNode) {
-      const tabBounds = this.tabNode.getBoundingClientRect()
-      this.tabOffsetLeft = tabBounds.left
-    }
+      // cache offset position for hover radial grandient
+      if (this.tabNode) {
+        const tabBounds = this.tabNode.getBoundingClientRect()
+        this.tabOffsetLeft = tabBounds.left
+      }
     }
   }
 
@@ -361,7 +361,9 @@ class Tab extends React.Component {
       className={css(
         styles.tabArea,
         this.props.isDragging && styles.tabArea_isDragging,
+        this.props.anyTabIsDragging && styles.tabArea_anyTabIsDragging,
         this.props.isPinnedTab && styles.tabArea_isPinned,
+        this.props.isEmpty && styles.tabArea_empty,
         (this.props.partOfFullPageSet || !!this.props.tabWidth) && styles.tabArea_partOfFullPageSet,
         this.props.isPreview && styles.tabArea_isPreview,
         !this.props.isPreview && this.props.anyTabIsPreview && styles.tabArea_siblingIsPreview,
@@ -397,8 +399,7 @@ class Tab extends React.Component {
           // tab icon only (on pinned tab / small tab)
           this.props.isPinnedTab && styles.tabArea__tab_pinned,
           this.props.centralizeTabIcons && styles.tabArea__tab_centered,
-          this.props.showAudioTopBorder && styles.tabArea__tab_audioTopBorder,
-          this.props.isEmpty && styles.tabArea__tab_empty
+          this.props.showAudioTopBorder && styles.tabArea__tab_audioTopBorder
         )}
         data-test-id='tab'
         data-test-active-tab={this.props.isActive}
@@ -443,8 +444,6 @@ class Tab extends React.Component {
 
 const styles = StyleSheet.create({
   tabArea: {
-    // TODO: add will-change when any tab is being dragged, making it ready for animate, but dont do it always
-    willChange: 'transform',
     boxSizing: 'border-box',
     position: 'relative',
     overflow: 'hidden',
@@ -505,9 +504,17 @@ const styles = StyleSheet.create({
   },
 
   tabArea_isDragging: {
-    transform: 'translateX(var(--dragging-delta-x))',
     '--tab-transit-duration': '0 !important',
+    '--tab-background': `var(--tab-background-hover)`,
+    '--tab-color': `var(--tab-color-hover, ${theme.tab.color})`,
+    '--tab-default-icon-color': `var(--tab-default-icon-color-hover, ${theme.tab.defaultFaviconColor})`,
+    '--tab-border-color': `var(--tab-border-color-hover, ${theme.tab.borderColor})`,
+    transform: 'translateX(var(--dragging-delta-x))',
     zIndex: 200
+  },
+
+  tabArea_anyTabIsDragging: {
+    willChange: 'transform'
   },
 
   tabArea_isPinned: {
@@ -517,6 +524,11 @@ const styles = StyleSheet.create({
 
   tabArea_partOfFullPageSet: {
     maxWidth: 'initial'
+  },
+
+  tabArea_empty: {
+    '--tab-background': 'white',
+    '--tab-background-hover': 'white'
   },
 
   tabArea_isActive: {
@@ -635,10 +647,6 @@ const styles = StyleSheet.create({
     }
   },
 
-  tabArea__tab_isDragging: {
-
-  },
-
   tabArea__tab_pinned: {
     padding: 0,
     width: '28px',
@@ -650,10 +658,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 0,
     margin: 0
-  },
-
-  tabArea__tab_empty: {
-    background: 'white'
   },
 
   // The sentinel is responsible to respond to tabs

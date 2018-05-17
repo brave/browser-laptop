@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     paddingLeft: '2px'
   },
   tabs__postTabButtons: {
-    background: '#ddd',
+    background: theme.tabsToolbar.backgroundColor,
     zIndex: 50, // underneath normal tab, on top of dragged tab
     opacity: 1,
     transition: 'opacity 120ms ease-in-out'
