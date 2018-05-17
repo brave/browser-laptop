@@ -4,11 +4,15 @@
 
 'use strict'
 
-// Tor daemon management.
-//
-// This doesn't actually manage the tor daemon: the parts that did are
-// commented out.  Rather it just watches the tor daemon's control
-// port file for activity and connects to its control socket.
+/**
+ * Tor daemon management.
+ *
+ * This doesn't actually manage the tor daemon: the parts that did are
+ * commented out.  Rather it just watches the tor daemon's control
+ * port file for activity and connects to its control socket.
+ *
+ * @module tor
+ */
 
 const EventEmitter = require('events')
 const assert = require('assert')
