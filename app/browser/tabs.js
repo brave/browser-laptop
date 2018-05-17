@@ -521,6 +521,7 @@ const api = {
       if (ses) {
         isPrivate = ses.isOffTheRecord()
       }
+      const isTor = isPrivate && settingsStore.getSetting(settings.USE_TOR_PRIVATE_TABS)
 
       const frameOpts = {
         location,
@@ -531,6 +532,7 @@ const api = {
         guestInstanceId: newTab.guestInstanceId,
         isPinned: !!newTabValue.get('pinned'),
         isPrivate,
+        isTor,
         openerTabId,
         disposition,
         index,
