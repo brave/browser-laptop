@@ -150,7 +150,7 @@ describe('tor unit tests', () => {
   })
   after((cb) => {
     fs.rmdir(bravePath(), (err) => {
-      assert.ifError(!err)
+      assert.ifError(err)
       cb()
     })
   })
