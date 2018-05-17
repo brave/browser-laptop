@@ -40,6 +40,7 @@ class NewPrivateTab extends React.Component {
   onClickTorTitle () {
     const newSettingValue = !this.props.newTabData.getIn(torEnabled)
     aboutActions.changeSetting(settings.USE_TOR_PRIVATE_TABS, newSettingValue)
+    aboutActions.recreateTorTab(newSettingValue)
   }
 
   render () {
@@ -81,11 +82,12 @@ class NewPrivateTab extends React.Component {
               <div className={css(styles.privateSearch__setting)}>
                 <img className={css(styles.privateSearch__torImage)} src={torIcon} alt='Tor logo' />
                 <span>
-                  <h2 onClick={this.onClickPrivateSearchTitle.bind(this)} className={css(styles.privateSearch__title)}>
+                  <h2 onClick={this.onClickTorTitle.bind(this)} className={css(styles.privateSearch__title)}>
                     <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabTorTitle' />
-                    <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight, styles.text_clickable)} onClick={aboutActions.createTabRequested.bind(null, {url: torFAQ})}>Tor</strong>
+                    <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>Tor</strong>
                   </h2>
                   <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabTorText1' />
+                  <p className={css(styles.text, styles.text_privateSearch, styles.text_clickable)} onClick={aboutActions.createTabRequested.bind(null, {url: torFAQ})} data-l10n-id='learnMore' />
                 </span>
                 <SettingCheckbox
                   large
