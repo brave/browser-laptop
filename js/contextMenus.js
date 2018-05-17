@@ -735,6 +735,7 @@ function hamburgerTemplateInit (location, e) {
 }
 
 const openInNewTabMenuItem = (url, isPrivate, partitionNumber, openerTabId) => {
+  const isTor = isPrivate && getSetting(settings.USE_TOR_PRIVATE_TABS)
   const active = getSetting(settings.SWITCH_TO_NEW_TABS) === true
   if (Array.isArray(url) && Array.isArray(partitionNumber)) {
     return {
@@ -744,6 +745,7 @@ const openInNewTabMenuItem = (url, isPrivate, partitionNumber, openerTabId) => {
           appActions.createTabRequested({
             url: url[i],
             isPrivate,
+            isTor,
             partitionNumber: partitionNumber[i],
             openerTabId,
             active
@@ -758,6 +760,7 @@ const openInNewTabMenuItem = (url, isPrivate, partitionNumber, openerTabId) => {
         appActions.createTabRequested({
           url,
           isPrivate,
+          isTor,
           partitionNumber,
           openerTabId,
           active
@@ -778,6 +781,7 @@ const openAllInNewTabsMenuItem = (folderDetail) => {
 
 const openInNewPrivateTabMenuItem = (url, openerTabId) => {
   const active = getSetting(settings.SWITCH_TO_NEW_TABS) === true
+  const isTor = getSetting(settings.USE_TOR_PRIVATE_TABS)
   if (Array.isArray(url)) {
     return {
       label: locale.translation('openInNewPrivateTabs'),
@@ -786,6 +790,7 @@ const openInNewPrivateTabMenuItem = (url, openerTabId) => {
           appActions.createTabRequested({
             url: url[i],
             isPrivate: true,
+            isTor,
             openerTabId,
             active
           })
@@ -799,6 +804,7 @@ const openInNewPrivateTabMenuItem = (url, openerTabId) => {
         appActions.createTabRequested({
           url,
           isPrivate: true,
+          isTor,
           openerTabId,
           active
         })
@@ -808,10 +814,11 @@ const openInNewPrivateTabMenuItem = (url, openerTabId) => {
 }
 
 const openInNewWindowMenuItem = (location, isPrivate, partitionNumber) => {
+  const isTor = isPrivate && getSetting(settings.USE_TOR_PRIVATE_TABS)
   return {
     label: locale.translation('openInNewWindow'),
     click: () => {
-      appActions.newWindow({ location, isPrivate, partitionNumber })
+      appActions.newWindow({ location, isPrivate, isTor, partitionNumber })
     }
   }
 }
@@ -887,9 +894,12 @@ const searchSelectionMenuItem = (location) => {
         let activeFrame = windowStore.getState().get('activeFrameKey')
         let frame = windowStore.getFrame(activeFrame)
         let searchUrl = appStoreRenderer.state.getIn(['searchDetail', 'searchURL']).replace('{searchTerms}', encodeURIComponent(location))
+        const isPrivate = frame.get('isPrivate')
+        const isTor = isPrivate && getSetting(settings.USE_TOR_PRIVATE_TABS)
         appActions.createTabRequested({
           url: searchUrl,
-          isPrivate: frame.get('isPrivate'),
+          isPrivate,
+          isTor,
           partitionNumber: frame.get('partitionNumber'),
           windowId: frame.get('windowId')
         })
@@ -955,6 +965,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
   const isTextSelected = nodeProps.selectionText && nodeProps.selectionText.length > 0
   const isAboutPage = aboutUrls.has(frame.get('location'))
   const isPrivate = frame.get('isPrivate')
+  const isTor = isPrivate && getSetting(settings.USE_TOR_PRIVATE_TABS)
 
   if (isLink) {
     template = addLinkMenu(nodeProps.linkURL, frame)
@@ -972,7 +983,9 @@ function mainTemplateInit (nodeProps, frame, tab) {
             appActions.createTabRequested({
               url: nodeProps.srcURL,
               openerTabId: frame.get('tabId'),
-              partition: frameStateUtil.getPartitionFromNumber(frame.get('partitionNumber'), isPrivate),
+              isPrivate,
+              isTor,
+              partitionNumber: frame.get('partitionNumber'),
               active: active
             })
           }
@@ -1001,6 +1014,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
             appActions.createTabRequested({
               url: searchUrl,
               isPrivate,
+              isTor,
               partitionNumber: frame.get('partitionNumber')
             })
           }
