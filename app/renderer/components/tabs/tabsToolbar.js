@@ -56,7 +56,7 @@ class TabsToolbar extends React.Component {
     // used in renderer
     const isNonSourceSingleTabDraggingWindow = tabDraggingState.app.isCurrentWindowDetached(state) && tabDraggingState.app.getSourceWindowId(state) !== getCurrentWindowId()
     props.hasPinnedTabs = !isNonSourceSingleTabDraggingWindow && !pinnedTabs.isEmpty()
-
+    props.hasPreview = frameStateUtil.getPreviewFrameKey(currentWindow) != null
     // used in other functions
     props.activeFrameKey = activeFrame.get('key')
     props.activeFrameLocation = activeFrame.get('location', '')
@@ -66,7 +66,10 @@ class TabsToolbar extends React.Component {
   }
 
   render () {
-    return <div className={css(styles.tabsToolbar)}
+    return <div className={css(
+        styles.tabsToolbar,
+        !this.props.hasPreview && styles.tabsToolbar_withoutTabPreview
+      )}
       data-test-id='tabsToolbar'
       onContextMenu={this.onContextMenu}
     >
@@ -107,6 +110,10 @@ const styles = StyleSheet.create({
     // increase its size by 1px to include the top border.
     // This MUST result in an even number so we support veritcal centering.
     height: globalStyles.spacing.tabsToolbarHeight
+  },
+
+  tabsToolbar_withoutTabPreview: {
+    overflowY: 'hidden'
   },
 
   tabsToolbar__button_menu: {
