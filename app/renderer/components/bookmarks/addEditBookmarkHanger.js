@@ -11,8 +11,8 @@ const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
 const AddEditBookmarkForm = require('./addEditBookmarkForm')
 const {
-  CommonFormHanger,
-  CommonFormSection
+  CommonFormBookmarkHanger,
+  CommonFormBottomWrapper
 } = require('../common/commonForm')
 
 // States
@@ -108,8 +108,8 @@ class AddEditBookmarkHanger extends React.Component {
       bookmarkDialog: this.props.isModal,
       bookmarkHanger: !this.props.isModal,
       [css(styles.bookmarkHanger)]: !this.props.isModal
-    })} isClickDismiss>
-      <CommonFormHanger bookmark onClick={this.onClick}>
+    })} onHide={this.onClose} isClickDismiss>
+      <CommonFormBookmarkHanger onClick={this.onClick}>
         {
           !this.props.isModal
           ? <div className={cx({
@@ -118,7 +118,10 @@ class AddEditBookmarkHanger extends React.Component {
           })} />
           : null
         }
-        <CommonFormSection title l10nId={this.props.heading} />
+        <div className={cx({
+          [css(styles.commonFormSection)]: true,
+          [css(styles.commonFormTitle)]: true
+        })} data-l10n-id={this.props.heading} />
         <AddEditBookmarkForm
           title={this.props.title}
           editKey={this.props.editKey}
@@ -133,20 +136,30 @@ class AddEditBookmarkHanger extends React.Component {
         />
         {
           !this.props.isModal
-            ? <CommonFormSection bottom>
+            ? <CommonFormBottomWrapper>
               <div className={css(styles.bookmark__bottomWrapper, styles.bottomWrapper__cursor)}
                 data-test-id='viewBookmarks'
                 data-l10n-id='viewBookmarks'
                 onClick={this.onViewBookmarks} />
-            </CommonFormSection>
+            </CommonFormBottomWrapper>
             : null
         }
-      </CommonFormHanger>
+      </CommonFormBookmarkHanger>
     </Dialog>
   }
 }
 
 const styles = StyleSheet.create({
+  // Copied from commonForm.js
+  commonFormSection: {
+    // PR #7985
+    margin: `${globalStyles.spacing.dialogInsideMargin} 30px`
+  },
+  commonFormTitle: {
+    color: globalStyles.color.braveOrange,
+    fontSize: '1.2em'
+  },
+
   bookmarkHanger: {
     // See: #9040
     justifyContent: 'flex-start !important',
