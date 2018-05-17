@@ -27,6 +27,7 @@ class ClearBrowsingDataPanel extends React.Component {
     this.onToggleDownloadHistory = this.onToggleSetting.bind(this, 'downloadHistory')
     this.onToggleCachedImagesAndFiles = this.onToggleSetting.bind(this, 'cachedImagesAndFiles')
     this.onToggleSavedPasswords = this.onToggleSetting.bind(this, 'savedPasswords')
+    this.onToggleAllSiteCookiesNoLocalStorage = this.onToggleSetting.bind(this, 'allSiteCookiesNoLocalStorage')
     this.onToggleAllSiteCookies = this.onToggleSetting.bind(this, 'allSiteCookies')
     this.onToggleAutocompleteData = this.onToggleSetting.bind(this, 'autocompleteData')
     this.onToggleAutofillData = this.onToggleSetting.bind(this, 'autofillData')
@@ -44,8 +45,8 @@ class ClearBrowsingDataPanel extends React.Component {
     this.onHide()
 
     if (
-      this.props.allSiteCookies &&
       this.props.browserHistory &&
+      (this.props.allSiteCookiesNoLocalStorage || this.props.allSiteCookies) &&
       this.props.cachedImagesAndFiles
     ) {
       aboutActions.requireRestart()
@@ -66,11 +67,11 @@ class ClearBrowsingDataPanel extends React.Component {
     const data = state.get('clearBrowsingDataDefaults', Immutable.Map()).merge(tempData)
 
     const props = {}
-    props.allSiteCookies = data.get('allSiteCookies')
     props.browserHistory = data.get('browserHistory')
     props.downloadHistory = data.get('downloadHistory')
     props.cachedImagesAndFiles = data.get('cachedImagesAndFiles')
     props.savedPasswords = data.get('savedPasswords')
+    props.allSiteCookiesNoLocalStorage = data.get('allSiteCookiesNoLocalStorage')
     props.allSiteCookies = data.get('allSiteCookies')
     props.autocompleteData = data.get('autocompleteData')
     props.autofillData = data.get('autofillData')
@@ -101,6 +102,10 @@ class ClearBrowsingDataPanel extends React.Component {
             rightl10nId='savedPasswords'
             checkedOn={this.props.savedPasswords}
             onClick={this.onToggleSavedPasswords} />
+          <SwitchControl
+            rightl10nId='allSiteCookiesNoLocalStorage'
+            checkedOn={this.props.allSiteCookiesNoLocalStorage}
+            onClick={this.onToggleAllSiteCookiesNoLocalStorage} />
           <SwitchControl
             rightl10nId='allSiteCookies'
             checkedOn={this.props.allSiteCookies}

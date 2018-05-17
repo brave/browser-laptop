@@ -420,6 +420,9 @@ const handleAppAction = (action) => {
       if (clearData.get('savedPasswords')) {
         handleAppAction({actionType: appConstants.APP_CLEAR_PASSWORDS})
       }
+      if (clearData.get('allSiteCookiesNoLocalStorage')) {
+        filtering.clearCookies()
+      }
       if (clearData.get('allSiteCookies')) {
         filtering.clearStorageData()
       }
