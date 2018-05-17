@@ -562,8 +562,8 @@ const api = {
         }
       }
 
-      tab.on('safebrowsing-hit', () => {
-        let safeBrowsingURL = getTargetAboutUrl('about:safebrowsing')
+      tab.on('safebrowsing-hit', (e, maliciousURL) => {
+        let safeBrowsingURL = getTargetAboutUrl('about:safebrowsing#' + maliciousURL)
         tab.loadURL(safeBrowsingURL)
       })
 
