@@ -31,9 +31,13 @@ const {
 
 const {
   CommonForm,
+  CommonFormTitle,
   CommonFormSection,
   CommonFormDropdown,
-  CommonFormClickable
+  CommonFormClickable,
+  CommonFormSubSection,
+  CommonFormButtonWrapper,
+  CommonFormBottomWrapper
 } = require('../../app/renderer/components/common/commonForm')
 
 class Container extends ImmutableComponent {
@@ -390,7 +394,7 @@ class AboutStyle extends ImmutableComponent {
             bottom: '40px'
           }}>
             <CommonForm>
-              <CommonFormSection title>Title</CommonFormSection>
+              <CommonFormTitle>CommonFormTitle</CommonFormTitle>
               <CommonFormSection>
                 CommonFormSection - Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
                 labore et dolore magna aliqua.
@@ -401,37 +405,41 @@ class AboutStyle extends ImmutableComponent {
                 </CommonFormDropdown>
               </CommonFormSection>
               <CommonFormSection>
-                <CommonFormSection subSection>Sub Section</CommonFormSection>
-                <CommonFormSection subSection>
+                <CommonFormSubSection>CommonFormSubSection</CommonFormSubSection>
+                <CommonFormSubSection>
                   <CommonFormDropdown>
                     <option value='CommonFormDropdown'>CommonFormDropdown</option>
                   </CommonFormDropdown>
-                </CommonFormSection>
+                </CommonFormSubSection>
               </CommonFormSection>
               <CommonFormSection>
                 CommonFormSection - Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
                 labore et dolore magna aliqua.
               </CommonFormSection>
-              <CommonFormSection buttons>
+              <CommonFormButtonWrapper>
                 <BrowserButton groupedItem secondaryColor l10nId='Cancel' />
                 <BrowserButton groupedItem primaryColor l10nId='Done' />
-              </CommonFormSection>
-              <CommonFormSection bottom>
+              </CommonFormButtonWrapper>
+              <CommonFormBottomWrapper>
                 <CommonFormClickable>CommonFormClickable</CommonFormClickable>
-              </CommonFormSection>
+              </CommonFormBottomWrapper>
             </CommonForm>
           </div>
 
           <Pre><Code>
             const &#123;{'\n'}
             <Tab>CommonForm,{'\n'}</Tab>
+            <Tab>CommonFormTitle,{'\n'}</Tab>
             <Tab>CommonFormSection,{'\n'}</Tab>
             <Tab>CommonFormDropdown,{'\n'}</Tab>
-            <Tab>CommonFormClickable{'\n'}</Tab>
+            <Tab>CommonFormClickable,{'\n'}</Tab>
+            <Tab>CommonFormSubSection,{'\n'}</Tab>
+            <Tab>CommonFormButtonWrapper,{'\n'}</Tab>
+            <Tab>CommonFormBottomWrapper{'\n'}</Tab>
             &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
-            <Tab>&lt;CommonFormSection title&gt;Title&lt;/CommonFormSection&gt;{'\n'}</Tab>
+            <Tab>&lt;CommonFormTitle&gt;CommonFormTitle&lt;/CommonFormTitle&gt;{'\n'}</Tab>
             <Tab>&lt;CommonFormSection&gt;{'\n'}</Tab>
             <Tab2>CommonFormSection - Lorem ipsum dolor sit amet, consectetur adipisicing elit,{'\n'}</Tab2>
             <Tab2>sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.{'\n'}</Tab2>
@@ -442,24 +450,24 @@ class AboutStyle extends ImmutableComponent {
             <Tab2>&lt;/CommonFormDropdown&gt;{'\n'}</Tab2>
             <Tab>&lt;/CommonFormSection&gt;{'\n'}</Tab>
             <Tab>&lt;CommonFormSection&gt;{'\n'}</Tab>
-            <Tab2>&lt;CommonFormSection subSection&gt;Sub Section&lt;/CommonFormSection&gt;{'\n'}</Tab2>
-            <Tab2>&lt;CommonFormSection subSection&gt;{'\n'}</Tab2>
+            <Tab2>&lt;CommonFormSubSection&gt;CommonFormSubSection&lt;/CommonFormSubSection&gt;{'\n'}</Tab2>
+            <Tab2>&lt;CommonFormSubSection&gt;{'\n'}</Tab2>
             <Tab3>&lt;CommonFormDropdown&gt;{'\n'}</Tab3>
             <Tab4>&lt;option value='CommonFormDropdown'&gt;CommonFormDropdown&lt;/option&gt;{'\n'}</Tab4>
             <Tab3>&lt;/CommonFormDropdown&gt;{'\n'}</Tab3>
-            <Tab2>&lt;/CommonFormSection&gt;{'\n'}</Tab2>
+            <Tab2>&lt;/CommonFormSubSection&gt;{'\n'}</Tab2>
             <Tab>&lt;/CommonFormSection&gt;{'\n'}</Tab>
             <Tab>&lt;CommonFormSection&gt;{'\n'}</Tab>
             <Tab2>CommonFormSection - Lorem ipsum dolor sit amet, consectetur adipisicing elit,{'\n'}</Tab2>
             <Tab2>sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.{'\n'}</Tab2>
             <Tab>&lt;/CommonFormSection&gt;{'\n'}</Tab>
-            <Tab>&lt;CommonFormSection buttons&gt;{'\n'}</Tab>
+            <Tab>&lt;CommonFormButtonWrapper&gt;{'\n'}</Tab>
             <Tab2>&lt;BrowserButton groupedItem secondaryColor l10nId='Cancel' /&gt;{'\n'}</Tab2>
             <Tab2>&lt;BrowserButton groupedItem primaryColor l10nId='Done' /&gt;{'\n'}</Tab2>
-            <Tab>&lt;/CommonFormSection&gt;{'\n'}</Tab>
-            <Tab>&lt;CommonFormSection bottom&gt;{'\n'}</Tab>
+            <Tab>&lt;/CommonFormButtonWrapper&gt;{'\n'}</Tab>
+            <Tab>&lt;CommonFormBottomWrapper&gt;{'\n'}</Tab>
             <Tab2>&lt;CommonFormClickable&gt;CommonFormClickable&lt;/CommonFormClickable&gt;{'\n'}</Tab2>
-            <Tab>&lt;/CommonFormSection&gt;{'\n'}</Tab>
+            <Tab>&lt;/CommonFormBottomWrapper&gt;{'\n'}</Tab>
             &lt;/CommonForm&gt;{'\n'}
           </Code></Pre>
 
@@ -482,18 +490,18 @@ class AboutStyle extends ImmutableComponent {
             bottom: '40px'
           }}>
             <CommonForm>
-              <CommonFormSection title>Title</CommonFormSection>
+              <CommonFormTitle>CommonFormTitle</CommonFormTitle>
             </CommonForm>
           </div>
 
           <Pre><Code>
             const &#123;{'\n'}
             <Tab>CommonForm,{'\n'}</Tab>
-            <Tab>CommonFormSection{'\n'}</Tab>
+            <Tab>CommonFormTitle{'\n'}</Tab>
             &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
-            <Tab>&lt;CommonFormSection title&gt;Title&lt;/CommonFormSection&gt;{'\n'}</Tab>
+            <Tab>&lt;CommonFormTitle&gt;CommonFormTitle&lt;/CommonFormTitle&gt;{'\n'}</Tab>
             &lt;/CommonForm&gt;{'\n'}
           </Code></Pre>
         </Container>
@@ -570,12 +578,12 @@ class AboutStyle extends ImmutableComponent {
           }}>
             <CommonForm>
               <CommonFormSection>
-                <CommonFormSection subSection>Sub Section</CommonFormSection>
-                <CommonFormSection subSection>
+                <CommonFormSubSection>CommonFormSubSection</CommonFormSubSection>
+                <CommonFormSubSection>
                   <CommonFormDropdown>
                     <option value='CommonFormDropdown'>CommonFormDropdown</option>
                   </CommonFormDropdown>
-                </CommonFormSection>
+                </CommonFormSubSection>
               </CommonFormSection>
             </CommonForm>
           </div>
@@ -584,17 +592,18 @@ class AboutStyle extends ImmutableComponent {
             const &#123;{'\n'}
             <Tab>CommonForm,{'\n'}</Tab>
             <Tab>CommonFormSection,{'\n'}</Tab>
+            <Tab>CommonFormSubSection,{'\n'}</Tab>
             <Tab>CommonFormDropdown{'\n'}</Tab>
             &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
             <Tab>&lt;CommonFormSection&gt;{'\n'}</Tab>
-            <Tab2>&lt;CommonFormSection subSection&gt;Sub Section&lt;/CommonFormSection&gt;{'\n'}</Tab2>
-            <Tab2>&lt;CommonFormSection subSection&gt;{'\n'}</Tab2>
+            <Tab2>&lt;CommonFormSubSection&gt;CommonFormSubSection&lt;/CommonFormSubSection&gt;{'\n'}</Tab2>
+            <Tab2>&lt;CommonFormSubSection&gt;{'\n'}</Tab2>
             <Tab3>&lt;CommonFormDropdown&gt;{'\n'}</Tab3>
             <Tab4>&lt;option value='CommonFormDropdown'&gt;CommonFormDropdown&lt;/option&gt;{'\n'}</Tab4>
             <Tab3>&lt;/CommonFormDropdown&gt;{'\n'}</Tab3>
-            <Tab2>&lt;/CommonFormSection&gt;{'\n'}</Tab2>
+            <Tab2>&lt;/CommonFormSubSection&gt;{'\n'}</Tab2>
             <Tab>&lt;/CommonFormSection&gt;{'\n'}</Tab>
             &lt;/CommonForm&gt;{'\n'}
           </Code></Pre>
@@ -608,24 +617,24 @@ class AboutStyle extends ImmutableComponent {
             bottom: '40px'
           }}>
             <CommonForm>
-              <CommonFormSection buttons>
+              <CommonFormButtonWrapper>
                 <BrowserButton groupedItem secondaryColor l10nId='Cancel' />
                 <BrowserButton groupedItem primaryColor l10nId='Done' />
-              </CommonFormSection>
+              </CommonFormButtonWrapper>
             </CommonForm>
           </div>
 
           <Pre><Code>
             const &#123;{'\n'}
             <Tab>CommonForm,{'\n'}</Tab>
-            <Tab>CommonFormSection{'\n'}</Tab>
+            <Tab>CommonFormButtonWrapper{'\n'}</Tab>
             &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
-            <Tab>&lt;CommonFormSection buttons&gt;{'\n'}</Tab>
+            <Tab>&lt;CommonFormButtonWrapper&gt;{'\n'}</Tab>
             <Tab2>&lt;BrowserButton groupedItem secondaryColor l10nId='Cancel' /&gt;{'\n'}</Tab2>
             <Tab2>&lt;BrowserButton groupedItem primaryColor l10nId='Done' /&gt;{'\n'}</Tab2>
-            <Tab>&lt;/CommonFormSection&gt;{'\n'}</Tab>
+            <Tab>&lt;/CommonFormButtonWrapper&gt;{'\n'}</Tab>
             &lt;/CommonForm&gt;{'\n'}
           </Code></Pre>
         </Container>
@@ -638,23 +647,23 @@ class AboutStyle extends ImmutableComponent {
             bottom: '40px'
           }}>
             <CommonForm>
-              <CommonFormSection bottom>
+              <CommonFormBottomWrapper>
                 <CommonFormClickable>CommonFormClickable</CommonFormClickable>
-              </CommonFormSection>
+              </CommonFormBottomWrapper>
             </CommonForm>
           </div>
 
           <Pre><Code>
             const &#123;{'\n'}
             <Tab>CommonForm,{'\n'}</Tab>
-            <Tab>CommonFormSection,{'\n'}</Tab>
+            <Tab>CommonFormBottomWrapper,{'\n'}</Tab>
             <Tab>CommonFormClickable{'\n'}</Tab>
             &#125; = require('../../app/renderer/components/common/commonForm'){'\n'}
             {'\n'}
             &lt;CommonForm&gt;{'\n'}
-            <Tab>&lt;CommonFormSection bottom&gt;{'\n'}</Tab>
+            <Tab>&lt;CommonFormBottomWrapper&gt;{'\n'}</Tab>
             <Tab2>&lt;CommonFormClickable&gt;CommonFormClickable&lt;/CommonFormClickable&gt;{'\n'}</Tab2>
-            <Tab>&lt;/CommonFormSection&gt;{'\n'}</Tab>
+            <Tab>&lt;/CommonFormBottomWrapper&gt;{'\n'}</Tab>
             &lt;/CommonForm&gt;{'\n'}
           </Code></Pre>
         </Container>
