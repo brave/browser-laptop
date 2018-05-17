@@ -25,7 +25,9 @@ class DeletedSitesContent extends ImmutableComponent {
   deletePermission (hostPattern) {
     appActions.removeSiteSetting(hostPattern, 'ledgerPayments')
     appActions.removeSiteSetting(hostPattern, 'ledgerPaymentsShown')
-    this.props.onHide()
+    if (this.props.sites.length === 1) {
+      this.props.onHide()
+    }
   }
 
   render () {
