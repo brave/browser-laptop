@@ -1286,8 +1286,11 @@ class LineReadable extends EventEmitter {
 
 module.exports.TorControl = TorControl
 module.exports.TorDaemon = TorDaemon
+module.exports.torControlCookiePath = torControlCookiePath
 module.exports.torControlParseKV = torControlParseKV
 module.exports.torControlParseQuoted = torControlParseQuoted
+module.exports.torControlPortPath = torControlPortPath
+module.exports.torDataDirPath = torDataDirPath
 module.exports.torrcEscapeBuffer = torrcEscapeBuffer
 module.exports.torrcEscapePath = torrcEscapePath
 module.exports.torrcEscapeString = torrcEscapeString
