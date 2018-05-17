@@ -18,57 +18,64 @@ const net = require('net')
 const path = require('path')
 const stream = require('stream')
 
-// torBravePath()
-//
-//      Return the path to the directory where we store tor-related
-//      files.
-//
+/**
+ * Return the path to the directory where we store tor-related files.
+ *
+ * @returns {path}
+ */
 function torBravePath () {
   const bravePath = electron.app.getPath('userData')
   return path.join(bravePath, 'tor')
 }
 
-// torDataDirPath()
-//
-//      Return the path to the data directory that we use for our tor
-//      daemon.
-//
+/**
+ * Return the path to the data directory that we use for our tor
+ * daemon.
+ *
+ * @returns {path}
+ */
 function torDataDirPath () {
   return path.join(torBravePath(), 'data')
 }
 
-// torWatchDirPath()
-//
-//      Return the path to the directory we watch for changes as tor
-//      starts up.
-//
+/**
+ * Return the path to the directory we watch for changes as tor
+ * starts up.
+ *
+ * @returns {path}
+ */
 function torWatchDirPath () {
   return path.join(torBravePath(), 'watch')
 }
 
-// torControlPortPath()
-//
-//      Return the path to the file containing the port number for the
-//      control channel that our tor daemon is listening on.
-//
+/**
+ * Return the path to the file containing the port number for the
+ * control channel that our tor daemon is listening on.
+ *
+ * @returns {path}
+ */
 function torControlPortPath () {
   return path.join(torWatchDirPath(), 'controlport')
 }
 
-// torControlCookiePath()
-//
-//      Return the path to the file containing the control connection
-//      authentication cookie.
-//
+/*
+ * Return the path to the file containing the control connection
+ * authentication cookie.
+ *
+ * @returns {path}
+ */
 function torControlCookiePath () {
   return path.join(torWatchDirPath(), 'control_auth_cookie')
 }
 
-// TorDaemon
-//
-//      State for a tor daemon subprocess.
-//
+/**
+ * State for a tor daemon subprocess.
+ */
 class TorDaemon extends EventEmitter {
+  /**
+   * Initialization-only constructor.  No parameters, no nontrivial
+   * computation, no I/O.
+   */
   constructor () {
     super()
     this._process = null        // child process
@@ -79,13 +86,14 @@ class TorDaemon extends EventEmitter {
     this._socks_addresses = null // array of tor's socks addresses
   }
 
-  // setup(callback)
-  //
-  //    Create the necessary directories and invoke callback when
-  //    done.  We assume the parent of torBravePath exists; we create
-  //    it and everything we need underneath it.  On failure other
-  //    than EEXIST, may leave directories partially created.
-  //
+  /**
+   * Create the necessary directories and invoke callback when done.
+   * We assume the parent of torBravePath exists; we create it and
+   * everything we need underneath it.  On failure other than EEXIST,
+   * may leave directories partially created.
+   *
+   * @param {Function(Error)} callback
+   */
   setup (callback) {
     const directories = [
       torBravePath(),
@@ -107,11 +115,16 @@ class TorDaemon extends EventEmitter {
     loop(0)
   }
 
-  // start()
-  //
-  //    Start the tor daemon.  Caller must ensure that the necessary
-  //    directories have been created.
-  //
+  /**
+   * Start the tor daemon and start watching for it to start up.
+   * Caller must ensure that the necessary directories have been
+   * created with {@link TorDaemon#setup}.
+   *
+   * This function is asynchronous.  If the tor daemon successfully
+   * launches, this emits a `'launch'` event with the SOCKS address on
+   * which it is listening.  If the tor daemon exits, this emits an
+   * `'exit'` event.
+   */
   start () {
     // Begin watching for the control port file to be written.
     const watchDir = torWatchDirPath()
@@ -124,10 +137,9 @@ class TorDaemon extends EventEmitter {
     this._poll()
   }
 
-  // kill()
-  //
-  //    Kill the tor daemon.
-  //
+  /**
+   * Kill the tor daemon.
+   */
   kill () {
     if (!this._process) {
       assert(this._process === null)
@@ -142,16 +154,18 @@ class TorDaemon extends EventEmitter {
     this.emit('exit')
   }
 
-  // _watchEvent(event, filename)
-  //
-  //    Called by fs.watch when the tor watch directory is changed.
-  //    If the control port file is newly written, then the control
-  //    socket should be available now.
-  //
-  //    Note: filename is documented to be unreliable, so we don't use
-  //    it.  Instead we just check whether the control port file is
-  //    written and matches.
-  //
+  /**
+   * Internal subroutine.  Called by fs.watch when the tor watch
+   * directory is changed.  If the control port file is newly written,
+   * then the control socket should be available now.
+   *
+   * Note: filename is documented to be unreliable, so we don't use
+   * it.  Instead we just check whether the control port file is
+   * written and matches.
+   *
+   * @param {string} event
+   * @param {string} filename
+   */
   _watchEvent (event, filename) {
     assert(this._watcher)
 
@@ -168,11 +182,11 @@ class TorDaemon extends EventEmitter {
     this._poll()
   }
 
-  // _poll()
-  //
-  //    Poll for whether tor has started yet, or if there is a poll
-  //    already pending, tell it to retry in case it fails.
-  //
+  /**
+   * Internal subroutine.  Poll for whether tor has started yet, or if
+   * there is a poll already pending, tell it to retry in case it
+   * fails.
+   */
   _poll () {
     assert(this._process)
     assert(this._control === null)
@@ -189,21 +203,20 @@ class TorDaemon extends EventEmitter {
     this._doPoll()
   }
 
-  // _doPoll()
-  //
-  //    Actually poll for whether tor has started yet.  If tor is not
-  //    ready yet, we exit via this._polled(), which either waits for
-  //    another notification or polls again in case another
-  //    notification already came in.
-  //
-  //    When is tor ready?  We need the control port _and_ the control
-  //    authentication cookie.  The tor daemon currently writes the
-  //    control port first, and _then_ the control authentication
-  //    cookie.  So we open both, and check the mtimes.  If either one
-  //    is not there, tor is not ready.  If the cookie is older, it is
-  //    stale, from an older run of tor, and so tor is not ready in
-  //    that case.
-  //
+  /**
+   * Internal subroutine.  Actually poll for whether tor has started
+   * yet.  If tor is not ready yet, we exit via this._polled(), which
+   * either waits for another notification or polls again in case
+   * another notification already came in.
+   *
+   * When is tor ready?  We need the control port _and_ the control
+   * authentication cookie.  The tor daemon currently writes the
+   * control port first, and _then_ the control authentication
+   * cookie.  So we open both, and check the mtimes.  If either one
+   * is not there, tor is not ready.  If the cookie is older, it is
+   * stale, from an older run of tor, and so tor is not ready in
+   * that case.
+   */
   _doPoll () {
     assert(this._process)
     assert(this._control === null)
@@ -262,11 +275,11 @@ class TorDaemon extends EventEmitter {
     })
   }
 
-  // _polled()
-  //
-  //    Called when done polling.  If no control socket but asked to
-  //    retry, arrange to poll again; otherwise, restore state.
-  //
+  /**
+   * Internal subroutine.  Called when done polling.  If no control
+   * socket but asked to retry, arrange to poll again; otherwise,
+   * restore state.
+   */
   _polled () {
     assert(this._polling)
     if (this._retry_polling && this._control === null) {
@@ -276,10 +289,11 @@ class TorDaemon extends EventEmitter {
     this._retry_poll = null
   }
 
-  // _readControlPort(callback)
-  //
-  //    Read the control port.
-  //
+  /*
+   * Internal subroutine.  Read the control port and its mtime.
+   *
+   * @param {Function(Error, number, Date)} callback
+   */
   _readControlPort (callback) {
     // First, open the control port file.
     fs.open(torControlPortPath(), 'r', (err, fd) => {
@@ -341,10 +355,11 @@ class TorDaemon extends EventEmitter {
     })
   }
 
-  // _readControlCookie(callback)
-  //
-  //    Read the control cookie.
-  //
+  /**
+   * Internal subroutine.  Read the control cookie and its mtime.
+   *
+   * @param {Function(Error, Buffer, Date)} callback
+   */
   _readControlCookie (callback) {
     // First, open the control cookie file.
     fs.open(torControlCookiePath(), 'r', (err, fd) => {
@@ -385,12 +400,14 @@ class TorDaemon extends EventEmitter {
     })
   }
 
-  // _openControl(portno, cookie)
-  //
-  //    Open a control socket, arrange to set up a TorControl to
-  //    manage it, and authenticate to it with a null authentication
-  //    cookie.
-  //
+  /**
+   * Internal subroutine.  Open a control socket, arrange to set up a
+   * TorControl to manage it, and authenticate to it with a null
+   * authentication cookie.
+   *
+   * @param {number} portno
+   * @param {Buffer} cookie - secret authentication cookie in raw bits
+   */
   _openControl (portno, cookie) {
     assert(this._process)
     assert(this._control === null)
@@ -458,26 +475,26 @@ class TorDaemon extends EventEmitter {
     })
   }
 
-  // _controlError(err)
-  //
-  //    Callback for any errors on the control socket.  If we get
-  //    anything, close it and kill the process.
-  //
-  //    TODO(riastradh): Also try to restart tor or anything?
-  //
+  /**
+   * Internal subroutine.  Callback for any errors on the control
+   * socket.  If we get anything, close it and kill the process.
+   *
+   * TODO(riastradh): Also try to restart tor or anything?
+   *
+   * @param {Error} err
+   */
   _controlError (err) {
     assert(this._control)
     console.log(`tor: control socket error: ${err}`)
     this.kill()
   }
 
-  // _controlClosed()
-  //
-  //    Callback for when the control socket has been closed.  Just
-  //    clear it.
-  //
-  //    TODO(riastradh): Also try to restart tor or anything?
-  //
+  /*
+   * Internal subroutine.  Callback for when the control socket has
+   * been closed.  Just clear it.
+   *
+   * TODO(riastradh): Also try to restart tor or anything?
+   */
   _controlClosed () {
     assert(this._control)
     // TODO(riastradh): Attempt to reopen it?
@@ -485,13 +502,14 @@ class TorDaemon extends EventEmitter {
     this._control = null
   }
 
-  // getSOCKSAddress()
-  //
-  //    Returns the current SOCKS address: a string of the form
-  //    `<IPv4>:<portno>', `[<IPv6>]:<portno>', or `unix:<pathname>'.
-  //    If tor is not initialized yet, or is dead, this returns null
-  //    instead.
-  //
+  /**
+   * Returns the current SOCKS address: a string of the form
+   * `<IPv4>:<portno>', `[<IPv6>]:<portno>', or `unix:<pathname>'.
+   * If tor is not initialized yet, or is dead, this returns null
+   * instead.
+   *
+   * @returns {string} SOCKS socket address as string
+   */
   getSOCKSAddress () {
     if (!this._socks_addresses) {
       return null
@@ -499,15 +517,20 @@ class TorDaemon extends EventEmitter {
     return this._socks_addresses[0]
   }
 
-  // getControl()
-  //
-  //    Returns the control socket.
-  //
+  /**
+   * Returns the control socket.
+   *
+   * @returns {TorControl}
+   */
   getControl () {
     return this._control
   }
 }
 
+/**
+ * Set of all recognized asynchronous event types in the tor control
+ * connection for use with SETEVENTS.
+ */
 const TOR_ASYNC_EVENTS = {
   ADDRMAP: 1,
   AUTHDIR_NEWDESCS: 1,
@@ -544,18 +567,25 @@ const TOR_ASYNC_EVENTS = {
   WARN: 1
 }
 
-// TorControl(readable, writable)
-//
-//      State for a tor control socket interface.
-//
-//      TODO(riastradh): register close event listeners on readable/writable?
-//
+/**
+ * Internal utility class.  State for a tor control socket interface.
+ */
 class TorControl extends EventEmitter {
+  /**
+   * Constructor.  Takes ownership of readable and writable to read
+   * from and write to them.  The readable must not be paused.
+   *
+   * @param {Readable} readable - source for output of tor control connection
+   * @param {Writable} writable - sink for input to control connection
+   */
   constructor (readable, writable) {
     assert(readable instanceof stream.Readable)
     assert(!readable.isPaused())
 
     super()
+
+    // TODO(riastradh): register close event listeners on
+    // readable/writable?
 
     this._readable = new LineReadable(readable, 4096)
     this._readable_on_line = this._onLine.bind(this)
@@ -579,6 +609,10 @@ class TorControl extends EventEmitter {
     this._tor_events = {}
   }
 
+  /**
+   * Close the control connection.  Tidy up and pass an error to all
+   * callbacks waiting for commands that have not yet completed.
+   */
   close () {
     this._tidy()
     const err = new Error('tor control connection closed')
@@ -588,6 +622,10 @@ class TorControl extends EventEmitter {
     }
   }
 
+  /**
+   * Internal subroutine.  Clean up any internal state.  In
+   * particular, remove any listeners on the readable and writable.
+   */
   _tidy () {
     this._readable.removeListener('line', this._readable_on_line)
     this._readable.removeListener('end', this._readable_on_end)
@@ -595,6 +633,13 @@ class TorControl extends EventEmitter {
     this._writable.removeListener('error', this._writable_on_error)
   }
 
+  /**
+   * Internal subroutine.  Callback for errors on the enclosed
+   * readable or writable.  Tidy up and pass err along to all
+   * callbacks waiting for commands that have not yet completed.
+   *
+   * @param {Error} err
+   */
   _onError (err) {
     console.log(`tor control error: ${err}`)
     this._tidy()
@@ -605,6 +650,16 @@ class TorControl extends EventEmitter {
     }
   }
 
+  /**
+   * Internal subroutine.  Callback for {@link LineReadable} `'line'`
+   * event on receipt of a line of input, either complete or truncated
+   * at the maximum length.  Parse the line and handle it, triggering
+   * any asynchronous events or calling a command callback as
+   * appropriate.
+   *
+   * @param {Buffer} linebuf
+   * @param {boolean} trunc
+   */
   _onLine (linebuf, trunc) {
     assert(linebuf instanceof Buffer)
 
@@ -728,6 +783,12 @@ class TorControl extends EventEmitter {
     }
   }
 
+  /**
+   * Internal subroutine.  Callback for {@link LineReadable} `'end'`
+   * event.  If there were still any commands pending in the queue,
+   * use {@link TorDaemon._error} to fail them; otherwise, quietly
+   * tidy up.  Emit our own `'end'` event for anyone listening.
+   */
   _onEnd () {
     if (this._cmdq.length > 0) {
       this._error('Tor control connection closed')
@@ -737,10 +798,47 @@ class TorControl extends EventEmitter {
     this.emit('end')
   }
 
+  /**
+   * Internal subroutine.  Tidy up and pass an error with message msg
+   * along to all callbacks waiting for commands that have not yet
+   * completed.
+   *
+   * @param {string} msg
+   */
   _error (msg) {
     this._onError(new Error(msg))
   }
 
+  /**
+   * Function invoked for every middle line of multi-line output from
+   * a command send to tor on the control connection.
+   *
+   * @callback perlineCallback
+   * @param {string} status - three-digit status code, e.g. 250
+   * @param {string} reply - text of reply after status code
+   */
+
+  /**
+   * Callback invoked once on error or for the last line of output
+   * from a command send to tor on a control connection.  If tor
+   * returns an _error code_, err will be null in that case; it is the
+   * _callback's_ responsibility to interpret that as an error.
+   *
+   * @callback cmdCallback
+   * @param {Error} err
+   * @param {string} status - three-digit status code, e.g. 250
+   * @param {string} reply - text of reply after status code
+   */
+
+  /**
+   * Send a command to the tor controller.  Invoke perline for every
+   * middle line of multi-line output, and callback exactly once
+   * either on error or for the last line.
+   *
+   * @param {string} cmdline
+   * @param {perlineCallback} perline
+   * @param {cmdCallback} callback
+   */
   cmd (cmdline, perline, callback) {
     this._cmdq.push([perline, callback])
     this._writable.cork()
@@ -749,10 +847,28 @@ class TorControl extends EventEmitter {
     process.nextTick(() => this._writable.uncork())
   }
 
+  /**
+   * Shortcut for {@link TorDaemon.cmd} with a per-line callback that
+   * does nothing, for commands that are expected to have only one
+   * final line of output or whose middle lines the caller doesn't
+   * care about.
+   *
+   * TODO(riastradh): Maybe distinguish the cases where we _expect no
+   * middle lines_ versus we _don't care about middle lines_.
+   *
+   * @param {string} cmdlind
+   * @param {cmdCallback} callback
+   */
   cmd1 (cmdline, callback) {
     this.cmd(cmdline, (status, reply) => {}, callback)
   }
 
+  /**
+   * Send SIGNAL NEWNYM to tor to get a fresh circuit any subsequent
+   * connection.
+   *
+   * @param {Function(Error)} callback
+   */
   newnym (callback) {
     this.cmd1('SIGNAL NEWNYM', (err, status, reply) => {
       if (err) {
@@ -765,6 +881,22 @@ class TorControl extends EventEmitter {
     })
   }
 
+  /**
+   * Subscribe to the named asynchronous event by sending SETEVENTS to
+   * tor with the named event included, and calling the callback when
+   * tor has acknowledged the change in event subscriptions.
+   * Subsequently, when tor sends asynchronous replies for that event,
+   * `'async-${event}'` events will be emitted.
+   *
+   * Subcribing to an event again has no effect except to add to the
+   * number of times it has been subscribed.  Do not send SETEVENTS
+   * explicitly because subscriptions to any events _not_ listed will
+   * be cancelled.  {@link TorControl} keeps track of the set of event
+   * subscriptions.
+   *
+   * @param {string} event - an event in {@link TOR_ASYNC_EVENTS}
+   * @param {Function(Error)} callback
+   */
   subscribe (event, callback) {
     if (!(event in TOR_ASYNC_EVENTS)) {
       const err = new Error('invalid tor controller event')
@@ -790,6 +922,18 @@ class TorControl extends EventEmitter {
     })
   }
 
+  /**
+   * Unsubscribe to the named asynchronous event by sending SETEVENTS
+   * to tor with the named event excluded, and calling the callback
+   * when tor has acknowledged the change in event subscriptions.
+   *
+   * Unsubscribing from an event with more than one subscription has
+   * no effect except to debit from the number of times it has been
+   * subscribed.
+   *
+   * @param {string} event - an event in {@link TOR_ASYNC_EVENTS}
+   * @param {Function(Error)} callback
+   */
   unsubscribe (event, callback) {
     if (!(event in TOR_ASYNC_EVENTS)) {
       const err = new Error('invalid tor controller event')
@@ -815,6 +959,13 @@ class TorControl extends EventEmitter {
     }
   }
 
+  /**
+   * Internal subroutine.  Send `GETINFO net/listeners/${purpose}` and
+   * return the list of replies to the callback, or an error.
+   *
+   * @param {string} purpose
+   * @param {Function(Error, string[])} callback
+   */
   _getListeners (purpose, callback) {
     const keyword = `net/listeners/${purpose}`
     let listeners = null
@@ -849,30 +1000,43 @@ class TorControl extends EventEmitter {
     })
   }
 
+  /**
+   * Request the list of SOCKS listeners from tor and return the list
+   * to callback, or an error.
+   *
+   * @param {Function(error, string[])} callback
+   */
   getSOCKSListeners (callback) {
     return this._getListeners('socks', callback)
   }
 
+  /**
+   * Request the list of control connection listeners from tor and
+   * return the list to callback, or an error.
+   *
+   * @param {Function(error, string[])} callback
+   */
   getControlListeners (callback) {
     return this._getListeners('control', callback)
   }
 }
 
-// torrcEscapeBuffer(buf)
-//
-//      Escape a Buffer buf in torrc's format, and return a
-//      US-ASCII-only string of it.
-//
-//      - We must escape leading SPC and TAB because tor will
-//        interpret them as the separator between config name and
-//        value.
-//
-//      - We must escape the sequence `\' LF because tor will
-//        interpret that as a continuation line.
-//
-//      To keep it safe, we choose to escape _all_ nonprintable
-//      characters, SPC, `\', `#' (comment), and `"'.
-//
+/**
+ * Escape a Buffer buf in torrc's format, and return a US-ASCII-only
+ * string of it.
+ *
+ * - We must escape leading SPC and TAB because tor will interpret
+ *   them as the separator between config name and value.
+ *
+ * - We must escape the sequence `\' LF because tor will interpret
+ *   that as a continuation line.
+ *
+ * To keep it safe, we choose to escape _all_ nonprintable characters,
+ * SPC, `\', `#' (comment), and `"'.
+ *
+ * @param {Buffer} buf
+ * @returns string
+ */
 function torrcEscapeBuffer (buf) {
   assert(buf instanceof Buffer)
 
@@ -948,42 +1112,49 @@ function torrcEscapeBuffer (buf) {
   return '"' + result + '"'
 }
 
-// torrcEscapeString(str)
-//
-//      Escape the UTF-8 encoding of the string str in torrc's format,
-//      and return a US-ASCII-only string of it.
-//
+/**
+ * Escape the UTF-8 encoding of the string str in torrc's format, and
+ * return a US-ASCII-only string of it.
+ *
+ * @param {string} str
+ * @returns string
+ */
 function torrcEscapeString (str) {
   return torrcEscapeBuffer(Buffer.from(str, 'utf8'))
 }
 
-// torrcEscapeString(path)
-//
-//      Escape a path in torrc's format, encoded as UTF-8, and return
-//      a US-ASCII-only string of it.
-//
-//      Paths are represented by strings, so this is the same as
-//      torrcEscapeString, and we cannot handle (e.g.) Unix paths that
-//      do not consist of a UTF-8 octet sequence.
-//
+/**
+ * Escape a path in torrc's format, encoded as UTF-8, and return a
+ * US-ASCII-only string of it.
+ *
+ * Paths are represented by strings, so this is the same as
+ * torrcEscapeString, and we cannot handle (e.g.) Unix paths that do
+ * not consist of a UTF-8 octet sequence.
+ *
+ * @param {string} path
+ * @returns string
+ */
 function torrcEscapePath (path) {
   return torrcEscapeString(path)
 }
 
-// torControlParseQuoted(string, start, end)
-//
-//      Try to parse a quoted string, in the tor control connection's
-//      C-style notation, from the given string, in the slice [start,
-//      end).
-//
-//      => On success, return [body, i], where body is the body of the
-//         quoted string and i is the first index after the closing
-//         quotation mark.
-//
-//      => On failure, return [null, i], where i is the first index
-//         where something went wrong, possibly equal to end if the
-//         string lacked a closing quote mark.
-//
+/**
+ * Try to parse a quoted string, in the tor control connection's
+ * C-style notation, from the given string, in the slice [start, end).
+ *
+ * => On success, return [body, i], where body is the body of the
+ *    quoted string and i is the first index after the closing
+ *    quotation mark.
+ *
+ * => On failure, return [null, i], where i is the first index where
+ *    something went wrong, possibly equal to end if the string lacked
+ *    a closing quote mark.
+ *
+ * @param {string} string
+ * @param {number} start - inclusive start index
+ * @param {number} end - exclusive end index
+ * @returns [string, number]
+ */
 function torControlParseQuoted (string, start, end) {
   const buf = Buffer.alloc(string.length)
   let pos = 0                   // position in buffer
@@ -1070,18 +1241,22 @@ function torControlParseQuoted (string, start, end) {
   return [null, end]
 }
 
-// torControlParseKV(string, start, end)
-//
-//      Try to parse the value of a keyword=value pair in the tor
-//      control connection's optionally-quoted notation.  Return a
-//      list [keyword, value, i], where the keyword is returned as a
-//      US-ASCII string, the value is returned as a buffer that
-//      may contain arbitrary octets, and i is the index of the first
-//      position not consumed by torControlParseKV, either end or one
-//      position past the space that terminated.
-//
-//      The string in [start, end) should contain no CR or LF.
-//
+/**
+ * Try to parse the value of a keyword=value pair in the tor control
+ * connection's optionally-quoted notation.  Return a list [keyword,
+ * value, i], where the keyword is returned as a US-ASCII string, the
+ * value is returned as a buffer that may contain arbitrary octets,
+ * and i is the index of the first position not consumed by
+ * torControlParseKV, either end or one position past the space that
+ * terminated.
+ *
+ * The string in [start, end) should contain no CR or LF.
+ *
+ * @param {string} string
+ * @param {number} start - inclusive start index
+ * @param {number} end - exclusive end index
+ * @returns [string, number, number]
+ */
 function torControlParseKV (string, start, end) {
   const eq = string.indexOf('=', start)
   if (eq === -1 || end <= eq) {
@@ -1120,15 +1295,20 @@ function torControlParseKV (string, start, end) {
   return [keyword, value, end]
 }
 
-// LineReadable(readable[, maxlen])
-//
-//      CRLF-based line reader.  Given an underlying stream.Readable
-//      object in unpaused mode, yield an event emitter with line,
-//      end, and error events.  Empty line at end of stream is not
-//      emitted.  Stray CR or LF is reported as error.  Error is
-//      unrecoverable.
-//
+/**
+ * Internal utility class.  CRLF-based line reader.  Given an
+ * underlying stream.Readable object in unpaused mode, yield an event
+ * emitter with `'line'`, `'end'`, and `'error'` events.  Empty line
+ * at end of stream is not emitted.  Stray CR or LF is reported as
+ * error.  Error is unrecoverable.
+ */
 class LineReadable extends EventEmitter {
+  /**
+   * Constructor.  Takes ownership of readable to read from it.  The
+   * readable must not be paused.  If specified, maxlen is the maximum
+   * number of octets in a line before it is truncated and emitted in
+   * a `'line'` event anyway.
+   */
   constructor (readable, maxlen) {
     assert(readable instanceof stream.Readable)
     assert(!readable.isPaused())
@@ -1142,22 +1322,20 @@ class LineReadable extends EventEmitter {
     readable.on('end', this._on_end_method)
   }
 
-  // LineReadable._reset()
-  //
-  //    Reset the state of the line-reading machine to the start of a
-  //    line.
-  //
+  /**
+   * Internal subroutine.  Reset the state of the line-reading machine
+   * to the start of a line.
+   */
   _reset () {
     this._chunks = []
     this._readlen = 0
     this._cr_seen = false
   }
 
-  // LineReadable._tidy()
-  //
-  //    Unhook references to this line reader from the underlying
-  //    readable.
-  //
+  /**
+   * Internal subroutine.  Unhook references to this line reader from
+   * the underlying readable.
+   */
   _tidy () {
     // Should be nothing left.
     assert(this._readlen === 0)
@@ -1167,13 +1345,14 @@ class LineReadable extends EventEmitter {
     this._readable.removeListener('end', this._on_end_method)
   }
 
-  // LineReadable._onData(chunk)
-  //
-  //    Event handler for receipt of data from the readable.
-  //    Processes octet by octet to find CRLFs, and emits line events
-  //    for each one, or errors if stray CR or LF are found in the
-  //    stream.
-  //
+  /**
+   * Internal subroutine.  Handler for `'data'` event, for receipt of
+   * data from the readable.  Processes octet by octet to find CRLFs,
+   * and emits line events for each one, or errors if stray CR or LF
+   * are found in the stream.
+   *
+   * @param {Buffer} data
+   */
   _onData (chunk) {
     assert(this._maxlen === null || this._readlen <= this._maxlen)
     assert(chunk instanceof Buffer)
@@ -1229,12 +1408,11 @@ class LineReadable extends EventEmitter {
     assert(this._maxlen === null || this._readlen <= this._maxlen)
   }
 
-  // LineReadable._onEnd()
-  //
-  //    Event handler for end of underlying readable stream.  Reports
-  //    a final line if we have any data, tidies up after ourselves,
-  //    and emits an end event.
-  //
+  /**
+   * Internal subroutine.  Handler for `'end'` event, for end of
+   * underlying readable stream.  Reports a final line if we have any
+   * data, tidies up after ourselves, and emits an end event.
+   */
   _onEnd () {
     // If there's anything stored, report it.
     if (this._readlen !== 0) {
@@ -1246,12 +1424,13 @@ class LineReadable extends EventEmitter {
     this.emit('end')
   }
 
-  // LineReadable._line(trunc)
-  //
-  //    Report a line event, possibly truncated, with the chunks of
-  //    data so far accumulated.  Reset the state to the beginning of
-  //    a line.
-  //
+  /**
+   * Internal subroutine.  Report a line event, possibly truncated,
+   * with the chunks of data so far accumulated.  Reset the state to
+   * the beginning of a line.
+   *
+   * @param {boolean} trunc
+   */
   _line (trunc) {
     // Compute the line.
     const line = Buffer.concat(this._chunks, this._readlen)
@@ -1261,12 +1440,16 @@ class LineReadable extends EventEmitter {
     this.emit('line', line, trunc)
   }
 
-  // LineReadable._error(chunk, start, msg)
-  //
-  //    Report an error event with the specified message.  Return any
-  //    data -- chunk[start], chunk[start+1], ..., chunk[n-1] -- to
-  //    the stream.  Reset and tidy up, since we're presumed wedged.
-  //
+  /**
+   * Internal subroutine.  Report an error event with the specified
+   * message.  Return any data -- chunk[start], chunk[start+1], ...,
+   * chunk[n-1] -- to the stream.  Reset and tidy up, since we're
+   * presumed wedged.
+   *
+   * @param {Buffer} chunk
+   * @param {number} start
+   * @param {string} msg
+   */
   _error (chunk, start, msg) {
     // Add what's left of the current chunk.
     assert(start < chunk.length)
