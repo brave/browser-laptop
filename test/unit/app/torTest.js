@@ -217,7 +217,7 @@ describe('tor unit tests', function () {
           assert(torDaemon)
           torProcess = spawnTor(torDaemon)
           const timeoutLaunch = setTimeout(() => {
-            assert.fail('tor daemon failed to start after 2.5sec')
+            assert.fail('tor daemon failed to start after 2sec')
           }, 2000)
           // Wait for it to launch.
           torDaemon.once('launch', (socksAddr) => {
