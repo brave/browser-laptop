@@ -754,10 +754,22 @@ function setupTor () {
         }
         console.log(`tor: bootstrapped ${progress}%`)
       }
+      const circuitEstablished = (err, ok) => {
+        if (ok) {
+          console.log(`tor: ready`)
+        } else {
+          console.log(err ? `tor: not ready: ${err}` : `tor: not ready`)
+        }
+      }
       torDaemon.onBootstrap(bootstrapped, (err) => {
         if (err) {
           console.log(`tor: error subscribing to bootstrap: ${err}`)
         }
+        torDaemon.onCircuitEstablished(circuitEstablished, (err) => {
+          if (err) {
+            console.log(`tor: error subscribing to circuit ready: ${err}`)
+          }
+        })
       })
     })
     torDaemon.start()

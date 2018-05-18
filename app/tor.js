@@ -535,62 +535,56 @@ class TorDaemon extends EventEmitter {
   }
 
   /**
-   * Arrange to call handler with the current bootstrap progress and
-   * every time it changes.  The handler may be called before or after
-   * the callback.
+   * Internal subroutine.  Arrange to call handler for asynchronous
+   * events about info.
    *
-   * @param {Function(Error, string)} handler
+   * @param {string} event - STATUS_CLIENT, STATUS_GENERAL, &c.
+   * @param {dict} keys - BOOTSTRAP, CIRCUIT_ESTABLISHED, &c.
+   * @param {string} info - status/bootstrap-phase, status/circuit-established
+   * @param {Function(Error, string)} statusHandler - called asynchronously
+   * @param {Function(Error, string)} infoHandler - called for GETINFO
    * @param {Function(Error)} callback
    */
-  onBootstrap (handler, callback) {
+  _torStatus (event, keys, info, statusHandler, infoHandler, callback) {
     const control = this._control
-    const handleStatusClient = (event, extra) => {
-      const args = event.split(' ') // TODO(riastradh): better parsing
-      if (args[1] !== 'BOOTSTRAP') {
+    const handleStatus = (data, extra) => {
+      const args = data.split(' ') // TODO(riastradh): better parsing
+      if (args.length < 2) {
+        console.log(`tor: warning: truncated ${event}`)
+        return
+      }
+      if (!(args[1] in keys)) {
         // Not for us!
         return
       }
       let err = null
       if (args[0] === 'ERR') {
-        err = new Error(`${event}`)
+        err = new Error(`${data}`)
       }
-      // Find the progress.
-      for (let i = 2; i < args.length; i++) {
-        const [k, v] = args[i].split('=')
-        if (k === 'PROGRESS') {
-          return handler(err, v)
-        }
-      }
-      // No progress.  If there isn't an error already, treat it as
-      // one.
-      if (!err) {
-        err = new Error(`bootstrap without progress: ${event}`)
-      }
-      handler(err, null)
+      statusHandler(err, data)
     }
-    // Subscribe to STATUS_CLIENT events.
-    const statusClientListener = (event, extra) => handleStatusClient(event)
-    control.on('async-STATUS_CLIENT', statusClientListener)
-    control.subscribe('STATUS_CLIENT', (err) => {
+    // Subscribe to events.
+    const statusListener = (data, extra) => handleStatus(data)
+    control.on(`async-${event}`, statusListener)
+    control.subscribe(event, (err) => {
       if (err) {
-        control.removeListener('async-STATUS_CLIENT', statusClientListener)
+        control.removeListener(`async-$[event}`, statusListener)
         return callback(err)
       }
-      // Run `GETINFO status/bootstrap-phase' to kick us off, in case
-      // it's a long time to the next phase or we're wedged.
-      const info = 'status/bootstrap-phase'
+      // Run `GETINFO ${info}' to kick us off, in case it's a long
+      // time to the next phase or we're wedged.
       const getinfoLine = (status, reply) => {
         if (status !== '250') {
           const err = new Error(`${status} ${reply}`)
-          return handler(err, null)
+          return infoHandler(err, null)
         }
         const prefix = `${info}=`
         if (!reply.startsWith(prefix)) {
-          const err = new Error(`bogus status/bootstrap-phase: ${reply}`)
-          return handler(err, null)
+          const err = new Error(`bogus ${info}: ${reply}`)
+          return infoHandler(err, null)
         }
-        const event = reply.slice(prefix.length)
-        return handleStatusClient(event)
+        const data = reply.slice(prefix.length)
+        return infoHandler(err, data)
       }
       control.cmd(`GETINFO ${info}`, getinfoLine, (err, status, reply) => {
         if (!err) {
@@ -605,6 +599,112 @@ class TorDaemon extends EventEmitter {
         return callback(null)
       })
     })
+  }
+
+  /**
+   * Arrange to call handler with the current bootstrap progress and
+   * every time it changes.  The handler may be called before or after
+   * the callback.
+   *
+   * TODO(riastradh): No way to deregister.
+   *
+   * @param {Function(Error, string)} handler
+   * @param {Function(Error)} callback
+   */
+  onBootstrap (handler, callback) {
+    const handleStatus = (err, data) => {
+      // <severity> BOOTSTRAP ... PROGRESS=<num>
+      const args = data.split(' ') // TODO(riastradh): better parsing
+      assert(args.length >= 2)
+      // Find the progress.  args[0] is ERR/WARN/NOTICE; args[1] is
+      // BOOTSTRAP.
+      assert(args[1] === 'BOOTSTRAP')
+      for (let i = 2; i < args.length; i++) {
+        const [k, v] = args[i].split('=')
+        if (k === 'PROGRESS') {
+          return handler(err, v)
+        }
+      }
+      // No progress.  If there isn't an error already, treat it as
+      // one.
+      if (!err) {
+        err = new Error(`bootstrap without progress: ${data}`)
+      }
+      handler(err, null)
+    }
+    const handleInfo = (err, data) => {
+      // <severity> BOOTSTRAP ... PROGRESS=<num>
+      const args = data.split(' ') // TODO(riastradh): better parsing
+      if (args.length < 2) {
+        console.log(`tor: warning: truncated ${event}`)
+        return
+      }
+      if (args[1] !== 'BOOTSTRAP') {
+        // Not for us!
+        return
+      }
+      if (!err && args[0] === 'ERR') {
+        err = new Error(`${data}`)
+      }
+      handleStatus(err, data)
+    }
+    const event = 'STATUS_CLIENT'
+    const keys = {BOOTSTRAP: 1}
+    const info = 'status/bootstrap-phase'
+    this._torStatus(event, keys, info, handleStatus, handleInfo, callback)
+  }
+
+  /**
+   * Arrange to call handler when tor thinks it can or cannot build
+   * circuits for client use.  The handler may be called before or
+   * after the callback.
+   *
+   * @param {Function(Error, string)} handler
+   * @param {Function(Error)} callback
+   */
+  onCircuitEstablished (handler, callback) {
+    const handleStatus = (err, data) => {
+      if (err) {
+        return handler(err, null)
+      }
+      // <severity> CIRCUIT_ESTABLISHED
+      // <severity> CIRCUIT_NOT_ESTABLISHED
+      const args = data.split(' ') // TODO(riastradh): better parsing
+      if (args[1] === 'CIRCUIT_ESTABLISHED') {
+        handler(null, true)
+      } else if (args[1] === 'CIRCUIT_NOT_ESTABLISHED') {
+        let err = null
+        for (let i = 2; i < args.length; i++) {
+          const [k, v] = args[i].split('=')
+          if (k === 'REASON') {
+            err = new Error(`tor: ${v}`)
+            break
+          }
+        }
+        handler(err, false)
+      } else {
+        const err = new Error(`tor: bogus circuit establishment info: ${data}`)
+        handler(err, false)
+      }
+    }
+    const handleInfo = (err, s) => {
+      if (err) {
+        return handler(err, null)
+      }
+      // 0 or 1
+      if (s === '1') {
+        handler(null, true)
+      } else if (s === '0') {
+        handler(null, false)
+      } else {
+        err = new Error(`tor: bogus circuit establishment info: ${s}`)
+        handler(err, false)
+      }
+    }
+    const event = 'STATUS_CLIENT'
+    const keys = {CIRCUIT_ESTABLISHED: 1, CIRCUIT_NOT_ESTABLISHED: 1}
+    const info = 'status/circuit-established'
+    this._torStatus(event, keys, info, handleStatus, handleInfo, callback)
   }
 }
 
