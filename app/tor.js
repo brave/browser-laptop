@@ -138,7 +138,12 @@ class TorDaemon extends EventEmitter {
     })
 
     this._process = 'i am the very seeming of a child process daemon'
-    this._poll()
+
+    // Defer to the next tick so that the user can reliably do
+    //
+    //          torDaemon.start()
+    //          torDaemon.on('launch', ...)
+    process.nextTick(() => this._poll())
   }
 
   /**
