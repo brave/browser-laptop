@@ -684,7 +684,7 @@ class TorDaemon extends EventEmitter {
         handler(err, false)
       } else {
         const err = new Error(`tor: bogus circuit establishment info: ${data}`)
-        handler(err, false)
+        handler(err, null)
       }
     }
     const handleInfo = (err, s) => {
