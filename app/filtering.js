@@ -748,6 +748,7 @@ function setupTor () {
     torDaemon.on('launch', (socksAddr) => {
       console.log(`tor: daemon listens on ${socksAddr}`)
       const bootstrapped = (err, progress) => {
+        // TODO(riastradh): Visually update a progress bar!
         if (err) {
           console.log(`tor: bootstrap error: ${err}`)
           return
