@@ -99,6 +99,7 @@ describe('sessionStore unit tests', function () {
 
   after(function () {
     mockery.disable()
+    mockery.deregisterAll()
   })
 
   describe('saveAppState', function () {
