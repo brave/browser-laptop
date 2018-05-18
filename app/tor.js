@@ -592,6 +592,7 @@ class TorDaemon extends EventEmitter {
           }
         }
         if (err) {
+          // TODO(riastradh): Unsubscribe and remove listener or not?
           return callback(err)
         }
         // Success!
