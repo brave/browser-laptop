@@ -6,10 +6,10 @@ const fs = require('fs')
 const mockery = require('mockery')
 const rimraf = require('rimraf')
 
-describe('tor unit tests', () => {
+describe('tor unit tests', function () {
   let tor
   const fakeElectron = require('../lib/fakeElectron')
-  before(() => {
+  before(function () {
     mockery.enable({
       warnOnReplace: false,
       warnOnUnregistered: false,
@@ -18,11 +18,11 @@ describe('tor unit tests', () => {
     mockery.registerMock('electron', fakeElectron)
     tor = require('../../../app/tor')
   })
-  after(() => {
+  after(function () {
     mockery.disable()
   })
 
-  it('torrcEscapeString', () => {
+  it('torrcEscapeString', function () {
     assert.strictEqual('foobar', tor.torrcEscapeString('foobar'))
     assert.strictEqual('" foobar"', tor.torrcEscapeString(' foobar'))
     assert.strictEqual('"\\x09foobar"', tor.torrcEscapeString('\tfoobar'))
@@ -36,12 +36,12 @@ describe('tor unit tests', () => {
       tor.torrcEscapeString('C:\\Ronald’s laptop\'s disk'))
   })
 
-  it('torrcEscapeBuffer', () => {
+  it('torrcEscapeBuffer', function () {
     assert.strictEqual('"\\x00\\x01\\x1f \\x7f\\x80\\xfe\\xff"',
       tor.torrcEscapeBuffer(Buffer.from([0, 1, 31, 32, 127, 128, 254, 255])))
   })
 
-  it('torControlParseQuoted', () => {
+  it('torControlParseQuoted', function () {
     assert.deepStrictEqual([Buffer.from('127.0.0.1:41159', 'ascii'), 17],
       tor.torControlParseQuoted('"127.0.0.1:41159"', 0, 17))
     assert.deepStrictEqual([Buffer.from('unix:/a b/c', 'ascii'), 13],
@@ -66,7 +66,7 @@ describe('tor unit tests', () => {
       tor.torControlParseQuoted('"unix:/a\\fb/c"', 0, 13))
   })
 
-  it('torControlParseKV', () => {
+  it('torControlParseKV', function () {
     assert.deepStrictEqual(['foo', Buffer.from('bar'), 8],
       tor.torControlParseKV('xfoo=bary', 1, 8))
     assert.deepStrictEqual(['foo', Buffer.from('bar'), 10],
@@ -156,7 +156,7 @@ describe('tor unit tests', () => {
     })
   })
 
-  it('tor daemon start then watch', (callback) => {
+  it('tor daemon start then watch', function (callback) {
     // TODO(riastradh): broken test
     return callback()
     /* eslint-disable no-unreachable */
@@ -186,7 +186,7 @@ describe('tor unit tests', () => {
     /* eslint-enable no-unreachable */
   })
 
-  it('tor daemon watch then start', (callback) => {
+  it('tor daemon watch then start', function (callback) {
     // TODO(riastradh): broken test
     return callback()
     /* eslint-disable no-unreachable */
