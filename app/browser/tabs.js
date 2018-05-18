@@ -712,7 +712,8 @@ const api = {
         if (!tabValue) {
           return
         }
-        appActions.tabSetFullScreen(tabId, false)
+        const windowId = tabValue.get('windowId')
+        appActions.tabSetFullScreen(tabId, false, false, windowId)
       })
 
       tab.on('media-started-playing', (e) => {

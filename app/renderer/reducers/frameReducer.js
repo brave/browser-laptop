@@ -22,6 +22,10 @@ const {getCurrentWindowId} = require('../currentWindow')
 
 const setFullScreen = (state, action) => {
   const index = frameStateUtil.getIndexByTabId(state, action.tabId)
+  if (index < 0) {
+    console.error('frame not found for setFullScreen: ', index)
+    return state
+  }
   return state.mergeIn(['frames', index], {
     isFullScreen: action.isFullScreen !== undefined ? action.isFullScreen : state.getIn(['frames', index].concat('isFullScreen')),
     showFullScreenWarning: action.showFullScreenWarning
