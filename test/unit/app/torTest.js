@@ -20,6 +20,7 @@ describe('tor unit tests', function () {
   })
   after(function () {
     mockery.disable()
+    mockery.deregisterAll()
   })
 
   it('torrcEscapeString', function () {
