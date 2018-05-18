@@ -153,7 +153,6 @@ class TorDaemon extends EventEmitter {
     if (!this._process) {
       assert(this._process === null)
       assert(this._control === null)
-      console.log("tor: not running, can't kill")
       return
     }
     if (this._control) {
@@ -184,10 +183,11 @@ class TorDaemon extends EventEmitter {
       return
     }
 
+    // If the control connection is already open, nothing to do.
     if (this._control) {
-      console.log('tor: ignoring watch event, control already open')
       return
     }
+
     this._poll()
   }
 
@@ -201,7 +201,6 @@ class TorDaemon extends EventEmitter {
     assert(this._control === null)
 
     if (this._polling) {
-      console.log('tor: already polling, will retry if it fails')
       this._retry_poll = true
       return
     } else {
@@ -237,7 +236,6 @@ class TorDaemon extends EventEmitter {
         // written incompletely, and we will, with any luck, be notified
         // again when it has been written completely and renamed to its
         // permanent location.
-        console.log(`tor: failed to read control port: ${err}`)
         return this._polled()
       }
 
@@ -254,7 +252,8 @@ class TorDaemon extends EventEmitter {
 
       this._readControlCookie((err, cookie, cookieMtime) => {
         if (err) {
-          console.log(`tor: failed to read control cookie: ${err}`)
+          // If there's an error, don't worry: the file may not be
+          // ready yet, and we'll be notified when it is.
           return this._polled()
         }
 
@@ -1052,7 +1051,7 @@ class TorControl extends EventEmitter {
     let listeners = null
     const perline = (status, reply) => {
       if (status !== '250' || !reply.startsWith(`${keyword}=`) || listeners) {
-        console.log(`unexpected GETINFO ${keyword} reply`)
+        console.log(`tor: unexpected GETINFO ${keyword} reply`)
         return
       }
       listeners = []
