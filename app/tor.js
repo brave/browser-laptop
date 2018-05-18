@@ -949,7 +949,7 @@ class TorControl extends EventEmitter {
       return process.nextTick(() => callback(err))
     }
     if (!(event in this._tor_events)) {
-      return
+      return process.nextTick(() => callback(null))
     }
     if (this._tor_events[event]-- === 0) {
       delete this._tor_events[event]
