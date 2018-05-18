@@ -188,14 +188,14 @@ describe('tor unit tests', function () {
             assert.fail('tor daemon failed to start after 2.5sec')
           }, 2000)
           // Wait for it to launch.
-          torDaemon.on('launch', (socksAddr) => {
+          torDaemon.once('launch', (socksAddr) => {
             clearTimeout(timeoutLaunch)
             // All done.  Kill it gently and wait for it to exit.
             torProcess.kill('SIGTERM')
             const timeoutKill = setTimeout(() => {
               assert.fail('tor daemon failed to exit after 2sec')
             }, 2000)
-            torProcess.on('exit', () => {
+            torProcess.once('exit', () => {
               clearTimeout(timeoutKill)
               // Success!
               callback()
@@ -220,14 +220,14 @@ describe('tor unit tests', function () {
             assert.fail('tor daemon failed to start after 2.5sec')
           }, 2000)
           // Wait for it to launch.
-          torDaemon.on('launch', (socksAddr) => {
+          torDaemon.once('launch', (socksAddr) => {
             clearTimeout(timeoutLaunch)
             // All done.  Kill it gently and wait for it to exit.
             torProcess.kill('SIGTERM')
             const timeoutKill = setTimeout(() => {
               assert.fail('tor daemon failed to exit after 2sec')
             }, 2000)
-            torProcess.on('exit', () => {
+            torProcess.once('exit', () => {
               clearTimeout(timeoutKill)
               // Success!
               callback()
