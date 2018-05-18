@@ -547,7 +547,8 @@ class TorDaemon extends EventEmitter {
    */
   _torStatus (event, keys, info, statusHandler, infoHandler, callback) {
     const control = this._control
-    const handleStatus = (data, extra) => {
+    // Subscribe to events.
+    const statusListener = (data, extra) => {
       const args = data.split(' ') // TODO(riastradh): better parsing
       if (args.length < 2) {
         console.log(`tor: warning: truncated ${event}`)
@@ -563,12 +564,10 @@ class TorDaemon extends EventEmitter {
       }
       statusHandler(err, data)
     }
-    // Subscribe to events.
-    const statusListener = (data, extra) => handleStatus(data)
     control.on(`async-${event}`, statusListener)
     control.subscribe(event, (err) => {
       if (err) {
-        control.removeListener(`async-$[event}`, statusListener)
+        control.removeListener(`async-${event}`, statusListener)
         return callback(err)
       }
       // Run `GETINFO ${info}' to kick us off, in case it's a long
