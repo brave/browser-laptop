@@ -534,6 +534,78 @@ class TorDaemon extends EventEmitter {
   getControl () {
     return this._control
   }
+
+  /**
+   * Arrange to call handler with the current bootstrap progress and
+   * every time it changes.  The handler may be called before or after
+   * the callback.
+   *
+   * @param {Function(Error, string)} handler
+   * @param {Function(Error)} callback
+   */
+  onBootstrap (handler, callback) {
+    const control = this._control
+    const onStatusClient = (event, extra) => {
+      const args = event.split(' ') // TODO(riastradh): better parsing
+      if (args[1] !== 'BOOTSTRAP') {
+        // Not for us!
+        return
+      }
+      let err = null
+      if (args[0] === 'ERR') {
+        err = new Error(`${event}`)
+      }
+      // Find the progress.
+      for (let i = 2; i < args.length; i++) {
+        const [k, v] = args[i].split('=')
+        if (k === 'PROGRESS') {
+          return handler(err, v)
+        }
+      }
+      // No progress.  If there isn't an error already, treat it as
+      // one.
+      if (!err) {
+        err = new Error(`bootstrap without progress: ${event}`)
+      }
+      handler(err, null)
+    }
+    // Subscribe to STATUS_CLIENT events.
+    control.on('async-STATUS_CLIENT', (event, extra) => onStatusClient(event))
+    control.subscribe('STATUS_CLIENT', (err) => {
+      if (err) {
+        control.removeListener('async-STATUS_CLIENT', onStatusClient)
+        return callback(err)
+      }
+      // Run `GETINFO status/bootstrap-phase' to kick us off, in case
+      // it's a long time to the next phase or we're wedged.
+      const info = 'status/bootstrap-phase'
+      const getinfoLine = (status, reply) => {
+        if (status !== '250') {
+          const err = new Error(`${status} ${reply}`)
+          return handler(err, null)
+        }
+        const prefix = `${info}=`
+        if (!reply.startsWith(prefix)) {
+          const err = new Error(`bogus status/bootstrap-phase: ${reply}`)
+          return handler(err, null)
+        }
+        const event = reply.slice(prefix.length)
+        return onStatusClient(event)
+      }
+      control.cmd(`GETINFO ${info}`, getinfoLine, (err, status, reply) => {
+        if (!err) {
+          if (status !== '250') {
+            err = new Error(`${status} ${reply}`)
+          }
+        }
+        if (err) {
+          return callback(err)
+        }
+        // Success!
+        return callback(null)
+      })
+    })
+  }
 }
 
 /**

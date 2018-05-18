@@ -236,5 +236,36 @@ describe('tor unit tests', function () {
         }, 500)
       })
     })
+
+    it('launches tor and begins bootstrapping', function (callback) {
+      torDaemon.setup(() => {
+        torDaemon.start()
+        torProcess = spawnTor(torDaemon)
+        const timeoutLaunch = setTimeout(() => {
+          assert.fail('tor daemon failed to start after 2sec')
+        }, 2000)
+        torDaemon.once('launch', (socksAddr) => {
+          clearTimeout(timeoutLaunch)
+          const bootstrapTimeout = setTimeout(() => {
+            assert.fail('tor daemon failed to begin bootstrapping after 2sec')
+          }, 2000)
+          let countdown = 2
+          const bootstrapped = (err, progress) => {
+            assert.ifError(err)
+            clearTimeout(bootstrapTimeout)
+            console.log(`tor: bootstrapped ${progress}%`)
+            if (--countdown === 0) {
+              return callback()
+            }
+          }
+          torDaemon.onBootstrap(bootstrapped, (err) => {
+            assert.ifError(err)
+            if (--countdown === 0) {
+              return callback()
+            }
+          })
+        })
+      })
+    })
   })
 })
