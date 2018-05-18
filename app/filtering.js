@@ -747,58 +747,17 @@ function setupTor () {
     torDaemon.on('exit', () => console.log('tor: daemon exited'))
     torDaemon.on('launch', (socksAddr) => {
       console.log(`tor: daemon listens on ${socksAddr}`)
-      const control = torDaemon.getControl()
-      const bootstrapped = (event) => {
-        const args = event.split(' ')
-        if (args[0] === 'ERR' || args[0] === 'WARN') {
-          console.log(`tor: ${event}`)
-          return
-        }
-        if (args[1] !== 'BOOTSTRAP') {
-          return
-        }
-        for (let i = 0; i < args.length; i++) {
-          const [k, v] = args[i].split('=')
-          if (k === 'PROGRESS') {
-            // TODO(riastradh): Visually update a progress bar!
-            console.log(`tor: bootstrapped ${v}%`)
-            return
-          }
-        }
-        console.log(`tor: bootstrapped but not sure how much: ${event}`)
-      }
-      control.on('async-STATUS_CLIENT', (event, extra) => {
-        bootstrapped(event)
-      })
-      control.subscribe('STATUS_CLIENT', (err) => {
+      const bootstrapped = (err, progress) => {
         if (err) {
-          console.log(`subscribe STATUS_CLIENT: ${err}`)
+          console.log(`tor: bootstrap error: ${err}`)
           return
         }
-        const getinfoLine = (status, reply) => {
-          if (status !== '250') {
-            console.log(`tor: bootstrap error: ${reply}`)
-            return
-          }
-          const prefix = 'status/bootstrap-phase='
-          if (!reply.startsWith(prefix)) {
-            console.log(`tor: GETINFO status/bootstrap-phase: ${reply}`)
-            return
-          }
-          const event = reply.slice(prefix.length)
-          bootstrapped(event)
+        console.log(`tor: bootstrapped ${progress}%`)
+      }
+      torDaemon.onBootstrap(bootstrapped, (err) => {
+        if (err) {
+          console.log(`tor: error subscribing to bootstrap: ${err}`)
         }
-        control.cmd('GETINFO status/bootstrap-phase', getinfoLine,
-          (err, status, reply) => {
-            if (!err) {
-              if (status !== '250') {
-                err = new Error(`tor: ${status} ${reply}`)
-              }
-            }
-            if (err) {
-              console.log(`tor: failed to get bootstrap phase: ${err}`)
-            }
-          })
       })
     })
     torDaemon.start()
