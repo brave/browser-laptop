@@ -544,7 +544,7 @@ class TorDaemon extends EventEmitter {
    */
   onBootstrap (handler, callback) {
     const control = this._control
-    const onStatusClient = (event, extra) => {
+    const handleStatusClient = (event, extra) => {
       const args = event.split(' ') // TODO(riastradh): better parsing
       if (args[1] !== 'BOOTSTRAP') {
         // Not for us!
@@ -569,10 +569,11 @@ class TorDaemon extends EventEmitter {
       handler(err, null)
     }
     // Subscribe to STATUS_CLIENT events.
-    control.on('async-STATUS_CLIENT', (event, extra) => onStatusClient(event))
+    const statusClientListener = (event, extra) => handleStatusClient(event)
+    control.on('async-STATUS_CLIENT', statusClientListener)
     control.subscribe('STATUS_CLIENT', (err) => {
       if (err) {
-        control.removeListener('async-STATUS_CLIENT', onStatusClient)
+        control.removeListener('async-STATUS_CLIENT', statusClientListener)
         return callback(err)
       }
       // Run `GETINFO status/bootstrap-phase' to kick us off, in case
@@ -589,7 +590,7 @@ class TorDaemon extends EventEmitter {
           return handler(err, null)
         }
         const event = reply.slice(prefix.length)
-        return onStatusClient(event)
+        return handleStatusClient(event)
       }
       control.cmd(`GETINFO ${info}`, getinfoLine, (err, status, reply) => {
         if (!err) {
