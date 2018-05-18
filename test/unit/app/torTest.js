@@ -249,19 +249,30 @@ describe('tor unit tests', function () {
           const bootstrapTimeout = setTimeout(() => {
             assert.fail('tor daemon failed to begin bootstrapping after 2sec')
           }, 2000)
+          const done = () => {
+            torProcess.kill('SIGTERM')
+            const timeoutKill = setTimeout(() => {
+              assert.fail('tor daemon failed to exit after 2sec')
+            }, 2000)
+            torProcess.once('exit', () => {
+              clearTimeout(timeoutKill)
+              // Success!
+              callback()
+            })
+          }
           let countdown = 2
           const bootstrapped = (err, progress) => {
             assert.ifError(err)
             clearTimeout(bootstrapTimeout)
             console.log(`tor: bootstrapped ${progress}%`)
             if (--countdown === 0) {
-              return callback()
+              return done()
             }
           }
           torDaemon.onBootstrap(bootstrapped, (err) => {
             assert.ifError(err)
             if (--countdown === 0) {
-              return callback()
+              return done()
             }
           })
         })
