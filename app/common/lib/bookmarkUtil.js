@@ -182,7 +182,7 @@ const buildBookmark = (state, bookmarkDetail) => {
     title: bookmarkDetail.get('title', ''),
     location: bookmarkDetail.get('location'),
     parentFolderId: Number(bookmarkDetail.get('parentFolderId', 0)),
-    partitionNumber: Number(dataItem.get('partitionNumber', 0)),
+    partitionNumber: Number(bookmarkDetail.get('partitionNumber', dataItem.get('partitionNumber', 0))),
     objectId: bookmarkDetail.get('objectId', null),
     favicon: dataItem.get('favicon'),
     themeColor: dataItem.get('themeColor'),
