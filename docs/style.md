@@ -6,7 +6,7 @@ All applicable styles should be colocated with their corresponding JavaScript co
 
 ## Legacy
 
-All legacy styles are processed with [LESS](http://lesscss.org/) and can be found in the `/less` directory. These should still be maintained but all future CSS should be written in JavaScript and kept inside the appropriate component file. 
+All legacy styles are processed with [LESS](http://lesscss.org/) and can be found in the `/less` directory. These should still be maintained but all future CSS should be written in JavaScript and kept inside the appropriate component file.
 
 
 ## Note
@@ -54,7 +54,7 @@ Also, note that this style guide was re-made after some code has being refactore
 
 ### Where to put my code
 
-The best practice regarding components is to split them into separate files, and that's what you should do with styles as well. Styles should be bound to the component whenever possible. For places where several styles apply (such as tab), that's OK to create a separated file for that. Styles files lives inside `app/renderer/components/styles`. 
+The best practice regarding components is to split them into separate files, and that's what you should do with styles as well. Styles should be bound to the component whenever possible. For places where several styles apply (such as tab), that's OK to create a separated file for that. Styles files lives inside `app/renderer/components/styles`.
 
 #### The global file
 
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
 
 ### Dealing with pseudo-states
 
-Aphrodite works ok with pseudo-states like `:hover` and `:active`, `:before`, `:after`, as well with `:nth-child()`. 
+Aphrodite works ok with pseudo-states like `:hover` and `:active`, `:before`, `:after`, as well with `:nth-child()`.
 
 There's no strict rule here, but you should avoid calling numbered children, being the only exception `:nth-child(even)` or `:nth-child(odd)`.
 
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
 
 ### Dealing with vendor prefixes
 
-Sometimes we'll need to flag `-webkit-` prefix. Prever camel-case instead of quoted objects (more below):
+Sometimes we'll need to flag `-webkit-` prefix. Prefer camel-case instead of quoted objects (more below):
 
 **Bad**
 ```js
@@ -557,7 +557,7 @@ styles = StyleSheet.create({
 
 #### Having to parse integers
 
-Sometimes you'll have to get the number of a given property written in pixels. You're incouraged of parsing that value instead of creating a new class:
+Sometimes you'll have to get the number of a given property written in pixels. You're encouraged to parse that value instead of creating a new class:
 
 ```js
 // global.js
@@ -577,7 +577,7 @@ const globalStyles = {
 
 someClassINeed: {
   // hard-coded, but we have that value already
-  something: 1000 
+  something: 1000
 }
 ```
 
@@ -642,9 +642,9 @@ const {isWindows} = require('../../app/common/lib/platformUtil')
 
 ### Descendant selection of pseudo-state
 
-Aphrodite don't deal well with that. However, that's a good thing and makes codebase more consise avoiding nested-styles hell. 
+Aphrodite don't deal well with that. However, that's a good thing and makes codebase more concise avoiding nested-styles hell.
 
-If that's strictly necessary, please make use of an `action` to dispatch changes you need so your className can be changed. A good example can be found looking at `windowActions.setTabHoverState()`, which we use to check if a tab is being hovered. If so, our closeTab icon is fired. 
+If that's strictly necessary, please make use of an `action` to dispatch changes you need so your className can be changed. A good example can be found looking at `windowActions.setTabHoverState()`, which we use to check if a tab is being hovered. If so, our closeTab icon is fired.
 
 If you look at how it was done before using Aphrodite:
 
