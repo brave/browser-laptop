@@ -267,7 +267,7 @@ class AddEditBookmarkForm extends React.Component {
                     }
                   </CommonFormDropdown>
                 </div>
-                </section>
+              </section>
               : null
           }
         </div>
