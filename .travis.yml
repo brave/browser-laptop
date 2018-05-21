@@ -28,6 +28,7 @@ env:
     - TEST_DIR=lint
     - TEST_DIR=unit
     - TEST_DIR=codecov
+    - TEST_DIR=security
     - TEST_DIR=about
     - TEST_DIR=app
     - TEST_DIR=bookmark-components
