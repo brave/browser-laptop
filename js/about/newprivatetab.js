@@ -63,7 +63,7 @@ class NewPrivateTab extends React.Component {
                 <span>
                   <h2 onClick={this.onClickPrivateSearchTitle.bind(this)} className={css(styles.privateSearch__title)}>
                     <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabSearchSectionTitle' />
-                    <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>DuckDuckGo</strong>
+                    <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>&nbsp;DuckDuckGo</strong>
                   </h2>
                   <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabSearchText1' />
                 </span>
@@ -84,7 +84,7 @@ class NewPrivateTab extends React.Component {
                 <span>
                   <h2 onClick={this.onClickTorTitle.bind(this)} className={css(styles.privateSearch__title)}>
                     <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabTorTitle' />
-                    <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>Tor</strong>
+                    <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>&nbsp;Tor</strong>
                   </h2>
                   <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabTorText1' />
                   <p className={css(styles.text, styles.text_privateSearch, styles.text_clickable)} onClick={aboutActions.createTabRequested.bind(null, {url: torFAQ})} data-l10n-id='learnMore' />
@@ -102,10 +102,8 @@ class NewPrivateTab extends React.Component {
         </div>
       </div>
       <div className={css(styles.section_privateTab)}>
-        <h1 className={css(styles.title)} data-l10n-id='privateTabsMore' />
-        <p className={css(styles.text)} data-l10n-id='privateTabText1' />
-        <p className={css(styles.text)} data-l10n-id='privateTabText2' />
-        <p className={css(styles.text)} data-l10n-id='privateTabText3' />
+        <h1 className={css(styles.text)} data-l10n-id='privateTabsMore' />
+        <p className={css(styles.text_footer)} data-l10n-id='privateTabText1' />
       </div>
     </div>
   }
@@ -117,12 +115,12 @@ const atBreakpointIconGutter = `@media screen and (max-width: 800px)`
 const atBreakpointPrivateSearchTitle = '@media screen and (max-width: 590px)'
 const styles = StyleSheet.create({
   newPrivateTabVars: {
-    '--private-tab-section-title-font-size': '24px',
+    '--private-tab-section-title-font-size': '20px',
     '--private-tab-section-title-letter-spacing': globalStyles.typography.display.spacingMedium,
     '--private-tab-section-title-logo-height': 'calc((var(--private-tab-section-title-font-size) / 2) * 3)',
 
     [atBreakpointPrivateSearchTitle]: {
-      '--private-tab-section-title-font-size': '18px',
+      '--private-tab-section-title-font-size': '20px',
       '--private-tab-section-title-letter-spacing': globalStyles.typography.display.spacingRegular
     }
   },
@@ -146,15 +144,11 @@ const styles = StyleSheet.create({
     animationTiming: 'ease-out',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'flex-start',
     minHeight: '100%',
     height: 'initial',
     padding: '40px 60px' // same as newtab
-  },
-
-  section_privateTab: {
-    margin: '0 0 10px 70px'
   },
 
   wrapper: {
@@ -171,7 +165,6 @@ const styles = StyleSheet.create({
     fontFamily: 'inherit',
     marginBottom: 0,
     [atBreakpointIconGutter]: {
-      padding: '14px 0',
       alignSelf: 'center',
       display: 'flex',
       flexDirection: 'column'
@@ -202,28 +195,31 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    marginTop: '14px',
-    marginBottom: '22px',
+    marginTop: '20px',
+    marginBottom: '30px',
+    paddingBottom: '30px',
     fontFamily: globalStyles.typography.display.family,
     letterSpacing: globalStyles.typography.display.spacingLarge,
-    fontSize: '30px',
-    color: globalStyles.color.white100
+    fontSize: '26px',
+    color: globalStyles.color.white100,
+    borderBottom: 'solid 1px rgba(255,255,255,.1)'
   },
 
   text: {
-    lineHeight: '1.5',
-    fontSize: '17px',
+    lineHeight: '1.75',
+    fontSize: '16px',
     color: globalStyles.color.alphaWhite,
     maxWidth: '800px',
     fontFamily: 'inherit',
-    ':not(:last-of-type)': {
-      paddingBottom: '20px'
-    }
+    paddingRight: '40px'
   },
 
-  text_privateSearch: {
-    fontSize: '17px',
-    lineHeight: '1.5'
+  text_footer: {
+    lineHeight: '1.5',
+    fontSize: '13px',
+    color: 'rgba(255, 255, 255, .5)',
+    maxWidth: '800px',
+    fontFamily: 'inherit'
   },
 
   text_sectionTitle: {
@@ -235,40 +231,38 @@ const styles = StyleSheet.create({
   },
 
   text_sectionTitleHighlight: {
-    fontWeight: '600',
-    marginLeft: '7px'
+    fontWeight: '600'
   },
 
   text_clickable: {
     cursor: 'pointer',
-    textDecoration: 'underline'
+    textDecoration: 'underline',
+    color: '#FF6000',
+    marginTop: '20px'
   },
 
   privateSearch: {
-    border: 'solid 2px',
-    borderRadius: '10px',
-    padding: '20px',
-    marginBottom: '10px'
+    borderBottom: 'solid 1px rgba(255,255,255,.1)',
+    marginBottom: '30px'
   },
 
   privateSearch__setting: {
-    marginBottom: '25px',
+    marginBottom: '30px',
     display: 'flex',
     alignItems: 'center'
   },
 
   privateSearch__ddgImage: {
-    width: '82px',
-    marginRight: '20px'
+    width: '114px',
+    marginRight: '30px'
   },
 
   privateSearch__torImage: {
-    width: '70px',
-    marginRight: '14px'
+    width: '114px',
+    marginRight: '30px'
   },
 
   privateSearch__switch: {
-    marginLeft: '14px',
     padding: 0,
     cursor: 'pointer'
   },
@@ -276,9 +270,8 @@ const styles = StyleSheet.create({
   privateSearch__title: {
     maxWidth: '800px',
     whiteSpace: 'nowrap',
-    marginRight: '18px',
+    marginBottom: '10px',
     display: 'flex',
-    alignItems: 'center',
     cursor: 'pointer'
   }
 })
