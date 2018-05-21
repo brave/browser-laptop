@@ -2,9 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { makeImmutable } = require('./immutableUtil')
 const Immutable = require('immutable')
+
+// Constants
+const config = require('../../../js/constants/config')
+const settings = require('../../../js/constants/settings')
+
+// Utils
+const { makeImmutable } = require('./immutableUtil')
 const platformUtil = require('../lib/platformUtil')
+const getSetting = require('../../../js/settings').getSetting
 const {chromeUrl} = require('../../../js/lib/appUrlUtil')
 
 const browserActionDefaults = Immutable.fromJS({
@@ -205,6 +212,18 @@ const extensionState = {
       })
     })
     return allProperties
+  },
+
+  isWebTorrentEnabled: (state) => {
+    if (state == null) {
+      return false
+    }
+
+    const settingsState = state.get('settings')
+    const extension = extensionState.getExtensionById(state, config.torrentExtensionId)
+    const extensionEnabled = extension != null ? extension.get('enabled') : false
+    const torrentEnabled = getSetting(settings.TORRENT_VIEWER_ENABLED, settingsState)
+    return extensionEnabled && torrentEnabled
   }
 }
 
