@@ -271,7 +271,9 @@ const handleAppAction = (action) => {
       // TODO(bridiver) - these should be refactored into reducers
       appState = filtering.init(appState, action, appStore)
       appState = basicAuth.init(appState, action, appStore)
-      appState = webtorrent.init(appState, action, appStore)
+      if (extensionState.isWebTorrentEnabled(appState)) {
+        appState = webtorrent.init(appState, action, appStore)
+      }
       appState = profiles.init(appState, action, appStore)
       appState = require('../../app/sync').init(appState, action, appStore)
       calculateTopSites(true, true)
