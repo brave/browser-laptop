@@ -8,17 +8,23 @@ const path = require('path')
 const getSSID = require('detect-ssid')
 const uuidv4 = require('uuid/v4')
 
+const app = require('electron').app
+const os = require('os')
+
 // Actions
 const appActions = require('../../../js/actions/appActions')
 
 // State
 const userModelState = require('../../common/state/userModelState')
+const settings = require('../../../js/constants/settings')
+const getSetting = require('../../../js/settings').getSetting
 
 // Constants
 const notificationTypes = require('../../common/constants/notificationTypes')
 
 // Utils
 const urlUtil = require('../../../js/lib/urlutil')
+const urlParse = require('../../common/urlParse')
 const ledgerUtil = require('../../common/lib/ledgerUtil')
 
 let foregroundP
@@ -26,6 +32,145 @@ let foregroundP
 let matrixData
 let priorData
 let sampleAdFeed
+
+let lastSingleClassification
+
+const getCoreEventPayload = (state) => {
+  const uuid = userModelState.getAdUUID(state) || 'uninitialized'
+  const version = app.getVersion()
+  const platform = { darwin: 'mac', win32: os.arch() === 'x32' ? 'winia32' : 'winx64' }[os.platform()] || 'linux'
+  const reportId = uuidv4()
+  const reportStamp = new Date().toISOString()
+
+  const payload = {
+    'browserId': uuid,
+    'braveVersion': version,
+    'platform': platform,
+    'reportId': reportId,
+    'reportStamp': reportStamp,
+    'events': []
+  }
+
+  return payload
+}
+
+const generateAdReportingEvent = (state, eventType, action) => {
+  // const payload = getCoreEventPayload(state)
+  // console.log("payload: ", payload)
+  let map = {}
+
+  map.type = eventType
+  map.stamp = new Date().toISOString()
+
+  // additional event data
+  switch (eventType) {
+    case 'notify':
+      {
+        const eventName = action.get('eventName')
+        const data = action.get('data')
+
+        switch (eventName) {
+          case notificationTypes.AD_SHOWN:
+            {
+              const classification = data.get('hierarchy')
+              map.notificationType = 'generated'
+              map.notificationClassification = classification
+              map.notificationCatalog = 'unspecified-catalog'
+              map.notificationUrl = data.get('notificationUrl')
+              break
+            }
+          case notificationTypes.NOTIFICATION_RESULT:
+            {
+              const result = data.get('result')
+              const translate = { 'clicked': 'clicked', 'closed': 'dismissed', 'ignored': 'timeout' }
+              map.notificationType = translate[result]
+              break
+            }
+          case notificationTypes.NOTIFICATION_CLICK:
+          case notificationTypes.NOTIFICATION_TIMEOUT:
+            {
+              // handling these in the other event, currently. 2018.05.23
+              return state
+            }
+          default:
+            {
+              // not an event we want to process
+              return state
+            }
+        }
+
+        // must follow the switch statement, so we return from bogus events we don't want to capture, which won't have this
+        map.notificationId = data.get('uuid')
+
+        break
+      }
+    case 'load':
+      {
+        const tabValue = action.get('tabValue')
+        const tabUrl = tabValue.get('url')
+
+        if (!tabUrl.startsWith('http://') && !tabUrl.startsWith('https://')) {
+          return state
+        }
+
+        map.tabId = String(tabValue.get('tabId'))
+        map.tabType = 'click'
+
+        const searchState = userModelState.getSearchState(state)
+
+        if (searchState) {
+          map.tabType = 'search'
+        }
+
+        map.tabUrl = tabUrl
+
+        let classification = lastSingleClassification || []
+
+        if (!Array.isArray(classification)) {
+          classification = classification.toArray()
+        }
+
+        map.tabClassification = classification
+
+        break
+      }
+    case 'blur':
+      {
+        map.tabId = String(action.get('tabValue').get('tabId'))
+        break
+      }
+    case 'focus':
+      {
+        map.tabId = String(action.get('tabId'))
+        break
+      }
+    case 'settings':
+      {
+        let config = {}
+        config.operatingMode = getSetting(settings.ADS_OPERATING_MODE, state.settings) ? 'B' : 'A'
+        config.adsPerHour = getSetting(settings.ADS_PER_HOUR, state.settings)
+        config.adsPerDay = getSetting(settings.ADS_PER_DAY, state.settings)
+
+        map.settings = config
+        break
+      }
+    case 'foreground':
+    case 'restart':
+    default:
+      {
+        map.place = userModelState.getAdPlace(state) || 'unspecified'
+        break
+      }
+  }
+
+  state = userModelState.appendToReportingEventQueue(state, map)
+
+  // let q = userModelState.getReportingEventQueue(state)
+  // console.log("q: ", q)
+  // state = userModelState.flushReportingEventQueue(state)
+
+  return state
+}
 
 const initialize = (state, adEnabled) => {
   // TODO turn back on?
@@ -99,12 +244,17 @@ const testShoppingData = (state, url) => {
 }
 
 const testSearchState = (state, url) => {
-  const hostname = urlUtil.getHostname(url)
+  // const hostname = urlUtil.getHostname(url)
+  const bundle = urlParse(url)
+  const google = 'www.google.com'
+
+  const hostname = bundle.hostname
+
   const lastSearchState = userModelState.getSearchState(state)
-  if (hostname === 'google.com') {
+  if (hostname === google) {
     const score = 1.0  // eventually this will be more sophisticated than if(), but google is always a search destination
     state = userModelState.flagSearchState(state, url, score)
-  } else if (hostname !== 'google.com' && lastSearchState) {
+  } else if (hostname !== google && lastSearchState) {
     state = userModelState.unFlagSearchState(state, url)
   }
   return state
@@ -131,7 +281,7 @@ function randomKey (dictionary) {
   return keys[keys.length * Math.random() << 0]
 }
 
-const goAheadAndShowTheAd = (windowId, notificationTitle, notificationText, notificationUrl) => {
+const goAheadAndShowTheAd = (windowId, notificationTitle, notificationText, notificationUrl, uuid) => {
   appActions.nativeNotificationCreate(
     windowId,
     {
@@ -141,6 +291,7 @@ const goAheadAndShowTheAd = (windowId, notificationTitle, notificationText, noti
       sound: true,
       timeout: 60,
       wait: true,
+      uuid: uuid,
       data: {
         windowId,
         notificationUrl,
@@ -188,6 +339,8 @@ const classifyPage = (state, action, windowId) => {
   let immediateMax = um.vectorIndexOfMax(pageScore)
   let immediateWinner = catNames[immediateMax].split('-')
 
+  lastSingleClassification = immediateWinner
+
   let mutable = true
   let history = userModelState.getPageScoreHistory(state, mutable)
 
@@ -228,10 +381,19 @@ const basicCheckReadyAdServe = (state, windowId) => {
   const scores = um.deriveCategoryScores(history)
   const indexOfMax = um.vectorIndexOfMax(scores)
   const category = catNames[indexOfMax]
-  const winnerOverTime = category && category.split('-')[0]
+  if (!category) {
+    appActions.onUserModelLog('No category at offset indexOfMax', {indexOfMax})
+    return state
+  }
 
-  // when catalog catches up, use category instead
-  const result = bundle['categories'][winnerOverTime]
+// given 'sports-rugby-rugby world cup': try that, then 'sports-rugby', then 'sports'
+  const hierarchy = category.split('-')
+  let winnerOverTime, result
+  for (let level in hierarchy) {
+    winnerOverTime = hierarchy.slice(0, hierarchy.length - level).join('-')
+    result = bundle['categories'][winnerOverTime]
+    if (result) break
+  }
   if (!result) {
     appActions.onUserModelLog('No ads for category', {category})
     return state
@@ -240,7 +402,7 @@ const basicCheckReadyAdServe = (state, windowId) => {
   const arbitraryKey = randomKey(result)
   const payload = result[arbitraryKey]
   if (!payload) {
-    appActions.onUserModelLog('No ad at offset for category', {category, arbitraryKey})
+    appActions.onUserModelLog('No ad at offset for winnerOverTime', {category, winnerOverTime, arbitraryKey})
     return state
   }
 
@@ -249,12 +411,14 @@ const basicCheckReadyAdServe = (state, windowId) => {
   const advertiser = payload['advertiser']
   if (!notificationText || !notificationUrl || !advertiser) {
     appActions.onUserModelLog('Incomplete ad information',
-                              {category, arbitraryKey, notificationUrl, notificationText, advertiser})
+                              {category, winnerOverTime, arbitraryKey, notificationUrl, notificationText, advertiser})
     return state
   }
 
-  goAheadAndShowTheAd(windowId, advertiser, notificationText, notificationUrl)
-  appActions.onUserModelLog('Ad shown', {category, arbitraryKey, notificationUrl, notificationText, winnerOverTime, advertiser})
+  const uuid = generateAdUUIDString()
+
+  goAheadAndShowTheAd(windowId, advertiser, notificationText, notificationUrl, uuid)
+  appActions.onUserModelLog(notificationTypes.AD_SHOWN, {category, winnerOverTime, arbitraryKey, notificationUrl, notificationText, advertiser, uuid, hierarchy})
   state = userModelState.appendAdShownToAdHistory(state)
 
   return state
@@ -353,7 +517,10 @@ const getMethods = () => {
     changeAdFrequency,
     goAheadAndShowTheAd,
     retrieveSSID,
-    confirmAdUUIDIfAdEnabled
+    confirmAdUUIDIfAdEnabled,
+    generateAdReportingEvent,
+    getCoreEventPayload,
+    lastSingleClassification
   }
 
   let privateMethods = {}

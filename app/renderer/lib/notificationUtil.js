@@ -91,12 +91,23 @@ const notificationUtil = {
       if (result.indexOf('Clicked') !== -1) result = 'clicked'
       if (result === 'timeout') result = 'ignored'
 
-      appActions.onUserModelLog('notification result', { result: result })
+      let payload = { result: result }
+
+      if (typeof options === 'object' && options.uuid) {
+        payload.uuid = options.uuid
+      }
+
+      appActions.onUserModelLog(notificationTypes.NOTIFICATION_RESULT, payload)
     })
   },
 
   clickHandler: (options) => {
     const data = options.data
+
+    let payload = { notificationUrl: data.notificationUrl }
+    if (typeof options === 'object' && options.uuid) {
+      payload.uuid = options.uuid
+    }
 
     switch (data.notificationId) {
       case notificationTypes.ADS:
@@ -105,7 +116,7 @@ const notificationUtil = {
             url: data.notificationUrl,
             windowId: data.windowId
           })
-          appActions.onUserModelLog('notification click', { notificationUrl: data.notificationUrl })
+          appActions.onUserModelLog(notificationTypes.NOTIFICATION_CLICK, payload)
           break
         }
     }
@@ -114,10 +125,15 @@ const notificationUtil = {
   timeoutHandler: (options) => {
     const data = options.data
 
+    let payload = { notificationUrl: data.notificationUrl }
+    if (typeof options === 'object' && options.uuid) {
+      payload.uuid = options.uuid
+    }
+
     switch (data.notificationId) {
       case notificationTypes.ADS:
         {
-          appActions.onUserModelLog('notification timeout', { notificationUrl: data.notificationUrl })
+          appActions.onUserModelLog(notificationTypes.NOTIFICATION_TIMEOUT, payload)
           break
         }
     }
