@@ -90,6 +90,14 @@ const appendToRingBufferUnderKey = (state, key, item, maxRows) => {
   return state
 }
 
+const getReportingEventQueue = (state) => {
+  return state.getIn(['userModel', 'reportingEventQueue']) || Immutable.List()
+}
+
+const setReportingEventQueue = (state, queue) => {
+  return state.setIn(['userModel', 'reportingEventQueue'], queue)
+}
+
 const userModelState = {
   setUserModelValue: (state, key, value) => {
     state = validateState(state)
@@ -128,7 +136,6 @@ const userModelState = {
 
     const respectsHourLimit = historyRespectsRollingTimeConstraint(history, hourWindow, hourAllowed)
     const respectsDayLimit = historyRespectsRollingTimeConstraint(history, dayWindow, dayAllowed)
-
     if (!respectsHourLimit || !respectsDayLimit) {
       return false
     }
@@ -368,7 +375,28 @@ const userModelState = {
 
   setAdUUID: (state, uuid) => {
     return state.setIn(['userModel', 'adUUID'], uuid)
-  }
+  },
+
+  appendToReportingEventQueue: (state, evt) => {
+    const wrappedEvent = Immutable.Map(evt)
+    let q = getReportingEventQueue(state)
+
+    if (!Immutable.List.isList(q)) {
+      q = Immutable.List()
+    }
+
+    q = q.push(wrappedEvent)
+    state = setReportingEventQueue(state, q)
+    return state
+  },
+
+  flushReportingEventQueue: (state) => {
+    return setReportingEventQueue(state, [])
+  },
+
+  getReportingEventQueue: getReportingEventQueue,
+
+  setReportingEventQueue: setReportingEventQueue
 
 }
 

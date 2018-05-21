@@ -3,5 +3,9 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 module.exports = {
-  ADS: 'ads'
+  ADS: 'ads',
+  AD_SHOWN: 'Ad shown',
+  NOTIFICATION_RESULT: 'notification result',
+  NOTIFICATION_CLICK: 'notification click',
+  NOTIFICATION_TIMEOUT: 'notification timeout'
 }
