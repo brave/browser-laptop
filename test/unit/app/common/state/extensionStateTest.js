@@ -1,5 +1,7 @@
 /* global describe, it, before */
 const extensionState = require('../../../../../app/common/state/extensionState')
+const config = require('../../../../../js/constants/config')
+const settings = require('../../../../../js/constants/settings')
 const Immutable = require('immutable')
 const assert = require('assert')
 
@@ -680,6 +682,50 @@ describe('extensionState', function () {
       })
 
       commonTests()
+    })
+  })
+
+  describe('isWebTorrentEnabled', function () {
+    const torrentId = config.torrentExtensionId
+
+    it('null case', function () {
+      const result = extensionState.isWebTorrentEnabled()
+      assert.equal(result, false)
+    })
+
+    it('empty state', function () {
+      const result = extensionState.isWebTorrentEnabled(defaultAppState)
+      assert.equal(result, false)
+    })
+
+    it('extension is disabled', function () {
+      const state = defaultAppState
+        .setIn(['extensions', torrentId], Immutable.fromJS({
+          enabled: false
+        }))
+        .setIn(['settings', settings.TORRENT_VIEWER_ENABLED], true)
+      const result = extensionState.isWebTorrentEnabled(state)
+      assert.equal(result, false)
+    })
+
+    it('torrent is disabled', function () {
+      const state = defaultAppState
+        .setIn(['extensions', torrentId], Immutable.fromJS({
+          enabled: true
+        }))
+        .setIn(['settings', settings.TORRENT_VIEWER_ENABLED], false)
+      const result = extensionState.isWebTorrentEnabled(state)
+      assert.equal(result, false)
+    })
+
+    it('everything is enabled', function () {
+      const state = defaultAppState
+        .setIn(['extensions', torrentId], Immutable.fromJS({
+          enabled: true
+        }))
+        .setIn(['settings', settings.TORRENT_VIEWER_ENABLED], true)
+      const result = extensionState.isWebTorrentEnabled(state)
+      assert.equal(result, true)
     })
   })
 })

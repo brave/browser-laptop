@@ -783,10 +783,7 @@ module.exports.isResourceEnabled = (resourceName, url, isPrivate) => {
   }
 
   if (resourceName === 'webtorrent') {
-    const extension = extensionState.getExtensionById(appState, config.torrentExtensionId)
-    const torrentEnabled = getSetting(settings.TORRENT_VIEWER_ENABLED, settingsState)
-    const extensionEnabled = extension !== undefined ? extension.get('enabled') : false
-    return extensionEnabled && torrentEnabled
+    return extensionState.isWebTorrentEnabled(appState)
   }
 
   if (resourceName === 'ledger') {
