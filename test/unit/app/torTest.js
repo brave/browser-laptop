@@ -260,17 +260,24 @@ describe('tor unit tests', function () {
           }, 2000)
           const done = () => killTor(torDaemon, torProcess, callback)
           let countdown = 2
+          let bootstrapped1 = false
           const bootstrapped = (err, progress) => {
             assert.ifError(err)
             clearTimeout(bootstrapTimeout)
             console.log(`tor: bootstrapped ${progress}%`)
-            if (--countdown === 0) {
-              return done()
+            if (!bootstrapped1) {
+              // Got at least one bootstrap progress notification.
+              bootstrapped1 = true
+              if (--countdown === 0) {
+                // And onBootstrap returned.
+                return done()
+              }
             }
           }
           torDaemon.onBootstrap(bootstrapped, (err) => {
             assert.ifError(err)
             if (--countdown === 0) {
+              // Got at least one bootstrap progress notification too.
               return done()
             }
           })
