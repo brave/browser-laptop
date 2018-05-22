@@ -3377,7 +3377,8 @@ const getMethods = () => {
     clearPaymentHistory,
     synopsisNormalizer,
     cacheRuleSet,
-    disablePayments
+    disablePayments,
+    callback
   }
 
   let privateMethods = {}
