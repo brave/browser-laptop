@@ -7,8 +7,12 @@ const compareVersions = require('compare-versions')
 // per https://github.com/brave/browser-laptop/issues/14152
 // add fingerprint exception for existing users for uphold.com
 module.exports = (data) => {
-  if (!data.lastAppVersion) {
-    return
+  // don't apply if:
+  // - user chooses to block all fingerprinting (global setting)
+  // - user is not upgrading from 0.22.714 or earlier
+  if ((data.fingerprintingProtectionAll && data.fingerprintingProtectionAll.enabled) ||
+    !data.lastAppVersion) {
+    return false
   }
 
   let migrationNeeded = false
@@ -18,7 +22,10 @@ module.exports = (data) => {
   } catch (e) {}
 
   if (migrationNeeded) {
-    const pattern = 'https://uphold.com'
+    const pattern = 'https?://uphold.com'
+    if (!data.siteSettings) {
+      data.siteSettings = {}
+    }
     if (!data.siteSettings[pattern]) {
       data.siteSettings[pattern] = {}
     }
@@ -27,4 +34,6 @@ module.exports = (data) => {
       targetSetting.fingerprintingProtection = 'allowAllFingerprinting'
     }
   }
+
+  return migrationNeeded
 }
