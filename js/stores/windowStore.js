@@ -752,9 +752,6 @@ const doAction = (action) => {
         if (tab) {
           // handle tabStripWindowId changed whilst tab was being moved (avoiding non-displaying tab)
           const existingTabStripWindowId = tab.get('tabStripWindowId')
-          if (existingTabStripWindowId && action.frameOpts.tabStripWindowId !== existingTabStripWindowId) {
-            console.warn('Frame did not have tab strip window id but tab did, setting tab property to (probably moved) frame', action.frameOpts.tabId, action.frameOpts.tabStripWindowId, existingTabStripWindowId)
-          }
           action.frameOpts.tabStripWindowId = existingTabStripWindowId
         }
       }
