@@ -88,6 +88,7 @@ describe('tor unit tests', function () {
 
   const spawnTor = (torDaemon) => {
     const argv = [
+      // Pass torrc on stdin.
       '-f', '-',
       '--defaults-torrc', '/nonexistent',
       '--ignore-missing-torrc',
@@ -131,18 +132,42 @@ describe('tor unit tests', function () {
         console.log(prefix + chunks[i])
       }
     }
+
     proc.stderr.on('data', (chunk) => termify('tor: stderr: ', chunk))
     proc.stdout.on('data', (chunk) => termify('tor: stdout: ', chunk))
-    proc.on('error', (err) => {
-      console.log(`error: ${err}`)
-      torDaemon.kill()
-    })
-    proc.on('exit', () => {
-      console.log(`exited`)
-      torDaemon.kill()
-    })
+    proc.on('error', (err) => console.log(`tor process error: ${err}`))
+    proc.on('exit', (status) => console.log(`tor process exited: ${status}`))
+
+    // Send empty torrc on stdin.
     proc.stdin.end('')
+
     return proc
+  }
+
+  // Kill tor gently with SIGTERM and wait for it to exit.
+  const killTor = (torDaemon, torProcess, callback) => {
+    // Send SIGTERM.
+    torProcess.kill('SIGTERM')
+
+    // Wait up to 2sec for both to report exit.
+    const timeoutExited = setTimeout(() => {
+      assert.fail('tor failed to exit after 2sec')
+    }, 2000)
+
+    let countdown = 2
+    const exited = () => {
+      if (--countdown === 0) {
+        clearTimeout(timeoutExited)
+        // Success!
+        callback()
+      }
+    }
+
+    // Make sure the TorDaemon emits an exit event.
+    torDaemon.once('exit', exited)
+
+    // Make sure the process actually exits.
+    torProcess.once('exit', exited)
   }
 
   describe('tor daemon tests', function () {
@@ -190,16 +215,8 @@ describe('tor unit tests', function () {
           // Wait for it to launch.
           torDaemon.once('launch', (socksAddr) => {
             clearTimeout(timeoutLaunch)
-            // All done.  Kill it gently and wait for it to exit.
-            torProcess.kill('SIGTERM')
-            const timeoutKill = setTimeout(() => {
-              assert.fail('tor daemon failed to exit after 2sec')
-            }, 2000)
-            torProcess.once('exit', () => {
-              clearTimeout(timeoutKill)
-              // Success!
-              callback()
-            })
+            // All done.
+            killTor(torDaemon, torProcess, callback)
           })
         }, 500)
       })
@@ -222,16 +239,8 @@ describe('tor unit tests', function () {
           // Wait for it to launch.
           torDaemon.once('launch', (socksAddr) => {
             clearTimeout(timeoutLaunch)
-            // All done.  Kill it gently and wait for it to exit.
-            torProcess.kill('SIGTERM')
-            const timeoutKill = setTimeout(() => {
-              assert.fail('tor daemon failed to exit after 2sec')
-            }, 2000)
-            torProcess.once('exit', () => {
-              clearTimeout(timeoutKill)
-              // Success!
-              callback()
-            })
+            // All done.
+            killTor(torDaemon, torProcess, callback)
           })
         }, 500)
       })
@@ -249,17 +258,7 @@ describe('tor unit tests', function () {
           const bootstrapTimeout = setTimeout(() => {
             assert.fail('tor daemon failed to begin bootstrapping after 2sec')
           }, 2000)
-          const done = () => {
-            torProcess.kill('SIGTERM')
-            const timeoutKill = setTimeout(() => {
-              assert.fail('tor daemon failed to exit after 2sec')
-            }, 2000)
-            torProcess.once('exit', () => {
-              clearTimeout(timeoutKill)
-              // Success!
-              callback()
-            })
-          }
+          const done = () => killTor(torDaemon, torProcess, callback)
           let countdown = 2
           const bootstrapped = (err, progress) => {
             assert.ifError(err)

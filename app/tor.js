@@ -157,9 +157,7 @@ class TorDaemon extends EventEmitter {
     }
     if (this._control) {
       this._control.close()
-      this._control = null
     }
-    this.emit('exit')
   }
 
   /**
@@ -457,7 +455,7 @@ class TorDaemon extends EventEmitter {
       const writable = controlSocket
       this._control = new TorControl(readable, writable)
       this._control.on('error', (err) => this._controlError(err))
-      this._control.on('end', (err) => this._controlClosed(err))
+      this._control.on('close', () => this._controlClosed())
       const hexCookie = cookie.toString('hex')
       this._control.cmd1(`AUTHENTICATE ${hexCookie}`, (err, status, reply) => {
         if (!err) {
@@ -485,29 +483,29 @@ class TorDaemon extends EventEmitter {
 
   /**
    * Internal subroutine.  Callback for any errors on the control
-   * socket.  If we get anything, close it and kill the process.
-   *
-   * TODO(riastradh): Also try to restart tor or anything?
+   * socket.  Report it to the console and give up by destroying the
+   * control connection.
    *
    * @param {Error} err
    */
   _controlError (err) {
     assert(this._control)
     console.log(`tor: control socket error: ${err}`)
-    this.kill()
+    this._control.destroy()
   }
 
   /*
    * Internal subroutine.  Callback for when the control socket has
-   * been closed.  Just clear it.
+   * been closed.  Clear it, and interpret it to mean the tor process
+   * has exited.
    *
    * TODO(riastradh): Also try to restart tor or anything?
    */
   _controlClosed () {
     assert(this._control)
-    // TODO(riastradh): Attempt to reopen it?
-    console.log('tor: control socket closed')
     this._control = null
+    // Assume this means the process exited.
+    this.emit('exit')
   }
 
   /**
@@ -750,6 +748,19 @@ const TOR_ASYNC_EVENTS = {
 
 /**
  * Internal utility class.  State for a tor control socket interface.
+ *
+ * Emits the following events:
+ *
+ * async-${KEYWORD}(line, extra)
+ * - on asynchronous events from Tor subscribed with
+ *   TorControl.subscribe.
+ *
+ * error(err)
+ * - on error
+ *
+ * close
+ * - at most once when the control connection closes; no more events
+ *   will be emitted.
  */
 class TorControl extends EventEmitter {
   /**
@@ -765,20 +776,24 @@ class TorControl extends EventEmitter {
 
     super()
 
-    // TODO(riastradh): register close event listeners on
-    // readable/writable?
-
     this._readable = new LineReadable(readable, 4096)
     this._readable_on_line = this._onLine.bind(this)
-    this._readable_on_end = this._onEnd.bind(this)
     this._readable_on_error = this._onError.bind(this)
+    this._readable_on_end = this._onEnd.bind(this)
+    this._readable_on_close = this._onClose.bind(this)
     this._readable.on('line', this._readable_on_line)
-    this._readable.on('end', this._readable_on_end)
     this._readable.on('error', this._readable_on_error)
+    this._readable.on('end', this._readable_on_end)
+    this._readable.on('close', this._readable_on_close)
 
     this._writable = writable
     this._writable_on_error = this._onError.bind(this)
+    this._writable_on_close = this._onClose.bind(this)
     this._writable.on('error', this._writable_on_error)
+    this._writable.on('close', this._writable_on_close)
+
+    this._destroyed = false
+    this._closing = 2           // count of {reader, writer} left to close
 
     this._cmdq = []
 
@@ -791,44 +806,31 @@ class TorControl extends EventEmitter {
   }
 
   /**
-   * Close the control connection.  Tidy up and pass an error to all
-   * callbacks waiting for commands that have not yet completed.
-   */
-  close () {
-    this._tidy()
-    const err = new Error('tor control connection closed')
-    while (this._cmdq.length > 0) {
-      const [, callback] = this._cmdq.shift()
-      callback(err, null, null)
-    }
-  }
-
-  /**
-   * Internal subroutine.  Clean up any internal state.  In
-   * particular, remove any listeners on the readable and writable.
-   */
-  _tidy () {
-    this._readable.removeListener('line', this._readable_on_line)
-    this._readable.removeListener('end', this._readable_on_end)
-    this._readable.removeListener('error', this._readable_on_error)
-    this._writable.removeListener('error', this._writable_on_error)
-  }
-
-  /**
-   * Internal subroutine.  Callback for errors on the enclosed
-   * readable or writable.  Tidy up and pass err along to all
-   * callbacks waiting for commands that have not yet completed.
+   * Destroy the control connection:
+   * - Destroy the underlying streams.
+   * - Remove any listeners on the readable and writable.
+   * - Mark the control closed so it can't be used any more.
+   * - Pass an error to all callbacks waiting for command completion.
    *
    * @param {Error} err
    */
-  _onError (err) {
-    console.log(`tor control error: ${err}`)
-    this._tidy()
-    this.emit('error', err)
+  destroy (err) {
+    assert(!this._destroyed)
+    this._readable.destroy(err)
+    this._writable.end()
+    this._writable.destroy(err)
+    this._readable.removeListener('line', this._readable_on_line)
+    this._readable.removeListener('error', this._readable_on_error)
+    this._readable.removeListener('end', this._readable_on_end)
+    this._readable.removeListener('close', this._readable_on_close)
+    this._writable.removeListener('error', this._writable_on_error)
+    this._writable.removeListener('close', this._writable_on_close)
+    this._destroyed = true
     while (this._cmdq.length > 0) {
       const [, callback] = this._cmdq.shift()
       callback(err, null, null)
     }
+    assert(this._closing === 0)
   }
 
   /**
@@ -842,6 +844,7 @@ class TorControl extends EventEmitter {
    * @param {boolean} trunc
    */
   _onLine (linebuf, trunc) {
+    assert(!this._destroyed)
     assert(linebuf instanceof Buffer)
 
     // Check for line-too-long or line-too-short.
@@ -967,27 +970,50 @@ class TorControl extends EventEmitter {
   /**
    * Internal subroutine.  Callback for {@link LineReadable} `'end'`
    * event.  If there were still any commands pending in the queue,
-   * use {@link TorDaemon._error} to fail them; otherwise, quietly
-   * tidy up.  Emit our own `'end'` event for anyone listening.
+   * emit an `'error'` event.  Then, either way, emit our own `'end'`
+   * event for anyone listening.
    */
   _onEnd () {
+    assert(!this._destroyed)
     if (this._cmdq.length > 0) {
-      this._error('Tor control connection closed')
-    } else {
-      this._tidy()
+      this._error('tor: control connection closed prematurely')
     }
     this.emit('end')
   }
 
   /**
-   * Internal subroutine.  Tidy up and pass an error with message msg
-   * along to all callbacks waiting for commands that have not yet
-   * completed.
+   * Internal subroutine.  Callback for errors on the enclosed
+   * readable or writable.  Pass it along.
+   *
+   * @param {Error} err
+   */
+  _onError (err) {
+    assert(!this._destroyed)
+    this.emit('error', err)
+  }
+
+  /**
+   * Internal subroutine.  Callback for closure of readable or
+   * writable.  When both are closed, pass it along.
+   */
+  _onClose () {
+    assert(!this._destroyed)
+    assert(this._closing > 0)
+    assert(this._closing <= 2)
+    if (--this._closing === 0) {
+      this.emit('close')
+    }
+    assert(this._closing >= 0)
+    assert(this._closing < 2)
+  }
+
+  /**
+   * Internal subroutine.  Emit an error with a prescribed message.
    *
    * @param {string} msg
    */
   _error (msg) {
-    this._onError(new Error(msg))
+    this.emit('error', new Error(msg))
   }
 
   /**
@@ -1021,6 +1047,7 @@ class TorControl extends EventEmitter {
    * @param {cmdCallback} callback
    */
   cmd (cmdline, perline, callback) {
+    assert(!this._destroyed)
     this._cmdq.push([perline, callback])
     this._writable.cork()
     this._writable.write(cmdline, 'ascii')
@@ -1479,9 +1506,9 @@ function torControlParseKV (string, start, end) {
 /**
  * Internal utility class.  CRLF-based line reader.  Given an
  * underlying stream.Readable object in unpaused mode, yield an event
- * emitter with `'line'`, `'end'`, and `'error'` events.  Empty line
- * at end of stream is not emitted.  Stray CR or LF is reported as
- * error.  Error is unrecoverable.
+ * emitter with `'line'`, `'end'`, `'error'`, and `'close'` events.
+ * Empty line at end of stream is not emitted.  Stray CR or LF is
+ * reported as error.  Error is unrecoverable.
  */
 class LineReadable extends EventEmitter {
   /**
@@ -1498,9 +1525,27 @@ class LineReadable extends EventEmitter {
     this._maxlen = maxlen
     this._reset()
     this._on_data_method = this._onData.bind(this)
+    this._on_error_method = this._onError.bind(this)
     this._on_end_method = this._onEnd.bind(this)
+    this._on_close_method = this._onClose.bind(this)
     readable.on('data', this._on_data_method)
+    readable.on('error', this._on_error_method)
     readable.on('end', this._on_end_method)
+    readable.on('close', this._on_close_method)
+
+    this._ended = false
+  }
+
+  /**
+   * Destroy the stream, passing any error down to Readable.destroy
+   * for the underlying readable.
+   *
+   * @param {Error} err
+   */
+  destroy (err) {
+    this._readable.destroy(err)
+    // Make sure we're tidied up.
+    this._tidy()
   }
 
   /**
@@ -1514,16 +1559,22 @@ class LineReadable extends EventEmitter {
   }
 
   /**
-   * Internal subroutine.  Unhook references to this line reader from
-   * the underlying readable.
+   * Internal subroutine.  Discard garbage we're not interested in
+   * hanging onto.  Unhook references to this line reader from the
+   * underlying readable.
+   *
+   * Idempotent.
    */
   _tidy () {
+    this._reset()
     // Should be nothing left.
     assert(this._readlen === 0)
     assert(this._chunks.length === 0)
     assert(this._cr_seen === false)
     this._readable.removeListener('data', this._on_data_method)
+    this._readable.removeListener('error', this._on_error_method)
     this._readable.removeListener('end', this._on_end_method)
+    this._readable.removeListener('close', this._on_close_method)
   }
 
   /**
@@ -1590,19 +1641,40 @@ class LineReadable extends EventEmitter {
   }
 
   /**
+   * Internal subroutine.  Handler for `'error'` event, for error in
+   * the underlying stream.  Pass it along.
+   */
+  _onError (err) {
+    this.emit('error', err)
+  }
+
+  /**
    * Internal subroutine.  Handler for `'end'` event, for end of
    * underlying readable stream.  Reports a final line if we have any
-   * data, tidies up after ourselves, and emits an end event.
+   * data.  Emits an end event if not already emitted owing to bad
+   * input.
    */
   _onEnd () {
     // If there's anything stored, report it.
     if (this._readlen !== 0) {
       this._line(false)
     }
-    // Tidy up after ourselves.
+    // Emit the end event.
+    if (!this._ended) {
+      this._ended = true
+      this.emit('end')
+    }
+  }
+
+  /**
+   * Internal subroutine.  Handler for `'close'` event, for when the
+   * underlying stream is closed.  Tidy up and pass it along.
+   */
+  _onClose () {
+    // Pass the event along.
+    this.emit('close')
+    // Make sure we're tidied up.
     this._tidy()
-    // Emit the event.
-    this.emit('end')
   }
 
   /**
@@ -1638,13 +1710,14 @@ class LineReadable extends EventEmitter {
     this._readlen += chunk.length - start
     // Restore the chunks we've consumed to the stream.
     this._readable.unshift(Buffer.concat(this._chunks, this._readlen))
-    // Reset the state.  No need to hang onto garbage we won't use.
-    this._reset()
     // Tidy up after ourselves: we are wedged and uninterested in
     // further events.
     this._tidy()
-    // Emit the event.
+    // Emit the error.
     this.emit('error', new Error(msg))
+    // Emit the end and mark us ended.
+    this.emit('end')
+    this._ended = true
   }
 }
 
