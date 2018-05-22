@@ -12,7 +12,6 @@ const windowActions = require('../../../../js/actions/windowActions')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
-const BrowserButton = require('../common/browserButton')
 const NavigationBar = require('./navigationBar')
 const MenuBar = require('./menuBar')
 const WindowCaptionButtons = require('./buttons/windowCaptionButtons')
@@ -21,6 +20,8 @@ const HomeButton = require('./buttons/homeButton')
 const BackButton = require('./buttons/backButton')
 const ForwardButton = require('./buttons/forwardButton')
 const ShieldsButton = require('./buttons/shieldsButton')
+const NavigationButton = require('./buttons/navigationButton')
+const MenuIcon = require('../../../../icons/menu_2')
 
 // State
 const tabState = require('../../../common/state/tabState')
@@ -28,6 +29,7 @@ const extensionState = require('../../../common/state/extensionState')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
 const menuBarState = require('../../../common/state/menuBarState')
 const windowState = require('../../../common/state/windowState')
+const contextMenuState = require('../../../common/state/contextMenuState')
 
 // Util
 const {getCurrentWindowId, isMaximized, isFullScreen, isFocused} = require('../../currentWindow')
@@ -42,11 +44,6 @@ const contextMenus = require('../../../../js/contextMenus')
 // Constants
 const appConfig = require('../../../../js/constants/appConfig')
 const settings = require('../../../../js/constants/settings')
-
-// Styles
-const globalStyles = require('../styles/global')
-const {theme} = require('../styles/theme')
-const menuButton = require('../../../../img/toolbar/menu_btn.svg')
 
 class Navigator extends React.Component {
   constructor (props) {
@@ -143,6 +140,7 @@ class Navigator extends React.Component {
       props.totalBlocks &&
       props.shieldEnabled
     props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
+    props.isHamburgerMenuOpen = contextMenuState.isHamburgerMenuOpen(currentWindow)
     props.showNavigationBar = activeFrameKey !== undefined &&
       state.get('siteSettings') !== undefined
 
@@ -208,15 +206,15 @@ class Navigator extends React.Component {
                 : null
             }
             <ShieldsButton />
-            <BrowserButton
-              iconOnly
-              isMaskImage
-              size={`calc(${globalStyles.spacing.tabsToolbarHeight} - 1px)`}
-              custom={styles.navigatorWrapper__button_menu}
+            <NavigationButton
               l10nId='menuButton'
               testId='menuButton'
               onClick={this.onHamburgerMenu}
-            />
+              active={this.props.isHamburgerMenuOpen}
+              styles={styles.navigatorWrapper__button_menu}
+            >
+              <MenuIcon />
+            </NavigationButton>
             {
               this.props.isCaptionButton
                 ? <span className='buttonSeparator' />
@@ -254,18 +252,7 @@ const styles = StyleSheet.create({
   },
 
   navigatorWrapper__button_menu: {
-    backgroundColor: theme.tabsToolbar.button.backgroundColor,
-    WebkitMaskImage: `url(${menuButton})`,
-    WebkitMaskRepeat: 'no-repeat',
-    WebkitMaskPosition: 'center',
-    WebkitMaskSize: '12px 12px',
-    WebkitMaskOrigin: 'border',
-    margin: '0 5px 0 0',
-
-    ':hover': {
-      opacity: 1.0,
-      backgroundColor: theme.tabsToolbar.button.onHover.backgroundColor
-    }
+    margin: '0 5px 0 0'
   }
 
 })

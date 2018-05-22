@@ -43,6 +43,8 @@ const api = {
     return contextMenuDetail
   },
 
+  isHamburgerMenuOpen: (windowState) => validateState(windowState).get('hamburgerMenuWasOpen'),
+
   selectedIndex: (windowState) => {
     const selectedIndex = windowState.getIn(['ui', 'contextMenu', 'selectedIndex'])
     return (typeof selectedIndex === 'object' &&

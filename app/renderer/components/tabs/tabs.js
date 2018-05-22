@@ -12,6 +12,7 @@ const ReduxComponent = require('../reduxComponent')
 const BrowserButton = require('../common/browserButton')
 const LongPressButton = require('../common/longPressButton')
 const Tab = require('./tab')
+const NewTabIcon = require('../../../../icons/plus')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -221,9 +222,7 @@ class Tabs extends React.Component {
           onClick={this.newTab}
           onLongPress={this.onNewTabLongPress}
         >
-          <svg className={css(styles.tabs__tabStrip__newTabButton__icon)} xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14.14 14.14'>
-            <path className={css(styles.tabs__tabStrip__newTabButton__icon__line)} d='M7.07 1v12.14M13.14 6.86H1' />
-          </svg>
+          <NewTabIcon styles={styles.tabs__tabStrip__newTabButton__icon} />
         </LongPressButton>
       </span>
     </div>
@@ -299,20 +298,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ':hover': {
       '--new-tab-button-line-color': theme.tabsToolbar.button.onHover.backgroundColor
+    },
+    ':active': {
+      '--new-tab-button-line-color': theme.tabsToolbar.button.backgroundColor
     }
   },
 
   tabs__tabStrip__newTabButton__icon: {
-    width: '12px'
-  },
-
-  tabs__tabStrip__newTabButton__icon__line: {
-    fill: 'none',
-    stroke: 'var(--new-tab-button-line-color)',
-    'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
-    'stroke-width': '2px',
-    transition: '.12s stroke ease'
+    '--icon-line-color': 'var(--new-tab-button-line-color)',
+    width: '80%'
   }
 })
 
