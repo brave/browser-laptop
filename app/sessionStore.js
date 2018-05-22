@@ -929,6 +929,11 @@ module.exports.runPreMigrations = (data) => {
     }
   }
 
+  // TODO: consider moving all of the above logic into here
+  // see https://github.com/brave/browser-laptop/issues/10488
+  const runMigrations = require('./migrations/pre')
+  runMigrations(data)
+
   return data
 }
 
