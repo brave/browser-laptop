@@ -196,7 +196,7 @@
       preview: {
         background: 'rgb(240,240,240)',
         boxShadow: '0 -2px 6px -0.5px rgba(0, 0, 0, 0.3)',
-        scale: '1.06'
+        scale: '1.04'
       },
 
       icon: {
