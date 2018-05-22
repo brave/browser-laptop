@@ -14,7 +14,7 @@ module.exports.defaultSiteSettingsList = [
     },
     {
       "name" : "fingerprintingProtection",
-      "pattern" : "https://uphold.com",
+      "pattern" : "https?://uphold.com",
       "value" : "allowAllFingerprinting"
     }
 ]

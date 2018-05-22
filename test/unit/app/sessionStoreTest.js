@@ -974,7 +974,7 @@ describe('sessionStore unit tests', function () {
           'https://www.youtube.com': {
             autoplay: true
           },
-          'https://uphold.com': {
+          'https?://uphold.com': {
             fingerprintingProtection: 'allowAllFingerprinting'
           }
         }
