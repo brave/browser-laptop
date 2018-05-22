@@ -87,7 +87,7 @@ describe('about:extensions', function () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
         .changeSetting(settingsConst.ACTIVE_PASSWORD_MANAGER, passwordManagers.ONE_PASSWORD)
-        .waitForVisible(`[data-test-id="extensionBrowserAction"][data-button-value="${extensionIds[passwordManagers.ONE_PASSWORD]}"]`)
+        .waitForVisible(`[data-test-id="extensionBrowserAction ${extensionIds[passwordManagers.ONE_PASSWORD]}"]`)
         .tabByIndex(0)
         .waitForVisible(`[data-extension-id="${extensionIds[passwordManagers.ONE_PASSWORD]}"]`, extensionDownloadWaitTime)
     })
@@ -101,7 +101,7 @@ describe('about:extensions', function () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
         .changeSetting(settingsConst.ACTIVE_PASSWORD_MANAGER, passwordManagers.DASHLANE)
-        .waitForVisible(`[data-test-id="extensionBrowserAction"][data-button-value="${extensionIds[passwordManagers.DASHLANE]}"]`)
+        .waitForVisible(`[data-test-id="extensionBrowserAction ${extensionIds[passwordManagers.DASHLANE]}"]`)
         .tabByIndex(0)
         .waitForVisible(`[data-extension-id="${extensionIds[passwordManagers.DASHLANE]}"]`, extensionDownloadWaitTime)
     })
@@ -115,7 +115,7 @@ describe('about:extensions', function () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
         .changeSetting(settingsConst.ACTIVE_PASSWORD_MANAGER, passwordManagers.LAST_PASS)
-        .waitForVisible(`[data-test-id="extensionBrowserAction"][data-button-value="${extensionIds[passwordManagers.LAST_PASS]}"]`)
+        .waitForVisible(`[data-test-id="extensionBrowserAction ${extensionIds[passwordManagers.LAST_PASS]}"]`)
         .tabByIndex(0)
         .waitForVisible(`[data-extension-id="${extensionIds[passwordManagers.LAST_PASS]}"]`, extensionDownloadWaitTime)
     })
@@ -132,7 +132,7 @@ describe('about:extensions', function () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
         .changeSetting(settingsConst.ACTIVE_PASSWORD_MANAGER, passwordManagers.ENPASS)
-        .waitForVisible(`[data-test-id="extensionBrowserAction"][data-button-value="${extensionIds[passwordManagers.ENPASS]}"]`)
+        .waitForVisible(`[data-test-id="extensionBrowserAction ${extensionIds[passwordManagers.ENPASS]}"]`)
         .tabByIndex(0)
         .waitForVisible(`[data-extension-id="${extensionIds[passwordManagers.ENPASS]}"]`, extensionDownloadWaitTime)
     })
@@ -146,7 +146,7 @@ describe('about:extensions', function () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
         .changeSetting(settingsConst.ACTIVE_PASSWORD_MANAGER, passwordManagers.BITWARDEN)
-        .waitForVisible(`[data-test-id="extensionBrowserAction"][data-button-value="${extensionIds[passwordManagers.BITWARDEN]}"]`)
+        .waitForVisible(`[data-test-id="extensionBrowserAction ${extensionIds[passwordManagers.BITWARDEN]}"]`)
         .tabByIndex(0)
         .waitForVisible(`[data-extension-id="${extensionIds[passwordManagers.BITWARDEN]}"]`, extensionDownloadWaitTime)
     })

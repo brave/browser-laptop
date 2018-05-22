@@ -9,19 +9,18 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ImmutableComponent = require('../../immutableComponent')
 const LongPressButton = require('../../common/longPressButton')
 
-// Utils
-const cx = require('../../../../../js/lib/classSet')
-
 // Styles
 const globalStyles = require('../../styles/global')
-const {theme} = require('../../styles/theme')
 
 class NavigationButton extends ImmutableComponent {
   render () {
     const buttonClass = css(
       styles.navigationButton,
       this.props.disabled && styles.navigationButton_disabled,
-      this.props.isNav && styles.navigationButton_nav
+      (!this.props.disabled) && styles.navigationButton_enabled,
+      this.props.isNav && styles.navigationButton_nav,
+      this.props.active && styles.navigationButton_active,
+      this.props.styles
     ) + (this.props.class ? ` ${this.props.class}` : '')
     const instanceStyle = {
       transform: this.props.disabled ? `scale(1)` : `scale(${this.props.swipePercent})`,
@@ -31,6 +30,7 @@ class NavigationButton extends ImmutableComponent {
       ? <LongPressButton
         testId={this.props.testId}
         l10nId={this.props.l10nId}
+        l10nArgs={this.props.l10nArgs}
         className={buttonClass}
         disabled={this.props.disabled}
         onClick={this.props.onClick}
@@ -43,6 +43,7 @@ class NavigationButton extends ImmutableComponent {
       : <button
         data-l10n-id={this.props.l10nId}
         data-test-id={this.props.testId}
+        data-l10n-args={this.props.l10nArgs && JSON.stringify(this.props.l10nArgs)}
         className={buttonClass}
         disabled={this.props.disabled}
         onClick={this.props.onClick}
@@ -54,8 +55,17 @@ class NavigationButton extends ImmutableComponent {
   }
 }
 
-const styles = StyleSheet.create({
+const activeStyles = {
+  background: 'rgba(153, 153, 158, 1)',
+  transitionDuration: '0s'
+}
 
+const hoverStyles = {
+  background: 'rgb(225, 225, 229)',
+  borderColor: '#eeeaea'
+  // boxShadow: '0 0px 3px 0 rgb(214,218,221)'
+}
+const styles = StyleSheet.create({
   navigationButton: {
     '--icon-line-color': globalStyles.color.buttonColor,
     display: 'flex',
@@ -64,30 +74,29 @@ const styles = StyleSheet.create({
     margin: `0 6px 0 0`,
     boxSizing: 'border-box',
     border: 'solid 1px transparent',
+    padding: '1px',
     borderRadius: '3px',
     background: 'none',
     width: '28px',
     height: '28px',
     boxShadow: '0 0 0 transparent',
     transition: 'background .24s ease-out, box-shadow .24s ease-out',
-    ':hover': {
-      background: 'rgb(255, 255, 255)',
-      borderColor: '#eeeaea'
-     // boxShadow: '0 0px 3px 0 rgb(214,218,221)'
-    },
-    ':active': {
-      background: 'rgba(255, 255, 255, .8)',
-      boxShadow: '0 0px 3px 0 rgba(74, 144, 226,.7)'
-    },
-    ':focus': {
-      boxShadow: '0 0px 3px 0 rgba(74, 144, 226,.7)'
-    }
+    // TODO: if we want focus styles that aren't like hover styles (i.e. a focus ring),
+    // but we only want to show up in keyboard-focused not mouse-focus (i.e. click), then
+    // either wait for the :focus-ring selector (which is only when keyboard is used to tab focus),
+    // or use the trick from https://stackoverflow.com/questions/31402576/enable-focus-only-on-keyboard-use-or-tab-press
+    ':focus': hoverStyles
+  },
+
+  navigationButton_active: hoverStyles,
+
+  navigationButton_enabled: {
+    ':hover': hoverStyles,
+    ':active': activeStyles
   },
 
   navigationButton_disabled: {
-    ':hover': {
-      background: 'none'
-    }
+    '--icon-line-color': globalStyles.color.buttonColorDisabled
   }
 })
 

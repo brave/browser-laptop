@@ -5,12 +5,12 @@
 const React = require('react')
 const electron = require('electron')
 const ipc = electron.ipcRenderer
-const {StyleSheet, css} = require('aphrodite')
+const {StyleSheet, css} = require('aphrodite/no-important')
 const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
-const BrowserButton = require('../common/browserButton')
+const NavigationButton = require('./buttons/navigationButton')
 const BrowserActionBadge = require('./browserActionBadge')
 
 // State
@@ -78,23 +78,26 @@ class BrowserAction extends React.Component {
   }
 
   render () {
-    // TODO(bridiver) should have some visual notification of hover/press
+    console.log(this.props.image)
     return <div className={css(styles.browserActionButton)}>
-      <BrowserButton
-        extensionButton
-        extensionItem
+      <NavigationButton
         l10nId='browserActionButton'
-        testId='extensionBrowserAction'
+        testId={`extensionBrowserAction ${this.props.extensionId}`}
         l10nArgs={{ name: this.props.title }}
-        inlineStyles={{
-          backgroundImage: this.props.image,
-          backgroundPosition: 'center',
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat'
-        }}
-        dataButtonValue={this.props.extensionId}
         onClick={this.onClick}
-      />
+        styles={
+          styles.browserActionButton__button
+        }
+      >
+        <div
+          className={css(
+            styles.browserActionButton__icon
+          )}
+          style={{
+            '--browser-action-image': this.props.image
+          }}
+        />
+      </NavigationButton>
       {
         this.props.text
         ? <BrowserActionBadge text={this.props.text} color={this.props.color} />
@@ -108,6 +111,25 @@ module.exports = ReduxComponent.connect(BrowserAction)
 
 const styles = StyleSheet.create({
   browserActionButton: {
-    position: 'relative'
+    position: 'relative',
+    marginRight: '5px',
+    display: 'flex',
+    alignItems: 'center'
+  },
+
+  browserActionButton__button: {
+    display: 'block',
+    width: '18px',
+    height: '100%',
+    margin: 0
+  },
+
+  browserActionButton__icon: {
+    height: '100%',
+    width: '100%',
+    backgroundImage: 'var(--browser-action-image)',
+    backgroundPosition: 'center',
+    backgroundSize: 'contain',
+    backgroundRepeat: 'no-repeat'
   }
 })

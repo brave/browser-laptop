@@ -63,6 +63,7 @@ const globalStyles = {
     siteEVColor: 'green',
     buttonColor: 'rgb(105, 105, 112)',
     buttonColorActive: 'rgb(101, 101, 107)',
+    buttonColorDisabled: 'rgb(195, 195, 200)',
     braveOrange: 'rgb(255, 80, 0)',
     braveLightOrange: '#FF7A1D',
     braveMediumOrange: 'rgb(232, 72, 0)',
