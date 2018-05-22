@@ -267,7 +267,7 @@ const onBootStateFile = (state) => {
     console.error('ledger client boot error: ', ex)
     return state
   }
-  if (client.sync(callback) === true) {
+  if (client.sync(module.exports.callback) === true) {
     run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute}))
   }
 
@@ -2419,7 +2419,7 @@ const onTimeUntilReconcile = (state, stateResult) => {
 }
 
 const onLedgerFirstSync = (state, parsedData) => {
-  if (client.sync(callback) === true) {
+  if (client.sync(module.exports.callback) === true) {
     run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute}))
   }
 
@@ -2575,7 +2575,7 @@ const run = (state, delayTime) => {
         return console.error('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
       }
 
-      if (client.sync(callback) === true) {
+      if (client.sync(module.exports.callback) === true) {
         appActions.onLedgerRun(0)
       }
     }, delayTime)
@@ -2601,7 +2601,7 @@ const onNetworkConnected = (state) => {
     runTimeoutId = false
   }
 
-  if (client.sync(callback) === true) {
+  if (client.sync(module.exports.callback) === true) {
     const delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute})
     run(state, delayTime)
   }
