@@ -38,6 +38,7 @@ const {cookieExceptions, isRefererException} = require('../js/data/siteHacks')
 const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
 const {shouldDebugTabEvents} = require('./cmdLine')
 const {getTorSocksProxy} = require('./channel')
+const tor = require('./tor')
 
 let appStore = null
 
@@ -712,6 +713,7 @@ const initPartition = (partition) => {
     options.parent_partition = ''
   }
   if (isTorPartition) {
+    setupTor()
     // TODO(riastradh): Duplicate logic in app/browser/tabs.js.
     options.isolated_storage = true
     options.parent_partition = ''
@@ -739,6 +741,49 @@ const initPartition = (partition) => {
   })
 }
 module.exports.initPartition = initPartition
+
+function setupTor () {
+  // Set up the tor daemon watcher.  (NOTE: We don't actually start
+  // the tor daemon here; that happens in C++ code.  But we do talk to
+  // its control socket.)
+  const torDaemon = new tor.TorDaemon()
+  torDaemon.setup((err) => {
+    if (err) {
+      console.log(`tor: failed to make directories: ${err}`)
+      return
+    }
+    torDaemon.on('exit', () => console.log('tor: daemon exited'))
+    torDaemon.on('launch', (socksAddr) => {
+      console.log(`tor: daemon listens on ${socksAddr}`)
+      const bootstrapped = (err, progress) => {
+        // TODO(riastradh): Visually update a progress bar!
+        if (err) {
+          console.log(`tor: bootstrap error: ${err}`)
+          return
+        }
+        console.log(`tor: bootstrapped ${progress}%`)
+      }
+      const circuitEstablished = (err, ok) => {
+        if (ok) {
+          console.log(`tor: ready`)
+        } else {
+          console.log(err ? `tor: not ready: ${err}` : `tor: not ready`)
+        }
+      }
+      torDaemon.onBootstrap(bootstrapped, (err) => {
+        if (err) {
+          console.log(`tor: error subscribing to bootstrap: ${err}`)
+        }
+        torDaemon.onCircuitEstablished(circuitEstablished, (err) => {
+          if (err) {
+            console.log(`tor: error subscribing to circuit ready: ${err}`)
+          }
+        })
+      })
+    })
+    torDaemon.start()
+  })
+}
 
 const filterableProtocols = ['http:', 'https:', 'ws:', 'wss:', 'magnet:', 'file:']
 
