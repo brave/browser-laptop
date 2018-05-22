@@ -77,7 +77,7 @@ class TabsToolbar extends React.Component {
 
 const styles = StyleSheet.create({
   tabsToolbar: {
-    paddingTop: '2px',
+    paddingTop: '1px',
     boxSizing: 'content-box',
     backgroundColor: theme.tabsToolbar.backgroundColor,
     display: 'flex',
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     // shadow done as pseudo element so that z-index can be controlled
     ':after': {
-      boxShadow: 'inset 0 -1px var(--tabs-toolbar-shadow-spread, 4px) -0.5px rgba(0, 0, 0, 0.22)',
+      boxShadow: 'inset 0 -0.5px var(--tabs-toolbar-shadow-spread, 3px) -0.5px rgba(0, 0, 0, 0.22)',
       '--tabs-toolbar-transit-duration': theme.tab.transitionDurationOut,
       '--tabs-toolbar-transit-easing': theme.tab.transitionEasingOut,
       transition: `box-shadow var(--tabs-toolbar-transit-duration) var(--tabs-toolbar-transit-easing)`,
@@ -104,14 +104,17 @@ const styles = StyleSheet.create({
       left: 0,
       zIndex: 200,
       display: 'block',
-      content: '" "'
+      content: '" "',
+      willChange: 'box-shadow'
     }
   },
 
   tabsToolbar_hasPreview: {
-    boxShadow: 'inset 0 -3px var(--tabs-toolbar-shadow-spread, 6px) -0.5px rgba(0, 0, 0, 0.22)',
-    '--tabs-toolbar-transit-duration': theme.tab.transitionDurationIn,
-    '--tabs-toolbar-transit-easing': theme.tab.transitionEasingIn
+    ':after': {
+      boxShadow: 'inset 0 -3px var(--tabs-toolbar-shadow-spread, 6px) -0.5px rgba(0, 0, 0, 0.22)',
+      '--tabs-toolbar-transit-duration': theme.tab.transitionDurationIn,
+      '--tabs-toolbar-transit-easing': theme.tab.transitionEasingIn
+    }
   }
 })
 
