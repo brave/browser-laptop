@@ -3358,7 +3358,8 @@ const getMethods = () => {
     setNewTimeUntilReconcileCallback,
     fetchReferralHeadersCallback,
     getPaymentInfo,
-    fetchReferralHeaders
+    fetchReferralHeaders,
+    callback
   }
 
   let privateMethods = {}
