@@ -3400,15 +3400,9 @@ const getMethods = () => {
     fetchReferralHeadersCallback,
     getPaymentInfo,
     fetchReferralHeaders,
-    callback,
-    onLedgerQRGeneratedCallback,
-    qrWriteImage,
-    onFuzzing,
-    getClient: () => {
-      return client
-    },
     deleteStateFile,
-    delayFirstSync
+    delayFirstSync,
+    callback
   }
 
   let privateMethods = {}
