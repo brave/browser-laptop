@@ -19,13 +19,11 @@ const isDarwin = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
 var outDir = 'dist'
 var arch = 'x64'
-var widevineCdmArch = 'win_x64'
 var cmds
 
 if (isWindows) {
   if (process.env.TARGET_ARCH === 'ia32') {
     arch = 'ia32'
-    widevineCdmArch = 'win_x86'
   }
 }
 
@@ -103,7 +101,6 @@ if (isDarwin) {
   const wvContents = wvBundleDir + '/Contents'
   const wvResources = wvContents + '/Resources'
   const wvBundleSig = wvResources + '/Brave Framework.sig'
-  const wvPlugin = buildDir + `/${appName}.app/Contents/Frameworks/Brave Framework.framework/Libraries/WidevineCdm/_platform_specific/mac_x64/widevinecdmadapter.plugin`
   // choose pkg or dmg based on channel
   cmds = [
     // Remove old
@@ -114,9 +111,7 @@ if (isDarwin) {
     'mkdir -p "' + wvResources + '"',
     'cp ' + buildDir + `/${appName}.app/Contents/Info.plist "` + wvContents + '"',
     'codesign --deep --force --strict --verbose --sign $IDENTIFIER "' + wvBundle + '"',
-    'codesign --deep --force --strict --verbose --sign $IDENTIFIER "' + wvPlugin + '"',
     'python tools/signature_generator.py --input_file "' + wvBundle + '" --output_file "' + wvBundleSig + '" --flag 1',
-    'python tools/signature_generator.py --input_file "' + wvPlugin + '"',
 
     // Sign it (requires Apple 'Developer ID Application' certificate installed in keychain)
     'cd ' + buildDir + `/${appName}.app/Contents/Frameworks`,
@@ -181,12 +176,9 @@ if (isDarwin) {
 
   // sign for widevine
   const wvExe = buildDir + `/${appName}.exe`
-  const wvPlugin = buildDir + '/WidevineCdm/_platform_specific/' + widevineCdmArch + '/widevinecdmadapter.dll'
   cmds = [
     getSignCmd(wvExe),
-    getSignCmd(wvPlugin),
-    'python tools/signature_generator.py --input_file "' + wvExe + '" --flag 1',
-    'python tools/signature_generator.py --input_file "' + wvPlugin + '"'
+    'python tools/signature_generator.py --input_file "' + wvExe + '" --flag 1'
   ]
   execute(cmds, {}, (err) => {
     if (err) {
