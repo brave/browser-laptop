@@ -1204,6 +1204,7 @@ const onWalletRecovery = (state, error, result) => {
     state = logError(state, error.toString(), 'recoveryWallet')
     state = aboutPreferencesState.setRecoveryStatus(state, false)
   } else {
+    result = makeImmutable(result)
     // convert buffer to Uint8Array
     let seed = result && result.getIn(['properties', 'wallet', 'keyinfo', 'seed'])
     if (seed) {
