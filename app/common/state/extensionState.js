@@ -5,7 +5,6 @@
 const Immutable = require('immutable')
 
 // Constants
-const config = require('../../../js/constants/config')
 const settings = require('../../../js/constants/settings')
 
 // Utils
@@ -220,10 +219,7 @@ const extensionState = {
     }
 
     const settingsState = state.get('settings')
-    const extension = extensionState.getExtensionById(state, config.torrentExtensionId)
-    const extensionEnabled = extension != null ? extension.get('enabled') : false
-    const torrentEnabled = getSetting(settings.TORRENT_VIEWER_ENABLED, settingsState)
-    return extensionEnabled && torrentEnabled
+    return getSetting(settings.TORRENT_VIEWER_ENABLED, settingsState)
   }
 }
 
