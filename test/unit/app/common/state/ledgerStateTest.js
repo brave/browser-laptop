@@ -493,6 +493,21 @@ describe('ledgerState unit test', function () {
       const expectedPromo = promo.set('claimedTimestamp', 10000)
       assert.deepEqual(result.toJS(), expectedPromo.toJS())
     })
+
+    it('with captcha', function () {
+      const promo = Immutable.fromJS({
+        notification: {
+          message: 'Hello'
+        }
+      })
+      const state = defaultState
+        .setIn(['ledger', 'promotion', 'activeState'], 'emptyWallet')
+        .setIn(['ledger', 'promotion', 'captcha'], 'base64....')
+        .setIn(['ledger', 'promotion', 'stateWallet', 'emptyWallet'], promo)
+      const result = ledgerState.getAboutPromotion(state)
+      const expectedPromo = promo.set('captcha', 'base64....')
+      assert.deepEqual(result.toJS(), expectedPromo.toJS())
+    })
   })
 
   describe('resetInfo', function () {

@@ -62,6 +62,8 @@ describe('ledgerReducer unit tests', function () {
       getPromotion: () => {},
       checkReferralActivity: dummyModifyState,
       referralCheck: () => {},
+      getCaptcha: () => {},
+      onCaptchaResponse: () => {},
       addNewLocation: dummyModifyState
     }
     fakeLedgerState = {
@@ -73,6 +75,7 @@ describe('ledgerReducer unit tests', function () {
       savePromotion: dummyModifyState,
       remindMeLater: dummyModifyState,
       removePromotion: dummyModifyState,
+      setPromotionProp: dummyModifyState,
       setAboutProp: ledgerState.setAboutProp
     }
     fakeLedgerNotifications = {
@@ -653,9 +656,11 @@ describe('ledgerReducer unit tests', function () {
 
     it('execute', function () {
       ledgerReducer(appState, Immutable.fromJS({
-        actionType: appConstants.APP_ON_PROMOTION_CLAIM
+        actionType: appConstants.APP_ON_PROMOTION_CLAIM,
+        x: 1,
+        y: 2
       }))
-      assert(claimPromotionSpy.calledOnce)
+      assert(claimPromotionSpy.withArgs(appState, 1, 2).calledOnce)
     })
   })
 
@@ -967,6 +972,54 @@ describe('ledgerReducer unit tests', function () {
         .setIn(['ledger', 'info', 'reconcileStamp'], 10)
 
       assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+  })
+
+  describe('APP_ON_PROMOTION_CLICK', function () {
+    let getCaptchaSpy
+
+    beforeEach(function () {
+      getCaptchaSpy = sinon.spy(fakeLedgerApi, 'getCaptcha')
+    })
+
+    afterEach(function () {
+      getCaptchaSpy.restore()
+    })
+
+    it('execute', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PROMOTION_CLICK
+      }))
+      assert(getCaptchaSpy.calledOnce)
+    })
+  })
+
+  describe('APP_ON_CAPTCHA_RESPONSE', function () {
+    let onCaptchaResponseSpy
+
+    beforeEach(function () {
+      onCaptchaResponseSpy = sinon.spy(fakeLedgerApi, 'onCaptchaResponse')
+    })
+
+    afterEach(function () {
+      onCaptchaResponseSpy.restore()
+    })
+
+    it('execute', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_CAPTCHA_RESPONSE,
+        body: 1
+      }))
+      assert(onCaptchaResponseSpy.withArgs(sinon.match.any, 1).calledOnce)
+    })
+  })
+
+  describe('APP_ON_CAPTCHA_CLOSE', function () {
+    it('execute', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_CAPTCHA_CLOSE
+      }))
+      assert.notDeepEqual(result.toJS(), appState.toJS())
     })
   })
 })
