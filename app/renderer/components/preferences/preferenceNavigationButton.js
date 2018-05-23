@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     background: 'transparent',
     userSelect: 'none',
-    padding: '11px 11px 11px 17px',
+    padding: '12px 12px 12px 14px',
     cursor: 'pointer',
 
     ':hover': {
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     width: '1.4em',
     height: '1.4em',
     WebkitMaskSize: 'contain',
-    marginRight: '9px',
+    marginRight: '16px',
     backgroundColor: '#ffffff'
   },
 

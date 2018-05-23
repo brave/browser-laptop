@@ -1,9 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 20.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.2" baseProfile="tiny" id="Layer_1_copy"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 48 48"
-	 xml:space="preserve">
-<path fill="#FFFFFF" d="M45.2,9.7H2.6c-1.1,0-1.9,0.9-1.9,1.9v26h8.5v-6.1H5.8l8.3-9.2h0.5l8.3,9.2h-3.4v6.1h27.7v-26
-	C47.1,10.6,46.2,9.7,45.2,9.7z M23.4,21.3H4.2v-4.5c0-0.5,0.4-1,1-1h17.2c0.5,0,1,0.4,1,1V21.3z M43.5,21.3H24.3v-4.5
-	c0-0.5,0.4-1,1-1h17.2c0.5,0,1,0.4,1,1V21.3z"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="#FFF" stroke-width="1.5" d="M19.3333333,19 L4.66666667,19 C4.298,19 4,18.6515556 4,18.2222222 L4,5.77777778 C4,5.34844444 4.298,5 4.66666667,5 L19.3333333,5 C19.702,5 20,5.34844444 20,5.77777778 L20,18.2222222 C20,18.6515556 19.702,19 19.3333333,19 Z"/>
+    <polyline stroke="#FFF" stroke-width="1.5" points="14.495 5 14.495 9.787 20 9.787"/>
+    <polyline stroke="#FFF" stroke-width="1.5" points="8.989 5 8.989 9.787 14.495 9.787"/>
+  </g>
 </svg>

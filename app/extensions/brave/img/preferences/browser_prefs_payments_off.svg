@@ -1,10 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 89.1 76.8" style="enable-background:new 0 0 89.1 76.8;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#FFFFFF;}
-</style>
-<path class="st0" d="M44.7,0.1L0,76.9l0.1-0.1l89,0l0.2,0.1L44.7,0.1 M14,70.8L30,61.6h30l15.9,9.2L14,70.8z M77.3,67.8l-15.9-9.1
-	l-14.7-25l0-18.8L77.3,67.8z M42.9,15.1l0-0.2l0,19L28.7,58.4l-16.5,9.4L42.9,15.1z"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+    <polygon stroke="#FFF" stroke-width="1.5" points="21 19.644 3 19.644 12 4.5"/>
+    <polygon stroke="#FFF" stroke-width="1.5" points="15.75 16.644 8.25 16.644 12 10.586"/>
+    <path stroke="#FFF" stroke-width="1.5" d="M12 10.644L12 4.62225M15.75 16.644L21 19.644M3 19.644L8.25 16.644"/>
+  </g>
 </svg>
