@@ -892,7 +892,14 @@ const api = {
         return
       }
 
-      const reloadMatchingUrl = action.get('reloadMatchingUrl') || false
+      const parsed = muon.url.parse(url)
+      // Set reloadMatchingUrl to true for hash URLs as workaround for
+      // https://github.com/brave/browser-laptop/issues/14231. (muon emits
+      // security-style-changed to insecure when a hash URL is loaded using
+      // tab.loadURL in a tab with the same URL)
+      const reloadMatchingUrl = action.get('reloadMatchingUrl') ||
+        (parsed && parsed.hash) ||
+        false
       if (reloadMatchingUrl && currentUrl === url) {
         tab.reload(true)
       } else {
