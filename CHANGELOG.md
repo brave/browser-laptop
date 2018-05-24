@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.22.714](https://github.com/brave/browser-laptop/releases/tag/v0.22.721dev)
+## [0.22.721](https://github.com/brave/browser-laptop/releases/tag/v0.22.721dev)
 
  - Fixed partner subscription page no longer active tab on initial launch. ([#14220](https://github.com/brave/browser-laptop/issues/14220))
  - Fixed tabs opened via links with target attribute not always rendering. ([#14159](https://github.com/brave/browser-laptop/issues/14159))
