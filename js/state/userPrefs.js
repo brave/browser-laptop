@@ -62,6 +62,7 @@ module.exports.setUserPref = (path, value, incognito = false) => {
       newValue = Object.assign({}, value, {
         flashEnabled: [blockContentSetting],
         flashAllowed: [blockContentSetting],
+        torEnabled: [blockContentSetting], // currently only used for webrtc blocking
         plugins: [blockContentSetting]
       })
     }
