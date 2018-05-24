@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.22.714](https://github.com/brave/browser-laptop/releases/tag/v0.22.721dev)
+
+ - Fixed partner subscription page no longer active tab on initial launch. ([#14220](https://github.com/brave/browser-laptop/issues/14220))
+ - Fixed tabs opened via links with target attribute not always rendering. ([#14159](https://github.com/brave/browser-laptop/issues/14159))
+ - Fixed fingerprinting protection breaks the Uphold verification process. ([#14152](https://github.com/brave/browser-laptop/issues/14152))
+ - Fixed toggling shields breaks the security indicator on URLs that include a hash. ([#14231](https://github.com/brave/browser-laptop/issues/14231))
+ - Fixed opening extension background pages from the URL bar causes Brave to crash. ([#14079](https://github.com/brave/browser-laptop/issues/14079))
+ - Fixed tabs becoming unresponsive when detaching into separate window. ([#14031](https://github.com/brave/browser-laptop/issues/14031))
+ - Fixed disabling TorrentViewer doesn't disable torrent handling. ([#10767](https://github.com/brave/browser-laptop/issues/10767))
+ - Upgraded to muon 6.0.12. ([#14154](https://github.com/brave/browser-laptop/issues/14154))
+ - Upgraded to Chromium 66.0.3359.170. ([#14125](https://github.com/brave/browser-laptop/issues/14125))
+
 ## [0.22.714](https://github.com/brave/browser-laptop/releases/tag/v0.22.714dev)
 
  - Improved performance for browser startup and general UI, especially with a high number of tabs opened. ([#13216](https://github.com/brave/browser-laptop/issues/13216))
