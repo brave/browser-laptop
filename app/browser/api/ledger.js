@@ -2691,6 +2691,7 @@ const run = (state, delayTime) => {
   if (client.isReadyToReconcile(synopsis, onFuzzing)) {
     client.reconcile(uuid.v4().toLowerCase(), callback)
   }
+  return state
 }
 
 const networkConnected = () => {
