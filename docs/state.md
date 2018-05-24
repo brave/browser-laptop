@@ -649,6 +649,7 @@ AppStore
     autocompleteURL: string, // ditto re: {searchTerms}
     searchURL: string // with replacement var in string: {searchTerms}
   },
+  windowReady: boolean // set to false on start; set to true when first window is ready
 }
 ```
 

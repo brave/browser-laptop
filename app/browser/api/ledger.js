@@ -2161,12 +2161,15 @@ const onReferralRead = (state, body, activeWindowId) => {
   if (body.has('offer_page_url')) {
     const url = body.get('offer_page_url')
     if (urlutil.isURL(url)) {
-      if (activeWindowId === windowState.WINDOW_ID_NONE) {
+      if (activeWindowId === windowState.WINDOW_ID_NONE || !state.get('windowReady')) {
+        // write referralPage to state if initial window is not created/visible yet
         state = updateState.setUpdateProp(state, 'referralPage', url)
       } else {
+        // initial window exists and should be ready; create tab directly
         appActions.createTabRequested({
           url,
-          windowId: activeWindowId
+          windowId: activeWindowId,
+          active: true
         })
         state = updateState.setUpdateProp(state, 'referralPage', null)
       }

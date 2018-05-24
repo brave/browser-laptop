@@ -451,6 +451,11 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
     console.error('cleanAppData: error cleaning up data: urls', e)
   }
 
+  // delete the window ready state (gets set again on program start)
+  if (immutableData.has('windowReady')) {
+    immutableData = immutableData.delete('windowReady')
+  }
+
   return immutableData
 }
 
@@ -1162,7 +1167,8 @@ module.exports.defaultAppState = () => {
         publishers: {}
       },
       promotion: {}
-    }
+    },
+    windowReady: false
   }
 }
 
