@@ -525,6 +525,7 @@ const tabsReducer = (state, action, immutableAction) => {
           state = updateState.setUpdateProp(state, 'referralPage', null)
         }
       }
+      state = state.set('windowReady', true)
       break
     }
     case appConstants.APP_ENABLE_PEPPER_MENU: {
