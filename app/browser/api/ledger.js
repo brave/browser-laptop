@@ -1194,7 +1194,6 @@ const onWalletRecovery = (state, error, result) => {
     state = logError(state, error.toString(), 'recoveryWallet')
     state = aboutPreferencesState.setRecoveryStatus(state, false)
   } else {
-    result = makeImmutable(result)
     // convert buffer to Uint8Array
     let seed = result && result.getIn(['properties', 'wallet', 'keyinfo', 'seed'])
     if (seed) {
@@ -1816,7 +1815,7 @@ const generatePaymentData = (state) => {
         })
         .on('end', () => {
           const paymentIMG = 'data:image/png;base64,' + Buffer.concat(chunks).toString('base64')
-          appActions.onLedgerQRGenerated(index, paymentIMG)
+          module.exports.onLedgerQRGeneratedCallback(index, paymentIMG)
         })
     } catch (ex) {
       console.error('qr.imageSync (for url ' + url + ') error: ' + ex.toString())
@@ -1824,6 +1823,10 @@ const generatePaymentData = (state) => {
   })
 
   return state
+}
+
+const onLedgerQRGeneratedCallback = (index, paymentIMG) => {
+  appActions.onLedgerQRGenerated(index, paymentIMG)
 }
 
 const getPaymentInfo = (state) => {
@@ -3361,7 +3364,8 @@ const getMethods = () => {
     fetchReferralHeadersCallback,
     getPaymentInfo,
     fetchReferralHeaders,
-    callback
+    callback,
+    onLedgerQRGeneratedCallback
   }
 
   let privateMethods = {}
