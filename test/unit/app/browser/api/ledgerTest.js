@@ -3202,7 +3202,8 @@ describe('ledger api unit tests', function () {
       })
 
       it('window is ready', function () {
-        ledgerApi.onReferralRead(defaultAppState, Immutable.fromJS({
+        const windowReadyState = defaultAppState.set('windowReady', true)
+        ledgerApi.onReferralRead(windowReadyState, Immutable.fromJS({
           download_id: 1,
           referral_code: 'code',
           offer_page_url: url
@@ -3210,7 +3211,8 @@ describe('ledger api unit tests', function () {
         assert(setUpdatePropSpy.withArgs(sinon.match.any, 'referralPage', null).calledOnce)
         assert(createTabRequestedSpy.withArgs({
           url,
-          windowId: 1
+          windowId: 1,
+          active: true
         }).calledOnce)
       })
     })
