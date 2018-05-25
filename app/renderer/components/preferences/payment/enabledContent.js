@@ -13,6 +13,7 @@ const BrowserButton = require('../../common/browserButton')
 const {FormTextbox} = require('../../common/textbox')
 const {FormDropdown} = require('../../common/dropdown')
 const LedgerTable = require('./ledgerTable')
+const Captcha = require('./captcha')
 
 // State
 const ledgerState = require('../../../../common/state/ledgerState')
@@ -41,6 +42,7 @@ const globalStyles = require('../../styles/global')
 const cx = require('../../../../../js/lib/classSet')
 const {paymentStylesVariables} = require('../../styles/payment')
 const closeButton = require('../../../../../img/toolbar/stoploading_btn.svg')
+const promotionStatuses = require('../../../../common/constants/promotionStatuses')
 
 // TODO: report when funds are too low
 class EnabledContent extends ImmutableComponent {
@@ -93,7 +95,7 @@ class EnabledContent extends ImmutableComponent {
   }
 
   onClaimClick () {
-    appActions.onPromotionClaim()
+    appActions.onPromotionClick()
   }
 
   claimButton () {
@@ -227,7 +229,7 @@ class EnabledContent extends ImmutableComponent {
     const promo = this.props.ledgerData.get('promotion') || Immutable.Map()
     const status = promo.get('promotionStatus')
     if (status && !promo.has('claimedTimestamp')) {
-      if (status === 'expiredError') {
+      if (status === promotionStatuses.PROMO_EXPIRED) {
         appActions.onPromotionRemoval()
       } else {
         appActions.onPromotionClose()
@@ -243,6 +245,10 @@ class EnabledContent extends ImmutableComponent {
       'about:preferences#payments?ledgerRecoveryOverlayVisible',
       true
     )
+  }
+
+  captchaOverlay (promo) {
+    return <Captcha promo={promo} />
   }
 
   statusMessage () {
@@ -275,19 +281,24 @@ class EnabledContent extends ImmutableComponent {
 
       if (promotionStatus) {
         switch (promotionStatus) {
-          case 'generalError':
+          case promotionStatuses.GENERAL_ERROR:
             {
               title = locale.translation('promotionGeneralErrorTitle')
               message = locale.translation('promotionGeneralErrorMessage')
               text = locale.translation('promotionGeneralErrorText')
               break
             }
-          case 'expiredError':
+          case promotionStatuses.PROMO_EXPIRED:
             {
               title = locale.translation('promotionClaimedErrorTitle')
               message = locale.translation('promotionClaimedErrorMessage')
               text = locale.translation('promotionClaimedErrorText')
               break
+            }
+          case promotionStatuses.CAPTCHA_CHECK:
+          case promotionStatuses.CAPTCHA_ERROR:
+            {
+              return this.captchaOverlay(promo)
             }
         }
       }
@@ -313,7 +324,6 @@ class EnabledContent extends ImmutableComponent {
             />
             break
           }
-
         case ledgerStatuses.SERVER_PROBLEM:
           {
             showClose = false
@@ -337,7 +347,8 @@ class EnabledContent extends ImmutableComponent {
           /> : null
       }
       <p className={css(styles.enabledContent__overlay_title)}>
-        <span className={css(styles.enabledContent__overlay_bold)}>{title}</span> {message}
+        <span className={css(styles.enabledContent__overlay_bold)}>{title}</span>
+        <span>{message}</span>
       </p>
       <p className={css(styles.enabledContent__overlay_text)}>
         {text}
@@ -594,7 +605,8 @@ const styles = StyleSheet.create({
   },
 
   enabledContent__overlay_bold: {
-    color: '#ff5500'
+    color: '#ff5500',
+    paddingRight: '5px'
   },
 
   enabledContent__overlay_text: {

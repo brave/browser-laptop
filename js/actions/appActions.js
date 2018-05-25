@@ -1864,9 +1864,24 @@ const appActions = {
     })
   },
 
-  onPromotionClaim: function () {
+  onPromotionClick: function () {
     dispatch({
-      actionType: appConstants.APP_ON_PROMOTION_CLAIM
+      actionType: appConstants.APP_ON_PROMOTION_CLICK
+    })
+  },
+
+  onCaptchaResponse: function (body) {
+    dispatch({
+      actionType: appConstants.APP_ON_CAPTCHA_RESPONSE,
+      body
+    })
+  },
+
+  onPromotionClaim: function (x, y) {
+    dispatch({
+      actionType: appConstants.APP_ON_PROMOTION_CLAIM,
+      x,
+      y
     })
   },
 
@@ -2011,6 +2026,12 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE,
       viewData
+    })
+  },
+
+  onCaptchaClose: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_CAPTCHA_CLOSE
     })
   },
 
