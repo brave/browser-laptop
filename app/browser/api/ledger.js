@@ -1882,15 +1882,33 @@ const onWalletProperties = (state, body) => {
     state = ledgerState.setInfoProp(state, 'currentRate', rate)
   }
 
+  // Grants
+  let probi = parseFloat(body.get('probi'))
+  let userFunded = null
+  if (!isNaN(probi)) {
+    userFunded = probi
+    let grants = body.get('grants') || Immutable.List()
+    if (!grants.isEmpty()) {
+      let grantTotal = 0
+      grants = grants.map(grant => {
+        grantTotal += parseFloat(grant.get('probi'))
+        return {
+          amount: new BigNumber(grant.get('probi').toString()).dividedBy('1e18').toNumber(),
+          expirationDate: grant.get('expiryTime')
+        }
+      })
+      state = ledgerState.setInfoProp(state, 'grants', grants)
+      userFunded = probi - grantTotal
+    }
+
+    state = ledgerState.setInfoProp(state, 'userFunded', new BigNumber(userFunded.toString()).dividedBy('1e18').toNumber())
+  }
+
   // Probi
-  const probi = parseFloat(body.get('probi'))
   if (probi >= 0) {
     state = ledgerState.setInfoProp(state, 'probi', probi)
-
-    const amount = info.get('balance')
-
-    if (amount != null && rate) {
-      const bigProbi = new BigNumber(probi.toString()).dividedBy('1e18')
+    if (userFunded != null && rate) {
+      const bigProbi = new BigNumber(userFunded.toString()).dividedBy('1e18')
       const bigRate = new BigNumber(rate.toString())
       const converted = bigProbi.times(bigRate).toNumber()
 
