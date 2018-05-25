@@ -53,9 +53,10 @@ const promoCodeFirstRunStorage = require('../../promoCodeFirstRunStorage')
 const appUrlUtil = require('../../../js/lib/appUrlUtil')
 const urlutil = require('../../../js/lib/urlutil')
 const windowState = require('../../common/state/windowState')
-const {makeImmutable, makeJS, isList} = require('../../common/state/immutableUtil')
+const {makeImmutable, makeJS, isList, isImmutable} = require('../../common/state/immutableUtil')
 const siteHacks = require('../../siteHacks')
 const UrlUtil = require('../../../js/lib/urlutil')
+const promotionStatuses = require('../../common/constants/promotionStatuses')
 
 // Caching
 let locationDefault = 'NOOP'
@@ -1305,7 +1306,6 @@ const enable = (state, paymentsEnabled) => {
 
   if (paymentsEnabled === getSetting(settings.PAYMENTS_ENABLED)) {
     // on start
-
     if (togglePromotionTimeoutId) {
       clearTimeout(togglePromotionTimeoutId)
     }
@@ -1314,7 +1314,7 @@ const enable = (state, paymentsEnabled) => {
       checkPromotions()
     }, random.randomInt({min: 10 * ledgerUtil.milliseconds.second, max: 15 * ledgerUtil.milliseconds.second}))
   } else if (paymentsEnabled) {
-    // on toggle
+    // toggle on
     if (togglePromotionTimeoutId) {
       clearTimeout(togglePromotionTimeoutId)
     }
@@ -1326,6 +1326,9 @@ const enable = (state, paymentsEnabled) => {
 
     state = ledgerState.setActivePromotion(state, paymentsEnabled)
     getPromotion(state)
+  } else {
+    // toggle off
+    state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
   }
 
   if (synopsis) {
@@ -1520,6 +1523,7 @@ const roundTripFromWindow = (params, callback) => {
  * @param {object} params.payload - payload that we want to send to the server
  * @param {object} params.headers - HTTP headers
  * @param {string} params.path - relative path to requested url
+ * @param {boolean} params.binaryP - are we receiving raw payload back
  * @param {object} options
  * @param {boolean} options.verboseP - tells us if we want to log the process or not
  * @param {object} options.headers - headers that are used in the request.request
@@ -1534,7 +1538,7 @@ const roundtrip = (params, options, callback) => {
   let parts = typeof params.server === 'string' ? urlParse(params.server)
     : typeof params.server !== 'undefined' ? params.server
       : typeof options.server === 'string' ? urlParse(options.server) : options.server
-  const binaryP = options.binaryP
+  const binaryP = options.binaryP || params.binaryP
   const rawP = binaryP || options.rawP || options.scrapeP
 
   if (!params.method) params.method = 'GET'
@@ -2928,7 +2932,7 @@ const getPromotion = (state) => {
   })
 }
 
-const claimPromotion = (state) => {
+const getCaptcha = (state) => {
   if (!client) {
     return
   }
@@ -2938,7 +2942,45 @@ const claimPromotion = (state) => {
     return
   }
 
-  client.setPromotion(promotion.get('promotionId'), (err, _, status) => {
+  client.getPromotionCaptcha(promotion.get('promotionId'), (err, body) => {
+    if (err) {
+      console.error(`Problem getting promotion captcha ${err.toString()}`)
+      appActions.onCaptchaResponse(null)
+    }
+
+    appActions.onCaptchaResponse(body)
+  })
+}
+
+const onCaptchaResponse = (state, body) => {
+  if (body == null) {
+    state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_ERROR)
+    return state
+  }
+
+  const image = `data:image/jpeg;base64,${Buffer.from(body).toString('base64')}`
+
+  state = ledgerState.setPromotionProp(state, 'captcha', image)
+  const currentStatus = ledgerState.getPromotionProp(state, 'promotionStatus')
+
+  if (currentStatus !== promotionStatuses.CAPTCHA_ERROR) {
+    state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_CHECK)
+  }
+
+  return state
+}
+
+const claimPromotion = (state, x, y) => {
+  if (!client) {
+    return
+  }
+
+  const promotion = ledgerState.getPromotion(state)
+  if (promotion.isEmpty()) {
+    return
+  }
+
+  client.setPromotion(promotion.get('promotionId'), {x, y}, (err, _, status) => {
     let param = null
     if (err) {
       console.error(`Problem claiming promotion ${err.toString()}`)
@@ -2950,15 +2992,28 @@ const claimPromotion = (state) => {
 }
 
 const onPromotionResponse = (state, status) => {
-  if (status) {
+  if (status && isImmutable(status)) {
     if (status.get('statusCode') === 422) {
       // promotion already claimed
-      state = ledgerState.setPromotionProp(state, 'promotionStatus', 'expiredError')
+      state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.PROMO_EXPIRED)
+    } else if (status.get('statusCode') === 403) {
+      // captcha verification failed
+      state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_ERROR)
+      module.exports.getCaptcha(state)
     } else {
       // general error
-      state = ledgerState.setPromotionProp(state, 'promotionStatus', 'generalError')
+      state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.GENERAL_ERROR)
     }
     return state
+  }
+
+  const currentStatus = ledgerState.getPromotionProp(state, 'promotionStatus')
+
+  if (
+    currentStatus === promotionStatuses.CAPTCHA_ERROR ||
+    currentStatus === promotionStatuses.CAPTCHA_CHECK
+  ) {
+    state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
   }
 
   ledgerNotifications.removePromotionNotification(state)
@@ -3123,6 +3178,8 @@ const getMethods = () => {
     processMediaData,
     addNewLocation,
     addSiteVisit,
+    getCaptcha,
+    onCaptchaResponse,
     shouldTrackTab
   }
 
