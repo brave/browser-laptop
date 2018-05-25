@@ -55,6 +55,8 @@ describe('PaymentsTab component', function () {
     // Mocks the icon used in payments tab
     mockery.registerMock('../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
     mockery.registerMock('../../../../../img/toolbar/stoploading_btn.svg')
+    mockery.registerMock('../../../../extensions/brave/img/ledger/BAT_captcha_dragicon.png')
+    mockery.registerMock('../../../../extensions/brave/img/ledger/BAT_captcha_BG_arrow.png')
     // Mocks the icons used in addFundsDialog and its steps
     mockery.registerMock('../../../../../../extensions/brave/img/ledger/wallet_icon.svg')
     mockery.registerMock('../../../../../../extensions/brave/img/ledger/cryptoIcons/ETH_icon.svg')

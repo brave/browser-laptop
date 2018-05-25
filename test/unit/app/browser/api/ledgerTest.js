@@ -13,6 +13,7 @@ const batPublisher = require('bat-publisher')
 const ledgerMediaProviders = require('../../../../../app/common/constants/ledgerMediaProviders')
 const fs = require('fs')
 const ledgerStatuses = require('../../../../../app/common/constants/ledgerStatuses')
+const promotionStatuses = require('../../../../../app/common/constants/promotionStatuses')
 
 describe('ledger api unit tests', function () {
   let ledgerApi
@@ -161,7 +162,8 @@ describe('ledger api unit tests', function () {
       setPromotion: () => {},
       setTimeUntilReconcile: () => {},
       isReadyToReconcile: () => isReadyToReconcile,
-      recoverWallet: () => {}
+      recoverWallet: () => {},
+      getPromotionCaptcha: () => {}
     }
     window.getWalletPassphrase = (parsedData) => {
       if (walletPassphraseReturn === 'error') {
@@ -1670,7 +1672,12 @@ describe('ledger api unit tests', function () {
 
     it('execute', function () {
       ledgerApi.claimPromotion(state)
-      assert(ledgersetPromotionSpy.calledOnce)
+      assert(ledgersetPromotionSpy.withArgs('1', {x: undefined, y: undefined}, sinon.match.any).calledOnce)
+    })
+
+    it('execute with coordinates', function () {
+      ledgerApi.claimPromotion(state, 5, 6)
+      assert(ledgersetPromotionSpy.withArgs('1', {x: 5, y: 6}, sinon.match.any).calledOnce)
     })
   })
 
@@ -1763,6 +1770,52 @@ describe('ledger api unit tests', function () {
         .setIn(['ledger', 'info', 'reconcileStamp'], 10001)
       ledgerApi.onPromotionResponse(state)
       assert(ledgerSetTimeUntilReconcile.notCalled)
+    })
+
+    describe('status', function () {
+      let getCaptchaSpy
+
+      before(function () {
+        getCaptchaSpy = sinon.spy(ledgerApi, 'getCaptcha')
+      })
+
+      afterEach(function () {
+        getCaptchaSpy.reset()
+      })
+
+      after(function () {
+        getCaptchaSpy.restore()
+      })
+
+      it('promotion expired', function () {
+        const result = ledgerApi.onPromotionResponse(defaultAppState, Immutable.fromJS({
+          statusCode: 422
+        }))
+        const expectedSate = defaultAppState
+          .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.PROMO_EXPIRED)
+        assert.deepEqual(result.toJS(), expectedSate.toJS())
+        assert(getCaptchaSpy.notCalled)
+      })
+
+      it('captcha error', function () {
+        const result = ledgerApi.onPromotionResponse(defaultAppState, Immutable.fromJS({
+          statusCode: 403
+        }))
+        const expectedSate = defaultAppState
+          .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_ERROR)
+        assert.deepEqual(result.toJS(), expectedSate.toJS())
+        assert(getCaptchaSpy.calledOnce)
+      })
+
+      it('general error', function () {
+        const result = ledgerApi.onPromotionResponse(defaultAppState, Immutable.fromJS({
+          statusCode: 500
+        }))
+        const expectedSate = defaultAppState
+          .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.GENERAL_ERROR)
+        assert.deepEqual(result.toJS(), expectedSate.toJS())
+        assert(getCaptchaSpy.notCalled)
+      })
     })
   })
 
@@ -3215,6 +3268,68 @@ describe('ledger api unit tests', function () {
           active: true
         }).calledOnce)
       })
+    })
+  })
+
+  describe('getCaptcha', function () {
+    let getPromotionCaptchaSpy
+
+    before(function () {
+      ledgerApi.setClient(ledgerClientObject)
+      getPromotionCaptchaSpy = sinon.spy(ledgerClientObject, 'getPromotionCaptcha')
+    })
+
+    afterEach(function () {
+      getPromotionCaptchaSpy.reset()
+    })
+
+    after(function () {
+      getPromotionCaptchaSpy.restore()
+      ledgerApi.setClient(undefined)
+    })
+
+    it('no promotion', function () {
+      ledgerApi.getCaptcha(defaultAppState)
+      assert(getPromotionCaptchaSpy.notCalled)
+    })
+
+    it('gets new promotion', function () {
+      const state = defaultAppState
+        .setIn(['ledger', 'promotion'], Immutable.fromJS({
+          promotionId: 1
+        }))
+
+      ledgerApi.getCaptcha(state)
+      assert(getPromotionCaptchaSpy.withArgs(1, sinon.match.any).calledOnce)
+    })
+  })
+
+  describe('onCaptchaResponse', function () {
+    const body = new Uint8Array([255, 216, 255, 219, 0])
+
+    it('null case', function () {
+      const expectedState = defaultAppState
+        .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_ERROR)
+      const result = ledgerApi.onCaptchaResponse(defaultAppState)
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('new captcha', function () {
+      const expectedState = defaultAppState
+        .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_CHECK)
+        .setIn(['ledger', 'promotion', 'captcha'], 'data:image/jpeg;base64,/9j/2wA=')
+      const result = ledgerApi.onCaptchaResponse(defaultAppState, body)
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('replacing exiting captcha', function () {
+      const state = defaultAppState
+        .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_ERROR)
+      const expectedState = defaultAppState
+        .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_ERROR)
+        .setIn(['ledger', 'promotion', 'captcha'], 'data:image/jpeg;base64,/9j/2wA=')
+      const result = ledgerApi.onCaptchaResponse(state, body)
+      assert.deepEqual(result.toJS(), expectedState.toJS())
     })
   })
 })

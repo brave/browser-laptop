@@ -431,9 +431,24 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerNotifications.onPromotionReceived(state)
         break
       }
+    case appConstants.APP_ON_PROMOTION_CLICK:
+      {
+        ledgerApi.getCaptcha(state)
+        break
+      }
+    case appConstants.APP_ON_CAPTCHA_RESPONSE:
+      {
+        state = ledgerApi.onCaptchaResponse(state, action.get('body'))
+        break
+      }
+    case appConstants.APP_ON_CAPTCHA_CLOSE:
+      {
+        state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
+        break
+      }
     case appConstants.APP_ON_PROMOTION_CLAIM:
       {
-        ledgerApi.claimPromotion(state)
+        ledgerApi.claimPromotion(state, action.get('x'), action.get('y'))
         break
       }
     case appConstants.APP_ON_PROMOTION_REMIND:
