@@ -1751,23 +1751,26 @@ const generatePaymentData = (state) => {
       default:
         return
     }
-
-    try {
-      let chunks = []
-      qr.image(url, {type: 'png'})
-        .on('data', (chunk) => {
-          chunks.push(chunk)
-        })
-        .on('end', () => {
-          const paymentIMG = 'data:image/png;base64,' + Buffer.concat(chunks).toString('base64')
-          module.exports.onLedgerQRGeneratedCallback(index, paymentIMG)
-        })
-    } catch (ex) {
-      console.error('qr.imageSync (for url ' + url + ') error: ' + ex.toString())
-    }
+    module.exports.qrWriteImage(index, url)
   })
 
   return state
+}
+
+const qrWriteImage = (index, url) => {
+  try {
+    let chunks = []
+    qr.image(url, {type: 'png'})
+      .on('data', (chunk) => {
+        chunks.push(chunk)
+      })
+      .on('end', () => {
+        const paymentIMG = 'data:image/png;base64,' + Buffer.concat(chunks).toString('base64')
+        module.exports.onLedgerQRGeneratedCallback(index, paymentIMG)
+      })
+  } catch (ex) {
+    console.error('qr.imageSync (for url ' + url + ') error: ' + ex.toString())
+  }
 }
 
 const onLedgerQRGeneratedCallback = (index, paymentIMG) => {
@@ -3158,7 +3161,8 @@ const getMethods = () => {
     getPaymentInfo,
     fetchReferralHeaders,
     callback,
-    onLedgerQRGeneratedCallback
+    onLedgerQRGeneratedCallback,
+    qrWriteImage
   }
 
   let privateMethods = {}
