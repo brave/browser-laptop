@@ -1420,49 +1420,6 @@ describe('ledger api unit tests', function () {
       })
     })
 
-    describe('getPaymentInfo', function () {
-      let onWalletPropertiesSpy
-      let getWalletPropertiesSpy
-      let getWalletPropertiesCallbackSpy
-
-      before(function () {
-        ledgerApi.setClient(ledgerClientObject)
-        onWalletPropertiesSpy = sinon.spy(appActions, 'onWalletProperties')
-        getWalletPropertiesSpy = sinon.spy(ledgerClientObject, 'getWalletProperties')
-        getWalletPropertiesCallbackSpy = sinon.spy(ledgerApi, 'getWalletPropertiesCallback')
-      })
-
-      afterEach(function () {
-        onWalletPropertiesSpy.restore()
-        getWalletPropertiesSpy.restore()
-        getWalletPropertiesCallbackSpy.restore()
-      })
-
-      after(function () {
-        onWalletPropertiesSpy.reset()
-        getWalletPropertiesSpy.reset()
-        getWalletPropertiesCallbackSpy.reset()
-      })
-
-      it('calls getWalletProperties with current amount and fee', function () {
-        const expectedProps = ledgerClientObject.getBraveryProperties()
-        ledgerApi.getPaymentInfo(defaultAppState)
-        const passedProps = getWalletPropertiesSpy.getCall(0).args
-        assert.equal(expectedProps.fee.amount, passedProps[0])
-        assert.equal(expectedProps.fee.currency, passedProps[1])
-      })
-
-      it('calls getWalletPropertiesCallback', function () {
-        ledgerApi.getPaymentInfo(defaultAppState)
-        assert(getWalletPropertiesCallbackSpy.calledOnce)
-      })
-
-      it('calls appActions.onWalletProperties', function () {
-        ledgerApi.getPaymentInfo(defaultAppState)
-        assert(onWalletPropertiesSpy.calledOnce)
-      })
-    })
-
     describe('addresses', function () {
       it('null case', function () {
         const result = ledgerApi.onWalletProperties(state, Immutable.Map())
