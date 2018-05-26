@@ -3412,7 +3412,8 @@ const getMethods = () => {
     getPaymentInfo,
     fetchReferralHeaders,
     callback,
-    onLedgerQRGeneratedCallback
+    onLedgerQRGeneratedCallback,
+    qrWriteImage
   }
 
   let privateMethods = {}
