@@ -1335,17 +1335,21 @@ describe('ledger api unit tests', function () {
       .setIn(['ledger', 'info', 'monthlyAmounts'], Immutable.List([5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0]))
 
     describe('generatePaymentData', function () {
+      let qrWriteImageSpy
       let generatePaymentDataSpy
 
       before(function () {
+        qrWriteImageSpy = sinon.spy(ledgerApi, 'qrWriteImage')
         generatePaymentDataSpy = sinon.spy(ledgerApi, 'generatePaymentData')
       })
 
       afterEach(function () {
+        qrWriteImageSpy.reset()
         generatePaymentDataSpy.reset()
       })
 
       after(function () {
+        qrWriteImageSpy.restore()
         generatePaymentDataSpy.restore()
       })
 
@@ -1357,6 +1361,19 @@ describe('ledger api unit tests', function () {
       it('we need to call generatePaymentData', function () {
         ledgerApi.onWalletProperties(state, Immutable.Map())
         assert(generatePaymentDataSpy.calledOnce)
+      })
+
+      it('calls qrWriteImage for each wallet address', function () {
+        const body = Immutable.fromJS({
+          addresses: {
+            BAT: 'BAT_address',
+            BTC: 'BTC_address',
+            ETH: 'ETH_address',
+            LTC: 'LTC_address'
+          }
+        })
+        ledgerApi.onWalletProperties(state, body)
+        assert.equal(4, qrWriteImageSpy.callCount)
       })
     })
 
