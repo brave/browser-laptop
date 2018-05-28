@@ -3397,6 +3397,12 @@ const getMethods = () => {
       setCurrentMediaKey: (key) => {
         currentMediaKey = key
       },
+      resetModules: () => {
+        client = null
+        ledgerClient = null
+        ledgerBalance = null
+        ledgerPublisher = null
+      },
       getCurrentMediaKey: (key) => currentMediaKey,
       observeTransactions,
       onWalletRecovery,
