@@ -10,7 +10,6 @@ const Immutable = require('immutable')
 // Components
 const ImmutableComponent = require('../../immutableComponent')
 const BrowserButton = require('../../common/browserButton')
-const {FormTextbox} = require('../../common/textbox')
 const {PanelDropdown} = require('../../common/dropdown')
 const LedgerTable = require('./ledgerTable')
 const Captcha = require('./captcha')
@@ -143,19 +142,28 @@ class EnabledContent extends ImmutableComponent {
 
   fundsAmount () {
     const ledgerData = this.props.ledgerData
-    const val = formatCurrentBalance(ledgerData) || ''
-    const big = val.length > 23
+    if (!ledgerData) {
+      return
+    }
 
-    return <section className={css(styles.balance)}>
-      <FormTextbox data-test-id='fundsAmount' readOnly value={val} customClass={big && styles.width_input} />
-      <a className={cx({
-        [globalStyles.appIcons.question]: true,
-        [css(styles.balance__iconLink)]: true
-      })}
-        href='https://brave.com/Payments_FAQ.html'
-        target='_blank' rel='noopener'
-      />
-    </section>
+    const total = formatCurrentBalance(ledgerData, ledgerData.get('balance'), false) || ''
+    const userFunded = formatCurrentBalance(ledgerData, ledgerData.get('userFunded')) || ''
+    const grants = ledgerData.get('grants') || Immutable.List()
+
+    return <div className={css(styles.fundsAmount)}>
+      <div className={css(styles.fundsAmount__item)}>{userFunded}</div>
+      {
+        grants.map(grant => {
+          return <div className={css(styles.fundsAmount__item)}>
+            {formatCurrentBalance(ledgerData, grant.get('amount'), false)}
+            <span> (<span data-l10n-id='expires' /> {new Date(grant.get('expirationDate') * 1000).toLocaleDateString()})</span>
+          </div>
+        })
+      }
+      <div className={css(styles.fundsAmount__item, styles.fundsAmount__total)}>
+        {total} (<span data-l10n-id='total' />)
+      </div>
+    </div>
   }
 
   lastReconcileMessage () {
@@ -183,8 +191,12 @@ class EnabledContent extends ImmutableComponent {
     }
 
     return <section>
-      <div data-l10n-id='lastContribution' />
-      <div data-l10n-id={text} data-l10n-args={JSON.stringify(l10nDataArgs)} />
+      {
+        prevReconcileDateValue
+        ? <span data-l10n-id='lastContribution' className={css(styles.lastContribution)} />
+        : null
+      }
+      <span data-l10n-id={text} data-l10n-args={JSON.stringify(l10nDataArgs)} />
     </section>
   }
 
@@ -224,8 +236,7 @@ class EnabledContent extends ImmutableComponent {
     }
 
     return <section>
-      <div data-l10n-id='nextContribution' />
-      <div data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id={l10nDataId} />
+      <span data-l10n-id='nextContribution' /> <span data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id={l10nDataId} />
     </section>
   }
 
@@ -422,7 +433,7 @@ class EnabledContent extends ImmutableComponent {
             }
           </PanelDropdown>
         </div>
-        <div className={css(gridStyles.row2col2)}>
+        <div className={css(gridStyles.row2col2, gridStyles.mergeRow23Col2)}>
           {
             ledgerData.get('error') && ledgerData.get('error').get('caller') === 'getWalletProperties'
               ? <div data-l10n-id='accountBalanceConnectionError' />
@@ -434,8 +445,6 @@ class EnabledContent extends ImmutableComponent {
         </div>
         <div className={css(gridStyles.row3col1, styles.enabledContent__walletBar__message)}>
           {this.lastReconcileMessage()}
-        </div>
-        <div className={css(gridStyles.row3col2, styles.enabledContent__walletBar__message)}>
           {
             ledgerData.get('error') && ledgerData.get('error').get('caller') === 'getWalletProperties'
               ? <div data-l10n-id={this.ledgerDataErrorText()} />
@@ -510,6 +519,10 @@ const gridStyles = StyleSheet.create({
   row3col3: {
     gridRow: 3,
     gridColumn: 3
+  },
+
+  mergeRow23Col2: {
+    gridRow: '2 / span 2'
   }
 })
 
@@ -539,10 +552,6 @@ const styles = StyleSheet.create({
   balance: {
     display: 'flex',
     alignItems: 'center'
-  },
-
-  width_input: {
-    width: '195px'
   },
 
   balance__iconLink: {
@@ -661,6 +670,23 @@ const styles = StyleSheet.create({
     ':hover': {
       textDecoration: 'underline'
     }
+  },
+
+  fundsAmount__item: {
+    marginBottom: '4px',
+    width: '215px',
+    fontSize: '14.5px'
+  },
+
+  fundsAmount__total: {
+    marginTop: '10px',
+    paddingTop: '12px',
+    borderTop: '1px solid #999',
+    fontSize: '15px'
+  },
+
+  lastContribution: {
+    paddingRight: '4px'
   }
 })
 

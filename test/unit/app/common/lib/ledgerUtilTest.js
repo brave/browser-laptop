@@ -223,12 +223,12 @@ describe('ledgerUtil unit test', function () {
 
     it('defaults to 0 as balance when rate is not present', function () {
       const data = ledgerData.delete('rates')
-      const result = ledgerUtil.formatCurrentBalance(data)
+      const result = ledgerUtil.formatCurrentBalance(data, ledgerData.get('balance'))
       assert.equal(result, '5.00 BAT')
     })
 
     it('formats `balance` and `converted` values to two decimal places', function () {
-      const result = ledgerUtil.formatCurrentBalance(ledgerData)
+      const result = ledgerUtil.formatCurrentBalance(ledgerData, ledgerData.get('balance'))
       assert.equal(result, '5.00 BAT (1.12 USD)')
     })
 
@@ -238,23 +238,28 @@ describe('ledgerUtil unit test', function () {
     })
 
     it('defaults `converted` to 0 if not found', function () {
-      const result = ledgerUtil.formatCurrentBalance(ledgerData.delete('converted'))
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.delete('converted'), ledgerData.get('balance'))
       assert.equal(result, '5.00 BAT (0.00 USD)')
     })
 
     it('handles `balance` being a string', function () {
-      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('balance', '5'))
+      const result = ledgerUtil.formatCurrentBalance(ledgerData, 5)
       assert.equal(result, '5.00 BAT (1.12 USD)')
     })
 
     it('handles `converted` being a string', function () {
-      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('converted', '1.1234'))
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('converted', '1.1234'), ledgerData.get('balance'))
       assert.equal(result, '5.00 BAT (1.12 USD)')
     })
 
     it('custom format for amount lower then 0.01', function () {
-      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('converted', '0.004'))
+      const result = ledgerUtil.formatCurrentBalance(ledgerData.set('converted', '0.004'), ledgerData.get('balance'))
       assert.equal(result, '5.00 BAT (< 0.01 USD)')
+    })
+
+    it('formats only `balance` when alt is excluded', function () {
+      const result = ledgerUtil.formatCurrentBalance(ledgerData, ledgerData.get('balance'), false)
+      assert.equal(result, '5.00 BAT')
     })
   })
 

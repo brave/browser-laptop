@@ -9,10 +9,9 @@ const assert = require('assert')
 const Immutable = require('immutable')
 const fakeElectron = require('../../../../lib/fakeElectron')
 const fakeSettings = require('../../../../lib/fakeSettings')
-const {batToCurrencyString} = require('../../../../../../app/common/lib/ledgerUtil')
 const {advancedSettingsDialog} = require('../../../../../lib/selectors')
 
-let PaymentsTab, EnabledContent
+let PaymentsTab
 require('../../../../braveUnit')
 
 describe('PaymentsTab component', function () {
@@ -71,7 +70,6 @@ describe('PaymentsTab component', function () {
     fakeSettings.mockReturnValue = false
     window.chrome = fakeElectron
     PaymentsTab = require('../../../../../../app/renderer/components/preferences/paymentsTab')
-    EnabledContent = require('../../../../../../app/renderer/components/preferences/payment/enabledContent')
   })
   after(function () {
     mockery.disable()
@@ -175,53 +173,6 @@ describe('PaymentsTab component', function () {
           ledgerData={Immutable.Map({created: true, transactions: {size: 3}})} />
       )
       assert.equal(wrapper.find('[data-test-id="paymentHistoryButton"]').length, 0)
-    })
-  })
-
-  describe('fundsamount functionality', function () {
-    it('does not display if wallet not created', function () {
-      fakeSettings.mockReturnValue = true
-      const wrapper = mount(
-        <PaymentsTab
-          showOverlay={function () {}}
-          hideOverlay={function () {}}
-          ledgerData={Immutable.Map({created: false, balance: null})} />
-      )
-      const inst = wrapper.instance()
-      assert.equal(inst.fundsAmount, null)
-    })
-
-    it('handles expected balance', function () {
-      fakeSettings.mockReturnValue = true
-      const wrapper = mount(
-        <PaymentsTab
-          showOverlay={function () {}}
-          hideOverlay={function () {}}
-          ledgerData={Immutable.Map({created: true, balance: 5})} />
-      )
-      assert.equal(wrapper.find('[data-test-id="fundsAmount"]').length, 1)
-    })
-
-    it.skip('renders full balance correctly', function () {
-      fakeSettings.mockReturnValue = true
-      const wrapper = mount(
-        <PaymentsTab
-          showOverlay={function () {}}
-          hideOverlay={function () {}}
-          ledgerData={Immutable.Map({created: false, bat: 10, amount: 10})} />
-      )
-      const inst = wrapper.instance()
-      assert.equal(batToCurrencyString(10, inst.props.ledgerData), '10.00 USD')
-    })
-
-    it.skip('renders partial balance correctly', function () {
-      fakeSettings.mockReturnValue = true
-      const wrapper = mount(
-        <EnabledContent
-          ledgerData={Immutable.Map({created: false, bat: 10, amount: 2})} />
-      )
-      const inst = wrapper.instance()
-      assert.equal(batToCurrencyString(10, inst.props.ledgerData), '2.00 USD')
     })
   })
 

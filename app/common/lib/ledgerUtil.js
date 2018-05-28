@@ -64,16 +64,16 @@ const batToCurrencyString = (bat, ledgerData) => {
   return `${converted} ${currency}`
 }
 
-const formatCurrentBalance = (ledgerData) => {
+const formatCurrentBalance = (ledgerData, amount, showAlt = true) => {
   let currency = 'USD'
   let balance = 0
   let converted = 0
   let hasRate = false
 
   if (ledgerData != null) {
-    balance = Number(ledgerData.get('balance') || 0)
+    balance = Number(amount || 0)
     converted = Number.parseFloat(ledgerData.get('converted')) || 0
-    hasRate = ledgerData.has('currentRate') && ledgerData.hasIn(['rates', 'BTC'])
+    hasRate = showAlt ? ledgerData.has('currentRate') && ledgerData.hasIn(['rates', 'BTC']) : false
   }
 
   balance = balance.toFixed(2)

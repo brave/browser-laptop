@@ -1504,19 +1504,18 @@ describe('ledger api unit tests', function () {
         const expectedState = state
           .setIn(['ledger', 'info', 'probi'], probi)
           .setIn(['ledger', 'info', 'balance'], 25)
+          .setIn(['ledger', 'info', 'userFunded'], 25)
           .setIn(['ledger', 'info', 'userHasFunded'], true)
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
 
       it('amount is null', function () {
         const result = ledgerApi.onWalletProperties(state, Immutable.fromJS({
-          probi: probi,
           rates: rates
         }))
         const expectedState = state
           .setIn(['ledger', 'info', 'rates'], Immutable.fromJS(rates))
           .setIn(['ledger', 'info', 'currentRate'], rate)
-          .setIn(['ledger', 'info', 'probi'], probi)
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
 
@@ -1531,13 +1530,14 @@ describe('ledger api unit tests', function () {
           .setIn(['ledger', 'info', 'currentRate'], rate)
           .setIn(['ledger', 'info', 'converted'], 3.5836474125)
           .setIn(['ledger', 'info', 'balance'], 25)
+          .setIn(['ledger', 'info', 'userFunded'], 25)
           .setIn(['ledger', 'info', 'probi'], probi)
           .setIn(['ledger', 'info', 'userHasFunded'], true)
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
 
       it('big probi', function () {
-        const bigProbi = '7.309622404968674704085e+21'
+        const bigProbi = 7.309622404968674704085e+21
         const result = ledgerApi.onWalletProperties(state, Immutable.fromJS({
           probi: bigProbi,
           balance: '7309.6224',
@@ -1548,6 +1548,7 @@ describe('ledger api unit tests', function () {
           .setIn(['ledger', 'info', 'currentRate'], rate)
           .setIn(['ledger', 'info', 'converted'], 1047.8043767167208)
           .setIn(['ledger', 'info', 'balance'], 7309.6224)
+          .setIn(['ledger', 'info', 'userFunded'], 7309.622404968675)
           .setIn(['ledger', 'info', 'probi'], bigProbi)
           .setIn(['ledger', 'info', 'userHasFunded'], true)
         assert.deepEqual(result.toJS(), expectedState.toJS())
@@ -1640,6 +1641,55 @@ describe('ledger api unit tests', function () {
         assert.deepEqual(result.toJS(), expectedState.toJS())
 
         contributionAmount = 10
+      })
+    })
+
+    describe('grants', function () {
+      const probi = 25000000000000000000
+
+      it('probi is missing', function () {
+        const expectedState = state
+          .setIn(['ledger', 'info', 'balance'], 25)
+          .setIn(['ledger', 'info', 'userHasFunded'], true)
+        const result = ledgerApi.onWalletProperties(state, Immutable.fromJS({
+          balance: 25
+        }))
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+
+      it('is missing', function () {
+        const expectedState = state
+          .setIn(['ledger', 'info', 'balance'], 25)
+          .setIn(['ledger', 'info', 'userHasFunded'], true)
+          .setIn(['ledger', 'info', 'probi'], probi)
+          .setIn(['ledger', 'info', 'userFunded'], 25)
+        const result = ledgerApi.onWalletProperties(state, Immutable.fromJS({
+          probi,
+          balance: 25
+        }))
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+
+      it('grant is saved', function () {
+        const expectedState = state
+          .setIn(['ledger', 'info', 'balance'], 25)
+          .setIn(['ledger', 'info', 'userHasFunded'], true)
+          .setIn(['ledger', 'info', 'probi'], probi)
+          .setIn(['ledger', 'info', 'userFunded'], 15)
+          .setIn(['ledger', 'info', 'grants'], Immutable.fromJS([{
+            expirationDate: 2130600234,
+            amount: 10
+          }]))
+        const result = ledgerApi.onWalletProperties(state, Immutable.fromJS({
+          probi,
+          balance: 25,
+          grants: [{
+            altcurrency: 'BAT',
+            expiryTime: 2130600234,
+            probi: 10000000000000000000
+          }]
+        }))
+        assert.deepEqual(result.toJS(), expectedState.toJS())
       })
     })
   })
