@@ -82,7 +82,7 @@ class PaymentsTab extends ImmutableComponent {
     const addresses = ledgerData.get('addresses') || Immutable.List()
     const walletQR = ledgerData.get('walletQR') || Immutable.List()
     const wizardData = ledgerData.get('wizardData') || Immutable.Map()
-    const funds = formatCurrentBalance(ledgerData)
+    const funds = formatCurrentBalance(ledgerData, ledgerData.get('balance'))
     const budget = ledgerState.getContributionAmount(null, ledgerData.get('contributionAmount'), this.props.settings)
     const minAmount = batToCurrencyString(budget, ledgerData)
 
@@ -110,7 +110,7 @@ class PaymentsTab extends ImmutableComponent {
 
   get getOverlayFunds () {
     const ledgerData = this.props.ledgerData || Immutable.Map()
-    return formatCurrentBalance(ledgerData)
+    return formatCurrentBalance(ledgerData, ledgerData.get('balance'))
   }
 
   get deletedSitesFooter () {
