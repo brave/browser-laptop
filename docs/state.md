@@ -212,6 +212,10 @@ AppStore
       created, boolean, // wallet is created
       creating: boolean, // wallet is being created
       currentRate: number,
+      grants: [{
+        amount: number,
+        expirationDate: number
+      }]
       hasBitcoinHandler: boolean, // brave browser has a `bitcoin:` URI handler
       monthlyAmounts: Array<float> // list of all monthly amounts for the contribution
       passphrase: string, // the BAT wallet passphrase
@@ -245,6 +249,7 @@ AppStore
         viewingId: string, // UUIDv4 for this contribution
       }],
       unconfirmed: string, // unconfirmed balance in BAT.toFixed(2)
+      userFunded: number, // amount funded by the user
       userHasFunded: boolean // permanently true once user funds wallet
     },
     locations: {
