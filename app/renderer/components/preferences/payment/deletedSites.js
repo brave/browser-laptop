@@ -16,16 +16,15 @@ const ImmutableComponent = require('../../immutableComponent')
 // Style
 const globalStyles = require('../../styles/global')
 
-const permissionName = 'ledgerPaymentsShown'
-
 class DeletedSitesContent extends ImmutableComponent {
   constructor (props) {
     super(props)
     this.deletePermission = this.deletePermission.bind(this)
   }
 
-  deletePermission (name, hostPattern) {
-    appActions.removeSiteSetting(hostPattern, name)
+  deletePermission (hostPattern) {
+    appActions.removeSiteSetting(hostPattern, 'ledgerPayments')
+    appActions.removeSiteSetting(hostPattern, 'ledgerPaymentsShown')
     this.props.onHide()
   }
 
@@ -46,7 +45,7 @@ class DeletedSitesContent extends ImmutableComponent {
                 iconClass={globalStyles.appIcons.remove}
                 size='1rem'
                 custom={styles.sitePermissions__list__item__button}
-                onClick={this.deletePermission.bind(this, permissionName, data.hostPattern)}
+                onClick={this.deletePermission.bind(this, data.hostPattern)}
               />
               <span>{siteName}</span>
             </div>
@@ -58,8 +57,8 @@ class DeletedSitesContent extends ImmutableComponent {
 }
 
 class DeletedSitesFooter extends ImmutableComponent {
-  clearPermissions (name) {
-    aboutActions.clearSiteSettings(name)
+  clearPermissions () {
+    aboutActions.clearSiteSettings('ledgerPaymentsShown')
     this.props.onHide()
   }
 
@@ -68,7 +67,7 @@ class DeletedSitesFooter extends ImmutableComponent {
       <BrowserButton groupedItem secondaryColor
         l10nId='clearAll'
         testId='clearAll'
-        onClick={this.clearPermissions.bind(this, 'ledgerPaymentsShown')}
+        onClick={this.clearPermissions.bind(this)}
       />
       <BrowserButton groupedItem primaryColor
         l10nId='done'
