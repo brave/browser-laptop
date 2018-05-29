@@ -233,6 +233,7 @@ var rendererIdentifiers = function () {
     'dappDismiss',
     'dappEnableExtension',
     'banSiteConfirmation',
+    'paymentsDeleteWalletConfirmation',
     // other
     'passwordsManager',
     'extensionsManager',

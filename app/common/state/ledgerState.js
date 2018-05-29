@@ -122,21 +122,25 @@ const ledgerState = {
     return state
   },
 
-  resetSynopsis: (state, options = false) => {
+  deleteSynopsis: (state) => {
     state = validateState(state)
-
-    if (options) {
-      state = state
-        .setIn(['ledger', 'synopsis', 'options'], Immutable.Map())
-        .setIn(['ledger', 'about', 'synopsisOptions'], Immutable.Map())
-    }
-
     state = pageDataState.resetPageData(state)
 
     return state
-      .setIn(['ledger', 'synopsis', 'publishers'], Immutable.Map())
-      .setIn(['ledger', 'locations'], Immutable.Map())
-      .setIn(['ledger', 'about', 'synopsis'], Immutable.List())
+      .setIn(['cache', 'ledgerVideos'], Immutable.Map())
+      .set('ledger', Immutable.fromJS({
+        about: {
+          synopsis: [],
+          synopsisOptions: {}
+        },
+        info: {},
+        locations: {},
+        synopsis: {
+          options: {},
+          publishers: {}
+        },
+        promotion: {}
+      }))
   },
 
   /**
@@ -193,6 +197,18 @@ const ledgerState = {
     }
 
     return state.setIn(['ledger', 'synopsis', 'publishers', key, prop], value)
+  },
+
+  resetPublishers: (state) => {
+    state = validateState(state)
+    state = pageDataState.resetPageData(state)
+
+    return state
+      .setIn(['ledger', 'synopsis', 'publishers'], Immutable.Map())
+      .setIn(['ledger', 'locations'], Immutable.Map())
+      .setIn(['ledger', 'about', 'synopsis'], Immutable.List())
+      .setIn(['ledger', 'publisherTimestamp'], 0)
+      .setIn(['cache', 'ledgerVideos'], Immutable.Map())
   },
 
   /**

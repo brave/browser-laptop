@@ -338,6 +338,15 @@ const globalStyles = {
       hoverColor: '#000'
     },
 
+    alert: {
+      color: '#fff',
+      gradientColor1: '#ff5000',
+      gradientColor2: '#ff001b',
+      background: 'linear-gradient(#ff5000, #ff001b)',
+      hoverColor: '#fff',
+      borderHoverColor: '#fff'
+    },
+
     panel: {
       width: '180px'
     }

@@ -83,6 +83,7 @@ const pageDataState = {
       .setIn(['pageData', 'info'], Immutable.Map())
       .setIn(['pageData', 'last', 'info'], null)
       .setIn(['pageData', 'last', 'tabId'], null)
+      .setIn(['pageData', 'last', 'closedTabValue'], null)
   }
 }
 
