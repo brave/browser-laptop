@@ -16,7 +16,7 @@ RELEASE_NAME = 'Dev Channel Beta'
 def main():
   repo = GitHub(get_env('GITHUB_TOKEN')).repos(BROWSER_LAPTOP_REPO)
 
-  release = get_draft(repo, get_tag())
+  release = get_draft(repo, get_tag_without_channel())
   commit_tag = get_commit_tag(get_version())
 
   print("[INFO] Releasing {}".format(release['tag_name']))

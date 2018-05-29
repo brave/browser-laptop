@@ -16,15 +16,15 @@ def main(args):
   repo = GitHub(get_env('GITHUB_TOKEN')).repos(BROWSER_LAPTOP_REPO)
 
   try:
-    sanity_check(repo, get_tag())
+    sanity_check(repo, get_tag_without_channel())
   except UserWarning:
     if args.force:
-      delete_release(repo, get_tag())
+      delete_release(repo, get_tag_without_channel())
     else:
       raise
 
 
-  release = create_release_draft(repo, get_tag())
+  release = create_release_draft(repo, get_tag_without_channel())
   print('[INFO] Uploading release {}'.format(release['tag_name']))
   for f in get_files_to_upload():
     upload_browser_laptop(repo, release, f)

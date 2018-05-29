@@ -33,6 +33,9 @@ def release_name():
 def get_tag():
   return 'v' + get_version() + release_channel()
 
+def get_tag_without_channel():
+  return 'v' + get_version()
+
 def get_version():
   return json.load(open('package.json'))['version']
 
