@@ -57,6 +57,9 @@ const siteSettingsReducer = (state, action, immutableAction) => {
           if (action.get('skipSync')) {
             newEntry = newEntry.set('skipSync', true)
           }
+          if (action.get('key') === 'ledgerPaymentsShown') {
+            newEntry = newEntry.delete('ledgerPayments')
+          }
           newSiteSettings = newSiteSettings.set(hostPattern, newEntry)
         })
         state = state.set(propertyName, newSiteSettings)
