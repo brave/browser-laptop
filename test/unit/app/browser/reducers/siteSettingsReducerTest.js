@@ -269,6 +269,30 @@ describe('siteSettingsReducer unit tests', function () {
         assert.equal(newState.getIn(['siteSettings', 'https://example.com', 'skipSync']), undefined)
       })
     })
+
+    it('ledger delete flag is cleared', function () {
+      const beforeState = fakeAppState.setIn(['siteSettings'], Immutable.fromJS({
+        'https://example.com': {
+          ledgerPaymentsShown: false,
+          ledgerPayments: true
+        },
+        'https://example1.com': {
+          keyNameHere: 'keyValueHere'
+        },
+        'https://example2.com': {
+          ledgerPayments: true
+        }
+      }))
+      const afterState = siteSettingsReducer(beforeState, Immutable.fromJS({
+        actionType: appConstants.APP_CLEAR_SITE_SETTINGS,
+        key: 'ledgerPaymentsShown'
+      }))
+
+      const expectedState = afterState
+        .setIn(['siteSettings', 'https://example.com'], Immutable.Map())
+
+      assert.deepEqual(afterState.toJS(), expectedState.toJS())
+    })
   })
 
   describe('APP_ADD_NOSCRIPT_EXCEPTIONS', function () {
