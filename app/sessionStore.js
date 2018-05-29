@@ -26,10 +26,12 @@ const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const siteTags = require('../js/constants/siteTags')
 const downloadStates = require('../js/constants/downloadStates')
+const ledgerStatuses = require('./common/constants/ledgerStatuses')
 
 // State
 const tabState = require('./common/state/tabState')
 const windowState = require('./common/state/windowState')
+const ledgerState = require('./common/state/ledgerState')
 
 // Utils
 const locale = require('./locale')
@@ -327,6 +329,13 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
       console.error('cleanAppData: error calling autofill.clearAutocompleteData: ', e)
     }
   }
+
+  const clearSynopsis = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_PUBLISHERS) === true
+  const inProgress = ledgerState.getAboutProp(immutableData, 'status') === ledgerStatuses.IN_PROGRESS
+  if (clearSynopsis && immutableData.has('ledger') && !inProgress) {
+    immutableData = ledgerState.resetPublishers(immutableData)
+  }
+
   const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
   if (clearAutofillData) {
     autofill.clearAutofillData()

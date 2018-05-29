@@ -4,6 +4,7 @@
 
 const React = require('react')
 const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -23,6 +24,12 @@ const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
 const aboutActions = require('../../../../js/about/aboutActions')
 
+// State
+const ledgerState = require('../../../common/state/ledgerState')
+
+// Constants
+const ledgerStatuses = require('../../../common/constants/ledgerStatuses')
+
 class ClearBrowsingDataPanel extends React.Component {
   constructor (props) {
     super(props)
@@ -34,6 +41,8 @@ class ClearBrowsingDataPanel extends React.Component {
     this.onToggleAutocompleteData = this.onToggleSetting.bind(this, 'autocompleteData')
     this.onToggleAutofillData = this.onToggleSetting.bind(this, 'autofillData')
     this.onToggleSavedSiteSettings = this.onToggleSetting.bind(this, 'savedSiteSettings')
+    this.onTogglePublishersClear = this.onToggleSetting.bind(this, 'publishersClear')
+    this.onTogglePaymentHistory = this.onToggleSetting.bind(this, 'paymentHistory')
     this.onClear = this.onClear.bind(this)
     this.onCancel = this.onCancel.bind(this)
   }
@@ -69,6 +78,7 @@ class ClearBrowsingDataPanel extends React.Component {
     const data = state.get('clearBrowsingDataDefaults', Immutable.Map()).merge(tempData)
 
     const props = {}
+    props.inProgress = ledgerState.getAboutProp(state, 'status') === ledgerStatuses.IN_PROGRESS
     props.allSiteCookies = data.get('allSiteCookies')
     props.browserHistory = data.get('browserHistory')
     props.downloadHistory = data.get('downloadHistory')
@@ -78,6 +88,8 @@ class ClearBrowsingDataPanel extends React.Component {
     props.autocompleteData = data.get('autocompleteData')
     props.autofillData = data.get('autofillData')
     props.savedSiteSettings = data.get('savedSiteSettings')
+    props.publishersClear = props.inProgress ? false : data.get('publishersClear')
+    props.paymentHistory = props.inProgress ? false : data.get('paymentHistory')
 
     return props
   }
@@ -123,6 +135,23 @@ class ClearBrowsingDataPanel extends React.Component {
             testId='siteSettingsSwitch'
             checkedOn={this.props.savedSiteSettings}
             onClick={this.onToggleSavedSiteSettings} />
+          <SwitchControl
+            rightl10nId='publishersClear'
+            testId='publishersClear'
+            disabled={this.props.inProgress}
+            checkedOn={this.props.publishersClear}
+            onClick={this.onTogglePublishersClear} />
+          <SwitchControl
+            rightl10nId='paymentHistory'
+            testId='paymentHistorySwitch'
+            disabled={this.props.inProgress}
+            checkedOn={this.props.paymentHistory}
+            onClick={this.onTogglePaymentHistory} />
+          {
+            this.props.inProgress
+            ? <span data-l10n-id='confirmPaymentsClear' className={css(styles.footNote)} />
+            : null
+          }
         </CommonFormSection>
         <CommonFormButtonWrapper>
           <Button className='whiteButton'
@@ -143,5 +172,13 @@ class ClearBrowsingDataPanel extends React.Component {
     </Dialog>
   }
 }
+
+const styles = StyleSheet.create({
+  footNote: {
+    marginTop: '12px',
+    fontSize: '12px',
+    display: 'block'
+  }
+})
 
 module.exports = ReduxComponent.connect(ClearBrowsingDataPanel)
