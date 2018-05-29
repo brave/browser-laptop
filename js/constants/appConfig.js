@@ -226,6 +226,7 @@ module.exports = {
     'shutdown.clear-autocomplete-data': false,
     'shutdown.clear-autofill-data': false,
     'shutdown.clear-site-settings': false,
+    'shutdown.clear-publishers': false,
     'extensions.pocket.enabled': false,
     'extensions.vimium.enabled': false,
     'extensions.honey.enabled': false,

@@ -109,6 +109,8 @@ AppStore
     browserHistory: boolean,
     cachedImagesAndFiles: boolean,
     downloadHistory: boolean,
+    paymentHistory: boolean,
+    publishersClear: boolean,
     savedPasswords: boolean,
     savedSiteSettings: boolean
   },
