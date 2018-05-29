@@ -216,7 +216,8 @@ const appConstants = {
   APP_SET_TOR_NEW_IDENTITY: _,
   APP_RESTART_TOR: _,
   APP_RECREATE_TOR_TAB: _,
-  APP_RUN_PROMOTION_CHECK: _
+  APP_RUN_PROMOTION_CHECK: _,
+  APP_ON_NOTIFICATION_RESPONSE: _
 }
 
 module.exports = mapValuesByKeys(appConstants)

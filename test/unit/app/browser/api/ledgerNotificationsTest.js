@@ -10,6 +10,7 @@ const mockery = require('mockery')
 const settings = require('../../../../../js/constants/settings')
 const ledgerUtil = require('../../../../../app/common/lib/ledgerUtil')
 const aboutPreferencesState = require('../../../../../app/common/state/aboutPreferencesState')
+const ledgerStatuses = require('../../../../../app/common/constants/ledgerStatuses')
 
 describe('ledgerNotifications unit test', function () {
   let fakeClock
@@ -565,6 +566,29 @@ describe('ledgerNotifications unit test', function () {
       const state = defaultAppState.setIn(['ledger', 'info', 'userHasFunded'], true)
       const result = ledgerNotificationsApi.hasFunded(state)
       assert.equal(result, true)
+    })
+  })
+
+  describe('shouldShowAddFundsModal', function () {
+    it('false when seed is corrupted', function () {
+      const state = defaultAppState.setIn(['ledger', 'about', 'status'], ledgerStatuses.CORRUPTED_SEED)
+      const result = ledgerNotificationsApi.shouldShowAddFundsModal(state)
+      assert.equal(result, false)
+    })
+    it('false when payments server is unresponsive', function () {
+      const state = defaultAppState.setIn(['ledger', 'about', 'status'], ledgerStatuses.SERVER_PROBLEM)
+      const result = ledgerNotificationsApi.shouldShowAddFundsModal(state)
+      assert.equal(result, false)
+    })
+    it('true when status is blank', function () {
+      const state = defaultAppState.setIn(['ledger', 'about', 'status'], '')
+      const result = ledgerNotificationsApi.shouldShowAddFundsModal(state)
+      assert(result)
+    })
+    it('true when status is a non-error case', function () {
+      const state = defaultAppState.setIn(['ledger', 'about', 'status'], ledgerStatuses.IN_PROGRESS)
+      const result = ledgerNotificationsApi.shouldShowAddFundsModal(state)
+      assert(result)
     })
   })
 
