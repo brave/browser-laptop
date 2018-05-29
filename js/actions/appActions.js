@@ -2011,6 +2011,12 @@ const appActions = {
     })
   },
 
+  onWalletDelete: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_WALLET_DELETE
+    })
+  },
+
   onPublisherToggleUpdate: function (viewData) {
     dispatch({
       actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE,

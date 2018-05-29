@@ -1208,12 +1208,19 @@ const onWalletRecovery = (state, error, result) => {
   return state
 }
 
+const resetPublishers = (state) => {
+  state = ledgerState.resetPublishers(state)
+  synopsis.publishers = {}
+
+  return state
+}
+
 const quit = (state) => {
   quitP = true
   state = addNewLocation(state, locationDefault)
 
-  if (!getSetting(settings.PAYMENTS_ENABLED) && getSetting(settings.SHUTDOWN_CLEAR_HISTORY)) {
-    state = ledgerState.resetSynopsis(state, true)
+  if (!getSetting(settings.PAYMENTS_ENABLED) && getSetting(settings.SHUTDOWN_CLEAR_PUBLISHERS)) {
+    resetPublishers(state)
   }
 
   return state
@@ -2730,10 +2737,6 @@ const savePublisherData = (publisherKey, prop, value) => {
   synopsis.publishers[publisherKey][prop] = value
 }
 
-const deleteSynopsis = () => {
-  synopsis.publishers = {}
-}
-
 let currentMediaKey = null
 const onMediaRequest = (state, xhr, type, details) => {
   if (!xhr || type == null) {
@@ -3132,6 +3135,53 @@ const activityRoundTrip = (err, response, body) => {
   updater.checkForUpdate(false, true)
 }
 
+const deleteWallet = (state) => {
+  state = ledgerState.deleteSynopsis(state)
+  state = state.setIn(['settings', settings.PAYMENTS_ENABLED], false)
+
+  client = null
+  synopsis = null
+
+  const fs = require('fs')
+  fs.access(pathName(statePath), fs.constants.F_OK, (err) => {
+    if (err) {
+      return
+    }
+
+    fs.unlink(pathName(statePath), (err) => {
+      if (err) {
+        return console.error('read error: ' + err.toString())
+      }
+    })
+  })
+
+  return state
+}
+
+const clearPaymentHistory = (state) => {
+  state = ledgerState.setInfoProp(state, 'transactions', Immutable.List())
+  state = ledgerState.setInfoProp(state, 'ballots', Immutable.List())
+  state = ledgerState.setInfoProp(state, 'batch', Immutable.Map())
+
+  const fs = require('fs')
+  const path = pathName(statePath)
+  try {
+    fs.accessSync(path, fs.constants.W_OK)
+    let data = fs.readFileSync(path)
+    data = JSON.parse(data)
+    if (data) {
+      data.transactions = []
+      data.ballots = []
+      data.batch = {}
+      muonWriter(statePath, data)
+    }
+  } catch (err) {
+    console.error(`Problem reading ${path} when clearing payment history`)
+  }
+
+  return state
+}
+
 const getMethods = () => {
   const publicMethods = {
     backupKeys,
@@ -3161,7 +3211,6 @@ const getMethods = () => {
     onNetworkConnected,
     migration,
     onInitRead,
-    deleteSynopsis,
     normalizePinned,
     roundToTarget,
     onFavIconReceived,
@@ -3189,7 +3238,10 @@ const getMethods = () => {
     addSiteVisit,
     getCaptcha,
     onCaptchaResponse,
-    shouldTrackTab
+    shouldTrackTab,
+    deleteWallet,
+    resetPublishers,
+    clearPaymentHistory
   }
 
   let privateMethods = {}

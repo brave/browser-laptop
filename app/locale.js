@@ -238,6 +238,7 @@ var rendererIdentifiers = function () {
     'dappDetected',
     'dappDismiss',
     'dappEnableExtension',
+    'paymentsDeleteWalletConfirmation',
     // other
     'passwordsManager',
     'extensionsManager',
