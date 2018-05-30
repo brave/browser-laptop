@@ -1752,7 +1752,6 @@ const generatePaymentData = (state) => {
         return
     }
     module.exports.qrWriteImage(index, url)
-    
   })
 
   return state
@@ -1773,7 +1772,6 @@ const qrWriteImage = (index, url) => {
     console.error('qr.imageSync (for url ' + url + ') error: ' + ex.toString())
   }
 }
-
 
 const onLedgerQRGeneratedCallback = (index, paymentIMG) => {
   appActions.onLedgerQRGenerated(index, paymentIMG)
@@ -3191,6 +3189,12 @@ const getMethods = () => {
       },
       setCurrentMediaKey: (key) => {
         currentMediaKey = key
+      },
+      resetModules: () => {
+        client = null
+        ledgerClient = null
+        ledgerBalance = null
+        ledgerPublisher = null
       },
       getCurrentMediaKey: (key) => currentMediaKey,
       synopsisNormalizer,
