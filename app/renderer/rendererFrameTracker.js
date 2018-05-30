@@ -10,7 +10,7 @@ const debounce = require('../../js/lib/debounce')
 function mapFramesByKey (immutableFrameList) {
   const frames = { }
   for (const frame of immutableFrameList.values()) {
-    const frameKey = frame.get('key')
+    const frameKey = frame && frame.get('key')
     if (frameKey == null) {
       console.error('immutableFrameList had frame with invalid key', { frame, immutableFrameList })
       continue
