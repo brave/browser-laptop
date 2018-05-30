@@ -588,6 +588,11 @@ function registerForDownloadListener (session) {
   })
 
   session.on('will-download', function (event, item, webContents) {
+    if (!webContents) {
+      console.warn('Download Cancelled')
+      event.preventDefault()
+      return
+    }
     if (webContents.isDestroyed()) {
       event.preventDefault()
       return
