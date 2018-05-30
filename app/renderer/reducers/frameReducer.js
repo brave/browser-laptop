@@ -86,10 +86,12 @@ function setFrameChangedIndex (state, frame, currentIndex, newIndex) {
   let frames = frameStateUtil.getFrames(state)
   if (newIndex >= frames.size) {
     console.error(`Cannot move frame to index ${newIndex} from ${currentIndex} because it is invalid for a frame List of size ${frames.size}!`)
+    state.set('frames', frames)
     return state
   }
   // put the frame at the correct index
   frames = frames
+    .filter((frame) => !!frame)
     .splice(currentIndex, 1)
     .splice(newIndex, 0, frame)
   state = state.set('frames', frames)
@@ -242,7 +244,9 @@ const frameReducer = (state, action, immutableAction) => {
             !hasBeenActivated && isPotentialPhishingUrl(tab.get('url')))
         }
         if (!frame.get('hasBeenActivated')) {
-          state = state.setIn(['frames', index, 'hasBeenActivated'], true)
+          if (state.hasIn(['frames', index])) {
+            state = state.setIn(['frames', index, 'hasBeenActivated'], true)
+          }
         }
         state = frameStateUtil.updateTabPageIndex(state, tabId)
       }
@@ -250,13 +254,17 @@ const frameReducer = (state, action, immutableAction) => {
 
     case appConstants.APP_MEDIA_STARTED_PLAYING: {
       const index = frameStateUtil.getIndexByTabId(state, action.tabId)
-      state = state.setIn(['frames', index, 'audioPlaybackActive'], true)
+      if (state.hasIn(['frames', index])) {
+        state = state.setIn(['frames', index, 'audioPlaybackActive'], true)
+      }
       break
     }
 
     case appConstants.APP_MEDIA_PAUSED: {
       const index = frameStateUtil.getIndexByTabId(state, action.tabId)
-      state = state.setIn(['frames', index, 'audioPlaybackActive'], false)
+      if (state.hasIn(['frames', index])) {
+        state = state.setIn(['frames', index, 'audioPlaybackActive'], false)
+      }
       break
     }
 

@@ -33,11 +33,11 @@ const matchFrame = (queryInfo, frame) => {
 }
 
 function query (state, queryInfo) {
-  return state.get('frames').filter(matchFrame.bind(null, queryInfo))
+  return getFrames(state).filter(matchFrame.bind(null, queryInfo))
 }
 
 function find (state, queryInfo) {
-  return state.get('frames').find(matchFrame.bind(null, queryInfo))
+  return getFrames(state).find(matchFrame.bind(null, queryInfo))
 }
 
 function isFrameKeyActive (state, frameKey) {
@@ -45,15 +45,19 @@ function isFrameKeyActive (state, frameKey) {
 }
 
 function getFrames (state) {
-  return state.get('frames')
+  return state
+    ? state.get('frames')
+      ? state.get('frames').filter((frame) => !!frame)
+      : Immutable.List()
+    : Immutable.Map()
 }
 
 function getFrameKeys (state) {
-  return state.get('frames', Immutable.List()).map(frame => frame.get('key'))
+  return getFrames(state).map(frame => frame.get('key'))
 }
 
 function getSortedFrames (state) {
-  return state.get('frames', Immutable.List()).sort(comparatorByKeyAsc)
+  return getFrames(state).sort(comparatorByKeyAsc)
 }
 
 function getSortedFrameKeys (state) {
@@ -62,11 +66,11 @@ function getSortedFrameKeys (state) {
 }
 
 function getPinnedFrames (state) {
-  return state.get('frames', Immutable.List()).filter((frame) => frame.get('pinnedLocation'))
+  return getFrames(state).filter((frame) => frame.get('pinnedLocation'))
 }
 
 function getNonPinnedFrames (state) {
-  return state.get('frames', Immutable.List()).filter((frame) => !frame.get('pinnedLocation'))
+  return getFrames(state).filter((frame) => !frame.get('pinnedLocation'))
 }
 
 function getFrameIndex (state, frameKey) {
@@ -103,14 +107,16 @@ function getFrameKeyByTabId (state, tabId) {
 }
 
 function getFrameKeysByDisplayIndex (state) {
-  const frames = state.get('frames')
+  const frames = getFrames(state)
   let framesByDisplayIndex = [[], []]
   frames.forEach((frame) => {
-    let key = frame.get('key')
-    if (frame.get('pinnedLocation')) {
-      framesByDisplayIndex[0].push(key)
-    } else {
-      framesByDisplayIndex[1].push(key)
+    if (frame) {
+      let key = frame.get('key')
+      if (frame.get('pinnedLocation')) {
+        framesByDisplayIndex[0].push(key)
+      } else {
+        framesByDisplayIndex[1].push(key)
+      }
     }
   })
   return framesByDisplayIndex.reduce(function (a, b) {
@@ -119,7 +125,7 @@ function getFrameKeysByDisplayIndex (state) {
 }
 
 function getTabIdsByNonPinnedDisplayIndex (state) {
-  return state.get('frames')
+  return getFrames(state)
     .filter((frame) => !frame.get('pinnedLocation'))
     .map((frame) => frame.get('tabId'))
 }
@@ -184,7 +190,7 @@ function isFrameKeyPinned (state, key) {
 }
 
 function getNonPinnedFrameCount (state) {
-  return state.get('frames').filter((frame) => !frame.get('pinnedLocation')).size
+  return getFrames(state).filter((frame) => !frame.get('pinnedLocation')).size
 }
 
 function getFrameByTabId (state, tabId) {
@@ -205,7 +211,7 @@ const getTabIdByFrameKey = (state, frameKey) => {
 
 function getActiveFrame (state) {
   const activeFrameIndex = getActiveFrameIndex(state)
-  const frames = state.get('frames')
+  const frames = getFrames(state)
   return frames ? frames.get(activeFrameIndex) : null
 }
 
@@ -243,14 +249,16 @@ const setFrameLastAccessedTime = (state, index) => {
 }
 
 function getNextFrame (state) {
+  const frames = getFrames(state)
   const activeFrameIndex = findDisplayIndexForFrameKey(state, getActiveFrameKey(state))
-  const index = (activeFrameIndex + 1) % state.get('frames').size
+  const index = (activeFrameIndex + 1) % frames.size
   return getFrameByDisplayIndex(state, index)
 }
 
 function getPreviousFrame (state) {
+  const frames = getFrames(state)
   const activeFrameIndex = findDisplayIndexForFrameKey(state, getActiveFrameKey(state))
-  const index = (state.get('frames').size + activeFrameIndex - 1) % state.get('frames').size
+  const index = (frames.size + activeFrameIndex - 1) % frames.size
   return getFrameByDisplayIndex(state, index)
 }
 
@@ -308,7 +316,9 @@ function isSessionPartition (partition) {
 }
 
 function getPartition (frameOpts) {
-  return getPartitionFromNumber(frameOpts.get('partitionNumber'), frameOpts.get('isPrivate'))
+  const partitionNumber = frameOpts && frameOpts.get('partitionNumber')
+  const isPrivate = frameOpts && frameOpts.get('isPrivate')
+  return getPartitionFromNumber(partitionNumber, isPrivate)
 }
 
 function getPartitionFromNumber (partitionNumber, incognito) {
@@ -333,7 +343,7 @@ const frameOptsFromFrame = (frame) => {
 * @return Immutable top level application state ready to merge back in
 */
 function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, insertionIndex) {
-  const frames = state.get('frames', Immutable.List())
+  const frames = getFrames(state)
 
   const location = frameOpts.location // page url
   const displayURL = frameOpts.displayURL == null ? location : frameOpts.displayURL
@@ -407,7 +417,7 @@ function addFrame (state, frameOpts, newKey, partitionNumber, openInForeground, 
 * @return Immutable top level application state ready to merge back in
 */
 function removeFrame (state, frameProps, framePropsIndex) {
-  const frames = state.get('frames')
+  const frames = getFrames(state)
   let closedFrames = state.get('closedFrames') || Immutable.List()
   const newFrames = frames.splice(framePropsIndex, 1)
 
@@ -542,7 +552,7 @@ const deleteFrameInternalIndex = (state, frame) => {
 
 const updateFramesInternalIndex = (state, fromIndex) => {
   let framesInternal = state.get('framesInternal') || Immutable.Map()
-  state.get('frames').slice(fromIndex).reduceRight((result, frame, idx) => {
+  getFrames(state).slice(fromIndex).reduceRight((result, frame, idx) => {
     const tabId = frame.get('tabId')
     const frameKey = frame.get('key')
     const realIndex = idx + fromIndex
@@ -748,72 +758,86 @@ const hasFrame = (state, frameKey) => {
   return frame && !frame.isEmpty()
 }
 
-module.exports = {
-  hasFrame,
-  setTabPageHoverState,
-  setPreviewTabPageIndex,
-  getTabHoverState,
-  setTabHoverState,
-  setPreviewFrameKey,
-  getPreviewFrameKey,
-  deleteTabInternalIndex,
-  deleteFrameInternalIndex,
-  updateFramesInternalIndex,
-  moveFrame,
-  query,
-  find,
-  isAncestorFrameKey,
-  isFrameKeyActive,
-  isFrameSecure,
-  isFrameLoading,
-  startLoadTime,
-  endLoadTime,
-  getHistory,
-  isFrameKeyPinned,
-  getNonPinnedFrameCount,
-  isPrivatePartition,
-  isSessionPartition,
-  getFrames,
-  getFrameKeys,
-  getSortedFrames,
-  getPinnedFrames,
-  getNonPinnedFrames,
-  getFrameIndex,
-  getActiveFrameIndex,
-  getActiveFrameTabId,
-  getFrameByIndex,
-  getFrameByDisplayIndex,
-  getFrameByKey,
-  getFrameByTabId,
-  getIndexByTabId,
-  getTabIdByFrameKey,
-  getPartitionNumber,
-  setFrameLastAccessedTime,
-  setActiveFrameKey,
-  getActiveFrame,
-  getNextFrame,
-  getPreviousFrame,
-  findDisplayIndexForFrameKey,
-  getFrameKeysByDisplayIndex,
-  getPartition,
-  getPartitionFromNumber,
-  addFrame,
-  removeFrame,
-  frameOptsFromFrame,
-  getFrameKeyByTabId,
-  getFrameTabPageIndex,
-  frameStatePath,
-  activeFrameStatePath,
-  getLastCommittedURL,
-  onFindBarHide,
-  getTotalBlocks,
-  isPinned,
-  isFirstFrameKeyInTabPage,
-  getTabPageIndex,
-  updateTabPageIndex,
-  isValidClosedFrame,
-  getTabPageCount,
-  getSortedFrameKeys,
-  frameStatePathByTabId,
-  frameLocationMatch
+const getMethods = () => {
+  const publicMethods = {
+    hasFrame,
+    setTabPageHoverState,
+    setPreviewTabPageIndex,
+    getTabHoverState,
+    setTabHoverState,
+    setPreviewFrameKey,
+    getPreviewFrameKey,
+    deleteTabInternalIndex,
+    deleteFrameInternalIndex,
+    updateFramesInternalIndex,
+    moveFrame,
+    query,
+    find,
+    isAncestorFrameKey,
+    isFrameKeyActive,
+    isFrameSecure,
+    isFrameLoading,
+    startLoadTime,
+    endLoadTime,
+    getHistory,
+    isFrameKeyPinned,
+    getNonPinnedFrameCount,
+    isPrivatePartition,
+    isSessionPartition,
+    getFrames,
+    getFrameKeys,
+    getSortedFrames,
+    getPinnedFrames,
+    getNonPinnedFrames,
+    getFrameIndex,
+    getActiveFrameIndex,
+    getActiveFrameTabId,
+    getFrameByIndex,
+    getFrameByDisplayIndex,
+    getFrameByKey,
+    getFrameByTabId,
+    getIndexByTabId,
+    getTabIdByFrameKey,
+    getPartitionNumber,
+    setFrameLastAccessedTime,
+    setActiveFrameKey,
+    getActiveFrame,
+    getNextFrame,
+    getPreviousFrame,
+    findDisplayIndexForFrameKey,
+    getFrameKeysByDisplayIndex,
+    getPartition,
+    getPartitionFromNumber,
+    addFrame,
+    removeFrame,
+    frameOptsFromFrame,
+    getFrameKeyByTabId,
+    getFrameTabPageIndex,
+    frameStatePath,
+    activeFrameStatePath,
+    getLastCommittedURL,
+    onFindBarHide,
+    getTotalBlocks,
+    isPinned,
+    isFirstFrameKeyInTabPage,
+    getTabPageIndex,
+    updateTabPageIndex,
+    isValidClosedFrame,
+    getTabPageCount,
+    getSortedFrameKeys,
+    frameStatePathByTabId,
+    frameLocationMatch
+  }
+
+  let privateMethods = {}
+
+  if (process.env.NODE_ENV === 'test') {
+    privateMethods = {
+      getTabIdsByNonPinnedDisplayIndex
+    }
+  }
+
+  return Object.assign({}, publicMethods, privateMethods)
 }
+
+module.exports = getMethods()

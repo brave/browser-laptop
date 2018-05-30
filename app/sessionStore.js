@@ -83,7 +83,7 @@ module.exports.saveAppState = (immutablePayload, isShutdown) => {
         immutablePayload.get('perWindowState').forEach((immutableWndPayload, i) => {
           let frames = immutableWndPayload.get('frames')
           if (frames) {
-            frames = frames.filter((frame) => !frame.get('isPrivate'))
+            frames = frames.filter((frame) => frame && !frame.get('isPrivate'))
           }
           immutableWndPayload = immutableWndPayload.set('frames', frames)
           immutablePayload = immutablePayload.setIn(['perWindowState', i], immutableWndPayload)
