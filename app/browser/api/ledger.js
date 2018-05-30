@@ -3397,7 +3397,11 @@ const getMethods = () => {
     fetchReferralHeaders,
     callback,
     onLedgerQRGeneratedCallback,
-    qrWriteImage
+    qrWriteImage,
+    onFuzzing,
+    getClient: () => {
+      return client
+    }
   }
 
   let privateMethods = {}
