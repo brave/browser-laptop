@@ -1665,7 +1665,6 @@ const getStateInfo = (state, parsedData) => {
   }
 
   const info = parsedData.paymentInfo
-  const then = new Date().getTime() - ledgerUtil.milliseconds.year
 
   if (!parsedData.properties || !parsedData.properties.wallet) {
     return state
@@ -1709,23 +1708,29 @@ const getStateInfo = (state, parsedData) => {
     return state
   }
 
+  const current = ledgerState.getInfoProp(state, 'transactions') || Immutable.Map()
+  if (current && current.size === parsedData.transactions.length) {
+    return state
+  }
+
   for (let i = parsedData.transactions.length - 1; i >= 0; i--) {
     let transaction = parsedData.transactions[i]
-    if (transaction.stamp < then) break
 
-    if (!transaction.ballots || transaction.ballots.length < transaction.count) continue
+    if (!transaction.ballots) {
+      continue
+    }
 
-    let ballots = underscore.clone(transaction.ballots || {})
-    parsedData.ballots.forEach((ballot) => {
-      if (ballot.viewingId !== transaction.viewingId) return
+    const ballotsTotal = Object.keys(transaction.ballots).reduce((acc, key) => {
+      return acc + transaction.ballots[key]
+    }, 0)
 
-      if (!ballots[ballot.publisher]) ballots[ballot.publisher] = 0
-      ballots[ballot.publisher]++
-    })
+    if (ballotsTotal < transaction.votes) break
 
-    transactions.push(underscore.extend(underscore.pick(transaction,
-      ['viewingId', 'contribution', 'submissionStamp', 'count']),
-      {ballots: ballots}))
+    transactions.push(underscore.pick(transaction, ['viewingId', 'contribution', 'submissionStamp', 'count', 'ballots']))
+  }
+
+  if (current && current.size === transactions.length) {
+    return state
   }
 
   state = observeTransactions(state, transactions)
@@ -1777,8 +1782,9 @@ const generatePaymentData = (state) => {
 
 const getPaymentInfo = (state) => {
   let amount, currency
+  const inProgress = ledgerState.getAboutProp(state, 'status') === ledgerStatuses.IN_PROGRESS
 
-  if (!client) {
+  if (!client || inProgress) {
     return state
   }
 
@@ -2025,11 +2031,12 @@ const uintKeySeed = (currentSeed) => {
 }
 
 const getBalance = (state) => {
-  if (!client) return
+  const inProgress = ledgerState.getAboutProp(state, 'status') === ledgerStatuses.IN_PROGRESS
+  if (!client || inProgress) return
 
   const balanceFn = module.exports.getBalance.bind(null, state)
   balanceTimeoutId = setTimeout(balanceFn, 1 * ledgerUtil.milliseconds.minute)
-  return getPaymentInfo(state)
+  return module.exports.getPaymentInfo(state)
 }
 
 const callback = (err, result, delayTime) => {
@@ -2076,6 +2083,7 @@ const onCallback = (state, result, delayTime) => {
   }
 
   const regularResults = result.toJS()
+  const notInProgress = ledgerState.getAboutProp(state, 'status') !== ledgerStatuses.IN_PROGRESS
 
   if (client && result.getIn(['properties', 'wallet'])) {
     if (!ledgerState.getInfoProp(state, 'created')) {
@@ -2083,47 +2091,52 @@ const onCallback = (state, result, delayTime) => {
     }
 
     state = getStateInfo(state, regularResults) // TODO optimize if possible
-    state = getPaymentInfo(state)
+
+    if (notInProgress) {
+      state = module.exports.getPaymentInfo(state)
+    }
   }
 
-  state = cacheRuleSet(state, regularResults.ruleset)
-  if (result.has('rulesetV2')) {
-    results = regularResults.rulesetV2 // TODO optimize if possible
-    delete regularResults.rulesetV2
+  if (notInProgress) {
+    state = module.exports.cacheRuleSet(state, regularResults.ruleset)
+    if (result.has('rulesetV2')) {
+      results = regularResults.rulesetV2 // TODO optimize if possible
+      delete regularResults.rulesetV2
 
-    entries = []
-    results.forEach((entry) => {
-      const key = entry.facet + ':' + entry.publisher
+      entries = []
+      results.forEach((entry) => {
+        const key = entry.facet + ':' + entry.publisher
 
-      if (entry.exclude !== false) {
-        entries.push({type: 'put', key: key, value: JSON.stringify(underscore.omit(entry, ['facet', 'publisher']))})
-      } else {
-        entries.push({type: 'del', key: key})
-      }
-    })
-
-    v2RulesetDB.batch(entries, (err) => {
-      if (err) return console.error(v2RulesetPath + ' error: ' + JSON.stringify(err, null, 2))
-
-      if (entries.length === 0) return
-
-      const publishers = ledgerState.getPublishers(state)
-      for (let item of publishers) {
-        const publisherKey = item[0]
-        const publisher = item[1] || Immutable.Map()
-
-        if (!publisher.getIn(['options', 'exclude'])) {
-          excludeP(publisherKey, (unused, exclude) => {
-            appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
-            savePublisherOption(publisherKey, 'exclude', exclude)
-          })
+        if (entry.exclude !== false) {
+          entries.push({type: 'put', key: key, value: JSON.stringify(underscore.omit(entry, ['facet', 'publisher']))})
+        } else {
+          entries.push({type: 'del', key: key})
         }
-      }
-    })
-  }
+      })
 
-  if (result.has('publishersV2')) {
-    delete regularResults.publishersV2
+      v2RulesetDB.batch(entries, (err) => {
+        if (err) return console.error(v2RulesetPath + ' error: ' + JSON.stringify(err, null, 2))
+
+        if (entries.length === 0) return
+
+        const publishers = ledgerState.getPublishers(state)
+        for (let item of publishers) {
+          const publisherKey = item[0]
+          const publisher = item[1] || Immutable.Map()
+
+          if (!publisher.getIn(['options', 'exclude'])) {
+            excludeP(publisherKey, (unused, exclude) => {
+              appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+              savePublisherOption(publisherKey, 'exclude', exclude)
+            })
+          }
+        }
+      })
+    }
+
+    if (result.has('publishersV2')) {
+      delete regularResults.publishersV2
+    }
   }
 
   // persist the new ledger state
@@ -2567,7 +2580,7 @@ const run = (state, delayTime) => {
   if (delayTime > 0) {
     if (runTimeoutId) return
     // useful for QA - #12249
-    if (noDelay) delayTime = 5000
+    if (noDelay) delayTime = 3000
 
     const active = client
     if (delayTime > (1 * ledgerUtil.milliseconds.hour)) {
@@ -3241,7 +3254,9 @@ const getMethods = () => {
     shouldTrackTab,
     deleteWallet,
     resetPublishers,
-    clearPaymentHistory
+    clearPaymentHistory,
+    getPaymentInfo,
+    cacheRuleSet
   }
 
   let privateMethods = {}

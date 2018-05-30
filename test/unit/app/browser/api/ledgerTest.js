@@ -163,7 +163,8 @@ describe('ledger api unit tests', function () {
       setTimeUntilReconcile: () => {},
       isReadyToReconcile: () => isReadyToReconcile,
       recoverWallet: () => {},
-      getPromotionCaptcha: () => {}
+      getPromotionCaptcha: () => {},
+      report: () => {}
     }
     window.getWalletPassphrase = (parsedData) => {
       if (walletPassphraseReturn === 'error') {
@@ -2156,6 +2157,108 @@ describe('ledger api unit tests', function () {
         assert(getWalletPassphraseSpy.withArgs(wrongSeed).calledOnce)
       })
     })
+
+    describe('transactions', function () {
+      let setInfoPropSpy, getInfoPropSpy
+
+      before(function () {
+        setInfoPropSpy = sinon.spy(ledgerState, 'setInfoProp')
+        getInfoPropSpy = sinon.spy(ledgerState, 'getInfoProp')
+      })
+
+      afterEach(function () {
+        setInfoPropSpy.reset()
+        getInfoPropSpy.reset()
+      })
+
+      after(function () {
+        setInfoPropSpy.restore()
+        getInfoPropSpy.restore()
+      })
+
+      it('transactions are missing', function () {
+        ledgerApi.getStateInfo(defaultAppState, Immutable.Map())
+        assert(getInfoPropSpy.notCalled)
+        assert(setInfoPropSpy.notCalled)
+      })
+
+      it('no new transactions', function () {
+        const transactions = [{
+          viewingId: 1,
+          votes: 44,
+          ballots: {
+            'site1.com': 10,
+            'site2.com': 18,
+            'site3.com': 9,
+            'site4.com': 7
+          }
+        }]
+        const param = {
+          properties: {
+            wallet: {
+              paymentId: '1'
+            }
+          },
+          transactions
+        }
+        const state = defaultAppState
+          .setIn(['ledger', 'info', 'transactions'], Immutable.fromJS(transactions))
+
+        ledgerApi.getStateInfo(state, param)
+        assert(getInfoPropSpy.calledOnce)
+        assert(setInfoPropSpy.notCalled)
+      })
+
+      it('transaction is still in progress', function () {
+        const param = {
+          properties: {
+            wallet: {
+              paymentId: '1'
+            }
+          },
+          transactions: [{
+            viewingId: 1,
+            votes: 44,
+            ballots: {
+              'site1.com': 10,
+              'site2.com': 18
+            }
+          }]
+        }
+        const state = defaultAppState
+          .setIn(['ledger', 'info', 'transactions'], Immutable.Map())
+
+        ledgerApi.getStateInfo(state, param)
+        assert(getInfoPropSpy.calledOnce)
+        assert(setInfoPropSpy.notCalled)
+      })
+
+      it('new transaction is completed', function () {
+        const param = {
+          properties: {
+            wallet: {
+              paymentId: '1'
+            }
+          },
+          transactions: [{
+            viewingId: 1,
+            votes: 44,
+            ballots: {
+              'site1.com': 10,
+              'site2.com': 18,
+              'site3.com': 9,
+              'site4.com': 7
+            }
+          }]
+        }
+        const state = defaultAppState
+          .setIn(['ledger', 'info', 'transactions'], Immutable.Map())
+
+        ledgerApi.getStateInfo(state, param)
+        assert(getInfoPropSpy.called)
+        assert(setInfoPropSpy.calledOnce)
+      })
+    })
   })
 
   describe('onPublisherTimestamp', function () {
@@ -2312,6 +2415,56 @@ describe('ledger api unit tests', function () {
           }
         }))
         assert.deepEqual(result.toJS(), defaultAppState.toJS())
+      })
+    })
+
+    describe('contribution', function () {
+      let getPaymentInfoSpy, cacheRuleSetSpy
+
+      before(function () {
+        getPaymentInfoSpy = sinon.spy(ledgerApi, 'getPaymentInfo')
+        cacheRuleSetSpy = sinon.spy(ledgerApi, 'cacheRuleSet')
+      })
+
+      afterEach(function () {
+        getPaymentInfoSpy.reset()
+        cacheRuleSetSpy.reset()
+      })
+
+      after(function () {
+        getPaymentInfoSpy.restore()
+        cacheRuleSetSpy.restore()
+      })
+
+      it('do not call if in progress', function () {
+        const state = defaultAppState
+          .setIn(['ledger', 'about', 'status'], ledgerStatuses.IN_PROGRESS)
+
+        ledgerApi.onCallback(state, Immutable.fromJS({
+          properties: {
+            wallet: {
+              paymentId: '1'
+            }
+          }
+        }))
+
+        assert(getPaymentInfoSpy.notCalled)
+        assert(cacheRuleSetSpy.notCalled)
+      })
+
+      it('execute', function () {
+        ledgerApi.setClient(ledgerClientObject)
+        ledgerApi.onCallback(defaultAppState, Immutable.fromJS({
+          properties: {
+            wallet: {
+              paymentId: '1'
+            }
+          }
+        }))
+        ledgerApi.setClient(undefined)
+
+        assert(getPaymentInfoSpy.calledOnce)
+        assert(cacheRuleSetSpy.calledOnce)
       })
     })
   })
@@ -3557,6 +3710,73 @@ describe('ledger api unit tests', function () {
       ledgerApi.resetPublishers(defaultAppState)
       assert(resetPublishersSpy.calledOnce)
       assert.deepEqual(ledgerApi.getSynopsis(), {publishers: {}})
+    })
+  })
+
+  describe('getBalance', function () {
+    let getPaymentInfoSpy
+
+    before(function () {
+      getPaymentInfoSpy = sinon.spy(ledgerApi, 'getPaymentInfo')
+    })
+
+    afterEach(function () {
+      getPaymentInfoSpy.reset()
+    })
+
+    after(function () {
+      getPaymentInfoSpy.restore()
+      ledgerApi.setClient(undefined)
+    })
+
+    it('client is not set up', function () {
+      ledgerApi.setClient(null)
+      ledgerApi.getBalance(defaultAppState)
+      assert(getPaymentInfoSpy.notCalled)
+    })
+
+    it('status is in progress', function () {
+      ledgerApi.setClient(ledgerClientObject)
+      const state = defaultAppState
+        .setIn(['ledger', 'about', 'status'], ledgerStatuses.IN_PROGRESS)
+      ledgerApi.getBalance(state)
+      assert(getPaymentInfoSpy.notCalled)
+    })
+
+    it('executes', function () {
+      ledgerApi.setClient(ledgerClientObject)
+      ledgerApi.getBalance(defaultAppState)
+      assert(getPaymentInfoSpy.calledOnce)
+    })
+  })
+
+  describe('getPaymentInfo', function () {
+    let getWalletPropertiesSpy
+
+    before(function () {
+      ledgerApi.setClient(ledgerClientObject)
+      getWalletPropertiesSpy = sinon.spy(ledgerClientObject, 'getWalletProperties')
+    })
+
+    afterEach(function () {
+      getWalletPropertiesSpy.reset()
+    })
+
+    after(function () {
+      getWalletPropertiesSpy.restore()
+      ledgerApi.setClient(undefined)
+    })
+
+    it('not called when contribution is in progress', function () {
+      const state = defaultAppState
+        .setIn(['ledger', 'about', 'status'], ledgerStatuses.IN_PROGRESS)
+      ledgerApi.getBalance(state)
+      assert(getWalletPropertiesSpy.notCalled)
+    })
+
+    it('executes', function () {
+      ledgerApi.getBalance(defaultAppState)
+      assert(getWalletPropertiesSpy.calledOnce)
     })
   })
 })
