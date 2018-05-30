@@ -11,6 +11,9 @@ const appActions = require('../../../js/actions/appActions')
 // Constants
 const notificationTypes = require('../../common/constants/notificationTypes')
 
+// State
+const windowState = require('../../common/state/windowState')
+
 // Utils
 const immutableUtil = require('../../common/state/immutableUtil')
 
@@ -105,13 +108,18 @@ const notificationUtil = {
     const data = options.data
 
     let payload = { notificationUrl: data.notificationUrl }
-    if (typeof options === 'object' && options.uuid) {
+    if (typeof options === 'object' && options.uuid && data.notificationId === notificationTypes.ADS) {
       payload.uuid = options.uuid
     }
 
     switch (data.notificationId) {
       case notificationTypes.ADS:
+      case notificationTypes.SURVEY:
         {
+          if (data.windowId === windowState.WINDOW_ID_NONE) {
+            // FIXME
+            appActions.onUserModelLog(notificationTypes.NOTIFICATION_CLICK, { data })
+          }
           appActions.createTabRequested({
             url: data.notificationUrl,
             windowId: data.windowId
@@ -126,7 +134,7 @@ const notificationUtil = {
     const data = options.data
 
     let payload = { notificationUrl: data.notificationUrl }
-    if (typeof options === 'object' && options.uuid) {
+    if (typeof options === 'object' && options.uuid && data.notificationId === notificationTypes.ADS) {
       payload.uuid = options.uuid
     }
 

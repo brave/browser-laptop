@@ -5,6 +5,7 @@
 'use strict'
 
 const electron = require('electron')
+const { getErrorByCode } = require('chromium-net-errors')
 const session = electron.session
 const underscore = require('underscore')
 const urlParse = require('../../app/common/urlParse')
@@ -66,7 +67,16 @@ module.exports.request = (options, callback) => {
       if (Array.isArray(rsp.headers[header])) rsp.headers[header] = rsp.headers[header][0]
     })
 
-    if (err) return callback(err, rsp)
+    if (err) {
+      if (err.errorCode) {
+        const Err = getErrorByCode(err.errorCode)
+
+        err = new Err()
+        rsp.statusCode = err.code
+        rsp.statusMessage = err.message
+      }
+      return callback(err, rsp)
+    }
 
     underscore.defaults(rsp, { statusMessage: '', httpVersionMajor: 1, httpVersionMinor: 1 })
     if (responseType !== 'text') body = Buffer.from(body, 'binary')

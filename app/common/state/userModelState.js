@@ -90,6 +90,14 @@ const appendToRingBufferUnderKey = (state, key, item, maxRows) => {
   return state
 }
 
+const getUserSurveyQueue = (state) => {
+  return state.getIn(['userModel', 'userSurveyQueue']) || Immutable.List()
+}
+
+const setUserSurveyQueue = (state, queue) => {
+  return state.setIn(['userModel', 'userSurveyQueue'], queue)
+}
+
 const getReportingEventQueue = (state) => {
   return state.getIn(['userModel', 'reportingEventQueue']) || Immutable.List()
 }
@@ -377,17 +385,24 @@ const userModelState = {
     return state.setIn(['userModel', 'adUUID'], uuid)
   },
 
-  appendToReportingEventQueue: (state, evt) => {
-    const wrappedEvent = Immutable.Map(evt)
+  appendToUserSurveyQueue: (state, survey) => {
+    let q = getUserSurveyQueue(state)
+
+    if (!Immutable.List.isList(q)) q = Immutable.List()
+
+    return setUserSurveyQueue(state, q.push(Immutable.Map(survey)))
+  },
+
+  getUserSurveyQueue: getUserSurveyQueue,
+
+  setUserSurveyQueue: setUserSurveyQueue,
+
+  appendToReportingEventQueue: (state, event) => {
     let q = getReportingEventQueue(state)
 
-    if (!Immutable.List.isList(q)) {
-      q = Immutable.List()
-    }
+    if (!Immutable.List.isList(q)) q = Immutable.List()
 
-    q = q.push(wrappedEvent)
-    state = setReportingEventQueue(state, q)
-    return state
+    return setReportingEventQueue(state, q.push(Immutable.Map(event)))
   },
 
   flushReportingEventQueue: (state) => {

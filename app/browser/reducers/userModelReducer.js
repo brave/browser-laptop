@@ -48,12 +48,6 @@ const userModelReducer = (state, action, immutableAction) => {
         state = userModel.initialize(state)
 
         state = userModel.generateAdReportingEvent(state, 'restart')
-
-        // TODO remove, only for testing
-        // setTimeout(() => {
-        //   const activeWindowId = windows.getActiveWindowId()
-        //   userModel.goAheadAndShowTheAd(activeWindowId, 'My category', 'This is text', 'https://www.google.com')
-        // }, 10000)
         break
       }
     case appConstants.APP_WINDOW_UPDATED:
@@ -198,6 +192,21 @@ const userModelReducer = (state, action, immutableAction) => {
 
         state = userModel.generateAdReportingEvent(state, 'notify', action)
 
+        break
+      }
+    case appConstants.APP_ON_USERMODEL_COLLECT_ACTIVITY:
+      {
+        state = userModel.collectActivity(state)
+        break
+      }
+    case appConstants.APP_ON_USERMODEL_UPLOAD_LOGS:
+      {
+        state = userModel.uploadLogs(state, action.get('stamp'), action.get('retryIn'))
+        break
+      }
+    case appConstants.APP_ON_USERMODEL_DOWNLOAD_SURVEYS:
+      {
+        state = userModel.downloadSurveys(state, action.get('entries'))
         break
       }
     case appConstants.APP_NETWORK_CONNECTED:
