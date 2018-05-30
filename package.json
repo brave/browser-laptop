@@ -98,6 +98,7 @@
     "bignumber.js": "^4.0.4",
     "bloodhound-js": "brave/bloodhound",
     "brave-node-notifier": "brave-intl/brave-node-notifier",
+    "chromium-net-errors": "^3.3.0",
     "clipboard-copy": "^1.0.0",
     "compare-versions": "^3.0.1",
     "date-fns": "^1.29.0",

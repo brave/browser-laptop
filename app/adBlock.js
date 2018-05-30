@@ -24,6 +24,8 @@ const {mapFilterType, shouldDoAdBlockCheck} = require('./browser/ads/adBlockUtil
 module.exports.adBlockResourceName = 'adblock'
 module.exports.safeBrowsingResourceName = 'safeBrowsing'
 
+const braveExemptHosts = ['ads-collector-staging.brave.com', 'ads-collector.brave.com']
+
 /**
  * Starts ad blocking
  * @param adblock {AdBlockClient} - The ad block client to start
@@ -47,7 +49,8 @@ const startAdBlocking = (adblock, resourceName, shouldCheckMainFrame) => {
     const firstPartyUrl = urlParse(mainFrameUrl)
     const url = urlParse(details.url)
     const cancel = shouldDoAdBlockCheck(details.resourceType, firstPartyUrl, url, shouldCheckMainFrame) &&
-      adblock.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.host)
+      adblock.matches(details.url, mapFilterType[details.resourceType], firstPartyUrl.host) &&
+      !braveExemptHosts.includes(url.hostname)
 
     return {
       cancel,
