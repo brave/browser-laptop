@@ -20,6 +20,7 @@ const siteSettingsState = require('../common/state/siteSettingsState')
 const contextMenuState = require('../common/state/contextMenuState')
 
 const domUtil = require('./lib/domUtil')
+const faviconUtil = require('../../js/lib/faviconUtil')
 const imageUtil = require('../../js/lib/imageUtil')
 const historyUtil = require('../common/lib/historyUtil')
 const UrlUtil = require('../../js/lib/urlutil')
@@ -111,13 +112,15 @@ const api = module.exports = {
       }
       case 'page-favicon-updated': {
         if (e.favicons &&
-            e.favicons.length > 0 &&
-            // Favicon changes lead to recalculation of top site data so only fire
-            // this when needed.  Some sites update favicons very frequently.
-            e.favicons[0] !== frame.get('icon')) {
-          imageUtil.getWorkingImageUrl(e.favicons[0], (error) => {
-            windowActions.setFavicon(frame, error ? null : e.favicons[0])
-          })
+            e.favicons.length > 0) {
+          const url = faviconUtil.wrapFaviconUrl(e.favicons[0])
+          // Favicon changes lead to recalculation of top site data so only fire
+          // this when needed.  Some sites update favicons very frequently.
+          if (url !== frame.get('icon')) {
+            imageUtil.getWorkingImageUrl(url, (error) => {
+              windowActions.setFavicon(frame, error ? null : url)
+            })
+          }
         }
         break
       }

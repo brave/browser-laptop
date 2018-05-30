@@ -16,6 +16,7 @@ const downloadStates = require('../js/constants/downloadStates')
 const urlParse = require('./common/urlParse')
 const getSetting = require('../js/settings').getSetting
 const appUrlUtil = require('../js/lib/appUrlUtil')
+const faviconUtil = require('../js/lib/faviconUtil')
 const siteSettings = require('../js/state/siteSettings')
 const settings = require('../js/constants/settings')
 const userPrefs = require('../js/state/userPrefs')
@@ -56,6 +57,11 @@ const registeredSessions = {}
  * Maps permission notification bar messages to their callback
  */
 const permissionCallbacks = {}
+
+/**
+ * A set to keep track of URLs fetching favicons that need special treatment later
+ */
+const faviconURLs = new Set()
 
 const getBraverySettingsForUrl = (url, appState, isPrivate) => {
   const cachedBraverySettings = getBraverySettingsCache(url, isPrivate)
@@ -109,13 +115,21 @@ function registerForBeforeRequest (session, partition) {
       }
     }
 
+    const url = details.url
+    // filter out special urls for fetching favicons
+    if (faviconUtil.isWrappedFaviconUrl(url)) {
+      const redirectURL = faviconUtil.unwrapFaviconUrl(url)
+      faviconURLs.add(redirectURL)
+      muonCb({ redirectURL })
+      return
+    }
+
     if (shouldIgnoreUrl(details)) {
       muonCb({})
       return
     }
 
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
-    const url = details.url
     // this can happen if the tab is closed and the webContents is no longer available
     if (!firstPartyUrl) {
       muonCb({ cancel: true })
@@ -301,9 +315,15 @@ function registerForBeforeSendHeaders (session, partition) {
   const isPrivate = module.exports.isPrivate(partition)
 
   session.webRequest.onBeforeSendHeaders(function (details, muonCb) {
+    // strip cookies from all requests fetching favicons
+    if (faviconURLs.has(details.url)) {
+      faviconURLs.delete(details.url)
+      delete details.requestHeaders['Cookie']
+    }
+
     // Using an electron binary which isn't from Brave
     if (shouldIgnoreUrl(details)) {
-      muonCb({})
+      muonCb({ requestHeaders: details.requestHeaders })
       return
     }
 
