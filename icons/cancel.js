@@ -8,6 +8,6 @@ const iconStyles = require('./styles')
 
 module.exports = ({ styles }) =>
   <svg className={css(styles, iconStyles.icon)} xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
-    <path fillRule='evenodd' d='M5.1819 5.1819l13.6365 13.6365M19.5 4.5l-15 15'
+    <path fillRule='evenodd' d='M7.65892167 16.8263597L16.8263597 7.65892167M7.65892167 7.65892167L16.8263597 16.8263597'
     />
   </svg>

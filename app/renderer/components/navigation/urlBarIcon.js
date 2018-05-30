@@ -159,7 +159,7 @@ class UrlBarIcon extends React.Component {
   }
 }
 
-const searchIconSize = 16
+const searchIconSize = 14
 const iconSize = 20
 const styles = StyleSheet.create({
   urlBarIcon: {
