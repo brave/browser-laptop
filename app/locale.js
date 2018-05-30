@@ -329,62 +329,83 @@ exports.translationReplace = function (translation, replacements = {}) {
 }
 
 // Default language locale identifier
-const DEFAULT_LANGUAGE = 'en-US'
+const DEFAULT_LANGUAGE = lang
 
-const availableLanguages = [
-  'bn-BD',
-  'bn-IN',
-  'cs',
-  'de-DE',
-  'en-GB',
-  'en-US',
-  'es',
-  'eu',
-  'fr-FR',
-  'hi-IN',
-  'id-ID',
-  'it-IT',
-  'ja-JP',
-  'ko-KR',
-  'ms-MY',
-  'nl-NL',
-  'pl-PL',
-  'pt-BR',
-  'ru',
-  'sl',
-  'sv-SE',
-  'ta',
-  'te',
-  'tr-TR',
-  'uk',
-  'zh-CN'
-]
+// locale brave
+var availableLanguages = []
 
-// Currently configured languages
-const configuredLanguages = {}
-availableLanguages.forEach(function (lang) {
-  configuredLanguages[lang] = true
-})
+const configuredLanguages = {
+  // locale electron : locale brave
+  'eu':'eu',
+  'bn':'bn-BD',
+  'bn-BD':'bn-BD',
+  'bn':'bn-IN',
+  'bn-IN':'bn-IN',
+  'zh-CN':'zh-CN',
+  'cs':'cs',
+  'nl':'nl-NL',
+  'nl':'nl',
+  'en-US':'en-US',
+  'en':'en-GB',
+  'en-GB':'en-GB',
+  'en-AU':'en-GB',
+  'en-CA':'en-GB',
+  'en-NZ':'en-GB',
+  'en-ZA':'en-GB',
+  'fr-FR':'fr-FR',
+  'fr':'fr-FR',
+  'fr-FR':'fr-FR',
+  'fr-CA':'fr-FR',
+  'fr-CH':'fr-FR',
+  'de-DE':'de-DE',
+  'de':'de-DE',
+  'de-AT':'de-DE',
+  'de-CH':'de-DE',
+  'hi':'hi-IN',
+  'hi-IN':'hi-IN',
+  'id':'id-ID',
+  'id-ID':'id-ID',
+  'it':'it-IT',
+  'it-IT':'it-IT',
+  'it-CH':'it-IT',
+  'ja':'ja-JP',
+  'ja-JP':'ja-JP',
+  'ko':'ko-KR',
+  'ko-KR':'ko-KR',
+  'ms':'ms-MY',
+  'ms-MY':'ms-MY',
+  'pl':'pl-PL',
+  'pl-PL':'pl-PL',
+  'pt':'pt-BR',
+  'pt-BR':'pt-BR',
+  'pt-PT':'pt-BR',
+  'ru':'ru',
+  'sl':'sl',
+  'sv':'sv-SE',
+  'sv-SE':'sv-SE',
+  'es':'es',
+  'es-419':'es',
+  'ta':'ta',
+  'te':'te',
+  'tr':'tr-TR',
+  'tr-TR':'tr-TR',
+  'uk':'uk'
+}
+
+// Dynamic filling of the  array of locale
+availableLanguages = [...new Set(Object.values(configuredLanguages))]
 
 // Return the default locale in xx-XX format I.e. pt-BR
 const defaultLocale = function () {
   // If electron has the locale
   if (app.getLocale()) {
     // Retrieve the language and convert _ to -
-    var lang = app.getLocale().replace('_', '-')
-    // If there is no country code designated use the language code
-    if (!lang.match(/-/)) {
-      lang = lang + '-' + lang.toUpperCase()
-    }
-    // If we have the language configured
-    if (configuredLanguages[lang]) {
+    lang = configuredLanguages[app.getLocale().replace('_', '-')] || null
+    if (lang) {
       return lang
-    } else {
-      return DEFAULT_LANGUAGE
     }
-  } else {
-    return DEFAULT_LANGUAGE
   }
+  return DEFAULT_LANGUAGE
 }
 
 // Initialize translations for a language
