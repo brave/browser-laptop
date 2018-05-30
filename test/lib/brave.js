@@ -4,7 +4,6 @@ var chai = require('chai')
 const Immutable = require('immutable')
 const {activeWebview, navigator, titleBar, urlInput} = require('./selectors')
 require('./coMocha')
-const series = require('async/series')
 
 const path = require('path')
 const fs = require('fs-extra')
@@ -249,6 +248,7 @@ var exports = {
     }
 
     var windowHandlesOrig = this.app.client.windowHandles
+    Object.getPrototypeOf(this.app.client)._windowHandlesOrig = windowHandlesOrig
     Object.getPrototypeOf(this.app.client).windowHandles = function () {
       return windowHandlesOrig.apply(this)
         .then(function (response) {
@@ -1161,61 +1161,83 @@ var exports = {
     return this.app.start()
   },
 
-  stopApp: function (cleanSessionStore = true, timeout = 100) {
-    const promises = []
-
+  stopApp: async function (cleanSessionStore = true, timeout = 5000) {
     if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_BROWSER_LOGS) {
-      promises.push((callback) => {
-        this.app.client.getMainProcessLogs().then(function (logs) {
-          logs.forEach(function (log) {
-            console.log(log)
-          })
-          callback()
-        })
+      const logs = await this.app.client.getMainProcessLogs()
+      console.log('App stopping, displaying all main process logs:')
+      logs.forEach(function (log) {
+        console.log(log)
       })
     }
 
     if (process.env.BRAVE_TEST_ALL_LOGS || process.env.BRAVE_TEST_RENDERER_LOGS) {
-      promises.push((callback) => {
-        this.app.client.getRenderProcessLogs().then(function (logs) {
-          logs.forEach(function (log) {
-            console.log(log)
-          })
-          callback()
-        })
+      const logs = await this.app.client.getRenderProcessLogs()
+      console.log('App stopping, displaying all render process logs:')
+      logs.forEach(function (log) {
+        console.log(log)
       })
     }
 
-    const cleanup = (callback) => {
-      if (cleanSessionStore) {
-        if (!process.env.KEEP_BRAVE_USER_DATA_DIR) {
-          userDataDir && rmDir(userDataDir)
+    // perform stop
+    try {
+      // dispatch appAction for quit
+      await this.app.client.waitForBrowserWindow().quit()
+      // wait for exit
+      await waitFor(async () => {
+        // `this.app.isRunning()` does not get updated when the app quits itself
+        // which is unfortunate because we want the app to exit gracefully
+        // and then find out when it has quit.
+        // Instead we can wait until webdriver throws an error communicating with
+        // the app.
+        try {
+          await this.app.client._windowHandlesOrig()
+          return false
+        } catch (e) {
+          return true
         }
-        userDataDir = generateUserDataDir()
+      }, timeout, 500)
+      logVerbose('app quit gracefully')
+    } catch (quitErr) {
+      console.error('Quit failed: ', quitErr)
+      try {
+        // do force quit
+        await this.app.stop()
+        // wait for exit
+        await waitFor(() => this.app.isRunning() === false, timeout, 500)
+        logVerbose('app force stopped.')
+      } catch (stopErr) {
+        console.error('Forced Stop failed:', stopErr)
       }
-      callback()
     }
-
-    promises.push((callback) => {
-      callback = setTimeout(cleanup.bind(this, callback), timeout)
-      this.app.client.waitForBrowserWindow().quit()
-        .then(callback)
-        .catch((err) => {
-          console.error('Quit failed: ', err)
-          this.app.stop.then(callback)
-        })
-    })
-
-    return new Promise((resolve, reject) => {
-      series(promises, (err) => {
-        if (err) {
-          console.log(err)
-          reject(new Error(err))
-        }
-        resolve()
-      })
-    })
+    logVerbose('User Data Cleanup...')
+    // cleanup
+    if (cleanSessionStore) {
+      if (!process.env.KEEP_BRAVE_USER_DATA_DIR) {
+        userDataDir && rmDir(userDataDir) // sync
+      }
+      userDataDir = generateUserDataDir() // sync
+    }
   }
+}
+
+function waitFor (fnShouldStopWaiting, timeout, interval) {
+  return new Promise(async (resolve, reject) => {
+    // handle timeout
+    let timeoutHandle = setTimeout(() => {
+      timeoutHandle = null
+      reject(new Error('waitFor timeout reached'))
+    }, timeout)
+    // handle condition evaluation
+    while (timeoutHandle != null) {
+      if (await fnShouldStopWaiting()) {
+        clearTimeout(timeoutHandle)
+        timeoutHandle = null // <-- for linter
+        resolve()
+        return
+      }
+      await new Promise(resolve => setTimeout(resolve, interval))
+    }
+  })
 }
 
 module.exports = exports

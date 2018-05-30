@@ -33,6 +33,7 @@
     "start2": "node ./tools/start.js --user-data-dir-name=brave-development-2 --enable-logging --v=0 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
     "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck --user-data-dir-name=brave-development",
     "test": "cross-env NODE_ENV=test mocha \"test/**/*Test.js\"",
+    "test-ledger": "npm run test -- --grep='Ledger table' && npm run test -- --grep='Regular payment panel tests' && npm run test -- --grep='synopsis'",
     "testsuite": "node ./tools/test.js",
     "unittest": "cross-env NODE_ENV=test mocha \"test/unit/**/*Test.js\" --globals chrome,DOMParser,XMLSerializer",
     "unittest-cov": "node --harmony node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --globals chrome,DOMParser,XMLSerializer --report lcovonly --report html --report text -x \"test/unit/**/*Test.js\" -- \"test/unit/**/*Test.js\"",

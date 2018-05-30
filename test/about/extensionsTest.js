@@ -41,13 +41,6 @@ describe('about:extensions', function () {
         .tabByIndex(0)
         .waitForVisible('[data-extension-id="niloccemoadcdkdjlinkgdfekeahmflj"]', extensionDownloadWaitTime)
     })
-    it('Opens up the signup page', function * () {
-      const pocketURL = 'https://getpocket.com/signup?mode=minimal&src=installed'
-      yield this.app.client
-        .tabByIndex(0)
-        .waitForUrl(pocketURL)
-        .url(pocketURL)
-    })
   })
   describe('Honey', function () {
     Brave.beforeAll(this)

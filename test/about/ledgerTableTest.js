@@ -50,26 +50,34 @@ function * before (client, siteList) {
     .waitForVisible(walletSwitch)
     .click(walletSwitch)
     .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
+    .windowByUrl(Brave.browserWindowUrl)
 
   for (let site of siteList) {
     yield client
-      .tabByIndex(0)
-      .loadUrl(site)
       .windowByUrl(Brave.browserWindowUrl)
+      .newTab({url: site})
       .waitForHistoryEntry(site, false)
-      .tabByUrl(site)
+      .waitForTabCount(2)
+      .then(() => new Promise(resolve => setTimeout(resolve, 500)))
+      .windowByUrl(Brave.browserWindowUrl)
+      .closeTabByIndex(1)
+      .waitForTabCount(1)
   }
 
   yield client
-    .tabByIndex(0)
-    .loadUrl(prefsUrl)
-    .waitForVisible(paymentsTab)
-    .click(paymentsTab)
-    .waitForVisible('[data-l10n-id="publisher"]')
+    .tabByUrl(prefsUrl)
 }
 
 function findBiggestPercentage (synopsis) {
-  return synopsis.sortBy((publisher) => publisher.get('percentage')).get(0)
+  return synopsis.get('publishers').map((publisher, key) => {
+    return publisher.set('publisherKey', key)
+  }).sort((a, b) => {
+    const aValue = a.get('pinPercentage') || 0
+    const bValue = b.get('pinPercentage') || 0
+    if (aValue < bValue) { return 1 }
+    if (aValue > bValue) { return -1 }
+    if (aValue === bValue) { return 0 }
+  }).first()
 }
 
 describe('Ledger table', function () {
@@ -102,7 +110,7 @@ describe('Ledger table', function () {
         .waitForVisible(`${firstTableFirstRow} [data-test-id="siteName"]`)
         .waitUntil(function () {
           return this.getText(`${firstTableFirstRow} [data-test-id="siteName"]`).then((value) => {
-            return value === topPublisher.get('site')
+            return value === topPublisher.get('publisherKey')
           })
         }, 5000)
         .waitForVisible(`${firstTableFirstRow} [data-test-id="pinnedInput"]`)
@@ -142,8 +150,8 @@ describe('Ledger table', function () {
       yield this.app.client
         .tabByIndex(0)
         .click(`${secondTableFirstRow} [data-test-id="switchBackground"]`)
-        .waitForVisible(`${secondTableFirstRow} [data-switch-status="false"]`)
-        .click(`${secondTableFirstRow} [data-test-pinned="false"]`)
+        .waitForVisible(`${secondTableSecondRow} [data-switch-status="false"]`)
+        .click(`${secondTableSecondRow} [data-test-pinned="false"]`)
         .waitForVisible(`${firstTableFirstRow} [data-test-pinned="true"]`)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntilSynopsis(function (synopsis) {
@@ -154,7 +162,7 @@ describe('Ledger table', function () {
         .waitForVisible(`${firstTableFirstRow} [data-test-id="siteName"]`)
         .waitUntil(function () {
           return this.getText(`${firstTableFirstRow} [data-test-id="siteName"]`).then((value) => {
-            return value === topPublisher.get('site')
+            return value === topPublisher.get('publisherKey')
           })
         }, 5000)
         .waitForVisible(`${firstTableFirstRow} [data-switch-status="true"]`)
@@ -223,7 +231,7 @@ describe('Ledger table', function () {
         .waitForElementCount(`${firstTable} tr`, 3)
         .windowByUrl(Brave.browserWindowUrl)
         .waitUntilSynopsis(function (synopsis) {
-          pinnedSum = synopsis.reduce((total, publisher) => {
+          pinnedSum = synopsis.get('publishers').reduce((total, publisher) => {
             if (publisher.get('pinPercentage') !== undefined) {
               return total + publisher.get('pinPercentage')
             }
@@ -251,10 +259,13 @@ describe('Ledger table', function () {
         .waitForElementCount(`${firstTable} tr`, 3)
         .click(`${firstTableFirstRow} [data-test-id="pinnedInput"]`)
         .keys([Brave.keys.DELETE, Brave.keys.DELETE, '40', Brave.keys.ENTER])
+        .pause(100)
         .click(`${firstTableSecondRow} [data-test-id="pinnedInput"]`)
         .keys([Brave.keys.DELETE, Brave.keys.DELETE, '30', Brave.keys.ENTER])
+        .pause(100)
         .click(`${firstTableThirdRow} [data-test-id="pinnedInput"]`)
         .keys([Brave.keys.DELETE, Brave.keys.DELETE, '20', Brave.keys.ENTER])
+        .pause(100)
         .waitForTextValue(`${secondTableForthRow} [data-test-id="percentageValue"]`, '10')
     })
 

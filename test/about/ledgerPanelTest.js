@@ -8,6 +8,7 @@ const {
   paymentsWelcomePage,
   paymentsTab,
   walletSwitch,
+  walletSwitchOff,
   siteSettingItem,
   ledgerTable,
   nextButton,
@@ -19,7 +20,6 @@ const {
   modalOverlay,
   modalOverlayCloseButton
 } = require('../lib/selectors')
-const assert = require('assert')
 const settings = require('../../js/constants/settings')
 
 const prefsUrl = 'about:preferences'
@@ -38,6 +38,7 @@ function * setup (client) {
     .waitForUrl(Brave.newTabUrl)
     .waitForBrowserWindow()
     .waitForVisible(urlInput)
+    .changeSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME, 1) // 1 msec for each page visit
 }
 
 describe('Regular payment panel tests', function () {
@@ -47,16 +48,14 @@ describe('Regular payment panel tests', function () {
       yield setup(this.app.client)
     })
 
-    it('shows welcome page', function * () {
-      yield this.app.client
+    it('shows welcome page', async function () {
+      await this.app.client
         .tabByIndex(0)
         .loadUrl(prefsUrl)
         .waitForVisible(paymentsTab)
         .click(paymentsTab)
         .waitForVisible(paymentsWelcomePage)
-        .waitForVisible(walletSwitch)
-      let background = yield this.app.client.getCssProperty(walletSwitch, 'background-color')
-      assert.equal(background.value, 'rgba(204,204,204,1)')
+        .waitForVisible(walletSwitchOff)
     })
 
     it('payments can be enabled', function * () {
@@ -69,12 +68,7 @@ describe('Regular payment panel tests', function () {
         .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.getAppState().then((val) => {
-            return val.value.settings['payments.enabled'] === true &&
-              val.value.settings['payments.notifications'] === true
-          })
-        }, ledgerAPIWaitTimeout)
+        .waitForSettingValue('payments.enabled', true)
     })
 
     it('payments can be disabled', function * () {
@@ -87,22 +81,12 @@ describe('Regular payment panel tests', function () {
         .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.getAppState().then((val) => {
-            return val.value.settings['payments.enabled'] === true &&
-              val.value.settings['payments.notifications'] === true
-          })
-        }, ledgerAPIWaitTimeout)
+        .waitForSettingValue('payments.enabled', true)
         .tabByIndex(0)
         .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .windowByUrl(Brave.browserWindowUrl)
-        .waitUntil(function () {
-          return this.getAppState().then((val) => {
-            return val.value.settings['payments.enabled'] === false &&
-              val.value.settings['payments.notifications'] === false
-          })
-        }, ledgerAPIWaitTimeout)
+        .waitForSettingValue('payments.enabled', false)
     })
 
     it('advanced settings is hidden by default', function * () {
@@ -193,16 +177,21 @@ describe('Regular payment panel tests', function () {
         .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
-        .tabByIndex(0)
-        .loadUrl(site1)
         .windowByUrl(Brave.browserWindowUrl)
+        .changeSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME, 1) // 1 msec for each page visit
+        // sites loaded in the same tab that payments were enabled in
+        // will not record, so make new tab
+        .newTab({ url: site1 })
         .waitForHistoryEntry(site1)
+        .waitForTabCount(2)
+        .then(() => new Promise(resolve => setTimeout(resolve, 500)))
         .tabByUrl(site1)
         .loadUrl(site2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForHistoryEntry(site2)
-        .tabByUrl(site2)
-        .loadUrl(prefsUrl)
+        .then(() => new Promise(resolve => setTimeout(resolve, 500)))
+        .closeTabByIndex(1)
+        .tabByUrl(prefsUrl)
         .waitForVisible(paymentsTab)
         .click(paymentsTab)
         .waitForElementCount('[data-tbody-index="1"] tr', 2)
@@ -237,16 +226,23 @@ describe('Regular payment panel tests', function () {
         .waitForVisible(walletSwitch)
         .click(walletSwitch)
         .waitForEnabled(addFundsButton, ledgerAPIWaitTimeout)
-        .tabByIndex(0)
-        .loadUrl(site1)
         .windowByUrl(Brave.browserWindowUrl)
+        .changeSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME, 1) // 1 msec for each page visit
+        // sites loaded in the same tab that payments were enabled in
+        // will not record, so make new tab
+        .newTab({ url: site1 })
         .waitForHistoryEntry(site1)
+        .waitForTabCount(2)
+        // stay on tab for some time
+        .then(() => new Promise(resolve => setTimeout(resolve, 500)))
         .tabByUrl(site1)
         .loadUrl(site2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForHistoryEntry(site2)
-        .tabByUrl(site2)
-        .loadUrl(prefsUrl)
+        // stay on tab for some time
+        .then(() => new Promise(resolve => setTimeout(resolve, 500)))
+        .closeTabByIndex(1)
+        .tabByUrl(prefsUrl)
         .waitForVisible(paymentsTab)
         .click(paymentsTab)
         .waitForElementCount('[data-tbody-index="1"] tr', 2)
@@ -280,16 +276,22 @@ describe('Regular payment panel tests', function () {
         .waitForVisible(walletSwitch)
         .click(walletSwitch, ledgerAPIWaitTimeout)
         .waitForEnabled(addFundsButton)
-        .tabByIndex(0)
-        .loadUrl(site1)
+        // sites loaded in the same tab that payments were enabled in
+        // will not record, so make new tab
         .windowByUrl(Brave.browserWindowUrl)
+        .newTab({ url: site1 })
         .waitForHistoryEntry(site1)
+        .waitForTabCount(2)
+        // stay on tab for some time
+        .then(() => new Promise(resolve => setTimeout(resolve, 500)))
         .tabByUrl(site1)
         .loadUrl(site2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForHistoryEntry(site2)
-        .tabByUrl(site2)
-        .loadUrl(prefsUrl)
+        // stay on tab for some time
+        .then(() => new Promise(resolve => setTimeout(resolve, 500)))
+        .closeTabByIndex(1)
+        .tabByUrl(prefsUrl)
         .waitForVisible(paymentsTab)
         .click(paymentsTab)
         .waitForElementCount('[data-tbody-index="1"] tr', 2)
@@ -337,15 +339,22 @@ describe('Regular payment panel tests', function () {
 
     it('site is added automatically', function * () {
       yield this.app.client
-        .loadUrl(site1)
+        // sites loaded in the same tab that payments were enabled in
+        // will not record, so make new tab
         .windowByUrl(Brave.browserWindowUrl)
+        .newTab({ url: site1 })
         .waitForHistoryEntry(site1)
+        .waitForTabCount(2)
+        // stay on tab for some time
+        .then(() => new Promise(resolve => setTimeout(resolve, 500)))
         .tabByUrl(site1)
         .loadUrl(site2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForHistoryEntry(site2)
-        .tabByUrl(site2)
-        .loadUrl(prefsUrl)
+        // stay on tab for some time
+        .then(() => new Promise(resolve => setTimeout(resolve, 500)))
+        .closeTabByIndex(1)
+        .tabByUrl(prefsUrl)
         .waitForVisible(paymentsTab)
         .click(paymentsTab)
         .waitForVisible('[data-l10n-id="publisher"]')
@@ -366,16 +375,22 @@ describe('Regular payment panel tests', function () {
       yield this.app.client
         .windowByUrl(Brave.browserWindowUrl)
         .changeSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST, false)
-        .tabByIndex(0)
-        .loadUrl(site1)
+        // sites loaded in the same tab that payments were enabled in
+        // will not record, so make new tab
         .windowByUrl(Brave.browserWindowUrl)
+        .newTab({ url: site1 })
         .waitForHistoryEntry(site1)
+        .waitForTabCount(2)
+        // stay on tab for some time
+        .then(() => new Promise(resolve => setTimeout(resolve, 500)))
         .tabByUrl(site1)
         .loadUrl(site2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForHistoryEntry(site2)
-        .tabByUrl(site2)
-        .loadUrl(prefsUrl)
+        // stay on tab for some time
+        .then(() => new Promise(resolve => setTimeout(resolve, 500)))
+        .closeTabByIndex(1)
+        .tabByUrl(prefsUrl)
         .waitForVisible(paymentsTab)
         .click(paymentsTab)
         .waitForVisible('[data-l10n-id="publisher"]')
@@ -394,19 +409,24 @@ describe('Regular payment panel tests', function () {
 
     it('first site included, second site excluded', function * () {
       yield this.app.client
-        .tabByIndex(0)
-        .loadUrl(site1)
+                // sites loaded in the same tab that payments were enabled in
+        // will not record, so make new tab
         .windowByUrl(Brave.browserWindowUrl)
+        .newTab({ url: site1 })
         .waitForHistoryEntry(site1)
-        .tabByUrl(site1)
+        .waitForTabCount(2)
+        // stay on tab for some time
+        .then(() => new Promise(resolve => setTimeout(resolve, 500)))
         .windowByUrl(Brave.browserWindowUrl)
         .changeSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST, false)
-        .tabByIndex(0)
+        .tabByUrl(site1)
         .loadUrl(site2)
         .windowByUrl(Brave.browserWindowUrl)
         .waitForHistoryEntry(site2)
-        .tabByUrl(site2)
-        .loadUrl(prefsUrl)
+        // stay on tab for some time
+        .then(() => new Promise(resolve => setTimeout(resolve, 500)))
+        .closeTabByIndex(1)
+        .tabByUrl(prefsUrl)
         .waitForVisible(paymentsTab)
         .click(paymentsTab)
         .waitForVisible('[data-l10n-id="publisher"]')
@@ -465,15 +485,11 @@ describe('Regular payment panel tests', function () {
         .waitForElementCount(addFundsWelcome, 1)
     })
 
-    it('renders the wizard when you click next button', function * () {
+    it('renders the wizard when you click next button (welcome screen shown only once)', function * () {
       yield this.app.client
         .click(addFundsButton)
         .waitForExist(modalOverlay)
         .waitForExist(addFundsDialog)
-        .waitForExist(addFundsWelcome)
-        .waitForElementCount(addFundsWelcome, 1)
-        .waitForExist(nextButton)
-        .click(nextButton)
         .waitForExist(addFundsWizard)
         .waitForElementCount(addFundsWizard, 1)
     })
@@ -572,11 +588,14 @@ describe('synopsis', function () {
 
   it('creates synopsis table after visiting a site', function * () {
     yield this.app.client
-      .url(site3)
+      .windowByUrl(Brave.browserWindowUrl)
+      .newTab({ url: site3 })
+      .waitForTabCount(2)
+      .tabByUrl(site3)
       .waitForTextValue('div', 'done')
       .windowByUrl(Brave.browserWindowUrl)
-      .tabByUrl(site3)
-      .loadUrl(prefsUrl)
+      .closeTabByIndex(1)
+      .tabByUrl(prefsUrl)
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
       .waitForElementCount(ledgerTable + ' tr', 2)
@@ -584,9 +603,10 @@ describe('synopsis', function () {
 
   it('can sort synopsis table', function * () {
     yield this.app.client
-      .loadUrl(site3)
       .windowByUrl(Brave.browserWindowUrl)
+      .newTab({ url: site3 })
       .waitForHistoryEntry(site3, false)
+      .waitForTabCount(2)
       .tabByUrl(site3)
       .loadUrl(site1)
       .windowByUrl(Brave.browserWindowUrl)
@@ -595,33 +615,39 @@ describe('synopsis', function () {
       .loadUrl(site2)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForHistoryEntry(site2)
-      .tabByUrl(site2)
-      .loadUrl(prefsUrl)
+      .closeTabByIndex(1)
+      .tabByUrl(prefsUrl)
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
       .waitForVisible('[data-l10n-id="publisher"]')
+      .click('[data-l10n-id="publisher"]')
+      .waitUntil(function () {
+        return this.getText(`${ledgerTable} a`).then((text) => {
+          return text[0] === 'mit.edu' && text[2] === 'eff.org'
+        })
+      })
       .click('[data-l10n-id="publisher"]')
       .waitUntil(function () {
         return this.getText(`${ledgerTable} a`).then((text) => {
           return text[0] === 'eff.org' && text[2] === 'mit.edu'
         })
       })
-      .click('[data-l10n-id="publisher"]')
-      .waitUntil(function () {
-        return this.getText(`${ledgerTable} a`).then((text) => {
-          return text[2] === 'eff.org' && text[0] === 'mit.edu'
-        })
-      })
   })
 
   it('can disable site', function * () {
     yield this.app.client
+      .windowByUrl(Brave.browserWindowUrl)
+      .newTab({ url: site3 })
+      .waitForHistoryEntry(site3, false)
+      .waitForTabCount(2)
+      .tabByUrl(site3)
       .loadUrl(site2)
-      .loadUrl(prefsUrl)
+      .windowByUrl(Brave.browserWindowUrl)
+      .waitForHistoryEntry(site2)
+      .closeTabByIndex(1)
+      .tabByUrl(prefsUrl)
       .waitForVisible(paymentsTab)
       .click(paymentsTab)
-      .waitForVisible('[data-l10n-id="publisher"]')
-      .click('[data-l10n-id="publisher"]')
       .waitForVisible(siteSettingItem + ' [data-test-id="switchBackground"]')
       .click(siteSettingItem + ' [data-test-id="switchBackground"]')
       .windowByUrl(Brave.browserWindowUrl)

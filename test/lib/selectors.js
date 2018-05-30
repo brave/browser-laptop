@@ -94,6 +94,7 @@ module.exports = {
   compactBraveryPanelSwitch: '[data-test-id="compactBraveryPanelSwitch"] [data-test-id="switchBackground"]',
   syncSwitch: '[data-test-id="syncContainer"] [data-test-id="switchBackground"]',
   walletSwitch: '[data-test-id="enablePaymentsSwitch"] [data-test-id="switchBackground"]',
+  walletSwitchOff: '[data-test-id="enablePaymentsSwitch"] [data-switch-status="false"]',
   addFundsButton: '[data-test2-id="addFunds"]',
   addFundsDialog: '[data-test-id="addFundsDialog"]',
   addFundsWizard: '[data-test-id="addFundsWizardMain"]',
