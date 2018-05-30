@@ -87,20 +87,21 @@ class Captcha extends ImmutableComponent {
     >
       {
         <div
-          className={css(styles.enabledContent__overlay_close)}
+          draggable='false'
+          className={css(styles.enabledContent__overlay_close, styles.disableDND)}
           onClick={this.closeCaptcha}
         />
       }
-      <p className={css(styles.enabledContent__overlay_title)}>
+      <p draggable='false' className={css(styles.enabledContent__overlay_title, styles.disableDND)}>
         <span className={css(styles.enabledContent__overlay_bold)} data-l10n-id={text.title} />
         <span data-l10n-id={text.text} />
       </p>
       <div className={css(styles.enabledContent__captcha__wrap)}>
         <img onDragStart={this.onCaptchaDrag} src={dragIcon} draggable='true' className={css(styles.enabledContent__captcha__image)} />
-        <img src={arrowIcon} className={css(styles.enabledContent__captcha__arrow)} />
+        <img src={arrowIcon} draggable='false' className={css(styles.enabledContent__captcha__arrow, styles.disableDND)} />
       </div>
-      <div onDrop={this.onCaptchaDrop} onDragOver={this.preventDefault} className={css(styles.enabledContent__captcha__drop)} />
-      <p className={css(styles.enabledContent__overlay_text)} data-l10n-id='promotionCaptchaMessage' />
+      <div draggable='false' onDrop={this.onCaptchaDrop} onDragOver={this.preventDefault} className={css(styles.enabledContent__captcha__drop, styles.disableDND)} />
+      <p draggable='false' className={css(styles.enabledContent__overlay_text, styles.disableDND)} data-l10n-id='promotionCaptchaMessage' />
     </div>
   }
 }
@@ -185,7 +186,13 @@ const styles = StyleSheet.create({
     height: '62px',
     marginTop: '10px',
     position: 'relative',
-    zIndex: '2'
+    zIndex: '2',
+    cursor: 'pointer'
+  },
+
+  disableDND: {
+    userSelect: 'none',
+    '-webkit-user-drag': 'none'
   }
 })
 
