@@ -1998,6 +1998,27 @@ const appActions = {
     })
   },
 
+  onUserModelCollectActivity: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_COLLECT_ACTIVITY
+    })
+  },
+
+  onUserModelUploadLogs: function (stamp, retryIn) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_UPLOAD_LOGS,
+      stamp,
+      retryIn
+    })
+  },
+
+  onUserModelDownloadSurveys: function (entries) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_DOWNLOAD_SURVEYS,
+      entries
+    })
+  },
+
   onReferralCodeFail: function () {
     dispatch({
       actionType: appConstants.APP_ON_REFERRAL_CODE_FAIL

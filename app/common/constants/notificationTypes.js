@@ -7,5 +7,7 @@ module.exports = {
   AD_SHOWN: 'Ad shown',
   NOTIFICATION_RESULT: 'notification result',
   NOTIFICATION_CLICK: 'notification click',
-  NOTIFICATION_TIMEOUT: 'notification timeout'
+  NOTIFICATION_TIMEOUT: 'notification timeout',
+  SURVEYS: 'surveys',
+  SURVEY_SHOWN: 'Survey shown'
 }
