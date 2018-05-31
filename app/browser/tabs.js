@@ -523,6 +523,22 @@ const api = {
         unloaded: !!newTabValue.get('discarded')
       }
 
+      newTab.on('set-active', (sender, isActive) => {
+        updateTab(tabId, { active: isActive })
+        if (isActive) {
+          const tabValue = getTabValue(tabId)
+          if (tabValue) {
+            const windowId = tabValue.get('windowId')
+            // set-active could be called multiple times even when the index does not change
+            // so make sure we only add this to the active-tab trail for the window
+            // once
+            if (activeTabHistory.getActiveTabForWindow(windowId, 0) !== tabId) {
+              activeTabHistory.setActiveTabForWindow(windowId, tabId)
+            }
+          }
+        }
+      })
+
       appActions.tabCreated(newTabValue)
 
       if (disposition === 'new-window' || disposition === 'new-popup') {
@@ -641,22 +657,6 @@ const api = {
 
       tab.on('will-attach', (e, windowWebContents) => {
         // tab will attach to webview
-      })
-
-      tab.on('set-active', (sender, isActive) => {
-        updateTab(tab.getId(), { active: isActive })
-        if (isActive) {
-          const tabValue = getTabValue(tabId)
-          if (tabValue) {
-            const windowId = tabValue.get('windowId')
-            // set-active could be called multiple times even when the index does not change
-            // so make sure we only add this to the active-tab trail for the window
-            // once
-            if (activeTabHistory.getActiveTabForWindow(windowId, 0) !== tabId) {
-              activeTabHistory.setActiveTabForWindow(windowId, tabId)
-            }
-          }
-        }
       })
 
       tab.on('tab-replaced-at', (e, windowId, tabIndex, newContents) => {
