@@ -27,6 +27,7 @@ const settings = require('../js/constants/settings')
 const siteTags = require('../js/constants/siteTags')
 const downloadStates = require('../js/constants/downloadStates')
 const ledgerStatuses = require('./common/constants/ledgerStatuses')
+const promotionStatuses = require('./common/constants/promotionStatuses')
 
 // State
 const tabState = require('./common/state/tabState')
@@ -410,6 +411,13 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
           }
         }
       })
+    }
+  }
+
+  if (isShutdown) {
+    const status = ledgerState.getPromotionProp(immutableData, 'promotionStatus')
+    if (status === promotionStatuses.CAPTCHA_CHECK || status === promotionStatuses.CAPTCHA_ERROR) {
+      immutableData = ledgerState.setPromotionProp(immutableData, 'promotionStatus', null)
     }
   }
 
