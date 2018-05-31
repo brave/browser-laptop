@@ -7,6 +7,8 @@ const fakeElectron = require('../../../lib/fakeElectron')
 
 const windowConstants = require('../../../../../js/constants/windowConstants')
 const appConstants = require('../../../../../js/constants/appConstants')
+const frameStateUtil = require('../../../../../js/state/frameStateUtil')
+
 require('../../../braveUnit')
 
 const windowState = Immutable.fromJS({
@@ -69,6 +71,13 @@ const windowState = Immutable.fromJS({
   }
 })
 
+const fakeCurrentWindow = {
+  isMaximized: () => false,
+  isFullScreen: () => false,
+  isFocused: () => false,
+  getCurrentWindowId: () => 1
+}
+
 describe('frameReducer', function () {
   let frameReducer
   before(function () {
@@ -79,6 +88,7 @@ describe('frameReducer', function () {
     })
     this.appActions = require('../../../../../js/actions/appActions')
     mockery.registerMock('electron', fakeElectron)
+    mockery.registerMock('../currentWindow', fakeCurrentWindow)
     frameReducer = require('../../../../../app/renderer/reducers/frameReducer')
   })
   after(function () {
@@ -319,6 +329,32 @@ describe('frameReducer', function () {
     describe('when active state changes', function () {
       // TODO(bbondy): Noticed this is missing while in the context of fixing an unrelated thing.
       it.skip('(todo)')
+    })
+  })
+  describe('APP_TAB_INSERTED_TO_TAB_STRIP', function () {
+    const tabId = 13
+    const index = 1
+    const action = {
+      actionType: appConstants.APP_TAB_INSERTED_TO_TAB_STRIP,
+      index,
+      tabId
+    }
+    const immutableAction = Immutable.fromJS(action)
+    let initialIndex
+
+    before(function () {
+      initialIndex = frameStateUtil.getIndexByTabId(windowState, tabId)
+      assert.equal(initialIndex, 2, 'frame is at the initial expected index')
+      const frame = frameStateUtil.getFrameByIndex(windowState, initialIndex)
+      assert.equal(frame.has('tabStripWindowId'), false, 'frame is not initially marked as in a window tab strip')
+    })
+
+    it('marks the frame as inserted to a window tab strip', function () {
+      const newState = frameReducer(windowState, action, immutableAction)
+      const newIndex = frameStateUtil.getIndexByTabId(newState, tabId)
+      assert.equal(newIndex, 1, 'frame is moved to the new index in the window tab strip')
+      const frame = frameStateUtil.getFrameByIndex(newState, newIndex)
+      assert.equal(frame.get('tabStripWindowId'), 1, 'frame is marked as in the window tab strip')
     })
   })
 })
