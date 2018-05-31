@@ -320,7 +320,13 @@ exports.translation = function (token, replacements = {}) {
   } else {
     // This will return an identifier in upper case useful for determining if a translation was not requested in the menu
     // identifiers above.
-    return token.toUpperCase()
+
+    let replacementText = ''
+    Object.keys(replacements).forEach(key => {
+      replacementText += `, ${key}/${replacements[key]}`
+    })
+
+    return token.toUpperCase() + replacementText
   }
 }
 
