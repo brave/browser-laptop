@@ -195,6 +195,13 @@ const paymentPresent = (state, tabId, present) => {
     balanceTimeoutId = false
   }
 
+  if (!present) {
+    const status = ledgerState.getPromotionProp(state, 'promotionStatus')
+    if (status === promotionStatuses.CAPTCHA_CHECK || status === promotionStatuses.CAPTCHA_ERROR) {
+      state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
+    }
+  }
+
   return state
 }
 
