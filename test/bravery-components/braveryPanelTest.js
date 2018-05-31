@@ -1053,4 +1053,28 @@ describe('Bravery Panel', function () {
         })
     })
   })
+
+  // see #14250
+  describe('Favicon requests cannot set cookies', function () {
+    Brave.beforeEach(this)
+    beforeEach(function * () {
+      yield setup(this.app.client)
+    })
+    it('does not allow favicon request to set cookie', function * () {
+      const url = Brave.server.url('cookie-favicon.html').replace('localhost', '127.0.0.1')
+      const testResultUrl = Brave.server.url('cookie-favicon-test-result.html')
+      yield this.app.client
+        .tabByIndex(0)
+        .loadUrl(url)
+        .openBraveMenu(braveMenu, braveryPanel)
+        .click(cookieControl)
+        .waitForVisible(allowAllCookiesOption)
+        .click(allowAllCookiesOption)
+        .tabByIndex(0)
+        .loadUrl(url)
+        .waitForExist('head>link')
+        .loadUrl(testResultUrl)
+        .waitForTextValue('body', 'pass')
+    })
+  })
 })

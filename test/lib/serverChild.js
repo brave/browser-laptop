@@ -91,6 +91,9 @@ Server.prototype = {
   start: function (port) {
     // using node-static for now we can do fancy stuff in the future.
     var file = new nodeStatic.Server(root)
+
+    // temporary state to control 3rd-party fingerprinting with favicons
+    var faviconCookieDetected = false
     this.http = http.createServer(function (req, res) {
       req.addListener('end', function () {
         // Handle corked urls.
@@ -121,6 +124,31 @@ Server.prototype = {
             'WWW-Authenticate': 'Basic realm="login required"'
           })
           res.end()
+          return
+        }
+
+        // the following routes are setup to test 3rd-party cookie sharing over favicons
+        if (req.url === '/cookie-favicon.ico') {
+          if (req.headers.cookie && req.headers.cookie !== '') {
+            faviconCookieDetected = true
+          }
+          file.servePath('/img/test.ico', 200, {}, req, res, () => res.end())
+          return
+        }
+
+        if (req.url === '/cookie-favicon-test.html') {
+          file.servePath(req.url, 200, {
+            'Set-Cookie': 'new-cookie'
+          }, req, res, () => res.end())
+          return
+        }
+
+        if (req.url === '/cookie-favicon-test-result.html') {
+          res.writeHead(200, {
+            'Content-Type': 'text/html'
+          })
+          const text = faviconCookieDetected ? 'fail' : 'pass'
+          res.end(`<body>${text}</body>`)
           return
         }
 
