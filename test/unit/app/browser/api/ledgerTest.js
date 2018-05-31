@@ -1230,41 +1230,50 @@ describe('ledger api unit tests', function () {
 
     it('no new transaction', function () {
       const state = defaultAppState.setIn(['ledger', 'info', 'transactions'], Immutable.fromJS([{votes: 10}]))
-      ledgerApi.observeTransactions(state, [{votes: 10}])
+      ledgerApi.observeTransactions(state, Immutable.fromJS([{votes: 10}]))
       assert(showPaymentDoneSpy.notCalled)
     })
 
     it('payment notifications are disabled', function () {
       paymentsNotifications = false
-      ledgerApi.observeTransactions(defaultAppState, [{votes: 10}])
+      ledgerApi.observeTransactions(defaultAppState, Immutable.fromJS([{votes: 10}]))
       assert(showPaymentDoneSpy.notCalled)
       paymentsNotifications = true
     })
 
     it('payment notifications are enabled, but there is no transactions', function () {
-      ledgerApi.observeTransactions(defaultAppState, [])
+      ledgerApi.observeTransactions(defaultAppState, Immutable.List())
       assert(showPaymentDoneSpy.notCalled)
     })
 
     it('transaction is corupted', function () {
-      ledgerApi.observeTransactions(defaultAppState, [{votes: 10}])
+      ledgerApi.observeTransactions(defaultAppState, Immutable.fromJS([{votes: 10}]))
       assert(showPaymentDoneSpy.notCalled)
     })
 
     it('show notification (first transaction in the array)', function () {
-      ledgerApi.observeTransactions(defaultAppState, [
+      ledgerApi.observeTransactions(defaultAppState, Immutable.fromJS([
         {
           contribution: {
-            fiat: 10
+            fiat: {
+              amount: 10,
+              currency: 'BAT'
+            }
           }
         },
         {
           contribution: {
-            fiat: 30
+            fiat: {
+              amount: 30,
+              currency: 'BAT'
+            }
           }
         }
-      ])
-      assert(showPaymentDoneSpy.withArgs(10).calledOnce)
+      ]))
+      assert(showPaymentDoneSpy.withArgs(Immutable.fromJS({
+        amount: 10,
+        currency: 'BAT'
+      })).calledOnce)
     })
   })
 
@@ -2255,7 +2264,7 @@ describe('ledger api unit tests', function () {
           }]
         }
         const state = defaultAppState
-          .setIn(['ledger', 'info', 'transactions'], Immutable.Map())
+          .setIn(['ledger', 'info', 'transactions'], Immutable.List())
 
         ledgerApi.getStateInfo(state, param)
         assert(getInfoPropSpy.calledOnce)
@@ -2281,11 +2290,161 @@ describe('ledger api unit tests', function () {
           }]
         }
         const state = defaultAppState
-          .setIn(['ledger', 'info', 'transactions'], Immutable.Map())
+          .setIn(['ledger', 'info', 'transactions'], Immutable.List())
 
         ledgerApi.getStateInfo(state, param)
         assert(getInfoPropSpy.called)
         assert(setInfoPropSpy.calledOnce)
+      })
+
+      it('old transaction is merged with the new one', function () {
+        const param = {
+          properties: {
+            wallet: {
+              paymentId: '1'
+            }
+          },
+          transactions: [
+            {
+              viewingId: 1,
+              votes: 44,
+              ballots: {
+                'site1.com': 10,
+                'site2.com': 18,
+                'site3.com': 9,
+                'site4.com': 7
+              }
+            },
+            {
+              viewingId: 2,
+              votes: 28,
+              ballots: {
+                'site1.com': 10,
+                'site2.com': 18
+              }
+            },
+            {
+              viewingId: 3,
+              votes: 35,
+              ballots: {
+                'site1.com': 10,
+                'site2.com': 18,
+                'site4.com': 7
+              }
+            }
+          ]
+        }
+        const state = defaultAppState
+          .setIn(['ledger', 'synopsis', 'publishers'], Immutable.fromJS({
+            'site1.com': {
+              faviconName: 'site1',
+              providerName: 'YouTube'
+            },
+            'site2.com': {
+              faviconName: 'site2',
+              providerName: 'YouTube'
+            },
+            'site3.com': {
+              faviconName: 'site3',
+              providerName: 'Twitch'
+            },
+            'site4.com': {}
+          }))
+          .setIn(['ledger', 'info', 'transactions'], Immutable.fromJS([
+            {
+              viewingId: 2,
+              votes: 28,
+              ballots: {
+                'site1.com': 10,
+                'site2.com': 18
+              },
+              names: {
+                'site1.com': 'PUBLISHERMEDIANAME, publisherName/site1, provider/YouTube',
+                'site2.com': 'PUBLISHERMEDIANAME, publisherName/site2, provider/YouTube'
+              }
+            },
+            {
+              viewingId: 1,
+              votes: 44,
+              ballots: {
+                'site1.com': 10,
+                'site2.com': 18,
+                'site3.com': 9,
+                'site4.com': 7
+              }
+            }
+          ]))
+
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'synopsis', 'publishers'], Immutable.fromJS({
+            'site1.com': {
+              faviconName: 'site1',
+              providerName: 'YouTube'
+            },
+            'site2.com': {
+              faviconName: 'site2',
+              providerName: 'YouTube'
+            },
+            'site3.com': {
+              faviconName: 'site3',
+              providerName: 'Twitch'
+            },
+            'site4.com': {}
+          }))
+          .setIn(['ledger', 'info'], Immutable.fromJS({
+            created: true,
+            creating: false,
+            paymentId: '1',
+            reconcileFrequency: undefined,
+            reconcileStamp: undefined
+          }))
+          .setIn(['ledger', 'info', 'transactions'], Immutable.fromJS([
+            {
+              viewingId: 3,
+              votes: 35,
+              ballots: {
+                'site1.com': 10,
+                'site2.com': 18,
+                'site4.com': 7
+              },
+              names: {
+                'site1.com': 'PUBLISHERMEDIANAME, publisherName/site1, provider/YouTube',
+                'site2.com': 'PUBLISHERMEDIANAME, publisherName/site2, provider/YouTube'
+              }
+            },
+            {
+              viewingId: 2,
+              votes: 28,
+              ballots: {
+                'site1.com': 10,
+                'site2.com': 18
+              },
+              names: {
+                'site1.com': 'PUBLISHERMEDIANAME, publisherName/site1, provider/YouTube',
+                'site2.com': 'PUBLISHERMEDIANAME, publisherName/site2, provider/YouTube'
+              }
+            },
+            {
+              viewingId: 1,
+              votes: 44,
+              ballots: {
+                'site1.com': 10,
+                'site2.com': 18,
+                'site3.com': 9,
+                'site4.com': 7
+              },
+              names: {
+                'site1.com': 'PUBLISHERMEDIANAME, publisherName/site1, provider/YouTube',
+                'site2.com': 'PUBLISHERMEDIANAME, publisherName/site2, provider/YouTube',
+                'site3.com': 'PUBLISHERMEDIANAME, publisherName/site3, provider/Twitch'
+              }
+            }
+          ]))
+
+        const result = ledgerApi.getStateInfo(state, param)
+        assert(getInfoPropSpy.called)
+        assert(setInfoPropSpy.calledOnce)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
       })
     })
   })
