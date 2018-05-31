@@ -1641,17 +1641,17 @@ const observeTransactions = (state, transactions) => {
   }
 
   const current = ledgerState.getInfoProp(state, 'transactions')
-  if (current && current.size === transactions.length) {
+  if (current && current.size === transactions.size) {
     return state
   }
 
   // Notify the user of new transactions.
   if (getSetting(settings.PAYMENTS_NOTIFICATIONS)) {
-    if (transactions.length > 0) {
-      const newestTransaction = transactions[0]
-      if (newestTransaction && newestTransaction.contribution) {
+    if (transactions.size > 0) {
+      const newestTransaction = transactions.first()
+      if (newestTransaction && newestTransaction.get('contribution')) {
         state = ledgerState.setAboutProp(state, 'status', '')
-        ledgerNotifications.showPaymentDone(newestTransaction.contribution.fiat)
+        ledgerNotifications.showPaymentDone(newestTransaction.getIn(['contribution', 'fiat'], Immutable.Map()))
       }
     }
   }
@@ -1709,7 +1709,7 @@ const getStateInfo = (state, parsedData) => {
     return state
   }
 
-  const current = ledgerState.getInfoProp(state, 'transactions') || Immutable.Map()
+  const current = ledgerState.getInfoProp(state, 'transactions') || Immutable.List()
   if (current && current.size === parsedData.transactions.length) {
     return state
   }
@@ -1727,15 +1727,46 @@ const getStateInfo = (state, parsedData) => {
 
     if (ballotsTotal < transaction.votes) break
 
-    transactions.push(underscore.pick(transaction, ['viewingId', 'contribution', 'submissionStamp', 'count', 'ballots']))
+    transactions.push(underscore.pick(transaction, [
+      'viewingId',
+      'contribution',
+      'submissionStamp',
+      'votes',
+      'count',
+      'ballots'
+    ]))
   }
 
   if (current && current.size === transactions.length) {
     return state
   }
 
-  state = observeTransactions(state, transactions)
-  return ledgerState.setInfoProp(state, 'transactions', Immutable.fromJS(transactions))
+  let newTransactions = Immutable.fromJS(transactions).map(transaction => {
+    if (!transaction || transaction.has('names')) {
+      return transaction
+    }
+
+    let names = Immutable.Map()
+    const publisherKeys = transaction.get('ballots').keySeq() || Immutable.List()
+
+    publisherKeys.forEach(publisherKey => {
+      const publisher = ledgerState.getPublisher(state, publisherKey)
+
+      if (!publisher.has('faviconName')) {
+        return
+      }
+
+      names = names.set(publisherKey, locale.translation('publisherMediaName', {
+        publisherName: publisher.get('faviconName'),
+        provider: publisher.get('providerName')
+      }))
+    })
+
+    return transaction.set('names', names)
+  })
+
+  state = observeTransactions(state, newTransactions)
+  return ledgerState.setInfoProp(state, 'transactions', newTransactions)
 }
 
 const generatePaymentData = (state) => {
