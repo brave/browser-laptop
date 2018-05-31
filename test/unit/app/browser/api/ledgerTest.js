@@ -1507,6 +1507,7 @@ describe('ledger api unit tests', function () {
           .setIn(['ledger', 'info', 'balance'], 25)
           .setIn(['ledger', 'info', 'userFunded'], 25)
           .setIn(['ledger', 'info', 'userHasFunded'], true)
+          .setIn(['ledger', 'info', 'grants'], Immutable.List())
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
 
@@ -1534,6 +1535,7 @@ describe('ledger api unit tests', function () {
           .setIn(['ledger', 'info', 'userFunded'], 25)
           .setIn(['ledger', 'info', 'probi'], probi)
           .setIn(['ledger', 'info', 'userHasFunded'], true)
+          .setIn(['ledger', 'info', 'grants'], Immutable.List())
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
 
@@ -1552,6 +1554,7 @@ describe('ledger api unit tests', function () {
           .setIn(['ledger', 'info', 'userFunded'], 7309.622404968675)
           .setIn(['ledger', 'info', 'probi'], bigProbi)
           .setIn(['ledger', 'info', 'userHasFunded'], true)
+          .setIn(['ledger', 'info', 'grants'], Immutable.List())
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
     })
@@ -1664,6 +1667,7 @@ describe('ledger api unit tests', function () {
           .setIn(['ledger', 'info', 'userHasFunded'], true)
           .setIn(['ledger', 'info', 'probi'], probi)
           .setIn(['ledger', 'info', 'userFunded'], 25)
+          .setIn(['ledger', 'info', 'grants'], Immutable.List())
         const result = ledgerApi.onWalletProperties(state, Immutable.fromJS({
           probi,
           balance: 25
@@ -1690,6 +1694,31 @@ describe('ledger api unit tests', function () {
             probi: 10000000000000000000
           }]
         }))
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+
+      it('grant is reset when claimed', function () {
+        const newState = state
+          .setIn(['ledger', 'info', 'balance'], 25)
+          .setIn(['ledger', 'info', 'userHasFunded'], true)
+          .setIn(['ledger', 'info', 'probi'], probi)
+          .setIn(['ledger', 'info', 'userFunded'], 15)
+          .setIn(['ledger', 'info', 'grants'], Immutable.fromJS([{
+            expirationDate: 2130600234,
+            amount: 10
+          }]))
+
+        const result = ledgerApi.onWalletProperties(newState, Immutable.fromJS({
+          probi,
+          balance: 25,
+          grants: []
+        }))
+        const expectedState = state
+          .setIn(['ledger', 'info', 'balance'], 25)
+          .setIn(['ledger', 'info', 'userHasFunded'], true)
+          .setIn(['ledger', 'info', 'probi'], probi)
+          .setIn(['ledger', 'info', 'userFunded'], 25)
+          .setIn(['ledger', 'info', 'grants'], Immutable.List())
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
     })
