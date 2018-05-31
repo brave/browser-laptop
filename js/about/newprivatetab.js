@@ -22,14 +22,22 @@ const useAlternativePrivateSearchEngineDataKeys = ['newTabDetail', 'useAlternati
 const torEnabled = ['newTabDetail', 'torEnabled']
 const torFAQ = 'https://github.com/brave/browser-laptop/wiki/Using-Tor-in-Brave#faq'
 
+const onChangeTor = (value) => {
+  aboutActions.changeSetting(settings.USE_TOR_PRIVATE_TABS, value)
+  if (value === true) {
+    // Also change DDG to enabled since Google is unusable with Tor.
+    aboutActions.changeSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, value)
+  }
+  aboutActions.recreateTorTab(value)
+}
+
 class NewPrivateTab extends React.Component {
   onChangePrivateSearch (e) {
     aboutActions.changeSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, e.target.value)
   }
 
   onChangeTor (e) {
-    aboutActions.changeSetting(settings.USE_TOR_PRIVATE_TABS, e.target.value)
-    aboutActions.recreateTorTab(e.target.value)
+    onChangeTor(e.target.value)
   }
 
   onClickPrivateSearchTitle () {
@@ -39,8 +47,7 @@ class NewPrivateTab extends React.Component {
 
   onClickTorTitle () {
     const newSettingValue = !this.props.newTabData.getIn(torEnabled)
-    aboutActions.changeSetting(settings.USE_TOR_PRIVATE_TABS, newSettingValue)
-    aboutActions.recreateTorTab(newSettingValue)
+    onChangeTor(newSettingValue)
   }
 
   render () {
