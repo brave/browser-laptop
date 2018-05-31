@@ -3808,4 +3808,40 @@ describe('ledger api unit tests', function () {
       assert(getWalletPropertiesSpy.calledOnce)
     })
   })
+
+  describe('paymentPresent', function () {
+    describe('captcha', function () {
+      it('captcha is displayed and payments page is opened', function () {
+        const state = defaultAppState
+          .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_CHECK)
+        const result = ledgerApi.paymentPresent(state, 1, true)
+        assert.deepEqual(result.toJS(), state.toJS())
+      })
+
+      it('captcha is displayed and payments page is not opened', function () {
+        const state = defaultAppState
+          .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_CHECK)
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'promotion', 'promotionStatus'], null)
+        const result = ledgerApi.paymentPresent(state, 1, false)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+
+      it('captcha error is displayed and payments page is not opened', function () {
+        const state = defaultAppState
+          .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_ERROR)
+        const expectedState = defaultAppState
+          .setIn(['ledger', 'promotion', 'promotionStatus'], null)
+        const result = ledgerApi.paymentPresent(state, 1, false)
+        assert.deepEqual(result.toJS(), expectedState.toJS())
+      })
+
+      it('captcha is not displayed and payments page is not opened', function () {
+        const state = defaultAppState
+          .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.GENERAL_ERROR)
+        const result = ledgerApi.paymentPresent(state, 1, false)
+        assert.deepEqual(result.toJS(), state.toJS())
+      })
+    })
+  })
 })
