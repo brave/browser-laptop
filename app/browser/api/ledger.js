@@ -1911,6 +1911,8 @@ const onWalletProperties = (state, body) => {
       })
       state = ledgerState.setInfoProp(state, 'grants', grants)
       userFunded = probi - grantTotal
+    } else {
+      state = ledgerState.setInfoProp(state, 'grants', Immutable.List())
     }
 
     state = ledgerState.setInfoProp(state, 'userFunded', new BigNumber(userFunded.toString()).dividedBy('1e18').toNumber())
