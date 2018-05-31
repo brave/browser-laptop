@@ -84,6 +84,10 @@ const getLocation = (location) => {
 
 function setFrameChangedIndex (state, frame, currentIndex, newIndex) {
   let frames = frameStateUtil.getFrames(state)
+  if (newIndex < 0) {
+    console.error(`Cannot move frame to index ${newIndex} from ${currentIndex} because it is invalid!`)
+    return state
+  }
   if (newIndex >= frames.size) {
     console.error(`Cannot move frame to index ${newIndex} from ${currentIndex} because it is invalid for a frame List of size ${frames.size}!`)
     return state
@@ -130,6 +134,7 @@ const frameReducer = (state, action, immutableAction) => {
       state = state.mergeIn(['frames', index], {
         tabStripWindowId: getCurrentWindowId()
       })
+      state = setFrameChangedIndex(state, frameStateUtil.getFrameByIndex(state, index), index, immutableAction.get('index'))
       break
     }
     case windowConstants.WINDOW_REMOVE_FRAME:
