@@ -8,22 +8,37 @@ const {isInternalUrl} = require('../js/lib/urlutil')
 
 module.exports.resourceName = 'firewall'
 
-const onHeadersReceived = (details) => {
-  const result = { resourceName: module.exports.resourceName }
-  const mainFrameUrl = Filtering.getMainFrameUrl(details)
-  const isIPInternal = ip.isPrivate(details.ip)
-  const isUrlInternal = isInternalUrl(details.url)
+/**
+ * Export this so it can be unit tested.
+ * @param {string} url
+ * @param {string} mainFrameUrl
+ * @param {boolean} isPrivate
+ * @returns {boolean}
+ */
+module.exports.shouldCancel = (url, mainFrameUrl, ipAddr, isPrivate) => {
+  if (!Filtering.isResourceEnabled(module.exports.resourceName, mainFrameUrl, isPrivate)) {
+    return false
+  }
+  const isIPInternal = ip.isPrivate(ipAddr)
+  const isUrlInternal = isInternalUrl(url)
 
   if ((isIPInternal || isUrlInternal) && !isInternalUrl(mainFrameUrl)) {
     // Block requests to local origins from non-local top-level origins
     console.log('firewall blocked request from external IP to internal IP')
-    result.cancel = true
+    return true
   } else if (isIPInternal && !isUrlInternal) {
     // Block requests to an external name that resolves to an internal address
     console.log('firewall blocked request for internal IP with external hostname')
-    result.cancel = true
+    return true
   }
+  return false
+}
 
+const onHeadersReceived = (details, isPrivate) => {
+  const result = { resourceName: module.exports.resourceName }
+  const mainFrameUrl = Filtering.getMainFrameUrl(details)
+  result.cancel = module.exports.shouldCancel(details.url, mainFrameUrl,
+    details.ip, isPrivate)
   return result
 }
 

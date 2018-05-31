@@ -8,6 +8,7 @@ require('../braveUnit')
 
 describe('filtering unit tests', function () {
   let filtering
+  let shouldFirewallCancel
   const fakeElectron = require('../lib/fakeElectron')
 
   before(function () {
@@ -19,10 +20,72 @@ describe('filtering unit tests', function () {
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('./adBlock', {adBlockResourceName: 'adblock'})
     filtering = require('../../../app/filtering')
+    shouldFirewallCancel = require('../../../app/firewall').shouldCancel
   })
 
   after(function () {
     mockery.disable()
+  })
+
+  describe('firewall', function () {
+    let isResourceEnabledStub
+    describe('when firewall is disabled', function () {
+      before(function () {
+        isResourceEnabledStub = sinon.stub(filtering, 'isResourceEnabled').returns(false)
+      })
+      after(function () {
+        isResourceEnabledStub.restore()
+      })
+      it('does not block external URLs', function () {
+        const url = 'https://brave.com'
+        const firstPartyUrl = 'https://slashdot.org/'
+        assert.equal(shouldFirewallCancel(url, firstPartyUrl), false)
+      })
+      it('does not block internal URLs', function () {
+        const url = 'http://brave.local'
+        const firstPartyUrl = 'https://slashdot.org/'
+        assert.equal(shouldFirewallCancel(url, firstPartyUrl), false)
+      })
+    })
+
+    describe('when firewall is enabled', function () {
+      before(function () {
+        isResourceEnabledStub = sinon.stub(filtering, 'isResourceEnabled').returns(true)
+      })
+      after(function () {
+        isResourceEnabledStub.restore()
+      })
+      it('does not block external URLs', function () {
+        const url = 'https://brave.com'
+        const firstPartyUrl = 'https://slashdot.org/'
+        const ip = '23.21.132.31'
+        assert.equal(shouldFirewallCancel(url, firstPartyUrl, ip), false)
+      })
+      it('does block internal URLs', function () {
+        const url = 'http://brave.local'
+        const firstPartyUrl = 'https://slashdot.org/'
+        const ip = '23.21.132.31'
+        assert.equal(shouldFirewallCancel(url, firstPartyUrl, ip), true)
+      })
+      it('does block internal IPs', function () {
+        const url = 'http://brave.com'
+        const firstPartyUrl = 'https://slashdot.org/'
+        const ip = '::1'
+        assert.equal(shouldFirewallCancel(url, firstPartyUrl, ip), true)
+      })
+      it('blocks mismatched internal/external URLs', function () {
+        const url = 'http://brave.com:80/foobar'
+        const firstPartyUrl = 'http://localhost:8000/test'
+        const ip = '127.0.0.1'
+        assert.equal(shouldFirewallCancel(url, firstPartyUrl, ip), true)
+      })
+      it('does not block local requests on local page', function () {
+        const url = 'http://brave.local:80/foobar'
+        const firstPartyUrl = 'http://localhost:8000/test'
+        const ip = '127.0.0.1'
+        assert.equal(shouldFirewallCancel(url, firstPartyUrl, ip), false)
+      })
+    })
   })
 
   describe('applyCookieSetting', function () {
