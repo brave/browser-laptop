@@ -118,7 +118,7 @@ function registerForBeforeRequest (session, partition) {
     const url = details.url
     // this can happen if the tab is closed and the webContents is no longer available
     if (!firstPartyUrl) {
-      muonCb({ cancel: true })
+      muonCb({})
       return
     }
 
@@ -312,7 +312,7 @@ function registerForBeforeSendHeaders (session, partition) {
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
     // this can happen if the tab is closed and the webContents is no longer available
     if (!firstPartyUrl) {
-      muonCb({ cancel: true })
+      muonCb({})
       return
     }
 
@@ -361,7 +361,7 @@ function registerForHeadersReceived (session, partition) {
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
     // this can happen if the tab is closed and the webContents is no longer available
     if (!firstPartyUrl) {
-      muonCb({ cancel: true })
+      muonCb({})
       return
     }
 
