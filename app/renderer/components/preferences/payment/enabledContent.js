@@ -412,7 +412,6 @@ class EnabledContent extends ImmutableComponent {
         </div>
         <div className={css(gridStyles.row2col1)}>
           <FormDropdown
-            data-isPanel
             data-test-id='fundsSelectBox'
             value={contributionAmount}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}
