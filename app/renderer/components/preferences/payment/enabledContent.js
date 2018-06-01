@@ -10,7 +10,7 @@ const Immutable = require('immutable')
 // Components
 const ImmutableComponent = require('../../immutableComponent')
 const BrowserButton = require('../../common/browserButton')
-const {PanelDropdown} = require('../../common/dropdown')
+const {FormDropdown} = require('../../common/dropdown')
 const LedgerTable = require('./ledgerTable')
 const Captcha = require('./captcha')
 
@@ -411,7 +411,7 @@ class EnabledContent extends ImmutableComponent {
           {this.claimButton()}
         </div>
         <div className={css(gridStyles.row2col1)}>
-          <PanelDropdown
+          <FormDropdown
             data-test-id='fundsSelectBox'
             value={contributionAmount}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}
@@ -431,7 +431,7 @@ class EnabledContent extends ImmutableComponent {
                 return <option value={amount}>{displayAmount} BAT {alternative}</option>
               })
             }
-          </PanelDropdown>
+          </FormDropdown>
         </div>
         <div className={css(gridStyles.row2col2, gridStyles.mergeRow23Col2)}>
           {
