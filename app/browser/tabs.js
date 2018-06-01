@@ -156,34 +156,37 @@ ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
   const tabId = tab.getId()
   aboutTabs[tabId] = {}
 
-  if (shouldDebugTabEvents) {
-    console.log(`Tab [${tabId}] ABOUT_COMPONENT_INITIALIZED`)
-  }
-
   const url = getSourceAboutUrl(tab.getURL())
   const location = getBaseUrl(url)
+
+  if (shouldDebugTabEvents) {
+    console.log(`Tab [${tabId}] ABOUT_COMPONENT_INITIALIZED`, location)
+  }
+
   if (location === 'about:preferences') {
     if (isOnAboutLocation(url, 'about:preferences#payments')) {
       appActions.ledgerPaymentsPresent(tabId, true)
     } else {
       appActions.ledgerPaymentsPresent(tabId, false)
     }
-
-    tab.on('will-destroy', () => {
-      appActions.ledgerPaymentsPresent(tabId, false)
-    })
-    tab.once('did-navigate', () => {
-      appActions.ledgerPaymentsPresent(tabId, false)
-    })
-    tab.on('did-navigate-in-page', (e, newUrl) => {
-      updateAboutDetails(tabId)
-      const url = getSourceAboutUrl(newUrl)
-      if (isOnAboutLocation(url, 'about:preferences#payments')) {
-        appActions.ledgerPaymentsPresent(tabId, true)
-      } else {
+    const webContents = webContentsCache.getWebContents(tabId)
+    if (webContents) {
+      webContents.on('will-destroy', () => {
         appActions.ledgerPaymentsPresent(tabId, false)
-      }
-    })
+      })
+      webContents.once('did-navigate', () => {
+        appActions.ledgerPaymentsPresent(tabId, false)
+      })
+      webContents.on('did-navigate-in-page', (e, newUrl) => {
+        updateAboutDetails(tabId)
+        const url = getSourceAboutUrl(newUrl)
+        if (isOnAboutLocation(url, 'about:preferences#payments')) {
+          appActions.ledgerPaymentsPresent(tabId, true)
+        } else {
+          appActions.ledgerPaymentsPresent(tabId, false)
+        }
+      })
+    }
   }
 })
 
