@@ -841,4 +841,76 @@ describe('ledgerState unit test', function () {
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
   })
+
+  describe('saveAboutSynopsis', function () {
+    it('publisher list is empty', function () {
+      const result = ledgerState.saveAboutSynopsis(defaultState)
+      const expectedState = defaultState
+        .setIn(['ledger', 'about'], Immutable.fromJS({
+          synopsis: [],
+          synopsisOptions: {}
+        }))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('publisher list is JS object', function () {
+      const result = ledgerState.saveAboutSynopsis(defaultState, [
+        {
+          'clifton.io': {
+            percentage: 10
+          }
+        }
+      ])
+      const expectedState = defaultState
+        .setIn(['ledger', 'about'], Immutable.fromJS({
+          synopsis: [{
+            'clifton.io': {
+              percentage: 10
+            }
+          }],
+          synopsisOptions: {}
+        }))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('publisher list is sorted desc', function () {
+      const result = ledgerState.saveAboutSynopsis(defaultState, [
+        {
+          'clifton.io': {
+            percentage: 10
+          },
+          'clifton1.io': {
+            percentage: 2
+          },
+          'clifton2.io': {
+            percentage: 30
+          },
+          'clifton3.io': {
+            percentage: 1
+          }
+        }
+      ])
+      const expectedState = defaultState
+        .setIn(['ledger', 'about'], Immutable.fromJS({
+          synopsis: [
+            {
+              'clifton2.io': {
+                percentage: 30
+              },
+              'clifton.io': {
+                percentage: 10
+              },
+              'clifton1.io': {
+                percentage: 2
+              },
+              'clifton3.io': {
+                percentage: 1
+              }
+            }
+          ],
+          synopsisOptions: {}
+        }))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+  })
 })
