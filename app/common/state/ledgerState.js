@@ -523,8 +523,10 @@ const ledgerState = {
    * ABOUT PAGE
    */
   // TODO (optimization) don't have two almost identical object in state (synopsi->publishers and about->synopsis)
-  saveAboutSynopsis: (state, publishers) => {
+  saveAboutSynopsis: (state, publishers = Immutable.List()) => {
     state = validateState(state)
+    publishers = makeImmutable(publishers)
+    publishers = publishers.sort((prev, next) => (parseFloat(prev.get('percentage')) - parseFloat(next.get('percentage'))) * -1)
     state = ledgerState.setAboutProp(state, 'synopsis', publishers)
     state = ledgerState.setAboutProp(state, 'synopsisOptions', ledgerState.getSynopsisOptions(state))
 
