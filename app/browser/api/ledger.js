@@ -2474,9 +2474,10 @@ const onInitRead = (state, parsedData) => {
   return state
 }
 
-const onFuzzing = () => {
+const onFuzzing = (pushBack, pruned = false) => {
   if (client && client.state) {
-    appActions.onLedgerFuzzing(client.state.reconcileStamp)
+    const newStamp = pushBack ? client.state.reconcileStamp : null
+    appActions.onLedgerFuzzing(newStamp, pruned)
   }
 }
 
@@ -3305,6 +3306,7 @@ const getMethods = () => {
     resetPublishers,
     clearPaymentHistory,
     getPaymentInfo,
+    synopsisNormalizer,
     cacheRuleSet
   }
 
@@ -3334,7 +3336,6 @@ const getMethods = () => {
         currentMediaKey = key
       },
       getCurrentMediaKey: (key) => currentMediaKey,
-      synopsisNormalizer,
       observeTransactions,
       onWalletRecovery,
       getStateInfo,
@@ -3348,6 +3349,7 @@ const getMethods = () => {
       roundTripFromWindow,
       onReferralCodeRead,
       onVerifiedPStatus,
+      onFuzzing,
       checkSeed,
       shouldTrackTab
     }
