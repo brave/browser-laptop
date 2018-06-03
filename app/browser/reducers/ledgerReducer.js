@@ -523,10 +523,16 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_LEDGER_FUZZING:
       {
-        state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.FUZZING)
-        const newStamp = parseInt(action.get('newStamp'))
-        if (!isNaN(newStamp) && newStamp > 0) {
-          state = ledgerState.setInfoProp(state, 'reconcileStamp', newStamp)
+        if (action.get('newStamp') != null) {
+          const newStamp = parseInt(action.get('newStamp'))
+          if (!isNaN(newStamp) && newStamp > 0) {
+            state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.FUZZING)
+            state = ledgerState.setInfoProp(state, 'reconcileStamp', newStamp)
+          }
+        }
+
+        if (action.get('pruned')) {
+          state = ledgerApi.synopsisNormalizer(state, null, true, true)
         }
         break
       }

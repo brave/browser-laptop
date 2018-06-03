@@ -150,7 +150,8 @@ describe('ledger api unit tests', function () {
         }
       },
       state: {
-        transactions: []
+        transactions: [],
+        reconcileStamp: 1000
       },
       busyP: function () {
         return isBusy
@@ -4001,6 +4002,48 @@ describe('ledger api unit tests', function () {
         const result = ledgerApi.paymentPresent(state, 1, false)
         assert.deepEqual(result.toJS(), state.toJS())
       })
+    })
+  })
+
+  describe('onFuzzing', function () {
+    let onLedgerFuzzingSpy
+
+    before(function () {
+      onLedgerFuzzingSpy = sinon.spy(appActions, 'onLedgerFuzzing')
+    })
+
+    beforeEach(function () {
+      ledgerApi.setClient(ledgerClientObject)
+    })
+
+    afterEach(function () {
+      onLedgerFuzzingSpy.reset()
+    })
+
+    after(function () {
+      onLedgerFuzzingSpy.restore()
+      ledgerApi.setClient(undefined)
+    })
+
+    it('null case', function () {
+      ledgerApi.onFuzzing()
+      assert(onLedgerFuzzingSpy.withArgs(null, false).calledOnce)
+    })
+
+    it('client is not set', function () {
+      ledgerApi.setClient(undefined)
+      ledgerApi.onFuzzing()
+      assert(onLedgerFuzzingSpy.notCalled)
+    })
+
+    it('push back is not happening', function () {
+      ledgerApi.onFuzzing(null, true)
+      assert(onLedgerFuzzingSpy.withArgs(null, true).calledOnce)
+    })
+
+    it('pushing back', function () {
+      ledgerApi.onFuzzing(10, true)
+      assert(onLedgerFuzzingSpy.withArgs(1000, true).calledOnce)
     })
   })
 })

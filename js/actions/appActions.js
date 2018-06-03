@@ -1992,10 +1992,11 @@ const appActions = {
     })
   },
 
-  onLedgerFuzzing: function (newStamp) {
+  onLedgerFuzzing: function (newStamp, pruned) {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_FUZZING,
-      newStamp
+      newStamp,
+      pruned
     })
   },
 

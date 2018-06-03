@@ -66,7 +66,8 @@ describe('ledgerReducer unit tests', function () {
       resetPublishers: () => {},
       clearPaymentHistory: () => {},
       deleteWallet: () => {},
-      addNewLocation: dummyModifyState
+      addNewLocation: dummyModifyState,
+      synopsisNormalizer: dummyModifyState
     }
     fakeLedgerState = {
       resetPublishers: dummyModifyState,
@@ -870,11 +871,20 @@ describe('ledgerReducer unit tests', function () {
   })
 
   describe('APP_ON_LEDGER_FUZZING', function () {
-    let newState
+    let newState, synopsisNormalizerSpy
 
-    before(() => {
+    before(function () {
       newState = appState
         .setIn(['ledger', 'about', 'status'], ledgerStatuses.FUZZING)
+      synopsisNormalizerSpy = sinon.spy(fakeLedgerApi, 'synopsisNormalizer')
+    })
+
+    afterEach(function () {
+      synopsisNormalizerSpy.reset()
+    })
+
+    after(function () {
+      synopsisNormalizerSpy.restore()
     })
 
     it('null case', function () {
@@ -882,7 +892,8 @@ describe('ledgerReducer unit tests', function () {
         actionType: appConstants.APP_ON_LEDGER_FUZZING
       }))
 
-      assert.deepEqual(result.toJS(), newState.toJS())
+      assert(synopsisNormalizerSpy.notCalled)
+      assert.deepEqual(result.toJS(), appState.toJS())
     })
 
     it('stamp is string', function () {
@@ -891,7 +902,8 @@ describe('ledgerReducer unit tests', function () {
         newStamp: 'str'
       }))
 
-      assert.deepEqual(result.toJS(), newState.toJS())
+      assert(synopsisNormalizerSpy.notCalled)
+      assert.deepEqual(result.toJS(), appState.toJS())
     })
 
     it('stamp is negative', function () {
@@ -900,7 +912,8 @@ describe('ledgerReducer unit tests', function () {
         newStamp: -10
       }))
 
-      assert.deepEqual(result.toJS(), newState.toJS())
+      assert(synopsisNormalizerSpy.notCalled)
+      assert.deepEqual(result.toJS(), appState.toJS())
     })
 
     it('stamp is number (string)', function () {
@@ -912,7 +925,17 @@ describe('ledgerReducer unit tests', function () {
       const expectedState = newState
         .setIn(['ledger', 'info', 'reconcileStamp'], 10)
 
+      assert(synopsisNormalizerSpy.notCalled)
       assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('stamp is 0', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_LEDGER_FUZZING,
+        newStamp: 0
+      }))
+
+      assert.deepEqual(result.toJS(), appState.toJS())
     })
 
     it('reconcile stamp is set', function () {
@@ -924,6 +947,36 @@ describe('ledgerReducer unit tests', function () {
       const expectedState = newState
         .setIn(['ledger', 'info', 'reconcileStamp'], 10)
 
+      assert(synopsisNormalizerSpy.notCalled)
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('pruned is false', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_LEDGER_FUZZING,
+        newStamp: 10,
+        pruned: false
+      }))
+
+      const expectedState = newState
+        .setIn(['ledger', 'info', 'reconcileStamp'], 10)
+
+      assert(synopsisNormalizerSpy.notCalled)
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('pruned is true', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_LEDGER_FUZZING,
+        newStamp: 10,
+        pruned: true
+      }))
+
+      const expectedState = newState
+        .setIn(['ledger', 'info', 'reconcileStamp'], 10)
+        .set('unittest', true)
+
+      assert(synopsisNormalizerSpy.withArgs(sinon.match.any, null, true, true))
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
   })
