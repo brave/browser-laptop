@@ -3725,6 +3725,17 @@ describe('ledger api unit tests', function () {
     })
   })
 
+  describe('disablePayments', function () {
+    beforeEach(function () {
+      onChangeSettingSpy.reset()
+    })
+
+    it('goes to set PAYMENTS_ENABLED to false', function () {
+      ledgerApi.disablePayments()
+      assert(onChangeSettingSpy.withArgs(settings.PAYMENTS_ENABLED, false).calledOnce)
+    })
+  })
+
   describe('deleteWallet', function () {
     it('data is cleared', function () {
       const state = defaultAppState
