@@ -2361,11 +2361,15 @@ const initialize = (state, paymentsEnabled) => {
     if (!fs) fs = require('fs')
     fs.access(pathName(statePath), fs.FF_OK, (err) => {
       if (err) {
+        if (!bootP) {
+          module.exports.disablePayments()
+        }
         return
       }
 
       fs.readFile(pathName(statePath), (err, data) => {
         if (err) {
+          module.exports.disablePayments()
           return console.error('read error: ' + err.toString())
         }
 
@@ -2375,6 +2379,7 @@ const initialize = (state, paymentsEnabled) => {
             console.log('\nstarting up ledger client integration')
           }
         } catch (ex) {
+          module.exports.disablePayments()
           console.error('statePath parse error: ' + ex.toString())
         }
       })
@@ -2382,6 +2387,7 @@ const initialize = (state, paymentsEnabled) => {
 
     return state
   } catch (err) {
+    module.exports.disablePayments()
     if (err.code !== 'ENOENT') {
       console.error('statePath read error: ' + err.toString())
     }
@@ -2448,6 +2454,7 @@ const onInitRead = (state, parsedData) => {
       setNewTimeUntilReconcile()
     }
   } catch (ex) {
+    module.exports.disablePayments()
     console.error('ledger client creation error(1): ', ex)
     return state
   }
@@ -3198,6 +3205,13 @@ const activityRoundTrip = (err, response, body) => {
   updater.checkForUpdate(false, true)
 }
 
+const disablePayments = () => {
+  if (clientOptions.verboseP) {
+    console.log('\nDisabling payments due to missing/corrupted state file')
+  }
+  appActions.changeSetting(settings.PAYMENTS_ENABLED, false)
+}
+
 const deleteWallet = (state) => {
   state = ledgerState.deleteSynopsis(state)
   state = state.setIn(['settings', settings.PAYMENTS_ENABLED], false)
@@ -3307,7 +3321,8 @@ const getMethods = () => {
     clearPaymentHistory,
     getPaymentInfo,
     synopsisNormalizer,
-    cacheRuleSet
+    cacheRuleSet,
+    disablePayments
   }
 
   let privateMethods = {}
