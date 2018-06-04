@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.22.727](https://github.com/brave/browser-laptop/releases/tag/v0.22.727dev)
+
+ - Added CAPTCHA verification when accepting Payment grants. ([#14188](https://github.com/brave/browser-laptop/issues/14188))
+ - Added "Clear Payment Data / Clear Payment History" under security preferences and "Delete Wallet" under advanced payments preferences. ([#8537](https://github.com/brave/browser-laptop/issues/8537))
+ - Optimized contributions by adding support for batch voting. ([#14190](https://github.com/brave/browser-laptop/issues/14190))
+ - Fixed Payments displaying message incorrectly stating that 30 minutes of total usage hasn't been logged (in some situations). ([#14310](https://github.com/brave/browser-laptop/issues/14310))
+ - Fixed tab ordering issue when opening new tabs. ([#14281](https://github.com/brave/browser-laptop/issues/14281))
+ - Fixed publishers being added as "include" even though the "auto-include" has been disabled. ([#14245](https://github.com/brave/browser-laptop/issues/14245))
+ - Fixed startup crashes when specific Payments files are missing or corrupted after an upgrade. ([#14202](https://github.com/brave/browser-laptop/issues/14202))
+
 ## [0.22.721](https://github.com/brave/browser-laptop/releases/tag/v0.22.721dev)
 
  - Fixed partner subscription page no longer active tab on initial launch. ([#14220](https://github.com/brave/browser-laptop/issues/14220))
