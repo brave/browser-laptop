@@ -114,12 +114,16 @@ const notificationUtil = {
 
     switch (data.notificationId) {
       case notificationTypes.ADS:
-      case notificationTypes.SURVEY:
+      case notificationTypes.SURVEYS:
         {
           if (data.windowId === windowState.WINDOW_ID_NONE) {
-            // FIXME
+            appActions.newWindow({
+              location: data.notificationUrl
+            })
             appActions.onUserModelLog(notificationTypes.NOTIFICATION_CLICK, { data })
+            return
           }
+
           appActions.createTabRequested({
             url: data.notificationUrl,
             windowId: data.windowId

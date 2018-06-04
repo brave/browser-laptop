@@ -222,24 +222,21 @@ const tabsReducer = (state, action, immutableAction) => {
       break
     }
     case appConstants.APP_CREATE_TAB_REQUESTED:
-      if (action.getIn(['createProperties', 'windowId']) == null) {
-        const senderWindowId = action.getIn(['senderWindowId'])
-        if (senderWindowId != null) {
-          action = action.setIn(['createProperties', 'windowId'], senderWindowId)
-        } else {
-          // no specified window, so use active one, or create one
-          const activeWindowId = windows.getActiveWindowId()
-          if (activeWindowId === windowState.WINDOW_ID_NONE) {
-            setImmediate(() => appActions.newWindow(action.get('createProperties')))
-            // this action will get dispatched again
-            // once the new window is ready to have tabs
-            break
-          }
-          action = action.setIn(['createProperties', 'windowId'], activeWindowId)
-        }
-      }
-      // option to focus the window the tab is being created in
       const windowId = action.getIn(['createProperties', 'windowId'])
+      if (windowId == null || !windows.getWindow(windowId)) {
+        // no specified window, so use active one, or create one
+        const activeWindowId = windows.getActiveWindowId()
+        if (activeWindowId === windowState.WINDOW_ID_NONE) {
+          action = action.deleteIn(['createProperties', 'windowId'])
+          setImmediate(() => appActions.newWindow(action.get('createProperties')))
+          // this action will get dispatched again
+          // once the new window is ready to have tabs
+          break
+        }
+        action = action.setIn(['createProperties', 'windowId'], activeWindowId)
+      }
+
+      // option to focus the window the tab is being created in
       const shouldFocusWindow = action.get('focusWindow')
       if (shouldFocusWindow && windowId) {
         windows.focus(windowId)
