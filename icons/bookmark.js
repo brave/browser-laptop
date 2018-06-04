@@ -7,7 +7,9 @@ const { css } = require('aphrodite/no-important')
 const iconStyles = require('./styles')
 
 module.exports = ({ styles }) =>
-  <svg className={css(styles, iconStyles.icon)} xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
-    <path fillRule='evenodd' d='M16.1142857 18.9199419l-3.745-2.1606728c-.2271428-.1309086-.5114286-.1309086-.7385714 0L7.885 18.9199419c-.39214286.2256809-.885-.0524998-.885-.5004525V5.57954303C7 5.25977164 7.26285714 5 7.58785714 5h8.82357146C16.7364286 5 17 5.25977164 17 5.57954303V18.4194894c0 .4479527-.4935714.7261334-.8857143.5004525z'
-    />
-  </svg>
+<svg className={css(styles, iconStyles.icon)} xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
+  <g fillRule='evenodd'>
+    <path className={css(iconStyles.icon__path_solid)} d='M8.5 6.5v10.351l3.057-1.679a1.453 1.453 0 0 1 1.386 0L16 16.851V6.5H8.5zm7.815 10.523h.01-.01zM8.28 18.499c-.23 0-.461-.061-.664-.181A1.23 1.23 0 0 1 7 17.252V6.247C7 5.56 7.574 5 8.279 5h7.942c.705 0 1.279.56 1.279 1.247v11.005c0 .439-.23.839-.616 1.066a1.31 1.31 0 0 1-1.293.02l-3.37-1.852-3.313 1.852a1.302 1.302 0 0 1-.628.161z'
+      />
+  </g>
+</svg>
