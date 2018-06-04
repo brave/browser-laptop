@@ -2695,14 +2695,14 @@ const run = (state, delayTime) => {
     return
   }
 
-  if (client.isReadyToReconcile(synopsis, module.exports.onFuzzing)) {
-    module.exports.reconcile(callback)
-  }
+  module.exports.reconcile(callback)
   return state
 }
 
 const reconcile = (callback) => {
-  client.reconcile(uuid.v4().toLowerCase(), callback)
+  if (client.isReadyToReconcile(synopsis, module.exports.onFuzzing)) {
+    client.reconcile(uuid.v4().toLowerCase(), callback)
+  }
 }
 
 const networkConnected = () => {
