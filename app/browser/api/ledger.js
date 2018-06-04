@@ -1658,7 +1658,7 @@ const observeTransactions = (state, transactions) => {
       const newestTransaction = transactions.first()
       if (newestTransaction && newestTransaction.get('contribution')) {
         state = ledgerState.setAboutProp(state, 'status', '')
-        ledgerNotifications.showPaymentDone(newestTransaction.getIn(['contribution', 'fiat'], Immutable.Map()))
+        ledgerNotifications.showPaymentDone(newestTransaction.get('contribution', Immutable.Map()))
       }
     }
   }

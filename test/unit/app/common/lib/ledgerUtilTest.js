@@ -304,7 +304,7 @@ describe('ledgerUtil unit test', function () {
         it('min balance is missing', function () {
           const state = Immutable.fromJS({
             created: 1111,
-            unconfirmed: 24
+            unconfirmed: 18
           })
           const result = ledgerUtil.walletStatus(state)
           assert.deepEqual(result, {
@@ -316,6 +316,17 @@ describe('ledgerUtil unit test', function () {
           const state = Immutable.fromJS({
             created: 1111,
             balance: 30
+          })
+          const result = ledgerUtil.walletStatus(state)
+          assert.deepEqual(result, {
+            id: 'createdWalletStatus'
+          })
+        })
+
+        it('funds are bellow budget, but are above 90%', function () {
+          const state = Immutable.fromJS({
+            created: 1111,
+            balance: 23
           })
           const result = ledgerUtil.walletStatus(state)
           assert.deepEqual(result, {
@@ -1234,6 +1245,28 @@ describe('ledgerUtil unit test', function () {
 
       const result = ledgerUtil.getRemainingRequiredTime(state, publisherKey)
       assert.equal(result, expectedResult)
+    })
+  })
+
+  describe('probiToFormat', function () {
+    it('null case', function () {
+      const result = ledgerUtil.probiToFormat()
+      assert.equal(result, 0)
+    })
+
+    it('string', function () {
+      const result = ledgerUtil.probiToFormat('asdfasdf')
+      assert.equal(result, 0)
+    })
+
+    it('string number', function () {
+      const result = ledgerUtil.probiToFormat('1234')
+      assert.equal(result, 1.234e-15)
+    })
+
+    it('string number', function () {
+      const result = ledgerUtil.probiToFormat('50000000000000000000')
+      assert.equal(result, 50)
     })
   })
 })

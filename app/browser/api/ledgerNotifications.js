@@ -326,10 +326,10 @@ const showAddFunds = () => {
 }
 
 // Called from observeTransactions() when we see a new payment (transaction).
-const showPaymentDone = (transactionContributionFiat) => {
+const showPaymentDone = (transactionContribution) => {
   text.paymentDone = locale.translation('notificationPaymentDone')
-    .replace(/{{\s*amount\s*}}/, transactionContributionFiat.get('amount'))
-    .replace(/{{\s*currency\s*}}/, transactionContributionFiat.get('currency'))
+    .replace(/{{\s*amount\s*}}/, ledgerUtil.probiToFormat(transactionContribution.get('probi')))
+    .replace(/{{\s*currency\s*}}/, transactionContribution.getIn(['currency', 'fiat']))
   // Hide the 'waiting for deposit' message box if it exists
   appActions.hideNotification(text.addFunds)
   appActions.showNotification({
