@@ -1163,6 +1163,52 @@ describe('ledger api unit tests', function () {
         assert(visitsByPublisher['clifton.io'])
       })
     })
+    describe('saveVisit', function () {
+      let setPublishersPropSpy
+
+      before(function () {
+        setPublishersPropSpy = sinon.spy(ledgerState, 'setPublishersProp')
+      })
+
+      beforeEach(function () {
+        ledgerApi.setSynopsis({
+          addPublisher: () => {},
+          options: {},
+          publishers: {}
+        })
+      })
+
+      afterEach(function () {
+        setPublishersPropSpy.reset()
+        ledgerApi.setSynopsis(undefined)
+      })
+
+      after(function () {
+        setPublishersPropSpy.restore()
+      })
+
+      it('sets https as protocol for secure site', function () {
+        const options = {
+          duration: 5500,
+          protocol: 'https:',
+          revisited: false
+        }
+        const result = ledgerApi.saveVisit(defaultAppState, 'brave.com', options)
+        assert.equal('https:', setPublishersPropSpy.getCall(0).args[3])
+        assert.equal('https:', result.getIn(['ledger', 'synopsis', 'publishers', 'brave.com', 'protocol']))
+      })
+
+      it('sets http as protocol for non-secure site', function () {
+        const options = {
+          duration: 5500,
+          protocol: 'http:',
+          revisited: false
+        }
+        const result = ledgerApi.saveVisit(defaultAppState, 'espn.com', options)
+        assert.equal('http:', setPublishersPropSpy.getCall(0).args[3])
+        assert.equal('http:', result.getIn(['ledger', 'synopsis', 'publishers', 'espn.com', 'protocol']))
+      })
+    })
     describe('addNewLocation', function () {
       const tabIdNone = -1
       const keepInfo = false

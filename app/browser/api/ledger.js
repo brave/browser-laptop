@@ -714,6 +714,7 @@ const addSiteVisit = (state, timestamp, location, tabId, manualAdd = false) => {
     return state
   }
 
+  const protocol = urlParse(location).protocol
   location = pageDataUtil.getInfoKey(location)
 
   const minimumVisitTime = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
@@ -753,6 +754,7 @@ const addSiteVisit = (state, timestamp, location, tabId, manualAdd = false) => {
 
   return module.exports.saveVisit(state, publisherKey, {
     duration,
+    protocol: protocol,
     revisited: revisitP
   })
 }
@@ -771,7 +773,11 @@ const saveVisit = (state, publisherKey, options) => {
     revisitP: options.revisited,
     ignoreMinTime: options.ignoreMinTime || false
   })
+
   state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
+  if (options.protocol) {
+    state = ledgerState.setPublishersProp(state, publisherKey, 'protocol', options.protocol)
+  }
   state = updatePublisherInfo(state)
   state = module.exports.checkVerifiedStatus(state, publisherKey)
 
