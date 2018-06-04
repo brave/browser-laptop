@@ -45,9 +45,11 @@ module.exports = {
       },
       'is an absolute file path without scheme': (test) => {
         test.equal(urlUtil().isNotURL('/file/path/to/file'), false)
+        test.equal(urlUtil().isNotURL('/3/25/25'), false)
       },
       'is an absolute file path with scheme': (test) => {
         test.equal(urlUtil().isNotURL('file:///file/path/to/file'), false)
+        test.equal(urlUtil().isNotURL('file:///3/25/25'), false)
       },
       'for special pages': {
         'is a data URI': (test) => {
@@ -147,6 +149,35 @@ module.exports = {
       },
       'has space in schema': (test) => {
         test.equal(urlUtil().isNotURL('https ://brave.com'), true)
+      },
+      'slashes and numbers': {
+        'forward-slashes and numbers in an arbitrary order': (test) => {
+          test.equal(urlUtil().isNotURL('3//'), true)
+          test.equal(urlUtil().isNotURL('64//8'), true)
+          test.equal(urlUtil().isNotURL('25/5/2//'), true)
+        },
+        'division-like expression containing no spaces': (test) => {
+          test.equal(urlUtil().isNotURL('4/2'), true)
+          test.equal(urlUtil().isNotURL('8/2/4'), true)
+          test.equal(urlUtil().isNotURL('100/25'), true)
+        }
+      },
+      // This set of tests confirm that isDate works as a test case inside isNotURL
+      // to determine that valid dates are not interpreted as URLs.
+      'dates': {
+        'forward-slash delimited date': (test) => {
+          test.equal(urlUtil().isNotURL('03/26'), true)
+          test.equal(urlUtil().isNotURL('01/01/1970'), true)
+          test.equal(urlUtil().isNotURL('03/26/2017'), true)
+          test.equal(urlUtil().isNotURL('1995/05/12'), true)
+        },
+        'dot-delimited date': (test) => {
+          test.equal(urlUtil().isNotURL('01.01.1970'), true)
+          test.equal(urlUtil().isNotURL('12.25.2000'), true)
+          test.equal(urlUtil().isNotURL('25.12.2000'), true)
+          test.equal(urlUtil().isNotURL('03.26'), true)
+          test.equal(urlUtil().isNotURL('1977.03.25'), true)
+        }
       }
     }
   },
@@ -565,6 +596,22 @@ module.exports = {
     'url is pdf': (test) => {
       const result = urlUtil().getUrlFromPDFUrl('chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/http://www.test.com/test.pdf')
       test.equal(result, 'http://www.test.com/test.pdf')
+    }
+  },
+
+  'isDate': {
+    'forward-slash delimited date': (test) => {
+      test.equal(urlUtil().isDate('03/26'), true)
+      test.equal(urlUtil().isDate('01/01/1970'), true)
+      test.equal(urlUtil().isDate('03/26/2017'), true)
+      test.equal(urlUtil().isDate('1995/05/12'), true)
+    },
+    'dot-delimited date': (test) => {
+      test.equal(urlUtil().isDate('01.01.1970'), true)
+      test.equal(urlUtil().isDate('12.25.2000'), true)
+      test.equal(urlUtil().isDate('25.12.2000'), true)
+      test.equal(urlUtil().isDate('03.26'), true)
+      test.equal(urlUtil().isDate('1977.03.25'), true)
     }
   }
 }
