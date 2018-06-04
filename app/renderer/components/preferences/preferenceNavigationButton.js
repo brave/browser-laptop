@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     width: '1.4em',
     height: '1.4em',
     WebkitMaskSize: 'contain',
-    marginRight: '16px',
+    marginRight: '14px',
     backgroundColor: '#ffffff'
   },
 
