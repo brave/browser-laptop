@@ -228,6 +228,7 @@ const applyReducers = (state, action, immutableAction) => [
   require('../../app/renderer/reducers/frameReducer'),
   require('../../app/renderer/reducers/contextMenuReducer'),
   require('../../app/renderer/reducers/tabContentReducer'),
+  require('../../app/renderer/reducers/tabDraggingWindowReducer'),
   // This should be included even in production builds since you can use
   // an environment variable to show the Debug menu
   require('../../app/renderer/reducers/debugReducer')

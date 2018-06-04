@@ -559,6 +559,9 @@ const updateFramesInternalIndex = (state, fromIndex) => {
 const moveFrame = (state, tabId, index) => {
   let framesInternal = state.get('framesInternal') || Immutable.Map()
   const frame = getFrameByTabId(state, tabId)
+  if (!frame) {
+    return state
+  }
   const frameKey = frame.get('key')
   if (frameKey) {
     framesInternal = framesInternal.setIn(['index', frameKey.toString()], index)

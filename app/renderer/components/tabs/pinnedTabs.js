@@ -3,70 +3,54 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ReactDOM = require('react-dom')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
-const Tab = require('./tab')
+const ConnectedDragSortDetachTab = require('./connectedDragSortDetachTab')
+const ListWithTransitions = require('./ListWithTransitions')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
 
-// Store
-const windowStore = require('../../../../js/stores/windowStore')
-
 // Constants
-const dragTypes = require('../../../../js/constants/dragTypes')
 const globalStyles = require('../styles/global')
 
 // Utils
-const dnd = require('../../../../js/dnd')
-const dndData = require('../../../../js/dndData')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
 
 class PinnedTabs extends React.Component {
-  constructor (props) {
-    super(props)
-    this.onDragOver = this.onDragOver.bind(this)
-    this.onDrop = this.onDrop.bind(this)
+  constructor (...args) {
+    super(...args)
+    this.onTabStartDragSortDetach = this.onTabStartDragSortDetach.bind(this)
+    this.onDragChangeIndex = this.onDragChangeIndex.bind(this)
   }
 
-  dropFrame (frameKey) {
-    return windowStore.getFrame(frameKey)
+  onTabStartDragSortDetach (frame, clientX, clientY, screenX, screenY, dragElementWidth, dragElementHeight, relativeXDragStart, relativeYDragStart) {
+    appActions.tabDragStarted(
+      getCurrentWindowId(),
+      frame,
+      frame.get('tabId'),
+      clientX,
+      clientY,
+      screenX,
+      screenY,
+      dragElementWidth,
+      dragElementHeight,
+      relativeXDragStart,
+      relativeYDragStart,
+      false
+   )
   }
 
-  onDrop (e) {
-    const clientX = e.clientX
-    const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
-    const location = sourceDragData.get('location')
-    if (location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location)) {
-      return
-    }
-
-    // This must be executed async because the state change that this causes
-    // will cause the onDragEnd to never run
-    setTimeout(() => {
-      const key = sourceDragData.get('key')
-      let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frameKey !== key), clientX).selectedRef
-      if (droppedOnTab) {
-        const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-        const sourceIsPinned = sourceDragData.get('pinnedLocation')
-        // TODO: pass in needs-pinning in moveTab, and do nothing else here
-        windowActions.moveTab(key, droppedOnTab.props.frameKey, isLeftSide)
-        if (!sourceIsPinned) {
-          appActions.tabPinned(sourceDragData.get('tabId'), true)
-        }
-      }
-    }, 0)
-  }
-
-  onDragOver (e) {
-    e.dataTransfer.dropEffect = 'move'
-    e.preventDefault()
+  onDragChangeIndex (currentIndex, destinationIndex) {
+    // We do not need to know which tab is changing index, since
+    // the currently-dragged tabId is stored on state.
+    // Move display index immediately
+    windowActions.tabDragChangeGroupDisplayIndex(true, destinationIndex)
+    return true
   }
 
   mergeProps (state, ownProps) {
@@ -77,33 +61,61 @@ class PinnedTabs extends React.Component {
 
     const props = {}
     // used in renderer
-    props.pinnedTabs = pinnedFrames.map((frame) => frame.get('key'))
+    props.pinnedTabs = pinnedFrames
     props.isPreviewingPinnedTab = previewFrameKey && props.pinnedTabs.some(key => key === previewFrameKey)
     return props
   }
 
   render () {
-    this.tabRefs = []
-    return <div
+    return <ListWithTransitions
       className={css(
         styles.pinnedTabs,
         this.props.isPreviewingPinnedTab && styles.pinnedTabs_previewing
       )}
       data-test-id='pinnedTabs'
+      typeName='div'
+      duration={710}
+      delay={0}
+      staggerDelayBy={0}
+      easing='cubic-bezier(0.23, 1, 0.32, 1)'
+      enterAnimation={[
+        {
+          transform: 'translateY(50%)'
+        },
+        {
+          transform: 'translateY(0)'
+        }
+      ]}
+      leaveAnimation={[
+        {
+          transform: 'translateY(0)'
+        },
+        {
+          transform: 'translateY(100%)'
+        }
+      ]}
       onDragOver={this.onDragOver}
       onDrop={this.onDrop}
     >
       {
-         this.props.pinnedTabs
-           .map((frameKey) =>
-             <Tab
-               key={'tab-' + frameKey}
-               ref={(node) => this.tabRefs.push(node)}
-               frameKey={frameKey}
-             />
-           )
+        this.props.pinnedTabs
+          .map((frame, tabDisplayIndex) =>
+            <ConnectedDragSortDetachTab
+              frame={frame}
+              key={`tab-${frame.get('tabId')}-${frame.get('key')}`}
+              // required for DragSortDetachTab
+              dragData={frame}
+              dragCanDetach={false}
+              firstItemDisplayIndex={0}
+              displayIndex={tabDisplayIndex}
+              displayedTabCount={this.props.pinnedTabs.size}
+              totalTabCount={this.props.pinnedTabs.size}
+              onStartDragSortDetach={this.onTabStartDragSortDetach}
+              onDragChangeIndex={this.onDragChangeIndex}
+            />
+          )
       }
-    </div>
+    </ListWithTransitions>
   }
 }
 

@@ -56,7 +56,11 @@
 
       button: {
         backgroundColor: globalStyles.color.buttonColor,
-
+        changingPage: {
+          fromBackgroundColor: globalStyles.color.braveOrangeOpaque,
+          toBackgroundColor: globalStyles.color.braveOrange,
+          color: '#fff'
+        },
         onHover: {
           backgroundColor: '#000'
         }

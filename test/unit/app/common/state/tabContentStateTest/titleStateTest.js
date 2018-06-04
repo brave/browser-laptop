@@ -51,10 +51,6 @@ describe('titleState unit tests', function () {
   })
 
   describe('showTabTitle', function () {
-    it('returns an empty string if frame is null/undefined', function () {
-      assert.equal(titleState.showTabTitle(), false)
-    })
-
     it('returns false if tab is intersected at 45% size and is active', function * () {
       const state = defaultState
         .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at45)
@@ -85,6 +81,13 @@ describe('titleState unit tests', function () {
         .setIn(['frames', index, 'location'], 'about:newtab')
         .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at45)
       const result = titleState.showTabTitle(state, frameKey)
+      assert.equal(result, true)
+    })
+
+    it('returns true if tab is intersected at 45% and frame does not exist', function () {
+      const state = defaultState
+        .setIn(['ui', 'tabs', 'intersectionRatio'], intersection.at45)
+      const result = titleState.showTabTitle(state, frameKey + 1)
       assert.equal(result, true)
     })
 

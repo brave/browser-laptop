@@ -1082,7 +1082,7 @@ const api = {
     })
   },
 
-  moveTo: (state, tabId, frameOpts, browserOpts, toWindowId) => {
+  moveTo: (state, tabId, frameOpts, browserOpts, toWindowId, onReady) => {
     frameOpts = makeImmutable(frameOpts)
     browserOpts = makeImmutable(browserOpts)
     if (shouldDebugTabEvents) {
@@ -1127,6 +1127,7 @@ const api = {
         win.webContents.emit('detached-tab-new-window')
       }
     })
+    tab.once('tab-inserted-at', onReady)
     // make sure frame has latest guestinstanceid
     const guestInstanceId = tabValue && tabValue.get('guestInstanceId')
     if (guestInstanceId != null) {

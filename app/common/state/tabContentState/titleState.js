@@ -18,23 +18,21 @@
 
  module.exports.showTabTitle = (state, frameKey) => {
    const frame = frameStateUtil.getFrameByKey(state, frameKey)
-
-   if (frame == null) {
-     return false
-   }
-
-   const isNewTabPage = frameStateUtil.frameLocationMatch(frame, 'about:newtab')
-   const isActive = frameStateUtil.isFrameKeyActive(state, frameKey)
-   const isPartition = partitionState.isPartitionTab(state, frameKey)
-   const isPrivate = privateState.isPrivateTab(state, frameKey)
-   const secondaryIconVisible = !isNewTabPage &&
+   // frame could be null but still may want a default title, since
+   // tabs may still show when the frame is destroyed (e.g. for transition / animation)
+   if (frame != null) {
+     const isNewTabPage = frameStateUtil.frameLocationMatch(frame, 'about:newtab')
+     const isActive = frameStateUtil.isFrameKeyActive(state, frameKey)
+     const isPartition = partitionState.isPartitionTab(state, frameKey)
+     const isPrivate = privateState.isPrivateTab(state, frameKey)
+     const secondaryIconVisible = !isNewTabPage &&
     (isPartition || isPrivate || isActive) &&
     tabUIState.showTabEndIcon(state, frameKey)
-
-   // If title is being intersected by ~half with other icons visible
-   // such as closeTab (activeTab) or session icons, do not show it
-   if (isEntryIntersected(state, 'tabs', intersection.at46) && secondaryIconVisible) {
-     return false
+     // If title is being intersected by ~half with other icons visible
+     // such as closeTab (activeTab) or session icons, do not show it
+     if (isEntryIntersected(state, 'tabs', intersection.at46) && secondaryIconVisible) {
+       return false
+     }
    }
 
    // title should never show at such intersection point

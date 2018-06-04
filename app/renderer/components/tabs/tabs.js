@@ -3,7 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ReactDOM = require('react-dom')
 const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite/no-important')
 
@@ -11,7 +10,8 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const ReduxComponent = require('../reduxComponent')
 const BrowserButton = require('../common/browserButton')
 const LongPressButton = require('../common/longPressButton')
-const Tab = require('./tab')
+const ConnectedDragSortDetachTab = require('./connectedDragSortDetachTab')
+const ListWithTransitions = require('./ListWithTransitions')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -19,6 +19,8 @@ const windowActions = require('../../../../js/actions/windowActions')
 
 // State
 const windowState = require('../../../common/state/windowState')
+const tabState = require('../../../common/state//tabState')
+const tabDraggingState = require('../../../common/state//tabDraggingState')
 
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
@@ -27,13 +29,14 @@ const settings = require('../../../../js/constants/settings')
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
 const {getCurrentWindowId, isFocused} = require('../../currentWindow')
-const dnd = require('../../../../js/dnd')
-const dndData = require('../../../../js/dndData')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {getSetting} = require('../../../../js/settings')
 
 const globalStyles = require('../styles/global')
 const {theme} = require('../styles/theme')
+
+// time to wait before moving page during a tab drag
+const DRAG_PAGEMOVE_MS_TIME_BUFFER = 1000
 
 class Tabs extends React.Component {
   constructor (props) {
@@ -44,6 +47,10 @@ class Tabs extends React.Component {
     this.onNextPage = this.onNextPage.bind(this)
     this.onNewTabLongPress = this.onNewTabLongPress.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
+    this.onTabStartDragSortDetach = this.onTabStartDragSortDetach.bind(this)
+    this.onRequestDetachTab = this.onRequestDetachTab.bind(this)
+    this.onDragMoveSingleTabWindow = this.onDragMoveSingleTabWindow.bind(this)
+    this.onDragChangeIndex = this.onDragChangeIndex.bind(this)
   }
 
   onMouseLeave () {
@@ -74,31 +81,6 @@ class Tabs extends React.Component {
 
   onDrop (e) {
     appActions.dataDropped(getCurrentWindowId())
-    const clientX = e.clientX
-    const sourceDragData = dndData.getDragData(e.dataTransfer, dragTypes.TAB)
-    if (sourceDragData) {
-      // If this is a different window ID than where the drag started, then
-      // the tear off will be done by tab.js
-      if (this.props.dragWindowId !== getCurrentWindowId()) {
-        return
-      }
-
-      // This must be executed async because the state change that this causes
-      // will cause the onDragEnd to never run
-      setTimeout(() => {
-        const key = sourceDragData.get('key')
-        let droppedOnTab = dnd.closestFromXOffset(this.tabRefs.filter((node) => node && node.props.frameKey !== key), clientX).selectedRef
-        if (droppedOnTab) {
-          const isLeftSide = dnd.isLeftSide(ReactDOM.findDOMNode(droppedOnTab), clientX)
-
-          windowActions.moveTab(key, droppedOnTab.props.frameKey, isLeftSide)
-          if (sourceDragData.get('pinnedLocation')) {
-            appActions.tabPinned(sourceDragData.get('tabId'), false)
-          }
-        }
-      }, 0)
-      return
-    }
 
     if (e.dataTransfer.files) {
       Array.from(e.dataTransfer.items).forEach((item) => {
@@ -110,16 +92,98 @@ class Tabs extends React.Component {
   }
 
   onDragOver (e) {
-    if (dndData.hasDragData(e.dataTransfer, dragTypes.TAB)) {
-      e.dataTransfer.dropEffect = 'move'
-      e.preventDefault()
-      return
-    }
-    let intersection = e.dataTransfer.types.filter((x) => ['Files'].includes(x))
-    if (intersection.length > 0) {
+    if (e.dataTransfer.types.some(x => x === 'Files')) {
       e.dataTransfer.dropEffect = 'copy'
       e.preventDefault()
     }
+  }
+
+  onTabStartDragSortDetach (frame, clientX, clientY, screenX, screenY, dragElementWidth, dragElementHeight, relativeXDragStart, relativeYDragStart) {
+    appActions.tabDragStarted(
+      getCurrentWindowId(),
+      frame,
+      frame.get('tabId'),
+      clientX,
+      clientY,
+      screenX,
+      screenY,
+      dragElementWidth,
+      dragElementHeight,
+      relativeXDragStart,
+      relativeYDragStart,
+      this.props.totalTabCount === 1
+    )
+  }
+
+  onRequestDetachTab (itemX, itemY) {
+    appActions.tabDragDetachRequested(itemX, itemY)
+  }
+
+  onDragMoveSingleTabWindow (itemX, itemY) {
+    // we do not need to send the cursor pos as it will be read by the store, since
+    // it may move between here and there
+    appActions.tabDragSingleTabMoved(itemX, itemY, getCurrentWindowId())
+  }
+
+  onDragChangeIndex (currentIndex, destinationIndex) {
+    // we do not need to know which tab is changing index, since
+    // the currently-dragged tabId is stored on state
+    let shouldPauseDraggingUntilUpdate = false
+    // handle any destination index change by dispatching actions to store
+    if (currentIndex !== destinationIndex) {
+      // only allow to drag to a different page if we hang here for a while
+      const firstIndexOnCurrentPage = this.props.firstTabDisplayIndex
+      const lastIndexOnCurrentPage = firstIndexOnCurrentPage + this.props.currentTabs.size - 1
+      const isDraggingToPreviousPage = destinationIndex < firstIndexOnCurrentPage
+      const isDraggingToNextPage = destinationIndex > lastIndexOnCurrentPage
+      const isDraggingToDifferentPage = isDraggingToPreviousPage || isDraggingToNextPage
+      if (isDraggingToDifferentPage) {
+        // dragging to a different page
+        // first, at least make sure the tab has moved to the index just next to the threshold
+        // (since we might have done a big jump)
+        if (isDraggingToNextPage && currentIndex !== lastIndexOnCurrentPage) {
+          shouldPauseDraggingUntilUpdate = true
+          windowActions.tabDragChangeGroupDisplayIndex(false, lastIndexOnCurrentPage)
+        } else if (isDraggingToPreviousPage && currentIndex !== firstIndexOnCurrentPage) {
+          shouldPauseDraggingUntilUpdate = true
+          windowActions.tabDragChangeGroupDisplayIndex(false, firstIndexOnCurrentPage)
+        }
+        // make sure the user wants to change page by enforcing a pause
+        this.beginOrContinueTimeoutForDragPageIndexMove(destinationIndex, this.props.tabPageIndex, this.props.firstTabDisplayIndex)
+      } else {
+        // dragging to a different index within the same page,
+        // so clear the wait for changing page and move immediately
+        this.clearDragPageIndexMoveTimeout()
+        // move display index immediately
+        shouldPauseDraggingUntilUpdate = true
+        windowActions.tabDragChangeGroupDisplayIndex(false, destinationIndex)
+      }
+    } else {
+      // no longer want to change tab page
+      this.clearDragPageIndexMoveTimeout()
+    }
+    return shouldPauseDraggingUntilUpdate
+  }
+
+  clearDragPageIndexMoveTimeout () {
+    if (this.draggingMoveTabPageTimeout) {
+      window.clearTimeout(this.draggingMoveTabPageTimeout)
+      this.draggingMoveTabPageTimeout = null
+      // let store know we're done waiting
+      windowActions.tabDragNotPausingForPageChange()
+    }
+  }
+
+  beginOrContinueTimeoutForDragPageIndexMove (destinationIndex, currentTabPageIndex, firstTabDisplayIndex) {
+    // let store know we're waiting to change
+    if (!this.draggingMoveTabPageTimeout) {
+      const waitingForPageIndex = currentTabPageIndex + ((destinationIndex > firstTabDisplayIndex) ? 1 : -1)
+      windowActions.tabDragPausingForPageChange(waitingForPageIndex)
+    }
+    this.draggingMoveTabPageTimeout = this.draggingMoveTabPageTimeout || window.setTimeout(() => {
+      this.clearDragPageIndexMoveTimeout()
+      windowActions.tabDragChangeGroupDisplayIndex(false, destinationIndex)
+    }, DRAG_PAGEMOVE_MS_TIME_BUFFER)
   }
 
   newTab () {
@@ -139,7 +203,7 @@ class Tabs extends React.Component {
       .filter(frame => frame.get('tabStripWindowId') === getCurrentWindowId())
     const currentTabs = unpinnedTabs
       .slice(startingFrameIndex, startingFrameIndex + tabsPerTabPage)
-      .map((tab) => tab.get('key'))
+      .filter(tab => tab)
     const totalPages = Math.ceil(unpinnedTabs.size / tabsPerTabPage)
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const dragData = (state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')) || Immutable.Map()
@@ -154,78 +218,144 @@ class Tabs extends React.Component {
     props.onPreviousPage = pageIndex > 0
     props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state))
 
+    // tab dragging
+    props.draggingTabId = tabState.draggingTabId(state)
+    props.pausingToChangePageIndex = tabDraggingState.window.getPausingForPageIndex(currentWindow)
+
     // used in other functions
+    props.firstTabDisplayIndex = startingFrameIndex
     props.fixTabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.tabPageIndex = currentWindow.getIn(['ui', 'tabs', 'tabPageIndex'])
+    props.totalTabCount = unpinnedTabs.size
+    props.dragData = dragData
     props.dragWindowId = dragData.get('windowId')
     props.totalPages = totalPages
-
     return props
   }
 
   render () {
+    const isPreview = this.props.previewTabPageIndex != null
     const isTabPreviewing = this.props.previewTabFrameKey != null
-    this.tabRefs = []
+    const displayedTabIndex = this.props.previewTabPageIndex != null ? this.props.previewTabPageIndex : this.props.tabPageIndex
     return <div className={css(styles.tabs)}
       data-test-id='tabs'
       onMouseLeave={this.onMouseLeave}
     >
-      <span className={css(
-        styles.tabs__tabStrip,
-        (this.props.previewTabPageIndex != null) && styles.tabs__tabStrip_isPreview,
-        this.props.shouldAllowWindowDrag && styles.tabs__tabStrip_allowDragging,
-        isTabPreviewing && styles.tabs__tabStrip_isTabPreviewing
-      )}
-        data-test-preview-tab={this.props.previewTabPageIndex != null}
-        onDragOver={this.onDragOver}
-        onDrop={this.onDrop}>
-        {
-          this.props.onPreviousPage
-            ? <BrowserButton
-              iconClass={globalStyles.appIcons.prev}
-              size='21px'
-              custom={[styles.tabs__tabStrip__navigation, styles.tabs__tabStrip__navigation_prev]}
-              onClick={this.onPrevPage}
-            />
-            : null
-        }
-        {
-          this.props.currentTabs
-            .map((frameKey) =>
-              <Tab
-                key={'tab-' + frameKey}
-                ref={(node) => this.tabRefs.push(node)}
-                frameKey={frameKey}
-                partOfFullPageSet={this.props.partOfFullPageSet}
-              />
-            )
-        }
-        {
-          this.props.onNextPage
-            ? <BrowserButton
-              iconClass={`${globalStyles.appIcons.next} ${css(styles.tabs__tabStrip__navigation__icon)}`}
-              size='21px'
-              custom={[styles.tabs__tabStrip__navigation, styles.tabs__tabStrip__navigation_next]}
-              onClick={this.onNextPage}
-            />
-            : null
-        }
-        <LongPressButton
-          className={css(
-            styles.tabs__tabStrip__newTabButton
+      {[
+        <ListWithTransitions className={css(
+            styles.tabs__tabStrip,
+            isPreview && styles.tabs__tabStrip_isPreview,
+            this.props.shouldAllowWindowDrag && styles.tabs__tabStrip_allowDragging,
+            isTabPreviewing && styles.tabs__tabStrip_isTabPreviewing
           )}
-          label='+'
-          l10nId='newTabButton'
-          testId='newTabButton'
-          disabled={false}
-          onClick={this.newTab}
-          onLongPress={this.onNewTabLongPress}
-        >
-          <svg className={css(styles.tabs__tabStrip__newTabButton__icon)} xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14.14 14.14'>
-            <path className={css(styles.tabs__tabStrip__newTabButton__icon__line)} d='M7.07 1v12.14M13.14 6.86H1' />
-          </svg>
-        </LongPressButton>
-      </span>
+          key={displayedTabIndex}
+          disableAllAnimations={isPreview}
+          data-test-preview-tab={isPreview}
+          typeName='span'
+          duration={710}
+          delay={0}
+          staggerDelayBy={0}
+          easing='cubic-bezier(0.23, 1, 0.32, 1)'
+          enterAnimation={this.props.draggingTabId != null ? null : [
+            {
+              transform: 'translateY(50%)'
+            },
+            {
+              transform: 'translateY(0)'
+            }
+          ]}
+          leaveAnimation={this.props.draggingTabId != null ? null : [
+            {
+              transform: 'translateY(0)'
+            },
+            {
+              transform: 'translateY(100%)'
+            }
+          ]}
+          onDragOver={this.onDragOver}
+          onDrop={this.onDrop}>
+          {
+            this.props.onPreviousPage
+              ? <BrowserButton
+                key='prev'
+                iconClass={globalStyles.appIcons.prev}
+                size='21px'
+                custom={[
+                  styles.tabs__tabStrip__navigation,
+                  styles.tabs__tabStrip__navigation_prev,
+                  this.props.pausingToChangePageIndex === this.props.tabPageIndex - 1 && styles.tabs__tabStrip__navigation_isPausing
+                ]}
+                onClick={this.onPrevPage}
+              />
+            : null
+          }
+          {
+            this.props.currentTabs
+              .map((frame, tabDisplayIndex) =>
+                <ConnectedDragSortDetachTab
+                  key={`tab-${frame.get('tabId')}-${frame.get('key')}`}
+                  // required for tab component
+                  frame={frame}
+                  partOfFullPageSet={this.props.partOfFullPageSet}
+                  // required for DragSortDetachTab
+                  dragData={frame}
+                  dragCanDetach
+                  firstItemDisplayIndex={this.props.firstTabDisplayIndex}
+                  displayIndex={tabDisplayIndex + this.props.firstTabDisplayIndex}
+                  displayedTabCount={this.props.currentTabs.size}
+                  totalTabCount={this.props.totalTabCount}
+                  tabPageIndex={displayedTabIndex}
+                  onStartDragSortDetach={this.onTabStartDragSortDetach}
+                  onRequestDetach={this.onRequestDetachTab}
+                  onDragMoveSingleItem={this.onDragMoveSingleTabWindow}
+                  onDragChangeIndex={this.onDragChangeIndex}
+                />
+              )
+          }
+          {
+            this.props.onNextPage
+              ? <BrowserButton
+                key='next'
+                iconClass={`${globalStyles.appIcons.next} ${css(styles.tabs__tabStrip__navigation__icon)}`}
+                size='21px'
+                custom={[
+                  styles.tabs__tabStrip__navigation,
+                  styles.tabs__tabStrip__navigation_next,
+                  this.props.pausingToChangePageIndex === this.props.tabPageIndex + 1 && styles.tabs__tabStrip__navigation_isPausing
+                ]}
+                onClick={this.onNextPage}
+                />
+              : null
+          }
+          <div
+            key='add'
+            className={css(
+              styles.tabs__postTabButtons,
+              // hide during drag but only when there's no 'next page' button
+              // as the hiding is to avoid a gap, but that would create a new gap
+              this.props.draggingTabId != null && styles.tabs__postTabButtons_ancestorIsDragging,
+              this.props.draggingTabId != null && !this.props.onNextPage && styles.tabs__postTabButtons_isInvisible
+            )}
+            data-prevent-transition-move-right
+          >
+            <LongPressButton
+              className={css(
+                styles.tabs__tabStrip__newTabButton
+              )}
+              label='+'
+              l10nId='newTabButton'
+              testId='newTabButton'
+              disabled={false}
+              onClick={this.newTab}
+              onLongPress={this.onNewTabLongPress}
+            >
+              <svg className={css(styles.tabs__tabStrip__newTabButton__icon)} xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14.14 14.14'>
+                <path className={css(styles.tabs__tabStrip__newTabButton__icon__line)} d='M7.07 1v12.14M13.14 6.86H1' />
+              </svg>
+            </LongPressButton>
+          </div>
+        </ListWithTransitions>
+      ]}
     </div>
   }
 }
@@ -264,11 +394,23 @@ const styles = StyleSheet.create({
     height: 'auto',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: '#ddddddaa',
+    zIndex: 400,
+    borderRadius: 0
   },
 
   tabs__tabStrip__navigation__icon: {
     lineHeight: 0
+  },
+
+  tabs__tabStrip__navigation_isPausing: {
+    backgroundColor: '#dddddd',
+    color: theme.tabsToolbar.button.changingPage.toBackgroundColor,
+    ':hover': {
+      backgroundColor: '#dddddd',
+      color: theme.tabsToolbar.button.changingPage.toBackgroundColor
+    }
   },
 
   tabs__tabStrip__navigation_prev: {
@@ -283,7 +425,18 @@ const styles = StyleSheet.create({
   tabs__tabStrip__navigation_next: {
     paddingLeft: '2px'
   },
-
+  tabs__postTabButtons: {
+    background: theme.tabsToolbar.backgroundColor,
+    zIndex: 50, // underneath normal tab, on top of dragged tab
+    opacity: 1,
+    transition: 'opacity 120ms ease-in-out'
+  },
+  tabs__postTabButtons_ancestorIsDragging: {
+    zIndex: 450
+  },
+  tabs__postTabButtons_isInvisible: {
+    opacity: 0
+  },
   tabs__tabStrip__newTabButton: {
     '--new-tab-button-line-color': theme.tabsToolbar.button.backgroundColor,
     // no-drag is applied to each button and tab

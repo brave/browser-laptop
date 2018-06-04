@@ -16,6 +16,9 @@ const windowActions = require('../../../../js/actions/windowActions')
 const dragTypes = require('../../../../js/constants/dragTypes')
 const settings = require('../../../../js/constants/settings')
 
+// State
+const tabDraggingState = require('../../../common/state/tabDraggingState')
+
 // Utils
 const {getSetting} = require('../../../../js/settings')
 const {getCurrentWindowId} = require('../../currentWindow')
@@ -37,11 +40,15 @@ class TabPage extends React.Component {
   }
 
   onMouseLeave () {
-    windowActions.setTabPageHoverState(this.props.index, false)
+    if (!this.props.isAnyTabDragging) {
+      windowActions.setTabPageHoverState(this.props.index, false)
+    }
   }
 
   onMouseEnter (e) {
-    windowActions.setTabPageHoverState(this.props.index, true)
+    if (!this.props.isAnyTabDragging) {
+      windowActions.setTabPageHoverState(this.props.index, true)
+    }
   }
 
   onDrop (e) {
@@ -143,6 +150,7 @@ class TabPage extends React.Component {
     props.tabPageFrames = tabPageFrames
     props.isPageEmpty = tabPageFrames.isEmpty()
     props.moveToFrameKey = tabPageFrames.getIn([0, 'key'])
+    props.isAnyTabDragging = tabDraggingState.app.isDragging(state)
 
     return props
   }

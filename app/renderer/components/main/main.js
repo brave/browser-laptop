@@ -63,6 +63,7 @@ const windowState = require('../../../common/state/windowState')
 const updateState = require('../../../common/state/updateState')
 const tabState = require('../../../common/state/tabState')
 const tabMessageBoxState = require('../../../common/state/tabMessageBoxState')
+const tabDraggingState = require('../../../common/state/tabDraggingState')
 
 // Util
 const _ = require('underscore')
@@ -529,6 +530,12 @@ class Main extends React.Component {
     contextMenus.onTabsToolbarContextMenu(this.props.title, this.props.location, undefined, undefined, e)
   }
 
+  setMouseInTitlebar (isInTitlebar) {
+    if (!this.props.isAnyTabDragging) {
+      windowActions.setMouseInTitlebar(isInTitlebar)
+    }
+  }
+
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
@@ -586,6 +593,7 @@ class Main extends React.Component {
       ? urlResolve(loginRequiredDetails.getIn(['request', 'url']), '/')
       : null
     props.showMessageBox = tabMessageBoxState.hasMessageBoxDetail(state, activeTabId)
+    props.isAnyTabDragging = tabDraggingState.app.isDragging(state)
 
     // used in other functions
     props.menubarSelectedIndex = currentWindow.getIn(['ui', 'menubar', 'selectedIndex'])
@@ -628,8 +636,8 @@ class Main extends React.Component {
             allowDragging: this.props.shouldAllowWindowDrag
           })
         }
-        onMouseEnter={windowActions.setMouseInTitlebar.bind(null, true)}
-        onMouseLeave={windowActions.setMouseInTitlebar.bind(null, false)}
+        onMouseEnter={this.setMouseInTitlebar.bind(this, true)}
+        onMouseLeave={this.setMouseInTitlebar.bind(this, false)}
         >
         <Navigator />
         {

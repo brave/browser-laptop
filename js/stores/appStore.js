@@ -221,6 +221,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/historyReducer'),
       require('../../app/browser/reducers/pinnedSitesReducer'),
       require('../../app/browser/reducers/windowsReducer'),
+      require('../../app/browser/reducers/tabDraggingReducer'),
       require('../../app/browser/reducers/syncReducer'),
       require('../../app/browser/reducers/clipboardReducer'),
       require('../../app/browser/reducers/passwordManagerReducer'),

@@ -39,6 +39,7 @@ class CloseTabIcon extends React.Component {
     const props = {}
     props.isPinned = isPinned
     props.onClick = ownProps.onClick
+    props.isDragging = tabState.isTabDragging(state, tabId)
     props.hasFrame = frameStateUtil.hasFrame(currentWindow, frameKey)
     props.centralizeTabIcons = tabUIState.centralizeTabIcons(currentWindow, frameKey, isPinned)
     props.showCloseIcon = closeState.showCloseTabIcon(currentWindow, frameKey)
@@ -50,7 +51,7 @@ class CloseTabIcon extends React.Component {
   }
 
   render () {
-    if (this.props.isPinned || !this.props.showCloseIcon) { // <-- comment out to always show, in order to view in inspector
+    if (this.props.isPinned || this.props.isDragging || !this.props.showCloseIcon) {
       return null
     }
 

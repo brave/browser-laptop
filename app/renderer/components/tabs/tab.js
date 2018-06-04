@@ -5,7 +5,6 @@
 const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const aphroditeInject = require('aphrodite/lib/inject')
-const Immutable = require('immutable')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
@@ -27,23 +26,19 @@ const windowStore = require('../../../../js/stores/windowStore')
 // State helpers
 const privateState = require('../../../common/state/tabContentState/privateState')
 const audioState = require('../../../common/state/tabContentState/audioState')
+const tabDraggingState = require('../../../common/state/tabDraggingState')
 const tabUIState = require('../../../common/state/tabUIState')
 const tabState = require('../../../common/state/tabState')
 const titleState = require('../../../common/state/tabContentState/titleState')
 
-// Constants
 const settings = require('../../../../js/constants/settings')
-const dragTypes = require('../../../../js/constants/dragTypes')
-
 // Styles
 const globalStyles = require('../styles/global')
 const {theme} = require('../styles/theme')
 
 // Utils
 const {backgroundRequiresLightText} = require('../../../../js/lib/color')
-const {isIntermediateAboutPage} = require('../../../../js/lib/appUrlUtil')
 const contextMenus = require('../../../../js/contextMenus')
-const dnd = require('../../../../js/dnd')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {hasTabAsRelatedTarget} = require('../../lib/tabUtil')
 const {getCurrentWindowId} = require('../../currentWindow')
@@ -57,10 +52,7 @@ class Tab extends React.Component {
     this.onMouseMove = this.onMouseMove.bind(this)
     this.onMouseEnter = this.onMouseEnter.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
-    this.onDrag = this.onDrag.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
-    this.onDragEnd = this.onDragEnd.bind(this)
-    this.onDragOver = this.onDragOver.bind(this)
     this.onClickTab = this.onClickTab.bind(this)
     this.onObserve = this.onObserve.bind(this)
     this.onTabClosedWithMouse = this.onTabClosedWithMouse.bind(this)
@@ -72,106 +64,51 @@ class Tab extends React.Component {
     return windowStore.getFrame(this.props.frameKey)
   }
 
-  get draggingOverData () {
-    const draggingOverData = this.props.dragData && this.props.dragData.get('dragOverData')
-    if (!draggingOverData ||
-        draggingOverData.get('draggingOverKey') !== this.props.tabId ||
-        draggingOverData.get('draggingOverWindowId') !== getCurrentWindowId()) {
-      return
-    }
-
-    const sourceDragData = dnd.getInterBraveDragData()
-    if (!sourceDragData) {
-      return
-    }
-    const location = sourceDragData.get('location')
-    const tabId = draggingOverData.get('draggingOverKey')
-    const draggingOverFrame = windowStore.getFrameByTabId(tabId)
-    if ((location === 'about:blank' || location === 'about:newtab' || isIntermediateAboutPage(location)) &&
-        (draggingOverFrame && draggingOverFrame.get('pinnedLocation'))) {
-      return
-    }
-
-    return draggingOverData
-  }
-
-  get isDragging () {
-    const sourceDragData = dnd.getInterBraveDragData()
-    return sourceDragData &&
-      sourceDragData.get('tabId') === this.props.tabId &&
-      sourceDragData.get('draggingOverWindowId') === getCurrentWindowId()
-  }
-
-  get isDraggingOverSelf () {
-    const draggingOverData = this.props.dragData && this.props.dragData.get('dragOverData')
-    const sourceDragData = dnd.getInterBraveDragData()
-    if (!draggingOverData || !sourceDragData) {
-      return false
-    }
-    return draggingOverData.get('draggingOverKey') === sourceDragData.get('tabId')
-  }
-
-  get isDraggingOverLeft () {
-    if (!this.draggingOverData) {
-      return false
-    }
-    return this.draggingOverData.get('draggingOverLeftHalf')
-  }
-
-  get isDraggingOverRight () {
-    if (!this.draggingOverData) {
-      return false
-    }
-    return this.draggingOverData.get('draggingOverRightHalf')
-  }
+  //
+  // General Events
+  //
 
   onDragStart (e) {
     if (this.frame) {
-      // showing up the sentinel while dragging leads to show the shadow
-      // of the next tab. See 10691#issuecomment-329854096
-      // this is added back to original size when onDrag event is happening
-      this.tabSentinel.style.width = 0
-
-      dnd.onDragStart(dragTypes.TAB, this.frame, e)
       // cancel tab preview while dragging. see #10103
       windowActions.setTabHoverState(this.props.frameKey, false, false)
     }
-  }
-
-  onDrag () {
-    // re-enable the tabSentinel while dragging
-    this.tabSentinel.style.width = globalStyles.spacing.sentinelSize
-  }
-
-  onDragEnd (e) {
-    if (this.frame) {
-      dnd.onDragEnd(dragTypes.TAB, this.frame, e)
+    if (this.props.onDragStart) {
+      this.props.onDragStart(e)
     }
   }
 
-  onDragOver (e) {
-    dnd.onDragOver(dragTypes.TAB, this.tabNode.getBoundingClientRect(), this.props.tabId, this.draggingOverData, e)
-  }
-
   onMouseLeave (e) {
-    // mouseleave will keep the previewMode
-    // as long as the related target is another tab
-    clearTimeout(this.mouseTimeout)
-    windowActions.setTabHoverState(this.props.frameKey, false, hasTabAsRelatedTarget(e))
+    if (!this.props.anyTabIsDragging) {
+      // mouseleave will keep the previewMode
+      // as long as the related target is another tab
+      clearTimeout(this.mouseTimeout)
+      windowActions.setTabHoverState(this.props.frameKey, false, hasTabAsRelatedTarget(e))
+    }
   }
 
   onMouseEnter (e) {
-    // if mouse entered a tab we only trigger a new preview
-    // if user is in previewMode, which is defined by mouse move
-    clearTimeout(this.mouseTimeout)
-    windowActions.setTabHoverState(this.props.frameKey, true, this.props.previewMode)
-    // In case there's a tab preview happening, cancel the preview
-    // when mouse is over a tab
-    windowActions.setTabPageHoverState(this.props.tabPageIndex, false)
-    // cache offset position for hover radial grandient
-    if (this.tabNode) {
-      const tabBounds = this.tabNode.getBoundingClientRect()
-      this.tabOffsetLeft = tabBounds.left
+    if (this.props.anyTabIsDragging) {
+      // report mouse over a tab that is not in the current window
+      // TODO: focus window when dragging and mouseenter the whole window
+      const windowId = getCurrentWindowId()
+      if (!this.props.isPinned && this.props.dragIntendedWindowId !== windowId) {
+        console.log('drag tab mouse enter')
+        appActions.tabDragMouseOverOtherWindowTab(this.props.frameIndex)
+      }
+    } else {
+      // if mouse entered a tab we only trigger a new preview
+      // if user is in previewMode, which is defined by mouse move
+      clearTimeout(this.mouseTimeout)
+      windowActions.setTabHoverState(this.props.frameKey, true, this.props.previewMode)
+      // In case there's a tab preview happening, cancel the preview
+      // when mouse is over a tab
+      windowActions.setTabPageHoverState(this.props.tabPageIndex, false)
+      // cache offset position for hover radial grandient
+      if (this.tabNode) {
+        const tabBounds = this.tabNode.getBoundingClientRect()
+        this.tabOffsetLeft = tabBounds.left
+      }
     }
   }
 
@@ -179,11 +116,14 @@ class Tab extends React.Component {
     // dispatch a message to the store so it can delay
     // and preview the tab based on mouse idle time
     clearTimeout(this.mouseTimeout)
-    this.mouseTimeout = setTimeout(
-      () => {
-        windowActions.setTabHoverState(this.props.frameKey, true, true)
-      },
-      getSetting(settings.TAB_PREVIEW_TIMING))
+    if (!this.props.anyTabIsDragging) {
+      this.mouseTimeout = setTimeout(
+        () => {
+          windowActions.setTabHoverState(this.props.frameKey, true, true)
+        },
+        getSetting(settings.TAB_PREVIEW_TIMING)
+      )
+    }
     // fancy radial gradient mouse tracker
     if (this.elementRef && !this.props.isActive) {
       // only update position once per render frame
@@ -232,6 +172,29 @@ class Tab extends React.Component {
     }
   }
 
+  onObserve (entries) {
+    if (this.props.isPinnedTab) {
+      return
+    }
+    // we only have one entry
+    const entry = entries[0]
+    windowActions.setTabIntersectionState(this.props.frameKey, entry.intersectionRatio)
+  }
+
+  get fixTabWidth () {
+    if (!this.elementRef) {
+      console.error('accessed fixTabWidth without an element to read')
+      return 0
+    }
+
+    const rect = this.elementRef.getBoundingClientRect()
+    return rect && rect.width
+  }
+
+  //
+  // React lifecycle events
+  //
+
   componentDidMount () {
     // Workaround the fact that aphrodite will not inject style rules until some time
     // after css([rules]) is called.
@@ -255,35 +218,17 @@ class Tab extends React.Component {
     this.observer.observe(this.tabSentinel)
 
     this.tabNode.addEventListener('auxclick', this.onAuxClick.bind(this))
+    clearTimeout(this.mouseTimeout)
   }
 
   componentWillUnmount () {
     this.observer.unobserve(this.tabSentinel)
-    clearTimeout(this.mouseTimeout)
-  }
-
-  onObserve (entries) {
-    if (this.props.isPinnedTab) {
-      return
-    }
-    // we only have one entry
-    const entry = entries[0]
-    windowActions.setTabIntersectionState(this.props.frameKey, entry.intersectionRatio)
-  }
-
-  get fixTabWidth () {
-    if (!this.tabNode) {
-      return 0
-    }
-
-    const rect = this.elementRef.getBoundingClientRect()
-    return rect && rect.width
   }
 
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
-    const frame = frameStateUtil.getFrameByKey(currentWindow, ownProps.frameKey) || Immutable.Map()
-    const frameKey = ownProps.frameKey
+    const frame = ownProps.frame
+    const frameKey = frame.get('key')
     const previewFrameKey = frameStateUtil.getPreviewFrameKey(currentWindow)
     const tabId = frame.get('tabId', tabState.TAB_ID_NONE)
     const isPinned = tabState.isTabPinned(state, tabId)
@@ -296,9 +241,12 @@ class Tab extends React.Component {
       notificationOrigins.includes(UrlUtil.getUrlOrigin(frame.get('location')))
 
     const props = {}
+    props.dragElementRef = ownProps.dragElementRef
+    props.onDragStart = ownProps.onDragStart
     // TODO: this should have its own method
     props.notificationBarActive = notificationBarActive
     props.frameKey = frameKey
+    props.isEmpty = frame.isEmpty()
     props.isPinnedTab = isPinned
     props.isPrivateTab = privateState.isPrivateTab(currentWindow, frameKey)
     props.isActive = !!frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
@@ -306,6 +254,7 @@ class Tab extends React.Component {
     props.anyTabIsPreview = previewFrameKey != null
     props.tabWidth = isPinned ? null : currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.themeColor = tabUIState.getThemeColor(currentWindow, frameKey)
+    props.displayIndex = ownProps.displayIndex
     props.title = titleState.getDisplayTitle(currentWindow, frameKey)
     props.tabPageIndex = frameStateUtil.getTabPageIndex(currentWindow)
     props.partOfFullPageSet = partOfFullPageSet
@@ -321,25 +270,26 @@ class Tab extends React.Component {
       props.tabIndex = tab && tab.get('index')
       props.frameStateInternalIndex = frameStateUtil.getIndexByTabId(currentWindow, tabId)
     }
-
+    props.tabPageIndex = ownProps.tabPageIndex
     // used in other functions
-    props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
     props.tabId = tabId
     props.previewMode = currentWindow.getIn(['ui', 'tabs', 'previewMode'])
-
+    props.frameIndex = frame.get('index')
+    // drag related
+    props.anyTabIsDragging = tabDraggingState.app.isDragging(state)
+    props.dragIntendedWindowId = tabDraggingState.app.getCurrentWindowId(state)
+    const isTabDragging = tabState.isTabDragging(state, tabId)
+    props.isDragging = isTabDragging
+    props.tabWidth = (isTabDragging && tabDraggingState.app.getTabWidth(state)) || props.tabWidth
     return props
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.tabWidth && !this.props.tabWidth && !this.props.partOfFullPageSet) {
-      this.elementRef.animate([
-          { flexBasis: `${prevProps.tabWidth}px`, flexGrow: 0, flexShrink: 0 },
-          { flexBasis: 0, flexGrow: 1, flexShrink: 1 }
-      ], {
-        duration: 250,
-        iterations: 1,
-        easing: 'ease-in-out'
-      })
+    if (this.props.isDragging !== prevProps.isDragging) {
+      console.log('tab changed isDragging')
+    }
+    if (!this.elementRef) {
+      return
     }
     // no transition between:
     // - active <-> inactive state
@@ -354,6 +304,31 @@ class Tab extends React.Component {
         this.elementRef.classList.remove(className)
       })
     }
+    const animateNoFixedTabWidth = () => {
+      this.elementRef.animate([
+        { flexBasis: `${prevProps.tabWidth}px`, flexGrow: 0, flexShrink: 0 },
+        { flexBasis: 0, flexGrow: 1, flexShrink: 1 }
+      ], {
+        duration: 250,
+        iterations: 1,
+        easing: 'ease-in-out'
+      })
+    }
+    const hasFinishedDragging = prevProps.isDragging && !this.props.isDragging
+    const hasTabWidthChangedToNone = prevProps.tabWidth && !this.props.tabWidth
+    // animate tab width if it changes due to a
+    // removal of a restriction when performing
+    // multiple tab-closes in a row
+    if (hasTabWidthChangedToNone && !this.props.partOfFullPageSet) {
+      window.requestAnimationFrame(animateNoFixedTabWidth)
+    } else if (hasFinishedDragging && hasTabWidthChangedToNone) {
+      animateNoFixedTabWidth()
+    }
+  }
+
+  captureRef (element) {
+    this.elementRef = element
+    this.props.dragElementRef(element)
   }
 
   render () {
@@ -379,12 +354,16 @@ class Tab extends React.Component {
     }
     return <div
       data-tab-area
+      data-frame-index={this.props.frameIndex}
+      data-display-index={this.props.displayIndex}
+      data-prevent-transitions={this.props.isDragging}
+      data-is-dragging={this.props.isDragging}
       className={css(
         styles.tabArea,
-        (this.isDraggingOverLeft && !this.isDraggingOverSelf) && styles.tabArea_dragging_left,
-        (this.isDraggingOverRight && !this.isDraggingOverSelf) && styles.tabArea_dragging_right,
-        this.isDragging && styles.tabArea_isDragging,
+        this.props.isDragging && styles.tabArea_isDragging,
+        this.props.anyTabIsDragging && styles.tabArea_anyTabIsDragging,
         this.props.isPinnedTab && styles.tabArea_isPinned,
+        this.props.isEmpty && styles.tabArea_empty,
         (this.props.partOfFullPageSet || !!this.props.tabWidth) && styles.tabArea_partOfFullPageSet,
         this.props.isPreview && styles.tabArea_isPreview,
         !this.props.isPreview && this.props.anyTabIsPreview && styles.tabArea_siblingIsPreview,
@@ -405,7 +384,7 @@ class Tab extends React.Component {
       data-tab-id={this.props.tabId}
       data-guest-instance-id={this.props.guestInstanceId}
       data-frame-key={this.props.frameKey}
-      ref={elementRef => { this.elementRef = elementRef }}
+      ref={this.captureRef.bind(this)}
       >
       {
         this.props.isActive && this.props.notificationBarActive
@@ -428,11 +407,10 @@ class Tab extends React.Component {
         data-test-private-tab={this.props.isPrivateTab}
         data-frame-key={this.props.frameKey}
         draggable
+        data-draggable-tab
+        data-prevent-transitions={this.props.isDragging}
         title={this.props.isPreview ? null : this.props.title}
-        onDrag={this.onDrag}
         onDragStart={this.onDragStart}
-        onDragEnd={this.onDragEnd}
-        onDragOver={this.onDragOver}
         onClick={this.onClickTab}
         onContextMenu={contextMenus.onTabContextMenu.bind(this, this.frame)}
       >
@@ -470,6 +448,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
     flex: '1 1 0',
+    bottom: 0, // when tab disappears, it gets absolute positioning and a top, left, right but no bottom
     '--tab-margin-top': `-${theme.tab.borderWidth}px`,
     // put the top border underneath tab-stip top border, and
     // the left border underneath the previous tab's right border
@@ -524,18 +503,18 @@ const styles = StyleSheet.create({
     '--tab-transit-duration': '0 !important'
   },
 
-  tabArea_dragging_left: {
-    paddingLeft: globalStyles.spacing.dragSpacing
-  },
-
-  tabArea_dragging_right: {
-    paddingRight: globalStyles.spacing.dragSpacing
-  },
-
   tabArea_isDragging: {
-    opacity: 0.2,
-    paddingLeft: 0,
-    paddingRight: 0
+    '--tab-transit-duration': '0 !important',
+    '--tab-background': `var(--tab-background-hover)`,
+    '--tab-color': `var(--tab-color-hover, ${theme.tab.color})`,
+    '--tab-default-icon-color': `var(--tab-default-icon-color-hover, ${theme.tab.defaultFaviconColor})`,
+    '--tab-border-color': `var(--tab-border-color-hover, ${theme.tab.borderColor})`,
+    transform: 'translateX(var(--dragging-delta-x))',
+    zIndex: 200
+  },
+
+  tabArea_anyTabIsDragging: {
+    willChange: 'transform'
   },
 
   tabArea_isPinned: {
@@ -545,6 +524,11 @@ const styles = StyleSheet.create({
 
   tabArea_partOfFullPageSet: {
     maxWidth: 'initial'
+  },
+
+  tabArea_empty: {
+    '--tab-background': 'white',
+    '--tab-background-hover': 'white'
   },
 
   tabArea_isActive: {
@@ -716,4 +700,8 @@ const styles = StyleSheet.create({
   }
 })
 
-module.exports = ReduxComponent.connect(Tab)
+// connect Tab component to state updates
+const ConnectedTab = ReduxComponent.connect(Tab)
+
+// export the final wrapped component
+module.exports = ConnectedTab

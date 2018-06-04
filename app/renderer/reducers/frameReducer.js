@@ -14,8 +14,12 @@ const config = require('../../../js/constants/config')
 // Actions
 const appActions = require('../../../js/actions/appActions')
 
+// Stores
+const appStore = require('../../../js/stores/appStoreRenderer')
+
 // Utils
 const frameStateUtil = require('../../../js/state/frameStateUtil')
+const tabDraggingState = require('../../common/state/tabDraggingState')
 const {getSourceAboutUrl, getSourceMagnetUrl} = require('../../../js/lib/appUrlUtil')
 const {isURL, isPotentialPhishingUrl, getUrlFromInput} = require('../../../js/lib/urlutil')
 const {getCurrentWindowId} = require('../currentWindow')
@@ -104,7 +108,7 @@ function setFrameChangedIndex (state, frame, currentIndex, newIndex) {
   const activeFrame = frameStateUtil.getActiveFrame(state)
   // avoid the race-condition of updating the tabPage
   // while active frame is not yet defined
-  if (activeFrame) {
+  if (activeFrame && !tabDraggingState.app.isDragging(appStore.state)) {
     // Update tab page index to the active tab in case the active tab changed
     state = frameStateUtil.updateTabPageIndex(state, activeFrame.get('tabId'))
     // after tabPageIndex is updated we need to update framesInternalIndex too

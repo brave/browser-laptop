@@ -8,5 +8,9 @@ module.exports = function (name) {
     return appActions
   } else if (name === 'immutable') {
     return require('immutable')
+  } else if (name === 'currentWindow') {
+    return electron.remote.BrowserWindow.getActiveWindow()
+  } else if (name === 'allWindows') {
+    return electron.remote.BrowserWindow.getAllWindows()
   }
 }

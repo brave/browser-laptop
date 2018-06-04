@@ -300,7 +300,9 @@ const tabsReducer = (state, action, immutableAction) => {
             const isPinned = tabState.isTabPinned(state, tabId)
             const nonPinnedTabs = tabState.getNonPinnedTabsByWindowId(state, windowId)
             const pinnedTabs = tabState.getPinnedTabsByWindowId(state, windowId)
-
+            // if there is 2 or more non-pinned tabs (including the current one)
+            // or 1 or more non-pinned tab as well as 1 or more pinned tab
+            // just close the tab
             if (nonPinnedTabs.size > 1 ||
               (nonPinnedTabs.size > 0 && pinnedTabs.size > 0)) {
               setImmediate(() => {
@@ -311,6 +313,7 @@ const tabsReducer = (state, action, immutableAction) => {
                 tabs.closeTab(tabId, action.get('forceClosePinned'))
               })
             } else {
+              // there would be no pinned or unpinned tabs remaining, close the window
               windows.closeWindow(windowId)
             }
           }

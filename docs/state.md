@@ -603,6 +603,23 @@ AppStore
     guestInstanceId: number,
     tabId: number
   }],
+  // tabDragData exists only whilst user is dragging a site tab
+  tabDragData: {
+    originalWindowId: number, // which window was the tab originally attached to
+    currentWindowId: number, // which window is the tab currently attached to
+    sourceTabId: string,  // globally unique id of the tab being dragged
+    originClientX: number, // where in the original window did the drag start, used to calc frame size
+    originClientY: number,
+    originScreenX: number, // where in the screen did the drag start, used to calc frame size
+    originScreenY: number,
+    relativeXDragStart: number, // where in the tab did the drag start, used to keep position relative to cursor
+    relativeYDragStart: number,
+    frame: [Frame], // the frame being dragged, used to attach to other window
+    originatedFromSingleTabWindow: boolean, // so we know if we are going to lose the original window when attaching the tab to a new one
+    detachRequestedWindowId: number, // windowId tab is waiting to detach from
+    attachRequestedWindowId: number, // windowId tab is waiting to attach from
+    dragDetachedWindowId: number, // a window that contains a detached tab
+  },
   temporarySiteSettings: {
     // Same as siteSettings but never gets written to disk
     // XXX: This was intended for Private Browsing but is currently unused.

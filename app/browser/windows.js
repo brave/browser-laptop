@@ -566,9 +566,9 @@ const api = {
   },
 
   /** Specialist function for providing an existing window for
-  * Buffer Window. Normally this should not be used as one
-  * will automatically be created with `getOrCreateBufferWindow`
-  */
+   * Buffer Window. Normally this should not be used as one
+   * will automatically be created with `getOrCreateBufferWindow`
+   */
   setWindowIsBufferWindow: (dragBufferWindowId) => {
     // close existing buffer window if it exists
     const existingBufferWindow = api.getBufferWindow()

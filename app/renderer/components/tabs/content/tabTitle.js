@@ -28,6 +28,7 @@ class TabTitle extends React.Component {
     props.showTabTitle = titleState.showTabTitle(currentWindow, frameKey)
     props.displayTitle = titleState.getDisplayTitle(currentWindow, frameKey)
     props.addExtraGutter = tabUIState.addExtraGutterToTitle(currentWindow, frameKey)
+    props.isDragging = tabState.isTabDragging(state, tabId)
     props.tabId = tabId
 
     return props
