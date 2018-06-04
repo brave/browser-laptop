@@ -8,7 +8,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // util
 const {addExportFilenamePrefixToTransactions} = require('../../../../common/lib/ledgerExportUtil')
-const {formattedTimeFromNow, formattedDateFromTimestamp} = require('../../../../common/lib/ledgerUtil')
+const {formattedTimeFromNow, formattedDateFromTimestamp, probiToFormat} = require('../../../../common/lib/ledgerUtil')
 const appUrlUtil = require('../../../../../js/lib/appUrlUtil')
 
 // components
@@ -61,8 +61,7 @@ class HistoryRow extends ImmutableComponent {
   }
 
   get totalAmount () {
-    const fiatAmount = this.transaction.getIn(['contribution', 'fiat', 'amount'])
-    return (fiatAmount && typeof fiatAmount === 'number' ? fiatAmount.toFixed(2) : '0.00')
+    return probiToFormat(this.transaction.getIn(['contribution', 'probi'])).toFixed(2)
   }
 
   get viewingId () {
