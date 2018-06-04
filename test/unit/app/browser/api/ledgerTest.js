@@ -1259,7 +1259,8 @@ describe('ledger api unit tests', function () {
             fiat: {
               amount: 10,
               currency: 'BAT'
-            }
+            },
+            probi: '100000000000000000000'
           }
         },
         {
@@ -1267,13 +1268,17 @@ describe('ledger api unit tests', function () {
             fiat: {
               amount: 30,
               currency: 'BAT'
-            }
+            },
+            probi: '300000000000000000000'
           }
         }
       ]))
       assert(showPaymentDoneSpy.withArgs(Immutable.fromJS({
-        amount: 10,
-        currency: 'BAT'
+        fiat: {
+          amount: 10,
+          currency: 'BAT'
+        },
+        probi: '100000000000000000000'
       })).calledOnce)
     })
   })

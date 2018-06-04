@@ -4,6 +4,7 @@
 
 const underscore = require('underscore')
 const format = require('date-fns/format')
+const ledgerUtil = require('./ledgerUtil')
 
 /**
  * Filter an array of transactions by an array of viewingIds
@@ -80,7 +81,7 @@ const getTotalContribution = (transactions, viewingIds) => {
       }
 
       if (totalContribution.fiat.currency === txContribution.fiat.currency) {
-        totalContribution.fiat.amount += 0 || (txContribution.fiat && txContribution.fiat.amount)
+        totalContribution.fiat.amount += 0 || ledgerUtil.probiToFormat(txContribution.probi)
       } else {
         throw new Error('ledgerUtil.totalContribution cannot handle multiple fiat currencies')
       }

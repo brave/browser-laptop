@@ -8,6 +8,7 @@ const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const {getBase64FromImageUrl} = require('../lib/imageUtil')
 
 const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
+const ledgerUtil = require('../../app/common/lib/ledgerUtil')
 const getTransactionCSVRows = ledgerExportUtil.getTransactionCSVRows
 const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
 
@@ -194,9 +195,9 @@ class ContributionStatement extends React.Component {
   }
 
   get contributionAmount () {
-    var fiatAmount = this.transaction.getIn(['contribution', 'fiat', 'amount'])
-    var currency = this.transaction.getIn(['contribution', 'fiat', 'currency']) || 'USD'
-    return (fiatAmount && typeof fiatAmount === 'number' ? fiatAmount.toFixed(2) : '0.00') + ' ' + currency
+    const fiatAmount = ledgerUtil.probiToFormat(this.transaction.getIn(['contribution', 'probi'])).toFixed(2)
+    const currency = this.transaction.getIn(['contribution', 'fiat', 'currency']) || 'USD'
+    return `${fiatAmount} ${currency}`
   }
 
   get ContributionStatementSummaryBox () {
