@@ -3269,6 +3269,12 @@ const deleteWallet = (state) => {
   client = null
   synopsis = null
 
+  module.exports.deleteStateFile()
+
+  return state
+}
+
+const deleteStateFile = () => {
   const fs = require('fs')
   fs.access(pathName(statePath), fs.constants.F_OK, (err) => {
     if (err) {
@@ -3281,8 +3287,6 @@ const deleteWallet = (state) => {
       }
     })
   })
-
-  return state
 }
 
 const clearPaymentHistory = (state) => {
@@ -3401,7 +3405,8 @@ const getMethods = () => {
     onFuzzing,
     getClient: () => {
       return client
-    }
+    },
+    deleteStateFile
   }
 
   let privateMethods = {}
