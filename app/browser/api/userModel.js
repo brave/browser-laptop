@@ -496,11 +496,12 @@ let collectActivityId
 let testingP = (process.env.NODE_ENV === 'test') || (process.env.LEDGER_VERBOSE === 'true')
 const oneDay = (testingP ? 600 : 86400) * 1000
 const oneHour = (testingP ? 25 : 3600) * 1000
+const hackStagingOn = true
 const roundTripOptions = {
   debugP: false,
   loggingP: false,
   verboseP: process.env.LEDGER_VERBOSE === 'true',
-  server: url.parse('https://' + (testingP ? 'collector-staging.brave.com' : 'collector.brave.com'))
+  server: url.parse('https://' + (hackStagingOn || testingP ? 'collector-staging.brave.com' : 'collector.brave.com'))
 }
 
 const collectActivityAsNeeded = (state, adEnabled) => {
