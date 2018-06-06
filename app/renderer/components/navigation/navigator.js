@@ -195,11 +195,6 @@ class Navigator extends React.Component {
             topLevelEndButtons: true,
             [css(styles.navigatorWrapper__topLevelEndButtons_isWideURLbarEnabled)]: this.props.isWideURLbarEnabled
           })}>
-            <div className={cx({
-              extraDragArea: !this.props.menuBarVisible,
-              allowDragging: this.props.shouldAllowWindowDrag,
-              [css(styles.navigatorWrapper__topLevelEndButtons__extraDragArea_disabled)]: this.props.isWideURLbarEnabled
-            })} />
             {
               this.props.showBrowserActions
                 ? this.extensionButtons
@@ -245,10 +240,6 @@ const styles = StyleSheet.create({
   // TODO: Refactor navigator.js with Aphrodite to remove !important
   navigatorWrapper__topLevelEndButtons_isWideURLbarEnabled: {
     marginLeft: '6px !important'
-  },
-
-  navigatorWrapper__topLevelEndButtons__extraDragArea_disabled: {
-    display: 'none'
   },
 
   navigatorWrapper__button_menu: {
