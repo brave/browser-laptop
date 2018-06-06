@@ -1819,16 +1819,14 @@ const qrWriteImage = (index, url) => {
       .on('data', (chunk) => {
         chunks.push(chunk)
       })
-      .on('end', () => {
-        const paymentIMG = 'data:image/png;base64,' + Buffer.concat(chunks).toString('base64')
-        module.exports.onLedgerQRGeneratedCallback(index, paymentIMG)
-      })
+      .on('end', module.exports.onLedgerQRGeneratedCallback(index, chunks))
   } catch (ex) {
     console.error('qr.imageSync (for url ' + url + ') error: ' + ex.toString())
   }
 }
 
-const onLedgerQRGeneratedCallback = (index, paymentIMG) => {
+const onLedgerQRGeneratedCallback = (index, chunks) => {
+  const paymentIMG = 'data:image/png;base64,' + Buffer.concat(chunks).toString('base64')
   appActions.onLedgerQRGenerated(index, paymentIMG)
 }
 
@@ -2397,15 +2395,7 @@ const initAccessStatePath = (state, statePath) => {
           return console.error('read error: ' + err.toString())
         }
 
-        try {
-          module.exports.onInitReadAction(state, JSON.parse(data))
-          if (clientOptions.verboseP) {
-            console.log('\nstarting up ledger client integration')
-          }
-        } catch (ex) {
-          module.exports.disablePayments()
-          console.error('statePath parse error: ' + ex.toString())
-        }
+        module.exports.onInitReadAction(state, JSON.parse(data))
       })
     })
 
@@ -2421,7 +2411,15 @@ const initAccessStatePath = (state, statePath) => {
 }
 
 const onInitReadAction = (state, parsedData) => {
-  appActions.onInitRead(parsedData)
+  try {
+    appActions.onInitRead(parsedData)
+    if (clientOptions.verboseP) {
+      console.log('\nstarting up ledger client integration')
+    }
+  } catch (ex) {
+    module.exports.disablePayments()
+    console.error('statePath parse error: ' + ex.toString())
+  }
 }
 
 const getContributionAmount = (state) => {
