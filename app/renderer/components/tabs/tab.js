@@ -474,15 +474,6 @@ const styles = StyleSheet.create({
     // put the top border underneath tab-stip top border, and
     // the left border underneath the previous tab's right border
     margin: `0 0 0 -${theme.tab.borderWidth}px`,
-    borderRadius: '2px 2px 0 0',
-    border: `solid var(--tab-border-width, ${theme.tab.borderWidth}px) var(--tab-border-color)`,
-    borderTopColor: 'var(--tab-background) !important',
-    // Border bottom is added to the tabArea__tab so that we do not get
-    // 45-degree angles when the bottom border is different color from the side borders.
-    // This could change when we can put the tab's background on this element,
-    // which can happen when tab dragging does not introduce a left/right 'space' when a tab
-    // is dragged over.
-    borderBottomWidth: `0 !important`, // aphrodite puts this above the border defined in the previous line, so use important :-(
     zIndex: 100, // underneath toolbar shadow
     transformOrigin: 'bottom center',
     minWidth: 0,
@@ -493,6 +484,7 @@ const styles = StyleSheet.create({
     // There's a special case that tabs should span the full width
     // if there are a full set of them.
     maxWidth: '184px',
+    boxShadow: 'var(--tab-box-shadow)',
     // Use css variables for some transition options so that we can change them
     // with other classes below, without having to re-define the whole property.
     // Avoid aphrodite bug which will change css variables
@@ -559,7 +551,7 @@ const styles = StyleSheet.create({
     '--tab-mouse-opacity': '0 !important',
     // on top of toolbar shadow but underneath preview
     zIndex: 300,
-    boxShadow: '0 2px 4px -0.5px rgba(0, 0, 0, 0.3)'
+    '--tab-box-shadow': '0 2px 4px -0.5px rgba(0, 0, 0, 0.3)'
   },
 
   tabArea_isPreview: {
@@ -572,8 +564,8 @@ const styles = StyleSheet.create({
     // on top of toolbar shadow and preview
     zIndex: 400,
     transform: `scale(${theme.tab.preview.scale})`,
-    boxShadow: theme.tab.preview.boxShadow,
-    borderRadius: '3px 3px 0 0',
+    '--tab-box-shadow': theme.tab.preview.boxShadow,
+    '--tab-border-radius': '3px',
     // want the zindex to change immediately when previewing, but delay when un-previewing
     '--tab-zindex-delay': '0s',
     '--tab-zindex-duration': '0s',
@@ -632,7 +624,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     position: 'relative',
     color: `var(--tab-color, ${theme.tab.color})`,
-    borderBottom: `solid var(--tab-border-width, ${theme.tab.borderWidth}px) transparent`,
+    borderRadius: 'var(--tab-border-radius, 2px) var(--tab-border-radius, 2px) 0 0',
+    border: `solid var(--tab-border-width, ${theme.tab.borderWidth}px) var(--tab-border-color)`,
+    borderTopColor: 'var(--tab-background) !important',  // aphrodite puts this above the border defined in the previous line, so use important :-(
+    borderBottom: `solid var(--tab-border-width, ${theme.tab.borderWidth}px) transparent !important`,  // aphrodite puts this above the border defined in the previous line, so use important :-(
 
     // mouse-tracking radial gradient
     '::before': {
