@@ -213,6 +213,10 @@ var rendererIdentifiers = function () {
     'smartphoneTitle',
     'updateLater',
     'updateHello',
+    'urlbarPlaceholder',
+    'urlbarPlaceholderTorSuccess',
+    'urlbarPlaceholderTorProgress',
+    'torConnectionError',
     // notifications
     'notificationPasswordWithUserName',
     'notificationUpdatePasswordWithUserName',
