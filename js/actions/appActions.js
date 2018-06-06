@@ -203,7 +203,7 @@ const appActions = {
     })
   },
 
-    /**
+  /**
    * Dispatches a message to the store to indicate that the webview entered full screen mode.
    *
    * @param {Object} tabId - Tab id of the frame to put in full screen
@@ -830,10 +830,12 @@ const appActions = {
 
   /**
    * Dispatches a message when the app is shutting down.
+   * @param {boolean} restart - whether to restart after shutdown
    */
-  shuttingDown: function () {
+  shuttingDown: function (restart) {
     dispatch({
-      actionType: appConstants.APP_SHUTTING_DOWN
+      actionType: appConstants.APP_SHUTTING_DOWN,
+      restart
     })
   },
 
@@ -2049,6 +2051,26 @@ const appActions = {
       actionType: appConstants.APP_TAB_DETACHED_FROM_TAB_STRIP,
       index,
       windowId
+    })
+  },
+
+  onTorInitError: function (message) {
+    dispatch({
+      actionType: appConstants.APP_ON_TOR_INIT_ERROR,
+      message
+    })
+  },
+
+  onTorInitSuccess: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_TOR_INIT_SUCCESS
+    })
+  },
+
+  onTorInitPercentage: function (percentage) {
+    dispatch({
+      actionType: appConstants.APP_ON_TOR_INIT_PERCENTAGE,
+      percentage
     })
   },
 
