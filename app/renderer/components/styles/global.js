@@ -288,7 +288,7 @@ const globalStyles = {
       willChange: 'opacity',
       animationName: opacityIncreaseKeyframes,
       animationDelay: '120ms',
-      animationTimingFunction: 'linear',
+      animationTimingFunction: 'ease-in-out',
       animationDuration: '120ms',
       animationFillMode: 'forwards'
     },

@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-/* global describe, it, before, after */
+/* global describe, it, before, after, beforeEach */
 
 const mockery = require('mockery')
 const React = require('react')
@@ -81,6 +81,7 @@ const defaultWindowStore = Immutable.fromJS({
 
 describe('NavigationBar component', function () {
   let NavigationBar, windowStore, appStore
+  let settingValue = true
 
   before(function () {
     mockery.enable({
@@ -90,7 +91,7 @@ describe('NavigationBar component', function () {
     })
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('../../../js/settings', {
-      getSetting: () => true
+      getSetting: () => settingValue
     })
     mockery.registerMock('../../../../img/url-bar-no-script.svg')
     mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
@@ -108,26 +109,21 @@ describe('NavigationBar component', function () {
     mockery.disable()
   })
 
+  beforeEach(function () {
+    settingValue = true
+  })
+
   describe('publisherToggle', function () {
-    it('do not render if about page', function () {
-      windowStore.state = defaultWindowStore.setIn(['frames', 0, 'location'], 'about:preferences')
+    it('do not render if payments is disabled', function () {
       appStore.state = fakeAppState
-
-      const wrapper = mount(<NavigationBar />)
-      assert.equal(wrapper.find('PublisherToggle').length, 0)
-    })
-
-    it('do not render if publisher is permanently hidden', function () {
-      windowStore.state = defaultWindowStore
-      appStore.state = fakeAppState
-
+      settingValue = false
       const wrapper = mount(<NavigationBar />)
       assert.equal(wrapper.find('PublisherToggle').length, 0)
     })
 
     it('render if ok', function () {
       windowStore.state = defaultWindowStore
-      appStore.state = fakeAppState.setIn(['siteSettings', 'https?://brave.com', 'ledgerPaymentsShown'], true)
+      appStore.state = fakeAppState
 
       const wrapper = mount(<NavigationBar />)
       assert.equal(wrapper.find('PublisherToggle').length, 1)

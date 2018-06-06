@@ -9,7 +9,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 // Components
 const ReduxComponent = require('../../reduxComponent')
 const NavigationButton = require('./navigationButton')
-const ShieldIcon = require('../../../../../icons/shield')
+const ShieldIcon = require('../../../../../icons/brave')
 
 // Actions
 const windowActions = require('../../../../../js/actions/windowActions')
@@ -22,13 +22,16 @@ const siteSettingsState = require('../../../../common/state/siteSettingsState')
 
 // Utils
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
-const isWindows = require('../../../../common/lib/platformUtil').isWindows()
+const platformUtil = require('../../../../common/lib/platformUtil')
 const {getSetting} = require('../../../../../js/settings')
 const siteSettings = require('../../../../../js/state/siteSettings')
 
 // Constants
 const appConfig = require('../../../../../js/constants/appConfig')
 const settings = require('../../../../../js/constants/settings')
+
+const isWindows = platformUtil.isWindows()
+const hasArialNarrowFont = platformUtil.isWindows()
 
 // Styles
 const globalStyles = require('../../styles/global')
@@ -86,7 +89,7 @@ class ShieldsButton extends React.Component {
       >
         <NavigationButton
           testId={
-            (this.props.shieldEnabled ? 'braveMenu' : 'braveMenuDisabled') +
+            ((this.props.shieldEnabled && this.props.activeTabShowingMessageBox !== true) ? 'braveMenu' : 'braveMenuDisabled') +
             ` shield-down-${this.props.shieldsDown}`
           }
           l10nId={'braveMenu'}
@@ -95,8 +98,24 @@ class ShieldsButton extends React.Component {
           styles={styles.braveMenu__button}
           active={this.props.shieldPanelShowing}
         >
-          <ShieldIcon />
+          <ShieldIcon styles={styles.braveMenu__icon} />
         </NavigationButton>
+        {
+          this.props.isCounterEnabled
+            ? <div className={css(
+                styles.braveMenu__counter,
+
+                // delay badge show-up.
+                // this is also set for extension badge
+                // in a way that both can appear at the same time.
+                styles.braveMenu__counter_subtleShowUp
+              )}
+              data-test-id='lionBadge'
+            >
+              {this.props.totalBlocks}
+            </div>
+            : null
+        }
       </div>
     )
   }
@@ -110,10 +129,7 @@ const styles = StyleSheet.create({
     WebkitAppRegion: 'no-drag',
     position: 'relative',
     transition: '--shields-line-color .24s ease-in-out',
-    margin: '0 0 0 5px',
-    ':hover': {
-      '--shields-counter-opacity': 'transparent'
-    }
+    margin: '0 6px 0 5px'
   },
 
   braveMenu_disabled: {
@@ -134,26 +150,29 @@ const styles = StyleSheet.create({
   braveMenu__button: {
     marginLeft: 0,
     marginRight: 0,
+    margin: 0,
     '--icon-line-color': 'var(--shields-line-color)',
     '--icon-fill-color': 'var(--shields-fill-color)'
   },
 
+  braveMenu__icon: {
+    padding: 0
+  },
+
   braveMenu__counter: {
     position: 'absolute',
-    right: 0,
-    left: 0,
-    bottom: '-6px',
+    right: '-2px',
+    bottom: '1px',
     textAlign: 'center',
     pointerEvents: 'none',
     fontSize: '8px',
     WebkitUserSelect: 'none',
-    background: 'var(--shields-counter-background)',
-    color: 'var(--shields-counter-opacity, var(--shields-line-color))',
-    transition: 'color .24s ease-in-out'
-  },
-
-  braveMenu__counter_right: {
-
+    background: 'rgba(105,105,112, .9)',
+    padding: !hasArialNarrowFont ? '1px 2px' : '2px 2px 1px 2px',
+    color: 'white',
+    borderRadius: '5px',
+    fontFamily: !hasArialNarrowFont ? '"Helvetica Neue", Ubuntu, sans-serif' : '"Arial Narrow"',
+    minWidth: '10px'
   },
 
   braveMenu__counter_subtleShowUp: globalStyles.animations.subtleShowUp

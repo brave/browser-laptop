@@ -17,7 +17,10 @@ const defaultWindowStore = Immutable.fromJS({
     key: 0,
     tabId: 1,
     location: 'http://brave.com',
-    title: 'Brave'
+    title: 'Brave',
+    adBlock: {
+      blocked: ['a', 'b', 'c']
+    }
   }],
   tabs: []
 })
@@ -155,32 +158,8 @@ describe('Navigator component unit tests', function () {
     })
 
     it('disables the lion icon', function () {
-      const node = wrapper.find('[data-test-id~="braveMenu"]').getDOMNode()
+      const node = wrapper.find('[data-test-id="braveMenuDisabled shield-down-false"]').getDOMNode()
       assert.equal(node.disabled, true)
-    })
-  })
-
-  describe('lion badge', function () {
-    before(function () {
-      appStore.state = appStoreRenderer
-      windowStore.state = defaultWindowStore
-    })
-
-    it('lion icon is shown by default', function () {
-      const wrapper = mount(<Navigator />)
-      const node = wrapper.find('[data-test-id~="braveMenu"]').getDOMNode()
-      assert.equal(node.disabled, false)
-    })
-
-    it('counter is shown by default', function () {
-      const wrapper = mount(<Navigator />)
-      assert.equal(wrapper.find('[data-test-id="lionBadge"]').length, 1)
-    })
-
-    it('counter is not shown when disabled via settings', function () {
-      settingDefaultValue = false
-      const wrapper = mount(<Navigator />)
-      assert.equal(wrapper.find('[data-test-id="lionBadge"]').length, 0)
     })
   })
 })

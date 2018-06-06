@@ -13,10 +13,10 @@ module.exports = class BraveIcon extends React.PureComponent {
     const { styles } = this.props
     return <svg
       className={css(
-        styles,
         iconStyles.icon,
         iconStyles.icon_customDrawn,
-        braveIconStyles.icon
+        braveIconStyles.icon,
+        styles
       )} xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14'
     >
       <defs>
