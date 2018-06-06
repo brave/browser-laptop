@@ -30,12 +30,16 @@ const urlUtil = require('../../../../js/lib/urlutil')
 const globalStyles = require('../styles/global')
 const commonStyles = require('../styles/commonStyles')
 
+// Constants
+const settings = require('../../../../js/constants/settings')
+
 class SiteInfo extends React.Component {
   constructor (props) {
     super(props)
     this.onAllowRunInsecureContent = this.onAllowRunInsecureContent.bind(this)
     this.onDenyRunInsecureContent = this.onDenyRunInsecureContent.bind(this)
     this.onViewCertificate = this.onViewCertificate.bind(this)
+    this.onDisableTor = this.onDisableTor.bind(this)
   }
 
   onAllowRunInsecureContent () {
@@ -61,7 +65,20 @@ class SiteInfo extends React.Component {
     windowActions.setSiteInfoVisible(false)
   }
 
+  onDisableTor () {
+    appActions.changeSetting(settings.USE_TOR_PRIVATE_TABS, false)
+    appActions.recreateTorTab(false, this.props.activeTabId,
+      this.props.activeTabIndex)
+  }
+
+  onRestart () {
+    appActions.shuttingDown(true)
+  }
+
   get secureIcon () {
+    if (this.props.torConnectionError) {
+      return <div className={css(styles.connectionInfo__header)} data-l10n-id='torConnectionError' />
+    }
     if (this.props.isFullySecured) {
       // fully secure
       return <div className={css(styles.secureIcon)}>
@@ -149,7 +166,26 @@ class SiteInfo extends React.Component {
       site: this.props.location
     }
 
-    if (this.props.maybePhishingLocation) {
+    if (this.props.torConnectionError) {
+      // Log the error for advanced users to debug
+      console.log('Tor connection error:', this.props.torConnectionError)
+      return <div>
+        <div className={css(styles.torBody)}>
+          <div className={css(styles.torConnectionInfo)} data-l10n-id='torConnectionErrorInfo' />
+          <Button
+            l10nId='torConnectionErrorDisable'
+            className='primaryButton'
+            onClick={this.onDisableTor}
+          />
+        </div>
+        <div className={css(styles.torFooter)}>
+          <div data-l10n-id='torConnectionErrorRetry' />
+          <div data-l10n-id='torConnectionErrorRestart'
+            className={css(styles.link)}
+            onClick={this.onRestart} />
+        </div>
+      </div>
+    } else if (this.props.maybePhishingLocation) {
       return <div className={css(styles.connectionInfo)}>
         <div data-l10n-id='phishingConnectionInfo' data-test-id='phishingConnectionInfo' />
       </div>
@@ -232,10 +268,12 @@ class SiteInfo extends React.Component {
     props.secureConnection = isSecure === true
     props.partiallySecureConnection = isSecure === 1
     props.certErrorConnection = isSecure === 2
+    props.torConnectionError = frameStateUtil.isTor(activeFrame) && state.getIn(['tor', 'initializationError'])
 
     // used in other function
     props.isPrivate = activeFrame.get('isPrivate')
     props.activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
+    props.activeTabIndex = frameStateUtil.getIndexByTabId(currentWindow, props.activeTabId)
 
     return props
   }
@@ -287,10 +325,34 @@ const styles = StyleSheet.create({
     margin: `${globalStyles.spacing.dialogInsideMargin} 0 0 ${globalStyles.spacing.dialogInsideMargin}`
   },
 
+  connectionInfo__header: {
+    color: globalStyles.color.braveOrange,
+    fontSize: '1rem'
+  },
+
   connectionInfo__viewCertificateButton: {
     display: 'flex',
     justifyContent: 'flex-end',
     marginTop: globalStyles.spacing.dialogInsideMargin
+  },
+
+  torConnectionInfo: {
+    marginTop: '15px',
+    marginBottom: '20px'
+  },
+
+  torBody: {
+    paddingBottom: '15px',
+    lineHeight: '1.5em'
+  },
+
+  torFooter: {
+    lineHeight: '1.5em'
+  },
+
+  link: {
+    color: globalStyles.color.braveOrange,
+    cursor: 'pointer'
   },
 
   siteInfo: {
