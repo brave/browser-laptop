@@ -608,6 +608,10 @@ AppStore
     // Same as siteSettings but never gets written to disk
     // XXX: This was intended for Private Browsing but is currently unused.
   },
+  tor: {
+    percentInitialized: number, // percentage initialized
+    initializationError: string|boolean, // error message. false means successfully initialized.
+  },
   updates: {
     lastCheckTimestamp: boolean,
     metadata: {
