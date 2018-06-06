@@ -9,6 +9,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 // Components
 const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
+const TabLoadingIcon = require('../../../../../icons/loader/spin')
 
 // State
 const faviconState = require('../../../../common/state/tabContentState/faviconState')
@@ -95,39 +96,37 @@ class Favicon extends React.Component {
       instanceStyles['--faviconsrc'] = `url(${this.props.favicon})`
     }
 
-    return <TabIcon
-      data-test-favicon={this.props.favicon}
-      data-test-id={this.testingIcon}
-      className={[
-        this.props.favicon && styles.icon_fav,
-        (this.props.favicon && themeLight) && styles.icon_favLight,
-        (!this.props.isPinned && this.props.showIconWithLessMargin) && styles.icon_lessMargin,
-        (!this.props.isPinned && this.props.showIconAtReducedSize) && styles.icon_reducedSize
-      ]}
-      style={instanceStyles}
-      ref={this.setRef}
-      symbol={
-        this.props.tabLoading
-          ? (
-            // no loading icon if there's no room for the icon
-            !this.props.showIconAtReducedSize &&
-            css(
-              styles.icon__symbol_loading,
-              themeLight && styles.icon__symbol_loading_colorLight
-            )
+    return this.props.tabLoading
+      ? !this.props.showIconAtReducedSize && <TabLoadingIcon styles={[styles.icon_loading]} />
+      : <TabIcon
+        data-test-favicon={this.props.favicon}
+        data-test-id={this.testingIcon}
+        className={[
+          this.props.favicon && styles.icon_fav,
+          (this.props.favicon && themeLight) && styles.icon_favLight,
+          (!this.props.isPinned && this.props.showIconWithLessMargin) && styles.icon_lessMargin,
+          (!this.props.isPinned && this.props.showIconAtReducedSize) && styles.icon_reducedSize
+        ]}
+        style={instanceStyles}
+        ref={this.setRef}
+        symbol={
+          !this.props.favicon &&
+          css(
+            styles.icon__symbol_default,
+            this.props.showIconAtReducedSize && styles.icon__symbol_default_reducedSize
           )
-          : (
-            !this.props.favicon &&
-            css(
-              styles.icon__symbol_default,
-              this.props.showIconAtReducedSize && styles.icon__symbol_default_reducedSize
-            )
-          )
-      } />
+        }
+      />
   }
 }
 
 const styles = StyleSheet.create({
+
+  icon_loading: {
+    '--loader-size': '12px',
+    '--loader-stroke': '1px'
+  },
+
   icon_fav: {
     backgroundImage: 'var(--faviconsrc)',
     overflow: 'visible'
