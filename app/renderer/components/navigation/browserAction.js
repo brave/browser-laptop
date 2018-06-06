@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
 
   browserActionButton__button: {
     display: 'block',
-    width: '18px',
+    width: '22px',
     height: '100%',
     margin: 0
   },
