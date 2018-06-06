@@ -166,7 +166,8 @@ const styles = StyleSheet.create({
     height: '100%',
     display: 'flex',
     alignItems: 'center',
-    width: `${iconSize}px`
+    width: `${iconSize}px`,
+    flexShrink: 0
   },
 
   urlBarIcon_secure: {
