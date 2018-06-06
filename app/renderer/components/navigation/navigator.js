@@ -57,7 +57,7 @@ class Navigator extends React.Component {
   get extensionButtons () {
     let buttons = this.props.extensionBrowserActions.map((id) => <BrowserAction extensionId={id} />).values()
     buttons = Array.from(buttons)
-    buttons.push(<span className='buttonSeparator' />)
+    buttons.push(<span className={css(styles.browserActionSeparator)} />)
 
     return buttons
   }
@@ -253,6 +253,12 @@ const styles = StyleSheet.create({
 
   navigatorWrapper__button_menu: {
     margin: '0 5px 0 0'
+  },
+
+  browserActionSeparator: {
+    width: '1px',
+    background: '#D6DADD',
+    margin: '4px 1px 4px 4px'
   }
 
 })

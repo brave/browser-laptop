@@ -78,7 +78,6 @@ class BrowserAction extends React.Component {
   }
 
   render () {
-    console.log(this.props.image)
     return <div className={css(styles.browserActionButton)}>
       <NavigationButton
         l10nId='browserActionButton'
@@ -112,21 +111,21 @@ module.exports = ReduxComponent.connect(BrowserAction)
 const styles = StyleSheet.create({
   browserActionButton: {
     position: 'relative',
-    marginRight: '5px',
+    marginRight: '2px',
     display: 'flex',
     alignItems: 'center'
   },
 
   browserActionButton__button: {
-    display: 'block',
-    width: '22px',
-    height: '100%',
-    margin: 0
+    margin: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
 
   browserActionButton__icon: {
-    height: '100%',
-    width: '100%',
+    height: '16px',
+    width: '16px',
     backgroundImage: 'var(--browser-action-image)',
     backgroundPosition: 'center',
     backgroundSize: 'contain',
