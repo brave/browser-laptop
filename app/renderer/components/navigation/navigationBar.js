@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   navigator_wide: {
     // TODO: Refactor navigationBar.js to remove !important
     maxWidth: '100% !important',
-    marginRight: '0 !important',
+    margin: '0 !important',
     justifyContent: 'initial !important'
   }
 })

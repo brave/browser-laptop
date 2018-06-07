@@ -22,11 +22,6 @@
   &.fullscreen {
     margin-left: 0;
   }
-
-  // Since we want to keep the navigator centered, we need to calculate the
-  // difference between the width of the left box and the width of the right box.
-  @centerOffset: @navbarLeftMarginDarwin + 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left
-                 - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
 }
 
 // Windows specific styles
@@ -400,18 +395,7 @@
   }
 }
 
-// Here I grouped the rules to keep the layout of the top bar consistent.
-// The tricky part is to keep the title in `#navigator` centered when the
-// box on its left has different size than the one on the right.
-// This is achieved by the local variable `@centerOffset`.
 .navigatorWrapper {
-  // Since we want to keep the navigator centered, we need to calculate the
-  // difference between the width of the left box and the width of the right box.
-  @centerOffset: 2 * (@navbarButtonWidth + @navbarButtonSpacing) // width area on the left
-                 - (@navbarBraveButtonWidth + 2 * @navbarButtonSpacing);
-
-  @rightMargin: @navbarLeftMarginDarwin / 2;
-
   display: flex;
 
   // Buttons on the left
@@ -425,13 +409,19 @@
     flex-grow: 1;
     min-width: 0%; // allow the navigator to shrink
     max-width: 900px;
-    margin-right: @rightMargin;
 
-
-
-    @media (max-width: @breakpointNarrowViewport) {
-      padding-right: 0;
+    // keep the nav items centered until not enough space
+    margin: 0;
+    @media (min-width: 700px) {
+      margin: 0 3%;
     }
+    @media (min-width: 850px) {
+      margin: 0 5%;
+    }
+    @media (min-width: 1000px) {
+      margin: 0 7%;
+    }
+
 
     @media (max-width: @breakpointNarrowViewport) {
       width: 100%;
