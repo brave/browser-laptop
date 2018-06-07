@@ -89,7 +89,7 @@
   "homepage": "https://www.brave.com/",
   "dependencies": {
     "@brave-intl/bat-elph": "^0.1.0",
-    "@brave-intl/bat-usermodel": "^0.3.0",
+    "@brave-intl/bat-usermodel": "^0.4.1",
     "aphrodite": "1.1.0",
     "async": "^2.0.1",
     "bat-balance": "^1.0.7",
@@ -98,7 +98,7 @@
     "bignumber.js": "^4.0.4",
     "bloodhound-js": "brave/bloodhound",
     "brave-crypto": "^0.2.0",
-    "brave-node-notifier": "brave-intl/brave-node-notifier",
+    "brave-node-notifier": "5.2.5",
     "chromium-net-errors": "^3.3.0",
     "clipboard-copy": "^1.0.0",
     "compare-versions": "^3.0.1",

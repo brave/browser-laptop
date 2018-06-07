@@ -560,7 +560,7 @@ const appActions = {
   /**
    * Changes an application level setting
    * @param {string} key - The key name for the setting
-   * @param {string} value - The value of the setting
+   * @param {any} value - The value of the setting
    */
   changeSetting: function (key, value) {
     dispatch({
@@ -2121,6 +2121,19 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE,
       viewData
+    })
+  },
+
+  onNativeNotificationConfig: function (ok) {
+    dispatch({
+      actionType: appConstants.APP_ON_NATIVE_NOTIFICATION_CONFIG,
+      ok
+    })
+  },
+
+  onNativeNotificationCheck: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_NATIVE_NOTIFICATION_CHECK
     })
   },
 

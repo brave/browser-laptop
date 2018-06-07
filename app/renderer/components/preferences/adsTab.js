@@ -119,8 +119,11 @@ class AdsTab extends ImmutableComponent {
             onChangeSetting={this.props.onChangeSetting}
             siteSettings={this.props.siteSettings}
             demoValue={this.props.demoValue}
+            userModelData={this.props.userModelData}
           />
-          : <DisabledContent />
+          : <DisabledContent
+            userModelData={this.props.userModelData}
+          />
       }
     </div>
   }
