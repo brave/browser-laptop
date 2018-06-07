@@ -191,6 +191,7 @@ module.exports = {
     'ads.amount.hour': 1,
     'ads.place': 'UNDISCLOSED',
     'ads.operating-mode': false,
+    'ads.local': 'default',
     // Windows has issues with titlebar mode because it doesn't fire onMouseEnter events if you enter
     // your mouse from the top of the window.  Also users with Surface tablets or Surface books that
     // have immersive mode w/ touch makes it too hard to enter a URL.

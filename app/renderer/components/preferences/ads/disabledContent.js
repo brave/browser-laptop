@@ -37,7 +37,52 @@ class DisabledContent extends React.Component {
     }
   }
 
+  agreeBlock () {
+    return <div>
+      <div className={css(styles.disabledContent__message__checkbox)} onClick={this.onAgree}>
+        <span className={css(styles.disabledContent__message__checkbox__box)}>
+          <span className={css(this.state.agree && styles.disabledContent__message__checkbox__box_on)} />
+        </span>
+        <span
+          className={css(
+            styles.disabledContent__message_bold,
+            styles.disabledContent__message__checkbox__text
+          )}
+          data-l10n-id='adsWelcomeAgree'
+        />
+      </div>
+      <button
+        className={css(
+          styles.disabledContent__message__button,
+          this.state.agree && styles.disabledContent__message__button_on
+        )}
+        data-l10n-id='adsWelcomeStart'
+        onClick={this.onStart}
+      />
+    </div>
+  }
+
+  showWarning (config, available) {
+    if (!available) {
+      return <span data-l10n-id='adsWelcomeAvailable' className={css(styles.disabledContent__message__warning)} />
+    }
+
+    if (!config) {
+      return <div>
+        <span data-l10n-id='adsWelcomeConfig' className={css(styles.disabledContent__message__warning)} />
+        <button
+          data-l10n-id='adsWelcomeReTry'
+          className={css(styles.disabledContent__message__button, styles.disabledContent__message__button_on)}
+          onClick={appActions.onNativeNotificationCheck}
+        />
+      </div>
+    }
+  }
+
   render () {
+    const config = this.props.userModelData.config || false
+    const available = this.props.userModelData.available || false
+
     return <section className={css(styles.disabledContent)} data-test-id='disabledContent'>
       <div className={css(styles.disabledContent__message)} data-test-id='paymentsMessage'>
         <h3 className={css(styles.disabledContent__message__header)} data-l10n-id='adsWelcomeHeader' />
@@ -57,26 +102,11 @@ class DisabledContent extends React.Component {
           </a>.
         </p>
         <p className={css(styles.disabledContent__message__text)} data-l10n-id='adsWelcomeText3' />
-        <div className={css(styles.disabledContent__message__checkbox)} onClick={this.onAgree}>
-          <span className={css(styles.disabledContent__message__checkbox__box)}>
-            <span className={css(this.state.agree && styles.disabledContent__message__checkbox__box_on)} />
-          </span>
-          <span
-            className={css(
-              styles.disabledContent__message_bold,
-              styles.disabledContent__message__checkbox__text
-            )}
-            data-l10n-id='adsWelcomeAgree'
-          />
-        </div>
-        <button
-          className={css(
-            styles.disabledContent__message__button,
-            this.state.agree && styles.disabledContent__message__button_on
-          )}
-          data-l10n-id='adsWelcomeStart'
-          onClick={this.onStart}
-        />
+        {
+          config && available
+          ? this.agreeBlock()
+          : this.showWarning(config, available)
+        }
       </div>
     </section>
   }
@@ -150,6 +180,14 @@ const styles = StyleSheet.create({
     height: '11px',
     display: 'block',
     margin: '2px 0 0 2px'
+  },
+
+  disabledContent__message__warning: {
+    color: '#fff',
+    marginTop: '20px',
+    display: 'block',
+    fontSize: '16px',
+    fontWeight: 'bold'
   },
 
   disabledContent__message__button: {

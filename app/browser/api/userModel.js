@@ -5,6 +5,7 @@
 'use strict'
 const um = require('@brave-intl/bat-usermodel')
 const elph = require('@brave-intl/bat-elph')
+const braveNotifier = require('brave-node-notifier')
 const path = require('path')
 const getSSID = require('detect-ssid')
 const underscore = require('underscore')
@@ -156,7 +157,41 @@ const generateAdReportingEvent = (state, eventType, action) => {
   return state
 }
 
+const processLocales = (state, result) => {
+  if (result == null || !Array.isArray(result)) {
+    return state
+  }
+
+  result = result.filter(item => item !== 'default')
+
+  if (result.length === 0) {
+    return state
+  }
+
+  if (result.length > 1) {
+    state = userModelState.setUserModelValue(state, 'locales', result)
+  }
+
+  appActions.changeSetting(settings.ADS_LOCAL, result[0])
+  return state
+}
+
 const initialize = (state, adEnabled) => {
+  if (adEnabled === false) {
+    return state
+  }
+
+  // check if notifications are available
+  if (!braveNotifier.available()) {
+    appActions.changeSetting(settings.ADS_ENABLED, false)
+    state = userModelState.setUserModelValue(state, 'available', false)
+  } else {
+    state = userModelState.setUserModelValue(state, 'available', true)
+  }
+
+  // check if notifications are configured correctly
+  appActions.onNativeNotificationCheck()
+
   // TODO turn back on?
   // state = userModelState.setAdFrequency(state, 15)
 
@@ -171,6 +206,7 @@ const initialize = (state, adEnabled) => {
 
   retrieveSSID()
 
+  state = processLocales(state, um.getLocalesSync())
   state = confirmAdUUIDIfAdEnabled(state)
 
   return state

@@ -636,6 +636,8 @@ AppStore
     adClass: any,
     adFrequency: any,
     adServed: any,
+    available: boolean,
+    config: boolean,
     currentSSID: string,
     error: {
       caller: string,
@@ -646,6 +648,7 @@ AppStore
     lastShopTime: any,
     lastUserActivity: any,
     lastUserIdleStopTime: any,
+    locales: string[],
     pageScoreHistory: Array,
     score: any,
     searchActivity: any,
