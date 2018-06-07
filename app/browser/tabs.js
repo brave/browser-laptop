@@ -42,6 +42,7 @@ const activeTabHistory = require('./activeTabHistory')
 const path = require('path')
 const {getTorSocksProxy} = require('../channel')
 const demoApi = require('./api/userModelLog')
+const userModelState = require('../common/state/userModelState')
 
 
 let adBlockRegions
@@ -306,7 +307,11 @@ const updateAboutDetails = (tabId) => {
     const sync = appState.get('sync', Immutable.Map())
     sendAboutDetails(tabId, messages.SYNC_UPDATED, sync)
   } else if (url === 'about:preferences#ads') {
-    sendAboutDetails(tabId, messages.DEMO_UPDATED, Immutable.fromJS({demoValue: demoApi.getValue()}))
+    const userModelData = userModelState.getModel(appState)
+    sendAboutDetails(tabId, messages.DEMO_UPDATED, Immutable.fromJS({
+      demoValue: demoApi.getValue(),
+      userModelData
+    }))
   } else if (location === 'about:extensions' || url === 'about:preferences#extensions') {
     const extensionsValue = appState.get('extensions', Immutable.Map())
     sendAboutDetails(tabId, messages.EXTENSIONS_UPDATED, extensionsValue)

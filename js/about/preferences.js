@@ -487,6 +487,7 @@ class AboutPreferences extends React.Component {
       braveryDefaults: Immutable.Map(),
       ledgerData: Immutable.Map(),
       syncData: Immutable.Map(),
+      userModelData: Immutable.Map(),
       demoValue: []
     }
 
@@ -720,6 +721,7 @@ class AboutPreferences extends React.Component {
     const syncData = this.state.syncData
     const extensions = this.state.extensions
     const demoValue = this.state.demoValue
+    const userModelData = this.state.userModelData
 
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
@@ -812,6 +814,7 @@ class AboutPreferences extends React.Component {
           settings={settings}
           onChangeSetting={this.onChangeSetting}
           demoValue={demoValue}
+          userModelData={userModelData}
         />
         break
     }
