@@ -396,6 +396,12 @@ const userModelState = {
     return state.setIn(['userModel', 'places', ssid], place)
   },
 
+  getModel: (state) => {
+    state = validateState(state)
+
+    return state.get('userModel') || Immutable.Map()
+  },
+
   getAdEnabledValue: (state) => {
     return state.getIn(['settings', settings.ADS_ENABLED])
   },

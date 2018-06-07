@@ -25,6 +25,8 @@ class EnabledContent extends ImmutableComponent {
     const perHour = getSetting(settings.ADS_PER_HOUR, this.props.settings)
     const perDay = getSetting(settings.ADS_PER_DAY, this.props.settings)
 
+    const locals = this.props.userModelData.locales
+
     return <section className={css(styles.enabledContent)}>
       <div className={css(styles.enabledContent__walletBar)} data-test-id='walletBar'>
         <div className={css(gridStyles.row1col1, styles.enabledContent__walletBar__title)}>
@@ -107,6 +109,30 @@ class EnabledContent extends ImmutableComponent {
             }
           </FormDropdown>
         </div>
+        {
+          locals
+          ? <div>
+            <div className={css(gridStyles.row3col1, styles.enabledContent__walletBar__title)}>
+              Local
+            </div>
+            <div className={css(gridStyles.row4col1)}>
+              <FormDropdown
+                data-isPanel
+                data-test-id='placeSelectBox'
+                customClass={styles.place_input}
+                value={getSetting(settings.ADS_LOCAL, this.props.settings)}
+                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.ADS_LOCAL)}
+              >
+                {
+                  locals.map(key => {
+                    return <option value={key} className={css(styles.local_option)}>{key}</option>
+                  })
+                }
+              </FormDropdown>
+            </div>
+          </div>
+          : null
+        }
       </div>
       <details style={{marginTop: '50px'}}>
         <summary>Click to see logs</summary>
@@ -164,6 +190,10 @@ const styles = StyleSheet.create({
 
   place_input: {
     marginTop: '12px'
+  },
+
+  local_option: {
+    textDecoration: 'uppercase'
   }
 })
 
@@ -194,7 +224,7 @@ const gridStyles = StyleSheet.create({
     gridRow: 2,
     gridColumn: 1,
     marginLeft: globalStyles.spacing.panelPadding,
-    marginBottom: '25px'
+    marginBottom: '10px'
   },
 
   row2col2: {
@@ -202,11 +232,52 @@ const gridStyles = StyleSheet.create({
     gridColumn: 2,
     marginRight: `calc(${globalStyles.spacing.panelPadding} / 2)`,
     marginLeft: `calc(${globalStyles.spacing.panelPadding} / 2)`,
-    marginBottom: '25px'
+    marginBottom: '10px'
   },
 
   row2col3: {
     gridRow: 2,
+    gridColumn: 3,
+    marginRight: globalStyles.spacing.panelPadding,
+    marginBottom: '10px'
+  },
+
+  row3col1: {
+    gridRow: 3,
+    gridColumn: 1,
+    marginLeft: globalStyles.spacing.panelPadding
+  },
+
+  row3col2: {
+    gridRow: 3,
+    gridColumn: 2,
+    marginRight: `calc(${globalStyles.spacing.panelPadding} / 2)`,
+    marginLeft: `calc(${globalStyles.spacing.panelPadding} / 2)`
+  },
+
+  row3col3: {
+    gridRow: 3,
+    gridColumn: 3,
+    marginRight: globalStyles.spacing.panelPadding
+  },
+
+  row4col1: {
+    gridRow: 4,
+    gridColumn: 1,
+    marginLeft: globalStyles.spacing.panelPadding,
+    marginBottom: '25px'
+  },
+
+  row4col2: {
+    gridRow: 4,
+    gridColumn: 2,
+    marginRight: `calc(${globalStyles.spacing.panelPadding} / 2)`,
+    marginLeft: `calc(${globalStyles.spacing.panelPadding} / 2)`,
+    marginBottom: '25px'
+  },
+
+  row4col3: {
+    gridRow: 4,
     gridColumn: 3,
     marginRight: globalStyles.spacing.panelPadding,
     marginBottom: '25px'
