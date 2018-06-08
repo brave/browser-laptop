@@ -24,6 +24,98 @@ describe('ledgerState unit test', function () {
     }
   })
 
+  const stateWithPublisher = defaultState
+    .setIn(['cache', 'ledgerVideos'], Immutable.fromJS({
+      'youtube_Ece3i74Wces': 'youtube#channel:radio1slovenia'
+    }))
+    .setIn(['settings', 'payments.enabled'], true)
+    .set('pageData', Immutable.fromJS({
+      info: {
+        'https://www.youtube.com/user/radio1slovenia/videos': {
+          faviconURL: 'https://s.ytimg.com/yts/img/favicon_32-vflOogEID.png',
+          key: 'https://www.youtube.com/user/radio1slovenia/videos',
+          protocol: 'https:',
+          publisher: 'youtube.com',
+          timestamp: 1526367684155,
+          url: 'https://www.youtube.com/user/radio1slovenia/videos'
+        }
+      },
+      last: {
+        closedTabValue: {
+          audible: false,
+          width: 2560,
+          active: true
+        },
+        info: '',
+        tabId: '7'
+      }
+    }))
+    .set('ledger', Immutable.fromJS({
+      about: {
+        synopsis: [
+          {
+            daysSpent: 0,
+            duration: 166431,
+            exclude: false,
+            faviconURL: 'data:image/jpeg;base64',
+            hoursSpent: 0,
+            minutesSpent: 2,
+            percentage: 38,
+            pinPercentage: undefined,
+            providerName: 'YouTube',
+            publisherKey: 'youtube#channel:radio1slovenia',
+            publisherURL: 'https://www.youtube.com/user/radio1slovenia/videos',
+            score: 14.588460435541956,
+            secondsSpent: 46,
+            siteName: 'radio1slovenia on YouTube',
+            verified: false,
+            views: 2,
+            weight: 38.244594657485045
+          }
+        ],
+        synopsisOptions: {
+          _a: 7000,
+          _b: 1000,
+          scorekeeper: 'concave',
+          _d: 0.000033333333333333335
+        }
+      },
+      info: {
+        balance: 0,
+        paymentId: 'ladasda'
+      },
+      locations: {
+        'https://www.youtube.com/user/radio1slovenia/videos': {
+          publisher: 'youtube.com'
+        }
+      },
+      synopsis: {
+        options: {
+          _a: 7000,
+          _b: 1000,
+          scorekeeper: 'concave',
+          _d: 0.000033333333333333335
+        },
+        publishers: {
+          'youtube#channel:radio1slovenia': {
+            duration: 166431,
+            options: {
+              exclude: false
+            },
+            pinPercentage: 20,
+            scores: {
+              concave: 3.249426617127623,
+              visits: 2
+            },
+            views: 2,
+            weight: 20
+          }
+        }
+      },
+      promotion: {},
+      publisherTimestamp: 123
+    }))
+
   // settings
   let paymentsEnabled = true
   let paymentsAmount = 5
@@ -493,6 +585,21 @@ describe('ledgerState unit test', function () {
       const expectedPromo = promo.set('claimedTimestamp', 10000)
       assert.deepEqual(result.toJS(), expectedPromo.toJS())
     })
+
+    it('with captcha', function () {
+      const promo = Immutable.fromJS({
+        notification: {
+          message: 'Hello'
+        }
+      })
+      const state = defaultState
+        .setIn(['ledger', 'promotion', 'activeState'], 'emptyWallet')
+        .setIn(['ledger', 'promotion', 'captcha'], 'base64....')
+        .setIn(['ledger', 'promotion', 'stateWallet', 'emptyWallet'], promo)
+      const result = ledgerState.getAboutPromotion(state)
+      const expectedPromo = promo.set('captcha', 'base64....')
+      assert.deepEqual(result.toJS(), expectedPromo.toJS())
+    })
   })
 
   describe('resetInfo', function () {
@@ -687,6 +794,123 @@ describe('ledgerState unit test', function () {
       const url = 'anything://www.2.www.ww.www.this.any.site.com.org.com'
       const result = ledgerState.getVerifiedPublisherLocation(defaultState, url)
       assert.equal(result, 'org.com')
+    })
+  })
+
+  describe('deleteSynopsis', function () {
+    it('data is cleared', function () {
+      const result = ledgerState.deleteSynopsis(stateWithPublisher)
+      const expectedState = stateWithPublisher
+        .set('ledger', Immutable.fromJS({
+          about: {
+            synopsis: [],
+            synopsisOptions: {}
+          },
+          info: {},
+          locations: {},
+          synopsis: {
+            options: {},
+            publishers: {}
+          },
+          promotion: {}
+        }))
+        .setIn(['cache', 'ledgerVideos'], Immutable.Map())
+        .setIn(['pageData', 'info'], Immutable.Map())
+        .setIn(['pageData', 'last', 'info'], null)
+        .setIn(['pageData', 'last', 'tabId'], null)
+        .setIn(['pageData', 'last', 'closedTabValue'], null)
+
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+  })
+
+  describe('resetPublishers', function () {
+    it('data is cleared', function () {
+      const result = ledgerState.resetPublishers(stateWithPublisher)
+      const expectedState = stateWithPublisher
+        .setIn(['ledger', 'synopsis', 'publishers'], Immutable.Map())
+        .setIn(['ledger', 'locations'], Immutable.Map())
+        .setIn(['ledger', 'about', 'synopsis'], Immutable.List())
+        .setIn(['ledger', 'publisherTimestamp'], 0)
+        .setIn(['cache', 'ledgerVideos'], Immutable.Map())
+        .setIn(['pageData', 'info'], Immutable.Map())
+        .setIn(['pageData', 'last', 'info'], null)
+        .setIn(['pageData', 'last', 'tabId'], null)
+        .setIn(['pageData', 'last', 'closedTabValue'], null)
+
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+  })
+
+  describe('saveAboutSynopsis', function () {
+    it('publisher list is empty', function () {
+      const result = ledgerState.saveAboutSynopsis(defaultState)
+      const expectedState = defaultState
+        .setIn(['ledger', 'about'], Immutable.fromJS({
+          synopsis: [],
+          synopsisOptions: {}
+        }))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('publisher list is JS object', function () {
+      const result = ledgerState.saveAboutSynopsis(defaultState, [
+        {
+          'clifton.io': {
+            percentage: 10
+          }
+        }
+      ])
+      const expectedState = defaultState
+        .setIn(['ledger', 'about'], Immutable.fromJS({
+          synopsis: [{
+            'clifton.io': {
+              percentage: 10
+            }
+          }],
+          synopsisOptions: {}
+        }))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('publisher list is sorted desc', function () {
+      const result = ledgerState.saveAboutSynopsis(defaultState, [
+        {
+          'clifton.io': {
+            percentage: 10
+          },
+          'clifton1.io': {
+            percentage: 2
+          },
+          'clifton2.io': {
+            percentage: 30
+          },
+          'clifton3.io': {
+            percentage: 1
+          }
+        }
+      ])
+      const expectedState = defaultState
+        .setIn(['ledger', 'about'], Immutable.fromJS({
+          synopsis: [
+            {
+              'clifton2.io': {
+                percentage: 30
+              },
+              'clifton.io': {
+                percentage: 10
+              },
+              'clifton1.io': {
+                percentage: 2
+              },
+              'clifton3.io': {
+                percentage: 1
+              }
+            }
+          ],
+          synopsisOptions: {}
+        }))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
     })
   })
 })

@@ -8,6 +8,7 @@ const {makeImmutable} = require('../../app/common/state/immutableUtil')
 const {getBase64FromImageUrl} = require('../lib/imageUtil')
 
 const ledgerExportUtil = require('../../app/common/lib/ledgerExportUtil')
+const ledgerUtil = require('../../app/common/lib/ledgerUtil')
 const getTransactionCSVRows = ledgerExportUtil.getTransactionCSVRows
 const addExportFilenamePrefixToTransactions = ledgerExportUtil.addExportFilenamePrefixToTransactions
 
@@ -194,9 +195,9 @@ class ContributionStatement extends React.Component {
   }
 
   get contributionAmount () {
-    var fiatAmount = this.transaction.getIn(['contribution', 'fiat', 'amount'])
-    var currency = this.transaction.getIn(['contribution', 'fiat', 'currency']) || 'USD'
-    return (fiatAmount && typeof fiatAmount === 'number' ? fiatAmount.toFixed(2) : '0.00') + ' ' + currency
+    const fiatAmount = ledgerUtil.probiToFormat(this.transaction.getIn(['contribution', 'probi'])).toFixed(2)
+    const currency = this.transaction.getIn(['contribution', 'fiat', 'currency']) || 'USD'
+    return `${fiatAmount} ${currency}`
   }
 
   get ContributionStatementSummaryBox () {
@@ -326,11 +327,18 @@ class ContributionStatement extends React.Component {
               page.map(function (row, idx) {
                 const publisherKey = row[0]
                 const publisherSynopsis = (this.synopsis.filter((entry) => { return entry.publisherKey === publisherKey }) || [])[0] || {}
+                const name = this.state.transaction.getIn(['names', publisherKey])
 
                 const verified = publisherSynopsis && publisherSynopsis.verified
                 const fractionStr = (parseFloat(row[2]) * 100).toFixed(2)
                 const fiatStr = row[3]
-                const title = (publisherSynopsis && publisherSynopsis.siteName) ? publisherSynopsis.siteName : publisherKey
+                let title = publisherKey
+
+                if (publisherSynopsis && publisherSynopsis.siteName) {
+                  title = publisherSynopsis.siteName
+                } else if (name) {
+                  title = name
+                }
 
                 return (
                   <tr className={css(styles.textAlignRight, styles.table__tr)}>

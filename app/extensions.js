@@ -183,7 +183,7 @@ let generateBraveManifest = () => {
       'img/favicon.ico',
       'img/newtab/defaultTopSitesIcon/appstore.png',
       'img/newtab/defaultTopSitesIcon/brave.ico',
-      'img/newtab/defaultTopSitesIcon/facebook.png',
+      'img/newtab/defaultTopSitesIcon/github.png',
       'img/newtab/defaultTopSitesIcon/playstore.png',
       'img/newtab/defaultTopSitesIcon/twitter.png',
       'img/newtab/defaultTopSitesIcon/youtube.png'

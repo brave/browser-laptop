@@ -57,6 +57,16 @@
   }
 
   if(window.top == window.self) {
-    chrome.ipcRenderer.sendToHost('theme-color-computed', computeThemeColor())
+    if (document.visibilityState !== 'visible' && window.innerWidth === 0 && window.innerHeight === 0) {
+      const handleVisibilityChange = function() {
+        if (window.innerWidth !== 0 && window.innerHeight !== 0) {
+          window.removeEventListener('resize', handleVisibilityChange)
+          chrome.ipcRenderer.sendToHost('theme-color-computed', computeThemeColor())
+        }
+      }
+      window.addEventListener('resize', handleVisibilityChange)
+    } else {
+      chrome.ipcRenderer.sendToHost('theme-color-computed', computeThemeColor())
+    }
   }
 })()

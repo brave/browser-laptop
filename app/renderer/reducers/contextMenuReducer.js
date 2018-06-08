@@ -55,14 +55,20 @@ const validateState = function (state) {
   return state
 }
 
-function generateMuteFrameList (framePropsList, muted) {
-  return framePropsList.map((frameProp) => {
-    return {
-      frameKey: frameProp.get('key'),
-      tabId: frameProp.get('tabId'),
-      muted: muted && frameProp.get('audioPlaybackActive') && !frameProp.get('audioMuted')
+function generateMuteFrameActions (framePropsList, mute) {
+  return framePropsList.filter(frame => {
+    if (mute) {
+      // only frames which are playing audio and haven't been asked to be muted
+      return frame.get('audioPlaybackActive') && !frame.get('audioMuted')
     }
+    // only frames which are not playing audio or have been asked to be muted
+    return frame.get('audioMuted')
   })
+  .map(frame => ({
+    tabId: frame.get('tabId'),
+    frameKey: frame.get('key'),
+    muted: mute
+  }))
 }
 
 const onTabPageMenu = function (state, action) {
@@ -85,12 +91,12 @@ const onTabPageMenu = function (state, action) {
   const template = [{
     label: locale.translation('unmuteTabs'),
     click: () => {
-      windowActions.muteAllAudio(generateMuteFrameList(tabPageFrames, false))
+      windowActions.muteAllAudio(generateMuteFrameActions(tabPageFrames, false))
     }
   }, {
     label: locale.translation('muteTabs'),
     click: () => {
-      windowActions.muteAllAudio(generateMuteFrameList(tabPageFrames, true))
+      windowActions.muteAllAudio(generateMuteFrameActions(tabPageFrames, true))
     }
   }, {
     label: locale.translation('closeTabPage'),

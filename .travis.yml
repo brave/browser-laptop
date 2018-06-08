@@ -21,18 +21,35 @@ notifications:
   slack:
     secure: bDwO2uce5JAZvjrvWj4+/+yEXJAIK4O0RcgUWvZ2IMbi7Q9I89Mw40JmkLWL6x2gWZwxr8+FoLtErJA7RVrsfImjrX+NmMyAB7AydLdrBJtkLozNnuacnhcnBRyp1gGCa1ymxCEXGbgC6onAD3kiJJhggr70T+2lu3IuJYXENhc=
 env:
-  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=lint
-  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=unit
-  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=codecov
-  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=about
-  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=app
-  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=bookmark-components
-  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=bravery-components
-  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=contents
-  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=misc-components
-  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=navbar-components
-  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=tab-components
-  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=performance ARTIFACTS_REGION=us-east-1
+  global:
+    - CXX=g++-4.8
+    - NODE_ENV=test
+  matrix:
+    - TEST_DIR=lint
+    - TEST_DIR=unit
+    - TEST_DIR=codecov
+    - TEST_DIR=security
+    - TEST_DIR=about
+    - TEST_DIR=app
+    - TEST_DIR=bookmark-components
+    - TEST_DIR=bravery-components
+    - TEST_DIR=contents
+    - TEST_DIR=misc-components
+    - TEST_DIR=navbar-components
+    - TEST_DIR=tab-components
+    - TEST_DIR=performance ARTIFACTS_REGION=us-east-1
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: TEST_DIR=about
+    - env: TEST_DIR=app
+    - env: TEST_DIR=bookmark-components
+    - env: TEST_DIR=bravery-components
+    - env: TEST_DIR=contents
+    - env: TEST_DIR=misc-components
+    - env: TEST_DIR=navbar-components
+    - env: TEST_DIR=tab-components
+    - env: TEST_DIR=performance ARTIFACTS_REGION=us-east-1
 addons:
   apt:
     sources:

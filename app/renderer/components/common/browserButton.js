@@ -13,6 +13,7 @@ class BrowserButton extends ImmutableComponent {
       styles.browserButton,
       this.props.primaryColor && [styles.browserButton_default, styles.browserButton_primaryColor],
       this.props.secondaryColor && [styles.browserButton_default, styles.browserButton_secondaryColor],
+      this.props.alertColor && [styles.browserButton_default, styles.browserButton_alertColor],
       this.props.subtleItem && [styles.browserButton_default, styles.browserButton_subtleItem],
       // actionItem is just subtleItem with a blue background
       this.props.actionItem &&
@@ -192,6 +193,21 @@ const styles = StyleSheet.create({
     ':hover': {
       border: `1px solid ${globalStyles.button.secondary.borderHoverColor}`,
       color: globalStyles.button.secondary.hoverColor
+    }
+  },
+
+  browserButton_alertColor: {
+    background: globalStyles.button.alert.background,
+    borderLeft: `2px solid ${globalStyles.button.alert.gradientColor1}`,
+    borderRight: `2px solid ${globalStyles.button.alert.gradientColor2}`,
+    borderTop: `2px solid ${globalStyles.button.alert.gradientColor1}`,
+    borderBottom: `2px solid ${globalStyles.button.alert.gradientColor2}`,
+    cursor: 'pointer',
+    fontWeight: 500,
+
+    ':hover': {
+      border: `2px solid ${globalStyles.button.alert.borderHoverColor}`,
+      color: globalStyles.button.alert.hoverColor
     }
   },
 

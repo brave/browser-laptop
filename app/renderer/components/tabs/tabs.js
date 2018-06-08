@@ -135,7 +135,8 @@ class Tabs extends React.Component {
     const pageIndex = frameStateUtil.getTabPageIndex(currentWindow)
     const tabsPerTabPage = Number(getSetting(settings.TABS_PER_PAGE))
     const startingFrameIndex = pageIndex * tabsPerTabPage
-    const unpinnedTabs = frameStateUtil.getNonPinnedFrames(currentWindow) || Immutable.List()
+    const unpinnedTabs = frameStateUtil.getNonPinnedFrames(currentWindow)
+      .filter(frame => frame.get('tabStripWindowId') === getCurrentWindowId())
     const currentTabs = unpinnedTabs
       .slice(startingFrameIndex, startingFrameIndex + tabsPerTabPage)
       .map((tab) => tab.get('key'))

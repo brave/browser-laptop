@@ -9,7 +9,6 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('./dialog')
-const FlyoutDialog = require('./flyoutDialog')
 const BrowserButton = require('../common/browserButton')
 const SwitchControl = require('./switchControl')
 const {PromptTextBox} = require('./textbox')
@@ -142,8 +141,8 @@ class MessageBox extends React.Component {
 
   render () {
     return <Dialog testId='messageBoxDialog'>
-      <FlyoutDialog
-        testId={'msgBoxTab_' + this.props.tabId}
+      <div className={css(commonStyles.flyoutDialog)}
+        data-test-id={'msgBoxTab_' + this.props.tabId}
         onKeyDown={this.onKeyDown}
       >
         <div className={css(styles.title)} data-test-id='msgBoxTitle'>
@@ -186,7 +185,7 @@ class MessageBox extends React.Component {
             {this.messageBoxButtons}
           </div>
         </div>
-      </FlyoutDialog>
+      </div>
     </Dialog>
   }
 }

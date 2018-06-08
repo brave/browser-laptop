@@ -1,0 +1,17 @@
+<html>
+<head>
+</head>
+<body>
+cookies:
+<div id='cookie-favicon'>
+</div>
+
+<script>
+function setText (id, result) {
+    document.getElementById(id).innerText = JSON.stringify(result)
+}
+
+setText('cookie-favicon', document.cookie)
+</script>
+</body>
+</html>

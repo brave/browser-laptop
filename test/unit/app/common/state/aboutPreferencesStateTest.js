@@ -62,6 +62,43 @@ describe('aboutPreferencesState unit test', function () {
     })
   })
 
+  describe('setRecoveryBalanceRecalculated', function () {
+    it('null case', function () {
+      const state = aboutPreferencesState.setRecoveryBalanceRecalculated(defaultState, null)
+      assert.equal(aboutPreferencesState.getPreferencesProp(state, 'recoveryBalanceRecalculated'), null)
+    })
+
+    it('sets true', function () {
+      const state = aboutPreferencesState.setRecoveryBalanceRecalculated(defaultState, true)
+      assert.equal(aboutPreferencesState.getPreferencesProp(state, 'recoveryBalanceRecalculated'), true)
+    })
+
+    it('sets false', function () {
+      const state = aboutPreferencesState.setRecoveryBalanceRecalculated(defaultState, false)
+      assert.equal(aboutPreferencesState.getPreferencesProp(state, 'recoveryBalanceRecalculated'), false)
+    })
+  })
+
+  describe('getRecoveryBalanceRecalculated', function () {
+    it('null case returns false', function () {
+      const state = aboutPreferencesState.setRecoveryBalanceRecalculated(defaultState, null)
+      const result = aboutPreferencesState.getRecoveryBalanceRecalulated(state)
+      assert.equal(result, false)
+    })
+
+    it('returns false', function () {
+      const state = aboutPreferencesState.setRecoveryBalanceRecalculated(defaultState, false)
+      const result = aboutPreferencesState.getRecoveryBalanceRecalulated(state)
+      assert.equal(result, false)
+    })
+
+    it('returns true', function () {
+      const state = aboutPreferencesState.setRecoveryBalanceRecalculated(defaultState, true)
+      const result = aboutPreferencesState.getRecoveryBalanceRecalulated(state)
+      assert.equal(result, true)
+    })
+  })
+
   describe('setRecoveryStatus', function () {
     it('updates recoverySucceeded', function () {
       const result = aboutPreferencesState.setRecoveryStatus(defaultState, true)

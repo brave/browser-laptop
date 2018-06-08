@@ -7,6 +7,21 @@ const ipc = chrome.ipcRenderer
 ipc.send('got-background-page-webcontents')
 const domParser = new DOMParser()
 
+/**
+ * Takes a string and sanitizes it for HTML.
+ * This doesn't defend against other forms of code injection (for instance
+ * interpreting the input as js), so the input should still be considered
+ * untrusted.
+ * @param {string} input
+ * @returns {string}
+ */
+const sanitizeHtml = (input) => {
+  if (typeof input !== 'string') {
+    return ''
+  }
+  return input.replace(/([\s\n]*<[^>]*>[\s\n]*)+/g, ' ')
+}
+
 ipc.on('fetch-publisher-info', (e, url, options) => {
   let finalUrl = url
   window.fetch(url, options).then((response) => {
@@ -43,9 +58,9 @@ const requestHandlerApi = {
         error: null,
         body: {
           url: finalUrl,
-          title: result.title || '',
-          image: result.image || '',
-          author: result.author || ''
+          title: sanitizeHtml(result.title) || '',
+          image: sanitizeHtml(result.image) || '',
+          author: sanitizeHtml(result.author) || ''
         }
       })
     } catch (err) {
@@ -73,7 +88,7 @@ const requestHandlerApi = {
     }
 
     const html = (node.outerHTML || new XMLSerializer().serializeToString(node)) || ''
-    return html.replace(/([\s\n]*<[^>]*>[\s\n]*)+/g, ' ')
+    return sanitizeHtml(html)
   },
 
   urlCheck: (url) => {

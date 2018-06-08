@@ -19,27 +19,33 @@ const api = {
    */
   getSearchData: function (state, activeFrame) {
     // TODO: don't have activeFrame param when reselect is used for state retrieval memoization
-    const urlbar = api.getActiveFrameUrlBarState(activeFrame)
-    const activeFrameIsPrivate = activeFrame.get('isPrivate')
-    const urlbarSearchDetail = urlbar.get('searchDetail')
-    const appSearchDetail = state.get('searchDetail')
-    const activateSearchEngine = urlbarSearchDetail && urlbarSearchDetail.get('activateSearchEngine')
+    let searchURL
+    let searchShortcut
 
     // get default search provider from app state
-    let searchURL =
+    const appSearchDetail = state.get('searchDetail')
+    const activeFrameIsPrivate = activeFrame.get('isPrivate')
+    if (appSearchDetail) {
+      searchURL =
       (activeFrameIsPrivate && appSearchDetail.has('privateSearchURL'))
         ? appSearchDetail.get('privateSearchURL')
         : appSearchDetail.get('searchURL')
-    let searchShortcut = ''
+      searchShortcut = ''
+    }
+
     // change search url if overrided by active frame state or shortcut
+    const urlbar = api.getActiveFrameUrlBarState(activeFrame)
+    const urlbarSearchDetail = urlbar && urlbar.get('searchDetail')
+    const activateSearchEngine = urlbarSearchDetail && urlbarSearchDetail.get('activateSearchEngine')
     if (activateSearchEngine) {
       const provider = urlbarSearchDetail
       searchShortcut = new RegExp('^' + provider.get('shortcut') + ' ', 'g')
       searchURL =
-        (activeFrame.get('isPrivate') && provider.has('privateSearch'))
+        (activeFrameIsPrivate && provider.has('privateSearch'))
           ? provider.get('privateSearch')
           : provider.get('search')
     }
+
     return {
       searchURL,
       searchShortcut

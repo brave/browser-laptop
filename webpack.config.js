@@ -122,6 +122,9 @@ function production () {  // eslint-disable-line
       parallel: true,
       uglifyOptions: {
         compress: {
+          // inline is buggy as of uglify-es 3.3.7
+          // https://github.com/mishoo/UglifyJS2/issues/2842
+          inline: 1,
           warnings: false
         },
         mangle: {

@@ -10,9 +10,9 @@ const Immutable = require('immutable')
 // Components
 const ImmutableComponent = require('../../immutableComponent')
 const BrowserButton = require('../../common/browserButton')
-const {FormTextbox} = require('../../common/textbox')
 const {FormDropdown} = require('../../common/dropdown')
 const LedgerTable = require('./ledgerTable')
+const Captcha = require('./captcha')
 
 // State
 const ledgerState = require('../../../../common/state/ledgerState')
@@ -41,6 +41,7 @@ const globalStyles = require('../../styles/global')
 const cx = require('../../../../../js/lib/classSet')
 const {paymentStylesVariables} = require('../../styles/payment')
 const closeButton = require('../../../../../img/toolbar/stoploading_btn.svg')
+const promotionStatuses = require('../../../../common/constants/promotionStatuses')
 
 // TODO: report when funds are too low
 class EnabledContent extends ImmutableComponent {
@@ -93,7 +94,7 @@ class EnabledContent extends ImmutableComponent {
   }
 
   onClaimClick () {
-    appActions.onPromotionClaim()
+    appActions.onPromotionClick()
   }
 
   claimButton () {
@@ -141,15 +142,28 @@ class EnabledContent extends ImmutableComponent {
 
   fundsAmount () {
     const ledgerData = this.props.ledgerData
-    const val = formatCurrentBalance(ledgerData) || ''
-    const big = val.length > 23
+    if (!ledgerData) {
+      return
+    }
 
-    return <FormTextbox
-      readOnly
-      data-test-id='fundsAmount'
-      value={val}
-      customClass={big && styles.width_input}
-    />
+    const total = formatCurrentBalance(ledgerData, ledgerData.get('balance'), false) || ''
+    const userFunded = formatCurrentBalance(ledgerData, ledgerData.get('userFunded')) || ''
+    const grants = ledgerData.get('grants') || Immutable.List()
+
+    return <div className={css(styles.fundsAmount)}>
+      <div className={css(styles.fundsAmount__item)}>{userFunded}</div>
+      {
+        grants.map(grant => {
+          return <div className={css(styles.fundsAmount__item)}>
+            {formatCurrentBalance(ledgerData, grant.get('amount'), false)}
+            <span> (<span data-l10n-id='expires' /> {new Date(grant.get('expirationDate') * 1000).toLocaleDateString()})</span>
+          </div>
+        })
+      }
+      <div className={css(styles.fundsAmount__item, styles.fundsAmount__total)}>
+        {total} (<span data-l10n-id='total' />)
+      </div>
+    </div>
   }
 
   lastReconcileMessage () {
@@ -177,8 +191,12 @@ class EnabledContent extends ImmutableComponent {
     }
 
     return <section>
-      <div data-l10n-id='lastContribution' />
-      <div data-l10n-id={text} data-l10n-args={JSON.stringify(l10nDataArgs)} />
+      {
+        prevReconcileDateValue
+        ? <span data-l10n-id='lastContribution' className={css(styles.lastContribution)} />
+        : null
+      }
+      <span data-l10n-id={text} data-l10n-args={JSON.stringify(l10nDataArgs)} />
     </section>
   }
 
@@ -218,8 +236,7 @@ class EnabledContent extends ImmutableComponent {
     }
 
     return <section>
-      <div data-l10n-id='nextContribution' />
-      <div data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id={l10nDataId} />
+      <span data-l10n-id='nextContribution' /> <span data-l10n-args={JSON.stringify(l10nDataArgs)} data-l10n-id={l10nDataId} />
     </section>
   }
 
@@ -227,7 +244,7 @@ class EnabledContent extends ImmutableComponent {
     const promo = this.props.ledgerData.get('promotion') || Immutable.Map()
     const status = promo.get('promotionStatus')
     if (status && !promo.has('claimedTimestamp')) {
-      if (status === 'expiredError') {
+      if (status === promotionStatuses.PROMO_EXPIRED) {
         appActions.onPromotionRemoval()
       } else {
         appActions.onPromotionClose()
@@ -243,6 +260,10 @@ class EnabledContent extends ImmutableComponent {
       'about:preferences#payments?ledgerRecoveryOverlayVisible',
       true
     )
+  }
+
+  captchaOverlay (promo) {
+    return <Captcha promo={promo} />
   }
 
   statusMessage () {
@@ -275,19 +296,31 @@ class EnabledContent extends ImmutableComponent {
 
       if (promotionStatus) {
         switch (promotionStatus) {
-          case 'generalError':
+          case promotionStatuses.GENERAL_ERROR:
             {
               title = locale.translation('promotionGeneralErrorTitle')
               message = locale.translation('promotionGeneralErrorMessage')
               text = locale.translation('promotionGeneralErrorText')
               break
             }
-          case 'expiredError':
+          case promotionStatuses.PROMO_EXPIRED:
             {
               title = locale.translation('promotionClaimedErrorTitle')
               message = locale.translation('promotionClaimedErrorMessage')
               text = locale.translation('promotionClaimedErrorText')
               break
+            }
+          case promotionStatuses.CAPTCHA_BLOCK:
+            {
+              title = locale.translation('promotionCaptchaBlockTitle')
+              message = locale.translation('promotionCaptchaBlockMessage')
+              text = ' '
+              break
+            }
+          case promotionStatuses.CAPTCHA_CHECK:
+          case promotionStatuses.CAPTCHA_ERROR:
+            {
+              return this.captchaOverlay(promo)
             }
         }
       }
@@ -313,7 +346,6 @@ class EnabledContent extends ImmutableComponent {
             />
             break
           }
-
         case ledgerStatuses.SERVER_PROBLEM:
           {
             showClose = false
@@ -337,7 +369,8 @@ class EnabledContent extends ImmutableComponent {
           /> : null
       }
       <p className={css(styles.enabledContent__overlay_title)}>
-        <span className={css(styles.enabledContent__overlay_bold)}>{title}</span> {message}
+        <span className={css(styles.enabledContent__overlay_bold)}>{title}</span>
+        <span>{message}</span>
       </p>
       <p className={css(styles.enabledContent__overlay_text)}>
         {text}
@@ -386,7 +419,6 @@ class EnabledContent extends ImmutableComponent {
         </div>
         <div className={css(gridStyles.row2col1)}>
           <FormDropdown
-            data-isPanel
             data-test-id='fundsSelectBox'
             value={contributionAmount}
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.PAYMENTS_CONTRIBUTION_AMOUNT)}
@@ -408,7 +440,7 @@ class EnabledContent extends ImmutableComponent {
             }
           </FormDropdown>
         </div>
-        <div className={css(gridStyles.row2col2)}>
+        <div className={css(gridStyles.row2col2, gridStyles.mergeRow23Col2)}>
           {
             ledgerData.get('error') && ledgerData.get('error').get('caller') === 'getWalletProperties'
               ? <div data-l10n-id='accountBalanceConnectionError' />
@@ -420,8 +452,6 @@ class EnabledContent extends ImmutableComponent {
         </div>
         <div className={css(gridStyles.row3col1, styles.enabledContent__walletBar__message)}>
           {this.lastReconcileMessage()}
-        </div>
-        <div className={css(gridStyles.row3col2, styles.enabledContent__walletBar__message)}>
           {
             ledgerData.get('error') && ledgerData.get('error').get('caller') === 'getWalletProperties'
               ? <div data-l10n-id={this.ledgerDataErrorText()} />
@@ -513,16 +543,16 @@ const gridStyles = StyleSheet.create({
     gridColumn: 3,
     marginRight: globalStyles.spacing.panelPadding,
     marginBottom: globalStyles.spacing.panelPadding
+  },
+
+  mergeRow23Col2: {
+    gridRow: '2 / span 2'
   }
 })
 
 const styles = StyleSheet.create({
   claimButton: {
     marginTop: '10px'
-  },
-
-  width_input: {
-    width: '195px'
   },
 
   iconLink: {
@@ -594,7 +624,8 @@ const styles = StyleSheet.create({
   },
 
   enabledContent__overlay_bold: {
-    color: '#ff5500'
+    color: '#ff5500',
+    paddingRight: '5px'
   },
 
   enabledContent__overlay_text: {
@@ -650,6 +681,23 @@ const styles = StyleSheet.create({
     fontSize: globalStyles.payments.fontSize.regular,
     lineHeight: 1.5,
     marginTop: globalStyles.spacing.panelPadding
+  },
+
+  fundsAmount__item: {
+    marginBottom: '4px',
+    width: '215px',
+    fontSize: '14.5px'
+  },
+
+  fundsAmount__total: {
+    marginTop: '10px',
+    paddingTop: '12px',
+    borderTop: '1px solid #999',
+    fontSize: '15px'
+  },
+
+  lastContribution: {
+    paddingRight: '4px'
   }
 })
 

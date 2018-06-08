@@ -64,6 +64,7 @@ const updater = require('./updater')
 const Importer = require('./importer')
 const messages = require('../js/constants/messages')
 const appActions = require('../js/actions/appActions')
+const tabActions = require('./common/actions/tabActions')
 const SessionStore = require('./sessionStore')
 const {startSessionSaveInterval} = require('./sessionStoreShutdown')
 const appStore = require('../js/stores/appStore')
@@ -142,15 +143,17 @@ const notifyCertError = (webContents, url, error, cert) => {
     fingerprint: cert.fingerprint
   }
 
-  // Tell the page to show an unlocked icon. Note this is sent to the main
-  // window webcontents, not the webview webcontents
-  let sender = webContents.hostWebContents || webContents
-  sender.send(messages.CERT_ERROR, {
+  // Load the certificate error page
+  // and provide details about the error,
+  // including enough data for in-page actions to force the
+  // insecure page to load or show the certificate.
+  tabActions.setContentsError(webContents.getId(), {
     url,
     error,
     cert,
     tabId: webContents.getId()
   })
+  appActions.loadURLRequested(webContents.getId(), 'about:certerror')
 }
 
 app.on('ready', () => {

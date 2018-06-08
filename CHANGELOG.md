@@ -1,5 +1,53 @@
 # Changelog
 
+## [0.22.727](https://github.com/brave/browser-laptop/releases/tag/v0.22.727dev)
+
+ - Added CAPTCHA verification when accepting Payment grants. ([#14188](https://github.com/brave/browser-laptop/issues/14188))
+ - Added "Clear Payment Data / Clear Payment History" under security preferences and "Delete Wallet" under advanced payments preferences. ([#8537](https://github.com/brave/browser-laptop/issues/8537))
+ - Optimized contributions by adding support for batch voting. ([#14190](https://github.com/brave/browser-laptop/issues/14190))
+ - Fixed Payments displaying message incorrectly stating that 30 minutes of total usage hasn't been logged (in some situations). ([#14310](https://github.com/brave/browser-laptop/issues/14310))
+ - Fixed tab ordering issue when opening new tabs. ([#14281](https://github.com/brave/browser-laptop/issues/14281))
+ - Fixed publishers being added as "include" even though the "auto-include" has been disabled. ([#14245](https://github.com/brave/browser-laptop/issues/14245))
+ - Fixed startup crashes when specific Payments files are missing or corrupted after an upgrade. ([#14202](https://github.com/brave/browser-laptop/issues/14202))
+
+## [0.22.721](https://github.com/brave/browser-laptop/releases/tag/v0.22.721dev)
+
+ - Fixed partner subscription page no longer active tab on initial launch. ([#14220](https://github.com/brave/browser-laptop/issues/14220))
+ - Fixed tabs opened via links with target attribute not always rendering. ([#14159](https://github.com/brave/browser-laptop/issues/14159))
+ - Fixed fingerprinting protection breaks the Uphold verification process. ([#14152](https://github.com/brave/browser-laptop/issues/14152))
+ - Fixed toggling shields breaks the security indicator on URLs that include a hash. ([#14231](https://github.com/brave/browser-laptop/issues/14231))
+ - Fixed opening extension background pages from the URL bar causes Brave to crash. ([#14079](https://github.com/brave/browser-laptop/issues/14079))
+ - Fixed tabs becoming unresponsive when detaching into separate window. ([#14031](https://github.com/brave/browser-laptop/issues/14031))
+ - Fixed disabling TorrentViewer doesn't disable torrent handling. ([#10767](https://github.com/brave/browser-laptop/issues/10767))
+ - Upgraded to muon 6.0.12. ([#14154](https://github.com/brave/browser-laptop/issues/14154))
+ - Upgraded to Chromium 66.0.3359.170. ([#14125](https://github.com/brave/browser-laptop/issues/14125))
+
+## [0.22.714](https://github.com/brave/browser-laptop/releases/tag/v0.22.714dev)
+
+ - Improved performance for browser startup and general UI, especially with a high number of tabs opened. ([#13216](https://github.com/brave/browser-laptop/issues/13216))
+ - Added "Include site in Brave Payments" right-click item for history and bookmarks. ([#6547](https://github.com/brave/browser-laptop/issues/6547))
+ - Added notification when contribution is pushed back due to minimum 30min browsing time not being met. ([#14000](https://github.com/brave/browser-laptop/issues/14000))
+ - Added an option to disable WebRTC. ([#13668](https://github.com/brave/browser-laptop/issues/13668))
+ - Added a reminder notification to backup Payments wallet when funds are added for the first time. ([#13425](https://github.com/brave/browser-laptop/issues/13425))
+ - Added HSTS fingerprinting mitigation. ([#12223](https://github.com/brave/browser-laptop/issues/12223))
+ - Added error under Payments when connection to the ledger server fails. ([#13972](https://github.com/brave/browser-laptop/issues/13972))
+ - Fixed performance issues when closing tab towards the beginning of a tab strip. ([#14081](https://github.com/brave/browser-laptop/issues/14081))
+ - Fixed bookmark bar staying visible after all bookmarks have been removed. ([#14047](https://github.com/brave/browser-laptop/issues/14047))
+ - Fixed crash on macOS when selecting "Share" under the file menu when there's no windows opened. ([#13928](https://github.com/brave/browser-laptop/issues/13928))
+ - Fixed several broken cases when adding websites via the publisher toggle button. ([#13879](https://github.com/brave/browser-laptop/issues/13879))
+ - Fixed ledger table sort based on contribution percentage. ([#13721](https://github.com/brave/browser-laptop/issues/13721))
+ - Fixed active tabs sometimes appearing white and not loading during startup. ([#13679](https://github.com/brave/browser-laptop/issues/13679))
+ - Fixed bookmark search. ([#13322](https://github.com/brave/browser-laptop/issues/13322))
+ - Fixed background process not correctly terminating when closing Brave after importing data. ([#13422](https://github.com/brave/browser-laptop/issues/13422))
+ - Fixed background process not correctly terminating when closing Brave using titlebar after bookmarking. ([#13277](https://github.com/brave/browser-laptop/issues/13277))
+ - Fixed PDFs not being added into Payments. ([#12792](https://github.com/brave/browser-laptop/issues/12792))
+ - Fixed large balances not being displayed correctly under Payments. ([#12220](https://github.com/brave/browser-laptop/issues/12220))
+ - Fixed loading icon being displayed in ad slots where ads have been removed on Marketwatch. ([#11730](https://github.com/brave/browser-laptop/issues/11730))
+ - Fixed crash when using "Mute other tabs" with large profiles. ([#14058](https://github.com/brave/browser-laptop/issues/14058))
+ - Fixed tabs become unmuted when dragged to a new window. ([#13979](https://github.com/brave/browser-laptop/issues/13979))
+ - Fixed unable to open private tab using keyboard shortcut from a PDF tab. ([#4024](https://github.com/brave/browser-laptop/issues/4024))
+ - Fixed escape key not closing the add funds dialog under Payments. ([#3800](https://github.com/brave/browser-laptop/issues/3800))
+
 ## [0.22.669](https://github.com/brave/browser-laptop/releases/tag/v0.22.669dev)
 
  - Fixed crashing when submitting online forms. ([#13947](https://github.com/brave/browser-laptop/issues/13947))

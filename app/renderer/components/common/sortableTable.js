@@ -47,9 +47,7 @@ class SortableTable extends React.Component {
       if (this.dimensionCount == null && prevProps.rows) {
         for (let i = 0; i < prevProps.rows.length; i++) {
           if (this.props.rows[i].length > 0) {
-            if (this.props.rows[i]) {
-              count += this.props.rows[i].length
-            }
+            count += this.props.rows[i].length
           }
         }
         this.dimensionCount = count
@@ -72,8 +70,6 @@ class SortableTable extends React.Component {
         this.dimensionCount = count
         return
       }
-
-      this.dimensionCount = count
     } else {
       if (
         this.props.rows &&

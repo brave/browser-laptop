@@ -17,9 +17,8 @@ const contextMenus = require('../../../../js/contextMenus')
 const {getSetting} = require('../../../../js/settings')
 
 // Components
-const { Transition, TransitionGroup } = require('react-transition-group')
 const Navigator = require('../navigation/navigator')
-const Frame = require('../frame/frame')
+const GuestInstanceRenderer = require('../frame/guestInstanceRenderer')
 const TabPages = require('../tabs/tabPages')
 const TabsToolbar = require('../tabs/tabsToolbar')
 const FindBar = require('./findbar')
@@ -42,6 +41,9 @@ const ContextMenu = require('../common/contextMenu/contextMenu')
 const PopupWindow = require('./popupWindow')
 const NoScriptInfo = require('./noScriptInfo')
 const CheckDefaultBrowserDialog = require('./checkDefaultBrowserDialog')
+const HrefPreview = require('../frame/hrefPreview')
+const MessageBox = require('../common/messageBox')
+const FullScreenWarning = require('../frame/fullScreenWarning')
 
 // Constants
 const appConfig = require('../../../../js/constants/appConfig')
@@ -60,6 +62,7 @@ const menuBarState = require('../../../common/state/menuBarState')
 const windowState = require('../../../common/state/windowState')
 const updateState = require('../../../common/state/updateState')
 const tabState = require('../../../common/state/tabState')
+const tabMessageBoxState = require('../../../common/state/tabMessageBoxState')
 
 // Util
 const _ = require('underscore')
@@ -206,7 +209,7 @@ class Main extends React.Component {
 
   exitFullScreen () {
     if (this.props.isFullScreen) {
-      windowActions.setFullScreen(this.props.tabId, false)
+      appActions.tabSetFullScreen(this.props.tabId, false)
     }
   }
 
@@ -343,7 +346,7 @@ class Main extends React.Component {
     // If the tab changes or was closed, exit out of full screen to give a better
     // picture of what's happening.
     if (prevProps.tabId !== this.props.tabId && this.props.isFullScreen) {
-      windowActions.setFullScreen(this.props.tabId, false)
+      appActions.tabSetFullScreen(this.props.tabId, false)
     }
   }
 
@@ -419,10 +422,6 @@ class Main extends React.Component {
 
     ipc.on(messages.HTTPSE_RULE_APPLIED, (e, ruleset, details) => {
       windowActions.setRedirectedBy(details.tabId, ruleset, details.url)
-    })
-
-    ipc.on(messages.CERT_ERROR, (e, details) => {
-      windowActions.onCertError(details.tabId, details.url, details.error)
     })
 
     ipc.on(messages.SET_SECURITY_STATE, (e, tabId, securityState) => {
@@ -543,7 +542,13 @@ class Main extends React.Component {
 
     const props = {}
     // used in renderer
+    props.activeFrameKey = activeFrame.get('key')
+    if (window.activeFrameKey !== props.activeFrameKey) {
+      window.activeFrameKey = props.activeFrameKey
+    }
+    props.previewFrameKey = frameStateUtil.getPreviewFrameKey(currentWindow)
     props.isFullScreen = activeFrame.get('isFullScreen', false)
+    props.showFullScreenWarning = activeFrame.get('showFullScreenWarning')
     props.isMaximized = isMaximized(state) || isFullScreen(state)
     props.captionButtonsVisible = isWindows
     props.showContextMenu = currentWindow.has('contextMenuDetail')
@@ -573,8 +578,6 @@ class Main extends React.Component {
     props.showNotificationBar = activeOrigin && state.get('notifications').filter((item) =>
         item.get('frameOrigin') ? activeOrigin === item.get('frameOrigin') : true).size > 0
     props.showFindBar = activeFrame.get('findbarShown') && !activeFrame.get('isFullScreen')
-    props.sortedFrames = frameStateUtil.getSortedFrameKeys(currentWindow)
-    props.hasFramePreview = currentWindow.get('previewFrameKey') != null
     props.showDownloadBar = currentWindow.getIn(['ui', 'downloadsToolbar', 'isVisible']) &&
       state.get('downloads') && state.get('downloads').size > 0
     props.title = activeFrame.get('title')
@@ -582,6 +585,7 @@ class Main extends React.Component {
     props.loginRequiredUrl = loginRequiredDetails
       ? urlResolve(loginRequiredDetails.getIn(['request', 'url']), '/')
       : null
+    props.showMessageBox = tabMessageBoxState.hasMessageBoxDetail(state, activeTabId)
 
     // used in other functions
     props.menubarSelectedIndex = currentWindow.getIn(['ui', 'menubar', 'selectedIndex'])
@@ -736,31 +740,23 @@ class Main extends React.Component {
           : null
         }
       </div>
-      <div className='mainContainer'>
-        <TransitionGroup className={cx({
-          tabContainer: true,
-          hasFramePreview: this.props.hasFramePreview
-        })}>
-          {
-            this.props.sortedFrames.map((frameKey) =>
-              <Transition
-                key={frameKey}
-                // after how long (ms)
-                // should the state 'entering' switch to 'entered'
-                // and also how long should state switch from 'exiting'
-                // to the <Frame /> component actually being removed
-                timeout={150}>
-                {
-                  (transitionState) =>
-                    <Frame
-                      frameKey={frameKey}
-                      transitionState={transitionState}
-                    />
-                }
-              </Transition>
-            )
-          }
-        </TransitionGroup>
+      <div className={cx({
+        mainContainer: true,
+        hasFramePreview: this.props.previewFrameKey != null
+      })}>
+        {
+          this.props.isFullScreen && this.props.showFullScreenWarning
+          ? <FullScreenWarning location={this.props.location} />
+          : null
+        }
+        <GuestInstanceRenderer isPreview={!!this.props.previewFrameKey} frameKey={this.props.previewFrameKey != null ? this.props.previewFrameKey : this.props.activeFrameKey} />
+        <HrefPreview frameKey={this.props.activeFrameKey} />
+        {
+          this.props.showMessageBox
+          ? <MessageBox
+            tabId={this.props.tabId} />
+          : null
+        }
       </div>
       {
         this.props.showDownloadBar

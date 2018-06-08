@@ -39,6 +39,7 @@ AppStore
       backupNotifyCount: number, // number of times user has been reminded to backup wallet
       backupNotifyTimestamp: number, // number of milliseconds from the last reminder until the next
       backupSucceeded: (boolean|undefined), // was last backup successful?
+      recoveryBalanceRecalculated: (boolean|undefined),
       recoverySucceeded: (boolean|undefined),
       updatedStamp: number
     }
@@ -108,6 +109,8 @@ AppStore
     browserHistory: boolean,
     cachedImagesAndFiles: boolean,
     downloadHistory: boolean,
+    paymentHistory: boolean,
+    publishersClear: boolean,
     savedPasswords: boolean,
     savedSiteSettings: boolean
   },
@@ -211,6 +214,10 @@ AppStore
       created, boolean, // wallet is created
       creating: boolean, // wallet is being created
       currentRate: number,
+      grants: [{
+        amount: number,
+        expirationDate: number
+      }]
       hasBitcoinHandler: boolean, // brave browser has a `bitcoin:` URI handler
       monthlyAmounts: Array<float> // list of all monthly amounts for the contribution
       passphrase: string, // the BAT wallet passphrase
@@ -244,6 +251,7 @@ AppStore
         viewingId: string, // UUIDv4 for this contribution
       }],
       unconfirmed: string, // unconfirmed balance in BAT.toFixed(2)
+      userFunded: number, // amount funded by the user
       userHasFunded: boolean // permanently true once user funds wallet
     },
     locations: {
@@ -589,7 +597,8 @@ AppStore
       suppress: boolean, // if true, show a suppress checkbox (defaulted to not checked)
       title: string, // title is the source; ex: "brave.com says:"
     },
-    muted: boolean, // is the tab muted
+    muted: boolean, // is the tab muted,
+    zoomPercent: number, // current zoom levellast
     windowId: number // the windowId that contains the tab
     guestInstanceId: number,
     tabId: number
@@ -647,6 +656,7 @@ AppStore
     autocompleteURL: string, // ditto re: {searchTerms}
     searchURL: string // with replacement var in string: {searchTerms}
   },
+  windowReady: boolean // set to false on start; set to true when first window is ready
 }
 ```
 
@@ -708,8 +718,6 @@ WindowStore
   createdFaviconDirectory: boolean, // whether the ledger-favicons directory has been created already in the appData directory
   frames: [{
     aboutDetails: object, // details for about pages
-    activeShortcut: string, // set by the application store when the component should react to a shortcut
-    activeShortcutDetails: object, // additional parameters for the active shortcut action if any
     adblock: {
       blocked: Array<string>
     },
@@ -741,7 +749,6 @@ WindowStore
     isPrivate: boolean, // private browsing tab
     key: number,
     lastAccessedTime: datetime,
-    lastZoomPercentage: number, // last value that was used for zooming
     loading: boolean,
     location: string, // the currently navigated location
     modalPromptDetail: object,

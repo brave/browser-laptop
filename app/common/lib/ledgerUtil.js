@@ -65,16 +65,16 @@ const batToCurrencyString = (bat, ledgerData) => {
   return `${converted} ${currency}`
 }
 
-const formatCurrentBalance = (ledgerData) => {
+const formatCurrentBalance = (ledgerData, amount, showAlt = true) => {
   let currency = 'USD'
   let balance = 0
   let converted = 0
   let hasRate = false
 
   if (ledgerData != null) {
-    balance = Number(ledgerData.get('balance') || 0)
+    balance = Number(amount || 0)
     converted = Number.parseFloat(ledgerData.get('converted')) || 0
-    hasRate = ledgerData.has('currentRate') && ledgerData.hasIn(['rates', 'BTC'])
+    hasRate = showAlt ? ledgerData.has('currentRate') && ledgerData.hasIn(['rates', 'BTC']) : false
   }
 
   balance = balance.toFixed(2)
@@ -120,7 +120,7 @@ const walletStatus = (ledgerData, settings) => {
     const transactions = ledgerData.get('transactions')
     const pendingFunds = Number(ledgerData.get('unconfirmed') || 0)
     const balance = Number(ledgerData.get('balance') || 0)
-    const minBalance = ledgerState.getContributionAmount(null, ledgerData.get('contributionAmount'), settings)
+    const minBalance = ledgerState.getContributionAmount(null, ledgerData.get('contributionAmount'), settings) * 0.9
 
     if (pendingFunds + balance < minBalance) {
       status.id = 'insufficientFundsStatus'
@@ -650,6 +650,18 @@ const getRemainingRequiredTime = (state, publisherKey) => {
   return (minimumVisitTime - publisherDuration)
 }
 
+const probiToFormat = (amount) => {
+  if (!amount) {
+    return 0
+  }
+
+  try {
+    return new BigNumber(amount.toString()).dividedBy('1e18').toNumber()
+  } catch (e) {
+    return 0
+  }
+}
+
 const defaultMonthlyAmounts = Immutable.List([5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0])
 
 const milliseconds = {
@@ -686,7 +698,8 @@ const getMethods = () => {
     generateMediaCacheData,
     shouldShowMenuOption,
     hasRequiredVisits,
-    getRemainingRequiredTime
+    getRemainingRequiredTime,
+    probiToFormat
   }
 
   let privateMethods = {}

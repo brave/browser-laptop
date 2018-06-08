@@ -122,21 +122,25 @@ const ledgerState = {
     return state
   },
 
-  resetSynopsis: (state, options = false) => {
+  deleteSynopsis: (state) => {
     state = validateState(state)
-
-    if (options) {
-      state = state
-        .setIn(['ledger', 'synopsis', 'options'], Immutable.Map())
-        .setIn(['ledger', 'about', 'synopsisOptions'], Immutable.Map())
-    }
-
     state = pageDataState.resetPageData(state)
 
     return state
-      .setIn(['ledger', 'synopsis', 'publishers'], Immutable.Map())
-      .setIn(['ledger', 'locations'], Immutable.Map())
-      .setIn(['ledger', 'about', 'synopsis'], Immutable.List())
+      .setIn(['cache', 'ledgerVideos'], Immutable.Map())
+      .set('ledger', Immutable.fromJS({
+        about: {
+          synopsis: [],
+          synopsisOptions: {}
+        },
+        info: {},
+        locations: {},
+        synopsis: {
+          options: {},
+          publishers: {}
+        },
+        promotion: {}
+      }))
   },
 
   /**
@@ -193,6 +197,18 @@ const ledgerState = {
     }
 
     return state.setIn(['ledger', 'synopsis', 'publishers', key, prop], value)
+  },
+
+  resetPublishers: (state) => {
+    state = validateState(state)
+    state = pageDataState.resetPageData(state)
+
+    return state
+      .setIn(['ledger', 'synopsis', 'publishers'], Immutable.Map())
+      .setIn(['ledger', 'locations'], Immutable.Map())
+      .setIn(['ledger', 'about', 'synopsis'], Immutable.List())
+      .setIn(['ledger', 'publisherTimestamp'], 0)
+      .setIn(['cache', 'ledgerVideos'], Immutable.Map())
   },
 
   /**
@@ -507,8 +523,10 @@ const ledgerState = {
    * ABOUT PAGE
    */
   // TODO (optimization) don't have two almost identical object in state (synopsi->publishers and about->synopsis)
-  saveAboutSynopsis: (state, publishers) => {
+  saveAboutSynopsis: (state, publishers = Immutable.List()) => {
     state = validateState(state)
+    publishers = makeImmutable(publishers)
+    publishers = publishers.sort((prev, next) => (parseFloat(prev.get('percentage')) - parseFloat(next.get('percentage'))) * -1)
     state = ledgerState.setAboutProp(state, 'synopsis', publishers)
     state = ledgerState.setAboutProp(state, 'synopsisOptions', ledgerState.getSynopsisOptions(state))
 
@@ -541,6 +559,7 @@ const ledgerState = {
     let promotion = ledgerState.getActivePromotion(state)
     const claim = state.getIn(['ledger', 'promotion', 'claimedTimestamp']) || null
     const status = state.getIn(['ledger', 'promotion', 'promotionStatus']) || null
+    const captcha = state.getIn(['ledger', 'promotion', 'captcha']) || null
 
     if (claim) {
       promotion = promotion.set('claimedTimestamp', claim)
@@ -548,6 +567,10 @@ const ledgerState = {
 
     if (status) {
       promotion = promotion.set('promotionStatus', status)
+    }
+
+    if (captcha) {
+      promotion = promotion.set('captcha', captcha)
     }
 
     return promotion

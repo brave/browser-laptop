@@ -1,0 +1,34 @@
+<html>
+<head>
+</head>
+<body>
+
+<iframe id='test-frame' height=200 width=500></iframe>
+
+<script>
+var host = window.location.origin
+
+function loadIco() {
+  var faviconLocation = host.replace('127.0.0.1', 'localhost') + '/cookie-favicon.ico'
+  var link = document.createElement('link')
+  link.rel = 'shortcut icon'
+  link.href = faviconLocation
+  document.head.appendChild(link);
+}
+
+
+function loadFrame() {
+  var testPageLocation = host.replace('127.0.0.1', 'localhost') + '/cookie-favicon-test.html'
+  var frame = document.getElementById('test-frame')
+  frame.onload = loadIco
+  frame.src = testPageLocation
+}
+
+loadFrame()
+
+function setText (id, result) {
+    document.getElementById(id).innerText = JSON.stringify(result)
+}
+</script>
+</body>
+</html>

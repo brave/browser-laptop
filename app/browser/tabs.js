@@ -23,6 +23,7 @@ const aboutHistoryState = require('../common/state/aboutHistoryState')
 const aboutNewTabState = require('../common/state/aboutNewTabState')
 const appStore = require('../../js/stores/appStore')
 const appConfig = require('../../js/constants/appConfig')
+const config = require('../../js/constants/config')
 const {newTabMode} = require('../common/constants/settingsEnums')
 const {tabCloseAction} = require('../common/constants/settingsEnums')
 const webContentsCache = require('./webContentsCache')
@@ -35,7 +36,7 @@ const historyState = require('../common/state/historyState')
 const siteSettingsState = require('../common/state/siteSettingsState')
 const bookmarkOrderCache = require('../common/cache/bookmarkOrderCache')
 const ledgerState = require('../common/state/ledgerState')
-const {getWindow} = require('./windows')
+const {getWindow, notifyWindowWebContentsAdded} = require('./windows')
 const activeTabHistory = require('./activeTabHistory')
 
 let adBlockRegions
@@ -64,6 +65,8 @@ const getTabValue = function (tabId) {
     tabValue = tabValue.set('guestInstanceId', tab.guestInstanceId)
     tabValue = tabValue.set('partition', tab.session.partition)
     tabValue = tabValue.set('partitionNumber', getPartitionNumber(tab.session.partition))
+    tabValue = tabValue.set('isPlaceholder', tab.isPlaceholder())
+    tabValue = tabValue.set('zoomPercent', tab.getZoomPercent())
     return tabValue.set('tabId', tabId)
   }
 }
@@ -71,8 +74,15 @@ const getTabValue = function (tabId) {
 const updateTab = (tabId, changeInfo = {}) => {
   let tabValue = getTabValue(tabId)
   if (shouldDebugTabEvents) {
-    console.log(`Tab [${tabId}] updated from muon`, changeInfo, { newIndex: tabValue && tabValue.get('index'), newActive: tabValue && tabValue.get('active') })
+    console.log(`Tab [${tabId}] updated from muon. changeInfo:`, changeInfo, 'currentValues:', {
+      newIndex: tabValue && tabValue.get('index'),
+      newActive: tabValue && tabValue.get('active'),
+      windowId: tabValue && tabValue.get('windowId'),
+      isPlaceholder: tabValue && tabValue.get('isPlaceholder'),
+      guestInstanceId: tabValue && tabValue.get('guestInstanceId')
+    })
   }
+
   if (tabValue) {
     appActions.tabUpdated(tabValue, makeImmutable(changeInfo))
   }
@@ -146,34 +156,37 @@ ipcMain.on(messages.ABOUT_COMPONENT_INITIALIZED, (e) => {
   const tabId = tab.getId()
   aboutTabs[tabId] = {}
 
-  if (shouldDebugTabEvents) {
-    console.log(`Tab [${tabId}] ABOUT_COMPONENT_INITIALIZED`)
-  }
-
   const url = getSourceAboutUrl(tab.getURL())
   const location = getBaseUrl(url)
+
+  if (shouldDebugTabEvents) {
+    console.log(`Tab [${tabId}] ABOUT_COMPONENT_INITIALIZED`, location)
+  }
+
   if (location === 'about:preferences') {
     if (isOnAboutLocation(url, 'about:preferences#payments')) {
       appActions.ledgerPaymentsPresent(tabId, true)
     } else {
       appActions.ledgerPaymentsPresent(tabId, false)
     }
-
-    tab.on('will-destroy', () => {
-      appActions.ledgerPaymentsPresent(tabId, false)
-    })
-    tab.once('did-navigate', () => {
-      appActions.ledgerPaymentsPresent(tabId, false)
-    })
-    tab.on('did-navigate-in-page', (e, newUrl) => {
-      updateAboutDetails(tabId)
-      const url = getSourceAboutUrl(newUrl)
-      if (isOnAboutLocation(url, 'about:preferences#payments')) {
-        appActions.ledgerPaymentsPresent(tabId, true)
-      } else {
+    const webContents = webContentsCache.getWebContents(tabId)
+    if (webContents) {
+      webContents.on('will-destroy', () => {
         appActions.ledgerPaymentsPresent(tabId, false)
-      }
-    })
+      })
+      webContents.once('did-navigate', () => {
+        appActions.ledgerPaymentsPresent(tabId, false)
+      })
+      webContents.on('did-navigate-in-page', (e, newUrl) => {
+        updateAboutDetails(tabId)
+        const url = getSourceAboutUrl(newUrl)
+        if (isOnAboutLocation(url, 'about:preferences#payments')) {
+          appActions.ledgerPaymentsPresent(tabId, true)
+        } else {
+          appActions.ledgerPaymentsPresent(tabId, false)
+        }
+      })
+    }
   }
 })
 
@@ -183,14 +196,14 @@ const getBookmarksData = (state) => {
     .set('bookmarkFolders', bookmarkFoldersState.getFolders(state))
     .set('bookmarkOrder', bookmarkOrderCache.getOrderCache(state))
 }
-
+const shouldDebugAboutData = false
 const sendAboutDetails = (tabId, type, value, shared = false) => {
   // use a weak map to avoid holding references to large objects that will never be equal to anything
   aboutTabs[tabId][type] = aboutTabs[tabId][type] || new WeakMap()
   if (aboutTabs[tabId] && !aboutTabs[tabId][type].get(value)) {
     const tab = webContentsCache.getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
-      if (shouldDebugTabEvents) {
+      if (shouldDebugAboutData) {
         console.log(`Tab [${tabId}] sendAboutDetails(${type})`)
       }
 
@@ -203,7 +216,7 @@ const sendAboutDetails = (tabId, type, value, shared = false) => {
       aboutTabs[tabId][type] = new WeakMap()
       aboutTabs[tabId][type].set(value, true)
     } else {
-      if (shouldDebugTabEvents) {
+      if (shouldDebugAboutData) {
         const isNull = !tab
         const isDestroyed = tab && tab.isDestroyed()
         const reason = isNull
@@ -215,7 +228,7 @@ const sendAboutDetails = (tabId, type, value, shared = false) => {
       }
     }
   } else {
-    if (shouldDebugTabEvents) {
+    if (shouldDebugAboutData) {
       const tabFalsey = !aboutTabs[tabId]
       const tabHasValue = aboutTabs[tabId] && !!aboutTabs[tabId][type].get(value)
       const reason = tabFalsey
@@ -465,6 +478,10 @@ const api = {
         return
       }
 
+      if (!newTab.isTab()) {
+        return
+      }
+
       let displayURL = newTab.getURL()
       let location = displayURL || 'about:blank'
       const openerTabId = !source.isDestroyed() ? source.getId() : -1
@@ -515,8 +532,14 @@ const api = {
         const windowOpts = makeImmutable(size)
         appActions.newWindow(makeImmutable(frameOpts), windowOpts)
       } else {
-        // TODO(bridiver) - use tabCreated in place of newWebContentsAdded
-        appActions.newWebContentsAdded(windowId, frameOpts, newTabValue)
+        // Unfortunately we rely on tab events in the renderer window process
+        // so use an IPC call here to notify that process of the new tab to track.
+        // TODO: move all events to browser process (this module) and do not handle all
+        // tab events inside the window.
+        if (shouldDebugTabEvents) {
+          console.log('notifyWindowWebContentsAdded: on tab creation in existing window', windowId)
+        }
+        notifyWindowWebContentsAdded(windowId, frameOpts, newTabValue.toJS())
       }
     })
 
@@ -529,7 +552,7 @@ const api = {
 
     process.on('chrome-tabs-updated', (tabId, changeInfo) => {
       if (shouldDebugTabEvents) {
-        console.log(`tab [${tabId} via process] chrome-tabs-updated`)
+        console.log(`tab [${tabId} via process] chrome-tabs-updated`, changeInfo)
       }
       updateTab(tabId, changeInfo)
     })
@@ -541,7 +564,7 @@ const api = {
     })
 
     app.on('web-contents-created', function (event, tab) {
-      if (tab.isBackgroundPage() || !tab.isGuest()) {
+      if (!tab.isTab()) {
         return
       }
       const tabId = tab.getId()
@@ -610,15 +633,21 @@ const api = {
         updateTab(tabId)
       })
 
-      tab.on('tab-moved', () => {
-        appActions.tabMoved(tabId)
+      tab.on('tab-moved', (e, fromIndex, toIndex) => {
+        const tabValue = getTabValue(tabId)
+        appActions.tabMoved(tabId, fromIndex, toIndex, tabValue && tabValue.get('windowId'))
+      })
+
+      tab.on('pinned', (e, isPinned) => {
+        updateTab(tabId)
       })
 
       tab.on('will-attach', (e, windowWebContents) => {
-        appActions.tabWillAttach(tab.getId())
+        // tab will attach to webview
       })
 
       tab.on('set-active', (sender, isActive) => {
+        updateTab(tab.getId(), { active: isActive })
         if (isActive) {
           const tabValue = getTabValue(tabId)
           if (tabValue) {
@@ -638,7 +667,7 @@ const api = {
         // if is a placeholder, new contents is temporary, and should not be used for tab ID
         const isPlaceholder = newContents.isPlaceholder()
         const newTabId = newContents.getId()
-
+        const tabValue = getTabValue(newTabId)
         if (shouldDebugTabEvents) {
           if (isPlaceholder) {
             console.log(`Tab [${tabId}] got a new placeholder (${newTabId}), not updating state.`)
@@ -648,7 +677,7 @@ const api = {
         }
 
         // update state
-        appActions.tabReplaced(tabId, getTabValue(newTabId), getTabValue(tabId).get('windowId'), !isPlaceholder)
+        appActions.tabReplaced(tabId, tabValue, windowId, !isPlaceholder)
         if (!isPlaceholder) {
           // update in-memory caches
           webContentsCache.tabIdChanged(tabId, newTabId)
@@ -656,31 +685,8 @@ const api = {
         }
       })
 
-      tab.on('tab-strip-empty', () => {
-        // It's only safe to close a window when the last web-contents tab has been
-        // re-attached.  A detach which already happens by this point is not enough.
-        // Otherwise the closing window will destroy the tab web-contents and it'll
-        // lead to a dead tab.  The destroy will happen because the old main window
-        // webcontents is still the embedder.
-        const tabValue = getTabValue(tabId)
-        const windowId = tabValue.get('windowId')
-        tab.once('did-attach', () => {
-          appActions.tabStripEmpty(windowId)
-        })
-      })
-
-      tab.on('did-detach', (e, oldTabId) => {
-        // forget last active trail in window tab
-        // is detaching from
-        const oldTab = getTabValue(oldTabId)
-        const detachedFromWindowId = oldTab.get('windowId')
-        if (detachedFromWindowId != null) {
-          activeTabHistory.clearTabFromWindow(detachedFromWindowId, oldTabId)
-        }
-      })
-
       tab.on('did-attach', (e, tabId) => {
-        appActions.tabAttached(tab.getId())
+        // tab has been attached to a webview
       })
 
       tab.on('save-password', (e, username, origin) => {
@@ -689,6 +695,28 @@ const api = {
 
       tab.on('update-password', (e, username, origin) => {
         appActions.updatePassword(username, origin, tabId)
+      })
+
+      tab.on('enter-html-full-screen', () => {
+        let tabValue = getTabValue(tabId)
+        if (!tabValue) {
+          return
+        }
+        const windowId = tabValue.get('windowId')
+        appActions.tabSetFullScreen(tabId, true, true, windowId)
+        // disable the fullscreen warning after 5 seconds
+        setTimeout(() => {
+          appActions.tabSetFullScreen(tabId, undefined, false, windowId)
+        }, 5000)
+      })
+
+      tab.on('leave-html-full-screen', () => {
+        let tabValue = getTabValue(tabId)
+        if (!tabValue) {
+          return
+        }
+        const windowId = tabValue.get('windowId')
+        appActions.tabSetFullScreen(tabId, false, false, windowId)
       })
 
       tab.on('media-started-playing', (e) => {
@@ -708,22 +736,10 @@ const api = {
       })
 
       tab.once('will-destroy', (e) => {
+        api.willBeRemovedFromWindow(tabId)
         const tabValue = getTabValue(tabId)
         if (tabValue) {
           const windowId = tabValue.get('windowId')
-          // forget about this tab in the history of active tabs
-          activeTabHistory.clearTabFromWindow(windowId, tabId)
-          // handle closed tab being the current active tab for window
-          if (tabValue.get('active')) {
-            // set the next active tab, if different from what muon will have set to
-            // Muon sets it to the next index (immediately above or below)
-            // But this app can be configured to select the parent tab,
-            // or the last active tab
-            let nextTabId = api.getNextActiveTabId(windowId, tabId)
-            if (nextTabId != null) {
-              api.setActive(nextTabId)
-            }
-          }
           // let the state know
           appActions.tabClosed(tabId, windowId)
         }
@@ -786,6 +802,9 @@ const api = {
   },
 
   setActive: (tabId) => {
+    if (shouldDebugTabEvents) {
+      console.log(`tabs.setActive: ${tabId}`)
+    }
     let tab = webContentsCache.getWebContents(tabId)
     if (tab && !tab.isDestroyed()) {
       tab.setActive(true)
@@ -831,6 +850,33 @@ const api = {
     }
   },
 
+  willBeRemovedFromWindow (tabId) {
+    const tabValue = getTabValue(tabId)
+    if (tabValue) {
+      const windowId = tabValue.get('windowId')
+      const wasActive = tabValue.get('active')
+      if (shouldDebugTabEvents) {
+        console.log(`tab ${tabId} will be removed from window ${windowId}, wasActive: ${wasActive}`)
+      }
+      // forget about this tab in the history of active tabs
+      activeTabHistory.clearTabFromWindow(windowId, tabId)
+      // handle closed tab being the current active tab for window
+      if (wasActive) {
+        // set the next active tab, if different from what muon will have set to
+        // Muon sets it to the next index (immediately above or below)
+        // But this app can be configured to select the parent tab,
+        // or the last active tab
+        let nextTabId = api.getNextActiveTabId(windowId, tabId)
+        if (nextTabId != null) {
+          if (shouldDebugTabEvents) {
+            console.log(`Got next active tab Id of ${nextTabId}`)
+          }
+          api.setActive(nextTabId)
+        }
+      }
+    }
+  },
+
   loadURL: (action) => {
     action = makeImmutable(action)
     const tabId = action.get('tabId')
@@ -849,7 +895,14 @@ const api = {
         return
       }
 
-      const reloadMatchingUrl = action.get('reloadMatchingUrl') || false
+      const parsed = muon.url.parse(url)
+      // Set reloadMatchingUrl to true for hash URLs as workaround for
+      // https://github.com/brave/browser-laptop/issues/14231. (muon emits
+      // security-style-changed to insecure when a hash URL is loaded using
+      // tab.loadURL in a tab with the same URL)
+      const reloadMatchingUrl = action.get('reloadMatchingUrl') ||
+        (parsed && parsed.hash) ||
+        false
       if (reloadMatchingUrl && currentUrl === url) {
         tab.reload(true)
       } else {
@@ -877,11 +930,17 @@ const api = {
   setAudioMuted: (action) => {
     action = makeImmutable(action)
     const muted = action.get('muted')
+    // We're crossing into type-safe muon code so make sure args
+    // are of correct type
+    if (typeof muted !== 'boolean') {
+      return
+    }
     const tabId = action.get('tabId')
     const tab = webContentsCache.getWebContents(tabId)
-    if (tab && !tab.isDestroyed()) {
-      tab.setAudioMuted(muted)
+    if (!tab || tab.isDestroyed()) {
+      return
     }
+    tab.setAudioMuted(muted)
   },
 
   clone: (action) => {
@@ -1024,81 +1083,80 @@ const api = {
   },
 
   moveTo: (state, tabId, frameOpts, browserOpts, toWindowId) => {
-    if (shouldDebugTabEvents) {
-      console.log(`Tab ${tabId}] tabs.moveTo(window: ${toWindowId})`)
-    }
     frameOpts = makeImmutable(frameOpts)
     browserOpts = makeImmutable(browserOpts)
-    const tab = webContentsCache.getWebContents(tabId)
-    if (tab && !tab.isDestroyed()) {
-      const tabValue = getTabValue(tabId)
-      const guestInstanceId = tabValue && tabValue.get('guestInstanceId')
-      if (guestInstanceId != null) {
-        frameOpts.set('guestInstanceId', guestInstanceId)
-      }
-
-      const currentWindowId = tabValue && tabValue.get('windowId')
-      if (toWindowId != null && currentWindowId === toWindowId) {
-        return
-      }
-
-      if (toWindowId == null || toWindowId === -1) {
-        // If there's only one tab and we're dragging outside the window, then disallow
-        // a new window to be created.
-        const windowTabCount = tabState.getTabsByWindowId(state, currentWindowId).size
-        if (windowTabCount === 1) {
-          return
-        }
-      }
-
-      if (tabValue.get('pinned')) {
-        // If the current tab is pinned, then don't allow to drag out
-        return
-      }
-
-      // perform detach from current window
-      // and handle at `did-detach`
-      tab.detach(() => {
-        if (shouldDebugTabEvents) {
-          console.log(`Tab [${tabId}] detached tab guestinstance id`, tab.guestInstanceId)
-        }
-        frameOpts = frameOpts.set('guestInstanceId', tab.guestInstanceId)
-        // handle tab has made it to the new window
-        tab.once('did-attach', () => {
-          if (shouldDebugTabEvents) {
-            console.log(`Tab [${tabId}] attached to a new window, so setting the desired index`)
-          }
-          // put the tab in the desired index position
-          const index = frameOpts.get('index')
-          if (index !== undefined) {
-            api.setTabIndex(tabId, frameOpts.get('index'))
-          }
-        })
-        // handle tab has detached from window
-        // handle tab was the active tab of the window
-        if (tabValue.get('active')) {
-          // decide and set next-active-tab muon override
-          const nextActiveTabIdForOldWindow = api.getNextActiveTabId(currentWindowId, tabId)
-          if (nextActiveTabIdForOldWindow !== null) {
-            api.setActive(nextActiveTabIdForOldWindow)
-          }
-        }
-        // tell another window to add the tab, this will cause the tab to render a webview and
-        // then attach to that window
-        if (toWindowId == null || toWindowId === -1) {
-          if (shouldDebugTabEvents) {
-            console.log('creating new window for detached tab')
-          }
-          // move tab to a new window
-          frameOpts = frameOpts.set('index', 0)
-          appActions.newWindow(frameOpts, browserOpts)
-        } else {
-          // ask for tab to be attached (via frame state and webview) to
-          // specified window
-          appActions.newWebContentsAdded(toWindowId, frameOpts, tabValue)
-        }
-      })
+    if (shouldDebugTabEvents) {
+      console.log(`Tab [${tabId}] tabs.moveTo(window: ${toWindowId}, index: ${frameOpts.get('index')})`)
     }
+    const tab = webContentsCache.getWebContents(tabId)
+    if (!tab || tab.isDestroyed()) {
+      return
+    }
+    const tabValue = getTabValue(tabId)
+    // don't move it to the same window
+    const currentWindowId = tabValue && tabValue.get('windowId')
+    if (toWindowId != null && currentWindowId === toWindowId) {
+      return
+    }
+    // If there's only one tab and we're dragging outside the window, then disallow
+    // a new window to be created.
+    if (toWindowId == null || toWindowId === -1) {
+      const windowTabCount = tabState.getTabsByWindowId(state, currentWindowId).size
+      if (windowTabCount === 1) {
+        return
+      }
+    }
+    // If the current tab is pinned, then don't allow to drag out
+    if (tabValue.get('pinned')) {
+      return
+    }
+    //
+    // perform the actual moving
+    //
+
+    // It's only safe to close a window when the last web-contents tab has been
+    // re-attached.  A tab-removed-at or tab-strip-empty is not enough.
+    // Otherwise the closing window will destroy the tab web-contents by the time it gets to the new window.
+    // The destroy will happen because the old main window
+    // webcontents is still the embedder.
+    tab.once('did-attach', () => {
+      // let the window know the tab has moved to another window, so
+      // it is free to close
+      const win = getWindow(currentWindowId)
+      if (win && !win.isDestroyed()) {
+        win.webContents.emit('detached-tab-new-window')
+      }
+    })
+    // make sure frame has latest guestinstanceid
+    const guestInstanceId = tabValue && tabValue.get('guestInstanceId')
+    if (guestInstanceId != null) {
+      frameOpts.set('guestInstanceId', guestInstanceId)
+    }
+    // create a new window if required
+    if (toWindowId == null || toWindowId === -1) {
+      // this will eventually call tab.moveTo when the window is known
+      api.willBeRemovedFromWindow(tabId, currentWindowId)
+      appActions.newWindow(frameOpts, browserOpts)
+      return
+    }
+    // use existing window
+    let toIndex = frameOpts.get('index')
+    // invalid index? add to end of tab strip by specifying -1 index
+    if (toIndex == null || toIndex === -1) {
+      toIndex = -1
+      frameOpts = frameOpts.set('index', -1)
+    }
+    const win = getWindow(toWindowId)
+    if (!win || win.isDestroyed()) {
+      console.error('Error: invalid window to move tab to')
+      return
+    }
+    api.willBeRemovedFromWindow(tabId, currentWindowId)
+    if (shouldDebugTabEvents) {
+      console.log('notifyWindowWebContentsAdded: on tab move to existing window', toWindowId)
+    }
+    notifyWindowWebContentsAdded(toWindowId, frameOpts.toJS(), tabValue.toJS())
+    tab.moveTo(toIndex, toWindowId)
   },
 
   maybeCreateTab: (state, createProperties) => {
@@ -1122,6 +1180,47 @@ const api = {
     if (tab && !tab.isDestroyed()) {
       tab.setWebRTCIPHandlingPolicy(policy)
     }
+  },
+
+  setFullScreen (tabId, isFullScreen) {
+    const tab = webContentsCache.getWebContents(tabId)
+    if (!tab || tab.isDestroyed()) {
+      return
+    }
+    const script = isFullScreen
+      ? 'document.documentElement.webkitRequestFullScreen()'
+      : 'document.webkitExitFullscreen()'
+    tab.executeScriptInTab(config.braveExtensionId, script, {})
+  },
+
+  findInPage (tabId, searchString, caseSensitivity, forward, findNext) {
+    const tab = webContentsCache.getWebContents(tabId)
+    if (shouldDebugTabEvents) {
+      console.log(`tabs.findInPage: ${tabId}, ${searchString}, ${caseSensitivity}, ${forward}, ${findNext}`)
+    }
+    if (!tab || tab.isDestroyed()) {
+      return
+    }
+    if (searchString) {
+      tab.findInPage(searchString, {
+        matchCase: caseSensitivity,
+        forward,
+        findNext
+      })
+    } else {
+      tab.stopFindInPage('clearSelection')
+    }
+  },
+
+  stopFindInPage (tabId) {
+    const tab = webContentsCache.getWebContents(tabId)
+    if (shouldDebugTabEvents) {
+      console.log(`tabs.stopFindInPage: ${tabId}`)
+    }
+    if (!tab || tab.isDestroyed()) {
+      return
+    }
+    tab.stopFindInPage('keepSelection')
   },
 
   goBack: (tabId) => {
@@ -1236,7 +1335,6 @@ const api = {
           tab.forceClose()
         }
       })
-    state = api.updateTabsStateForWindow(state, windowId)
     return state
   },
 
@@ -1258,7 +1356,6 @@ const api = {
           tab.forceClose()
         }
       })
-    state = api.updateTabsStateForWindow(state, windowId)
     return state
   },
 
@@ -1280,7 +1377,6 @@ const api = {
           tab.forceClose()
         }
       })
-    state = api.updateTabsStateForWindow(state, windowId)
     return state
   },
 
@@ -1297,7 +1393,6 @@ const api = {
           tab.forceClose()
         }
       })
-    state = api.updateTabsStateForWindow(state, windowId)
     return state
   },
 
@@ -1328,37 +1423,38 @@ const api = {
     if (!tabValue) {
       return state
     }
-    return api.updateTabsStateForWindow(state, tabValue.get('windowId'))
+    return api.updateTabIndexesForWindow(state, tabValue.get('windowId'))
   },
-  updateTabsStateForWindow: (state, windowId) => {
-    tabState.getTabsByWindowId(state, windowId).forEach((tabValue) => {
-      const tabId = tabValue.get('tabId')
 
-      const oldTabValue = tabState.getByTabId(state, tabId)
+  updateTabIndexesForWindow: (state, windowId) => {
+    const t0 = shouldDebugTabEvents ? process.hrtime() : null
+    let changesMade = 0
+    // make sure all indexes are up to date
+    const stateTabs = tabState.getTabsByWindowId(state, windowId)
+    for (const stateTab of stateTabs.values()) {
+      const tabId = stateTab.get('tabId')
       const newTabValue = getTabValue(tabId)
-
-      // For now the renderer needs to know about index and pinned changes
-      // communicate those out here.
-      if (newTabValue && oldTabValue) {
-        const changeInfo = {}
-        const rendererAwareProps = ['index', 'pinned', 'url', 'active']
-        rendererAwareProps.forEach((prop) => {
-          const newPropVal = newTabValue.get(prop)
-          if (oldTabValue.get(prop) !== newPropVal) {
-            changeInfo[prop] = newPropVal
-          }
-        })
-        if (Object.keys(changeInfo).length > 0) {
-          updateTab(tabId, changeInfo)
+      if (!newTabValue) {
+        // This is probably the deleted tab
+        continue
+      }
+      const oldIndex = stateTab.get('index')
+      const newIndex = newTabValue.get('index')
+      if (oldIndex !== newIndex) {
+        if (shouldDebugTabEvents) {
+          console.log(`Tab [${tabId} Updating state index from ${oldIndex} to ${newIndex}`)
         }
+        state = tabState.updateTabValue(state, Immutable.Map({ tabId, index: newIndex }))
+        changesMade++
       }
-
-      if (newTabValue) {
-        state = tabState.updateTabValue(state, newTabValue, false)
-      }
-    })
+    }
+    if (shouldDebugTabEvents) {
+      const t1 = process.hrtime(t0)
+      console.info(`updateTabIndexesForWindow took: %ds %dms with ${changesMade} changes`, t1[0], t1[1] / 1000000)
+    }
     return state
   },
+
   forgetTab: (tabId) => {
     const tab = webContentsCache.getWebContents(tabId)
     if (!tab) {

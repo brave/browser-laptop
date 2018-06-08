@@ -75,12 +75,15 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_CLEAR_BROWSING_DATA:
       {
-        const defaults = state.get('clearBrowsingDataDefaults')
+        const defaults = state.get('clearBrowsingDataDefaults') || Immutable.Map()
         const temp = state.get('tempClearBrowsingData', Immutable.Map())
         const clearData = defaults ? defaults.merge(temp) : temp
-        if (clearData.get('browserHistory') && !getSetting(settings.PAYMENTS_ENABLED)) {
-          state = ledgerState.resetSynopsis(state)
-          ledgerApi.deleteSynopsis()
+        if (clearData.get('publishersClear')) {
+          state = ledgerApi.resetPublishers(state)
+        }
+
+        if (clearData.get('paymentHistory')) {
+          state = ledgerApi.clearPaymentHistory(state)
         }
         break
       }
@@ -431,9 +434,24 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerNotifications.onPromotionReceived(state)
         break
       }
+    case appConstants.APP_ON_PROMOTION_CLICK:
+      {
+        ledgerApi.getCaptcha(state)
+        break
+      }
+    case appConstants.APP_ON_CAPTCHA_RESPONSE:
+      {
+        state = ledgerApi.onCaptchaResponse(state, action.get('response'), action.get('body'))
+        break
+      }
+    case appConstants.APP_ON_CAPTCHA_CLOSE:
+      {
+        state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
+        break
+      }
     case appConstants.APP_ON_PROMOTION_CLAIM:
       {
-        ledgerApi.claimPromotion(state)
+        ledgerApi.claimPromotion(state, action.get('x'), action.get('y'))
         break
       }
     case appConstants.APP_ON_PROMOTION_REMIND:
@@ -505,10 +523,16 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_LEDGER_FUZZING:
       {
-        state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.FUZZING)
-        const newStamp = parseInt(action.get('newStamp'))
-        if (!isNaN(newStamp) && newStamp > 0) {
-          state = ledgerState.setInfoProp(state, 'reconcileStamp', newStamp)
+        if (action.get('newStamp') != null) {
+          const newStamp = parseInt(action.get('newStamp'))
+          if (!isNaN(newStamp) && newStamp > 0) {
+            state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.FUZZING)
+            state = ledgerState.setInfoProp(state, 'reconcileStamp', newStamp)
+          }
+        }
+
+        if (action.get('pruned')) {
+          state = ledgerApi.synopsisNormalizer(state, null, true, true)
         }
         break
       }
@@ -538,6 +562,11 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_LEDGER_BACKUP_SUCCESS:
       {
         state = aboutPreferencesState.setBackupStatus(state, true)
+        break
+      }
+    case appConstants.APP_ON_WALLET_DELETE:
+      {
+        state = ledgerApi.deleteWallet(state)
         break
       }
     case appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE:

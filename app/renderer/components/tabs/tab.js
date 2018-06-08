@@ -311,9 +311,16 @@ class Tab extends React.Component {
     props.partOfFullPageSet = partOfFullPageSet
     props.showAudioTopBorder = audioState.showAudioTopBorder(currentWindow, frameKey, isPinned)
     props.centralizeTabIcons = tabUIState.centralizeTabIcons(currentWindow, frameKey, isPinned)
+    props.guestInstanceId = frame.get('guestInstanceId')
     // required only so that context menu shows correct state (mute vs unmute)
     props.isAudioMuted = audioState.isAudioMuted(currentWindow, frameKey)
     props.isAudio = audioState.canPlayAudio(currentWindow, frameKey)
+    props.visualTabIdDebug = getSetting(settings.DEBUG_VERBOSE_TAB_INFO)
+    if (props.visualTabIdDebug) {
+      const tab = tabState.getByTabId(state, tabId)
+      props.tabIndex = tab && tab.get('index')
+      props.frameStateInternalIndex = frameStateUtil.getIndexByTabId(currentWindow, tabId)
+    }
 
     // used in other functions
     props.dragData = state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')
@@ -396,6 +403,7 @@ class Tab extends React.Component {
       onMouseLeave={this.onMouseLeave}
       data-test-id='tab-area'
       data-tab-id={this.props.tabId}
+      data-guest-instance-id={this.props.guestInstanceId}
       data-frame-key={this.props.frameKey}
       ref={elementRef => { this.elementRef = elementRef }}
       >
@@ -438,6 +446,14 @@ class Tab extends React.Component {
         )}>
           <Favicon tabId={this.props.tabId} />
           <AudioTabIcon tabId={this.props.tabId} />
+          {
+            this.props.visualTabIdDebug &&
+            <span className={css(styles.tabArea__tab__tabIdDebug)}>
+              <span>[t:{this.props.tabId},(g:{this.props.guestInstanceId})]</span>
+              <span>[f:{this.props.frameKey}]</span>
+              <span>#[fi:{this.props.frameStateInternalIndex},ti:{this.props.tabIndex}]</span>
+            </span>
+          }
           <TabTitle tabId={this.props.tabId} />
         </div>
         <PrivateIcon tabId={this.props.tabId} />
@@ -690,6 +706,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 0,
     margin: 0
+  },
+
+  tabArea__tab__tabIdDebug: {
+    fontSize: '8px',
+    display: 'flex',
+    flexDirection: 'column',
+    flexWrap: 'wrap'
   }
 })
 

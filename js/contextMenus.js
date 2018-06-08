@@ -508,20 +508,21 @@ function tabTemplateInit (frameProps) {
   //   }
   // })
 
-  const frameToSkip = frameProps.get('key')
-  const frameList = frames.map((frame) => {
-    return {
-      frameKey: frame.get('key'),
-      tabId: frame.get('tabId'),
-      muted: frame.get('key') !== frameToSkip && frame.get('audioPlaybackActive')
-    }
-  })
-
   template.push(CommonMenu.separatorMenuItem,
     {
       label: locale.translation('muteOtherTabs'),
       click: () => {
-        windowActions.muteAllAudio(frameList)
+        // only select frames which are not the current frame and are not muted
+        const otherFrames = frames.filter(frame =>
+          frame.get('key') !== frameProps.get('key') &&
+          frame.get('audioPlaybackActive') === true
+        )
+        const actionCommands = otherFrames.map(frame => ({
+          tabId: frame.get('tabId'),
+          frameKey: frame.get('key'),
+          muted: true
+        }))
+        windowActions.muteAllAudio(actionCommands)
       }
     })
 

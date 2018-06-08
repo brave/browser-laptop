@@ -159,7 +159,7 @@ const UrlUtil = {
     }
 
     try {
-      return new window.URL(input).href
+      return (typeof window === 'undefined') ? input : new window.URL(input).href
     } catch (e) {
       return input
     }

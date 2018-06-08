@@ -87,7 +87,7 @@ describe('tabsReducer unit tests', function () {
       closeTab: sinon.mock(),
       moveTo: sinon.mock(),
       reload: sinon.mock(),
-      updateTabsStateForWindow: sinon.mock(),
+      updateTabIndexesForWindow: sinon.mock(),
       create: sinon.mock(),
       forgetTab: sinon.spy()
     }
@@ -263,13 +263,13 @@ describe('tabsReducer unit tests', function () {
 
     afterEach(function () {
       this.removeTabByTabIdSpy.restore()
-      this.tabsAPI.updateTabsStateForWindow.reset()
+      this.tabsAPI.updateTabIndexesForWindow.reset()
     })
 
     it('calls tabState.removeTabByTabId', function () {
       tabsReducer(this.state, action)
       assert.equal(this.tabStateAPI.removeTabByTabId.getCall(0).args[1], action.tabId)
-      assert.equal(this.tabsAPI.updateTabsStateForWindow.getCall(0).args[1], 2)
+      assert.equal(this.tabsAPI.updateTabIndexesForWindow.getCall(0).args[1], 2)
       assert(this.tabsAPI.forgetTab.withArgs(5).calledOnce)
     })
 
@@ -596,10 +596,12 @@ describe('tabsReducer unit tests', function () {
       assert.equal(args[0], state)  // State is passed in as first arg
       assert.equal(args[1], 1)  // tabId is 1 for first tab
       // frameOpts being dragged is for the first tab
-      assert.deepEqual(args[2].toJS(), { tabId: 1,
+      assert.deepEqual(args[2].toJS(), {
+        tabId: 1,
         windowId: 1,
         pinned: false,
-        active: true
+        active: true,
+        index: -1 // -1 specifies should go at end of tab strip
       })
       // Passes browser options for position by mouse cursor
       assert.deepEqual(args[3], {

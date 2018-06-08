@@ -11,5 +11,10 @@ module.exports.defaultSiteSettingsList = [
       "name" : "autoplay",
       "pattern" : "https://www.twitch.tv",
       "value" : true,
+    },
+    {
+      "name" : "fingerprintingProtection",
+      "pattern" : "https?://uphold.com",
+      "value" : "allowAllFingerprinting"
     }
 ]

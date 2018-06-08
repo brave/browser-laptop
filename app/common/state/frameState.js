@@ -37,7 +37,7 @@ const api = {
         return null
       }
       return path.concat(['frames', index])
-    } else {
+    } else if (state.get('tabs')) {
       // in AppState
       const index = state.get('tabs').findIndex((tab) => tab.getIn(['frame', 'key']) === frameKey)
       if (index === -1) {

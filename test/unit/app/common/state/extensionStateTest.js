@@ -1,5 +1,6 @@
 /* global describe, it, before */
 const extensionState = require('../../../../../app/common/state/extensionState')
+const settings = require('../../../../../js/constants/settings')
 const Immutable = require('immutable')
 const assert = require('assert')
 
@@ -680,6 +681,32 @@ describe('extensionState', function () {
       })
 
       commonTests()
+    })
+  })
+
+  describe('isWebTorrentEnabled', function () {
+    it('null case', function () {
+      const result = extensionState.isWebTorrentEnabled()
+      assert.equal(result, false)
+    })
+
+    it('torrent is enabled by default', function () {
+      const result = extensionState.isWebTorrentEnabled(defaultAppState)
+      assert.equal(result, true)
+    })
+
+    it('torrent is disabled', function () {
+      const state = defaultAppState
+        .setIn(['settings', settings.TORRENT_VIEWER_ENABLED], false)
+      const result = extensionState.isWebTorrentEnabled(state)
+      assert.equal(result, false)
+    })
+
+    it('torrent is enabled', function () {
+      const state = defaultAppState
+        .setIn(['settings', settings.TORRENT_VIEWER_ENABLED], true)
+      const result = extensionState.isWebTorrentEnabled(state)
+      assert.equal(result, true)
     })
   })
 })

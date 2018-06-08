@@ -34,6 +34,7 @@ const {HrtimeLogger} = require('../../app/common/lib/logUtil')
 const platformUtil = require('../../app/common/lib/platformUtil')
 const urlUtil = require('../lib/urlutil')
 const buildConfig = require('../constants/buildConfig')
+const {shouldDebugStoreActions} = require('../../app/cmdLine')
 
 // state helpers
 const {makeImmutable, findNullKeyPaths} = require('../../app/common/state/immutableUtil')
@@ -67,6 +68,14 @@ if (SHOULD_LOG_TIME) {
 }
 const timeLogger = new HrtimeLogger(TIME_LOG_PATH, TIME_LOG_THRESHOLD)
 
+function shouldIgnoreStateDiffForWindow (stateOp) {
+  const path = stateOp.get('path')
+  // remove tabs[].frame since it comes from the windowState anyway
+  // TODO: do we need to store this in the appState? It's expensive.
+  const shouldIgnore = (path.startsWith('/tabs/') && path.includes('/frame/'))
+  return shouldIgnore
+}
+
 class AppStore extends EventEmitter {
   constructor () {
     super()
@@ -82,6 +91,8 @@ class AppStore extends EventEmitter {
       let d
       try {
         d = diff(this.lastEmittedState, appState)
+          // remove paths the window does not care about
+          .filterNot(shouldIgnoreStateDiffForWindow)
       } catch (e) {
         console.error('Error getting a diff from latest state.')
         // one possible reason immutablediff can throw an error
@@ -100,13 +111,14 @@ class AppStore extends EventEmitter {
         throw error
       }
       if (d && !d.isEmpty()) {
+        const stateDiff = d.toJS()
         BrowserWindow.getAllWindows().forEach((wnd) => {
           if (wnd.webContents && !wnd.webContents.isDestroyed()) {
-            wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff: d.toJS() })
+            wnd.webContents.send(messages.APP_STATE_CHANGE, { stateDiff })
           }
         })
         this.lastEmittedState = appState
-        this.emit(CHANGE_EVENT, d.toJS())
+        this.emit(CHANGE_EVENT, stateDiff)
       }
     } else {
       this.emit(CHANGE_EVENT, [])
@@ -234,6 +246,10 @@ const handleAppAction = (action) => {
     return
   }
 
+  if (shouldDebugStoreActions) {
+    console.log('action:', action.actionType)
+  }
+
   let immutableAction = Immutable.Map()
   // exclude big chucks that have regular JS in it
   if (
@@ -255,7 +271,9 @@ const handleAppAction = (action) => {
       // TODO(bridiver) - these should be refactored into reducers
       appState = filtering.init(appState, action, appStore)
       appState = basicAuth.init(appState, action, appStore)
-      appState = webtorrent.init(appState, action, appStore)
+      if (extensionState.isWebTorrentEnabled(appState)) {
+        appState = webtorrent.init(appState, action, appStore)
+      }
       appState = profiles.init(appState, action, appStore)
       appState = require('../../app/sync').init(appState, action, appStore)
       calculateTopSites(true, true)

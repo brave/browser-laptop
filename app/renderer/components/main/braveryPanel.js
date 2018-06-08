@@ -9,7 +9,6 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 // Components
 const ReduxComponent = require('../reduxComponent')
 const Dialog = require('../common/dialog')
-const FlyoutDialog = require('../common/flyoutDialog')
 const BrowserButton = require('../common/browserButton')
 const SwitchControl = require('../common/switchControl')
 const {FormDropdown} = require('../common/dropdown')
@@ -38,6 +37,7 @@ const urlUtil = require('../../../../js/lib/urlutil')
 
 // Styles
 const globalStyles = require('../styles/global')
+const commonStyles = require('../styles/commonStyles')
 const closeButton = require('../../../../img/toolbar/braveryPanel_btn.svg')
 
 class BraveryPanel extends React.Component {
@@ -249,13 +249,13 @@ class BraveryPanel extends React.Component {
     })
 
     return <Dialog onHide={this.onHide} testId='braveryPanelContainer' isClickDismiss>
-      <FlyoutDialog custom={[
+      <div className={css(
+        commonStyles.flyoutDialog,
         styles.braveryPanel,
         this.props.isCompactBraveryPanel && styles.braveryPanel_compact
-      ]}
+      )}
         onClick={(e) => e.stopPropagation()}
-        testId={this.props.isCompactBraveryPanel ? 'braveryPanelCompact' : 'braveryPanel'}
-      >
+        data-test-id={this.props.isCompactBraveryPanel ? 'braveryPanelCompact' : 'braveryPanel'}>
         {
           this.props.isCompactBraveryPanel
           ? this.compactBraveryPanelHeader
@@ -649,7 +649,7 @@ class BraveryPanel extends React.Component {
             </div>
           </div>
         </section>
-      </FlyoutDialog>
+      </div>
     </Dialog>
   }
 }

@@ -26,10 +26,13 @@ const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const siteTags = require('../js/constants/siteTags')
 const downloadStates = require('../js/constants/downloadStates')
+const ledgerStatuses = require('./common/constants/ledgerStatuses')
+const promotionStatuses = require('./common/constants/promotionStatuses')
 
 // State
 const tabState = require('./common/state/tabState')
 const windowState = require('./common/state/windowState')
+const ledgerState = require('./common/state/ledgerState')
 
 // Utils
 const locale = require('./locale')
@@ -232,10 +235,7 @@ module.exports.cleanPerWindowData = (immutablePerWindowData, isShutdown) => {
       // currently get re-generated when session store is
       // restored.  We will be able to keep this once we
       // don't regenerate new frame keys when opening storage.
-      'parentFrameKey',
-      // Delete the active shortcut details
-      'activeShortcut',
-      'activeShortcutDetails'
+      'parentFrameKey'
     ])
 
     if (immutableFrame.get('navbar') && immutableFrame.getIn(['navbar', 'urlbar'])) {
@@ -330,6 +330,13 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
       console.error('cleanAppData: error calling autofill.clearAutocompleteData: ', e)
     }
   }
+
+  const clearSynopsis = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_PUBLISHERS) === true
+  const inProgress = ledgerState.getAboutProp(immutableData, 'status') === ledgerStatuses.IN_PROGRESS
+  if (clearSynopsis && immutableData.has('ledger') && !inProgress) {
+    immutableData = ledgerState.resetPublishers(immutableData)
+  }
+
   const clearAutofillData = isShutdown && getSetting(settings.SHUTDOWN_CLEAR_AUTOFILL_DATA) === true
   if (clearAutofillData) {
     autofill.clearAutofillData()
@@ -407,6 +414,17 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
     }
   }
 
+  if (isShutdown) {
+    const status = ledgerState.getPromotionProp(immutableData, 'promotionStatus')
+    if (
+      status === promotionStatuses.CAPTCHA_CHECK ||
+      status === promotionStatuses.CAPTCHA_BLOCK ||
+      status === promotionStatuses.CAPTCHA_ERROR
+    ) {
+      immutableData = ledgerState.setPromotionProp(immutableData, 'promotionStatus', null)
+    }
+  }
+
   immutableData = immutableData.delete('menu')
   immutableData = immutableData.delete('pageData')
 
@@ -452,6 +470,11 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
     immutableData = cleanFavicons(basePath, immutableData)
   } catch (e) {
     console.error('cleanAppData: error cleaning up data: urls', e)
+  }
+
+  // delete the window ready state (gets set again on program start)
+  if (immutableData.has('windowReady')) {
+    immutableData = immutableData.delete('windowReady')
   }
 
   return immutableData
@@ -932,6 +955,11 @@ module.exports.runPreMigrations = (data) => {
     }
   }
 
+  // TODO: consider moving all of the above logic into here
+  // see https://github.com/brave/browser-laptop/issues/10488
+  const runMigrations = require('./migrations/pre')
+  runMigrations(data)
+
   return data
 }
 
@@ -1127,7 +1155,7 @@ module.exports.defaultAppState = () => {
       },
       preferences: {},
       welcome: {
-        showOnLoad: !['test', 'development'].includes(process.env.NODE_ENV)
+        showOnLoad: !['test', 'development'].includes(process.env.NODE_ENV) || process.env.BRAVE_SHOW_FIRST_RUN_WELCOME
       }
     },
     trackingProtection: {
@@ -1160,7 +1188,8 @@ module.exports.defaultAppState = () => {
         publishers: {}
       },
       promotion: {}
-    }
+    },
+    windowReady: false
   }
 }
 

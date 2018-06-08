@@ -115,12 +115,12 @@ Some platforms are available as pre-configured VMs. See the [readme](https://git
 
 ### Running Brave
 
-To run a development version of the browser requires a few steps. The easiest way is just to use two
-terminals. One terminal can be used just to watch for changes to the code
+Running a development version of the browser requires two steps. The easiest way is just to use two
+terminals (or one terminal with two tabs). First, you'll need to start the watch process (which runs webpack and watches for changes to the code)
 
     npm run watch
 
-Now actually run Brave in another terminal
+Second, you can start the actual Brave process (in another terminal or tab)
 
     npm start
 

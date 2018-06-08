@@ -17,7 +17,7 @@ const settings = require('../../../../js/constants/settings')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
-const webviewActions = require('../../../../js/actions/webviewActions')
+const tabActions = require('../../../common/actions/tabActions')
 
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
@@ -167,11 +167,11 @@ class FindBar extends React.Component {
   }
 
   onFindHide () {
-    frameStateUtil.onFindBarHide(this.props.activeFrameKey)
+    frameStateUtil.onFindBarHide(this.props.activeFrameKey, this.props.activeTabId)
   }
 
   onFind (searchString, caseSensitivity, forward, findNext) {
-    webviewActions.findInPage(searchString, caseSensitivity, forward, findNext)
+    tabActions.findInPageRequest(this.props.activeTabId, this.props.searchString, caseSensitivity, forward, findNext)
     if (!findNext) {
       windowActions.setFindDetail(this.props.activeFrameKey, Immutable.fromJS({
         internalFindStatePresent: true
@@ -224,6 +224,7 @@ class FindBar extends React.Component {
 
     // used in other functions
     props.activeFrameKey = activeFrameKey
+    props.activeTabId = activeFrame.get('tabId')
     props.isSelected = activeFrame.get('findbarSelected', false)
     props.internalFindStatePresent = activeFrame.getIn(['findDetail', 'internalFindStatePresent'])
     props.isPrivate = activeFrame.get('isPrivate', false)

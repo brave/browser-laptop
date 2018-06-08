@@ -11,6 +11,7 @@ const BrowserButton = require('../common/browserButton')
 const {
   CommonFormSection,
   CommonFormDropdown,
+  CommonFormButtonWrapper,
   commonFormStyles
 } = require('../common/commonForm')
 
@@ -192,7 +193,7 @@ class AddEditBookmarkFolderForm extends React.Component {
           </div>
         </div>
       </CommonFormSection>
-      <CommonFormSection buttons>
+      <CommonFormButtonWrapper>
         {
           this.props.editKey != null
             ? <BrowserButton groupedItem secondaryColor
@@ -212,7 +213,7 @@ class AddEditBookmarkFolderForm extends React.Component {
           disabled={this.state.isDisabled}
           onClick={this.onSave}
         />
-      </CommonFormSection>
+      </CommonFormButtonWrapper>
     </div>
   }
 }

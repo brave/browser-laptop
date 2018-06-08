@@ -43,7 +43,6 @@ describe('ledgerReducer unit tests', function () {
       quit: dummyModifyState,
       pageDataChanged: dummyModifyState,
       addVisit: dummyModifyState,
-      deleteSynopsis: () => {},
       boot: () => {},
       onBootStateFile: dummyModifyState,
       onWalletProperties: dummyModifyState,
@@ -62,10 +61,16 @@ describe('ledgerReducer unit tests', function () {
       getPromotion: () => {},
       checkReferralActivity: dummyModifyState,
       referralCheck: () => {},
-      addNewLocation: dummyModifyState
+      getCaptcha: () => {},
+      onCaptchaResponse: () => {},
+      resetPublishers: () => {},
+      clearPaymentHistory: () => {},
+      deleteWallet: () => {},
+      addNewLocation: dummyModifyState,
+      synopsisNormalizer: dummyModifyState
     }
     fakeLedgerState = {
-      resetSynopsis: dummyModifyState,
+      resetPublishers: dummyModifyState,
       setRecoveryStatus: dummyModifyState,
       setRecoveryInProgressStatus: dummyModifyState,
       setInfoProp: ledgerState.setInfoProp,
@@ -73,6 +78,7 @@ describe('ledgerReducer unit tests', function () {
       savePromotion: dummyModifyState,
       remindMeLater: dummyModifyState,
       removePromotion: dummyModifyState,
+      setPromotionProp: dummyModifyState,
       setAboutProp: ledgerState.setAboutProp
     }
     fakeLedgerNotifications = {
@@ -232,57 +238,12 @@ describe('ledgerReducer unit tests', function () {
     })
   })
 
-  describe('APP_ON_CLEAR_BROWSING_DATA', function () {
-    let resetSynopsisSpy
-    let clearAppState
-    before(function () {
-      resetSynopsisSpy = sinon.spy(fakeLedgerState, 'resetSynopsis')
-    })
-    after(function () {
-      resetSynopsisSpy.restore()
-    })
-    describe('when clearData.browserHistory is true and payments is disabled', function () {
-      before(function () {
-        resetSynopsisSpy.reset()
-        paymentsEnabled = false
-        clearAppState = appState.setIn(['settings', settings.PAYMENTS_ENABLED], paymentsEnabled)
-        clearAppState = clearAppState.set('clearBrowsingDataDefaults', Immutable.fromJS({
-          browserHistory: true
-        }))
-        returnedState = ledgerReducer(clearAppState, Immutable.fromJS({
-          actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA
-        }))
-      })
-      it('calls ledgerState.resetSynopsis', function () {
-        assert(resetSynopsisSpy.withArgs(clearAppState).calledOnce)
-      })
-      it('returns a modified state', function () {
-        assert.notDeepEqual(returnedState, clearAppState)
-      })
-    })
-    describe('else', function () {
-      before(function () {
-        resetSynopsisSpy.reset()
-        paymentsEnabled = true
-        clearAppState = appState.setIn(['settings', settings.PAYMENTS_ENABLED], paymentsEnabled)
-        clearAppState = clearAppState.set('clearBrowsingDataDefaults', Immutable.fromJS({
-          browserHistory: true
-        }))
-        returnedState = ledgerReducer(clearAppState, Immutable.fromJS({
-          actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA
-        }))
-      })
-      it('does not call ledgerState.resetSynopsis', function () {
-        assert(resetSynopsisSpy.notCalled)
-      })
-      it('returns an ununmodified state', function () {
-        assert.deepEqual(returnedState, clearAppState)
-      })
-    })
-  })
-
   describe('APP_IDLE_STATE_CHANGED', function () {
     let pageDataChangedSpy
+    before(function () {
+      paymentsEnabled = true
+    })
+
     beforeEach(function () {
       pageDataChangedSpy = sinon.spy(fakeLedgerApi, 'pageDataChanged')
     })
@@ -317,10 +278,6 @@ describe('ledgerReducer unit tests', function () {
       }))
       assert.notDeepEqual(returnedState, appState)
     })
-  })
-
-  describe('', function () {
-
   })
 
   describe('APP_ON_LEDGER_WALLET_CREATE', function () {
@@ -653,9 +610,11 @@ describe('ledgerReducer unit tests', function () {
 
     it('execute', function () {
       ledgerReducer(appState, Immutable.fromJS({
-        actionType: appConstants.APP_ON_PROMOTION_CLAIM
+        actionType: appConstants.APP_ON_PROMOTION_CLAIM,
+        x: 1,
+        y: 2
       }))
-      assert(claimPromotionSpy.calledOnce)
+      assert(claimPromotionSpy.withArgs(appState, 1, 2).calledOnce)
     })
   })
 
@@ -912,11 +871,20 @@ describe('ledgerReducer unit tests', function () {
   })
 
   describe('APP_ON_LEDGER_FUZZING', function () {
-    let newState
+    let newState, synopsisNormalizerSpy
 
-    before(() => {
+    before(function () {
       newState = appState
         .setIn(['ledger', 'about', 'status'], ledgerStatuses.FUZZING)
+      synopsisNormalizerSpy = sinon.spy(fakeLedgerApi, 'synopsisNormalizer')
+    })
+
+    afterEach(function () {
+      synopsisNormalizerSpy.reset()
+    })
+
+    after(function () {
+      synopsisNormalizerSpy.restore()
     })
 
     it('null case', function () {
@@ -924,7 +892,8 @@ describe('ledgerReducer unit tests', function () {
         actionType: appConstants.APP_ON_LEDGER_FUZZING
       }))
 
-      assert.deepEqual(result.toJS(), newState.toJS())
+      assert(synopsisNormalizerSpy.notCalled)
+      assert.deepEqual(result.toJS(), appState.toJS())
     })
 
     it('stamp is string', function () {
@@ -933,7 +902,8 @@ describe('ledgerReducer unit tests', function () {
         newStamp: 'str'
       }))
 
-      assert.deepEqual(result.toJS(), newState.toJS())
+      assert(synopsisNormalizerSpy.notCalled)
+      assert.deepEqual(result.toJS(), appState.toJS())
     })
 
     it('stamp is negative', function () {
@@ -942,7 +912,8 @@ describe('ledgerReducer unit tests', function () {
         newStamp: -10
       }))
 
-      assert.deepEqual(result.toJS(), newState.toJS())
+      assert(synopsisNormalizerSpy.notCalled)
+      assert.deepEqual(result.toJS(), appState.toJS())
     })
 
     it('stamp is number (string)', function () {
@@ -954,7 +925,17 @@ describe('ledgerReducer unit tests', function () {
       const expectedState = newState
         .setIn(['ledger', 'info', 'reconcileStamp'], 10)
 
+      assert(synopsisNormalizerSpy.notCalled)
       assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('stamp is 0', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_LEDGER_FUZZING,
+        newStamp: 0
+      }))
+
+      assert.deepEqual(result.toJS(), appState.toJS())
     })
 
     it('reconcile stamp is set', function () {
@@ -966,7 +947,182 @@ describe('ledgerReducer unit tests', function () {
       const expectedState = newState
         .setIn(['ledger', 'info', 'reconcileStamp'], 10)
 
+      assert(synopsisNormalizerSpy.notCalled)
       assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('pruned is false', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_LEDGER_FUZZING,
+        newStamp: 10,
+        pruned: false
+      }))
+
+      const expectedState = newState
+        .setIn(['ledger', 'info', 'reconcileStamp'], 10)
+
+      assert(synopsisNormalizerSpy.notCalled)
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('pruned is true', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_LEDGER_FUZZING,
+        newStamp: 10,
+        pruned: true
+      }))
+
+      const expectedState = newState
+        .setIn(['ledger', 'info', 'reconcileStamp'], 10)
+        .set('unittest', true)
+
+      assert(synopsisNormalizerSpy.withArgs(sinon.match.any, null, true, true))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+  })
+
+  describe('APP_ON_PROMOTION_CLICK', function () {
+    let getCaptchaSpy
+
+    before(function () {
+      getCaptchaSpy = sinon.spy(fakeLedgerApi, 'getCaptcha')
+    })
+
+    afterEach(function () {
+      getCaptchaSpy.reset()
+    })
+
+    after(function () {
+      getCaptchaSpy.restore()
+    })
+
+    it('execute', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_PROMOTION_CLICK
+      }))
+      assert(getCaptchaSpy.calledOnce)
+    })
+  })
+
+  describe('APP_ON_CAPTCHA_RESPONSE', function () {
+    let onCaptchaResponseSpy
+
+    before(function () {
+      onCaptchaResponseSpy = sinon.spy(fakeLedgerApi, 'onCaptchaResponse')
+    })
+
+    afterEach(function () {
+      onCaptchaResponseSpy.reset()
+    })
+
+    after(function () {
+      onCaptchaResponseSpy.restore()
+    })
+
+    it('execute error', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_CAPTCHA_RESPONSE,
+        body: null,
+        response: {
+          statusCode: 429
+        }
+      }))
+      assert(onCaptchaResponseSpy.withArgs(sinon.match.any, Immutable.fromJS({
+        statusCode: 429
+      }), null).calledOnce)
+    })
+
+    it('execute correct', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_CAPTCHA_RESPONSE,
+        body: 1,
+        response: null
+      }))
+      assert(onCaptchaResponseSpy.withArgs(sinon.match.any, null, 1).calledOnce)
+    })
+  })
+
+  describe('APP_ON_CAPTCHA_CLOSE', function () {
+    it('execute', function () {
+      const result = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_CAPTCHA_CLOSE
+      }))
+      assert.notDeepEqual(result.toJS(), appState.toJS())
+    })
+  })
+
+  describe('APP_ON_CLEAR_BROWSING_DATA', function () {
+    let resetPublishersSpy, clearPaymentHistorySpy
+
+    before(function () {
+      resetPublishersSpy = sinon.spy(fakeLedgerApi, 'resetPublishers')
+      clearPaymentHistorySpy = sinon.spy(fakeLedgerApi, 'clearPaymentHistory')
+    })
+
+    afterEach(function () {
+      resetPublishersSpy.reset()
+      clearPaymentHistorySpy.reset()
+    })
+
+    after(function () {
+      resetPublishersSpy.restore()
+      clearPaymentHistorySpy.restore()
+    })
+
+    it('only defaults', function () {
+      const state = appState
+        .set('clearBrowsingDataDefaults', Immutable.fromJS({
+          publishersClear: true,
+          paymentHistory: true
+        }))
+
+      ledgerReducer(state, Immutable.fromJS({
+        actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA
+      }))
+
+      assert(clearPaymentHistorySpy.calledOnce)
+      assert(resetPublishersSpy.calledOnce)
+    })
+
+    it('we have some temp data', function () {
+      const state = appState
+        .set('clearBrowsingDataDefaults', Immutable.fromJS({
+          publishersClear: false,
+          paymentHistory: false
+        }))
+        .set('tempClearBrowsingData', Immutable.fromJS({
+          paymentHistory: true
+        }))
+
+      ledgerReducer(state, Immutable.fromJS({
+        actionType: appConstants.APP_ON_CLEAR_BROWSING_DATA
+      }))
+
+      assert(clearPaymentHistorySpy.calledOnce)
+      assert(resetPublishersSpy.notCalled)
+    })
+  })
+
+  describe('APP_ON_WALLET_DELETE', function () {
+    let deleteWalletSpy
+
+    before(function () {
+      deleteWalletSpy = sinon.spy(fakeLedgerApi, 'deleteWallet')
+    })
+
+    afterEach(function () {
+      deleteWalletSpy.reset()
+    })
+
+    after(function () {
+      deleteWalletSpy.restore()
+    })
+
+    it('execute', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_WALLET_DELETE
+      }))
+      assert(deleteWalletSpy.calledOnce)
     })
   })
 })

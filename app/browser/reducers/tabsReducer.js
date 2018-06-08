@@ -63,6 +63,37 @@ const getWebRTCPolicy = (state, tabId) => {
   }
 }
 
+function expireContentSettings (state, tabId, origin) {
+  // Expired Flash settings should be deleted when the webview is
+  // navigated or closed. Same for NoScript's allow-once option.
+  const tabValue = tabState.getByTabId(state, tabId)
+  const isPrivate = tabValue.get('incognito') === true
+  const allSiteSettings = siteSettingsState.getAllSiteSettings(state, isPrivate)
+  const tabSiteSettings =
+    siteSettings.getSiteSettingsForURL(allSiteSettings, tabValue.get('url'))
+  if (!tabSiteSettings) {
+    return
+  }
+  const originFlashEnabled = tabSiteSettings.get('flash')
+  const originWidevineEnabled = tabSiteSettings.get('widevine')
+  const originNoScriptEnabled = tabSiteSettings.get('noScript')
+  const originNoScriptExceptions = tabSiteSettings.get('noScriptExceptions')
+  if (typeof originFlashEnabled === 'number') {
+    if (originFlashEnabled < Date.now()) {
+      appActions.removeSiteSetting(origin, 'flash', isPrivate)
+    }
+  }
+  if (originWidevineEnabled === 0) {
+    appActions.removeSiteSetting(origin, 'widevine', isPrivate)
+  }
+  if (originNoScriptEnabled === 0) {
+    appActions.removeSiteSetting(origin, 'noScript', isPrivate)
+  }
+  if (originNoScriptExceptions) {
+    appActions.noScriptExceptionsAdded(origin, originNoScriptExceptions.map(value => value === 0 ? false : value))
+  }
+}
+
 const tabsReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
@@ -70,7 +101,13 @@ const tabsReducer = (state, action, immutableAction) => {
     case tabActionConsts.START_NAVIGATION:
       {
         const tabId = action.get('tabId')
+        const originalOrigin = tabState.getVisibleOrigin(state, tabId)
         state = tabState.setNavigationState(state, tabId, action.get('navigationState'))
+        const newOrigin = tabState.getVisibleOrigin(state, tabId)
+        // For cross-origin navigation, clear temp approvals
+        if (originalOrigin !== newOrigin) {
+          expireContentSettings(state, tabId, originalOrigin)
+        }
         setImmediate(() => {
           tabs.setWebRTCIPHandlingPolicy(tabId, getWebRTCPolicy(state, tabId))
         })
@@ -84,28 +121,62 @@ const tabsReducer = (state, action, immutableAction) => {
         })
         break
       }
+    case tabActionConsts.FIND_IN_PAGE_REQUEST:
+      {
+        const tabId = tabState.resolveTabId(state, action.get('tabId'))
+        setImmediate(() => {
+          tabs.findInPage(
+            tabId,
+            action.get('searchString'),
+            action.get('caseSensitivity'),
+            action.get('forward'),
+            action.get('findNext')
+          )
+        })
+        break
+      }
+    case tabActionConsts.STOP_FIND_IN_PAGE_REQUEST:
+      {
+        const tabId = tabState.resolveTabId(state, action.get('tabId'))
+        setImmediate(() => {
+          tabs.stopFindInPage(tabId)
+        })
+        break
+      }
+    case tabActionConsts.ZOOM_CHANGED:
+      {
+        const tabId = tabState.resolveTabId(state, action.get('tabId'))
+        const zoomPercent = action.get('zoomPercent')
+        state = tabState.setZoomPercent(state, tabId, zoomPercent)
+        break
+      }
     case appConstants.APP_SET_STATE:
       state = tabs.init(state, action)
       break
     case appConstants.APP_TAB_CREATED:
       state = tabState.maybeCreateTab(state, action)
       break
-    case appConstants.APP_TAB_ATTACHED:
-      state = tabs.updateTabsStateForAttachedTab(state, action.get('tabId'))
-      break
-    case appConstants.APP_TAB_WILL_ATTACH: {
-      const tabId = action.get('tabId')
-      const tabValue = tabState.getByTabId(state, tabId)
-      if (!tabValue) {
-        break
-      }
-      const oldWindowId = tabState.getWindowId(state, tabId)
-      state = tabs.updateTabsStateForWindow(state, oldWindowId)
-      break
-    }
     case appConstants.APP_TAB_MOVED:
       state = tabs.updateTabsStateForAttachedTab(state, action.get('tabId'))
       break
+    case appConstants.APP_TAB_INSERTED_TO_TAB_STRIP: {
+      const windowId = action.get('windowId')
+      if (windowId == null) {
+        break
+      }
+      const tabId = action.get('tabId')
+      state = tabState.setTabStripWindowId(state, tabId, windowId)
+      state = tabs.updateTabIndexesForWindow(state, windowId)
+      break
+    }
+    case appConstants.APP_TAB_DETACHED_FROM_TAB_STRIP: {
+      const windowId = action.get('windowId')
+      if (windowId == null) {
+        break
+      }
+      state = tabs.updateTabIndexesForWindow(state, windowId)
+      break
+    }
     case appConstants.APP_TAB_DETACH_MENU_ITEM_CLICKED: {
       setImmediate(() => {
         const tabId = action.get('tabId')
@@ -256,8 +327,10 @@ const tabsReducer = (state, action, immutableAction) => {
         // But still check for no tabId because on tab detach there's a dummy tabId
         const tabValue = tabState.getByTabId(state, tabId)
         if (tabValue) {
+          const lastOrigin = tabState.getVisibleOrigin(state, tabId)
+          expireContentSettings(state, tabId, lastOrigin)
           const windowIdOfTabBeingRemoved = tabState.getWindowId(state, tabId)
-          state = tabs.updateTabsStateForWindow(state, windowIdOfTabBeingRemoved)
+          state = tabs.updateTabIndexesForWindow(state, windowIdOfTabBeingRemoved)
         }
         state = tabState.removeTabByTabId(state, tabId)
         tabs.forgetTab(tabId)
@@ -302,6 +375,14 @@ const tabsReducer = (state, action, immutableAction) => {
         tabs.setTabIndex(action.get('tabId'), action.get('index'))
       })
       break
+    case appConstants.APP_TAB_SET_FULL_SCREEN: {
+      const isFullscreen = action.get('isFullScreen')
+      const tabId = action.get('tabId')
+      if (isFullscreen === true || isFullscreen === false) {
+        tabs.setFullScreen(tabId, isFullscreen)
+      }
+      break
+    }
     case appConstants.APP_TAB_TOGGLE_DEV_TOOLS:
       setImmediate(() => {
         tabs.toggleDevTools(action.get('tabId'))
@@ -378,12 +459,19 @@ const tabsReducer = (state, action, immutableAction) => {
         }
         break
       }
-    case appConstants.APP_FRAME_CHANGED:
-      state = tabState.updateFrame(state, action, shouldDebugTabEvents)
+    case appConstants.APP_FRAMES_CHANGED:
+      for (const frameAction of action.get('frames').valueSeq()) {
+        state = tabState.updateFrame(state, frameAction, shouldDebugTabEvents)
+      }
       break
+    // TODO: convert window frame navigation status (load, error, etc)
+    // to browser actions with data on tab state. This reducer responds to
+    // actions from both at the moment (browser-side for certificate errors and
+    // renderer-side for load errors) until all can be refactored.
     case windowConstants.WINDOW_SET_FRAME_ERROR:
+    case tabActionConsts.SET_CONTENTS_ERROR:
       {
-        const tabId = action.getIn(['frameProps', 'tabId'])
+        const tabId = action.getIn(['frameProps', 'tabId']) || action.get('tabId')
         const tab = getWebContents(tabId)
         if (tab) {
           let currentIndex = tab.getCurrentEntryIndex()
@@ -437,6 +525,7 @@ const tabsReducer = (state, action, immutableAction) => {
           state = updateState.setUpdateProp(state, 'referralPage', null)
         }
       }
+      state = state.set('windowReady', true)
       break
     }
     case appConstants.APP_ENABLE_PEPPER_MENU: {
@@ -448,15 +537,21 @@ const tabsReducer = (state, action, immutableAction) => {
       if (dragData && dragData.get('type') === dragTypes.TAB) {
         const frame = dragData.get('data')
         let frameOpts = frameOptsFromFrame(frame)
+        const draggingTabId = frameOpts.get('tabId')
         const browserOpts = { positionByMouseCursor: true, checkMaximized: true }
         const tabIdForIndex = dragData.getIn(['dragOverData', 'draggingOverKey'])
-        const tabForIndex = tabState.getByTabId(state, tabIdForIndex)
+        const tabForIndex = tabIdForIndex !== draggingTabId && tabState.getByTabId(state, tabIdForIndex)
         const dropWindowId = dragData.get('dropWindowId')
-        if (dropWindowId != null && dropWindowId !== -1 && tabForIndex) {
+        let newIndex = -1
+        // Set new index for new window if last dragged-over tab is in new window.
+        // Otherwise, could be over another tab's tab strip, but most recently dragged-over a tab in another window.
+        if (dropWindowId != null && dropWindowId !== -1 && tabForIndex && tabForIndex.get('windowId') === dropWindowId) {
           const prependIndexByTabId = dragData.getIn(['dragOverData', 'draggingOverLeftHalf'])
-          frameOpts = frameOpts.set('index', tabForIndex.get('index') + (prependIndexByTabId ? 0 : 1))
+          newIndex = tabForIndex.get('index') + (prependIndexByTabId ? 0 : 1)
         }
-        tabs.moveTo(state, frame.get('tabId'), frameOpts, browserOpts, dragData.get('dropWindowId'))
+        // ensure the tab never moves window with its original index
+        frameOpts = frameOpts.set('index', newIndex)
+        tabs.moveTo(state, draggingTabId, frameOpts, browserOpts, dragData.get('dropWindowId'))
       }
       break
     }
