@@ -2850,14 +2850,17 @@ describe('ledger api unit tests', function () {
   describe('fileRecoveryKeys', function () {
     let stub
     let setRecoveryInProgressSpy
+    let recoverWalletSpy
 
     before(function () {
       setRecoveryInProgressSpy = sinon.spy(aboutPreferencesState, 'setRecoveryInProgress')
+      recoverWalletSpy = sinon.spy(ledgerClientObject, 'recoverWallet')
     })
 
     after(function () {
       stub.restore()
       setRecoveryInProgressSpy.restore()
+      recoverWalletSpy.restore()
     })
 
     it('does not modify state if there is no recovery key file', function () {
@@ -2877,6 +2880,12 @@ describe('ledger api unit tests', function () {
       ledgerApi.fileRecoveryKeys(stateWithPreferences, 'file.txt')
       assert.equal(stateWithPreferences, setRecoveryInProgressSpy.getCall(0).args[0])
       assert.equal(true, setRecoveryInProgressSpy.getCall(0).args[1])
+    })
+
+    it('client calls recoverWallet using the ledger api\'s callback', function () {
+      ledgerApi.setClient(ledgerClientObject)
+      ledgerApi.fileRecoveryKeys(defaultAppState, false, 'test key')
+      assert.equal('recoverWalletCallback', recoverWalletSpy.getCall(0).args[2].name)
     })
   })
 
