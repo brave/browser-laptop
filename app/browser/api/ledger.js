@@ -1817,6 +1817,7 @@ const generatePaymentData = (state) => {
         return
     }
     module.exports.qrWriteImage(index, url)
+    
   })
 
   return state
