@@ -310,6 +310,13 @@ class EnabledContent extends ImmutableComponent {
               text = locale.translation('promotionClaimedErrorText')
               break
             }
+          case promotionStatuses.CAPTCHA_BLOCK:
+            {
+              title = locale.translation('promotionCaptchaBlockTitle')
+              message = locale.translation('promotionCaptchaBlockMessage')
+              text = ' '
+              break
+            }
           case promotionStatuses.CAPTCHA_CHECK:
           case promotionStatuses.CAPTCHA_ERROR:
             {

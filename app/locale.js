@@ -285,6 +285,8 @@ var rendererIdentifiers = function () {
     'promotionClaimedErrorMessage',
     'promotionClaimedErrorText',
     'promotionClaimedErrorTitle',
+    'promotionCaptchaBlockTitle',
+    'promotionCaptchaBlockMessage',
     'corruptedOverlayTitle',
     'corruptedOverlayMessage',
     'corruptedOverlayText',
