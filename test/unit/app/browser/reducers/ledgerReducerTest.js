@@ -1019,12 +1019,26 @@ describe('ledgerReducer unit tests', function () {
       onCaptchaResponseSpy.restore()
     })
 
-    it('execute', function () {
+    it('execute error', function () {
       ledgerReducer(appState, Immutable.fromJS({
         actionType: appConstants.APP_ON_CAPTCHA_RESPONSE,
-        body: 1
+        body: null,
+        response: {
+          statusCode: 429
+        }
       }))
-      assert(onCaptchaResponseSpy.withArgs(sinon.match.any, 1).calledOnce)
+      assert(onCaptchaResponseSpy.withArgs(sinon.match.any, Immutable.fromJS({
+        statusCode: 429
+      }), null).calledOnce)
+    })
+
+    it('execute correct', function () {
+      ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_ON_CAPTCHA_RESPONSE,
+        body: 1,
+        response: null
+      }))
+      assert(onCaptchaResponseSpy.withArgs(sinon.match.any, null, 1).calledOnce)
     })
   })
 
