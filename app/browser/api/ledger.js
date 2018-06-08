@@ -197,7 +197,11 @@ const paymentPresent = (state, tabId, present) => {
 
   if (!present) {
     const status = ledgerState.getPromotionProp(state, 'promotionStatus')
-    if (status === promotionStatuses.CAPTCHA_CHECK || status === promotionStatuses.CAPTCHA_ERROR) {
+    if (
+      status === promotionStatuses.CAPTCHA_CHECK ||
+      status === promotionStatuses.CAPTCHA_ERROR ||
+      status === promotionStatuses.CAPTCHA_BLOCK
+    ) {
       state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
     }
   }
@@ -1826,9 +1830,8 @@ const generatePaymentData = (state) => {
 
 const getPaymentInfo = (state) => {
   let amount, currency
-  const inProgress = ledgerState.getAboutProp(state, 'status') === ledgerStatuses.IN_PROGRESS
 
-  if (!client || inProgress) {
+  if (!client) {
     return state
   }
 
@@ -3021,20 +3024,24 @@ const getCaptcha = (state) => {
     return
   }
 
-  client.getPromotionCaptcha(promotion.get('promotionId'), (err, body) => {
+  client.getPromotionCaptcha(promotion.get('promotionId'), (err, body, response) => {
     if (err) {
       console.error(`Problem getting promotion captcha ${err.toString()}`)
-      appActions.onCaptchaResponse(null)
+      appActions.onCaptchaResponse(response, null)
+      return
     }
 
-    appActions.onCaptchaResponse(body)
+    appActions.onCaptchaResponse(null, body)
   })
 }
 
-const onCaptchaResponse = (state, body) => {
+const onCaptchaResponse = (state, response, body) => {
   if (body == null) {
-    state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_ERROR)
-    return state
+    if (response && response.get('statusCode') === 429) {
+      return ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_BLOCK)
+    }
+
+    return ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_ERROR)
   }
 
   const image = `data:image/jpeg;base64,${Buffer.from(body).toString('base64')}`
@@ -3079,6 +3086,9 @@ const onPromotionResponse = (state, status) => {
       // captcha verification failed
       state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_ERROR)
       module.exports.getCaptcha(state)
+    } else if (status.get('statusCode') === 429) {
+      // too many attempts
+      state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_BLOCK)
     } else {
       // general error
       state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.GENERAL_ERROR)
@@ -3090,7 +3100,8 @@ const onPromotionResponse = (state, status) => {
 
   if (
     currentStatus === promotionStatuses.CAPTCHA_ERROR ||
-    currentStatus === promotionStatuses.CAPTCHA_CHECK
+    currentStatus === promotionStatuses.CAPTCHA_CHECK ||
+    currentStatus === promotionStatuses.CAPTCHA_BLOCK
   ) {
     state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
   }

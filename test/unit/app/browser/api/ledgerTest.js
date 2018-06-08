@@ -1952,6 +1952,16 @@ describe('ledger api unit tests', function () {
         assert.deepEqual(result.toJS(), expectedSate.toJS())
         assert(getCaptchaSpy.notCalled)
       })
+
+      it('block error', function () {
+        const result = ledgerApi.onPromotionResponse(defaultAppState, Immutable.fromJS({
+          statusCode: 429
+        }))
+        const expectedSate = defaultAppState
+          .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_BLOCK)
+        assert.deepEqual(result.toJS(), expectedSate.toJS())
+        assert(getCaptchaSpy.notCalled)
+      })
     })
   })
 
@@ -3752,11 +3762,25 @@ describe('ledger api unit tests', function () {
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
 
+    it('responose too many', function () {
+      const expectedState = defaultAppState
+        .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_BLOCK)
+      const result = ledgerApi.onCaptchaResponse(defaultAppState, Immutable.fromJS({statusCode: 429}))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('responose not found', function () {
+      const expectedState = defaultAppState
+        .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_ERROR)
+      const result = ledgerApi.onCaptchaResponse(defaultAppState, Immutable.fromJS({statusCode: 404}))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
     it('new captcha', function () {
       const expectedState = defaultAppState
         .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_CHECK)
         .setIn(['ledger', 'promotion', 'captcha'], 'data:image/jpeg;base64,/9j/2wA=')
-      const result = ledgerApi.onCaptchaResponse(defaultAppState, body)
+      const result = ledgerApi.onCaptchaResponse(defaultAppState, null, body)
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
 
@@ -3766,7 +3790,7 @@ describe('ledger api unit tests', function () {
       const expectedState = defaultAppState
         .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_ERROR)
         .setIn(['ledger', 'promotion', 'captcha'], 'data:image/jpeg;base64,/9j/2wA=')
-      const result = ledgerApi.onCaptchaResponse(state, body)
+      const result = ledgerApi.onCaptchaResponse(state, null, body)
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
   })

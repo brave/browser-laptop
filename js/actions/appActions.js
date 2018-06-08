@@ -1859,10 +1859,11 @@ const appActions = {
     })
   },
 
-  onCaptchaResponse: function (body) {
+  onCaptchaResponse: function (response, body) {
     dispatch({
       actionType: appConstants.APP_ON_CAPTCHA_RESPONSE,
-      body
+      body,
+      response
     })
   },
 
