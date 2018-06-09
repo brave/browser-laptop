@@ -1,7 +1,7 @@
 {
   "name": "brave",
   "version": "0.24.0",
-  "description": "Brave laptop and desktop browser",
+  "description": "Odin laptop and desktop browser",
   "main": "./app/index.js",
   "config": {
     "port": "8080"
@@ -51,7 +51,7 @@
   },
   "repository": "brave/browser-laptop",
   "author": {
-    "name": "Brave Software <support+laptop@brave.com>"
+    "name": "Odin Software <support+laptop@brave.com>"
   },
   "contributors": [
     {
@@ -83,7 +83,7 @@
   "bugs": {
     "url": "https://github.com/brave/browser-laptop/issues"
   },
-  "homepage": "https://www.brave.com/",
+  "homepage": "https://www.odinlink.com/",
   "dependencies": {
     "acorn": "3.2.0",
     "aphrodite": "1.1.0",

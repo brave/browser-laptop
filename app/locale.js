@@ -302,7 +302,7 @@ var rendererIdentifiers = function () {
 
 var ctx = null
 var translations = {}
-var lang = 'en-US'
+var lang = 'zh-CN'
 
 // Return a translate token from cache or a placeholder
 // indicating that no translation is available
@@ -337,34 +337,12 @@ exports.translationReplace = function (translation, replacements = {}) {
 }
 
 // Default language locale identifier
-const DEFAULT_LANGUAGE = 'en-US'
+const DEFAULT_LANGUAGE = 'zh-CN'
 
 const availableLanguages = [
-  'bn-BD',
-  'bn-IN',
-  'cs',
-  'de-DE',
+   
   'en-GB',
   'en-US',
-  'es',
-  'eu',
-  'fr-FR',
-  'hi-IN',
-  'id-ID',
-  'it-IT',
-  'ja-JP',
-  'ko-KR',
-  'ms-MY',
-  'nl-NL',
-  'pl-PL',
-  'pt-BR',
-  'ru',
-  'sl',
-  'sv-SE',
-  'ta',
-  'te',
-  'tr-TR',
-  'uk',
   'zh-CN'
 ]
 

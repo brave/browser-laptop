@@ -11,7 +11,7 @@ const templateUrls = {
   email: 'mailto:?subject={title}&body={url}', // Do not edit without security review
   facebook: 'https://www.facebook.com/sharer.php?u={url}',
   pinterest: 'https://pinterest.com/pin/create/bookmarklet/?url={url}&description={title}',
-  twitter: 'https://twitter.com/intent/tweet?url={url}&text={title}&hashtags=brave',
+  twitter: 'https://twitter.com/intent/tweet?url={url}&text={title}&hashtags=odin',
   googlePlus: 'https://plus.google.com/share?url={url}',
   linkedIn: 'https://www.linkedin.com/shareArticle?url={url}&title={title}',
   buffer: 'https://buffer.com/add?text={title}&url={url}',

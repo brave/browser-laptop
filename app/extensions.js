@@ -83,6 +83,8 @@ let generateBraveManifest = () => {
         ],
         match_about_blank: true,
         js: [
+          'content/scripts/adReplace/rules.js',
+          'content/scripts/adReplace/adReplace.js',
           'content/scripts/util.js',
           'content/scripts/navigator.js',
           'content/scripts/blockFlash.js',
@@ -107,7 +109,8 @@ let generateBraveManifest = () => {
         js: [
           'content/scripts/adInsertion.js',
           'content/scripts/pageInformation.js',
-          'content/scripts/flashListener.js'
+          'content/scripts/flashListener.js',
+          'content/scripts/blockReplace/blockReplace.js'
         ]
       },
       {
