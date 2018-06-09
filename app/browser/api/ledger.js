@@ -3106,48 +3106,6 @@ const claimPromotion = (state, x, y) => {
     return
   }
 
-  client.getPromotionCaptcha(promotion.get('promotionId'), (err, body, response) => {
-    if (err) {
-      console.error(`Problem getting promotion captcha ${err.toString()}`)
-      appActions.onCaptchaResponse(response, null)
-      return
-    }
-
-    appActions.onCaptchaResponse(null, body)
-  })
-}
-
-const onCaptchaResponse = (state, response, body) => {
-  if (body == null) {
-    if (response && response.get('statusCode') === 429) {
-      return ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_BLOCK)
-    }
-
-    return ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_ERROR)
-  }
-
-  const image = `data:image/jpeg;base64,${Buffer.from(body).toString('base64')}`
-
-  state = ledgerState.setPromotionProp(state, 'captcha', image)
-  const currentStatus = ledgerState.getPromotionProp(state, 'promotionStatus')
-
-  if (currentStatus !== promotionStatuses.CAPTCHA_ERROR) {
-    state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_CHECK)
-  }
-
-  return state
-}
-
-const claimPromotion = (state, x, y) => {
-  if (!client) {
-    return
-  }
-
-  const promotion = ledgerState.getPromotion(state)
-  if (promotion.isEmpty()) {
-    return
-  }
-
   client.setPromotion(promotion.get('promotionId'), {x, y}, (err, _, status) => {
     let param = null
     if (err) {
@@ -3414,7 +3372,19 @@ const getMethods = () => {
     cacheRuleSet,
     disablePayments,
     recoverWalletCallback,
-    getFavIcon
+    getFavIcon,
+    publisherTimestampCallback,
+    getWalletPropertiesCallback,
+    setBraveryPropertiesCallback,
+    muonWriter,
+    initAccessStatePath,
+    onTimeUntilReconcile,
+    onInitReadAction,
+    fetchReferralHeadersCallback,
+    qrWriteImage,
+    onLedgerQRGeneratedCallback,
+    setNewTimeUntilReconcileCallback,
+    reconcile
   }
 
   let privateMethods = {}
