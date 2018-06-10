@@ -1335,17 +1335,21 @@ describe('ledger api unit tests', function () {
       .setIn(['ledger', 'info', 'monthlyAmounts'], Immutable.List([5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0]))
 
     describe('generatePaymentData', function () {
+      let qrWriteImageSpy
       let generatePaymentDataSpy
 
       before(function () {
+        qrWriteImageSpy = sinon.spy(ledgerApi, 'qrWriteImage')
         generatePaymentDataSpy = sinon.spy(ledgerApi, 'generatePaymentData')
       })
 
       afterEach(function () {
+        qrWriteImageSpy.reset()
         generatePaymentDataSpy.reset()
       })
 
       after(function () {
+        qrWriteImageSpy.restore()
         generatePaymentDataSpy.restore()
       })
 
@@ -1357,6 +1361,62 @@ describe('ledger api unit tests', function () {
       it('we need to call generatePaymentData', function () {
         ledgerApi.onWalletProperties(state, Immutable.Map())
         assert(generatePaymentDataSpy.calledOnce)
+      })
+
+      it('calls qrWriteImage for each wallet address', function () {
+        const body = Immutable.fromJS({
+          addresses: {
+            BAT: 'BAT_address',
+            BTC: 'BTC_address',
+            ETH: 'ETH_address',
+            LTC: 'LTC_address'
+          }
+        })
+        ledgerApi.onWalletProperties(state, body)
+        assert.equal(4, qrWriteImageSpy.callCount)
+      })
+    })
+
+    describe('getPaymentInfo', function () {
+      let onWalletPropertiesSpy
+      let getWalletPropertiesSpy
+      let getWalletPropertiesCallbackSpy
+
+      before(function () {
+        ledgerApi.setClient(ledgerClientObject)
+        onWalletPropertiesSpy = sinon.spy(appActions, 'onWalletProperties')
+        getWalletPropertiesSpy = sinon.spy(ledgerClientObject, 'getWalletProperties')
+        getWalletPropertiesCallbackSpy = sinon.spy(ledgerApi, 'getWalletPropertiesCallback')
+      })
+
+      afterEach(function () {
+        onWalletPropertiesSpy.restore()
+        getWalletPropertiesSpy.restore()
+        getWalletPropertiesCallbackSpy.restore()
+      })
+
+      after(function () {
+        onWalletPropertiesSpy.reset()
+        getWalletPropertiesSpy.reset()
+        getWalletPropertiesCallbackSpy.reset()
+      })
+
+      it('calls getWalletProperties with current amount and fee', function () {
+        const expectedProps = ledgerClientObject.getBraveryProperties()
+        ledgerApi.getPaymentInfo(defaultAppState)
+        const passedProps = getWalletPropertiesSpy.getCall(0).args
+        assert.equal(expectedProps.fee.amount, passedProps[0])
+        assert.equal(expectedProps.fee.currency, passedProps[1])
+      })
+
+      it('calls getWalletPropertiesCallback', function () {
+        ledgerApi.getPaymentInfo(defaultAppState)
+        assert(getWalletPropertiesCallbackSpy.calledOnce)
+      })
+
+      it('calls appActions.onWalletProperties', function () {
+        ledgerApi.getPaymentInfo(defaultAppState)
+        assert(onWalletPropertiesSpy.calledOnce)
       })
     })
 
@@ -1782,6 +1842,48 @@ describe('ledger api unit tests', function () {
           .setIn(['ledger', 'info', 'grants'], Immutable.List())
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
+    })
+  })
+
+  describe('setPaymentInfo', function () {
+    const amount = 15
+    let onBraveryPropertiesSpy
+    let setBraveryPropertiesSpy
+    let setBraveryPropertiesCallbackSpy
+
+    before(function () {
+      ledgerApi.setClient(ledgerClientObject)
+      onBraveryPropertiesSpy = sinon.spy(appActions, 'onBraveryProperties')
+      setBraveryPropertiesSpy = sinon.spy(ledgerClientObject, 'setBraveryProperties')
+      setBraveryPropertiesCallbackSpy = sinon.spy(ledgerApi, 'setBraveryPropertiesCallback')
+    })
+
+    after(function () {
+      onBraveryPropertiesSpy.restore()
+      setBraveryPropertiesSpy.restore()
+      setBraveryPropertiesCallbackSpy.restore()
+    })
+
+    afterEach(function () {
+      onBraveryPropertiesSpy.reset()
+      setBraveryPropertiesSpy.reset()
+      setBraveryPropertiesCallbackSpy.reset()
+    })
+
+    it('extends bravery', function () {
+      ledgerApi.setPaymentInfo(amount)
+      const passedBravery = setBraveryPropertiesSpy.getCall(0).args[0]
+      assert.equal(amount, passedBravery.fee.amount)
+    })
+
+    it('calls setBraveryPropertiesCallback', function () {
+      ledgerApi.setPaymentInfo(amount)
+      assert(setBraveryPropertiesCallbackSpy.calledOnce)
+    })
+
+    it('it calls appActions.onBraveryProperties', function () {
+      ledgerApi.setPaymentInfo(amount)
+      assert(onBraveryPropertiesSpy.calledOnce)
     })
   })
 
@@ -2850,14 +2952,17 @@ describe('ledger api unit tests', function () {
   describe('fileRecoveryKeys', function () {
     let stub
     let setRecoveryInProgressSpy
+    let recoverWalletSpy
 
     before(function () {
       setRecoveryInProgressSpy = sinon.spy(aboutPreferencesState, 'setRecoveryInProgress')
+      recoverWalletSpy = sinon.spy(ledgerClientObject, 'recoverWallet')
     })
 
     after(function () {
       stub.restore()
       setRecoveryInProgressSpy.restore()
+      recoverWalletSpy.restore()
     })
 
     it('does not modify state if there is no recovery key file', function () {
@@ -2877,6 +2982,12 @@ describe('ledger api unit tests', function () {
       ledgerApi.fileRecoveryKeys(stateWithPreferences, 'file.txt')
       assert.equal(stateWithPreferences, setRecoveryInProgressSpy.getCall(0).args[0])
       assert.equal(true, setRecoveryInProgressSpy.getCall(0).args[1])
+    })
+
+    it('client calls recoverWallet using the ledger api\'s callback', function () {
+      ledgerApi.setClient(ledgerClientObject)
+      ledgerApi.fileRecoveryKeys(defaultAppState, false, 'test key')
+      assert.equal('recoverWalletCallback', recoverWalletSpy.getCall(0).args[2].name)
     })
   })
 

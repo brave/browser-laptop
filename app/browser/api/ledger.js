@@ -2693,6 +2693,11 @@ const run = (state, delayTime) => {
     return
   }
 
+  module.exports.reconcile(callback)
+  return state
+}
+
+const reconcile = (callback) => {
   if (client.isReadyToReconcile(synopsis, module.exports.onFuzzing)) {
     client.reconcile(uuid.v4().toLowerCase(), callback)
   }
@@ -3384,6 +3389,8 @@ const getMethods = () => {
     onLedgerQRGeneratedCallback,
     qrWriteImage,
     onFuzzing,
+    setNewTimeUntilReconcileCallback,
+    reconcile,
     getClient: () => {
       return client
     }
