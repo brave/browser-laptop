@@ -15,26 +15,31 @@ def main(args):
   print('[INFO] Running upload...')
   repo = GitHub(get_env('GITHUB_TOKEN')).repos(BROWSER_LAPTOP_REPO)
 
-  try:
-    sanity_check(repo, get_tag_without_channel())
-  except UserWarning:
-    if args.force:
-      delete_release(repo, get_tag_without_channel())
-    else:
-      raise
 
+  tag = get_tag_without_channel()
+  release = get_draft(repo, tag)
 
-  release = create_release_draft(repo, get_tag_without_channel())
+  if not release:
+    print("[INFO] No existing release found, creating new release for this upload")
+    release = create_release_draft(repo, tag)
+
   print('[INFO] Uploading release {}'.format(release['tag_name']))
   for f in get_files_to_upload():
-    upload_browser_laptop(repo, release, f)
+    upload_browser_laptop(repo, release, f, force=args.force)
   print('[INFO] Finished upload')
 
-def sanity_check(repo, tag):
+def get_draft(repo, tag):
+  release = None
   releases = get_releases_by_tag(repo, tag, include_drafts=True)
-  print('[INFO] Existing releases: {}'.format([x['tag_name'] for x in releases]))
   if releases:
-    raise(UserWarning("Draft with tag {} already exists".format(tag)))
+    print("[INFO] Found existing release draft, merging this upload with it")
+    if len(releases) > 1:
+      raise UserWarning("[INFO] More then one draft with the tag '{}' found, not sure which one to merge with.".format(tag))
+    release = releases[0]
+    if release['draft'] == False:
+      raise UserWarning("[INFO] Release with tag '{}' is already published, aborting.".format(tag))
+
+  return release
 
 def delete_release(repo, tag):
   print('[WARN] Deleting release {}'.format(tag))
@@ -44,7 +49,7 @@ def delete_release(repo, tag):
     catch=requests.exceptions.ConnectionError, retries=3
   )
 
-def upload_browser_laptop(github, release, file_path):
+def upload_browser_laptop(github, release, file_path, force=False):
   filename = os.path.basename(file_path)
   print('[INFO] Uploading: ' + filename)
 
@@ -52,6 +57,9 @@ def upload_browser_laptop(github, release, file_path):
   with open(file_path, 'rb') as f:
     if filename == 'RELEASES':
       filename = 'RELEASES-{0}'.format(TARGET_ARCH)
+
+    if force:
+      delete_file(github, release, filename)
 
     retry_func(
       lambda ran: upload_io_to_github(github, release, filename, f, 'application/octet-stream'),
@@ -101,6 +109,6 @@ def delete_file(github, release, name, retries=3):
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Uploads the browser-laptop build to GitHub')
-  parser.add_argument('--force', action='store_true', help='Overwrite the destination release if it already exists.')
+  parser.add_argument('--force', action='store_true', help='Overwrite files in destination draft on upload.')
   args = parser.parse_args()
   sys.exit(main(args))

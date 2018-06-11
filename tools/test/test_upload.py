@@ -15,21 +15,22 @@ import upload
 
 from mock import Repo
 
-class TestPublishSanityCheck(unittest.TestCase):
+class TestGetDraft(unittest.TestCase):
   def setUp(self):
     self.repo = Repo()
 
-  def test_fails_on_existing_draft(self):
+  def test_returns_existing_draft(self):
     self.repo.releases._releases = [{'tag_name': 'test', 'draft': True}]
-    self.assertRaises(UserWarning, upload.sanity_check, self.repo, 'test')
+    self.assertEquals(upload.get_draft(self.repo, 'test')['tag_name'], 'test')
 
   def test_fails_on_existing_release(self):
     self.repo.releases._releases = [{'tag_name': 'test', 'draft': False}]
-    self.assertRaises(UserWarning, upload.sanity_check, self.repo, 'test')
+    self.assertRaises(UserWarning, upload.get_draft, self.repo, 'test')
 
-  def test_succeeds_on_new_release(self):
+  def test_returns_none_on_new_draft(self):
     self.repo.releases._releases = [{'tag_name': 'old', 'draft': False}]
-    upload.sanity_check(self.repo, 'new')
+    upload.get_draft(self.repo, 'new')
+    self.assertEquals(upload.get_draft(self.repo, 'test'), None)
 
 if __name__ == '__main__':
   print unittest.main()
