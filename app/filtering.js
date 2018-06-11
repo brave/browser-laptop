@@ -28,6 +28,7 @@ const ipcMain = electron.ipcMain
 const app = electron.app
 const path = require('path')
 const getOrigin = require('../js/lib/urlutil').getOrigin
+const {isTorrentFile, isMagnetURL} = require('./browser/webtorrent')
 const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 const {fullscreenOption} = require('./common/constants/settingsEnums')
@@ -41,6 +42,7 @@ const tor = require('./tor')
 
 let appStore = null
 
+const tabMessageBox = require('./browser/tabMessageBox')
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 const beforeRedirectFilteringFns = []
@@ -115,6 +117,11 @@ function registerForBeforeRequest (session, partition) {
 
     if (shouldIgnoreUrl(details)) {
       muonCb({})
+      return
+    }
+
+    if ((isMagnetURL(details)) && partition === appConfig.tor.partition) {
+      showTorrentBlockedInTorWarning(details)
       return
     }
 
@@ -349,6 +356,16 @@ function registerForBeforeSendHeaders (session, partition) {
   })
 }
 
+function showTorrentBlockedInTorWarning (details) {
+  if (details.tabId) {
+    tabMessageBox.show(details.tabId, {
+      message: `${locale.translation('torrentBlockedInTor')}`,
+      title: 'Brave',
+      buttons: [locale.translation('torrentWarningOk')]
+    })
+  }
+}
+
 /**
  * Register for notifications for webRequest.onHeadersReceived for a particular
  * session.
@@ -360,6 +377,10 @@ function registerForHeadersReceived (session, partition) {
     // Using an electron binary which isn't from Brave
     if (shouldIgnoreUrl(details)) {
       muonCb({})
+      return
+    }
+    if ((isTorrentFile(details)) && partition === appConfig.tor.partition) {
+      showTorrentBlockedInTorWarning(details)
       return
     }
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
