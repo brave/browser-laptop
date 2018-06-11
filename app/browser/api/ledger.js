@@ -1073,11 +1073,11 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
 
     if (initP) {
       if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
-        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', true)
+        module.exports.onPublisherOptionUpdateAction(publisherKey, 'exclude', true)
         savePublisherOption(publisherKey, 'exclude', true)
       } else {
         excludeP(publisherKey, (unused, exclude) => {
-          appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+          module.exports.onPublisherOptionUpdateAction(publisherKey, 'exclude', exclude)
           savePublisherOption(publisherKey, 'exclude', exclude)
         })
       }
@@ -1293,7 +1293,7 @@ const initSynopsis = (state) => {
 
     if (!publisher.getIn(['options', 'exclude'])) {
       excludeP(publisherKey, (unused, exclude) => {
-        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+        module.exports.onPublisherOptionUpdateAction(publisherKey, 'exclude', exclude)
         savePublisherOption(publisherKey, 'exclude', exclude)
       })
     }
@@ -1302,6 +1302,10 @@ const initSynopsis = (state) => {
   state = updatePublisherInfo(state)
 
   return state
+}
+
+const onPublisherOptionUpdateAction = (publisherKey, prop, value) => {
+  appActions.onPublisherOptionUpdate(publisherKey, prop, value)
 }
 
 const checkPromotions = () => {
@@ -2185,7 +2189,7 @@ const onCallback = (state, result, delayTime) => {
 
           if (!publisher.getIn(['options', 'exclude'])) {
             excludeP(publisherKey, (unused, exclude) => {
-              appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+              module.exports.onPublisherOptionUpdateAction(publisherKey, 'exclude', exclude)
               savePublisherOption(publisherKey, 'exclude', exclude)
             })
           }
@@ -2979,11 +2983,11 @@ const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
     state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
 
     if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
-      appActions.onPublisherOptionUpdate(publisherKey, 'exclude', true)
+      module.exports.onPublisherOptionUpdateAction(publisherKey, 'exclude', true)
       savePublisherOption(publisherKey, 'exclude', true)
     } else {
       excludeP(publisherKey, (unused, exclude) => {
-        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+        module.exports.onPublisherOptionUpdateAction(publisherKey, 'exclude', exclude)
         savePublisherOption(publisherKey, 'exclude', exclude)
       })
     }
@@ -3379,7 +3383,8 @@ const getMethods = () => {
       return client
     },
     deleteStateFile,
-    delayFirstSync
+    delayFirstSync,
+    onPublisherOptionUpdateAction
   }
 
   let privateMethods = {}
