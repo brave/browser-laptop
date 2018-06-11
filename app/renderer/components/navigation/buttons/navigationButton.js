@@ -37,6 +37,7 @@ class NavigationButton extends ImmutableComponent {
         onLongPress={this.props.onLongPress}
         ref={this.props.navigationButtonRef}
         style={instanceStyle}
+        dataAttributes={this.props.dataAttributes}
       >
         { this.props.children }
       </LongPressButton>
@@ -49,6 +50,7 @@ class NavigationButton extends ImmutableComponent {
         onClick={this.props.onClick}
         ref={this.props.navigationButtonRef}
         style={instanceStyle}
+        {...this.props.dataAttributes}
       >
         {this.props.children}
       </button>

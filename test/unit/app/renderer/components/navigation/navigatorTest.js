@@ -68,10 +68,6 @@ describe('Navigator component unit tests', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg', {})
-    mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg', {})
-    mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_no.svg', {})
-    mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg', {})
     mockery.registerMock('../../extensions/brave/img/tabs/new_session.svg')
     mockery.registerMock('../../../extensions/brave/img/caret_down_grey.svg')
     mockery.registerMock('../../../../img/url-bar-no-script.svg', {})

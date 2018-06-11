@@ -94,10 +94,6 @@ describe('NavigationBar component', function () {
       getSetting: () => settingValue
     })
     mockery.registerMock('../../../../img/url-bar-no-script.svg')
-    mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
-    mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
-    mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_no.svg')
-    mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg')
     mockery.registerMock('../../../extensions/brave/img/caret_down_grey.svg')
     mockery.registerMock('./urlBar', urlBarFake)
     windowStore = require('../../../../../../js/stores/windowStore')

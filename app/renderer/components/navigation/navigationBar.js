@@ -20,11 +20,9 @@ const settings = require('../../../../js/constants/settings')
 const tabState = require('../../../common/state/tabState')
 const publisherState = require('../../../common/lib/publisherUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
-const ledgerState = require('../../../common/state/ledgerState')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
-const {getBaseUrl} = require('../../../../js/lib/appUrlUtil')
 const {getSetting} = require('../../../../js/settings')
 const bookmarkLocationCache = require('../../../common/cache/bookmarkLocationCache')
 
@@ -43,8 +41,6 @@ class NavigationBar extends React.Component {
     const title = activeFrame.get('title', '')
     const loading = activeFrame.get('loading')
     const location = activeFrame.get('location', '')
-    const locationId = getBaseUrl(location)
-    const publisherKey = ledgerState.getLocationProp(state, locationId, 'publisher')
     const navbar = activeFrame.get('navbar', Immutable.Map())
     const locationCache = bookmarkLocationCache.getCacheKey(state, location)
 
@@ -72,7 +68,7 @@ class NavigationBar extends React.Component {
     props.isFocused = navbar.getIn(['urlbar', 'focused'], false)
     props.shouldRenderSuggestions = navbar.getIn(['urlbar', 'suggestions', 'shouldRender']) === true
 
-    props.showPublisherToggle = publisherState.shouldShowAddPublisherButton(state, location, publisherKey)
+    props.showPublisherToggle = publisherState.shouldShowAddPublisherButton()
     props.activeTabId = activeTabId
     props.bookmarkKey = locationCache.get(0, false)
 

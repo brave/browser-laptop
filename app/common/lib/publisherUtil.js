@@ -12,12 +12,16 @@ const {isHttpOrHttps, getUrlFromPDFUrl} = require('../../../js/lib/urlutil')
 const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 
 const publisherUtil = {
-  shouldShowAddPublisherButton: (state, location, publisherKey) => {
+  shouldShowAddPublisherButton: () => {
+    return getSetting(settings.PAYMENTS_ENABLED)
+  },
+
+  shouldEnableAddPublisherButton: (state, location, publisherKey) => {
     return location &&
-      !isSourceAboutUrl(location) &&
-      getSetting(settings.PAYMENTS_ENABLED) &&
-      isHttpOrHttps(getUrlFromPDFUrl(location)) &&
-      !ledgerUtil.blockedP(state, publisherKey)
+    !isSourceAboutUrl(location) &&
+    getSetting(settings.PAYMENTS_ENABLED) &&
+    isHttpOrHttps(getUrlFromPDFUrl(location)) &&
+    !ledgerUtil.blockedP(state, publisherKey)
   }
 }
 
