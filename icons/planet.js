@@ -7,7 +7,7 @@ const { css } = require('aphrodite/no-important')
 const iconStyles = require('./styles')
 
 module.exports = ({ styles }) =>
-  <svg className={css(styles, iconStyles.icon)} xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
+  <svg className={css(iconStyles.icon, styles)} xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
     <g fillRule='evenodd' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5'>
       <path d='M11.24697 6.00101c3.72975 0 6.753 3.02325 6.753 6.7515 0 3.72975-3.02325 6.753-6.753 6.753-3.72825 0-6.7515-3.02325-6.7515-6.753 0-3.72825 3.02325-6.7515 6.7515-6.7515z'
         />

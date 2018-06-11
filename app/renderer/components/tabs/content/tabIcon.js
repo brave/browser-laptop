@@ -38,7 +38,7 @@ class TabIcon extends ImmutableComponent {
         this.props.symbol
           ? <span
             className={cx({
-              [css(styles.tabIcon, styles.tabIcon_symbol)]: true,
+              [css(styles.tabIcon_symbol)]: true,
               [this.props.symbol]: true
             })}
             data-test-id={this.props['data-test-id']}
@@ -81,7 +81,22 @@ const styles = StyleSheet.create({
   tabIcon_symbol: {
     fontSize: 'inherit',
     fontWeight: 'normal',
-    color: 'inherit'
+    color: 'inherit',
+
+    // Default flex properties
+    display: 'flex',
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0, // must keep set width and height and not crop self
+
+    // Default background properties
+    backgroundSize: globalStyles.spacing.iconSize,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+
+    // Default animation properties
+    animationFillMode: 'forwards'
   }
 })
 
