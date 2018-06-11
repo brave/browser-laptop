@@ -33,7 +33,7 @@ const contextMenuState = require('../../../common/state/contextMenuState')
 
 // Util
 const {getCurrentWindowId, isMaximized, isFullScreen, isFocused} = require('../../currentWindow')
-const isWindows = require('../../../common/lib/platformUtil').isWindows()
+const platformUtil = require('../../../common/lib/platformUtil')
 const {braveShieldsEnabled} = require('../../../common/state/shieldState')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const siteSettings = require('../../../../js/state/siteSettings')
@@ -44,6 +44,9 @@ const contextMenus = require('../../../../js/contextMenus')
 // Constants
 const appConfig = require('../../../../js/constants/appConfig')
 const settings = require('../../../../js/constants/settings')
+
+const isWindows = platformUtil.isWindows()
+const hasWindowInsetLeftButtons = platformUtil.isDarwin()
 
 class Navigator extends React.Component {
   constructor (props) {
@@ -169,14 +172,18 @@ class Navigator extends React.Component {
             </div>
             : null
         }
-        <div className='navigatorWrapper'
+        <div
+          className={cx({
+            navigatorWrapper: true,
+            hasWindowInsetLeftButtons,
+            fullscreen: this.props.isFullScreen
+          })}
           onDoubleClick={this.onDoubleClick}
           onDragOver={this.onDragOver}
           onDrop={this.onDrop}
         >
           <div className={cx({
-            backforward: true,
-            fullscreen: this.props.isFullScreen
+            backforward: true
           })}>
             <BackButton />
             <ForwardButton />

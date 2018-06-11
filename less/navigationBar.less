@@ -14,25 +14,23 @@
   .loadTime { display: none; }
 }
 
-// (macOS) We need to keep a padding left to avoid overlapping
-// with the window buttons to close/maximize/minimize the window.
-.platform--darwin .navigatorWrapper .backforward {
-  margin-left: @navbarLeftMarginDarwin;
 
-  &.fullscreen {
-    margin-left: 0;
-  }
+// windows which do not have window buttons on left
+.navigatorWrapper {
+  margin-left: 10px;
 }
+// macOS has window nav buttons inset on left on window so allow space
+// (does not show for fullscreen)
+.navigatorWrapper.hasWindowInsetLeftButtons:not(.fullscreen) {
+  margin-left: @navbarLeftMarginDarwin;
+}
+
 
 // Windows specific styles
 .platform--win32 {
   #window.frameless:not(.isFullScreen):not(.isMaximized) {
     border: 1px solid #000;
     box-sizing: border-box;
-  }
-
-  .backforward {
-    padding-left: 5px;
   }
 
   #navigator {
