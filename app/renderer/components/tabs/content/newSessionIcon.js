@@ -4,7 +4,7 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const {StyleSheet} = require('aphrodite/no-important')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
@@ -19,6 +19,7 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 // Styles
 const globalStyles = require('../../styles/global')
 const {opacityIncreaseElementKeyframes} = require('../../styles/animations')
+const {theme} = require('../../styles/theme')
 
 const newSessionSvg = require('../../../../extensions/brave/img/tabs/new_session.svg')
 
@@ -85,13 +86,18 @@ class NewSessionIcon extends React.Component {
       return null
     }
 
-    return <TabIcon symbol
+    const sessionName = <div className={css(styles.icon_newSession__name)}>
+      { this.props.partitionNumber }
+    </div>
+
+    return <TabIcon
       data-test-id='newSessionIcon'
       className={[
         styles.icon_newSession,
         this.props.isActive && this.props.textIsWhite && styles.icon_newSession_active_light
       ]}
-      symbolContent={this.props.partitionNumber}
+      symbolContent={sessionName}
+      symbol={css(styles.icon__symbol)}
       l10nArgs={{partitionNumber: this.props.partitionNumber}}
       l10nId='sessionInfoTab'
       ref={this.setRef}
@@ -111,6 +117,18 @@ const styles = StyleSheet.create({
 
   icon_newSession_active_light: {
     filter: 'invert(100%)'
+  },
+
+  icon__symbol: {
+    marginLeft: '4px',
+    justifyContent: 'flex-end'
+  },
+
+  icon_newSession__name: {
+    marginLeft: '4px',
+    fontSize: '11px',
+    fontWeight: 'bold',
+    color: theme.tab.icon.symbol.color
   }
 })
 
