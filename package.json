@@ -12,7 +12,7 @@
     "build-installer": "node ./tools/buildInstaller.js",
     "build-package": "node ./tools/buildPackage.js",
     "build-test": "cross-env NODE_ENV=test webpack",
-    "check-security": "nsp check",
+    "check-security": "npm audit",
     "checks": "npm run check-security",
     "clean": "node ./tools/clean.js",
     "clean-adblock-data": "node ./tools/clean.js userData ABPFilterParserData.dat",
@@ -167,7 +167,6 @@
     "flow-bin": "^0.53.1",
     "font-awesome-webpack": "~0.0.4",
     "git-rev-sync": "^1.8.0",
-    "gulp": "^3.9.0",
     "istanbul": "^1.1.0-alpha.1",
     "joi": "^10.2.2",
     "jsdom": "~11.2.0",
@@ -186,7 +185,6 @@
     "node-gyp": "^3.3.1",
     "node-libs-browser": "~2.0.0",
     "node-static": "^0.7.7",
-    "nsp": "^3.2.1",
     "pre-commit": "brave/pre-commit",
     "pre-push": "^0.1.1",
     "react-addons-perf": "^15.2.1",
@@ -250,6 +248,7 @@
     ]
   },
   "engines": {
-    "node": ">= 7.9.0"
+    "node": ">= 7.9.0",
+    "npm": ">= 6.0.0"
   }
 }
