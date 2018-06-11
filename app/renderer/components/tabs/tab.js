@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
     '--tab-mouse-opacity': '0 !important',
     // on top of toolbar shadow but underneath preview
     zIndex: 300,
-    '--tab-box-shadow': '0 2px 4px -0.5px rgba(0, 0, 0, 0.3)'
+    '--tab-box-shadow': '0 2px 4px -0.5px rgba(0, 0, 0, 0.18)'
   },
 
   tabArea_isPreview: {
@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
     // then we want to immediately have that tab on top of the last-previewed tab
     // but have the last previewed tab wait to be underneath the next tab in the DOM
     '--tab-zindex-delay': '0s',
-    '--tab-zindex-duration': '2s',
+    '--tab-zindex-duration': '.85s',
     willChange: 'transform'
   },
 

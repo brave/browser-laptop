@@ -61,17 +61,17 @@ html,
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to top, rgb(28, 27, 27) 0%, rgba(255, 255, 255, .3) 60%);
+    background: linear-gradient(to top, rgb(125, 125, 125) 0%, rgba(255, 255, 255, .3) 60%);
     display: block;
     opacity: 0;
-    transition: opacity .4s ease-in; // TODO: get from theme.tab
+    transition: opacity .2s ease-in; // TODO: get from theme.tab
     pointer-events: none;
     will-change: opacity;
     z-index: 110;
   }
   &.hasFramePreview::after {
     transition-timing-function: ease-out; // TODO: get from theme.tab
-    transition-duration: .2s; // TODO: get from theme.tab
+    transition-duration: .1s; // TODO: get from theme.tab
     opacity: 1;
   }
 

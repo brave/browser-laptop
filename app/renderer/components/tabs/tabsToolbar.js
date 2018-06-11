@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     // shadow done as pseudo element so that z-index can be controlled
     ':after': {
-      boxShadow: 'inset 0 -0.5px var(--tabs-toolbar-shadow-spread, 3px) -0.5px rgba(0, 0, 0, 0.22)',
+      boxShadow: 'inset 0 -0.5px var(--tabs-toolbar-shadow-spread, 3px) -0.5px rgba(0, 0, 0, 0.18)',
       '--tabs-toolbar-transit-duration': theme.tab.transitionDurationOut,
       '--tabs-toolbar-transit-easing': theme.tab.transitionEasingOut,
       transition: `box-shadow var(--tabs-toolbar-transit-duration) var(--tabs-toolbar-transit-easing)`,
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
 
   tabsToolbar_hasPreview: {
     ':after': {
-      boxShadow: 'inset 0 -3px var(--tabs-toolbar-shadow-spread, 6px) -0.5px rgba(0, 0, 0, 0.22)',
+      boxShadow: 'inset 0 -3px var(--tabs-toolbar-shadow-spread, 6px) -0.5px rgba(0, 0, 0, 0.18)',
       '--tabs-toolbar-transit-duration': theme.tab.transitionDurationIn,
       '--tabs-toolbar-transit-easing': theme.tab.transitionEasingIn
     }
