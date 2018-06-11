@@ -9,10 +9,11 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
-const BrowserButton = require('../common/browserButton')
 const LongPressButton = require('../common/longPressButton')
 const Tab = require('./tab')
 const NewTabIcon = require('../../../../icons/plus')
+const NextTabPageIcon = require('../../../../icons/arrow/right')
+const PreviousTabPageIcon = require('../../../../icons/arrow/left')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -182,12 +183,12 @@ class Tabs extends React.Component {
         onDrop={this.onDrop}>
         {
           this.props.onPreviousPage
-            ? <BrowserButton
-              iconClass={globalStyles.appIcons.prev}
-              size='21px'
-              custom={[styles.tabs__tabStrip__navigation, styles.tabs__tabStrip__navigation_prev]}
+            ? <button
+              className={css(styles.tabs__tabStrip__navigation, styles.tabs__tabStrip__navigation_prev)}
               onClick={this.onPrevPage}
-            />
+            >
+              <PreviousTabPageIcon />
+            </button>
             : null
         }
         {
@@ -203,12 +204,12 @@ class Tabs extends React.Component {
         }
         {
           this.props.onNextPage
-            ? <BrowserButton
-              iconClass={`${globalStyles.appIcons.next} ${css(styles.tabs__tabStrip__navigation__icon)}`}
-              size='21px'
-              custom={[styles.tabs__tabStrip__navigation, styles.tabs__tabStrip__navigation_next]}
+            ? <button
+              className={css(styles.tabs__tabStrip__navigation)}
               onClick={this.onNextPage}
-            />
+            >
+              <NextTabPageIcon />
+            </button>
             : null
         }
         <LongPressButton
@@ -259,28 +260,30 @@ const styles = StyleSheet.create({
   },
 
   tabs__tabStrip__navigation: {
-    fontSize: '21px',
-    height: 'auto',
+    '--icon-line-color': globalStyles.color.buttonColor,
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
-  },
-
-  tabs__tabStrip__navigation__icon: {
-    lineHeight: 0
+    alignItems: 'center',
+    background: 'transparent',
+    outline: 'none',
+    border: 'none',
+    margin: '0',
+    width: '21px',
+    ':hover': {
+      '--icon-line-color': globalStyles.button.default.hoverColor
+    },
+    ':focus': {
+      '--icon-line-color': globalStyles.button.default.hoverColor
+    },
+    ':active': {
+      '--icon-line-color': globalStyles.color.buttonColor
+    }
   },
 
   tabs__tabStrip__navigation_prev: {
-    paddingRight: '2px',
-
-    // Override border:none specified with browserButton
     borderWidth: '0 1px 0 0',
     borderStyle: 'solid',
     borderColor: theme.tabsToolbar.tabs.navigation.borderColor
-  },
-
-  tabs__tabStrip__navigation_next: {
-    paddingLeft: '2px'
   },
 
   tabs__tabStrip__newTabButton: {
