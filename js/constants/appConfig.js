@@ -154,7 +154,7 @@ module.exports = {
     'search.use-alternate-private-search-engine': false,
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
-    'tabs.tabs-per-page': 20,
+    'tabs.tabs-per-page': 16,
     'tabs.close-action': 'parent',
     'tabs.show-tab-previews': true,
     'tabs.preview-timing': tabPreviewTiming.SHORT,
