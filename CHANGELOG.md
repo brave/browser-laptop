@@ -6,7 +6,7 @@
  - Fixed CAPTCHA not compatible with Windows scaling options (high-res screen support). ([#14361](https://github.com/brave/browser-laptop/issues/14361))
  - Fixed HTTP links being added as HTTPS in the Payments table. ([#14283](https://github.com/brave/browser-laptop/issues/14283))
  - Fixed certain situations where Brave becomes unresponsive when blocking large amounts of popups. ([#14261](https://github.com/brave/browser-laptop/issues/14261))
- - Upgraded to muon 7.0.4. ([#14308](https://github.com/brave/browser-laptop/issues/14308))
+ - Upgraded to muon 7.0.6. ([#14308](https://github.com/brave/browser-laptop/issues/14308))
  - Upgraded to Chromium 67.0.3396.71. ([#14307](https://github.com/brave/browser-laptop/issues/14307))
 
 ## [0.22.727](https://github.com/brave/browser-laptop/releases/tag/v0.22.727dev)
