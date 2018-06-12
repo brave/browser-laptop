@@ -3373,6 +3373,8 @@ const getMethods = () => {
     getCaptcha,
     onCaptchaResponse,
     deleteWallet,
+    delayFirstSync,
+    deleteStateFile,
     resetPublishers,
     clearPaymentHistory,
     synopsisNormalizer,
