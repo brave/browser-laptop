@@ -359,11 +359,10 @@ function registerForBeforeSendHeaders (session, partition) {
 function showTorrentBlockedInTorWarning (details) {
   if (details.tabId) {
     tabMessageBox.show(details.tabId, {
-        message: `${locale.translation('torrentBlockedInTor')}`,
-        title: 'Brave',
-        buttons: [locale.translation('torrentWarningOk')]
+      message: `${locale.translation('torrentBlockedInTor')}`,
+      title: 'Brave',
+      buttons: [locale.translation('torrentWarningOk')]
     })
-    return
   }
 }
 
