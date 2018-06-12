@@ -9,6 +9,7 @@ const Immutable = require('immutable')
 const mockery = require('mockery')
 const fakeElectron = require('../../../../lib/fakeElectron')
 const {intersection} = require('../../../../../../app/renderer/components/styles/global')
+const appUrlUtil = require('../../../../../../js/lib/appUrlUtil')
 
 const frameKey = 1
 const index = 0
@@ -101,35 +102,59 @@ describe('faviconState unit tests', function () {
       assert.equal(faviconState.showLoadingIcon(), false)
     })
 
-    it('returns false if source is about page', function * () {
+    it('returns false if destination is about page and page is not loading', function * () {
       const state = defaultState
-        .setIn(['frames', index, 'location'], 'about:blank')
+        .mergeIn(['frames', index], {
+          loading: false,
+          location: 'http://www.example.com',
+          provisionalLocation: appUrlUtil.aboutUrls.get('about:newtab')
+        })
       const result = faviconState.showLoadingIcon(state, frameKey)
       assert.equal(result, false)
     })
 
-    it('returns true if source is not about page', function * () {
-      const state = defaultState.setIn(['frames', index, 'loading'], true)
+    it('returns false if loading an about page', function * () {
+      const state = defaultState
+        .mergeIn(['frames', index], {
+          loading: true,
+          location: 'http://www.example.com',
+          provisionalLocation: appUrlUtil.aboutUrls.get('about:newtab')
+        })
+      const result = faviconState.showLoadingIcon(state, frameKey)
+      assert.equal(result, false)
+    })
+
+    it('returns true if destination is not about page', function * () {
+      const state = defaultState
+      .mergeIn(['frames', index], {
+        loading: true,
+        location: 'http://www.example.com',
+        provisionalLocation: 'https://www.brave.com/'
+      })
       const result = faviconState.showLoadingIcon(state, frameKey)
       assert.equal(result, true)
     })
 
     it('returns false if page is not loading', function * () {
-      const state = defaultState.setIn(['frames', index, 'loading'], false)
+      const state = defaultState
+      .mergeIn(['frames', index], {
+        loading: false,
+        location: 'http://www.example.com',
+        provisionalLocation: 'https://www.brave.com/'
+      })
       const result = faviconState.showLoadingIcon(state, frameKey)
       assert.equal(result, false)
     })
 
     it('returns false if loading is undefined', function * () {
-      const state = defaultState.setIn(['frames', index, 'loading'], undefined)
+      const state = defaultState
+      .mergeIn(['frames', index], {
+        loading: undefined,
+        location: 'http://www.example.com',
+        provisionalLocation: 'https://www.brave.com/'
+      })
       const result = faviconState.showLoadingIcon(state, frameKey)
       assert.equal(result, false)
-    })
-
-    it('returns true if page is loading', function * () {
-      const state = defaultState.setIn(['frames', index, 'loading'], true)
-      const result = faviconState.showLoadingIcon(state, frameKey)
-      assert.equal(result, true)
     })
   })
 
