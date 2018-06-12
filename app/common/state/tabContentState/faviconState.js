@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // Utils
-const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
+const {isTargetAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {isEntryIntersected} = require('../../../../app/renderer/lib/observerUtil')
 
@@ -35,7 +35,8 @@ module.exports.showFavicon = (state, frameKey) => {
   }
 
   // new tab page is the only tab we do not show favicon
-  return !isNewTabPage
+  // unless we are loading the next page
+  return !isNewTabPage || module.exports.showLoadingIcon(state, frameKey)
 }
 
 module.exports.getFavicon = (state, frameKey) => {
@@ -55,15 +56,14 @@ module.exports.showLoadingIcon = (state, frameKey) => {
   if (frame == null) {
     return false
   }
-
-  if (frame.get('loading') == null) {
+  const isLoading = frame.get('loading')
+  // handle false or falsy value
+  if (!isLoading) {
     return false
   }
 
-  return (
-    !isSourceAboutUrl(frame.get('location')) &&
-    frame.get('loading')
-  )
+  const isLoadingAboutUrl = isTargetAboutUrl(frame.get('provisionalLocation'))
+  return !isLoadingAboutUrl
 }
 
 module.exports.showIconWithLessMargin = (state, frameKey) => {

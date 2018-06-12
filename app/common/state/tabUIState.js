@@ -8,6 +8,7 @@ const settings = require('../../../js/constants/settings')
 // State helpers
 const closeState = require('../../common/state/tabContentState/closeState')
 const frameStateUtil = require('../../../js/state/frameStateUtil')
+const faviconState = require('../../common/state/tabContentState/faviconState')
 
 // Utils
 const {isEntryIntersected} = require('../../../app/renderer/lib/observerUtil')
@@ -84,7 +85,10 @@ module.exports.addExtraGutterToTitle = (state, frameKey) => {
     return false
   }
 
-  return frameStateUtil.frameLocationMatch(frame, 'about:newtab')
+  return (
+    frameStateUtil.frameLocationMatch(frame, 'about:newtab') &&
+    !faviconState.showLoadingIcon(state, frameKey)
+  )
 }
 
 module.exports.centralizeTabIcons = (state, frameKey, isPinned) => {
