@@ -145,5 +145,7 @@ function getHeader (headers, headerName) {
 
 module.exports = {
   init,
+  isTorrentFile,
+  isMagnetURL,
   resourceName: 'webtorrent'
 }
