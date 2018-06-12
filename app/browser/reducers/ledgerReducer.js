@@ -441,7 +441,7 @@ const ledgerReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_CAPTCHA_RESPONSE:
       {
-        state = ledgerApi.onCaptchaResponse(state, action.get('body'))
+        state = ledgerApi.onCaptchaResponse(state, action.get('response'), action.get('body'))
         break
       }
     case appConstants.APP_ON_CAPTCHA_CLOSE:

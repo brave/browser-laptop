@@ -416,7 +416,11 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
 
   if (isShutdown) {
     const status = ledgerState.getPromotionProp(immutableData, 'promotionStatus')
-    if (status === promotionStatuses.CAPTCHA_CHECK || status === promotionStatuses.CAPTCHA_ERROR) {
+    if (
+      status === promotionStatuses.CAPTCHA_CHECK ||
+      status === promotionStatuses.CAPTCHA_BLOCK ||
+      status === promotionStatuses.CAPTCHA_ERROR
+    ) {
       immutableData = ledgerState.setPromotionProp(immutableData, 'promotionStatus', null)
     }
   }

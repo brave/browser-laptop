@@ -197,7 +197,11 @@ const paymentPresent = (state, tabId, present) => {
 
   if (!present) {
     const status = ledgerState.getPromotionProp(state, 'promotionStatus')
-    if (status === promotionStatuses.CAPTCHA_CHECK || status === promotionStatuses.CAPTCHA_ERROR) {
+    if (
+      status === promotionStatuses.CAPTCHA_CHECK ||
+      status === promotionStatuses.CAPTCHA_ERROR ||
+      status === promotionStatuses.CAPTCHA_BLOCK
+    ) {
       state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
     }
   }
@@ -715,6 +719,7 @@ const addSiteVisit = (state, timestamp, location, tabId, manualAdd = false) => {
     return state
   }
 
+  const protocol = urlParse(location).protocol
   location = pageDataUtil.getInfoKey(location)
 
   const minimumVisitTime = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
@@ -754,6 +759,7 @@ const addSiteVisit = (state, timestamp, location, tabId, manualAdd = false) => {
 
   return module.exports.saveVisit(state, publisherKey, {
     duration,
+    protocol: protocol,
     revisited: revisitP
   })
 }
@@ -772,7 +778,11 @@ const saveVisit = (state, publisherKey, options) => {
     revisitP: options.revisited,
     ignoreMinTime: options.ignoreMinTime || false
   })
+
   state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
+  if (options.protocol) {
+    state = ledgerState.setPublishersProp(state, publisherKey, 'protocol', options.protocol)
+  }
   state = updatePublisherInfo(state)
   state = module.exports.checkVerifiedStatus(state, publisherKey)
 
@@ -1173,7 +1183,6 @@ const recoverKeys = (state, useRecoveryKeyFile, key) => {
     state = aboutPreferencesState.setRecoveryStatus(state, false)
     return state
   }
-
   state = aboutPreferencesState.setRecoveryBalanceRecalculated(state, false)
   client.recoverWallet(null, recoveryKey, module.exports.recoverWalletCallback)
 
@@ -1668,7 +1677,7 @@ const observeTransactions = (state, transactions) => {
       const newestTransaction = transactions.first()
       if (newestTransaction && newestTransaction.get('contribution')) {
         state = ledgerState.setAboutProp(state, 'status', '')
-        ledgerNotifications.showPaymentDone(newestTransaction.getIn(['contribution', 'fiat'], Immutable.Map()))
+        ledgerNotifications.showPaymentDone(newestTransaction.get('contribution', Immutable.Map()))
       }
     }
   }
@@ -1812,7 +1821,6 @@ const generatePaymentData = (state) => {
     }
     module.exports.qrWriteImage(index, url)
   })
-
   return state
 }
 
@@ -1836,9 +1844,8 @@ const onLedgerQRGeneratedCallback = (index, chunks) => {
 
 const getPaymentInfo = (state) => {
   let amount, currency
-  const inProgress = ledgerState.getAboutProp(state, 'status') === ledgerStatuses.IN_PROGRESS
 
-  if (!client || inProgress) {
+  if (!client) {
     return state
   }
 
@@ -2692,10 +2699,14 @@ const run = (state, delayTime) => {
     return
   }
 
+  module.exports.reconcile(callback)
+  return state
+}
+
+const reconcile = (callback) => {
   if (client.isReadyToReconcile(synopsis, module.exports.onFuzzing)) {
     client.reconcile(uuid.v4().toLowerCase(), callback)
   }
-  return state
 }
 
 const networkConnected = () => {
@@ -3058,20 +3069,24 @@ const getCaptcha = (state) => {
     return
   }
 
-  client.getPromotionCaptcha(promotion.get('promotionId'), (err, body) => {
+  client.getPromotionCaptcha(promotion.get('promotionId'), (err, body, response) => {
     if (err) {
       console.error(`Problem getting promotion captcha ${err.toString()}`)
-      appActions.onCaptchaResponse(null)
+      appActions.onCaptchaResponse(response, null)
+      return
     }
 
-    appActions.onCaptchaResponse(body)
+    appActions.onCaptchaResponse(null, body)
   })
 }
 
-const onCaptchaResponse = (state, body) => {
+const onCaptchaResponse = (state, response, body) => {
   if (body == null) {
-    state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_ERROR)
-    return state
+    if (response && response.get('statusCode') === 429) {
+      return ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_BLOCK)
+    }
+
+    return ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_ERROR)
   }
 
   const image = `data:image/jpeg;base64,${Buffer.from(body).toString('base64')}`
@@ -3116,6 +3131,9 @@ const onPromotionResponse = (state, status) => {
       // captcha verification failed
       state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_ERROR)
       module.exports.getCaptcha(state)
+    } else if (status.get('statusCode') === 429) {
+      // too many attempts
+      state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_BLOCK)
     } else {
       // general error
       state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.GENERAL_ERROR)
@@ -3127,7 +3145,8 @@ const onPromotionResponse = (state, status) => {
 
   if (
     currentStatus === promotionStatuses.CAPTCHA_ERROR ||
-    currentStatus === promotionStatuses.CAPTCHA_CHECK
+    currentStatus === promotionStatuses.CAPTCHA_CHECK ||
+    currentStatus === promotionStatuses.CAPTCHA_BLOCK
   ) {
     state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
   }
@@ -3384,7 +3403,8 @@ const getMethods = () => {
     },
     deleteStateFile,
     delayFirstSync,
-    onPublisherOptionUpdateAction
+    onPublisherOptionUpdateAction,
+    reconcile
   }
 
   let privateMethods = {}

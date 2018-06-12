@@ -6,6 +6,7 @@ const statuses = {
   GENERAL_ERROR: 'generalError',
   PROMO_EXPIRED: 'expiredError',
   CAPTCHA_CHECK: 'captchaCheck',
+  CAPTCHA_BLOCK: 'captchaBlock',
   CAPTCHA_ERROR: 'captchaError'
 }
 

@@ -1163,6 +1163,52 @@ describe('ledger api unit tests', function () {
         assert(visitsByPublisher['clifton.io'])
       })
     })
+    describe('saveVisit', function () {
+      let setPublishersPropSpy
+
+      before(function () {
+        setPublishersPropSpy = sinon.spy(ledgerState, 'setPublishersProp')
+      })
+
+      beforeEach(function () {
+        ledgerApi.setSynopsis({
+          addPublisher: () => {},
+          options: {},
+          publishers: {}
+        })
+      })
+
+      afterEach(function () {
+        setPublishersPropSpy.reset()
+        ledgerApi.setSynopsis(undefined)
+      })
+
+      after(function () {
+        setPublishersPropSpy.restore()
+      })
+
+      it('sets https as protocol for secure site', function () {
+        const options = {
+          duration: 5500,
+          protocol: 'https:',
+          revisited: false
+        }
+        const result = ledgerApi.saveVisit(defaultAppState, 'brave.com', options)
+        assert.equal('https:', setPublishersPropSpy.getCall(0).args[3])
+        assert.equal('https:', result.getIn(['ledger', 'synopsis', 'publishers', 'brave.com', 'protocol']))
+      })
+
+      it('sets http as protocol for non-secure site', function () {
+        const options = {
+          duration: 5500,
+          protocol: 'http:',
+          revisited: false
+        }
+        const result = ledgerApi.saveVisit(defaultAppState, 'espn.com', options)
+        assert.equal('http:', setPublishersPropSpy.getCall(0).args[3])
+        assert.equal('http:', result.getIn(['ledger', 'synopsis', 'publishers', 'espn.com', 'protocol']))
+      })
+    })
     describe('addNewLocation', function () {
       const tabIdNone = -1
       const keepInfo = false
@@ -1259,7 +1305,8 @@ describe('ledger api unit tests', function () {
             fiat: {
               amount: 10,
               currency: 'BAT'
-            }
+            },
+            probi: '100000000000000000000'
           }
         },
         {
@@ -1267,13 +1314,17 @@ describe('ledger api unit tests', function () {
             fiat: {
               amount: 30,
               currency: 'BAT'
-            }
+            },
+            probi: '300000000000000000000'
           }
         }
       ]))
       assert(showPaymentDoneSpy.withArgs(Immutable.fromJS({
-        amount: 10,
-        currency: 'BAT'
+        fiat: {
+          amount: 10,
+          currency: 'BAT'
+        },
+        probi: '100000000000000000000'
       })).calledOnce)
     })
   })
@@ -2005,6 +2056,16 @@ describe('ledger api unit tests', function () {
         }))
         const expectedSate = defaultAppState
           .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.GENERAL_ERROR)
+        assert.deepEqual(result.toJS(), expectedSate.toJS())
+        assert(getCaptchaSpy.notCalled)
+      })
+
+      it('block error', function () {
+        const result = ledgerApi.onPromotionResponse(defaultAppState, Immutable.fromJS({
+          statusCode: 429
+        }))
+        const expectedSate = defaultAppState
+          .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_BLOCK)
         assert.deepEqual(result.toJS(), expectedSate.toJS())
         assert(getCaptchaSpy.notCalled)
       })
@@ -3880,11 +3941,25 @@ describe('ledger api unit tests', function () {
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
 
+    it('responose too many', function () {
+      const expectedState = defaultAppState
+        .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_BLOCK)
+      const result = ledgerApi.onCaptchaResponse(defaultAppState, Immutable.fromJS({statusCode: 429}))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('responose not found', function () {
+      const expectedState = defaultAppState
+        .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_ERROR)
+      const result = ledgerApi.onCaptchaResponse(defaultAppState, Immutable.fromJS({statusCode: 404}))
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
     it('new captcha', function () {
       const expectedState = defaultAppState
         .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_CHECK)
         .setIn(['ledger', 'promotion', 'captcha'], 'data:image/jpeg;base64,/9j/2wA=')
-      const result = ledgerApi.onCaptchaResponse(defaultAppState, body)
+      const result = ledgerApi.onCaptchaResponse(defaultAppState, null, body)
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
 
@@ -3894,7 +3969,7 @@ describe('ledger api unit tests', function () {
       const expectedState = defaultAppState
         .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_ERROR)
         .setIn(['ledger', 'promotion', 'captcha'], 'data:image/jpeg;base64,/9j/2wA=')
-      const result = ledgerApi.onCaptchaResponse(state, body)
+      const result = ledgerApi.onCaptchaResponse(state, null, body)
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
   })
