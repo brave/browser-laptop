@@ -2493,14 +2493,7 @@ const onInitRead = (state, parsedData) => {
     return state
   }
 
-  // speed-up browser start-up by delaying the first synchronization action
-  setTimeout(() => {
-    if (!client) {
-      return
-    }
-
-    appActions.onLedgerFirstSync(parsedData)
-  }, 3 * ledgerUtil.milliseconds.second)
+  module.exports.delayFirstSync(parsedData)
 
   // Make sure bravery props are up-to-date with user settings
   const address = ledgerState.getInfoProp(state, 'address')
@@ -2513,6 +2506,17 @@ const onInitRead = (state, parsedData) => {
   module.exports.getBalance(state)
 
   return state
+}
+
+const delayFirstSync = (parsedData) => {
+  // speed-up browser start-up by delaying the first synchronization action
+  setTimeout(() => {
+    if (!client) {
+      return
+    }
+
+    appActions.onLedgerFirstSync(parsedData)
+  }, 3 * ledgerUtil.milliseconds.second)
 }
 
 const onFuzzing = (pushBack, pruned = false) => {
@@ -3266,6 +3270,12 @@ const deleteWallet = (state) => {
   client = null
   synopsis = null
 
+  module.exports.deleteStateFile()
+
+  return state
+}
+
+const deleteStateFile = () => {
   const fs = require('fs')
   fs.access(pathName(statePath), fs.constants.F_OK, (err) => {
     if (err) {
@@ -3278,8 +3288,6 @@ const deleteWallet = (state) => {
       }
     })
   })
-
-  return state
 }
 
 const clearPaymentHistory = (state) => {
@@ -3364,6 +3372,8 @@ const getMethods = () => {
     onCaptchaResponse,
     shouldTrackTab,
     deleteWallet,
+    delayFirstSync,
+    deleteStateFile,
     resetPublishers,
     clearPaymentHistory,
     getPaymentInfo,
