@@ -1277,10 +1277,7 @@ const initSynopsis = (state) => {
   }
 
   if (process.env.NODE_ENV === 'test') {
-    synopsis.options.minPublisherDuration = 0
-    synopsis.options.minPublisherVisits = 0
-    state = ledgerState.setSynopsisOption(state, 'minPublisherDuration', 0)
-    state = ledgerState.setSynopsisOption(state, 'minPublisherVisits', 0)
+    state = module.exports.setTestMinimums(state)
   } else {
     if (process.env.LEDGER_PUBLISHER_MIN_DURATION) {
       value = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_DURATION)
@@ -1310,6 +1307,14 @@ const initSynopsis = (state) => {
 
   state = updatePublisherInfo(state)
 
+  return state
+}
+
+const setTestMinimums = (state) => {
+  synopsis.options.minPublisherDuration = 0
+  synopsis.options.minPublisherVisits = 0
+  state = ledgerState.setSynopsisOption(state, 'minPublisherDuration', 0)
+  state = ledgerState.setSynopsisOption(state, 'minPublisherVisits', 0)
   return state
 }
 
@@ -3404,7 +3409,8 @@ const getMethods = () => {
     deleteStateFile,
     delayFirstSync,
     onPublisherOptionUpdateAction,
-    reconcile
+    reconcile,
+    setTestMinimums
   }
 
   let privateMethods = {}
