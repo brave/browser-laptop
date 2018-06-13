@@ -50,6 +50,17 @@ class UrlBarSuggestionItem extends ImmutableComponent {
   }
 
   render () {
+    const urlLocation = this.props.suggestion.get('location')
+    let firstPortion, boldPortion, endPortion
+
+    if (this.props.suggestion.get('type') !== suggestionTypes.CURRENT_SEARCH) {
+      const sizeOfCurrentValue = this.props.currentSearchValue.length
+      const boldPortionStart = urlLocation.indexOf(this.props.currentSearchValue)
+      firstPortion = urlLocation.slice(0, boldPortionStart)
+      boldPortion = urlLocation.slice(boldPortionStart, boldPortionStart + sizeOfCurrentValue)
+      endPortion = urlLocation.slice(boldPortionStart + sizeOfCurrentValue)
+    }
+
     return <li className={cx({
       selected: this.props.selected,
       suggestionItem: true,
@@ -64,13 +75,28 @@ class UrlBarSuggestionItem extends ImmutableComponent {
       ref={(node) => { this.node = node }}
     >
       {
-        this.props.suggestion.get('type') !== suggestionTypes.TOP_SITE && this.props.suggestion.get('title')
-        ? <div data-test-id='suggestionTitle' className='suggestionTitle'>{this.props.suggestion.get('title')}</div>
+        this.props.icon && this.props.sectionKey && this.props.suggestion.get('type') !== suggestionTypes.TAB
+        ? <span className={cx({
+          suggestionSectionIcon: true,
+          [this.props.sectionKey]: true,
+          fa: true,
+          [this.props.icon]: true
+        })} />
         : null
       }
       {
-        this.props.suggestion.get('type') !== suggestionTypes.SEARCH && this.props.suggestion.get('type') !== suggestionTypes.ABOUT_PAGES
-        ? <div data-test-id='suggestionLocation' className='suggestionLocation'>{this.props.suggestion.get('location')}</div>
+        this.props.suggestion.get('type') === suggestionTypes.ABOUT_PAGES && this.props.suggestion.get('title')
+        ? <span data-test-id='suggestionTitle' className='suggestionTitle'>{this.props.suggestion.get('title')}</span>
+        : null
+      }
+      {
+        this.props.suggestion.get('type') === suggestionTypes.CURRENT_SEARCH
+        ? <span data-test-id='suggestionLocation' className='suggestionLocation'>{urlLocation} - {this.props.suggestion.get('title')}</span>
+        : null
+      }
+      {
+        this.props.suggestion.get('type') !== suggestionTypes.SEARCH && this.props.suggestion.get('type') !== suggestionTypes.ABOUT_PAGES && this.props.suggestion.get('type') !== suggestionTypes.CURRENT_SEARCH
+        ? <span data-test-id='suggestionLocation' className='suggestionLocation'>{firstPortion}<strong>{boldPortion}</strong>{endPortion} - {this.props.suggestion.get('title')}</span>
         : null
       }
     </li>

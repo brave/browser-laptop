@@ -10,6 +10,9 @@ const sinon = require('sinon')
 const Immutable = require('immutable')
 const fakeElectron = require('../../../../lib/fakeElectron')
 const suggestionTypes = require('../../../../../../js/constants/suggestionTypes')
+
+const currentSearch = 'br'
+
 require('../../../../braveUnit')
 
 describe('UrlBarSuggestionItem component', function () {
@@ -49,6 +52,7 @@ describe('UrlBarSuggestionItem component', function () {
         this.result = mount(<UrlBarSuggestionItem
           suggestion={this.suggestion}
           selected
+          currentSearchValue={currentSearch}
           currentIndex={1}
           i={0}
         />)
@@ -59,7 +63,7 @@ describe('UrlBarSuggestionItem component', function () {
       })
 
       it('renders the suggestion title', function () {
-        if (suggestionType !== suggestionTypes.TOP_SITE) {
+        if (suggestionType === suggestionTypes.ABOUT_PAGES) {
           assert.equal(this.result.find('[data-test-id="suggestionTitle"]').length, 1)
           assert.equal(this.result.find('[data-test-id="suggestionTitle"]').text(), this.suggestion.get('title'))
         } else {
@@ -70,7 +74,7 @@ describe('UrlBarSuggestionItem component', function () {
       it('renders a suggestion URL', function () {
         if (suggestionType !== suggestionTypes.SEARCH && suggestionType !== suggestionTypes.ABOUT_PAGES) {
           assert.equal(this.result.find('[data-test-id="suggestionLocation"]').length, 1)
-          assert.equal(this.result.find('[data-test-id="suggestionLocation"]').text(), this.suggestion.get('location'))
+          assert.equal(this.result.find('[data-test-id="suggestionLocation"]').text(), `${this.suggestion.get('location')} - ${this.suggestion.get('title')}`)
         } else {
           assert.equal(this.result.find('[data-test-id="suggestionLocation"]').length, 0)
         }

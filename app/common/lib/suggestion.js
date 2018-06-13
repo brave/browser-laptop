@@ -498,6 +498,23 @@ const getMapListToElements = (urlLocationLower) => ({data, maxResults, type,
     }))
 }
 
+const getCurrentSearch = (state, urlLocationLower) => {
+  return new Promise((resolve, reject) => {
+    const mapListToElements = getMapListToElements(urlLocationLower)
+    const suggestionsList = mapListToElements({
+      data: [{
+        location: urlLocationLower,
+        title: 'Search',
+        type: 'currentSearch'
+      }],
+      maxResults: 1,
+      type: suggestionTypes.CURRENT_SEARCH,
+      filterValue: null
+    })
+    resolve(suggestionsList)
+  })
+}
+
 const getHistorySuggestions = (state, urlLocationLower) => {
   return new Promise((resolve, reject) => {
     const mapListToElements = getMapListToElements(urlLocationLower)
@@ -602,11 +619,12 @@ const generateNewSuggestionsList = debounce((state, windowId, tabId, urlLocation
   }
   const urlLocationLower = urlLocation.toLowerCase()
   Promise.all([
+    getCurrentSearch(state, urlLocation),
     getHistorySuggestions(state, urlLocationLower),
     getAboutSuggestions(state, urlLocationLower),
-    getOpenedTabSuggestions(state, windowId, urlLocationLower),
     getSearchSuggestions(state, tabId, urlLocationLower),
-    getAlexaSuggestions(state, urlLocationLower)
+    getAlexaSuggestions(state, urlLocationLower),
+    getOpenedTabSuggestions(state, windowId, urlLocationLower)
   ]).then(([...suggestionsLists]) => {
     const appActions = require('../../../js/actions/appActions')
     // Flatten only 1 level deep for perf only, nested will be objects within arrrays
@@ -647,6 +665,7 @@ const generateNewSearchXHRResults = debounce((state, windowId, tabId, input) => 
 }, 10)
 
 const filterSuggestionListByType = (suggestionList) => {
+  const currentSearch = []
   const bookmarkSuggestions = []
   const historySuggestions = []
   const aboutPagesSuggestions = []
@@ -680,11 +699,16 @@ const filterSuggestionListByType = (suggestionList) => {
         case suggestionTypes.TOP_SITE:
           topSiteSuggestions.push(item)
           break
+
+        case suggestionTypes.CURRENT_SEARCH:
+          currentSearch.push(item)
+          break
       }
     })
   }
 
   return {
+    currentSearch,
     bookmarkSuggestions,
     historySuggestions,
     aboutPagesSuggestions,
@@ -719,6 +743,7 @@ module.exports = {
   shouldNormalizeLocation,
   createVirtualHistoryItems,
   getMapListToElements,
+  getCurrentSearch,
   getHistorySuggestions,
   getAboutSuggestions,
   getOpenedTabSuggestions,
