@@ -61,6 +61,7 @@ class UrlBar extends React.Component {
     this.onKeyPress = this.onKeyPress.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
+    this.updateAutocomplete = this.updateAutocomplete.bind(this)
   }
 
   maybeUrlBarTextChanged (value) {
@@ -229,6 +230,11 @@ class UrlBar extends React.Component {
       if (this.urlInput) {
         this.urlInput.setSelectionRange(newValue.length, newValue.length + newSuffix.length + 1)
       }
+      return true
+      // this is if the new value normalized IS CONTAINED within the suggestion, then just set the url input
+      // instead of just updating the suffix
+    } else if (this.props.normalizedSuggestion.includes(newValueNormalized) && this.props.normalizedSuggestion.length > 0) {
+      this.urlInput.value = this.props.normalizedSuggestion
       return true
     } else {
       this.setValue(newValue, '')
