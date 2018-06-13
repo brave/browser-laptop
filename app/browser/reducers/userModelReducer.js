@@ -2,28 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// SCL COMMENTS
-// Like with UMS, it was written in an aspirational way, not because I had any idea if
-// it was correct.
-// initialize should initialize the UMS. At present it is missing initialization for searching/shopping/userActivity
-// APP_IDLE_STATE_CHANGED
-// I was hoping idle would happen after like 2 minutes of browser idleness
-// It does occasionally fire, but the period of time is indeterminate and doesn't look reliable
-// APP_SHUTTING_DOWN
-// should do stuff when browser is shut down
-// APP_ADD_AUTOFILL_XXXX
-// the idea of this is to find when the user has purchased something, so we don't serve him an
-// ad any more. Or, perhaps this is a super great time to serve an ad. Anyway I want to record this, and possibly fire off an ad when this happens
-// APP_CHANGE_SETTING
-
-// TODO INCOMPLETES:
-// It is important to have something  like "APP_IDLE_STATE_CHANGED" which records when someone has recently restarted doing stuff
-// I think there should also be something which counts user interactions with the browser, as in, actively is scrolling, reading searching. For now, tab switches and loading is enough.
-// A good time to serve an ad is when the user is about to go back to browsing.
-// Possibly it can all be done through TEXT_SCRAPER_DATA_AVAILABLE and something that does what I wish IDLE_STATE_CHANGE did.
-// END SCL COMMENTS
-
 'use strict'
+
+// Actions
+const appActions = require('../../../js/actions/appActions')
 
 // Constants
 const appConstants = require('../../../js/constants/appConstants')
@@ -31,7 +13,6 @@ const settings = require('../../../js/constants/settings')
 
 // State
 const tabState = require('../../common/state/tabState')
-const windows = require('../windows')
 const userModelState = require('../../common/state/userModelState')
 const windowState = require('../../common/state/windowState')
 
@@ -47,19 +28,16 @@ const userModelReducer = (state, action, immutableAction) => {
       {
         state = userModel.initialize(state)
 
-        state = userModel.generateAdReportingEvent(state, 'restart')
+        state = userModel.generateAdReportingEvent(state, 'restart', action)
         break
       }
     case appConstants.APP_WINDOW_UPDATED:
       {
         let winData = windowState.getActiveWindow(state)
+        let focusP = winData && winData.get('focused')
 
-        userModel.appFocused(state, !!winData)
-
-        if (winData && winData.get('focused')) {
-          state = userModel.generateAdReportingEvent(state, 'foreground')
-        }
-
+        userModel.appFocused(state, focusP)
+        state = userModel.generateAdReportingEvent(state, focusP ? 'foreground' : 'background', action)
         break
       }
     case appConstants.APP_TAB_UPDATED: // kind of worthless; fires too often
@@ -68,25 +46,23 @@ const userModelReducer = (state, action, immutableAction) => {
         const stat = changeInfo && changeInfo.get('status')
         const complete = stat === 'complete'
 
-        if (complete) {
-          state = userModel.generateAdReportingEvent(state, 'load', action)
+        const tabValue = action.get('tabValue')
+        if ((tabValue) && (tabValue.get('incongnito') === true)) {
+          break
         }
 
-        const tabValue = action.get('tabValue')
-
-        const blurred = tabValue && !tabValue.get('active')
+        if (complete) state = userModel.generateAdReportingEvent(state, 'load', action)
 
         state = userModel.tabUpdate(state, action)
-
-        if (blurred) {
-          state = userModel.generateAdReportingEvent(state, 'blur', action)
-        }
-
+        if (tabValue && !tabValue.get('active')) state = userModel.generateAdReportingEvent(state, 'blur', action)
         break
       }
     case appConstants.APP_REMOVE_HISTORY_SITE:
       {
-        console.log('actionType remove history site')
+        const historyKey = action.get('historyKey')
+
+        if (!historyKey) break
+
         state = userModel.removeHistorySite(state, action)
         break
       }
@@ -99,44 +75,46 @@ const userModelReducer = (state, action, immutableAction) => {
     case appConstants.APP_TAB_ACTIVATE_REQUESTED:  // tab switching
       {
         const tabId = action.get('tabId')
-        const tab = tabState.getByTabId(state, tabId)
-        if (tab == null) {
+        const tabValue = tabState.getByTabId(state, tabId)
+
+        if (tabValue == null) break
+
+        if (tabValue.get('incognito') === true) {
           break
         }
 
-        const url = tab.get('url')
+        const url = tabValue.get('url')
         state = userModel.tabUpdate(state, action)
         state = userModel.testShoppingData(state, url)
         state = userModel.testSearchState(state, url)
-
         state = userModel.generateAdReportingEvent(state, 'focus', action)
-
         break
       }
     case appConstants.APP_IDLE_STATE_CHANGED: // TODO where to set this globally
       {
-        console.log('idle state changed. action: ', action.toJS())
+        appActions.onUserModelLog('Idle state changed', { idleState: action.get('idleState') })
 
-        const activeWindowId = windows.getActiveWindowId()
-
-        if (action.has('idleState') && action.get('idleState') === 'active') {
+        if (action.get('idleState') === 'active') {
           state = userModel.recordUnIdle(state)
-          state = userModel.basicCheckReadyAdServe(state, activeWindowId)
+          appActions.onNativeNotificationAllowedCheck(true)
         }
         break
       }
     case appConstants.APP_TEXT_SCRAPER_DATA_AVAILABLE:
       {
         const tabId = action.get('tabId')
-        const tab = tabState.getByTabId(state, tabId)
-        if (tab == null) {
+        const tabValue = tabState.getByTabId(state, tabId)
+
+        if (tabValue == null) break
+
+        if (tabValue.get('incognito') === true) {
           break
         }
 
-        const url = tab.get('url')
+        const url = tabValue.get('url')
         state = userModel.testShoppingData(state, url)
         state = userModel.testSearchState(state, url)
-        state = userModel.classifyPage(state, action, tab.get('windowId'))
+        state = userModel.classifyPage(state, action, tabValue.get('windowId'))
         break
       }
     case appConstants.APP_SHUTTING_DOWN:
@@ -148,7 +126,7 @@ const userModelReducer = (state, action, immutableAction) => {
     case appConstants.APP_ADD_AUTOFILL_CREDIT_CARD:
       {
         // TODO test this SCL
-        const url = action.getIn(['details', 'newURL'])
+        const url = action.getIn([ 'details', 'newURL' ])
         state = userModelState.flagBuyingSomething(state, url)
         break
       }
@@ -158,17 +136,7 @@ const userModelReducer = (state, action, immutableAction) => {
         switch (action.get('key')) {
           case settings.ADS_ENABLED:
             {
-              const adEnabled = action.get('value')
-
-              // this reports `value` true if enabled and false if disabled
-              state = userModel.initialize(state, adEnabled)
-
-              break
-            }
-          // TODO check why this is here and fix if needed, currently is not triggered
-          case settings.ADJUST_FREQ:
-            {
-              state = userModel.changeAdFreq(state, action.get('value'))
+              state = userModel.initialize(state, action.get('value'))
               break
             }
           case settings.ADS_PLACE:
@@ -176,12 +144,16 @@ const userModelReducer = (state, action, immutableAction) => {
               state = userModelState.setAdPlace(state, action.get('value'))
               break
             }
+          case settings.ADS_LOCALE:
+            {
+              state = userModel.changeLocale(state, action.get('value'))
+              break
+            }
         }
 
         // You need to call this at the bottom of the case and not
-        // the top because the `switch` changes the values in question
-        state = userModel.generateAdReportingEvent(state, 'settings')
-
+        // the top because the `switch` may change the values in question
+        state = userModel.generateAdReportingEvent(state, 'settings', action)
         break
       }
     case appConstants.APP_ON_USERMODEL_LOG:
@@ -191,7 +163,6 @@ const userModelReducer = (state, action, immutableAction) => {
         demoApi.appendValue(eventName, data)
 
         state = userModel.generateAdReportingEvent(state, 'notify', action)
-
         break
       }
     case appConstants.APP_ON_USERMODEL_COLLECT_ACTIVITY:

@@ -89,25 +89,25 @@ class AdsTab extends ImmutableComponent {
           </div>
           <div className={css(gridStyles.row1col3)}>
             {
-              this.enabled
-                ? <SettingCheckbox
-                  dataL10nIdLeft='Mode A'
-                  dataL10nId='Mode B'
-                  prefKey={settings.ADS_OPERATING_MODE}
-                  settings={this.props.settings}
-                  onChangeSetting={this.props.onChangeSetting}
-                  customStyleTextLeft={[
-                    styles.switch__label,
-                    styles.switch__label_left,
-                    styles.switch__label_left_off
-                  ]}
-                  customStyleTextRight={[
-                    styles.switch__label,
-                    styles.switch__label_right
-                  ]}
-                  disabled
-                />
-                : null
+              // this.enabled
+              //   ? <SettingCheckbox
+              //     dataL10nIdLeft='Mode A'
+              //     dataL10nId='Mode B'
+              //     prefKey={settings.ADS_OPERATING_MODE}
+              //     settings={this.props.settings}
+              //     onChangeSetting={this.props.onChangeSetting}
+              //     customStyleTextLeft={[
+              //       styles.switch__label,
+              //       styles.switch__label_left,
+              //       styles.switch__label_left_off
+              //     ]}
+              //     customStyleTextRight={[ADS_LOCALE
+              //       styles.switch__label,
+              //       styles.switch__label_right
+              //     ]}
+              //     disabled
+              //   />
+              //   : null
             }
           </div>
         </section>
