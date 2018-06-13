@@ -113,15 +113,15 @@ class EnabledContent extends ImmutableComponent {
           locals
           ? <div>
             <div className={css(gridStyles.row3col1, styles.enabledContent__walletBar__title)}>
-              Local
+              Locale
             </div>
             <div className={css(gridStyles.row4col1)}>
               <FormDropdown
                 data-isPanel
                 data-test-id='placeSelectBox'
                 customClass={styles.place_input}
-                value={getSetting(settings.ADS_LOCAL, this.props.settings)}
-                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.ADS_LOCAL)}
+                value={getSetting(settings.ADS_LOCALE, this.props.settings)}
+                onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.ADS_LOCALE)}
               >
                 {
                   locals.map(key => {

@@ -105,7 +105,7 @@ const settings = {
   DEBUG_VERBOSE_TAB_INFO: 'debug.verbose-tab-info.enabled',
   // Ads
   ADS_ENABLED: 'ads.enabled',
-  ADS_LOCAL: 'ads.local',
+  ADS_LOCALE: 'ads.locale',
   ADS_PER_DAY: 'ads.amount.day',
   ADS_PER_HOUR: 'ads.amount.hour',
   ADS_PLACE: 'ads.place',
