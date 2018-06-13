@@ -127,7 +127,7 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
       primaryPattern: '*'
     }],
     BATads: [{
-      setting: 'allow',
+      setting: getSetting(settings.ADS_ENABLED) ? 'allow' : 'block',
       primaryPattern: '*'
     }],
     popups: [{

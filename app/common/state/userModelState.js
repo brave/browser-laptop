@@ -2,28 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// -SCL COMMENTS BELOW
-// This was written as "aspirational." Most has not been tested
-// State should capture
-// 1. searching state (url, score, search values, time) -note these are now hard coded to be score = 1 at google, 0 every other time
-// 2. is user shopping now (url, score, search values, time) -same as searching except hard coded to be score = 1 at amazon, 0 every other url
-// 3. ad served, time, value (3 month buffer)
-// 4. error (something went wrong)
-// 5. page classification scores, score, url, (time) (3 month buffer)
-// 6. userModel unidle time (last time browser woke up)
-// at present, searching and shopping states need to be initialized and properly set
-// there is still missing something in the reducer which calls them at the right time,
-// unless we want to just overload the APP_TEXT_SCRAPER_DATA_AVAILABLE section and test for all shoppiness there
-// (I think this will work and is the right thing to do)
-// TODO INCOMPLETES; something which logs the AUTOFILL events, page, date, moving average score up to that autofill, and previous AUTOFILL events/pages/score
-// END SCL COMMENTS
-
 'use strict'
 
 const Immutable = require('immutable')
 const assert = require('assert')
 
+// Actions
+const appActions = require('../../../js/actions/appActions')
+
+// Constants
 const settings = require('../../../js/constants/settings')
+
+// State
 const getSetting = require('../../../js/settings').getSetting
 
 // Utils
@@ -65,17 +55,16 @@ const historyRespectsRollingTimeConstraint = function (history, secondsWindow, a
 }
 
 const appendToRingBufferUnderKey = (state, key, item, maxRows) => {
+  if (!userModelState.getAdEnabledValue(state)) return state
+
   state = validateState(state)
 
   let previous = state.getIn(key)
 
-  if (!Immutable.List.isList(previous)) {
-    console.warn('Previously stored page score history is not a List.')
-    previous = Immutable.List()
-  }
+  // it's undefined...
+  if (!Immutable.List.isList(previous)) previous = Immutable.List()
 
   let ringbuf = previous.push(item)
-
   let n = ringbuf.size
 
   // this is the "rolling window"
@@ -85,56 +74,78 @@ const appendToRingBufferUnderKey = (state, key, item, maxRows) => {
     ringbuf = ringbuf.slice(diff)
   }
 
-  state = state.setIn(key, ringbuf)
-
-  return state
+  return state.setIn(key, ringbuf)
 }
 
 const getUserSurveyQueue = (state) => {
-  return state.getIn(['userModel', 'userSurveyQueue']) || Immutable.List()
+  return state.getIn([ 'userModel', 'userSurveyQueue' ]) || Immutable.List()
 }
 
 const setUserSurveyQueue = (state, queue) => {
-  return state.setIn(['userModel', 'userSurveyQueue'], queue)
+  if (!userModelState.getAdEnabledValue(state)) return state
+
+  return state.setIn([ 'userModel', 'userSurveyQueue' ], queue)
 }
 
 const getReportingEventQueue = (state) => {
-  return state.getIn(['userModel', 'reportingEventQueue']) || Immutable.List()
+  return state.getIn([ 'userModel', 'reportingEventQueue' ]) || Immutable.List()
 }
 
 const setReportingEventQueue = (state, queue) => {
-  return state.setIn(['userModel', 'reportingEventQueue'], queue)
+  if (!userModelState.getAdEnabledValue(state)) return state
+
+  return state.setIn([ 'userModel', 'reportingEventQueue' ], queue)
 }
 
 const userModelState = {
   setUserModelValue: (state, key, value) => {
-    state = validateState(state)
-    if (key == null) {
-      return state
-    }
+    if ((!key) || (!userModelState.getAdEnabledValue(state))) return state
 
-    return state.setIn(['userModel', key], value)
+    state = validateState(state)
+
+    return state.setIn([ 'userModel', key ], value)
   },
 
   getUserModelValue: (state, key) => {
     state = validateState(state)
-    return state.getIn(['userModel', key])
+    return state.getIn([ 'userModel', key ])
   },
 
   appendPageScoreToHistoryAndRotate: (state, pageScore) => {
-    const stateKey = ['userModel', 'pageScoreHistory']
+    const stateKey = [ 'userModel', 'pageScoreHistory' ]
     const wrappedScore = Immutable.List(pageScore)
+
     return appendToRingBufferUnderKey(state, stateKey, wrappedScore, maxRowsInPageScoreHistory)
   },
 
   appendAdShownToAdHistory: (state) => {
-    const stateKey = ['userModel', 'adsShownHistory']
+    const stateKey = [ 'userModel', 'adsShownHistory' ]
     var unixTime = unixTimeNowSeconds()
+
     return appendToRingBufferUnderKey(state, stateKey, unixTime, maxRowsInAdsShownHistory)
   },
 
+  getAdUUIDSeen: (state) => {
+    const key = [ 'userModel', 'adsUUIDSeen' ]
+    let seen = state.getIn(key) || Immutable.Map()
+
+    if (!Immutable.Map.isMap(seen)) seen = Immutable.Map()
+
+    return seen
+  },
+
+  recordAdUUIDSeen: (state, uuid, value = 1) => {
+    if (!userModelState.getAdEnabledValue(state)) return state
+
+    const key = [ 'userModel', 'adsUUIDSeen' ]
+    let seen = state.getIn(key) || Immutable.Map()
+
+    seen = seen.setIn([uuid], value)
+    return state.setIn(key, seen)
+  },
+
   allowedToShowAdBasedOnHistory: (state) => {
-    const history = state.getIn(['userModel', 'adsShownHistory']) || []
+    const history = state.getIn([ 'userModel', 'adsShownHistory' ]) || []
 
     const hourWindow = 60 * 60
     const dayWindow = 24 * hourWindow
@@ -153,105 +164,112 @@ const userModelState = {
 
   getPageScoreHistory: (state, mutable = false) => {
     state = validateState(state)
-    let history = state.getIn(['userModel', 'pageScoreHistory']) || []
+    let history = state.getIn([ 'userModel', 'pageScoreHistory' ]) || []
 
-    if (!mutable) {
-      return makeImmutable(history) // immutable version
-    }
+    if (!mutable) return makeImmutable(history)
 
-    return makeJS(history) // mutable version
+    return makeJS(history)
   },
 
   removeAllHistory: (state) => {
+// DO NOT check settings.ADS_ENABLED
+
     state = validateState(state)
-    state = state.setIn(['userModel'], Immutable.Map())
+
+    return state.setIn([ 'userModel' ], Immutable.Map())
+  },
+
+  removeHistorySite: (state, action) => {
+    const historyKey = action.get('historyKey')
+
+// DO NOT check settings.ADS_ENABLED
+
+    state = validateState(state)
+
+    appActions.onUserModelLog('FIXME', { action: action.get('actionType'), historyKey })
+
     return state
   },
 
   // later maybe include a search term and history
   flagSearchState: (state, url, score) => {
-    state = validateState(state)
-    if (url == null || !urlUtil.isURL(url)) { // bum url; log this?
-      return state
-    }
+    if ((!url) || (!urlUtil.isURL(url)) || (!userModelState.getAdEnabledValue(state))) return state
 
-    const date = new Date().getTime()
-    state = state
-      .setIn(['userModel', 'searchActivity'], true)
-      .setIn(['userModel', 'searchUrl'], url)  // can we check this here?
-      .setIn(['userModel', 'score'], score)
-      .setIn(['userModel', 'lastSearchTime'], date)
+    state = validateState(state)
 
     return state
+          .setIn([ 'userModel', 'searchActivity' ], true)
+          .setIn([ 'userModel', 'searchUrl' ], url)  // can we check this here?
+          .setIn([ 'userModel', 'score' ], score)
+          .setIn([ 'userModel', 'lastSearchTime' ], new Date().getTime())
   },
 
   // user has stopped searching for things
   unFlagSearchState: (state, url) => {
+    if ((!url) || (!urlUtil.isURL(url)) || (!userModelState.getAdEnabledValue(state))) return state
+
     state = validateState(state)
-    if (url == null || !urlUtil.isURL(url)) { // bum url; log this?
-      return state
-    }
 
     // if you're still at the same url, you're still searching; maybe this should log an error
-    if (state.getIn(['userModel', 'searchUrl']) === url) {
-      return state
-    }
-
-    const date = new Date().getTime()
-    state = state
-      .setIn(['userModel', 'searchActivity'], false) // toggle off date probably more useful
-      .setIn(['userModel', 'lastSearchTime'], date)
+    if (state.getIn([ 'userModel', 'searchUrl' ]) === url) return state
 
     return state
+          .setIn([ 'userModel', 'searchActivity' ], false) // toggle off date probably more useful
+          .setIn([ 'userModel', 'lastSearchTime' ], new Date().getTime())
   },
 
   // user is visiting a shopping website
   flagShoppingState: (state, url) => {
-    state = validateState(state)
-    const date = new Date().getTime()
+    if (!userModelState.getAdEnabledValue(state)) return state
 
-    state = state
-      .setIn(['userModel', 'shopActivity'], true) // never hit; I think design is wrong
-      .setIn(['userModel', 'shopUrl'], url)
-      .setIn(['userModel', 'lastShopTime'], date)
+    state = validateState(state)
 
     return state
+          .setIn([ 'userModel', 'shopActivity' ], true) // never hit; I think design is wrong
+          .setIn([ 'userModel', 'shopUrl' ], url)
+          .setIn([ 'userModel', 'lastShopTime' ], new Date().getTime())
   },
 
   getSearchState: (state) => {
     state = validateState(state)
-    return state.getIn(['userModel', 'searchActivity'])
+
+    return state.getIn([ 'userModel', 'searchActivity' ])
   },
 
   getShoppingState: (state) => {
     state = validateState(state)
-    return state.getIn(['userModel', 'shopActivity'])
+
+    return state.getIn([ 'userModel', 'shopActivity' ])
   },
 
   unFlagShoppingState: (state) => {
+    if (!userModelState.getAdEnabledValue(state)) return state
+
     state = validateState(state)
-    state = state.setIn(['userModel', 'shopActivity'], false)
-    return state
+
+    return state.setIn([ 'userModel', 'shopActivity' ], false)
   },
 
   flagUserBuyingSomething: (state, url) => {
+    if (!userModelState.getAdEnabledValue(state)) return state
+
     state = validateState(state)
-    const date = new Date().getTime()
-    state = state
-      .setIn(['userModel', 'purchaseTime'], date)
-      .setIn(['userModel', 'purchaseUrl'], url)
-      .setIn(['userModel', 'purchaseActive'], true)
 
     return state
+          .setIn([ 'userModel', 'purchaseTime' ], new Date().getTime())
+          .setIn([ 'userModel', 'purchaseUrl' ], url)
+          .setIn([ 'userModel', 'purchaseActive' ], true)
   },
 
   getUserBuyingState: (state) => {
     state = validateState(state)
-    return state.getIn(['userModel', 'purchaseActive'])
+
+    return state.getIn([ 'userModel', 'purchaseActive' ])
   },
 
   getUserModelTimingMdl: (state, mutable = true) => {
-    let mdl = state.getIn(['userModel', 'timingModel']) || Immutable.List()
+    let mdl = state.getIn([ 'userModel', 'timingModel' ]) || Immutable.List()
+
     if (!mutable) {
       return makeImmutable(mdl) // immutable version
     } else {
@@ -260,32 +278,28 @@ const userModelState = {
   },
 
   setUserModelTimingMdl: (state, model) => {
-    let mimut = makeImmutable(model)
-    return state.setIn(['userModel', 'timingModel'], mimut)
+    if (!userModelState.getAdEnabledValue(state)) return state
+
+    return state.setIn([ 'userModel', 'timingModel' ], makeImmutable(model))
   },
 
   setUrlActive: (state, url) => {
-    state = validateState(state)
-    if (url == null || !urlUtil.isURL(url)) { // bum url; log this?
-      return state
-    }
+    if ((!url) || (!urlUtil.isURL(url)) || (!userModelState.getAdEnabledValue(state))) return state
 
-    return state.setIn(['userModel', 'url'], url)
+    state = validateState(state)
+
+    return state.setIn([ 'userModel', 'url' ], url)
   },
 
   setUrlClass: (state, url, pageClass) => {
-    state = validateState(state)
-    if (url == null || pageClass == null || !urlUtil.isURL(url)) { // bum url; log this?
-      return state
-    }
+    if ((!url) || (!pageClass) || (!urlUtil.isURL(url)) || (!userModelState.getAdEnabledValue(state))) return state
 
-    const date = new Date().getTime()
-    state = state
-      .setIn(['userModel', 'updated'], date)
-      .setIn(['userModel', 'url'], url)
-      .setIn(['userModel', 'pageClass'], pageClass)
+    state = validateState(state)
 
     return state
+      .setIn([ 'userModel', 'updated' ], new Date().getTime())
+      .setIn([ 'userModel', 'url' ], url)
+      .setIn([ 'userModel', 'pageClass' ], pageClass)
   },
 
   // this gets called when an ad is served, so we know the last time
@@ -293,60 +307,63 @@ const userModelState = {
   // potential fun stuff to put here; length of ad-view, some kind of
   // signatures on ad-hash and length of ad view
   setServedAd: (state, adServed, adClass) => {
-    state = validateState(state)
-    if (adServed == null) {
-      return state
-    }
+    if ((!adServed) || (!userModelState.getAdEnabledValue(state))) return state
 
-    const date = new Date().getTime()
-    state = state
-      .setIn(['userModel', 'lastAdTime'], date)
-      .setIn(['userModel', 'adServed'], adServed)
-      .setIn(['userModel', 'adClass'], adClass)
+    state = validateState(state)
 
     return state
+      .setIn([ 'userModel', 'lastAdTime' ], new Date().getTime())
+      .setIn([ 'userModel', 'adServed' ], adServed)
+      .setIn([ 'userModel', 'adClass' ], adClass)
   },
 
   getLastServedAd: (state) => {
     state = validateState(state)
+
     const result = {
-      lastAdTime: state.getIn(['userModel', 'lastAdTime']),
-      lastAdServed: state.getIn(['userModel', 'adServed']),
-      lastAdClass: state.getIn(['userModel', 'adClass'])
+      lastAdTime: state.getIn([ 'userModel', 'lastAdTime' ]),
+      lastAdServed: state.getIn([ 'userModel', 'adServed' ]),
+      lastAdClass: state.getIn([ 'userModel', 'adClass' ])
     }
 
     return Immutable.fromJS(result) || Immutable.Map()
   },
 
   setLastUserActivity: (state) => {
+    if (!userModelState.getAdEnabledValue(state)) return state
+
     state = validateState(state)
-    const date = new Date().getTime()
-    state = state.setIn(['userModel', 'lastUserActivity'], date)
-    return state
+
+    return state.setIn([ 'userModel', 'lastUserActivity' ], new Date().getTime())
   },
 
-  setAdFrequency: (state, freq) => {
+  setLocale: (state, locale) => {
+    if (!userModelState.getAdEnabledValue(state)) return state
+
     state = validateState(state)
-    state = state.setIn(['userModel', 'adFrequency'], freq)
-    return state
+
+    return state.setIn([ 'userModel', 'locale' ], locale)
   },
 
   setLastUserIdleStopTime: (state) => {
+    if (!userModelState.getAdEnabledValue(state)) return state
+
     state = validateState(state)
-    const date = new Date().getTime()
-    state = state.setIn(['userModel', 'lastUserIdleStopTime'], date)
-    return state
+
+    return state.setIn([ 'userModel', 'lastUserIdleStopTime' ], new Date().getTime())
   },
 
   getLastUserIdleStopTime: (state) => {
     state = validateState(state)
-    return state.getIn(['userModel', 'lastUserIdleStopTime'])
+    return state.getIn([ 'userModel', 'lastUserIdleStopTime' ])
   },
 
   setUserModelError: (state, error, caller) => {
+    if (!userModelState.getAdEnabledValue(state)) return state
+
     state = validateState(state)
 
-    state = state.setIn(['userModel', 'error'], Immutable.fromJS({
+    state = state.setIn([ 'userModel', 'error' ], Immutable.fromJS({
       caller: caller,
       error: error
     }))
@@ -355,45 +372,38 @@ const userModelState = {
   },
 
   setSSID: (state, value) => {
-    if (!value || value.length === 0) {
-      value = 'unknown'
-    }
+    if (!userModelState.getAdEnabledValue(state)) return state
+
     const current = userModelState.getSSID(state)
-    state = state.setIn(['userModel', 'currentSSID'], value)
+
+    if (!value) value = 'unknown'
+    state = state.setIn([ 'userModel', 'currentSSID' ], value)
 
     if (current !== value) {
-      const place = userModelState.getAdPlace(state)
-      let newValue = 'UNDISCLOSED'
-      if (place) {
-        newValue = place
-      }
-      state = state.setIn(['settings', settings.ADS_PLACE], newValue)
+      state = state.setIn([ 'settings', settings.ADS_PLACE ], userModelState.getAdPlace(state) || 'UNDISCLOSED')
     }
 
     return state
   },
 
   getSSID: (state) => {
-    return state.getIn(['userModel', 'currentSSID']) || null
+    return (state.getIn([ 'userModel', 'currentSSID' ]) || null)
   },
 
   getAdPlace: (state) => {
     const ssid = userModelState.getSSID(state)
-    const places = state.getIn(['userModel', 'places'])
-    if (!places || !ssid || !isMap(places)) {
-      return null
-    }
+    const places = state.getIn([ 'userModel', 'places' ])
 
-    return places.get(ssid) || null
+    return ((places && ssid && isMap(places) && places.get(ssid)) || 'UNDISCLOSED')
   },
 
   setAdPlace: (state, place) => {
-    const ssid = userModelState.getSSID(state)
-    if (!ssid) {
-      return state
-    }
+    if (!userModelState.getAdEnabledValue(state)) return state
 
-    return state.setIn(['userModel', 'places', ssid], place)
+    const ssid = userModelState.getSSID(state)
+    if (ssid) state = state.setIn([ 'userModel', 'places', ssid ], place)
+
+    return state
   },
 
   getModel: (state) => {
@@ -403,16 +413,18 @@ const userModelState = {
   },
 
   getAdEnabledValue: (state) => {
-    return state.getIn(['settings', settings.ADS_ENABLED])
+    return state.getIn([ 'settings', settings.ADS_ENABLED ])
   },
 
   getAdUUID: (state) => {
     // returns string or undefined
-    return state.getIn(['userModel', 'adUUID'])
+    return state.getIn([ 'userModel', 'adUUID' ])
   },
 
   setAdUUID: (state, uuid) => {
-    return state.setIn(['userModel', 'adUUID'], uuid)
+    if (!userModelState.getAdEnabledValue(state)) return state
+
+    return state.setIn([ 'userModel', 'adUUID' ], uuid)
   },
 
   appendToUserSurveyQueue: (state, survey) => {

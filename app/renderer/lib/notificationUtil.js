@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const notifier = require('brave-node-notifier')
+const notifier = require('brave-ads-notifier')
 const os = require('os')
 
 // Actions
@@ -85,9 +85,12 @@ const notificationUtil = {
 
       if (!result && arguments[1]) {
         result = {
-          'the user clicked on the toast.': 'clicked',
+          'the user clicked on the toast.': 'contentsClicked',
+          'the user activated the notification': 'contentsClicked',
           'the toast has timed out': 'timeout',
-          'the user dismissed this toast': 'closed'
+          'the notification has timed out.': 'timeout',
+          'the user dismissed this toast': 'closed',
+          'the user dismissed the notification.': 'closed'
         }[arguments[1]]
       }
       if (!result) result = 'unknown'

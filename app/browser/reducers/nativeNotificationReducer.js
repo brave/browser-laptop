@@ -4,7 +4,7 @@
 
 'use strict'
 
-const braveNotifier = require('brave-node-notifier')
+const notifier = require('brave-ads-notifier')
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
@@ -14,11 +14,14 @@ const appConstants = require('../../../js/constants/appConstants')
 const settings = require('../../../js/constants/settings')
 
 // State
+const windows = require('../windows')
 const userModelState = require('../../common/state/userModelState')
+const Immutable = require('immutable')
 
 // Utils
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const notificationUtil = require('../../renderer/lib/notificationUtil')
+const userModel = require('../api/userModel')
 
 const nativeNotifications = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -28,27 +31,58 @@ const nativeNotifications = (state, action, immutableAction) => {
         notificationUtil.createNotification(action.get('options'))
         break
       }
-    case appConstants.APP_ON_NATIVE_NOTIFICATION_CONFIG:
+    case appConstants.APP_ON_NATIVE_NOTIFICATION_CONFIGURATION_CHECK:
       {
-        const ok = !!action.get('ok')
+        notifier.configured((err, result) => {
+          appActions.onUserModelLog(appConstants.APP_ON_NATIVE_NOTIFICATION_CONFIGURATION_CHECK, {err, result})
 
-        if (!ok) {
-          appActions.changeSetting(settings.ADS_ENABLED, false)
-        }
-
-        state = userModelState.setUserModelValue(state, 'config', ok)
+          appActions.onNativeNotificationConfigurationReport((!err) && (result))
+        })
         break
       }
-    case appConstants.APP_ON_NATIVE_NOTIFICATION_CHECK:
+    case appConstants.APP_ON_NATIVE_NOTIFICATION_CONFIGURATION_REPORT:
       {
-        braveNotifier.configured((err, result) => {
-          if (err) {
-            appActions.onUserModelLog('Configured error', {err, result})
-            result = false
-          }
+        const ok = !!action.get('ok')
+        const previous = userModelState.getUserModelValue(state, 'allowed')
 
-          appActions.onNativeNotificationConfig(result)
+        if (ok !== previous) state = userModelState.setUserModelValue(state, 'configured', ok)
+
+        if (!ok) appActions.changeSetting(settings.ADS_ENABLED, false)
+        break
+      }
+    case appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_CHECK:
+      {
+        notifier.enabled((err, result) => {
+          appActions.onUserModelLog(appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_CHECK, {err, result})
+
+          appActions.onNativeNotificationAllowedReport((!err) && (result), !!action.get('serveP'))
         })
+        break
+      }
+    case appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_REPORT:
+      {
+        const ok = !!action.get('ok')
+        const previous = userModelState.getUserModelValue(state, 'allowed')
+        const serveP = !!action.get('serveP')
+
+        if (ok !== previous) state = userModelState.setUserModelValue(state, 'allowed', ok)
+        if ((!serveP) || (ok !== previous)) {
+          const action = Immutable.fromJS({
+            actionType: appConstants.APP_CHANGE_SETTING,
+            key: settings.ADS_ENABLED,
+            value: ok
+          })
+
+          state = userModel.generateAdReportingEvent(state, 'settings', action)
+        }
+        if (!serveP) break
+
+        if (ok) {
+          state = userModel.checkReadyAdServe(state, windows.getActiveWindowId())
+        } else {
+          appActions.onUserModelLog('Ad not served', { reason: 'notifications not presently allowed' })
+        }
+        break
       }
   }
 

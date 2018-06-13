@@ -73,14 +73,14 @@ class DisabledContent extends React.Component {
         <button
           data-l10n-id='adsWelcomeReTry'
           className={css(styles.disabledContent__message__button, styles.disabledContent__message__button_on)}
-          onClick={appActions.onNativeNotificationCheck}
+          onClick={appActions.onNativeNotificationConfigurationCheck}
         />
       </div>
     }
   }
 
   render () {
-    const config = this.props.userModelData.config || false
+    const config = this.props.userModelData.configured || false
     const available = this.props.userModelData.available || false
 
     return <section className={css(styles.disabledContent)} data-test-id='disabledContent'>
