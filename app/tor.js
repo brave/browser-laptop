@@ -350,7 +350,7 @@ class TorDaemon extends EventEmitter {
           // We're done with the control port file; close it.
           fs.close(fd, (err) => {
             if (err) {
-              console.log(`tor: close pidfile failed: ${err}`)
+              console.log(`tor: close control port file failed: ${err}`)
             }
           })
 
