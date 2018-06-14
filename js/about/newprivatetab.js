@@ -54,6 +54,7 @@ class NewPrivateTab extends React.Component {
     if (!this.props.newTabData) {
       return null
     }
+    const isTor = Boolean(this.props.newTabData.getIn(torEnabled))
     return <div data-test-id='privateTabContent' className={css(styles.newPrivateTab, styles.newPrivateTabVars)}>
       <div className='statsBar'>
         <Stats newTabData={this.props.newTabData} />
@@ -94,13 +95,13 @@ class NewPrivateTab extends React.Component {
                     <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>&nbsp;Tor</strong>
                   </h2>
                   <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabTorText1' />
-                  <p className={css(styles.text, styles.text_privateSearch, styles.text_clickable)} onClick={aboutActions.createTabRequested.bind(null, {url: torFAQ})} data-l10n-id='learnMore' />
+                  <p className={css(styles.text, styles.text_privateSearch, styles.text_clickable)} onClick={aboutActions.createTabRequested.bind(null, {url: torFAQ, isPrivate: true, isTor})} data-l10n-id='learnMore' />
                 </span>
                 <SettingCheckbox
                   large
                   switchClassName={css(styles.privateSearch__switch)}
                   rightLabelClassName={css(styles.sectionTitle)}
-                  checked={Boolean(this.props.newTabData.getIn(torEnabled))}
+                  checked={isTor}
                   onChange={this.onChangeTor.bind(this)}
                 />
               </div>
