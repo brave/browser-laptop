@@ -329,7 +329,7 @@ const showAddFunds = () => {
 const showPaymentDone = (transactionContribution) => {
   text.paymentDone = locale.translation('notificationPaymentDone')
     .replace(/{{\s*amount\s*}}/, ledgerUtil.probiToFormat(transactionContribution.get('probi')))
-    .replace(/{{\s*currency\s*}}/, transactionContribution.getIn(['currency', 'fiat']))
+    .replace(/{{\s*currency\s*}}/, transactionContribution.getIn(['fiat', 'currency']))
   // Hide the 'waiting for deposit' message box if it exists
   appActions.hideNotification(text.addFunds)
   appActions.showNotification({
