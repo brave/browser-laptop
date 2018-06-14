@@ -400,6 +400,15 @@ class TorDaemon extends EventEmitter {
             assert(!err)
             cookie = buf.slice(0, nread)
           } while (0)
+
+          // We're done with the control cookie file; close it.
+          fs.close(fd, (err) => {
+            if (err) {
+              console.log(`tor: close control auth cookie file failed: ${err}`)
+            }
+          })
+
+          // And call back.
           callback(err, cookie, stat.mtime)
         })
       })
