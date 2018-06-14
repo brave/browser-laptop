@@ -34,7 +34,7 @@
     "start-brk": "node ./tools/start.js --debug-brk=5858 -enable-logging --v=0 --enable-dcheck --user-data-dir-name=brave-development",
     "test": "cross-env NODE_ENV=test mocha \"test/**/*Test.js\"",
     "testsuite": "node ./tools/test.js",
-    "unittest": "cross-env NODE_ENV=test mocha \"test/unit/**/*Test.js\" --globals chrome,DOMParser,XMLSerializer",
+    "unittest": "python tools/test && cross-env NODE_ENV=test mocha \"test/unit/**/*Test.js\" --globals chrome,DOMParser,XMLSerializer",
     "unittest-cov": "node --harmony node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly --report html --report text -x \"test/unit/**/*Test.js\" -- \"test/unit/**/*Test.js\"",
     "update-pdfjs": "rm -r app/extensions/pdfjs/; cp -r ../pdf.js/build/chromium/ app/extensions/pdfjs/",
     "update-psl": "./tools/updatepsl.sh",

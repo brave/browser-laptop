@@ -15,6 +15,9 @@ switch (TEST_DIR) {
   case 'codecov':
     cmd.push('bash tools/codecov.sh')
     break
+  case 'tools':
+    cmd.push('python tools/test')
+    break
   case 'performance':
     // 2017-09-28 Use debug builds for tests which require muon to run with
     // --debug, currently broken in Linux on prod muon builds.

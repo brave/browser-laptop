@@ -5,6 +5,7 @@ dist: trusty
 sudo: required
 group: edge
 before_install:
+  - sudo apt-get install -y python
   - npm i -g npm@5.5.1
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
@@ -24,6 +25,7 @@ env:
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=lint
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=unit
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=codecov
+  - CXX=g++-4.8 NODE_ENV=test TEST_DIR=tools
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=about
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=app
   - CXX=g++-4.8 NODE_ENV=test TEST_DIR=bookmark-components
