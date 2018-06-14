@@ -76,13 +76,14 @@ class UrlBarIcon extends React.Component {
     const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
     const displayURL = tabState.getVisibleVirtualURL(state, activeTabId) || ''
     const urlBarLocation = urlBar.get('location')
+    const frameSecurity = activeFrame.get('security')
 
     const props = {}
     // used in renderer
     props.activateSearchEngine = urlBar.getIn(['searchDetail', 'activateSearchEngine'])
     props.active = urlBar.get('active')
-    props.isSecure = activeFrame.getIn(['security', 'isSecure'])
-    props.isFullySecure = props.isSecure === true
+    props.isSecure = frameSecurity && frameSecurity.get('isSecure')
+    props.isSecureWithEVCert = frameSecurity && frameSecurity.get('evCert')
     props.location = displayURL
     props.isHTTPPage = UrlUtil.isHttpOrHttps(props.location)
     props.searchSelectImage = urlBar.getIn(['searchDetail', 'image'], '')
@@ -109,8 +110,8 @@ class UrlBarIcon extends React.Component {
 
     let icon = null
     let iconTestId = ''
-    let isVeryInsecure = false
-    let isVerySecure = false
+    let isInsecure = false
+    let isExtendedSecure = false
     const instanceStyles = {}
 
     if (this.props.activateSearchEngine) {
@@ -118,7 +119,7 @@ class UrlBarIcon extends React.Component {
     } else if (this.props.isPotentialPhishingUrl) {
       icon = <WarningIcon />
       iconTestId = 'isPotentialPhishingUrl'
-      isVeryInsecure = true
+      isInsecure = true
     } else if (this.isSearch) {
       icon = <DefaultSearchIcon />
       iconTestId = 'isSearch'
@@ -129,14 +130,14 @@ class UrlBarIcon extends React.Component {
       if (this.props.isSecure === true) {
         icon = <EncryptedIcon />
         iconTestId = 'isSecure'
-        isVerySecure = true
+        isExtendedSecure = this.props.isSecureWithEVCert
       } else if (this.props.isSecure === 1) {
         icon = <UnencryptedIcon />
         iconTestId = 'isInsecure'
       } else if (this.props.isSecure === false || this.props.isSecure === 2) {
         icon = <UnencryptedIcon />
         iconTestId = 'isInsecureColor'
-        isVeryInsecure = true
+        isInsecure = true
       }
     }
 
@@ -146,8 +147,8 @@ class UrlBarIcon extends React.Component {
       {...props}
       className={css(
         styles.urlBarIcon,
-        isVerySecure && styles.urlBarIcon_secure,
-        isVeryInsecure && styles.urlBarIcon_warning,
+        isExtendedSecure && styles.urlBarIcon_extendedSecure,
+        isInsecure && styles.urlBarIcon_warning,
         this.props.activateSearchEngine && styles.urlBarIcon_specificSearchEngine
       )}
       style={instanceStyles}
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     flexShrink: 0
   },
 
-  urlBarIcon_secure: {
+  urlBarIcon_extendedSecure: {
     '--icon-line-color': '#7ED321'
   },
 
