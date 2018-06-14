@@ -42,35 +42,15 @@ describe('publisherUtil test', function () {
       }
     })
 
-    it('location is empty', function () {
-      const result = publisherUtil.shouldShowAddPublisherButton(state, '', 'brave.com')
-      assert.equal(result, false)
-    })
-
-    it('location is about page', function () {
-      const result = publisherUtil.shouldShowAddPublisherButton(state, 'about:about', 'about:about')
-      assert.equal(result, false)
-    })
-
-    it('location is file', function () {
-      const result = publisherUtil.shouldShowAddPublisherButton(state, 'file://test.txt', 'test.txt')
-      assert.equal(result, false)
+    it('payment is enabled', function () {
+      const result = publisherUtil.shouldShowAddPublisherButton(state, 'https://brave.com', 'brave.com')
+      assert.equal(result, true)
     })
 
     it('payment is disabled', function () {
       getSetting = false
       const result = publisherUtil.shouldShowAddPublisherButton(state, 'https://brave.com', 'brave.com')
       assert.equal(result, false)
-    })
-
-    it('everything is ok', function () {
-      const result = publisherUtil.shouldShowAddPublisherButton(state, 'https://brave.com', 'brave.com')
-      assert.equal(result, true)
-    })
-
-    it('location is pdf', function () {
-      const result = publisherUtil.shouldShowAddPublisherButton(state, 'chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/http://orimi.com/pdf-test.pdf', 'orimi.com')
-      assert.equal(result, true)
     })
   })
 })

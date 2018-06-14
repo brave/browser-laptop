@@ -13,7 +13,6 @@ const cx = require('../../../../../js/lib/classSet')
 
 // Styles
 const globalStyles = require('../../styles/global')
-const {theme} = require('../../styles/theme')
 
 class TabIcon extends ImmutableComponent {
   render () {
@@ -39,15 +38,15 @@ class TabIcon extends ImmutableComponent {
         this.props.symbol
           ? <span
             className={cx({
-              [this.props.symbol]: true,
-              [css(styles.tabIcon, styles.tabIcon_symbol, this.props.symbolContent && styles.tabIcon_symbol_content)]: true
+              [css(styles.tabIcon_symbol)]: true,
+              [this.props.symbol]: true
             })}
             data-test-id={this.props['data-test-id']}
             data-test2-id={this.props['data-test2-id']}
             data-l10n-id={this.props.l10nId}
             data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
           >{this.props.symbolContent}</span>
-          : null
+          : this.props.children
       }
     </div>
   }
@@ -82,15 +81,22 @@ const styles = StyleSheet.create({
   tabIcon_symbol: {
     fontSize: 'inherit',
     fontWeight: 'normal',
-    color: 'inherit'
-  },
+    color: 'inherit',
 
-  tabIcon_symbol_content: {
-    fontSize: '11px',
-    fontWeight: 'bold',
-    marginLeft: '4px',
-    justifyContent: 'flex-end',
-    color: theme.tab.icon.symbol.color
+    // Default flex properties
+    display: 'flex',
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0, // must keep set width and height and not crop self
+
+    // Default background properties
+    backgroundSize: globalStyles.spacing.iconSize,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+
+    // Default animation properties
+    animationFillMode: 'forwards'
   }
 })
 

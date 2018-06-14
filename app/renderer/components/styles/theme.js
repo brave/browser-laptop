@@ -35,6 +35,11 @@
           backgroundColor: '#555',
           color: '#fff'
         }
+      },
+
+      icons: {
+        spacing: '7px',
+        separatorColor: 'rgb(221, 220, 220)'
       }
     },
 
@@ -51,7 +56,7 @@
       backgroundColor: '#CDD1D5',
 
       border: {
-        color: 'rgb(187, 187, 191)'
+        color: '#CDD1D5'
       },
 
       button: {
@@ -190,8 +195,8 @@
 
       preview: {
         background: 'rgb(240,240,240)',
-        boxShadow: '0 -2px 12px rgba(0, 0, 0, 0.22)',
-        scale: '1.06'
+        boxShadow: '0 -2px 6px -0.5px rgba(0, 0, 0, 0.2)',
+        scale: '1.04'
       },
 
       icon: {

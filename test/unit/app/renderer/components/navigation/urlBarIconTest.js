@@ -79,6 +79,12 @@ describe('UrlBarIcon component unit tests', function () {
     mockery.disable()
   })
 
+  function getIcon (wrapper) {
+    const icons = wrapper.find('[data-test-id="urlBarIcon"]')
+    assert.equal(icons.length, 1, 'icon found')
+    return icons.first()
+  }
+
   describe('general things', function () {
     before(function () {
       appStore.state = fakeAppStoreRenderer
@@ -87,7 +93,8 @@ describe('UrlBarIcon component unit tests', function () {
 
     it('sets element as draggable', function () {
       const wrapper = mount(<UrlBarIcon titleMode />)
-      assert.equal(wrapper.find('span[draggable]').length, 1)
+      const icon = getIcon(wrapper)
+      assert.equal(icon.props()['draggable'], true)
     })
 
     it('shows site information when clicked', function () {
@@ -122,7 +129,8 @@ describe('UrlBarIcon component unit tests', function () {
 
     it('does not set element as draggable', function () {
       const wrapper = mount(<UrlBarIcon titleMode />)
-      assert.equal(wrapper.find('span[draggable]').length, 0)
+      const icon = getIcon(wrapper)
+      assert.equal(icon.props()['draggable'], null)
     })
 
     it('does not respond to clicks', function () {
