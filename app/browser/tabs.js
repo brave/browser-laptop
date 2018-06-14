@@ -18,6 +18,7 @@ const settings = require('../../js/constants/settings')
 const {getBaseUrl} = require('../../js/lib/appUrlUtil')
 const siteSettings = require('../../js/state/siteSettings')
 const messages = require('../../js/constants/messages')
+const webrtcConstants = require('../../js/constants/webrtcConstants')
 const debounce = require('../../js/lib/debounce')
 const aboutHistoryState = require('../common/state/aboutHistoryState')
 const aboutNewTabState = require('../common/state/aboutNewTabState')
@@ -1086,6 +1087,12 @@ const api = {
           console.log('Creating tab with properties: ', createProperties)
         }
         extensions.createTab(createProperties, (tab) => {
+          if (tab) {
+            // Initialize WebRTC IP handling to the safest default. This will
+            // be set based on shield settings in reducers/tabReducer.js once
+            // navigation starts.
+            tab.setWebRTCIPHandlingPolicy(webrtcConstants.disableNonProxiedUdp)
+          }
           cb && cb(tab)
         })
       }
