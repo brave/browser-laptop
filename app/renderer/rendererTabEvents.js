@@ -512,6 +512,11 @@ function allowRunningWidevinePlugin (tabId, frame) {
  *   accepted
  */
 function showWidevineNotification (tabId, frame, noWidevineCallback, widevineCallback) {
+  if (frameStateUtil.isTor(frame)) {
+    // Never show widevine prompts on a Tor tab (needed for
+    // https://github.com/brave/browser-laptop/issues/13626)
+    return
+  }
   // https://www.nfl.com is said to be a widevine site but it actually uses Flash for me Oct 10, 2016
   const widevineSites = ['https://www.netflix.com',
     'http://bitmovin.com',
