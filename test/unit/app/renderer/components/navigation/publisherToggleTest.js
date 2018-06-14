@@ -16,14 +16,38 @@ describe('PublisherToggle component', function () {
   const fakeAppState = Immutable.fromJS({
     ledger: {
       synopsis: {
+        options: {
+          scorekeeper: 'concave',
+          'minPublisherDuration': 1,
+          'minPublisherVisits': 0
+        },
         publishers: {
           'brave.com': {
+            scores: {
+              concave: 1
+            },
             duration: 623405,
             faviconURL: '',
             percentage: 100,
             publisherURL: 'https://brave.com',
             score: 9.365888800773842,
             site: 'brave.com',
+            options: {
+              verified: true
+            },
+            visits: 1,
+            weight: 100
+          },
+          'orimi.com': {
+            scores: {
+              concave: 1
+            },
+            duration: 623405,
+            faviconURL: '',
+            percentage: 100,
+            publisherURL: 'https://orimi.com',
+            score: 9.365888800773842,
+            site: 'orimi.com',
             options: {
               verified: true
             },
@@ -45,8 +69,11 @@ describe('PublisherToggle component', function () {
     siteSettings: {
       'https?://brave.com': {
         ledgerPayments: false,
-        ledgerPaymentsShown: false
+        ledgerPaymentsShown: true
       }
+    },
+    settings: {
+      'payments.enabled': true
     }
   })
 
@@ -69,10 +96,6 @@ describe('PublisherToggle component', function () {
       useCleanCache: true
     })
     mockery.registerMock('electron', fakeElectron)
-    mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg')
-    mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg')
-    mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_no.svg')
-    mockery.registerMock('../../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg')
     mockery.registerMock('../../../../js/settings', {
       getSetting: () => true
     })
@@ -86,41 +109,78 @@ describe('PublisherToggle component', function () {
     mockery.disable()
   })
 
-  describe('default behaviour (when autoSuggest is ON)', function () {
-    it('Show as disabled if publisher is on exclusion list', function () {
-      windowStore.state = defaultWindowStore
-      appStore.state = fakeAppState.setIn(['ledger', 'locations', 'https://brave.com', 'exclude'], true)
+  function getButton (wrapper, shouldExist = true) {
+    const buttons = wrapper.find('[data-test-id="publisherButton"]')
+    if (!shouldExist) {
+      assert.equal(buttons.length, 0, 'button did not exist')
+      return
+    }
+    assert.equal(buttons.length, 1, 'button existed')
+    return buttons.first()
+  }
 
-      const wrapper = mount(<PublisherToggle />)
-      assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
-      assert.equal(wrapper.find('span').props()['data-test-authorized'], false)
+  describe('default behaviour (when autoSuggest is ON)', function () {
+    it('Show as unauthorized if publisher is on exclusion list', function () {
+      windowStore.state = defaultWindowStore
+      appStore.state = fakeAppState.setIn(['ledger', 'synopsis', 'publishers', 'brave.com', 'options', 'exclude'], true)
+      const button = getButton(mount(<PublisherToggle />))
+
+      assert.equal(button.props()['data-test-authorized'], false)
     })
 
     it('Show as verified if publisher is shown as verified on ledger locations list', function () {
       windowStore.state = defaultWindowStore
       appStore.state = fakeAppState
-      const wrapper = mount(<PublisherToggle />)
-      assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
-      assert.equal(wrapper.find('span').props()['data-test-verified'], true)
+      const button = getButton(mount(<PublisherToggle />))
+
+      assert.equal(button.props()['data-test-verified'], true)
     })
   })
 
   describe('user interaction behaviour', function () {
-    it('show as enabled if ledgerPayments is true for that publisher', function () {
+    it('show as enabled and authorized if ledgerPayments is true for that publisher', function () {
       windowStore.state = defaultWindowStore
       appStore.state = fakeAppState.setIn(['siteSettings', 'https?://brave.com', 'ledgerPayments'], true)
+      const button = getButton(mount(<PublisherToggle />))
 
-      const wrapper = mount(<PublisherToggle />)
-      assert.equal(wrapper.find('[data-test-id="publisherButton"]').length, 1)
-      assert.equal(wrapper.find('span').props()['data-test-authorized'], true)
+      assert.equal(button.props()['disabled'], false)
+      assert.equal(button.props()['data-test-authorized'], true)
     })
 
-    it('Show as disabled if ledgerPayments is false for that publisher', function () {
+    it('show as enabled and unauthorized if ledgerPayments is false for that publisher', function () {
       windowStore.state = defaultWindowStore
-      appStore.state = fakeAppState
+      appStore.state = fakeAppState.setIn(['siteSettings', 'https?://brave.com', 'ledgerPayments'], false)
+      const button = getButton(mount(<PublisherToggle />))
+      assert.equal(button.props()['disabled'], false)
+      assert.equal(button.props()['data-test-authorized'], false)
+    })
 
-      const wrapper = mount(<PublisherToggle />)
-      assert.equal(wrapper.find('span').props()['data-test-authorized'], false)
+    it('Show as disabled if ledgerPaymentsShown is false for that publisher', function () {
+      windowStore.state = defaultWindowStore
+      appStore.state = fakeAppState.setIn(['siteSettings', 'https?://brave.com', 'ledgerPaymentsShown'], false)
+      const button = getButton(mount(<PublisherToggle />))
+      assert.equal(button.props()['disabled'], true)
+    })
+
+    it('Show as disabled for about pages', function () {
+      windowStore.state = defaultWindowStore.setIn(['frames', 0, 'location'], 'about:preferences')
+      appStore.state = fakeAppState
+      const button = getButton(mount(<PublisherToggle />))
+      assert.equal(button.props()['disabled'], true)
+    })
+
+    it('shows as disabled for file URLs', function () {
+      windowStore.state = defaultWindowStore.setIn(['frames', 0, 'location'], 'file://test.txt')
+      appStore.state = fakeAppState
+      const button = getButton(mount(<PublisherToggle />))
+      assert.equal(button.props()['disabled'], true)
+    })
+
+    it('shows as enabled for PDF URLs', function () {
+      windowStore.state = defaultWindowStore.setIn(['frames', 0, 'location'], 'chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/http://orimi.com/pdf-test.pdf')
+      appStore.state = fakeAppState
+      const button = getButton(mount(<PublisherToggle />))
+      assert.equal(button.props()['disabled'], false)
     })
   })
 })

@@ -642,6 +642,21 @@ const tabState = {
     return path ? state.setIn(path.concat(['navigationState']), navigationState) : state
   },
 
+  setNavigationProgressPercent: (state, tabId, navigationProgressPercent) => {
+    const path = tabState.getPathByTabId(state, tabId)
+    if (path) {
+      state = state.setIn(path.concat(['navigationProgressPercent']), navigationProgressPercent)
+    }
+    return state
+  },
+
+  getNavigationProgressPercent: (state, tabId, navigationProgressPercent) => {
+    const path = tabState.getPathByTabId(state, tabId)
+    return path
+      ? state.getIn(path.concat(['navigationProgressPercent']), null)
+      : null
+  },
+
   getNavigationState: (state, tabId) => {
     const path = tabState.getPathByTabId(state, tabId)
     return path ? state.getIn(path.concat(['navigationState']), Immutable.Map()) : null

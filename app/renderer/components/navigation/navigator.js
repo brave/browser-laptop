@@ -4,6 +4,7 @@
 
 const React = require('react')
 const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
@@ -14,10 +15,13 @@ const ReduxComponent = require('../reduxComponent')
 const NavigationBar = require('./navigationBar')
 const MenuBar = require('./menuBar')
 const WindowCaptionButtons = require('./buttons/windowCaptionButtons')
-const BrowserButton = require('../common/browserButton')
 const BrowserAction = require('./browserAction')
+const HomeButton = require('./buttons/homeButton')
 const BackButton = require('./buttons/backButton')
 const ForwardButton = require('./buttons/forwardButton')
+const ShieldsButton = require('./buttons/shieldsButton')
+const NavigationButton = require('./buttons/navigationButton')
+const MenuIcon = require('../../../../icons/menu_2')
 
 // State
 const tabState = require('../../../common/state/tabState')
@@ -25,24 +29,24 @@ const extensionState = require('../../../common/state/extensionState')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
 const menuBarState = require('../../../common/state/menuBarState')
 const windowState = require('../../../common/state/windowState')
+const contextMenuState = require('../../../common/state/contextMenuState')
 
 // Util
 const {getCurrentWindowId, isMaximized, isFullScreen, isFocused} = require('../../currentWindow')
-const isWindows = require('../../../common/lib/platformUtil').isWindows()
+const platformUtil = require('../../../common/lib/platformUtil')
 const {braveShieldsEnabled} = require('../../../common/state/shieldState')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const siteSettings = require('../../../../js/state/siteSettings')
 const cx = require('../../../../js/lib/classSet')
 const {getSetting} = require('../../../../js/settings')
+const contextMenus = require('../../../../js/contextMenus')
 
 // Constants
 const appConfig = require('../../../../js/constants/appConfig')
 const settings = require('../../../../js/constants/settings')
 
-// Styles
-const {StyleSheet, css} = require('aphrodite/no-important')
-const globalStyles = require('../styles/global')
-const {theme} = require('../styles/theme')
+const isWindows = platformUtil.isWindows()
+const hasWindowInsetLeftButtons = platformUtil.isDarwin()
 
 class Navigator extends React.Component {
   constructor (props) {
@@ -50,13 +54,13 @@ class Navigator extends React.Component {
     this.onDoubleClick = this.onDoubleClick.bind(this)
     this.onDragOver = this.onDragOver.bind(this)
     this.onDrop = this.onDrop.bind(this)
-    this.onBraveMenu = this.onBraveMenu.bind(this)
+    this.onHamburgerMenu = this.onHamburgerMenu.bind(this)
   }
 
   get extensionButtons () {
     let buttons = this.props.extensionBrowserActions.map((id) => <BrowserAction extensionId={id} />).values()
     buttons = Array.from(buttons)
-    buttons.push(<span className='buttonSeparator' />)
+    buttons.push(<span className={css(styles.browserActionSeparator)} />)
 
     return buttons
   }
@@ -83,20 +87,18 @@ class Navigator extends React.Component {
     }
   }
 
-  onBraveMenu () {
-    if (this.props.shieldEnabled) {
-      windowActions.setBraveryPanelDetail({})
-    }
-  }
-
   onDoubleClick (e) {
-    if (!e.target.className.includes('navigatorWrapper')) {
+    if (!e.target.classList.contains('navigatorWrapper')) {
       return
     }
 
     return !this.props.isMaximized
       ? windowActions.shouldMaximize(getCurrentWindowId())
       : windowActions.shouldMinimize(getCurrentWindowId())
+  }
+
+  onHamburgerMenu (e) {
+    contextMenus.onHamburgerMenu(this.props.activeFrameLocation, e)
   }
 
   mergeProps (state, ownProps) {
@@ -135,11 +137,13 @@ class Navigator extends React.Component {
     props.showBrowserActions = !activeTabShowingMessageBox &&
       extensionBrowserActions &&
       extensionBrowserActions.size > 0
+    props.showHomeButton = getSetting(settings.SHOW_HOME_BUTTON)
     props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state))
     props.isCounterEnabled = getSetting(settings.BLOCKED_COUNT_BADGE) &&
       props.totalBlocks &&
       props.shieldEnabled
     props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
+    props.isHamburgerMenuOpen = contextMenuState.isHamburgerMenuOpen(currentWindow)
     props.showNavigationBar = activeFrameKey !== undefined &&
       state.get('siteSettings') !== undefined
 
@@ -168,17 +172,26 @@ class Navigator extends React.Component {
             </div>
             : null
         }
-        <div className='navigatorWrapper'
+        <div
+          className={cx({
+            navigatorWrapper: true,
+            hasWindowInsetLeftButtons,
+            fullscreen: this.props.isFullScreen
+          })}
           onDoubleClick={this.onDoubleClick}
           onDragOver={this.onDragOver}
           onDrop={this.onDrop}
         >
           <div className={cx({
-            backforward: true,
-            fullscreen: this.props.isFullScreen
+            backforward: true
           })}>
             <BackButton />
             <ForwardButton />
+            {
+              this.props.showHomeButton
+              ? <HomeButton activeTabId={this.props.activeTabId} />
+              : null
+            }
           </div>
           {
             this.props.showNavigationBar
@@ -189,63 +202,21 @@ class Navigator extends React.Component {
             topLevelEndButtons: true,
             [css(styles.navigatorWrapper__topLevelEndButtons_isWideURLbarEnabled)]: this.props.isWideURLbarEnabled
           })}>
-            <div className={cx({
-              extraDragArea: !this.props.menuBarVisible,
-              allowDragging: this.props.shouldAllowWindowDrag,
-              [css(styles.navigatorWrapper__topLevelEndButtons__extraDragArea_disabled)]: this.props.isWideURLbarEnabled
-            })} />
             {
               this.props.showBrowserActions
                 ? this.extensionButtons
                 : null
             }
-            <div className={css(
-              styles.braveMenu,
-
-              // See #9696
-              this.props.activeTabShowingMessageBox && styles.braveMenu_disabled
-            )}>
-              <BrowserButton
-                iconOnly
-                size={globalStyles.spacing.navbarBraveButtonWidth}
-                custom={[
-                  styles.braveMenu__braveShield,
-                  this.props.shieldsDown && styles.braveMenu__braveShield_down,
-                  !this.props.shieldEnabled && styles.braveMenu__braveShield_disabled,
-                  this.props.isCaptionButton && styles.braveMenu__braveShield_isCaptionButton,
-
-                  // See #9696: Cancel the opacity of browserButton_disabled
-                  // to inherit the value set by braveMenu_disabled above.
-                  this.props.activeTabShowingMessageBox && styles.braveMenu__braveShield_cancelOpacity
-                ]}
-                iconClass='braveMenu'
-                l10nId='braveMenu'
-                testId={cx({
-                  braveMenu: this.props.shieldEnabled,
-                  braveMenuDisabled: !this.props.shieldEnabled
-                })}
-                test2Id={`shield-down-${this.props.shieldsDown}`}
-                disabled={this.props.activeTabShowingMessageBox}
-                onClick={this.onBraveMenu}
-              />
-              {
-                this.props.isCounterEnabled
-                  ? <div className={css(
-                      styles.braveMenu__counter,
-                      (this.props.menuBarVisible || !isWindows) && styles.braveMenu__counter_right,
-
-                      // delay badge show-up.
-                      // this is also set for extension badge
-                      // in a way that both can appear at the same time.
-                      styles.braveMenu__counter_subtleShowUp
-                    )}
-                    data-test-id='lionBadge'
-                  >
-                    {this.props.totalBlocks}
-                  </div>
-                  : null
-              }
-            </div>
+            <ShieldsButton />
+            <NavigationButton
+              l10nId='menuButton'
+              testId='menuButton'
+              onClick={this.onHamburgerMenu}
+              active={this.props.isHamburgerMenuOpen}
+              styles={styles.navigatorWrapper__button_menu}
+            >
+              <MenuIcon />
+            </NavigationButton>
             {
               this.props.isCaptionButton
                 ? <span className='buttonSeparator' />
@@ -278,64 +249,16 @@ const styles = StyleSheet.create({
     marginLeft: '6px !important'
   },
 
-  navigatorWrapper__topLevelEndButtons__extraDragArea_disabled: {
-    display: 'none'
+  navigatorWrapper__button_menu: {
+    margin: '0 5px 0 0'
   },
 
-  braveMenu: {
-    position: 'relative'
-  },
+  browserActionSeparator: {
+    width: '1px',
+    background: '#D6DADD',
+    margin: '4px 1px 4px 4px'
+  }
 
-  braveMenu_disabled: {
-    // See: browserButton_disabled
-    pointerEvents: 'none',
-    animation: 'none',
-    opacity: 0.25
-  },
-
-  braveMenu__braveShield: {
-    marginRight: globalStyles.spacing.navbarButtonSpacing
-  },
-
-  braveMenu__braveShield_down: {
-    filter: 'grayscale(100%)'
-  },
-
-  braveMenu__braveShield_disabled: {
-    filter: 'grayscale(100%)',
-    opacity: 0.4
-  },
-
-  braveMenu__braveShield_isCaptionButton: {
-    marginRight: '3px'
-  },
-
-  braveMenu__braveShield_cancelOpacity: {
-    // Without this the disabled lion icon gets lighter than it should be.
-    opacity: 1
-  },
-
-  braveMenu__counter: {
-    left: 'calc(50% - 1px)',
-    top: '14px',
-    position: 'absolute',
-    color: theme.navigator.braveMenu.counter.color,
-    borderRadius: '2.5px',
-    padding: '1px 2px',
-    pointerEvents: 'none',
-    font: '6pt "Arial Narrow"',
-    textAlign: 'center',
-    background: theme.navigator.braveMenu.counter.backgroundColor,
-    minWidth: '10px',
-    WebkitUserSelect: 'none'
-  },
-
-  braveMenu__counter_right: {
-    left: 'auto',
-    right: '2px'
-  },
-
-  braveMenu__counter_subtleShowUp: globalStyles.animations.subtleShowUp
 })
 
 module.exports = ReduxComponent.connect(Navigator)
