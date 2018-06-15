@@ -34,8 +34,8 @@ module.exports = {
   errorContent: '[data-test-id="errorContent"]',
   errorUrl: '[data-test-id="errorUrl"]',
   errorText: '[data-test-id="errorText"]',
-  braveMenu: '[data-test-id="braveMenu"]',
-  braveMenuDisabled: '[data-test-id="braveMenuDisabled"]',
+  braveMenu: '[data-test-id~="braveMenu"]',
+  braveMenuDisabled: '[data-test-id~="braveMenuDisabled"]',
 
   // findBar
   findBar: '[data-test-id="findBar"]',
@@ -73,10 +73,10 @@ module.exports = {
   noScriptAllowTempButton: '[data-test-id="allowScriptsTemp"]',
   noScriptAllowOnceButton: '[data-test-id="allowScriptsOnce"]',
 
-  backButtonEnabled: '[data-test-id="backButtonEnabled"]',
-  backButtonDisabled: '[data-test-id="backButtonDisabled"]',
-  forwardButtonEnabled: '[data-test-id="forwardButtonEnabled"]',
-  forwardButtonDisabled: '[data-test-id="forwardButtonDisabled"]',
+  backButtonEnabled: '[data-test-id="navigationBackButtonEnabled"]',
+  backButtonDisabled: '[data-test-id="navigationBackButtonDisabled"]',
+  forwardButtonEnabled: '[data-test-id="navigationForwardButtonEnabled"]',
+  forwardButtonDisabled: '[data-test-id="navigationForwardButtonDisabled"]',
 
   reloadButton: '[data-test-id="reloadButton"]',
   homeButton: '[data-test-id="homeButton"]',

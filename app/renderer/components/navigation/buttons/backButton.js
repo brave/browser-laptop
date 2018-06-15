@@ -9,6 +9,7 @@ const ipc = require('electron').ipcRenderer
 // Components
 const ReduxComponent = require('../../reduxComponent')
 const NavigationButton = require('./navigationButton')
+const Back = require('../../../../../icons/back')
 
 // Actions
 const appActions = require('../../../../../js/actions/appActions')
@@ -72,10 +73,10 @@ class BackButton extends React.Component {
     // used in renderer
     props.canGoBack = activeTab.get('canGoBack') && !activeTabShowingMessageBox
     props.swipeLeftPercent = swipeLeftPercent ? (swipeLeftPercent + 1) * 1.2 : 1
-    props.swipeLeftOpacity = swipeLeftPercent ? 0.85 - (swipeLeftPercent > 0.65 ? 0.65 : swipeLeftPercent) : 0.85
+    props.swipeLeftOpacity = swipeLeftPercent ? 1 - (swipeLeftPercent > 0.65 ? 0.65 : swipeLeftPercent) : 1
 
     if (swipeLeftPercent === 1) {
-      props.swipeLeftOpacity = 0.85
+      props.swipeLeftOpacity = 1
     }
 
     // used in other functions
@@ -92,19 +93,17 @@ class BackButton extends React.Component {
           ? 'navigationBackButtonEnabled'
           : 'navigationBackButtonDisabled'
       }
-      testId2={
-        this.props.canGoBack
-          ? 'backButtonEnabled'
-          : 'backButtonDisabled'
-      }
       l10nId={'backButton'}
       class={'backButton'}
+      isNav
       disabled={!this.props.canGoBack}
       swipePercent={this.props.swipeLeftPercent}
       swipeOpacity={this.props.swipeLeftOpacity}
       onClick={this.onBack}
       onLongPress={this.onBackLongPress}
-    />
+    >
+      <Back />
+    </NavigationButton>
   }
 }
 

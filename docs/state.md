@@ -364,7 +364,7 @@ AppStore
           faviconName: string,
           faviconURL: string,
           options: {
-            exclude: boolean,
+            exclude: boolean, // publisher should not be included, toggle is off
             verified: boolean,
             verifiedTimestamp: number, // timestamp of the last change
             stickyP: boolean
@@ -532,7 +532,7 @@ AppStore
       geolocationPermission: boolean,
       httpsEverywhere: boolean,
       ledgerPayments: boolean, // false if site should not be paid by the ledger. Defaults to true.
-      ledgerPaymentsShown: boolean, // false if site should not be paid by the ledger and should not be shown in the UI. Defaults to true.
+      ledgerPaymentsShown: boolean, // false if site has been deleted, should not be paid by the ledger and should not be shown in the UI. Defaults to true.
       mediaPermission: boolean,
       midiSysexPermission: boolean,
       notificationsPermission: boolean,

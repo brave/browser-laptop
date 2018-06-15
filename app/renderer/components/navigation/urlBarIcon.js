@@ -4,9 +4,15 @@
 
 const React = require('react')
 const Immutable = require('immutable')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../reduxComponent')
+const AboutPageIcon = require('../../../../icons/brave')
+const WarningIcon = require('../../../../icons/information')
+const EncryptedIcon = require('../../../../icons/small_lock')
+const UnencryptedIcon = require('../../../../icons/small_unlock')
+const DefaultSearchIcon = require('../../../../icons/search')
 
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
@@ -18,60 +24,17 @@ const dragTypes = require('../../../../js/constants/dragTypes')
 const tabState = require('../../../common/state/tabState')
 
 // Utils
-const cx = require('../../../../js/lib/classSet')
 const dndData = require('../../../../js/dndData')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
 const {isSourceAboutUrl} = require('../../../../js/lib/appUrlUtil')
 const {isPotentialPhishingUrl} = require('../../../../js/lib/urlutil')
 
-const searchIconSize = 16
-
 class UrlBarIcon extends React.Component {
   constructor (props) {
     super(props)
     this.onClick = this.onClick.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
-  }
-
-  get iconCssClasses () {
-    if (this.props.isPotentialPhishingUrl) {
-      return ['fa-exclamation-triangle', 'insecure-color']
-    } else if (this.isSearch) {
-      return ['fa-search']
-    } else if (this.props.isAboutPage && !this.props.titleMode) {
-      return ['fa-list']
-    } else if (this.props.isHTTPPage && !this.props.active) {
-      if (this.props.isSecure === true) {
-        return ['fa-lock']
-      } else if (this.props.isSecure === false || this.props.isSecure === 2) {
-        return ['fa-unlock', 'insecure-color']
-      } else if (this.props.isSecure === 1) {
-        return ['fa-unlock']
-      }
-    }
-
-    return []
-  }
-
-  get dataTestId () {
-    if (this.props.isPotentialPhishingUrl) {
-      return ['isPotentialPhishingUrl']
-    } else if (this.isSearch) {
-      return ['isSearch']
-    } else if (this.props.isAboutPage && !this.props.titleMode) {
-      return ['isAboutPage']
-    } else if (this.props.isHTTPPage && !this.props.active) {
-      if (this.props.isSecure === true) {
-        return ['isSecure']
-      } else if (this.props.isSecure === false || this.props.isSecure === 2) {
-        return ['isInsecureColor']
-      } else if (this.props.isSecure === 1) {
-        return ['isInsecure']
-      }
-    }
-
-    return []
   }
 
   /**
@@ -88,37 +51,6 @@ class UrlBarIcon extends React.Component {
                             !this.props.isAboutPage
 
     return showSearch || defaultToSearch
-  }
-
-  get iconClasses () {
-    if (this.props.activateSearchEngine) {
-      return cx({
-        urlbarIcon: true
-      })
-    }
-
-    const iconClasses = {
-      urlbarIcon: true,
-      fa: true
-    }
-
-    this.iconCssClasses.forEach((iconClass) => {
-      iconClasses[iconClass] = true
-    })
-    return cx(iconClasses)
-  }
-
-  get iconStyles () {
-    if (!this.props.activateSearchEngine) {
-      return {}
-    }
-
-    return {
-      backgroundImage: `url(${this.props.searchSelectImage})`,
-      backgroundSize: searchIconSize,
-      width: searchIconSize,
-      height: searchIconSize
-    }
   }
 
   onClick () {
@@ -144,12 +76,14 @@ class UrlBarIcon extends React.Component {
     const activeTabId = activeFrame.get('tabId', tabState.TAB_ID_NONE)
     const displayURL = tabState.getVisibleVirtualURL(state, activeTabId) || ''
     const urlBarLocation = urlBar.get('location')
+    const frameSecurity = activeFrame.get('security')
 
     const props = {}
     // used in renderer
     props.activateSearchEngine = urlBar.getIn(['searchDetail', 'activateSearchEngine'])
     props.active = urlBar.get('active')
-    props.isSecure = activeFrame.getIn(['security', 'isSecure'])
+    props.isSecure = frameSecurity && frameSecurity.get('isSecure')
+    props.isSecureWithEVCert = frameSecurity && frameSecurity.get('evCert')
     props.location = displayURL
     props.isHTTPPage = UrlUtil.isHttpOrHttps(props.location)
     props.searchSelectImage = urlBar.getIn(['searchDetail', 'image'], '')
@@ -174,13 +108,83 @@ class UrlBarIcon extends React.Component {
       props.onDragStart = this.onDragStart
     }
 
-    return <span
+    let icon = null
+    let iconTestId = ''
+    let isInsecure = false
+    let isExtendedSecure = false
+    const instanceStyles = {}
+
+    if (this.props.activateSearchEngine) {
+      instanceStyles['--search-engine-favicon-url'] = `url(${this.props.searchSelectImage})`
+    } else if (this.props.isPotentialPhishingUrl) {
+      icon = <WarningIcon />
+      iconTestId = 'isPotentialPhishingUrl'
+      isInsecure = true
+    } else if (this.isSearch) {
+      icon = <DefaultSearchIcon />
+      iconTestId = 'isSearch'
+    } else if (this.props.isAboutPage) {
+      icon = <AboutPageIcon />
+      iconTestId = 'isAbout'
+    } else if (this.props.isHTTPPage && !this.props.active) {
+      if (this.props.isSecure === true) {
+        icon = <EncryptedIcon />
+        iconTestId = 'isSecure'
+        isExtendedSecure = this.props.isSecureWithEVCert
+      } else if (this.props.isSecure === 1) {
+        icon = <UnencryptedIcon />
+        iconTestId = 'isInsecure'
+      } else if (this.props.isSecure === false || this.props.isSecure === 2) {
+        icon = <UnencryptedIcon />
+        iconTestId = 'isInsecureColor'
+        isInsecure = true
+      }
+    }
+
+    return <div
       data-test-id='urlBarIcon'
-      data-test2-id={this.dataTestId}
+      data-test2-id={iconTestId}
       {...props}
-      className={this.iconClasses}
-      style={this.iconStyles} />
+      className={css(
+        styles.urlBarIcon,
+        isExtendedSecure && styles.urlBarIcon_extendedSecure,
+        isInsecure && styles.urlBarIcon_warning,
+        this.props.activateSearchEngine && styles.urlBarIcon_specificSearchEngine
+      )}
+      style={instanceStyles}
+    >
+      { icon }
+    </div>
   }
 }
+
+const searchIconSize = 14
+const iconSize = 20
+const styles = StyleSheet.create({
+  urlBarIcon: {
+    '--url-bar-icon-color': '#696970',
+    '--icon-line-color': '#696970',
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    width: `${iconSize}px`,
+    flexShrink: 0
+  },
+
+  urlBarIcon_extendedSecure: {
+    '--icon-line-color': '#7ED321'
+  },
+
+  urlBarIcon_warning: {
+    '--icon-line-color': '#ff0000'
+  },
+
+  urlBarIcon_specificSearchEngine: {
+    backgroundImage: 'var(--search-engine-favicon-url)',
+    backgroundSize: `${searchIconSize}px`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center center'
+  }
+})
 
 module.exports = ReduxComponent.connect(UrlBarIcon)

@@ -8,6 +8,8 @@ const ipc = require('electron').ipcRenderer
 
 // Components
 const ImmutableComponent = require('../../immutableComponent')
+const NavigationButton = require('./navigationButton')
+const StopIcon = require('../../../../../icons/cancel')
 
 // Constants
 const messages = require('../../../../../js/constants/messages')
@@ -28,12 +30,12 @@ class StopButton extends ImmutableComponent {
   }
 
   render () {
-    return <span className='navigationButtonContainer'>
-      <button data-l10n-id='stopButton'
-        className='normalizeButton navigationButton stopButton'
-        onClick={this.onStop}
-      />
-    </span>
+    return <NavigationButton
+      l10nId='stopButton'
+      onClick={this.onStop}
+    >
+      <StopIcon />
+    </NavigationButton>
   }
 }
 

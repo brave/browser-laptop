@@ -61,7 +61,7 @@ class UrlBar extends React.Component {
     this.onKeyPress = this.onKeyPress.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
-    this.updateAutocomplete = this.updateAutocomplete.bind(this)
+    this.setUrlBarRef = this.setUrlBarRef.bind(this)
   }
 
   maybeUrlBarTextChanged (value) {
@@ -365,6 +365,14 @@ class UrlBar extends React.Component {
 
   componentDidUpdate (prevProps) {
     if (this.props.activeFrameKey !== prevProps.activeFrameKey) {
+      const classNameChangingTab = 'urlbarForm_tabChanged'
+      if (this.urlBarRef && !this.urlBarRef.classList.contains(classNameChangingTab)) {
+        // ensure we can disable transitions between tabs
+        this.urlBarRef.classList.add(classNameChangingTab)
+        window.requestAnimationFrame(() => {
+          this.urlBarRef.classList.remove(classNameChangingTab)
+        })
+      }
       // The user just changed tabs
       this.setValue(this.props.urlbarLocation)
 
@@ -387,6 +395,28 @@ class UrlBar extends React.Component {
     } else if ((this.props.titleMode !== prevProps.titleMode) ||
          (!this.props.isActive && !this.props.isFocused)) {
       this.setValue(this.props.urlbarLocation)
+    }
+
+    // load progress
+    if (!this.props.loading && prevProps.loading) {
+      // Stop loading
+      this.urlBarRef.style.setProperty('--navigation-progress-percent', '100%')
+      window.requestAnimationFrame(() => {
+        const tra = () => {
+          this.urlBarRef.removeEventListener('transitionend', tra)
+          this.urlBarRef.style.setProperty('--navigation-progress-percent', '0%')
+        }
+        this.urlBarRef.addEventListener('transitionend', tra)
+      })
+    } else if (this.props.loading && !prevProps.loading) {
+      // Begin loading
+      const initialLoadingPercent = this.props.navigationProgressPercent
+        ? this.props.navigationProgressPercent === 100 ? 0 : this.props.navigationProgressPercent
+        : 0
+      this.urlBarRef.style.setProperty('--navigation-progress-percent', `${initialLoadingPercent}%`)
+    } else if (this.props.navigationProgressPercent !== prevProps.navigationProgressPercent) {
+      const percentString = this.props.navigationProgressPercent ? `${this.props.navigationProgressPercent}%` : '0%'
+      this.urlBarRef.style.setProperty('--navigation-progress-percent', percentString)
     }
 
     if (this.props.isSelected && !prevProps.isSelected) {
@@ -470,6 +500,8 @@ class UrlBar extends React.Component {
     props.startLoadTime = activeFrame.get('startLoadTime')
     props.endLoadTime = activeFrame.get('endLoadTime')
     props.loading = activeFrame.get('loading')
+    props.navigationProgressPercent = tabState.getNavigationProgressPercent(state, activeTabId)
+
     props.showDisplayTime = !props.titleMode && props.displayURL === location
     props.showNoScriptInfo = enableNoScript && scriptsBlocked && scriptsBlocked.size
     props.evCert = activeFrame.getIn(['security', 'evCert'])
@@ -499,10 +531,14 @@ class UrlBar extends React.Component {
   }
 
   get showEvCert () {
-    if (this.props.titleMode || this.props.isActive) {
+    if (this.props.isActive) {
       return null
     }
     return <span className='evCert' title={this.props.evCert}> {this.props.evCert} </span>
+  }
+
+  setUrlBarRef (ref) {
+    this.urlBarRef = ref
   }
 
   render () {
@@ -521,15 +557,19 @@ class UrlBar extends React.Component {
     return <div
       className={cx({
         urlbarForm: true,
+        urlBarForm_focused: this.props.isFocused,
+        urlBarForm_titleMode: this.props.titleMode,
+        urlBarForm_loading: this.props.loading,
         [css(styles.urlbarForm_wide)]: this.props.isWideURLbarEnabled,
         noBorderRadius: this.props.publisherButtonVisible
       })}
+      ref={this.setUrlBarRef}
       id='urlbar'
     >
       {urlbarIconContainer}
       {
         this.props.titleMode
-        ? <div id='titleBar' data-test-id='titleBar'>
+        ? <div className='titleBar' data-test-id='titleBar'>
           <span><strong>{this.props.hostValue}</strong></span>
           <span>{this.props.hostValue && this.titleValue ? ' | ' : ''}</span>
           <span>{this.titleValue}</span>
@@ -591,6 +631,7 @@ class UrlBar extends React.Component {
 }
 
 const styles = StyleSheet.create({
+
   noScriptContainer: {
     display: 'flex',
     padding: '5px',

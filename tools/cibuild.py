@@ -87,4 +87,4 @@ if is_linux:
 execute([npm, 'run', 'build-package'])
 execute([npm, 'run', 'build-installer'])
 
-run_script('upload.py')
+run_script('upload.py', sys.argv[1:])
