@@ -2905,7 +2905,7 @@ const processMediaData = (state, parsed, type, details) => {
   }
 
   // Don't record if visit is in private tab
-  if (!shouldTrackTab(state, tabId)) {
+  if (!module.exports.shouldTrackTab(state, tabId)) {
     return state
   }
 
@@ -2955,6 +2955,12 @@ const processMediaData = (state, parsed, type, details) => {
     providerName: type
   }
 
+  module.exports.getPublisherFromPropsAction(mediaProps, options, mediaKey, duration, revisited)
+
+  return state
+}
+
+const getPublisherFromPropsAction = (mediaProps, options, mediaKey, duration, revisited) => {
   ledgerPublisher.getMedia().getPublisherFromMediaProps(mediaProps, options, (error, response) => {
     if (error) {
       console.error('Error while getting publisher from media', error.toString())
@@ -2973,8 +2979,6 @@ const processMediaData = (state, parsed, type, details) => {
 
     appActions.onLedgerMediaPublisher(mediaKey, response, duration, revisited)
   })
-
-  return state
 }
 
 const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
@@ -3410,7 +3414,8 @@ const getMethods = () => {
     delayFirstSync,
     onPublisherOptionUpdateAction,
     reconcile,
-    setTestMinimums
+    setTestMinimums,
+    getPublisherFromPropsAction
   }
 
   let privateMethods = {}
