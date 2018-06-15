@@ -7,12 +7,16 @@ import sys
 import unittest
 import os
 
+from mock import MockImport, Repo
+
+# Mock requests module
+sys.modules['requests'] = MockImport
+
 dirname = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(dirname, '..'))
 
 import publish_release
 
-from mock import Repo
 
 class TestPublishGetDraft(unittest.TestCase):
   def setUp(self):
