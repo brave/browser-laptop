@@ -601,6 +601,7 @@ function updateDownloadState (win, downloadId, item, state) {
 
 function registerForDownloadListener (session) {
   var repaint = false
+  let networkConnected = true
   session.on('default-download-directory-changed', (e, newPath) => {
     if (newPath !== getSetting(settings.DOWNLOAD_DEFAULT_PATH)) {
       appActions.changeSetting(settings.DOWNLOAD_DEFAULT_PATH, newPath)
@@ -613,6 +614,13 @@ function registerForDownloadListener (session) {
       return
     }
 
+    app.on('network-connected', () => {
+      networkConnected = true
+    })
+    app.on('network-disconnected', () => {
+      networkConnected = false
+    })
+
     const hostWebContents = webContents.hostWebContents || webContents
     const win = BrowserWindow.fromWebContents(hostWebContents) || BrowserWindow.getFocusedWindow()
 
@@ -624,7 +632,12 @@ function registerForDownloadListener (session) {
       if (!item.getSavePath()) {
         return
       }
-      const state = item.isPaused() ? downloadStates.PAUSED : downloadStates.IN_PROGRESS
+      let state
+      if (networkConnected === false) {
+        state = downloadStates.INTERRUPTED
+      } else {
+        state = item.isPaused() ? downloadStates.PAUSED : downloadStates.IN_PROGRESS
+      }
       updateDownloadState(win, downloadId, item, state)
       if (win && !win.isDestroyed() && !win.webContents.isDestroyed() && repaint) {
         win.webContents.send(messages.SHOW_DOWNLOADS_TOOLBAR)
