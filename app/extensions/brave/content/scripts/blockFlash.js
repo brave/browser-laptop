@@ -30,7 +30,7 @@ if (adobeRegex.test(window.location.href)) {
   }
 }
 
-if (chrome.contentSettings.flashEnabled == 'allow') {
+if (chrome.contentSettings.flashEnabled == 'allow' && chrome.contentSettings.torEnabled == 'allow') {
   document.addEventListener('click', (e) => {
     let node = e.target
     while (!node.href && node.parentNode)
@@ -46,6 +46,6 @@ if (chrome.contentSettings.flashEnabled == 'allow') {
   })
 }
 
-if (chrome.contentSettings.plugins != 'allow') {
+if (chrome.contentSettings.plugins != 'allow' || chrome.contentSettings.torEnabled == 'block') {
   executeScript(getBlockFlashPageScript())
 }

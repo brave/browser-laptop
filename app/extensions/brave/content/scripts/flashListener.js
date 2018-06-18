@@ -73,7 +73,7 @@ function hasHiddenFlashElement (elem) {
 
 // If Flash is enabled but not runnable, show a permission notification for small
 // Flash elements
-if (chrome.contentSettings.flashEnabled == 'allow' && chrome.contentSettings.flashAllowed != 'allow') {
+if (chrome.contentSettings.flashEnabled == 'allow' && chrome.contentSettings.flashAllowed != 'allow' && chrome.contentSettings.torEnabled == 'allow') {
   const maxFlashAttempts = 3
   let flashAttempts = 0
   const intervalId = window.setInterval(() => {
