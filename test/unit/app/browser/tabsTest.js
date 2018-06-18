@@ -107,12 +107,14 @@ describe('tabs API unit tests', function () {
 
     appActions = require('../../../../js/actions/appActions')
     windows = require('../../../../app/browser/windows')
+    this.notifyWindowWebContentsAddedSpy = sinon.spy(windows, 'notifyWindowWebContentsAdded')
     mockery.registerMock('./windows', windows)
     tabs = require('../../../../app/browser/tabs')
   })
 
   after(function () {
     mockery.disable()
+    this.notifyWindowWebContentsAddedSpy.restore()
   })
 
   describe('toggleDevTools', function () {
@@ -445,8 +447,131 @@ describe('tabs API unit tests', function () {
     })
   })
 
-  describe.skip('init', function () {
-    it('todo', function () {
+  describe('init', function () {
+    it('should return state', function () {
+      const state = {
+        'stateKey': 'stateValue'
+      }
+      const actual = tabs.init(state, {})
+      assert.equal(actual, state)
+    })
+    describe('on event \'open-url-from-tab\'', function () {
+      it('should create tab with url, openerTabId and exptected active properties', function () {
+        const expectedId = 12
+        const expectedUrl = 'some-url'
+        const expectedArguments = {
+          url: expectedUrl,
+          openerTabId: expectedId,
+          active: true
+        }
+        const source = {
+          getId: () => expectedId
+        }
+        const tempCreate = tabs.create
+        tabs.create = sinon.stub()
+        tabs.init({}, {})
+        process.emit('open-url-from-tab', {}, source, expectedUrl)
+        assert.equal(tabs.create.called, true)
+        assert.equal(tabs.create.calledWithExactly(expectedArguments), true)
+        tabs.create = tempCreate
+      })
+    })
+    describe('on event \'add-new-contents\'', function () {
+      it('should prevent default, if not user gesture', function () {
+        const event = {
+          preventDefault: sinon.stub()
+        }
+        tabs.init({}, {})
+        process.emit('add-new-contents', event, {}, {}, {}, {}, false)
+        assert.equal(event.preventDefault.called, true)
+      })
+      it('should focus on devtools contents, if is background page and devtools open', function () {
+        const navTab = {
+          isBackgroundPage: () => true,
+          isDevToolsOpened: () => true,
+          devToolsWebContents: {
+            focus: sinon.stub()
+          }
+        }
+        tabs.init({}, {})
+        process.emit('add-new-contents', {}, {}, navTab, {}, {}, true)
+        assert.equal(navTab.devToolsWebContents.focus.called, true)
+      })
+      it('should open devtools, if is background page but devtools is not open', function () {
+        const navTab = {
+          isBackgroundPage: () => true,
+          isDevToolsOpened: () => false,
+          openDevTools: sinon.stub()
+        }
+        tabs.init({}, {})
+        process.emit('add-new-contents', {}, {}, navTab, {}, {}, true)
+        assert.equal(navTab.openDevTools.called, true)
+      })
+      it('should return empty, if is a background page but not a tab', function () {
+        const navTab = {
+          isBackgroundPage: () => false,
+          isTab: () => false,
+          openDevTools: sinon.stub()
+        }
+        tabs.init({}, {})
+        process.emit('add-new-contents', {}, {}, navTab, {}, {}, true)
+        assert.equal(navTab.openDevTools.called, false)
+      })
+
+      describe('if is not a background page and is a tab', () => {
+        const expectedTabId = 10
+        const expectedWindowId = 12
+        const expectedOwnerWindowId = 13
+        const navTab = {
+          isBackgroundPage: () => false,
+          isTab: () => true,
+          getURL: () => '',
+          getId: () => '',
+          isDestroyed: () => '',
+          tabValue: () => ({
+            set: () => '',
+            windowId: expectedWindowId
+          }),
+          canGoBack: () => '',
+          canGoForward: () => '',
+          session: {
+            partition: ''
+          },
+          isPlaceholder: () => '',
+          getZoomPercent: () => ''
+        }
+        const source = {
+          isDestroyed: () => '',
+          getId: () => expectedTabId,
+          isGuest: () => '',
+          hostWebContents: ({
+            getOwnerBrowserWindow: () => ({id: expectedOwnerWindowId})
+          })
+        }
+        it('should updateWebContents with opener tab id', function () {
+          this.actualWebContentsCache.updateWebContents = sinon.stub()
+          this.actualWebContentsCache.getWebContents = sinon.stub().returns(navTab)
+          tabs.init({}, {})
+          process.emit('add-new-contents', {}, source, navTab, {}, {}, true)
+          assert.equal(this.actualWebContentsCache.updateWebContents.calledWithExactly('', navTab, expectedTabId), true)
+        })
+
+        it('should notifyWindowWebContentsAdded with new tabs windowId, if new tab has got a window ID', function () {
+          tabs.init({}, {})
+          process.emit('add-new-contents', {}, source, navTab, {}, {}, true)
+          assert.equal(this.notifyWindowWebContentsAddedSpy.getCall(0).args[0], expectedWindowId)
+        })
+
+        it('should notifyWindowWebContentsAdded with hostWebContents owner browser window ID, if new tab has not got a window ID', function () {
+          const clonedTab = Object.assign({}, navTab)
+          clonedTab.tabValue = () => ({set: () => ''})
+          this.actualWebContentsCache.getWebContents = sinon.stub().returns(clonedTab)
+          tabs.init({}, {})
+          process.emit('add-new-contents', {}, source, clonedTab, {}, {}, true)
+          const lastCall = this.notifyWindowWebContentsAddedSpy.callCount - 1
+          assert.equal(this.notifyWindowWebContentsAddedSpy.getCall(lastCall).args[0], expectedOwnerWindowId)
+        })
+      })
     })
   })
 
