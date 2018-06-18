@@ -678,25 +678,31 @@ const collectActivity = (state) => {
       })
 
       if (response.statusCode !== 400) stamp = null
+      result = { reason: err.toString() }
     }
 
-    appActions.onUserModelUploadLogs(stamp, err ? oneHour : oneDay)
+    appActions.onUserModelUploadLogs(stamp, err ? oneHour : oneDay, result)
   })
 
   return state
 }
 
-const uploadLogs = (state, stamp, retryIn) => {
+const uploadLogs = (state, stamp, retryIn, result) => {
   if (noop(state)) return state
 
   const events = userModelState.getReportingEventQueue(state)
   const path = '/v1/surveys/reporter/' + userModelState.getAdUUID(state) + '?product=ads-test'
+  const status = userModelState.getUserModelValue(state, 'status')
+
+  if ((result) && (result.expirations) && (result.expirations.status) && (result.expirations.status !== status)) {
+    state = userModelState.setUserModelValue(state, 'status', result.expirations.status)
+  }
 
   if (stamp) {
     const data = events.filter(entry => entry.get('stamp') > stamp)
 
     state = userModelState.setReportingEventQueue(state, data)
-    appActions.onUserModelLog('Events uploaded', { previous: state.size, current: data.size })
+    appActions.onUserModelLog('Events uploaded', { result, events: { previous: state.size, current: data.size } })
   }
 
   if (collectActivityId) collectActivityId = setTimeout(appActions.onUserModelCollectActivity, retryIn)

@@ -172,7 +172,7 @@ const userModelReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_USERMODEL_UPLOAD_LOGS:
       {
-        state = userModel.uploadLogs(state, action.get('stamp'), action.get('retryIn'))
+        state = userModel.uploadLogs(state, action.get('stamp'), action.get('retryIn'), action.get('result'))
         break
       }
     case appConstants.APP_ON_USERMODEL_DOWNLOAD_SURVEYS:

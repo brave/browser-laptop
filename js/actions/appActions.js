@@ -2000,11 +2000,12 @@ const appActions = {
     })
   },
 
-  onUserModelUploadLogs: function (stamp, retryIn) {
+  onUserModelUploadLogs: function (stamp, retryIn, result) {
     dispatch({
       actionType: appConstants.APP_ON_USERMODEL_UPLOAD_LOGS,
       stamp,
-      retryIn
+      retryIn,
+      result
     })
   },
 
