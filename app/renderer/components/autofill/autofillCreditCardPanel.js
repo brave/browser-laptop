@@ -112,7 +112,21 @@ class AutofillCreditCardPanel extends React.Component {
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const detail = currentWindow.get('autofillCreditCardDetail', Immutable.Map())
-
+    const cardTypes = [
+      { regExp: /^(4)[0-9]{12,18}$/, name: 'Visa' },
+      { regExp: /^(34|37)[0-9]{13}$/, name: 'AmericanExpress' },
+      { regExp: /^5[1-5][0-9]{14}$/, name: 'Mastercard' },
+      { regExp: /^6(0|4|5)[0-9]{14,17 }$/, name: 'Discover' },
+      { regExp: /^35[2-8][0-9][0-9]{12,15}$/, name: 'JCB' },
+      { regExp: /^(2014|2149)[0-9]{11}$/, name: 'Diners EnRoute' },
+      { regExp: /^36[0-9]{12,17}$/, name: 'Diners International' },
+      { regExp: /^(62)[0-9]{14,17}$/, name: 'China Union Pay' },
+      { regExp: /^[0-9]{13,19}$/, name: 'Default' }
+    ]
+    let isValidCreditCard = false
+    for (let i = 0; i < cardTypes.length; ++i) {
+      isValidCreditCard = isValidCreditCard || cardTypes[i].regExp.test(detail.get('card'))
+    }
     const props = {}
     props.name = detail.get('name', '')
     props.card = detail.get('card', '')
@@ -120,8 +134,7 @@ class AutofillCreditCardPanel extends React.Component {
     props.year = detail.get('year')
     props.guid = detail.get('guid', '-1')
     props.disableSaveButton = detail.isEmpty() ||
-      (!detail.get('name') && !detail.get('card'))
-
+    (!detail.get('name') && !detail.get('card')) || !isValidCreditCard
     return props
   }
 

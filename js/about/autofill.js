@@ -84,6 +84,25 @@ class CreditCardItem extends ImmutableComponent {
 
   render () {
     const creditCard = this.props.creditCard
+    const cardTypes = [
+      { regExp: /^(4)[0-9]{12,18}/, name: 'Visa', class: 'fa fa-cc-visa' },
+      { regExp: /^(34|37)[0-9]{13}$/, name: 'American Express', class: 'fa fa-cc-amex' },
+      { regExp: /^5[1-5][0-9]{14}$/, name: 'Mastercard', class: 'fa fa-cc-mastercard' },
+      { regExp: /^(6011|64|65)[0-9]{14,17}$/, name: 'Discover', class: 'fa fa-cc-discover' },
+      { regExp: /^35[2-8][0-9][0-9]{12,15}$/, name: 'JCB', class: 'fa fa-cc-jcb' },
+      { regExp: /^36[0-9]{12,17}$/, name: 'Diners International', class: 'fa fa-cc-diners-club' },
+      { regExp: /^(2014|2149)[0-9]{11}$/, name: 'Diners EnRoute', class: 'fa fa-cc-diners-club' },
+      { regExp: /^[0-9]{13,19}/, name: 'Default', class: 'fa fa-credit-card-alt' }
+    ]
+    let matchedType = {}
+    for (let i = 0; i < cardTypes.length; ++i) {
+      if (cardTypes[i].regExp.test(creditCard.get('card'))) {
+        matchedType = cardTypes[i]
+        break
+      }
+    }
+    if (matchedType === {}) return null
+
     return <tr className='autofillItem'>
       <td className='autofillActions'>
         <span className={cx({
@@ -113,6 +132,9 @@ class CreditCardItem extends ImmutableComponent {
           data-test-id='EditCreditCard'
           title='Edit creditCard'
           onClick={this.onEdit} />
+      </td>
+      <td>
+        <span className={matchedType.class} />
       </td>
     </tr>
   }
