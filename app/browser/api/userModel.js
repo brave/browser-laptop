@@ -24,6 +24,7 @@ const searchProviders = require('../../../js/data/searchProviders').providers
 const settings = require('../../../js/constants/settings')
 
 // State
+const windows = require('../windows')
 const userModelState = require('../../common/state/userModelState')
 const getSetting = require('../../../js/settings').getSetting
 const Immutable = require('immutable')
@@ -32,6 +33,9 @@ const Immutable = require('immutable')
 const urlUtil = require('../../../js/lib/urlutil')
 const urlParse = require('../../common/urlParse')
 const roundtrip = require('./ledger').roundtrip
+
+const testingP = (process.env.NODE_ENV === 'test') || (process.env.LEDGER_VERBOSE === 'true')
+let nextEasterEgg = 0
 
 let initP
 let foregroundP
@@ -128,6 +132,13 @@ const generateAdReportingEvent = (state, eventType, action) => {
 
         if (!Array.isArray(classification)) classification = classification.toArray()
         map.tabClassification = classification
+
+        const now = underscore.now()
+        if ((testingP) && (tabUrl === 'https://www.iab.com/') && (nextEasterEgg < now)) {
+          nextEasterEgg = now + (30 * 1000)
+
+          state = checkReadyAdServe(state, windows.getActiveWindowId())
+        }
         break
       }
 
@@ -601,7 +612,6 @@ const confirmAdUUIDIfAdEnabled = (state) => {
 
 let collectActivityId
 
-let testingP = (process.env.NODE_ENV === 'test') || (process.env.LEDGER_VERBOSE === 'true')
 const oneDay = (testingP ? 600 : 86400) * 1000
 const oneHour = (testingP ? 25 : 3600) * 1000
 const hackStagingOn = true
