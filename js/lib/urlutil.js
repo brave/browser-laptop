@@ -5,10 +5,11 @@
 'use strict'
 
 // characters, then : with optional //
-const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]+)(?::(\/\/)?)(?!\d)/i
+const rscheme = /^(?:[a-z\u00a1-\uffff0-9-+]{2,})(?::(\/\/)?)(?!\d)/i
 const httpScheme = 'http://'
 const httpsScheme = 'https://'
 const fileScheme = 'file://'
+const windowsFileScheme = /[a-z]:\\/i
 const defaultScheme = httpScheme
 const os = require('os')
 const punycode = require('punycode/')
@@ -67,6 +68,11 @@ const UrlUtil = {
       input = fileScheme + input
     }
 
+    if (windowsFileScheme.test(input)) {
+      input = input.replace(/\\/g, '/')
+      input = `${fileScheme}/${input}`
+    }
+
     // If there's no scheme, prepend the default scheme
     if (!UrlUtil.hasScheme(input)) {
       input = defaultScheme + input
@@ -111,12 +117,13 @@ const UrlUtil = {
     // - starts with "?" or "."
     // - contains "? "
     // - ends with "." (and was not preceded by a domain or /)
-    const case2Reg = /(^\?)|(\?.+\s)|(^\.)|(^[^.+]*[^/]*\.$)/
+    const case2Reg = /(^\?)|(\?\s+)|(^\.)|(^[^.+]*[^/]*\.$)/
     // for cases, pure string
     const case3Reg = /[?./\s:]/
     // for cases, data:uri, view-source:uri and about
     const case4Reg = /^(data|view-source|mailto|about|chrome-extension|chrome-devtools|magnet|chrome):.*/
-
+    // for Windows and unix file paths
+    const case5Reg = /(?:^\/)|(?:^[a-zA-Z]:\\)/
     let str = input.trim()
     const scheme = UrlUtil.getScheme(str)
 
@@ -127,7 +134,7 @@ const UrlUtil = {
       return true
     }
     if (case2Reg.test(str) || !case3Reg.test(str) ||
-        (scheme === undefined && /\s/g.test(str))) {
+    (scheme === undefined && /\s/g.test(str) && !case5Reg.test(str))) {
       return true
     }
     if (case4Reg.test(str)) {

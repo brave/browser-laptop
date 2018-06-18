@@ -46,6 +46,9 @@ module.exports = {
       'is an absolute file path without scheme': (test) => {
         test.equal(urlUtil().isNotURL('/file/path/to/file'), false)
       },
+      'is an absolute file path without scheme with space in name': (test) => {
+        test.equal(urlUtil().isNotURL('/path/to/file/with space'), false)
+      },
       'is an absolute file path with scheme': (test) => {
         test.equal(urlUtil().isNotURL('file:///file/path/to/file'), false)
       },
@@ -97,6 +100,15 @@ module.exports = {
       },
       'has custom protocol': (test) => {
         test.equal(urlUtil().isNotURL('brave://test'), false)
+      },
+      'returns url with encoded space character in the query string': (test) => {
+        test.equal(urlUtil().isNotURL('https://www.google.ca/search?q=dog cat'), false)
+      },
+      'is a Windows file path without scheme': (test) => {
+        test.equal(urlUtil().isNotURL('C:\\Path\to\\file'), false)
+      },
+      'is a Windows file path without scheme with space in file name': (test) => {
+        test.equal(urlUtil().isNotURL('C:\\Path\\with\\some space'), false)
       }
     },
 
@@ -121,6 +133,9 @@ module.exports = {
         },
         'has a question mark followed by a space': (test) => {
           test.equal(urlUtil().isNotURL('? brave'), true)
+        },
+        'is a pure query string without domain name': (test) => {
+          test.equal(urlUtil().isNotURL('?query=hello'), true)
         },
         'starts with period': (test) => {
           test.equal(urlUtil().isNotURL('.brave'), true)
@@ -160,6 +175,12 @@ module.exports = {
     },
     'calls prependScheme': (test) => {
       test.equal(urlUtil().getUrlFromInput('/file/path/to/file'), 'file:///file/path/to/file')
+    },
+    'returns URL with file schema for Windows': (test) => {
+      test.equal(urlUtil().getUrlFromInput('C:\\path\\to\\file'), 'file:///C:/path/to/file')
+    },
+    'returns url with file schema for Windows with space character encoded': (test) => {
+      test.equal(urlUtil().getUrlFromInput('C:\\path\\to\\file name'), 'file:///C:/path/to/file%20name')
     }
   },
 
