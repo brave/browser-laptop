@@ -90,7 +90,7 @@
     "async": "^2.0.1",
     "bat-balance": "^1.0.7",
     "bat-client": "^3.3.2",
-    "bat-publisher": "^2.0.17",
+    "bat-publisher": "^2.0.18",
     "bignumber.js": "^4.0.4",
     "bloodhound-js": "brave/bloodhound",
     "clipboard-copy": "^1.0.0",
