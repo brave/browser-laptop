@@ -660,7 +660,7 @@ const collectActivity = (state) => {
   let stamp
 
   if (!mark) {
-    appActions.onUserModelUploadLogs(null, oneDay)
+    appActions.onUserModelUploadLogs(null, oneDay, Immutable.Map())
 
     return state
   }
@@ -705,11 +705,9 @@ const uploadLogs = (state, stamp, retryIn, result) => {
   const events = userModelState.getReportingEventQueue(state)
   const path = '/v1/surveys/reporter/' + userModelState.getAdUUID(state) + '?product=ads-test'
   const status = userModelState.getUserModelValue(state, 'status')
+  const newState = result.getIn([ 'expirations', 'status' ])
 
-  result = result.toJS()
-  if ((result.expirations) && (result.expirations.status) && (result.expirations.status !== status)) {
-    state = userModelState.setUserModelValue(state, 'status', result.expirations.status)
-  }
+  if (newState !== status) state = userModelState.setUserModelValue(state, 'status', newState)
 
   if (stamp) {
     const data = events.filter(entry => entry.get('stamp') > stamp)
