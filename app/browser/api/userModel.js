@@ -173,11 +173,11 @@ const generateAdReportingEvent = (state, eventType, action) => {
             allowed: userModelState.getUserModelValue(state, 'allowed')
           }
         }
+        const stateSettings = state.get('settings')
         underscore.keys(mapping).forEach((k) => {
           const v = mapping[k]
 
-          // state.settings isn't updated yet (sigh...)
-          map.settings[v] = k !== key ? getSetting(k, state.settings) : action.get('value')
+          map.settings[v] = k !== key ? getSetting(k, stateSettings) : action.get('value')
           if (k === settings.ADS_OPERATING_MODE) map.settings[v] = map.settings[v] ? 'B' : 'A'
         })
         delete map.settings.enabled
@@ -210,7 +210,7 @@ const processLocales = (state, result) => {
 
   state = userModelState.setUserModelValue(state, 'locales', result)
 
-  let locale = getSetting(settings.ADS_LOCALE, state.settings)
+  let locale = getSetting(settings.ADS_LOCALE, state.get('settings'))
 
   if (locale) {
     try { locale = um.setLocaleSync(locale) } catch (ex) {

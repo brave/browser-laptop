@@ -146,8 +146,8 @@ const userModelState = {
     const hourWindow = 60 * 60
     const dayWindow = 24 * hourWindow
 
-    const hourAllowed = getSetting(settings.ADS_PER_HOUR, state.settings)
-    const dayAllowed = getSetting(settings.ADS_PER_DAY, state.settings)
+    const hourAllowed = getSetting(settings.ADS_PER_HOUR, state.get('settings'))
+    const dayAllowed = getSetting(settings.ADS_PER_DAY, state.get('settings'))
 
     const respectsHourLimit = historyRespectsRollingTimeConstraint(history, hourWindow, hourAllowed)
     const respectsDayLimit = historyRespectsRollingTimeConstraint(history, dayWindow, dayAllowed)
