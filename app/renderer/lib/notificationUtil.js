@@ -162,7 +162,7 @@ const notificationUtil = {
     })
   },
 
-  onAllowCheck: (serveP) => {
+  onAllowedCheck: (serveP) => {
     notifier.enabled((err, result) => {
       appActions.onUserModelLog(appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_CHECK, {err, result})
       appActions.onNativeNotificationAllowedReport(!err && result, serveP)
