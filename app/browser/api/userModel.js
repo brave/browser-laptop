@@ -170,7 +170,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
         map.settings = {
           notifications: {
             configured: userModelState.getUserModelValue(state, 'configured'),
-            available: userModelState.getUserModelValue(state, 'available')
+            allowed: userModelState.getUserModelValue(state, 'available')
           }
         }
         underscore.keys(mapping).forEach((k) => {
