@@ -23,6 +23,9 @@ class DisabledContent extends React.Component {
     this.state = {
       agree: false
     }
+
+    // check if notifications are configured correctly and currently allowed
+    appActions.onNativeNotificationCheck(false)
   }
 
   onAgree () {
@@ -63,6 +66,10 @@ class DisabledContent extends React.Component {
   }
 
   showWarning (config, available) {
+    if (config === undefined && available === undefined) {
+      return null
+    }
+
     if (!available) {
       return <span data-l10n-id='adsWelcomeAvailable' className={css(styles.disabledContent__message__warning)} />
     }
@@ -80,8 +87,8 @@ class DisabledContent extends React.Component {
   }
 
   render () {
-    const config = this.props.userModelData.configured || false
-    const available = this.props.userModelData.available || false
+    const config = this.props.userModelData.configured
+    const available = this.props.userModelData.available
 
     return <section className={css(styles.disabledContent)} data-test-id='disabledContent'>
       <div className={css(styles.disabledContent__message)} data-test-id='paymentsMessage'>
