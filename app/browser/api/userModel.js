@@ -706,7 +706,8 @@ const uploadLogs = (state, stamp, retryIn, result) => {
   const path = '/v1/surveys/reporter/' + userModelState.getAdUUID(state) + '?product=ads-test'
   const status = userModelState.getUserModelValue(state, 'status')
 
-  if ((result) && (result.expirations) && (result.expirations.status) && (result.expirations.status !== status)) {
+  result = result.toJS()
+  if ((result.expirations) && (result.expirations.status) && (result.expirations.status !== status)) {
     state = userModelState.setUserModelValue(state, 'status', result.expirations.status)
   }
 
