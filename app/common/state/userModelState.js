@@ -47,11 +47,7 @@ const historyRespectsRollingTimeConstraint = function (history, secondsWindow, a
     }
   }
 
-  if (recentCount > allowableAdCount) {
-    return false
-  }
-
-  return true
+  return recentCount <= allowableAdCount
 }
 
 const appendToRingBufferUnderKey = (state, key, item, maxRows) => {
@@ -99,7 +95,7 @@ const setReportingEventQueue = (state, queue) => {
 
 const userModelState = {
   setUserModelValue: (state, key, value) => {
-    if ((!key) || (!userModelState.getAdEnabledValue(state))) return state
+    if (!key) return state
 
     state = validateState(state)
 
@@ -120,7 +116,7 @@ const userModelState = {
 
   appendAdShownToAdHistory: (state) => {
     const stateKey = [ 'userModel', 'adsShownHistory' ]
-    var unixTime = unixTimeNowSeconds()
+    const unixTime = unixTimeNowSeconds()
 
     return appendToRingBufferUnderKey(state, stateKey, unixTime, maxRowsInAdsShownHistory)
   },
@@ -155,11 +151,7 @@ const userModelState = {
 
     const respectsHourLimit = historyRespectsRollingTimeConstraint(history, hourWindow, hourAllowed)
     const respectsDayLimit = historyRespectsRollingTimeConstraint(history, dayWindow, dayAllowed)
-    if (!respectsHourLimit || !respectsDayLimit) {
-      return false
-    }
-
-    return true
+    return respectsHourLimit && respectsDayLimit
   },
 
   getPageScoreHistory: (state, mutable = false) => {
@@ -451,10 +443,9 @@ const userModelState = {
     return setReportingEventQueue(state, [])
   },
 
-  getReportingEventQueue: getReportingEventQueue,
+  getReportingEventQueue,
 
-  setReportingEventQueue: setReportingEventQueue
-
+  setReportingEventQueue
 }
 
 module.exports = userModelState

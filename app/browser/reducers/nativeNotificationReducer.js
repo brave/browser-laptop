@@ -4,8 +4,6 @@
 
 'use strict'
 
-const notifier = require('brave-ads-notifier')
-
 // Actions
 const appActions = require('../../../js/actions/appActions')
 
@@ -31,19 +29,21 @@ const nativeNotifications = (state, action, immutableAction) => {
         notificationUtil.createNotification(action.get('options'))
         break
       }
+    case appConstants.APP_ON_NATIVE_NOTIFICATION_CHECK:
+      {
+        notificationUtil.onConfigCheck()
+        notificationUtil.onAllowCheck(!!action.get('serveP'))
+        break
+      }
     case appConstants.APP_ON_NATIVE_NOTIFICATION_CONFIGURATION_CHECK:
       {
-        notifier.configured((err, result) => {
-          appActions.onUserModelLog(appConstants.APP_ON_NATIVE_NOTIFICATION_CONFIGURATION_CHECK, {err, result})
-
-          appActions.onNativeNotificationConfigurationReport((!err) && (result))
-        })
+        notificationUtil.onConfigCheck()
         break
       }
     case appConstants.APP_ON_NATIVE_NOTIFICATION_CONFIGURATION_REPORT:
       {
         const ok = !!action.get('ok')
-        const previous = userModelState.getUserModelValue(state, 'allowed')
+        const previous = userModelState.getUserModelValue(state, 'configured')
 
         if (ok !== previous) state = userModelState.setUserModelValue(state, 'configured', ok)
 
@@ -52,20 +52,16 @@ const nativeNotifications = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_CHECK:
       {
-        notifier.enabled((err, result) => {
-          appActions.onUserModelLog(appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_CHECK, {err, result})
-
-          appActions.onNativeNotificationAllowedReport((!err) && (result), !!action.get('serveP'))
-        })
+        notificationUtil.onAllowCheck(!!action.get('serveP'))
         break
       }
     case appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_REPORT:
       {
         const ok = !!action.get('ok')
-        const previous = userModelState.getUserModelValue(state, 'allowed')
+        const previous = userModelState.getUserModelValue(state, 'available')
         const serveP = !!action.get('serveP')
 
-        if (ok !== previous) state = userModelState.setUserModelValue(state, 'allowed', ok)
+        if (ok !== previous) state = userModelState.setUserModelValue(state, 'available', ok)
         if ((!serveP) || (ok !== previous)) {
           const action = Immutable.fromJS({
             actionType: appConstants.APP_CHANGE_SETTING,
