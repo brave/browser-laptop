@@ -641,6 +641,7 @@ AppStore
     adFrequency: any,
     adServed: any,
     allowed: boolean,
+    available: boolean,
     config: boolean,
     currentSSID: string,
     error: {

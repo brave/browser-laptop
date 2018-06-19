@@ -170,7 +170,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
         map.settings = {
           notifications: {
             configured: userModelState.getUserModelValue(state, 'configured'),
-            allowed: userModelState.getUserModelValue(state, 'available')
+            allowed: userModelState.getUserModelValue(state, 'allowed')
           }
         }
         underscore.keys(mapping).forEach((k) => {
@@ -254,7 +254,7 @@ const initialize = (state, adEnabled) => {
 
   state = processLocales(state, um.getLocalesSync())
 
-  return confirmAdUUIDIfAdEnabled(state)
+  return confirmAdUUIDIfAdEnabled(state, adEnabled)
 }
 
 const appFocused = (state, focusP) => {
@@ -602,8 +602,10 @@ const generateAndSetAdUUIDButOnlyIfDNE = (state) => {
   return state
 }
 
-const confirmAdUUIDIfAdEnabled = (state) => {
-  let adEnabled = userModelState.getAdEnabledValue(state)
+const confirmAdUUIDIfAdEnabled = (state, adEnabled) => {
+  if (adEnabled == null) {
+    adEnabled = userModelState.getAdEnabledValue(state)
+  }
 
   if (adEnabled) state = generateAndSetAdUUIDButOnlyIfDNE(state)
 
