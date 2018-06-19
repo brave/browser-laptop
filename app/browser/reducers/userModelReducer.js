@@ -26,8 +26,6 @@ const userModelReducer = (state, action, immutableAction) => {
   switch (action.get('actionType')) {
     case appConstants.APP_SET_STATE: // performed once on app startup
       {
-        state = userModel.initialize(state)
-
         state = userModel.generateAdReportingEvent(state, 'restart', action)
         break
       }

@@ -2141,6 +2141,13 @@ const appActions = {
     })
   },
 
+  onNativeNotificationCheck: function (serveP) {
+    dispatch({
+      actionType: appConstants.APP_ON_NATIVE_NOTIFICATION_CHECK,
+      serveP
+    })
+  },
+
   onNativeNotificationAllowedReport: function (ok, serveP) {
     dispatch({
       actionType: appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_REPORT,
