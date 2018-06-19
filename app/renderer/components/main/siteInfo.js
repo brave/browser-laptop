@@ -30,9 +30,6 @@ const urlUtil = require('../../../../js/lib/urlutil')
 const globalStyles = require('../styles/global')
 const commonStyles = require('../styles/commonStyles')
 
-// Constants
-const settings = require('../../../../js/constants/settings')
-
 class SiteInfo extends React.Component {
   constructor (props) {
     super(props)
@@ -66,7 +63,6 @@ class SiteInfo extends React.Component {
   }
 
   onDisableTor () {
-    appActions.changeSetting(settings.USE_TOR_PRIVATE_TABS, false)
     appActions.recreateTorTab(false, this.props.activeTabId,
       this.props.activeTabIndex)
   }
