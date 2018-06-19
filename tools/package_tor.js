@@ -28,10 +28,10 @@ if (isWindows) {
   // To-Do: https://github.com/brave/browser-laptop/issues/14291
   torVersion = '0.3.2.10'
 } else {
-  torVersion = '0.3.3.6'
+  torVersion = '0.3.3.7'
 }
 
-const braveVersion = '3'
+const braveVersion = '4'
 var torURL = torS3Prefix + 'tor-' + torVersion + '-' + process.platform + '-brave-' + braveVersion
 
 if (isWindows) {
@@ -45,9 +45,9 @@ if (!fs.existsSync(torPath)) {
 
 var sha512Tor
 if (isDarwin) {
-  sha512Tor = '49c7bf2bb648faca53c578b69a8e85e6e817ddd5d9991cc3c61d6d445dcca8f4a745053a57f4093bb161168d1f5d6dba005a9d969a75c286013a37c273b3bb64'
+  sha512Tor = '12d14784724c71f573aeebeaeaa22e39e271b565bc02cdd630d4d70da1b6ba9ffef61d4145735b8f7874abee08c67e6445cf854c877a9d69763332100c9dc293'
 } else if (isLinux) {
-  sha512Tor = 'a93c447ede02df5ea5992c1d1c18ea16544b82513a0c8f21cd818c7724b2c489970c749444e5098f1c57f6e4db44106825ad23a41dbb277e2576d22ae38e6ea6'
+  sha512Tor = '868c0f2c933445ca68f330ade872b66b6e2914eccd6b966c300f006468e921813eb7311345213d9e1546e85be400b7d2842506192b8d0ec125c3774c6e5c6d16'
 } else {
   sha512Tor = 'bd25dcd1e6ca8c1048eaac584aa462a030a302d9f13e55d7f13f4003ec24b9e6ac1396fa62b2bda2dfbd1babed69fe205c605bf978c0779995f4817add84f981'
 }
