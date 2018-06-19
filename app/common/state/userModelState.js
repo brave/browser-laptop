@@ -414,8 +414,6 @@ const userModelState = {
   },
 
   setAdUUID: (state, uuid) => {
-    if (!userModelState.getAdEnabledValue(state)) return state
-
     return state.setIn([ 'userModel', 'adUUID' ], uuid)
   },
 
@@ -426,10 +424,6 @@ const userModelState = {
 
     return setUserSurveyQueue(state, q.push(Immutable.Map(survey)))
   },
-
-  getUserSurveyQueue: getUserSurveyQueue,
-
-  setUserSurveyQueue: setUserSurveyQueue,
 
   appendToReportingEventQueue: (state, event) => {
     let q = getReportingEventQueue(state)
@@ -442,6 +436,10 @@ const userModelState = {
   flushReportingEventQueue: (state) => {
     return setReportingEventQueue(state, [])
   },
+
+  getUserSurveyQueue,
+
+  setUserSurveyQueue,
 
   getReportingEventQueue,
 

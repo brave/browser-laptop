@@ -4,6 +4,8 @@
 
 'use strict'
 
+const notifier = require('brave-ads-notifier')
+
 // Actions
 const appActions = require('../../../js/actions/appActions')
 
@@ -31,8 +33,13 @@ const nativeNotifications = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_NATIVE_NOTIFICATION_CHECK:
       {
+        if (!notifier.available()) {
+          state = userModelState.setUserModelValue(state, 'available', false)
+        } else {
+          state = userModelState.setUserModelValue(state, 'available', true)
+        }
         notificationUtil.onConfigCheck()
-        notificationUtil.onAllowCheck(!!action.get('serveP'))
+        notificationUtil.onAllowedCheck(!!action.get('serveP'))
         break
       }
     case appConstants.APP_ON_NATIVE_NOTIFICATION_CONFIGURATION_CHECK:
@@ -52,16 +59,16 @@ const nativeNotifications = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_CHECK:
       {
-        notificationUtil.onAllowCheck(!!action.get('serveP'))
+        notificationUtil.onAllowedCheck(!!action.get('serveP'))
         break
       }
     case appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_REPORT:
       {
         const ok = !!action.get('ok')
-        const previous = userModelState.getUserModelValue(state, 'available')
+        const previous = userModelState.getUserModelValue(state, 'allowed')
         const serveP = !!action.get('serveP')
 
-        if (ok !== previous) state = userModelState.setUserModelValue(state, 'available', ok)
+        if (ok !== previous) state = userModelState.setUserModelValue(state, 'allowed', ok)
         if ((!serveP) || (ok !== previous)) {
           const action = Immutable.fromJS({
             actionType: appConstants.APP_CHANGE_SETTING,
