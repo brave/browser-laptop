@@ -20,12 +20,17 @@ const windowState = require('../../common/state/windowState')
 const userModel = require('../api/userModel')
 const demoApi = require('../api/userModelLog')
 const {makeImmutable} = require('../../common/state/immutableUtil')
+const getSetting = require('../../../js/settings').getSetting
 
 const userModelReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case appConstants.APP_SET_STATE: // performed once on app startup
       {
+        if (getSetting(settings.ADS_ENABLED, state.get('settings'))) {
+          userModel.initialize(state, true)
+        }
+
         state = userModel.generateAdReportingEvent(state, 'restart', action)
         break
       }
