@@ -151,7 +151,7 @@ module.exports = {
     'general.spellcheck-languages': Immutable.fromJS(['en-US']),
     'search.default-search-engine': 'Google',
     'search.offer-search-suggestions': false, // false by default for privacy reasons
-    'search.use-alternate-private-search-engine': false,
+    'search.use-alternate-private-search-engine': true,
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
     'tabs.tabs-per-page': 20,
@@ -174,7 +174,6 @@ module.exports = {
     'security.autoplay.media': autoplayOption.ALWAYS_ALLOW,
     'security.flash.installed': false,
     'security.site-isolation-enabled': false,
-    'tor.private-tabs.enabled': false,
     'shields.blocked-count-badge': true,
     'shields.compact-bravery-panel': false,
     // sync
