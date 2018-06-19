@@ -120,7 +120,7 @@ function handleShortcut (frameKey, shortcut, e, args) {
         appActions.createTabRequested({
           url: sourceLocation,
           isPrivate,
-          isTor: isPrivate && getSetting(settings.USE_TOR_PRIVATE_TABS),
+          isTor: frameStateUtil.isTor(frame),
           partitionNumber: frame.get('partitionNumber'),
           openerTabId: tabId,
           active: true
