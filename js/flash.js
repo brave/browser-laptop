@@ -11,6 +11,7 @@ const {getOrigin} = require('./lib/urlutil')
 const locale = require('../app/locale')
 const messages = require('./constants/messages')
 const settings = require('./constants/settings')
+const appConfig = require('./constants/appConfig')
 const {getSetting} = require('./settings')
 const {memoize} = require('underscore')
 const tabState = require('../app/common/state/tabState')
@@ -163,7 +164,7 @@ module.exports.onFlashContextMenu = (state, tabId) => {
   if (!tab) {
     return
   }
-  if (tabState.isIncognito(state, tabId) && getSetting(settings.USE_TOR_PRIVATE_TABS)) {
+  if (tab.session && tab.session.partition === appConfig.tor.partition) {
     return
   }
 
