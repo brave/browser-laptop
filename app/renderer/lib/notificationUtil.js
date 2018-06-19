@@ -10,6 +10,7 @@ const appActions = require('../../../js/actions/appActions')
 
 // Constants
 const notificationTypes = require('../../common/constants/notificationTypes')
+const appConstants = require('../../../js/constants/appConstants')
 
 // State
 const windowState = require('../../common/state/windowState')
@@ -152,6 +153,20 @@ const notificationUtil = {
           break
         }
     }
+  },
+
+  onConfigCheck: () => {
+    notifier.configured((err, result) => {
+      appActions.onUserModelLog(appConstants.APP_ON_NATIVE_NOTIFICATION_CONFIGURATION_CHECK, {err, result})
+      appActions.onNativeNotificationConfigurationReport(!err && result)
+    })
+  },
+
+  onAllowCheck: (serveP) => {
+    notifier.enabled((err, result) => {
+      appActions.onUserModelLog(appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_CHECK, {err, result})
+      appActions.onNativeNotificationAllowedReport(!err && result, serveP)
+    })
   }
 }
 

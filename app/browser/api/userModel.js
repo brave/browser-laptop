@@ -170,7 +170,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
         map.settings = {
           notifications: {
             configured: userModelState.getUserModelValue(state, 'configured'),
-            allowed: userModelState.getUserModelValue(state, 'allowed')
+            available: userModelState.getUserModelValue(state, 'available')
           }
         }
         underscore.keys(mapping).forEach((k) => {
@@ -225,7 +225,7 @@ const processLocales = (state, result) => {
 }
 
 const initialize = (state, adEnabled) => {
-  if ((adEnabled === false) || (initP)) return state
+  if (!adEnabled || initP) return state
 
   initP = true
 
