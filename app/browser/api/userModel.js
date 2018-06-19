@@ -120,6 +120,9 @@ const generateAdReportingEvent = (state, eventType, action) => {
 
         if (!tabUrl.startsWith('http://') && !tabUrl.startsWith('https://')) return state
 
+        const events = userModelState.getReportingEventQueue(state)
+        if (events.some(entry => (entry.get('type') === 'notify') && (entry.get('notificationUrl') === tabUrl))) return state
+
         map.tabId = String(tabValue.get('tabId'))
         map.tabType = 'click'
 
