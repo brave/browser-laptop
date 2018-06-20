@@ -59,7 +59,7 @@ if (isLinux) {
 }
 
 if (isWindows) {
-  appName = appName.replace(/-/, '')
+  appName = appName.replace(/-/g, '')
 }
 
 const buildDir = appName + '-' + process.platform + '-' + arch
