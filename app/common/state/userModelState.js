@@ -35,19 +35,17 @@ const unixTimeNowSeconds = function () {
 }
 
 const historyRespectsRollingTimeConstraint = function (history, secondsWindow, allowableAdCount) {
-  let n = history.size
-  let now = unixTimeNowSeconds()
+  const n = history.size
+  const now = unixTimeNowSeconds()
   let recentCount = 0
 
   for (let i = 0; i < n; i++) {
-    let timeOfAd = history.get(i)
-    let delta = now - timeOfAd
-    if (delta < secondsWindow) {
-      recentCount++
-    }
+    const timeOfAd = history.get(i)
+
+    if ((now - timeOfAd) < secondsWindow) recentCount++
   }
 
-  return recentCount <= allowableAdCount
+  return (recentCount <= allowableAdCount)
 }
 
 const appendToRingBufferUnderKey = (state, key, item, maxRows) => {
@@ -61,14 +59,11 @@ const appendToRingBufferUnderKey = (state, key, item, maxRows) => {
   if (!Immutable.List.isList(previous)) previous = Immutable.List()
 
   let ringbuf = previous.push(item)
-  let n = ringbuf.size
+  const n = ringbuf.size
 
   // this is the "rolling window"
   // in general, this is triggered w/ probability 1
-  if (n > maxRows) {
-    let diff = n - maxRows
-    ringbuf = ringbuf.slice(diff)
-  }
+  if (n > maxRows) ringbuf = ringbuf.slice(n - maxRows)
 
   return state.setIn(key, ringbuf)
 }
@@ -156,11 +151,9 @@ const userModelState = {
 
   getPageScoreHistory: (state, mutable = false) => {
     state = validateState(state)
-    let history = state.getIn([ 'userModel', 'pageScoreHistory' ]) || []
+    const history = state.getIn([ 'userModel', 'pageScoreHistory' ]) || []
 
-    if (!mutable) return makeImmutable(history)
-
-    return makeJS(history)
+    return (mutable ? makeJS(history) : makeImmutable(history))
   },
 
   removeAllHistory: (state) => {
@@ -260,13 +253,9 @@ const userModelState = {
   },
 
   getUserModelTimingMdl: (state, mutable = true) => {
-    let mdl = state.getIn([ 'userModel', 'timingModel' ]) || Immutable.List()
+    const mdl = state.getIn([ 'userModel', 'timingModel' ]) || Immutable.List()
 
-    if (!mutable) {
-      return makeImmutable(mdl) // immutable version
-    } else {
-      return makeJS(mdl) // mutable version, which is what elph expects
-    }
+    return (mutable ? makeJS(mdl) : makeImmutable(mdl))
   },
 
   setUserModelTimingMdl: (state, model) => {
