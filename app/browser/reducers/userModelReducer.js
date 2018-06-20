@@ -126,7 +126,13 @@ const userModelReducer = (state, action, immutableAction) => {
         switch (action.get('key')) {
           case settings.ADS_ENABLED:
             {
-              state = userModel.initialize(state, action.get('value'))
+              const value = action.get('value')
+              state = userModel.initialize(state, value)
+              if (!value) {
+                appActions.createTabRequested({
+                  url: 'https://brave.com/ads-goodbye'
+                })
+              }
               break
             }
           case settings.ADS_PLACE:
