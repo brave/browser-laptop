@@ -33,19 +33,19 @@ describe('tor tab tests', function () {
   })
 
   it('uses ddg if setting is on', function * () {
-    yield this.app.client.changeSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, true)
+    yield this.app.client.changeSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE_TOR, true)
     yield this.app.client
-      .newTab({ isPrivate: true })
-      .pause(1000)
+      .newTab({ isPrivate: true, isTor: true })
+      .pause(10000) // wait for tor init
       .setValue(urlInput, 'zzz')
       .keys(Brave.keys.ENTER)
       .windowByUrl(Brave.browserWindowUrl)
       .waitForInputText(urlInput, /duckduckgo/)
   })
   it('does not use ddg if setting is off', function * () {
-    yield this.app.client.changeSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, false)
+    yield this.app.client.changeSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE_TOR, false)
     yield this.app.client
-      .newTab({ isPrivate: true })
+      .newTab({ isPrivate: true, isTor: true })
       .setValue(urlInput, 'test')
       .keys(Brave.keys.ENTER)
       .windowByUrl(Brave.browserWindowUrl)

@@ -290,6 +290,7 @@ class SearchTab extends ImmutableComponent {
       <SettingsList>
         <DefaultSectionTitle data-l10n-id='privateTabsSearchSettingsTitle' />
         <SettingCheckbox dataL10nId='useDuckDuckGoForPrivateSearch' prefKey={settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='useDuckDuckGoForPrivateSearchTor' prefKey={settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE_TOR} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
       </SettingsList>
       <DefaultSectionTitle data-l10n-id='locationBarSettings' />
       <SettingsList>
