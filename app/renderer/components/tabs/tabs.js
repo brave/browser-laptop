@@ -45,17 +45,6 @@ class Tabs extends React.Component {
     this.onPrevPage = this.onPrevPage.bind(this)
     this.onNextPage = this.onNextPage.bind(this)
     this.onNewTabLongPress = this.onNewTabLongPress.bind(this)
-    this.onMouseLeave = this.onMouseLeave.bind(this)
-  }
-
-  onMouseLeave () {
-    if (this.props.fixTabWidth == null) {
-      return
-    }
-
-    windowActions.onTabMouseLeave({
-      fixTabWidth: null
-    })
   }
 
   onPrevPage () {
@@ -157,7 +146,6 @@ class Tabs extends React.Component {
     props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state))
 
     // used in other functions
-    props.fixTabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.tabPageIndex = currentWindow.getIn(['ui', 'tabs', 'tabPageIndex'])
     props.dragWindowId = dragData.get('windowId')
     props.totalPages = totalPages
@@ -170,7 +158,6 @@ class Tabs extends React.Component {
     this.tabRefs = []
     return <div className={css(styles.tabs)}
       data-test-id='tabs'
-      onMouseLeave={this.onMouseLeave}
     >
       <span className={css(
         styles.tabs__tabStrip,
