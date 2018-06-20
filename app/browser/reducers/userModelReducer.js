@@ -27,17 +27,13 @@ const userModelReducer = (state, action, immutableAction) => {
   switch (action.get('actionType')) {
     case appConstants.APP_SET_STATE: // performed once on app startup
       {
-        if (getSetting(settings.ADS_ENABLED, state.get('settings'))) {
-          userModel.initialize(state, true)
-        }
-
-        state = userModel.generateAdReportingEvent(state, 'restart', action)
+        if (getSetting(settings.ADS_ENABLED, state.get('settings'))) state = userModel.initialize(state, true)
         break
       }
     case appConstants.APP_WINDOW_UPDATED:
       {
-        let winData = windowState.getActiveWindow(state)
-        let focusP = winData && winData.get('focused')
+        const winData = windowState.getActiveWindow(state)
+        const focusP = winData && winData.get('focused')
 
         userModel.appFocused(state, focusP)
         state = userModel.generateAdReportingEvent(state, focusP ? 'foreground' : 'background', action)
@@ -48,11 +44,9 @@ const userModelReducer = (state, action, immutableAction) => {
         const changeInfo = action.get('changeInfo')
         const stat = changeInfo && changeInfo.get('status')
         const complete = stat === 'complete'
-
         const tabValue = action.get('tabValue')
-        if ((tabValue) && (tabValue.get('incongnito') === true)) {
-          break
-        }
+
+        if ((tabValue) && (tabValue.get('incongnito') === true)) break
 
         if (complete) state = userModel.generateAdReportingEvent(state, 'load', action)
 
@@ -80,11 +74,7 @@ const userModelReducer = (state, action, immutableAction) => {
         const tabId = action.get('tabId')
         const tabValue = tabState.getByTabId(state, tabId)
 
-        if (tabValue == null) break
-
-        if (tabValue.get('incognito') === true) {
-          break
-        }
+        if ((tabValue == null) || (tabValue.get('incognito') === true)) break
 
         const url = tabValue.get('url')
         state = userModel.tabUpdate(state, action)
@@ -108,11 +98,7 @@ const userModelReducer = (state, action, immutableAction) => {
         const tabId = action.get('tabId')
         const tabValue = tabState.getByTabId(state, tabId)
 
-        if (tabValue == null) break
-
-        if (tabValue.get('incognito') === true) {
-          break
-        }
+        if ((tabValue == null) || (tabValue.get('incognito') === true)) break
 
         const url = tabValue.get('url')
         state = userModel.testShoppingData(state, url)
