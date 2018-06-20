@@ -58,6 +58,7 @@ class NewPrivateTab extends React.Component {
         <div className={css(styles.textWrapper)}>
           <h1 className={css(styles.title)} data-l10n-id='privateTabTitle' />
           {
+            !isTor &&
             this.props.newTabData.hasIn(useAlternativePrivateSearchEngineDataKeys) &&
             <div className={css(styles.privateSearch)}>
               <div className={css(styles.privateSearch__setting)}>
@@ -67,7 +68,7 @@ class NewPrivateTab extends React.Component {
                     <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabSearchSectionTitle' />
                     <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>&nbsp;DuckDuckGo</strong>
                   </h2>
-                  <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabSearchText1' />
+                  <p className={css(styles.text)} data-l10n-id='privateTabSearchText1' />
                 </span>
                 <SettingCheckbox
                   large
@@ -88,8 +89,8 @@ class NewPrivateTab extends React.Component {
                     <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabTorTitle' />
                     <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>&nbsp;Tor</strong>
                   </h2>
-                  <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabTorText1' />
-                  <p className={css(styles.text, styles.text_privateSearch, styles.text_clickable)} onClick={aboutActions.createTabRequested.bind(null, {url: torFAQ, isPrivate: true, isTor})} data-l10n-id='learnMore' />
+                  <p className={css(styles.text)} data-l10n-id='privateTabTorText1' />
+                  <p className={css(styles.text, styles.text_clickable)} onClick={aboutActions.createTabRequested.bind(null, {url: torFAQ, isPrivate: true, isTor})} data-l10n-id='learnMore' />
                 </span>
                 <SettingCheckbox
                   large
@@ -98,6 +99,17 @@ class NewPrivateTab extends React.Component {
                   checked={isTor}
                   onChange={this.onChangeTor.bind(this)}
                 />
+              </div>
+            </div>
+          }
+          {
+            isTor &&
+            <div className={css(styles.privateSearch)}>
+              <div className={css(styles.privateSearch__setting)}>
+                <p>
+                  <span className={css(styles.text, styles.text_DDG)} data-l10n-id='privateTabTorText2' />
+                  <span className={css(styles.text, styles.text_clickable)} data-l10n-id='searchPreferences' onClick={aboutActions.createTabRequested.bind(null, {url: 'about:preferences#search'})} />
+                </p>
               </div>
             </div>
           }
@@ -214,6 +226,10 @@ const styles = StyleSheet.create({
     maxWidth: '800px',
     fontFamily: 'inherit',
     paddingRight: '40px'
+  },
+
+  text_DDG: {
+    paddingRight: '10px'
   },
 
   text_footer: {
