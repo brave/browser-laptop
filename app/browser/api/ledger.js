@@ -1826,7 +1826,6 @@ const generatePaymentData = (state) => {
         return
     }
     module.exports.qrWriteImage(index, url)
-    
   })
 
   return state
@@ -2715,7 +2714,6 @@ const reconcile = (callback) => {
   if (client.isReadyToReconcile(synopsis, module.exports.onFuzzing)) {
     client.reconcile(uuid.v4().toLowerCase(), callback)
   }
-  return state
 }
 
 const networkConnected = () => {
@@ -3417,10 +3415,7 @@ const getMethods = () => {
     fetchReferralHeadersCallback,
     getPaymentInfo,
     fetchReferralHeaders,
-    deleteStateFile,
-    delayFirstSync,
     onPublisherOptionUpdateAction,
-    reconcile,
     setTestMinimums,
     getPublisherFromPropsAction
   }

@@ -3019,7 +3019,7 @@ describe('ledger api unit tests', function () {
       assert.equal(aboutPreferencesState.getPreferencesProp(state, 'recoveryBalanceRecalculated'), null)
     })
   })
-  
+
   describe('backupKeys', function () {
     let onPrintBackupKeysSpy
 
@@ -4305,8 +4305,8 @@ describe('ledger api unit tests', function () {
       ledgerApi.onFuzzing(10, true)
       assert(onLedgerFuzzingSpy.withArgs(1000, true).calledOnce)
     })
-  }
-  
+  })
+
   describe('fetchReferralHeaders', function () {
     const referralServer = 'https://laptop-updates.brave.com'
     let roundtripSpy
