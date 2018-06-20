@@ -33,7 +33,7 @@ const {fullscreenOption} = require('./common/constants/settingsEnums')
 const isThirdPartyHost = require('./browser/isThirdPartyHost')
 const extensionState = require('./common/state/extensionState')
 const ledgerUtil = require('./common/lib/ledgerUtil')
-const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
+const {cookieExceptions, isRefererException} = require('../js/data/siteHacks')
 const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
 
 let appStore = null
@@ -293,7 +293,7 @@ module.exports.applyCookieSetting = (requestHeaders, url, firstPartyUrl, isPriva
 
     if (referer &&
         cookieSetting !== 'allowAllCookies' &&
-        !refererExceptions.includes(targetHostname) &&
+        !isRefererException(targetHostname) &&
         isThirdPartyHost(targetHostname, urlParse(referer).hostname)) {
       // Spoof third party referer
       requestHeaders['Referer'] = targetOrigin
