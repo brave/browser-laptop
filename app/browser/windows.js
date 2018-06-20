@@ -226,7 +226,7 @@ function openFramesInWindow (win, frames, activeFrameKey) {
           url: frame.location || frame.src || frame.provisionalLocation || frame.url,
           partitionNumber: frame.partitionNumber,
           isPrivate: frame.isPrivate,
-          isTor: tab && tab.session && tab.session.partition === appConfig.tor.partition,
+          isTor: frame.isTor || (tab && tab.session && tab.session.partition === appConfig.tor.partition),
           active: activeFrameKey ? frame.key === activeFrameKey : true,
           discarded: frame.unloaded,
           title: frame.title,
