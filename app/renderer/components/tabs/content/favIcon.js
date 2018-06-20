@@ -9,6 +9,8 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 // Components
 const ReduxComponent = require('../../reduxComponent')
 const TabIcon = require('./tabIcon')
+const TabLoadingIcon = require('../../../../../icons/loader/spin')
+const DefaultDocumentIcon = require('../../../../../icons/planet')
 
 // State
 const faviconState = require('../../../../common/state/tabContentState/faviconState')
@@ -19,10 +21,7 @@ const tabState = require('../../../../common/state/tabState')
 // Styles
 const globalStyles = require('../../styles/global')
 const {theme} = require('../../styles/theme')
-const {spinKeyframes, opacityIncreaseElementKeyframes} = require('../../styles/animations')
-
-const defaultIconSvg = require('../../../../extensions/brave/img/tabs/default.svg')
-const loadingIconSvg = require('../../../../extensions/brave/img/tabs/loading.svg')
+const {opacityIncreaseElementKeyframes} = require('../../styles/animations')
 
 class Favicon extends React.Component {
   constructor (props) {
@@ -95,6 +94,18 @@ class Favicon extends React.Component {
       instanceStyles['--faviconsrc'] = `url(${this.props.favicon})`
     }
 
+    const inlineIcon = this.props.tabLoading
+      ? <TabLoadingIcon />
+      : !this.props.favicon
+        ? <DefaultDocumentIcon />
+        : null
+
+    const inlineIconStyles = this.props.tabLoading
+      ? css(styles.icon__symbol_loading)
+      : !this.props.favicon
+        ? css(styles.icon__symbol_default)
+        : null
+
     return <TabIcon
       data-test-favicon={this.props.favicon}
       data-test-id={this.testingIcon}
@@ -106,35 +117,22 @@ class Favicon extends React.Component {
       ]}
       style={instanceStyles}
       ref={this.setRef}
-      symbol={
-        this.props.tabLoading
-          ? (
-            // no loading icon if there's no room for the icon
-            !this.props.showIconAtReducedSize &&
-            css(
-              styles.icon__symbol_loading,
-              themeLight && styles.icon__symbol_loading_colorLight
-            )
-          )
-          : (
-            !this.props.favicon &&
-            css(
-              styles.icon__symbol_default,
-              this.props.showIconAtReducedSize && styles.icon__symbol_default_reducedSize
-            )
-          )
-      } />
+      symbol={inlineIconStyles}
+      symbolContent={inlineIcon}
+    />
   }
 }
 
 const styles = StyleSheet.create({
   icon_fav: {
     backgroundImage: 'var(--faviconsrc)',
+    '--icon-line-color': '#7A7B80',
     overflow: 'visible'
   },
 
   icon_favLight: {
-    filter: theme.filter.whiteShadow
+    filter: theme.filter.whiteShadow,
+    '--icon-line-color': 'white'
   },
 
   icon_lessMargin: {
@@ -149,31 +147,12 @@ const styles = StyleSheet.create({
   },
 
   icon__symbol_loading: {
-    position: 'absolute',
-    left: 0,
-    backgroundImage: `url(${loadingIconSvg})`,
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'top left',
-    animationName: spinKeyframes,
-    animationTimingFunction: 'linear',
-    animationDuration: '1200ms',
-    animationIterationCount: 'infinite'
-  },
-
-  icon__symbol_loading_colorLight: {
-    filter: theme.filter.whiteShadow
+    '--loader-size': globalStyles.spacing.narrowIconSize,
+    '--loader-stroke': '1px'
   },
 
   icon__symbol_default: {
-    WebkitMaskRepeat: 'no-repeat',
-    WebkitMaskPosition: 'center',
-    WebkitMaskImage: `url(${defaultIconSvg})`,
-    WebkitMaskSize: '14px',
-    backgroundColor: 'var(--tab-default-icon-color)'
-  },
-
-  icon__symbol_default_reducedSize: {
-    WebkitMaskSize: '10px'
+    width: '100%'
   }
 })
 

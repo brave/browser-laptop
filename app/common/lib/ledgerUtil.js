@@ -217,7 +217,6 @@ const eligibleP = (state, publisherKey) => {
   const minPublisherDuration = ledgerState.getSynopsisOption(state, 'minPublisherDuration')
   const minPublisherVisits = ledgerState.getSynopsisOption(state, 'minPublisherVisits')
   const publisher = ledgerState.getPublisher(state, publisherKey)
-
   return (
     publisher.getIn(['scores', scorekeeper]) > 0 &&
     publisher.get('duration') >= minPublisherDuration &&

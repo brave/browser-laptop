@@ -6,6 +6,8 @@ const React = require('react')
 
 // Components
 const ImmutableComponent = require('../../immutableComponent')
+const NavigationButton = require('./navigationButton')
+const HomeIcon = require('../../../../../icons/home')
 
 // Actions
 const appActions = require('../../../../../js/actions/appActions')
@@ -50,15 +52,15 @@ class HomeButton extends ImmutableComponent {
   }
 
   render () {
-    return <span className='navigationButtonContainer'>
-      <button
-        data-test-id='homeButton'
-        data-l10n-id='homeButton'
-        className='normalizeButton navigationButton homeButton'
-        ref={(node) => { this.homeButton = node }}
-        onClick={this.onHome}
-      />
-    </span>
+    return <NavigationButton
+      testId='homeButton'
+      l10nId='homeButton'
+      class='homeButton'
+      navigationButtonRef={(node) => { this.homeButton = node }}
+      onClick={this.onHome}
+    >
+      <HomeIcon />
+    </NavigationButton>
   }
 }
 

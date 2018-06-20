@@ -1,20 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 134.8 116" style="enable-background:new 0 0 134.8 116;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#9E1F63;}
-	.st1{fill:#FF5000;}
-	.st2{fill:#662D91;}
-	.st3{fill:#FFFFFF;stroke:#FF5000;stroke-width:0.88;stroke-miterlimit:10;}
-</style>
-<title>BAT_logo_color</title>
-<g id="Layer_2">
-	<g id="Layer_1-2">
-		<polygon class="st0" points="67.6,0 67.6,77.6 134.9,116.2 		"/>
-		<polygon class="st1" points="0,116.1 67.5,77.7 67.6,0.1 		"/>
-		<polygon class="st2" points="134.8,116 67.6,77 0.2,116 		"/>
-		<polygon class="st3" points="67.4,46.3 40.2,92.7 95.1,92.7 		"/>
-	</g>
-</g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <g fill="none" fill-rule="evenodd">
+    <path fill="#FF5000" d="M11.98990962 3.99998333L2.99994808 18.9593167 8.41483269 15.93915l3.57507693-5.949z"/>
+    <path fill="#9E1F63" d="M11.98990962 3.99998333V9.99015l3.57524998 5.949 5.4147116 3.0201667V18.95915z"/>
+    <path fill="#662D91" d="M8.41485 15.9392333L2.99996538 18.9594H20.9798885v-.0001667l-5.4147116-3.02z"/>
+    <path fill="#FFF" d="M8.41478077 15.9392167L11.98985769 9.99005l3.57525001 5.9491667z"/>
+  </g>
 </svg>

@@ -33,7 +33,7 @@ const {fullscreenOption} = require('./common/constants/settingsEnums')
 const isThirdPartyHost = require('./browser/isThirdPartyHost')
 const extensionState = require('./common/state/extensionState')
 const ledgerUtil = require('./common/lib/ledgerUtil')
-const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
+const {cookieExceptions, isRefererException} = require('../js/data/siteHacks')
 const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
 
 let appStore = null
@@ -132,7 +132,7 @@ function registerForBeforeRequest (session, partition) {
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
     // this can happen if the tab is closed and the webContents is no longer available
     if (!firstPartyUrl) {
-      muonCb({ cancel: true })
+      muonCb({})
       return
     }
 
@@ -293,7 +293,7 @@ module.exports.applyCookieSetting = (requestHeaders, url, firstPartyUrl, isPriva
 
     if (referer &&
         cookieSetting !== 'allowAllCookies' &&
-        !refererExceptions.includes(targetHostname) &&
+        !isRefererException(targetHostname) &&
         isThirdPartyHost(targetHostname, urlParse(referer).hostname)) {
       // Spoof third party referer
       requestHeaders['Referer'] = targetOrigin
@@ -332,7 +332,7 @@ function registerForBeforeSendHeaders (session, partition) {
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
     // this can happen if the tab is closed and the webContents is no longer available
     if (!firstPartyUrl) {
-      muonCb({ cancel: true })
+      muonCb({})
       return
     }
 
@@ -381,7 +381,7 @@ function registerForHeadersReceived (session, partition) {
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
     // this can happen if the tab is closed and the webContents is no longer available
     if (!firstPartyUrl) {
-      muonCb({ cancel: true })
+      muonCb({})
       return
     }
 

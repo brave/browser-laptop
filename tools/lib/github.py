@@ -40,7 +40,11 @@ class GitHub:
       if 'data' in kw:
         kw['data'] = json.dumps(kw['data'])
 
-    r = getattr(requests, method)(url, **kw).json()
+    try:
+      r = getattr(requests, method)(url, **kw).json()
+    except ValueError:
+      # Returned response may be empty in some cases
+      r = {}
     if 'message' in r:
       raise Exception(json.dumps(r, indent=2, separators=(',', ': ')))
     return r

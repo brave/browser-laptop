@@ -4,8 +4,8 @@ import os
 import subprocess
 import sys
 import os.path
-MUON_VERSION = '6.0.12'
-CHROMEDRIVER_VERSION = '2.36'
+MUON_VERSION = '7.0.6'
+CHROMEDRIVER_VERSION = '2.37'
 SOURCE_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 TARGET_ARCH= os.environ['TARGET_ARCH'] if os.environ.has_key('TARGET_ARCH') else 'x64'
 os.environ['npm_config_arch'] = TARGET_ARCH
@@ -87,4 +87,4 @@ if is_linux:
 execute([npm, 'run', 'build-package'])
 execute([npm, 'run', 'build-installer'])
 
-run_script('upload.py')
+run_script('upload.py', sys.argv[1:])

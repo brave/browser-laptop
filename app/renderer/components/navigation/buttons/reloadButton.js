@@ -7,7 +7,8 @@ const ipc = require('electron').ipcRenderer
 
 // Components
 const ImmutableComponent = require('../../immutableComponent')
-const LongPressButton = require('../../common/longPressButton')
+const NavigationButton = require('./navigationButton')
+const ReloadIcon = require('../../../../../icons/refresh')
 
 // Actions
 const appActions = require('../../../../../js/actions/appActions')
@@ -39,14 +40,13 @@ class ReloadButton extends ImmutableComponent {
   }
 
   render () {
-    return <span className='navigationButtonContainer'>
-      <LongPressButton
-        l10nId='reloadButton'
-        testId='reloadButton'
-        className='normalizeButton navigationButton reloadButton'
-        onClick={this.onReload}
-        onLongPress={this.onReloadLongPress} />
-    </span>
+    return <NavigationButton
+      l10nId='reloadButton'
+      testId='reloadButton'
+      onClick={this.onReload}
+      onLongPress={this.onReloadLongPress}>
+      <ReloadIcon />
+    </NavigationButton>
   }
 }
 

@@ -13,6 +13,7 @@ class LongPressButton extends ImmutableComponent {
     this.onMouseDown = this.onMouseDown.bind(this)
     this.onMouseUp = this.onMouseUp.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
+    this.setRef = this.setRef.bind(this)
   }
 
   componentDidMount (e) {
@@ -77,16 +78,25 @@ class LongPressButton extends ImmutableComponent {
     }
   }
 
+  setRef (node) {
+    this.buttonNode = node
+    if (this.props.ref) {
+      this.props.ref(node)
+    }
+  }
+
   render () {
     return <button data-l10n-id={this.props.l10nId}
       data-test-id={this.props.testId}
+      data-l10n-args={this.props.l10nArgs && JSON.stringify(this.props.l10nArgs)}
       className={this.props.className}
       disabled={this.props.disabled}
       onClick={this.onClick}
-      ref={(node) => { this.buttonNode = node }}
+      ref={this.setRef}
       onMouseDown={this.onMouseDown}
       onMouseUp={this.onMouseUp}
       onMouseLeave={this.onMouseLeave}
+      {...this.props.dataAttributes}
     >
       {this.props.children}
     </button>

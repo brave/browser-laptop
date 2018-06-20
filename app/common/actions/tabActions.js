@@ -37,6 +37,13 @@ const tabActions = {
     })
   },
 
+  didChangeNavigationProgress: (tabId, progressPercent) => {
+    dispatchAction(tabActionConstants.NAVIGATION_PROGRESS_CHANGED, {
+      tabId,
+      progressPercent
+    })
+  },
+
   findInPageRequest (tabId, searchString, caseSensitivity, forward, findNext) {
     dispatchAction(tabActionConstants.FIND_IN_PAGE_REQUEST, {
       tabId,

@@ -9,6 +9,7 @@ const ipc = require('electron').ipcRenderer
 // Components
 const ReduxComponent = require('../../reduxComponent')
 const NavigationButton = require('./navigationButton')
+const ForwardIcon = require('../../../../../icons/forward')
 
 // Actions
 const appActions = require('../../../../../js/actions/appActions')
@@ -72,10 +73,10 @@ class ForwardButton extends React.Component {
     // used in renderer
     props.canGoForward = activeTab.get('canGoForward') && !activeTabShowingMessageBox
     props.swipeRightPercent = swipeRightPercent ? (swipeRightPercent + 1) * 1.2 : 1
-    props.swipeRightOpacity = swipeRightPercent ? 0.85 - (swipeRightPercent > 0.65 ? 0.65 : swipeRightPercent) : 0.85
+    props.swipeRightOpacity = swipeRightPercent ? 1 - (swipeRightPercent > 0.65 ? 0.65 : swipeRightPercent) : 1
 
     if (swipeRightPercent === 1) {
-      props.swipeRightOpacity = 0.85
+      props.swipeRightOpacity = 1
     }
 
     // used in other functions
@@ -92,19 +93,17 @@ class ForwardButton extends React.Component {
           ? 'navigationForwardButtonEnabled'
           : 'navigationForwardButtonDisabled'
       }
-      testId2={
-        this.props.canGoForward
-          ? 'forwardButtonEnabled'
-          : 'forwardButtonDisabled'
-      }
       l10nId={'forwardButton'}
       class={'forwardButton'}
+      isNav
       disabled={!this.props.canGoForward}
       swipePercent={this.props.swipeRightPercent}
       swipeOpacity={this.props.swipeRightOpacity}
       onClick={this.onForward}
       onLongPress={this.onForwardLongPress}
-    />
+    >
+      <ForwardIcon />
+    </NavigationButton>
   }
 }
 

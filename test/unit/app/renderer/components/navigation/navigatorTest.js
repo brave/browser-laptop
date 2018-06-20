@@ -17,7 +17,10 @@ const defaultWindowStore = Immutable.fromJS({
     key: 0,
     tabId: 1,
     location: 'http://brave.com',
-    title: 'Brave'
+    title: 'Brave',
+    adBlock: {
+      blocked: ['a', 'b', 'c']
+    }
   }],
   tabs: []
 })
@@ -65,10 +68,6 @@ describe('Navigator component unit tests', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_no_verified.svg', {})
-    mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes_verified.svg', {})
-    mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_no.svg', {})
-    mockery.registerMock('../../extensions/brave/img/urlbar/browser_URL_fund_yes.svg', {})
     mockery.registerMock('../../extensions/brave/img/tabs/new_session.svg')
     mockery.registerMock('../../../extensions/brave/img/caret_down_grey.svg')
     mockery.registerMock('../../../../img/url-bar-no-script.svg', {})
@@ -111,17 +110,17 @@ describe('Navigator component unit tests', function () {
       wrapper = mount(<Navigator />)
     })
 
-    it('both back/forward navigationButtonContainers are enabled', function () {
+    it('both back/forward buttons are enabled', function () {
       assert.equal(wrapper.find('[data-test-id="navigationBackButtonEnabled"]').length, 1)
       assert.equal(wrapper.find('[data-test-id="navigationForwardButtonEnabled"]').length, 1)
     })
 
     it('back navigation button is enabled', function () {
-      assert.equal(wrapper.find('[data-test-id="backButtonEnabled"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="navigationBackButtonEnabled"]').length, 1)
     })
 
     it('forward navigation button is enabled', function () {
-      assert.equal(wrapper.find('[data-test-id="forwardButtonEnabled"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="navigationForwardButtonEnabled"]').length, 1)
     })
   })
 
@@ -141,46 +140,22 @@ describe('Navigator component unit tests', function () {
       wrapper = mount(<Navigator />)
     })
 
-    it('disables both back/forward navigationButtonContainers', function () {
+    it('disables both back/forward buttons', function () {
       assert.equal(wrapper.find('[data-test-id="navigationBackButtonDisabled"]').length, 1)
       assert.equal(wrapper.find('[data-test-id="navigationForwardButtonDisabled"]').length, 1)
     })
 
     it('disables the back navigation button', function () {
-      assert.equal(wrapper.find('[data-test-id="backButtonDisabled"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="navigationBackButtonDisabled"]').length, 1)
     })
 
     it('disables the forward navigation button', function () {
-      assert.equal(wrapper.find('[data-test-id="forwardButtonDisabled"]').length, 1)
+      assert.equal(wrapper.find('[data-test-id="navigationForwardButtonDisabled"]').length, 1)
     })
 
     it('disables the lion icon', function () {
-      const node = wrapper.find('[data-test-id="braveMenu"]').getDOMNode()
+      const node = wrapper.find('[data-test-id="braveMenuDisabled shield-down-false"]').getDOMNode()
       assert.equal(node.disabled, true)
-    })
-  })
-
-  describe('lion badge', function () {
-    before(function () {
-      appStore.state = appStoreRenderer
-      windowStore.state = defaultWindowStore
-    })
-
-    it('lion icon is shown by default', function () {
-      const wrapper = mount(<Navigator />)
-      const node = wrapper.find('[data-test-id="braveMenu"]').getDOMNode()
-      assert.equal(node.disabled, false)
-    })
-
-    it('counter is shown by default', function () {
-      const wrapper = mount(<Navigator />)
-      assert.equal(wrapper.find('[data-test-id="lionBadge"]').length, 1)
-    })
-
-    it('counter is not shown when disabled via settings', function () {
-      settingDefaultValue = false
-      const wrapper = mount(<Navigator />)
-      assert.equal(wrapper.find('[data-test-id="lionBadge"]').length, 0)
     })
   })
 })

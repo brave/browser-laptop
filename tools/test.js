@@ -15,6 +15,9 @@ switch (TEST_DIR) {
   case 'codecov':
     cmd.push('bash tools/codecov.sh')
     break
+  case 'tools':
+    cmd.push('python tools/test')
+    break
   case 'security':
     cmd.push('npm run check-security')
     break

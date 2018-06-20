@@ -19,6 +19,9 @@ const closeButton = require('../../../../../img/toolbar/stoploading_btn.svg')
 const dragIcon = require('../../../../extensions/brave/img/ledger/BAT_captcha_dragicon.png')
 const arrowIcon = require('../../../../extensions/brave/img/ledger/BAT_captcha_BG_arrow.png')
 
+// Utils
+const isWindows = require('../../../../common/lib/platformUtil').isWindows()
+
 // TODO: report when funds are too low
 class Captcha extends ImmutableComponent {
   constructor (props) {
@@ -27,6 +30,7 @@ class Captcha extends ImmutableComponent {
     this.onCaptchaDrag = this.onCaptchaDrag.bind(this)
     this.getText = this.getText.bind(this)
     this.captchaBox = null
+    this.offset = 5
     this.dndStartPosition = {
       x: 0,
       y: 0,
@@ -39,8 +43,15 @@ class Captcha extends ImmutableComponent {
     event.preventDefault()
     const target = this.captchaBox.getBoundingClientRect()
 
-    const x = event.clientX - target.left - this.dndStartPosition.x + (this.dndStartPosition.height / 2)
-    const y = event.clientY - target.top - this.dndStartPosition.y + (this.dndStartPosition.width / 2)
+    let x = event.clientX - target.left - this.dndStartPosition.x + (this.dndStartPosition.height / 2)
+    let y = event.clientY - target.top - this.dndStartPosition.y + (this.dndStartPosition.width / 2)
+
+    if (isWindows) {
+      const dpr = window.devicePixelRatio
+      const factor = (dpr <= 1) ? 0 : (this.offset * dpr)
+      x = Math.round(x + factor)
+      y = Math.round(y + factor)
+    }
 
     appActions.onPromotionClaim(x, y)
   }

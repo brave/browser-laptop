@@ -18,7 +18,6 @@ class BrowserButton extends ImmutableComponent {
       // actionItem is just subtleItem with a blue background
       this.props.actionItem &&
         [styles.browserButton_default, styles.browserButton_subtleItem, styles.browserButton_actionItem],
-      this.props.extensionItem && styles.browserButton_extensionItem,
       this.props.groupedItem && styles.browserButton_groupedItem,
       this.props.notificationItem && styles.browserButton_notificationItem,
       this.props.panelItem && styles.browserButton_panelItem,
@@ -61,13 +60,11 @@ class BrowserButton extends ImmutableComponent {
   render () {
     return <button
       disabled={this.props.disabled}
-      data-extension-button={this.props.extensionButton}
       data-l10n-id={this.props.l10nId}
       data-test-id={this.props.testId}
       data-test2-id={this.props.test2Id}
       data-l10n-args={JSON.stringify(this.props.l10nArgs || {})}
       style={this.buttonStyle}
-      data-button-value={this.props.dataButtonValue}
       onClick={this.props.onClick}
       className={css(this.classNames, this.props.custom)}>
       {
@@ -209,14 +206,6 @@ const styles = StyleSheet.create({
       border: `2px solid ${globalStyles.button.alert.borderHoverColor}`,
       color: globalStyles.button.alert.hoverColor
     }
-  },
-
-  browserButton_extensionItem: {
-    backgroundSize: 'contain',
-    height: '17px',
-    margin: '4px 0 0 0',
-    opacity: '0.85',
-    backgroundRepeat: 'no-repeat'
   },
 
   browserButton_groupedItem: {

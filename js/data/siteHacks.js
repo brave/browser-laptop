@@ -32,7 +32,11 @@ module.exports.cookieExceptions = {
 }
 
 // Third party domains that require a valid referer to work
-module.exports.refererExceptions = ['use.typekit.net', 'cloud.typography.com', 'www.moremorewin.net']
+const refererExceptions = ['use.typekit.net', 'cloud.typography.com', 'www.moremorewin.net']
+const refererExceptionsRegex = [/.*\.fbcdn\.net$/]
+module.exports.isRefererException = (hostname) =>
+  refererExceptions.includes(hostname) || refererExceptionsRegex.some(regex => regex.test(hostname))
+module.exports.getTestRefererException = () => refererExceptions[0]
 
 /**
  * Holds an array of [Primary URL, subresource URL] to allow 3rd party localstorage.

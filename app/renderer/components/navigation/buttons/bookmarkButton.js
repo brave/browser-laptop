@@ -4,20 +4,18 @@
 
 const React = require('react')
 const ipc = require('electron').ipcRenderer
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ImmutableComponent = require('../../immutableComponent')
+const NavigationButton = require('./navigationButton')
+const BookmarkIcon = require('../../../../../icons/bookmark')
 
 // Actions
 const windowActions = require('../../../../../js/actions/windowActions')
 
 // Constants
 const messages = require('../../../../../js/constants/messages')
-const settings = require('../../../../../js/constants/settings')
-
-// Utils
-const cx = require('../../../../../js/lib/classSet')
-const {getSetting} = require('../../../../../js/settings')
 
 class BookmarkButton extends ImmutableComponent {
   constructor (props) {
@@ -39,26 +37,32 @@ class BookmarkButton extends ImmutableComponent {
   }
 
   render () {
-    return <div className='startButtons'>
-      {
-        !this.props.titleMode
-          ? <span className='bookmarkButtonContainer'>
-            <button className={cx({
-              navigationButton: true,
-              bookmarkButton: true,
-              removeBookmarkButton: !!this.props.bookmarkKey,
-              withHomeButton: getSetting(settings.SHOW_HOME_BUTTON),
-              normalizeButton: true
-            })}
-              data-test-id={this.props.bookmarkKey ? 'removeBookmarkButton' : 'addBookmarkButton'}
-              data-l10n-id={this.props.bookmarkKey ? 'removeBookmarkButton' : 'addBookmarkButton'}
-              onClick={this.onToggleBookmark}
-            />
-          </span>
-          : null
-      }
-    </div>
+    const isBookmarked = !!this.props.bookmarkKey
+    return <NavigationButton
+      l10nId={this.props.bookmarkKey ? 'removeBookmarkButton' : 'addBookmarkButton'}
+      testId={this.props.bookmarkKey ? 'removeBookmarkButton' : 'addBookmarkButton'}
+      onClick={this.onToggleBookmark}
+      class={css(
+        styles.bookmarkButton,
+        isBookmarked && styles.bookmarkButton_isBookmarked
+      )}
+    >
+      <BookmarkIcon />
+    </NavigationButton>
   }
 }
+
+const styles = StyleSheet.create({
+  bookmarkButton: {
+    '--icon-fill-color': 'transparent',
+    '--icon-transit-easing': 'ease-in',
+    justifyContent: 'flex-start'
+  },
+
+  bookmarkButton_isBookmarked: {
+    '--icon-line-color': '#FB542B',
+    '--icon-transit-easing': 'ease-out'
+  }
+})
 
 module.exports = BookmarkButton
