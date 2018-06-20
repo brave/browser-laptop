@@ -2,7 +2,7 @@
 const mockery = require('mockery')
 const assert = require('assert')
 const sinon = require('sinon')
-const {cookieExceptions, refererExceptions} = require('../../../js/data/siteHacks')
+const {cookieExceptions, getTestRefererException} = require('../../../js/data/siteHacks')
 
 require('../braveUnit')
 
@@ -134,7 +134,7 @@ describe('filtering unit tests', function () {
 
       describe('when there is a referer exception', function () {
         it('keeps the referer field', function () {
-          const url = 'https://' + refererExceptions[0]
+          const url = 'https://' + getTestRefererException()
           const firstPartyUrl = 'https://slashdot.org/'
           const requestHeaders = {
             Referer: 'https://brave.com'
