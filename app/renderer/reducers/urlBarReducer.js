@@ -7,7 +7,7 @@
 const windowConstants = require('../../../js/constants/windowConstants')
 const appConstants = require('../../../js/constants/appConstants')
 const {isURL} = require('../../../js/lib/urlutil')
-const {activeFrameStatePath, frameStatePath, getFrameByTabId} = require('../../../js/state/frameStateUtil')
+const {activeFrameStatePath, frameStatePath, getFrameByTabId, isTor} = require('../../../js/state/frameStateUtil')
 const searchProviders = require('../../../js/data/searchProviders')
 const Immutable = require('immutable')
 const {navigateSiteClickHandler} = require('../suggestionClickHandlers')
@@ -42,7 +42,8 @@ const updateSearchEngineInfoFromInput = (state, frameProps) => {
     }
     if (frameProps.get('isPrivate')) {
       // handle private tab search with default search provider
-      const useAlternateDefaultPrivateSearchProvider = getSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE)
+      const useAlternateDefaultPrivateSearchProvider =
+        getSetting(isTor(frameProps) ? settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE_TOR : settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE)
       if (useAlternateDefaultPrivateSearchProvider === true) {
         // DuckDuckGo hard-coded as Private Tab default provider
         // if asked to use a privacy-centric 'alternative'
