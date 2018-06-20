@@ -71,12 +71,22 @@ class DisabledContent extends React.Component {
     }
 
     if (!available) {
-      return <span data-l10n-id='adsWelcomeAvailable' className={css(styles.disabledContent__message__warning)} />
+      return <div className={css(styles.disabledContent__message__warning)}>
+        <span data-l10n-id='adsWelcomeAvailable' className={css(styles.disabledContent__message__warning_text)} />&nbsp;
+        <a href='https://brave.com/faq-ads-testing#linux-build' target={'_blank'} className={css(styles.disabledContent__message__warning_text)}>
+          <span data-l10n-id='adsWelcomeMore' className={css(styles.disabledContent__message__warning_text)} />
+        </a>
+      </div>
     }
 
     if (!config) {
       return <div>
-        <span data-l10n-id='adsWelcomeConfig' className={css(styles.disabledContent__message__warning)} />
+        <div className={css(styles.disabledContent__message__warning)}>
+          <span data-l10n-id='adsWelcomeConfig' className={css(styles.disabledContent__message__warning_text)} />&nbsp;
+          <a href='https://brave.com/faq-ads-testing#os-settings' target={'_blank'} className={css(styles.disabledContent__message__warning_text)}>
+            <span data-l10n-id='adsWelcomeMore' className={css(styles.disabledContent__message__warning_text)} />
+          </a>
+        </div>
         <button
           data-l10n-id='adsWelcomeReTry'
           className={css(styles.disabledContent__message__button, styles.disabledContent__message__button_on)}
@@ -193,6 +203,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginTop: '20px',
     display: 'block',
+    fontSize: '16px',
+    fontWeight: 'bold'
+  },
+
+  disabledContent__message__warning_text: {
+    color: '#fff',
     fontSize: '16px',
     fontWeight: 'bold'
   },
