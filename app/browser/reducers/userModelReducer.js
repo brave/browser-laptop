@@ -21,6 +21,7 @@ const userModel = require('../api/userModel')
 const demoApi = require('../api/userModelLog')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
+const locale = require('../../locale')
 
 const userModelReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -125,7 +126,13 @@ const userModelReducer = (state, action, immutableAction) => {
         switch (action.get('key')) {
           case settings.ADS_ENABLED:
             {
-              state = userModel.initialize(state, action.get('value'))
+              const value = action.get('value')
+              state = userModel.initialize(state, value)
+              if (!value) {
+                appActions.createTabRequested({
+                  url: 'https://brave.com/ads-goodbye'
+                })
+              }
               break
             }
           case settings.ADS_PLACE:
@@ -177,6 +184,32 @@ const userModelReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_ADS_SSID_RECEIVED:
       {
         state = userModelState.setSSID(state, action.get('value'))
+        break
+      }
+    case appConstants.APP_ON_USERMODEL_DISABLED:
+      {
+        state = userModelState.setUserModelValue(state, 'expired', true)
+        break
+      }
+    case appConstants.APP_ON_USERMODEL_EXPIRED:
+      {
+        appActions.changeSetting(settings.ADS_ENABLED, false)
+        appActions.createTabRequested({
+          url: 'https://brave.com/ads-goodbye'
+        })
+        appActions.showNotification({
+          position: 'global',
+          greeting: locale.translation('notificationAdsExpiredThankYou'),
+          message: locale.translation('notificationAdsExpiredText'),
+          options: {
+            style: 'greetingStyle',
+            persist: true
+          }
+        })
+
+        setTimeout(() => {
+          appActions.onUserModelDisabled()
+        }, 0)
         break
       }
   }
