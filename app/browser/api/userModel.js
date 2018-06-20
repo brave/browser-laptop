@@ -91,11 +91,11 @@ const generateAdReportingEvent = (state, eventType, action) => {
               if (map.notificationType === 'clicked' || map.notificationType === 'dismissed') {
                 state = userModelState.recordAdUUIDSeen(state, uuid)
               }
-              console.log(map.notificationType)
-              if (map.notificationType === 'clicked' || map.notificationType === 'dismissed' || map.notificationType === 'timeout') {
-                const translateElph = { 'clicked': 'z', 'dismissed': 'y', 'timeout': 'y' } // refers to elph alphabetizer
+//              console.log(map.notificationType)
+//              if (map.notificationType === 'clicked' || map.notificationType === 'dismissed' || map.notificationType === 'timeout') {
+//                const translateElph = { 'clicked': 'z', 'dismissed': 'y', 'timeout': 'y' } // refers to elph alphabetizer
 //                state = updateTimingModel(state, translateElph[map.notificationType])
-              }
+//              }
 
               break
             }
