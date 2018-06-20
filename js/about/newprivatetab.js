@@ -58,29 +58,6 @@ class NewPrivateTab extends React.Component {
         <div className={css(styles.textWrapper)}>
           <h1 className={css(styles.title)} data-l10n-id='privateTabTitle' />
           {
-            !isTor &&
-            this.props.newTabData.hasIn(useAlternativePrivateSearchEngineDataKeys) &&
-            <div className={css(styles.privateSearch)}>
-              <div className={css(styles.privateSearch__setting)}>
-                <img className={css(styles.privateSearch__ddgImage)} src={ddgIcon} alt='DuckDuckGo logo' />
-                <span>
-                  <h2 onClick={this.onClickPrivateSearchTitle.bind(this)} className={css(styles.privateSearch__title)}>
-                    <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabSearchSectionTitle' />
-                    <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>&nbsp;DuckDuckGo</strong>
-                  </h2>
-                  <p className={css(styles.text)} data-l10n-id='privateTabSearchText1' />
-                </span>
-                <SettingCheckbox
-                  large
-                  switchClassName={css(styles.privateSearch__switch)}
-                  rightLabelClassName={css(styles.sectionTitle)}
-                  checked={Boolean(this.props.newTabData.getIn(useAlternativePrivateSearchEngineDataKeys))}
-                  onChange={this.onChangePrivateSearch.bind(this)}
-                />
-              </div>
-            </div>
-          }
-          {
             <div className={css(styles.privateSearch)}>
               <div className={css(styles.privateSearch__setting)}>
                 <img className={css(styles.privateSearch__torImage)} src={torIcon} alt='Tor logo' />
@@ -110,6 +87,29 @@ class NewPrivateTab extends React.Component {
                   <span className={css(styles.text, styles.text_DDG)} data-l10n-id='privateTabTorText2' />
                   <span className={css(styles.text, styles.text_clickable)} data-l10n-id='searchPreferences' onClick={aboutActions.createTabRequested.bind(null, {url: 'about:preferences#search'})} />
                 </p>
+              </div>
+            </div>
+          }
+          {
+            !isTor &&
+            this.props.newTabData.hasIn(useAlternativePrivateSearchEngineDataKeys) &&
+            <div className={css(styles.privateSearch)}>
+              <div className={css(styles.privateSearch__setting)}>
+                <img className={css(styles.privateSearch__ddgImage)} src={ddgIcon} alt='DuckDuckGo logo' />
+                <span>
+                  <h2 onClick={this.onClickPrivateSearchTitle.bind(this)} className={css(styles.privateSearch__title)}>
+                    <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabSearchSectionTitle' />
+                    <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>&nbsp;DuckDuckGo</strong>
+                  </h2>
+                  <p className={css(styles.text)} data-l10n-id='privateTabSearchText1' />
+                </span>
+                <SettingCheckbox
+                  large
+                  switchClassName={css(styles.privateSearch__switch)}
+                  rightLabelClassName={css(styles.sectionTitle)}
+                  checked={Boolean(this.props.newTabData.getIn(useAlternativePrivateSearchEngineDataKeys))}
+                  onChange={this.onChangePrivateSearch.bind(this)}
+                />
               </div>
             </div>
           }
