@@ -932,7 +932,8 @@ function addLinkMenu (link, frame) {
   template.push(
     openInNewPrivateTabMenuItem(link, frame.get('tabId'), isTor),
     openInNewPrivateTabMenuItem(link, frame.get('tabId'), !isTor),
-    openInNewWindowMenuItem(link, frame.get('isPrivate'), frame.get('partitionNumber')),
+    openInNewWindowMenuItem(link, frame.get('isPrivate'),
+      frame.get('partitionNumber'), isTor),
     CommonMenu.separatorMenuItem,
     openInNewSessionTabMenuItem(link, frame.get('tabId')),
     CommonMenu.separatorMenuItem)
