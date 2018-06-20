@@ -246,6 +246,8 @@ var rendererIdentifiers = function () {
     'paymentsDeleteWalletConfirmation',
     'messageBoxOk',
     'messageBoxCancel',
+    'notificationAdsExpiredThankYou',
+    'notificationAdsExpiredText',
     // other
     'passwordsManager',
     'extensionsManager',
