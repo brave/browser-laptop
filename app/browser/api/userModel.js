@@ -39,6 +39,7 @@ let nextEasterEgg = 0
 
 let initP
 let foregroundP
+let onceP
 
 let matrixData
 let priorData
@@ -54,6 +55,12 @@ const noop = (state) => {
 
 const generateAdReportingEvent = (state, eventType, action) => {
   if (noop(state)) return state
+
+  if (!onceP) {
+    onceP = true
+
+    state = generateAdReportingEvent(state, 'restart', action)
+  }
 
   const map = { type: eventType, stamp: new Date().toISOString() }
 
