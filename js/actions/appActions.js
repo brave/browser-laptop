@@ -2072,9 +2072,9 @@ const appActions = {
     })
   },
 
-  onUserModelKill: function () {
+  onUserModelDisabled: function () {
     dispatch({
-      actionType: appConstants.APP_ON_USERMODEL_KILL
+      actionType: appConstants.APP_ON_USERMODEL_DISABLED
     })
   },
 

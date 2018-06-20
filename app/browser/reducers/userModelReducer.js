@@ -186,7 +186,7 @@ const userModelReducer = (state, action, immutableAction) => {
         state = userModelState.setSSID(state, action.get('value'))
         break
       }
-    case appConstants.APP_ON_USERMODEL_KILL:
+    case appConstants.APP_ON_USERMODEL_DISABLED:
       {
         state = userModelState.setUserModelValue(state, 'expired', true)
         break
@@ -208,7 +208,7 @@ const userModelReducer = (state, action, immutableAction) => {
         })
 
         setTimeout(() => {
-          appActions.onUserModelKill()
+          appActions.onUserModelDisabled()
         }, 0)
         break
       }
