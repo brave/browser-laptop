@@ -71,12 +71,22 @@ class DisabledContent extends React.Component {
     }
 
     if (!available) {
-      return <span data-l10n-id='adsWelcomeAvailable' className={css(styles.disabledContent__message__warning)} />
+      return <div className={css(styles.disabledContent__message__warning)}>
+        <span data-l10n-id='adsWelcomeAvailable' className={css(styles.disabledContent__message__warning_text)} />&nbsp;
+        <a href='https://brave.com/faq-ads-testing#linux-build' target={'_blank'} className={css(styles.disabledContent__message__warning_text)}>
+          <span data-l10n-id='adsWelcomeMore' className={css(styles.disabledContent__message__warning_text)} />
+        </a>
+      </div>
     }
 
     if (!config) {
       return <div>
-        <span data-l10n-id='adsWelcomeConfig' className={css(styles.disabledContent__message__warning)} />
+        <div className={css(styles.disabledContent__message__warning)}>
+          <span data-l10n-id='adsWelcomeConfig' className={css(styles.disabledContent__message__warning_text)} />&nbsp;
+          <a href='https://brave.com/faq-ads-testing#os-settings' target={'_blank'} className={css(styles.disabledContent__message__warning_text)}>
+            <span data-l10n-id='adsWelcomeMore' className={css(styles.disabledContent__message__warning_text)} />
+          </a>
+        </div>
         <button
           data-l10n-id='adsWelcomeReTry'
           className={css(styles.disabledContent__message__button, styles.disabledContent__message__button_on)}
@@ -86,33 +96,61 @@ class DisabledContent extends React.Component {
     }
   }
 
-  render () {
+  disabledContent = () => {
     const config = this.props.userModelData.configured
     const available = this.props.userModelData.available
+
+    return <div>
+      <p className={css(styles.disabledContent__message__text)}>
+        <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText1' />&nbsp;
+        <span className={css(styles.disabledContent__message_bold)} data-l10n-id='adsWelcomeText4' />&nbsp;
+        <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText5' />&nbsp;
+      </p>
+      <p className={css(styles.disabledContent__message__text)}>
+        <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText2' />
+        <a
+          href='https://brave.com/download'
+          target='_blank'
+          className={css(styles.disabledContent__message_white)}
+        >
+          https://brave.com/download
+        </a>.
+      </p>
+      <p className={css(styles.disabledContent__message__text)} data-l10n-id='adsWelcomeText3' />
+      {
+        config && available
+        ? this.agreeBlock()
+        : this.showWarning(config, available)
+      }
+    </div>
+  }
+
+  expiredContent () {
+    return <div>
+      <div className={css(styles.disabledContent__message__warning)}>
+        <p className={css(styles.disabledContent__message__text)}>
+          <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsExpiredText1' />
+        </p>
+      </div>
+      <a
+        data-l10n-id='adsExpiredDownload'
+        className={css(styles.disabledContent__message__button, styles.disabledContent__message__button_on)}
+        href='https://brave.com/download'
+        target='_blank'
+        />
+    </div>
+  }
+
+  render () {
+    const expired = this.props.userModelData.expired
 
     return <section className={css(styles.disabledContent)} data-test-id='disabledContent'>
       <div className={css(styles.disabledContent__message)} data-test-id='paymentsMessage'>
         <h3 className={css(styles.disabledContent__message__header)} data-l10n-id='adsWelcomeHeader' />
-        <p className={css(styles.disabledContent__message__text)}>
-          <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText1' />&nbsp;
-          <span className={css(styles.disabledContent__message_bold)} data-l10n-id='adsWelcomeText4' />&nbsp;
-          <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText5' />&nbsp;
-        </p>
-        <p className={css(styles.disabledContent__message__text)}>
-          <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText2' />
-          <a
-            href='https://brave.com/download'
-            target='_blank'
-            className={css(styles.disabledContent__message_white)}
-          >
-            https://brave.com/download
-          </a>.
-        </p>
-        <p className={css(styles.disabledContent__message__text)} data-l10n-id='adsWelcomeText3' />
         {
-          config && available
-          ? this.agreeBlock()
-          : this.showWarning(config, available)
+          expired
+          ? this.expiredContent()
+          : this.disabledContent()
         }
       </div>
     </section>
@@ -197,6 +235,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
 
+  disabledContent__message__warning_text: {
+    color: '#fff',
+    fontSize: '16px',
+    fontWeight: 'bold'
+  },
+
   disabledContent__message__button: {
     background: 'none',
     marginTop: '70px',
@@ -207,7 +251,12 @@ const styles = StyleSheet.create({
     padding: '10px 50px',
     fontSize: '16px',
     fontWeight: 'bold',
-    opacity: 0.5
+    opacity: 0.5,
+    display: 'inline-block',
+
+    ':hover': {
+      textDecoration: 'none'
+    }
   },
 
   disabledContent__message__button_on: {
