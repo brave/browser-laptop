@@ -2066,6 +2066,18 @@ const appActions = {
     })
   },
 
+  onUserModelExpired: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_EXPIRED
+    })
+  },
+
+  onUserModelKill: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_KILL
+    })
+  },
+
   onLedgerBackupSuccess: function () {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_BACKUP_SUCCESS

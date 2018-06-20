@@ -704,10 +704,17 @@ const uploadLogs = (state, stamp, retryIn, result) => {
 
   const events = userModelState.getReportingEventQueue(state)
   const path = '/v1/surveys/reporter/' + userModelState.getAdUUID(state) + '?product=ads-test'
-  const status = userModelState.getUserModelValue(state, 'status')
+  let status = userModelState.getUserModelValue(state, 'status')
   const newState = result.getIn([ 'expirations', 'status' ])
 
-  if (newState !== status) state = userModelState.setUserModelValue(state, 'status', newState)
+  if (newState !== status) {
+    state = userModelState.setUserModelValue(state, 'status', newState)
+    status = newState
+  }
+
+  if (status === 'expired') {
+    appActions.onUserModelExpired()
+  }
 
   if (stamp) {
     const data = events.filter(entry => entry.get('stamp') > stamp)

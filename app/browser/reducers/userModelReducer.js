@@ -21,6 +21,7 @@ const userModel = require('../api/userModel')
 const demoApi = require('../api/userModelLog')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
+const locale = require('../../locale')
 
 const userModelReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
@@ -177,6 +178,32 @@ const userModelReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_ADS_SSID_RECEIVED:
       {
         state = userModelState.setSSID(state, action.get('value'))
+        break
+      }
+    case appConstants.APP_ON_USERMODEL_KILL:
+      {
+        state = userModelState.setUserModelValue(state, 'expired', true)
+        break
+      }
+    case appConstants.APP_ON_USERMODEL_EXPIRED:
+      {
+        appActions.changeSetting(settings.ADS_ENABLED, false)
+        appActions.createTabRequested({
+          url: 'https://brave.com/ads-goodbye'
+        })
+        appActions.showNotification({
+          position: 'global',
+          greeting: locale.translation('notificationAdsExpiredThankYou'),
+          message: locale.translation('notificationAdsExpiredText'),
+          options: {
+            style: 'greetingStyle',
+            persist: true
+          }
+        })
+
+        setTimeout(() => {
+          appActions.onUserModelKill()
+        }, 0)
         break
       }
   }
