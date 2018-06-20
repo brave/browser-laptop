@@ -55,10 +55,7 @@ const noop = (state) => {
 const generateAdReportingEvent = (state, eventType, action) => {
   if (noop(state)) return state
 
-  let map = {}
-
-  map.type = eventType
-  map.stamp = new Date().toISOString()
+  const map = { type: eventType, stamp: new Date().toISOString() }
 
   // additional event data
   switch (eventType) {
@@ -392,6 +389,7 @@ function cleanLines (x) {
 
 function randomKey (dictionary) {
   const keys = Object.keys(dictionary)
+
   return keys[keys.length * Math.random() << 0]
 }
 
@@ -418,9 +416,9 @@ const goAheadAndShowTheAd = (windowId, notificationTitle, notificationText, noti
 const classifyPage = (state, action, windowId) => {
   if (noop(state)) return state
 
+  const url = action.getIn([ 'scrapedData', 'url' ])
   let headers = action.getIn([ 'scrapedData', 'headers' ])
   let body = action.getIn([ 'scrapedData', 'body' ])
-  let url = action.getIn([ 'scrapedData', 'url' ])
 
   if (!headers) return state
 
@@ -437,20 +435,20 @@ const classifyPage = (state, action, windowId) => {
 
   state = userModelState.appendPageScoreToHistoryAndRotate(state, pageScore)
 
-  let catNames = priorData.names
+  const catNames = priorData.names
 
-  let immediateMax = um.vectorIndexOfMax(pageScore)
-  let immediateWinner = catNames[immediateMax].split('-')
+  const immediateMax = um.vectorIndexOfMax(pageScore)
+  const immediateWinner = catNames[immediateMax].split('-')
 
   lastSingleClassification = immediateWinner
 
-  let mutable = true
-  let history = userModelState.getPageScoreHistory(state, mutable)
+  const mutable = true
+  const history = userModelState.getPageScoreHistory(state, mutable)
 
-  let scores = um.deriveCategoryScores(history)
-  let indexOfMax = um.vectorIndexOfMax(scores)
-  let winnerOverTime = catNames[indexOfMax].split('-')
-  appActions.onUserModelLog('Site visited', {url, immediateWinner, winnerOverTime})
+  const scores = um.deriveCategoryScores(history)
+  const indexOfMax = um.vectorIndexOfMax(scores)
+  const winnerOverTime = catNames[indexOfMax].split('-')
+  appActions.onUserModelLog('Site visited', { url, immediateWinner, winnerOverTime })
 
   return state
 }
@@ -506,6 +504,7 @@ const checkReadyAdServe = (state, windowId) => {
 // given 'sports-rugby-rugby world cup': try that, then 'sports-rugby', then 'sports'
   const hierarchy = category.split('-')
   let winnerOverTime, result
+
   for (let level in hierarchy) {
     winnerOverTime = hierarchy.slice(0, hierarchy.length - level).join('-')
     result = bundle.categories[winnerOverTime]
@@ -519,19 +518,14 @@ const checkReadyAdServe = (state, windowId) => {
 
   const seen = userModelState.getAdUUIDSeen(state)
 
-  let adsSeen = result.filter(x => seen.get(x.uuid))
+  const adsSeen = result.filter(x => seen.get(x.uuid))
   let adsNotSeen = result.filter(x => !seen.get(x.uuid))
-
   const allSeen = (adsNotSeen.length <= 0)
 
   if (allSeen) {
     appActions.onUserModelLog('Ad round-robin', { category, adsSeen, adsNotSeen })
     // unmark all
-    for (let i = 0; i < result.length; i++) {
-      const uuid = result[i].uuid
-      const unsee = 0
-      state = userModelState.recordAdUUIDSeen(state, uuid, unsee)
-    }
+    for (let i = 0; i < result.length; i++) state = userModelState.recordAdUUIDSeen(state, result[i].uuid, 0)
     adsNotSeen = adsSeen
   } // else - recordAdUUIDSeen - this actually only happens in click-or-close event capture in generateAdReportingEvent in this file
 
@@ -598,17 +592,13 @@ const generateAndSetAdUUIDRegardless = (state) => {
 }
 
 const generateAndSetAdUUIDButOnlyIfDNE = (state) => {
-  let uuid = userModelState.getAdUUID(state)
-
-  if (typeof uuid === 'undefined') state = generateAndSetAdUUIDRegardless(state)
+  if (userModelState.getAdUUID(state) === 'undefined') state = generateAndSetAdUUIDRegardless(state)
 
   return state
 }
 
 const confirmAdUUIDIfAdEnabled = (state, adEnabled) => {
-  if (adEnabled == null) {
-    adEnabled = userModelState.getAdEnabledValue(state)
-  }
+  if (adEnabled == null) adEnabled = userModelState.getAdEnabledValue(state)
 
   if (adEnabled) state = generateAndSetAdUUIDButOnlyIfDNE(state)
 
