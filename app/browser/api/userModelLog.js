@@ -6,8 +6,9 @@ const electron = require('electron')
 const ledgerUtil = require('../../common/lib/ledgerUtil')
 const path = require('path')
 
+const demoValue = []
+
 let fs
-let demoValue = []
 let saveInterval = null
 let savedValues = 0
 
