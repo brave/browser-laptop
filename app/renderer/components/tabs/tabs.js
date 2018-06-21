@@ -19,16 +19,13 @@ const PreviousTabPageIcon = require('../../../../icons/arrow/left')
 const appActions = require('../../../../js/actions/appActions')
 const windowActions = require('../../../../js/actions/windowActions')
 
-// State
-const windowState = require('../../../common/state/windowState')
-
 // Constants
 const dragTypes = require('../../../../js/constants/dragTypes')
 const settings = require('../../../../js/constants/settings')
 
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
-const {getCurrentWindowId, isFocused} = require('../../currentWindow')
+const {getCurrentWindowId} = require('../../currentWindow')
 const dnd = require('../../../../js/dnd')
 const dndData = require('../../../../js/dndData')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
@@ -132,7 +129,6 @@ class Tabs extends React.Component {
       .slice(startingFrameIndex, startingFrameIndex + tabsPerTabPage)
       .map((tab) => tab.get('key'))
     const totalPages = Math.ceil(unpinnedTabs.size / tabsPerTabPage)
-    const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const dragData = (state.getIn(['dragData', 'type']) === dragTypes.TAB && state.get('dragData')) || Immutable.Map()
 
     const props = {}
@@ -143,7 +139,6 @@ class Tabs extends React.Component {
     props.partOfFullPageSet = currentTabs.size === tabsPerTabPage
     props.onNextPage = currentTabs.size >= tabsPerTabPage && totalPages > pageIndex + 1
     props.onPreviousPage = pageIndex > 0
-    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state))
 
     // used in other functions
     props.tabPageIndex = currentWindow.getIn(['ui', 'tabs', 'tabPageIndex'])
@@ -162,7 +157,6 @@ class Tabs extends React.Component {
       <span className={css(
         styles.tabs__tabStrip,
         (this.props.previewTabPageIndex != null) && styles.tabs__tabStrip_isPreview,
-        this.props.shouldAllowWindowDrag && styles.tabs__tabStrip_allowDragging,
         isTabPreviewing && styles.tabs__tabStrip_isTabPreviewing
       )}
         data-test-preview-tab={this.props.previewTabPageIndex != null}
@@ -242,11 +236,9 @@ const styles = StyleSheet.create({
 
   tabs__tabStrip_isPreview: globalStyles.animations.tabFadeIn,
 
-  tabs__tabStrip_allowDragging: {
-    WebkitAppRegion: 'drag'
-  },
-
   tabs__tabStrip__navigation: {
+    // no-drag is applied to each button and tab
+    WebkitAppRegion: 'no-drag',
     '--icon-line-color': globalStyles.color.buttonColor,
     display: 'flex',
     justifyContent: 'center',
