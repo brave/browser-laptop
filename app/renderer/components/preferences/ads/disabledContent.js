@@ -13,7 +13,7 @@ const settings = require('../../../../../js/constants/settings')
 
 // style
 const globalStyles = require('../../styles/global')
-const iconPaymentsOn = require('../../../../extensions/brave/img/preferences/ads_welcome_BG.png')
+const welcomeBg = require('../../../../extensions/brave/img/preferences/ads_welcome_BG.png')
 
 class DisabledContent extends React.Component {
   constructor () {
@@ -101,22 +101,32 @@ class DisabledContent extends React.Component {
     const available = this.props.userModelData.available
 
     return <div>
-      <p className={css(styles.disabledContent__message__text)}>
-        <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText1' />&nbsp;
-        <span className={css(styles.disabledContent__message_bold)} data-l10n-id='adsWelcomeText4' />&nbsp;
-        <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText5' />&nbsp;
+      <p className={css(styles.disabledContent__message__text, styles.disabledContent__message_white)}>
+        Thank you helping us develop BAT Ads in Brave. This test phase involves
+        <b className={css(styles.disabledContent__message_bold)}> sending a detailed log of your browsing activity
+        (including full URLs) in non-private tabs, which ads are seen and clicked, IP address, operating system and
+        browser version, browser ads settings, when the browser is being used, and a unique identifier per
+        participant to Brave. In addition, you may choose to send Brave a self-selected description of the
+        location associated with your current WiFi network (“home”, “work”, etc.).</b>&nbsp;
+        We use this information as algorithmic test data for our machine learning system that will be used upon release of Brave Ads.
       </p>
-      <p className={css(styles.disabledContent__message__text)}>
-        <span className={css(styles.disabledContent__message_white)} data-l10n-id='adsWelcomeText2' />
-        <a
-          href='https://brave.com/download'
-          target='_blank'
-          className={css(styles.disabledContent__message_white)}
-        >
-          https://brave.com/download
-        </a>.
+      <p className={css(styles.disabledContent__message__text, styles.disabledContent__message_white)}>
+        Once you have opted in to the program, you can check the details of the log files collected and
+        sent to Brave by clicking on ‘Click to see Logs’ on this page.
       </p>
-      <p className={css(styles.disabledContent__message__text)} data-l10n-id='adsWelcomeText3' />
+      <p className={css(styles.disabledContent__message__text, styles.disabledContent__message_white)}>
+        This is not a production version of Brave and
+        <b className={css(styles.disabledContent__message_bold)}>does NOT offer the same privacy guarantees as the
+        production version of the Brave browser.</b> Only use this version as part of the Brave Ads test program.
+        Otherwise, download Brave from <a className={css(styles.disabledContent__message_white, styles.disabledContent__message_link)} href='https://brave.com/download'>https://brave.com/download</a>.
+        When Brave Ads launches later this year, all personal data and browsing history will remain on-device
+        and will not be transmitted to Brave or anyone else. The data being collected in this early test is
+        specific to this test.
+      </p>
+      <p className={css(styles.disabledContent__message__text, styles.disabledContent__message_white)}>
+        You can leave this test at any time by switching off this feature, or using the current release
+        version of Brave. Any browsing done in private tabs is not subject to data collection. <a className={css(styles.disabledContent__message_white, styles.disabledContent__message_link)} href='https://brave.com/hc-privacy'>Learn more about this test.</a>
+      </p>
       {
         config && available
         ? this.agreeBlock()
@@ -172,12 +182,12 @@ const styles = StyleSheet.create({
   },
 
   disabledContent__message: {
-    background: `url(${iconPaymentsOn}) no-repeat bottom right #FB542B`,
+    background: `url(${welcomeBg}) no-repeat top right, linear-gradient(180deg,#5c32e5 10%,#6b2f8e 100%);`,
     backgroundSize: 'contain',
     borderRadius: globalStyles.radius.borderRadiusUIbox,
     boxSizing: 'border-box',
     padding: '40px',
-    lineHeight: '1.2em',
+    lineHeight: '1.4em',
     fontSize: '15px'
   },
 
@@ -191,6 +201,10 @@ const styles = StyleSheet.create({
   disabledContent__message_white: {
     color: globalStyles.color.white100,
     display: 'inline-block'
+  },
+
+  disabledContent__message_link: {
+    textDecoration: 'underline !important'
   },
 
   disabledContent__message_bold: {
