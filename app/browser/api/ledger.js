@@ -229,16 +229,16 @@ const getPublisherTimestamp = (updateList) => {
     return
   }
 
-  const publisherTimestampFn = module.exports.publisherTimestampCallback.bind(updateList)
+  const publisherTimestampFn = module.exports.publisherTimestampCallback.bind(this, updateList)
   client.publisherTimestamp(publisherTimestampFn)
 }
 
-const publisherTimestampCallback = (err, result, updateList) => {
+const publisherTimestampCallback = (updateList, err, result) => {
   if (err || !result) {
     console.error('Error while retrieving publisher timestamp', err.toString())
     return
   }
-
+  
   appActions.onPublisherTimestamp(result.timestamp, updateList)
 }
 
