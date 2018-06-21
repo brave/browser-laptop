@@ -11,7 +11,7 @@ const {app, extensions, session, ipcMain} = require('electron')
 const {makeImmutable, makeJS} = require('../common/state/immutableUtil')
 const {getExtensionsPath, getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
-const {isSessionPartition} = require('../../js/state/frameStateUtil')
+const {isSessionPartition, isTor} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/lib/urlutil')
 const settingsStore = require('../../js/settings')
 const settings = require('../../js/constants/settings')
@@ -346,12 +346,14 @@ const updateAboutDetails = (tabId) => {
     const trackedBlockersCount = appState.getIn(['trackingProtection', 'count'], 0)
     const httpsUpgradedCount = appState.getIn(['httpsEverywhere', 'count'], 0)
     const adblockCount = appState.getIn(['adblock', 'count'], 0)
+    const torEnabled = isTor(getTabValue(tabId))
     sendAboutDetails(tabId, messages.NEWTAB_DATA_UPDATED, {
       showEmptyPage,
       showImages,
       trackedBlockersCount,
       adblockCount,
       httpsUpgradedCount,
+      torEnabled,
       newTabDetail: newTabDetail.toJS()
     })
   } else if (location === 'about:autofill') {
@@ -522,7 +524,7 @@ const api = {
       if (ses) {
         isPrivate = ses.isOffTheRecord()
       }
-      const isTor = isPrivate && settingsStore.getSetting(settings.USE_TOR_PRIVATE_TABS)
+      const isTor = newTab.session.partition === appConfig.tor.partition
 
       const frameOpts = {
         location,

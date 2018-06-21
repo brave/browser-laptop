@@ -19,15 +19,9 @@ const aboutActions = require('./aboutActions')
 require('../../less/about/newtab.less')
 
 const useAlternativePrivateSearchEngineDataKeys = ['newTabDetail', 'useAlternativePrivateSearchEngine']
-const torEnabled = ['newTabDetail', 'torEnabled']
 const torFAQ = 'https://github.com/brave/browser-laptop/wiki/Using-Tor-in-Brave#faq'
 
 const onChangeTor = (value) => {
-  aboutActions.changeSetting(settings.USE_TOR_PRIVATE_TABS, value)
-  if (value === true) {
-    // Also change DDG to enabled since Google is unusable with Tor.
-    aboutActions.changeSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, value)
-  }
   aboutActions.recreateTorTab(value)
 }
 
@@ -46,7 +40,7 @@ class NewPrivateTab extends React.Component {
   }
 
   onClickTorTitle () {
-    const newSettingValue = !this.props.newTabData.getIn(torEnabled)
+    const newSettingValue = !this.props.torEnabled
     onChangeTor(newSettingValue)
   }
 
@@ -54,7 +48,7 @@ class NewPrivateTab extends React.Component {
     if (!this.props.newTabData) {
       return null
     }
-    const isTor = Boolean(this.props.newTabData.getIn(torEnabled))
+    const isTor = Boolean(this.props.torEnabled)
     return <div data-test-id='privateTabContent' className={css(styles.newPrivateTab, styles.newPrivateTabVars)}>
       <div className='statsBar'>
         <Stats newTabData={this.props.newTabData} />
@@ -64,6 +58,40 @@ class NewPrivateTab extends React.Component {
         <div className={css(styles.textWrapper)}>
           <h1 className={css(styles.title)} data-l10n-id='privateTabTitle' />
           {
+            <div className={css(styles.privateSearch)}>
+              <div className={css(styles.privateSearch__setting)}>
+                <img className={css(styles.privateSearch__torImage)} src={torIcon} alt='Tor logo' />
+                <span>
+                  <h2 onClick={this.onClickTorTitle.bind(this)} className={css(styles.privateSearch__title)}>
+                    <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabTorTitle' />
+                    <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>&nbsp;Tor</strong>
+                  </h2>
+                  <p className={css(styles.text)} data-l10n-id='privateTabTorText1' />
+                  <p className={css(styles.text, styles.text_clickable)} onClick={aboutActions.createTabRequested.bind(null, {url: torFAQ, isPrivate: true, isTor})} data-l10n-id='learnMore' />
+                </span>
+                <SettingCheckbox
+                  large
+                  switchClassName={css(styles.privateSearch__switch)}
+                  rightLabelClassName={css(styles.sectionTitle)}
+                  checked={isTor}
+                  onChange={this.onChangeTor.bind(this)}
+                />
+              </div>
+            </div>
+          }
+          {
+            isTor &&
+            <div className={css(styles.privateSearch)}>
+              <div className={css(styles.privateSearch__setting)}>
+                <p>
+                  <span className={css(styles.text, styles.text_DDG)} data-l10n-id='privateTabTorText2' />
+                  <span className={css(styles.text, styles.text_clickable)} data-l10n-id='searchPreferences' onClick={aboutActions.createTabRequested.bind(null, {url: 'about:preferences#search'})} />
+                </p>
+              </div>
+            </div>
+          }
+          {
+            !isTor &&
             this.props.newTabData.hasIn(useAlternativePrivateSearchEngineDataKeys) &&
             <div className={css(styles.privateSearch)}>
               <div className={css(styles.privateSearch__setting)}>
@@ -73,7 +101,7 @@ class NewPrivateTab extends React.Component {
                     <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabSearchSectionTitle' />
                     <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>&nbsp;DuckDuckGo</strong>
                   </h2>
-                  <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabSearchText1' />
+                  <p className={css(styles.text)} data-l10n-id='privateTabSearchText1' />
                 </span>
                 <SettingCheckbox
                   large
@@ -81,28 +109,6 @@ class NewPrivateTab extends React.Component {
                   rightLabelClassName={css(styles.sectionTitle)}
                   checked={Boolean(this.props.newTabData.getIn(useAlternativePrivateSearchEngineDataKeys))}
                   onChange={this.onChangePrivateSearch.bind(this)}
-                />
-              </div>
-            </div>
-          }
-          {
-            <div className={css(styles.privateSearch)}>
-              <div className={css(styles.privateSearch__setting)}>
-                <img className={css(styles.privateSearch__torImage)} src={torIcon} alt='Tor logo' />
-                <span>
-                  <h2 onClick={this.onClickTorTitle.bind(this)} className={css(styles.privateSearch__title)}>
-                    <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabTorTitle' />
-                    <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>&nbsp;Tor</strong>
-                  </h2>
-                  <p className={css(styles.text, styles.text_privateSearch)} data-l10n-id='privateTabTorText1' />
-                  <p className={css(styles.text, styles.text_privateSearch, styles.text_clickable)} onClick={aboutActions.createTabRequested.bind(null, {url: torFAQ, isPrivate: true, isTor})} data-l10n-id='learnMore' />
-                </span>
-                <SettingCheckbox
-                  large
-                  switchClassName={css(styles.privateSearch__switch)}
-                  rightLabelClassName={css(styles.sectionTitle)}
-                  checked={isTor}
-                  onChange={this.onChangeTor.bind(this)}
                 />
               </div>
             </div>
@@ -220,6 +226,10 @@ const styles = StyleSheet.create({
     maxWidth: '800px',
     fontFamily: 'inherit',
     paddingRight: '40px'
+  },
+
+  text_DDG: {
+    paddingRight: '10px'
   },
 
   text_footer: {
