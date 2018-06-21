@@ -85,7 +85,6 @@ class AddEditBookmarkHanger extends React.Component {
     const props = {}
     // used in renderer
     props.isModal = ownProps.isModal
-    props.withHomeButton = getSetting(settings.SHOW_HOME_BUTTON)
     props.heading = bookmarkHangerHeading(editMode, isAdded)
     props.location = siteDetail.get('location')
     props.parentFolderId = siteDetail.get('parentFolderId')
@@ -113,8 +112,7 @@ class AddEditBookmarkHanger extends React.Component {
         {
           !this.props.isModal
           ? <div className={cx({
-            [css(styles.bookmarkHanger__arrowUp)]: true,
-            [css(styles.bookmarkHanger__withHomeButton)]: this.props.withHomeButton
+            [css(styles.bookmarkHanger__arrowUp)]: true
           })} />
           : null
         }
@@ -175,7 +173,7 @@ const styles = StyleSheet.create({
   },
   bookmarkHanger__arrowUp: {
     position: 'relative',
-    left: '54px',
+    left: '59px',
 
     '::after': {
       content: '""',
@@ -187,9 +185,6 @@ const styles = StyleSheet.create({
       transformOrigin: '0 0',
       transform: 'rotate(135deg)'
     }
-  },
-  bookmarkHanger__withHomeButton: {
-    left: '83px'
   },
   bookmark__bottomWrapper: {
     display: 'flex',
