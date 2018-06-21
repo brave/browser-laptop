@@ -233,7 +233,7 @@ const getPublisherTimestamp = (updateList) => {
   client.publisherTimestamp(publisherTimestampFn)
 }
 
-const publisherTimestampCallback = (updateList, err, result) => {
+const publisherTimestampCallback = (err, result, updateList) => {
   if (err || !result) {
     console.error('Error while retrieving publisher timestamp', err.toString())
     return
@@ -2690,24 +2690,28 @@ const run = (state, delayTime) => {
       delayTime = random.randomInt({min: 3 * ledgerUtil.milliseconds.minute, max: ledgerUtil.milliseconds.hour})
     }
 
-    runTimeoutId = setTimeout(() => {
-      runTimeoutId = false
-      if (active !== client) return
-
-      if (!client) {
-        return console.error('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
-      }
-
-      if (client.sync(module.exports.callback) === true) {
-        appActions.onLedgerRun(0)
-      }
-    }, delayTime)
+    syncUpLedger(active)
     return
   }
 
   module.exports.reconcile(callback)
   return state
 }
+
+const syncUpLedger = (active) => {
+  return new Promise((resolve, reject) => {
+    runTimeoutId = false
+    if (active !== client) return
+
+    if (!client) {
+      return console.error('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
+    }
+
+    if (client.sync(module.exports.callback) === true) {
+      appActions.onLedgerRun(0)
+    }
+  })
+} 
 
 const reconcile = (callback) => {
   if (client.isReadyToReconcile(synopsis, module.exports.onFuzzing)) {
