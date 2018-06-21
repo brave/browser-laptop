@@ -34,6 +34,7 @@ const extensionState = require('./common/state/extensionState')
 const ledgerUtil = require('./common/lib/ledgerUtil')
 const {cookieExceptions, refererExceptions} = require('../js/data/siteHacks')
 const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
+const {shouldDebugTabEvents} = require('./cmdLine')
 
 let appStore = null
 
@@ -589,10 +590,17 @@ function registerForDownloadListener (session) {
 
   session.on('will-download', function (event, item, webContents) {
     if (webContents.isDestroyed()) {
+      if (shouldDebugTabEvents) {
+        console.log(`Tab [DESTROYED] will-download`)
+      }
       event.preventDefault()
       return
     }
 
+    if (shouldDebugTabEvents) {
+      const tabId = webContents.getId ? webContents.getId() : 'NOT_TAB'
+      console.log(`Tab [${tabId}] will-download`)
+    }
     const hostWebContents = webContents.hostWebContents || webContents
     const win = BrowserWindow.fromWebContents(hostWebContents) || BrowserWindow.getFocusedWindow()
 
