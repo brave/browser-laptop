@@ -32,7 +32,8 @@ class AboutWelcome extends React.Component {
             <p className={css(styles.p3, styles.note)}>
               <b className={css(styles.p3_b)}>Note</b>: This version of Brave should only be used by those who have been invited to participate in the
               Brave Ads Trial program. If you have found your way here by accident, please download the current
-              release version for your device at https://brave.com/download
+              release version for your device at <br />
+              <a href='https://brave.com/download' target='_blank' className={css(styles.link)}>https://brave.com/download</a>
             </p>
             <p className={css(styles.p3)}>
               <b className={css(styles.p3_b)}>Brave Ads will give you your fair share of ad dollars.</b>

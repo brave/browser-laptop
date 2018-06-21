@@ -118,14 +118,14 @@ class DisabledContent extends React.Component {
         This is not a production version of Brave and
         <b className={css(styles.disabledContent__message_bold)}>does NOT offer the same privacy guarantees as the
         production version of the Brave browser.</b> Only use this version as part of the Brave Ads test program.
-        Otherwise, download Brave from <a className={css(styles.disabledContent__message_white)} href='https://brave.com/download'>https://brave.com/download</a>.
+        Otherwise, download Brave from <a className={css(styles.disabledContent__message_white, styles.disabledContent__message_link)} href='https://brave.com/download'>https://brave.com/download</a>.
         When Brave Ads launches later this year, all personal data and browsing history will remain on-device
         and will not be transmitted to Brave or anyone else. The data being collected in this early test is
         specific to this test.
       </p>
       <p className={css(styles.disabledContent__message__text, styles.disabledContent__message_white)}>
         You can leave this test at any time by switching off this feature, or using the current release
-        version of Brave. Any browsing done in private tabs is not subject to data collection. <a className={css(styles.disabledContent__message_white)} href='https://brave.com/hc-privacy'>Learn more about this test.</a>
+        version of Brave. Any browsing done in private tabs is not subject to data collection. <a className={css(styles.disabledContent__message_white, styles.disabledContent__message_link)} href='https://brave.com/hc-privacy'>Learn more about this test.</a>
       </p>
       {
         config && available
@@ -201,6 +201,10 @@ const styles = StyleSheet.create({
   disabledContent__message_white: {
     color: globalStyles.color.white100,
     display: 'inline-block'
+  },
+
+  disabledContent__message_link: {
+    textDecoration: 'underline !important'
   },
 
   disabledContent__message_bold: {
