@@ -267,6 +267,6 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
   blockWebRTC()
 }
 
-if (chrome.contentSettings.torEnabled == 'block') {
+if (isTorTab()) {
   blockWebRTC()
 }
