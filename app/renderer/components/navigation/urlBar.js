@@ -429,6 +429,9 @@ class UrlBar extends React.Component {
       } else if (this.props.torPercentInitialized) {
         // Don't show 100% since it sometimes gets stuck at 100%
         const percentInitialized = this.props.torPercentInitialized === '100' ? '99' : this.props.torPercentInitialized
+        if (percentInitialized === '0') {
+          return `${locale.translation('urlbarPlaceholderTorProgress')}...`
+        }
         return `${locale.translation('urlbarPlaceholderTorProgress')}: ${percentInitialized}%...`
       } else if (this.props.torInitializationError === false) {
         return locale.translation('urlbarPlaceholderTorSuccess')
