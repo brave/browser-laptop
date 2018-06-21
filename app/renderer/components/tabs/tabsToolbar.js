@@ -14,9 +14,13 @@ const PinnedTabs = require('./pinnedTabs')
 // Actions
 const windowActions = require('../../../../js/actions/windowActions')
 
+// State
+const windowState = require('../../../common/state/windowState')
+
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
+const {isFocused} = require('../../currentWindow')
 
 const globalStyles = require('../styles/global')
 const {theme} = require('../styles/theme')
@@ -61,6 +65,7 @@ class TabsToolbar extends React.Component {
     // used in renderer
     props.hasPinnedTabs = !pinnedTabs.isEmpty()
     props.hasPreview = (frameStateUtil.getPreviewFrameKey(currentWindow) != null)
+    props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, isFocused(state))
 
     // used in other functions
     props.activeFrameKey = activeFrame.get('key')
@@ -75,6 +80,7 @@ class TabsToolbar extends React.Component {
     return <div
       className={css(
         styles.tabsToolbar,
+        this.props.shouldAllowWindowDrag && styles.tabsToolbar_allowWindowDragging,
         this.props.hasPreview && styles.tabsToolbar_hasPreview
       )}
       data-test-id='tabsToolbar'
@@ -98,7 +104,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.tabsToolbar.backgroundColor,
     display: 'flex',
     userSelect: 'none',
-    WebkitAppRegion: 'no-drag',
 
     // This element is set as border-box so it does not
     // take into account the borders as width gutter, so we
@@ -123,6 +128,10 @@ const styles = StyleSheet.create({
       content: '" "',
       willChange: 'box-shadow'
     }
+  },
+
+  tabsToolbar_allowWindowDragging: {
+    WebkitAppRegion: 'drag'
   },
 
   tabsToolbar_hasPreview: {
