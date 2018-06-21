@@ -33,6 +33,7 @@ const updateState = require('../../common/state/updateState')
 // Constants
 const settings = require('../../../js/constants/settings')
 const messages = require('../../../js/constants/messages')
+const appConfig = require('../../../js/constants/appConfig')
 const ledgerStatuses = require('../../common/constants/ledgerStatuses')
 
 // Utils
@@ -866,7 +867,7 @@ const shouldTrackTab = (state, tabId) => {
   }
   const partition = tabFromState.get('partition', '')
   const ses = session.fromPartition(partition)
-  const isPrivate = (ses && ses.isOffTheRecord()) || tabFromState.get('incognito')
+  const isPrivate = (ses && ses.isOffTheRecord()) || tabFromState.get('incognito') || partition === appConfig.tor.partition
   return !isPrivate && !tabFromState.isEmpty() && ledgerUtil.shouldTrackView(tabFromState)
 }
 

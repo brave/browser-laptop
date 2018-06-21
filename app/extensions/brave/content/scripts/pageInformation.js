@@ -130,7 +130,7 @@
   if (window.top !== window.self) return
 
   // Don't allow ledger to run in incognito
-  if (chrome.extension.inIncognitoContext) {
+  if (chrome.extension.inIncognitoContext || isTorTab()) {
     return
   }
 
