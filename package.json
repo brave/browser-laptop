@@ -7,6 +7,7 @@
     "port": "8080"
   },
   "scripts": {
+    "push-back-next-reconcile-stamp": "node ./tools/pushBackNextReconcileStamp.js",
     "add-simulated-payment-history": "node ./tools/addSimulatedPaymentHistory.js",
     "add-simulated-synopsis-visits": "node ./tools/addSimulatedSynopsisVisits.js",
     "build-installer": "node ./tools/buildInstaller.js",
