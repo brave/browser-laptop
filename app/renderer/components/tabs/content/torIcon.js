@@ -3,24 +3,20 @@
 * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const React = require('react')
-const ReactDOM = require('react-dom')
-const {StyleSheet} = require('aphrodite/no-important')
+const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const ReduxComponent = require('../../reduxComponent')
-const TabIcon = require('./tabIcon')
 
 // State helpers
 const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const tabState = require('../../../../common/state/tabState')
-const privateState = require('../../../../common/state/tabContentState/privateState')
+const tabUIState = require('../../../../common/state/tabUIState')
 
 // Styles
 const globalStyles = require('../../styles/global')
-const {theme} = require('../../styles/theme')
 const {opacityIncreaseElementKeyframes} = require('../../styles/animations')
-
-const torSvg = require('../../../../extensions/brave/img/tabs/tor.svg')
+require('../../../../../fonts/poppins.css')
 
 class TorIcon extends React.Component {
   constructor (props) {
@@ -36,9 +32,8 @@ class TorIcon extends React.Component {
 
     const props = {}
     props.isPinned = tabState.isTabPinned(state, tabId)
-    props.isActive = frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
     props.showTorIcon = frameStateUtil.isTor(frame) &&
-      privateState.showPrivateIcon(currentWindow, frameKey)
+      tabUIState.showTabEndIcon(currentWindow, frameKey)
     props.tabId = tabId
 
     return props
@@ -70,7 +65,7 @@ class TorIcon extends React.Component {
   }
 
   setRef (ref) {
-    this.element = ReactDOM.findDOMNode(ref)
+    this.element = ref
   }
 
   render () {
@@ -78,34 +73,23 @@ class TorIcon extends React.Component {
       return null
     }
 
-    return <TabIcon
+    return <div
       data-test-id='torIcon'
-      className={[
-        styles.icon_private,
-        this.props.isActive && styles.icon_private_active
-      ]}
+      className={css(
+        styles.icon_private
+      )}
       ref={this.setRef}
-    />
+    >
+      Tor
+    </div>
   }
 }
 
 const styles = StyleSheet.create({
   icon_private: {
-    WebkitMaskRepeat: 'no-repeat',
-    WebkitMaskPosition: 'center',
-    WebkitMaskImage: `url(${torSvg})`,
-    WebkitMaskSize: globalStyles.spacing.sessionIconSize,
     marginRight: globalStyles.spacing.defaultTabMargin,
-
-    // Override default properties
-    backgroundSize: 0,
-    height: globalStyles.spacing.sessionIconSize,
-    width: globalStyles.spacing.sessionIconSize,
-    backgroundColor: theme.tab.icon.private.background.notActive
-  },
-
-  icon_private_active: {
-    backgroundColor: theme.tab.icon.private.background.active
+    paddingTop: '1px',
+    font: '600 10px Poppins, sans-serif'
   }
 })
 
