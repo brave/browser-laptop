@@ -69,15 +69,11 @@ const notificationUtil = {
 
     if (!notificationUtil.onClick) {
       notificationUtil.onClick = notifier.on('click', function (notifierObject, options) {
-        if (typeof options === 'object' && options.data) {
-          notificationUtil.clickHandler(options)
-        }
+        if (typeof options === 'object' && options.data) notificationUtil.clickHandler(options)
       })
 
       notifier.on('timeout', () => {
-        if (typeof options === 'object' && options.data) {
-          notificationUtil.timeoutHandler(options)
-        }
+        if (typeof options === 'object' && options.data) notificationUtil.timeoutHandler(options)
       })
     }
 
@@ -94,15 +90,16 @@ const notificationUtil = {
           'the user dismissed the notification.': 'closed'
         }[arguments[1]]
       }
-      if (!result) result = 'unknown'
+      if (!result) {
+        console.error(JSON.stringify(arguments, null, 2))
+        result = 'unknown'
+      }
       if (result.indexOf('Clicked') !== -1) result = 'clicked'
       if (result === 'timeout') result = 'ignored'
 
       let payload = { result: result }
 
-      if (typeof options === 'object' && options.uuid) {
-        payload.uuid = options.uuid
-      }
+      if (typeof options === 'object' && options.uuid) payload.uuid = options.uuid
 
       appActions.onUserModelLog(notificationTypes.NOTIFICATION_RESULT, payload)
     })

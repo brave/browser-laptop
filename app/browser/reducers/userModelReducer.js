@@ -131,7 +131,7 @@ const userModelReducer = (state, action, immutableAction) => {
               state = userModel.initialize(state, value)
               if (!value) {
                 appActions.createTabRequested({
-                  url: 'https://brave.com/ads-goodbye'
+                  url: 'https://brave.com/ads-user-trials-goodbye'
                 })
               }
               break
@@ -196,7 +196,7 @@ const userModelReducer = (state, action, immutableAction) => {
       {
         appActions.changeSetting(settings.ADS_ENABLED, false)
         appActions.createTabRequested({
-          url: 'https://brave.com/ads-goodbye'
+          url: 'https://brave.com/ads-user-trials-goodbye'
         })
         appActions.showNotification({
           position: 'global',
