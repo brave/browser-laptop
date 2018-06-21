@@ -33,7 +33,8 @@ const Immutable = require('immutable')
 const urlParse = require('../../common/urlParse')
 const roundtrip = require('./ledger').roundtrip
 
-const testingP = (process.env.NODE_ENV === 'test') || (process.env.LEDGER_VERBOSE === 'true')
+const debugP = (process.env.NODE_ENV === 'test') || (process.env.LEDGER_VERBOSE === 'true')
+const testingP = true
 let nextEasterEgg = 0
 
 let initP
@@ -614,13 +615,13 @@ const generateAndSetAdUUIDRegardless = (state) => {
 }
 
 const generateAndSetAdUUIDButOnlyIfDNE = (state) => {
-  if (userModelState.getAdUUID(state) === 'undefined') state = generateAndSetAdUUIDRegardless(state)
+  if (userModelState.getAdUUID(state) === undefined) state = generateAndSetAdUUIDRegardless(state)
 
   return state
 }
 
 const confirmAdUUIDIfAdEnabled = (state, adEnabled) => {
-  if (adEnabled == null) adEnabled = userModelState.getAdEnabledValue(state)
+  if (adEnabled === undefined) adEnabled = userModelState.getAdEnabledValue(state)
 
   if (adEnabled) state = generateAndSetAdUUIDButOnlyIfDNE(state)
 
@@ -629,8 +630,8 @@ const confirmAdUUIDIfAdEnabled = (state, adEnabled) => {
 
 let collectActivityId
 
-const oneDay = (testingP ? 600 : 86400) * 1000
-const oneHour = (testingP ? 25 : 3600) * 1000
+const oneDay = (debugP ? 600 : 86400) * 1000
+const oneHour = (debugP ? 25 : 3600) * 1000
 const hackStagingOn = true
 const roundTripOptions = {
   debugP: process.env.LEDGER_DEBUG === 'true',
