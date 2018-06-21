@@ -51,13 +51,15 @@ const requestHandlerApi = {
       const result = {
         image: await requestHandlerApi.getData({ htmlDom, finalUrl, conditions: metaScraperRules.getImageRules() }),
         title: await requestHandlerApi.getData({ htmlDom, finalUrl, conditions: metaScraperRules.getTitleRules() }),
-        author: await requestHandlerApi.getData({ htmlDom, finalUrl, conditions: metaScraperRules.getAuthorRules() })
+        author: await requestHandlerApi.getData({ htmlDom, finalUrl, conditions: metaScraperRules.getAuthorRules() }),
+        url: await requestHandlerApi.getData({ htmlDom, finalUrl, conditions: metaScraperRules.getUrlRules() })
       }
 
       ipc.send(`got-publisher-info-${url}`, {
         error: null,
         body: {
-          url: finalUrl,
+          finalUrl: finalUrl,
+          url: sanitizeHtml(result.url) || finalUrl,
           title: sanitizeHtml(result.title) || '',
           image: sanitizeHtml(result.image) || '',
           author: sanitizeHtml(result.author) || ''
@@ -114,6 +116,14 @@ const requestHandlerApi = {
     }
 
     return selector.src
+  },
+
+  getHref: (selector) => {
+    if (!selector) {
+      return null
+    }
+
+    return selector.href
   },
 
   urlTest: (url, opts) => {
