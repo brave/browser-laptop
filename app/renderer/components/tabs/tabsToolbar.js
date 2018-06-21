@@ -11,6 +11,9 @@ const ReduxComponent = require('../reduxComponent')
 const Tabs = require('./tabs')
 const PinnedTabs = require('./pinnedTabs')
 
+// Actions
+const windowActions = require('../../../../js/actions/windowActions')
+
 // Utils
 const contextMenus = require('../../../../js/contextMenus')
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
@@ -22,6 +25,7 @@ class TabsToolbar extends React.Component {
   constructor (props) {
     super(props)
     this.onContextMenu = this.onContextMenu.bind(this)
+    this.onMouseLeave = this.onMouseLeave.bind(this)
   }
 
   onContextMenu (e) {
@@ -38,6 +42,16 @@ class TabsToolbar extends React.Component {
     )
   }
 
+  onMouseLeave () {
+    if (this.props.fixTabWidth == null) {
+      return
+    }
+
+    windowActions.onTabMouseLeave({
+      fixTabWidth: null
+    })
+  }
+
   mergeProps (state, ownProps) {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
@@ -52,6 +66,7 @@ class TabsToolbar extends React.Component {
     props.activeFrameKey = activeFrame.get('key')
     props.activeFrameLocation = activeFrame.get('location', '')
     props.activeFrameTitle = activeFrame.get('title', '')
+    props.fixTabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
 
     return props
   }
@@ -64,6 +79,7 @@ class TabsToolbar extends React.Component {
       )}
       data-test-id='tabsToolbar'
       onContextMenu={this.onContextMenu}
+      onMouseLeave={this.onMouseLeave}
     >
       {
         this.props.hasPinnedTabs
