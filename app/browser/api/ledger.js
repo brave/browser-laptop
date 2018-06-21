@@ -238,7 +238,7 @@ const publisherTimestampCallback = (updateList, err, result) => {
     console.error('Error while retrieving publisher timestamp', err.toString())
     return
   }
-  
+
   appActions.onPublisherTimestamp(result.timestamp, updateList)
 }
 
@@ -2711,7 +2711,7 @@ const syncUpLedger = (active) => {
       appActions.onLedgerRun(0)
     }
   })
-} 
+}
 
 const reconcile = (callback) => {
   if (client.isReadyToReconcile(synopsis, module.exports.onFuzzing)) {
@@ -3417,8 +3417,6 @@ const getMethods = () => {
     getClient: () => {
       return client
     },
-    deleteStateFile,
-    delayFirstSync,
     onPublisherOptionUpdateAction,
     reconcile,
     setTestMinimums,
