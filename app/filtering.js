@@ -761,33 +761,42 @@ module.exports.initPartition = initPartition
 
 function setupTor () {
   let torInitialized = null
+  const setTorErrorOnTimeout = (timeout, msg) => {
+    torInitialized = null
+    setTimeout(() => {
+      if (torInitialized === null) {
+        appActions.onTorInitError(msg)
+      }
+    }, timeout)
+  }
+  const onTorSuccess = () => {
+    torInitialized = true
+    appActions.onTorInitSuccess()
+  }
+  const onTorFail = (msg) => {
+    torInitialized = false
+    appActions.onTorInitError(msg)
+  }
   // If Tor has not successfully initialized or thrown an error within 20s,
   // assume it's broken.
-  setTimeout(() => {
-    if (torInitialized === null) {
-      appActions.onTorInitError(`Tor could not start.`)
-    }
-  }, 20000)
+  setTorErrorOnTimeout(20000, 'Tor could not start.')
   // Set up the tor daemon watcher.  (NOTE: We don't actually start
   // the tor daemon here; that happens in C++ code.  But we do talk to
   // its control socket.)
   const torDaemon = new tor.TorDaemon()
   torDaemon.setup((err) => {
     if (err) {
-      appActions.onTorInitError(`Tor failed to make directories: ${err}`)
-      torInitialized = false
+      onTorFail(`Tor failed to make directories: ${err}`)
       return
     }
     torDaemon.on('exit', () => {
-      appActions.onTorInitError('The Tor process has stopped.')
-      torInitialized = false
+      onTorFail('The Tor process has stopped.')
     })
     torDaemon.on('launch', (socksAddr) => {
       console.log(`tor: daemon listens on ${socksAddr}`)
       const bootstrapped = (err, progress) => {
         if (err) {
-          appActions.onTorInitError(`Tor bootstrap error: ${err}`)
-          torInitialized = false
+          onTorFail(`Tor bootstrap error: ${err}`)
           return
         }
         appActions.onTorInitPercentage(progress)
@@ -795,12 +804,12 @@ function setupTor () {
       const circuitEstablished = (err, ok) => {
         if (ok) {
           console.log('Tor ready!')
-          appActions.onTorInitSuccess()
-          torInitialized = true
+          onTorSuccess()
         } else {
           if (err) {
-            appActions.onTorInitError(`Tor not ready: ${err}`)
-            torInitialized = false
+            // Wait for tor to re-initialize a circuit (ex: after a clock jump)
+            appActions.onTorInitPercentage('0')
+            setTorErrorOnTimeout(10000, `Tor not ready: ${err}`)
           } else {
             // Simply log the error but don't show error UI since Tor might
             // finish opening a circuit.
@@ -810,13 +819,11 @@ function setupTor () {
       }
       torDaemon.onBootstrap(bootstrapped, (err) => {
         if (err) {
-          appActions.onTorInitError(`Tor error bootstrapping: ${err}`)
-          torInitialized = false
+          onTorFail(`Tor error bootstrapping: ${err}`)
         }
         torDaemon.onCircuitEstablished(circuitEstablished, (err) => {
           if (err) {
-            appActions.onTorInitError(`Tor error opening a circuit: ${err}`)
-            torInitialized = false
+            onTorFail(`Tor error opening a circuit: ${err}`)
           }
         })
       })
