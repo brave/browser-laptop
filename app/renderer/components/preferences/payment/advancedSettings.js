@@ -115,13 +115,20 @@ class AdvancedSettingsFooter extends ImmutableComponent {
 
   render () {
     return <div className={css(styles.footer__wrapper)}>
-      <div className={css(styles.footer__wrapper__left)}>
-        <BrowserButton groupedItem alertColor
-          l10nId='paymentsDeleteWallet'
-          testId='paymentsDeleteWallet'
-          onClick={this.deleteWallet.bind(this)}
-        />
-      </div>
+      {
+        this.props.paymentInProgress
+        ? <div className={css(styles.footer__wrapper__left__footnote)}>
+          <span data-l10n-id='cannotDeleteWalletOnReconcile' className={css(styles.wallet__delete__footNote)}
+          />
+        </div>
+        : <div className={css(styles.footer__wrapper__left)}>
+          <BrowserButton groupedItem alertColor
+            l10nId='paymentsDeleteWallet'
+            testId='paymentsDeleteWallet'
+            onClick={this.deleteWallet.bind(this)}
+          />
+        </div>
+      }
       <div>
         <BrowserButton groupedItem primaryColor
           l10nId='backupLedger'
@@ -174,6 +181,17 @@ const styles = StyleSheet.create({
 
   footer__wrapper__left: {
     flex: 1
+  },
+
+  footer__wrapper__left__footnote: {
+    marginRight: '30px',
+    flex: 1
+  },
+
+  wallet__delete__footNote: {
+    marginTop: '12px',
+    fontSize: '12px',
+    display: 'block'
   }
 })
 

@@ -34,6 +34,7 @@ const appActions = require('../../../../js/actions/appActions')
 
 // State
 const ledgerState = require('../../../common/state/ledgerState')
+const ledgerStatuses = require('../../../common/constants/ledgerStatuses')
 
 // Style
 const globalStyles = require('../styles/global')
@@ -244,6 +245,7 @@ class PaymentsTab extends ImmutableComponent {
             showOverlay={this.props.showOverlay}
             hideOverlay={this.props.hideOverlay}
             setOverlayName={this.props.setOverlayName}
+            paymentInProgress={this.props.ledgerData.get('status') === ledgerStatuses.IN_PROGRESS}
           />}
           onHide={this.props.hideOverlay.bind(this, 'advancedSettings')}
         />
@@ -379,6 +381,7 @@ class PaymentsTab extends ImmutableComponent {
           siteSettings={this.props.siteSettings}
           showDeletedSites={showDeletedSites}
           setOverlayName={this.props.setOverlayName}
+          paymentInProgress={this.props.ledgerData.get('status') === ledgerStatuses.IN_PROGRESS}
         />
         : <DisabledContent
           ledgerData={this.props.ledgerData}

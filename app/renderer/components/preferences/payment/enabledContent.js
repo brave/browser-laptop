@@ -468,7 +468,8 @@ class EnabledContent extends ImmutableComponent {
       <LedgerTable ledgerData={this.props.ledgerData}
         settings={this.props.settings}
         onChangeSetting={this.props.onChangeSetting}
-        siteSettings={this.props.siteSettings} />
+        siteSettings={this.props.siteSettings}
+        paymentInProgress={this.props.paymentInProgress} />
       <div className={css(styles.enabledContent__tos)}>
         { this.deletedSitesLink }
         <a data-l10n-id='termsOfService'
