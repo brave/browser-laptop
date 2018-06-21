@@ -18,6 +18,7 @@ const urlFormat = require('url').format
 const pdfjsExtensionId = require('../constants/config').PDFJSExtensionId
 const ip = require('ip')
 const pdfjsBaseUrl = `chrome-extension://${pdfjsExtensionId}/`
+const config = require('../../js/constants/config')
 
 /**
  * A simple class for parsing and dealing with URLs.
@@ -124,6 +125,9 @@ const UrlUtil = {
     const case4Reg = /^(data|view-source|mailto|about|chrome-extension|chrome-devtools|magnet|chrome):.*/
     // for Windows and unix file paths
     const case5Reg = /(?:^\/)|(?:^[a-zA-Z]:\\)/
+    // for swarm BZZ Schemes
+    const case6Reg = new RegExp(`^(${config.bzzUrlSchemes.join('|')})://.*`)
+
     let str = input.trim()
     const scheme = UrlUtil.getScheme(str)
 
@@ -143,6 +147,11 @@ const UrlUtil = {
     if (scheme && (scheme !== fileScheme)) {
       return !caseDomain.test(str + '/')
     }
+
+    if (case6Reg.test(str)) {
+      return true
+    }
+
     str = UrlUtil.prependScheme(str)
     return !UrlUtil.canParseURL(str)
   },

@@ -48,20 +48,20 @@ class PreferenceNavigation extends ImmutableComponent {
           onClick={this.props.changeTab.bind(null, preferenceTabs.SECURITY)}
           selected={this.props.preferenceTab === preferenceTabs.SECURITY}
         />
-        <PreferenceNavigationButton icon={styles.sync}
+        {/* <PreferenceNavigationButton icon={styles.sync}
           l10nId='sync'
           testId='syncTabButton'
           onClick={this.props.changeTab.bind(null, preferenceTabs.SYNC)}
           selected={this.props.preferenceTab === preferenceTabs.SYNC}
-        />
-        <PreferenceNavigationButton
+        /> */}
+        {/* <PreferenceNavigationButton
           iconOn={styles.paymentsOn}
           iconOff={styles.paymentsOff}
           l10nId='payments'
           testId='paymentsTabButton'
           onClick={this.props.changeTab.bind(null, preferenceTabs.PAYMENTS)}
           selected={this.props.preferenceTab === preferenceTabs.PAYMENTS}
-        />
+        /> */}
         <PreferenceNavigationButton icon={styles.extensions}
           l10nId='extensions'
           onClick={this.props.changeTab.bind(null, preferenceTabs.EXTENSIONS)}

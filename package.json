@@ -101,6 +101,7 @@
     "dtrace-provider": "brave/node-dtrace-provider",
     "electron-localshortcut": "^0.6.0",
     "electron-squirrel-startup": "brave/electron-squirrel-startup",
+    "ethereum-ens": "0.7.4",
     "emoji-regex": "^6.5.1",
     "file-loader": "0.11.2",
     "font-awesome": "^4.5.0",

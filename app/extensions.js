@@ -76,7 +76,7 @@ let generateBraveManifest = () => {
         all_frames: true,
         matches: ['<all_urls>'],
         include_globs: [
-          'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc'
+          'http://*/*', 'https://*/*', 'bzz://*/*', 'bzz-raw://*/*', 'bzzi://*/*', 'file://*', 'data:*', 'about:srcdoc'
         ],
         exclude_globs: [
           indexHTML
@@ -99,7 +99,7 @@ let generateBraveManifest = () => {
         all_frames: true,
         matches: ['<all_urls>'],
         include_globs: [
-          'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc'
+          'http://*/*', 'https://*/*', 'bzz://*/*', 'bzz-raw://*/*', 'bzzi://*/*', 'file://*', 'data:*', 'about:srcdoc'
         ],
         exclude_globs: [
           indexHTML
@@ -115,7 +115,7 @@ let generateBraveManifest = () => {
         all_frames: false,
         matches: ['<all_urls>'],
         include_globs: [
-          'http://*/*', 'https://*/*', 'file://*', 'data:*', 'about:srcdoc',
+          'http://*/*', 'https://*/*', 'bzz://*/*', 'bzz-raw://*/*', 'bzzi://*/*', 'file://*', 'data:*', 'about:srcdoc',
           indexHTML,
           getBraveExtUrl('about-*.html'),
           getBraveExtUrl('about-*.html') + '#*'
@@ -171,7 +171,7 @@ let generateBraveManifest = () => {
           '<all_urls>'
         ],
         include_globs: [
-          'http://*/*', 'https://*/*', 'file://*'
+          'http://*/*', 'https://*/*', 'bzz://*/*', 'bzz-raw://*/*', 'bzzi://*/*', 'file://*'
         ],
         exclude_globs: [
           indexHTML,
