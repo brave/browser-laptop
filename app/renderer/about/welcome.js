@@ -6,6 +6,8 @@ const React = require('react')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../components/styles/global')
 
+const welcomeBg = require('../../extensions/brave/img/preferences/ads_welcome_BG.png')
+
 // TODO we need to move this into a separate component if this will be used in production as well
 class AboutWelcome extends React.Component {
   render () {
@@ -13,7 +15,7 @@ class AboutWelcome extends React.Component {
       <div className={css(styles.et_pb_section)}>
         <div className={css(styles.et_pb_row, styles.et_pb_row_0)}>
           <h1 className={css(styles.h1)}>
-            Thanks for participating in the<br /><b>Brave Ads Trial Program!</b>
+            Thank you for participating in the Brave Ads Test Program
           </h1>
         </div>
         <div className={css(styles.et_pb_row)}>
@@ -23,28 +25,46 @@ class AboutWelcome extends React.Component {
               href='chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-preferences.html#ads'
               target='_blank'
             >
-              Let's Begin!
+              Let's Get Started!
             </a>
           </div>
           <div className={css(styles.et_pb_column, styles.et_pb_column_2_3)}>
-            <h3 className={css(styles.h3)}>
-              Brave Ads finally gives you what you always wanted. Your fair share. Rather than being a
-              product of the internet, take control!
-            </h3>
+            <p className={css(styles.p3, styles.note)}>
+              <b className={css(styles.p3_b)}>Note</b>: This version of Brave should only be used by those who have been invited to participate in the
+              Brave Ads Trial program. If you have found your way here by accident, please download the current
+              release version for your device at <br />
+              <a href='https://brave.com/download' target='_blank' className={css(styles.link)}>https://brave.com/download</a>
+            </p>
+            <p className={css(styles.p3)}>
+              <b className={css(styles.p3_b)}>Brave Ads will give you your fair share of ad dollars.</b>
+              For this early test, <b className={css(styles.p3_b)}>we need volunteers who are willing to share their
+              data</b> to help us build Brave Ads, a private Ad platform. Information
+              collected during this experiment will be used to test, calibrate, and improve Brave’s advertising
+              agent and to administer the experiment.
+            </p>
+            <p className={css(styles.p3)}>
+              <b className={css(styles.p3_b)}>When Brave Ads launches
+              later this year, all personal data and browsing history will remain on-device and will not be
+              transmitted to Brave or anyone else. The data being collected in this test is specific to this
+              early test.</b>
+            </p>
             <p className={css(styles.p3, styles.pr_no)}>
-              A few relevant ads are presented to you, a few times per day. In exchange for your valuable attention,
-              advertisers pass some of the profits to you. A large sum. 70% actually! Try it now and  let us know what
-              you think of the new Brave Ads solution.
+              <b className={css(styles.p3_b)}>How the test works:</b> A few times per day, a handful of relevant
+              ads are presented to you.  In exchange for your participation in downloading and using the test
+              browser for 14 days, you will be compensated with an Amazon gift card or you can choose to get paid
+              in BAT by sending us your Ethereum address. Try it now and let us know what you think of the new Brave Ads.
             </p>
             <div className={css(styles.et_pb_divider_internal)} />
             <p className={css(styles.p3)}>
-              This version of Brave Ads is part of a test which&nbsp;
-              <b className={css(styles.p3_b)}>sends your browsing history to Brave</b>.
-              If you’re not part of this test program, you should not be using this<br />
-              version of Brave.
+              This version of Brave Ads is part of a test <b className={css(styles.p3_b)}>which sends your browsing
+              activity and other potentially sensitive data to Brave.</b> If you’re not part of this test program,
+              do not use this version of Brave.The test will complete in 14 days, after which we recommend an
+              upgrade to the Brave production version that will no longer collect any browsing history or activity.
             </p>
             <p className={css(styles.p3, styles.pr_no)}>
-              <a href='https://brave.com/privacy' target='_blank' className={css(styles.link)}>Learn more</a>
+              <a href='https://brave.com/hc-privacy' target='_blank' className={css(styles.link)}>
+                Learn more about this test.
+              </a>
             </p>
           </div>
           <div className={css(styles.clear)} />
@@ -58,17 +78,17 @@ class AboutWelcome extends React.Component {
 const styles = StyleSheet.create({
   welcomeIframe: {
     width: '100%',
-    minHeight: '3249px',
+    minHeight: '3350px',
     border: 0
   },
 
   et_pb_section: {
     position: 'relative',
-    padding: '54px 0',
+    padding: '120px 0 54px',
     backgroundSize: 'initial',
     backgroundPosition: 'center right',
     backgroundRepeat: 'no-repeat',
-    backgroundImage: 'url(https://brave.mystagingwebsite.com/wp-content/uploads/2018/05/ads_welcome_BG.png),radial-gradient(circle at top left,#5c58c2 10%,#5c58c2 100%) !important'
+    backgroundImage: `url(${welcomeBg}),linear-gradient(180deg,#5c32e5 10%,#6b2f8e 100%)`
   },
 
   et_pb_row: {
@@ -150,7 +170,7 @@ const styles = StyleSheet.create({
   p3: {
     paddingBottom: '15px',
     color: '#fff',
-    fontSize: '18px',
+    fontSize: '17px',
     fontWeight: 300,
     margin: 0
   },
@@ -165,6 +185,12 @@ const styles = StyleSheet.create({
 
   link: {
     color: '#fff'
+  },
+
+  note: {
+    backgroundColor: 'rgba(0,0,0,0.23)',
+    padding: '15px 15px 35px',
+    marginBottom: '20px'
   }
 })
 
