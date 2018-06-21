@@ -235,6 +235,7 @@ var rendererIdentifiers = function () {
     'dappDismiss',
     'dappEnableExtension',
     'banSiteConfirmation',
+    'cannotBanSiteOnReconcile',
     'paymentsDeleteWalletConfirmation',
     'messageBoxOk',
     'messageBoxCancel',

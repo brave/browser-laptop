@@ -114,6 +114,19 @@ class LedgerTable extends ImmutableComponent {
     }
   }
 
+  banSiteDuringReconcile () {
+    const msg = locale.translation('cannotBanSiteOnReconcile')
+    window.alert(msg)
+  }
+
+  deleteSite (synopsis, siteName) {
+    if (this.props.paymentInProgress) {
+      this.banSiteDuringReconcile()
+    } else {
+      this.banSite(this.getHostPattern(synopsis), siteName)
+    }
+  }
+
   togglePinSite (hostPattern, publisherKey, pinned, percentage) {
     if (pinned) {
       if (percentage < 1) {
@@ -264,7 +277,7 @@ class LedgerTable extends ImmutableComponent {
             styles.actionIcons__icon,
             styles.actionIcons__icon_remove
           )}
-            onClick={this.banSite.bind(this, this.getHostPattern(synopsis), siteName)}
+            onClick={this.deleteSite.bind(this, synopsis, siteName)}
           />
         </div>,
         value: ''
