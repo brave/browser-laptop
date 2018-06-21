@@ -228,7 +228,7 @@ class TorDaemon extends EventEmitter {
     assert(this._control === null)
     assert(this._polling)
 
-    this._readControlPort((err, portno, portMtime) => {
+    this._eatControlPort((err, portno, portMtime) => {
       if (err) {
         // If there's an error, don't worry: the file may have been
         // written incompletely, and we will, with any luck, be notified
@@ -248,7 +248,7 @@ class TorDaemon extends EventEmitter {
       assert(this._control === null)
       assert(this._polling)
 
-      this._readControlCookie((err, cookie, cookieMtime) => {
+      this._eatControlCookie((err, cookie, cookieMtime) => {
         if (err) {
           // If there's an error, don't worry: the file may not be
           // ready yet, and we'll be notified when it is.
@@ -296,120 +296,141 @@ class TorDaemon extends EventEmitter {
   }
 
   /*
-   * Internal subroutine.  Read the control port and its mtime.
+   * Internal subroutine.  Move the control port out of the way to
+   * commit to it, and read the control port and its mtime.
    *
    * @param {Function(Error, number, Date)} callback
    */
-  _readControlPort (callback) {
-    // First, open the control port file.
-    fs.open(torControlPortPath(), 'r', (err, fd) => {
+  _eatControlPort (callback) {
+    // First, rename the file, so that we don't read a stale one later.
+    const oldf = torControlPortPath()
+    const newf = torControlPortPath() + '.ack'
+    fs.rename(oldf, newf, (err) => {
       if (err) {
         return callback(err, null, null)
       }
 
-      // Get the mtime.
-      fs.fstat(fd, (err, stat) => {
+      // Then open the committed control port file.
+      fs.open(newf, 'r', (err, fd) => {
         if (err) {
           return callback(err, null, null)
         }
 
-        // Read up to 27 octets, the maximum we will ever need.
-        const readlen = 'PORT=255.255.255.255:65535\n'.length
-        const buf = Buffer.alloc(readlen)
-        fs.read(fd, buf, 0, readlen, null, (err, nread, buf) => {
-          let portno = null
-          do {                    // break for cleanup
-            if (err) {
-              break
-            }
+        // Get the mtime.
+        fs.fstat(fd, (err, stat) => {
+          if (err) {
+            return callback(err, null, null)
+          }
 
-            // Make sure the line looks sensible.
-            const line = buf.slice(0, nread).toString('utf8')
-            if (!line.startsWith('PORT=') || !line.endsWith('\n')) {
-              err = new Error(`invalid control port file`)
-              break
-            }
-            if (!line.startsWith('PORT=127.0.0.1:')) {
-              err = new Error(`control port has non-local address`)
-              break
-            }
+          // Read up to 27 octets, the maximum we will ever need.
+          const readlen = 'PORT=255.255.255.255:65535\n'.length
+          const buf = Buffer.alloc(readlen)
+          fs.read(fd, buf, 0, readlen, null, (err, nread, buf) => {
+            let portno = null
+            do {                    // break for cleanup
+              if (err) {
+                break
+              }
 
-            // Parse the port number.
-            const portstr = line.slice('PORT=127.0.0.1:'.length, line.length - 1)
-            const portno0 = parseInt(portstr, 10)
-            if (isNaN(portno) || portno === 0) {
-              err = new Error(`invalid control port number`)
-              break
-            }
+              // Make sure the line looks sensible.
+              const line = buf.slice(0, nread).toString('utf8')
+              if (!line.startsWith('PORT=') || !line.endsWith('\n')) {
+                err = new Error(`invalid control port file`)
+                break
+              }
+              if (!line.startsWith('PORT=127.0.0.1:')) {
+                err = new Error(`control port has non-local address`)
+                break
+              }
 
-            // We'll take it!
-            assert(!err)
-            portno = portno0
-          } while (0)
+              // Parse the port number.
+              const portstr = line.slice(
+                'PORT=127.0.0.1:'.length, line.length - 1)
+              const portno0 = parseInt(portstr, 10)
+              if (isNaN(portno) || portno === 0) {
+                err = new Error(`invalid control port number`)
+                break
+              }
 
-          // We're done with the control port file; close it.
-          fs.close(fd, (err) => {
-            if (err) {
-              console.log(`tor: close control port file failed: ${err}`)
-            }
+              // We'll take it!
+              assert(!err)
+              portno = portno0
+            } while (0)
+
+            // We're done with the control port file; close it.
+            fs.close(fd, (err) => {
+              if (err) {
+                console.log(`tor: close control port file failed: ${err}`)
+              }
+            })
+
+            // And call back.
+            callback(err, portno, stat.mtime)
           })
-
-          // And call back.
-          callback(err, portno, stat.mtime)
         })
       })
     })
   }
 
   /**
-   * Internal subroutine.  Read the control cookie and its mtime.
+   * Internal subroutine.  Move the control cookie out of the way to
+   * commit to it, and read the control cookie and its mtime.
    *
    * @param {Function(Error, Buffer, Date)} callback
    */
-  _readControlCookie (callback) {
-    // First, open the control cookie file.
-    fs.open(torControlCookiePath(), 'r', (err, fd) => {
+  _eatControlCookie (callback) {
+    // First, rename the file, so that we don't read a stale one later.
+    const oldf = torControlCookiePath()
+    const newf = torControlCookiePath() + '.ack'
+    fs.rename(oldf, newf, (err) => {
       if (err) {
         return callback(err, null, null)
       }
 
-      // Get the mtime.
-      fs.fstat(fd, (err, stat) => {
+      // Then open the control cookie file.
+      fs.open(newf, 'r', (err, fd) => {
         if (err) {
           return callback(err, null, null)
         }
 
-        // Read up to 33 octets.  We should need no more than 32, so 33
-        // will indicate the file is abnormally large.
-        const readlen = 33
-        const buf = Buffer.alloc(readlen)
-        fs.read(fd, buf, 0, readlen, null, (err, nread, buf) => {
-          let cookie = null
-          do {                    // break for cleanup
-            if (err) {
-              break
-            }
+        // Get the mtime.
+        fs.fstat(fd, (err, stat) => {
+          if (err) {
+            return callback(err, null, null)
+          }
 
-            // Check for probable truncation.
-            if (nread === readlen) {
-              err = new Error('control cookie too long')
-              break
-            }
+          // Read up to 33 octets.  We should need no more than 32, so 33
+          // will indicate the file is abnormally large.
+          const readlen = 33
+          const buf = Buffer.alloc(readlen)
+          fs.read(fd, buf, 0, readlen, null, (err, nread, buf) => {
+            let cookie = null
+            do {                    // break for cleanup
+              if (err) {
+                break
+              }
 
-            // We'll take it!
-            assert(!err)
-            cookie = buf.slice(0, nread)
-          } while (0)
+              // Check for probable truncation.
+              if (nread === readlen) {
+                err = new Error('control cookie too long')
+                break
+              }
 
-          // We're done with the control cookie file; close it.
-          fs.close(fd, (err) => {
-            if (err) {
-              console.log(`tor: close control auth cookie file failed: ${err}`)
-            }
+              // We'll take it!
+              assert(!err)
+              cookie = buf.slice(0, nread)
+            } while (0)
+
+            // We're done with the control cookie file; close it.
+            fs.close(fd, (err) => {
+              if (err) {
+                console.log(`tor: close control auth cookie file failed: ${err}`)
+              }
+            })
+
+            // And call back.
+            callback(err, cookie, stat.mtime)
           })
-
-          // And call back.
-          callback(err, cookie, stat.mtime)
         })
       })
     })
