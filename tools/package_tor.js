@@ -37,7 +37,7 @@ if (isDarwin) {
 } else if (isLinux) {
   sha512Tor = '868c0f2c933445ca68f330ade872b66b6e2914eccd6b966c300f006468e921813eb7311345213d9e1546e85be400b7d2842506192b8d0ec125c3774c6e5c6d16'
 } else {
-  sha512Tor = 'AMEND ME WITH THE REAL HASH'
+  sha512Tor = 'e903df0f7de750e65dc0509fa2a7237b8f69964e34b41aa23f6bf89579202e27ff00df7bb639d4676fbf569baf0fa95acef9192212c6093303baa6468d4affc5'
 }
 
 // download the binary
