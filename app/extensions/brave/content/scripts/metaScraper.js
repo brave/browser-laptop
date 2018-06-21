@@ -98,5 +98,16 @@ const metaScraperRules = {
       requestHandlerApi.strict(wrap(html => requestHandlerApi.getValue(html.querySelectorAll('[class*="author"]')))),
       requestHandlerApi.strict(wrap(html => requestHandlerApi.getValue(html.querySelectorAll('[class*="byline"]'))))
     ]
+  },
+
+  getUrlRules: () => {
+    const wrap = rule => ({htmlDom, url}) => {
+      const value = rule(htmlDom)
+      return requestHandlerApi.isUrl(value, {relative: false}) && requestHandlerApi.getUrl(url, value)
+    }
+
+    return [
+      wrap(html => requestHandlerApi.getHref(html.querySelector('link[rel="canonical"]')))
+    ]
   }
 }
