@@ -36,3 +36,7 @@ function isPlatformOSX () {
 function hasWhitespace (text) {
   return /\s/g.test(text);
 }
+
+function isTorTab () {
+  return chrome.contentSettings.torEnabled != 'allow'
+}
