@@ -174,9 +174,10 @@ class Tabs extends React.Component {
         }
         {
           this.props.currentTabs
-            .map((frameKey) =>
+            .map((frameKey, i) =>
               <Tab
                 key={'tab-' + frameKey}
+                pageDisplayIndex={i}
                 ref={(node) => this.tabRefs.push(node)}
                 frameKey={frameKey}
                 partOfFullPageSet={this.props.partOfFullPageSet}

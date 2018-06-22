@@ -332,15 +332,18 @@ class Tab extends React.Component {
 
   componentDidUpdate (prevProps) {
     if (prevProps.tabWidth && !this.props.tabWidth && !this.props.partOfFullPageSet) {
-      this.elementRef.animate([
+      window.requestAnimationFrame(() => {
+        this.elementRef && this.elementRef.animate([
           { flexBasis: `${prevProps.tabWidth}px`, flexGrow: 0, flexShrink: 0 },
           { flexBasis: 0, flexGrow: 1, flexShrink: 1 }
-      ], {
-        duration: 250,
-        iterations: 1,
-        easing: 'ease-in-out'
+        ], {
+          duration: 250,
+          iterations: 1,
+          easing: 'ease-in-out'
+        })
       })
     }
+
     // no transition between:
     // - active <-> inactive state
     // - no theme color and first theme color
