@@ -303,7 +303,7 @@ class Tab extends React.Component {
     props.isPinnedTab = isPinned
     props.isPrivateTab = privateState.isPrivateTab(currentWindow, frameKey)
     props.isActive = !!frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
-    props.tabWidth = currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
+    props.tabWidth = isPinned ? null : currentWindow.getIn(['ui', 'tabs', 'fixTabWidth'])
     props.isPreview = frameKey === previewFrameKey /* || frameKey === 2 */ // <-- uncomment to force 1 preview tab for style inspection
     props.anyTabIsPreview = previewFrameKey != null
     props.themeColor = tabUIState.getThemeColor(currentWindow, frameKey)
@@ -329,13 +329,6 @@ class Tab extends React.Component {
     props.previewMode = currentWindow.getIn(['ui', 'tabs', 'previewMode'])
 
     return props
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (this.props.tabWidth && !nextProps.tabWidth) {
-      // remember the width so we can transition from it
-      this.originalWidth = this.elementRef.getBoundingClientRect().width
-    }
   }
 
   componentDidUpdate (prevProps) {
@@ -480,7 +473,7 @@ const styles = StyleSheet.create({
     boxSizing: 'border-box',
     position: 'relative',
     overflow: 'hidden',
-    flex: 1,
+    flex: '1 1 0',
     // put the top border underneath tab-stip top border, and
     // the left border underneath the previous tab's right border
     margin: `0 0 0 -${theme.tab.borderWidth}px`,
