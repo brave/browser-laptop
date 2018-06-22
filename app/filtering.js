@@ -122,7 +122,7 @@ function registerForBeforeRequest (session, partition) {
     }
 
     if ((isMagnetURL(details)) && partition === appConfig.tor.partition) {
-      showTorrentBlockedInTorWarning(details)
+      showTorrentBlockedInTorWarning(details, muonCb)
       return
     }
 
@@ -357,13 +357,16 @@ function registerForBeforeSendHeaders (session, partition) {
   })
 }
 
-function showTorrentBlockedInTorWarning (details) {
+function showTorrentBlockedInTorWarning (details, muonCb) {
+  const cb = () => muonCb({cancel: true})
   if (details.tabId) {
     tabMessageBox.show(details.tabId, {
       message: `${locale.translation('torrentBlockedInTor')}`,
       title: 'Brave',
       buttons: [locale.translation('torrentWarningOk')]
-    })
+    }, cb)
+  } else {
+    cb()
   }
 }
 
@@ -381,7 +384,7 @@ function registerForHeadersReceived (session, partition) {
       return
     }
     if ((isTorrentFile(details)) && partition === appConfig.tor.partition) {
-      showTorrentBlockedInTorWarning(details)
+      showTorrentBlockedInTorWarning(details, muonCb)
       return
     }
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
@@ -670,7 +673,10 @@ function registerForDownloadListener (session) {
   })
 }
 
-function registerForMagnetHandler (session) {
+function registerForMagnetHandler (session, partition) {
+  if (partition === appConfig.tor.partition) {
+    return
+  }
   const webtorrentUrl = appUrlUtil.getTorrentExtUrl('webtorrent.html')
   try {
     if (getSetting(settings.TORRENT_VIEWER_ENABLED)) {
