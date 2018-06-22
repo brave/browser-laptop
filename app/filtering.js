@@ -817,7 +817,7 @@ function setupTor () {
           if (err) {
             // Wait for tor to re-initialize a circuit (ex: after a clock jump)
             appActions.onTorInitPercentage('0')
-            setTorErrorOnTimeout(10000, `Tor not ready: ${err}`)
+            setTorErrorOnTimeout(17000, `Tor not ready: ${err}`)
           } else {
             // Simply log the error but don't show error UI since Tor might
             // finish opening a circuit.
