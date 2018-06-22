@@ -206,11 +206,11 @@ class Tab extends React.Component {
     const frame = this.frame
 
     if (frame && !frame.isEmpty()) {
-      // do not mimic tab size if closed tab is a pinned tab
+      // do not mimic tab size if closed tab is a pinned tab or last tab
       if (!this.props.isPinnedTab) {
         const tabWidth = this.fixTabWidth
         windowActions.onTabClosedWithMouse({
-          fixTabWidth: tabWidth
+          fixTabWidth: this.props.isLastTabOfPage ? null : tabWidth
         })
       }
       appActions.tabCloseRequested(this.props.tabId)
@@ -299,6 +299,7 @@ class Tab extends React.Component {
     // TODO: this should have its own method
     props.notificationBarActive = notificationBarActive
     props.frameKey = frameKey
+    props.isLastTabOfPage = ownProps.isLastTabOfPage
     props.isPinnedTab = isPinned
     props.isPrivateTab = privateState.isPrivateTab(currentWindow, frameKey)
     props.isActive = !!frameStateUtil.isFrameKeyActive(currentWindow, frameKey)
@@ -332,15 +333,18 @@ class Tab extends React.Component {
 
   componentDidUpdate (prevProps) {
     if (prevProps.tabWidth && !this.props.tabWidth && !this.props.partOfFullPageSet) {
-      this.elementRef.animate([
+      window.requestAnimationFrame(() => {
+        this.elementRef && this.elementRef.animate([
           { flexBasis: `${prevProps.tabWidth}px`, flexGrow: 0, flexShrink: 0 },
           { flexBasis: 0, flexGrow: 1, flexShrink: 1 }
-      ], {
-        duration: 250,
-        iterations: 1,
-        easing: 'ease-in-out'
+        ], {
+          duration: 250,
+          iterations: 1,
+          easing: 'ease-in-out'
+        })
       })
     }
+
     // no transition between:
     // - active <-> inactive state
     // - no theme color and first theme color
