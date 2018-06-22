@@ -228,7 +228,7 @@ class TorDaemon extends EventEmitter {
     assert(this._control === null)
     assert(this._polling)
 
-    this._eatControlPort((err, portno, portMtime) => {
+    this._eatControlCookie((err, cookie, cookieMtime) => {
       if (err) {
         // If there's an error, don't worry: the file may have been
         // written incompletely, and we will, with any luck, be notified
@@ -248,7 +248,7 @@ class TorDaemon extends EventEmitter {
       assert(this._control === null)
       assert(this._polling)
 
-      this._eatControlCookie((err, cookie, cookieMtime) => {
+      this._eatControlPort((err, portno, portMtime) => {
         if (err) {
           // If there's an error, don't worry: the file may not be
           // ready yet, and we'll be notified when it is.
