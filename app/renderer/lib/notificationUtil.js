@@ -45,7 +45,7 @@ const notificationUtil = {
       Darwin: () => {
         if (notifier.utils.isMountainLion()) {
           return {
-            actions: 'Open',
+            actions: 'View',
             closeLabel: 'Close'
           }
         }
