@@ -133,6 +133,7 @@ class TorDaemon extends EventEmitter {
     // Begin watching for the control port file to be written.
     const watchDir = torWatchDirPath()
     const watchOpts = {persistent: false}
+    assert(this._watcher === null)
     this._watcher = fs.watch(watchDir, watchOpts, (event, filename) => {
       this._watchEvent(event, filename)
     })
@@ -150,6 +151,9 @@ class TorDaemon extends EventEmitter {
    * Kill the tor daemon.
    */
   kill () {
+    assert(this._watcher)
+    this._watcher.close()
+    this._watcher = null
     if (!this._process) {
       assert(this._process === null)
       assert(this._control === null)
@@ -173,13 +177,14 @@ class TorDaemon extends EventEmitter {
    * @param {string} filename
    */
   _watchEvent (event, filename) {
-    assert(this._watcher)
-
     // If the process died in the interim, give up.
     if (!this._process) {
       console.log('tor: process dead, ignoring watch event')
       return
     }
+
+    // Watcher shouldn't be there without process.
+    assert(this._watcher)
 
     // If the control connection is already open, nothing to do.
     if (this._control) {
