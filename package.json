@@ -197,7 +197,6 @@
     "standard": "10.0.3",
     "style-loader": "~0.19.0",
     "uglifyjs-webpack-plugin": "^1.0.0",
-    "unzip": "^0.1.11",
     "uuid": "^3.0.1",
     "webdriverio": "4.7.1",
     "webpack": "^3.8.1",
