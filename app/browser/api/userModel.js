@@ -615,7 +615,7 @@ const generateAndSetAdUUIDRegardless = (state) => {
 }
 
 const generateAndSetAdUUIDButOnlyIfDNE = (state) => {
-  if (userModelState.getAdUUID(state) === 'undefined') state = generateAndSetAdUUIDRegardless(state)
+  if (userModelState.getAdUUID(state) === undefined) state = generateAndSetAdUUIDRegardless(state)
 
   return state
 }
