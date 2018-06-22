@@ -462,6 +462,9 @@ class UrlBar extends React.Component {
   }
 
   onContextMenu (e) {
+    if (this.torInitializing) {
+      return
+    }
     contextMenus.onUrlBarContextMenu(e)
   }
 
@@ -553,10 +556,16 @@ class UrlBar extends React.Component {
     return <span className='evCert' title={this.props.evCert}> {this.props.evCert} </span>
   }
 
+  get torInitializing () {
+    // Returns true if the current tab is a Tor tab and Tor has not yet
+    // initialized successfully
+    return this.props.isTor &&
+      (this.props.torPercentInitialized || this.props.torInitializationError !== false)
+  }
+
   get shouldDisable () {
     return (this.props.displayURL === undefined && this.loadTime === '') ||
-      (this.props.isTor &&
-        (this.props.torPercentInitialized || this.props.torInitializationError !== false))
+      this.torInitializing
   }
 
   setUrlBarRef (ref) {
