@@ -72,16 +72,6 @@ class AdsTab extends ImmutableComponent {
                       [css(styles.payments__title__switch__checkbox)]: true
                     })}
                   />
-                  <a
-                    className={cx({
-                      fa: true,
-                      'fa-question-circle': true,
-                      [css(styles.payments__title__switch__moreInfo)]: true
-                    })}
-                    href='https://brave.com/Payments_FAQ.html'
-                    data-l10n-id='paymentsFAQLink'
-                    rel='noopener' target='_blank'
-                  />
                 </div>
                 : null
             }

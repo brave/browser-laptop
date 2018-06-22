@@ -111,11 +111,11 @@ class DisabledContent extends React.Component {
         We use this information as algorithmic test data for our machine learning system that will be used upon release of Brave Ads.
       </p>
       <p className={css(styles.disabledContent__message__text, styles.disabledContent__message_white)}>
-        Once you have opted in to the program, you can check the details of the log files collected and
+        Once you have opted into the program, you can check the details of the log files collected and
         sent to Brave by clicking on ‘Click to see Logs’ on this page.
       </p>
       <p className={css(styles.disabledContent__message__text, styles.disabledContent__message_white)}>
-        This is not a production version of Brave and
+        This is not a production version of Brave and&nbsp;
         <b className={css(styles.disabledContent__message_bold)}>does NOT offer the same privacy guarantees as the
         production version of the Brave browser.</b> Only use this version as part of the Brave Ads test program.
         Otherwise, download Brave from <a className={css(styles.disabledContent__message_white, styles.disabledContent__message_link)} href='https://brave.com/download'>https://brave.com/download</a>.
