@@ -755,7 +755,9 @@ const doAction = (action) => {
           action.frameOpts.tabStripWindowId = existingTabStripWindowId
         }
       }
-
+      // if we get a new frame, we're no longer in a close-tab-with-mouse frenzy
+      windowState = windowState.deleteIn(['ui', 'tabs', 'fixTabWidth'])
+      // add the frame to the state
       windowState = newFrame(windowState, action.frameOpts)
       setImmediate(() => {
         // Inform subscribers that we now have a frame
