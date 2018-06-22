@@ -288,7 +288,7 @@ class TorDaemon extends EventEmitter {
    */
   _polled () {
     assert(this._polling)
-    if (this._retry_polling && this._control === null) {
+    if (this._retry_poll && this._control === null) {
       return process.nextTick(() => this._doPoll())
     }
     this._polling = false
