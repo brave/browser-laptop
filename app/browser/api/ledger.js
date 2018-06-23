@@ -714,6 +714,14 @@ const excludeP = (publisherKey, callback) => {
   })
 }
 
+const getVisitDuration = (timestamp, minVisitTime, manualAdd) => {
+  if (manualAdd) {
+    return parseInt(minVisitTime)
+  }
+
+  return (new Date().getTime() - timestamp)
+}
+
 const addSiteVisit = (state, timestamp, location, tabId, manualAdd = false) => {
   if (!synopsis || location == null) {
     return state
@@ -723,7 +731,7 @@ const addSiteVisit = (state, timestamp, location, tabId, manualAdd = false) => {
   location = pageDataUtil.getInfoKey(location)
 
   const minimumVisitTime = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
-  const duration = manualAdd ? parseInt(minimumVisitTime) : new Date().getTime() - timestamp
+  const duration = module.exports.getVisitDuration(timestamp, minimumVisitTime, manualAdd)
   const locationData = manualAdd ? Immutable.fromJS({ publisher: tldjs.getDomain(location) }) : ledgerState.getLocation(state, location)
 
   if (_internal.verboseP) {
@@ -3420,7 +3428,8 @@ const getMethods = () => {
     onPublisherOptionUpdateAction,
     reconcile,
     setTestMinimums,
-    getPublisherFromPropsAction
+    getPublisherFromPropsAction,
+    getVisitDuration
   }
 
   let privateMethods = {}
