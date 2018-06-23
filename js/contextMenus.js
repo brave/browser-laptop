@@ -44,6 +44,22 @@ const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
 
 /**
+ * Gets the correct search URL for the current frame.
+ * @param {Immutable.Map} activeFrame - currently active frame
+ * @param {string} searchTerms - terms to search
+ * @returns {string}
+ */
+const getSearchUrl = (activeFrame, searchTerms) => {
+  const searchUrl = (
+    (getSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE_TOR) && frameStateUtil.isTor(activeFrame)) ||
+    (getSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE) && activeFrame.get('isPrivate'))
+  )
+  ? 'https://duckduckgo.com/?q={searchTerms}'
+  : appStoreRenderer.state.getIn(['searchDetail', 'searchURL'])
+  return searchUrl.replace('{searchTerms}', encodeURIComponent(searchTerms))
+}
+
+/**
  * Obtains an add bookmark menu item
  */
 const addBookmarkMenuItem = (label, siteDetail, closestDestinationDetail, isParent) => {
@@ -91,7 +107,7 @@ const addFolderMenuItem = (closestDestinationDetail, isParent) => {
   }
 }
 
-function urlBarTemplateInit (searchDetail, activeFrame, e) {
+function urlBarTemplateInit (activeFrame, e) {
   const items = getEditableItems(window.getSelection().toString())
   const clipboardText = clipboard.readText()
   const hasClipboard = clipboardText && clipboardText.length > 0
@@ -106,7 +122,7 @@ function urlBarTemplateInit (searchDetail, activeFrame, e) {
       }
     })
   } else {
-    let searchUrl = searchDetail.get('searchURL').replace('{searchTerms}', encodeURIComponent(clipboardText))
+    const searchUrl = getSearchUrl(activeFrame, clipboardText)
 
     items.push({
       label: locale.translation('pasteAndSearch'),
@@ -889,7 +905,7 @@ const searchSelectionMenuItem = (location) => {
       if (location) {
         let activeFrame = windowStore.getState().get('activeFrameKey')
         let frame = windowStore.getFrame(activeFrame)
-        let searchUrl = appStoreRenderer.state.getIn(['searchDetail', 'searchURL']).replace('{searchTerms}', encodeURIComponent(location))
+        const searchUrl = getSearchUrl(frame, location)
         const isPrivate = frame.get('isPrivate')
         const isTor = frameStateUtil.isTor(frame)
         appActions.createTabRequested({
@@ -999,19 +1015,16 @@ function mainTemplateInit (nodeProps, frame, tab) {
       },
       copyAddressMenuItem('copyImageAddress', nodeProps.srcURL)
     )
-    if (getSetting(settings.DEFAULT_SEARCH_ENGINE) === 'Google' &&
-      nodeProps.srcURL && urlParse(nodeProps.srcURL).protocol !== 'data:') {
+    const searchUrl = getSearchUrl(frame, nodeProps.srcURL || '')
+    if (searchUrl.startsWith('https://www.google.com/search?q') &&
+      nodeProps.srcURL &&
+      urlParse(nodeProps.srcURL).protocol !== 'data:') {
       template.push(
         {
           label: locale.translation('searchImage'),
           click: () => {
-            let activeFrame = windowStore.getState().get('activeFrameKey')
-            let frame = windowStore.getFrame(activeFrame)
-            let searchUrl = appStoreRenderer.state.getIn(['searchDetail', 'searchURL'])
-              .replace('{searchTerms}', encodeURIComponent(nodeProps.srcURL))
-              .replace('?q', 'byimage?image_url')
             appActions.createTabRequested({
-              url: searchUrl,
+              url: searchUrl.replace('?q', 'byimage?image_url'),
               isPrivate,
               isTor,
               partitionNumber: frame.get('partitionNumber')
@@ -1352,10 +1365,9 @@ function onDownloadsToolbarContextMenu (downloadId, downloadItem, e) {
 
 function onUrlBarContextMenu (e) {
   e.stopPropagation()
-  const searchDetail = appStoreRenderer.state.get('searchDetail')
   const windowState = windowStore.getState()
   const activeFrame = frameStateUtil.getActiveFrame(windowState)
-  const inputMenu = Menu.buildFromTemplate(urlBarTemplateInit(searchDetail, activeFrame, e))
+  const inputMenu = Menu.buildFromTemplate(urlBarTemplateInit(activeFrame, e))
   inputMenu.popup(getCurrentWindow())
 }
 
