@@ -809,6 +809,9 @@ function setupTor () {
     torDaemon.on('launch', (socksAddr) => {
       const version = torDaemon.getVersion()
       console.log(`tor: daemon listens on ${socksAddr}, version ${version}`)
+      if (version) {
+        appActions.setVersionInfo('Tor', version)
+      }
       const bootstrapped = (err, progress) => {
         if (err) {
           onTorFail(`Tor bootstrap error: ${err}`)
