@@ -88,6 +88,7 @@ class TorDaemon extends EventEmitter {
     this._retry_poll = null     // set if polling, true if should retry on fail
     this._control = null        // TorControl instance
     this._socks_addresses = null // array of tor's socks addresses
+    this._tor_version = null    // string of tor version number
   }
 
   /**
@@ -510,7 +511,15 @@ class TorDaemon extends EventEmitter {
             return
           }
           this._socks_addresses = listeners
-          this.emit('launch', this.getSOCKSAddress())
+          this._control.getVersion((err, version) => {
+            if (err) {
+              console.log(`tor: failed to get version: ${err}`)
+              this.kill()
+              return
+            }
+            this._tor_version = version
+            this.emit('launch', this.getSOCKSAddress())
+          })
         })
       })
     })
@@ -556,6 +565,17 @@ class TorDaemon extends EventEmitter {
       return null
     }
     return this._socks_addresses[0]
+  }
+
+  /**
+   * Returns the version of the software running the tor daemon.  If
+   * tor is not initialized yet, or is dead, this returns null
+   * instead.
+   *
+   * @returns {string} tor version number as string
+   */
+  getVersion () {
+    return this._tor_version
   }
 
   /**
@@ -1261,6 +1281,34 @@ class TorControl extends EventEmitter {
    */
   getControlListeners (callback) {
     return this._getListeners('control', callback)
+  }
+
+  /**
+   * Request the tor version number and return it as a string to the
+   * callback, or an error.
+   *
+   * @param {Function(error, string)} callback
+   */
+  getVersion (callback) {
+    let version = null
+    const perline = (status, reply) => {
+      if (status !== '250' || !reply.startsWith('version=') || version) {
+        console.log('tor: unexpected GETINFO version reply')
+        return
+      }
+      version = reply.slice('version='.length)
+    }
+    this.cmd('GETINFO version', perline, (err, status, reply) => {
+      if (err) {
+        return callback(err, null)
+      } else if (status !== '250' || reply !== 'OK') {
+        return callback(new Error(`Tor error ${status}: ${reply}`), null)
+      } else if (version === null) {
+        return callback(new Error('Tor failed to return version'), null)
+      } else {
+        return callback(null, version)
+      }
+    })
   }
 }
 
