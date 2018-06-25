@@ -807,7 +807,8 @@ function setupTor () {
       onTorFail('The Tor process has stopped.')
     })
     torDaemon.on('launch', (socksAddr) => {
-      console.log(`tor: daemon listens on ${socksAddr}`)
+      const version = torDaemon.getVersion()
+      console.log(`tor: daemon listens on ${socksAddr}, version ${version}`)
       const bootstrapped = (err, progress) => {
         if (err) {
           onTorFail(`Tor bootstrap error: ${err}`)
