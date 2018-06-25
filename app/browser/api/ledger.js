@@ -880,6 +880,7 @@ const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo 
   // We always want to have the latest active tabId
   const currentTabId = manualAdd ? tabId : pageDataState.getLastActiveTabId(state)
   state = pageDataState.setLastActiveTabId(state, tabId)
+
   if (location === currentUrl && !manualAdd) {
     return state
   }
@@ -3429,7 +3430,10 @@ const getMethods = () => {
     reconcile,
     setTestMinimums,
     getPublisherFromPropsAction,
-    getVisitDuration
+    getVisitDuration,
+    resetCurrentUrl: () => {
+      currentUrl = locationDefault
+    }
   }
 
   let privateMethods = {}
