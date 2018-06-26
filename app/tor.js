@@ -458,7 +458,7 @@ class TorDaemon extends EventEmitter {
     const controlSocket = new net.Socket()
     const closeMethod = () => console.log('tor: control socket closed early')
     const errorMethod = (err) => {
-      console.log(`tor: control socket error: ${err}`)
+      console.log(`tor: control socket connection error: ${err}`)
       controlSocket.destroy(err)
     }
     controlSocket.on('close', closeMethod)
