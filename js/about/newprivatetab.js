@@ -65,6 +65,7 @@ class NewPrivateTab extends React.Component {
                   <h2 onClick={this.onClickTorTitle.bind(this)} className={css(styles.privateSearch__title)}>
                     <span className={css(styles.text_sectionTitle)} data-l10n-id='privateTabTorTitle' />
                     <strong className={css(styles.text_sectionTitle, styles.text_sectionTitleHighlight)}>&nbsp;Tor</strong>
+                    <span className={css(styles.text__badge, styles.text__badge_beta)}>Beta</span>
                   </h2>
                   <p className={css(styles.text)} data-l10n-id='privateTabTorText1' />
                   <p className={css(styles.text, styles.text_clickable)} onClick={aboutActions.createTabRequested.bind(null, {url: torFAQ, isPrivate: true, isTor})} data-l10n-id='learnMore' />
@@ -257,6 +258,21 @@ const styles = StyleSheet.create({
     textDecoration: 'underline',
     color: '#FF6000',
     marginTop: '20px'
+  },
+
+  text__badge: {
+    alignSelf: 'center',
+    marginLeft: '10px',
+    padding: '3px 8px',
+    borderRadius: '12px',
+    textTransform: 'uppercase',
+    font: '600 11px Poppins',
+    letterSpacing: '0.5px'
+  },
+
+  text__badge_beta: {
+    background: '#0795fa',
+    color: 'white'
   },
 
   privateSearch: {
