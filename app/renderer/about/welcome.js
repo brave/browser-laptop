@@ -36,7 +36,7 @@ class AboutWelcome extends React.Component {
               <a href='https://brave.com/download' target='_blank' className={css(styles.link)}>https://brave.com/download</a>
             </p>
             <p className={css(styles.p3)}>
-              <b className={css(styles.p3_b)}>Brave Ads will give you your fair share of ad dollars.</b>
+              <b className={css(styles.p3_b)}>Brave Ads will give you your fair share of ad dollars.</b>&nbsp;
               For this early test, <b className={css(styles.p3_b)}>we need volunteers who are willing to share their
               data</b> to help us build Brave Ads, a private Ad platform. Information
               collected during this experiment will be used to test, calibrate, and improve Brave’s advertising

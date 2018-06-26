@@ -149,6 +149,21 @@ const userModelState = {
     return respectsHourLimit && respectsDayLimit
   },
 
+  elphDeferRecorder: (state, reset = false) => {
+    state = validateState(state)
+    let defer = 0
+    if (!reset) {
+      defer = 1 + state.getIn([ 'userModel', 'elphDefer' ])
+    }
+    return state
+      .setIn(['userModel', 'elphDefer'], defer)
+  },
+
+  elphDeferRemember: (state) => {
+    state = validateState(state)
+    return state.getIn([ 'userModel', 'elphDefer' ])
+  },
+
   getPageScoreHistory: (state, mutable = false) => {
     state = validateState(state)
     const history = state.getIn([ 'userModel', 'pageScoreHistory' ]) || []
@@ -162,6 +177,22 @@ const userModelState = {
     state = validateState(state)
 
     return state.setIn([ 'userModel' ], Immutable.Map())
+  },
+
+  scraperDebounceSet: (state, url, newtime) => {
+    state = validateState(state)
+    return state
+          .setIn([ 'userModel', 'lastUrl' ], url)
+          .setIn([ 'userModel', 'lastBounceTime' ], newtime)
+  },
+
+  scraperDebounceQuery: (state) => {
+    const result = {
+      url: state.getIn(['userModel', 'lastUrl']),
+      time: state.getIn(['userModel', 'lastBounceTime'])
+    }
+
+    return result
   },
 
   removeHistorySite: (state, action) => {
@@ -215,7 +246,7 @@ const userModelState = {
     state = validateState(state)
 
     return state
-          .setIn([ 'userModel', 'shopActivity' ], true) // never hit; I think design is wrong
+          .setIn([ 'userModel', 'shopActivity' ], true)
           .setIn([ 'userModel', 'shopUrl' ], url)
           .setIn([ 'userModel', 'lastShopTime' ], new Date().getTime())
   },
@@ -258,14 +289,14 @@ const userModelState = {
   },
 
   getUserModelTimingMdl: (state, mutable = true) => {
+    state = validateState(state)
     const mdl = state.getIn([ 'userModel', 'timingModel' ]) || Immutable.List()
-
     return (mutable ? makeJS(mdl) : makeImmutable(mdl))
   },
 
   setUserModelTimingMdl: (state, model) => {
     if (!userModelState.getAdEnabledValue(state)) return state
-
+    state = validateState(state)
     return state.setIn([ 'userModel', 'timingModel' ], makeImmutable(model))
   },
 
