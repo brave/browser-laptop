@@ -535,7 +535,7 @@ class TorDaemon extends EventEmitter {
   _controlError (err) {
     assert(this._control)
     console.log(`tor: control socket error: ${err}`)
-    this._control.destroy()
+    this._control.destroy(err)
   }
 
   /*
