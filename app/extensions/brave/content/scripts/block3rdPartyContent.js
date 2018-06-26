@@ -27,3 +27,8 @@ if (chrome.contentSettings.referer != 'allow' &&
 if (chrome.contentSettings.cookies != 'allow') {
   executeScript(getBlockCookieScript())
 }
+
+// Block Chromecast (unsupported)
+// Necessary otherwise players will try to send the cast_sender.js script
+// https://github.com/brave/browser-laptop/issues/14475
+executeScript('window.chrome.cast = undefined')
