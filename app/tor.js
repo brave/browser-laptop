@@ -465,7 +465,7 @@ class TorDaemon extends EventEmitter {
     controlSocket.on('error', errorMethod)
 
     // Now connect the socket.
-    controlSocket.connect({port: portno}, () => {
+    controlSocket.connect({host: '127.0.0.1', port: portno}, () => {
       // If the process died in the interim, give up.
       if (!this._process) {
         console.log('tor: process died, closing control')
