@@ -458,14 +458,14 @@ class TorDaemon extends EventEmitter {
     const controlSocket = new net.Socket()
     const closeMethod = () => console.log('tor: control socket closed early')
     const errorMethod = (err) => {
-      console.log(`tor: control socket error: ${err}`)
+      console.log(`tor: control socket connection error: ${err}`)
       controlSocket.destroy(err)
     }
     controlSocket.on('close', closeMethod)
     controlSocket.on('error', errorMethod)
 
     // Now connect the socket.
-    controlSocket.connect({port: portno}, () => {
+    controlSocket.connect({host: '127.0.0.1', port: portno}, () => {
       // If the process died in the interim, give up.
       if (!this._process) {
         console.log('tor: process died, closing control')
@@ -535,7 +535,7 @@ class TorDaemon extends EventEmitter {
   _controlError (err) {
     assert(this._control)
     console.log(`tor: control socket error: ${err}`)
-    this._control.destroy()
+    this._control.destroy(err)
   }
 
   /*
