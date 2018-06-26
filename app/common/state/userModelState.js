@@ -151,11 +151,9 @@ const userModelState = {
 
   elphDeferRecorder: (state, reset = false) => {
     state = validateState(state)
-    const defer = 0
-    if (reset) {
-      const defer = 0
-    } else {
-      const defer = 1 + state.getIn([ 'userModel', 'elphDefer' ])
+    let defer = 0
+    if (!reset) {
+      defer = 1 + state.getIn([ 'userModel', 'elphDefer' ])
     }
     return state
       .setIn(['userModel', 'elphDefer'], defer)
@@ -190,9 +188,10 @@ const userModelState = {
 
   scraperDebounceQuery: (state) => {
     const result = {
-      url: state.getIn([ 'userModel', 'lastUrl']),
-      time: state.getIn([ 'userModel', 'lastBounceTime' ])
+      url: state.getIn(['userModel', 'lastUrl']),
+      time: state.getIn(['userModel', 'lastBounceTime'])
     }
+
     return result
   },
 
