@@ -92,7 +92,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
               if (map.notificationType === 'clicked' || map.notificationType === 'dismissed') {
                 state = userModelState.recordAdUUIDSeen(state, uuid)
               }
-//              console.log(map.notificationType)
+//              uncomment testing SCL
 //              if (map.notificationType === 'clicked' || map.notificationType === 'dismissed' || map.notificationType === 'timeout') {
 //                const translateElph = { 'clicked': 'z', 'dismissed': 'y', 'timeout': 'y' } // refers to elph alphabetizer
 //                state = updateTimingModel(state, translateElph[map.notificationType])
@@ -307,7 +307,7 @@ const updateTimingModel = (state, special = 'invalid') => {
   if (special === 'invalid') {
     letter = stateToLetterStd(state)
   } else if (special.length === 1) {
-// console.log('state noget enter;'  + special)
+//    console.log('state noget enter;'  + special)
     letter = special
   } // anything else is an error
   let mdl = userModelState.getUserModelTimingMdl(state, true)
@@ -315,20 +315,62 @@ const updateTimingModel = (state, special = 'invalid') => {
     mdl = elph.initOnlineELPH() // TODO init with useful Hspace
   }
   mdl = elph.updateOnlineELPH(letter, mdl)
-  // console.log('letter is ' + letter)
+//   console.log('letter is ' + letter)
   return userModelState.setUserModelTimingMdl(state, mdl)
 }
 
 const stateToLetterStd = (state) => {
   let tvar = topicVariance(state)
   let sch = userModelState.getSearchState(state)
-  let shp = userModelState.getShoppingState(state) // this is listed as 'never hit' in flag source
-//  let buy = shp || userModelState.getUserBuyingState(state) // shopping or buying same to us for now
+  let shp = userModelState.getShoppingState(state)
+//  let buy = shp || userModelState.getUserBuyingState(state) // this is broken
   let rec = recencyCalc(state)
   let freq = frequencyCalc(state)
 //  console.log("calc rec  " + rec + " search= " + sch + " tvar = " + tvar +  " shop "+ shp +  " since search " + freq + " alphabetizing")
   let letter = elph.alphabetizer(tvar, sch, shp, false, false, freq, rec) // one more for buy perhaps, or xor
   return letter
+}
+
+// const elphSaysGo = (state) => {
+//   let mdl = userModelState.getUserModelTimingMdl(state)
+//   let defers = userModelState.elphDeferRemember(state)
+//   let out = false
+//   // magic number needs accounting for -SCL
+//   if (defers > 8 ) {
+//     out = true
+//   } else {
+//     let pred = elph.dealphabet( elph.predictOnlineELPH(mdl) )
+//     switch(pred) {
+//       case 'servead' :
+//         out = true
+//         break
+//       case 'clickad':
+//         out =  true
+//         break
+//       default :
+//         out = false
+//         break
+//     }
+//   }
+//   return out
+// }
+
+// the following fixes a problem with "text available" in the reducer firing multiple times on one page load
+// in principle we might check for corner cases which change state as time passes, but main thing is to
+// avoid updating timing model too many times for one page load. First noticed at smothsonian website
+// delay .... 1.5 maybe too long, but at least it smooths out for slow networks
+const debouncedTimingUpdate = (state, url, delay = 1.5) => {
+  let bounce = userModelState.scraperDebounceQuery(state)
+  let now = new Date().getTime()
+  let diff = (now - bounce.time) / 1000
+  if (bounce.url === url && diff < delay) { // houston we have a problem; do not update
+    state = userModelState.scraperDebounceSet(state, url, now)
+    return state
+  } else {
+    state = userModelState.scraperDebounceSet(state, url, now)
+    state = updateTimingModel(state)        // otherwise update as normal
+    return state
+  }
 }
 
 const topicVariance = (state) => { // this is a fairly random function; would have preferred something else
@@ -343,14 +385,12 @@ const topicVariance = (state) => { // this is a fairly random function; would ha
 const recencyCalc = (state) => { // using unidle time here; might be better to pick something else
   let now = new Date().getTime()
   let diff = (now - userModelState.getLastUserIdleStopTime(state)) / 1000 // milliseconds
-  // console.log('how long a diff in seconds ' + diff)
   return valueToLowHigh(diff, 600) // shorter than 10 minutes from idle
 }
 
 const frequencyCalc = (state) => {
   let now = new Date().getTime()
   let diff = (now - userModelState.getLastSearchTime(state)) / 1000 // milliseconds
-  // console.log('how long a Search diff in seconds ' + diff)
   return valueToLowHigh(diff, 180) // 3 minutes from search
 }
 
@@ -491,6 +531,14 @@ const checkReadyAdServe = (state, windowId) => {  // around here is where you wi
     return state
   }
 
+  // SCL uncomment when ready
+  // if (!elphSaysGo(state)) {
+  //   appActions.onUserModelLog('Ad not served', { reason: 'elph says user unlikely to click' })
+  //   state = userModelState.elphDeferRecorder(state)
+  //   return state
+  // }
+  // let reset = true
+  // state = userModelState.elphDeferRecorder(state, reset) // reset deferral counter
   const surveys = userModelState.getUserSurveyQueue(state).toJS()
   const survey = underscore.findWhere(surveys, { status: 'available' })
   if (survey) {
@@ -794,7 +842,7 @@ const getMethods = () => {
     uploadLogs,
     downloadSurveys,
     retrieveSSID,
-    updateTimingModel,
+    debouncedTimingUpdate,
     checkReadyAdServe
   }
 
