@@ -337,20 +337,35 @@ ul {
         height: 35px;
         margin: 15px 5px;
         cursor: default;
-        background-color: white;
-        -webkit-mask-repeat: no-repeat;
-
+        border: solid 1px transparent;
+        transition: border-color .12s ease;
+        position: relative;
+        border-radius: 3px;
+        &:after {
+          -webkit-mask-repeat: no-repeat;
+          position: absolute;
+          content: ' ';
+          background-color: white;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+        }
         &:hover {
-          background-color: @gray;
+          border-color: white;
         }
 
-        &.settingsIcon {
+        &:active {
+          opacity: .8;
+        }
+
+        &.settingsIcon:after {
           -webkit-mask-image: url('/img/newtab/settings_prefs_btn.svg');
         }
-        &.bookmarksIcon {
+        &.bookmarksIcon:after {
           -webkit-mask-image: url('/img/newtab/bookmarks_btn.svg');
         }
-        &.historyIcon {
+        &.historyIcon:after {
           -webkit-mask-image: url('/img/newtab/history_btn.svg');
         }
       }
