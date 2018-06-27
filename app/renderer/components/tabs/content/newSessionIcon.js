@@ -20,6 +20,7 @@ const frameStateUtil = require('../../../../../js/state/frameStateUtil')
 const globalStyles = require('../../styles/global')
 const {opacityIncreaseElementKeyframes} = require('../../styles/animations')
 const {theme} = require('../../styles/theme')
+require('../../../../../fonts/poppins.css')
 
 const newSessionSvg = require('../../../../extensions/brave/img/tabs/new_session.svg')
 
@@ -125,9 +126,8 @@ const styles = StyleSheet.create({
   },
 
   icon_newSession__name: {
-    marginLeft: '4px',
-    fontSize: '11px',
-    fontWeight: 'bold',
+    marginLeft: '6px',
+    font: '600 9px/0 Poppins, sans-serif',
     color: theme.tab.icon.symbol.color
   }
 })
