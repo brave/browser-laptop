@@ -460,6 +460,7 @@ class TorDaemon extends EventEmitter {
     const errorMethod = (err) => {
       console.log(`tor: control socket connection error: ${err}`)
       controlSocket.destroy(err)
+      return this._polled()
     }
     controlSocket.on('close', closeMethod)
     controlSocket.on('error', errorMethod)
@@ -474,7 +475,7 @@ class TorDaemon extends EventEmitter {
             console.log(`tor: close control socket failed: ${err}`)
           }
         })
-        return
+        return this._polled()
       }
 
       // Assert we are in a sane state: we have a process, but we have
@@ -492,6 +493,13 @@ class TorDaemon extends EventEmitter {
       this._control = new TorControl(readable, writable)
       this._control.on('error', (err) => this._controlError(err))
       this._control.on('close', () => this._controlClosed())
+
+      // We have finished polling, _and_ we are scheduled to be
+      // notified either by (a) our file system activity watcher, or
+      // (b) failure on the control channel.  That way we won't lose
+      // any notifications that tor has restarted.
+      this._polled()
+
       const hexCookie = cookie.toString('hex')
       this._control.cmd1(`AUTHENTICATE ${hexCookie}`, (err, status, reply) => {
         if (!err) {
@@ -550,6 +558,9 @@ class TorDaemon extends EventEmitter {
     this._control = null
     // Assume this means the process exited.
     this.emit('exit')
+    // Poll in case we received a watch event for file system activity
+    // before we actually closed the channel.
+    this._poll()
   }
 
   /**

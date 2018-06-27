@@ -714,8 +714,6 @@ module.exports.relaunchTor = () => {
   }
   appActions.onTorInitError(null)
   try {
-    // TODO (riastradh): why is calling setupTor again necessary?
-    setupTor()
     ses.relaunchTor()
   } catch (e) {
     appActions.onTorInitError(`Could not restart Tor: ${e}`)
