@@ -653,15 +653,20 @@ AppStore
     lastSearchTime: any,
     lastShopTime: any,
     lastUserActivity: any,
+    lastUrl: any,                  
+    lastBounceTime: any,        // used to debounce alphabet on browse
+    elphDefer: any,                  // records elph saying "do it later
+    elphstring: string,              // internal state history in alphabet form
+    timingModel: any,             // actual elph model (it's a complex object when it exists)
     lastUserIdleStopTime: any,
-    locales: string[],
+    locale: string[],
     pageScoreHistory: Array,
     score: any,
     searchActivity: any,
-    searchUrl: any,
-    shopActivity: any,
-    shopUrl: any,
-    pageClass: any,
+    searchUrl: any,                  // url of last searching activity
+    shopActivity: any,              // shopping now bool
+    shopUrl: any,                     // url of last shopping activity
+    pageClass: any,               
     places: string[],
     purchaseActive: any,
     purchaseTime: any,
