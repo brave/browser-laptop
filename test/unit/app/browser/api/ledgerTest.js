@@ -1046,6 +1046,26 @@ describe('ledger api unit tests', function () {
   })
 
   describe('when timing needs to be checked', function () {
+    describe('getVisitDuration', function () {
+      let fakeClock
+
+      beforeEach(function () {
+        fakeClock = sinon.useFakeTimers()
+      })
+      afterEach(function () {
+        fakeClock.restore()
+      })
+
+      it('returns the time on page', function () {
+        fakeClock.tick(10000)
+        const result = ledgerApi.getVisitDuration(8000, 5000, false)
+        assert.equal(2000, result)
+      })
+      it('returns minimum visit time when addition is manual', function () {
+        const result = ledgerApi.getVisitDuration(0, 8000, true)
+        assert.equal(8000, result)
+      })
+    })
     describe('addSiteVisit', function () {
       const fakeTabId = 7
       const tabIdNone = -1
