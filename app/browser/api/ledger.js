@@ -1907,7 +1907,10 @@ const setNewTimeUntilReconcileCallback = (err, stateResult) => {
   if (!stateResult) {
     return
   }
+  module.exports.onTimeUntilReconcileAction(stateResult)
+}
 
+const onTimeUntilReconcileAction = (stateResult) => {
   appActions.onTimeUntilReconcile(stateResult)
 }
 
@@ -2130,7 +2133,11 @@ const callback = (err, result, delayTime) => {
     }
   }
 
-  appActions.onLedgerCallback(result, delayTime)
+  module.exports.onLedgerCallback(result, delayTime)
+}
+
+const onLedgerCallback = (result, delayTime) => {
+  state = onCallback(state, result, delayTime)
 }
 
 const onCallback = (state, result, delayTime) => {
@@ -2530,8 +2537,22 @@ const delayFirstSync = (parsedData) => {
 const onFuzzing = (pushBack, pruned = false) => {
   if (client && client.state) {
     const newStamp = pushBack ? client.state.reconcileStamp : null
-    appActions.onLedgerFuzzing(newStamp, pruned)
+    module.exports.onLedgerFuzzing(newStamp, pruned)
   }
+}
+
+const onLedgerFuzzing = (state, pushBack, pruned = false) => {
+  if (client && client.state) {
+    state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.FUZZING)
+    const newStamp = parseInt(client.state.reconcileStamp)
+    if (!isNaN(newStamp) && newStamp > 0) {
+      state = ledgerState.setInfoProp(state, 'reconcileStamp', newStamp)
+    }
+  }
+  if (pruned) {
+    state = synopsisNormalizer(state, null, true, true)
+  }
+  return state
 }
 
 const onTimeUntilReconcile = (state, stateResult) => {
@@ -2699,23 +2720,29 @@ const run = (state, delayTime) => {
 }
 
 const syncUpLedger = (active) => {
-  return new Promise((resolve, reject) => {
-    runTimeoutId = false
-    if (active !== client) return
+  runTimeoutId = false
+  if (active !== client) return
 
-    if (!client) {
-      return console.error('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
-    }
+  if (!client) {
+    return console.error('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
+  }
 
-    if (client.sync(module.exports.callback) === true) {
-      appActions.onLedgerRun(0)
-    }
-  })
+  if (client.sync(module.exports.callback) === true) {
+    module.exports.onLedgerRunCallback(0)
+  }
+}
+
+const onLedgerRunCallback = (delay) => {
+  appActions.onLedgerRun(delay)
 }
 
 const reconcile = (callback) => {
+  doClientReconcile(callback, uuid.v4().toLowerCase(), callback)
+}
+
+const doClientReconcile = (callback, viewingId) => {
   if (client.isReadyToReconcile(synopsis, module.exports.onFuzzing)) {
-    client.reconcile(uuid.v4().toLowerCase(), callback)
+    client.reconcile(viewingId, callback)
   }
 }
 
@@ -3414,6 +3441,11 @@ const getMethods = () => {
     onLedgerQRGeneratedCallback,
     qrWriteImage,
     onFuzzing,
+    onLedgerFuzzing,
+    onLedgerCallback,
+    onLedgerRunCallback,
+    onTimeUntilReconcileAction,
+    doClientReconcile,
     getClient: () => {
       return client
     },
