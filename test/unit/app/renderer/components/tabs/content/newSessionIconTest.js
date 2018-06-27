@@ -71,6 +71,7 @@ describe('Tabs content - NewSessionIcon', function () {
     })
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('../../../../extensions/brave/img/tabs/new_session.svg')
+    mockery.registerMock('../../../../../fonts/poppins.css')
     windowStore = require('../../../../../../../js/stores/windowStore')
     appStore = require('../../../../../../../js/stores/appStoreRenderer')
     NewSessionIcon = require('../../../../../../../app/renderer/components/tabs/content/newSessionIcon')
