@@ -706,6 +706,22 @@ module.exports.setTorNewIdentity = (url, tabId) => {
   })
 }
 
+module.exports.relaunchTor = () => {
+  const ses = session.fromPartition(appConfig.tor.partition)
+  if (!ses) {
+    console.log('Tor session no longer exists. Cannot restart Tor.')
+    return
+  }
+  appActions.onTorInitError(null)
+  try {
+    // TODO (riastradh): why is calling setupTor again necessary?
+    setupTor()
+    ses.relaunchTor()
+  } catch (e) {
+    appActions.onTorInitError(`Could not restart Tor: ${e}`)
+  }
+}
+
 function initSession (ses, partition) {
   registeredSessions[partition] = ses
   ses.setEnableBrotli(true)

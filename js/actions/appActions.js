@@ -2082,6 +2082,12 @@ const appActions = {
     })
   },
 
+  restartTor: function () {
+    dispatch({
+      actionType: appConstants.APP_RESTART_TOR
+    })
+  },
+
   recreateTorTab: function (torEnabled, tabId, index) {
     dispatch({
       actionType: appConstants.APP_RECREATE_TOR_TAB,

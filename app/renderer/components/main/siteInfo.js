@@ -67,8 +67,8 @@ class SiteInfo extends React.Component {
       this.props.activeTabIndex)
   }
 
-  onRestart () {
-    appActions.shuttingDown(true)
+  onRestartTor () {
+    appActions.restartTor()
   }
 
   get secureIcon () {
@@ -169,16 +169,15 @@ class SiteInfo extends React.Component {
         <div className={css(styles.torBody)}>
           <div className={css(styles.torConnectionInfo)} data-l10n-id='torConnectionErrorInfo' />
           <Button
-            l10nId='torConnectionErrorDisable'
+            l10nId='torConnectionErrorRetry'
             className='primaryButton'
+            onClick={this.onRestartTor}
+          />
+          <Button
+            l10nId='torConnectionErrorDisable'
+            className='whiteButton'
             onClick={this.onDisableTor}
           />
-        </div>
-        <div className={css(styles.torFooter)}>
-          <div data-l10n-id='torConnectionErrorRetry' />
-          <div data-l10n-id='torConnectionErrorRestart'
-            className={css(styles.link)}
-            onClick={this.onRestart} />
         </div>
       </div>
     } else if (this.props.maybePhishingLocation) {
@@ -340,15 +339,6 @@ const styles = StyleSheet.create({
   torBody: {
     paddingBottom: '15px',
     lineHeight: '1.5em'
-  },
-
-  torFooter: {
-    lineHeight: '1.5em'
-  },
-
-  link: {
-    color: globalStyles.color.braveOrange,
-    cursor: 'pointer'
   },
 
   siteInfo: {
