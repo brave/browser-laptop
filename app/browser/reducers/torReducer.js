@@ -9,6 +9,9 @@ const appConstants = require('../../../js/constants/appConstants')
 
 const torReducer = (state, action) => {
   switch (action.actionType) {
+    case appConstants.APP_RESTART_TOR:
+      filtering.relaunchTor()
+      break
     case appConstants.APP_SET_TOR_NEW_IDENTITY:
       filtering.setTorNewIdentity(action.url, action.tabId)
       break
