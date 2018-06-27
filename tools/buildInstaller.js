@@ -190,6 +190,7 @@ if (isDarwin) {
     // need to store the output files in separate directories
     outDir = path.join(outDir, arch)
 
+    const splashKey = channel === 'developer' ? '_dev' : ''
     var muonInstaller = require('muon-winstaller')
     var resultPromise = muonInstaller.createWindowsInstaller({
       appDirectory: buildDir,
@@ -197,7 +198,7 @@ if (isDarwin) {
       title: appName,
       name: appName,
       authors: 'Brave Software',
-      loadingGif: 'res/brave_splash_installing.gif',
+      loadingGif: `res/brave_splash_installing${splashKey}.gif`,
       setupIcon: `res/${channel}/brave_installer.ico`,
       iconUrl: `https://raw.githubusercontent.com/brave/browser-laptop/master/res/${channel}/app.ico`,
       signWithParams: format('-a -fd sha256 -f "%s" -p "%s"', path.resolve(cert), certPassword),
