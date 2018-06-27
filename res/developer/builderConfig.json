@@ -1,12 +1,12 @@
 {
   "appId": "com.electron.brave",
-  "productName": "Brave Ads Trial",
+  "productName": "Brave-Ads-Trial",
   "npmRebuild": false,
   "mac": {
     "target": "dmg"
   },
   "dmg": {
-    "title": "Brave Ads Trial",
+    "title": "Brave-Ads-Trial",
     "background": "res/background.png",
     "icon": "res/developer/brave_installer.icns",
     "iconSize": 80,
