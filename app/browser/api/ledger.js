@@ -229,13 +229,17 @@ const getPublisherTimestamp = (updateList) => {
     return
   }
 
-  client.publisherTimestamp((err, result) => {
-    if (err) {
-      console.error('Error while retrieving publisher timestamp', err.toString())
-      return
-    }
-    appActions.onPublisherTimestamp(result.timestamp, updateList)
-  })
+  const publisherTimestampFn = module.exports.publisherTimestampCallback.bind(this, updateList)
+  client.publisherTimestamp(publisherTimestampFn)
+}
+
+const publisherTimestampCallback = (updateList, err, result) => {
+  if (err || !result) {
+    console.error('Error while retrieving publisher timestamp', err.toString())
+    return
+  }
+
+  appActions.onPublisherTimestamp(result.timestamp, updateList)
 }
 
 const addFoundClosed = (state) => {
@@ -268,7 +272,6 @@ const onBootStateFile = (state) => {
   try {
     clientprep()
     client = ledgerClient(null, underscore.extend({roundtrip: module.exports.roundtrip}, clientOptions), null)
-
     getPublisherTimestamp()
   } catch (ex) {
     state = ledgerState.resetInfo(state)
@@ -276,15 +279,13 @@ const onBootStateFile = (state) => {
     console.error('ledger client boot error: ', ex)
     return state
   }
-
-  if (client.sync(callback) === true) {
+  if (client.sync(module.exports.callback) === true) {
     run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute}))
   }
 
   module.exports.getBalance(state)
 
   bootP = false
-
   return state
 }
 
@@ -713,6 +714,14 @@ const excludeP = (publisherKey, callback) => {
   })
 }
 
+const getVisitDuration = (timestamp, minVisitTime, manualAdd) => {
+  if (manualAdd) {
+    return parseInt(minVisitTime)
+  }
+
+  return (new Date().getTime() - timestamp)
+}
+
 const addSiteVisit = (state, timestamp, location, tabId, manualAdd = false) => {
   if (!synopsis || location == null) {
     return state
@@ -722,7 +731,7 @@ const addSiteVisit = (state, timestamp, location, tabId, manualAdd = false) => {
   location = pageDataUtil.getInfoKey(location)
 
   const minimumVisitTime = getSetting(settings.PAYMENTS_MINIMUM_VISIT_TIME)
-  const duration = manualAdd ? parseInt(minimumVisitTime) : new Date().getTime() - timestamp
+  const duration = module.exports.getVisitDuration(timestamp, minimumVisitTime, manualAdd)
   const locationData = manualAdd ? Immutable.fromJS({ publisher: tldjs.getDomain(location) }) : ledgerState.getLocation(state, location)
 
   if (_internal.verboseP) {
@@ -871,6 +880,7 @@ const addNewLocation = (state, location, tabId = tabState.TAB_ID_NONE, keepInfo 
   // We always want to have the latest active tabId
   const currentTabId = manualAdd ? tabId : pageDataState.getLastActiveTabId(state)
   state = pageDataState.setLastActiveTabId(state, tabId)
+
   if (location === currentUrl && !manualAdd) {
     return state
   }
@@ -1045,7 +1055,7 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
   let publisher = ledgerState.getPublisher(state, publisherKey)
   if (!publisher.isEmpty()) {
     if (publisher.get('faviconURL') == null) {
-      state = getFavIcon(state, publisherKey, info)
+      state = module.exports.getFavIcon(state, publisherKey, info)
     }
   } else {
     const infoPublisher = info.get('publisher')
@@ -1082,17 +1092,17 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
 
     if (initP) {
       if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
-        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', true)
+        module.exports.onPublisherOptionUpdateAction(publisherKey, 'exclude', true)
         savePublisherOption(publisherKey, 'exclude', true)
       } else {
         excludeP(publisherKey, (unused, exclude) => {
-          appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+          module.exports.onPublisherOptionUpdateAction(publisherKey, 'exclude', exclude)
           savePublisherOption(publisherKey, 'exclude', exclude)
         })
       }
     }
 
-    state = getFavIcon(state, publisherKey, info)
+    state = module.exports.getFavIcon(state, publisherKey, info)
   }
 
   state = addNewLocation(state, location, tabId, keepInfo)
@@ -1119,10 +1129,7 @@ const backupKeys = (state, backupAction) => {
   const fs = require('fs')
 
   if (backupAction === 'print') {
-    tabs.create({url: appUrlUtil.aboutUrls.get('about:printkeys')})
-
-    // we do not check whether the user actually printed the backup word list
-    return aboutPreferencesState.setBackupStatus(state, true)
+    return module.exports.onPrintBackupKeys(state)
   }
 
   const dialog = electron.dialog
@@ -1145,6 +1152,12 @@ const backupKeys = (state, backupAction) => {
     }
   })
   return state
+}
+
+const onPrintBackupKeys = (state) => {
+  tabs.create({url: appUrlUtil.aboutUrls.get('about:printkeys')})
+  // we do not check whether the user actually printed the backup word list
+  return aboutPreferencesState.setBackupStatus(state, true)
 }
 
 const fileRecoveryKeys = (state, recoveryKeyFile) => {
@@ -1179,15 +1192,16 @@ const recoverKeys = (state, useRecoveryKeyFile, key) => {
     state = aboutPreferencesState.setRecoveryStatus(state, false)
     return state
   }
-
   state = aboutPreferencesState.setRecoveryBalanceRecalculated(state, false)
-  client.recoverWallet(null, recoveryKey, (err, result) => {
-    appActions.onWalletRecovery(err, result)
-    appActions.onPromotionRemoval()
-    appActions.onPromotionGet()
-  })
+  client.recoverWallet(null, recoveryKey, module.exports.recoverWalletCallback)
 
   return state
+}
+
+const recoverWalletCallback = (err, result) => {
+  appActions.onWalletRecovery(err, result)
+  appActions.onPromotionRemoval()
+  appActions.onPromotionGet()
 }
 
 const onWalletRecovery = (state, error, result) => {
@@ -1198,6 +1212,7 @@ const onWalletRecovery = (state, error, result) => {
     state = logError(state, error.toString(), 'recoveryWallet')
     state = aboutPreferencesState.setRecoveryStatus(state, false)
   } else {
+    result = makeImmutable(result)
     // convert buffer to Uint8Array
     let seed = result && result.getIn(['properties', 'wallet', 'keyinfo', 'seed'])
     if (seed) {
@@ -1214,7 +1229,7 @@ const onWalletRecovery = (state, error, result) => {
       state = ledgerState.setAboutProp(state, 'status', '')
     }
 
-    callback(error, result)
+    module.exports.callback(error, result)
 
     if (balanceTimeoutId) {
       clearTimeout(balanceTimeoutId)
@@ -1272,10 +1287,7 @@ const initSynopsis = (state) => {
   }
 
   if (process.env.NODE_ENV === 'test') {
-    synopsis.options.minPublisherDuration = 0
-    synopsis.options.minPublisherVisits = 0
-    state = ledgerState.setSynopsisOption(state, 'minPublisherDuration', 0)
-    state = ledgerState.setSynopsisOption(state, 'minPublisherVisits', 0)
+    state = module.exports.setTestMinimums(state)
   } else {
     if (process.env.LEDGER_PUBLISHER_MIN_DURATION) {
       value = ledgerClient.prototype.numbion(process.env.LEDGER_PUBLISHER_MIN_DURATION)
@@ -1297,7 +1309,7 @@ const initSynopsis = (state) => {
 
     if (!publisher.getIn(['options', 'exclude'])) {
       excludeP(publisherKey, (unused, exclude) => {
-        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+        module.exports.onPublisherOptionUpdateAction(publisherKey, 'exclude', exclude)
         savePublisherOption(publisherKey, 'exclude', exclude)
       })
     }
@@ -1306,6 +1318,18 @@ const initSynopsis = (state) => {
   state = updatePublisherInfo(state)
 
   return state
+}
+
+const setTestMinimums = (state) => {
+  synopsis.options.minPublisherDuration = 0
+  synopsis.options.minPublisherVisits = 0
+  state = ledgerState.setSynopsisOption(state, 'minPublisherDuration', 0)
+  state = ledgerState.setSynopsisOption(state, 'minPublisherVisits', 0)
+  return state
+}
+
+const onPublisherOptionUpdateAction = (publisherKey, prop, value) => {
+  appActions.onPublisherOptionUpdate(publisherKey, prop, value)
 }
 
 const checkPromotions = () => {
@@ -1810,23 +1834,27 @@ const generatePaymentData = (state) => {
       default:
         return
     }
-
-    try {
-      let chunks = []
-      qr.image(url, {type: 'png'})
-        .on('data', (chunk) => {
-          chunks.push(chunk)
-        })
-        .on('end', () => {
-          const paymentIMG = 'data:image/png;base64,' + Buffer.concat(chunks).toString('base64')
-          appActions.onLedgerQRGenerated(index, paymentIMG)
-        })
-    } catch (ex) {
-      console.error('qr.imageSync (for url ' + url + ') error: ' + ex.toString())
-    }
+    module.exports.qrWriteImage(index, url)
   })
-
   return state
+}
+
+const qrWriteImage = (index, url) => {
+  try {
+    let chunks = []
+    qr.image(url, {type: 'png'})
+      .on('data', (chunk) => {
+        chunks.push(chunk)
+      })
+      .on('end', module.exports.onLedgerQRGeneratedCallback(index, chunks))
+  } catch (ex) {
+    console.error('qr.imageSync (for url ' + url + ') error: ' + ex.toString())
+  }
+}
+
+const onLedgerQRGeneratedCallback = (index, chunks) => {
+  const paymentIMG = 'data:image/png;base64,' + Buffer.concat(chunks).toString('base64')
+  appActions.onLedgerQRGenerated(index, paymentIMG)
 }
 
 const getPaymentInfo = (state) => {
@@ -1843,25 +1871,26 @@ const getPaymentInfo = (state) => {
       amount = bravery.fee.amount
       currency = bravery.fee.currency
     }
-
-    client.getWalletProperties(amount, currency, function (err, body) {
-      if (err) {
-        if (err.message) {
-          console.error('getWalletProperties error: ' + err.message)
-        } else {
-          console.error('getWalletProperties error: ' + err.toString())
-        }
-        appActions.onWalletPropertiesError()
-        return
-      }
-
-      appActions.onWalletProperties(body)
-    })
+    client.getWalletProperties(amount, currency, module.exports.getWalletPropertiesCallback)
   } catch (ex) {
     console.error('properties error: ' + ex.toString())
   }
 
   return state
+}
+
+const getWalletPropertiesCallback = (err, body) => {
+  if (err) {
+    if (err.message) {
+      console.error('getWalletProperties error: ' + err.message)
+    } else {
+      console.error('getWalletProperties error: ' + err.toString())
+    }
+    appActions.onWalletPropertiesError()
+    return
+  }
+
+  appActions.onWalletProperties(body)
 }
 
 const lockInContributionAmount = (state, balance) => {
@@ -1878,15 +1907,20 @@ const lockInContributionAmount = (state, balance) => {
 }
 
 const setNewTimeUntilReconcile = (newReconcileTime = null) => {
-  client.setTimeUntilReconcile(newReconcileTime, (err, stateResult) => {
-    if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
+  client.setTimeUntilReconcile(newReconcileTime, module.exports.setNewTimeUntilReconcileCallback)
+}
 
-    if (!stateResult) {
-      return
-    }
+const setNewTimeUntilReconcileCallback = (err, stateResult) => {
+  if (err) return console.error('ledger setTimeUntilReconcile error: ' + err.toString())
 
-    appActions.onTimeUntilReconcile(stateResult)
-  })
+  if (!stateResult) {
+    return
+  }
+  module.exports.onTimeUntilReconcileAction(stateResult)
+}
+
+const onTimeUntilReconcileAction = (stateResult) => {
+  appActions.onTimeUntilReconcile(stateResult)
 }
 
 const onWalletProperties = (state, body) => {
@@ -1920,7 +1954,7 @@ const onWalletProperties = (state, body) => {
     if (balance > 0) {
       state = ledgerState.setInfoProp(state, 'userHasFunded', true)
     }
-    lockInContributionAmount(state, balance)
+    module.exports.lockInContributionAmount(state, balance)
   }
 
   // Rates
@@ -2035,13 +2069,15 @@ const setPaymentInfo = (amount) => {
   }
 
   underscore.extend(bravery.fee, { amount: amount, currency: currency })
-  client.setBraveryProperties(bravery, (err, result) => {
-    if (err) {
-      err = err.toString()
-    }
+  client.setBraveryProperties(bravery, module.exports.setBraveryPropertiesCallback)
+}
 
-    appActions.onBraveryProperties(err, result)
-  })
+const setBraveryPropertiesCallback = (err, result) => {
+  if (err) {
+    err = err.toString()
+  }
+
+  appActions.onBraveryProperties(err, result)
 }
 
 const onBraveryProperties = (state, error, result) => {
@@ -2059,7 +2095,7 @@ const onBraveryProperties = (state, error, result) => {
     if (result.properties && result.properties.wallet && result.properties.wallet.keyinfo) {
       result.properties.wallet.keyinfo.seed = uintKeySeed(result.properties.wallet.keyinfo.seed)
     }
-    muonWriter(statePath, result)
+    module.exports.muonWriter(statePath, result)
   }
 
   return state
@@ -2106,7 +2142,11 @@ const callback = (err, result, delayTime) => {
     }
   }
 
-  appActions.onLedgerCallback(result, delayTime)
+  module.exports.onLedgerCallback(result, delayTime)
+}
+
+const onLedgerCallback = (result, delayTime) => {
+  state = onCallback(state, result, delayTime)
 }
 
 const onCallback = (state, result, delayTime) => {
@@ -2178,7 +2218,7 @@ const onCallback = (state, result, delayTime) => {
 
           if (!publisher.getIn(['options', 'exclude'])) {
             excludeP(publisherKey, (unused, exclude) => {
-              appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+              module.exports.onPublisherOptionUpdateAction(publisherKey, 'exclude', exclude)
               savePublisherOption(publisherKey, 'exclude', exclude)
             })
           }
@@ -2192,7 +2232,7 @@ const onCallback = (state, result, delayTime) => {
   }
 
   // persist the new ledger state
-  muonWriter(statePath, regularResults)
+  module.exports.muonWriter(statePath, regularResults)
 
   run(state, delayTime)
 
@@ -2284,7 +2324,11 @@ const fetchReferralHeaders = () => {
     server: referralServer,
     method: 'GET',
     path: '/promo/custom-headers'
-  }, {}, appActions.onFetchReferralHeaders)
+  }, {}, module.exports.fetchReferralHeadersCallback)
+}
+
+const fetchReferralHeadersCallback = (err, response, body) => {
+  appActions.onFetchReferralHeaders(err, response, body)
 }
 
 const onFetchReferralHeaders = (state, err, response, body) => {
@@ -2304,8 +2348,6 @@ const onFetchReferralHeaders = (state, err, response, body) => {
 }
 
 const initialize = (state, paymentsEnabled) => {
-  let fs
-
   if (!v2RulesetDB) v2RulesetDB = levelUp(pathName(v2RulesetPath))
   state = enable(state, paymentsEnabled)
 
@@ -2365,6 +2407,11 @@ const initialize = (state, paymentsEnabled) => {
     if (rule.consequent) ruleset.push(rule)
   })
   state = cacheRuleSet(state, ruleset)
+  return module.exports.initAccessStatePath(state, statePath)
+}
+
+const initAccessStatePath = (state, statePath) => {
+  let fs
 
   try {
     if (!fs) fs = require('fs')
@@ -2375,22 +2422,13 @@ const initialize = (state, paymentsEnabled) => {
         }
         return
       }
-
       fs.readFile(pathName(statePath), (err, data) => {
         if (err) {
           module.exports.disablePayments()
           return console.error('read error: ' + err.toString())
         }
 
-        try {
-          appActions.onInitRead(JSON.parse(data))
-          if (clientOptions.verboseP) {
-            console.log('\nstarting up ledger client integration')
-          }
-        } catch (ex) {
-          module.exports.disablePayments()
-          console.error('statePath parse error: ' + ex.toString())
-        }
+        module.exports.onInitReadAction(state, JSON.parse(data))
       })
     })
 
@@ -2402,6 +2440,18 @@ const initialize = (state, paymentsEnabled) => {
     }
     state = ledgerState.resetInfo(state)
     return state
+  }
+}
+
+const onInitReadAction = (state, parsedData) => {
+  try {
+    appActions.onInitRead(parsedData)
+    if (clientOptions.verboseP) {
+      console.log('\nstarting up ledger client integration')
+    }
+  } catch (ex) {
+    module.exports.disablePayments()
+    console.error('statePath parse error: ' + ex.toString())
   }
 }
 
@@ -2420,12 +2470,11 @@ const onInitRead = (state, parsedData) => {
     fs.renameSync(pathName(statePath), pathName('ledger-state-btc.json'))
     state = ledgerState.resetInfo(state)
     clientprep()
-    client = ledgerClient(null, underscore.extend({roundtrip: roundtrip}, clientOptions), null)
+    client = ledgerClient(null, underscore.extend({roundtrip: module.exports.roundtrip}, clientOptions), null)
     parsedData = client.state
     getPaymentInfo(state)
-    muonWriter(statePath, parsedData)
+    module.exports.muonWriter(statePath, parsedData)
   }
-
   if (Array.isArray(parsedData.transactions)) {
     parsedData.transactions.sort((transaction1, transaction2) => {
       return transaction1.submissionStamp - transaction2.submissionStamp
@@ -2455,7 +2504,7 @@ const onInitRead = (state, parsedData) => {
     // enables it again -> reconcileStamp is in the past.
     // In this case reset reconcileStamp to the future.
     try {
-      timeUntilReconcile = client.timeUntilReconcile(synopsis, onFuzzing)
+      timeUntilReconcile = client.timeUntilReconcile(synopsis, module.exports.onFuzzing)
     } catch (ex) {}
 
     let ledgerWindow = (ledgerState.getSynopsisOption(state, 'numFrames') - 1) * ledgerState.getSynopsisOption(state, 'frameSize')
@@ -2468,14 +2517,7 @@ const onInitRead = (state, parsedData) => {
     return state
   }
 
-  // speed-up browser start-up by delaying the first synchronization action
-  setTimeout(() => {
-    if (!client) {
-      return
-    }
-
-    appActions.onLedgerFirstSync(parsedData)
-  }, 3 * ledgerUtil.milliseconds.second)
+  module.exports.delayFirstSync(parsedData)
 
   // Make sure bravery props are up-to-date with user settings
   const address = ledgerState.getInfoProp(state, 'address')
@@ -2490,22 +2532,47 @@ const onInitRead = (state, parsedData) => {
   return state
 }
 
+const delayFirstSync = (parsedData) => {
+  // speed-up browser start-up by delaying the first synchronization action
+  setTimeout(() => {
+    if (!client) {
+      return
+    }
+
+    appActions.onLedgerFirstSync(parsedData)
+  }, 3 * ledgerUtil.milliseconds.second)
+}
+
 const onFuzzing = (pushBack, pruned = false) => {
   if (client && client.state) {
     const newStamp = pushBack ? client.state.reconcileStamp : null
-    appActions.onLedgerFuzzing(newStamp, pruned)
+    module.exports.onLedgerFuzzing(newStamp, pruned)
   }
+}
+
+const onLedgerFuzzing = (state, pushBack, pruned = false) => {
+  if (client && client.state) {
+    state = ledgerState.setAboutProp(state, 'status', ledgerStatuses.FUZZING)
+    const newStamp = parseInt(client.state.reconcileStamp)
+    if (!isNaN(newStamp) && newStamp > 0) {
+      state = ledgerState.setInfoProp(state, 'reconcileStamp', newStamp)
+    }
+  }
+  if (pruned) {
+    state = synopsisNormalizer(state, null, true, true)
+  }
+  return state
 }
 
 const onTimeUntilReconcile = (state, stateResult) => {
   state = getStateInfo(state, stateResult.toJS()) // TODO optimize
-  muonWriter(statePath, stateResult)
+  module.exports.muonWriter(statePath, stateResult)
 
   return state
 }
 
 const onLedgerFirstSync = (state, parsedData) => {
-  if (client.sync(callback) === true) {
+  if (client.sync(module.exports.callback) === true) {
     run(state, random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute}))
   }
 
@@ -2573,7 +2640,7 @@ const run = (state, delayTime) => {
   }
 
   const publishers = ledgerState.getAboutProp(state, 'synopsis') || Immutable.List()
-  if (isList(publishers) && publishers.isEmpty() && client.isReadyToReconcile(synopsis, onFuzzing)) {
+  if (isList(publishers) && publishers.isEmpty() && client.isReadyToReconcile(synopsis, module.exports.onFuzzing)) {
     setNewTimeUntilReconcile()
   }
 
@@ -2627,14 +2694,14 @@ const run = (state, delayTime) => {
     if (!stateData && map) {
       stateData = client.state
     }
-    if (stateData) muonWriter(statePath, stateData)
+    if (stateData) module.exports.muonWriter(statePath, stateData)
   } catch (ex) {
     console.error('ledger client error(2): ' + ex.toString() + (ex.stack ? ('\n' + ex.stack) : ''))
   }
 
   if (delayTime === 0) {
     try {
-      delayTime = client.timeUntilReconcile(synopsis, onFuzzing)
+      delayTime = client.timeUntilReconcile(synopsis, module.exports.onFuzzing)
     } catch (ex) {
       delayTime = false
     }
@@ -2653,23 +2720,38 @@ const run = (state, delayTime) => {
       delayTime = random.randomInt({min: 3 * ledgerUtil.milliseconds.minute, max: ledgerUtil.milliseconds.hour})
     }
 
-    runTimeoutId = setTimeout(() => {
-      runTimeoutId = false
-      if (active !== client) return
-
-      if (!client) {
-        return console.error('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
-      }
-
-      if (client.sync(callback) === true) {
-        appActions.onLedgerRun(0)
-      }
-    }, delayTime)
+    syncUpLedger(active)
     return
   }
 
-  if (client.isReadyToReconcile(synopsis, onFuzzing)) {
-    client.reconcile(uuid.v4().toLowerCase(), callback)
+  module.exports.reconcile(callback)
+  return state
+}
+
+const syncUpLedger = (active) => {
+  runTimeoutId = false
+  if (active !== client) return
+
+  if (!client) {
+    return console.error('\n\n*** MTR says this can\'t happen(1)... please tell him that he\'s wrong!\n\n')
+  }
+
+  if (client.sync(module.exports.callback) === true) {
+    module.exports.onLedgerRunCallback(0)
+  }
+}
+
+const onLedgerRunCallback = (delay) => {
+  appActions.onLedgerRun(delay)
+}
+
+const reconcile = (callback) => {
+  doClientReconcile(callback, uuid.v4().toLowerCase(), callback)
+}
+
+const doClientReconcile = (callback, viewingId) => {
+  if (client.isReadyToReconcile(synopsis, module.exports.onFuzzing)) {
+    client.reconcile(viewingId, callback)
   }
 }
 
@@ -2687,7 +2769,7 @@ const onNetworkConnected = (state) => {
     runTimeoutId = false
   }
 
-  if (client.sync(callback) === true) {
+  if (client.sync(module.exports.callback) === true) {
     const delayTime = random.randomInt({min: ledgerUtil.milliseconds.minute, max: 5 * ledgerUtil.milliseconds.minute})
     run(state, delayTime)
   }
@@ -2864,7 +2946,7 @@ const processMediaData = (state, parsed, type, details) => {
   }
 
   // Don't record if visit is in private tab
-  if (!shouldTrackTab(state, tabId)) {
+  if (!module.exports.shouldTrackTab(state, tabId)) {
     return state
   }
 
@@ -2914,6 +2996,12 @@ const processMediaData = (state, parsed, type, details) => {
     providerName: type
   }
 
+  module.exports.getPublisherFromPropsAction(mediaProps, options, mediaKey, duration, revisited)
+
+  return state
+}
+
+const getPublisherFromPropsAction = (mediaProps, options, mediaKey, duration, revisited) => {
   ledgerPublisher.getMedia().getPublisherFromMediaProps(mediaProps, options, (error, response) => {
     if (error) {
       console.error('Error while getting publisher from media', error.toString())
@@ -2932,8 +3020,6 @@ const processMediaData = (state, parsed, type, details) => {
 
     appActions.onLedgerMediaPublisher(mediaKey, response, duration, revisited)
   })
-
-  return state
 }
 
 const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
@@ -2958,11 +3044,11 @@ const onMediaPublisher = (state, mediaKey, response, duration, revisited) => {
     state = ledgerState.setPublisher(state, publisherKey, synopsis.publishers[publisherKey])
 
     if (!getSetting(settings.PAYMENTS_SITES_AUTO_SUGGEST)) {
-      appActions.onPublisherOptionUpdate(publisherKey, 'exclude', true)
+      module.exports.onPublisherOptionUpdateAction(publisherKey, 'exclude', true)
       savePublisherOption(publisherKey, 'exclude', true)
     } else {
       excludeP(publisherKey, (unused, exclude) => {
-        appActions.onPublisherOptionUpdate(publisherKey, 'exclude', exclude)
+        module.exports.onPublisherOptionUpdateAction(publisherKey, 'exclude', exclude)
         savePublisherOption(publisherKey, 'exclude', exclude)
       })
     }
@@ -3236,6 +3322,12 @@ const deleteWallet = (state) => {
   client = null
   synopsis = null
 
+  module.exports.deleteStateFile()
+
+  return state
+}
+
+const deleteStateFile = () => {
   const fs = require('fs')
   fs.access(pathName(statePath), fs.constants.F_OK, (err) => {
     if (err) {
@@ -3248,8 +3340,6 @@ const deleteWallet = (state) => {
       }
     })
   })
-
-  return state
 }
 
 const clearPaymentHistory = (state) => {
@@ -3332,14 +3422,50 @@ const getMethods = () => {
     addSiteVisit,
     getCaptcha,
     onCaptchaResponse,
-    shouldTrackTab,
     deleteWallet,
+    delayFirstSync,
+    deleteStateFile,
     resetPublishers,
     clearPaymentHistory,
-    getPaymentInfo,
     synopsisNormalizer,
     cacheRuleSet,
-    disablePayments
+    disablePayments,
+    shouldTrackTab,
+    recoverWalletCallback,
+    getFavIcon,
+    lockInContributionAmount,
+    onPrintBackupKeys,
+    clientprep,
+    setBraveryPropertiesCallback,
+    muonWriter,
+    onInitReadAction,
+    initAccessStatePath,
+    getWalletPropertiesCallback,
+    publisherTimestampCallback,
+    setNewTimeUntilReconcileCallback,
+    fetchReferralHeadersCallback,
+    getPaymentInfo,
+    fetchReferralHeaders,
+    callback,
+    onLedgerQRGeneratedCallback,
+    qrWriteImage,
+    onFuzzing,
+    onLedgerFuzzing,
+    onLedgerCallback,
+    onLedgerRunCallback,
+    onTimeUntilReconcileAction,
+    doClientReconcile,
+    getClient: () => {
+      return client
+    },
+    onPublisherOptionUpdateAction,
+    reconcile,
+    setTestMinimums,
+    getPublisherFromPropsAction,
+    getVisitDuration,
+    resetCurrentUrl: () => {
+      currentUrl = locationDefault
+    }
   }
 
   let privateMethods = {}
@@ -3366,6 +3492,12 @@ const getMethods = () => {
       },
       setCurrentMediaKey: (key) => {
         currentMediaKey = key
+      },
+      resetModules: () => {
+        client = null
+        ledgerClient = null
+        ledgerBalance = null
+        ledgerPublisher = null
       },
       getCurrentMediaKey: (key) => currentMediaKey,
       observeTransactions,
