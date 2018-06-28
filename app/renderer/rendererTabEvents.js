@@ -111,6 +111,10 @@ const api = module.exports = {
         break
       }
       case 'page-favicon-updated': {
+        if (frameStateUtil.isTor(frame)) {
+          // This will be set as a data: URL by the page content script
+          break
+        }
         if (e.favicons &&
             e.favicons.length > 0) {
           const url = faviconUtil.wrapFaviconUrl(e.favicons[0])
@@ -350,6 +354,22 @@ function handleTabIpcMessage (tabId, frame, e) {
       method = () => windowActions.setContextMenuDetail()
       break
     }
+    case messages.RECREATE_TOR_TAB: {
+      const tab = getTab(tabId)
+      method = (torEnabled) => {
+        appActions.recreateTorTab(torEnabled, tabId,
+          tab ? tab.get('index') : undefined)
+      }
+      break
+    }
+    case messages.GOT_PAGE_FAVICON: {
+      method = (dataUrl) => {
+        if (frameStateUtil.isTor(frame)) {
+          windowActions.setFavicon(frame, dataUrl)
+        }
+      }
+      break
+    }
   }
   method.apply(null, e.args)
 }
@@ -495,6 +515,11 @@ function allowRunningWidevinePlugin (tabId, frame) {
  *   accepted
  */
 function showWidevineNotification (tabId, frame, noWidevineCallback, widevineCallback) {
+  if (frameStateUtil.isTor(frame)) {
+    // Never show widevine prompts on a Tor tab (needed for
+    // https://github.com/brave/browser-laptop/issues/13626)
+    return
+  }
   // https://www.nfl.com is said to be a widevine site but it actually uses Flash for me Oct 10, 2016
   const widevineSites = ['https://www.netflix.com',
     'http://bitmovin.com',

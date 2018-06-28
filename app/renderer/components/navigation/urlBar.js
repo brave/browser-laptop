@@ -41,6 +41,7 @@ const {normalizeLocation, getNormalizedSuggestion} = require('../../../common/li
 const isDarwin = require('../../../common/lib/platformUtil').isDarwin()
 const publisherUtil = require('../../../common/lib/publisherUtil')
 const historyUtil = require('../../../common/lib/historyUtil')
+const locale = require('../../../../js/l10n')
 
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
@@ -425,6 +426,26 @@ class UrlBar extends React.Component {
     }
   }
 
+  get placeholderValue () {
+    if (this.props.isTor) {
+      if (this.props.torInitializationError) {
+        return `${locale.translation('torConnectionError')}.`
+      } else if (this.props.torPercentInitialized) {
+        // Don't show 100% since it sometimes gets stuck at 100%
+        const percentInitialized = this.props.torPercentInitialized === '100' ? '99' : this.props.torPercentInitialized
+        if (percentInitialized === '0') {
+          return `${locale.translation('urlbarPlaceholderTorProgress')}...`
+        }
+        return `${locale.translation('urlbarPlaceholderTorProgress')}: ${percentInitialized}%...`
+      } else if (this.props.torInitializationError === false) {
+        return locale.translation('urlbarPlaceholderTorSuccess')
+      } else {
+        return `${locale.translation('urlbarPlaceholderTorProgress')}...`
+      }
+    }
+    return locale.translation('urlbarPlaceholder')
+  }
+
   get titleValue () {
     // For about:newtab we don't want the top of the browser saying New Tab
     // Instead just show "Brave"
@@ -445,6 +466,9 @@ class UrlBar extends React.Component {
   }
 
   onContextMenu (e) {
+    if (this.torInitializing) {
+      return
+    }
     contextMenus.onUrlBarContextMenu(e)
   }
 
@@ -472,6 +496,7 @@ class UrlBar extends React.Component {
     const selectedIndex = urlbar.getIn(['suggestions', 'selectedIndex'])
     const allSiteSettings = siteSettingsState.getAllSiteSettings(state, activeFrameIsPrivate)
     const braverySettings = siteSettings.getSiteSettingsForURL(allSiteSettings, location)
+    const isTor = frameStateUtil.isTor(activeFrame)
 
     // TODO(bridiver) - these definitely needs a helpers
     const publisherKey = ledgerState.getLocationProp(state, baseUrl, 'publisher')
@@ -497,6 +522,9 @@ class UrlBar extends React.Component {
     props.loading = activeFrame.get('loading')
     props.navigationProgressPercent = tabState.getNavigationProgressPercent(state, activeTabId)
 
+    props.isTor = isTor
+    props.torPercentInitialized = state.getIn(['tor', 'percentInitialized'])
+    props.torInitializationError = state.getIn(['tor', 'initializationError'])
     props.showDisplayTime = !props.titleMode && props.displayURL === location
     props.showNoScriptInfo = enableNoScript && scriptsBlocked && scriptsBlocked.size
     props.evCert = activeFrame.getIn(['security', 'evCert'])
@@ -530,6 +558,18 @@ class UrlBar extends React.Component {
       return null
     }
     return <span className='evCert' title={this.props.evCert}> {this.props.evCert} </span>
+  }
+
+  get torInitializing () {
+    // Returns true if the current tab is a Tor tab and Tor has not yet
+    // initialized successfully
+    return this.props.isTor &&
+      (this.props.torPercentInitialized || this.props.torInitializationError !== false)
+  }
+
+  get shouldDisable () {
+    return (this.props.displayURL === undefined && this.loadTime === '') ||
+      this.torInitializing
   }
 
   setUrlBarRef (ref) {
@@ -571,7 +611,7 @@ class UrlBar extends React.Component {
         </div>
         : <input type='text'
           spellCheck='false'
-          disabled={this.props.displayURL === undefined && this.loadTime === ''}
+          disabled={this.shouldDisable}
           onFocus={this.onFocus}
           onBlur={this.onBlur}
           onKeyDown={this.onKeyDown}
@@ -584,6 +624,7 @@ class UrlBar extends React.Component {
           onClick={this.onClick}
           onContextMenu={this.onContextMenu}
           data-l10n-id='urlbar'
+          placeholder={this.placeholderValue}
           className={cx({
             testHookLoadDone: !this.props.loading
           })}

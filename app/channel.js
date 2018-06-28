@@ -52,3 +52,34 @@ exports.getLinuxDesktopName = () => {
   }
   return desktopName
 }
+
+// getTorSocksProxy()
+//
+//      Return the socks5:// `URL' for the Tor socks proxy we will
+//      configure the tor daemon to listen on and muon to connect to,
+//      depending on which channel we're using.  This is provisional
+//      until we let the OS choose the port number as in
+//      <https://github.com/brave/browser-laptop/issues/12936>, or
+//      until we add support for local sockets for SOCKS proxies as in
+//      <https://github.com/brave/muon/issues/469>.
+//
+exports.getTorSocksProxy = () => {
+  let portno
+  switch (channel) {
+    case 'dev':
+    case '':
+    default:
+      portno = 9250
+      break
+    case 'beta':
+      portno = 9260
+      break
+    case 'nightly':
+      portno = 9270
+      break
+    case 'developer':
+      portno = 9280
+      break
+  }
+  return `socks5://127.0.0.1:${portno}`
+}

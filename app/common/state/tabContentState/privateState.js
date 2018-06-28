@@ -25,6 +25,7 @@ module.exports.showPrivateIcon = (state, frameKey) => {
 
   return (
     module.exports.isPrivateTab(state, frameKey) &&
+    !frameStateUtil.isTor(frame) &&
     tabUIState.showTabEndIcon(state, frameKey)
   )
 }

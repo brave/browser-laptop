@@ -52,6 +52,7 @@ const createFileSubmenu = () => {
   const submenu = [
     CommonMenu.newTabMenuItem(),
     CommonMenu.newPrivateTabMenuItem(),
+    CommonMenu.newTorTabMenuItem(),
     CommonMenu.newPartitionedTabMenuItem(),
     CommonMenu.newWindowMenuItem(),
     CommonMenu.separatorMenuItem,

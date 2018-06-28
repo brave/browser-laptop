@@ -9,6 +9,7 @@ const format = require('date-fns/format')
 const Immutable = require('immutable')
 const electron = require('electron')
 const ipc = electron.ipcMain
+const session = electron.session
 const path = require('path')
 const os = require('os')
 const qr = require('qr-image')
@@ -32,6 +33,7 @@ const updateState = require('../../common/state/updateState')
 // Constants
 const settings = require('../../../js/constants/settings')
 const messages = require('../../../js/constants/messages')
+const appConfig = require('../../../js/constants/appConfig')
 const ledgerStatuses = require('../../common/constants/ledgerStatuses')
 
 // Utils
@@ -863,7 +865,9 @@ const shouldTrackTab = (state, tabId) => {
   if (tabFromState == null) {
     tabFromState = pageDataState.getLastClosedTab(state, tabId)
   }
-  const isPrivate = !tabFromState.get('partition', '').startsWith('persist:') || tabFromState.get('incognito')
+  const partition = tabFromState.get('partition', '')
+  const ses = session.fromPartition(partition)
+  const isPrivate = (ses && ses.isOffTheRecord()) || tabFromState.get('incognito') || partition === appConfig.tor.partition
   return !isPrivate && !tabFromState.isEmpty() && ledgerUtil.shouldTrackView(tabFromState)
 }
 

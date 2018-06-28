@@ -9,7 +9,7 @@ const messages = require('../../js/constants/messages')
 const locale = require('../../js/l10n')
 const settings = require('../../js/constants/settings')
 const {tabs} = require('../../js/constants/config')
-const getSetting = require('../../js/settings').getSetting
+const {getSetting} = require('../../js/settings')
 const communityURL = 'https://community.brave.com/'
 const isDarwin = process.platform === 'darwin'
 const electron = require('electron')
@@ -80,6 +80,19 @@ module.exports.newPrivateTabMenuItem = () => {
       ensureAtLeastOneWindow({
         url: 'about:newtab',
         isPrivate: true
+      })
+    }
+  }
+}
+
+module.exports.newTorTabMenuItem = () => {
+  return {
+    label: locale.translation('newTorTab'),
+    click: function (item, focusedWindow) {
+      ensureAtLeastOneWindow({
+        url: 'about:newtab',
+        isPrivate: true,
+        isTor: true
       })
     }
   }
