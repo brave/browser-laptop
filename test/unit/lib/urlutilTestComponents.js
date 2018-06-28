@@ -587,5 +587,27 @@ module.exports = {
       const result = urlUtil().getUrlFromPDFUrl('chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/http://www.test.com/test.pdf')
       test.equal(result, 'http://www.test.com/test.pdf')
     }
+  },
+
+  'isOnionUrl': {
+    'null url': (test) => {
+      const result = urlUtil().isOnionUrl(null)
+      test.equal(result, false)
+    },
+
+    'regular url': (test) => {
+      const result = urlUtil().isOnionUrl('http://bing.com')
+      test.equal(result, false)
+    },
+
+    'onion url': (test) => {
+      const result = urlUtil().isOnionUrl('https://facebookcorewwwi.onion/')
+      test.equal(result, true)
+    },
+
+    'weird onion url': (test) => {
+      const result = urlUtil().isOnionUrl('hTtpS://ABCDEF.onioN/?test=1#abc')
+      test.equal(result, true)
+    }
   }
 }

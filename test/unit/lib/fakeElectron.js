@@ -81,7 +81,17 @@ const fakeElectron = {
         }
       }
     },
-    fromPartition: () => {}
+    fromPartition: function (partition) {
+      if (!partition.startsWith('persist:') || partition === 'tor') {
+        return {
+          isOffTheRecord: function () { return true }
+        }
+      } else {
+        return {
+          isOffTheRecord: function () { return false }
+        }
+      }
+    }
   },
   extensions: {
     createTab: function () {}

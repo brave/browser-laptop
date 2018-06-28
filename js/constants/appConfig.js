@@ -109,6 +109,9 @@ module.exports = {
     delayNotificationTryPayments: 1000 * 60 * 60 * 24 * 10, // 10 days (from firstRunTimestamp)
     defaultContributionAmount: 7.5
   },
+  tor: {
+    partition: 'persist:tor'
+  },
   updates: {
     // Check for front end updates every hour
     appUpdateCheckFrequency: 1000 * 60 * 60,
@@ -152,7 +155,8 @@ module.exports = {
     'general.spellcheck-languages': Immutable.fromJS(['en-US']),
     'search.default-search-engine': 'Google',
     'search.offer-search-suggestions': false, // false by default for privacy reasons
-    'search.use-alternate-private-search-engine': false, // use true for DDG search in Private Tab
+    'search.use-alternate-private-search-engine': false,
+    'search.use-alternate-private-search-engine-tor': true,
     'tabs.switch-to-new-tabs': false,
     'tabs.paint-tabs': true,
     'tabs.tabs-per-page': 20,

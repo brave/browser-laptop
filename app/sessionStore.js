@@ -299,6 +299,8 @@ module.exports.cleanAppData = (immutableData, isShutdown) => {
   immutableData = immutableData.set('notifications', Immutable.List())
   // Delete temp site settings
   immutableData = immutableData.set('temporarySiteSettings', Immutable.Map())
+  // Delete Tor init state
+  immutableData = immutableData.set('tor', Immutable.Map())
 
   if (immutableData.getIn(['settings', settings.CHECK_DEFAULT_ON_STARTUP]) === true) {
     // Delete defaultBrowserCheckComplete state since this is checked on startup
@@ -1135,6 +1137,7 @@ module.exports.defaultAppState = () => {
     passwords: [],
     notifications: [],
     temporarySiteSettings: {},
+    tor: {},
     autofill: {
       addresses: {
         guid: [],

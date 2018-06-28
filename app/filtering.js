@@ -9,12 +9,14 @@ const electron = require('electron')
 const session = electron.session
 const BrowserWindow = electron.BrowserWindow
 const webContents = electron.webContents
+const webContentsCache = require('./browser/webContentsCache')
 const appActions = require('../js/actions/appActions')
 const appConfig = require('../js/constants/appConfig')
 const hostContentSettings = require('./browser/contentSettings/hostContentSettings')
 const downloadStates = require('../js/constants/downloadStates')
 const urlParse = require('./common/urlParse')
 const getSetting = require('../js/settings').getSetting
+const {getExtensionsPath} = require('../js/lib/appUrlUtil')
 const appUrlUtil = require('../js/lib/appUrlUtil')
 const faviconUtil = require('../js/lib/faviconUtil')
 const siteSettings = require('../js/state/siteSettings')
@@ -27,6 +29,7 @@ const ipcMain = electron.ipcMain
 const app = electron.app
 const path = require('path')
 const getOrigin = require('../js/lib/urlutil').getOrigin
+const {isTorrentFile, isMagnetURL} = require('./browser/webtorrent')
 const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 const {fullscreenOption} = require('./common/constants/settingsEnums')
@@ -36,14 +39,17 @@ const ledgerUtil = require('./common/lib/ledgerUtil')
 const {cookieExceptions, isRefererException} = require('../js/data/siteHacks')
 const {getBraverySettingsCache, updateBraverySettingsCache} = require('./common/cache/braverySettingsCache')
 const {shouldDebugTabEvents} = require('./cmdLine')
+const {getTorSocksProxy} = require('./channel')
+const tor = require('./tor')
 
 let appStore = null
 
+const tabMessageBox = require('./browser/tabMessageBox')
 const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 const beforeRedirectFilteringFns = []
 const headersReceivedFilteringFns = []
-let partitionsToInitialize = ['default']
+let partitionsToInitialize = ['default', appConfig.tor.partition]
 let initializedPartitions = {}
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
@@ -127,6 +133,11 @@ function registerForBeforeRequest (session, partition) {
 
     if (shouldIgnoreUrl(details)) {
       muonCb({})
+      return
+    }
+
+    if ((isMagnetURL(details)) && partition === appConfig.tor.partition) {
+      showTorrentBlockedInTorWarning(details, muonCb)
       return
     }
 
@@ -366,6 +377,19 @@ function registerForBeforeSendHeaders (session, partition) {
   })
 }
 
+function showTorrentBlockedInTorWarning (details, muonCb) {
+  const cb = () => muonCb({cancel: true})
+  if (details.tabId) {
+    tabMessageBox.show(details.tabId, {
+      message: `${locale.translation('torrentBlockedInTor')}`,
+      title: 'Brave',
+      buttons: [locale.translation('torrentWarningOk')]
+    }, cb)
+  } else {
+    cb()
+  }
+}
+
 /**
  * Register for notifications for webRequest.onHeadersReceived for a particular
  * session.
@@ -377,6 +401,10 @@ function registerForHeadersReceived (session, partition) {
     // Using an electron binary which isn't from Brave
     if (shouldIgnoreUrl(details)) {
       muonCb({})
+      return
+    }
+    if ((isTorrentFile(details)) && partition === appConfig.tor.partition) {
+      showTorrentBlockedInTorWarning(details, muonCb)
       return
     }
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
@@ -505,6 +533,9 @@ function registerPermissionHandler (session, partition) {
 
       if (!permissions[permission]) {
         console.warn('WARNING: got unregistered permission request', permission)
+        response.push(false)
+      } else if (permission === 'geolocation' && partition === appConfig.tor.partition) {
+        // Never allow geolocation in Tor mode
         response.push(false)
       } else if (isFullscreen && mainFrameOrigin &&
         // The Torrent Viewer extension is always allowed to show fullscreen media
@@ -662,7 +693,10 @@ function registerForDownloadListener (session) {
   })
 }
 
-function registerForMagnetHandler (session) {
+function registerForMagnetHandler (session, partition) {
+  if (partition === appConfig.tor.partition) {
+    return
+  }
   const webtorrentUrl = appUrlUtil.getTorrentExtUrl('webtorrent.html')
   try {
     if (getSetting(settings.TORRENT_VIEWER_ENABLED)) {
@@ -679,6 +713,33 @@ function registerForMagnetHandler (session) {
   }
 }
 
+module.exports.setTorNewIdentity = (url, tabId) => {
+  const ses = session.fromPartition(appConfig.tor.partition)
+  if (!ses || !url) {
+    return
+  }
+  ses.setTorNewIdentity(url, () => {
+    const tab = webContentsCache.getWebContents(tabId)
+    if (tab && !tab.isDestroyed()) {
+      tab.reload(true)
+    }
+  })
+}
+
+module.exports.relaunchTor = () => {
+  const ses = session.fromPartition(appConfig.tor.partition)
+  if (!ses) {
+    console.log('Tor session no longer exists. Cannot restart Tor.')
+    return
+  }
+  appActions.onTorInitError(null)
+  try {
+    ses.relaunchTor()
+  } catch (e) {
+    appActions.onTorInitError(`Could not restart Tor: ${e}`)
+  }
+}
+
 function initSession (ses, partition) {
   registeredSessions[partition] = ses
   ses.setEnableBrotli(true)
@@ -686,6 +747,7 @@ function initSession (ses, partition) {
 }
 
 const initPartition = (partition) => {
+  const isTorPartition = partition === appConfig.tor.partition
   // Partitions can only be initialized once the app is ready
   if (!app.isReady()) {
     partitionsToInitialize.push(partition)
@@ -695,6 +757,7 @@ const initPartition = (partition) => {
     return
   }
   initializedPartitions[partition] = true
+
   let fns = [initSession,
     userPrefs.init,
     hostContentSettings.init,
@@ -710,8 +773,25 @@ const initPartition = (partition) => {
   if (isSessionPartition(partition)) {
     options.parent_partition = ''
   }
+  if (isTorPartition) {
+    try {
+      setupTor()
+    } catch (e) {
+      appActions.onTorInitError(`Could not start Tor: ${e}`)
+    }
+    // TODO(riastradh): Duplicate logic in app/browser/tabs.js.
+    options.isolated_storage = true
+    options.parent_partition = ''
+    options.tor_proxy = getTorSocksProxy()
+    if (process.platform === 'win32') {
+      options.tor_path = path.join(getExtensionsPath('bin'), 'tor.exe')
+    } else {
+      options.tor_path = path.join(getExtensionsPath('bin'), 'tor')
+    }
+  }
 
   let ses = session.fromPartition(partition, options)
+
   fns.forEach((fn) => {
     fn(ses, partition, module.exports.isPrivate(partition))
   })
@@ -726,6 +806,83 @@ const initPartition = (partition) => {
   })
 }
 module.exports.initPartition = initPartition
+
+function setupTor () {
+  let torInitialized = null
+  const setTorErrorOnTimeout = (timeout, msg) => {
+    torInitialized = null
+    setTimeout(() => {
+      if (torInitialized === null) {
+        appActions.onTorInitError(msg)
+      }
+    }, timeout)
+  }
+  const onTorSuccess = () => {
+    torInitialized = true
+    appActions.onTorInitSuccess()
+  }
+  const onTorFail = (msg) => {
+    torInitialized = false
+    appActions.onTorInitError(msg)
+  }
+  // If Tor has not successfully initialized or thrown an error within 20s,
+  // assume it's broken.
+  setTorErrorOnTimeout(20000, 'Tor could not start.')
+  // Set up the tor daemon watcher.  (NOTE: We don't actually start
+  // the tor daemon here; that happens in C++ code.  But we do talk to
+  // its control socket.)
+  const torDaemon = new tor.TorDaemon()
+  torDaemon.setup((err) => {
+    if (err) {
+      onTorFail(`Tor failed to make directories: ${err}`)
+      return
+    }
+    torDaemon.on('exit', () => {
+      onTorFail('The Tor process has stopped.')
+    })
+    torDaemon.on('launch', (socksAddr) => {
+      const version = torDaemon.getVersion()
+      console.log(`tor: daemon listens on ${socksAddr}, version ${version}`)
+      if (version) {
+        appActions.setVersionInfo('Tor', version)
+      }
+      const bootstrapped = (err, progress) => {
+        if (err) {
+          onTorFail(`Tor bootstrap error: ${err}`)
+          return
+        }
+        appActions.onTorInitPercentage(progress)
+      }
+      const circuitEstablished = (err, ok) => {
+        if (ok) {
+          console.log('Tor ready!')
+          onTorSuccess()
+        } else {
+          if (err) {
+            // Wait for tor to re-initialize a circuit (ex: after a clock jump)
+            appActions.onTorInitPercentage('0')
+            setTorErrorOnTimeout(17000, `Tor not ready: ${err}`)
+          } else {
+            // Simply log the error but don't show error UI since Tor might
+            // finish opening a circuit.
+            console.log('tor still not ready')
+          }
+        }
+      }
+      torDaemon.onBootstrap(bootstrapped, (err) => {
+        if (err) {
+          onTorFail(`Tor error bootstrapping: ${err}`)
+        }
+        torDaemon.onCircuitEstablished(circuitEstablished, (err) => {
+          if (err) {
+            onTorFail(`Tor error opening a circuit: ${err}`)
+          }
+        })
+      })
+    })
+    torDaemon.start()
+  })
+}
 
 const filterableProtocols = ['http:', 'https:', 'ws:', 'wss:', 'magnet:', 'file:']
 
@@ -760,7 +917,11 @@ function shouldIgnoreUrl (details) {
 }
 
 module.exports.isPrivate = (partition) => {
-  return !partition.startsWith('persist:')
+  const ses = session.fromPartition(partition)
+  if (!ses) {
+    return false
+  }
+  return ses.isOffTheRecord()
 }
 
 module.exports.init = (state, action, store) => {

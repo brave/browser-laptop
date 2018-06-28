@@ -11,6 +11,7 @@ require('v8-compile-cache')
 
 const CrashHerald = require('./crash-herald')
 const telemetry = require('./telemetry')
+const {setUserPref} = require('../js/state/userPrefs')
 
 // set initial base line checkpoint
 telemetry.setCheckpoint('init')
@@ -157,6 +158,8 @@ const notifyCertError = (webContents, url, error, cert) => {
 }
 
 app.on('ready', () => {
+  setUserPref('safebrowsing.enabled', false)
+
   app.on('certificate-error', (e, webContents, url, error, cert, resourceType, strictEnforcement, expiredPreviousDecision, muonCb) => {
     let host = urlParse(url).host
     if (host && acceptCertDomains[host] === true) {

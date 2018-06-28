@@ -9,15 +9,16 @@ const { shouldDebugTabEvents } = require('../cmdLine')
 const tabState = require('../common/state/tabState')
 const {app, extensions, session, ipcMain} = require('electron')
 const {makeImmutable, makeJS} = require('../common/state/immutableUtil')
-const {getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
+const {getExtensionsPath, getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
 const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
-const {isSessionPartition} = require('../../js/state/frameStateUtil')
+const {isSessionPartition, isTor} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/lib/urlutil')
 const settingsStore = require('../../js/settings')
 const settings = require('../../js/constants/settings')
 const {getBaseUrl} = require('../../js/lib/appUrlUtil')
 const siteSettings = require('../../js/state/siteSettings')
 const messages = require('../../js/constants/messages')
+const webrtcConstants = require('../../js/constants/webrtcConstants')
 const debounce = require('../../js/lib/debounce')
 const aboutHistoryState = require('../common/state/aboutHistoryState')
 const aboutNewTabState = require('../common/state/aboutNewTabState')
@@ -38,6 +39,8 @@ const bookmarkOrderCache = require('../common/cache/bookmarkOrderCache')
 const ledgerState = require('../common/state/ledgerState')
 const {getWindow, notifyWindowWebContentsAdded} = require('./windows')
 const activeTabHistory = require('./activeTabHistory')
+const path = require('path')
+const {getTorSocksProxy} = require('../channel')
 
 let adBlockRegions
 let currentPartitionNumber = 0
@@ -101,6 +104,8 @@ const getPartition = (createProperties) => {
   let partition = session.defaultSession.partition
   if (createProperties.partition) {
     partition = createProperties.partition
+  } else if (createProperties.isTor) {
+    partition = appConfig.tor.partition
   } else if (createProperties.isPrivate) {
     partition = 'default'
   } else if (createProperties.isPartitioned) {
@@ -114,6 +119,7 @@ const getPartition = (createProperties) => {
 
 const needsPartitionAssigned = (createProperties) => {
   return !createProperties.openerTabId ||
+    createProperties.isTor ||
     createProperties.isPrivate ||
     createProperties.isPartitioned ||
     createProperties.partitionNumber ||
@@ -340,12 +346,14 @@ const updateAboutDetails = (tabId) => {
     const trackedBlockersCount = appState.getIn(['trackingProtection', 'count'], 0)
     const httpsUpgradedCount = appState.getIn(['httpsEverywhere', 'count'], 0)
     const adblockCount = appState.getIn(['adblock', 'count'], 0)
+    const torEnabled = isTor(getTabValue(tabId))
     sendAboutDetails(tabId, messages.NEWTAB_DATA_UPDATED, {
       showEmptyPage,
       showImages,
       trackedBlockersCount,
       adblockCount,
       httpsUpgradedCount,
+      torEnabled,
       newTabDetail: newTabDetail.toJS()
     })
   } else if (location === 'about:autofill') {
@@ -511,6 +519,13 @@ const api = {
         index = newTabValue.get('index')
       }
 
+      const ses = session.fromPartition(newTab.session.partition)
+      let isPrivate
+      if (ses) {
+        isPrivate = ses.isOffTheRecord()
+      }
+      const isTor = newTab.session.partition === appConfig.tor.partition
+
       const frameOpts = {
         location,
         displayURL,
@@ -519,6 +534,8 @@ const api = {
         active: !!newTabValue.get('active'),
         guestInstanceId: newTab.guestInstanceId,
         isPinned: !!newTabValue.get('pinned'),
+        isPrivate,
+        isTor,
         openerTabId,
         disposition,
         index,
@@ -1048,6 +1065,17 @@ const api = {
         if (isSessionPartition(createProperties.partition)) {
           createProperties.parent_partition = ''
         }
+        if (createProperties.isTor) {
+          // TODO(riastradh): Duplicate logic in app/filtering.js.
+          createProperties.isolated_storage = true
+          createProperties.parent_partition = ''
+          createProperties.tor_proxy = getTorSocksProxy()
+          if (process.platform === 'win32') {
+            createProperties.tor_path = path.join(getExtensionsPath('bin'), 'tor.exe')
+          } else {
+            createProperties.tor_path = path.join(getExtensionsPath('bin'), 'tor')
+          }
+        }
       }
 
       // Tabs are allowed to be initially discarded (unloaded) if they are regular tabs
@@ -1068,6 +1096,12 @@ const api = {
           console.log('Creating tab with properties: ', createProperties)
         }
         extensions.createTab(createProperties, (tab) => {
+          if (tab) {
+            // Initialize WebRTC IP handling to the safest default. This will
+            // be set based on shield settings in reducers/tabReducer.js once
+            // navigation starts.
+            tab.setWebRTCIPHandlingPolicy(webrtcConstants.disableNonProxiedUdp)
+          }
           cb && cb(tab)
         })
       }
