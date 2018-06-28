@@ -11,6 +11,7 @@ const {getOrigin} = require('./lib/urlutil')
 const locale = require('../app/locale')
 const messages = require('./constants/messages')
 const settings = require('./constants/settings')
+const appConfig = require('./constants/appConfig')
 const {getSetting} = require('./settings')
 const {memoize} = require('underscore')
 const tabState = require('../app/common/state/tabState')
@@ -161,6 +162,9 @@ const flashMenuTemplateInit = (state, tabId) => {
 module.exports.onFlashContextMenu = (state, tabId) => {
   const tab = webContents.fromTabID(tabId)
   if (!tab) {
+    return
+  }
+  if (tab.session && tab.session.partition === appConfig.tor.partition) {
     return
   }
 

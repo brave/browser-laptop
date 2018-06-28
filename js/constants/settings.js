@@ -23,6 +23,7 @@ const settings = {
   // Search tab
   DEFAULT_SEARCH_ENGINE: 'search.default-search-engine',
   USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE: 'search.use-alternate-private-search-engine',
+  USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE_TOR: 'search.use-alternate-private-search-engine-tor',
   OFFER_SEARCH_SUGGESTIONS: 'search.offer-search-suggestions',
   // Tabs tab
   SWITCH_TO_NEW_TABS: 'tabs.switch-to-new-tabs',

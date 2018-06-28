@@ -81,3 +81,6 @@ app/extensions/brave/content/scripts/sync.js
 
 # script used for signing for widevine
 signature_generator.py
+
+# binaries
+app/extensions/bin

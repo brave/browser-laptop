@@ -2,9 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const appConfig = require('../constants/appConfig')
+
 let registeredCallbacks = []
 let registeredSessions = {}
 let registeredPrivateSessions = {}
+const blockContentSetting = { setting: 'block', primaryPattern: '*' }
 
 // TODO(bridiver) move this to electron so we can call a simpler api
 const setUserPrefType = (ses, path, value) => {
@@ -54,8 +57,17 @@ module.exports.setUserPref = (path, value, incognito = false) => {
 
   const partitions = incognito ? registeredPrivateSessions : registeredSessions
   for (let partition in partitions) {
+    let newValue = value
+    if (partition === appConfig.tor.partition && path === 'content_settings' && value) {
+      newValue = Object.assign({}, value, {
+        flashEnabled: [blockContentSetting],
+        flashAllowed: [blockContentSetting],
+        torEnabled: [blockContentSetting], // currently only used for webrtc blocking
+        plugins: [blockContentSetting]
+      })
+    }
     const ses = partitions[partition]
-    setUserPrefType(ses, path, value)
+    setUserPrefType(ses, path, newValue)
     ses.webRequest.handleBehaviorChanged()
   }
 }

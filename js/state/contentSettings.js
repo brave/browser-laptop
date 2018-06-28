@@ -114,6 +114,10 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
       setting: 'block',
       primaryPattern: '*'
     }],
+    torEnabled: [{ // set to 'block' when in a Tor tab
+      setting: 'allow',
+      primaryPattern: '*'
+    }],
     dappDetection: [{
       setting: getSetting(settings.METAMASK_PROMPT_DISMISSED) || getSetting(settings.METAMASK_ENABLED) ? 'block' : 'allow',
       primaryPattern: '*'

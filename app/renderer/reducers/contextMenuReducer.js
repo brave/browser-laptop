@@ -109,7 +109,7 @@ const onTabPageMenu = function (state, action) {
   tabPageMenu.popup(getCurrentWindow())
 }
 
-const openInNewTabMenuItem = (url, isPrivate, partitionNumber, openerTabId) => {
+const openInNewTabMenuItem = (url, partitionNumber, openerTabId) => {
   const active = getSetting(settings.SWITCH_TO_NEW_TABS) === true
   if (Array.isArray(url) && Array.isArray(partitionNumber)) {
     return {
@@ -118,7 +118,6 @@ const openInNewTabMenuItem = (url, isPrivate, partitionNumber, openerTabId) => {
         for (let i = 0; i < url.length; ++i) {
           appActions.createTabRequested({
             url: url[i],
-            isPrivate,
             partitionNumber: partitionNumber[i],
             openerTabId,
             active
@@ -132,7 +131,6 @@ const openInNewTabMenuItem = (url, isPrivate, partitionNumber, openerTabId) => {
       click: () => {
         appActions.createTabRequested({
           url,
-          isPrivate,
           partitionNumber,
           openerTabId,
           active
@@ -142,16 +140,17 @@ const openInNewTabMenuItem = (url, isPrivate, partitionNumber, openerTabId) => {
   }
 }
 
-const openInNewPrivateTabMenuItem = (url, openerTabId) => {
+const openInNewPrivateTabMenuItem = (url, openerTabId, isTor) => {
   const active = getSetting(settings.SWITCH_TO_NEW_TABS) === true
   if (Array.isArray(url)) {
     return {
-      label: locale.translation('openInNewPrivateTabs'),
+      label: locale.translation(isTor ? 'openInNewTorTabs' : 'openInNewPrivateTabs'),
       click: () => {
         for (let i = 0; i < url.length; ++i) {
           appActions.createTabRequested({
             url: url[i],
             isPrivate: true,
+            isTor,
             openerTabId,
             active
           })
@@ -160,11 +159,12 @@ const openInNewPrivateTabMenuItem = (url, openerTabId) => {
     }
   } else {
     return {
-      label: locale.translation('openInNewPrivateTab'),
+      label: locale.translation(isTor ? 'openInNewTorTab' : 'openInNewPrivateTab'),
       click: () => {
         appActions.createTabRequested({
           url,
           isPrivate: true,
+          isTor,
           openerTabId,
           active
         })
@@ -204,11 +204,11 @@ const openInNewSessionTabMenuItem = (url, openerTabId) => {
   }
 }
 
-const openInNewWindowMenuItem = (location, isPrivate, partitionNumber) => {
+const openInNewWindowMenuItem = (location, partitionNumber) => {
   return {
     label: locale.translation('openInNewWindow'),
     click: () => {
-      appActions.newWindow({ location, isPrivate, partitionNumber })
+      appActions.newWindow({ location, partitionNumber })
     }
   }
 }
@@ -314,9 +314,10 @@ const siteDetailTemplateInit = (state, siteKey, type) => {
     const location = siteDetail.get('location')
 
     template.push(
-      openInNewTabMenuItem(location, undefined, siteDetail.get('partitionNumber')),
+      openInNewTabMenuItem(location, siteDetail.get('partitionNumber')),
       openInNewPrivateTabMenuItem(location),
-      openInNewWindowMenuItem(location, undefined, siteDetail.get('partitionNumber')),
+      openInNewPrivateTabMenuItem(location, undefined, true),
+      openInNewWindowMenuItem(location, siteDetail.get('partitionNumber')),
       openInNewSessionTabMenuItem(location),
       copyAddressMenuItem('copyLinkAddress', location),
       CommonMenu.separatorMenuItem
