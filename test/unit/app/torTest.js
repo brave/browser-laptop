@@ -284,5 +284,34 @@ describe('tor unit tests', function () {
         })
       })
     })
+
+    it('notices tor restart', function (callback) {
+      torDaemon.setup(() => {
+        // Start watching.
+        torDaemon.start()
+        // Spawn a process.
+        torProcess = spawnTor(torDaemon)
+        // Wait for it to launch once.
+        const timeoutLaunch = setTimeout(() => {
+          assert.fail('tor daemon failed to start after 2sec')
+        }, 2000)
+        torDaemon.once('launch', (socksAddr) => {
+          clearTimeout(timeoutLaunch)
+          // Kill the _process_ once.
+          killTor(torDaemon, torProcess, () => {
+            // Spawn a new process.
+            torProcess = spawnTor(torDaemon)
+            // Wait for it to launch a second time.
+            const timeoutRelaunch = setTimeout(() => {
+              assert.fail('tor daemon failed to restart after 2sec')
+            }, 2000)
+            torDaemon.once('launch', (socksAddr) => {
+              clearTimeout(timeoutRelaunch)
+              killTor(torDaemon, torProcess, callback)
+            })
+          })
+        })
+      })
+    })
   })
 })
