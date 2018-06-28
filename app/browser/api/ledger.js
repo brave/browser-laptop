@@ -2234,7 +2234,10 @@ const onCallback = (state, result, delayTime) => {
   // persist the new ledger state
   module.exports.muonWriter(statePath, regularResults)
 
-  run(state, delayTime)
+  // if transactions are present exit the contribution test
+  if (!ledgerState.getInfoProp(state, 'transactions')) {
+    run(state, delayTime)
+  }
 
   return state
 }
