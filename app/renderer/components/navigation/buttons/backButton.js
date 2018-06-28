@@ -57,7 +57,8 @@ class BackButton extends React.Component {
     const rect = target.parentNode.getBoundingClientRect()
     appActions.onGoBackLong(this.props.activeTabId, {
       left: rect.left,
-      bottom: rect.bottom
+      bottom: rect.bottom,
+      type: false
     })
   }
 

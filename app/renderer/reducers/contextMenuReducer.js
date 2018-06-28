@@ -542,51 +542,59 @@ const onLongBackHistory = (state, action) => {
   action = validateAction(action)
   state = validateState(state)
   const history = action.get('history')
-
   const menuTemplate = []
 
-  if (action.get('tabId') > -1 && history && history.get('entries').size > 0) {
-    const stopIndex = Math.max(((history.get('currentIndex') - config.navigationBar.maxHistorySites) - 1), -1)
-    for (let index = (history.get('currentIndex') - 1); index > stopIndex; index--) {
-      const entry = history.getIn(['entries', index])
-      const url = entry.get('url')
+  if(action.get('type') === 'onBackLongPressMenuWasOpen') {
+    if (action.get('tabId') > -1 && history && history.get('entries').size > 0) {
+      const stopIndex = Math.max(((history.get('currentIndex') - config.navigationBar.maxHistorySites) - 1), -1)
+      for (let index = (history.get('currentIndex') - 1); index > stopIndex; index--) {
+        const entry = history.getIn(['entries', index])
+        const url = entry.get('url')
 
-      menuTemplate.push({
-        label: entry.get('display'),
-        icon: entry.get('icon'),
-        click: function (e) {
-          if (eventUtil.isForSecondaryAction(e)) {
-            appActions.createTabRequested({
-              url,
-              partitionNumber: action.get('partitionNumber'),
-              active: !!e.shiftKey
-            })
-          } else {
-            appActions.onGoToIndex(action.get('tabId'), index)
+        menuTemplate.push({
+          label: entry.get('display'),
+          icon: entry.get('icon'),
+          click: function (e) {
+            if (eventUtil.isForSecondaryAction(e)) {
+              appActions.createTabRequested({
+                url,
+                partitionNumber: action.get('partitionNumber'),
+                active: !!e.shiftKey
+              })
+            } else {
+              appActions.onGoToIndex(action.get('tabId'), index)
+              windowActions.setContextMenuDetail()
+            }
           }
-        }
-      })
+        })
+      }
+      // Always display "Show History" link
+      menuTemplate.push(
+        CommonMenu.separatorMenuItem,
+        {
+          label: locale.translation('showAllHistory'),
+          click: function () {
+            appActions.createTabRequested({
+              url: 'about:history'
+            })
+            windowActions.setContextMenuDetail()
+          }
+        })
+
+        state = contextMenuState.setContextMenu(state, makeImmutable({
+          left: action.get('left'),
+          top: action.get('top'),
+          template: menuTemplate,
+          type: 'onBackLongPressMenuWasOpen'
+        }))
+      }
+    } else {
+      //attempt to remove menuTemplate completely
+      state = contextMenuState.setContextMenu(state, makeImmutable({
+        template: menuTemplate,
+        type: false
+      }))
     }
-
-    // Always display "Show History" link
-    menuTemplate.push(
-      CommonMenu.separatorMenuItem,
-      {
-        label: locale.translation('showAllHistory'),
-        click: function () {
-          appActions.createTabRequested({
-            url: 'about:history'
-          })
-          windowActions.setContextMenuDetail()
-        }
-      })
-
-    state = contextMenuState.setContextMenu(state, makeImmutable({
-      left: action.get('left'),
-      top: action.get('top'),
-      template: menuTemplate
-    }))
-  }
 
   return state
 }
@@ -595,49 +603,57 @@ const onLongForwardHistory = (state, action) => {
   action = validateAction(action)
   state = validateState(state)
   const history = action.get('history')
-
   const menuTemplate = []
 
-  if (action.get('tabId') > -1 && history && history.get('entries').size > 0) {
-    const stopIndex = Math.min(((history.get('currentIndex') + config.navigationBar.maxHistorySites) + 1), history.get('entries').size)
-    for (let index = (history.get('currentIndex') + 1); index < stopIndex; index++) {
-      const entry = history.getIn(['entries', index])
-      const url = entry.get('url')
+  if(action.get('type') === 'onBackLongPressMenuWasOpen') {
+    if (action.get('tabId') > -1 && history && history.get('entries').size > 0) {
+      const stopIndex = Math.min(((history.get('currentIndex') + config.navigationBar.maxHistorySites) + 1), history.get('entries').size)
+      for (let index = (history.get('currentIndex') + 1); index < stopIndex; index++) {
+        const entry = history.getIn(['entries', index])
+        const url = entry.get('url')
 
-      menuTemplate.push({
-        label: entry.get('display'),
-        icon: entry.get('icon'),
-        click: function (e) {
-          if (eventUtil.isForSecondaryAction(e)) {
-            appActions.createTabRequested({
-              url,
-              partitionNumber: action.get('partitionNumber'),
-              active: !!e.shiftKey
-            })
-          } else {
-            appActions.onGoToIndex(action.get('tabId'), index)
+        menuTemplate.push({
+          label: entry.get('display'),
+          icon: entry.get('icon'),
+          click: function (e) {
+            if (eventUtil.isForSecondaryAction(e)) {
+              appActions.createTabRequested({
+                url,
+                partitionNumber: action.get('partitionNumber'),
+                active: !!e.shiftKey
+              })
+            } else {
+              appActions.onGoToIndex(action.get('tabId'), index)
+            }
           }
-        }
-      })
+        })
+      }
+
+      // Always display "Show History" link
+      menuTemplate.push(
+        CommonMenu.separatorMenuItem,
+        {
+          label: locale.translation('showAllHistory'),
+          click: function () {
+            appActions.createTabRequested({
+              url: 'about:history'
+            })
+            windowActions.setContextMenuDetail()
+          }
+        })
+
+      state = contextMenuState.setContextMenu(state, makeImmutable({
+        left: action.get('left'),
+        top: action.get('top'),
+        template: menuTemplate,
+        type: 'onBackLongPressMenuWasOpen'
+      }))
     }
-
-    // Always display "Show History" link
-    menuTemplate.push(
-      CommonMenu.separatorMenuItem,
-      {
-        label: locale.translation('showAllHistory'),
-        click: function () {
-          appActions.createTabRequested({
-            url: 'about:history'
-          })
-          windowActions.setContextMenuDetail()
-        }
-      })
-
+  } else {
+    //attempt to remove menuTemplate completely
     state = contextMenuState.setContextMenu(state, makeImmutable({
-      left: action.get('left'),
-      top: action.get('top'),
-      template: menuTemplate
+      template: menuTemplate,
+      type: false
     }))
   }
 
