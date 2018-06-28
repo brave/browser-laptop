@@ -939,6 +939,8 @@ class TorControl extends EventEmitter {
     // If it's an asynchronous reply (status 6yz), pass it on
     // asynchronously.
     if (status[0] === '6') {
+      this.emit('asyncReply', status, reply)
+
       assert(this._async_keyword || this._async_keyword === null)
       assert((this._async_keyword === null) === (this._async_extra === null))
       assert((this._async_keyword === null) === (this._async_skip === null))
@@ -1113,6 +1115,7 @@ class TorControl extends EventEmitter {
    * @param {cmdCallback} callback
    */
   cmd (cmdline, perline, callback) {
+    this.emit('cmd', cmdline)
     assert(!this._destroyed)
     this._cmdq.push([perline, callback])
     this._writable.cork()
