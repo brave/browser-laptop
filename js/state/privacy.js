@@ -15,7 +15,10 @@ const getPrivacySettings = () => {
   return { 'autofill.enabled': getSetting(settings.AUTOFILL_ENABLED),
     'profile.password_manager_enabled': passwordManagerEnabled,
     'credentials_enable_service': passwordManagerEnabled,
-    'credentials_enable_autosignin': false
+    'credentials_enable_autosignin': false,
+    // required explicitly disable it because it is true by default
+    // https://chromium.googlesource.com/chromium/src/+/dac2bad4efc572810f6b39598705c01df7c64ea6/components/safe_browsing/common/safe_browsing_prefs.cc#283
+    'safebrowsing.enabled': false
   }
 }
 

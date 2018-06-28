@@ -211,12 +211,12 @@ function openFramesInWindow (win, frames, activeFrameKey) {
     let frameIndex = -1
     for (const frame of frames) {
       frameIndex++
+      const tab = webContentsCache.getWebContents(frame.tabId)
       if (frame.tabId != null && frame.guestInstanceId != null) {
         if (shouldDebugTabEvents) {
           console.log('notifyWindowWebContentsAdded: on window create with existing tab', win.id)
         }
         api.notifyWindowWebContentsAdded(win.id, frame)
-        const tab = webContentsCache.getWebContents(frame.tabId)
         if (tab && !tab.isDestroyed()) {
           tab.moveTo(frameIndex, win.id)
         }
@@ -226,6 +226,7 @@ function openFramesInWindow (win, frames, activeFrameKey) {
           url: frame.location || frame.src || frame.provisionalLocation || frame.url,
           partitionNumber: frame.partitionNumber,
           isPrivate: frame.isPrivate,
+          isTor: frame.isTor || (tab && tab.session && tab.session.partition === appConfig.tor.partition),
           active: activeFrameKey ? frame.key === activeFrameKey : true,
           discarded: frame.unloaded,
           title: frame.title,

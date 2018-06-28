@@ -1,6 +1,6 @@
 {
   "name": "brave",
-  "version": "0.23.0",
+  "version": "0.23.19",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "config": {
@@ -26,7 +26,8 @@
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "lint": "standard --verbose | snazzy",
     "lint-standard": "standard",
-    "postinstall": "npm run download-sync-client && webpack",
+    "package-tor": "node ./tools/package_tor.js",
+    "postinstall": "npm run package-tor && npm run download-sync-client && webpack",
     "pre-push-tests": "if [ -z $NO_PUSH_TESTS ]; then npm run unittest; fi",
     "start-log": "node ./tools/start.js --user-data-dir-name=brave-development --enable-logging=stderr --v=1 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",
     "start": "node ./tools/start.js --user-data-dir-name=brave-development --enable-logging --v=0 --enable-extension-activity-logging --enable-sandbox-logging --enable-dcheck",

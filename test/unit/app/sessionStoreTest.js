@@ -654,6 +654,7 @@ describe('sessionStore unit tests', function () {
           .set('createdFaviconDirectory', true)
           .set('notifications', Immutable.List())
           .set('temporarySiteSettings', Immutable.Map())
+          .set('tor', Immutable.Map())
 
         assert(resetPublishersSpy.notCalled)
         assert.deepEqual(result.toJS(), expectedResult.toJS())
@@ -681,6 +682,7 @@ describe('sessionStore unit tests', function () {
           .set('createdFaviconDirectory', true)
           .set('notifications', Immutable.List())
           .set('temporarySiteSettings', Immutable.Map())
+          .set('tor', Immutable.Map())
 
         assert(resetPublishersSpy.notCalled)
         assert.deepEqual(result.toJS(), expectedResult.toJS())

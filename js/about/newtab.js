@@ -48,6 +48,7 @@ class NewTabPage extends React.Component {
       updatedStamp: undefined,
       showEmptyPage: true,
       showImages: false,
+      torEnabled: false,
       backgroundImage: undefined
     }
 
@@ -68,6 +69,7 @@ class NewTabPage extends React.Component {
         newTabData: data,
         updatedStamp,
         showEmptyPage,
+        torEnabled: data.get('torEnabled'),
         showImages: !!data.get('showImages') && !showEmptyPage,
         backgroundImage: showImages
           ? this.state.backgroundImage || this.randomBackgroundImage
@@ -261,8 +263,9 @@ class NewTabPage extends React.Component {
       return <div className='empty' />
     }
 
+    // TODO: use this.props.isIncognito when muon supports it for tor tabs
     if (this.props.isIncognito) {
-      return <NewPrivateTab newTabData={this.state.newTabData} />
+      return <NewPrivateTab newTabData={this.state.newTabData} torEnabled={this.state.torEnabled} />
     }
 
     // don't render until object is found

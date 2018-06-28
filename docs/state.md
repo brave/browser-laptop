@@ -33,7 +33,7 @@ AppStore
       ignoredTopSites: [string], // list of ignored sites
       pinnedTopSites: [string], // list of pinned sites to be used on gridLayout. Defaults to 1 Brave-related site; see data/newTabData.js => pinnedTopSites
       sites: [string], // list of sites to be used on gridLayout. Defaults to 6 Brave-related sites; see data/newTabData.js => topSites
-      updatedStamp: number // timestamp for when the data was last updated
+      updatedStamp: number, // timestamp for when the data was last updated
     },
     preferences: {
       backupNotifyCount: number, // number of times user has been reminded to backup wallet
@@ -606,6 +606,10 @@ AppStore
   temporarySiteSettings: {
     // Same as siteSettings but never gets written to disk
     // XXX: This was intended for Private Browsing but is currently unused.
+  },
+  tor: {
+    percentInitialized: number, // percentage initialized
+    initializationError: string|boolean, // error message. false means successfully initialized.
   },
   updates: {
     lastCheckTimestamp: boolean,
