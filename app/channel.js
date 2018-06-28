@@ -67,7 +67,6 @@ exports.getTorSocksProxy = () => {
   let portno
   switch (channel) {
     case 'dev':
-    case '':
     default:
       portno = 9250
       break
@@ -79,6 +78,9 @@ exports.getTorSocksProxy = () => {
       break
     case 'developer':
       portno = 9280
+      break
+    case '':
+      portno = 9290
       break
   }
   return `socks5://127.0.0.1:${portno}`
