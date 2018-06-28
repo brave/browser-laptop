@@ -1219,7 +1219,7 @@ class TorControl extends EventEmitter {
     if (!(event in this._tor_events)) {
       return process.nextTick(() => callback(null))
     }
-    if (this._tor_events[event]-- === 0) {
+    if (--this._tor_events[event] === 0) {
       delete this._tor_events[event]
       const eventList = Object.keys(this._tor_events).sort().join(' ')
       this.cmd1(`SETEVENTS ${eventList}`, (err, status, reply) => {
@@ -1233,6 +1233,8 @@ class TorControl extends EventEmitter {
         }
         return callback(null)
       })
+    } else {
+      return callback(null)
     }
   }
 
