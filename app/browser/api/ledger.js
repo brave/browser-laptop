@@ -442,9 +442,13 @@ const pruneSynopsis = (state) => {
     return state
   }
 
-  appActions.onPruneSynopsis(json.publishers)
+  module.exports.onPruneSynopsisAction(state, json.publishers)
 
   return ledgerState.saveSynopsis(state, json.publishers)
+}
+
+const onPruneSynopsisAction = (state, publishers) => {
+  ledgerState.saveSynopsis(state, publishers)
 }
 
 // TODO we should convert this function and all related ones into immutable
@@ -3470,6 +3474,7 @@ const getMethods = () => {
     onLedgerRunCallback,
     onTimeUntilReconcileAction,
     doClientReconcile,
+    onPruneSynopsisAction,
     getClient: () => {
       return client
     },
