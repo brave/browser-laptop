@@ -58,6 +58,8 @@ const siteHacks = require('../../siteHacks')
 const UrlUtil = require('../../../js/lib/urlutil')
 const promotionStatuses = require('../../common/constants/promotionStatuses')
 
+let contributionComplete = false
+
 // Caching
 let locationDefault = 'NOOP'
 let currentUrl = locationDefault
@@ -1807,6 +1809,7 @@ const getStateInfo = (state, parsedData) => {
   })
 
   state = observeTransactions(state, newTransactions)
+  contributionComplete = true
   return ledgerState.setInfoProp(state, 'transactions', newTransactions)
 }
 
@@ -2146,7 +2149,7 @@ const callback = (err, result, delayTime) => {
 }
 
 const onLedgerCallback = (result, delayTime) => {
-  state = onCallback(state, result, delayTime)
+  onCallback(result, delayTime)
 }
 
 const onCallback = (state, result, delayTime) => {
@@ -2234,12 +2237,21 @@ const onCallback = (state, result, delayTime) => {
   // persist the new ledger state
   module.exports.muonWriter(statePath, regularResults)
 
-  // if transactions are present exit the contribution test
-  if (!ledgerState.getInfoProp(state, 'transactions')) {
-    run(state, delayTime)
+  // exit the contribution test
+  if (contributionComplete) {
+    return state
   }
 
+  run(state, delayTime)
   return state
+}
+
+const setContributionComplete = (complete) => {
+  contributionComplete = complete
+}
+
+const getContributionComplete = () => {
+  return contributionComplete
 }
 
 const onReferralCodeRead = (code) => {
@@ -3466,6 +3478,8 @@ const getMethods = () => {
     setTestMinimums,
     getPublisherFromPropsAction,
     getVisitDuration,
+    getContributionComplete,
+    setContributionComplete,
     resetCurrentUrl: () => {
       currentUrl = locationDefault
     }
