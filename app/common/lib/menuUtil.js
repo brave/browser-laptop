@@ -23,6 +23,7 @@ const locale = require('../../locale')
 const {separatorMenuItem} = require('../../common/commonMenu')
 const bookmarkUtil = require('./bookmarkUtil')
 const bookmarkFoldersUtil = require('./bookmarkFoldersUtil')
+const {isSourceAboutUrl} = require('../../../js/lib/appUrlUtil')
 
 /**
  * Get the an electron MenuItem object from a Menu based on its label
@@ -268,6 +269,11 @@ module.exports.updateRecentlyClosedMenuItems = (appMenu, closedFrames) => {
 
   let visibleItems = 0
   closedFrames.reverse().forEach((frame, url) => {
+    // About pages should not be displayed in recently closed items
+    const isAboutUrl = isSourceAboutUrl(frame.get('location'))
+    if (isAboutUrl) {
+      return
+    }
     const menuIndex = historyMenuIndicesByOrder[url]
     if (visibleItems >= maxMenuItems) {
       if (menuIndex) {

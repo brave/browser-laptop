@@ -293,9 +293,13 @@ describe('menuUtil tests', function () {
     const url1 = 'https://brave01.com'
     const url2 = 'https://brave02.com'
     const url3 = 'https://brave03.com'
+    const url4 = 'about:extensions'
+    const url5 = 'about:about'
     const frame1 = new Immutable.Map({title: 'site1', location: url1})
     const frame2 = new Immutable.Map({title: 'site2', location: url2})
     const frame3 = new Immutable.Map({title: 'site3', location: url3})
+    const frame4 = new Immutable.Map({title: 'site4', location: url4})
+    const frame5 = new Immutable.Map({title: 'site5', location: url5})
     const frameMatcher = (frame) => {
       return (menuItem) => {
         return menuItem.id === menuUtil.getRecentlyClosedMenuId(frame.get('location'))
@@ -343,6 +347,36 @@ describe('menuUtil tests', function () {
         submenu: {
           insert: sinon.spy(),
           items: [
+            {
+              id: menuUtil.getRecentlyClosedMenuId(frame1.get('location')),
+              label: 'site1',
+              visible: true
+            }
+          ]
+        }
+      }
+      menuUtil.updateRecentlyClosedMenuItems({}, closedFrames)
+      assert(this.historyMenu.submenu.insert.notCalled)
+    })
+
+    it('does not insert about pages', function () {
+      let closedFrames = new Immutable.OrderedMap()
+      closedFrames = closedFrames.set(frame4.get('location'), frame4)
+      closedFrames = closedFrames.set(frame5.get('location'), frame5)
+      this.historyMenu = {
+        submenu: {
+          insert: sinon.spy(),
+          items: [
+            {
+              id: menuUtil.getRecentlyClosedMenuId(frame3.get('location')),
+              label: 'site3',
+              visible: true
+            },
+            {
+              id: menuUtil.getRecentlyClosedMenuId(frame2.get('location')),
+              label: 'site2',
+              visible: true
+            },
             {
               id: menuUtil.getRecentlyClosedMenuId(frame1.get('location')),
               label: 'site1',
