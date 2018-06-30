@@ -578,12 +578,14 @@ class UrlBar extends React.Component {
 
   render () {
     const urlbarIconContainer = this.props.evCert
-    ? (<div onClick={this.onUrlBarIconContainerClick} className='urlbarIconContainer'>
-      <UrlBarIcon
-        titleMode={this.props.titleMode}
-      />
-      {this.showEvCert}
-    </div>)
+    ? (<div onClick={this.onUrlBarIconContainerClick}>
+        <div className='urlbarIconContainer'>
+          <UrlBarIcon
+            titleMode={this.props.titleMode}
+          />
+          {this.showEvCert}
+        </div>
+      </div>)
     : (<div onClick={this.onUrlBarIconContainerClick} className='urlbarIconContainer'>
       <UrlBarIcon
         titleMode={this.props.titleMode}
