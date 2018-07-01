@@ -1325,13 +1325,11 @@ const checkPromotions = () => {
   }, random.randomInt({min: 20 * ledgerUtil.milliseconds.hour, max: 24 * ledgerUtil.milliseconds.hour}))
 }
 
-const enable = (state, paymentsEnabled) => {
-  if (paymentsEnabled) {
-    if (!getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
-      appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
-    }
-  }
+const runPromotionCheck = () => {
+  appActions.runPromotionCheck()
+}
 
+const onRunPromotionCheck = (state, paymentsEnabled) => {
   if (paymentsEnabled === getSetting(settings.PAYMENTS_ENABLED)) {
     // on start
     if (togglePromotionTimeoutId) {
@@ -1340,7 +1338,10 @@ const enable = (state, paymentsEnabled) => {
 
     togglePromotionTimeoutId = setTimeout(() => {
       checkPromotions()
-    }, random.randomInt({min: 10 * ledgerUtil.milliseconds.second, max: 15 * ledgerUtil.milliseconds.second}))
+    }, process.env.LEDGER_ENVIRONMENT === 'staging'
+      ? random.randomInt({min: 10 * ledgerUtil.milliseconds.second, max: 15 * ledgerUtil.milliseconds.second})
+      : random.randomInt({min: 45 * ledgerUtil.milliseconds.second, max: 60 * ledgerUtil.milliseconds.second})
+    )
   } else if (paymentsEnabled) {
     // toggle on
     if (togglePromotionTimeoutId) {
@@ -1357,6 +1358,15 @@ const enable = (state, paymentsEnabled) => {
   } else {
     // toggle off
     state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
+  }
+  return state
+}
+
+const enable = (state, paymentsEnabled) => {
+  if (paymentsEnabled) {
+    if (!getSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED)) {
+      appActions.changeSetting(settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED, true)
+    }
   }
 
   if (synopsis) {
@@ -3343,7 +3353,9 @@ const getMethods = () => {
     getPaymentInfo,
     synopsisNormalizer,
     cacheRuleSet,
-    disablePayments
+    disablePayments,
+    runPromotionCheck,
+    onRunPromotionCheck
   }
 
   let privateMethods = {}

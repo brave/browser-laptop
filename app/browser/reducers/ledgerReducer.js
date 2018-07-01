@@ -12,6 +12,7 @@ const windowConstants = require('../../../js/constants/windowConstants')
 const settings = require('../../../js/constants/settings')
 const tabActionConstants = require('../../common/constants/tabAction')
 const ledgerStatuses = require('../../common/constants/ledgerStatuses')
+const messages = require('../../../js/constants/messages')
 
 // State
 const ledgerState = require('../../common/state/ledgerState')
@@ -576,8 +577,17 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.pageDataChanged(state, viewData, true)
         break
       }
+    case appConstants.APP_RUN_PROMOTION_CHECK:
+      {
+        state = ledgerApi.onRunPromotionCheck(state, getSetting(settings.PAYMENTS_ENABLED))
+        break
+      }
   }
   return state
 }
+
+process.on(messages.APP_INITIALIZED, () => {
+  ledgerApi.runPromotionCheck()
+})
 
 module.exports = ledgerReducer

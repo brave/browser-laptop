@@ -67,7 +67,8 @@ describe('ledgerReducer unit tests', function () {
       clearPaymentHistory: () => {},
       deleteWallet: () => {},
       addNewLocation: dummyModifyState,
-      synopsisNormalizer: dummyModifyState
+      synopsisNormalizer: dummyModifyState,
+      onRunPromotionCheck: () => {}
     }
     fakeLedgerState = {
       resetPublishers: dummyModifyState,
@@ -1123,6 +1124,26 @@ describe('ledgerReducer unit tests', function () {
         actionType: appConstants.APP_ON_WALLET_DELETE
       }))
       assert(deleteWalletSpy.calledOnce)
+    })
+  })
+
+  describe('APP_RUN_PROMOTION_CHECK', function () {
+    let onRunPromotionCheckSpy
+    before(function () {
+      onRunPromotionCheckSpy = sinon.spy(fakeLedgerApi, 'onRunPromotionCheck')
+      returnedState = ledgerReducer(appState, Immutable.fromJS({
+        actionType: appConstants.APP_RUN_PROMOTION_CHECK,
+        stateResult: 'state-result-goes-here'
+      }))
+    })
+    after(function () {
+      onRunPromotionCheckSpy.restore()
+    })
+    it('calls ledgerApi.onRunPromotionCheck', function () {
+      assert(onRunPromotionCheckSpy.calledOnce)
+    })
+    it('returns a modified state', function () {
+      assert.notDeepEqual(returnedState, appState)
     })
   })
 })
