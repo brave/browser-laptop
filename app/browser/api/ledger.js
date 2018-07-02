@@ -1813,7 +1813,7 @@ const getStateInfo = (state, parsedData) => {
   })
 
   state = observeTransactions(state, newTransactions)
-  if (process.env.NODE_ENV == 'test') {
+  if (process.env.NODE_ENV === 'test') {
     module.exports.invokeBreakRun()
   }
   return ledgerState.setInfoProp(state, 'transactions', newTransactions)
@@ -2735,7 +2735,7 @@ const run = (state, delayTime) => {
     }
   }
 
-  if (process.env.NODE_ENV == 'test' && delayTime > 190800000) { // if contribution was advanced forward 
+  if (process.env.NODE_ENV === 'test' && delayTime > 190800000) { // if contribution was advanced forward 
     module.exports.invokeBreakRun()
   }
   if (delayTime > 0) {
