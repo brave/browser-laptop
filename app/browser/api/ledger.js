@@ -1813,7 +1813,7 @@ const getStateInfo = (state, parsedData) => {
   })
 
   state = observeTransactions(state, newTransactions)
-  breakRun = true
+  module.exports.invokeBreakRun()
   return ledgerState.setInfoProp(state, 'transactions', newTransactions)
 }
 
@@ -2256,6 +2256,10 @@ const setBreakRun = (complete) => {
 
 const getBreakRun = () => {
   return breakRun
+}
+
+const invokeBreakRun = () => {
+  breakRun = false // for ledger-spec-tests tests. Set to true in stub. Has no effect when run from browser context.
 }
 
 const onReferralCodeRead = (code) => {
@@ -3475,6 +3479,7 @@ const getMethods = () => {
     onTimeUntilReconcileAction,
     doClientReconcile,
     onPruneSynopsisAction,
+    invokeBreakRun,
     getClient: () => {
       return client
     },
