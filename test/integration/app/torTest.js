@@ -12,7 +12,7 @@ const rimraf = require('rimraf')
 
 describe('tor unit tests', function () {
   let tor
-  const fakeElectron = require('../lib/fakeElectron')
+  const fakeElectron = require('../../unit/lib/fakeElectron')
   before(function () {
     mockery.enable({
       warnOnReplace: false,

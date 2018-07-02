@@ -24,6 +24,7 @@
     "download-sync-client": "node ./tools/downloadSyncClient",
     "electron-rebuild": "electron-rebuild",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
+    "inttest": "cross-env NODE_ENV=test mocha \"test/integration/**/*Test.js\"",
     "lint": "standard --verbose | snazzy",
     "lint-standard": "standard",
     "package-tor": "node ./tools/package_tor.js",
