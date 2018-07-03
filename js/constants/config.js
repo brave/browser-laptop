@@ -42,6 +42,14 @@ module.exports = {
     defaultSearchSuggestions: false,
     maxHistorySites: 10
   },
+  // NOTE: names here correspond to `name` field in:
+  // js/data/searchProviders.js
+  defaultSearchEngineByLocale: {
+    // Example entries look like this:
+    // 'en-US': 'GitHub',
+    // 'es-MX': 'YouTube',
+    'default': 'Google'
+  },
   defaultOpenSearchPath: 'content/search/google.xml',
   vault: {
     syncUrl: (userId) => `${vaultHost}/v1/users/${userId}/appState`,

@@ -25,6 +25,7 @@ const {execSync} = require('child_process')
 const UpdateStatus = require('../js/constants/updateStatus')
 const settings = require('../js/constants/settings')
 const siteTags = require('../js/constants/siteTags')
+const config = require('../js/constants/config')
 const downloadStates = require('../js/constants/downloadStates')
 const ledgerStatuses = require('./common/constants/ledgerStatuses')
 const promotionStatuses = require('./common/constants/promotionStatuses')
@@ -1015,6 +1016,22 @@ module.exports.runImportDefaultSettings = (data) => {
   return data
 }
 
+module.exports.setDefaultSearchEngine = (immutableData) => {
+  const defaultLocale = locale.getDefaultLocale(true)
+  let defaultSearchEngine = config.defaultSearchEngineByLocale.default
+
+  for (let entry in config.defaultSearchEngineByLocale) {
+    if (entry === defaultLocale) {
+      defaultSearchEngine = config.defaultSearchEngineByLocale[entry]
+      break
+    }
+  }
+
+  return defaultSearchEngine
+    ? immutableData.setIn(['settings', settings.DEFAULT_SEARCH_ENGINE], defaultSearchEngine)
+    : immutableData
+}
+
 /**
  * Loads the browser state from storage.
  *
@@ -1079,9 +1096,15 @@ module.exports.loadAppState = () => {
       immutableData = module.exports.runPostMigrations(immutableData)
     }
 
-    locale.init(immutableData.getIn(['settings', settings.LANGUAGE])).then((locale) => {
+    locale.init(immutableData.getIn(['settings', settings.LANGUAGE])).then((lang) => {
       immutableData = setVersionInformation(immutableData)
-      app.setLocale(locale)
+      app.setLocale(lang)
+
+      // Set default search engine for locale (if not already set)
+      if (immutableData.getIn(['settings', settings.DEFAULT_SEARCH_ENGINE]) == null) {
+        immutableData = module.exports.setDefaultSearchEngine(immutableData)
+      }
+
       resolve(immutableData)
     })
   })
