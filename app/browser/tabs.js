@@ -44,7 +44,6 @@ const {getTorSocksProxy} = require('../channel')
 const demoApi = require('./api/userModelLog')
 const userModelState = require('../common/state/userModelState')
 
-
 let adBlockRegions
 let currentPartitionNumber = 0
 const incrementPartitionNumber = () => ++currentPartitionNumber
