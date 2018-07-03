@@ -1,16 +1,17 @@
 .ad-hideable,
-  .ad-div,
-  .masthead-ad-control,
-  .video-ads,
-  #ad_creative_3,
-  #footer-ads,
-  #watch7-sidebar-ads,
-  .ytp-ad-progress-list,
-  .ad-container,
-  #video-masthead,
-  #watch-channel-brand-div,
-  #Billboard-ad {
-    display: none !important;
+.ad-div,
+.masthead-ad-control,
+.video-ads,
+#ad_creative_3,
+#footer-ads,
+#watch7-sidebar-ads,
+.ytp-ad-progress-list,
+.ad-container,
+#video-masthead,
+#watch-channel-brand-div,
+#Billboard-ad,
+div[id^=my-ads] {
+  display: none !important;
 }
 
 /* CoinMarketCap Ads */
