@@ -257,7 +257,9 @@ const styles = StyleSheet.create({
     cursor: 'pointer',
     textDecoration: 'underline',
     color: '#FF6000',
-    marginTop: '20px'
+    marginTop: '20px',
+    paddingRight: 0,
+    display: 'inline-block'
   },
 
   text__badge: {
