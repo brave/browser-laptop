@@ -161,7 +161,7 @@ class TorDaemon extends EventEmitter {
       return
     }
     if (this._control) {
-      this._control.close()
+      this._control.destroy()
     }
   }
 
