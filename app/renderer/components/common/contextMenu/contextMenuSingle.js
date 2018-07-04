@@ -43,6 +43,7 @@ class ContextMenuSingle extends ImmutableComponent {
         visibleMenuItems.map((contextMenuItem) => {
           let props = {
             contextMenuItem: contextMenuItem,
+            isTor: this.props.isTor,
             submenuIndex: this.props.submenuIndex,
             lastZoomPercentage: this.props.lastZoomPercentage,
             contextMenuDetail: this.props.contextMenuDetail,
