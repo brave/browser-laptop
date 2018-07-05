@@ -179,7 +179,7 @@ class ContextMenuItem extends ImmutableComponent {
       width: iconSize
     }
 
-    const icon = this.props.contextMenuItem.get('icon')
+    const icon = !this.props.isTor && this.props.contextMenuItem.get('icon')
     let faIcon
     if (icon) {
       iconStyle = Object.assign(iconStyle, {
