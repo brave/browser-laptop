@@ -138,7 +138,7 @@ class ClearBrowsingDataPanel extends React.Component {
             checkedOn={this.props.savedSiteSettings}
             onClick={this.onToggleSavedSiteSettings} />
           <SwitchControl
-            rightl10nId='Brave ads'
+            rightl10nId='braveAds'
             testId='adsSettingsSwitch'
             checkedOn={this.props.adsSettings}
             onClick={this.onToggleAdsSettings} />
