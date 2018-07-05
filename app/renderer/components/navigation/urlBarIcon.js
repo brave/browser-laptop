@@ -116,7 +116,8 @@ class UrlBarIcon extends React.Component {
     const instanceStyles = {}
 
     if (this.props.activateSearchEngine) {
-      instanceStyles['--search-engine-favicon-url'] = `url(${this.props.searchSelectImage})`
+      icon = <img src={this.props.searchSelectImage}
+        className={css(styles.searchIcon)} alt='Search provider icon' />
     } else if (this.props.isPotentialPhishingUrl) {
       icon = <WarningIcon />
       iconTestId = 'isPotentialPhishingUrl'
@@ -151,8 +152,7 @@ class UrlBarIcon extends React.Component {
       className={css(
         styles.urlBarIcon,
         isExtendedSecure && styles.urlBarIcon_extendedSecure,
-        isInsecure && styles.urlBarIcon_warning,
-        this.props.activateSearchEngine && styles.urlBarIcon_specificSearchEngine
+        isInsecure && styles.urlBarIcon_warning
       )}
       style={instanceStyles}
     >
@@ -174,19 +174,16 @@ const styles = StyleSheet.create({
     flexShrink: 0
   },
 
+  searchIcon: {
+    width: `${searchIconSize}px`
+  },
+
   urlBarIcon_extendedSecure: {
     '--icon-line-color': '#7ED321'
   },
 
   urlBarIcon_warning: {
     '--icon-line-color': '#ff0000'
-  },
-
-  urlBarIcon_specificSearchEngine: {
-    backgroundImage: 'var(--search-engine-favicon-url)',
-    backgroundSize: `${searchIconSize}px`,
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center center'
   }
 })
 
