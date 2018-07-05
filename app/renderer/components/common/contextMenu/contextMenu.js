@@ -19,6 +19,7 @@ const keyCodes = require('../../../../common/constants/keyCodes')
 const contextMenuState = require('../../../../common/state/contextMenuState')
 const tabState = require('../../../../common/state/tabState')
 const appStore = require('../../../../../js/stores/appStoreRenderer')
+const { getActiveFrame, isTor } = require('../../../../../js/state/frameStateUtil')
 const { getCurrentWindowId } = require('../../../currentWindow')
 
 // Utils
@@ -227,6 +228,8 @@ class ContextMenu extends React.Component {
 
     const props = {}
     const activeTab = tabState.getActiveTab(appStore.state, getCurrentWindowId())
+    const activeFrame = getActiveFrame(currentWindow)
+    props.isTor = activeFrame && isTor(activeFrame)
     props.lastZoomPercentage = activeTab && activeTab.get('zoomPercent')
     props.contextMenuDetail = contextMenuDetail  // TODO (nejc) only primitives
     props.selectedIndex = typeof selectedIndex === 'object' &&
@@ -284,6 +287,7 @@ class ContextMenu extends React.Component {
       style={contextStyles}
     >
       <ContextMenuSingle contextMenuDetail={this.props.contextMenuDetail}
+        isTor={this.props.isTor}
         submenuIndex={0}
         lastZoomPercentage={this.props.lastZoomPercentage}
         template={this.props.template}
