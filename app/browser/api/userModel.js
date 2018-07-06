@@ -468,7 +468,9 @@ const goAheadAndShowTheAd = (windowId, notificationTitle, notificationText, noti
     {
       title: notificationTitle,
       message: notificationText,
-      icon: path.join(__dirname, '../../../img/BAT_icon.png'),
+      icon: process.env.NODE_ENV === 'development'
+        ? path.join(__dirname, '../../extensions/brave/img/BAT_icon.png')
+        : path.normalize(path.join(process.resourcesPath, 'extensions', 'brave', 'img', 'BAT_icon.png')),
       sound: true,
       timeout: 60,
       wait: true,
