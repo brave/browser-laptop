@@ -641,6 +641,21 @@ const appActions = {
   },
 
   /**
+   * Handles user response to a notifcation
+   * @param {string} message
+   * @param {number} buttonIndex
+   * @param {object} activeWindow
+   */
+  onNotificationResponse: function (message, buttonIndex, activeWindow) {
+    dispatch({
+      actionType: appConstants.APP_ON_NOTIFICATION_RESPONSE,
+      message,
+      buttonIndex,
+      activeWindow
+    })
+  },
+
+  /**
    * Adds information about pending basic auth login requests
    * @param {number} tabId - The tabId that generated the request
    * @param {string} detail - login request info

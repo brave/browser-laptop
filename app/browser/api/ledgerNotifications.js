@@ -9,6 +9,7 @@ const ipc = electron.ipcMain
 const appConfig = require('../../../js/constants/appConfig')
 const messages = require('../../../js/constants/messages')
 const settings = require('../../../js/constants/settings')
+const ledgerStatuses = require('../../common/constants/ledgerStatuses')
 
 // State
 const aboutPreferencesState = require('../../common/state/aboutPreferencesState')
@@ -60,6 +61,13 @@ const shouldShowNotificationAddFunds = () => {
   const nextTime = getSetting(settings.PAYMENTS_NOTIFICATION_ADD_FUNDS_TIMESTAMP)
   return !nextTime || (new Date().getTime() > nextTime)
 }
+const shouldShowAddFundsModal = (state) => {
+  const ledgerStatus = ledgerState.getAboutProp(state, 'status') || ''
+  return (
+    ledgerStatus !== ledgerStatuses.SERVER_PROBLEM &&
+    ledgerStatus !== ledgerStatuses.CORRUPTED_SEED
+  )
+}
 
 const init = () => {
   // Check if relevant browser notifications should be shown every 15 minutes
@@ -107,7 +115,7 @@ const onIntervalDynamic = (state) => {
   return state
 }
 
-const onResponse = (message, buttonIndex, activeWindow) => {
+const onResponse = (state, message, buttonIndex, activeWindow) => {
   switch (message) {
     case text.addFunds:
       // See showNotificationAddFunds() for buttons.
@@ -116,9 +124,10 @@ const onResponse = (message, buttonIndex, activeWindow) => {
       if (buttonIndex === 0) {
         appActions.changeSetting(settings.PAYMENTS_NOTIFICATIONS, false)
       } else if (buttonIndex === 2 && activeWindow) {
+        const addFundsOverlay = shouldShowAddFundsModal(state) ? '?addFundsOverlayVisible' : ''
         // Add funds: Open payments panel
         appActions.createTabRequested({
-          url: 'about:preferences#payments?addFundsOverlayVisible',
+          url: `about:preferences#payments${addFundsOverlay}`,
           windowId: activeWindow.id
         })
       }
@@ -163,10 +172,12 @@ const onResponse = (message, buttonIndex, activeWindow) => {
       }
       break
     default:
-      return
+      return state
   }
 
   appActions.hideNotification(message)
+
+  return state
 }
 
 const onDynamicResponse = (message, actionId, activeWindow) => {
@@ -413,7 +424,7 @@ if (ipc) {
       return
     }
 
-    onResponse(
+    appActions.onNotificationResponse(
       message,
       buttonIndex,
       electron.BrowserWindow.getActiveWindow()
@@ -434,7 +445,9 @@ const getMethods = () => {
     showPromotionNotification,
     showBackupKeys,
     hasFunded,
-    getNextBackupNotification
+    shouldShowAddFundsModal,
+    getNextBackupNotification,
+    onResponse
   }
 
   let privateMethods = {}
