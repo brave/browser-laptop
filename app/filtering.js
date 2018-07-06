@@ -28,7 +28,7 @@ const ipcMain = electron.ipcMain
 const app = electron.app
 const path = require('path')
 const getOrigin = require('../js/lib/urlutil').getOrigin
-const {isTorrentFile, isMagnetURL} = require('./browser/webtorrent')
+const {isTorrentFile} = require('./browser/webtorrent')
 const {adBlockResourceName} = require('./adBlock')
 const {updateElectronDownloadItem} = require('./browser/electronDownloadItem')
 const {fullscreenOption} = require('./common/constants/settingsEnums')
@@ -97,6 +97,13 @@ module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
   headersReceivedFilteringFns.push(filteringFn)
 }
 
+// Protocols which are safe to load in tor tabs
+const whitelistedTorProtocols = ['http:', 'https:', 'chrome-extension:', 'chrome-devtools:']
+if (process.env.NODE_ENV === 'development') {
+  // Needed for connection to webpack local server
+  whitelistedTorProtocols.push('ws:')
+}
+
 /**
  * Register for notifications for webRequest.onBeforeRequest for a particular
  * session.
@@ -105,6 +112,20 @@ module.exports.registerHeadersReceivedFilteringCB = (filteringFn) => {
 function registerForBeforeRequest (session, partition) {
   const isPrivate = module.exports.isPrivate(partition)
   session.webRequest.onBeforeRequest((details, muonCb) => {
+    if (partition === appConfig.tor.partition) {
+      if (!details.url) {
+        muonCb({ cancel: true })
+        return
+      }
+      // To minimize leakage risk, only allow whitelisted protocols in Tor
+      // sessions
+      const protocol = urlParse(details.url).protocol
+      if (!whitelistedTorProtocols.includes(protocol)) {
+        onBlockedInTor(details, muonCb)
+        return
+      }
+    }
+
     if (process.env.NODE_ENV === 'development') {
       let page = appUrlUtil.getGenDir(details.url)
       if (page) {
@@ -118,11 +139,6 @@ function registerForBeforeRequest (session, partition) {
 
     if (shouldIgnoreUrl(details)) {
       muonCb({})
-      return
-    }
-
-    if ((isMagnetURL(details)) && partition === appConfig.tor.partition) {
-      showTorrentBlockedInTorWarning(details, muonCb)
       return
     }
 
@@ -357,13 +373,13 @@ function registerForBeforeSendHeaders (session, partition) {
   })
 }
 
-function showTorrentBlockedInTorWarning (details, muonCb) {
+function onBlockedInTor (details, muonCb) {
   const cb = () => muonCb({cancel: true})
-  if (details.tabId) {
+  if (details.tabId && details.resourceType === 'mainFrame') {
     tabMessageBox.show(details.tabId, {
-      message: `${locale.translation('torrentBlockedInTor')}`,
+      message: `${locale.translation('urlBlockedInTor')}`,
       title: 'Brave',
-      buttons: [locale.translation('torrentWarningOk')]
+      buttons: [locale.translation('urlWarningOk')]
     }, cb)
   } else {
     cb()
@@ -384,7 +400,7 @@ function registerForHeadersReceived (session, partition) {
       return
     }
     if ((isTorrentFile(details)) && partition === appConfig.tor.partition) {
-      showTorrentBlockedInTorWarning(details, muonCb)
+      onBlockedInTor(details, muonCb)
       return
     }
     const firstPartyUrl = module.exports.getMainFrameUrl(details)
