@@ -230,7 +230,8 @@ const styles = StyleSheet.create({
     borderRadius: '4px',
     marginRight: '10px',
     position: 'relative',
-    top: '4px'
+    top: '4px',
+    fontSize: 0
   },
 
   disabledContent__message__checkbox__box_on: {
@@ -238,7 +239,8 @@ const styles = StyleSheet.create({
     width: '11px',
     height: '11px',
     display: 'block',
-    margin: '2px 0 0 2px'
+    margin: '2px 0 0 2px',
+    fontSize: 0
   },
 
   disabledContent__message__warning: {
