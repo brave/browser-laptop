@@ -171,6 +171,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
       {
         const key = action.get('key')
         const mapping = underscore.invert({
+          place: settings.ADS_PLACE,
           enabled: settings.ADS_ENABLED,
           locale: settings.ADS_LOCALE,
           adsPerDay: settings.ADS_PER_DAY,
