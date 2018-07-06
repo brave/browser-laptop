@@ -4161,4 +4161,20 @@ describe('ledger api unit tests', function () {
       assert(onLedgerFuzzingSpy.withArgs(1000, true).calledOnce)
     })
   })
+
+  describe('runPromotionCheck', function () {
+    let onRunPromotionCheckSpy
+
+    before(function () {
+      onRunPromotionCheckSpy = sinon.spy(appActions, 'runPromotionCheck')
+    })
+
+    afterEach(function () {
+      onRunPromotionCheckSpy.reset()
+    })
+    it('calls runPromotionCheck', function () {
+      ledgerApi.runPromotionCheck()
+      assert(onRunPromotionCheckSpy.calledOnce)
+    })
+  })
 })
