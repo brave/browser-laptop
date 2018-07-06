@@ -291,8 +291,9 @@ const removeHistorySite = (state, action) => {
 }
 
 const removeAllHistory = (state) => {
+  const locales = userModelState.getUserModelValue(state, 'locales')
   state = userModelState.removeAllHistory(state)
-
+  state = processLocales(state, locales)
   return confirmAdUUIDIfAdEnabled(state)
 }
 
