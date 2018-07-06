@@ -40,7 +40,7 @@ switch (channel) {
     appName = 'Brave-Nightly'
     break
   case 'developer':
-    appName = 'Brave-Ads-Trial'
+    appName = 'Brave-Ads-Test'
     break
   case 'beta':
     appName = 'Brave-Beta'
