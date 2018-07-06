@@ -48,7 +48,7 @@ const beforeSendHeadersFilteringFns = []
 const beforeRequestFilteringFns = []
 const beforeRedirectFilteringFns = []
 const headersReceivedFilteringFns = []
-let partitionsToInitialize = ['default', appConfig.tor.partition]
+let partitionsToInitialize = ['default']
 let initializedPartitions = {}
 
 const transparent1pxGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
