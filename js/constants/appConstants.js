@@ -215,7 +215,8 @@ const appConstants = {
   APP_ON_TOR_INIT_PERCENTAGE: _,
   APP_SET_TOR_NEW_IDENTITY: _,
   APP_RESTART_TOR: _,
-  APP_RECREATE_TOR_TAB: _
+  APP_RECREATE_TOR_TAB: _,
+  APP_RUN_PROMOTION_CHECK: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
