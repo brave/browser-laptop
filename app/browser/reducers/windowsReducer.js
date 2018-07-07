@@ -22,8 +22,6 @@ const {makeImmutable, isImmutable} = require('../../common/state/immutableUtil')
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const firstDefinedValue = require('../../../js/lib/functional').firstDefinedValue
-const settings = require('../../../js/constants/settings')
-const getSetting = require('../../../js/settings').getSetting
 
 // TODO cleanup all this createWindow crap
 function isModal (browserOpts) {
@@ -42,23 +40,6 @@ function clearFramesFromWindowState (windowState) {
   return windowState
     .set('frames', Immutable.List())
     .set('tabs', Immutable.List())
-}
-
-/**
- * Determine the frame(s) to be loaded in a new window
- * based on user preferences
- */
-function getFramesForNewWindow () {
-  const startupSetting = getSetting(settings.STARTUP_MODE)
-  const homepageSetting = getSetting(settings.HOMEPAGE)
-  if (startupSetting === 'homePage' && homepageSetting) {
-    return homepageSetting
-      .split('|')
-      .map((homepage) => ({
-        location: homepage
-      }))
-  }
-  return [ { } ]
 }
 
 /**
@@ -124,20 +105,6 @@ const setMaximized = (state, browserOpts, immutableWindowState) => {
   return state.getIn(['defaultWindowParams', 'maximized']) || false
 }
 
-function windowDefaults (state) {
-  return {
-    width: state.getIn(['defaultWindowParams', 'width']) || state.get('defaultWindowWidth'),
-    height: state.getIn(['defaultWindowParams', 'height']) || state.get('defaultWindowHeight'),
-    x: state.getIn(['defaultWindowParams', 'x']) || undefined,
-    y: state.getIn(['defaultWindowParams', 'y']) || undefined,
-    minWidth: 480,
-    minHeight: 300,
-    minModalHeight: 100,
-    minModalWidth: 100,
-    windowOffset: 20
-  }
-}
-
 /**
  * set the default width and height if they
  * haven't been initialized yet
@@ -163,7 +130,7 @@ const handleCreateWindowAction = (state, action = Immutable.Map()) => {
   let browserOpts = (action.get('browserOpts') || Immutable.Map()).toJS()
   let immutableWindowState = action.get('restoredState') || Immutable.Map()
   state = setDefaultWindowSize(state)
-  const defaults = windowDefaults(state)
+  const defaults = windows.windowDefaults(state)
   const isMaximized = setMaximized(state, browserOpts, immutableWindowState)
 
   browserOpts = setWindowDimensions(browserOpts, defaults, immutableWindowState)
@@ -270,7 +237,7 @@ const handleCreateWindowAction = (state, action = Immutable.Map()) => {
         }
       } else {
         // handle nothing provided, so follow 'new tab' preferences
-        frames = getFramesForNewWindow()
+        frames = windows.getFramesForNewWindow()
       }
     }
     // window does not need to receive frames as part of initial state

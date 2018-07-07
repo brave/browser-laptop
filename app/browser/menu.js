@@ -7,7 +7,6 @@
 const Immutable = require('immutable')
 const electron = require('electron')
 const Menu = electron.Menu
-const dialog = electron.dialog
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 
@@ -29,7 +28,6 @@ const appActions = require('../../js/actions/appActions')
 // Util
 const CommonMenu = require('../common/commonMenu')
 const {makeImmutable} = require('../common/state/immutableUtil')
-const {fileUrl} = require('../../js/lib/appUrlUtil')
 const frameStateUtil = require('../../js/state/frameStateUtil')
 const menuUtil = require('../common/lib/menuUtil')
 const {getSetting} = require('../../js/settings')
@@ -40,7 +38,7 @@ const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
 const isWindows = platformUtil.isWindows()
 const {templateUrls} = require('./share')
-const {getAllRendererWindows} = require('./windows')
+const windows = require('./windows')
 
 let appMenu = null
 let closedFrames = new Immutable.OrderedMap()
@@ -60,23 +58,21 @@ const createFileSubmenu = () => {
       label: locale.translation('openFile'),
       accelerator: 'CmdOrCtrl+O',
       click: (item, focusedWindow) => {
-        dialog.showDialog(focusedWindow, {
-          type: 'select-open-multi-file'
-        }, (paths) => {
-          if (paths) {
-            paths.forEach((path) => {
-              appActions.createTabRequested({
-                url: fileUrl(path),
-                windowId: focusedWindow.id
-              })
-            })
-          }
-        })
+        if (focusedWindow) {
+          CommonMenu.openFileDialog(focusedWindow)
+        } else {
+          focusedWindow = windows.getWindowForFileAction(appStore.getState())
+          focusedWindow.webContents.on('did-finish-load', () => {
+            focusedWindow.show()
+            CommonMenu.openFileDialog(focusedWindow)
+          })
+        }
       }
     }, {
       label: locale.translation('openLocation'),
       accelerator: 'CmdOrCtrl+L',
       click: function (item, focusedWindow) {
+        focusedWindow = focusedWindow || windows.getWindowForFileAction(appStore.getState(), true)
         CommonMenu.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_FOCUS_URL])
       }
     },
@@ -647,7 +643,7 @@ const doAction = (state, action) => {
     case appConstants.APP_WINDOW_CLOSED:
     case appConstants.APP_WINDOW_CREATED:
       {
-        const windowCount = getAllRendererWindows().length
+        const windowCount = windows.getAllRendererWindows().length
         if (action.actionType === appConstants.APP_WINDOW_CLOSED && windowCount === 0) {
           updateShareMenuItems(state, false)
         } else if (action.actionType === appConstants.APP_WINDOW_CREATED && windowCount === 1) {

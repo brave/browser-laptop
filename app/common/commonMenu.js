@@ -13,7 +13,9 @@ const {getSetting} = require('../../js/settings')
 const communityURL = 'https://community.brave.com/'
 const isDarwin = process.platform === 'darwin'
 const electron = require('electron')
+const dialog = electron.dialog
 const menuUtil = require('./lib/menuUtil')
+const {fileUrl} = require('../../js/lib/appUrlUtil')
 
 const ensureAtLeastOneWindow = (frameOpts) => {
   // Handle no new tab requested, but need a window
@@ -29,6 +31,19 @@ const ensureAtLeastOneWindow = (frameOpts) => {
   // then it will create the tab in the active window
   // or a new window if there is no active window.
   appActions.createTabRequested(frameOpts, false, false, true)
+}
+
+module.exports.openFileDialog = (focusedWindow) => {
+  dialog.showDialog(focusedWindow, { type: 'select-open-multi-file' }, (paths) => {
+    if (paths) {
+      paths.forEach((path) => {
+        appActions.createTabRequested({
+          url: fileUrl(path),
+          windowId: focusedWindow.id
+        })
+      })
+    }
+  })
 }
 
 /**

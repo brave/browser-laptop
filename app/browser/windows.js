@@ -874,6 +874,44 @@ const api = {
       )
   },
 
+  /**
+   * Determine the frame(s) to be loaded in a new window
+   * based on user preferences
+   */
+  getFramesForNewWindow: () => {
+    const startupSetting = getSetting(settings.STARTUP_MODE)
+    const homepageSetting = getSetting(settings.HOMEPAGE)
+    if (startupSetting === 'homePage' && homepageSetting) {
+      return homepageSetting
+        .split('|')
+        .map((homepage) => ({
+          location: homepage
+        }))
+    }
+    return [ { } ]
+  },
+
+  windowDefaults: (state) => {
+    return {
+      width: state.getIn(['defaultWindowParams', 'width']) || state.get('defaultWindowWidth'),
+      height: state.getIn(['defaultWindowParams', 'height']) || state.get('defaultWindowHeight'),
+      x: state.getIn(['defaultWindowParams', 'x']) || undefined,
+      y: state.getIn(['defaultWindowParams', 'y']) || undefined,
+      minWidth: 480,
+      minHeight: 300,
+      minModalHeight: 100,
+      minModalWidth: 100,
+      windowOffset: 20
+    }
+  },
+
+  getWindowForFileAction: (state, show = false) => {
+    const frames = api.getFramesForNewWindow()
+    const defaults = api.windowDefaults(state)
+    const options = Object.assign({ fullscreen: false, show: show }, defaults)
+    return api.createWindow(options, null, false, frames)
+  },
+
   notifyWindowWebContentsAdded (windowId, frame, tabValue) {
     const win = api.getWindow(windowId)
     if (!win || win.isDestroyed()) {
