@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.23.31](https://github.com/brave/browser-laptop/releases/tag/v0.23.31dev)
+
+- Fixed Twitch streams not playing ([#14475](https://github.com/brave/browser-laptop/issues/14475))
+- Fixed IndexedDB not working in web worker ([#12463](https://github.com/brave/browser-laptop/issues/12463))
+- Tor only loads when needed (lazy loading) ([#14617](https://github.com/brave/browser-laptop/issues/14617))
+- Fixed webcompat issues with riot.im ([#10685](https://github.com/brave/browser-laptop/issues/10685))
+- Upgraded to Chromium 67.0.3396.103 ([#14618](https://github.com/brave/browser-laptop/issues/14618))
+
 ## [0.23.19](https://github.com/brave/browser-laptop/releases/tag/v0.23.19dev)
 
  - Added Tor support for Private Browsing. ([#1185](https://github.com/brave/browser-laptop/issues/1185))
