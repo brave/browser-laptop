@@ -428,19 +428,20 @@ class UrlBar extends React.Component {
 
   get placeholderValue () {
     if (this.props.isTor) {
-      if (this.props.torInitializationError) {
+      if (this.props.torError) {
+        console.log(`tor error: ${this.props.torError}`)
         return `${locale.translation('torConnectionError')}.`
-      } else if (this.props.torPercentInitialized) {
-        // Don't show 100% since it sometimes gets stuck at 100%
-        const percentInitialized = this.props.torPercentInitialized === '100' ? '99' : this.props.torPercentInitialized
-        if (percentInitialized === '0') {
-          return `${locale.translation('urlbarPlaceholderTorProgress')}...`
-        }
-        return `${locale.translation('urlbarPlaceholderTorProgress')}: ${percentInitialized}%...`
-      } else if (this.props.torInitializationError === false) {
-        return locale.translation('urlbarPlaceholderTorSuccess')
-      } else {
+      } else if (!this.props.torPercentInitialized ||
+                 this.props.torPercentInitialized === '0') {
         return `${locale.translation('urlbarPlaceholderTorProgress')}...`
+      } else if (this.props.torPercentInitialized !== '100') {
+        const msg = locale.translation('urlbarPlaceholderTorProgress')
+        const percentInitialized = this.props.torPercentInitialized
+        return `${msg}: ${percentInitialized}%...`
+      } else if (!this.props.torOnline) {
+        return `${locale.translation('torConnectionError')}.`
+      } else {
+        return locale.translation('urlbarPlaceholderTorSuccess')
       }
     }
     return locale.translation('urlbarPlaceholder')
@@ -524,7 +525,8 @@ class UrlBar extends React.Component {
 
     props.isTor = isTor
     props.torPercentInitialized = state.getIn(['tor', 'percentInitialized'])
-    props.torInitializationError = state.getIn(['tor', 'initializationError'])
+    props.torError = state.getIn(['tor', 'error'])
+    props.torOnline = state.getIn(['tor', 'online'])
     props.showDisplayTime = !props.titleMode && props.displayURL === location
     props.showNoScriptInfo = enableNoScript && scriptsBlocked && scriptsBlocked.size
     props.evCert = activeFrame.getIn(['security', 'evCert'])
@@ -563,8 +565,7 @@ class UrlBar extends React.Component {
   get torInitializing () {
     // Returns true if the current tab is a Tor tab and Tor has not yet
     // initialized successfully
-    return this.props.isTor &&
-      (this.props.torPercentInitialized || this.props.torInitializationError !== false)
+    return this.props.isTor && !this.props.torOnline
   }
 
   get shouldDisable () {

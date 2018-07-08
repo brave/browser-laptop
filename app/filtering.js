@@ -748,11 +748,12 @@ module.exports.relaunchTor = () => {
     console.log('Tor session no longer exists. Cannot restart Tor.')
     return
   }
-  appActions.onTorInitError(null)
+  appActions.onTorOnline(false)
   try {
+    console.log('tor: relaunch')
     ses.relaunchTor()
   } catch (e) {
-    appActions.onTorInitError(`Could not restart Tor: ${e}`)
+    appActions.onTorError(`Could not restart Tor: ${e}`)
   }
 }
 
@@ -793,7 +794,7 @@ const initPartition = (partition) => {
     try {
       setupTor()
     } catch (e) {
-      appActions.onTorInitError(`Could not start Tor: ${e}`)
+      appActions.onTorError(`Could not start Tor: ${e}`)
     }
     // TODO(riastradh): Duplicate logic in app/browser/tabs.js.
     options.isolated_storage = true
@@ -824,22 +825,29 @@ const initPartition = (partition) => {
 module.exports.initPartition = initPartition
 
 function setupTor () {
-  let torInitialized = null
-  const setTorErrorOnTimeout = (timeout, msg) => {
-    torInitialized = null
-    setTimeout(() => {
-      if (torInitialized === null) {
-        appActions.onTorInitError(msg)
-      }
-    }, timeout)
+  let timer = null
+  const setTorErrorOnTimeout = (delay, msg) => {
+    if (timer === null) {
+      timer = setTimeout(() => {
+        appActions.onTorError(msg)
+        console.log(`tor timeout: ${msg}`)
+      }, delay)
+    }
   }
-  const onTorSuccess = () => {
-    torInitialized = true
-    appActions.onTorInitSuccess()
+  const initialized = () => {
+    if (timer !== null) {
+      clearTimeout(timer)
+      timer = null
+    }
   }
-  const onTorFail = (msg) => {
-    torInitialized = false
-    appActions.onTorInitError(msg)
+  const onTorError = (msg) => {
+    initialized()
+    appActions.onTorError(msg)
+    console.warn(`tor error: ${msg}`)
+  }
+  const onTorOnline = (online) => {
+    initialized()
+    appActions.onTorOnline(online)
   }
   // If Tor has not successfully initialized or thrown an error within 20s,
   // assume it's broken.
@@ -850,12 +858,10 @@ function setupTor () {
   const torDaemon = new tor.TorDaemon()
   torDaemon.setup((err) => {
     if (err) {
-      onTorFail(`Tor failed to make directories: ${err}`)
+      onTorError(`Tor failed to make directories: ${err}`)
       return
     }
-    torDaemon.on('exit', () => {
-      onTorFail('The Tor process has stopped.')
-    })
+    torDaemon.on('exit', () => onTorError('The Tor process has exited.'))
     torDaemon.on('launch', (socksAddr) => {
       const version = torDaemon.getVersion()
       console.log(`tor: daemon listens on ${socksAddr}, version ${version}`)
@@ -864,35 +870,52 @@ function setupTor () {
       }
       const bootstrapped = (err, progress) => {
         if (err) {
-          onTorFail(`Tor bootstrap error: ${err}`)
+          console.warn(`tor: bootstrap ${progress}% error: ${err}`)
+          onTorError(`Tor bootstrap error: ${err}`)
           return
         }
         appActions.onTorInitPercentage(progress)
       }
-      const circuitEstablished = (err, ok) => {
-        if (ok) {
-          console.log('Tor ready!')
-          onTorSuccess()
-        } else {
-          if (err) {
-            // Wait for tor to re-initialize a circuit (ex: after a clock jump)
-            appActions.onTorInitPercentage('0')
-            setTorErrorOnTimeout(17000, `Tor not ready: ${err}`)
-          } else {
-            // Simply log the error but don't show error UI since Tor might
-            // finish opening a circuit.
-            console.log('tor still not ready')
-          }
+      const networkLiveness = (live) => {
+        if (live) {
+          // Network is now live.
+          onTorOnline(true)
+        } else if (timer === null) {
+          // We were online before; now we are not.
+          onTorOnline(false)
+          // Wait for tor to reconnect.
+          setTorErrorOnTimeout(17000, 'Tor could not reconnect.')
+        }
+      }
+      const circuitEstablished = (err, established) => {
+        if (err && established === null) {
+          onTorError(`Tor circuit error: ${err}`)
+          return
+        }
+        if (established) {
+          // Circuit is now established.
+          onTorOnline(true)
+        } else if (timer === null) {
+          // We were online before; now we are not.
+          onTorOnline(false)
+          // Wait for tor to reconnect.
+          setTorErrorOnTimeout(17000, 'Tor could not reconnect.')
         }
       }
       torDaemon.onBootstrap(bootstrapped, (err) => {
         if (err) {
-          onTorFail(`Tor error bootstrapping: ${err}`)
+          onTorError(`Tor error subscribing to bootstrap event: ${err}`)
         }
-        torDaemon.onCircuitEstablished(circuitEstablished, (err) => {
+        torDaemon.onNetworkLiveness(networkLiveness, (err) => {
           if (err) {
-            onTorFail(`Tor error opening a circuit: ${err}`)
+            onTorError(`Tor error subscribing to network liveness: ${err}`)
           }
+          torDaemon.onCircuitEstablished(circuitEstablished, (err) => {
+            if (err) {
+              onTorError(
+                `Tor error subscribing to circuit establishment: ${err}`)
+            }
+          })
         })
       })
     })
