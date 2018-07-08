@@ -770,6 +770,72 @@ class TorDaemon extends EventEmitter {
     const info = 'status/circuit-established'
     this._torStatus(event, keys, info, handleStatus, handleInfo, callback)
   }
+
+  /**
+   * Arrange to call handler when tor thinks the network is up or
+   * down.  The handler may be called before or after the callback.
+   *
+   * @param {Function(boolean)} handler
+   * @param {Function(Error)} callback
+   */
+  onNetworkLiveness (handler, callback) {
+    const control = this._control
+    // Subscribe to events.
+    const statusListener = (data, extra) => {
+      const liveness = {UP: true, DOWN: false}
+      if (!(data in liveness)) {
+        console.log(`tor: warning: invalid network liveness: ${data}`)
+        return
+      }
+      handler(liveness[data])
+    }
+    control.on('async-NETWORK_LIVENESS', statusListener)
+    control.subscribe('NETWORK_LIVENESS', (err) => {
+      if (err) {
+        control.removeListener('async-NETWORK_LIVENESS', statusListener)
+        return callback(err)
+      }
+      // Run `GETINFO network-liveness' to find out what state we're
+      // in now before the next state change event.
+      let err0 = null
+      const getinfoLine = (status, reply) => {
+        const liveness = {up: true, down: false}
+        if (status !== '250') {
+          err0 = err0 || new Error(`${status} ${reply}`)
+          return
+        }
+        const prefix = 'network-liveness='
+        if (!reply.startsWith(prefix)) {
+          err0 = err0 || new Error(`bogus network-liveness: ${reply}`)
+          return
+        }
+        const data = reply.slice(prefix.length)
+        if (!(data in liveness)) {
+          err0 = err0 || new Error(`bogus network-liveness: ${data}`)
+          return
+        }
+        return handler(liveness[data])
+      }
+      const cmd = 'GETINFO network-liveness'
+      control.cmd(cmd, getinfoLine, (err, status, reply) => {
+        if (!err) {
+          if (err0) {
+            err = err0
+          } else if (status !== '250') {
+            err = new Error(`${status} ${reply}`)
+          }
+        }
+        if (err) {
+          control.removeListener('async-NETWORK_LIVENESS', statusListener)
+          control.unsubscribe('NETWORK_LIVENESS', (err1) => {
+            return callback(err)
+          })
+        }
+        // Success!
+        return callback(null)
+      })
+    })
+  }
 }
 
 /**
@@ -939,6 +1005,8 @@ class TorControl extends EventEmitter {
     // If it's an asynchronous reply (status 6yz), pass it on
     // asynchronously.
     if (status[0] === '6') {
+      this.emit('asyncReply', status, reply)
+
       assert(this._async_keyword || this._async_keyword === null)
       assert((this._async_keyword === null) === (this._async_extra === null))
       assert((this._async_keyword === null) === (this._async_skip === null))
@@ -1113,6 +1181,7 @@ class TorControl extends EventEmitter {
    * @param {cmdCallback} callback
    */
   cmd (cmdline, perline, callback) {
+    this.emit('cmd', cmdline)
     assert(!this._destroyed)
     this._cmdq.push([perline, callback])
     this._writable.cork()
@@ -1216,7 +1285,7 @@ class TorControl extends EventEmitter {
     if (!(event in this._tor_events)) {
       return process.nextTick(() => callback(null))
     }
-    if (this._tor_events[event]-- === 0) {
+    if (--this._tor_events[event] === 0) {
       delete this._tor_events[event]
       const eventList = Object.keys(this._tor_events).sort().join(' ')
       this.cmd1(`SETEVENTS ${eventList}`, (err, status, reply) => {
@@ -1230,6 +1299,8 @@ class TorControl extends EventEmitter {
         }
         return callback(null)
       })
+    } else {
+      return callback(null)
     }
   }
 

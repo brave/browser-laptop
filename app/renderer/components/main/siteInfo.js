@@ -263,7 +263,7 @@ class SiteInfo extends React.Component {
     props.secureConnection = isSecure === true
     props.partiallySecureConnection = isSecure === 1
     props.certErrorConnection = isSecure === 2
-    props.torConnectionError = frameStateUtil.isTor(activeFrame) && state.getIn(['tor', 'initializationError'])
+    props.torConnectionError = frameStateUtil.isTor(activeFrame) && state.getIn(['tor', 'error'])
 
     // used in other function
     props.isPrivate = activeFrame.get('isPrivate')

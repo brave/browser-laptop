@@ -540,7 +540,7 @@ class Main extends React.Component {
     const loginRequiredDetails = basicAuthState.getLoginRequiredDetail(state, activeTabId)
     const focused = isFocused(state)
     const isTor = frameStateUtil.isTor(activeFrame)
-    const torConnectionError = state.getIn(['tor', 'initializationError'])
+    const torConnectionError = state.getIn(['tor', 'error'])
 
     const props = {}
     // used in renderer
