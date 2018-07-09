@@ -326,7 +326,12 @@ const styles = StyleSheet.create({
 
     // This is a reasonable max height and also solves problems for bookmarks menu
     // and bookmarks overflow menu reaching down too low.
-    maxHeight: `calc(100% - ${globalStyles.spacing.navbarHeight} + ${globalStyles.spacing.bookmarksToolbarWithFaviconsHeight})`,
+    // TODO (petemill): This is flakey since it does not cover dynamic 'navbar' height
+    // such as menu bar or notifications presence. It could be much more gracefully achieved
+    // via `bottom: 0` positioning and would look better by creating a container element
+    // which has `max-height: 100%` on it so that the inside of the menu box scrolled rather
+    // than the border scrolling away wierdly.
+    maxHeight: `calc(100% - ((2 * ${globalStyles.spacing.navbarMenubarMargin}) + ${globalStyles.spacing.navbarHeight} + ${globalStyles.spacing.bookmarksToolbarHeight}))`,
 
     '::-webkit-scrollbar': {
       backgroundColor: theme.contextMenu.scrollBar.backgroundColor
