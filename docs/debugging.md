@@ -184,3 +184,12 @@ To debug renderer, change browser-laptop's `tools/start.js`:
 It’ll print a message in console telling you the PIDs to attach to, in this case `83916`:
 
 > [83916:0710/120909:ERROR:child_process.cc(136)] Renderer (83916) paused waiting for debugger to attach. Send SIGUSR1 to unpause.
+
+### Creating a fresh brave-development profile
+
+Using a simple shell script, a developer can easily create a fresh profile for their debugging needs:
+```
+./createFreshDevProfile.sh
+```
+Often times profiles can be useful towards re-creating simple bugs, to more complex ones which require a refreshed profile,
+as if a user is logging in for the first time. 
