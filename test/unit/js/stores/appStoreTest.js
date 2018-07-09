@@ -52,7 +52,7 @@ describe('App store unit tests', function () {
     '../../app/browser/reducers/siteSettingsReducer',
     '../../app/browser/reducers/pageDataReducer',
     '../../app/browser/reducers/ledgerReducer',
-    '../../app/browser/menu'
+    '../../app/browser/reducers/menuReducer'
   ]
 
   before(function () {

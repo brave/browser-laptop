@@ -2,12 +2,12 @@
 const mockery = require('mockery')
 const Immutable = require('immutable')
 const assert = require('assert')
-const appConstants = require('../../../../js/constants/appConstants')
-const windowConstants = require('../../../../js/constants/windowConstants')
-const fakeElectron = require('../../lib/fakeElectron')
-const fakeAdBlock = require('../../lib/fakeAdBlock')
+const appConstants = require('../../../../../js/constants/appConstants')
+const windowConstants = require('../../../../../js/constants/windowConstants')
+const fakeElectron = require('../../../lib/fakeElectron')
+const fakeAdBlock = require('../../../lib/fakeAdBlock')
 
-require('../../braveUnit')
+require('../../../braveUnit')
 
 describe('menu reducer unit tests', function () {
   let menuReducer
@@ -44,7 +44,7 @@ describe('menu reducer unit tests', function () {
     mockery.registerMock('ad-block', fakeAdBlock)
     mockery.registerMock('../../js/l10n', fakeLocale)
     mockery.registerMock('../common/lib/menuUtil', fakeMenuUtil)
-    menuReducer = require('../../../../app/browser/menu')
+    menuReducer = require('../../../../../app/browser/reducers/menuReducer')
   })
 
   after(function () {
@@ -56,6 +56,54 @@ describe('menu reducer unit tests', function () {
     const output = menuReducer(input, {actionType})
     assert.deepEqual(input, output)
   }
+
+  describe('APP_ADD_BOOKMARK', function () {
+    it('state is returned unchanged', function () {
+      assertNoStateChange(appConstants.APP_ADD_BOOKMARK)
+    })
+  })
+
+  describe('APP_EDIT_BOOKMARK', function () {
+    it('state is returned unchanged', function () {
+      assertNoStateChange(appConstants.APP_EDIT_BOOKMARK)
+    })
+  })
+
+  describe('APP_MOVE_BOOKMARK', function () {
+    it('state is returned unchanged', function () {
+      assertNoStateChange(appConstants.APP_MOVE_BOOKMARK)
+    })
+  })
+
+  describe('APP_REMOVE_BOOKMARK', function () {
+    it('state is returned unchanged', function () {
+      assertNoStateChange(appConstants.APP_REMOVE_BOOKMARK)
+    })
+  })
+
+  describe('APP_ADD_BOOKMARK_FOLDER', function () {
+    it('state is returned unchanged', function () {
+      assertNoStateChange(appConstants.APP_ADD_BOOKMARK_FOLDER)
+    })
+  })
+
+  describe('APP_MOVE_BOOKMARK_FOLDER', function () {
+    it('state is returned unchanged', function () {
+      assertNoStateChange(appConstants.APP_MOVE_BOOKMARK_FOLDER)
+    })
+  })
+
+  describe('APP_EDIT_BOOKMARK_FOLDER', function () {
+    it('state is returned unchanged', function () {
+      assertNoStateChange(appConstants.APP_EDIT_BOOKMARK_FOLDER)
+    })
+  })
+
+  describe('APP_REMOVE_BOOKMARK_FOLDER', function () {
+    it('state is returned unchanged', function () {
+      assertNoStateChange(appConstants.APP_REMOVE_BOOKMARK_FOLDER)
+    })
+  })
 
   describe('APP_SET_STATE', function () {
     it('state is returned unchanged', function () {
