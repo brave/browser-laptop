@@ -161,7 +161,7 @@ class TorDaemon extends EventEmitter {
       return
     }
     if (this._control) {
-      this._control.close()
+      this._control.destroy()
     }
   }
 
@@ -962,7 +962,7 @@ class TorControl extends EventEmitter {
       const [, callback] = this._cmdq.shift()
       callback(err, null, null)
     }
-    assert(this._closing === 0)
+    setImmediate(() => assert(this._closing === 0))
   }
 
   /**
