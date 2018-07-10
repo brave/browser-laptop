@@ -150,8 +150,13 @@ class TorDaemon extends EventEmitter {
 
   /**
    * Kill the tor daemon.
+   *
+   * Idempotent.  Repeated calls have no effect.
    */
   kill () {
+    if (this._watcher === null) {
+      return
+    }
     assert(this._watcher)
     this._watcher.close()
     this._watcher = null
