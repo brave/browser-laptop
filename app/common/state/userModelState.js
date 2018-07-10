@@ -144,9 +144,14 @@ const userModelState = {
     const hourAllowed = getSetting(settings.ADS_PER_HOUR, state.get('settings'))
     const dayAllowed = getSetting(settings.ADS_PER_DAY, state.get('settings'))
 
+    // evenly divide hour window based on ads-per-hour to get minimum wait time
+    const sinceLastWindow = hourWindow / hourAllowed
+
     const respectsHourLimit = historyRespectsRollingTimeConstraint(history, hourWindow, hourAllowed)
     const respectsDayLimit = historyRespectsRollingTimeConstraint(history, dayWindow, dayAllowed)
-    return respectsHourLimit && respectsDayLimit
+    const respectsMinimumTimeSinceLast = historyRespectsRollingTimeConstraint(history, sinceLastWindow, 0)
+
+    return respectsHourLimit && respectsDayLimit && respectsMinimumTimeSinceLast
   },
 
   elphAppendLetter: (state, letter) => {
