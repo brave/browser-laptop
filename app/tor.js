@@ -150,8 +150,13 @@ class TorDaemon extends EventEmitter {
 
   /**
    * Kill the tor daemon.
+   *
+   * Idempotent.  Repeated calls have no effect.
    */
   kill () {
+    if (this._watcher === null) {
+      return
+    }
     assert(this._watcher)
     this._watcher.close()
     this._watcher = null
@@ -163,6 +168,17 @@ class TorDaemon extends EventEmitter {
     if (this._control) {
       this._control.destroy()
     }
+  }
+
+  /**
+   * Internal subroutine.  Report an error and kill the daemon.
+   *
+   * @param {string} msg - error message
+   */
+  _error (msg) {
+    console.log(msg)
+    this.emit('error', msg)
+    this.kill()
   }
 
   /**
@@ -490,9 +506,10 @@ class TorDaemon extends EventEmitter {
 
       const readable = controlSocket
       const writable = controlSocket
-      this._control = new TorControl(readable, writable)
-      this._control.on('error', (err) => this._controlError(err))
-      this._control.on('close', () => this._controlClosed())
+      const control = new TorControl(readable, writable)
+      this._control = control
+      this._control.on('error', (err) => this._controlError(control, err))
+      this._control.on('close', () => this._controlClosed(control))
 
       // We have finished polling, _and_ we are scheduled to be
       // notified either by (a) our file system activity watcher, or
@@ -508,22 +525,16 @@ class TorDaemon extends EventEmitter {
           }
         }
         if (err) {
-          console.log(`tor: authentication failure: ${err}`)
-          this.kill()
-          return
+          return this._error(`tor: authentication failure: ${err}`)
         }
         this._control.getSOCKSListeners((err, listeners) => {
           if (err) {
-            console.log(`tor: failed to get socks addresses: ${err}`)
-            this.kill()
-            return
+            return this._error(`tor: failed to get socks addresses: ${err}`)
           }
           this._socks_addresses = listeners
           this._control.getVersion((err, version) => {
             if (err) {
-              console.log(`tor: failed to get version: ${err}`)
-              this.kill()
-              return
+              return this._error(`tor: failed to get version: ${err}`)
             }
             this._tor_version = version
             this.emit('launch', this.getSOCKSAddress())
@@ -538,12 +549,17 @@ class TorDaemon extends EventEmitter {
    * socket.  Report it to the console and give up by destroying the
    * control connection.
    *
+   * @param {TorControl} control
    * @param {Error} err
    */
-  _controlError (err) {
-    assert(this._control)
+  _controlError (control, err) {
+    if (this._control === control) {
+      this._control = null
+    } else {
+      console.log('tor: control error got deferred')
+    }
     console.log(`tor: control socket error: ${err}`)
-    this._control.destroy(err)
+    control.destroy(err)
   }
 
   /*
@@ -552,10 +568,15 @@ class TorDaemon extends EventEmitter {
    * has exited.
    *
    * TODO(riastradh): Also try to restart tor or anything?
+   *
+   * @param {TorControl} control
    */
-  _controlClosed () {
-    assert(this._control)
-    this._control = null
+  _controlClosed (control) {
+    if (this._control === control) {
+      this._control = null
+    } else {
+      console.log('tor: control closure got deferred')
+    }
     // Assume this means the process exited.
     this.emit('exit')
     // Poll in case we received a watch event for file system activity
@@ -944,10 +965,14 @@ class TorControl extends EventEmitter {
    * - Mark the control closed so it can't be used any more.
    * - Pass an error to all callbacks waiting for command completion.
    *
+   * Idempotent.  Repeated calls have no effect.
+   *
    * @param {Error} err
    */
   destroy (err) {
-    assert(!this._destroyed)
+    if (this._destroyed) {
+      return
+    }
     this._readable.destroy(err)
     this._writable.end()
     this._writable.destroy(err)
@@ -962,7 +987,6 @@ class TorControl extends EventEmitter {
       const [, callback] = this._cmdq.shift()
       callback(err, null, null)
     }
-    setImmediate(() => assert(this._closing === 0))
   }
 
   /**
