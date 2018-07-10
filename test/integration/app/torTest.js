@@ -313,5 +313,42 @@ describe('tor unit tests', function () {
         })
       })
     })
+
+    it('handles failure gracefully', function (callback) {
+      torDaemon.setup(() => {
+        // Spawn a process.
+        torProcess = spawnTor(torDaemon)
+        // Wait half a second to give the tor process a head start.
+        setTimeout(() => {
+          // Clobber the authentication cookie.
+          const zero = Buffer.alloc(32, 0)
+          fs.writeFile(tor.torControlCookiePath(), zero, (err) => {
+            if (err) {
+              return callback(err)
+            }
+            // Start watching.
+            torDaemon.start()
+            // Wait 2sec for error.
+            const errorTimeout = setTimeout(() => {
+              assert.fail('timeout on tor error')
+            }, 2000)
+            torDaemon.once('error', (err) => {
+              assert(err.toString().indexOf('Tor error 515:') !== -1)
+              clearTimeout(errorTimeout)
+              assert(err)
+              // Kill the tor process gently and wait for it to exit.
+              torProcess.kill('SIGTERM')
+              const timeoutExited = setTimeout(() => {
+                assert.fail('tor process failed to exit after 2sec')
+              }, 2000)
+              torProcess.once('exit', () => {
+                clearTimeout(timeoutExited)
+                callback()
+              })
+            })
+          })
+        }, 500)
+      })
+    })
   })
 })
