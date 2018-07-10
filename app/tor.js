@@ -955,10 +955,14 @@ class TorControl extends EventEmitter {
    * - Mark the control closed so it can't be used any more.
    * - Pass an error to all callbacks waiting for command completion.
    *
+   * Idempotent.  Repeated calls have no effect.
+   *
    * @param {Error} err
    */
   destroy (err) {
-    assert(!this._destroyed)
+    if (this._destroyed) {
+      return
+    }
     this._readable.destroy(err)
     this._writable.end()
     this._writable.destroy(err)
