@@ -75,7 +75,7 @@ module.exports.newTabMenuItem = (openerTabId) => {
 module.exports.newPrivateTabMenuItem = () => {
   return {
     label: locale.translation('newPrivateTab'),
-    accelerator: 'Shift+CmdOrCtrl+P',
+    accelerator: 'Shift+CmdOrCtrl+N',
     click: function (item, focusedWindow) {
       ensureAtLeastOneWindow({
         url: 'about:newtab',
@@ -88,6 +88,7 @@ module.exports.newPrivateTabMenuItem = () => {
 module.exports.newTorTabMenuItem = () => {
   return {
     label: locale.translation('newTorTab'),
+    accelerator: 'CmdOrCtrl+Alt+N',
     click: function (item, focusedWindow) {
       ensureAtLeastOneWindow({
         url: 'about:newtab',
