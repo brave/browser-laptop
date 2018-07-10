@@ -987,7 +987,6 @@ class TorControl extends EventEmitter {
       const [, callback] = this._cmdq.shift()
       callback(err, null, null)
     }
-    setImmediate(() => assert(this._closing === 0))
   }
 
   /**
