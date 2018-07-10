@@ -171,6 +171,17 @@ class TorDaemon extends EventEmitter {
   }
 
   /**
+   * Internal subroutine.  Report an error and kill the daemon.
+   *
+   * @param {string} msg - error message
+   */
+  _error (msg) {
+    console.log(msg)
+    this.emit('error', msg)
+    this.kill()
+  }
+
+  /**
    * Internal subroutine.  Called by fs.watch when the tor watch
    * directory is changed.  If the control port file is newly written,
    * then the control socket should be available now.
@@ -514,22 +525,16 @@ class TorDaemon extends EventEmitter {
           }
         }
         if (err) {
-          console.log(`tor: authentication failure: ${err}`)
-          this.kill()
-          return
+          return this._error(`tor: authentication failure: ${err}`)
         }
         this._control.getSOCKSListeners((err, listeners) => {
           if (err) {
-            console.log(`tor: failed to get socks addresses: ${err}`)
-            this.kill()
-            return
+            return this._error(`tor: failed to get socks addresses: ${err}`)
           }
           this._socks_addresses = listeners
           this._control.getVersion((err, version) => {
             if (err) {
-              console.log(`tor: failed to get version: ${err}`)
-              this.kill()
-              return
+              return this._error(`tor: failed to get version: ${err}`)
             }
             this._tor_version = version
             this.emit('launch', this.getSOCKSAddress())
