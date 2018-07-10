@@ -490,9 +490,10 @@ class TorDaemon extends EventEmitter {
 
       const readable = controlSocket
       const writable = controlSocket
-      this._control = new TorControl(readable, writable)
-      this._control.on('error', (err) => this._controlError(err))
-      this._control.on('close', () => this._controlClosed())
+      const control = new TorControl(readable, writable)
+      this._control = control
+      this._control.on('error', (err) => this._controlError(control, err))
+      this._control.on('close', () => this._controlClosed(control))
 
       // We have finished polling, _and_ we are scheduled to be
       // notified either by (a) our file system activity watcher, or
@@ -538,12 +539,17 @@ class TorDaemon extends EventEmitter {
    * socket.  Report it to the console and give up by destroying the
    * control connection.
    *
+   * @param {TorControl} control
    * @param {Error} err
    */
-  _controlError (err) {
-    assert(this._control)
+  _controlError (control, err) {
+    if (this._control === control) {
+      this._control = null
+    } else {
+      console.log('tor: control error got deferred')
+    }
     console.log(`tor: control socket error: ${err}`)
-    this._control.destroy(err)
+    control.destroy(err)
   }
 
   /*
@@ -552,10 +558,15 @@ class TorDaemon extends EventEmitter {
    * has exited.
    *
    * TODO(riastradh): Also try to restart tor or anything?
+   *
+   * @param {TorControl} control
    */
-  _controlClosed () {
-    assert(this._control)
-    this._control = null
+  _controlClosed (control) {
+    if (this._control === control) {
+      this._control = null
+    } else {
+      console.log('tor: control closure got deferred')
+    }
     // Assume this means the process exited.
     this.emit('exit')
     // Poll in case we received a watch event for file system activity
