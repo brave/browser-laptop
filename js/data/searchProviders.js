@@ -4,6 +4,7 @@
 
 const path = require('path')
 const {braveExtensionId} = require('../constants/config')
+const {isWindows} = require('../../app/common/lib/platformUtil')
 
 /**
  * Returns chrome-extension:// URL of a favicon resource
@@ -18,6 +19,9 @@ const getFaviconUrl = (name, ext = 'ico') => {
  * Returns path of a favicon resource
  */
 const getPath = (name, ext = 'ico') => {
+  if (isWindows()) {
+    return path.join(__dirname, '..', 'img', 'favicons', `${name}.${ext}`)
+  }
   return path.join(__dirname, '..', '..', 'img', 'favicons', `${name}.${ext}`)
 }
 
