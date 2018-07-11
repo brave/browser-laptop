@@ -1,6 +1,6 @@
 {
   "name": "brave",
-  "version": "0.24.137",
+  "version": "0.24.140",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "config": {
@@ -98,7 +98,7 @@
     "bignumber.js": "^4.0.4",
     "bloodhound-js": "brave/bloodhound",
     "brave-crypto": "^0.2.0",
-    "brave-ads-notifier": "5.7.0",
+    "brave-ads-notifier": "6.1.0",
     "chromium-net-errors": "^3.3.0",
     "clipboard-copy": "^1.0.0",
     "compare-versions": "^3.0.1",
