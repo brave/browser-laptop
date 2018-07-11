@@ -270,6 +270,7 @@ var rendererIdentifiers = function () {
     'noDownloads',
     'torrentDesc',
     'urlBlockedInTor',
+    'urlBlockedOutsideTor',
     'urlWarningOk',
     'multiSelectionBookmarks',
     // Caption buttons in titlebar (min/max/close - Windows only)
