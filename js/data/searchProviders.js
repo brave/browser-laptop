@@ -184,8 +184,8 @@ module.exports = { "providers" :
     {
       "name" : "searx",
       "base" : "https://searx.me",
-      "image" : getPath('searx'),
-      "localImage" : getFaviconUrl('searx'),
+      "image" : getPath('favicon_that_shall_not_be_named', 'png'),
+      "localImage" : getFaviconUrl('favicon_that_shall_not_be_named', 'png'),
       "search" : "https://searx.me/?q={searchTerms}&categories=general",
       "shortcut" : ":x"
     },
