@@ -95,6 +95,18 @@ const getPartitionNumber = (partition) => {
   return Number(partition.split('persist:partition-')[1] || 0)
 }
 
+const shouldWaitForTorLoad = (webContents, appState) => {
+  if (webContents &&
+    webContents.session &&
+    webContents.session.partition === appConfig.tor.partition) {
+    appState = appState || appStore.getState()
+    if (appState.getIn(['tor', 'online']) !== true) {
+      console.log('Blocking page load until Tor tab is initialized')
+      return true
+    }
+  }
+}
+
 /**
  * Obtains the current partition.
  * Warning: This function has global side effects in that it increments the
@@ -905,6 +917,9 @@ const api = {
     action = makeImmutable(action)
     const tabId = action.get('tabId')
     const tab = webContentsCache.getWebContents(tabId)
+    if (shouldWaitForTorLoad(tab)) {
+      return
+    }
     if (tab && !tab.isDestroyed()) {
       const url = normalizeUrl(action.get('url'))
       const currentUrl = tab.getURL()
@@ -944,6 +959,9 @@ const api = {
 
   loadURLInTab: (state, tabId, url) => {
     const tab = webContentsCache.getWebContents(tabId)
+    if (shouldWaitForTorLoad(tab)) {
+      return
+    }
     if (tab && !tab.isDestroyed()) {
       url = normalizeUrl(url)
       tab.loadURL(url)
