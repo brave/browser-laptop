@@ -150,7 +150,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
         if ((testingP) && (tabUrl === 'https://www.iab.com/') && (nextEasterEgg < now)) {
           nextEasterEgg = now + (30 * 1000)
 
-          state = checkReadyAdServe(state, windows.getActiveWindowId())
+          state = checkReadyAdServe(state, windows.getActiveWindowId(), true)
         }
         break
       }
@@ -524,20 +524,21 @@ const classifyPage = (state, action, windowId) => {
   return state
 }
 
-const checkReadyAdServe = (state, windowId) => {  // around here is where you will check in with elph
+const checkReadyAdServe = (state, windowId, forceP) => {  // around here is where you will check in with elph
   if (noop(state)) return state
 
-  if (!foregroundP) { // foregroundP is sensible but questionable -SCL
-    appActions.onUserModelLog('Ad not served', { reason: 'not in foreground' })
+  if (!forceP) {
+    if (!foregroundP) { // foregroundP is sensible but questionable -SCL
+      appActions.onUserModelLog('Ad not served', { reason: 'not in foreground' })
 
-    return state
-  }
+      return state
+    }
 
-  if (!userModelState.allowedToShowAdBasedOnHistory(state)) {
-    appActions.onUserModelLog('Ad not served', { reason: 'not allowed based on history' })
+    if (!userModelState.allowedToShowAdBasedOnHistory(state)) {
+      appActions.onUserModelLog('Ad not served', { reason: 'not allowed based on history' })
 
-    return state
-  }
+      return state
+    }
 
   // SCL uncomment when ready
   // let whatnext = elphSaysGo(state)
@@ -549,18 +550,19 @@ const checkReadyAdServe = (state, windowId) => {  // around here is where you wi
   // let reset = true
   // state = userModelState.elphDeferRecorder(state, reset) // reset deferral counter
 
-  const surveys = userModelState.getUserSurveyQueue(state).toJS()
-  const survey = underscore.findWhere(surveys, { status: 'available' })
-  if (survey) {
-    survey.status = 'display'
-    survey.status_at = new Date().toISOString()
-    state = userModelState.setUserSurveyQueue(state, Immutable.fromJS(surveys))
+    const surveys = userModelState.getUserSurveyQueue(state).toJS()
+    const survey = underscore.findWhere(surveys, { status: 'available' })
+    if (survey) {
+      survey.status = 'display'
+      survey.status_at = new Date().toISOString()
+      state = userModelState.setUserSurveyQueue(state, Immutable.fromJS(surveys))
 
-    goAheadAndShowTheAd(windowId, survey.title, survey.description, survey.url, generateAdUUIDString(),
-                        notificationTypes.SURVEYS)
-    appActions.onUserModelLog(notificationTypes.SURVEY_SHOWN, survey)
+      goAheadAndShowTheAd(windowId, survey.title, survey.description, survey.url, generateAdUUIDString(),
+                          notificationTypes.SURVEYS)
+      appActions.onUserModelLog(notificationTypes.SURVEY_SHOWN, survey)
 
-    return state
+      return state
+    }
   }
 
   const bundle = sampleAdFeed
