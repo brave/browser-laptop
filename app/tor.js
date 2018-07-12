@@ -149,17 +149,18 @@ class TorDaemon extends EventEmitter {
   }
 
   /**
-   * Kill the tor daemon.
-   *
-   * Idempotent.  Repeated calls have no effect.
+   * Stop watching for the tor daemon to start up.
    */
-  kill () {
-    if (this._watcher === null) {
-      return
-    }
+  stop () {
     assert(this._watcher)
     this._watcher.close()
     this._watcher = null
+  }
+
+  /**
+   * Kill the tor daemon and close the control channel.
+   */
+  kill () {
     if (!this._process) {
       assert(this._process === null)
       assert(this._control === null)
