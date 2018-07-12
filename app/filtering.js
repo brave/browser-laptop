@@ -862,6 +862,7 @@ function setupTor () {
       return
     }
     torDaemon.on('exit', () => onTorError('The Tor process has exited.'))
+    torDaemon.on('error', (err) => onTorError(`${err}`))
     torDaemon.on('launch', (socksAddr) => {
       const version = torDaemon.getVersion()
       console.log(`tor: daemon listens on ${socksAddr}, version ${version}`)

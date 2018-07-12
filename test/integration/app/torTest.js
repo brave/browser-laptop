@@ -191,6 +191,7 @@ describe('tor unit tests', function () {
         torProcess = null
       }
       assert(torDaemon)
+      torDaemon.stop()
       torDaemon.kill()
       torDaemon = null
       rimraf(bravePath(), (err) => {
