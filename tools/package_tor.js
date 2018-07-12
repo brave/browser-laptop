@@ -21,8 +21,8 @@ if (torPath === undefined) {
   torPath = path.join('app', 'extensions', 'bin')
 }
 
-const torVersion = '0.3.3.7'
-const braveVersion = '4'
+const torVersion = '0.3.3.8'
+const braveVersion = '5'
 const exeSuffix = isWindows ? '.exe' : ''
 const torURL = torS3Prefix + 'tor-' + torVersion + '-' + process.platform + '-brave-' + braveVersion + exeSuffix
 
@@ -33,11 +33,11 @@ if (!fs.existsSync(torPath)) {
 
 var sha512Tor
 if (isDarwin) {
-  sha512Tor = '12d14784724c71f573aeebeaeaa22e39e271b565bc02cdd630d4d70da1b6ba9ffef61d4145735b8f7874abee08c67e6445cf854c877a9d69763332100c9dc293'
+  sha512Tor = '1a578a544ba259a9de11a63ef24f867bb7efbf7df4cd45dd08b9fff775f3b7f39eacd699c25fab22d69d4bee25bc03e9977a5cc66416792281276d584c101a5f'
 } else if (isLinux) {
-  sha512Tor = '868c0f2c933445ca68f330ade872b66b6e2914eccd6b966c300f006468e921813eb7311345213d9e1546e85be400b7d2842506192b8d0ec125c3774c6e5c6d16'
+  sha512Tor = '193f01b75123debf90b3e35d0bc731f9e59cc06cd4e2869123f133f3a5f5c1796150b536c3cca50a9579c03f90084e5052d3ca385f807eac191f46348a57dce1'
 } else {
-  sha512Tor = 'e903df0f7de750e65dc0509fa2a7237b8f69964e34b41aa23f6bf89579202e27ff00df7bb639d4676fbf569baf0fa95acef9192212c6093303baa6468d4affc5'
+  sha512Tor = '7ba514fdd5f184015d65bbb65c82475dc256d23078dd3f7d115b4e2b93bf73ceedfbca89eed1baf501bddcdb7f5c81f384e02836588d067c01c3f469b0664885'
 }
 
 // download the binary
