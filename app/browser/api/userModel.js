@@ -284,11 +284,12 @@ const tabUpdate = (state, action) => {
 }
 
 const removeHistorySite = (state, action) => {
-  // check to see how ledger removes history
-  // first need to establish site classification DB in userModelState
-  // blow it all away for now
+  // site history removal happens on legit issues like site fails to load.
+  // removing All History absolutely can't happen here. 
+  // other than (possibly) the temporary logging facility, these sites are never
+  // really logged in this state anyway -SCL
 
-  return userModelState.removeAllHistory(state)
+  return state
 }
 
 const removeAllHistory = (state) => {
