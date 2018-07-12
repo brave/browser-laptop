@@ -285,10 +285,9 @@ const tabUpdate = (state, action) => {
 
 const removeHistorySite = (state, action) => {
   // site history removal happens on legit issues like site fails to load.
-  // removing All History absolutely can't happen here. 
+  // removing All History absolutely can't happen here.
   // other than (possibly) the temporary logging facility, these sites are never
   // really logged in this state anyway -SCL
-
   return state
 }
 
