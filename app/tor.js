@@ -149,17 +149,18 @@ class TorDaemon extends EventEmitter {
   }
 
   /**
-   * Kill the tor daemon.
-   *
-   * Idempotent.  Repeated calls have no effect.
+   * Stop watching for the tor daemon to start up.
    */
-  kill () {
-    if (this._watcher === null) {
-      return
-    }
+  stop () {
     assert(this._watcher)
     this._watcher.close()
     this._watcher = null
+  }
+
+  /**
+   * Kill the tor daemon and close the control channel.
+   */
+  kill () {
     if (!this._process) {
       assert(this._process === null)
       assert(this._control === null)
@@ -176,7 +177,6 @@ class TorDaemon extends EventEmitter {
    * @param {string} msg - error message
    */
   _error (msg) {
-    console.log(msg)
     this.emit('error', msg)
     this.kill()
   }
@@ -311,6 +311,7 @@ class TorDaemon extends EventEmitter {
   _polled () {
     assert(this._polling)
     if (this._retry_poll && this._control === null) {
+      this._retry_poll = false
       return process.nextTick(() => this._doPoll())
     }
     this._polling = false
@@ -525,16 +526,16 @@ class TorDaemon extends EventEmitter {
           }
         }
         if (err) {
-          return this._error(`tor: authentication failure: ${err}`)
+          return this._error(`authentication failure: ${err}`)
         }
         this._control.getSOCKSListeners((err, listeners) => {
           if (err) {
-            return this._error(`tor: failed to get socks addresses: ${err}`)
+            return this._error(`failed to get socks addresses: ${err}`)
           }
           this._socks_addresses = listeners
           this._control.getVersion((err, version) => {
             if (err) {
-              return this._error(`tor: failed to get version: ${err}`)
+              return this._error(`failed to get version: ${err}`)
             }
             this._tor_version = version
             this.emit('launch', this.getSOCKSAddress())
@@ -983,6 +984,7 @@ class TorControl extends EventEmitter {
     this._writable.removeListener('error', this._writable_on_error)
     this._writable.removeListener('close', this._writable_on_close)
     this._destroyed = true
+    err = err || new Error('tor: control channel destroyed')
     while (this._cmdq.length > 0) {
       const [, callback] = this._cmdq.shift()
       callback(err, null, null)
@@ -1134,20 +1136,29 @@ class TorControl extends EventEmitter {
   _onEnd () {
     assert(!this._destroyed)
     if (this._cmdq.length > 0) {
-      this._error('tor: control connection closed prematurely')
+      this._error('control connection closed prematurely')
     }
     this.emit('end')
   }
 
   /**
    * Internal subroutine.  Callback for errors on the enclosed
-   * readable or writable.  Pass it along.
+   * readable or writable.  If there are any commands pending, fail
+   * them with this error.  Otherwise, emit an asynchronous 'error'
+   * event.
    *
    * @param {Error} err
    */
   _onError (err) {
-    assert(!this._destroyed)
-    this.emit('error', err)
+    if (this._cmdq.length > 0) {
+      assert(!this._destroyed)
+      do {
+        const [, callback] = this._cmdq.shift()
+        callback(err, null, null)
+      } while (this._cmdq.length > 0)
+    } else {
+      this.emit('error', err)
+    }
   }
 
   /**
@@ -1166,12 +1177,14 @@ class TorControl extends EventEmitter {
   }
 
   /**
-   * Internal subroutine.  Emit an error with a prescribed message.
+   * Internal subroutine.  Pass an error with the prescribed message
+   * to any callbacks, or emit an error with a prescribed message if
+   * there are none.
    *
    * @param {string} msg
    */
   _error (msg) {
-    this.emit('error', new Error(msg))
+    this._onError(new Error(msg))
   }
 
   /**
