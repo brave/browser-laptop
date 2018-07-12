@@ -985,6 +985,7 @@ class TorControl extends EventEmitter {
     this._writable.removeListener('error', this._writable_on_error)
     this._writable.removeListener('close', this._writable_on_close)
     this._destroyed = true
+    err = err || new Error('tor: control channel destroyed')
     while (this._cmdq.length > 0) {
       const [, callback] = this._cmdq.shift()
       callback(err, null, null)
@@ -1143,13 +1144,22 @@ class TorControl extends EventEmitter {
 
   /**
    * Internal subroutine.  Callback for errors on the enclosed
-   * readable or writable.  Pass it along.
+   * readable or writable.  If there are any commands pending, fail
+   * them with this error.  Otherwise, emit an asynchronous 'error'
+   * event.
    *
    * @param {Error} err
    */
   _onError (err) {
-    assert(!this._destroyed)
-    this.emit('error', err)
+    if (this._cmdq.length > 0) {
+      assert(!this._destroyed)
+      do {
+        const [, callback] = this._cmdq.shift()
+        callback(err, null, null)
+      } while (this._cmdq.length > 0)
+    } else {
+      this.emit('error', err)
+    }
   }
 
   /**
@@ -1168,12 +1178,14 @@ class TorControl extends EventEmitter {
   }
 
   /**
-   * Internal subroutine.  Emit an error with a prescribed message.
+   * Internal subroutine.  Pass an error with the prescribed message
+   * to any callbacks, or emit an error with a prescribed message if
+   * there are none.
    *
    * @param {string} msg
    */
   _error (msg) {
-    this.emit('error', new Error(msg))
+    this._onError(new Error(msg))
   }
 
   /**
