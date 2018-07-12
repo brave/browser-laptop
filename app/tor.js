@@ -526,16 +526,16 @@ class TorDaemon extends EventEmitter {
           }
         }
         if (err) {
-          return this._error(`tor: authentication failure: ${err}`)
+          return this._error(`authentication failure: ${err}`)
         }
         this._control.getSOCKSListeners((err, listeners) => {
           if (err) {
-            return this._error(`tor: failed to get socks addresses: ${err}`)
+            return this._error(`failed to get socks addresses: ${err}`)
           }
           this._socks_addresses = listeners
           this._control.getVersion((err, version) => {
             if (err) {
-              return this._error(`tor: failed to get version: ${err}`)
+              return this._error(`failed to get version: ${err}`)
             }
             this._tor_version = version
             this.emit('launch', this.getSOCKSAddress())
@@ -1136,7 +1136,7 @@ class TorControl extends EventEmitter {
   _onEnd () {
     assert(!this._destroyed)
     if (this._cmdq.length > 0) {
-      this._error('tor: control connection closed prematurely')
+      this._error('control connection closed prematurely')
     }
     this.emit('end')
   }
