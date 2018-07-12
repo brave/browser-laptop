@@ -177,7 +177,6 @@ class TorDaemon extends EventEmitter {
    * @param {string} msg - error message
    */
   _error (msg) {
-    console.log(msg)
     this.emit('error', msg)
     this.kill()
   }
