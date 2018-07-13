@@ -185,6 +185,17 @@ app.on('ready', () => {
     appActions.networkDisconnected()
   })
 
+  app.setUserTasks([
+    {
+      title: "New Window",
+      description: "Create a new Window",
+      iconIndex: 0,
+      iconPath: process.execPath,
+      program: process.argv[0],
+      arguments: "--new-window"
+    }
+  ])
+
   loadAppStatePromise.then((initialImmutableState) => {
     // Do this after loading the state
     // For tests we always want to load default app state
