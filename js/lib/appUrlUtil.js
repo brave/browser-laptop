@@ -7,7 +7,6 @@ const path = require('path')
 const UrlUtil = require('./urlutil')
 const config = require('../constants/config')
 const isDarwin = require('../../app/common/lib/platformUtil').isDarwin()
-const urlParse = require('../../app/common/urlParse')
 
 module.exports.fileUrl = (filePath) => {
   // It's preferrable to call path.resolve but it's not available

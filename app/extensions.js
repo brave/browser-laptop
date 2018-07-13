@@ -601,7 +601,8 @@ module.exports.init = () => {
     var gethArgs = [
       '--light',
       '--rpc',
-      '--rpccorsdomain',
+      '--ws',
+      '--wsorigins',
       'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp',
       '--datadir',
       path.join(app.getPath('userData'), 'ethereum'),
