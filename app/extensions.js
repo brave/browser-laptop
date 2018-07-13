@@ -303,7 +303,7 @@ let generateEthwalletManifest = () => {
     'style-src': '\'self\' \'unsafe-inline\'',
     'connect-src': 'blob: \'self\' ws://localhost:* http://localhost:* https://min-api.cryptocompare.com https://mini-api.cryptocompare.com',
     'img-src': '\'self\' data:',
-    'script-src': '\'unsafe-eval\' \'unsafe-inline\' \'sha256-7B6rTuXUsu9shBeECmDFH4h7RDsfogQ3kIonJnIL40o\' \'sha256-zgjB35Pd2ax7Wwfk9iKnAH8r+gNrD2cHpxDkH81DHzw=\' \'safe\' \'self\''
+    'script-src': '\'self\' \'unsafe-eval\' \'sha256-7B6rTuXUsu9shBeECmDFH4h7RDsfogQ3kIonJnIL40o\' \'sha256-zgjB35Pd2ax7Wwfk9iKnAH8r+gNrD2cHpxDkH81DHzw=\''
   }
 
   if (process.env.NODE_ENV === 'development') {
