@@ -267,13 +267,13 @@ class EnabledContent extends ImmutableComponent {
   }
 
   statusMessage () {
-    const promo = this.props.ledgerData.get('promotion') || Immutable.Map()
-    const status = this.props.ledgerData.get('status') || ''
-    const successText = promo.getIn(['panel', 'successText'])
-    const promotionStatus = promo.get('promotionStatus')
+    const promo = (this.props.ledgerData && this.props.ledgerData.get('promotion')) || Immutable.Map()
+    const status = (this.props.ledgerData && this.props.ledgerData.get('status')) || ''
+    const successText = promo && promo.getIn(['panel', 'successText'])
+    const promotionStatus = promo && promo.get('promotionStatus')
     let isPromotion = true
 
-    if ((!successText || !promo.has('claimedTimestamp')) && !promotionStatus) {
+    if ((!successText || (promo && !promo.has('claimedTimestamp'))) && !promotionStatus) {
       isPromotion = false
       if (status.length === 0) {
         return
@@ -284,9 +284,9 @@ class EnabledContent extends ImmutableComponent {
 
     if (isPromotion) {
       showClose = true
-      title = successText.get('title')
-      message = successText.get('message')
-      text = promo.getIn(['panel', 'disclaimer'])
+      title = successText && successText.get('title')
+      message = successText && successText.get('message')
+      text = promo && promo.getIn(['panel', 'disclaimer'])
       rightButton = <BrowserButton
         secondaryColor
         l10nId={'paymentHistoryOKText'}
