@@ -1839,6 +1839,28 @@ const appActions = {
     })
   },
 
+  onPublishersInfoReceived: function (result) {
+    dispatch({
+      actionType: appConstants.APP_ON_PUBLISHERS_INFO_RECEIVED,
+      result
+    })
+  },
+
+  onPublishersInfoWrite: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_PUBLISHERS_INFO_WRITE
+    })
+  },
+
+  onPublishersInfoRead: function (keys, data, updateStamp) {
+    dispatch({
+      actionType: appConstants.APP_ON_PUBLISHERS_INFO_READ,
+      keys,
+      data,
+      updateStamp
+    })
+  },
+
   /**
    * Dispatches a message that window was resized
    * @param windowValue - window properties
