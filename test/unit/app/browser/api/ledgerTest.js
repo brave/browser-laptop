@@ -3922,6 +3922,32 @@ describe('ledger api unit tests', function () {
         assert.deepEqual(result.toJS(), state.toJS())
       })
     })
+
+    describe('promotion polling', function () {
+      let onPromotionGetSpy
+
+      before(function () {
+        onPromotionGetSpy = sinon.spy(appActions, 'onPromotionGet')
+      })
+
+      after(function () {
+        onPromotionGetSpy.restore()
+      })
+
+      afterEach(function () {
+        onPromotionGetSpy.reset()
+      })
+
+      it('is called without payments enabled', function () {
+        ledgerApi.paymentPresent(defaultAppState, 1, true)
+        assert(onPromotionGetSpy.calledOnce)
+      })
+
+      it('is not called if not on payments screen', function () {
+        ledgerApi.paymentPresent(defaultAppState, 1, false)
+        assert(onPromotionGetSpy.notCalled)
+      })
+    })
   })
 
   describe('onFuzzing', function () {
@@ -3963,22 +3989,6 @@ describe('ledger api unit tests', function () {
     it('pushing back', function () {
       ledgerApi.onFuzzing(10, true)
       assert(onLedgerFuzzingSpy.withArgs(1000, true).calledOnce)
-    })
-  })
-
-  describe('runPromotionCheck', function () {
-    let onRunPromotionCheckSpy
-
-    before(function () {
-      onRunPromotionCheckSpy = sinon.spy(appActions, 'runPromotionCheck')
-    })
-
-    afterEach(function () {
-      onRunPromotionCheckSpy.reset()
-    })
-    it('calls runPromotionCheck', function () {
-      ledgerApi.runPromotionCheck()
-      assert(onRunPromotionCheckSpy.calledOnce)
     })
   })
 

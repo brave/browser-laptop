@@ -2144,12 +2144,6 @@ const appActions = {
       tabId,
       index
     })
-  },
-
-  runPromotionCheck: function () {
-    dispatch({
-      actionType: appConstants.APP_RUN_PROMOTION_CHECK
-    })
   }
 }
 

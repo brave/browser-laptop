@@ -577,11 +577,6 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.pageDataChanged(state, viewData, true)
         break
       }
-    case appConstants.APP_RUN_PROMOTION_CHECK:
-      {
-        state = ledgerApi.onRunPromotionCheck(state, getSetting(settings.PAYMENTS_ENABLED))
-        break
-      }
     case appConstants.APP_ON_NOTIFICATION_RESPONSE:
       {
         state = ledgerNotifications.onResponse(
