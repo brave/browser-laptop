@@ -130,6 +130,15 @@ function registerForBeforeRequest (session, partition) {
         onBlockedInTor(details, muonCb)
         return
       }
+    } else {
+      const hostname = urlParse(details.url).hostname
+      // US-ASCII only in `.onion', so no need for locale-dependent
+      // case-insensitive comparisons.
+      if (typeof hostname === 'string' &&
+          hostname.toLowerCase().endsWith('.onion')) {
+        onBlockedOutsideTor(details, muonCb)
+        return
+      }
     }
 
     if (process.env.NODE_ENV === 'development') {
@@ -393,17 +402,25 @@ function registerForBeforeSendHeaders (session, partition) {
   })
 }
 
-function onBlockedInTor (details, muonCb) {
+function onBlocked (reasonKey, details, muonCb) {
   const cb = () => muonCb({cancel: true})
   if (details.tabId && details.resourceType === 'mainFrame') {
     tabMessageBox.show(details.tabId, {
-      message: `${locale.translation('urlBlockedInTor')}`,
+      message: `${locale.translation(reasonKey)}`,
       title: 'Brave',
       buttons: [locale.translation('urlWarningOk')]
     }, cb)
   } else {
     cb()
   }
+}
+
+function onBlockedInTor (details, muonCb) {
+  onBlocked('urlBlockedInTor', details, muonCb)
+}
+
+function onBlockedOutsideTor (details, muonCb) {
+  onBlocked('urlBlockedOutsideTor', details, muonCb)
 }
 
 /**
