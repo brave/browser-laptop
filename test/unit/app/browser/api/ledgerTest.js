@@ -156,16 +156,16 @@ describe('ledger api unit tests', function () {
       busyP: function () {
         return isBusy
       },
-      publisherTimestamp: function () {
-        return 0
-      },
       getPromotion: () => {},
       setPromotion: () => {},
       setTimeUntilReconcile: () => {},
       isReadyToReconcile: () => isReadyToReconcile,
       recoverWallet: () => {},
       getPromotionCaptcha: () => {},
-      report: () => {}
+      report: () => {},
+      fetchPublisherInfo: function (callback) {
+        callback(null, {})
+      }
     }
     window.getWalletPassphrase = (parsedData) => {
       if (walletPassphraseReturn === 'error') {
@@ -233,22 +233,39 @@ describe('ledger api unit tests', function () {
     })
 
     describe('initialize', function () {
-      let notificationsInitStub
+      let notificationsInitStub, checkPublisherInfoUpdateSpy
+
+      before(function () {
+        checkPublisherInfoUpdateSpy = sinon.spy(ledgerApi, 'checkPublisherInfoUpdate')
+      })
+
       beforeEach(function () {
         notificationsInitStub = sinon.stub(ledgerNotificationsApi, 'init')
       })
 
       afterEach(function () {
         notificationsInitStub.restore()
+        checkPublisherInfoUpdateSpy.reset()
       })
 
       after(function () {
         ledgerApi.setSynopsis(undefined)
+        checkPublisherInfoUpdateSpy.restore()
       })
 
       it('calls notifications.init', function () {
         ledgerApi.initialize(defaultAppState, true)
         assert(notificationsInitStub.calledOnce)
+      })
+
+      it('doesn\'t check for verified publisher updates when payments are disabled', function () {
+        ledgerApi.initialize(defaultAppState, false)
+        assert(checkPublisherInfoUpdateSpy.notCalled)
+      })
+
+      it('checks for verified publisher updates when payments are disabled', function () {
+        ledgerApi.initialize(defaultAppState, true)
+        assert(checkPublisherInfoUpdateSpy.calledOnce)
       })
     })
 
@@ -473,100 +490,34 @@ describe('ledger api unit tests', function () {
     })
 
     describe('checkVerifiedStatus', function () {
-      let verifiedPSpy, onPublishersOptionUpdateSpy
-      let returnValue = false
+      let updatePublishersSpy
 
       before(function () {
-        verifiedPSpy = sinon.spy(ledgerApi, 'verifiedP')
-        onPublishersOptionUpdateSpy = sinon.spy(appActions, 'onPublishersOptionUpdate')
-
-        ledgerApi.setClient({
-          publisherInfo: function (publisherKey, callback) {
-            callback(null, {
-              publisher: 'test.io',
-              properties: {
-                verified: returnValue
-              }
-            })
-          },
-          publishersInfo: function (publisherKey, callback) {
-            publisherKey.forEach(key => {
-              callback(null, {
-                publisher: key,
-                properties: {
-                  verified: returnValue
-                }
-              })
-            })
-          }
-        })
-      })
-
-      afterEach(function () {
-        returnValue = false
-        verifiedPSpy.reset()
-        onPublishersOptionUpdateSpy.reset()
+        updatePublishersSpy = sinon.spy(ledgerApi, 'updatePublishers')
       })
 
       after(function () {
-        verifiedPSpy.restore()
-        onPublishersOptionUpdateSpy.restore()
-        ledgerApi.setClient(undefined)
+        updatePublishersSpy.restore()
+      })
+
+      afterEach(function () {
+        updatePublishersSpy.reset()
       })
 
       it('null case', function () {
         const result = ledgerApi.checkVerifiedStatus(defaultAppState)
-        assert.deepEqual(result.toJS(), defaultAppState.toJS())
-        assert(verifiedPSpy.notCalled)
+        assert.equal(defaultAppState, result)
       })
 
-      it('only update if timestamp is older then current', function () {
-        const newState = defaultAppState
-          .setIn(['ledger', 'publisherTimestamp'], 20)
-          .setIn(['ledger', 'synopsis', 'publishers', 'test.io', 'options', 'verifiedTimestamp'], 20)
-        const result = ledgerApi.checkVerifiedStatus(newState, 'test.io')
-        assert.deepEqual(result.toJS(), newState.toJS())
-        assert(verifiedPSpy.notCalled)
+      it('converts a single key to a one element array', function () {
+        ledgerApi.checkVerifiedStatus(defaultAppState, 'brave.com')
+        assert(updatePublishersSpy.withArgs(defaultAppState, ['brave.com']).calledOnce)
       })
 
-      it('update when timestamp is older', function () {
-        returnValue = true
-        const newState = defaultAppState
-          .setIn(['ledger', 'publisherTimestamp'], 20)
-          .setIn(['ledger', 'synopsis', 'publishers', 'test.io', 'options', 'verifiedTimestamp'], 10)
-
-        const result = ledgerApi.checkVerifiedStatus(newState, 'test.io')
-        assert.deepEqual(result.toJS(), newState.toJS())
-        assert(verifiedPSpy.withArgs(sinon.match.any, ['test.io'], sinon.match.any, 20).calledOnce)
-      })
-
-      it('change publisher verified status from true to false', function () {
-        const newState = defaultAppState
-          .setIn(['ledger', 'publisherTimestamp'], 20)
-          .setIn(['ledger', 'synopsis', 'publishers', 'test.io', 'options', 'verifiedTimestamp'], 10)
-          .setIn(['ledger', 'synopsis', 'publishers', 'test.io', 'options', 'verified'], true)
-
-        const result = ledgerApi.checkVerifiedStatus(newState, 'test.io')
-        assert.deepEqual(result.toJS(), newState.toJS())
-        assert(verifiedPSpy.withArgs(sinon.match.any, ['test.io'], sinon.match.any, 20).calledOnce)
-      })
-
-      it('handle multiple publishers', function () {
-        const newState = defaultAppState
-          .setIn(['ledger', 'publisherTimestamp'], 20)
-          .setIn(['ledger', 'synopsis', 'publishers', 'test.io', 'options', 'verifiedTimestamp'], 10)
-          .setIn(['ledger', 'synopsis', 'publishers', 'test1.io', 'options', 'verifiedTimestamp'], 15)
-          .setIn(['ledger', 'synopsis', 'publishers', 'test2.io', 'options', 'verifiedTimestamp'], 20)
-          .setIn(['ledger', 'synopsis', 'publishers', 'test3.io', 'options', 'verifiedTimestamp'], 30)
-
-        const result = ledgerApi.checkVerifiedStatus(newState, [
-          'test1.io',
-          'test2.io',
-          'test3.io',
-          'test.io'
-        ])
-        assert.deepEqual(result.toJS(), newState.toJS())
-        assert(verifiedPSpy.withArgs(sinon.match.any, ['test1.io', 'test.io'], sinon.match.any, 20).calledOnce)
+      it('calls verifiedP with array of keys', function () {
+        const publisherKeys = ['brave.com', 'clifton.io']
+        ledgerApi.checkVerifiedStatus(defaultAppState, publisherKeys)
+        assert(updatePublishersSpy.withArgs(defaultAppState, publisherKeys).calledOnce)
       })
     })
 
@@ -783,7 +734,7 @@ describe('ledger api unit tests', function () {
     })
 
     describe('onMediaPublisher', function () {
-      let saveVisitSpy, verifiedPStub, setPublisherSpy
+      let saveVisitSpy, updatePublishersStub, setPublisherSpy
 
       const expectedState = Immutable.fromJS({
         cache: {
@@ -820,7 +771,7 @@ describe('ledger api unit tests', function () {
       })
 
       before(function () {
-        verifiedPStub = sinon.stub(ledgerApi, 'verifiedP', (state, publisherKey, fn) => state)
+        updatePublishersStub = sinon.stub(ledgerApi, 'updatePublishers', (state, publisherKey, fn) => state)
         saveVisitSpy = sinon.spy(ledgerApi, 'saveVisit')
         setPublisherSpy = sinon.spy(ledgerState, 'setPublisher')
       })
@@ -842,14 +793,14 @@ describe('ledger api unit tests', function () {
       })
 
       after(function () {
-        verifiedPStub.restore()
+        updatePublishersStub.restore()
         saveVisitSpy.restore()
         setPublisherSpy.restore()
       })
 
       afterEach(function () {
         ledgerApi.setSynopsis(undefined)
-        verifiedPStub.reset()
+        updatePublishersStub.reset()
         saveVisitSpy.reset()
         setPublisherSpy.reset()
       })
@@ -2274,6 +2225,7 @@ describe('ledger api unit tests', function () {
       after(function () {
         setInfoPropSpy.restore()
         getInfoPropSpy.restore()
+        ledgerApi.setClient(undefined)
       })
 
       it('transactions are missing', function () {
@@ -2508,61 +2460,6 @@ describe('ledger api unit tests', function () {
         assert(setInfoPropSpy.calledOnce)
         assert.deepEqual(result.toJS(), expectedState.toJS())
       })
-    })
-  })
-
-  describe('onPublisherTimestamp', function () {
-    let checkVerifiedStatusSpy
-
-    const stateWithData = defaultAppState
-      .setIn(['ledger', 'synopsis', 'publishers', 'clifton.io'], Immutable.fromJS({
-        visits: 1
-      }))
-
-    before(function () {
-      checkVerifiedStatusSpy = sinon.spy(ledgerApi, 'checkVerifiedStatus')
-      ledgerApi.setClient({
-        publisherInfo: function () {
-          return false
-        },
-        publishersInfo: function () {
-          return false
-        }
-      })
-    })
-
-    afterEach(function () {
-      checkVerifiedStatusSpy.reset()
-    })
-
-    after(function () {
-      checkVerifiedStatusSpy.restore()
-      ledgerApi.setClient(undefined)
-    })
-
-    it('publisher timestamp is the same', function () {
-      ledgerApi.onPublisherTimestamp(defaultAppState, 10, 10)
-      assert(checkVerifiedStatusSpy.notCalled)
-    })
-
-    it('publisher list is empty', function () {
-      ledgerApi.onPublisherTimestamp(defaultAppState, 10, 20)
-      assert(checkVerifiedStatusSpy.notCalled)
-    })
-
-    it('check publishers', function () {
-      ledgerApi.onPublisherTimestamp(stateWithData, 10, 20)
-      assert(checkVerifiedStatusSpy.withArgs(sinon.match.any, ['clifton.io'], 20).calledOnce)
-    })
-
-    it('check multiple publishers', function () {
-      const multiple = stateWithData
-        .setIn(['ledger', 'synopsis', 'publishers', 'brave.com'], Immutable.fromJS({
-          visits: 1
-        }))
-      ledgerApi.onPublisherTimestamp(multiple, 10, 20)
-
-      assert(checkVerifiedStatusSpy.withArgs(sinon.match.any, ['clifton.io', 'brave.com'], 20).calledOnce)
     })
   })
 
@@ -3140,98 +3037,6 @@ describe('ledger api unit tests', function () {
       const returnedState = ledgerApi.referralCheck(state)
       assert.deepEqual(returnedState.toJS(), expectedState.toJS())
       assert(deleteUpdatePropSpy.calledOnce)
-    })
-  })
-
-  describe('onVerifiedPStatus', function () {
-    let onPublishersOptionUpdateSpy
-
-    before(function () {
-      onPublishersOptionUpdateSpy = sinon.spy(appActions, 'onPublishersOptionUpdate')
-    })
-
-    afterEach(function () {
-      onPublishersOptionUpdateSpy.reset()
-    })
-
-    after(function () {
-      onPublishersOptionUpdateSpy.restore()
-    })
-
-    it('null case', function () {
-      ledgerApi.onVerifiedPStatus()
-      assert(onPublishersOptionUpdateSpy.notCalled)
-    })
-
-    it('on error', function () {
-      ledgerApi.onVerifiedPStatus('error')
-      assert(onPublishersOptionUpdateSpy.notCalled)
-    })
-
-    it('convert regular object into array', function () {
-      ledgerApi.onVerifiedPStatus(null, {
-        SLD: 'clifton.io',
-        RLD: '',
-        QLD: '',
-        publisher: 'clifton.io',
-        properties: { timestamp: '6509162935841980427', verified: true }
-      }, 100)
-      assert(onPublishersOptionUpdateSpy.withArgs([
-        {
-          publisherKey: 'clifton.io',
-          verified: true,
-          verifiedTimestamp: 100
-        }
-      ]).calledOnce)
-    })
-
-    it('all publishers has errors', function () {
-      ledgerApi.onVerifiedPStatus(null, [
-        {
-          publisher: 'https://clifton.io/',
-          err: 'error'
-        },
-        {
-          publisher: 'https://brianbondy.com/',
-          err: 'error'
-        }
-      ], 100)
-      assert(onPublishersOptionUpdateSpy.notCalled)
-    })
-
-    it('publishers are ok', function () {
-      ledgerApi.onVerifiedPStatus(null, [
-        {
-          SLD: 'clifton.io',
-          RLD: '',
-          QLD: '',
-          publisher: 'clifton.io',
-          properties: { timestamp: '6509162935841980427', verified: true }
-        },
-        {
-          publisher: 'https://test.com/',
-          err: 'error'
-        },
-        {
-          SLD: 'brianbondy.com',
-          RLD: '',
-          QLD: '',
-          publisher: 'brianbondy.com',
-          properties: { timestamp: '6509162935841940427', verified: false }
-        }
-      ], 100)
-      assert(onPublishersOptionUpdateSpy.withArgs([
-        {
-          publisherKey: 'clifton.io',
-          verified: true,
-          verifiedTimestamp: 100
-        },
-        {
-          publisherKey: 'brianbondy.com',
-          verified: false,
-          verifiedTimestamp: 100
-        }
-      ]).calledOnce)
     })
   })
 
@@ -3930,8 +3735,7 @@ describe('ledger api unit tests', function () {
               }
             }
           },
-          promotion: {},
-          publisherTimestamp: 123
+          promotion: {}
         }))
 
       const result = ledgerApi.deleteWallet(state)
@@ -4175,6 +3979,314 @@ describe('ledger api unit tests', function () {
     it('calls runPromotionCheck', function () {
       ledgerApi.runPromotionCheck()
       assert(onRunPromotionCheckSpy.calledOnce)
+    })
+  })
+
+  describe('getPublisherInfo', function () {
+    let fetchPublisherInfoSpy, onPublishersInfoReceivedSpy
+
+    before(function () {
+      fetchPublisherInfoSpy = sinon.spy(ledgerClientObject, 'fetchPublisherInfo')
+      onPublishersInfoReceivedSpy = sinon.spy(appActions, 'onPublishersInfoReceived')
+    })
+
+    after(function () {
+      fetchPublisherInfoSpy.restore()
+      onPublishersInfoReceivedSpy.restore()
+    })
+
+    afterEach(function () {
+      fetchPublisherInfoSpy.reset()
+      onPublishersInfoReceivedSpy.reset()
+    })
+
+    it('does nothing when the client is undefined', function () {
+      ledgerApi.setClient(undefined)
+      ledgerApi.getPublisherInfo()
+      assert(fetchPublisherInfoSpy.notCalled)
+    })
+
+    it('makes request and dispatches app action', function () {
+      ledgerApi.setClient(ledgerClientObject)
+      ledgerApi.getPublisherInfo()
+      assert(fetchPublisherInfoSpy.calledOnce)
+      assert(onPublishersInfoReceivedSpy.calledOnce)
+    })
+  })
+
+  describe('checkPublisherInfoUpdate', function () {
+    let fakeClock, getPublisherInfoSpy
+    const delay = 1000 * 15
+    const day = 1000 * 60 * 60 * 24
+
+    beforeEach(function () {
+      fakeClock = sinon.useFakeTimers()
+      ledgerApi.clearVisitsByPublisher()
+    })
+
+    before(function () {
+      getPublisherInfoSpy = sinon.spy(ledgerApi, 'getPublisherInfo')
+    })
+
+    after(function () {
+      getPublisherInfoSpy.restore()
+    })
+
+    afterEach(function () {
+      fakeClock.restore()
+      getPublisherInfoSpy.reset()
+    })
+
+    it('calls getPublisherInfo (no delay) when no timestamp is present and client exists', function () {
+      ledgerApi.setClient(ledgerClientObject)
+      ledgerApi.checkPublisherInfoUpdate(defaultAppState)
+      fakeClock.tick(delay)
+      assert(getPublisherInfoSpy.calledOnce)
+    })
+
+    it('calls getPublisherInfo when no timestamp is present and client is undefined', function () {
+      ledgerApi.setClient(undefined)
+      ledgerApi.checkPublisherInfoUpdate(defaultAppState)
+      fakeClock.tick(delay)
+      assert(getPublisherInfoSpy.calledOnce)
+    })
+
+    it('doesn\'t call getPublisherInfo when last check has happened in the past two days', function () {
+      const state = defaultAppState
+        .setIn(['updates', 'verifiedPublishersTimestamp'], day)
+      fakeClock.tick(new Date().getTime())
+      ledgerApi.setClient(ledgerClientObject)
+      ledgerApi.checkPublisherInfoUpdate(state)
+      assert(getPublisherInfoSpy.notCalled)
+    })
+  })
+
+  describe('runPublishersUpdate', function () {
+    let updatePublishersSpy
+
+    before(function () {
+      updatePublishersSpy = sinon.spy(ledgerApi, 'updatePublishers')
+    })
+
+    after(function () {
+      updatePublishersSpy.restore()
+      ledgerApi.setSynopsis(undefined)
+    })
+
+    afterEach(function () {
+      updatePublishersSpy.reset()
+    })
+
+    it('calls verifiedP with an array of publisher keys', function () {
+      const expectedKeys = ['brave.com', 'clifton.io']
+      const state = defaultAppState
+        .setIn(['ledger', 'synopsis'], Immutable.fromJS({
+          publishers: {
+            'brave.com': {
+              verified: true,
+              exclude: false,
+              options: {
+                exclude: true
+              },
+              publisherURL: 'https://brave.com'
+            },
+            'clifton.io': {
+              verified: true,
+              exclude: false,
+              options: {
+                exclude: true
+              },
+              publisherURL: 'https://clifton.io'
+            }
+          }
+        }))
+      ledgerApi.runPublishersUpdate(state)
+      assert(updatePublishersSpy.withArgs(state, expectedKeys).calledOnce)
+    })
+    it('does not call verifiedP when there are no publishers in the synopsis', function () {
+      ledgerApi.runPublishersUpdate(defaultAppState)
+      assert(updatePublishersSpy.notCalled)
+    })
+  })
+
+  describe('updatePublishers', function () {
+    let readFileStub, onPublishersInfoReadSpy
+    const corruptData = '[{"brave.com",true,false],["vimeo.com",false,false]]'
+    const readData = '[["brave.com",true,false],["vimeo.com",false,false]]'
+
+    before(function () {
+      onPublishersInfoReadSpy = sinon.spy(appActions, 'onPublishersInfoRead')
+    })
+
+    afterEach(function () {
+      readFileStub.restore()
+      onPublishersInfoReadSpy.reset()
+    })
+
+    after(function () {
+      onPublishersInfoReadSpy.restore()
+    })
+
+    it('dispatches onPublishersInfoRead with read data', function () {
+      readFileStub = sinon.stub(fs, 'readFile', (path, callback) => {
+        callback(null, readData)
+      })
+
+      ledgerApi.updatePublishers(defaultAppState, ['brave.com'])
+      assert.deepEqual(['brave.com'], onPublishersInfoReadSpy.getCall(0).args[0])
+      assert.deepEqual(JSON.parse(readData), onPublishersInfoReadSpy.getCall(0).args[1])
+    })
+
+    it('does not dispatch onPublishersInfoRead if data from file cannot be parsed as JSON', function () {
+      readFileStub = sinon.stub(fs, 'readFile', (path, callback) => {
+        callback(null, corruptData)
+      })
+
+      ledgerApi.updatePublishers(defaultAppState, ['brave.com'])
+      assert(onPublishersInfoReadSpy.notCalled)
+    })
+
+    it('does not dispatch onPublishersInfoRead if there was a read error', function () {
+      readFileStub = sinon.stub(fs, 'readFile', (path, callback) => {
+        const error = {'success': false}
+        callback(error, readData)
+      })
+
+      ledgerApi.updatePublishers(defaultAppState, ['brave.com'])
+      assert(onPublishersInfoReadSpy.notCalled)
+    })
+  })
+
+  describe('updatePublishersInfo', function () {
+    let onPublishersOptionUpdateSpy
+
+    before(function () {
+      onPublishersOptionUpdateSpy = sinon.spy(appActions, 'onPublishersOptionUpdate')
+    })
+
+    after(function () {
+      onPublishersOptionUpdateSpy.restore()
+      ledgerApi.setSynopsis(undefined)
+    })
+
+    afterEach(function () {
+      onPublishersOptionUpdateSpy.reset()
+    })
+
+    it('dispatches onPublishersOptionUpdate with updateData', function () {
+      const updateStamp = 99999
+      const publisherKeys = ['brave.com', 'clifton.io']
+      const publisherData = [
+        ['brave.com', true, false],
+        ['clifton.io', true, false]
+      ]
+      const defaultSynopsis = {
+        publishers: {
+          'brave.com': {
+            verified: false,
+            exclude: false,
+            options: {
+              exclude: true
+            },
+            publisherURL: 'https://brave.com'
+          },
+          'clifton.io': {
+            verified: false,
+            exclude: false,
+            options: {
+              exclude: true
+            },
+            publisherURL: 'https://clifton.io'
+          }
+        }
+      }
+      const state = defaultAppState
+        .setIn(['ledger', 'synopsis'], Immutable.fromJS(defaultSynopsis))
+      const expectedData = [
+        {
+          verified: true,
+          publisherKey: 'brave.com',
+          verifiedTimestamp: 99999
+        },
+        {
+          verified: true,
+          publisherKey: 'clifton.io',
+          verifiedTimestamp: 99999
+        }
+      ]
+
+      ledgerApi.setSynopsis(defaultSynopsis)
+      ledgerApi.updatePublishersInfo(state, publisherKeys, publisherData, updateStamp)
+      assert(onPublishersOptionUpdateSpy.withArgs(expectedData).calledOnce)
+    })
+
+    it('does not dispatch onPublishersOptionUpdate when there is nothing to change', function () {
+      const updateStamp = 99999
+      const publisherKeys = ['brave.com', 'clifton.io']
+      const publisherData = [
+        ['null.com', true, false]
+      ]
+      const state = defaultAppState
+        .setIn(['ledger', 'synopsis'], Immutable.fromJS({
+          publishers: {
+            'brave.com': {
+              verified: false,
+              exclude: false,
+              options: {
+                exclude: true
+              },
+              publisherURL: 'https://brave.com'
+            },
+            'clifton.io': {
+              verified: false,
+              exclude: false,
+              options: {
+                exclude: true
+              },
+              publisherURL: 'https://clifton.io'
+            }
+          }
+        }))
+      ledgerApi.updatePublishersInfo(state, publisherKeys, publisherData, updateStamp)
+      assert(onPublishersOptionUpdateSpy.notCalled)
+    })
+
+    it('updates publishers according to verified data', function () {
+      const updateStamp = 99999
+      const publisherKeys = ['brave.com', 'clifton.io']
+      const publisherData = [
+        ['brave.com', false, false],
+        ['clifton.io', true, false]
+      ]
+      const defaultSynopsis = {
+        publishers: {
+          'brave.com': {
+            verified: false,
+            exclude: false,
+            options: {
+              exclude: true
+            },
+            publisherURL: 'https://brave.com'
+          },
+          'clifton.io': {
+            verified: false,
+            exclude: false,
+            options: {
+              exclude: true
+            },
+            publisherURL: 'https://clifton.io'
+          }
+        }
+      }
+      const state = defaultAppState
+        .setIn(['ledger', 'synopsis'], Immutable.fromJS(defaultSynopsis))
+
+      ledgerApi.setSynopsis(defaultSynopsis)
+      ledgerApi.updatePublishersInfo(state, publisherKeys, publisherData, updateStamp)
+
+      const synopsis = ledgerApi.getSynopsis()
+      assert.equal(false, synopsis.publishers['brave.com'].options.verified)
+      assert.equal(true, synopsis.publishers['clifton.io'].options.verified)
     })
   })
 })

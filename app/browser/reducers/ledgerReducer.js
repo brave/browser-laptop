@@ -25,7 +25,7 @@ const tabState = require('../../common/state/tabState')
 const windows = require('../windows')
 const ledgerApi = require('../../browser/api/ledger')
 const ledgerNotifications = require('../../browser/api/ledgerNotifications')
-const {makeImmutable, makeJS} = require('../../common/state/immutableUtil')
+const {makeImmutable, makeJS, isImmutable} = require('../../common/state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
 
 const ledgerReducer = (state, action, immutableAction) => {
@@ -160,7 +160,7 @@ const ledgerReducer = (state, action, immutableAction) => {
                 break
               }
               state = ledgerApi.updatePublisherInfo(state)
-              state = ledgerApi.verifiedP(state, publisherKey)
+              state = ledgerApi.updatePublishers(state, publisherKey)
               break
             }
         }
@@ -580,6 +580,43 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_RUN_PROMOTION_CHECK:
       {
         state = ledgerApi.onRunPromotionCheck(state, getSetting(settings.PAYMENTS_ENABLED))
+        break
+      }
+    case appConstants.APP_ON_NOTIFICATION_RESPONSE:
+      {
+        state = ledgerNotifications.onResponse(
+          state,
+          action.get('message'),
+          action.get('buttonIndex'),
+          action.get('activeWindow')
+        )
+        break
+      }
+    case appConstants.APP_ON_PUBLISHERS_INFO_RECEIVED:
+      {
+        state = ledgerApi.onPublishersInfo(state, action.get('result'))
+        break
+      }
+    case appConstants.APP_ON_PUBLISHERS_INFO_WRITE:
+      {
+        state = updateState.setUpdateProp(state, 'verifiedPublishersTimestamp', new Date().getTime())
+        break
+      }
+    case appConstants.APP_ON_PUBLISHERS_INFO_READ:
+      {
+        const keys = action.get('keys')
+
+        if (!keys) {
+          break
+        }
+
+        const publisherKeys = isImmutable(keys) ? keys.toJS() : keys
+        state = ledgerApi.updatePublishersInfo(
+          state,
+          publisherKeys,
+          action.get('data').toJS(),
+          action.get('updateStamp')
+        )
         break
       }
   }
