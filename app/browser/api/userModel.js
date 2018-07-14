@@ -692,12 +692,13 @@ let collectActivityId
 
 const oneDay = (debugP ? 600 : 86400) * 1000
 const oneHour = (debugP ? 25 : 3600) * 1000
-const hackStagingOn = true
+const hackStagingOn = process.env.COLLECTOR_DEBUG === 'true'
 const roundTripOptions = {
   debugP: process.env.LEDGER_DEBUG === 'true',
   loggingP: process.env.LEDGER_LOGGING === 'true',
   verboseP: process.env.LEDGER_VERBOSE === 'true',
-  server: urlParse('https://' + (hackStagingOn || testingP ? 'collector-staging.brave.com' : 'collector.brave.com'))
+  server: urlParse('https://' + (hackStagingOn ? 'collector-staging.brave.com'
+                                 : testingP ? 'collector-testing.brave.com' : 'collector.brave.com'))
 }
 
 const collectActivityAsNeeded = (state, adEnabled) => {
@@ -819,18 +820,9 @@ const downloadSurveys = (state, surveys) => {
 
   appActions.onUserModelLog('Surveys downloaded', surveys)
   surveys = surveys.filter(survey => survey.get('status') === 'available')
-
-  if (testingP) {
-    const queue = userModelState.getUserSurveyQueue(state)
-
-    surveys = surveys.filter(survey =>
-                             !queue.some(entry => (survey.id === entry.id) && (entry.get('status') !== 'available')))
-  }
-
-  state = userModelState.setUserSurveyQueue(state, surveys)
   appActions.onUserModelLog('Surveys available', surveys)
 
-  return state
+  return userModelState.setUserSurveyQueue(state, surveys)
 }
 
 const privateTest = () => {
