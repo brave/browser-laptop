@@ -112,8 +112,7 @@ describe('ledgerState unit test', function () {
           }
         }
       },
-      promotion: {},
-      publisherTimestamp: 123
+      promotion: {}
     }))
 
   // settings
@@ -831,7 +830,6 @@ describe('ledgerState unit test', function () {
         .setIn(['ledger', 'synopsis', 'publishers'], Immutable.Map())
         .setIn(['ledger', 'locations'], Immutable.Map())
         .setIn(['ledger', 'about', 'synopsis'], Immutable.List())
-        .setIn(['ledger', 'publisherTimestamp'], 0)
         .setIn(['cache', 'ledgerVideos'], Immutable.Map())
         .setIn(['pageData', 'info'], Immutable.Map())
         .setIn(['pageData', 'last', 'info'], null)

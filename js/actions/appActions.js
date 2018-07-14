@@ -1852,12 +1852,11 @@ const appActions = {
     })
   },
 
-  onPublishersInfoRead: function (keys, data, updateStamp) {
+  onPublishersInfoRead: function (keys, data) {
     dispatch({
       actionType: appConstants.APP_ON_PUBLISHERS_INFO_READ,
       keys,
-      data,
-      updateStamp
+      data
     })
   },
 
@@ -1885,14 +1884,6 @@ const appActions = {
       actionType: appConstants.APP_ADD_PUBLISHER_TO_LEDGER,
       location,
       tabId
-    })
-  },
-
-  onPublisherTimestamp: function (timestamp, updateList) {
-    dispatch({
-      actionType: appConstants.APP_ON_PUBLISHER_TIMESTAMP,
-      timestamp,
-      updateList
     })
   },
 

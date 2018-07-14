@@ -25,7 +25,7 @@ const tabState = require('../../common/state/tabState')
 const windows = require('../windows')
 const ledgerApi = require('../../browser/api/ledger')
 const ledgerNotifications = require('../../browser/api/ledgerNotifications')
-const {makeImmutable, makeJS, isImmutable} = require('../../common/state/immutableUtil')
+const {makeImmutable, makeJS} = require('../../common/state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
 
 const ledgerReducer = (state, action, immutableAction) => {
@@ -420,15 +420,6 @@ const ledgerReducer = (state, action, immutableAction) => {
         }
         break
       }
-    case appConstants.APP_ON_PUBLISHER_TIMESTAMP:
-      {
-        const oldValue = ledgerState.getLedgerValue(state, 'publisherTimestamp')
-        state = ledgerState.setLedgerValue(state, 'publisherTimestamp', action.get('timestamp'))
-        if (action.get('updateList')) {
-          ledgerApi.onPublisherTimestamp(state, oldValue, action.get('timestamp'))
-        }
-        break
-      }
     case appConstants.APP_SAVE_LEDGER_PROMOTION:
       {
         state = ledgerState.savePromotion(state, action.get('promotion'))
@@ -610,12 +601,11 @@ const ledgerReducer = (state, action, immutableAction) => {
           break
         }
 
-        const publisherKeys = isImmutable(keys) ? keys.toJS() : keys
+        const publisherKeys = makeImmutable(keys)
         state = ledgerApi.updatePublishersInfo(
           state,
           publisherKeys,
-          action.get('data').toJS(),
-          action.get('updateStamp')
+          action.get('data')
         )
         break
       }
