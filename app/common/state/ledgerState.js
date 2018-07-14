@@ -207,7 +207,6 @@ const ledgerState = {
       .setIn(['ledger', 'synopsis', 'publishers'], Immutable.Map())
       .setIn(['ledger', 'locations'], Immutable.Map())
       .setIn(['ledger', 'about', 'synopsis'], Immutable.List())
-      .setIn(['ledger', 'publisherTimestamp'], 0)
       .setIn(['cache', 'ledgerVideos'], Immutable.Map())
   },
 

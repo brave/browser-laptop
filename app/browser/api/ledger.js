@@ -90,6 +90,7 @@ let runTimeoutId
 let promotionTimeoutId
 let togglePromotionTimeoutId
 let publisherInfoTimeoutId = false
+let publisherInfoUpdateIntervalId
 
 // Database
 let v2RulesetDB
@@ -99,6 +100,7 @@ const statePath = 'ledger-state.json'
 // Publisher info
 const publisherInfoPath = 'publisher-data.json'
 const publisherInfoUpdateInterval = ledgerUtil.milliseconds.day * 2
+let publisherInfoData = []
 
 // Definitions
 const clientOptions = {
@@ -249,7 +251,7 @@ const checkPublisherInfoUpdate = (state) => {
 
   if (
     verifiedPTimestamp == null ||
-    ((new Date().getTime() - verifiedPTimestamp) >= publisherInfoUpdateInterval)
+    (new Date().getTime() - verifiedPTimestamp) >= publisherInfoUpdateInterval
   ) {
     if (publisherInfoTimeoutId) {
       clearTimeout(publisherInfoTimeoutId)
@@ -264,29 +266,29 @@ const checkPublisherInfoUpdate = (state) => {
   }
 }
 
-const updatePublishersInfo = (state, publisherKeys, publisherData, updateStamp) => {
+const updatePublishersInfo = (state, publisherKeys, publisherData) => {
   if (publisherData == null || publisherKeys == null) {
     return state
   }
 
   let updateData = []
 
-  if (!Array.isArray(publisherKeys)) {
-    publisherKeys = [publisherKeys]
+  if (!isList(publisherKeys)) {
+    publisherKeys = Immutable.List([publisherKeys])
   }
 
-  const publishers = publisherData.filter(p => publisherKeys.indexOf(p[0]) > -1)
+  publisherData = makeImmutable(publisherData)
+
+  const publishers = publisherData.filter(p => publisherKeys.indexOf(p.first()) > -1)
   publishers.forEach((publisher) => {
-    const verified = !!publisher[1]
-    const publisherKey = publisher[0]
+    const verified = !!publisher.get(1)
+    const publisherKey = publisher.get(0)
 
     savePublisherOption(publisherKey, 'verified', verified)
-    savePublisherOption(publisherKey, 'verifiedTimestamp', updateStamp)
 
     updateData.push({
       verified,
-      publisherKey,
-      verifiedTimestamp: updateStamp
+      publisherKey
     })
   })
 
@@ -698,18 +700,19 @@ const runPublishersUpdate = (state) => {
 const updatePublishers = (state, publisherKeys) => {
   const fs = require('fs')
 
+  if (publisherInfoData && publisherInfoData.length > 0) {
+    appActions.onPublishersInfoRead(publisherKeys, publisherInfoData)
+  }
+
   fs.readFile(pathName(publisherInfoPath), (err, data) => {
     if (err) {
       console.error('Error: Could not read from publishers file')
       return
     }
 
-    let result
-    const updateStamp = new Date().getTime()
-
     try {
-      result = JSON.parse(data)
-      appActions.onPublishersInfoRead(publisherKeys, result, updateStamp)
+      const result = JSON.parse(data)
+      appActions.onPublishersInfoRead(publisherKeys, result)
     } catch (err) {
       console.error(`Error: Could not parse data from publishers file`)
     }
@@ -2369,13 +2372,16 @@ const initialize = (state, paymentsEnabled) => {
     // First run
     module.exports.checkPublisherInfoUpdate(state)
     // Check again every other day
-    setInterval(() => {
+    publisherInfoUpdateIntervalId = setInterval(() => {
       module.exports.checkPublisherInfoUpdate(state)
     }, publisherInfoUpdateInterval)
   }
 
   if (!paymentsEnabled) {
     client = null
+    if (publisherInfoUpdateIntervalId) {
+      clearInterval(publisherInfoUpdateIntervalId)
+    }
     return ledgerState.resetInfo(state, true)
   }
 
@@ -3166,6 +3172,7 @@ const onPublishersInfo = (state, result) => {
 
   const fs = require('fs')
   const path = pathName(publisherInfoPath)
+  publisherInfoData = result
 
   fs.writeFile(path, JSON.stringify(result), (err) => {
     if (err) {
@@ -3403,6 +3410,12 @@ const getMethods = () => {
       },
       setClient: (data) => {
         client = data
+      },
+      getPublisherInfoData: () => {
+        return publisherInfoData
+      },
+      setPublisherInfoData: (data) => {
+        publisherInfoData = data
       },
       setCurrentMediaKey: (key) => {
         currentMediaKey = key
