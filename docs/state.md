@@ -342,7 +342,6 @@ AppStore
         }
       }
     }
-    publisherTimestamp: number, // timestamp of last publisher update in the database
     status: string, // ledger status
     synopsis: {
       options: {
@@ -366,7 +365,6 @@ AppStore
           options: {
             exclude: boolean, // publisher should not be included, toggle is off
             verified: boolean,
-            verifiedTimestamp: number, // timestamp of the last change
             stickyP: boolean
           },
           pinPercentage: number,

@@ -3070,8 +3070,7 @@ describe('ledger api unit tests', function () {
     it('publisher is missing publisherKey', function () {
       const result = ledgerApi.setPublishersOptions(defaultAppState, Immutable.fromJS([
         {
-          verified: true,
-          verifiedTimestamp: 100
+          verified: true
         }
       ]))
       assert(savePublisherOptionSpy.notCalled)
@@ -3082,35 +3081,29 @@ describe('ledger api unit tests', function () {
       const result = ledgerApi.setPublishersOptions(defaultAppState, Immutable.fromJS([
         {
           publisherKey: 'clifton.io',
-          verified: true,
-          verifiedTimestamp: 100
+          verified: true
         },
         {
           publisherKey: 'brianbondy.com',
-          verified: false,
-          verifiedTimestamp: 200
+          verified: false
         }
       ]))
       const expectedState = defaultAppState
         .setIn(['ledger', 'synopsis', 'publishers'], Immutable.fromJS({
           'clifton.io': {
             options: {
-              verified: true,
-              verifiedTimestamp: 100
+              verified: true
             }
           },
           'brianbondy.com': {
             options: {
-              verified: false,
-              verifiedTimestamp: 200
+              verified: false
             }
           }
         }))
 
       assert(savePublisherOptionSpy.withArgs('clifton.io', 'verified', true).calledOnce)
-      assert(savePublisherOptionSpy.withArgs('clifton.io', 'verifiedTimestamp', 100).calledOnce)
       assert(savePublisherOptionSpy.withArgs('brianbondy.com', 'verified', false).calledOnce)
-      assert(savePublisherOptionSpy.withArgs('brianbondy.com', 'verifiedTimestamp', 200).calledOnce)
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
   })
@@ -4121,6 +4114,7 @@ describe('ledger api unit tests', function () {
     afterEach(function () {
       readFileStub.restore()
       onPublishersInfoReadSpy.reset()
+      ledgerApi.setPublisherInfoData(null)
     })
 
     after(function () {
@@ -4174,12 +4168,11 @@ describe('ledger api unit tests', function () {
     })
 
     it('dispatches onPublishersOptionUpdate with updateData', function () {
-      const updateStamp = 99999
-      const publisherKeys = ['brave.com', 'clifton.io']
-      const publisherData = [
+      const publisherKeys = Immutable.fromJS(['brave.com', 'clifton.io'])
+      const publisherData = Immutable.fromJS([
         ['brave.com', true, false],
         ['clifton.io', true, false]
-      ]
+      ])
       const defaultSynopsis = {
         publishers: {
           'brave.com': {
@@ -4205,27 +4198,24 @@ describe('ledger api unit tests', function () {
       const expectedData = [
         {
           verified: true,
-          publisherKey: 'brave.com',
-          verifiedTimestamp: 99999
+          publisherKey: 'brave.com'
         },
         {
           verified: true,
-          publisherKey: 'clifton.io',
-          verifiedTimestamp: 99999
+          publisherKey: 'clifton.io'
         }
       ]
 
       ledgerApi.setSynopsis(defaultSynopsis)
-      ledgerApi.updatePublishersInfo(state, publisherKeys, publisherData, updateStamp)
+      ledgerApi.updatePublishersInfo(state, publisherKeys, publisherData)
       assert(onPublishersOptionUpdateSpy.withArgs(expectedData).calledOnce)
     })
 
     it('does not dispatch onPublishersOptionUpdate when there is nothing to change', function () {
-      const updateStamp = 99999
-      const publisherKeys = ['brave.com', 'clifton.io']
-      const publisherData = [
+      const publisherKeys = Immutable.fromJS(['brave.com', 'clifton.io'])
+      const publisherData = Immutable.fromJS([
         ['null.com', true, false]
-      ]
+      ])
       const state = defaultAppState
         .setIn(['ledger', 'synopsis'], Immutable.fromJS({
           publishers: {
@@ -4247,17 +4237,16 @@ describe('ledger api unit tests', function () {
             }
           }
         }))
-      ledgerApi.updatePublishersInfo(state, publisherKeys, publisherData, updateStamp)
+      ledgerApi.updatePublishersInfo(state, publisherKeys, publisherData)
       assert(onPublishersOptionUpdateSpy.notCalled)
     })
 
     it('updates publishers according to verified data', function () {
-      const updateStamp = 99999
-      const publisherKeys = ['brave.com', 'clifton.io']
-      const publisherData = [
+      const publisherKeys = Immutable.fromJS(['brave.com', 'clifton.io'])
+      const publisherData = Immutable.fromJS([
         ['brave.com', false, false],
         ['clifton.io', true, false]
-      ]
+      ])
       const defaultSynopsis = {
         publishers: {
           'brave.com': {
@@ -4282,7 +4271,7 @@ describe('ledger api unit tests', function () {
         .setIn(['ledger', 'synopsis'], Immutable.fromJS(defaultSynopsis))
 
       ledgerApi.setSynopsis(defaultSynopsis)
-      ledgerApi.updatePublishersInfo(state, publisherKeys, publisherData, updateStamp)
+      ledgerApi.updatePublishersInfo(state, publisherKeys, publisherData)
 
       const synopsis = ledgerApi.getSynopsis()
       assert.equal(false, synopsis.publishers['brave.com'].options.verified)
