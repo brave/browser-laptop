@@ -4138,7 +4138,21 @@ describe('ledger api unit tests', function () {
 
       ledgerApi.updatePublishers(defaultAppState, ['brave.com'])
       assert.deepEqual(['brave.com'], onPublishersInfoReadSpy.getCall(0).args[0])
-      assert.deepEqual(JSON.parse(readData), onPublishersInfoReadSpy.getCall(0).args[1])
+      assert.deepEqual(Immutable.fromJS(JSON.parse(readData)), onPublishersInfoReadSpy.getCall(0).args[1])
+    })
+
+    it('does not dispatch file read if publisherInfoData has value', function () {
+      const infoData = Immutable.fromJS([
+        ['brave.com', true, false]
+      ])
+      readFileStub = sinon.stub(fs, 'readFile', (path, callback) => {
+        callback(null, readData)
+      })
+
+      ledgerApi.setPublisherInfoData(infoData)
+      ledgerApi.updatePublishers(defaultAppState, ['brave.com'])
+      assert(onPublishersInfoReadSpy.withArgs(['brave.com'], infoData).calledOnce)
+      assert(readFileStub.notCalled)
     })
 
     it('does not dispatch onPublishersInfoRead if data from file cannot be parsed as JSON', function () {
