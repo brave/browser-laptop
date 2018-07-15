@@ -383,6 +383,11 @@ const globalStyles = {
       regular: '14.5px'
     }
   },
+  plugins: {
+    fontSize: {
+      regular: '14.5px'
+    }
+  },
 
   sortableTable: {
     cell: {
