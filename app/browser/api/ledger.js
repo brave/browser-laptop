@@ -703,8 +703,9 @@ const runPublishersUpdate = (state) => {
 const updatePublishers = (state, publisherKeys) => {
   const fs = require('fs')
 
-  if (publisherInfoData && publisherInfoData.length > 0) {
+  if (publisherInfoData && publisherInfoData.size > 0) {
     appActions.onPublishersInfoRead(publisherKeys, publisherInfoData)
+    return state
   }
 
   fs.readFile(pathName(publisherInfoPath), (err, data) => {
@@ -715,7 +716,8 @@ const updatePublishers = (state, publisherKeys) => {
 
     try {
       const result = JSON.parse(data)
-      appActions.onPublishersInfoRead(publisherKeys, result)
+      publisherInfoData = makeImmutable(result)
+      appActions.onPublishersInfoRead(publisherKeys, publisherInfoData)
     } catch (err) {
       console.error(`Error: Could not parse data from publishers file`)
     }
@@ -3168,9 +3170,11 @@ const onPublishersInfo = (state, result) => {
 
   const fs = require('fs')
   const path = pathName(publisherInfoPath)
-  publisherInfoData = result
+  const writeData = JSON.stringify(result)
 
-  fs.writeFile(path, JSON.stringify(result), (err) => {
+  publisherInfoData = makeImmutable(result)
+
+  fs.writeFile(path, writeData, (err) => {
     if (err) {
       console.error(`Error: Could not write file at ${path}`)
       return
