@@ -675,6 +675,13 @@ const updatePublishers = (state, publisherKeys) => {
   fs.readFile(pathName(publisherInfoPath), (err, data) => {
     if (err) {
       console.error('Error: Could not read from publishers file')
+
+      // Clear get interval if it already exists
+      if (publisherInfoTimeoutId) {
+        clearTimeout(publisherInfoTimeoutId)
+      }
+
+      module.exports.getPublisherInfo()
       return
     }
 
@@ -3160,24 +3167,32 @@ const disablePayments = () => {
 const deleteWallet = (state) => {
   state = ledgerState.deleteSynopsis(state)
   state = state.setIn(['settings', settings.PAYMENTS_ENABLED], false)
+  state = updateState.setUpdateProp(state, 'verifiedPublishersTimestamp', null)
 
   client = null
   synopsis = null
 
-  const fs = require('fs')
-  fs.access(pathName(statePath), fs.constants.F_OK, (err) => {
-    if (err) {
-      return
-    }
+  module.exports.deletePaymentsFiles()
+  return state
+}
 
-    fs.unlink(pathName(statePath), (err) => {
+const deletePaymentsFiles = () => {
+  const fs = require('fs')
+  const paths = [statePath, publisherInfoPath]
+
+  paths.forEach((path) => {
+    fs.access(pathName(path), fs.constants.F_OK, (err) => {
       if (err) {
-        return console.error('read error: ' + err.toString())
+        return
       }
+
+      fs.unlink(pathName(path), (err) => {
+        if (err) {
+          return console.error('read error: ' + err.toString())
+        }
+      })
     })
   })
-
-  return state
 }
 
 const clearPaymentHistory = (state) => {
@@ -3279,7 +3294,8 @@ const getMethods = () => {
     onRunPromoRefFetch,
     getPublisherExclude,
     doneP,
-    shouldExclude
+    shouldExclude,
+    deletePaymentsFiles
   }
 
   let privateMethods = {}
