@@ -67,14 +67,14 @@ module.exports = {
     shields: false
   },
   adblock: {
-    alternateDataFiles: 'https://adblock-data.s3.brave.com/{version}/{uuid}.dat',
-    url: 'https://adblock-data.s3.brave.com/{version}/ABPFilterParserData.dat',
+    alternateDataFiles: 'https://s3.amazonaws.com/adblock-data/{version}/{uuid}.dat',
+    url: 'https://s3.amazonaws.com/adblock-data/{version}/ABPFilterParserData.dat',
     // version is specified in the ad-block library
     msBetweenRechecks: 1000 * 60 * 60 * 2, // 2 hours
     enabled: true
   },
   safeBrowsing: {
-    url: 'https://adblock-data.s3.brave.com/{version}/SafeBrowsingData.dat',
+    url: 'https://s3.amazonaws.com/adblock-data/{version}/SafeBrowsingData.dat',
     // version is specified in the ad-block library
     msBetweenRechecks: 1000 * 60 * 60 * 2, // 2 hours
     enabled: true
