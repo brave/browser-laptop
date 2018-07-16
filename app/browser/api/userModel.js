@@ -31,6 +31,7 @@ const Immutable = require('immutable')
 
 // Utils
 const urlParse = require('../../common/urlParse')
+const urlParse2 = require('url').parse
 const roundtrip = require('./ledger').roundtrip
 
 const debugP = (process.env.NODE_ENV === 'test') || (process.env.LEDGER_VERBOSE === 'true')
@@ -408,13 +409,38 @@ const valueToLowHigh = (x, thresh) => {
 }
 // end timing related pieces
 
+const amazonSearchQueryFields = ['field-keywords', 'keywords']
+
+const extractURLKeywordsByField = (url, queryFields) => {
+  const parsed = urlParse2(url, true)
+  const query = parsed.query
+
+  let found = []
+
+  for (let field of queryFields) {
+    let sentence = query[field]
+
+    if (!sentence) {
+      continue
+    }
+
+    let words = sentence.split(' ')
+    found = found.concat(words)
+  }
+
+  return found
+}
+
 const testShoppingData = (state, url) => {
   if (noop(state)) return state
   const hostname = urlParse(url).hostname
   const lastShopState = userModelState.getShoppingState(state)
+
   if (hostname === 'www.amazon.com') {
     const score = 1.0   // eventually this will be more sophisticated than if(), but amazon is always a shopping destination
     state = userModelState.flagShoppingState(state, url, score)
+    const keywords = extractURLKeywordsByField(url, amazonSearchQueryFields)
+    console.log('keywords: ', keywords)
   } else if (hostname !== 'www.amazon.com' && lastShopState) { // do we need lastShopState? assumes amazon queries hostname changes
     state = userModelState.unFlagShoppingState(state)
   }
