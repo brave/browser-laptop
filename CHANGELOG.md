@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.23.37](https://github.com/brave/browser-laptop/releases/tag/v0.23.37dev)
+
+ - Added keyboard shortcut for Tor Private Tab. ([#14504](https://github.com/brave/browser-laptop/issues/14504))
+ - Fixed potential Tor bypass by file:// URLs. ([#14664](https://github.com/brave/browser-laptop/issues/14664))
+ - Fixed potential Tor bypass while loading Favicons. ([#14641](https://github.com/brave/browser-laptop/issues/14641))
+ - Fixed CSS and font resources being shown in blocked scripts list in shields. ([#14582](https://github.com/brave/browser-laptop/issues/14582))
+ - Fixed bookmark scrolling when populated beyond initial display boundry. ([#14606](https://github.com/brave/browser-laptop/issues/14606))
+ - Fixed Tor control socket error when network is disconnected. ([#14630](https://github.com/brave/browser-laptop/issues/14630))
+ - Fixed being able to load bookmarks in Tor Tab before Tor finishes loading. ([#14680](https://github.com/brave/browser-laptop/issues/14680))
+ - Fixed search icons in URL bar should be a local resource. ([#14653](https://github.com/brave/browser-laptop/issues/14653))
+ - Fixed right click context menu not working after switching tabs. ([#14643](https://github.com/brave/browser-laptop/issues/14643))
+ - Optimized startup time by removing UGP promo check at initial startup. ([#14616](https://github.com/brave/browser-laptop/issues/14616))
+ - Upgraded localization files. ([#14580](https://github.com/brave/browser-laptop/issues/14580))
+ - Upgraded to Tor 0.3.3.8. ([#14695](https://github.com/brave/browser-laptop/issues/14695))
+ - Upgraded to muon 7.1.6. ([#14719](https://github.com/brave/browser-laptop/issues/14719))
+
 ## [0.23.31](https://github.com/brave/browser-laptop/releases/tag/v0.23.31dev)
 
 - Fixed Twitch streams not playing ([#14475](https://github.com/brave/browser-laptop/issues/14475))
