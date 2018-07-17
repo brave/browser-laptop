@@ -757,6 +757,26 @@ const windowActions = {
     })
   },
 
+  /**
+   * Sets weather the eth wallet popup is visible
+   */
+  setEthWalletVisible: function (isVisible) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_ETH_WALLET_VISIBLE,
+      isVisible
+    })
+  },
+  /**
+   * Sets the selected import browser data
+   * @param {Object} selected - selected browser data to import
+   */
+  setEthWalletNewPasswordValue: function (newPasswordValue) {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_ETH_WALLET_NEW_PASSWORD_VALUE,
+      newPasswordValue
+    })
+  },
+
   widevineSiteAccessedWithoutInstall: function () {
     dispatch({
       actionType: windowConstants.WINDOW_WIDEVINE_SITE_ACCESSED_WITHOUT_INSTALL
