@@ -604,6 +604,11 @@ const ledgerReducer = (state, action, immutableAction) => {
         )
         break
       }
+    case appConstants.APP_ON_CHECK_BROWSER_ACTIVITY_TIME:
+      {
+        state = ledgerApi.checkBrowserActivityTime(state)
+        break
+      }
   }
   return state
 }

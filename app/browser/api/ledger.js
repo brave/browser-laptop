@@ -190,6 +190,7 @@ const paymentPresent = (state, tabId, present) => {
   }
   if (present) {
     appActions.onPromotionGet()
+
     if (togglePromotionTimeoutId) {
       clearTimeout(togglePromotionTimeoutId)
     }
@@ -1113,6 +1114,38 @@ const pageDataChanged = (state, viewData = {}, keepInfo = false) => {
   }
 
   state = addNewLocation(state, location, tabId, keepInfo)
+  appActions.onCheckBrowserActivityTime()
+
+  return state
+}
+
+const checkBrowserActivityTime = (state) => {
+  // Fuzzing threshold
+  const minTime = 30 * ledgerUtil.milliseconds.minute
+  const publishers = ledgerState.getPublishers(state)
+
+  if (publishers.isEmpty()) {
+    return state
+  }
+
+  const ledgerStatus = ledgerState.getAboutProp(state, 'status')
+  const curBrowsingTime = ledgerState.getAboutProp(state, 'browsingTime') || 0
+
+  // Check cached browsing time to avoid unneeded recalculation
+  if (curBrowsingTime >= minTime || ledgerStatus !== ledgerStatuses.FUZZING) {
+    return state
+  }
+
+  const browsingTime = publishers.reduce((acc, publisher) => {
+    return acc + publisher.get('duration')
+  }, 0)
+
+  // Cache browsing time
+  state = ledgerState.setAboutProp(state, 'browsingTime', browsingTime)
+
+  if (browsingTime >= minTime && ledgerStatus === ledgerStatuses.FUZZING) {
+    state = ledgerState.setAboutProp(state, 'status', '')
+  }
 
   return state
 }
@@ -3385,7 +3418,8 @@ const getMethods = () => {
     getPublisherInfo,
     checkPublisherInfoUpdate,
     updatePublishersInfo,
-    runPublishersUpdate
+    runPublishersUpdate,
+    checkBrowserActivityTime
   }
 
   let privateMethods = {}
