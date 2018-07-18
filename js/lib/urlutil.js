@@ -376,19 +376,6 @@ const UrlUtil = {
   },
 
   /**
-   * Converts a potential PDF URL to the PDFJS URL.
-   * XXX: This only looks at the URL file extension, not MIME types.
-   * @param {string} url
-   * @return {string}
-   */
-  toPDFJSLocation: function (url) {
-    if (url && UrlUtil.isHttpOrHttps(url) && UrlUtil.isFileType(url, 'pdf')) {
-      return UrlUtil.getPDFViewerUrl(url)
-    }
-    return url
-  },
-
-  /**
    * Gets the default favicon URL for a URL.
    * @param {string} url The URL to find a favicon for
    * @return {string} url The base favicon URL

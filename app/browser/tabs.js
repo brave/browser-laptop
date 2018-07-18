@@ -10,7 +10,7 @@ const tabState = require('../common/state/tabState')
 const {app, extensions, session, ipcMain} = require('electron')
 const {makeImmutable, makeJS} = require('../common/state/immutableUtil')
 const {getExtensionsPath, getTargetAboutUrl, getSourceAboutUrl, isSourceAboutUrl, newFrameUrl, isTargetAboutUrl, isIntermediateAboutPage, isTargetMagnetUrl, getSourceMagnetUrl} = require('../../js/lib/appUrlUtil')
-const {isURL, getUrlFromInput, toPDFJSLocation, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
+const {isURL, getUrlFromInput, getDefaultFaviconUrl, isHttpOrHttps, getLocationIfPDF} = require('../../js/lib/urlutil')
 const {isSessionPartition, isTor} = require('../../js/state/frameStateUtil')
 const {getOrigin} = require('../../js/lib/urlutil')
 const settingsStore = require('../../js/settings')
@@ -52,9 +52,6 @@ const normalizeUrl = function (url) {
   }
   if (isURL(url)) {
     url = getUrlFromInput(url)
-  }
-  if (settingsStore.getSetting(settings.PDFJS_ENABLED)) {
-    url = toPDFJSLocation(url)
   }
   return url
 }

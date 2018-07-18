@@ -78,6 +78,21 @@ Server.prototype = {
   },
 
   /**
+   * Allows replacing the default headers sent with a url
+   * @param {String} url for response
+   * @param {Object} new headers to use with response
+   */
+  defineHeaders: function (url, headers) {
+    this.child.send({
+      action: 'defineHeaders',
+      args: {
+        url: url,
+        headers: headers
+      }
+    })
+  },
+
+  /**
    * Protects a URL using HTTP authentication.
    * @param {String} url to protect
    */
