@@ -192,22 +192,6 @@ describe('urlutil', function () {
     })
   })
 
-  describe('toPDFJSLocation', function () {
-    const baseUrl = 'chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/'
-    it('pdf', function () {
-      assert.equal(urlUtil.toPDFJSLocation('http://abc.com/test.pdf'), baseUrl + 'content/web/viewer.html?file=http%3A%2F%2Fabc.com%2Ftest.pdf')
-    })
-    it('non-pdf', function () {
-      assert.equal(urlUtil.toPDFJSLocation('http://abc.com/test.pdf.txt'), 'http://abc.com/test.pdf.txt')
-    })
-    it('file url', function () {
-      assert.equal(urlUtil.toPDFJSLocation('file://abc.com/test.pdf.txt'), 'file://abc.com/test.pdf.txt')
-    })
-    it('empty', function () {
-      assert.equal(urlUtil.toPDFJSLocation(''), '')
-    })
-  })
-
   describe('getPDFViewerUrl', function () {
     const baseUrl = 'chrome-extension://jdbefljfgobbmcidnmpjamcbhnbphjnb/content/web/viewer.html?file='
     it('regular url', function () {

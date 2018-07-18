@@ -2,6 +2,7 @@
 
 const Brave = require('../lib/brave')
 const {urlInput,
+  activeTabTitle,
   pinnedTabsTabs,
   backButtonEnabled,
   backButtonDisabled,
@@ -277,6 +278,21 @@ describe('frame tests', function () {
         .tabByIndex(0)
         .url(url)
         .waitForVisible('#viewerContainer')
+    })
+
+    it('loads HTML properly despite having .pdf extension', function * () {
+      // Add custom headers for this request, so we can override the
+      // default mime type that will otherwise get added for a .pdf file.
+      let customHeaders = { 'Content-Type': 'text/html; charset=utf-8' }
+      let url = Brave.server.url('html_with_pdf_extension.pdf')
+      Brave.server.defineHeaders(url, customHeaders)
+
+      yield this.app.client
+        .tabByIndex(0)
+        .url(url)
+        .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
+        .waitForTextValue(activeTabTitle, 'HTML using .pdf Extension')
     })
   })
 })

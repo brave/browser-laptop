@@ -2,7 +2,44 @@ var http = require('http')
 var emptyPort = require('empty-port')
 var nodeStatic = require('node-static')
 
+var url = require('url')
 var EventEmitter = require('events').EventEmitter
+
+/**
+ * Patch node-static to allow passing headers. Based on .serve()
+ * https://github.com/cloudhead/node-static/blob/9fabe339698e88594ac81ddc2cb0a7065ad98113/lib/node-static.js#L164-L190
+ */
+nodeStatic.Server.prototype.serveWithHeaders = function (req, res, headers, callback) {
+  var that = this
+  var promise = new EventEmitter()
+  var pathname
+
+  var finish = function (status, headers) {
+    that.finish(status, headers, req, res, promise, callback)
+  }
+
+  try {
+    pathname = decodeURI(url.parse(req.url).pathname)
+  } catch (e) {
+    return process.nextTick(function () {
+      return finish(400, {})
+    })
+  }
+
+  // We assume this is being called in order to pass in headers
+  // but in case not, make sure we have something.
+  headers = headers || {}
+
+  process.nextTick(function () {
+    that.servePath(pathname, 200, headers, req, res, finish)
+    .on('success', function (result) {
+      promise.emit('success', result)
+    }).on('error', function (err) {
+      promise.emit('error', err)
+    })
+  })
+  if (!callback) { return promise }
+}
 
 var root = process.argv[2]
 
@@ -35,6 +72,11 @@ Server.prototype = {
    * A map of protected URLs.
    */
   authUrls: {},
+
+  /**
+   * A map of URLs for which we need custom Headers sent
+   */
+  urlsWithHeaders: {},
 
   stop: function () {
     if (this.http) {
@@ -82,8 +124,13 @@ Server.prototype = {
           return
         }
 
-        // hand off request to node-static
-        file.serve(req, res)
+        // If we have been asked to send our own headers for this URL, do that
+        if (server.urlsWithHeaders[fullUrl]) {
+          file.serveWithHeaders(req, res, server.urlsWithHeaders[fullUrl])
+        } else {
+          // Otherwise, hand off request to regular node-static handling
+          file.serve(req, res)
+        }
       }).resume()
     }).listen(port)
   },
@@ -107,6 +154,10 @@ Server.prototype = {
 
   protect: function (url) {
     this.authUrls[url] = true
+  },
+
+  defineHeaders: function (options) {
+    this.urlsWithHeaders[options.url] = options.headers
   },
 
   unprotect: function (url) {
@@ -145,6 +196,9 @@ process.on('message', function (data) {
       break
     case 'unprotect':
       server.unprotect(data.args)
+      break
+    case 'defineHeaders':
+      server.defineHeaders(data.args)
       break
     case 'stop':
       server.stop()
