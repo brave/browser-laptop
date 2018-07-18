@@ -1589,15 +1589,6 @@ const roundtrip = (params, options, callback) => {
   parts = underscore.extend(underscore.pick(parts, ['protocol', 'hostname', 'port']),
     underscore.omit(params, ['headers', 'payload', 'timeout']))
 
-  // TBD: let the user configure this via preferences [MTR]
-  if (params.useProxy) {
-    if (parts.hostname === 'ledger.brave.com') {
-      parts.hostname = 'ledger-proxy.privateinternetaccess.com'
-    } else if (parts.hostname === 'ledger.mercury.basicattentiontoken.org') {
-      parts.hostname = 'mercury-proxy.privateinternetaccess.com'
-    }
-  }
-
   // Use alternate hostname if it's provided
   parts.hostname = params.altHostname || parts.hostname
 
@@ -1642,11 +1633,6 @@ const roundtrip = (params, options, callback) => {
     if (err) return callback(err, response)
 
     if (Math.floor(response.statusCode / 100) !== 2) {
-      if (params.useProxy && response.statusCode === 403) {
-        params.useProxy = false
-        return module.exports.roundtrip(params, options, callback)
-      }
-
       return callback(
         new Error('HTTP response ' + response.statusCode + ' for ' + params.method + ' ' + params.path),
         response)
