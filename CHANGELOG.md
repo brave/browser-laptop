@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.23.37](https://github.com/brave/browser-laptop/releases/tag/v0.23.37dev)
+## [0.23.39](https://github.com/brave/browser-laptop/releases/tag/v0.23.39dev)
 
  - Added keyboard shortcut for Tor Private Tab. ([#14504](https://github.com/brave/browser-laptop/issues/14504))
  - Fixed potential Tor bypass by file:// URLs. ([#14664](https://github.com/brave/browser-laptop/issues/14664))
