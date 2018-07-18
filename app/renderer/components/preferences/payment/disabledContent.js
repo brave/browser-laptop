@@ -14,8 +14,6 @@ const cx = require('../../../../../js/lib/classSet')
 // style
 const globalStyles = require('../../styles/global')
 const commonStyles = require('../../styles/commonStyles')
-const PIA = require('../../../../extensions/brave/img/private_internet_access.png')
-const PIA2 = require('../../../../extensions/brave/img/private_internet_access_2x.png')
 const uphold = require('../../../../extensions/brave/img/ledger/uphold_logo_small.png')
 const uphold2 = require('../../../../extensions/brave/img/ledger/uphold_logo_medium.png')
 
@@ -91,8 +89,6 @@ class DisabledContent extends ImmutableComponent {
       </div>
       <div className={css(styles.disabledContent__sidebar)}>
         <h2 className={css(styles.disabledContent__sidebar__header)} data-l10n-id='paymentsSidebarText1' />
-        <div className={css(styles.disabledContent__sidebar__text)} data-l10n-id='paymentsSidebarText2' />
-        <a href='https://www.privateinternetaccess.com/' rel='noopener' target='_blank'><span className={css(styles.disabledContent__sidebar__logo, styles.disabledContent__sidebar__logo_PIA)} /></a>
         <div className={css(styles.disabledContent__sidebar__text)} data-l10n-id='paymentsSidebarText3' />
         <a href='https://uphold.com/' rel='noopener' target='_blank'><span className={css(styles.disabledContent__sidebar__logo, styles.disabledContent__sidebar__logo_uphold)} /></a>
       </div>
@@ -165,12 +161,6 @@ const styles = StyleSheet.create({
   disabledContent__sidebar__logo: {
     margin: '20px 0px 50px',
     display: 'block'
-  },
-
-  disabledContent__sidebar__logo_PIA: {
-    backgroundImage: `-webkit-image-set(url(${PIA}) 1x, url(${PIA2}) 2x)`,
-    width: '195px',
-    height: '20px'
   },
 
   disabledContent__sidebar__logo_uphold: {
