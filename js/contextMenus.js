@@ -704,7 +704,7 @@ function hamburgerTemplateInit (location, e) {
   const template = [
     CommonMenu.newTabMenuItem(),
     CommonMenu.newPrivateTabMenuItem(),
-    CommonMenu.newTorTabMenuItem(),
+    CommonMenu.newTorTabMenuItem(false),
     CommonMenu.newPartitionedTabMenuItem(),
     CommonMenu.newWindowMenuItem(),
     CommonMenu.separatorMenuItem,
