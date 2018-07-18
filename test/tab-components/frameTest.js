@@ -291,6 +291,7 @@ describe('frame tests', function () {
         .tabByIndex(0)
         .url(url)
         .waitForUrl(url)
+        .windowByUrl(Brave.browserWindowUrl)
         .waitForTextValue(activeTabTitle, 'HTML using .pdf Extension')
     })
   })
