@@ -47,12 +47,14 @@ let closedFrames = new Immutable.OrderedMap()
 let lastClosedUrl = null
 let currentLocation = null
 
+const mainMenuIsOSDrawn = isLinux || isDarwin
+
 // Submenu initialization
 const createFileSubmenu = () => {
   const submenu = [
     CommonMenu.newTabMenuItem(),
     CommonMenu.newPrivateTabMenuItem(),
-    CommonMenu.newTorTabMenuItem(),
+    CommonMenu.newTorTabMenuItem(mainMenuIsOSDrawn),
     CommonMenu.newPartitionedTabMenuItem(),
     CommonMenu.newWindowMenuItem(),
     CommonMenu.separatorMenuItem,

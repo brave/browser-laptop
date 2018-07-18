@@ -10,10 +10,13 @@ const locale = require('../../js/l10n')
 const settings = require('../../js/constants/settings')
 const {tabs} = require('../../js/constants/config')
 const {getSetting} = require('../../js/settings')
+const platformUtil = require('./lib/platformUtil')
 const communityURL = 'https://community.brave.com/'
-const isDarwin = process.platform === 'darwin'
 const electron = require('electron')
 const menuUtil = require('./lib/menuUtil')
+
+const isDarwin = platformUtil.isDarwin()
+const isLinux = platformUtil.isLinux()
 
 const ensureAtLeastOneWindow = (frameOpts) => {
   // Handle no new tab requested, but need a window
@@ -85,10 +88,17 @@ module.exports.newPrivateTabMenuItem = () => {
   }
 }
 
-module.exports.newTorTabMenuItem = () => {
+module.exports.newTorTabMenuItem = (isOSDrawn = true) => {
+  // On Windows and (often) Linux, a menu drawn by the OS
+  // via Muon will not display the 'Alt' modifier, so
+  // make sure we do not display a hint that is incorrect.
+  // On Windows we can leave it in sometimes since the main app menu is
+  // not OS-drawn, so we are ok to display the accelerator for it.
+  // On Linux, never display since it will be disabled in the OS-drawn App Menu.
+  const shouldShowAccelerator = !isLinux && (!isOSDrawn || isDarwin)
   return {
     label: locale.translation('newTorTab'),
-    accelerator: 'CmdOrCtrl+Alt+N',
+    accelerator: shouldShowAccelerator ? 'CmdOrCtrl+Alt+N' : undefined,
     click: function (item, focusedWindow) {
       ensureAtLeastOneWindow({
         url: 'about:newtab',
