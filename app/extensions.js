@@ -219,6 +219,7 @@ let generateBraveManifest = () => {
     key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAupOLMy5Fd4dCSOtjcApsAQOnuBdTs+OvBVt/3P93noIrf068x0xXkvxbn+fpigcqfNamiJ5CjGyfx9zAIs7zcHwbxjOw0Uih4SllfgtK+svNTeE0r5atMWE0xR489BvsqNuPSxYJUmW28JqhaSZ4SabYrRx114KcU6ko7hkjyPkjQa3P+chStJjIKYgu5tWBiMJp5QVLelKoM+xkY6S7efvJ8AfajxCViLGyDQPDviGr2D0VvIBob0D1ZmAoTvYOWafcNCaqaejPDybFtuLFX3pZBqfyOCyyzGhucyCmfBXJALKbhjRAqN5glNsUmGhhPK87TuGATQfVuZtenMvXMQIDAQAB'
   }
 
+  const ethWalletUrl = `chrome-extension://${config.ethwalletExtensionId}`
   let cspDirectives = {
     'default-src': '\'self\'',
     'form-action': '\'none\'',
@@ -226,7 +227,7 @@ let generateBraveManifest = () => {
     'font-src': '\'self\' data:',
     'img-src': '* data: file://*',
     'connect-src': '\'self\' https://www.youtube.com',
-    'frame-src': '\'self\' https://brave.com'
+    'frame-src': '\'self\' https://brave.com ' + ethWalletUrl
   }
 
   if (process.env.NODE_ENV === 'development') {
@@ -303,7 +304,8 @@ let generateEthwalletManifest = () => {
     'style-src': '\'self\' \'unsafe-inline\'',
     'connect-src': 'blob: \'self\' ws://localhost:* http://localhost:* https://min-api.cryptocompare.com https://mini-api.cryptocompare.com',
     'img-src': '\'self\' data:',
-    'script-src': '\'self\' \'unsafe-eval\' \'sha256-7B6rTuXUsu9shBeECmDFH4h7RDsfogQ3kIonJnIL40o\' \'sha256-zgjB35Pd2ax7Wwfk9iKnAH8r+gNrD2cHpxDkH81DHzw=\''
+    'script-src': '\'self\' \'unsafe-eval\' \'sha256-7B6rTuXUsu9shBeECmDFH4h7RDsfogQ3kIonJnIL40o\' \'sha256-zgjB35Pd2ax7Wwfk9iKnAH8r+gNrD2cHpxDkH81DHzw=\'',
+    'frame-ancestors': `chrome-extension://${config.braveExtensionId}`
   }
 
   if (process.env.NODE_ENV === 'development') {
@@ -332,7 +334,8 @@ let generateEthwalletManifest = () => {
       default_title: 'Ethereum Wallet'
     },
     incognito: 'split',
-    key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzrdMUtpj4PkN7uoeRC7pXsJyNC65iCWJObISzDQ/mCXerD3ATL54Y8TCkE1mS9O2tiZFY+og4g0GqLjT/M9GJ/Rjlj6cQqIaa9MnQ65H789V6rqPlTQyrd3udIylPJbr5aJ9RvuMcX8BKpT7SKcYvRSwZblKQ/OZ/a/5ylfM+QPyS5ZzooEq921I8eB4JF80aic/3cdU+Xmpyo/jdEe804/MemQ6kqlErXdNaFVU7fQ3lvCzWWcI+I3A1QbKSC2+G1HiToxllxU1gv+rAOsoHYwSkL2ZBTPkvnVBuV5vTS91GF3jGF9TMbw4m3TRNPJZkU32nfJy2JNaa1Ssnws+bQIDAQAB'
+    key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzrdMUtpj4PkN7uoeRC7pXsJyNC65iCWJObISzDQ/mCXerD3ATL54Y8TCkE1mS9O2tiZFY+og4g0GqLjT/M9GJ/Rjlj6cQqIaa9MnQ65H789V6rqPlTQyrd3udIylPJbr5aJ9RvuMcX8BKpT7SKcYvRSwZblKQ/OZ/a/5ylfM+QPyS5ZzooEq921I8eB4JF80aic/3cdU+Xmpyo/jdEe804/MemQ6kqlErXdNaFVU7fQ3lvCzWWcI+I3A1QbKSC2+G1HiToxllxU1gv+rAOsoHYwSkL2ZBTPkvnVBuV5vTS91GF3jGF9TMbw4m3TRNPJZkU32nfJy2JNaa1Ssnws+bQIDAQAB',
+    web_accessible_resources: ['index.html']
   }
 }
 
@@ -618,13 +621,16 @@ module.exports.init = () => {
     } else {
       geth = spawn(path.join(getExtensionsPath('bin'), 'geth'), gethArgs)
     }
+    console.warn('GETH: spawned')
     geth.stdout.on('data', (data) => {
       console.warn(data.toString())
     })
     geth.on('exit', function (code, signal) {
+      console.warn('GETH: exited')
       geth.stdout.destroy()
     })
     geth.on('close', function (code, signal) {
+      console.warn('GETH: closed')
       geth.stdout.destroy()
     })
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
