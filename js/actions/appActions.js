@@ -2109,6 +2109,12 @@ const appActions = {
       tabId,
       index
     })
+  },
+
+  onCheckBrowserActivityTime: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_CHECK_BROWSER_ACTIVITY_TIME
+    })
   }
 }
 

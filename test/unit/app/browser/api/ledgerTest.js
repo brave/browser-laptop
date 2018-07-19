@@ -4211,4 +4211,155 @@ describe('ledger api unit tests', function () {
       assert.equal(true, synopsis.publishers['clifton.io'].options.verified)
     })
   })
+
+  describe('checkBrowserActivityTime', function () {
+    afterEach(function () {
+      ledgerApi.setSynopsis(undefined)
+    })
+
+    it('returns state when there are no publishers', function () {
+      const synopsis = {
+        options: {},
+        publishers: {}
+      }
+      const state = defaultAppState
+        .setIn(['ledger', 'synopsis'], Immutable.fromJS(synopsis))
+
+      ledgerApi.setSynopsis(synopsis)
+
+      const result = ledgerApi.checkBrowserActivityTime(state)
+      assert.deepEqual(result.toJS(), state.toJS())
+    })
+
+    it('returns state if browsingTime is cached at >= 30 minutes, and ledger doesn\'t have a fuzzed status', function () {
+      const synopsis = {
+        options: {},
+        publishers: {
+          'brave.com': {
+            visits: 2,
+            duration: 1080000
+          },
+          'clifton.io': {
+            visits: 3,
+            duration: 1200000
+          }
+        }
+      }
+      const state = defaultAppState
+        .setIn(['ledger', 'synopsis'], Immutable.fromJS(synopsis))
+        .setIn(['ledger', 'about', 'browsingTime'], 2280000)
+
+      ledgerApi.setSynopsis(synopsis)
+
+      const result = ledgerApi.checkBrowserActivityTime(state)
+      assert.deepEqual(result.toJS(), state.toJS())
+    })
+
+    it('return state if cached time is less than 30 minutes and status is not fuzzed', function () {
+      const synopsis = {
+        options: {},
+        publishers: {
+          'brave.com': {
+            visits: 2,
+            duration: 420000
+          },
+          'clifton.io': {
+            visits: 3,
+            duration: 425000
+          }
+        }
+      }
+      const state = defaultAppState
+        .setIn(['ledger', 'synopsis'], Immutable.fromJS(synopsis))
+        .setIn(['ledger', 'about', 'status'], ledgerStatuses.CORRUPTED_SEED)
+
+      ledgerApi.setSynopsis(synopsis)
+
+      const result = ledgerApi.checkBrowserActivityTime(state)
+      assert.deepEqual(result.toJS(), state.toJS())
+    })
+
+    it('does not unset status if browsing time is less than 30 minutes, and ledger has a fuzzed status', function () {
+      const synopsis = {
+        options: {},
+        publishers: {
+          'brave.com': {
+            visits: 2,
+            duration: 20000
+          },
+          'clifton.io': {
+            visits: 3,
+            duration: 40000
+          }
+        }
+      }
+      const state = defaultAppState
+        .setIn(['ledger', 'synopsis'], Immutable.fromJS(synopsis))
+        .setIn(['ledger', 'about', 'status'], ledgerStatuses.FUZZING)
+
+      const expectedState = state
+        .setIn(['ledger', 'about', 'browsingTime'], 60000)
+
+      ledgerApi.setSynopsis(synopsis)
+
+      const result = ledgerApi.checkBrowserActivityTime(state)
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('unsets status if browsingTime is >= 30 minutes and ledgerStatus is fuzzing', function () {
+      const synopsis = {
+        options: {},
+        publishers: {
+          'brave.com': {
+            visits: 2,
+            duration: 1080000
+          },
+          'clifton.io': {
+            visits: 3,
+            duration: 1200000
+          }
+        }
+      }
+      const state = defaultAppState
+        .setIn(['ledger', 'synopsis'], Immutable.fromJS(synopsis))
+        .setIn(['ledger', 'about', 'status'], ledgerStatuses.FUZZING)
+
+      const expectedState = state
+        .setIn(['ledger', 'about', 'browsingTime'], 2280000)
+        .setIn(['ledger', 'about', 'status'], '')
+
+      ledgerApi.setSynopsis(synopsis)
+
+      const result = ledgerApi.checkBrowserActivityTime(state)
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+
+    it('caches browsing time and unsets status if browsing time is greater than 30 minutes', function () {
+      const synopsis = {
+        options: {},
+        publishers: {
+          'brave.com': {
+            visits: 2,
+            duration: 1080000
+          },
+          'clifton.io': {
+            visits: 3,
+            duration: 1200000
+          }
+        }
+      }
+      const state = defaultAppState
+        .setIn(['ledger', 'synopsis'], Immutable.fromJS(synopsis))
+        .setIn(['ledger', 'about', 'status'], ledgerStatuses.FUZZING)
+
+      const expectedState = state
+        .setIn(['ledger', 'about', 'status'], '')
+        .setIn(['ledger', 'about', 'browsingTime'], 2280000)
+
+      ledgerApi.setSynopsis(synopsis)
+
+      const result = ledgerApi.checkBrowserActivityTime(state)
+      assert.deepEqual(result.toJS(), expectedState.toJS())
+    })
+  })
 })

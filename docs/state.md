@@ -189,6 +189,7 @@ AppStore
   },
   ledger: {
     about: {
+      browsingTime: number, // A total of publisher visit time
       synopsis: Array.Object,
       synopsisOptions: Object
     },
