@@ -509,7 +509,16 @@ const doAction = (action) => {
       if (!action.detail) {
         windowState = windowState.delete('popupWindowDetail')
       } else {
+        const alreadyFinishedLoad = windowState.getIn(['popupWindowDetail', 'didFinishLoad'])
         windowState = windowState.set('popupWindowDetail', action.detail)
+        if (alreadyFinishedLoad) {
+          windowState = windowState.setIn(['popupWindowDetail', 'didFinishLoad'], true)
+        }
+      }
+      break
+    case windowConstants.WINDOW_SET_POPUP_WINDOW_LOADED:
+      if (windowState.has('popupWindowDetail')) {
+        windowState = windowState.setIn(['popupWindowDetail', 'didFinishLoad'], true)
       }
       break
     case windowConstants.WINDOW_SET_AUDIO_MUTED:
