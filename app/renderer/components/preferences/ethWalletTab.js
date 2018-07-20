@@ -21,11 +21,31 @@ const settings = require('../../../../js/constants/settings')
 const config = require('../../../../js/constants/config')
 
 class EthWalletTab extends ImmutableComponent {
+  constructor () {
+    super()
+    this.onChange = this.onChange.bind(this)
+  }
+
+  isEnabled () {
+    return this.props.settings.get(settings.ETHWALLET_ENABLED)
+  }
+
+  onChange () {
+    const {onChangeSetting} = this.props
+    if (this.isEnabled()) {
+      onChangeSetting(settings.ETHWALLET_ENABLED, false)
+    } else {
+      onChangeSetting(settings.ETHWALLET_ENABLED, true)
+    }
+  }
+
   render () {
+    const iframe = this.isEnabled() ? <iframe src={`chrome-extension://${config.ethwalletExtensionId}/index.html`} className={css(styles.frame)} /> : null
+    const marketingText = this.isEnabled() ? null : <div>Hello some text here</div>
     return <section>
       <SectionTitleWrapper>
         <div className={css(styles.frameWrapper)}>
-          <iframe src={`chrome-extension://${config.ethwalletExtensionId}/index.html`} className={css(styles.frame)} />
+          {iframe}
         </div>
         <section className={css(styles.ethWallet__title)}>
           { /* Note: This div cannot be replaced with SectionTitleLabelWrapper */ }
@@ -46,8 +66,8 @@ class EthWalletTab extends ImmutableComponent {
               dataL10nIdLeft='off'
               dataL10nId='on'
               prefKey={settings.ETHWALLET_ENABLED}
-              settings={this.props.settings}
-              onChangeSetting={this.props.onChangeSetting}
+              checked={this.isEnabled()}
+              onChangeSetting={this.onChange}
               customStyleTextLeft={[
                 styles.switch__label,
                 styles.switch__label_left,
@@ -61,6 +81,7 @@ class EthWalletTab extends ImmutableComponent {
           </div>
         </section>
       </SectionTitleWrapper>
+      {marketingText}
     </section>
   }
 }

@@ -587,15 +587,6 @@ const doAction = (action) => {
         }
       }
       break
-
-    case windowConstants.WINDOW_SET_ETH_WALLET_VISIBLE:
-      windowState = windowState.setIn(['ui', 'isEthWalletPanelVisible'], action.isVisible)
-      break
-
-    case windowConstants.WINDOW_SET_ETH_WALLET_NEW_PASSWORD_VALUE:
-      windowState = windowState.setIn(['ethWalletData', 'newPasswordValue'], action.newPasswordValue)
-      break
-
     case windowConstants.WINDOW_WIDEVINE_PANEL_DETAIL_CHANGED:
       if (!action.widevinePanelDetail) {
         windowState = windowState.delete('widevinePanelDetail')

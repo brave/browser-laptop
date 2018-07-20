@@ -24,7 +24,6 @@ const ipc = require('electron').ipcRenderer
 const locale = require('../js/l10n')
 const {getSetting} = require('./settings')
 const settings = require('./constants/settings')
-const {ethwalletExtensionId} = require('./constants/config')
 const textUtils = require('./lib/text')
 const {isIntermediateAboutPage, isUrl, aboutUrls} = require('./lib/appUrlUtil')
 const urlParse = require('../app/common/urlParse')
@@ -702,18 +701,7 @@ function hamburgerTemplateInit (location, e) {
 
   helpSubmenu.push(CommonMenu.submitFeedbackMenuItem())
 
-  const ethWalletMenu = {
-    l10nLabelId: 'ethWallet',
-    submenu: [
-      CommonMenu.openEthWalletMenuItem(),
-      CommonMenu.transferEthFundsMenuItem(),
-      CommonMenu.createEthWalletMenuItem()
-    ]
-  }
-
-  const ethWalletState = extensionState.getExtensionById(appStoreRenderer.state, ethwalletExtensionId)
-
-  let template = [
+  const template = [
     CommonMenu.newTabMenuItem(),
     CommonMenu.newPrivateTabMenuItem(),
     CommonMenu.newTorTabMenuItem(false),
@@ -741,7 +729,6 @@ function hamburgerTemplateInit (location, e) {
       }]
     },
     CommonMenu.separatorMenuItem,
-    ethWalletMenu,
     {
       label: locale.translation('bookmarks'),
       submenu: [
@@ -771,11 +758,6 @@ function hamburgerTemplateInit (location, e) {
     },
     CommonMenu.quitMenuItem()
   ]
-
-  if (!ethWalletState.get('enabled')) {
-    template = template.filter(item => item !== ethWalletMenu)
-  }
-
   return menuUtil.sanitizeTemplateItems(template)
 }
 

@@ -5,11 +5,10 @@
 'use strict'
 
 const appActions = require('../../js/actions/appActions')
-const windowActions = require('../../js/actions/windowActions')
 const messages = require('../../js/constants/messages')
 const locale = require('../../js/l10n')
 const settings = require('../../js/constants/settings')
-const {tabs, ethwalletExtensionId} = require('../../js/constants/config')
+const {tabs} = require('../../js/constants/config')
 const {getSetting} = require('../../js/settings')
 const platformUtil = require('./lib/platformUtil')
 const communityURL = 'https://community.brave.com/'
@@ -391,37 +390,6 @@ module.exports.cleanReloadMenuItem = () => {
     accelerator: 'CmdOrCtrl+Shift+R',
     click: function (item, focusedWindow) {
       module.exports.sendToFocusedWindow(focusedWindow, [messages.SHORTCUT_ACTIVE_FRAME_CLEAN_RELOAD])
-    }
-  }
-}
-
-module.exports.openEthWalletMenuItem = () => {
-  return {
-    label: locale.translation('openEthWallet'),
-    click: function (item, focusedWindow) {
-      ensureAtLeastOneWindow({
-        url: `chrome-extension://${ethwalletExtensionId}/index.html`
-      })
-    }
-  }
-}
-
-module.exports.transferEthFundsMenuItem = () => {
-  return {
-    label: locale.translation('transferEthFunds'),
-    click: function (item, focusedWindow) {
-      ensureAtLeastOneWindow({
-        url: `chrome-extension://${ethwalletExtensionId}/index.html`
-      })
-    }
-  }
-}
-
-module.exports.createEthWalletMenuItem = () => {
-  return {
-    label: locale.translation('createEthWallet'),
-    click: function (item, focusedWindow) {
-      windowActions.setEthWalletVisible(true)
     }
   }
 }

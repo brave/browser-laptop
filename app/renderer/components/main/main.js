@@ -29,7 +29,6 @@ const SiteInfo = require('./siteInfo')
 const BraveryPanel = require('./braveryPanel')
 const ClearBrowsingDataPanel = require('./clearBrowsingDataPanel')
 const ImportBrowserDataPanel = require('./importBrowserDataPanel')
-const EthWalletPanel = require('./ethWalletPanel')
 const WidevinePanel = require('./widevinePanel')
 const AutofillAddressPanel = require('../autofill/autofillAddressPanel')
 const AutofillCreditCardPanel = require('../autofill/autofillCreditCardPanel')
@@ -563,7 +562,6 @@ class Main extends React.Component {
       !!currentWindow.get('braveryPanelDetail')
     props.showClearData = currentWindow.getIn(['ui', 'isClearBrowsingDataPanelVisible'], false)
     props.showImportData = currentWindow.has('importBrowserDataDetail')
-    props.showEthWallet = currentWindow.getIn(['ui', 'isEthWalletPanelVisible'], false)
     props.showWidevine = currentWindow.getIn(['widevinePanelDetail', 'shown']) && !isLinux
     props.showAutoFillAddress = currentWindow.has('autofillAddressDetail')
     props.showAutoFillCC = currentWindow.has('autofillCreditCardDetail')
@@ -656,11 +654,6 @@ class Main extends React.Component {
           this.props.showImportData
           ? <ImportBrowserDataPanel />
           : null
-        }
-        {
-          this.props.showEthWallet
-            ? <EthWalletPanel />
-            : null
         }
         {
           this.props.showWidevine

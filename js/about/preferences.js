@@ -770,7 +770,7 @@ class AboutPreferences extends React.Component {
         />
         break
       case preferenceTabs.ETHWALLET:
-        tab = <EthWalletTab onChangeSetting={this.onChangeSetting} />
+        tab = <EthWalletTab onChangeSetting={this.onChangeSetting} settings={settings} />
         break
       case preferenceTabs.SHIELDS:
         tab = <ShieldsTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />
