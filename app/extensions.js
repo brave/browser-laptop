@@ -661,6 +661,17 @@ module.exports.init = () => {
         client.end()
       })
     })
+    ipcMain.on('eth-wallet-wallets', (e, data) => {
+      var client = net.createConnection(path.join(app.getPath('userData'), 'ethereum', 'geth.ipc'))
+
+      client.on('connect', () => {
+        client.write(JSON.stringify({ 'method': 'db_putString', 'params': ['braveEthWallet', 'wallets', data], 'id': 1, 'jsonrpc': '2.0' }))
+      })
+
+      client.on('data', (data) => {
+        client.end()
+      })
+    })
   } else {
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.DISABLED)
     extensionActions.extensionDisabled(config.ethwalletExtensionId)
