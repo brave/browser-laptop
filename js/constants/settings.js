@@ -33,6 +33,7 @@ const settings = {
   SHOW_TAB_PREVIEWS: 'tabs.show-tab-previews',
   TAB_PREVIEW_TIMING: 'tabs.preview-timing',
   SHOW_DASHBOARD_IMAGES: 'tabs.show-dashboard-images',
+  CLOCK_DISPLAY_TWENTY_FOUR: 'tabs.clock-display-twenty-four',
   // Privacy Tab
   HISTORY_SUGGESTIONS: 'privacy.history-suggestions',
   BOOKMARK_SUGGESTIONS: 'privacy.bookmark-suggestions',

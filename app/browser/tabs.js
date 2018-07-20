@@ -352,6 +352,7 @@ const updateAboutDetails = (tabId) => {
     const newTabDetail = aboutNewTabState.getData(appState)
     const showEmptyPage = settingsStore.getSetting(settings.NEWTAB_MODE) === newTabMode.EMPTY_NEW_TAB
     const showImages = settingsStore.getSetting(settings.SHOW_DASHBOARD_IMAGES) && !showEmptyPage
+    const clockDisplayTwentyFour = settingsStore.getSetting(settings.CLOCK_DISPLAY_TWENTY_FOUR) && !showEmptyPage
     const trackedBlockersCount = appState.getIn(['trackingProtection', 'count'], 0)
     const httpsUpgradedCount = appState.getIn(['httpsEverywhere', 'count'], 0)
     const adblockCount = appState.getIn(['adblock', 'count'], 0)
@@ -359,6 +360,7 @@ const updateAboutDetails = (tabId) => {
     sendAboutDetails(tabId, messages.NEWTAB_DATA_UPDATED, {
       showEmptyPage,
       showImages,
+      clockDisplayTwentyFour,
       trackedBlockersCount,
       adblockCount,
       httpsUpgradedCount,

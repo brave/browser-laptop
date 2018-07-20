@@ -154,6 +154,17 @@ class TabsTab extends ImmutableComponent {
               settings={this.props.settings}
               onChangeSetting={this.props.onChangeSetting}
             />
+
+            <SettingCheckbox
+              dataL10nId='clockDisplayTwentyFour'
+              dataTestId='clockDisplayTwentyFour'
+              testIsEnabled={
+                getSetting(settings.CLOCK_DISPLAY_TWENTY_FOUR, this.props.settings) === true
+              }
+              prefKey={settings.CLOCK_DISPLAY_TWENTY_FOUR}
+              settings={this.props.settings}
+              onChangeSetting={this.props.onChangeSetting}
+            />
           </SettingItem>
         </SettingsList>
       </div>

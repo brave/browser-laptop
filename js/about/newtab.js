@@ -49,6 +49,7 @@ class NewTabPage extends React.Component {
       showEmptyPage: true,
       showImages: false,
       torEnabled: false,
+      clockDisplayTwentyFour: false,
       backgroundImage: undefined
     }
 
@@ -71,6 +72,7 @@ class NewTabPage extends React.Component {
         showEmptyPage,
         torEnabled: data.get('torEnabled'),
         showImages: !!data.get('showImages') && !showEmptyPage,
+        clockDisplayTwentyFour: !!data.get('clockDisplayTwentyFour') && !showEmptyPage,
         backgroundImage: showImages
           ? this.state.backgroundImage || this.randomBackgroundImage
           : undefined
@@ -297,7 +299,7 @@ class NewTabPage extends React.Component {
         <main className='newTabDashboard'>
           <div className='statsBar'>
             <Stats newTabData={this.state.newTabData} />
-            <Clock />
+            <Clock displayTwentyFour={this.state.clockDisplayTwentyFour} />
           </div>
           <div className='topSitesContainer'>
             <nav className='topSitesGrid'>

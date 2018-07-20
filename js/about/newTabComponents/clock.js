@@ -1,13 +1,12 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 const React = require('react')
 
 class Clock extends React.Component {
-  constructor () {
-    super()
-    this.dateTimeFormat = new Intl.DateTimeFormat([], {hour: '2-digit', minute: '2-digit'})
+  constructor (props) {
+    super(props)
+    this.setDateTimeFormat()
     this.state = this.getClockState(new Date())
   }
   get formattedTime () {
@@ -41,14 +40,32 @@ class Clock extends React.Component {
       this.setState(this.getClockState(now))
     }
   }
+  setDateTimeFormat () {
+    this.dateTimeFormat = new Intl.DateTimeFormat([],
+      {
+        hour12: !this.props.displayTwentyFour,
+        hour: '2-digit',
+        minute: '2-digit'
+      }
+    )
+  }
   getClockState (now) {
     return {
       date: now,
       currentTime: this.dateTimeFormat.formatToParts(now)
     }
   }
+  applyUpdatedFormat () {
+    this.setDateTimeFormat()
+    this.setState(this.getClockState(new Date()))
+  }
   componentDidMount () {
     window.setInterval(this.maybeUpdateClock.bind(this), 2000)
+  }
+  componentDidUpdate (prevProps) {
+    if (prevProps.displayTwentyFour !== this.props.displayTwentyFour) {
+      this.applyUpdatedFormat()
+    }
   }
 
   render () {
