@@ -376,7 +376,8 @@ const availableLanguages = [
   'te',
   'tr-TR',
   'uk',
-  'zh-CN'
+  'zh-CN',
+  'vi-VN'
 ]
 
 // Currently configured languages
