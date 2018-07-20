@@ -18,6 +18,16 @@ const windowActions = require('../../../../js/actions/windowActions')
 
 // Styles
 const globalStyles = require('../styles/global')
+const shouldDebugWebviewEvents = false
+const waitForFrame = () => new Promise(resolve => window.requestAnimationFrame(resolve))
+
+async function forceDrawWebview (webview) {
+  await waitForFrame()
+  webview.style.visibility = 'hidden'
+  await waitForFrame()
+  webview.style.visibility = ''
+  await waitForFrame()
+}
 
 class PopupWindow extends React.Component {
   constructor (props) {
@@ -47,8 +57,39 @@ class PopupWindow extends React.Component {
       })
       webview.addEventListener('did-attach', () => {
         webview.enablePreferredSizeMode(true)
+        // Workaround first-draw blankness by forcing hide and show.
+        if (!this.hasDrawn) {
+          forceDrawWebview(webview)
+          this.hasDrawn = true
+        }
+      })
+      webview.addEventListener('load-start', () => {
+        if (shouldDebugWebviewEvents) {
+          console.log('load-start')
+        }
+      })
+      webview.addEventListener('did-finish-load', () => {
+        if (shouldDebugWebviewEvents) {
+          console.log('did-finish-load')
+        }
+        windowActions.setPopupWindowLoaded()
+      })
+      webview.addEventListener('did-fail-load', () => {
+        if (shouldDebugWebviewEvents) {
+          console.log('did-fail-load')
+        }
+        windowActions.setPopupWindowLoaded()
+      })
+      webview.addEventListener('did-fail-provisional-load', () => {
+        if (shouldDebugWebviewEvents) {
+          console.log('did-fail-provisional-load')
+        }
+        windowActions.setPopupWindowLoaded()
       })
       webview.addEventListener('preferred-size-changed', () => {
+        if (shouldDebugWebviewEvents) {
+          console.log('preferred-size-changed')
+        }
         webview.getPreferredSize((preferredSize) => {
           const width = preferredSize.width
           const height = preferredSize.height
@@ -84,6 +125,7 @@ class PopupWindow extends React.Component {
     props.height = parseInt(detail.get('height'))
     props.top = parseInt(detail.get('top'))
     props.left = parseInt(detail.get('left'))
+    props.loaded = detail.get('didFinishLoad')
 
     // used in other functions
     props.src = detail.get('src')
@@ -122,6 +164,7 @@ class PopupWindow extends React.Component {
       data-popup-window
       className={css(
         styles.popupWindow,
+        !this.props.loaded && styles.popupWindow_notLoaded,
         style.right !== undefined && styles.popupWindow_reverseExpand
       )}
       style={style} />
@@ -143,6 +186,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     userSelect: 'none',
     zIndex: globalStyles.zindex.zindexPopupWindow
+  },
+
+  popupWindow_notLoaded: {
+    opacity: 0
   },
 
   popupWindow_reverseExpand: {
