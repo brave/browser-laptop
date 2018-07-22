@@ -373,6 +373,12 @@ const windowActions = {
     })
   },
 
+  openSubMenu: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_OPEN_SUBMENU
+    })
+  },
+
   urlBarOnFocus: function (windowId) {
     dispatch({
       actionType: windowConstants.WINDOW_URL_BAR_ON_FOCUS,

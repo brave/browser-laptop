@@ -664,6 +664,26 @@ const doAction = (action) => {
           windowState.deleteIn(blockedRunInsecureContentPath.concat(['security', 'blockedRunInsecureContent']))
       }
       break
+    case windowConstants.WINDOW_OPEN_SUBMENU:
+    /*  const selectedIndex = windowState.getIn(['ui','menubar','SelectedIndex'])
+      const template = windowState.getIn(['ui','menubar','template'])
+      const contextMenuIndex = windowState.getIn(['ui','menubar','contextMenuSelectedIndex'])
+
+    if (getSetting(settings.AUTO_HIDE_MENU)) {
+      doAction({actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})
+    }
+    console.log(selectedIndex)
+    console.log(template)
+    console.log(contextMenuIndex)
+    if (contextMenuIndex === null &&
+        template.get(selectedIndex).has('submenu')) {
+      doAction({acitonType: windowConstants.WINDOW_SET_CONTEXT_MENU_SELECTED_INDEX, index: [0]})
+      showContextMenu(this.getMenubarItemBounds(selectedIndex), template.get(selectedIndex).get('submenu').toJS(), this.props.lastFocusedSelector)
+    }*/
+    console.log("sub")
+
+
+      break
     case windowConstants.WINDOW_TOGGLE_MENUBAR_VISIBLE:
       if (getSetting(settings.AUTO_HIDE_MENU)) {
         doAction({actionType: windowConstants.WINDOW_SET_CONTEXT_MENU_DETAIL})

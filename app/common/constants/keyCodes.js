@@ -20,7 +20,8 @@ const KeyCodes = {
   NUMPAD_PLUS: 107,
   NUMPAD_MINUS: 109,
   TAB: 9,
-  PRINT_SCREEN: 44
+  PRINT_SCREEN: 44,
+  F: 70
 }
 
 module.exports = KeyCodes

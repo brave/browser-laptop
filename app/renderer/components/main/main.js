@@ -98,6 +98,11 @@ class Main extends React.Component {
         appActions.closeWindow(getCurrentWindowId())
         return
       }
+      if (e.key === 'f' && e.altKey && isWindows) {
+        e.stopPropagation()
+        windowActions.toggleMenubarVisible(true)
+        windowActions.setMenuBarSelectedIndex(0)
+      }
       switch (e.which) {
         case keyCodes.ESC:
           this.exitFullScreen()
@@ -151,7 +156,7 @@ class Main extends React.Component {
                 this.lastKeyPressed !== keyCodes.ALT ||
                 Object.keys(this.keydown).length > 1 ||
                 this.keydownHistory.length > 0) {
-              break
+                  break
             }
 
             e.preventDefault()
@@ -183,10 +188,26 @@ class Main extends React.Component {
 
         // For ALT menu processing
         if (Object.keys(this.keydown).length > 1) {
+          //console.log(e.which)
           this.keydownHistory.push(e.which)
+          /*if(this.lastKeyPressed === keyCodes.F)
+          {
+            windowActions.toggleMenubarVisible(true)
+            windowActions.setMenuBarSelectedIndex(0)
+            //windowActions.openSubMenu()
+            //windowActions.clickMenubarSubmenu()
+            console.log("f key pressed")
+          }
+          else
+          {
+            console.log("ran away")
+           }*/
+
         } else {
           this.keydownHistory = []
         }
+
+
         delete this.keydown[e.which]
       })
 
@@ -601,6 +622,7 @@ class Main extends React.Component {
     props.isWidevineReady = state.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])
     props.widevineLocation = urlUtil.getOrigin(widevinePanelDetail.get('location'))
     props.widevineRememberSettings = widevinePanelDetail.get('alsoAddRememberSiteSetting') ? 1 : 0
+    props.template = state.getIn(['menu', 'template'])
 
     return props
   }
