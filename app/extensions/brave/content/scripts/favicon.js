@@ -1,6 +1,7 @@
 const getBase64FromImageUrl = (url) => {
   return new Promise((resolve, reject) => {
     const img = new window.Image()
+    img.crossOrigin = "anonymous"
     img.onerror = function () {
       reject(new Error('unable to load image'))
     }
