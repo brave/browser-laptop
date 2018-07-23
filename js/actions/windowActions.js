@@ -520,6 +520,12 @@ const windowActions = {
     })
   },
 
+  setPopupWindowLoaded: function () {
+    dispatch({
+      actionType: windowConstants.WINDOW_SET_POPUP_WINDOW_LOADED
+    })
+  },
+
   /**
    * Dispatches a message to indicate that the frame should be muted
    *

@@ -44,6 +44,7 @@ const windowConstants = {
   WINDOW_SET_CONTEXT_MENU_DETAIL: _, // If set, also indicates that the context menu is shown
   WINDOW_SET_CONTEXT_MENU_SELECTED_INDEX: _,
   WINDOW_SET_POPUP_WINDOW_DETAIL: _, // If set, also indicates that the popup window is shown
+  WINDOW_SET_POPUP_WINDOW_LOADED: _,
   WINDOW_HIDE_BOOKMARK_HANGER: _,
   WINDOW_SET_AUDIO_MUTED: _,
   WINDOW_SET_FAVICON: _,
