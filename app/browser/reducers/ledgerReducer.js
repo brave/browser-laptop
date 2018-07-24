@@ -609,12 +609,18 @@ const ledgerReducer = (state, action, immutableAction) => {
         state = ledgerApi.checkBrowserActivityTime(state)
         break
       }
+    case appConstants.APP_ON_PROMO_REF_FETCH:
+      {
+        state = ledgerApi.onRunPromoRefFetch(state)
+        break
+      }
   }
   return state
 }
 
 process.on(messages.APP_INITIALIZED, () => {
   ledgerApi.runPromotionCheck()
+  ledgerApi.schedulePromoRefFetch()
 })
 
 module.exports = ledgerReducer

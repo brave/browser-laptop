@@ -2715,6 +2715,75 @@ describe('ledger api unit tests', function () {
     })
   })
 
+  describe('schedulePromoRefFetch', function () {
+    const fortySeconds = 40000
+    const seventySeconds = 70000
+    let fakeClock, onPromoRefFetchSpy
+
+    before(function () {
+      fakeClock = sinon.useFakeTimers()
+      onPromoRefFetchSpy = sinon.spy(appActions, 'onPromoRefFetch')
+    })
+
+    after(function () {
+      fakeClock.restore()
+      onPromoRefFetchSpy.restore()
+    })
+
+    afterEach(function () {
+      onPromoRefFetchSpy.reset()
+    })
+
+    it('dispatches onPromoRefFetch after 50 - 70 seconds', function () {
+      ledgerApi.schedulePromoRefFetch(defaultAppState)
+      fakeClock.tick(seventySeconds)
+      assert(onPromoRefFetchSpy.calledOnce)
+    })
+
+    it('does not dispatch onPromoRefFetch after 40 seconds', function () {
+      ledgerApi.schedulePromoRefFetch(defaultAppState)
+      fakeClock.tick(fortySeconds)
+      assert(onPromoRefFetchSpy.notCalled)
+    })
+  })
+
+  describe('onRunPromoRefFetch', function () {
+    let fakeRoundtrip, firstRunPromoCodeSpy, fetchReferralHeadersSpy
+
+    before(function () {
+      fakeRoundtrip = sinon.stub(ledgerApi, 'roundtrip')
+      firstRunPromoCodeSpy = sinon.spy(ledgerApi, 'firstRunPromoCode')
+      fetchReferralHeadersSpy = sinon.spy(ledgerApi, 'fetchReferralHeaders')
+    })
+
+    after(function () {
+      fakeRoundtrip.restore()
+      firstRunPromoCodeSpy.restore()
+      fetchReferralHeadersSpy.restore()
+    })
+
+    afterEach(function () {
+      fakeRoundtrip.reset()
+      firstRunPromoCodeSpy.reset()
+      fetchReferralHeadersSpy.reset()
+    })
+
+    it('calls firstRunPromoCode when download id is null', function () {
+      const state = defaultAppState
+        .setIn(['updates', 'referralDownloadId'], null)
+      ledgerApi.onRunPromoRefFetch(state)
+      assert(firstRunPromoCodeSpy.calledOnce)
+    })
+
+    it('does not call firstRunPromoCode and delays fetchReferralHeaders when download id exists', function () {
+      const state = defaultAppState
+        .setIn(['updates', 'referralDownloadId'], 9999)
+      ledgerApi.onRunPromoRefFetch(state)
+      assert(firstRunPromoCodeSpy.notCalled)
+      assert(fetchReferralHeadersSpy.calledOnce)
+    })
+  })
+
   describe('checkReferralActivity', function () {
     let checkForUpdateSpy, roundtripSpy, fakeClock
 
