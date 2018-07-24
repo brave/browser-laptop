@@ -2475,21 +2475,18 @@ describe('ledger api unit tests', function () {
     })
 
     describe('contribution', function () {
-      let getPaymentInfoSpy, cacheRuleSetSpy
+      let getPaymentInfoSpy
 
       before(function () {
         getPaymentInfoSpy = sinon.spy(ledgerApi, 'getPaymentInfo')
-        cacheRuleSetSpy = sinon.spy(ledgerApi, 'cacheRuleSet')
       })
 
       afterEach(function () {
         getPaymentInfoSpy.reset()
-        cacheRuleSetSpy.reset()
       })
 
       after(function () {
         getPaymentInfoSpy.restore()
-        cacheRuleSetSpy.restore()
       })
 
       it('do not call if in progress', function () {
@@ -2505,7 +2502,6 @@ describe('ledger api unit tests', function () {
         }))
 
         assert(getPaymentInfoSpy.notCalled)
-        assert(cacheRuleSetSpy.notCalled)
       })
 
       it('execute', function () {
@@ -2520,7 +2516,6 @@ describe('ledger api unit tests', function () {
         ledgerApi.setClient(undefined)
 
         assert(getPaymentInfoSpy.calledOnce)
-        assert(cacheRuleSetSpy.calledOnce)
       })
     })
   })
@@ -4150,6 +4145,104 @@ describe('ledger api unit tests', function () {
 
       ledgerApi.updatePublishers(defaultAppState, ['brave.com'])
       assert(onPublishersInfoReadSpy.notCalled)
+    })
+  })
+
+  describe('checkExclusionRules', function () {
+    it('excludes sites with the .gov tld', function () {
+      assert(ledgerApi.shouldExclude('usa.gov'))
+      assert(ledgerApi.shouldExclude('fda.gov'))
+      assert(ledgerApi.shouldExclude('nsa.gov'))
+    })
+    it('excludes sites with the .gov tld + www', function () {
+      assert(ledgerApi.shouldExclude('www.whitehouse.gov'))
+      assert(ledgerApi.shouldExclude('www.nsa.gov'))
+      assert(ledgerApi.shouldExclude('https://www.fda.gov/'))
+    })
+    it('excludes japanese government sites', function () {
+      assert(ledgerApi.shouldExclude('jasso.go.jp'))
+      assert(ledgerApi.shouldExclude('nenkin.go.jp'))
+    })
+    it('government sites that use gov as their root hostname', function () {
+      assert(ledgerApi.shouldExclude('gov.ie'))
+      assert(ledgerApi.shouldExclude('aces.gov.in'))
+      assert(ledgerApi.shouldExclude('aponline.gov.in'))
+      assert(ledgerApi.shouldExclude('apspsc.gov.in'))
+      assert(ledgerApi.shouldExclude('asic.gov.au'))
+      assert(ledgerApi.shouldExclude('tnpsc.gov.in'))
+      assert(ledgerApi.shouldExclude('pscwbonline.gov.in'))
+      assert(ledgerApi.shouldExclude('india.gov.in'))
+    })
+    it('excludes keybase.pub', function () {
+      assert(ledgerApi.shouldExclude('keybase.pub'))
+    })
+    it('does not exclude non government, non keybase sites', function () {
+      assert.equal(false, ledgerApi.shouldExclude('brave.com'))
+      assert.equal(false, ledgerApi.shouldExclude('amazon.co.uk'))
+      assert.equal(false, ledgerApi.shouldExclude('ilovegov.co'))
+      assert.equal(false, ledgerApi.shouldExclude('www.biggov.com'))
+      assert.equal(false, ledgerApi.shouldExclude('www.yahoo.com'))
+      assert.equal(false, ledgerApi.shouldExclude('clifton.io'))
+      assert.equal(false, ledgerApi.shouldExclude('socket.io'))
+    })
+  })
+
+  describe('getPublisherExclude', function () {
+    let fakeClock, donePSpy, getPublisherExcludeSpy, shouldExcludeSpy
+    const callback = (err, result) => {
+      if (err) {
+        console.log('Something went wrong')
+      }
+    }
+
+    before(function () {
+      fakeClock = sinon.useFakeTimers()
+      donePSpy = sinon.spy(ledgerApi, 'doneP')
+      getPublisherExcludeSpy = sinon.spy(ledgerApi, 'getPublisherExclude')
+      shouldExcludeSpy = sinon.spy(ledgerApi, 'shouldExclude')
+    })
+
+    afterEach(function () {
+      donePSpy.reset()
+      getPublisherExcludeSpy.reset()
+      shouldExcludeSpy.reset()
+    })
+
+    after(function () {
+      fakeClock.restore()
+      donePSpy.restore()
+      getPublisherExcludeSpy.restore()
+      shouldExcludeSpy.restore()
+    })
+
+    it('retries after 15 seconds if there is no publisherInfoData', function () {
+      ledgerApi.setPublisherInfoData(undefined)
+      ledgerApi.getPublisherExclude('brave.com', callback)
+      getPublisherExcludeSpy.reset()
+      fakeClock.tick(15000)
+      assert(getPublisherExcludeSpy.calledOnce)
+    })
+
+    it('defers to exclusion rules if publisher is not in publisherInfoData', function () {
+      ledgerApi.setPublisherInfoData(Immutable.fromJS([
+        ['null.com', true, true]
+      ]))
+      ledgerApi.getPublisherExclude('brave.com', callback)
+      assert(shouldExcludeSpy.withArgs('brave.com').calledOnce)
+      assert(donePSpy.withArgs(null, false, callback).calledOnce)
+    })
+
+    it('returns exclude as expected from publisherInfoData', function () {
+      ledgerApi.setPublisherInfoData(Immutable.fromJS([
+        ['brave.com', true, true],
+        ['clifton.io', true, false]
+      ]))
+      ledgerApi.getPublisherExclude('brave.com', callback)
+      assert(donePSpy.withArgs(null, true, callback).calledOnce)
+      donePSpy.reset()
+
+      ledgerApi.getPublisherExclude('clifton.io', callback)
+      assert(donePSpy.withArgs(null, false, callback).calledOnce)
     })
   })
 
