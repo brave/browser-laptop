@@ -91,6 +91,7 @@ let promotionTimeoutId
 let togglePromotionTimeoutId
 let publisherInfoTimeoutId = false
 let publisherInfoUpdateIntervalId
+let promoRefFetchTimeoutId = false
 
 // Database
 let v2RulesetDB
@@ -133,6 +134,8 @@ let referralAPI = 'key'
 if (clientOptions.environment === 'production') {
   referralServer = 'https://laptop-updates.brave.com'
   referralAPI = config.referralAPI || process.env.LEDGER_REFERRAL_API_KEY || ''
+} else {
+  referralAPI = process.env.LEDGER_REFERRAL_API_KEY || referralAPI
 }
 
 const fileTypes = {
@@ -2366,22 +2369,6 @@ const initialize = (state, paymentsEnabled) => {
     }
   }
 
-  if (updateState.getUpdateProp(state, 'referralDownloadId') == null) {
-    promoCodeFirstRunStorage
-      .readFirstRunPromoCode()
-      .then((code) => {
-        onReferralCodeRead(code)
-      })
-      .catch(error => {
-        if (clientOptions.verboseP) {
-          console.error('read error: ' + error.toString())
-        }
-        fetchReferralHeaders()
-      })
-  } else {
-    fetchReferralHeaders()
-  }
-
   // Get referral headers every day
   setInterval(() => fetchReferralHeaders, (24 * ledgerUtil.milliseconds.hour))
 
@@ -2451,6 +2438,39 @@ const initialize = (state, paymentsEnabled) => {
     state = ledgerState.resetInfo(state)
     return state
   }
+}
+
+const schedulePromoRefFetch = () => {
+  if (promoRefFetchTimeoutId) {
+    clearTimeout(promoRefFetchTimeoutId)
+  }
+
+  promoRefFetchTimeoutId = setTimeout(() => {
+    appActions.onPromoRefFetch()
+  }, random.randomInt({min: 50 * ledgerUtil.milliseconds.second, max: 70 * ledgerUtil.milliseconds.second}))
+}
+
+const onRunPromoRefFetch = (state) => {
+  if (updateState.getUpdateProp(state, 'referralDownloadId') == null) {
+    module.exports.firstRunPromoCode()
+  } else {
+    module.exports.fetchReferralHeaders()
+  }
+  return state
+}
+
+const firstRunPromoCode = () => {
+  promoCodeFirstRunStorage
+    .readFirstRunPromoCode()
+    .then((code) => {
+      onReferralCodeRead(code)
+    })
+    .catch(error => {
+      if (clientOptions.verboseP) {
+        console.error('read error: ' + error.toString())
+      }
+      fetchReferralHeaders()
+    })
 }
 
 const getContributionAmount = (state) => {
@@ -3405,7 +3425,11 @@ const getMethods = () => {
     checkPublisherInfoUpdate,
     updatePublishersInfo,
     runPublishersUpdate,
-    checkBrowserActivityTime
+    checkBrowserActivityTime,
+    firstRunPromoCode,
+    fetchReferralHeaders,
+    schedulePromoRefFetch,
+    onRunPromoRefFetch
   }
 
   let privateMethods = {}
