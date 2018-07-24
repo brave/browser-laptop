@@ -2115,6 +2115,12 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_ON_CHECK_BROWSER_ACTIVITY_TIME
     })
+  },
+
+  onPromoRefFetch: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_PROMO_REF_FETCH
+    })
   }
 }
 
