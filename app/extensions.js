@@ -601,6 +601,10 @@ module.exports.init = () => {
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
   if (getSetting(settings.ETHWALLET_ENABLED)) {
+    const ipcPath = process.platform === 'win32'
+          ? '\\\\.\\pipe\\geth.ipc'
+          : path.join(app.getPath('userData'), 'ethereum', 'geth.ipc')
+
     var gethArgs = [
       '--light',
       '--rpc',
@@ -610,7 +614,7 @@ module.exports.init = () => {
       '--datadir',
       path.join(app.getPath('userData'), 'ethereum'),
       '--ipcpath',
-      path.join(app.getPath('userData'), 'ethereum', 'geth.ipc')
+      ipcPath
     ]
     if (process.env.ETHEREUM_NETWORK === 'ropsten') {
       gethArgs.push('--testnet')
@@ -651,7 +655,7 @@ module.exports.init = () => {
       }
     })
     ipcMain.on('create-wallet', (e, pwd) => {
-      var client = net.createConnection(path.join(app.getPath('userData'), 'ethereum', 'geth.ipc'))
+      var client = net.createConnection(ipcPath)
 
       client.on('connect', () => {
         client.write(JSON.stringify({ 'method': 'personal_newAccount', 'params': [pwd], 'id': 1, 'jsonrpc': '2.0' }))
@@ -662,7 +666,7 @@ module.exports.init = () => {
       })
     })
     ipcMain.on('eth-wallet-wallets', (e, data) => {
-      var client = net.createConnection(path.join(app.getPath('userData'), 'ethereum', 'geth.ipc'))
+      var client = net.createConnection(ipcPath)
 
       client.on('connect', () => {
         client.write(JSON.stringify({ 'method': 'db_putString', 'params': ['braveEthWallet', 'wallets', data], 'id': 1, 'jsonrpc': '2.0' }))
