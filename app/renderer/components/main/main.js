@@ -268,6 +268,8 @@ class Main extends React.Component {
       appActions.swipedLeft(0)
       appActions.swipedRight(0)
       trackingFingers = false
+      isSwipeOnRightEdge = false
+      isSwipeOnLeftEdge = false
       deltaX = 0
       deltaY = 0
       startTime = 0
