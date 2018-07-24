@@ -274,13 +274,14 @@ class Main extends React.Component {
     })
 
     ipc.on('scroll-touch-edge', () => {
+      const scrollingHorizontally = deltaX > deltaY
       if (trackingFingers) {
-        if (!isSwipeOnRightEdge && deltaX > 0) {
+        if (!isSwipeOnRightEdge && deltaX > 0 && scrollingHorizontally) {
           isSwipeOnRightEdge = true
           isSwipeOnLeftEdge = false
           time = 0
           deltaX = 0
-        } else if (!isSwipeOnLeftEdge && deltaX < 0) {
+        } else if (!isSwipeOnLeftEdge && deltaX < 0 && scrollingHorizontally) {
           isSwipeOnLeftEdge = true
           isSwipeOnRightEdge = false
           time = 0
