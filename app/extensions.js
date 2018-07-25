@@ -605,7 +605,7 @@ module.exports.init = () => {
           ? '\\\\.\\pipe\\geth.ipc'
           : path.join(app.getPath('userData'), 'ethereum', 'geth.ipc')
 
-    var gethArgs = [
+    const gethArgs = [
       '--light',
       '--rpc',
       '--ws',
@@ -619,23 +619,23 @@ module.exports.init = () => {
     if (process.env.ETHEREUM_NETWORK === 'ropsten') {
       gethArgs.push('--testnet')
     }
+
+    const spawnOptions = {
+      stdio: !!process.env.GETH_LOG ? 'inherit' : 'ignore'
+    }
+
     var geth
     if (process.platform === 'win32') {
-      geth = spawn(path.join(getExtensionsPath('bin'), 'geth.exe'), gethArgs)
+      geth = spawn(path.join(getExtensionsPath('bin'), 'geth.exe'), gethArgs, spawnOptions)
     } else {
-      geth = spawn(path.join(getExtensionsPath('bin'), 'geth'), gethArgs)
+      geth = spawn(path.join(getExtensionsPath('bin'), 'geth'), gethArgs, spawnOptions)
     }
     console.warn('GETH: spawned')
-    geth.stdout.on('data', (data) => {
-      console.warn(data.toString())
-    })
     geth.on('exit', function (code, signal) {
       console.warn('GETH: exited')
-      geth.stdout.destroy()
     })
     geth.on('close', function (code, signal) {
       console.warn('GETH: closed')
-      geth.stdout.destroy()
     })
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
     loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
@@ -654,6 +654,7 @@ module.exports.init = () => {
         popupWebContents.send('ethwallet-index-loaded')
       }
     })
+
     ipcMain.on('create-wallet', (e, pwd) => {
       var client = net.createConnection(ipcPath)
 
