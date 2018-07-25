@@ -473,6 +473,16 @@ const recordUnIdle = (state) => {
   return userModelState.setLastUserIdleStopTime(state)
 }
 
+const mediaTabs = {}
+
+const recordMediaPlaying = (state, active, tabId) => {
+  if (active) mediaTabs[tabId] = true
+  else delete mediaTabs[tabId]
+
+  console.log('recordMediaPlaying: ' + underscore.size(mediaTabs) + ' active media tags')
+  return state
+}
+
 function cleanLines (x) {
   if (x == null) return []
 
@@ -760,6 +770,7 @@ const collectActivity = (state) => {
   const path = '/v1/reports/' + userModelState.getAdUUID(state)
   const events = userModelState.getReportingEventQueue(state).toJS()
   const mark = underscore.last(events)
+  const now = new Date()
   let stamp
 
   if (!mark) {
@@ -773,6 +784,19 @@ const collectActivity = (state) => {
     state = userModelState.setReportingEventQueue(state, Immutable.fromJS(events))
   }
 
+/*
+  let offset = -new Date().getTimezoneOffset()
+  const sign = offset < 0 ? '-' : '+'
+
+  offset = Math.abs(offset)
+
+  let hh = parseInt(offset / 60)
+  if (hh < 9) hh = '0' + hh
+
+  let mm = offset % 60
+  if (mm < 9) mm = '0' + mm
+ */
+
   roundtrip({
     method: 'PUT',
     path: path,
@@ -780,7 +804,10 @@ const collectActivity = (state) => {
       braveVersion: app.getVersion(),
       platform: { darwin: 'mac', win32: os.arch() === 'x32' ? 'winia32' : 'winx64' }[os.platform()] || 'linux',
       reportId: mark.uuid,
-      reportStamp: new Date().toISOString(),
+      reportStamp: now.toISOString(),
+/*
+      reportTZO: sign + hh + ':' + mm,
+ */
       events: events
     }
   }, roundTripOptions, (err, response, result) => {
@@ -867,6 +894,7 @@ const getMethods = () => {
     testShoppingData,
     testSearchState,
     recordUnIdle,
+    recordMediaPlaying,
     classifyPage,
     saveCachedInfo,
     changeLocale,
