@@ -94,6 +94,16 @@ const userModelReducer = (state, action, immutableAction) => {
         }
         break
       }
+    case appConstants.APP_MEDIA_STARTED_PLAYING:
+      {
+        state = userModel.recordMediaPlaying(state, true, action.get('tabId'))
+        break
+      }
+    case appConstants.APP_MEDIA_PAUSED:
+      {
+        state = userModel.recordMediaPlaying(state, false, action.get('tabId'))
+        break
+      }
     case appConstants.APP_TEXT_SCRAPER_DATA_AVAILABLE:
       {
         const tabId = action.get('tabId')
