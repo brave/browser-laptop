@@ -325,14 +325,6 @@ let generateEthwalletManifest = () => {
       48: 'ethereum-48.png',
       16: 'ethereum-16.png'
     },
-    browser_action: {
-      default_icon: {
-        38: 'ethereum-38.png',
-        19: 'ethereum-19.png'
-      },
-      default_popup: 'ethwallet-popup.html',
-      default_title: 'Ethereum Wallet'
-    },
     incognito: 'split',
     key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzrdMUtpj4PkN7uoeRC7pXsJyNC65iCWJObISzDQ/mCXerD3ATL54Y8TCkE1mS9O2tiZFY+og4g0GqLjT/M9GJ/Rjlj6cQqIaa9MnQ65H789V6rqPlTQyrd3udIylPJbr5aJ9RvuMcX8BKpT7SKcYvRSwZblKQ/OZ/a/5ylfM+QPyS5ZzooEq921I8eB4JF80aic/3cdU+Xmpyo/jdEe804/MemQ6kqlErXdNaFVU7fQ3lvCzWWcI+I3A1QbKSC2+G1HiToxllxU1gv+rAOsoHYwSkL2ZBTPkvnVBuV5vTS91GF3jGF9TMbw4m3TRNPJZkU32nfJy2JNaa1Ssnws+bQIDAQAB',
     web_accessible_resources: ['index.html']
@@ -664,7 +656,7 @@ module.exports.init = () => {
       }
     })
 
-    ipcMain.on('create-wallet', (e, pwd) => {
+    ipcMain.on('eth-wallet-create-wallet', (e, pwd) => {
       var client = net.createConnection(ipcPath)
 
       client.on('connect', () => {
@@ -684,6 +676,25 @@ module.exports.init = () => {
 
       client.on('data', (data) => {
         client.end()
+      })
+    })
+    ipcMain.on('eth-wallet-unlock-account', (e, data) => {
+      const [ pw, tx ] = JSON.parse(data)
+      var client = net.createConnection(ipcPath)
+
+      client.on('connect', () => {
+        client.write(JSON.stringify({ 'method': 'personal_unlockAccount', 'params': [tx.from, pw], 'id': 1, 'jsonrpc': '2.0' }))
+      })
+
+      client.on('data', (data) => {
+        client.end()
+        const response = JSON.parse(data.toString())
+
+        if (response.error) {
+          e.sender.send('eth-wallet-notification-error', response.error.message)
+        } else {
+          e.sender.send('eth-wallet-retry-tx', JSON.stringify(tx))
+        }
       })
     })
   } else {
