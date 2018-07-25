@@ -20,7 +20,7 @@ class Clock extends React.Component {
           // hide blank strings
           return null
         }
-      } else if (component.type === 'dayperiod') {
+      } else if (component.type === 'dayperiod' || component.type === 'dayPeriod') {
         // hide day-period (AM / PM), it's rendered in a separate component
         return null
       }
@@ -29,7 +29,7 @@ class Clock extends React.Component {
   }
   get formattedTimePeriod () {
     const time = this.state.currentTime
-    const period = time.find(component => component.type === 'dayperiod')
+    const period = time.find(component => component.type === 'dayperiod' || component.type === 'dayPeriod')
     return period ? period.value : ''
   }
   getMinutes (date) {
