@@ -605,6 +605,8 @@ module.exports.init = () => {
           ? '\\\\.\\pipe\\geth.ipc'
           : path.join(app.getPath('userData'), 'ethereum', 'geth.ipc')
 
+    const gethDataDir = path.join(app.getPath('userData'), 'ethereum')
+
     const gethArgs = [
       '--light',
       '--rpc',
@@ -612,16 +614,23 @@ module.exports.init = () => {
       '--wsorigins',
       'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp',
       '--datadir',
-      path.join(app.getPath('userData'), 'ethereum'),
+      gethDataDir,
       '--ipcpath',
       ipcPath
     ]
+
+    let staticNodes = []
     if (process.env.ETHEREUM_NETWORK === 'ropsten') {
       gethArgs.push('--testnet')
+      staticNodes.push(
+        'enode://9e0b07fae6615bb0e154591c50f26fddef0833f2a54fa857cc2c20e6b6e2f16fa2ce6b0022309bce73c35110eff97a1684cb92d26a5ac58f4c9378f52e137e1f@52.8.32.174:30303'
+      )
     }
 
+    fs.writeFileSync(path.join(gethDataDir, 'geth', 'static-nodes.json'), JSON.stringify(staticNodes))
+
     const spawnOptions = {
-      stdio: !!process.env.GETH_LOG ? 'inherit' : 'ignore'
+      stdio: process.env.GETH_LOG ? 'inherit' : 'ignore'
     }
 
     var geth
