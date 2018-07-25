@@ -15,7 +15,7 @@ const qr = require('qr-image')
 const underscore = require('underscore')
 const tldjs = require('tldjs')
 const urlFormat = require('url').format
-const random = require('random-lib')
+const random = require('brave-crypto/random-lib')
 const uuid = require('uuid')
 const BigNumber = require('bignumber.js')
 
