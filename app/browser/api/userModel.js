@@ -496,7 +496,7 @@ function randomKey (dictionary) {
 }
 
 const goAheadAndShowTheAd = (windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId) => {
-/* MTR: perhaps we should manage a notiricationId to notificationUrl here so as to help in classifyPage and for the 10 second
+/* MTR: perhaps we should manage a uuid to notificationUrl here so as to help in classifyPage and for the 10 second
         check
  */
   appActions.nativeNotificationCreate(
