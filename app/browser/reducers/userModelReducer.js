@@ -223,6 +223,11 @@ const userModelReducer = (state, action, immutableAction) => {
         }, 0)
         break
       }
+    case appConstants.APP_TAB_CLOSED:
+      {
+        state = userModel.generateAdReportingEvent(state, 'destroy', action)
+        break
+      }
   }
 
   return state
