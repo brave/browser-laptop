@@ -614,6 +614,7 @@ module.exports.init = () => {
     let staticNodes = []
     if (process.env.ETHEREUM_NETWORK === 'ropsten') {
       gethArgs.push('--testnet')
+      gethArgs.push('--rpcapi', 'admin,eth,web3')
       staticNodes.push(
         'enode://9e0b07fae6615bb0e154591c50f26fddef0833f2a54fa857cc2c20e6b6e2f16fa2ce6b0022309bce73c35110eff97a1684cb92d26a5ac58f4c9378f52e137e1f@52.8.32.174:30303',
         'enode://b2ca57957bd17dcea46f38648ab71a4c03e0ae4f727c5dbe655d12b7d999a64804125b80963da5e894e6a678ed8eef20d86c89e5737886eec6837b3c6588a8f6@52.8.32.174:30303'
