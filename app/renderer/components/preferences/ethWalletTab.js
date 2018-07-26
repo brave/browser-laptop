@@ -39,9 +39,21 @@ class EthWalletTab extends ImmutableComponent {
     }
   }
 
+  getDisabledContent () {
+    const styles = disabledContentStyles
+    return <div className={css(styles.disabledContent__wrapper)} data-test-id='ethwalletWrapper'>
+      <div className={css(styles.disabledContent__message)} data-test-id='ethwalletMessage'>
+        Some text goes here
+      </div>
+      <div className={css(styles.disabledContent__footer)}>
+        <div className={css(styles.disabledContent__commonText)} data-l10n-id='ethWalletText1' />
+      </div>
+    </div>
+  }
+
   render () {
     const iframe = this.isEnabled() ? <iframe src={`chrome-extension://${config.ethwalletExtensionId}/index.html`} className={css(styles.frame)} /> : null
-    const marketingText = this.isEnabled() ? null : <div>Hello some text here</div>
+    const disabledContent = this.isEnabled() ? null : this.getDisabledContent()
     return <section>
       <SectionTitleWrapper>
         <div className={css(styles.frameWrapper)}>
@@ -81,7 +93,7 @@ class EthWalletTab extends ImmutableComponent {
           </div>
         </section>
       </SectionTitleWrapper>
-      {marketingText}
+      {disabledContent}
     </section>
   }
 }
@@ -166,6 +178,46 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
     height: '100%'
+  }
+})
+
+const disabledContentStyles = StyleSheet.create({
+  disabledContent: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    marginTop: globalStyles.spacing.panelMargin
+  },
+
+  disabledContent__commonText: {
+    padding: '0.5em 0'
+  },
+
+  disabledContent__commonText_bold: {
+    fontWeight: 'bold'
+  },
+
+  disabledContent__wrapper: {
+    fontSize: globalStyles.payments.fontSize.regular,
+    color: globalStyles.color.mediumGray
+  },
+
+  disabledContent__message: {
+    backgroundColor: globalStyles.color.lightGray,
+    borderRadius: globalStyles.radius.borderRadiusUIbox,
+    boxSizing: 'border-box',
+    padding: '40px',
+    lineHeight: '1.8em'
+  },
+
+  disabledContent__message__header: {
+    fontSize: '18px',
+    paddingBottom: '0.5em'
+  },
+
+  disabledContent__footer: {
+    lineHeight: '1.2em',
+    padding: '20px'
   }
 })
 
