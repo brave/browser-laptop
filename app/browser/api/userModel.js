@@ -159,6 +159,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
         break
       }
 
+    case 'destroy':
     case 'focus':
       {
         map.tabId = String(action.get('tabId'))
@@ -195,7 +196,6 @@ const generateAdReportingEvent = (state, eventType, action) => {
         delete map.settings.enabled
         break
       }
-
     case 'foreground':
     case 'background':
     case 'restart':
