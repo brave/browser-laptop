@@ -6,7 +6,7 @@ const React = require('react')
 const ImmutableComponent = require('../immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
-const batIcon = require('../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
+const ethereumIcon = require('../../../../img/ethereum/ethereum-logo.svg')
 
 // Components
 const {SettingCheckbox} = require('../common/settings')
@@ -42,11 +42,28 @@ class EthWalletTab extends ImmutableComponent {
   getDisabledContent () {
     const styles = disabledContentStyles
     return <div className={css(styles.disabledContent__wrapper)} data-test-id='ethwalletWrapper'>
-      <div className={css(styles.disabledContent__message)} data-test-id='ethwalletMessage'>
-        Some text goes here
-      </div>
-      <div className={css(styles.disabledContent__footer)}>
-        <div className={css(styles.disabledContent__commonText)} data-l10n-id='ethWalletText1' />
+      <div className={css(styles.disabledContent)}>
+        <div>
+          <div className={css(styles.disabledContent__message)} data-test-id='ethwalletMessage'>
+            <h1>Create and manage your local Ethereum wallet in Brave</h1>
+            <ul className={css(styles.disabledContent__list)}>
+              <li className={css(styles.disabledContent__list_item)}>Transfer funds back and forth through the Ethereum blockchain</li>
+              <li className={css(styles.disabledContent__list_item)}>Access hardware wallets like the Ledger Nano and Trezor</li>
+              <li className={css(styles.disabledContent__list_item)}>Connect your ETH wallet to Metamask for easy DApp transfers</li>
+              <li className={css(styles.disabledContent__list_item)}>Transfer ETH to your Brave Wallet for Brave Payments deposits</li>
+            </ul>
+          </div>
+          <div className={css(styles.disabledContent__footer)}>
+            <p className={css(styles.disabledContent__note)}>
+              <span className={css(styles.disabledContent__note_bold)}>Note:</span>
+              <span>If you are using Brave Payments, your anonymous Brave BAT Wallet is <strong>managed separately</strong> from your ETH Wallet.</span>
+            </p>
+          </div>
+        </div>
+        <div className={css(styles.disabledContent__sidebar)}>
+          <h2 className={css(styles.disabledContent__sidebar__text)}>MetaMask</h2>
+          <p className={css(styles.disabledContent__sidebar__text)}>Do you use DApps? Try MetaMask with ETH Wallet for additional functionality.</p>
+        </div>
       </div>
     </div>
   }
@@ -56,7 +73,7 @@ class EthWalletTab extends ImmutableComponent {
     const disabledContent = this.isEnabled() ? null : this.getDisabledContent()
     return <section>
       <SectionTitleWrapper>
-        <div className={css(styles.frameWrapper)}>
+        <div className={css(styles.fullFrame)}>
           {iframe}
         </div>
         <section className={css(styles.ethWallet__title)}>
@@ -65,7 +82,7 @@ class EthWalletTab extends ImmutableComponent {
             gridStyles.row1col1,
             sectionTitleStyles.beta
           )}>
-            <img className={css(styles.ethWallet__title__icon_bat)} src={batIcon} />
+            <img className={css(styles.ethWallet__title__icon_eth)} src={ethereumIcon} />
             <AboutPageSectionTitle>ETH Wallet</AboutPageSectionTitle>
             <SectionLabelTitle>beta</SectionLabelTitle>
           </div>
@@ -93,6 +110,7 @@ class EthWalletTab extends ImmutableComponent {
           </div>
         </section>
       </SectionTitleWrapper>
+      <div className={css(disabledContent ? styles.fullFrame : null, disabledContentStyles.disabledContent__background)} />
       {disabledContent}
     </section>
   }
@@ -134,8 +152,9 @@ const styles = StyleSheet.create({
     zIndex: 200
   },
 
-  ethWallet__title__icon_bat: {
-    width: globalStyles.spacing.batIconWidth
+  ethWallet__title__icon_eth: {
+    width: '40px',
+    height: '40px'
   },
 
   ethWallet__title__switch: {
@@ -172,7 +191,7 @@ const styles = StyleSheet.create({
     height: '100%'
   },
 
-  frameWrapper: {
+  fullFrame: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -184,30 +203,49 @@ const styles = StyleSheet.create({
 const disabledContentStyles = StyleSheet.create({
   disabledContent: {
     display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    marginTop: globalStyles.spacing.panelMargin
+    marginTop: globalStyles.spacing.panelMargin,
+    width: 1000,
+    paddingBottom: 40
   },
 
-  disabledContent__commonText: {
-    padding: '0.5em 0'
+  disabledContent__note: {
+    color: globalStyles.color.mediumGray,
+    fontSize: '16px'
   },
 
-  disabledContent__commonText_bold: {
-    fontWeight: 'bold'
+  disabledContent__note_bold: {
+    fontWeight: 'bold',
+    color: globalStyles.color.braveOrange,
+    paddingRight: '0.3em'
   },
 
   disabledContent__wrapper: {
+    marginTop: '2em',
     fontSize: globalStyles.payments.fontSize.regular,
     color: globalStyles.color.mediumGray
   },
 
   disabledContent__message: {
-    backgroundColor: globalStyles.color.lightGray,
+    backgroundColor: globalStyles.color.white100,
     borderRadius: globalStyles.radius.borderRadiusUIbox,
     boxSizing: 'border-box',
     padding: '40px',
-    lineHeight: '1.8em'
+    lineHeight: '1.8em',
+    boxShadow: globalStyles.shadow.softBoxShadow
+  },
+
+  disabledContent__list: {
+    listStyle: 'none',
+    marginTop: '1em'
+  },
+
+  disabledContent__list_item: {
+    color: globalStyles.color.mediumGray,
+    ':before': {
+      content: '\'-\'',
+      paddingRight: '16px',
+      color: globalStyles.color.braveOrange
+    }
   },
 
   disabledContent__message__header: {
@@ -216,8 +254,37 @@ const disabledContentStyles = StyleSheet.create({
   },
 
   disabledContent__footer: {
-    lineHeight: '1.2em',
-    padding: '20px'
+    marginTop: '2em',
+    backgroundColor: globalStyles.color.white100,
+    borderRadius: globalStyles.radius.borderRadiusUIbox,
+    boxSizing: 'border-box',
+    padding: '40px',
+    paddingTop: '20px',
+    paddingBottom: '20px',
+    lineHeight: '1.8em',
+    borderWidth: '1px',
+    borderColor: globalStyles.color.braveOrange,
+    borderStyle: 'solid'
+  },
+
+  disabledContent__sidebar: {
+    minWidth: '200px',
+    marginLeft: '35px',
+    marginTop: '40px'
+  },
+
+  disabledContent__sidebar__text: {
+    color: globalStyles.color.darkGray
+  },
+
+  disabledContent__background: {
+    backgroundImage: `url(${ethereumIcon})`,
+    backgroundSize: 'contain',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'top center',
+    zIndex: '-100',
+    opacity: '0.3',
+    top: '15em'
   }
 })
 
