@@ -17,11 +17,15 @@ let completedBytes = 0
 const activeDownloadItems = () => Object.keys(downloadMap).length
 const progressDownloadItems = () => {
   const receivedBytes = Object.keys(downloadMap).reduce((receivedBytes, downloadId) => {
-    receivedBytes += downloadMap[downloadId].getReceivedBytes()
+    if (typeof downloadMap[downloadId].getReceivedBytes === 'function') {
+      receivedBytes += downloadMap[downloadId].getReceivedBytes()
+    }
     return receivedBytes
   }, completedBytes)
   const totalBytes = Object.keys(downloadMap).reduce((totalBytes, downloadId) => {
-    totalBytes += downloadMap[downloadId].getTotalBytes()
+    if (typeof downloadMap[downloadId].getTotalBytes === 'function') {
+      totalBytes += downloadMap[downloadId].getTotalBytes()
+    }
     return totalBytes
   }, completedBytes)
   return receivedBytes / totalBytes
@@ -43,7 +47,7 @@ module.exports.updateElectronDownloadItem = (win, downloadId, item, state) => {
   if (['darwin', 'linux'].includes(process.platform)) {
     app.setBadgeCount(activeDownloadItems())
   }
-  if (win && !win.isDestroyed()) {
+  if (win && typeof win.isDestroyed === 'function' && !win.isDestroyed()) {
     if (activeDownloadItems()) {
       win.setProgressBar(progressDownloadItems())
     } else {
