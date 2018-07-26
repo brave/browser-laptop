@@ -131,9 +131,6 @@ const generateAdReportingEvent = (state, eventType, action) => {
 
         if (!tabUrl.startsWith('http://') && !tabUrl.startsWith('https://')) return state
 
-        const events = userModelState.getReportingEventQueue(state)
-        if (events.some(entry => (entry.get('type') === 'notify') && (entry.get('notificationUrl') === tabUrl))) return state
-
         map.tabId = String(tabValue.get('tabId'))
         map.tabType = 'click'
 
@@ -499,6 +496,9 @@ function randomKey (dictionary) {
 }
 
 const goAheadAndShowTheAd = (windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId) => {
+/* MTR: perhaps we should manage a uuid to notificationUrl here so as to help in classifyPage and for the 10 second
+        check
+ */
   appActions.nativeNotificationCreate(
     windowId,
     {
@@ -528,6 +528,26 @@ const classifyPage = (state, action, windowId) => {
   let body = action.getIn([ 'scrapedData', 'body' ])
 
   if (!headers) return state
+
+/* MTR: determine if url corresponds to a 'notify' event in the report event queue. if so, return state; if not, continue
+   however the entry looks like this:
+
+  {
+    "type": "notify",
+    "stamp": "2018-07-26T19:24:57.296Z",
+    "notificationType": "clicked",
+    "notificationId": "e1d523df-e268-4756-a676-66bb15c42e8b"
+  }
+
+  which explains why this code isn't catching it...
+
+  const events = userModelState.getReportingEventQueue(state)
+  console.log(JSON.stringify(events, null, 2))
+  if (events.some(entry => (entry.get('type') === 'notify') && (entry.get('notificationUrl') === url))) {
+    console.log('\nskipped ' + url)
+    return state
+  }
+ */
 
   headers = cleanLines(headers)
   body = cleanLines(body)
