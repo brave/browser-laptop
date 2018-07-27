@@ -9,6 +9,7 @@ const series = require('async/series')
 const path = require('path')
 const fs = require('fs-extra')
 const os = require('os')
+const crypto = require('brave-crypto')
 const {getTargetAboutUrl, isSourceAboutUrl, getBraveExtIndexHTML} = require('../../js/lib/appUrlUtil')
 
 var chaiAsPromised = require('chai-as-promised')
@@ -26,7 +27,7 @@ const logVerbose = (string, ...rest) => {
 }
 
 const generateUserDataDir = () => {
-  return process.env.BRAVE_USER_DATA_DIR || path.join(os.tmpdir(), 'brave-test', (new Date().getTime()) + Math.floor(Math.random() * 1000).toString())
+  return process.env.BRAVE_USER_DATA_DIR || path.join(os.tmpdir(), 'brave-test', (new Date().getTime()) + crypto.random.uniform(1000).toString())
 }
 
 const rmDir = (dirPath) => {

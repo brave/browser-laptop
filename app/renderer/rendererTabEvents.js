@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Immutable = require('immutable')
+const crypto = require('brave-crypto')
 const electron = require('electron')
 
 const windowStore = require('../../js/stores/windowStore')
@@ -535,9 +536,8 @@ function showWidevineNotification (tabId, frame, noWidevineCallback, widevineCal
     return
   }
 
-  // Generate a random string that is unlikely to collide. Not
-  // cryptographically random.
-  const nonce = Math.random().toString()
+  // Generate a random string that is unlikely to collide.
+  const nonce = crypto.uint8ToHex(crypto.getSeed(32))
   const isWidevineEnabled = state.get('widevine') && state.getIn(['widevine', 'enabled'])
   if (isWidevineEnabled) {
     const message = locale.translation('allowWidevine').replace(/{{\s*origin\s*}}/, origin)

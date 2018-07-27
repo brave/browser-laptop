@@ -1,3 +1,4 @@
+const crypto = require('brave-crypto')
 const randomHostname = require('./randomHostname')
 
 const Synopsis = require('bat-publisher').Synopsis
@@ -5,16 +6,18 @@ const Synopsis = require('bat-publisher').Synopsis
 const PROTOCOL_PREFIXES = ['http://', 'https://']
 
 const generateSynopsisVisits = function (synopsis, numPublishers) {
-  let numHosts = numPublishers || Math.round(Math.random() * 100)
+  let numHosts = numPublishers || crypto.random.uniform(100)
 
   let hosts = (new Array(numHosts)).fill(null).map(function () { return randomHostname() })
 
   hosts.forEach(function (host) {
-    let numVisits = Math.round(Math.random() * 10)
+    let numVisits = crypto.random.uniform(10)
 
     for (let i = 0; i < numVisits; i++) {
-      synopsis.addPublisher(PROTOCOL_PREFIXES[Math.round(Math.random())] + host + '/', {
-        duration: Math.round(Math.random() * 60 * 1000),
+      const nprefixes = PROTOCOL_PREFIXES.length
+      const prefix = PROTOCOL_PREFIXES[crypto.random.uniform(nprefixes)]
+      synopsis.addPublisher(prefix + host + '/', {
+        duration: crypto.random.uniform(60 * 1000),
         revisitP: false
       })
     }

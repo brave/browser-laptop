@@ -1,4 +1,5 @@
 let Joi = require('joi')
+const braveCrypto = require('brave-crypto')
 let generateRandomHost = require('./randomHostname')
 const BigNumber = require('bignumber.js')
 
@@ -44,7 +45,7 @@ const validateTransaction = function (tx) {
 }
 
 const generateTransaction = function () {
-  const count = Math.round(Math.random() * 100)
+  const count = braveCrypto.random.uniform(100)
 
   const viewingId = generateViewingId()
   const surveyorId = generateSurveyorId()
@@ -104,7 +105,8 @@ const generateSurveyorIds = function (count) {
 }
 
 const generateContribution = function () {
-  let randomContributionAmount = [5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0][ Math.round(Math.random() * 3) ]
+  const amounts = [5.0, 7.5, 10.0, 17.5, 25.0, 50.0, 75.0, 100.0]
+  let randomContributionAmount = amounts[braveCrypto.random.uniform(amounts.length)]
   const currency = 'BAT'
 
   let rates = {
@@ -145,7 +147,10 @@ const generateBallots = function (votes) {
   let votesRemaining = votes
 
   while (votesRemaining) {
-    let votesToCast = Math.min(Math.round(Math.random() * votesRemaining) + 1, votesRemaining)
+    let votesToCast = 1
+    if (votesRemaining > 1) {
+      votesToCast += braveCrypto.random.uniform(votesRemaining - 1)
+    }
     let host = generateRandomHost()
     ballots[host] = votesToCast
     votesRemaining -= votesToCast
