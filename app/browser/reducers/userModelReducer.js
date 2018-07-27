@@ -107,6 +107,8 @@ const userModelReducer = (state, action, immutableAction) => {
     case appConstants.APP_TEXT_SCRAPER_DATA_AVAILABLE:
       {
         const tabId = action.get('tabId')
+        if (userModelState.getNotificationFromTab(state, tabId)) break
+
         const tabValue = tabState.getByTabId(state, tabId)
 
         if ((tabValue == null) || (tabValue.get('incognito') === true)) break
@@ -225,6 +227,7 @@ const userModelReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_TAB_CLOSED:
       {
+        state = userModelState.setNotificationFromTab(state, action.get('tabId'))
         state = userModel.generateAdReportingEvent(state, 'destroy', action)
         break
       }
