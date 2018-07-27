@@ -29,7 +29,7 @@ const backgrounds = require('../data/backgrounds')
 
 // Utils
 const urlutils = require('../lib/urlutil')
-const {random} = require('../../app/common/lib/randomUtil')
+const random = require('../../app/common/lib/randomUtil')
 const cx = require('../lib/classSet')
 const ipc = window.chrome.ipcRenderer
 
@@ -83,7 +83,7 @@ class NewTabPage extends React.Component {
   }
 
   get randomBackgroundImage () {
-    const image = Object.assign({}, backgrounds[Math.floor(random() * backgrounds.length)])
+    const image = Object.assign({}, backgrounds[random.uniform(backgrounds.length)])
     return image
   }
 

@@ -10,6 +10,8 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../../app/renderer/components/styles/global')
 const commonStyles = require('../../app/renderer/components/styles/commonStyles')
 
+const crypto = require('brave-crypto')
+
 // Components
 const PreferenceNavigation = require('../../app/renderer/components/preferences/preferenceNavigation')
 const {SettingsList, SettingItem, SettingCheckbox, SettingItemIcon} = require('../../app/renderer/components/common/settings')
@@ -618,7 +620,7 @@ class AboutPreferences extends React.Component {
     // refresh button is broken.
     let newNumber
     for (let i = 0; i < 10; ++i) {
-      newNumber = Math.random() * hintCount | 0
+      newNumber = crypto.random.uniform(hintCount)
       if (!this.state || newNumber !== this.state.hintNumber) {
         break
       }

@@ -6,9 +6,10 @@ const {getTargetAboutUrl} = require('../../js/lib/appUrlUtil')
 const siteTags = require('../../js/constants/siteTags')
 const aboutBookmarksUrl = getTargetAboutUrl('about:bookmarks')
 const Immutable = require('immutable')
+const crypto = require('brave-crypto')
 
 describe('about:bookmarks', function () {
-  const folderId = Math.floor(Math.random() * (100 - 1 + 1)) + 1
+  const folderId = 1 + crypto.random.uniform(100)
   const browseableSiteUrl = 'page1.html'
   const browseableSiteTitle = 'Page 1'
 
