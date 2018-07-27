@@ -496,9 +496,6 @@ function randomKey (dictionary) {
 }
 
 const goAheadAndShowTheAd = (windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId) => {
-/* MTR: perhaps we should manage a uuid to notificationUrl here so as to help in classifyPage and for the 10 second
-        check
- */
   appActions.nativeNotificationCreate(
     windowId,
     {
@@ -528,26 +525,6 @@ const classifyPage = (state, action, windowId) => {
   let body = action.getIn([ 'scrapedData', 'body' ])
 
   if (!headers) return state
-
-/* MTR: determine if url corresponds to a 'notify' event in the report event queue. if so, return state; if not, continue
-   however the entry looks like this:
-
-  {
-    "type": "notify",
-    "stamp": "2018-07-26T19:24:57.296Z",
-    "notificationType": "clicked",
-    "notificationId": "e1d523df-e268-4756-a676-66bb15c42e8b"
-  }
-
-  which explains why this code isn't catching it...
-
-  const events = userModelState.getReportingEventQueue(state)
-  console.log(JSON.stringify(events, null, 2))
-  if (events.some(entry => (entry.get('type') === 'notify') && (entry.get('notificationUrl') === url))) {
-    console.log('\nskipped ' + url)
-    return state
-  }
- */
 
   headers = cleanLines(headers)
   body = cleanLines(body)
@@ -804,7 +781,6 @@ const collectActivity = (state) => {
     state = userModelState.setReportingEventQueue(state, Immutable.fromJS(events))
   }
 
-/*
   let offset = -new Date().getTimezoneOffset()
   const sign = offset < 0 ? '-' : '+'
 
@@ -815,7 +791,6 @@ const collectActivity = (state) => {
 
   let mm = offset % 60
   if (mm < 9) mm = '0' + mm
- */
 
   roundtrip({
     method: 'PUT',
@@ -825,9 +800,7 @@ const collectActivity = (state) => {
       platform: { darwin: 'mac', win32: os.arch() === 'x32' ? 'winia32' : 'winx64' }[os.platform()] || 'linux',
       reportId: mark.uuid,
       reportStamp: now.toISOString(),
-/*
       reportTZO: sign + hh + ':' + mm,
- */
       events: events
     }
   }, roundTripOptions, (err, response, result) => {
