@@ -1,6 +1,8 @@
+const crypto = require('brave-crypto')
+
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'
 const _chooseRandomLetter = function () {
-  return ALPHABET[Math.round(Math.random() * (ALPHABET.length - 1))]
+  return ALPHABET[crypto.random.uniform(ALPHABET.length)]
 }
 
 const _generateRandomString = function (len) {
@@ -13,12 +15,12 @@ const generateRandomHostname = function (maxLength, minLength) {
   maxLength = maxLength || 10
   minLength = minLength || 4
 
-  let tld = TLDS[Math.round(Math.random() * (TLDS.length - 1))]
+  let tld = TLDS[crypto.random.uniform(TLDS.length)]
 
-  let numParts = Math.round(Math.random()) + 1
+  let numParts = 1 + crypto.random.uniform(2)
 
   let host = (new Array(numParts)).fill(null).map(function () {
-    let partLen = Math.max(Math.round(Math.random() * maxLength), minLength)
+    let partLen = minLength + crypto.random.uniform(maxLength - minLength + 1)
     return _generateRandomString(partLen)
   }).join('.') + '.' + tld
 
