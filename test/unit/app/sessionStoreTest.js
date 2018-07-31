@@ -63,6 +63,14 @@ describe('sessionStore unit tests', function () {
     },
     translation: (token) => {
       return token
+    },
+    getDefaultLocale: (allowUnsupported = false) => {
+      return 'en-US'
+    }
+  }
+  const fakeConfig = {
+    defaultSearchEngineByLocale: {
+      default: 'MetaCrawler'
     }
   }
 
@@ -77,6 +85,7 @@ describe('sessionStore unit tests', function () {
     mockery.registerMock('compare-versions', compareVersions)
     mockery.registerMock('electron', fakeElectron)
     mockery.registerMock('./locale', fakeLocale)
+    mockery.registerMock('../js/constants/config', fakeConfig)
     mockery.registerMock('./autofill', fakeAutofill)
     mockery.registerMock('./common/state/tabState', fakeTabState)
     mockery.registerMock('./common/state/windowState', fakeWindowState)
@@ -912,6 +921,7 @@ describe('sessionStore unit tests', function () {
     let cleanAppDataStub
     let defaultAppStateSpy
     let runPostMigrationsSpy
+    let setDefaultSearchEngineSpy
     let localeInitSpy
     let backupSessionStub
     let runImportDefaultSettings
@@ -922,6 +932,7 @@ describe('sessionStore unit tests', function () {
       cleanAppDataStub = sinon.stub(sessionStore, 'cleanAppData', (data) => data)
       defaultAppStateSpy = sinon.spy(sessionStore, 'defaultAppState')
       runPostMigrationsSpy = sinon.spy(sessionStore, 'runPostMigrations')
+      setDefaultSearchEngineSpy = sinon.spy(sessionStore, 'setDefaultSearchEngine')
       localeInitSpy = sinon.spy(fakeLocale, 'init')
       backupSessionStub = sinon.stub(sessionStore, 'backupSession')
       runImportDefaultSettings = sinon.spy(sessionStore, 'runImportDefaultSettings')
@@ -933,6 +944,7 @@ describe('sessionStore unit tests', function () {
       runPreMigrationsSpy.restore()
       defaultAppStateSpy.restore()
       runPostMigrationsSpy.restore()
+      setDefaultSearchEngineSpy.restore()
       localeInitSpy.restore()
       backupSessionStub.restore()
       clearHSTSDataSpy.restore()
@@ -1299,6 +1311,45 @@ describe('sessionStore unit tests', function () {
         }, function (result) {
           assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
         })
+    })
+
+    describe('when checking DEFAULT_SEARCH_ENGINE', function () {
+      beforeEach(function () {
+        setDefaultSearchEngineSpy.reset()
+      })
+
+      let readFileSyncStub
+
+      afterEach(function () {
+        readFileSyncStub.restore()
+      })
+
+      it('calls setDefaultSearchEngine if DEFAULT_SEARCH_ENGINE is null', function () {
+        const session = {
+          settings: {}
+        }
+        readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns(JSON.stringify(session))
+        return sessionStore.loadAppState()
+          .then(function (result) {
+            assert.equal(setDefaultSearchEngineSpy.calledOnce, true)
+          }, function (result) {
+            assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+          })
+      })
+
+      it('does not call setDefaultSearchEngine if DEFAULT_SEARCH_ENGINE has a value', function () {
+        const session = {
+          settings: {}
+        }
+        session.settings[settings.DEFAULT_SEARCH_ENGINE] = 'Excite'
+        readFileSyncStub = sinon.stub(fakeFileSystem, 'readFileSync').returns(JSON.stringify(session))
+        return sessionStore.loadAppState()
+          .then(function (result) {
+            assert.equal(setDefaultSearchEngineSpy.notCalled, true)
+          }, function (result) {
+            assert.ok(false, 'promise was rejected: ' + JSON.stringify(result))
+          })
+      })
     })
   })
 
@@ -1932,6 +1983,50 @@ describe('sessionStore unit tests', function () {
         const returnedAppState = sessionStore.runPostMigrations(exampleState)
         assert.equal(returnedAppState.getIn(['siteSettings', 'privacy.block-canvas-fingerprinting']), undefined)
       })
+    })
+  })
+
+  describe('setDefaultSearchEngine', function () {
+    let getDefaultLocaleSpy
+
+    beforeEach(function () {
+      getDefaultLocaleSpy = sinon.spy(fakeLocale, 'getDefaultLocale')
+    })
+
+    afterEach(function () {
+      getDefaultLocaleSpy.restore()
+      if (fakeConfig.defaultSearchEngineByLocale['en-US']) {
+        delete fakeConfig.defaultSearchEngineByLocale['en-US']
+      }
+      if (!fakeConfig.defaultSearchEngineByLocale.default) {
+        fakeConfig.defaultSearchEngineByLocale.default = 'MetaCrawler'
+      }
+    })
+
+    it('calls getDefaultLocale with true', function () {
+      const input = Immutable.fromJS({settings: {}})
+      sessionStore.setDefaultSearchEngine(input)
+      assert(getDefaultLocaleSpy.calledOnce)
+    })
+
+    it('defaults to `default` entry', function () {
+      const input = Immutable.fromJS({settings: {}})
+      const output = sessionStore.setDefaultSearchEngine(input)
+      assert.equal(output.getIn(['settings', settings.DEFAULT_SEARCH_ENGINE]), 'MetaCrawler')
+    })
+
+    it('matches a locale specific entry (if present)', function () {
+      fakeConfig.defaultSearchEngineByLocale['en-US'] = 'Yahoo'
+      const input = Immutable.fromJS({settings: {}})
+      const output = sessionStore.setDefaultSearchEngine(input)
+      assert.equal(output.getIn(['settings', settings.DEFAULT_SEARCH_ENGINE]), 'Yahoo')
+    })
+
+    it('does not change input if there is no default in config', function () {
+      delete fakeConfig.defaultSearchEngineByLocale.default
+      const input = Immutable.fromJS({settings: {}})
+      const output = sessionStore.setDefaultSearchEngine(input)
+      assert.deepEqual(input, output)
     })
   })
 })

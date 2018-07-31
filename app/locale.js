@@ -386,24 +386,19 @@ availableLanguages.forEach(function (lang) {
 })
 
 // Return the default locale in xx-XX format I.e. pt-BR
-const defaultLocale = function () {
-  // If electron has the locale
+module.exports.getDefaultLocale = function (allowUnsupported = false) {
   if (app.getLocale()) {
-    // Retrieve the language and convert _ to -
     var lang = app.getLocale().replace('_', '-')
     // If there is no country code designated use the language code
     if (!lang.match(/-/)) {
       lang = lang + '-' + lang.toUpperCase()
     }
     // If we have the language configured
-    if (configuredLanguages[lang]) {
+    if (allowUnsupported || configuredLanguages[lang]) {
       return lang
-    } else {
-      return DEFAULT_LANGUAGE
     }
-  } else {
-    return DEFAULT_LANGUAGE
   }
+  return DEFAULT_LANGUAGE
 }
 
 // Initialize translations for a language
@@ -427,7 +422,7 @@ exports.init = function (language) {
   }
 
   // Currently selected language identifier I.e. 'en-US'
-  lang = language || defaultLocale()
+  lang = language || module.exports.getDefaultLocale()
 
   // Languages to support
   const langs = availableLanguages.map(function (lang) {
