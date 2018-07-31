@@ -71,6 +71,7 @@ describe('Preferences component unittest', function () {
     mockery.registerMock('../../../../../extensions/brave/img/ledger/uphold_logo_medium.png')
     // Mocks the icons used in EthWallet
     mockery.registerMock('../../../../img/ethereum/ethereum-logo.svg')
+    mockery.registerMock('../../../../img/ethereum/metamask-logo.svg')
 
     mockery.registerMock('electron', fakeElectron)
 

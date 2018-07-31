@@ -7,6 +7,7 @@ const ImmutableComponent = require('../immutableComponent')
 const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
 const ethereumIcon = require('../../../../img/ethereum/ethereum-logo.svg')
+const metamaskIcon = require('../../../../img/ethereum/metamask-logo.svg')
 
 // Components
 const {SettingCheckbox} = require('../common/settings')
@@ -61,7 +62,18 @@ class EthWalletTab extends ImmutableComponent {
           </div>
         </div>
         <div className={css(styles.disabledContent__sidebar)}>
-          <h2 className={css(styles.disabledContent__sidebar__text)}>MetaMask</h2>
+          <div className={css(styles.disabledContent__sidebar__metamask)}>
+            <img className={
+              css(
+                styles.disabledContent__sidebar__metamask__content,
+                styles.disabledContent__sidebar__metamask__content__image
+              )
+            } src={metamaskIcon} />
+            <h2 className={css(
+              styles.disabledContent__sidebar__metamask__content,
+              styles.disabledContent__sidebar__text
+            )}>MetaMask</h2>
+          </div>
           <p className={css(styles.disabledContent__sidebar__text)}>Do you use DApps? Try MetaMask with ETH Wallet for additional functionality.</p>
         </div>
       </div>
@@ -275,6 +287,17 @@ const disabledContentStyles = StyleSheet.create({
 
   disabledContent__sidebar__text: {
     color: globalStyles.color.darkGray
+  },
+
+  disabledContent__sidebar__metamask: {
+    marginBottom: '15px'
+  },
+  disabledContent__sidebar__metamask__content: {
+    display: 'inline-block',
+    verticalAlign: 'middle'
+  },
+  disabledContent__sidebar__metamask__content__image: {
+    marginRight: '15px'
   },
 
   disabledContent__background: {
