@@ -5,6 +5,7 @@
 const appConfig = require('./constants/appConfig')
 const Immutable = require('immutable')
 const settings = require('./constants/settings')
+const config = require('./constants/config')
 const {passwordManagers, defaultPasswordManager, extensionIds, displayNames} = require('./constants/passwordManagers')
 const {bookmarksToolbarMode} = require('../app/common/constants/settingsEnums')
 
@@ -54,8 +55,14 @@ const getDefaultSetting = (settingKey, settingsCollection) => {
 
     // 2) Get a default value when no value is set
     // allows for default to change until user locks it in
+    //
+    // These are overridden when:
+    // >> user picks their own setting in about:preferences#payments
     case settings.PAYMENTS_CONTRIBUTION_AMOUNT:
       return contributionDefaultAmount(settingKey, settingsCollection)
+    // >> locale is intialized (which determines default search engine)
+    case settings.DEFAULT_SEARCH_ENGINE:
+      return config.defaultSearchEngineByLocale.default
   }
   return undefined
 }
