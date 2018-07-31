@@ -621,6 +621,12 @@ module.exports.init = () => {
       )
     }
 
+    if (!fs.existsSync(gethDataDir)) {
+      fs.mkdirSync(gethDataDir)
+    }
+    if (!fs.existsSync(path.join(gethDataDir, 'geth'))) {
+      fs.mkdirSync(path.join(gethDataDir, 'geth'))
+    }
     fs.writeFileSync(path.join(gethDataDir, 'geth', 'static-nodes.json'), JSON.stringify(staticNodes))
 
     const spawnOptions = {
