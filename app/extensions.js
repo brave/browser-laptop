@@ -593,9 +593,12 @@ module.exports.init = () => {
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
   if (getSetting(settings.ETHWALLET_ENABLED)) {
+    const gethProcessKey = process.platform === 'win32'
+      ? 'geth.exe'
+      : 'geth'
     const ipcPath = process.platform === 'win32'
-          ? '\\\\.\\pipe\\geth.ipc'
-          : path.join(app.getPath('userData'), 'ethereum', 'geth.ipc')
+      ? '\\\\.\\pipe\\geth.ipc'
+      : path.join(app.getPath('userData'), 'ethereum', 'geth.ipc')
 
     const gethDataDir = path.join(app.getPath('userData'), 'ethereum')
 
@@ -634,18 +637,43 @@ module.exports.init = () => {
     }
 
     var geth
-    if (process.platform === 'win32') {
-      geth = spawn(path.join(getExtensionsPath('bin'), 'geth.exe'), gethArgs, spawnOptions)
-    } else {
-      geth = spawn(path.join(getExtensionsPath('bin'), 'geth'), gethArgs, spawnOptions)
+    let gethRetryTimeoutId
+    const gethRetryInterval = 30000
+
+    const spawnGeth = () => {
+      geth = spawn(path.join(getExtensionsPath('bin'), gethProcessKey), gethArgs, spawnOptions)
+
+      geth.on('exit', function (code, signal) {
+        geth = null
+        console.warn('GETH: exited')
+      })
+      geth.on('close', function (code, signal) {
+        restartGeth()
+        console.warn('GETH: closed')
+      })
+
+      console.warn('GETH: spawned')
     }
-    console.warn('GETH: spawned')
-    geth.on('exit', function (code, signal) {
-      console.warn('GETH: exited')
-    })
-    geth.on('close', function (code, signal) {
-      console.warn('GETH: closed')
-    })
+
+    // Attempts to restart geth up to 3 times
+    const restartGeth = (tries = 3) => {
+      if (tries === 0) {
+        return
+      }
+
+      spawnGeth()
+
+      if (gethRetryTimeoutId) {
+        clearTimeout(gethRetryTimeoutId)
+      }
+
+      if (geth == null) {
+        gethRetryTimeoutId = setTimeout(restartGeth(tries--), gethRetryInterval)
+      }
+    }
+
+    spawnGeth()
+
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
     loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
     let popupWebContents = null
