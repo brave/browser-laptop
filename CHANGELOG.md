@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.23.73](https://github.com/brave/browser-laptop/releases/tag/v0.23.73dev)
+
+ - Fixed extension popups appearing transparent on first click after Brave restart. ([#13633](https://github.com/brave/browser-laptop/issues/13633))
+ - Fixed Tor process not terminating when Brave crashes on macOS. ([#14636](https://github.com/brave/browser-laptop/issues/14636))
+ - Fixed Tor crash when opening a link summary embedded in a tweet on Twitter. ([#14392](https://github.com/brave/browser-laptop/issues/14392))
+ - Fixed file access bug. ([#14642](https://github.com/brave/browser-laptop/issues/14642))
+ - Fixed minimum browsing activity message in Payments being retained even after minimum criteria has been met. ([#14767](https://github.com/brave/browser-laptop/issues/14767))
+ - Fixed "Save As" dialog still appearing after disabling "Always ask me where to save files" ([#14625](https://github.com/brave/browser-laptop/issues/14625))
+ - Fixed URLs ending with .pdf causes Brave to ignore Content-Type and fails to load the document. ([#10554](https://github.com/brave/browser-laptop/issues/10554))
+ - Changed crossOrigin policy to anonymous when fetching favicons ([#14742](https://github.com/brave/browser-laptop/issues/14742))
+ - Optimized startup time by removing referral promo check at initial startup. ([#14615](https://github.com/brave/browser-laptop/issues/14615))
+ - Upgraded to muon to 8.0.3. ([#14885](https://github.com/brave/browser-laptop/issues/14885))
+ - Upgraded to Chromium 68.0.3440.75. ([#14886](https://github.com/brave/browser-laptop/issues/14886))
+
 ## [0.23.39](https://github.com/brave/browser-laptop/releases/tag/v0.23.39dev)
 
  - Added keyboard shortcut for Tor Private Tab. ([#14504](https://github.com/brave/browser-laptop/issues/14504))
