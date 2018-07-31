@@ -98,23 +98,40 @@ function expireContentSettings (state, tabId, origin) {
   }
 }
 
+function onStartOrFinishNavigation (state, action) {
+  const tabId = action.get('tabId')
+  const originalOrigin = tabState.getVisibleOrigin(state, tabId)
+  state = tabState.setNavigationState(state, tabId, action.get('navigationState'))
+  const newOrigin = tabState.getVisibleOrigin(state, tabId)
+  // For cross-origin navigation, clear temp approvals
+  if (originalOrigin !== newOrigin) {
+    expireContentSettings(state, tabId, originalOrigin)
+  }
+  setImmediate(() => {
+    tabs.setWebRTCIPHandlingPolicy(tabId, getWebRTCPolicy(state, tabId))
+  })
+  return state
+}
+
 const tabsReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case tabActionConsts.FINISH_NAVIGATION:
+      {
+        state = onStartOrFinishNavigation(state, action)
+        break
+      }
     case tabActionConsts.START_NAVIGATION:
       {
         const tabId = action.get('tabId')
-        const originalOrigin = tabState.getVisibleOrigin(state, tabId)
-        state = tabState.setNavigationState(state, tabId, action.get('navigationState'))
-        const newOrigin = tabState.getVisibleOrigin(state, tabId)
-        // For cross-origin navigation, clear temp approvals
-        if (originalOrigin !== newOrigin) {
-          expireContentSettings(state, tabId, originalOrigin)
+        // Reset isAdTab if we navigate away from ad.
+        // This only works correctly this way since setIsAdTab
+        // is called after the initial START_NAVIGATION.
+        const isAdTab = tabState.getIsAdTab(state, tabId)
+        if (isAdTab) {
+          state = tabState.setIsAdTab(state, tabId, false)
         }
-        setImmediate(() => {
-          tabs.setWebRTCIPHandlingPolicy(tabId, getWebRTCPolicy(state, tabId))
-        })
+        state = onStartOrFinishNavigation(state, action)
         break
       }
     case tabActionConsts.NAVIGATION_PROGRESS_CHANGED:
@@ -158,6 +175,12 @@ const tabsReducer = (state, action, immutableAction) => {
         const tabId = tabState.resolveTabId(state, action.get('tabId'))
         const zoomPercent = action.get('zoomPercent')
         state = tabState.setZoomPercent(state, tabId, zoomPercent)
+        break
+      }
+    case tabActionConsts.SET_IS_AD_TAB:
+      {
+        const tabId = tabState.resolveTabId(state, action.get('tabId'))
+        state = tabState.setIsAdTab(state, tabId, action.get('isAdTab'))
         break
       }
     case appConstants.APP_SET_STATE:

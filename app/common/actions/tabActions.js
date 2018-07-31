@@ -72,6 +72,13 @@ const tabActions = {
       tabId,
       errorDetails
     })
+  },
+
+  setIsAdTab (tabId, isAdTab) {
+    dispatchAction(tabActionConstants.SET_IS_AD_TAB, {
+      tabId,
+      isAdTab
+    })
   }
 }
 
