@@ -119,7 +119,8 @@ const notificationUtil = {
         {
           if (data.windowId === windowState.WINDOW_ID_NONE) {
             appActions.newWindow({
-              location: data.notificationUrl
+              location: data.notificationUrl,
+              isAdTab: true
             })
             appActions.onUserModelLog(notificationTypes.NOTIFICATION_CLICK, { data })
             return
@@ -127,7 +128,8 @@ const notificationUtil = {
 
           appActions.createTabRequested({
             url: data.notificationUrl,
-            windowId: data.windowId
+            windowId: data.windowId,
+            isAdTab: true
           })
           appActions.onUserModelLog(notificationTypes.NOTIFICATION_CLICK, payload)
           break

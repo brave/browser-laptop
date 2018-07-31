@@ -1128,10 +1128,22 @@ const api = {
         }
         extensions.createTab(createProperties, (tab) => {
           if (tab) {
+            const tabId = tab.getId()
+            if (shouldDebugTabEvents) {
+              console.log(`[Tab ${tabId}] createTab callback`)
+            }
+            // add custom manual properties to state
+            if (createProperties.isAdTab) {
+              tabActions.setIsAdTab(tabId, true)
+            }
             // Initialize WebRTC IP handling to the safest default. This will
             // be set based on shield settings in reducers/tabReducer.js once
             // navigation starts.
             tab.setWebRTCIPHandlingPolicy(webrtcConstants.disableNonProxiedUdp)
+          } else {
+            if (shouldDebugTabEvents) {
+              console.error(`Got createTab callback with no tab object!`)
+            }
           }
           cb && cb(tab)
         })

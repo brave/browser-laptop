@@ -14,6 +14,7 @@ const AudioTabIcon = require('./content/audioTabIcon')
 const NewSessionIcon = require('./content/newSessionIcon')
 const PrivateIcon = require('./content/privateIcon')
 const TorIcon = require('./content/torIcon')
+const AdIcon = require('./content/adIcon')
 const TabTitle = require('./content/tabTitle')
 const CloseTabIcon = require('./content/closeTabIcon')
 const {NotificationBarCaret} = require('../main/notificationBar')
@@ -463,6 +464,7 @@ class Tab extends React.Component {
         </div>
         <PrivateIcon tabId={this.props.tabId} />
         <TorIcon tabId={this.props.tabId} />
+        <AdIcon tabId={this.props.tabId} />
         <NewSessionIcon tabId={this.props.tabId} />
         <CloseTabIcon tabId={this.props.tabId} onClick={this.onTabClosedWithMouse} />
       </div>
