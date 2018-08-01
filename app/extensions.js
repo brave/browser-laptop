@@ -654,17 +654,28 @@ module.exports.init = () => {
 
       geth = spawn(gethProcessPath, gethArgs, spawnOptions)
 
-      geth.on('exit', function (code, signal) {
-        geth = null
-        console.warn('GETH: exited')
-      })
-      geth.on('close', function (code, signal) {
-        restartGeth()
-        console.warn('GETH: closed')
-      })
+      geth.on('exit', handleGethStop.bind(null, 'exit'))
+      geth.on('close', handleGethStop.bind(null, 'close'))
+
       writeGethPid(geth.pid)
 
       console.warn('GETH: spawned')
+    }
+
+    const handleGethStop = (event, code, signal) => {
+      console.warn(`GETH Stop: Code: ${code} | Signal: ${signal}`)
+
+      if (code) {
+        return
+      }
+
+      // Restart should occur on close only, else restart
+      // events can compound.
+      if (event === 'exit') {
+        geth = null
+      } else if (event === 'close') {
+        restartGeth()
+      }
     }
 
     const writeGethPid = (pid) => {
@@ -676,18 +687,19 @@ module.exports.init = () => {
 
       try {
         fs.writeFileSync(pidPath, gethProcessId)
-        console.log('wrote', {gethProcessId})
       } catch (ex) {
         console.error('Could not write geth.pid')
       }
     }
 
     const cleanupGeth = (processId) => {
-      if (geth && processId) {
+      if (processId) {
         // Set geth to null to remove bound listeners
         // Otherwise, geth will attempt to restart itself
         // when killed.
-        geth = null
+        if (geth) {
+          geth = null
+        }
         process.kill(processId)
 
         // Remove in memory process id
