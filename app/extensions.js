@@ -594,6 +594,7 @@ module.exports.init = () => {
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
   if (getSetting(settings.ETHWALLET_ENABLED)) {
+    const envNet = process.env.ETHEREUM_NETWORK;
     const gethProcessKey = process.platform === 'win32'
       ? 'geth.exe'
       : 'geth'
@@ -605,7 +606,7 @@ module.exports.init = () => {
       : path.join(app.getPath('userData'), 'ethereum', 'geth.pid')
     const gethProcessPath = path.join(getExtensionsPath('bin'), gethProcessKey)
 
-    const gethDataDir = path.join(app.getPath('userData'), 'ethereum')
+    const gethDataDir = path.join(app.getPath('userData'), envNet || 'ethereum')
 
     const gethArgs = [
       '--light',
@@ -620,7 +621,7 @@ module.exports.init = () => {
     ]
 
     let staticNodes = []
-    if (process.env.ETHEREUM_NETWORK === 'ropsten') {
+    if (envNet === 'ropsten') {
       gethArgs.push('--testnet')
       gethArgs.push('--rpcapi', 'admin,eth,web3')
       staticNodes.push(
