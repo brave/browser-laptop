@@ -124,12 +124,12 @@ const tabsReducer = (state, action, immutableAction) => {
     case tabActionConsts.START_NAVIGATION:
       {
         const tabId = action.get('tabId')
-        // Reset isAdTab if we navigate away from ad.
-        // This only works correctly this way since setIsAdTab
+        // Reset tab ad data if we navigate away from ad.
+        // This only works correctly this way since deleteAdData
         // is called after the initial START_NAVIGATION.
-        const isAdTab = tabState.getIsAdTab(state, tabId)
+        const isAdTab = tabState.getAdData(state, tabId)
         if (isAdTab) {
-          state = tabState.setIsAdTab(state, tabId, false)
+          state = tabState.deleteAdData(state, tabId)
         }
         state = onStartOrFinishNavigation(state, action)
         break
@@ -177,10 +177,10 @@ const tabsReducer = (state, action, immutableAction) => {
         state = tabState.setZoomPercent(state, tabId, zoomPercent)
         break
       }
-    case tabActionConsts.SET_IS_AD_TAB:
+    case tabActionConsts.SET_AD_DATA:
       {
         const tabId = tabState.resolveTabId(state, action.get('tabId'))
-        state = tabState.setIsAdTab(state, tabId, action.get('isAdTab'))
+        state = tabState.setAdData(state, tabId, action.get('adData'))
         break
       }
     case appConstants.APP_SET_STATE:

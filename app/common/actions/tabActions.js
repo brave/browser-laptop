@@ -74,10 +74,10 @@ const tabActions = {
     })
   },
 
-  setIsAdTab (tabId, isAdTab) {
-    dispatchAction(tabActionConstants.SET_IS_AD_TAB, {
+  setAdData (tabId, adData) {
+    dispatchAction(tabActionConstants.SET_AD_DATA, {
       tabId,
-      isAdTab
+      adData
     })
   }
 }
