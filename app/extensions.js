@@ -13,6 +13,7 @@ const appStore = require('../js/stores/appStore')
 const extensionState = require('./common/state/extensionState')
 const appActions = require('../js/actions/appActions')
 const fs = require('fs')
+const fsExtra = require('fs-extra')
 const path = require('path')
 const l10n = require('../js/l10n')
 const {bravifyText} = require('./renderer/lib/extensionsUtil')
@@ -599,6 +600,10 @@ module.exports.init = () => {
     const ipcPath = process.platform === 'win32'
       ? '\\\\.\\pipe\\geth.ipc'
       : path.join(app.getPath('userData'), 'ethereum', 'geth.ipc')
+    const pidPath = process.platform === 'win32'
+      ? '\\\\.\\pipe\\geth.pid'
+      : path.join(app.getPath('userData'), 'ethereum', 'geth.pid')
+    const gethProcessPath = path.join(getExtensionsPath('bin'), gethProcessKey)
 
     const gethDataDir = path.join(app.getPath('userData'), 'ethereum')
 
@@ -624,12 +629,7 @@ module.exports.init = () => {
       )
     }
 
-    if (!fs.existsSync(gethDataDir)) {
-      fs.mkdirSync(gethDataDir)
-    }
-    if (!fs.existsSync(path.join(gethDataDir, 'geth'))) {
-      fs.mkdirSync(path.join(gethDataDir, 'geth'))
-    }
+    fsExtra.ensureDirSync(path.join(gethDataDir, 'geth'))
     fs.writeFileSync(path.join(gethDataDir, 'geth', 'static-nodes.json'), JSON.stringify(staticNodes))
 
     const spawnOptions = {
@@ -637,11 +637,22 @@ module.exports.init = () => {
     }
 
     var geth
+    let gethProcessId
     let gethRetryTimeoutId
     const gethRetryInterval = 30000
 
     const spawnGeth = () => {
-      geth = spawn(path.join(getExtensionsPath('bin'), gethProcessKey), gethArgs, spawnOptions)
+      // If the process from the previous browswer session still lingers, it should be killed
+      if (fs.existsSync(pidPath)) {
+        try {
+          const pid = fs.readFileSync(pidPath)
+          cleanupGeth(pid)
+        } catch (ex) {
+          console.error('Could not read from geth.pid')
+        }
+      }
+
+      geth = spawn(gethProcessPath, gethArgs, spawnOptions)
 
       geth.on('exit', function (code, signal) {
         geth = null
@@ -651,8 +662,46 @@ module.exports.init = () => {
         restartGeth()
         console.warn('GETH: closed')
       })
+      writeGethPid(geth.pid)
 
       console.warn('GETH: spawned')
+    }
+
+    const writeGethPid = (pid) => {
+      if (!pid) {
+        return
+      }
+
+      gethProcessId = pid
+
+      try {
+        fs.writeFileSync(pidPath, gethProcessId)
+        console.log('wrote', {gethProcessId})
+      } catch (ex) {
+        console.error('Could not write geth.pid')
+      }
+    }
+
+    const cleanupGeth = (processId) => {
+      if (geth && processId) {
+        // Set geth to null to remove bound listeners
+        // Otherwise, geth will attempt to restart itself
+        // when killed.
+        geth = null
+        process.kill(processId)
+
+        // Remove in memory process id
+        if (gethProcessId) {
+          gethProcessId = null
+        }
+
+        try {
+          fs.unlinkSync(pidPath)
+        } catch (ex) {
+          console.error('Could not delete geth.pid')
+        }
+        console.warn('GETH: cleanup done')
+      }
     }
 
     // Attempts to restart geth up to 3 times
@@ -673,6 +722,20 @@ module.exports.init = () => {
     }
 
     spawnGeth()
+
+    // Geth should be killed on normal process, exit, SIGINT,
+    // and application crashing exceptions.
+    process.on('exit', () => {
+      cleanupGeth(gethProcessId)
+    })
+    process.on('SIGINT', () => {
+      cleanupGeth(gethProcessId)
+      process.exit(2)
+    })
+    process.on('uncaughtException', () => {
+      cleanupGeth(gethProcessId)
+      process.exit(99)
+    })
 
     extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
     loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
