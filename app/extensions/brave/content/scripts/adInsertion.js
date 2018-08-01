@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const crypto = require('brave-crypto')
-
 if (chrome.contentSettings.adInsertion == 'allow') {
   /**
    * Determines the ad size which should be shown
@@ -74,7 +72,11 @@ if (chrome.contentSettings.adInsertion == 'allow') {
     // generate a random segment
     // @todo - replace with renko targeting
     var segments = ['IAB2', 'IAB17', 'IAB14', 'IAB21', 'IAB20']
-    var segment = segments[crypto.random.uniform(segments.length)]
+    // TODO(riastradh): Can't use brave-crypto's random.uniform(n)
+    // here because this is not node.  Use n*Math.random() because
+    // this doesn't seem to be security-sensitive (if itis used at
+    // all?).
+    var segment = segments[Math.floor(segments.length * Math.random())]
     var time_in_segment = new Date().getSeconds()
     var segment_expiration_time = 0 // no expiration
 
