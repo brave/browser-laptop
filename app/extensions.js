@@ -13,8 +13,9 @@ const appStore = require('../js/stores/appStore')
 const extensionState = require('./common/state/extensionState')
 const appActions = require('../js/actions/appActions')
 const fs = require('fs')
-const fsExtra = require('fs-extra')
 const path = require('path')
+const dns = require('dns-then')
+const byline = require('byline')
 const l10n = require('../js/l10n')
 const {bravifyText} = require('./renderer/lib/extensionsUtil')
 const {app, componentUpdater, session, ipcMain} = require('electron')
@@ -594,7 +595,7 @@ module.exports.init = () => {
   loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
   if (getSetting(settings.ETHWALLET_ENABLED)) {
-    const envNet = process.env.ETHEREUM_NETWORK;
+    const envNet = process.env.ETHEREUM_NETWORK
     const gethProcessKey = process.platform === 'win32'
       ? 'geth.exe'
       : 'geth'
@@ -620,27 +621,63 @@ module.exports.init = () => {
       ipcPath
     ]
 
-    let staticNodes = []
     if (envNet === 'ropsten') {
       gethArgs.push('--testnet')
       gethArgs.push('--rpcapi', 'admin,eth,web3')
-      staticNodes.push(
-        'enode://9e0b07fae6615bb0e154591c50f26fddef0833f2a54fa857cc2c20e6b6e2f16fa2ce6b0022309bce73c35110eff97a1684cb92d26a5ac58f4c9378f52e137e1f@52.8.32.174:30303',
-        'enode://b2ca57957bd17dcea46f38648ab71a4c03e0ae4f727c5dbe655d12b7d999a64804125b80963da5e894e6a678ed8eef20d86c89e5737886eec6837b3c6588a8f6@52.8.32.174:30303'
-      )
-    }
-
-    fsExtra.ensureDirSync(path.join(gethDataDir, 'geth'))
-    fs.writeFileSync(path.join(gethDataDir, 'geth', 'static-nodes.json'), JSON.stringify(staticNodes))
-
-    const spawnOptions = {
-      stdio: process.env.GETH_LOG ? 'inherit' : 'ignore'
     }
 
     var geth
     let gethProcessId
     let gethRetryTimeoutId
     const gethRetryInterval = 30000
+
+    const configurePeers = () => {
+      const client = net.createConnection(ipcPath)
+      let id = 1
+      let terminateId = 1
+
+      client.on('connect', () => {
+        client.write(JSON.stringify({ 'method': 'admin_peers', 'params': [], 'id': id++, 'jsonrpc': '2.0' }))
+      })
+
+      client.on('data', (data) => {
+        const response = JSON.parse(data)
+        if (response.id === 1) {
+          const existingNodes = response.result
+          const discoveryDomain = '_enode._tcp.ropsten.ethwallet.bravesoftware.com' // XXX should be set to something else on mainnet
+
+          ;(async function () {
+            const newNodes = await dns.resolveSrv(discoveryDomain)
+            const newNodesNames = newNodes.map(({ name }) => name)
+            const newNodesPublicKeys = await Promise.all(newNodesNames.map(name => dns.resolveTxt(name)))
+            const newNodesIps = await Promise.all(newNodesNames.map(name => dns.resolve4(name)))
+
+            const enodes = newNodes.map(({name, port}, i) => `enode://${newNodesPublicKeys[i]}@${newNodesIps[i]}:${port}`)
+            const commands = []
+            enodes.forEach(enode => {
+              if (!existingNodes.includes(enode)) {
+                commands.push({ method: 'admin_addPeer', params: [enode] })
+              }
+            })
+            existingNodes.forEach(enode => {
+              if (!enodes.includes(enode)) {
+                commands.push({ method: 'admin_removePeer', params: [enode] })
+              }
+            })
+
+            commands.forEach(command => {
+              client.write(JSON.stringify(Object.assign({ id: id++, jsonrpc: '2.0' }, command)))
+            })
+
+            terminateId = id
+          })()
+        } else {
+          if (response.id === terminateId) {
+            client.end()
+          }
+        }
+      })
+    }
 
     const spawnGeth = () => {
       // If the process from the previous browswer session still lingers, it should be killed
@@ -653,7 +690,18 @@ module.exports.init = () => {
         }
       }
 
-      geth = spawn(gethProcessPath, gethArgs, spawnOptions)
+      geth = spawn(gethProcessPath, gethArgs)
+
+      byline(geth.stderr).on('data', function (line) {
+        line = line.toString()
+        if (process.env.GETH_LOG) {
+          console.log(line)
+        }
+
+        if (line.match(/IPC endpoint opened/)) {
+          configurePeers()
+        }
+      })
 
       geth.on('exit', handleGethStop.bind(null, 'exit'))
       geth.on('close', handleGethStop.bind(null, 'close'))
