@@ -18,7 +18,8 @@ const iconShieldsOn = require('../../../extensions/brave/img/preferences/browser
 const iconShieldsOff = require('../../../extensions/brave/img/preferences/browser_prefs_shields_off.svg')
 const iconPaymentsOn = require('../../../extensions/brave/img/preferences/browser_prefs_payments_on.svg')
 const iconPaymentsOff = require('../../../extensions/brave/img/preferences/browser_prefs_payments_off.svg')
-const iconEthWallet = require('../../../extensions/brave/img/preferences/browser_prefs_advanced.svg')
+const iconEthWalletOn = require('../../../extensions/brave/img/preferences/browser_prefs_ethwallet_on.svg')
+const iconEthWalletOff = require('../../../extensions/brave/img/preferences/browser_prefs_ethwallet_off.svg')
 // sync TBD
 const iconSync = require('../../../extensions/brave/img/preferences/browser_prefs_sync.svg')
 const iconAdvanced = require('../../../extensions/brave/img/preferences/browser_prefs_advanced.svg')
@@ -64,6 +65,8 @@ class PreferenceNavigation extends ImmutableComponent {
           selected={this.props.preferenceTab === preferenceTabs.PAYMENTS}
         />
         <PreferenceNavigationButton icon={styles.ethWallet}
+          iconOn={styles.ethWalletOn}
+          iconOff={styles.ethWalletOff}
           l10nId='ethWallet'
           testId='ethWalletTabButton'
           onClick={this.props.changeTab.bind(null, preferenceTabs.ETHWALLET)}
@@ -127,8 +130,9 @@ const styles = StyleSheet.create({
   shieldsOff: navIcon(iconShieldsOff),
   paymentsOn: {background: `url(${iconPaymentsOn}) no-repeat 0 0`},
   paymentsOff: navIcon(iconPaymentsOff),
+  ethWalletOn: {background: `url(${iconEthWalletOn}) no-repeat 0 0`},
+  ethWalletOff: navIcon(iconEthWalletOff),
   sync: navIcon(iconSync),
-  ethWallet: navIcon(iconEthWallet),
   extensions: navIcon(iconExtensions),
   advanced: navIcon(iconAdvanced)
 })
