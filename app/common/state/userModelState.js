@@ -116,19 +116,6 @@ const userModelState = {
     return appendToRingBufferUnderKey(state, stateKey, unixTime, maxRowsInAdsShownHistory)
   },
 
-  getNotificationFromTab: (state, tabId) => {
-    return state.getIn([ 'userModel', 'adsUUIDTabs', tabId ])
-  },
-
-  setNotificationFromTab: (state, tabId, data) => {
-    if (!userModelState.getAdEnabledValue(state)) return state
-
-    const key = [ 'userModel', 'adsUUIDTabs' ]
-    const tabs = state.getIn(key) || Immutable.Map()
-
-    return state.setIn(key, data ? tabs.setIn([ tabId ], data) : tabs.removeIn([ tabId ]))
-  },
-
   getAdUUIDSeen: (state) => {
     const key = [ 'userModel', 'adsUUIDSeen' ]
     let seen = state.getIn(key) || Immutable.Map()
