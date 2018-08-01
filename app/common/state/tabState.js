@@ -714,25 +714,30 @@ const tabState = {
     return state.setIn(path, zoomPercent)
   },
 
-  setIsAdTab: (state, tabId, isAdTab) => {
-    if (typeof isAdTab !== 'boolean') {
-      console.error(`setIsAdTabValue: bad value for isAdTab (type ${typeof isAdTab}):`, isAdTab)
-      return state
-    }
+  setAdData: (state, tabId, adData) => {
     let path = tabState.getPathByTabId(state, tabId)
     if (!path) {
-      console.error(`setIsAdTabValue: tab with ID ${tabId} not found in state!`)
+      console.error(`setAdData: tab with ID ${tabId} not found in state!`)
       return state
     }
-    return state.setIn([...path, 'isAdTab'], isAdTab)
+    return state.setIn([...path, 'adData'], adData)
   },
 
-  getIsAdTab: (state, tabId) => {
+  deleteAdData: (state, tabId, adData) => {
+    let path = tabState.getPathByTabId(state, tabId)
+    if (!path) {
+      console.error(`deteleAdData: tab with ID ${tabId} not found in state!`)
+      return state
+    }
+    return state.deleteIn([...path, 'adData'])
+  },
+
+  getAdData: (state, tabId) => {
     let path = tabState.getPathByTabId(state, tabId)
     if (!path) {
       return null
     }
-    return state.getIn([...path, 'isAdTab'])
+    return state.getIn([...path, 'adData'])
   }
 }
 
