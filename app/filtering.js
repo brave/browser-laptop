@@ -532,14 +532,16 @@ function registerPermissionHandler (session, partition) {
         requestingOrigin = isPDFOrigin ? 'PDF Viewer' : 'Brave Browser'
         // display on all tabs
         mainFrameOrigin = null
-      } else if (isOpenExternal) {
+      } else {
+        requestingOrigin = getOrigin(requestingUrl) || requestingUrl
+      }
+
+      if (isOpenExternal) {
         // Open external is a special case since we want to apply the permission
         // for the entire scheme to avoid cluttering the saved permissions. See
         // https://github.com/brave/browser-laptop/issues/13642
         const protocol = urlParse(requestingUrl).protocol
         requestingOrigin = protocol ? `${protocol} URLs` : requestingUrl
-      } else {
-        requestingOrigin = getOrigin(requestingUrl) || requestingUrl
       }
 
       // Look up by host pattern since requestingOrigin is not necessarily
@@ -559,10 +561,6 @@ function registerPermissionHandler (session, partition) {
         response.push(true)
       } else if (isFullscreen && alwaysAllowFullscreen) {
         // Always allow fullscreen if setting is ON
-        response.push(true)
-      } else if (isOpenExternal && (
-        // The Brave extension and PDFJS are always allowed to open files in an external app
-        isPDFOrigin || isBraveOrigin)) {
         response.push(true)
       } else {
         const permissionName = permission + 'Permission'
