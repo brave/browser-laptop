@@ -141,6 +141,7 @@
   if (node) results.faviconURL = node.getAttribute('href')
 
   var location = document.location.href
+  // called from ledger.js with variable LEDGER_PUBLISHER_RESPONSE
   chrome.ipcRenderer.once('ledger-publisher-response-' + location, (e, pubinfo) => {
     if (!pubinfo || !pubinfo.context || !pubinfo.rules) {
       return console.log('no pubinfo available')

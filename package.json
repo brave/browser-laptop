@@ -88,6 +88,7 @@
   },
   "homepage": "https://www.brave.com/",
   "dependencies": {
+    "acorn": "^5.7.1",
     "aphrodite": "1.1.0",
     "async": "^2.0.1",
     "bat-balance": "^1.0.7",

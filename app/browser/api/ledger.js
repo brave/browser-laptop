@@ -7,6 +7,7 @@
 const format = require('date-fns/format')
 const Immutable = require('immutable')
 const electron = require('electron')
+const acorn = require('acorn')
 const ipc = electron.ipcMain
 const session = electron.session
 const path = require('path')
@@ -68,7 +69,8 @@ const _internal = {
   verboseP: process.env.LEDGER_VERBOSE || false,
   debugP: process.env.LEDGER_DEBUG || false,
   ruleset: {
-    raw: []
+    raw: [],
+    cooked: []
   }
 }
 let userAgent = ''
@@ -170,7 +172,7 @@ if (ipc) {
     if (!event.sender.isDestroyed()) {
       event.sender.send(messages.LEDGER_PUBLISHER_RESPONSE + '-' + location, {
         context: ctx,
-        rules: _internal.ruleset.raw
+        rules: _internal.ruleset.cooked
       })
     }
   })
@@ -2249,6 +2251,7 @@ const initialize = (state, paymentsEnabled) => {
   if (typeof ledgerPublisher.ruleset === 'function') ledgerPublisher.ruleset = ledgerPublisher.ruleset()
 
   _internal.ruleset.raw = ledgerPublisher.ruleset
+  _internal.ruleset.cooked = cookRules(ledgerPublisher.ruleset)
 
   try {
     if (!fs) fs = require('fs')
@@ -2287,6 +2290,31 @@ const initialize = (state, paymentsEnabled) => {
     state = ledgerState.resetInfo(state)
     return state
   }
+}
+
+const cookRules = (rules) => {
+  let cooked = []
+  rules.forEach((rule) => {
+    let entry = {condition: acorn.parse(rule.condition)}
+    if (rule.dom) {
+      if (rule.dom.publisher) {
+        entry.publisher = {
+          selector: rule.dom.publisher.nodeSelector,
+          consequent: acorn.parse(rule.dom.publisher.consequent)
+        }
+      }
+      if (rule.dom.faviconURL) {
+        entry.faviconURL = {
+          selector: rule.dom.faviconURL.nodeSelector,
+          consequent: acorn.parse(rule.dom.faviconURL.consequent)
+        }
+      }
+    }
+    if (!entry.publisher) entry.consequent = rule.consequent ? acorn.parse(rule.consequent) : rule.consequent
+    cooked.push(entry)
+  })
+
+  return cooked
 }
 
 const schedulePromoRefFetch = () => {
