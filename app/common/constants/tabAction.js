@@ -11,5 +11,5 @@
    STOP_FIND_IN_PAGE_REQUEST: 'tabActionsStopFindInPageRequest',
    ZOOM_CHANGED: 'tabActionsZoomChanged',
    SET_CONTENTS_ERROR: 'tabActionsSetContentsError',
-   SET_IS_AD_TAB: 'tabActionsSetIsAdTab'
+   SET_AD_DATA: 'tabActionsSetAdData'
  }

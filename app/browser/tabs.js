@@ -1110,8 +1110,8 @@ const api = {
               console.log(`[Tab ${tabId}] createTab callback`)
             }
             // add custom manual properties to state
-            if (createProperties.isAdTab) {
-              tabActions.setIsAdTab(tabId, true)
+            if (createProperties.adData) {
+              tabActions.setAdData(tabId, createProperties.adData)
             }
             // Initialize WebRTC IP handling to the safest default. This will
             // be set based on shield settings in reducers/tabReducer.js once

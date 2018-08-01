@@ -31,7 +31,7 @@ class AdIcon extends React.Component {
 
     const props = {}
     props.isPinned = tabState.isTabPinned(state, tabId)
-    props.showAdIcon = tabState.getIsAdTab(state, tabId) &&
+    props.showAdIcon = tabState.getAdData(state, tabId) &&
       tabUIState.showTabEndIcon(currentWindow, frameKey)
     props.tabId = tabId
 
