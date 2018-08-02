@@ -25,18 +25,22 @@ const pidPath = process.platform === 'win32'
 const gethProcessPath = path.join(getExtensionsPath('bin'), gethProcessKey)
 
 const configurePeers = async (dataDir) => {
-  const discoveryDomain = `_enode._tcp.${envNet || 'mainnet'}.ethwallet.bravesoftware.com`
-  const newNodes = await dns.resolveSrv(discoveryDomain)
-  const newNodesNames = newNodes.map(({ name }) => name)
+  try {
+    const discoveryDomain = `_enode._tcp.${envNet || 'mainnet'}.ethwallet.bravesoftware.com`
+    const newNodes = await dns.resolveSrv(discoveryDomain)
+    const newNodesNames = newNodes.map(({ name }) => name)
 
-  // start without await to take advantage of async parallelism
-  const newNodesPublicKeysPromises = Promise.all(newNodesNames.map(name => dns.resolveTxt(name)))
-  const newNodesIps = await Promise.all(newNodesNames.map(name => dns.resolve4(name)))
-  const newNodesPublicKeys = await newNodesPublicKeysPromises
+    // start without await to take advantage of async parallelism
+    const newNodesPublicKeysPromises = Promise.all(newNodesNames.map(name => dns.resolveTxt(name)))
+    const newNodesIps = await Promise.all(newNodesNames.map(name => dns.resolve4(name)))
+    const newNodesPublicKeys = await newNodesPublicKeysPromises
 
-  const enodes = newNodes.map(({name, port}, i) => `enode://${newNodesPublicKeys[i]}@${newNodesIps[i]}:${port}`)
+    const enodes = newNodes.map(({name, port}, i) => `enode://${newNodesPublicKeys[i]}@${newNodesIps[i]}:${port}`)
 
-  await fs.writeFile(path.join(dataDir, 'static-nodes.json'), JSON.stringify(enodes))
+    await fs.writeFile(path.join(dataDir, 'static-nodes.json'), JSON.stringify(enodes))
+  } catch(e) {
+    console.error('Failed to configure static nodes peers ' + e.message)
+  }
 }
 
 // needs to be shared to the eth-wallet app over ipc
