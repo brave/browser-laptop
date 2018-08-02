@@ -7,7 +7,6 @@
 const format = require('date-fns/format')
 const Immutable = require('immutable')
 const electron = require('electron')
-const acorn = require('acorn')
 const ipc = electron.ipcMain
 const session = electron.session
 const path = require('path')
@@ -69,8 +68,7 @@ const _internal = {
   verboseP: process.env.LEDGER_VERBOSE || false,
   debugP: process.env.LEDGER_DEBUG || false,
   ruleset: {
-    raw: [],
-    cooked: []
+    raw: []
   }
 }
 let userAgent = ''
@@ -153,27 +151,8 @@ if (ipc) {
       return
     }
 
-    let ctx = urlParse(location, true)
-    ctx.TLD = tldjs.getPublicSuffix(ctx.host)
-    if (!ctx.TLD) {
-      if (_internal.verboseP) console.log('\nno TLD for:' + ctx.host)
-      event.returnValue = {}
-      return
-    }
-
-    ctx = underscore.mapObject(ctx, function (value) {
-      if (!underscore.isFunction(value)) return value
-    })
-    ctx.URL = location
-    ctx.SLD = tldjs.getDomain(ctx.host)
-    ctx.RLD = tldjs.getSubdomain(ctx.host)
-    ctx.QLD = ctx.RLD ? underscore.last(ctx.RLD.split('.')) : ''
-
     if (!event.sender.isDestroyed()) {
-      event.sender.send(messages.LEDGER_PUBLISHER_RESPONSE + '-' + location, {
-        context: ctx,
-        rules: _internal.ruleset.cooked
-      })
+      event.sender.send(messages.LEDGER_PUBLISHER_RESPONSE + '-' + location)
     }
   })
 }
@@ -2251,7 +2230,6 @@ const initialize = (state, paymentsEnabled) => {
   if (typeof ledgerPublisher.ruleset === 'function') ledgerPublisher.ruleset = ledgerPublisher.ruleset()
 
   _internal.ruleset.raw = ledgerPublisher.ruleset
-  _internal.ruleset.cooked = cookRules(ledgerPublisher.ruleset)
 
   try {
     if (!fs) fs = require('fs')
@@ -2290,31 +2268,6 @@ const initialize = (state, paymentsEnabled) => {
     state = ledgerState.resetInfo(state)
     return state
   }
-}
-
-const cookRules = (rules) => {
-  let cooked = []
-  rules.forEach((rule) => {
-    let entry = {condition: acorn.parse(rule.condition)}
-    if (rule.dom) {
-      if (rule.dom.publisher) {
-        entry.publisher = {
-          selector: rule.dom.publisher.nodeSelector,
-          consequent: acorn.parse(rule.dom.publisher.consequent)
-        }
-      }
-      if (rule.dom.faviconURL) {
-        entry.faviconURL = {
-          selector: rule.dom.faviconURL.nodeSelector,
-          consequent: acorn.parse(rule.dom.faviconURL.consequent)
-        }
-      }
-    }
-    if (!entry.publisher) entry.consequent = rule.consequent ? acorn.parse(rule.consequent) : rule.consequent
-    cooked.push(entry)
-  })
-
-  return cooked
 }
 
 const schedulePromoRefFetch = () => {
