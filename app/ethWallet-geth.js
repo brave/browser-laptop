@@ -75,7 +75,9 @@ const spawnGeth = async () => {
     '--datadir',
     gethDataDir,
     '--ipcpath',
-    ipcPath
+    ipcPath,
+    '--maxpeers',
+    '10'
   ]
 
   if (envNet === 'ropsten') {
