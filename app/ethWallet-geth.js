@@ -41,6 +41,8 @@ const configurePeers = async (dataDir) => {
 
 // needs to be shared to the eth-wallet app over ipc
 let wsPort
+// needs to be shared to the metamask extension
+let rpcPort
 
 let geth
 let gethProcessId
@@ -54,12 +56,17 @@ const spawnGeth = async () => {
   portfinder.basePort = 40600
   wsPort = await portfinder.getPortPromise()
 
+  portfinder.basePort = 40800
+  rpcPort = await portfinder.getPortPromise()
+
   const gethArgs = [
     '--port',
     port,
     '--syncmode',
     'light',
     '--rpc',
+    '--rpcport',
+    rpcPort,
     '--ws',
     '--wsorigins',
     'chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp',
