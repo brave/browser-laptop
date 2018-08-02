@@ -510,6 +510,7 @@ function registerPermissionHandler (session, partition) {
     const isBraveOrigin = mainFrameOrigin.startsWith(`chrome-extension://${config.braveExtensionId}/`)
     const isPDFOrigin = mainFrameOrigin.startsWith(`${pdfjsOrigin}/`)
     let response = []
+    let position
 
     if (!requestingUrl) {
       response = new Array(permissionTypes.length)
@@ -542,6 +543,8 @@ function registerPermissionHandler (session, partition) {
         // https://github.com/brave/browser-laptop/issues/13642
         const protocol = urlParse(requestingUrl).protocol
         requestingOrigin = protocol ? `${protocol} URLs` : requestingUrl
+        mainFrameOrigin = null
+        position = 'global'
       }
 
       // Look up by host pattern since requestingOrigin is not necessarily
@@ -591,6 +594,7 @@ function registerPermissionHandler (session, partition) {
             {text: locale.translation('deny')},
             {text: locale.translation('allow')}
           ],
+          position,
           frameOrigin: getOrigin(mainFrameOrigin),
           options: {
             persist: !!requestingOrigin,
