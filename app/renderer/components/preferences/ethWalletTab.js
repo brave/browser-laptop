@@ -86,41 +86,41 @@ class EthWalletTab extends ImmutableComponent {
     return <section>
       <SectionTitleWrapper>
         <div className={css(styles.fullFrame)}>
+          <section className={css(styles.ethWallet__title)}>
+            { /* Note: This div cannot be replaced with SectionTitleLabelWrapper */ }
+            <div className={css(
+              gridStyles.row1col1,
+              sectionTitleStyles.beta
+            )}>
+              <img className={css(styles.ethWallet__title__icon_eth)} src={ethereumIcon} />
+              <AboutPageSectionTitle>ETH Wallet</AboutPageSectionTitle>
+              <SectionLabelTitle>beta</SectionLabelTitle>
+            </div>
+
+            <div data-test-id='enableEthWalletSwitch' className={css(
+              gridStyles.row1col2,
+              styles.ethWallet__title__switch
+            )}>
+              <SettingCheckbox
+                dataL10nIdLeft='off'
+                dataL10nId='on'
+                prefKey={settings.ETHWALLET_ENABLED}
+                checked={this.isEnabled()}
+                onChangeSetting={this.onChange}
+                customStyleTextLeft={[
+                  styles.switch__label,
+                  styles.switch__label_left,
+                  styles.switch__label_left_off
+                ]}
+                customStyleTextRight={[
+                  styles.switch__label,
+                  styles.switch__label_right
+                ]}
+              />
+            </div>
+          </section>
           {iframe}
         </div>
-        <section className={css(styles.ethWallet__title)}>
-          { /* Note: This div cannot be replaced with SectionTitleLabelWrapper */ }
-          <div className={css(
-            gridStyles.row1col1,
-            sectionTitleStyles.beta
-          )}>
-            <img className={css(styles.ethWallet__title__icon_eth)} src={ethereumIcon} />
-            <AboutPageSectionTitle>ETH Wallet</AboutPageSectionTitle>
-            <SectionLabelTitle>beta</SectionLabelTitle>
-          </div>
-
-          <div data-test-id='enableEthWalletSwitch' className={css(
-            gridStyles.row1col2,
-            styles.ethWallet__title__switch
-          )}>
-            <SettingCheckbox
-              dataL10nIdLeft='off'
-              dataL10nId='on'
-              prefKey={settings.ETHWALLET_ENABLED}
-              checked={this.isEnabled()}
-              onChangeSetting={this.onChange}
-              customStyleTextLeft={[
-                styles.switch__label,
-                styles.switch__label_left,
-                styles.switch__label_left_off
-              ]}
-              customStyleTextRight={[
-                styles.switch__label,
-                styles.switch__label_right
-              ]}
-            />
-          </div>
-        </section>
       </SectionTitleWrapper>
       <div className={css(disabledContent ? styles.fullFrame : null, disabledContentStyles.disabledContent__background)} />
       {disabledContent}
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     gridTemplateColumns: '1fr 1fr 1fr',
     alignItems: 'center',
     width: '100%',
-    zIndex: 200
+    margin: '40px'
   },
 
   ethWallet__title__icon_eth: {
@@ -200,7 +200,10 @@ const styles = StyleSheet.create({
   frame: {
     border: 0,
     width: '100%',
-    height: '100%'
+    height: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0
   },
 
   fullFrame: {
