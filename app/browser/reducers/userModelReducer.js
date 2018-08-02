@@ -230,6 +230,11 @@ const userModelReducer = (state, action, immutableAction) => {
         state = userModel.generateAdReportingEvent(state, 'destroy', action)
         break
       }
+    case appConstants.APP_ON_USERMODEL_SUSTAINED_AD_INTERACTION:
+      {
+        state = userModel.generateAdReportingEvent(state, 'sustain', action)
+        break
+      }
   }
 
   return state

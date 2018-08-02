@@ -1958,6 +1958,13 @@ const appActions = {
     })
   },
 
+  onUserModelSustainedAdInteraction: function (data) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_SUSTAINED_AD_INTERACTION,
+      data
+    })
+  },
+
   onUserModelLog: function (eventName, data) {
     dispatch({
       actionType: appConstants.APP_ON_USERMODEL_LOG,
