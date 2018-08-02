@@ -1,7 +1,6 @@
-const fs = require('fs')
+const fs = require('fs-extra')
 const path = require('path')
 const dns = require('dns-then')
-const byline = require('byline')
 const {spawn} = require('child_process')
 const portfinder = require('portfinder')
 const net = require('net')
@@ -25,52 +24,19 @@ const pidPath = process.platform === 'win32'
   : path.join(gethDataDir, 'geth.pid')
 const gethProcessPath = path.join(getExtensionsPath('bin'), gethProcessKey)
 
-const configurePeers = () => {
-  const client = net.createConnection(ipcPath)
-  let id = 1
-  let terminateId = 1
+const configurePeers = async (dataDir) => {
+  const discoveryDomain = `_enode._tcp.${envNet || 'mainnet'}.ethwallet.bravesoftware.com`
+  const newNodes = await dns.resolveSrv(discoveryDomain)
+  const newNodesNames = newNodes.map(({ name }) => name)
 
-  client.on('connect', () => {
-    client.write(JSON.stringify({ 'method': 'admin_peers', 'params': [], 'id': id++, 'jsonrpc': '2.0' }))
-  })
+  // start without await to take advantage of async parallelism
+  const newNodesPublicKeysPromises = Promise.all(newNodesNames.map(name => dns.resolveTxt(name)))
+  const newNodesIps = await Promise.all(newNodesNames.map(name => dns.resolve4(name)))
+  const newNodesPublicKeys = await newNodesPublicKeysPromises
 
-  client.on('data', (data) => {
-    const response = JSON.parse(data)
-    if (response.id === 1) {
-      const existingNodes = response.result
-      const discoveryDomain = `_enode._tcp.${envNet || 'mainnet'}.ethwallet.bravesoftware.com`
+  const enodes = newNodes.map(({name, port}, i) => `enode://${newNodesPublicKeys[i]}@${newNodesIps[i]}:${port}`)
 
-      ;(async function () {
-        const newNodes = await dns.resolveSrv(discoveryDomain)
-        const newNodesNames = newNodes.map(({ name }) => name)
-        const newNodesPublicKeys = await Promise.all(newNodesNames.map(name => dns.resolveTxt(name)))
-        const newNodesIps = await Promise.all(newNodesNames.map(name => dns.resolve4(name)))
-
-        const enodes = newNodes.map(({name, port}, i) => `enode://${newNodesPublicKeys[i]}@${newNodesIps[i]}:${port}`)
-        const commands = []
-        enodes.forEach(enode => {
-          if (!existingNodes.includes(enode)) {
-            commands.push({ method: 'admin_addPeer', params: [enode] })
-          }
-        })
-        existingNodes.forEach(enode => {
-          if (!enodes.includes(enode)) {
-            commands.push({ method: 'admin_removePeer', params: [enode] })
-          }
-        })
-
-        commands.forEach(command => {
-          client.write(JSON.stringify(Object.assign({ id: id++, jsonrpc: '2.0' }, command)))
-        })
-
-        terminateId = id
-      })()
-    } else {
-      if (response.id === terminateId) {
-        client.end()
-      }
-    }
-  })
+  await fs.writeFile(path.join(dataDir, 'static-nodes.json'), JSON.stringify(enodes))
 }
 
 // needs to be shared to the eth-wallet app over ipc
@@ -109,38 +75,32 @@ const spawnGeth = async () => {
     gethArgs.push('--testnet')
     gethArgs.push('--rpcapi', 'admin,eth,web3')
   }
-  // Ensure geth dir is available
-  if (!fs.existsSync(gethDataDir)) {
-    fs.mkdirSync(gethDataDir)
+
+  const gethOptions = {
+    stdio: process.env.GETH_LOG ? 'inherit' : 'ignore'
   }
 
+  // Ensure geth dir is available
+  await fs.ensureDir(gethDataDir)
+
+  await configurePeers(gethDataDir)
+
   // If the process from the previous browswer session still lingers, it should be killed
-  if (fs.existsSync(pidPath)) {
+  if (await fs.pathExists(pidPath)) {
     try {
-      const pid = fs.readFileSync(pidPath)
+      const pid = await fs.readFile(pidPath)
       cleanupGeth(pid)
     } catch (ex) {
       console.error('Could not read from geth.pid')
     }
   }
 
-  geth = spawn(gethProcessPath, gethArgs)
-
-  byline(geth.stderr).on('data', function (line) {
-    line = line.toString()
-    if (process.env.GETH_LOG) {
-      console.log(line)
-    }
-
-    if (line.match(/IPC endpoint opened/)) {
-      configurePeers()
-    }
-  })
+  geth = spawn(gethProcessPath, gethArgs, gethOptions)
 
   geth.on('exit', handleGethStop.bind(null, 'exit'))
   geth.on('close', handleGethStop.bind(null, 'close'))
 
-  writeGethPid(geth.pid)
+  await writeGethPid(geth.pid)
 
   console.warn('GETH: spawned')
 }
@@ -161,7 +121,7 @@ const handleGethStop = (event, code, signal) => {
   }
 }
 
-const writeGethPid = (pid) => {
+const writeGethPid = async (pid) => {
   if (!pid) {
     return
   }
@@ -169,7 +129,7 @@ const writeGethPid = (pid) => {
   gethProcessId = pid
 
   try {
-    fs.writeFileSync(pidPath, gethProcessId)
+    await fs.writeFile(pidPath, gethProcessId)
   } catch (ex) {
     console.error('Could not write geth.pid')
   }
@@ -275,7 +235,6 @@ ipcMain.on('eth-wallet-unlock-account', (e, data) => {
 })
 
 ipcMain.on('eth-wallet-get-geth-address', (e) => {
-  console.log(wsPort)
   e.sender.send('eth-wallet-geth-address', `ws://localhost:${wsPort}`)
 })
 
