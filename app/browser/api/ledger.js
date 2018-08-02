@@ -151,27 +151,8 @@ if (ipc) {
       return
     }
 
-    let ctx = urlParse(location, true)
-    ctx.TLD = tldjs.getPublicSuffix(ctx.host)
-    if (!ctx.TLD) {
-      if (_internal.verboseP) console.log('\nno TLD for:' + ctx.host)
-      event.returnValue = {}
-      return
-    }
-
-    ctx = underscore.mapObject(ctx, function (value) {
-      if (!underscore.isFunction(value)) return value
-    })
-    ctx.URL = location
-    ctx.SLD = tldjs.getDomain(ctx.host)
-    ctx.RLD = tldjs.getSubdomain(ctx.host)
-    ctx.QLD = ctx.RLD ? underscore.last(ctx.RLD.split('.')) : ''
-
     if (!event.sender.isDestroyed()) {
-      event.sender.send(messages.LEDGER_PUBLISHER_RESPONSE + '-' + location, {
-        context: ctx,
-        rules: _internal.ruleset.raw
-      })
+      event.sender.send(messages.LEDGER_PUBLISHER_RESPONSE + '-' + location)
     }
   })
 }
