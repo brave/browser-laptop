@@ -25,9 +25,11 @@ const settings = require('../../../js/constants/settings')
 
 // State
 const windows = require('../windows')
+const appStore = require('../../../js/stores/appStore')
 const userModelState = require('../../common/state/userModelState')
 const getSetting = require('../../../js/settings').getSetting
 const Immutable = require('immutable')
+const tabState = require('../../common/state/tabState')
 
 // Utils
 const urlParse = require('../../common/urlParse')
@@ -47,6 +49,8 @@ let priorData
 let sampleAdFeed
 
 let lastSingleClassification
+
+let adTabUrl
 
 const noop = (state) => {
 // IF [ we haven't initialized yet OR we're not enabled ], RETURN state
@@ -93,6 +97,53 @@ const generateAdReportingEvent = (state, eventType, action) => {
               if (map.notificationType === 'clicked' || map.notificationType === 'dismissed') {
                 state = userModelState.recordAdUUIDSeen(state, uuid)
               }
+
+              if (map.notificationType === 'clicked') {
+                let cb = (preservedState, adTabUrl) => {
+                  const oldState = preservedState
+                  const latestState = appStore.getState()
+
+                  const oldTabValue = tabState.getByTabId(oldState, tabState.TAB_ID_ACTIVE)
+                  // Note: if the app is backgrounded, this is undefined
+                  const latestTabValue = tabState.getByTabId(latestState, tabState.TAB_ID_ACTIVE)
+
+                  // some of these unused variables are present because we expect
+                  // the stillViewingAd logic to change (and to use them)
+                  let latestWindowId // eslint-disable-line no-unused-vars
+                  let latestTabId    // eslint-disable-line no-unused-vars
+                  let latestUrl
+
+                  let oldWindowId    // eslint-disable-line no-unused-vars
+                  let oldTabId       // eslint-disable-line no-unused-vars
+                  let oldUrl         // eslint-disable-line no-unused-vars
+
+                  if (latestTabValue) {
+                    latestWindowId = latestTabValue.get('windowId')
+                    latestTabId = latestTabValue.get('tabId')
+                    latestUrl = latestTabValue.get('url')
+                  }
+
+                  if (oldTabValue) {
+                    oldWindowId = oldTabValue.get('windowId')
+                    oldTabId = oldTabValue.get('tabId')
+                    oldUrl = oldTabValue.get('url')
+                  }
+
+                  // When the timer starts, the ad-tab hasn't opened, so we need to check the url,
+                  // unless we wish to add a lot of logic to new ad-tabs.
+                  // this fails on redirects of course
+                  let stillViewingAd = (adTabUrl === latestUrl)
+
+                  if (stillViewingAd) {
+                    appActions.onUserModelSustainedAdInteraction({'uuid': uuid, 'url': latestUrl, 'tabId': latestTabId})
+                  }
+                }
+
+                // see if the user is still viewing the ad-tab N seconds after opening via ad-click
+                const delayMillis = 10 * 1000
+                setTimeout(cb, delayMillis, state, adTabUrl)
+              }
+
 //              uncomment testing SCL
 //              if (map.notificationType === 'clicked' || map.notificationType === 'dismissed' || map.notificationType === 'timeout') {
 //                const translateElph = { 'clicked': 'z', 'dismissed': 'y', 'timeout': 'y' } // refers to elph alphabetizer
@@ -150,6 +201,16 @@ const generateAdReportingEvent = (state, eventType, action) => {
 
           state = checkReadyAdServe(state, windows.getActiveWindowId(), true)
         }
+        break
+      }
+
+    case 'sustain':
+      {
+        const data = action.get('data')
+
+        map.type = 'notify'
+        map.notificationId = data.get('uuid')
+        map.notificationType = 'viewed'
         break
       }
 
@@ -495,7 +556,7 @@ function randomKey (dictionary) {
   return keys[keys.length * Math.random() << 0]
 }
 
-const goAheadAndShowTheAd = (windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId) => {
+const goAheadAndShowTheAd = (state, windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId) => {
   appActions.nativeNotificationCreate(
     windowId,
     {
@@ -515,6 +576,8 @@ const goAheadAndShowTheAd = (windowId, notificationTitle, notificationText, noti
       }
     }
   )
+
+  adTabUrl = notificationUrl
 }
 
 const classifyPage = (state, action, windowId) => {
@@ -590,7 +653,7 @@ const checkReadyAdServe = (state, windowId, forceP) => {  // around here is wher
       survey.status_at = new Date().toISOString()
       state = userModelState.setUserSurveyQueue(state, Immutable.fromJS(surveys))
 
-      goAheadAndShowTheAd(windowId, survey.title, survey.description, survey.url, generateAdUUIDString(),
+      goAheadAndShowTheAd(state, windowId, survey.title, survey.description, survey.url, generateAdUUIDString(),
                           notificationTypes.SURVEYS)
       appActions.onUserModelLog(notificationTypes.SURVEY_SHOWN, survey)
 
@@ -668,7 +731,7 @@ const checkReadyAdServe = (state, windowId, forceP) => {  // around here is wher
 
   const uuid = payload.uuid
 
-  goAheadAndShowTheAd(windowId, advertiser, notificationText, notificationUrl, uuid)
+  goAheadAndShowTheAd(state, windowId, advertiser, notificationText, notificationUrl, uuid)
   appActions.onUserModelLog(notificationTypes.AD_SHOWN,
                             {category, winnerOverTime, arbitraryKey, notificationUrl, notificationText, advertiser, uuid, hierarchy})
 
