@@ -207,9 +207,10 @@ const generateAdReportingEvent = (state, eventType, action) => {
     case 'sustain':
       {
         const data = action.get('data')
-        map.tabUrl = data.get('url')
-        map.tabId = String(data.get('tabId'))
+
+        map.type = 'notify'
         map.notificationId = data.get('uuid')
+        map.notificationType = 'viewed'
         break
       }
 
