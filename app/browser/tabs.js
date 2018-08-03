@@ -612,6 +612,13 @@ const api = {
       }
 
       tab.on('did-start-navigation', (e, navigationHandle) => {
+        if (navigationHandle.isRendererInitiated() &&
+          navigationHandle.getURL().startsWith('chrome-extension://') &&
+          !tab.getURL().startsWith('chrome-extension://')) {
+          // XXX: tab.stop and tab.loadURL cause a crash here
+          appActions.loadURLRequested(tabId, 'about:blank')
+          return
+        }
         if (!tab.isDestroyed() && navigationHandle.isValid() && navigationHandle.isInMainFrame()) {
           const controller = tab.controller()
           if (!controller.isValid()) {
