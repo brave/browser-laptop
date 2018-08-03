@@ -40,6 +40,12 @@ class EthWalletTab extends ImmutableComponent {
     }
   }
 
+  getIframeContent () {
+    return <div className={css(styles.frameContainer)}>
+      <iframe src={`chrome-extension://${config.ethwalletExtensionId}/index.html`} className={css(styles.frame)} scrolling='no' />
+    </div>
+  }
+
   getDisabledContent () {
     const styles = disabledContentStyles
     return <div className={css(styles.disabledContent__wrapper)} data-test-id='ethwalletWrapper'>
@@ -81,7 +87,7 @@ class EthWalletTab extends ImmutableComponent {
   }
 
   render () {
-    const iframe = this.isEnabled() ? <iframe src={`chrome-extension://${config.ethwalletExtensionId}/index.html`} className={css(styles.frame)} scrolling='no' /> : null
+    const iframe = this.isEnabled() ? this.getIframeContent() : null
     const disabledContent = this.isEnabled() ? null : this.getDisabledContent()
     return <section>
       <SectionTitleWrapper>
@@ -119,7 +125,7 @@ class EthWalletTab extends ImmutableComponent {
               />
             </div>
           </section>
-          <div className={css(styles.frameContainer)}>{iframe}</div>
+          {iframe}
         </div>
       </SectionTitleWrapper>
       <div className={css(disabledContent ? styles.fullFrame : null, disabledContentStyles.disabledContent__background)} />
@@ -200,7 +206,7 @@ const styles = StyleSheet.create({
     width: 'calc(100vw - 200px)',
     height: 'calc(100vh - 10px)',
     position: 'absolute',
-    top: 0,
+    top: 100,
     left: 0,
     display: 'flex'
   },
@@ -239,7 +245,7 @@ const disabledContentStyles = StyleSheet.create({
   },
 
   disabledContent__wrapper: {
-    marginTop: '2em',
+    marginTop: '5em',
     fontSize: globalStyles.payments.fontSize.regular,
     color: globalStyles.color.mediumGray
   },
