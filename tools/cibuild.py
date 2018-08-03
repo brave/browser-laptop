@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 import os.path
-MUON_VERSION = '8.0.5'
+MUON_VERSION = '8.0.6'
 CHROMEDRIVER_VERSION = '2.38'
 SOURCE_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 TARGET_ARCH= os.environ['TARGET_ARCH'] if os.environ.has_key('TARGET_ARCH') else 'x64'
