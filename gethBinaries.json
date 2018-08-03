@@ -12,15 +12,15 @@
                                 ],
                                 "output": [
                                     "Geth",
-                                    "1.8.12"
+                                    "1.8.13"
                                 ]
                             }
                         },
                         "download": {
-                            "bin": "geth-linux-386-1.8.12-37685930/geth",
-                            "sha256": "fb3673700806e4b45d51d478e3ca53240f3ece51cd1e83d6675b107cb4795d1b",
+                            "bin": "geth-linux-386-1.8.13-225171a4/geth",
+                            "sha256": "34e17bab3ed79dbdfa577598e83aaffb0ad57c4a7ea342fe0b45812ca25538f1",
                             "type": "tar",
-                            "url": "https://gethstore.blob.core.windows.net/builds/geth-linux-386-1.8.12-37685930.tar.gz"
+                            "url": "https://gethstore.blob.core.windows.net/builds/geth-linux-386-1.8.13-225171a4.tar.gz"
                         }
                     },
                     "x64": {
@@ -32,15 +32,15 @@
                                 ],
                                 "output": [
                                     "Geth",
-                                    "1.8.12"
+                                    "1.8.13"
                                 ]
                             }
                         },
                         "download": {
-                            "bin": "geth-linux-amd64-1.8.12-37685930/geth",
-                            "sha256": "9aa679d5f060c4d10ce0df55117a17387b12c71bf336b6bf913dd8a71f6b5c78",
+                            "bin": "geth-linux-amd64-1.8.13-225171a4/geth",
+                            "sha256": "e8def809ecad0c98a7781fe92a8f8f0a43fc84c9ee7df306f5820b829cbc20ef",
                             "type": "tar",
-                            "url": "https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.8.12-37685930.tar.gz"
+                            "url": "https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.8.13-225171a4.tar.gz"
                         }
                     }
                 },
@@ -54,15 +54,15 @@
                                 ],
                                 "output": [
                                     "Geth",
-                                    "1.8.12"
+                                    "1.8.13"
                                 ]
                             }
                         },
                         "download": {
-                            "bin": "geth-darwin-amd64-1.8.12-37685930/geth",
-                            "sha256": "072cd0e4aeb8109beb264685f833d08720c3eed1ad2cdb6b1e36068d575385d6",
+                            "bin": "geth-darwin-amd64-1.8.13-225171a4/geth",
+                            "sha256": "2aff322af5f458e1d13bb0d1a3b7543fd8bdddf04b503fabcce89c094437e32b",
                             "type": "tar",
-                            "url": "https://gethstore.blob.core.windows.net/builds/geth-darwin-amd64-1.8.12-37685930.tar.gz"
+                            "url": "https://gethstore.blob.core.windows.net/builds/geth-darwin-amd64-1.8.13-225171a4.tar.gz"
                         }
                     }
                 },
@@ -76,15 +76,15 @@
                                 ],
                                 "output": [
                                     "Geth",
-                                    "1.8.12"
+                                    "1.8.13"
                                 ]
                             }
                         },
                         "download": {
-                            "bin": "geth-windows-386-1.8.12-37685930\\geth.exe",
-                            "sha256": "8a78d124cd692b86945965b4cc1f0d04a01c8249f0175f185a67bad57934aacf",
+                            "bin": "geth-windows-386-1.8.13-225171a4\\geth.exe",
+                            "sha256": "a6836624bcb7d8eb52dfe77f6ef3352dbb00fe893654f1030c4e53faf6877dac",
                             "type": "zip",
-                            "url": "https://gethstore.blob.core.windows.net/builds/geth-windows-386-1.8.12-37685930.zip"
+                            "url": "https://gethstore.blob.core.windows.net/builds/geth-windows-386-1.8.13-225171a4.zip"
                         }
                     },
                     "x64": {
@@ -96,20 +96,20 @@
                                 ],
                                 "output": [
                                     "Geth",
-                                    "1.8.12"
+                                    "1.8.13"
                                 ]
                             }
                         },
                         "download": {
-                            "bin": "geth-windows-amd64-1.8.12-37685930\\geth.exe",
-                            "sha256": "13ad985bdcd2c19521439089f8a7f3767aa41914e475f14c1a01e8bdbe29b8d2",
+                            "bin": "geth-windows-amd64-1.8.13-225171a4\\geth.exe",
+                            "sha256": "51d643e49ae2d7b87d88314faf76af620bc05ac91ff402e54cdd2390479e55f3",
                             "type": "zip",
-                            "url": "https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-1.8.12-37685930.zip"
+                            "url": "https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-1.8.13-225171a4.zip"
                         }
                     }
                 }
             },
-            "version": "1.8.12"
+            "version": "1.8.13"
         }
     }
 }

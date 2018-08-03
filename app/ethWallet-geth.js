@@ -68,6 +68,8 @@ const spawnGeth = async () => {
     port,
     '--syncmode',
     'light',
+    '--cache',
+    '1024',
     '--rpc',
     '--rpcport',
     rpcPort,
