@@ -173,12 +173,12 @@ const cleanupGeth = (processId) => {
 }
 
 // Attempts to restart geth up to 3 times
-const restartGeth = (tries = 3) => {
+const restartGeth = async (tries = 3) => {
   if (tries === 0) {
     return
   }
 
-  spawnGeth()
+  await spawnGeth()
 
   if (gethRetryTimeoutId) {
     clearTimeout(gethRetryTimeoutId)
