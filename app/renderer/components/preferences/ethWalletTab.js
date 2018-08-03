@@ -81,7 +81,7 @@ class EthWalletTab extends ImmutableComponent {
   }
 
   render () {
-    const iframe = this.isEnabled() ? <iframe src={`chrome-extension://${config.ethwalletExtensionId}/index.html`} className={css(styles.frame)} scrolling="no" /> : null
+    const iframe = this.isEnabled() ? <iframe src={`chrome-extension://${config.ethwalletExtensionId}/index.html`} className={css(styles.frame)} scrolling='no' /> : null
     const disabledContent = this.isEnabled() ? null : this.getDisabledContent()
     return <section>
       <SectionTitleWrapper>
