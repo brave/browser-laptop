@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.23.77](https://github.com/brave/browser-laptop/releases/tag/v0.23.77dev)
+
+ - Fixed local file reading security issue, credit to Vladimir Metnew. ([#14936](https://github.com/brave/browser-laptop/issues/14936))
+ - Disabled FTP in Brave. ([#14712](https://github.com/brave/browser-laptop/issues/14712))
+ - Disabled non-chrome-extension origins from navigating to chrome-extension. ([#14772](https://github.com/brave/browser-laptop/issues/14772))
+ - Fixed crash when visiting certain URLs. ([#14893](https://github.com/brave/browser-laptop/issues/14893))
+ - Fixed JavaScript errors in developer tools on each page load. ([#14890](https://github.com/brave/browser-laptop/issues/14890))
+ - Fixed LastPass Vault not displaying passwords. ([#11624](https://github.com/brave/browser-laptop/issues/11624))
+ - Fixed Brave becoming unresponsive when the delete button under downloads is clicked. ([#14805](https://github.com/brave/browser-laptop/issues/14805))
+ - Fixed external protocol prompt not being displayed on "about:" pages. ([#14679](https://github.com/brave/browser-laptop/issues/14679))
+ - Upgraded to muon 8.0.6. ([#14911](https://github.com/brave/browser-laptop/issues/14911))
+ - Upgraded to Chromium 68.0.3440.84. ([#14910](https://github.com/brave/browser-laptop/issues/14910))
+
 ## [0.23.73](https://github.com/brave/browser-laptop/releases/tag/v0.23.73dev)
 
  - Fixed extension popups appearing transparent on first click after Brave restart. ([#13633](https://github.com/brave/browser-laptop/issues/13633))
