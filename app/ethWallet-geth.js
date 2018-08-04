@@ -4,6 +4,7 @@ const dns = require('dns-then')
 const {spawn} = require('child_process')
 const portfinder = require('portfinder')
 const net = require('net')
+const underscore = require('underscore')
 
 const {app, ipcMain} = require('electron')
 const {getExtensionsPath} = require('../js/lib/appUrlUtil')
@@ -27,7 +28,12 @@ const gethProcessPath = path.join(getExtensionsPath('bin'), gethProcessKey)
 const configurePeers = async (dataDir) => {
   try {
     const discoveryDomain = `_enode._tcp.${envNet || 'mainnet'}.ethwallet.bravesoftware.com`
-    const newNodes = await dns.resolveSrv(discoveryDomain)
+    let newNodes = await dns.resolveSrv(discoveryDomain)
+    newNodes = underscore.shuffle(newNodes).sort((a, b) => {
+      const pdiff = a.priority - b.priority
+
+      return ((pdiff !== 0) ? pdiff : (b.weight - a.weight))
+    })
     const newNodesNames = newNodes.map(({ name }) => name)
 
     // start without await to take advantage of async parallelism
@@ -121,7 +127,7 @@ const spawnGeth = async () => {
 }
 
 const handleGethStop = (event, code, signal) => {
-  console.warn(`GETH Stop: Code: ${code} | Signal: ${signal}`)
+  console.warn(`GETH ${event}: Code: ${code} | Signal: ${signal}`)
 
   if (code) {
     return
@@ -187,7 +193,7 @@ const restartGeth = async (tries = 3) => {
   }
 
   if (geth == null) {
-    gethRetryTimeoutId = setTimeout(restartGeth(tries--), gethRetryInterval)
+    gethRetryTimeoutId = setTimeout(() => { restartGeth(--tries) }, gethRetryInterval)
   }
 }
 
