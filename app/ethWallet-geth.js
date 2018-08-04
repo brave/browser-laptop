@@ -11,7 +11,7 @@ const appStore = require('../js/stores/appStore')
 const ledgerState = require('./common/state/ledgerState')
 
 const envNet = process.env.ETHEREUM_NETWORK
-const gethDataDir = path.join(app.getPath('userData'), envNet || 'ethereum')
+const gethDataDir = path.join(app.getPath('userData'), 'ethereum', envNet || 'mainnet')
 
 const gethProcessKey = process.platform === 'win32'
   ? 'geth.exe'
