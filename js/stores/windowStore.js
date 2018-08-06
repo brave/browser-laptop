@@ -303,14 +303,16 @@ const doAction = (action) => {
         const statePath = path =>
           [path, frameStateUtil.getFrameIndex(windowState, action.frameProps.get('key'))]
 
-        // Reset security state
-        windowState =
-          windowState.deleteIn(statePath('frames').concat(['security', 'blockedRunInsecureContent']))
-        windowState = windowState.mergeIn(statePath('frames').concat(['security']), {
-          isSecure: null,
-          evCert: undefined,
-          runInsecureContent: false
-        })
+        if (!appConstants.APP_DOWNLOAD_ACTION_PERFORMED) {
+          // Reset security state
+          windowState =
+            windowState.deleteIn(statePath('frames').concat(['security', 'blockedRunInsecureContent']))
+          windowState = windowState.mergeIn(statePath('frames').concat(['security']), {
+            isSecure: null,
+            evCert: undefined,
+            runInsecureContent: false
+          })
+        }
         // Update loading UI
         const isNewTabUrl = action.location === getTargetAboutUrl('about:newtab')
         const frameUpdatedData = {
