@@ -16,15 +16,11 @@ const envNet = process.env.ETHEREUM_NETWORK || 'mainnet'
 const envSubDomain = envNet === 'mainnet' ? 'ethwallet' : 'ethwallet-test'
 const gethDataDir = path.join(app.getPath('userData'), 'ethereum', envNet)
 
-const gethProcessKey = process.platform === 'win32'
-  ? 'geth.exe'
-  : 'geth'
-const ipcPath = process.platform === 'win32'
-  ? '\\\\.\\pipe\\geth.ipc'
-  : path.join(gethDataDir, 'geth.ipc')
-const pidPath = process.platform === 'win32'
-  ? '\\\\.\\pipe\\geth.pid'
-  : path.join(gethDataDir, 'geth.pid')
+const isWindows = process.platform === 'win32'
+const gethProcessKey = isWindows ? 'geth.exe' : 'geth'
+
+const ipcPath = isWindows ? '\\\\.\\pipe\\geth.ipc' : path.join(gethDataDir, 'geth.ipc')
+const pidPath = isWindows ? '\\\\.\\pipe\\geth.pid' : path.join(gethDataDir, 'geth.pid')
 const gethProcessPath = path.join(getExtensionsPath('bin'), gethProcessKey)
 
 const configurePeers = async (dataDir) => {
@@ -177,10 +173,14 @@ const cleanupGeth = (processId) => {
       gethProcessId = null
     }
 
-    try {
-      fs.unlinkSync(pidPath)
-    } catch (ex) {
-      console.error('Could not delete geth.pid')
+    // Named pipes on Windows will get deleted
+    // automatically once no processes are using them.
+    if (!isWindows) {
+      try {
+        fs.unlinkSync(pidPath)
+      } catch (ex) {
+        console.error('Could not delete geth.pid')
+      }
     }
     console.warn('GETH: cleanup done')
   }
