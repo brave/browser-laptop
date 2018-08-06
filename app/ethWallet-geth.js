@@ -11,8 +11,10 @@ const {getExtensionsPath} = require('../js/lib/appUrlUtil')
 const appStore = require('../js/stores/appStore')
 const ledgerState = require('./common/state/ledgerState')
 
-const envNet = process.env.ETHEREUM_NETWORK
-const gethDataDir = path.join(app.getPath('userData'), 'ethereum', envNet || 'mainnet')
+const gethCache = process.env.GETH_CACHE || '1024'
+const envNet = process.env.ETHEREUM_NETWORK || 'mainnet'
+const envSubDomain = envNet === 'mainnet' ? 'ethwallet' : 'ethwallet-test'
+const gethDataDir = path.join(app.getPath('userData'), 'ethereum', envNet)
 
 const gethProcessKey = process.platform === 'win32'
   ? 'geth.exe'
@@ -27,7 +29,7 @@ const gethProcessPath = path.join(getExtensionsPath('bin'), gethProcessKey)
 
 const configurePeers = async (dataDir) => {
   try {
-    const discoveryDomain = `_enode._tcp.${envNet || 'mainnet'}.ethwallet.bravesoftware.com`
+    const discoveryDomain = `_enode._tcp.${envNet}.${envSubDomain}.brave.com`
     let newNodes = await dns.resolveSrv(discoveryDomain)
     newNodes = underscore.shuffle(newNodes).sort((a, b) => {
       const pdiff = a.priority - b.priority
@@ -75,7 +77,11 @@ const spawnGeth = async () => {
     '--syncmode',
     'light',
     '--cache',
-    '1024',
+    gethCache,
+    '--cache.database',
+    gethCache,
+    '--trie-cache-gens',
+    gethCache,
     '--rpc',
     '--rpcport',
     rpcPort,
