@@ -20,7 +20,7 @@ const appActions = require('../../../js/actions/appActions')
 
 // Constants
 const notificationTypes = require('../../common/constants/notificationTypes')
-// const searchProviders = require('../../../js/data/searchProviders').providers // apparently busted
+const searchProviders = require('../../../js/data/searchProviders').providers
 const settings = require('../../../js/constants/settings')
 
 // State
@@ -510,20 +510,36 @@ const testSearchState = (state, url) => {
 
   const hostname = urlParse(url).hostname
   const lastSearchState = userModelState.getSearchState(state)
-  if (hostname === 'www.google.com') {
+
+  let wasASearch = false
+  const href = urlParse(url).href
+
+  for (let provider of searchProviders) {
+    const providerUrl = provider.base
+    const providerHostname = urlParse(providerUrl).hostname
+
+    const isSearchEngine = provider.anyVisitToBaseDomainIsSearch
+
+    if (isSearchEngine && hostname === providerHostname) {
+      wasASearch = true
+      break
+    }
+
+    const prefix = provider.search
+    const x = prefix.indexOf('{')
+
+    if (x > 0 && href.indexOf(prefix.substr(0, x)) !== -1) {
+      wasASearch = true
+      break
+    }
+  }
+
+  if (wasASearch) {
     state = userModelState.flagSearchState(state, url, 1.0)
-  } else if (hostname !== 'www.google.com' && lastSearchState) {
+  } else if (lastSearchState) {
     state = userModelState.unFlagSearchState(state, url)
   }
-    // do this broken thing that only works on 2nd page of search
-    // const href = urlParse(url).href
-    // for (let provider of searchProviders) {
-    // const prefix = provider.search
-    // const x = prefix.indexOf('{')
-    // if ((x <= 0) || (href.indexOf(prefix.substr(0, x)) !== 0)) continue
-    // return userModelState.flagSearchState(state, url, 1.0)
-    // if (lastSearchState) state = userModelState.unFlagSearchState(state, url)
-    // return state
+
   return state
 }
 

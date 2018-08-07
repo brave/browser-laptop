@@ -34,6 +34,7 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('amazon'),
       "search" : "https://www.amazon.com/exec/obidos/external-search/?field-keywords={searchTerms}&mode=blended",
       "autocomplete" : "https://completion.amazon.com/search/complete?method=completion&q={searchTerms}&search-alias=aps&client=amazon-search-ui&mkt=1",
+      "anyVisitToBaseDomainIsSearch" : false,
       "shortcut" : ":a"
     },
     {
@@ -43,6 +44,7 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('bing'),
       "search" : "https://www.bing.com/search?q={searchTerms}",
       "autocomplete" : "https://api.bing.com/osjson.aspx?query={searchTerms}&language={language}&form=OSDJAS",
+      "anyVisitToBaseDomainIsSearch" : true,
       "shortcut" : ":b"
     },
     {
@@ -52,6 +54,7 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('duckduckgo'),
       "search" : "https://duckduckgo.com/?q={searchTerms}&t=brave",
       "autocomplete" : "https://ac.duckduckgo.com/ac/?q={searchTerms}&type=list",
+      "anyVisitToBaseDomainIsSearch" : true,
       "shortcut" : ":d"
     },
     {
@@ -61,6 +64,7 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('fireball'),
       "search" : "https://fireball.com/?q={searchTerms}",
       "autocomplete" : "https://fireball.com/search/?q={searchTerms}",
+      "anyVisitToBaseDomainIsSearch" : true,
       "shortcut" : ":f"
     },
     {
@@ -69,6 +73,7 @@ module.exports = { "providers" :
       "image" : getPath('github'),
       "localImage" : getFaviconUrl('github'),
       "search" : "https://github.com/search?q={searchTerms}",
+      "anyVisitToBaseDomainIsSearch" : false,
       "shortcut" : ":gh"
     },
     {
@@ -78,6 +83,7 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('google'),
       "search" : "https://www.google.com/search?q={searchTerms}",
       "autocomplete" : "https://suggestqueries.google.com/complete/search?client=chrome&q={searchTerms}",
+      "anyVisitToBaseDomainIsSearch" : true,
       "shortcut" : ":g"
     },
     {
@@ -86,6 +92,7 @@ module.exports = { "providers" :
       "image" : getPath('stackoverflow'),
       "localImage" : getFaviconUrl('stackoverflow'),
       "search" : "https://stackoverflow.com/search?q={searchTerms}",
+      "anyVisitToBaseDomainIsSearch" : false,
       "shortcut" : ":s"
     },
     {
@@ -94,6 +101,7 @@ module.exports = { "providers" :
       "image" : getPath('mdn', 'png'),
       "localImage" : getFaviconUrl('mdn', 'png'),
       "search" : "https://developer.mozilla.org/search?q={searchTerms}",
+      "anyVisitToBaseDomainIsSearch" : false,
       "shortcut" : ":m"
     },
     {
@@ -102,6 +110,7 @@ module.exports = { "providers" :
       "image" : getPath('twitter'),
       "localImage" : getFaviconUrl('twitter'),
       "search" : "https://twitter.com/search?q={searchTerms}&source=desktop-search",
+      "anyVisitToBaseDomainIsSearch" : false,
       "shortcut" : ":t"
     },
     {
@@ -110,6 +119,7 @@ module.exports = { "providers" :
       "image" : getPath('wikipedia'),
       "localImage" : getFaviconUrl('wikipedia'),
       "search" : "https://en.wikipedia.org/wiki/Special:Search?search={searchTerms}",
+      "anyVisitToBaseDomainIsSearch" : false,
       "shortcut" : ":w"
     },
     {
@@ -119,6 +129,7 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('yahoo'),
       "search" : "https://search.yahoo.com/search?p={searchTerms}&fr=opensearch",
       "autocomplete": "https://search.yahoo.com/sugg/os?command={searchTerms}&output=fxjson&fr=opensearch",
+      "anyVisitToBaseDomainIsSearch" : true,
       "shortcut" : ":y"
     },
     {
@@ -128,6 +139,7 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('youtube'),
       "search" : "https://www.youtube.com/results?search_type=search_videos&search_query={searchTerms}&search_sort=relevance&search_category=0&page=",
       "autocomplete": "https://suggestqueries.google.com/complete/search?output=chrome&client=chrome&hl=it&q={searchTerms}&ds=yt",
+      "anyVisitToBaseDomainIsSearch" : false,
       "shortcut" : ":yt"
     },
     {
@@ -137,6 +149,7 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('startpage', 'png'),
       "search" : "https://www.startpage.com/do/dsearch?query={searchTerms}&cat=web&pl=opensearch",
       "autocomplete": "https://www.startpage.com/cgi-bin/csuggest?query={searchTerms}&limit=10&format=json",
+      "anyVisitToBaseDomainIsSearch" : true,
       "shortcut" : ":sp"
     },
     {
@@ -146,6 +159,7 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('infogalactic'),
       "search" : "https://infogalactic.com/w/index.php?title=Special:Search&search={searchTerms}",
       "autocomplete": "https://infogalactic.com/w/api.php?action=opensearch&search={searchTerms}&namespace=0",
+      "anyVisitToBaseDomainIsSearch" : false,
       "shortcut" : ":i"
     },
     {
@@ -154,6 +168,7 @@ module.exports = { "providers" :
       "image" : getPath('wolframalpha'),
       "localImage" : getFaviconUrl('wolframalpha'),
       "search" : "https://www.wolframalpha.com/input/?i={searchTerms}",
+      "anyVisitToBaseDomainIsSearch" : false,
       "shortcut" : ":wa"
     },
     {
@@ -162,6 +177,7 @@ module.exports = { "providers" :
       "image" : getPath('semanticscholar', 'png'),
       "localImage" : getFaviconUrl('semanticscholar', 'png'),
       "search" : "https://www.semanticscholar.org/search?q={searchTerms}",
+      "anyVisitToBaseDomainIsSearch" : true,
       "shortcut" : ":ss"
     },
     {
@@ -171,6 +187,7 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('qwant'),
       "search" : "https://www.qwant.com/?q={searchTerms}&client=brave",
       "autocomplete": "https://api.qwant.com/api/suggest/?q={searchTerms}&client=brave",
+      "anyVisitToBaseDomainIsSearch" : true,
       "shortcut" : ":q"
     },
     {
@@ -179,6 +196,7 @@ module.exports = { "providers" :
       "image" : getPath('yandex'),
       "localImage" : getFaviconUrl('yandex'),
       "search" : "https://yandex.com/search/?text={searchTerms}&clid=2274777",
+      "anyVisitToBaseDomainIsSearch" : true,
       "shortcut" : ":ya"
     },
     {
@@ -188,6 +206,7 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('ecosia'),
       "search" : "https://www.ecosia.org/search?q={searchTerms}",
       "autocomplete": "https://ac.ecosia.org/autocomplete?q={searchTerms}&type=list",
+      "anyVisitToBaseDomainIsSearch" : true,
       "shortcut" : ":e"
     },
     {
@@ -196,6 +215,7 @@ module.exports = { "providers" :
       "image" : getPath('favicon_that_shall_not_be_named', 'png'),
       "localImage" : getFaviconUrl('favicon_that_shall_not_be_named', 'png'),
       "search" : "https://searx.me/?q={searchTerms}&categories=general",
+      "anyVisitToBaseDomainIsSearch" : true,
       "shortcut" : ":x"
     },
     {
@@ -205,6 +225,7 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('findx'),
       "search": "https://www.findx.com/search?q={searchTerms}&type=web",
       "autocomplete": "https://www.findx.com/api/web-search/suggestions/?q={searchTerms}&type=opensearch",
+      "anyVisitToBaseDomainIsSearch" : true,
       "shortcut": ":fx"
     }
   ]
