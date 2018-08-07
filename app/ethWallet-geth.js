@@ -91,7 +91,8 @@ const spawnGeth = async () => {
     '--ipcpath',
     ipcPath,
     '--maxpeers',
-    '10'
+    '10',
+    '--nousb'
   ]
 
   if (envNet === 'ropsten') {
