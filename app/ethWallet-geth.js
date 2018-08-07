@@ -152,6 +152,7 @@ const writeGethPid = async (pid) => {
   gethProcessId = pid
 
   try {
+    await fs.ensureDir(gethDataDir)
     await fs.writeFile(pidPath, gethProcessId)
   } catch (ex) {
     console.error('Could not write geth.pid')
