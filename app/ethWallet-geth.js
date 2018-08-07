@@ -243,23 +243,16 @@ ipcMain.on('eth-wallet-wallets', (e, data) => {
   })
 })
 
-ipcMain.on('eth-wallet-unlock-account', (e, data) => {
-  const [ pw, tx ] = JSON.parse(data)
+ipcMain.on('eth-wallet-unlock-account', (e, address, pw) => {
   const client = net.createConnection(ipcPath)
 
   client.on('connect', () => {
-    client.write(JSON.stringify({ 'method': 'personal_unlockAccount', 'params': [tx.from, pw], 'id': 1, 'jsonrpc': '2.0' }))
+    client.write(JSON.stringify({ 'method': 'personal_unlockAccount', 'params': [address, pw], 'id': 1, 'jsonrpc': '2.0' }))
   })
 
   client.on('data', (data) => {
     client.end()
-    const response = JSON.parse(data.toString())
-
-    if (response.error) {
-      e.sender.send('eth-wallet-notification-error', response.error.message)
-    } else {
-      e.sender.send('eth-wallet-retry-tx', JSON.stringify(tx))
-    }
+    e.sender.send('eth-wallet-unlock-account-result', data.toString())
   })
 })
 
