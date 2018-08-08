@@ -20,24 +20,30 @@ const {
 
 const settings = require('../../../../js/constants/settings')
 const config = require('../../../../js/constants/config')
+const getSetting = require('../../../../js/settings').getSetting
+const tabActions = require('../../../common/actions/tabActions')
 
 class EthWalletTab extends ImmutableComponent {
   constructor () {
     super()
-    this.onChange = this.onChange.bind(this)
+    this.reloadDelay = 250
+    this.reloadTimeout = null
+    this.onToggleEthWallet = this.onToggleEthWallet.bind(this)
   }
 
-  isEnabled () {
-    return this.props.settings.get(settings.ETHWALLET_ENABLED)
+  get enabled () {
+    return getSetting(settings.ETHWALLET_ENABLED, this.props.settings)
   }
 
-  onChange () {
-    const {onChangeSetting} = this.props
-    if (this.isEnabled()) {
-      onChangeSetting(settings.ETHWALLET_ENABLED, false)
-    } else {
-      onChangeSetting(settings.ETHWALLET_ENABLED, true)
+  onToggleEthWallet () {
+    this.props.onChangeSetting(settings.ETHWALLET_ENABLED, !this.enabled)
+    // For a smoother transition
+    if (this.reloadTimeout) {
+      clearTimeout(this.reloadTimeout)
     }
+    this.reloadTimeout = setTimeout(() => {
+      tabActions.reload()
+    }, this.reloadDelay)
   }
 
   getIframeContent () {
@@ -87,8 +93,8 @@ class EthWalletTab extends ImmutableComponent {
   }
 
   render () {
-    const iframe = this.isEnabled() ? this.getIframeContent() : null
-    const disabledContent = this.isEnabled() ? null : this.getDisabledContent()
+    const iframe = this.enabled ? this.getIframeContent() : null
+    const disabledContent = this.enabled ? null : this.getDisabledContent()
     return <section>
       <SectionTitleWrapper>
         <div className={css(styles.fullFrame)}>
@@ -111,9 +117,9 @@ class EthWalletTab extends ImmutableComponent {
               <SettingCheckbox
                 dataL10nIdLeft='off'
                 dataL10nId='on'
+                settings={this.props.settings}
                 prefKey={settings.ETHWALLET_ENABLED}
-                checked={this.isEnabled()}
-                onChangeSetting={this.onChange}
+                onChangeSetting={this.onToggleEthWallet}
                 customStyleTextLeft={[
                   styles.switch__label,
                   styles.switch__label_left,

@@ -10,6 +10,8 @@ const {app, ipcMain} = require('electron')
 const {getExtensionsPath} = require('../js/lib/appUrlUtil')
 const appStore = require('../js/stores/appStore')
 const ledgerState = require('./common/state/ledgerState')
+const {getSetting} = require('../js/settings')
+const settings = require('../js/constants/settings')
 
 const gethCache = process.env.GETH_CACHE || '1024'
 const envNet = process.env.ETHEREUM_NETWORK || 'mainnet'
@@ -135,11 +137,12 @@ const handleGethStop = (event, code, signal) => {
     return
   }
 
+  const isEnabled = getSetting(settings.ETHWALLET_ENABLED)
   // Restart should occur on close only, else restart
   // events can compound.
   if (event === 'exit') {
     geth = null
-  } else if (event === 'close') {
+  } else if (isEnabled && event === 'close') {
     restartGeth()
   }
 }
@@ -160,19 +163,19 @@ const writeGethPid = async (pid) => {
 }
 
 const cleanupGeth = (processId) => {
+  processId = processId || gethProcessId
+
   if (processId) {
     // Set geth to null to remove bound listeners
     // Otherwise, geth will attempt to restart itself
     // when killed.
-    if (geth) {
-      geth = null
-    }
+    geth = null
+
+    // Kill process
     process.kill(processId)
 
     // Remove in memory process id
-    if (gethProcessId) {
-      gethProcessId = null
-    }
+    gethProcessId = null
 
     // Named pipes on Windows will get deleted
     // automatically once no processes are using them.
@@ -267,6 +270,11 @@ ipcMain.on('get-popup-bat-balance', (e) => {
                 ledgerInfo.getIn(['addresses', 'BAT']))
 })
 
-module.exports = async function () {
+const launchGeth = async function () {
   await spawnGeth()
+}
+
+module.exports = {
+  launchGeth,
+  cleanupGeth
 }

@@ -17,7 +17,7 @@ const path = require('path')
 const l10n = require('../js/l10n')
 const {bravifyText} = require('./renderer/lib/extensionsUtil')
 const {componentUpdater, session} = require('electron')
-const launchGeth = require('./ethWallet-geth')
+const {launchGeth, cleanupGeth} = require('./ethWallet-geth')
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -413,6 +413,51 @@ const disableExtension = (extensionId) => {
   session.defaultSession.extensions.disable(extensionId)
 }
 
+module.exports.loadExtension = (extensionId, extensionPath, manifest = {}, manifestLocation = 'unpacked') => {
+  const isPDF = extensionId === config.PDFJSExtensionId
+  if (isPDF) {
+    manifestLocation = 'component'
+    // Override the manifest. TODO: Update manifest in pdf.js itself after enough
+    // clients have updated to Brave 0.20.x+
+    manifest = {
+      name: 'PDF Viewer',
+      manifest_version: 2,
+      version: '1.9.459',
+      description: 'Uses HTML5 to display PDF files directly in the browser.',
+      icons: {
+        '128': 'icon128.png',
+        '48': 'icon48.png',
+        '16': 'icon16.png'
+      },
+      permissions: ['storage', '<all_urls>'],
+      content_security_policy: "script-src 'self'; object-src 'self'",
+      incognito: 'split',
+      key: config.PDFJSExtensionPublicKey
+    }
+  }
+  if (!extensionInfo.isLoaded(extensionId) && !extensionInfo.isLoading(extensionId)) {
+    extensionInfo.setState(extensionId, extensionStates.LOADING)
+    if (extensionId === config.braveExtensionId || extensionId === config.torrentExtensionId || extensionId === config.ethwalletExtensionId || extensionId === config.cryptoTokenExtensionId || extensionId === config.syncExtensionId) {
+      session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
+      return
+    }
+    // Verify we don't have info about an extension which doesn't exist
+    // on disk anymore.  It will crash if it doesn't exist, so this is
+    // just a safety net.
+    fs.access(path.join(extensionPath, 'manifest.json'), fs.constants.F_OK, (err) => {
+      if (err) {
+        // This is an error condition, but we can recover.
+        extensionInfo.setState(extensionId, undefined)
+        componentUpdater.checkNow(extensionId)
+      } else {
+        session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
+      }
+    })
+  } else {
+    enableExtension(extensionId)
+  }
+}
+
 module.exports.reloadExtension = (extensionId) => {
   const reload = (unloadedExtensionId) => {
     if (extensionId === unloadedExtensionId) {
@@ -424,6 +469,18 @@ module.exports.reloadExtension = (extensionId) => {
   }
   process.on('extension-unloaded', reload)
   disableExtension(extensionId)
+}
+
+module.exports.configureEthWallet = (ethWalletEnabled) => {
+  if (ethWalletEnabled) {
+    extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
+    module.exports.loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
+    launchGeth()
+  } else {
+    extensionInfo.setState(config.ethwalletExtensionId, extensionStates.DISABLED)
+    extensionActions.extensionDisabled(config.ethwalletExtensionId)
+    cleanupGeth()
+  }
 }
 
 module.exports.init = () => {
@@ -447,7 +504,7 @@ module.exports.init = () => {
     // Re-setup the loadedExtensions info if it exists
     extensionInfo.setState(componentId, extensionStates.REGISTERED)
     if (isExtension(componentId)) {
-      loadExtension(componentId, extensionPath)
+      module.exports.loadExtension(componentId, extensionPath)
     } else if (isWidevine(componentId)) {
       appActions.resourceReady(appConfig.resourceNames.WIDEVINE)
     }
@@ -463,7 +520,7 @@ module.exports.init = () => {
       componentUpdater.checkNow(extensionId)
     } else {
       extensionInfo.setState(extensionId, extensionStates.REGISTERED)
-      loadExtension(extensionId, extensionPath)
+      module.exports.loadExtension(extensionId, extensionPath)
     }
   })
 
@@ -519,51 +576,6 @@ module.exports.init = () => {
     return object
   }
 
-  let loadExtension = (extensionId, extensionPath, manifest = {}, manifestLocation = 'unpacked') => {
-    const isPDF = extensionId === config.PDFJSExtensionId
-    if (isPDF) {
-      manifestLocation = 'component'
-      // Override the manifest. TODO: Update manifest in pdf.js itself after enough
-      // clients have updated to Brave 0.20.x+
-      manifest = {
-        name: 'PDF Viewer',
-        manifest_version: 2,
-        version: '1.9.459',
-        description: 'Uses HTML5 to display PDF files directly in the browser.',
-        icons: {
-          '128': 'icon128.png',
-          '48': 'icon48.png',
-          '16': 'icon16.png'
-        },
-        permissions: ['storage', '<all_urls>'],
-        content_security_policy: "script-src 'self'; object-src 'self'",
-        incognito: 'split',
-        key: config.PDFJSExtensionPublicKey
-      }
-    }
-    if (!extensionInfo.isLoaded(extensionId) && !extensionInfo.isLoading(extensionId)) {
-      extensionInfo.setState(extensionId, extensionStates.LOADING)
-      if (extensionId === config.braveExtensionId || extensionId === config.torrentExtensionId || extensionId === config.ethwalletExtensionId || extensionId === config.cryptoTokenExtensionId || extensionId === config.syncExtensionId) {
-        session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
-        return
-      }
-      // Verify we don't have info about an extension which doesn't exist
-      // on disk anymore.  It will crash if it doesn't exist, so this is
-      // just a safety net.
-      fs.access(path.join(extensionPath, 'manifest.json'), fs.constants.F_OK, (err) => {
-        if (err) {
-          // This is an error condition, but we can recover.
-          extensionInfo.setState(extensionId, undefined)
-          componentUpdater.checkNow(extensionId)
-        } else {
-          session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
-        }
-      })
-    } else {
-      enableExtension(extensionId)
-    }
-  }
-
   let registerComponent = (extensionId, publicKeyString) => {
     if (!extensionInfo.isRegistered(extensionId) && !extensionInfo.isRegistering(extensionId)) {
       extensionInfo.setState(extensionId, extensionStates.REGISTERING)
@@ -577,32 +589,25 @@ module.exports.init = () => {
       const extensionPath = extensions.getIn([extensionId, 'filePath'])
       if (extensionPath) {
         // Otheriwse just install it
-        loadExtension(extensionId, extensionPath)
+        module.exports.loadExtension(extensionId, extensionPath)
       }
     }
   }
 
   // Manually install the braveExtension and torrentExtension
   extensionInfo.setState(config.braveExtensionId, extensionStates.REGISTERED)
-  loadExtension(config.braveExtensionId, getExtensionsPath('brave'), generateBraveManifest(), 'component')
+  module.exports.loadExtension(config.braveExtensionId, getExtensionsPath('brave'), generateBraveManifest(), 'component')
   // Cryptotoken extension is loaded from electron_resources.pak
   extensionInfo.setState(config.cryptoTokenExtensionId, extensionStates.REGISTERED)
-  loadExtension(config.cryptoTokenExtensionId, getComponentExtensionsPath('cryptotoken'), {}, 'component')
+  module.exports.loadExtension(config.cryptoTokenExtensionId, getComponentExtensionsPath('cryptotoken'), {}, 'component')
   extensionInfo.setState(config.syncExtensionId, extensionStates.REGISTERED)
-  loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
+  module.exports.loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
 
-  if (getSetting(settings.ETHWALLET_ENABLED)) {
-    extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
-    loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
-    launchGeth()
-  } else {
-    extensionInfo.setState(config.ethwalletExtensionId, extensionStates.DISABLED)
-    extensionActions.extensionDisabled(config.ethwalletExtensionId)
-  }
+  module.exports.configureEthWallet(getSetting(settings.ETHWALLET_ENABLED))
 
   if (getSetting(settings.TORRENT_VIEWER_ENABLED)) {
     extensionInfo.setState(config.torrentExtensionId, extensionStates.REGISTERED)
-    loadExtension(config.torrentExtensionId, getExtensionsPath('torrent'), generateTorrentManifest(), 'component')
+    module.exports.loadExtension(config.torrentExtensionId, getExtensionsPath('torrent'), generateTorrentManifest(), 'component')
   } else {
     extensionInfo.setState(config.torrentExtensionId, extensionStates.DISABLED)
     extensionActions.extensionDisabled(config.torrentExtensionId)
