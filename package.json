@@ -98,7 +98,7 @@
     "bat-publisher": "^2.0.18",
     "bignumber.js": "^4.0.4",
     "bloodhound-js": "brave/bloodhound",
-    "brave-ads-notifier": "6.1.1",
+    "brave-ads-notifier": "6.1.2",
     "chromium-net-errors": "^3.3.0",
     "clipboard-copy": "^1.0.0",
     "compare-versions": "^3.0.1",
