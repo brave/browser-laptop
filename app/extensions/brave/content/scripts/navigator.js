@@ -27,3 +27,13 @@ if (chrome.contentSettings.ads == 'block') {
 
 // Spectre hotfix (https://github.com/brave/browser-laptop/issues/12570)
 chrome.webFrame.setGlobal('window.SharedArrayBuffer', false)
+
+if (chrome.contentSettings.mediaPermission == 'block') {
+  // Needed for https://github.com/brave/browser-laptop/issues/14889
+  // Note this is not necessary in non-Electron-based codebases since Chromium
+  // automatically handles the permission for device enumeration.
+  // Also: chromium doesn't have mediaPermission in content setting. It is actually
+  // microphone && camera in chromium.
+  executeScript("window.MediaDeviceInfo.prototype.__defineGetter__('label', () => { return '' })")
+  executeScript("window.InputDeviceInfo.prototype.__defineGetter__('label', () => { return '' })")
+}
