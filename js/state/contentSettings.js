@@ -93,6 +93,10 @@ const getDefaultUserPrefContentSettings = (braveryDefaults, appSettings, appConf
       setting: getSetting(settings.DO_NOT_TRACK, appSettings) ? 'allow' : 'block',
       primaryPattern: '*'
     }],
+    mediaPermission: [{
+      setting: 'block',
+      primaryPattern: '*'
+    }],
     passwordManager: getDefaultPasswordManagerSettings(braveryDefaults, appSettings, appConfig),
     javascript: [{
       setting: braveryDefaults.get('noScript') ? 'block' : 'allow',
@@ -283,10 +287,12 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
         }
       })
     }
-    if (typeof siteSetting.get('runInsecureContent') === 'boolean') {
-      contentSettings = addContentSettings(contentSettings, 'runInsecureContent', primaryPattern, '*',
-        siteSetting.get('runInsecureContent') ? 'allow' : 'block')
-    }
+    ['runInsecureContent', 'autoplay', 'mediaPermission'].forEach((permission) => {
+      if (typeof siteSetting.get(permission) === 'boolean') {
+        contentSettings = addContentSettings(contentSettings, permission, primaryPattern, '*',
+          siteSetting.get(permission) ? 'allow' : 'block')
+      }
+    })
     if (siteSetting.get('cookieControl')) {
       if (siteSetting.get('cookieControl') === 'block3rdPartyCookie') {
         contentSettings = addContentSettings(contentSettings, 'cookies', primaryPattern, '*', 'block')
@@ -325,9 +331,6 @@ const siteSettingsToContentSettings = (currentSiteSettings, defaultContentSettin
     }
     if (typeof siteSetting.get('widevine') === 'number' && braveryDefaults.get('widevine')) {
       contentSettings = addContentSettings(contentSettings, 'plugins', primaryPattern, '*', 'allow', widevineResourceId)
-    }
-    if (typeof siteSetting.get('autoplay') === 'boolean') {
-      contentSettings = addContentSettings(contentSettings, 'autoplay', primaryPattern, '*', siteSetting.get('autoplay') ? 'allow' : 'block')
     }
   })
   // On the second pass we consider only shieldsUp === false settings since we want those to take precedence.
