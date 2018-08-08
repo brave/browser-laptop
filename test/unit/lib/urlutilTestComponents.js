@@ -329,6 +329,11 @@ module.exports = {
       }
     },
     'returns false when input:': {
+      'is falsey': (test) => {
+        test.equal(urlUtil().isFileScheme(''), false)
+        test.equal(urlUtil().isFileScheme(), false)
+        test.equal(urlUtil().isFileScheme(null), false)
+      },
       'is an absolute file path without scheme': (test) => {
         test.equal(urlUtil().isFileScheme('/file/path/to/file'), false)
       },
