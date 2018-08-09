@@ -235,6 +235,10 @@ ipcMain.on('eth-wallet-create-wallet', (e, pwd) => {
   })
 
   client.on('data', (data) => {
+    const res = JSON.parse(data.toString())
+    if (res.result) {
+      e.sender.send('eth-wallet-new-wallet', res.result)
+    }
     client.end()
   })
 })
