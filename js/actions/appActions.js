@@ -2236,6 +2236,12 @@ const appActions = {
     })
   },
 
+  onTestNotification: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_TEST_NOTIFICATION
+    })
+  },
+
   recreateTorTab: function (torEnabled, tabId, index) {
     dispatch({
       actionType: appConstants.APP_RECREATE_TOR_TAB,
