@@ -1,7 +1,7 @@
 const fs = require('fs-extra')
 const path = require('path')
 const dns = require('dns-then')
-const {spawn} = require('child_process')
+const {spawn, spawnSync} = require('child_process')
 const portfinder = require('portfinder')
 const net = require('net')
 const underscore = require('underscore')
@@ -132,7 +132,7 @@ const ensureGethDataDir = async () => {
   if (!isWindows) {
     await fs.ensureDir(gethDataDir)
   } else {
-    spawn('mkdir', ['-p', gethDataDir])
+    spawnSync('mkdir', ['-p', gethDataDir])
   }
 }
 
