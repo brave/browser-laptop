@@ -677,13 +677,6 @@ const checkReadyAdServe = (state, windowId, forceP) => {  // around here is wher
     }
   }
 
-  const bundle = sampleAdFeed
-  if (!bundle) {
-    appActions.onUserModelLog('Ad not served', { reason: 'no ad catalog' })
-
-    return state
-  }
-
   const catNames = priorData.names
   const mutable = true
   const history = userModelState.getPageScoreHistory(state, mutable)
@@ -692,6 +685,17 @@ const checkReadyAdServe = (state, windowId, forceP) => {  // around here is wher
   const category = catNames[indexOfMax]
   if (!category) {
     appActions.onUserModelLog('Ad not served', { reason: 'no category at offset indexOfMax', indexOfMax })
+
+    return state
+  }
+
+  return serveAdFromCategory(state, windowId, category)
+}
+
+const serveAdFromCategory = (state, windowId, category) => {
+  const bundle = sampleAdFeed
+  if (!bundle) {
+    appActions.onUserModelLog('Ad not served', { reason: 'no ad catalog' })
 
     return state
   }
@@ -752,6 +756,17 @@ const checkReadyAdServe = (state, windowId, forceP) => {  // around here is wher
                             {category, winnerOverTime, arbitraryKey, notificationUrl, notificationText, advertiser, uuid, hierarchy})
 
   return userModelState.appendAdShownToAdHistory(state)
+}
+
+const serveSampleAd = (state, windowId) => {
+  if (noop(state)) return state
+
+  const catNames = priorData.names
+  const indexOfCategory = (catNames.length * Math.random()) << 0
+  const category = catNames[indexOfCategory]
+  console.log('category[' + indexOfCategory + ']=' + category)
+
+  return serveAdFromCategory(state, windows.getActiveWindowId(), category)
 }
 
 const changeLocale = (state, locale) => {
@@ -975,7 +990,8 @@ const getMethods = () => {
     downloadSurveys,
     retrieveSSID,
     debouncedTimingUpdate,
-    checkReadyAdServe
+    checkReadyAdServe,
+    serveSampleAd
   }
 
   let privateMethods = {}

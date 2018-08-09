@@ -7,6 +7,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 
 // Components
 const {SettingCheckbox} = require('../common/settings')
+const BrowserButton = require('../common/browserButton')
 const DisabledContent = require('./ads/disabledContent')
 const EnabledContent = require('./ads/enabledContent')
 const {
@@ -18,6 +19,9 @@ const {
 
 // Constants
 const settings = require('../../../../js/constants/settings')
+
+// Actions
+const appActions = require('../../../../js/actions/appActions')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
@@ -31,6 +35,10 @@ const batIcon = require('../../../extensions/brave/img/ledger/cryptoIcons/BAT_ic
 class AdsTab extends ImmutableComponent {
   get enabled () {
     return getSetting(settings.ADS_ENABLED, this.props.settings)
+  }
+
+  onTestNotification () {
+    appActions.onTestNotification()
   }
 
   render () {
@@ -77,7 +85,17 @@ class AdsTab extends ImmutableComponent {
             }
 
           </div>
-          <div className={css(gridStyles.row1col3)}>
+          <div className={css(gridStyles.row1col3, styles.sample_ad)}>
+            {
+              this.enabled
+              ? <BrowserButton
+                primaryColor
+                panelItem
+                l10nId={'Click for Sample Ad'}
+                onClick={this.onTestNotification}
+              />
+              : null
+            }
             {
               // this.enabled
               //   ? <SettingCheckbox
@@ -277,6 +295,10 @@ const styles = StyleSheet.create({
 
   recoveryFooter: {
     justifyContent: 'normal'
+  },
+
+  sample_ad: {
+    textAlign: 'center'
   }
 })
 
