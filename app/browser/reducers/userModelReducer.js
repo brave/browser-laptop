@@ -238,7 +238,7 @@ const userModelReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_TEST_NOTIFICATION:
       {
-        // TODO Marshal add logic
+        state = userModel.serveSampleAd(state)
         break
       }
   }
