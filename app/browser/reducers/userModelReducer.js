@@ -236,6 +236,11 @@ const userModelReducer = (state, action, immutableAction) => {
         state = userModel.generateAdReportingEvent(state, 'sustain', action)
         break
       }
+    case appConstants.APP_ON_TEST_NOTIFICATION:
+      {
+        // TODO Marshal add logic
+        break
+      }
   }
 
   return state
