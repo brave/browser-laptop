@@ -21,13 +21,13 @@ const {
 const settings = require('../../../../js/constants/settings')
 const config = require('../../../../js/constants/config')
 const getSetting = require('../../../../js/settings').getSetting
-const tabActions = require('../../../common/actions/tabActions')
 
 class EthWalletTab extends ImmutableComponent {
   constructor () {
     super()
-    this.reloadDelay = 250
+    this.reloadDelay = 3250
     this.reloadTimeout = null
+    this.state = { willReload: false }
     this.onToggleEthWallet = this.onToggleEthWallet.bind(this)
   }
 
@@ -37,16 +37,33 @@ class EthWalletTab extends ImmutableComponent {
 
   onToggleEthWallet () {
     this.props.onChangeSetting(settings.ETHWALLET_ENABLED, !this.enabled)
-    // For a smoother transition
+
+    if (this.enabled) {
+      return
+    }
+
     if (this.reloadTimeout) {
       clearTimeout(this.reloadTimeout)
     }
+
+    this.setState({
+      willReload: true
+    })
+
+    // For a smoother transition and user notification
     this.reloadTimeout = setTimeout(() => {
-      tabActions.reload()
+      this.setState({
+        willReload: false
+      })
+      this.forceUpdate()
     }, this.reloadDelay)
   }
 
   getIframeContent () {
+    if (this.state.willReload) {
+      return null
+    }
+
     return <div className={css(styles.frameContainer)}>
       <iframe src={`chrome-extension://${config.ethwalletExtensionId}/index.html`} className={css(styles.frame)} />
     </div>
@@ -131,6 +148,11 @@ class EthWalletTab extends ImmutableComponent {
                 ]}
               />
             </div>
+            {this.state.willReload
+              ? <div className={css(gridStyles.row1col3)}>
+                <span className={css(styles.startupMsg)}>Starting Up ETH Wallet...</span>
+              </div>
+              : null}
           </section>
         </div>
       </SectionTitleWrapper>
@@ -230,6 +252,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     overflow: 'hidden'
+  },
+
+  startupMsg: {
+    fontWeight: '200',
+    fontSize: '14px',
+    margin: '0px 0px 0px 10px'
   }
 })
 
