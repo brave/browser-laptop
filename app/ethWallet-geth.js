@@ -12,6 +12,8 @@ const appStore = require('../js/stores/appStore')
 const ledgerState = require('./common/state/ledgerState')
 const {getSetting} = require('../js/settings')
 const settings = require('../js/constants/settings')
+const appDispatcher = require('../js/dispatcher/appDispatcher')
+const appConstants = require('../js/constants/appConstants')
 
 const gethCache = process.env.GETH_CACHE || '1024'
 const envNet = process.env.ETHEREUM_NETWORK || 'mainnet'
@@ -278,6 +280,18 @@ ipcMain.on('get-popup-bat-balance', (e) => {
   e.sender.send('popup-bat-balance',
                 ledgerInfo.get('balance'),
                 ledgerInfo.getIn(['addresses', 'BAT']))
+})
+
+ipcMain.on('eth-wallet-get-metamask-state', (e) => {
+  e.sender.send('eth-wallet-metamask-state', getSetting(settings.METAMASK_ENABLED) ? 'enabled' : 'disabled')
+})
+
+ipcMain.on('eth-wallet-enable-metamask', (e) => {
+  appDispatcher.dispatch({
+    actionType: appConstants.APP_CHANGE_SETTING,
+    key: settings.METAMASK_ENABLED,
+    value: true
+  })
 })
 
 const launchGeth = async function () {
