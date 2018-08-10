@@ -423,7 +423,7 @@ const elphSaysGo = (state) => {
 // delay .... 1.5 maybe too long, but at least it smooths out for slow networks
 const debouncedTimingUpdate = (state, url, delay = 1.5) => {
   let bounce = userModelState.scraperDebounceQuery(state)
-  let now = new Date().getTime()
+  const now = underscore.now()
   let diff = (now - bounce.time) / 1000
   if (bounce.url === url && diff < delay) { // houston we have a problem; do not update
     state = userModelState.scraperDebounceSet(state, url, now)
@@ -450,13 +450,13 @@ const topicVariance = (state) => { // this is a fairly random function; would ha
 }
 
 const recencyCalc = (state) => { // was using unidle time here; switched to last shopping time
-  let now = new Date().getTime()
+  const now = underscore.now()
   let diff = (now - userModelState.getLastShoppingTime(state)) / 1000 // milliseconds
   return valueToLowHigh(diff, 600) // shorter than 10 minutes from idle
 }
 
 const frequencyCalc = (state) => {
-  let now = new Date().getTime()
+  const now = underscore.now()
   let diff = (now - userModelState.getLastSearchTime(state)) / 1000 // milliseconds
   return valueToLowHigh(diff, 180) // 3 minutes from search
 }
@@ -662,18 +662,28 @@ const checkReadyAdServe = (state, windowId, forceP) => {  // around here is wher
   // let reset = true
   // state = userModelState.elphDeferRecorder(state, reset) // reset deferral counter
 
-    const surveys = userModelState.getUserSurveyQueue(state).toJS()
-    const survey = underscore.findWhere(surveys, { status: 'available' })
-    if (survey) {
-      survey.status = 'display'
-      survey.status_at = new Date().toISOString()
-      state = userModelState.setUserSurveyQueue(state, Immutable.fromJS(surveys))
+    const first = userModelState.getUserModelValue(state, 'firstContactTimestamp')
+    if (first) {
+      const surveys = userModelState.getUserSurveyQueue(state).toJS()
+      const available = underscore.where(surveys, { status: 'available' }) || []
+      const survey = underscore.first(available)
+      const offset = (available.length > 1 ? 1 : 12) * 86400 * 1000
 
-      goAheadAndShowTheAd(state, windowId, survey.title, survey.description, survey.url, generateAdUUIDString(),
-                          notificationTypes.SURVEYS)
-      appActions.onUserModelLog(notificationTypes.SURVEY_SHOWN, survey)
+      /* NB: temporary survey logic for beta
+             - first survey appears no earlier than one day after start; otherwise,
+             - surveys appear no earlier than twelve days after start
+      */
+      if ((survey) && ((first + offset) <= underscore.now())) {
+        survey.status = 'display'
+        survey.status_at = new Date().toISOString()
+        state = userModelState.setUserSurveyQueue(state, Immutable.fromJS(surveys))
 
-      return state
+        goAheadAndShowTheAd(state, windowId, survey.title, survey.description, survey.url, generateAdUUIDString(),
+                            notificationTypes.SURVEYS)
+        appActions.onUserModelLog(notificationTypes.SURVEY_SHOWN, survey)
+
+        return state
+      }
     }
   }
 
@@ -764,7 +774,6 @@ const serveSampleAd = (state, windowId) => {
   const catNames = priorData.names
   const indexOfCategory = (catNames.length * Math.random()) << 0
   const category = catNames[indexOfCategory]
-  console.log('category[' + indexOfCategory + ']=' + category)
 
   return serveAdFromCategory(state, windows.getActiveWindowId(), category)
 }
@@ -928,6 +937,12 @@ const uploadLogs = (state, stamp, retryIn, result) => {
     if (newState !== status) state = userModelState.setUserModelValue(state, 'status', status = newState)
     if (status === 'expired') appActions.onUserModelExpired()
   }
+  if (status === 'active') {
+    let first = result.getIn([ 'expirations', 'first_contact_ts' ])
+
+    first = (new Date(first)).getTime()
+    if (first) state = userModelState.setUserModelValue(state, 'firstContactTimestamp', first)
+  }
 
   if (stamp) {
     const data = events.filter(entry => entry.get('stamp') > stamp)
@@ -959,7 +974,7 @@ const downloadSurveys = (state, surveys) => {
   if (noop(state)) return state
 
   appActions.onUserModelLog('Surveys downloaded', surveys)
-  surveys = surveys.filter(survey => survey.get('status') === 'available')
+  surveys = surveys.sortBy(survey => survey.get('created_at')).filter(survey => survey.get('status') === 'available')
   appActions.onUserModelLog('Surveys available', surveys)
 
   return userModelState.setUserSurveyQueue(state, surveys)
