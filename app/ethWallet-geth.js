@@ -45,7 +45,7 @@ const configurePeers = async (dataDir) => {
 
     const enodes = newNodes.map(({name, port}, i) => `enode://${newNodesPublicKeys[i]}@${newNodesIps[i]}:${port}`)
 
-    await fs.writeFile(path.join(dataDir, 'static-nodes.json'), JSON.stringify(enodes))
+    await fs.writeFile(path.join(dataDir, 'geth', 'static-nodes.json'), JSON.stringify(enodes))
   } catch (e) {
     console.error('Failed to configure static nodes peers ' + e.message)
   }
