@@ -3612,100 +3612,113 @@ describe('ledger api unit tests', function () {
   })
 
   describe('deleteWallet', function () {
-    it('data is cleared', function () {
-      const state = defaultAppState
-        .setIn(['cache', 'ledgerVideos'], Immutable.fromJS({
-          'youtube_Ece3i74Wces': 'youtube#channel:radio1slovenia'
-        }))
-        .setIn(['settings', 'payments.enabled'], true)
-        .set('pageData', Immutable.fromJS({
-          info: {
-            'https://www.youtube.com/user/radio1slovenia/videos': {
-              faviconURL: 'https://s.ytimg.com/yts/img/favicon_32-vflOogEID.png',
-              key: 'https://www.youtube.com/user/radio1slovenia/videos',
-              protocol: 'https:',
-              publisher: 'youtube.com',
-              timestamp: 1526367684155,
-              url: 'https://www.youtube.com/user/radio1slovenia/videos'
-            }
-          },
-          last: {
-            closedTabValue: {
-              audible: false,
-              width: 2560,
-              active: true
-            },
-            info: '',
-            tabId: '7'
+    let deletePaymentsFilesSpy
+
+    const state = defaultAppState
+      .setIn(['cache', 'ledgerVideos'], Immutable.fromJS({
+        'youtube_Ece3i74Wces': 'youtube#channel:radio1slovenia'
+      }))
+      .setIn(['settings', 'payments.enabled'], true)
+      .set('pageData', Immutable.fromJS({
+        info: {
+          'https://www.youtube.com/user/radio1slovenia/videos': {
+            faviconURL: 'https://s.ytimg.com/yts/img/favicon_32-vflOogEID.png',
+            key: 'https://www.youtube.com/user/radio1slovenia/videos',
+            protocol: 'https:',
+            publisher: 'youtube.com',
+            timestamp: 1526367684155,
+            url: 'https://www.youtube.com/user/radio1slovenia/videos'
           }
-        }))
-        .set('ledger', Immutable.fromJS({
-          about: {
-            synopsis: [
-              {
-                daysSpent: 0,
-                duration: 166431,
-                exclude: false,
-                faviconURL: 'data:image/jpeg;base64',
-                hoursSpent: 0,
-                minutesSpent: 2,
-                percentage: 38,
-                pinPercentage: undefined,
-                providerName: 'YouTube',
-                publisherKey: 'youtube#channel:radio1slovenia',
-                publisherURL: 'https://www.youtube.com/user/radio1slovenia/videos',
-                score: 14.588460435541956,
-                secondsSpent: 46,
-                siteName: 'radio1slovenia on YouTube',
-                verified: false,
-                views: 2,
-                weight: 38.244594657485045
-              }
-            ],
-            synopsisOptions: {
-              _a: 7000,
-              _b: 1000,
-              scorekeeper: 'concave',
-              _d: 0.000033333333333333335
+        },
+        last: {
+          closedTabValue: {
+            audible: false,
+            width: 2560,
+            active: true
+          },
+          info: '',
+          tabId: '7'
+        }
+      }))
+      .set('ledger', Immutable.fromJS({
+        about: {
+          synopsis: [
+            {
+              daysSpent: 0,
+              duration: 166431,
+              exclude: false,
+              faviconURL: 'data:image/jpeg;base64',
+              hoursSpent: 0,
+              minutesSpent: 2,
+              percentage: 38,
+              pinPercentage: undefined,
+              providerName: 'YouTube',
+              publisherKey: 'youtube#channel:radio1slovenia',
+              publisherURL: 'https://www.youtube.com/user/radio1slovenia/videos',
+              score: 14.588460435541956,
+              secondsSpent: 46,
+              siteName: 'radio1slovenia on YouTube',
+              verified: false,
+              views: 2,
+              weight: 38.244594657485045
             }
+          ],
+          synopsisOptions: {
+            _a: 7000,
+            _b: 1000,
+            scorekeeper: 'concave',
+            _d: 0.000033333333333333335
+          }
+        },
+        info: {
+          balance: 0,
+          paymentId: 'ladasda'
+        },
+        locations: {
+          'https://www.youtube.com/user/radio1slovenia/videos': {
+            publisher: 'youtube.com'
+          }
+        },
+        synopsis: {
+          options: {
+            _a: 7000,
+            _b: 1000,
+            scorekeeper: 'concave',
+            _d: 0.000033333333333333335
           },
-          info: {
-            balance: 0,
-            paymentId: 'ladasda'
-          },
-          locations: {
-            'https://www.youtube.com/user/radio1slovenia/videos': {
-              publisher: 'youtube.com'
+          publishers: {
+            'youtube#channel:radio1slovenia': {
+              duration: 166431,
+              options: {
+                exclude: false
+              },
+              pinPercentage: 20,
+              scores: {
+                concave: 3.249426617127623,
+                visits: 2
+              },
+              views: 2,
+              weight: 20
             }
-          },
-          synopsis: {
-            options: {
-              _a: 7000,
-              _b: 1000,
-              scorekeeper: 'concave',
-              _d: 0.000033333333333333335
-            },
-            publishers: {
-              'youtube#channel:radio1slovenia': {
-                duration: 166431,
-                options: {
-                  exclude: false
-                },
-                pinPercentage: 20,
-                scores: {
-                  concave: 3.249426617127623,
-                  visits: 2
-                },
-                views: 2,
-                weight: 20
-              }
-            }
-          },
-          promotion: {}
-        }))
+          }
+        },
+        promotion: {}
+      }))
 
+    before(function () {
+      deletePaymentsFilesSpy = sinon.spy(ledgerApi, 'deletePaymentsFiles')
+    })
+
+    afterEach(function () {
+      deletePaymentsFilesSpy.reset()
+    })
+
+    after(function () {
+      deletePaymentsFilesSpy.restore()
+    })
+
+    it('data is cleared', function () {
       const result = ledgerApi.deleteWallet(state)
-
       const expectedState = state
         .set('ledger', Immutable.fromJS({
           about: {
@@ -3726,10 +3739,54 @@ describe('ledger api unit tests', function () {
         .setIn(['pageData', 'last', 'tabId'], null)
         .setIn(['pageData', 'last', 'closedTabValue'], null)
         .setIn(['settings', 'payments.enabled'], false)
+        .setIn(['updates', 'verifiedPublishersTimestamp'], null)
 
       assert.deepEqual(result.toJS(), expectedState.toJS())
       assert.equal(ledgerApi.getClient(), null)
       assert.equal(ledgerApi.getSynopsis(), null)
+    })
+
+    it('calls function to delete payments files', function () {
+      ledgerApi.deleteWallet(state)
+      assert(deletePaymentsFilesSpy.calledOnce)
+    })
+  })
+
+  describe('deletePaymentsFiles', function () {
+    let accessStub, unlinkStub
+    const statePath = 'ledger-state.json'
+    const publishersInfoPath = 'publisher-data.json'
+
+    before(function () {
+      unlinkStub = sinon.stub(fs, 'unlink', function (path, callback) {
+        callback(null)
+      })
+      accessStub = sinon.stub(fs, 'access', function (path, fOk, callback) {
+        fs.unlink(path, function (err) {
+          // Satisfies the linter
+          if (err) {
+            console.log('Something went wrong')
+          }
+        })
+      })
+    })
+
+    afterEach(function () {
+      accessStub.reset()
+      unlinkStub.reset()
+    })
+
+    after(function () {
+      accessStub.restore()
+      unlinkStub.restore()
+    })
+
+    it('accesses and deletes ledger state and publisher data files', function () {
+      ledgerApi.deletePaymentsFiles()
+      assert.equal(ledgerApi.pathName(statePath), accessStub.getCall(0).args[0])
+      assert.equal(ledgerApi.pathName(statePath), unlinkStub.getCall(0).args[0])
+      assert.equal(ledgerApi.pathName(publishersInfoPath), accessStub.getCall(1).args[0])
+      assert.equal(ledgerApi.pathName(publishersInfoPath), unlinkStub.getCall(1).args[0])
     })
   })
 
