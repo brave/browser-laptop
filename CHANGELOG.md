@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.23.79](https://github.com/brave/browser-laptop/releases/tag/v0.23.79dev)
+
+ - Fixed crash when tabs are discarded. ([#14955](https://github.com/brave/browser-laptop/issues/14955))
+ - Improved fingerprinting protection. ([#14889](https://github.com/brave/browser-laptop/issues/14889))
+ - Upgraded to muon 8.0.7. ([#14974](https://github.com/brave/browser-laptop/issues/14974))
+
 ## [0.23.77](https://github.com/brave/browser-laptop/releases/tag/v0.23.77dev)
 
  - Fixed local file reading security issue, credit to Vladimir Metnew. ([#14936](https://github.com/brave/browser-laptop/issues/14936))
