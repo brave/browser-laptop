@@ -294,6 +294,10 @@ ipcMain.on('eth-wallet-enable-metamask', (e) => {
   })
 })
 
+ipcMain.on('eth-wallet-get-keys-path', (e) => {
+  e.sender.send('eth-wallet-keys-path', path.join(gethDataDir, 'keystore'))
+})
+
 const launchGeth = async function () {
   await spawnGeth()
 }
