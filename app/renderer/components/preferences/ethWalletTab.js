@@ -82,6 +82,7 @@ class EthWalletTab extends ImmutableComponent {
               <li className={css(styles.disabledContent__list_item)}>Connect your ETH wallet to Metamask for easy DApp transfers</li>
               <li className={css(styles.disabledContent__list_item)}>Transfer ETH to your Brave Wallet for Brave Payments deposits</li>
             </ul>
+            <p className={css(styles.disabledContent__message__paragraph)}>ETH Wallet is meant for people who are already familiar with cryptocurrencies in general, and Ethereum in particular.</p>
           </div>
           <div className={css(styles.disabledContent__footer)}>
             <p className={css(styles.disabledContent__note)}>
@@ -312,6 +313,10 @@ const disabledContentStyles = StyleSheet.create({
   disabledContent__message__header: {
     fontSize: '18px',
     paddingBottom: '0.5em'
+  },
+
+  disabledContent__message__paragraph: {
+    marginTop: '1em'
   },
 
   disabledContent__footer: {
