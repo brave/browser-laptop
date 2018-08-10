@@ -8,6 +8,7 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
 const ethereumIcon = require('../../../../img/ethereum/ethereum-logo.svg')
 const metamaskIcon = require('../../../../img/ethereum/metamask-logo.svg')
+const appActions = require('../../../../js/actions/appActions')
 
 // Components
 const {SettingCheckbox} = require('../common/settings')
@@ -27,7 +28,7 @@ class EthWalletTab extends ImmutableComponent {
     super()
     this.reloadDelay = 3250
     this.reloadTimeout = null
-    this.state = { willReload: false }
+    this.state = { willRerender: false }
     this.onToggleEthWallet = this.onToggleEthWallet.bind(this)
   }
 
@@ -36,9 +37,12 @@ class EthWalletTab extends ImmutableComponent {
   }
 
   onToggleEthWallet () {
-    this.props.onChangeSetting(settings.ETHWALLET_ENABLED, !this.enabled)
+    const newSetting = !this.enabled
 
-    if (this.enabled) {
+    appActions.changeSetting(settings.ETHWALLET_ENABLED, newSetting)
+    this.props.onChangeSetting(settings.ETHWALLET_ENABLED, newSetting)
+
+    if (!newSetting) {
       return
     }
 
@@ -47,20 +51,20 @@ class EthWalletTab extends ImmutableComponent {
     }
 
     this.setState({
-      willReload: true
+      willRerender: true
     })
 
     // For a smoother transition and user notification
     this.reloadTimeout = setTimeout(() => {
       this.setState({
-        willReload: false
+        willRerender: false
       })
       this.forceUpdate()
     }, this.reloadDelay)
   }
 
   getIframeContent () {
-    if (this.state.willReload) {
+    if (this.state.willRerender) {
       return null
     }
 
@@ -149,7 +153,7 @@ class EthWalletTab extends ImmutableComponent {
                 ]}
               />
             </div>
-            {this.state.willReload
+            {this.state.willRerender
               ? <div className={css(gridStyles.row1col3)}>
                 <span className={css(styles.startupMsg)}>Starting Up ETH Wallet...</span>
               </div>
