@@ -92,7 +92,7 @@
     "@brave-intl/bat-usermodel": "^0.4.4",
     "aphrodite": "1.1.0",
     "async": "^2.0.1",
-    "bat-balance": "^1.0.7",
+    "bat-balance": "^1.1.0",
     "bat-client": "^4.0.1",
     "bat-publisher": "^2.0.23",
     "bignumber.js": "^4.0.4",
