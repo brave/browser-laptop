@@ -2944,11 +2944,13 @@ const getCaptcha = (state) => {
       return
     }
 
-    appActions.onCaptchaResponse(null, body)
+    if (response && response.headers && response.headers['captcha-hint']) {
+      appActions.onCaptchaResponse(null, body, response.headers['captcha-hint'])
+    }
   })
 }
 
-const onCaptchaResponse = (state, response, body) => {
+const onCaptchaResponse = (state, response, body, hint) => {
   if (body == null) {
     if (response && response.get('statusCode') === 429) {
       return ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_BLOCK)
@@ -2965,6 +2967,8 @@ const onCaptchaResponse = (state, response, body) => {
   if (currentStatus !== promotionStatuses.CAPTCHA_ERROR) {
     state = ledgerState.setPromotionProp(state, 'promotionStatus', promotionStatuses.CAPTCHA_CHECK)
   }
+
+  state = ledgerState.setPromotionProp(state, 'captchaHint', hint || '')
 
   return state
 }
