@@ -67,7 +67,7 @@ exports.updateUrl = function (updates, platform, arch) {
     return platformBaseUrl
   } else {
     if (platform.match(/^win32/)) {
-      var windowsUpdateUrlWithArch = updates.winBaseUrl.replace('CHANNEL', Channel.channel()) + platforms[platform]
+      const windowsUpdateUrlWithArch = updates.winBaseUrl.replace('CHANNEL', Channel.channel()) + platforms[platform]
       return windowsUpdateUrlWithArch
     } else {
       // Unsupport platform for automatic updates
@@ -176,7 +176,7 @@ var requestVersionInfo = (done, pingOnly) => {
   debug(queryString)
 
   request(queryString, (err, response, body) => {
-    var statusCode = response.statusCode
+    const statusCode = response.statusCode
     appActions.setUpdateLastCheck()
     if (pingOnly) {
       return

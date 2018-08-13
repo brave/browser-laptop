@@ -2,12 +2,12 @@
 <div id='error'></div>
 <script>
   // This should get blocked by adblock if it is on
-  var exampleSocket = new WebSocket("ws://ag.innovid.com/dv/sync?tid=2");
+  const exampleSocket = new WebSocket("ws://ag.innovid.com/dv/sync?tid=2");
   exampleSocket.onerror = (e) => {
     document.getElementById('error').innerText = 'error'
   }
   // This should be a valid connection
-  var ws = new WebSocket("wss://echo.websocket.org")
+  const ws = new WebSocket("wss://echo.websocket.org")
   ws.onopen = function() {
     document.getElementById('result').innerText = 'success'
   }

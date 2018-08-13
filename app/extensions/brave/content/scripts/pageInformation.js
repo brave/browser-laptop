@@ -13,17 +13,17 @@
     return
   }
 
-  var results = { timestamp: new Date().getTime(), protocol: document.location.protocol }
+  const results = { timestamp: new Date().getTime(), protocol: document.location.protocol }
 
-  var node = document.head.querySelector("link[rel='icon']")
+  const node = document.head.querySelector("link[rel='icon']")
   if (!node) node = document.head.querySelector("link[rel='shortcut icon']")
   if (node) results.faviconURL = node.getAttribute('href')
 
-  var location = document.location.href
+  const location = document.location.href
   // called from ledger.js with variable LEDGER_PUBLISHER_RESPONSE
   chrome.ipcRenderer.once('ledger-publisher-response-' + location, () => {
     if (results.faviconURL) {
-      var prefix = (results.faviconURL.indexOf('//') === 0) ? document.location.protocol
+      const prefix = (results.faviconURL.indexOf('//') === 0) ? document.location.protocol
                    : (results.faviconURL.indexOf('/') === 0) ? document.location.protocol + '//' + document.location.host
                    : (results.faviconURL.indexOf(':') === -1) ? document.location.protocol + '//' + document.location.host + '/'
                    : null

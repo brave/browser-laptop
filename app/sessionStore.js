@@ -1000,7 +1000,7 @@ module.exports.runPostMigrations = (immutableData) => {
 module.exports.runImportDefaultSettings = (data) => {
   // import default site settings list
   if (!data.defaultSiteSettingsListImported) {
-    for (var i = 0; i < defaultSiteSettingsList.length; ++i) {
+    for (let i = 0; i < defaultSiteSettingsList.length; ++i) {
       let setting = defaultSiteSettingsList[i]
       if (!data.siteSettings[setting.pattern]) {
         data.siteSettings[setting.pattern] = {}

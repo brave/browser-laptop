@@ -53,11 +53,11 @@ module.exports.getBaseDomain = function (hostname) {
   }
 
   // search through PSL
-  var prevDomains = []
-  var curDomain = hostname
-  var nextDot = curDomain.indexOf('.')
-  var tld = 0
-  var suffix
+  const prevDomains = []
+  let curDomain = hostname
+  let nextDot = curDomain.indexOf('.')
+  let tld = 0
+  let suffix
 
   while (true) {
     suffix = publicSuffixes[curDomain]

@@ -4,14 +4,14 @@
 function init() {
   // WebRTC from https://github.com/diafygi/webrtc-ips
   try {
-      var RTCPeerConnection = window.webkitRTCPeerConnection;
+      const RTCPeerConnection = window.webkitRTCPeerConnection;
       //minimal requirements for data connection
-      var mediaConstraints = {
+      const mediaConstraints = {
           optional: [{RtpDataChannels: true}]
       };
-      var servers = {iceServers: [{urls: "stun:stun.services.mozilla.com"}]};
+      const servers = {iceServers: [{urls: "stun:stun.services.mozilla.com"}]};
       //construct a new RTCPeerConnection
-      var pc = new RTCPeerConnection(servers, mediaConstraints);
+      const pc = new RTCPeerConnection(servers, mediaConstraints);
       //listen for candidate events
       pc.onicecandidate = function(ice){
       };
@@ -26,11 +26,12 @@ function init() {
 
   // Canvas
   try {
-      var canvas = document.createElement("canvas");
+      const canvas = document.createElement("canvas");
       canvas.width = 2000;
       canvas.height = 200;
       canvas.style.display = "inline";
-      var ctx = canvas.getContext("2d");
+
+      const ctx = canvas.getContext("2d");
       ctx.rect(0, 0, 10, 10);
       ctx.rect(2, 2, 6, 6);
       canvas.toDataURL()
@@ -38,8 +39,8 @@ function init() {
 
   // WebGL
   try {
-      var canvas = document.createElement("canvas");
-      var gl = canvas.getContext("webgl")
+      const canvas = document.createElement("canvas");
+      const gl = canvas.getContext("webgl")
       gl.getSupportedExtensions()
   } catch (e) {}
 }

@@ -1,13 +1,13 @@
-var baseHref = 'http://localhost:8080' // + process.env.npm_package_config_port
-var appEntry = baseHref + '/gen/app.entry.js'
+const baseHref = 'http://localhost:8080' // + process.env.npm_package_config_port
+const appEntry = baseHref + '/gen/app.entry.js'
 
-var baseNode = document.createElement('base')
+const baseNode = document.createElement('base')
 baseNode.href = baseHref
 document.getElementsByTagName('head')[0].appendChild(baseNode)
 
 const createScript = function (scriptPath) {
   return new Promise(function (resolve, reject) {
-    var script = document.createElement('script')
+    const script = document.createElement('script')
     script.type = 'text/javascript'
     script.src = scriptPath
     script.async = true

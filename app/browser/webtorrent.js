@@ -10,7 +10,7 @@ const urlParse = require('../common/urlParse')
 const DEBUG_IPC = false
 if (DEBUG_IPC) console.log('WebTorrent IPC debugging enabled')
 
-var VIEWER_URL = appUrlUtil.getTorrentExtUrl('webtorrent.html')
+const VIEWER_URL = appUrlUtil.getTorrentExtUrl('webtorrent.html')
 
 function getViewerURL (torrentUrl) {
   return VIEWER_URL + '#' + encodeURIComponent(torrentUrl)
@@ -101,9 +101,9 @@ function setupFiltering () {
  * @return {boolean} True if the resource is a torrent file.
  */
 function isTorrentFile (details) {
-  var header = getHeader(details.responseHeaders, 'content-type')
+  const header = getHeader(details.responseHeaders, 'content-type')
   if (header) {
-    var headerValue = header.toLowerCase().split(';', 1)[0].trim()
+    const headerValue = header.toLowerCase().split(';', 1)[0].trim()
     if (headerValue === 'application/x-bittorrent') {
       return true
     }
@@ -111,8 +111,7 @@ function isTorrentFile (details) {
       if (details.url.toLowerCase().indexOf('.torrent') > 0) {
         return true
       }
-      var cdHeader =
-        getHeader(details.responseHeaders, 'content-disposition')
+      const cdHeader = getHeader(details.responseHeaders, 'content-disposition')
       if (cdHeader && /\.torrent(["']|$)/i.test(cdHeader)) {
         return true
       }
@@ -135,8 +134,8 @@ function isMagnetURL (details) {
 }
 
 function getHeader (headers, headerName) {
-  var headerNames = Object.keys(headers)
-  for (var i = 0; i < headerNames.length; ++i) {
+  const headerNames = Object.keys(headers)
+  for (let i = 0; i < headerNames.length; ++i) {
     if (headerNames[i].toLowerCase() === headerName) {
       return headers[headerNames[i]][0]
     }

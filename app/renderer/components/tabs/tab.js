@@ -189,7 +189,7 @@ class Tab extends React.Component {
     if (this.elementRef && !this.props.isActive) {
       // only update position once per render frame
       if (!this.nextFrameSetTabMouseX) {
-        var x = e.pageX - this.tabOffsetLeft
+        const x = e.pageX - this.tabOffsetLeft
         this.nextFrameSetTabMouseX = window.requestAnimationFrame(() => {
           this.nextFrameSetTabMouseX = null
           this.elementRef.style.setProperty('--tab-mouse-x', `${x}px`)

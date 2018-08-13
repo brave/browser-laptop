@@ -50,10 +50,10 @@ class LedgerTable extends ImmutableComponent {
   }
 
   getFormattedTime (synopsis) {
-    var d = synopsis.get('daysSpent')
-    var h = synopsis.get('hoursSpent')
-    var m = synopsis.get('minutesSpent')
-    var s = synopsis.get('secondsSpent')
+    let d = synopsis.get('daysSpent')
+    let h = synopsis.get('hoursSpent')
+    let m = synopsis.get('minutesSpent')
+    let s = synopsis.get('secondsSpent')
     if (d << 0 > 364) {
       return '>1y'
     }

@@ -31,7 +31,7 @@ const handleUncaughtError = (stack, message) => {
   }
 }
 process.on('uncaughtException', function (error) {
-  var message, ref, stack
+  let message, ref, stack
   if (typeof error === 'string') {
     stack = error
   } else {
@@ -271,7 +271,7 @@ app.on('ready', () => {
     // DO NOT TO THIS LIST
     // using ipcMain.on is deprecated and should be replaced by actions/reducers
     ipcMain.on(messages.PREFS_RESTART, (e, config, value) => {
-      var message = locale.translation('prefsRestart')
+      const message = locale.translation('prefsRestart')
       if (prefsRestartLastValue[config] !== undefined && prefsRestartLastValue[config] !== value) {
         delete prefsRestartLastValue[config]
         appActions.hideNotification(message)

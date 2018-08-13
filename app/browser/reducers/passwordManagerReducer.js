@@ -29,7 +29,7 @@ const savePassword = (username, origin, tabId) => {
     return
   }
 
-  var message = username
+  const message = username
     ? locale.translation('notificationPasswordWithUserName').replace(/{{\s*username\s*}}/, username).replace(/{{\s*origin\s*}}/, origin)
     : locale.translation('notificationPassword').replace(/{{\s*origin\s*}}/, origin)
 
@@ -80,7 +80,7 @@ const updatePassword = (username, origin, tabId) => {
     return
   }
 
-  var message = username
+  const message = username
     ? locale.translation('notificationUpdatePasswordWithUserName').replace(/{{\s*username\s*}}/, username).replace(/{{\s*origin\s*}}/, origin)
     : locale.translation('notificationUpdatePassword').replace(/{{\s*origin\s*}}/, origin)
 

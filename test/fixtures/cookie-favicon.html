@@ -6,11 +6,11 @@
 <iframe id='test-frame' height=200 width=500></iframe>
 
 <script>
-var host = window.location.origin
+const host = window.location.origin
 
 function loadIco() {
-  var faviconLocation = host.replace('127.0.0.1', 'localhost') + '/cookie-favicon.ico'
-  var link = document.createElement('link')
+  const faviconLocation = host.replace('127.0.0.1', 'localhost') + '/cookie-favicon.ico'
+  const link = document.createElement('link')
   link.rel = 'shortcut icon'
   link.href = faviconLocation
   document.head.appendChild(link);
@@ -18,8 +18,8 @@ function loadIco() {
 
 
 function loadFrame() {
-  var testPageLocation = host.replace('127.0.0.1', 'localhost') + '/cookie-favicon-test.html'
-  var frame = document.getElementById('test-frame')
+  const testPageLocation = host.replace('127.0.0.1', 'localhost') + '/cookie-favicon-test.html'
+  const frame = document.getElementById('test-frame')
   frame.onload = loadIco
   frame.src = testPageLocation
 }

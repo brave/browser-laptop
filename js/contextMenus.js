@@ -906,7 +906,7 @@ const copyEmailAddressMenuItem = (location) => {
 }
 
 const searchSelectionMenuItem = (location) => {
-  var searchText = textUtils.ellipse(location)
+  const searchText = textUtils.ellipse(location)
   return {
     label: locale.translation('openSearch').replace(/{{\s*selectedVariable\s*}}/, searchText),
     click: (item) => {

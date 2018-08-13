@@ -17,7 +17,7 @@ const closeButton = require('../../../../img/toolbar/stoploading_btn.svg')
  */
 
 var globalInstanceCounter = 0
-var mountedInstances = []
+let mountedInstances = []
 
 class ModalOverlay extends ImmutableComponent {
   componentWillMount () {
@@ -49,9 +49,9 @@ class ModalOverlay extends ImmutableComponent {
   }
 
   get dialogContent () {
-    var close = null
-    var title = null
-    var subTitle = null
+    let close = null
+    let title = null
+    let subTitle = null
 
     const customDialogClassesStr = this.props.customDialogClasses ? this.props.customDialogClasses : ''
     const customDialogHeaderClassesStr = this.props.customDialogHeaderClasses ? this.props.customDialogHeaderClasses : ''

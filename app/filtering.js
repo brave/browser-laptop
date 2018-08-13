@@ -667,7 +667,7 @@ function updateDownloadState (win, downloadId, item, state) {
 }
 
 function registerForDownloadListener (session) {
-  var repaint = false
+  let repaint = false
   session.on('default-download-directory-changed', (e, newPath) => {
     if (newPath !== getSetting(settings.DOWNLOAD_DEFAULT_PATH)) {
       appActions.changeSetting(settings.DOWNLOAD_DEFAULT_PATH, newPath)

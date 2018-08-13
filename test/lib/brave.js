@@ -1,6 +1,6 @@
 /* globals devTools */
-var Application = require('spectron').Application
-var chai = require('chai')
+const Application = require('spectron').Application
+const chai = require('chai')
 const Immutable = require('immutable')
 const {activeWebview, navigator, titleBar, urlInput} = require('./selectors')
 require('./coMocha')
@@ -12,7 +12,7 @@ const os = require('os')
 const crypto = require('brave-crypto')
 const {getTargetAboutUrl, isSourceAboutUrl, getBraveExtIndexHTML} = require('../../js/lib/appUrlUtil')
 
-var chaiAsPromised = require('chai-as-promised')
+const chaiAsPromised = require('chai-as-promised')
 chai.should()
 chai.use(chaiAsPromised)
 
@@ -31,15 +31,16 @@ const generateUserDataDir = () => {
 }
 
 const rmDir = (dirPath) => {
+  let files
   try {
-    var files = fs.readdirSync(dirPath)
+    files = fs.readdirSync(dirPath)
   } catch (e) {
     console.error(e)
     return
   }
   if (files.length > 0) {
-    for (var i = 0; i < files.length; i++) {
-      var filePath = path.join(dirPath, files[i])
+    for (let i = 0; i < files.length; i++) {
+      const filePath = path.join(dirPath, files[i])
       try {
         if (fs.statSync(filePath).isFile()) {
           fs.unlinkSync(filePath)
@@ -85,12 +86,12 @@ const executeType = (current, next) => {
   return current
 }
 
-var promiseMapSeries = function (array, iterator) {
-  var length = array.length
-  var current = Promise.resolve()
-  var results = new Array(length)
+const promiseMapSeries = function (array, iterator) {
+  const length = array.length
+  let current = Promise.resolve()
+  let results = new Array(length)
 
-  for (var i = 0; i < length; ++i) {
+  for (let i = 0; i < length; ++i) {
     current = results[i] = current.then(function (i) {
       return iterator(array[i])
     }.bind(undefined, i))
@@ -99,7 +100,7 @@ var promiseMapSeries = function (array, iterator) {
 }
 
 let userDataDir = generateUserDataDir()
-var exports = {
+const exports = {
   keys: {
     COMMAND: '\ue03d',
     CONTROL: '\ue009',
@@ -237,7 +238,7 @@ var exports = {
       }, message, ...param)
     })
 
-    var windowOrig = this.app.client.window
+    const windowOrig = this.app.client.window
     Object.getPrototypeOf(this.app.client).window = function (handle) {
       if (!initialized.includes(handle)) {
         initialized.push(handle)
@@ -249,7 +250,7 @@ var exports = {
       }
     }
 
-    var windowHandlesOrig = this.app.client.windowHandles
+    const windowHandlesOrig = this.app.client.windowHandles
     Object.getPrototypeOf(this.app.client).windowHandles = function () {
       return windowHandlesOrig.apply(this)
         .then(function (response) {
@@ -260,8 +261,8 @@ var exports = {
               return ''
             })
           }).then((urls) => {
-            var newHandles = []
-            for (var i = 0; i < urls.length; i++) {
+            const newHandles = []
+            for (let i = 0; i < urls.length; i++) {
               // ignore extension urls unless they are "about" pages
               // if (!(urls[i].startsWith('chrome-extension') && !urls[i].match(/about-.*\.html$/))) {
               if (urls[i].startsWith(exports.browserWindowUrl)) {
@@ -285,8 +286,8 @@ var exports = {
               return ''
             })
           }).then((urls) => {
-            var newHandles = []
-            for (var i = 0; i < urls.length; i++) {
+            const newHandles = []
+            for (let i = 0; i < urls.length; i++) {
               // ignore extension urls unless they are "about" pages
               if (!(urls[i].startsWith('chrome-extension') && !urls[i].match(/about-.*\.html(#.*)?$/)) &&
                   // ignore window urls
@@ -991,7 +992,7 @@ var exports = {
 
     this.app.client.addCommand('windowByUrl', function (url) {
       logVerbose('windowByUrl("' + url + '")')
-      var context = this
+      const context = this
       return this.windowHandles().then((response) => response.value).then(function (handles) {
         return promiseMapSeries(handles, function (handle) {
           return context.window(handle).getUrl()
@@ -1029,8 +1030,8 @@ var exports = {
       return this.execute(function (frameKey, eventName, ...params) {
         const webview = document.querySelector('webview[data-frame-key="' + frameKey + '"]')
         // Get the internal view instance ID from the selected webview
-        var v8Util = process.atomBinding('v8_util')
-        var internal = v8Util.getHiddenValue(webview, 'internal')
+        const v8Util = process.atomBinding('v8_util')
+        const internal = v8Util.getHiddenValue(webview, 'internal')
 
         // This allows you to send more args than just the event itself like would only
         // be possible with dispatchEvent.

@@ -1,22 +1,22 @@
 module.exports = rimraf
 rimraf.sync = rimrafSync
 
-var assert = require("assert")
-var path = require("path")
-var fs = require("fs")
+const assert = require("assert")
+const path = require("path")
+const fs = require("fs")
 
-var defaultGlobOpts = {
+const defaultGlobOpts = {
   nosort: true,
   silent: true
 }
 
 // for EMFILE handling
-var timeout = 0
+let timeout = 0
 
-var isWindows = (process.platform === "win32")
+const isWindows = (process.platform === "win32")
 
 function defaults (options) {
-  var methods = [
+  const methods = [
     'unlink',
     'chmod',
     'stat',
@@ -53,9 +53,9 @@ function rimraf (p, options, cb) {
 
   defaults(options)
 
-  var busyTries = 0
-  var errState = null
-  var n = 0
+  let busyTries = 0
+  let errState = null
+  let n = 0
 
   if (options.disableGlob || !glob.hasMagic(p))
     return afterGlob(null, [p])
@@ -266,7 +266,7 @@ function rimrafSync (p, options) {
   assert(options, 'rimraf: missing options')
   assert.equal(typeof options, 'object', 'rimraf: options should be object')
 
-  var results
+  let results
 
   if (options.disableGlob || !glob.hasMagic(p)) {
     results = [p]
@@ -282,8 +282,8 @@ function rimrafSync (p, options) {
   if (!results.length)
     return
 
-  for (var i = 0; i < results.length; i++) {
-    var p = results[i]
+  for (let i = 0; i < results.length; i++) {
+    let p = results[i]
 
     try {
       var st = options.lstatSync(p)

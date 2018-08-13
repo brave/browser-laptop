@@ -32,7 +32,7 @@ module.exports.serialize = (action) => {
  */
 module.exports.deserialize = (action) => {
   let payload = JSON.parse(action)
-  for (var i = 0; i < payload.length; i++) {
+  for (let i = 0; i < payload.length; i++) {
     payload[i] = deserializeAction(payload[i])
   }
   return payload

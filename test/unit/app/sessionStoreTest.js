@@ -1428,7 +1428,7 @@ describe('sessionStore unit tests', function () {
     })
     it('import to default app state', function () {
       const result = sessionStore.runImportDefaultSettings(defaultAppState)
-      for (var i = 0; i < defaultSiteSettingsList.length; ++i) {
+      for (let i = 0; i < defaultSiteSettingsList.length; ++i) {
         assert.equal(result.siteSettings.hasOwnProperty(defaultSiteSettingsList[i].pattern), true)
         const setting = result.siteSettings[defaultSiteSettingsList[i].pattern]
         assert.equal(setting[defaultSiteSettingsList[i].name], defaultSiteSettingsList[i].value)
@@ -1444,7 +1444,7 @@ describe('sessionStore unit tests', function () {
         conflictedSetting[defaultSiteSettingsList[0].name] = 'BRAVE'
         sameSetting[defaultSiteSettingsList[1].name] = defaultSiteSettingsList[1].value
         const result = sessionStore.runImportDefaultSettings(conflictedAppstate)
-        for (var i = 1; i < defaultSiteSettingsList.length; ++i) {
+        for (let i = 1; i < defaultSiteSettingsList.length; ++i) {
           assert.equal(result.siteSettings.hasOwnProperty(defaultSiteSettingsList[i].pattern), true)
           const setting = result.siteSettings[defaultSiteSettingsList[i].pattern]
           assert.equal(setting[defaultSiteSettingsList[i].name], defaultSiteSettingsList[i].value)

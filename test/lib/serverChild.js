@@ -1,9 +1,9 @@
-var http = require('http')
-var emptyPort = require('empty-port')
-var nodeStatic = require('node-static')
+const http = require('http')
+const emptyPort = require('empty-port')
+const nodeStatic = require('node-static')
 
-var url = require('url')
-var EventEmitter = require('events').EventEmitter
+const url = require('url')
+const EventEmitter = require('events').EventEmitter
 
 /**
  * Patch node-static to allow passing headers. Based on .serve()
@@ -12,9 +12,9 @@ var EventEmitter = require('events').EventEmitter
 nodeStatic.Server.prototype.serveWithHeaders = function (req, res, headers, callback) {
   var that = this
   var promise = new EventEmitter()
-  var pathname
+  let pathname
 
-  var finish = function (status, headers) {
+  const finish = function (status, headers) {
     that.finish(status, headers, req, res, promise, callback)
   }
 
@@ -97,7 +97,7 @@ Server.prototype = {
     this.http = http.createServer(function (req, res) {
       req.addListener('end', function () {
         // Handle corked urls.
-        var fullUrl = 'http://' + req.headers.host + req.url
+        const fullUrl = 'http://' + req.headers.host + req.url
         if (server.chunkedUrls[fullUrl]) {
           res.setHeader('Content-Type', 'text/html; charset=UTF-8')
           res.setHeader('Transfer-Encoding', 'chunked')

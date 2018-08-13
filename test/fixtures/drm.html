@@ -6,39 +6,39 @@
 
 // Based on DRM detection code from https://github.com/google/shaka-player
 function probeSupport() {
-  var tests = [];
-  var testKeySystems = [
+  const tests = [];
+  const testKeySystems = [
     'org.w3.clearkey',
     'com.widevine.alpha',
   ];
 
-  var basicVideoCapabilities = [
+  const basicVideoCapabilities = [
     { contentType: 'video/mp4; codecs="avc1.42E01E"' },
     { contentType: 'video/webm; codecs="vp9"' }
   ];
 
-  var basicConfig = {
+  const basicConfig = {
     videoCapabilities: basicVideoCapabilities
   };
-  var offlineConfig = {
+  const offlineConfig = {
     videoCapabilities: basicVideoCapabilities,
     persistentState: 'required',
     sessionTypes: ['persistent-license']
   };
 
   // Try the offline config first, then fall back to the basic config.
-  var configs = [offlineConfig, basicConfig];
+  const configs = [offlineConfig, basicConfig];
 
-  var support = {};
+  let support = {};
   testKeySystems.forEach(function(keySystem) {
-    var p = navigator.requestMediaKeySystemAccess(keySystem, configs)
+    const p = navigator.requestMediaKeySystemAccess(keySystem, configs)
         .then(function(access) {
           // We can't (yet) trust every browser to report the session types they
           // support in access.getConfiguration().  Therefore, we create a
           // MediaKeys object and try to create an offline session.
           // https://goo.gl/gtYT3z, https://goo.gl/rvnB1g, https://goo.gl/z0URJ0
-          var mediaKeys = access.createMediaKeys();
-          var persistentState = false;
+          const mediaKeys = access.createMediaKeys();
+          let persistentState = false;
           try {
             // This will throw if persistent licenses are not supported.
             mediaKeys.createSession('persistent-license');
@@ -62,7 +62,7 @@ function getWidevineCdmInfo() {
     return "Widevine CDM plugin not loaded.";
   }
 
-  var plugin = navigator.plugins['Widevine Content Decryption Module'];
+  const plugin = navigator.plugins['Widevine Content Decryption Module'];
   return "Widevine CDM plugin:\n" + JSON.stringify({
     "name": plugin.name,
     "filename": plugin.filename,
@@ -71,7 +71,7 @@ function getWidevineCdmInfo() {
 }
 
 function printSupport(support) {
-  var output = document.getElementById('output');
+  const output = document.getElementById('output');
   output.textContent = getWidevineCdmInfo() + "\n\nDRM Support:\n" + support;
 }
 
@@ -84,7 +84,7 @@ function doTest() {
 // Send a message to the browser process.
 function sendMessage() {
   // Create the request object.
-  var request = {};
+  let request = {};
   request.widevine_cdm_path =
       document.getElementById("widevine_cdm_path").value;
 

@@ -8,7 +8,7 @@ const {LANGUAGE, REQUEST_LANGUAGE} = require('./constants/messages')
 
 // rendererTranslationCache stores a hash containing the entire set of menu translations
 // for the currently selected language
-var rendererTranslationCache = {}
+let rendererTranslationCache = {}
 
 // As for a translation for the current language
 exports.translation = (token, replacements = {}) => {

@@ -12,7 +12,7 @@ if (chrome.contentSettings.adInsertion == 'allow') {
    * @param iframeData The known preprocessed iframeData for that node
    */
   function getAdSize (node, iframeData) {
-    var acceptableAdSizes = [
+    const acceptableAdSizes = [
       [970, 250],
       [970, 90],
       [728, 90],
@@ -22,8 +22,8 @@ if (chrome.contentSettings.adInsertion == 'allow') {
       [120, 600],
       [320, 50]
     ]
-    for (var i = 0; i < acceptableAdSizes.length; i++) {
-      var adSize = acceptableAdSizes[i]
+    for (let i = 0; i < acceptableAdSizes.length; i++) {
+      const adSize = acceptableAdSizes[i]
       if (node.offsetWidth === adSize[0] && node.offsetHeight >= adSize[1] ||
           node.offsetWidth >= adSize[0] && node.offsetHeight === adSize[1]) {
         return adSize
@@ -61,7 +61,7 @@ if (chrome.contentSettings.adInsertion == 'allow') {
       return
     }
 
-    var adSize = getAdSize(node, iframeData)
+    const adSize = getAdSize(node, iframeData)
     // Could not determine the ad size, so just skip this replacement
     if (!adSize.length) {
       // we have a replace node node but no replacement, so just display none on it
@@ -71,27 +71,27 @@ if (chrome.contentSettings.adInsertion == 'allow') {
 
     // generate a random segment
     // @todo - replace with renko targeting
-    var segments = ['IAB2', 'IAB17', 'IAB14', 'IAB21', 'IAB20']
+    const segments = ['IAB2', 'IAB17', 'IAB14', 'IAB21', 'IAB20']
     // TODO(riastradh): Can't use brave-crypto's random.uniform(n)
     // here because this is not node.  Use n*Math.random() because
     // this doesn't seem to be security-sensitive (if itis used at
     // all?).
-    var segment = segments[Math.floor(segments.length * Math.random())]
-    var time_in_segment = new Date().getSeconds()
-    var segment_expiration_time = 0 // no expiration
+    const segment = segments[Math.floor(segments.length * Math.random())]
+    const time_in_segment = new Date().getSeconds()
+    const segment_expiration_time = 0 // no expiration
 
     // ref param for referrer when possible
-    var srcUrl = replacementUrl +
+    const srcUrl = replacementUrl +
                   '?width=' + adSize[0] +
                   '&height=' + adSize[1] +
                   '&seg=' + segment + ':' + time_in_segment + ':' + segment_expiration_time
 
-    var xhttp = new window.XMLHttpRequest()
+    const xhttp = new window.XMLHttpRequest()
     xhttp.onreadystatechange = function () {
       if (xhttp.readyState === 4 && xhttp.status === 200) {
-        var src = '<html><body style="width: ' + adSize[0] + 'px; height: ' + adSize[1] +
+        const src = '<html><body style="width: ' + adSize[0] + 'px; height: ' + adSize[1] +
                             '; padding: 0; margin: 0; overflow: hidden;">' + xhttp.responseText + '</body></html>'
-        var sandbox = 'allow-popups allow-popups-to-escape-sandbox'
+        const sandbox = 'allow-popups allow-popups-to-escape-sandbox'
         if (node.tagName === 'IFRAME') {
           node.setAttribute('srcdoc', src)
           node.setAttribute('sandbox', sandbox)
@@ -99,7 +99,7 @@ if (chrome.contentSettings.adInsertion == 'allow') {
           while (node.firstChild) {
             node.removeChild(node.firstChild)
           }
-          var iframe = document.createElement('iframe')
+          const iframe = document.createElement('iframe')
           iframe.setAttribute('sandbox', sandbox)
           iframe.setAttribute('srcdoc', src)
           iframe.setAttribute('style',
@@ -120,13 +120,13 @@ if (chrome.contentSettings.adInsertion == 'allow') {
   }
 
   function setAdDivCandidates(adDivCandidates, placeholderUrl) {
-    var fallbackNodeDataForCommon = {}
+    let fallbackNodeDataForCommon = {}
 
     // Process all of the specific ad information for this page
     adDivCandidates.forEach(function (iframeData) {
-      var replaceId = iframeData.replapceId || iframeData.rid
-      var selector = '[id="' + replaceId + '"]'
-      var node = document.querySelector(selector)
+      const replaceId = iframeData.replapceId || iframeData.rid
+      const selector = '[id="' + replaceId + '"]'
+      const node = document.querySelector(selector)
       if (!node) {
         return
       }
@@ -143,13 +143,13 @@ if (chrome.contentSettings.adInsertion == 'allow') {
     })
 
     // Common selectors which could be on every page
-    var commonSelectors = [
+    const commonSelectors = [
       '[id^="google_ads_iframe_"][id$="__container__"]',
       '[id^="ad-slot-banner-"]',
       '[data-ad-slot]'
     ]
     commonSelectors.forEach((commonSelector) => {
-      var nodes = document.querySelectorAll(commonSelector)
+      const nodes = document.querySelectorAll(commonSelector)
       if (!nodes) {
         return
       }
@@ -159,7 +159,7 @@ if (chrome.contentSettings.adInsertion == 'allow') {
     })
   }
 
-  var host = document.location.hostname
+  let host = document.location.hostname
   if (host) {
     host = host.replace(/^www\./, '')
     chrome.ipcRenderer.on('set-ad-div-candidates', (e, divHost, adDivCandidates, placeholderUrl) => {

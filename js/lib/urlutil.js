@@ -314,24 +314,24 @@ const UrlUtil = {
    * @return {Array.<string>}
    */
   getHostnamePatterns: function (url) {
-    var host = urlParse(url).hostname
+    const host = urlParse(url).hostname
     if (!host) {
       return []
     }
-    var hostPatterns = [host]
-    var segmented = host.split('.')
+    const hostPatterns = [host]
+    const segmented = host.split('.')
 
     // Since targets can contain a single wildcard, replace each label of the
     // hostname with "*" in turn.
     segmented.forEach((label, index) => {
       // copy the original array
-      var tmp = segmented.slice()
+      const tmp = segmented.slice()
       tmp[index] = '*'
       hostPatterns.push(tmp.join('.'))
     })
     // Now eat away from the left with * so that for x.y.z.google.com we also
     // check *.z.google.com and *.google.com.
-    for (var i = 2; i <= segmented.length - 2; ++i) {
+    for (let i = 2; i <= segmented.length - 2; ++i) {
       hostPatterns.push('*.' + segmented.slice(i, segmented.length).join('.'))
     }
     return hostPatterns
@@ -394,7 +394,7 @@ const UrlUtil = {
       parsed.hostname = punycode.toASCII(parsed.hostname)
       return urlFormat(parsed)
     } catch (e) {
-      var splitUrl = url.split('@')
+      let splitUrl = url.split('@')
       splitUrl = splitUrl.map(str => punycode.toASCII(str))
       return splitUrl.join('@')
     }

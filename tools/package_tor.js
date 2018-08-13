@@ -16,7 +16,7 @@ const isDarwin = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
 
 const torS3Prefix = 'https://s3.us-east-2.amazonaws.com/demo-tor-binaries/'
-var torPath = process.argv.slice(2)[0] // npm run package-tor torPath
+let torPath = process.argv.slice(2)[0] // npm run package-tor torPath
 if (torPath === undefined) {
   torPath = path.join('app', 'extensions', 'bin')
 }
@@ -31,7 +31,7 @@ if (!fs.existsSync(torPath)) {
   fs.mkdirSync(torPath)
 }
 
-var sha512Tor
+let sha512Tor
 if (isDarwin) {
   sha512Tor = '1a578a544ba259a9de11a63ef24f867bb7efbf7df4cd45dd08b9fff775f3b7f39eacd699c25fab22d69d4bee25bc03e9977a5cc66416792281276d584c101a5f'
 } else if (isLinux) {

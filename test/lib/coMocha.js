@@ -1,3 +1,3 @@
-var mocha = require('mocha')
-var coMocha = require('co-mocha')
+const mocha = require('mocha')
+const coMocha = require('co-mocha')
 coMocha(mocha)

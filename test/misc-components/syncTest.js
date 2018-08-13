@@ -20,7 +20,7 @@ const PANEL_SEED = Immutable.fromJS(Array(32).fill(0))
 
 function toHex (byteArray) {
   let str = ''
-  for (var i = 0; i < byteArray.length; i++) {
+  for (let i = 0; i < byteArray.length; i++) {
     let char = byteArray[i].toString(16)
     if (char.length === 1) {
       char = '0' + char

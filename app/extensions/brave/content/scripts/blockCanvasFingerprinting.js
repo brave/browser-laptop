@@ -16,9 +16,9 @@ Error.stackTraceLimit = Infinity // collect all frames
  * @returns {*} Returns the stack trace
  */
 function getStackTrace (structured) {
-  var errObj = {}
-  var origFormatter
-  var stack
+  let errObj = {}
+  let origFormatter
+  let stack
 
   if (structured) {
     origFormatter = Error.prepareStackTrace
@@ -42,19 +42,19 @@ function getStackTrace (structured) {
  * @returns {String} The URL of the originating script (URL:Line number:Column number)
  */
 function getOriginatingScriptUrl () {
-  var trace = getStackTrace(true)
+  const trace = getStackTrace(true)
 
   if (trace.length < 3) {
     return ''
   }
 
   // this script is at 0 and 1
-  var callSite = trace[2]
+  const callSite = trace[2]
 
   if (callSite.isEval()) {
     // argh, getEvalOrigin returns a string ...
-    var eval_origin = callSite.getEvalOrigin()
-    var script_url_matches = eval_origin.match(/\((http.*:\d+:\d+)/)
+    const eval_origin = callSite.getEvalOrigin()
+    const script_url_matches = eval_origin.match(/\((http.*:\d+:\d+)/)
 
     return script_url_matches && script_url_matches[1] || eval_origin
   } else {
@@ -82,19 +82,19 @@ function stripLineAndColumnNumbers (script_url) {
 // chains of no-op operations like
 //    AnalyserNode.prototype.getFloatFrequencyData().bort.alsoBort,
 // even though AnalyserNode.prototype.getFloatFrequencyData has been replaced.
-var defaultFunc = function () {}
+const defaultFunc = function () {}
 
 // In order to avoid deeply borking things, we need to make sure we don't
 // prevent access to builtin object properties and functions (things
 // like (Object.prototype.constructor).  So, build a list of those below,
 // and then special case those in the allPurposeProxy object's traps.
-var funcPropNames = Object.getOwnPropertyNames(defaultFunc)
+const funcPropNames = Object.getOwnPropertyNames(defaultFunc)
 var unconfigurablePropNames = funcPropNames.filter(function (propName) {
-  var possiblePropDesc = Object.getOwnPropertyDescriptor(defaultFunc, propName)
+  const possiblePropDesc = Object.getOwnPropertyDescriptor(defaultFunc, propName)
   return (possiblePropDesc && !possiblePropDesc.configurable)
 })
 
-var valueOfCoercionFunc = function (hint) {
+const valueOfCoercionFunc = function (hint) {
   if (hint === 'string') {
     return ''
   }
@@ -104,7 +104,7 @@ var valueOfCoercionFunc = function (hint) {
   return undefined
 }
 
-var allPurposeProxy = new Proxy(defaultFunc, {
+const allPurposeProxy = new Proxy(defaultFunc, {
   get: function (target, property) {
 
     if (property === Symbol.toPrimitive) {
@@ -142,8 +142,8 @@ var allPurposeProxy = new Proxy(defaultFunc, {
 })
 
 function reportBlock (type) {
-  var script_url = getOriginatingScriptUrl() || window.location.href
-  var msg = {
+  const script_url = getOriginatingScriptUrl() || window.location.href
+  const msg = {
     type,
     scriptUrl: stripLineAndColumnNumbers(script_url)
   }
@@ -188,10 +188,10 @@ function blockWebRTC () {
 }
 
 if (chrome.contentSettings.canvasFingerprinting == 'block') {
-  var methods = []
-  var canvasMethods = ['getImageData', 'getLineDash', 'measureText', 'isPointInPath']
+  const methods = []
+  const canvasMethods = ['getImageData', 'getLineDash', 'measureText', 'isPointInPath']
   canvasMethods.forEach(function (method) {
-    var item = {
+    const item = {
       type: 'Canvas',
       objName: 'CanvasRenderingContext2D',
       propName: method
@@ -200,9 +200,9 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     methods.push(item)
   })
 
-  var canvasElementMethods = ['toDataURL', 'toBlob']
+  const canvasElementMethods = ['toDataURL', 'toBlob']
   canvasElementMethods.forEach(function (method) {
-    var item = {
+    const item = {
       type: 'Canvas',
       objName: 'HTMLCanvasElement',
       propName: method
@@ -210,11 +210,11 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     methods.push(item)
   })
 
-  var webglMethods = ['getSupportedExtensions', 'getParameter', 'getContextAttributes',
+  const webglMethods = ['getSupportedExtensions', 'getParameter', 'getContextAttributes',
     'getShaderPrecisionFormat', 'getExtension', 'readPixels', 'getUniformLocation',
     'getAttribLocation']
   webglMethods.forEach(function (method) {
-    var item = {
+    const item = {
       type: 'WebGL',
       objName: 'WebGLRenderingContext',
       propName: method
@@ -223,9 +223,9 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     methods.push(Object.assign({}, item, {objName: 'WebGL2RenderingContext'}))
   })
 
-  var audioBufferMethods = ['copyFromChannel', 'getChannelData']
+  const audioBufferMethods = ['copyFromChannel', 'getChannelData']
   audioBufferMethods.forEach(function (method) {
-    var item = {
+    const item = {
       type: 'AudioContext',
       objName: 'AudioBuffer',
       propName: method
@@ -233,10 +233,10 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     methods.push(item)
   })
 
-  var analyserMethods = ['getFloatFrequencyData', 'getByteFrequencyData',
+  const analyserMethods = ['getFloatFrequencyData', 'getByteFrequencyData',
     'getFloatTimeDomainData', 'getByteTimeDomainData']
   analyserMethods.forEach(function (method) {
-    var item = {
+    const item = {
       type: 'AudioContext',
       objName: 'AnalyserNode',
       propName: method
@@ -244,9 +244,9 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     methods.push(item)
   })
 
-  var svgPathMethods = ['getTotalLength']
+  const svgPathMethods = ['getTotalLength']
   svgPathMethods.forEach(function (method) {
-    var item = {
+    const item = {
       type: 'SVG',
       objName: 'SVGPathElement',
       propName: method
@@ -254,9 +254,9 @@ if (chrome.contentSettings.canvasFingerprinting == 'block') {
     methods.push(item)
   })
 
-  var svgTextContentMethods = ['getComputedTextLength']
+  const svgTextContentMethods = ['getComputedTextLength']
   svgTextContentMethods.forEach(function (method) {
-    var item = {
+    const item = {
       type: 'SVG',
       objName: 'SVGTextContentElement',
       propName: method

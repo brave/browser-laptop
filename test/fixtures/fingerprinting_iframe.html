@@ -11,14 +11,14 @@ fingerprinting test
 
 <script>
  // WebRTC from https://github.com/diafygi/webrtc-ips
-  var RTCPeerConnection = window.webkitRTCPeerConnection;
+  const RTCPeerConnection = window.webkitRTCPeerConnection;
   //minimal requirements for data connection
-  var mediaConstraints = {
+  const mediaConstraints = {
       optional: [{RtpDataChannels: true}]
   };
-  var servers = {iceServers: [{urls: "stun:stun.services.mozilla.com"}]};
+  const servers = {iceServers: [{urls: "stun:stun.services.mozilla.com"}]};
   //construct a new RTCPeerConnection
-  var pc = new RTCPeerConnection(servers, mediaConstraints);
+  const pc = new RTCPeerConnection(servers, mediaConstraints);
   //listen for candidate events
   pc.onicecandidate = function(ice){
       //skip non-candidate events
@@ -35,17 +35,17 @@ fingerprinting test
   }, function(){});
 
   // Canvas
-      var canvas = document.createElement("canvas");
+      let canvas = document.createElement("canvas");
       canvas.width = 2000;
       canvas.height = 200;
       canvas.style.display = "inline";
-      var ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d");
       ctx.rect(0, 0, 10, 10);
       ctx.rect(2, 2, 6, 6);
       document.getElementById('canvas').innerText = canvas.toDataURL() ? 'got canvas fingerprint ' + canvas.toDataURL() : ''
 // WebGL
 canvas = document.createElement("canvas");
-var gl = canvas.getContext("webgl")
+const gl = canvas.getContext("webgl")
 gl.clearColor(0.0, 0.0, 0.0, 1.0);
 if (gl.getSupportedExtensions()) {
   document.getElementById('gl').innerText = 'got webgl fingerprint ' + gl.getSupportedExtensions().join(";") + gl.getParameter(gl.ALPHA_BITS);

@@ -20,16 +20,16 @@ function toHexString (byteArray) {
 }
 
 function toByteArray (str) {
-  var bytes = []
-  for (var i = 0; i < str.length; ++i) {
+  const bytes = []
+  for (let i = 0; i < str.length; ++i) {
     bytes.push(str.charCodeAt(i))
   }
   return bytes
 }
 
 function seperateHex (hexStr) {
-  var result = []
-  for (var i = 0; i < hexStr.length; ++i) {
+  let result = []
+  for (let i = 0; i < hexStr.length; ++i) {
     result += hexStr[i]
     if (i % 2 && i !== hexStr.length - 1) {
       result += ':'
@@ -53,12 +53,12 @@ class CertErrorPage extends React.Component {
     }
 
     ipc.on(messages.SET_CERT_ERROR_DETAIL, (e, detail) => {
-      var validStart = new Date()
-      var validExpiry = new Date()
+      const validStart = new Date()
+      const validExpiry = new Date()
       validStart.setTime(detail.validStart * 1000)
       validExpiry.setTime(detail.validExpiry * 1000)
-      var fingerprint = detail.fingerprint.split('/')
-      var algorithm = fingerprint.shift()
+      const fingerprint = detail.fingerprint.split('/')
+      const algorithm = fingerprint.shift()
       this.setState({
         certDetail: true,
         certIssuerName: detail.issuerName,

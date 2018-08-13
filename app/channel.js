@@ -9,8 +9,8 @@ const config = require('../js/constants/buildConfig')
 
 // The current channel is retrieved first from the buildConfig constants file,
 // then the environments and finally defaults to dev
-var channel = config.channel || process.env.CHANNEL || ''
-let channels = new Set(['dev', 'beta', 'stable', 'developer', 'nightly', ''])
+const channel = config.channel || process.env.CHANNEL || ''
+const channels = new Set(['dev', 'beta', 'stable', 'developer', 'nightly', ''])
 
 if (!channels.has(channel)) {
   throw new Error(`Invalid channel ${channel}`)

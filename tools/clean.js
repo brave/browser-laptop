@@ -49,7 +49,7 @@ module.exports.all = () => {
   module.exports.app()
 }
 
-var cmd = process.argv[2]
+const cmd = process.argv[2]
 if (cmd) {
   module.exports[cmd]()
 } else {

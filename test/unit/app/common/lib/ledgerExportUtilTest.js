@@ -377,7 +377,7 @@ function cloneTransactionWithNewViewingId (tx) {
 }
 
 function checkColumnCountsForRows (rows) {
-  for (var rowIdx = 0; rowIdx < rows.length; rowIdx++) {
+  for (let rowIdx = 0; rowIdx < rows.length; rowIdx++) {
     let row = rows[rowIdx]
     assert(!!row, `expected row ${rowIdx} to exist`)
 
@@ -397,11 +397,11 @@ function checkHeaderRowPrefixForRows (rows) {
 function checkColumnDatatypesForRows (rows) {
   let COLUMN_LABELS = CSV_HEADER_ROW_PREFIX_COLUMNS.concat(['FIAT'])
   // start at rowIdx = 1 to SKIP the header row
-  for (var rowIdx = 1; rowIdx < rows.length; rowIdx++) {
+  for (let rowIdx = 1; rowIdx < rows.length; rowIdx++) {
     let row = rows[rowIdx]
     assert(!!row, `expected row ${rowIdx} to exist`)
     let cols = row.split(',')
-    for (var colIdx = 0; colIdx < cols.length; colIdx++) {
+    for (let colIdx = 0; colIdx < cols.length; colIdx++) {
       let colVal = cols[colIdx]
 
       if (CSV_EXPECTED_COLUMN_DATATYPES[colIdx] === 'number' &&
@@ -420,7 +420,7 @@ function checkTotalRow (rows) {
 
   let totalRowColumns = totalRow.split(',')
 
-  for (var colIdx = 0; colIdx < totalRowColumns.length; colIdx++) {
+  for (let colIdx = 0; colIdx < totalRowColumns.length; colIdx++) {
     let expectedColType = CSV_EXPECTED_COLUMN_DATATYPES[colIdx]
 
     if (expectedColType === 'number') {
@@ -433,7 +433,7 @@ function checkTotalRow (rows) {
 function checkCSVColumnTotal (rows, colIdx, expectedTotal) {
   let sum = 0
 
-  for (var rowIdx = 0; rowIdx < rows.length; rowIdx++) {
+  for (let rowIdx = 0; rowIdx < rows.length; rowIdx++) {
     let row = rows[rowIdx]
     let cols = row.split(',')
 

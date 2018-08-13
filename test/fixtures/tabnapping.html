@@ -2,10 +2,10 @@
 <body>
 <script>
 
-var target_html =
+const target_html =
   '<title>tabnapped</title>'
 
-var w = null
+let w = null
 function open_target() {
   w = window.open('tabnapping_target.html', 'target')
   w.onload = update_target

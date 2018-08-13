@@ -179,7 +179,7 @@ class AboutPasswords extends React.Component {
   render () {
     let counter = 0
 
-    var savedPasswordsPage = this.isPasswordsEmpty
+    const savedPasswordsPage = this.isPasswordsEmpty
     ? null
     : <div>
       <h2 data-l10n-id='savedPasswords' />
@@ -211,7 +211,7 @@ class AboutPasswords extends React.Component {
       </div>
     </div>
 
-    var savedSitesPage = this.isSitesEmpty
+    const savedSitesPage = this.isSitesEmpty
     ? null
     : <div>
       <h2 data-l10n-id='passwordSites' />

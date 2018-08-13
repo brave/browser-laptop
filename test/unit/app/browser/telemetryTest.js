@@ -19,8 +19,8 @@ describe('telemetry', function () {
     assert.equal(telemetry.deltaBetween('foo', 'bar'), 2000, 'clears checkpoints')
   })
   it('formats and sends telemetry object correctly', function () {
-    var payload = telemetry.setCheckpointAndReport('baz', 'foo', { attrib: 'value' }, 5000)
-    var expected = {
+    const payload = telemetry.setCheckpointAndReport('baz', 'foo', { attrib: 'value' }, 5000)
+    const expected = {
       platform: payload.platform,
       version: '1.2.3',
       channel: payload.channel,
