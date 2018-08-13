@@ -2103,7 +2103,7 @@ const onReferralCodeRead = (code) => {
         referral_code: code,
         platform: platform
       }
-    }, {}, onReferralInit)
+    }, {verboseP: clientOptions.verboseP}, onReferralInit)
   }
 }
 
@@ -2170,7 +2170,7 @@ const fetchReferralHeaders = () => {
     server: referralServer,
     method: 'GET',
     path: '/promo/custom-headers'
-  }, {}, appActions.onFetchReferralHeaders)
+  }, {verboseP: clientOptions.verboseP}, appActions.onFetchReferralHeaders)
 }
 
 const onFetchReferralHeaders = (state, err, response, body) => {
@@ -3098,7 +3098,7 @@ const checkReferralActivity = (state) => {
         download_id: downloadId,
         api_key: referralAPI
       }
-    }, {}, activityRoundTrip)
+    }, {verboseP: clientOptions.verboseP}, activityRoundTrip)
   } else {
     updater.checkForUpdate(false, true)
   }
