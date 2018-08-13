@@ -416,7 +416,10 @@ const UrlUtil = {
    * @return {boolean}
    */
   isFileScheme: function (url) {
-    return this.getScheme(url) === fileScheme
+    if (!url) {
+      return false
+    }
+    return urlParse(url).protocol === 'file:'
   },
 
   /**
