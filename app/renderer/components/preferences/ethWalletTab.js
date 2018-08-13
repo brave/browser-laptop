@@ -8,7 +8,6 @@ const {StyleSheet, css} = require('aphrodite/no-important')
 const globalStyles = require('../styles/global')
 const ethereumIcon = require('../../../../img/ethereum/ethereum-logo.svg')
 const metamaskIcon = require('../../../../img/ethereum/metamask-logo.svg')
-const appActions = require('../../../../js/actions/appActions')
 
 // Components
 const {SettingCheckbox} = require('../common/settings')
@@ -39,7 +38,6 @@ class EthWalletTab extends ImmutableComponent {
   onToggleEthWallet () {
     const newSetting = !this.enabled
 
-    appActions.changeSetting(settings.ETHWALLET_ENABLED, newSetting)
     this.props.onChangeSetting(settings.ETHWALLET_ENABLED, newSetting)
 
     if (!newSetting) {

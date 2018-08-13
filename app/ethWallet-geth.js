@@ -107,7 +107,7 @@ const spawnGeth = async () => {
     stdio: process.env.GETH_LOG ? 'inherit' : 'ignore'
   }
 
-  await ensureGethDataDir()
+  ensureGethDataDir()
   await configurePeers(gethDataDir)
 
   // If the process from the previous browswer session still lingers, it should be killed
@@ -130,9 +130,9 @@ const spawnGeth = async () => {
   console.warn('GETH: spawned')
 }
 
-const ensureGethDataDir = async () => {
+const ensureGethDataDir = () => {
   if (!isWindows) {
-    await fs.ensureDir(gethDataDir)
+    fs.ensureDirSync(gethDataDir)
   } else {
     spawnSync('mkdir', ['-p', gethDataDir])
   }
@@ -163,7 +163,6 @@ const writeGethPid = async (pid) => {
   gethProcessId = pid
 
   try {
-    await ensureGethDataDir()
     await fs.writeFile(pidPath, gethProcessId)
   } catch (ex) {
     console.error('Could not write geth.pid')
