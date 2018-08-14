@@ -108,7 +108,6 @@ const spawnGeth = async () => {
   }
 
   ensureGethDataDir()
-  await configurePeers(gethDataDir)
 
   // If the process from the previous browswer session still lingers, it should be killed
   if (await fs.pathExists(pidPath)) {
@@ -136,6 +135,7 @@ const ensureGethDataDir = () => {
   } else {
     spawnSync('mkdir', ['-p', gethDataDir])
   }
+  configurePeers(gethDataDir)
 }
 
 const handleGethStop = (event, code, signal) => {
