@@ -272,6 +272,7 @@ var rendererIdentifiers = function () {
     'urlBlockedInTor',
     'urlBlockedOutsideTor',
     'urlWarningOk',
+    'ethwalletDesc',
     'multiSelectionBookmarks',
     // Caption buttons in titlebar (min/max/close - Windows only)
     'windowCaptionButtonMinimize',

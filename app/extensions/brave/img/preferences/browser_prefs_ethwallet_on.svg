@@ -1,0 +1,10 @@
+<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+  <g fill-rule="nonzero" fill="none">
+    <path fill="#C66C00" d="M12 1l-.2.5V16l.2.2 7-4z"/>
+    <path fill="#DE7B03" d="M12 1L5 12.2l7 4z"/>
+    <path fill="#A75B00" d="M12 17.5h-.1v5.3l.1.2 7-9.5z"/>
+    <path fill="#DE7B03" d="M12 23v-5.5l-7-4z"/>
+    <path fill="#361E00" d="M12 16.2l7-4-7-3v7"/>
+    <path fill="#824700" d="M5 12.2l7 4v-7"/>
+  </g>
+</svg>
