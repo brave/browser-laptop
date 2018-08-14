@@ -235,6 +235,7 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/siteSettingsReducer'),
       require('../../app/browser/reducers/torReducer'),
       require('../../app/browser/reducers/pageDataReducer'),
+      require('../../app/browser/reducers/ethWalletReducer'),
       ledgerReducer,
       require('../../app/browser/menu')
     ]

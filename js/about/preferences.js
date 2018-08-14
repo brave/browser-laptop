@@ -26,6 +26,7 @@ const PaymentsTab = require('../../app/renderer/components/preferences/paymentsT
 const TabsTab = require('../../app/renderer/components/preferences/tabsTab')
 const ShieldsTab = require('../../app/renderer/components/preferences/shieldsTab')
 const SyncTab = require('../../app/renderer/components/preferences/syncTab')
+const EthWalletTab = require('../../app/renderer/components/preferences/ethWalletTab')
 const PluginsTab = require('../../app/renderer/components/preferences/pluginsTab')
 const ExtensionsTab = require('../../app/renderer/components/preferences/extensionsTab')
 const AdvancedTab = require('../../app/renderer/components/preferences/advancedTab')
@@ -770,6 +771,9 @@ class AboutPreferences extends React.Component {
           }}
           syncResetOverlayVisible={this.state.syncResetOverlayVisible}
         />
+        break
+      case preferenceTabs.ETHWALLET:
+        tab = <EthWalletTab onChangeSetting={this.onChangeSetting} settings={settings} />
         break
       case preferenceTabs.SHIELDS:
         tab = <ShieldsTab settings={settings} siteSettings={siteSettings} braveryDefaults={braveryDefaults} onChangeSetting={this.onChangeSetting} />

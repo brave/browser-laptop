@@ -11,6 +11,7 @@ const preferenceTabs = {
   TABS: _,
   PLUGINS: _,
   SYNC: _,
+  ETHWALLET: _,
   SHIELDS: _,
   SECURITY: _,
   PAYMENTS: _,

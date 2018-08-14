@@ -17,6 +17,7 @@ const path = require('path')
 const l10n = require('../js/l10n')
 const {bravifyText} = require('./renderer/lib/extensionsUtil')
 const {componentUpdater, session} = require('electron')
+const {launchGeth, cleanupGeth} = require('./ethWallet-geth')
 
 // Takes Content Security Policy flags, for example { 'default-src': '*' }
 // Returns a CSP string, for example 'default-src: *;'
@@ -216,6 +217,7 @@ let generateBraveManifest = () => {
     key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAupOLMy5Fd4dCSOtjcApsAQOnuBdTs+OvBVt/3P93noIrf068x0xXkvxbn+fpigcqfNamiJ5CjGyfx9zAIs7zcHwbxjOw0Uih4SllfgtK+svNTeE0r5atMWE0xR489BvsqNuPSxYJUmW28JqhaSZ4SabYrRx114KcU6ko7hkjyPkjQa3P+chStJjIKYgu5tWBiMJp5QVLelKoM+xkY6S7efvJ8AfajxCViLGyDQPDviGr2D0VvIBob0D1ZmAoTvYOWafcNCaqaejPDybFtuLFX3pZBqfyOCyyzGhucyCmfBXJALKbhjRAqN5glNsUmGhhPK87TuGATQfVuZtenMvXMQIDAQAB'
   }
 
+  const ethWalletUrl = `chrome-extension://${config.ethwalletExtensionId}`
   let cspDirectives = {
     'default-src': '\'self\'',
     'form-action': '\'none\'',
@@ -223,7 +225,7 @@ let generateBraveManifest = () => {
     'font-src': '\'self\' data:',
     'img-src': '* data: file://*',
     'connect-src': '\'self\' https://www.youtube.com',
-    'frame-src': '\'self\' https://brave.com'
+    'frame-src': '\'self\' https://brave.com ' + ethWalletUrl
   }
 
   if (process.env.NODE_ENV === 'development') {
@@ -291,6 +293,40 @@ let generateTorrentManifest = () => {
     },
     incognito: 'split',
     key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyWl+wMvL0wZX3JUs7GeZAvxMP+LWEh2bwMV1HyuBra/lGZIq3Fmh0+AFnvFPXz1NpQkbLS3QWyqhdIn/lepGwuc2ma0glPzzmieqwctUurMGSGManApGO1MkcbSPhb+R1mx8tMam5+wbme4WoW37PI3oATgOs2NvHYuP60qol3U7b/zB3IWuqtwtqKe2Q1xY17btvPuz148ygWWIHneedt0jwfr6Zp+CSLARB9Heq/jqGXV4dPSVZ5ebBHLQ452iZkHxS6fm4Z+IxjKdYs3HNj/s8xbfEZ2ydnArGdJ0lpSK9jkDGYyUBugq5Qp3FH6zV89WqBvoV1dqUmL9gxbHsQIDAQAB'
+  }
+}
+
+let generateEthwalletManifest = () => {
+  let cspDirectives = {
+    'default-src': '\'self\'',
+    'style-src': '\'self\' \'unsafe-inline\'',
+    'connect-src': 'blob: \'self\' ws://localhost:* http://localhost:* https://min-api.cryptocompare.com https://mini-api.cryptocompare.com',
+    'img-src': '\'self\' data:',
+    'script-src': '\'self\' \'unsafe-eval\' \'sha256-7B6rTuXUsu9shBeECmDFH4h7RDsfogQ3kIonJnIL40o\' \'sha256-zgjB35Pd2ax7Wwfk9iKnAH8r+gNrD2cHpxDkH81DHzw=\'',
+    'frame-ancestors': `chrome-extension://${config.braveExtensionId}`
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    // allow access to webpack dev server resources
+    let devServer = 'localhost:' + process.env.npm_package_config_port
+    cspDirectives['default-src'] += ' http://' + devServer + ' ' + 'ws://' + devServer
+  }
+
+  return {
+    name: 'Ethereum Wallet',
+    description: l10n.translation('ethwalletDesc'),
+    manifest_version: 2,
+    version: '1.0',
+    content_security_policy: concatCSP(cspDirectives),
+    icons: {
+      128: 'ethereum-128.png',
+      48: 'ethereum-48.png',
+      16: 'ethereum-16.png'
+    },
+    incognito: 'split',
+    key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzrdMUtpj4PkN7uoeRC7pXsJyNC65iCWJObISzDQ/mCXerD3ATL54Y8TCkE1mS9O2tiZFY+og4g0GqLjT/M9GJ/Rjlj6cQqIaa9MnQ65H789V6rqPlTQyrd3udIylPJbr5aJ9RvuMcX8BKpT7SKcYvRSwZblKQ/OZ/a/5ylfM+QPyS5ZzooEq921I8eB4JF80aic/3cdU+Xmpyo/jdEe804/MemQ6kqlErXdNaFVU7fQ3lvCzWWcI+I3A1QbKSC2+G1HiToxllxU1gv+rAOsoHYwSkL2ZBTPkvnVBuV5vTS91GF3jGF9TMbw4m3TRNPJZkU32nfJy2JNaa1Ssnws+bQIDAQAB',
+    web_accessible_resources: ['index.html'],
+    permissions: [ 'notifications' ]
   }
 }
 
@@ -377,6 +413,51 @@ const disableExtension = (extensionId) => {
   session.defaultSession.extensions.disable(extensionId)
 }
 
+module.exports.loadExtension = (extensionId, extensionPath, manifest = {}, manifestLocation = 'unpacked') => {
+  const isPDF = extensionId === config.PDFJSExtensionId
+  if (isPDF) {
+    manifestLocation = 'component'
+    // Override the manifest. TODO: Update manifest in pdf.js itself after enough
+    // clients have updated to Brave 0.20.x+
+    manifest = {
+      name: 'PDF Viewer',
+      manifest_version: 2,
+      version: '1.9.459',
+      description: 'Uses HTML5 to display PDF files directly in the browser.',
+      icons: {
+        '128': 'icon128.png',
+        '48': 'icon48.png',
+        '16': 'icon16.png'
+      },
+      permissions: ['storage', '<all_urls>'],
+      content_security_policy: "script-src 'self'; object-src 'self'",
+      incognito: 'split',
+      key: config.PDFJSExtensionPublicKey
+    }
+  }
+  if (!extensionInfo.isLoaded(extensionId) && !extensionInfo.isLoading(extensionId)) {
+    extensionInfo.setState(extensionId, extensionStates.LOADING)
+    if (extensionId === config.braveExtensionId || extensionId === config.torrentExtensionId || extensionId === config.ethwalletExtensionId || extensionId === config.cryptoTokenExtensionId || extensionId === config.syncExtensionId) {
+      session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
+      return
+    }
+    // Verify we don't have info about an extension which doesn't exist
+    // on disk anymore.  It will crash if it doesn't exist, so this is
+    // just a safety net.
+    fs.access(path.join(extensionPath, 'manifest.json'), fs.constants.F_OK, (err) => {
+      if (err) {
+        // This is an error condition, but we can recover.
+        extensionInfo.setState(extensionId, undefined)
+        componentUpdater.checkNow(extensionId)
+      } else {
+        session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
+      }
+    })
+  } else {
+    enableExtension(extensionId)
+  }
+}
+
 module.exports.reloadExtension = (extensionId) => {
   const reload = (unloadedExtensionId) => {
     if (extensionId === unloadedExtensionId) {
@@ -388,6 +469,18 @@ module.exports.reloadExtension = (extensionId) => {
   }
   process.on('extension-unloaded', reload)
   disableExtension(extensionId)
+}
+
+module.exports.configureEthWallet = (ethWalletEnabled) => {
+  if (ethWalletEnabled) {
+    extensionInfo.setState(config.ethwalletExtensionId, extensionStates.REGISTERED)
+    module.exports.loadExtension(config.ethwalletExtensionId, getExtensionsPath('ethwallet'), generateEthwalletManifest(), 'component')
+    launchGeth()
+  } else {
+    extensionInfo.setState(config.ethwalletExtensionId, extensionStates.DISABLED)
+    extensionActions.extensionDisabled(config.ethwalletExtensionId)
+    cleanupGeth()
+  }
 }
 
 module.exports.init = () => {
@@ -411,7 +504,7 @@ module.exports.init = () => {
     // Re-setup the loadedExtensions info if it exists
     extensionInfo.setState(componentId, extensionStates.REGISTERED)
     if (isExtension(componentId)) {
-      loadExtension(componentId, extensionPath)
+      module.exports.loadExtension(componentId, extensionPath)
     } else if (isWidevine(componentId)) {
       appActions.resourceReady(appConfig.resourceNames.WIDEVINE)
     }
@@ -427,7 +520,7 @@ module.exports.init = () => {
       componentUpdater.checkNow(extensionId)
     } else {
       extensionInfo.setState(extensionId, extensionStates.REGISTERED)
-      loadExtension(extensionId, extensionPath)
+      module.exports.loadExtension(extensionId, extensionPath)
     }
   })
 
@@ -483,51 +576,6 @@ module.exports.init = () => {
     return object
   }
 
-  let loadExtension = (extensionId, extensionPath, manifest = {}, manifestLocation = 'unpacked') => {
-    const isPDF = extensionId === config.PDFJSExtensionId
-    if (isPDF) {
-      manifestLocation = 'component'
-      // Override the manifest. TODO: Update manifest in pdf.js itself after enough
-      // clients have updated to Brave 0.20.x+
-      manifest = {
-        name: 'PDF Viewer',
-        manifest_version: 2,
-        version: '1.9.459',
-        description: 'Uses HTML5 to display PDF files directly in the browser.',
-        icons: {
-          '128': 'icon128.png',
-          '48': 'icon48.png',
-          '16': 'icon16.png'
-        },
-        permissions: ['storage', '<all_urls>'],
-        content_security_policy: "script-src 'self'; object-src 'self'",
-        incognito: 'split',
-        key: config.PDFJSExtensionPublicKey
-      }
-    }
-    if (!extensionInfo.isLoaded(extensionId) && !extensionInfo.isLoading(extensionId)) {
-      extensionInfo.setState(extensionId, extensionStates.LOADING)
-      if (extensionId === config.braveExtensionId || extensionId === config.torrentExtensionId || extensionId === config.cryptoTokenExtensionId || extensionId === config.syncExtensionId) {
-        session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
-        return
-      }
-      // Verify we don't have info about an extension which doesn't exist
-      // on disk anymore.  It will crash if it doesn't exist, so this is
-      // just a safety net.
-      fs.access(path.join(extensionPath, 'manifest.json'), fs.constants.F_OK, (err) => {
-        if (err) {
-          // This is an error condition, but we can recover.
-          extensionInfo.setState(extensionId, undefined)
-          componentUpdater.checkNow(extensionId)
-        } else {
-          session.defaultSession.extensions.load(extensionPath, manifest, manifestLocation)
-        }
-      })
-    } else {
-      enableExtension(extensionId)
-    }
-  }
-
   let registerComponent = (extensionId, publicKeyString) => {
     if (!extensionInfo.isRegistered(extensionId) && !extensionInfo.isRegistering(extensionId)) {
       extensionInfo.setState(extensionId, extensionStates.REGISTERING)
@@ -541,23 +589,25 @@ module.exports.init = () => {
       const extensionPath = extensions.getIn([extensionId, 'filePath'])
       if (extensionPath) {
         // Otheriwse just install it
-        loadExtension(extensionId, extensionPath)
+        module.exports.loadExtension(extensionId, extensionPath)
       }
     }
   }
 
   // Manually install the braveExtension and torrentExtension
   extensionInfo.setState(config.braveExtensionId, extensionStates.REGISTERED)
-  loadExtension(config.braveExtensionId, getExtensionsPath('brave'), generateBraveManifest(), 'component')
+  module.exports.loadExtension(config.braveExtensionId, getExtensionsPath('brave'), generateBraveManifest(), 'component')
   // Cryptotoken extension is loaded from electron_resources.pak
   extensionInfo.setState(config.cryptoTokenExtensionId, extensionStates.REGISTERED)
-  loadExtension(config.cryptoTokenExtensionId, getComponentExtensionsPath('cryptotoken'), {}, 'component')
+  module.exports.loadExtension(config.cryptoTokenExtensionId, getComponentExtensionsPath('cryptotoken'), {}, 'component')
   extensionInfo.setState(config.syncExtensionId, extensionStates.REGISTERED)
-  loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
+  module.exports.loadExtension(config.syncExtensionId, getExtensionsPath('brave'), generateSyncManifest(), 'unpacked')
+
+  module.exports.configureEthWallet(getSetting(settings.ETHWALLET_ENABLED))
 
   if (getSetting(settings.TORRENT_VIEWER_ENABLED)) {
     extensionInfo.setState(config.torrentExtensionId, extensionStates.REGISTERED)
-    loadExtension(config.torrentExtensionId, getExtensionsPath('torrent'), generateTorrentManifest(), 'component')
+    module.exports.loadExtension(config.torrentExtensionId, getExtensionsPath('torrent'), generateTorrentManifest(), 'component')
   } else {
     extensionInfo.setState(config.torrentExtensionId, extensionStates.DISABLED)
     extensionActions.extensionDisabled(config.torrentExtensionId)
