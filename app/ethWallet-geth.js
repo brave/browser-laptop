@@ -223,10 +223,6 @@ process.on('SIGINT', () => {
   cleanupGeth(gethProcessId)
   process.exit(2)
 })
-process.on('uncaughtException', () => {
-  cleanupGeth(gethProcessId)
-  process.exit(99)
-})
 
 ipcMain.on('eth-wallet-create-wallet', (e, pwd) => {
   const client = net.createConnection(ipcPath)
