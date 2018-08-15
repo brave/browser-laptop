@@ -718,16 +718,6 @@ const api = {
         }
       })
 
-      tab.on('did-detach', (e, oldTabId) => {
-        // forget last active trail in window tab
-        // is detaching from
-        const oldTab = getTabValue(oldTabId)
-        const detachedFromWindowId = oldTab ? oldTab.get('windowId') : undefined
-        if (detachedFromWindowId != null) {
-          activeTabHistory.clearTabFromWindow(detachedFromWindowId, oldTabId)
-        }
-      })
-
       tab.on('did-attach', (e, tabId) => {
         // tab has been attached to a webview
       })
