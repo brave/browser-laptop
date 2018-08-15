@@ -13,8 +13,7 @@ const appStore = require('../js/stores/appStore')
 const ledgerState = require('./common/state/ledgerState')
 const {getSetting} = require('../js/settings')
 const settings = require('../js/constants/settings')
-const appDispatcher = require('../js/dispatcher/appDispatcher')
-const appConstants = require('../js/constants/appConstants')
+const appActions = require('../js/actions/appActions')
 
 const gethCache = process.env.GETH_CACHE || '1024'
 const envNet = process.env.ETHEREUM_NETWORK || 'mainnet'
@@ -326,11 +325,7 @@ ipcMain.on('eth-wallet-get-metamask-state', (e) => {
 })
 
 ipcMain.on('eth-wallet-enable-metamask', (e) => {
-  appDispatcher.dispatch({
-    actionType: appConstants.APP_CHANGE_SETTING,
-    key: settings.METAMASK_ENABLED,
-    value: true
-  })
+  appActions.changeSetting(settings.METAMASK_ENABLED, true)
 })
 
 ipcMain.on('eth-wallet-get-keys-path', (e) => {
@@ -378,11 +373,7 @@ ipcMain.on('eth-wallet-get-compare-password-hash', (e, str, hash) => {
 })
 
 ipcMain.on('eth-wallet-enable-brave-payments', (e) => {
-  appDispatcher.dispatch({
-    actionType: appConstants.APP_CHANGE_SETTING,
-    key: settings.PAYMENTS_ENABLED,
-    value: true
-  })
+  appActions.changeSetting(settings.PAYMENTS_ENABLED, true)
 })
 
 const launchGeth = async function () {
