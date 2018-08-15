@@ -30,7 +30,7 @@ const pwPath = path.join(gethDataDir, 'wallets.pw')
 const gethProcessPath = path.join(getExtensionsPath('bin'), gethProcessKey)
 
 const configurePeers = async (dataDir) => {
-  const staticNodePath = path.join(dataDir, 'geth', 'static-nodes.json')
+  const staticNodePath = path.join(dataDir, 'static-nodes.json')
   try {
     const discoveryDomain = `_enode._tcp.${envNet}.${envSubDomain}.brave.com`
     let newNodes = await dns.resolveSrv(discoveryDomain)
