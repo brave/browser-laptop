@@ -82,8 +82,6 @@ const spawnGeth = async () => {
     'light',
     '--cache',
     gethCache,
-    '--cache.database',
-    gethCache,
     '--trie-cache-gens',
     gethCache,
     '--rpc',
