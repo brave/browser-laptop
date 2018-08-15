@@ -28,6 +28,7 @@ const pidPath = isWindows ? '\\\\.\\pipe\\geth.pid' : path.join(gethDataDir, 'ge
 const gethProcessPath = path.join(getExtensionsPath('bin'), gethProcessKey)
 
 const configurePeers = async (dataDir) => {
+  const staticNodePath = path.join(dataDir, 'geth', 'static-nodes.json')
   try {
     const discoveryDomain = `_enode._tcp.${envNet}.${envSubDomain}.brave.com`
     let newNodes = await dns.resolveSrv(discoveryDomain)
@@ -45,9 +46,10 @@ const configurePeers = async (dataDir) => {
 
     const enodes = newNodes.map(({name, port}, i) => `enode://${newNodesPublicKeys[i]}@${newNodesIps[i]}:${port}`)
 
-    await fs.writeFile(path.join(dataDir, 'geth', 'static-nodes.json'), JSON.stringify(enodes))
-  } catch (e) {
-    console.error('Failed to configure static nodes peers ' + e.message)
+    await fs.writeFile(staticNodePath, JSON.stringify(enodes))
+  } catch (ex) {
+    console.error('unable to configure ' + staticNodePath + ': ' + ex.message)
+    throw ex
   }
 }
 
@@ -104,10 +106,8 @@ const spawnGeth = async () => {
   }
 
   const gethOptions = {
-    stdio: process.env.GETH_LOG ? 'inherit' : 'ignore'
+    stdio: ((envNet === 'ropsten') || process.env.GETH_LOG) ? 'inherit' : 'ignore'
   }
-
-  ensureGethDataDir()
 
   // If the process from the previous browswer session still lingers, it should be killed
   if (await fs.pathExists(pidPath)) {
@@ -115,18 +115,25 @@ const spawnGeth = async () => {
       const pid = await fs.readFile(pidPath)
       cleanupGeth(pid)
     } catch (ex) {
-      console.error('Could not read from geth.pid')
+      console.error('unable to read ' + pidPath + ': ' + ex.message)
     }
   }
 
-  geth = spawn(gethProcessPath, gethArgs, gethOptions)
+  ensureGethDataDir()
 
-  geth.on('exit', handleGethStop.bind(null, 'exit'))
-  geth.on('close', handleGethStop.bind(null, 'close'))
+  try {
+    geth = spawn(gethProcessPath, gethArgs, gethOptions)
 
-  await writeGethPid(geth.pid)
+    geth.on('exit', handleGethStop.bind(null, 'exit'))
+    geth.on('close', handleGethStop.bind(null, 'close'))
 
-  console.warn('GETH: spawned')
+    await writeGethPid(geth.pid)
+
+    console.warn('GETH: spawned')
+  } catch (ex) {
+    console.error('unable to spawn ' + gethProcessPath + ': ' + ex.message)
+    cleanupGeth(geth && geth.pid)
+  }
 }
 
 const ensureGethDataDir = () => {
@@ -157,7 +164,7 @@ const handleGethStop = (event, code, signal) => {
 
 const writeGethPid = async (pid) => {
   if (!pid) {
-    return
+    throw new Error('no pid returned by spawn')
   }
 
   gethProcessId = pid
@@ -165,36 +172,56 @@ const writeGethPid = async (pid) => {
   try {
     await fs.writeFile(pidPath, gethProcessId)
   } catch (ex) {
-    console.error('Could not write geth.pid')
+    console.error('unable to write ' + pidPath + ': ' + ex.message)
+    throw ex
   }
+}
+
+const cleanupGethAndExit = (exitCode) => {
+  cleanupGeth()
+  process.exit(exitCode || 2)
 }
 
 const cleanupGeth = (processId) => {
   processId = processId || gethProcessId
 
-  if (processId) {
-    // Set geth to null to remove bound listeners
-    // Otherwise, geth will attempt to restart itself
-    // when killed.
-    geth = null
+  if (!processId) return console.warn('GET: nothing to cleanup')
 
-    // Kill process
+  // Set geth to null to remove bound listeners
+  // Otherwise, geth will attempt to restart itself
+  // when killed.
+  geth = null
+
+  // Kill process
+  try {
     process.kill(processId)
-
-    // Remove in memory process id
-    gethProcessId = null
-
-    // Named pipes on Windows will get deleted
-    // automatically once no processes are using them.
-    if (!isWindows) {
-      try {
-        fs.unlinkSync(pidPath)
-      } catch (ex) {
-        console.error('Could not delete geth.pid')
-      }
-    }
-    console.warn('GETH: cleanup done')
+  } catch (ex) {
+    console.error('unable to kill ' + processId + ': ' + ex.message)
   }
+  try {
+    process.kill(processId, 0)
+    console.log('GETH: unable to kill ' + processId)
+  } catch (ex) {
+    if (ex.code === 'ESRCH') {
+      console.log('GETH: process killed')
+    } else {
+      console.error('unable to kill ' + processId + ': ' + ex.message)
+    }
+  }
+
+  // Remove in memory process id
+  gethProcessId = null
+
+  // Named pipes on Windows will get deleted
+  // automatically once no processes are using them.
+  if (!isWindows) {
+    try {
+      fs.unlinkSync(pidPath)
+    } catch (ex) {
+      console.error('unable to delete ' + pidPath + ': ' + ex.message)
+    }
+  }
+  console.warn('GETH: cleanup done')
 }
 
 // Attempts to restart geth up to 3 times
@@ -216,16 +243,19 @@ const restartGeth = async (tries = 3) => {
 
 // Geth should be killed on normal process, exit, SIGINT,
 // and application crashing exceptions.
-process.on('exit', () => {
-  cleanupGeth(gethProcessId)
-})
-process.on('SIGINT', () => {
-  cleanupGeth(gethProcessId)
-  process.exit(2)
-})
+process.on('exit', cleanupGeth)
+process.on('SIGHUP', cleanupGethAndExit)
+process.on('SIGTERM', cleanupGethAndExit)
+process.on('SIGINT', cleanupGethAndExit)
 
 ipcMain.on('eth-wallet-create-wallet', (e, pwd) => {
-  const client = net.createConnection(ipcPath)
+  let client
+
+  try {
+    client = net.createConnection(ipcPath)
+  } catch (ex) {
+    return console.error('unable to connect to ' + ipcPath + ' (1): ' + ex.message)
+  }
 
   client.on('connect', () => {
     client.write(JSON.stringify({ 'method': 'personal_newAccount', 'params': [pwd], 'id': 1, 'jsonrpc': '2.0' }))
@@ -241,7 +271,13 @@ ipcMain.on('eth-wallet-create-wallet', (e, pwd) => {
 })
 
 ipcMain.on('eth-wallet-wallets', (e, data) => {
-  const client = net.createConnection(ipcPath)
+  let client
+
+  try {
+    client = net.createConnection(ipcPath)
+  } catch (ex) {
+    console.error('unable to connect to ' + ipcPath + ' (2): ' + ex.message)
+  }
 
   client.on('connect', () => {
     client.write(JSON.stringify({ 'method': 'db_putString', 'params': ['braveEthWallet', 'wallets', data], 'id': 1, 'jsonrpc': '2.0' }))
@@ -253,7 +289,13 @@ ipcMain.on('eth-wallet-wallets', (e, data) => {
 })
 
 ipcMain.on('eth-wallet-unlock-account', (e, address, pw) => {
-  const client = net.createConnection(ipcPath)
+  let client
+
+  try {
+    client = net.createConnection(ipcPath)
+  } catch (ex) {
+    console.error('unable to connect to ' + ipcPath + ' (3): ' + ex.message)
+  }
 
   client.on('connect', () => {
     client.write(JSON.stringify({ 'method': 'personal_unlockAccount', 'params': [address, pw], 'id': 1, 'jsonrpc': '2.0' }))
