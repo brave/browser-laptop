@@ -5,6 +5,7 @@ const {spawn, spawnSync} = require('child_process')
 const portfinder = require('portfinder')
 const net = require('net')
 const underscore = require('underscore')
+const bcrypt = require('bcryptjs')
 
 const {app, ipcMain} = require('electron')
 const {getExtensionsPath} = require('../js/lib/appUrlUtil')
@@ -25,6 +26,7 @@ const gethProcessKey = isWindows ? 'geth.exe' : 'geth'
 
 const ipcPath = isWindows ? '\\\\.\\pipe\\geth.ipc' : path.join(gethDataDir, 'geth.ipc')
 const pidPath = isWindows ? '\\\\.\\pipe\\geth.pid' : path.join(gethDataDir, 'geth.pid')
+const pwPath = path.join(gethDataDir, 'wallets.pw')
 const gethProcessPath = path.join(getExtensionsPath('bin'), gethProcessKey)
 
 const configurePeers = async (dataDir) => {
@@ -291,6 +293,46 @@ ipcMain.on('eth-wallet-enable-metamask', (e) => {
 
 ipcMain.on('eth-wallet-get-keys-path', (e) => {
   e.sender.send('eth-wallet-keys-path', path.join(gethDataDir, 'keystore'))
+})
+
+ipcMain.on('eth-wallet-get-password-hash', (e) => {
+  fs.readFile(pwPath, 'utf8', (err, hash) => {
+    if (err || !hash) {
+      e.sender.send('eth-wallet-password-hash', null)
+    } else {
+      e.sender.send('eth-wallet-password-hash', hash)
+    }
+  })
+})
+
+ipcMain.on('eth-wallet-store-password-hash', (e, str) => {
+  bcrypt.genSalt(14, (err, salt) => {
+    if (err) {
+      console.error(err)
+      return
+    }
+    bcrypt.hash(str, salt, (err, hash) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      fs.writeFile(pwPath, hash, (err) => {
+        if (err) {
+          console.error(err)
+        }
+      })
+    })
+  })
+})
+
+ipcMain.on('eth-wallet-get-compare-password-hash', (e, str, hash) => {
+  bcrypt.compare(str, hash, (err, res) => {
+    if (err) {
+      e.sender.send('eth-wallet-compare-password-hash', false)
+    } else {
+      e.sender.send('eth-wallet-compare-password-hash', res)
+    }
+  })
 })
 
 const launchGeth = async function () {
