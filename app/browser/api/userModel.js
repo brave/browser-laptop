@@ -663,17 +663,18 @@ const checkReadyAdServe = (state, windowId, forceP) => {  // around here is wher
   // state = userModelState.elphDeferRecorder(state, reset) // reset deferral counter
 
     const first = userModelState.getUserModelValue(state, 'firstContactTimestamp')
-    if (first) {
+    const finale = userModelState.getUserModelValue(state, 'finalContactTimestamp')
+    if (first && finale) {
       const surveys = userModelState.getUserSurveyQueue(state).toJS()
       const available = underscore.where(surveys, { status: 'available' }) || []
       const survey = underscore.first(available)
-      const offset = (available.length > 1 ? 1 : 12) * 86400 * 1000
+      const allowed = (available.length > 1) ? (first + (86400 * 1000)) : (finale - (2 * 86400 * 1000))
 
       /* NB: temporary survey logic for beta
              - first survey appears no earlier than one day after start; otherwise,
-             - surveys appear no earlier than twelve days after start
+             - surveys appear no earlier than two days before end of trial
       */
-      if ((survey) && ((first + offset) <= underscore.now())) {
+      if ((survey) && (allowed <= underscore.now())) {
         survey.status = 'display'
         survey.status_at = new Date().toISOString()
         state = userModelState.setUserSurveyQueue(state, Immutable.fromJS(surveys))
@@ -939,9 +940,12 @@ const uploadLogs = (state, stamp, retryIn, result) => {
   }
   if (status === 'active') {
     let first = result.getIn([ 'expirations', 'first_contact_ts' ])
+    let finale = result.getIn([ 'expirations', 'expires_at_ts' ])
 
     first = (new Date(first)).getTime()
     if (first) state = userModelState.setUserModelValue(state, 'firstContactTimestamp', first)
+    finale = (new Date(finale)).getTime()
+    if (finale) state = userModelState.setUserModelValue(state, 'finalContactTimestamp', finale)
   }
 
   if (stamp) {
