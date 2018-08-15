@@ -377,6 +377,14 @@ ipcMain.on('eth-wallet-get-compare-password-hash', (e, str, hash) => {
   })
 })
 
+ipcMain.on('eth-wallet-enable-brave-payments', (e) => {
+  appDispatcher.dispatch({
+    actionType: appConstants.APP_CHANGE_SETTING,
+    key: settings.PAYMENTS_ENABLED,
+    value: true
+  })
+})
+
 const launchGeth = async function () {
   await spawnGeth()
 }
