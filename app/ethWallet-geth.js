@@ -28,6 +28,7 @@ const pidPath = isWindows ? '\\\\.\\pipe\\geth.pid' : path.join(gethDataDir, 'ge
 const gethProcessPath = path.join(getExtensionsPath('bin'), gethProcessKey)
 
 const configurePeers = async (dataDir) => {
+  const staticNodePath = path.join(dataDir, 'static-nodes.json')
   try {
     const discoveryDomain = `_enode._tcp.${envNet}.${envSubDomain}.brave.com`
     let newNodes = await dns.resolveSrv(discoveryDomain)
@@ -45,7 +46,7 @@ const configurePeers = async (dataDir) => {
 
     const enodes = newNodes.map(({name, port}, i) => `enode://${newNodesPublicKeys[i]}@${newNodesIps[i]}:${port}`)
 
-    await fs.writeFile(path.join(dataDir, 'geth', 'static-nodes.json'), JSON.stringify(enodes))
+    await fs.writeFile(staticNodePath, JSON.stringify(enodes))
   } catch (e) {
     console.error('Failed to configure static nodes peers ' + e.message)
   }
