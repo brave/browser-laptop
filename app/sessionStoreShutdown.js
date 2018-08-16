@@ -12,6 +12,7 @@ const updater = require('./updater')
 const appConfig = require('../js/constants/appConfig')
 const async = require('async')
 const messages = require('../js/constants/messages')
+const settings = require('../js/constants/settings')
 const appActions = require('../js/actions/appActions')
 const platformUtil = require('./common/lib/platformUtil')
 const Immutable = require('immutable')
@@ -112,14 +113,18 @@ const saveAppState = (forceSave = false) => {
           }
         }
 
-        // If there's an update to apply, then do it here.
-        // Otherwise just quit.
-        if (immutableAppState.get('updates') && (immutableAppState.getIn(['updates', 'status']) === updateStatus.UPDATE_APPLYING_NO_RESTART ||
-            immutableAppState.getIn(['updates', 'status']) === updateStatus.UPDATE_APPLYING_RESTART)) {
-          updater.quitAndInstall()
-        } else {
-          app.quit()
-        }
+        // Workaround potential race condition in #14667
+        const quitTimeout = platformUtil.isLinux() && immutableAppState.getIn(['settings', settings.SHUTDOWN_CLEAR_HISTORY]) ? 1000 : 0
+        setTimeout(() => {
+          // If there's an update to apply, then do it here.
+          // Otherwise just quit.
+          if (immutableAppState.get('updates') && (immutableAppState.getIn(['updates', 'status']) === updateStatus.UPDATE_APPLYING_NO_RESTART ||
+              immutableAppState.getIn(['updates', 'status']) === updateStatus.UPDATE_APPLYING_RESTART)) {
+            updater.quitAndInstall()
+          } else {
+            app.quit()
+          }
+        }, quitTimeout)
       } else {
         const cb = sessionStateStoreCompleteCallback
         sessionStateStoreCompleteCallback = null
