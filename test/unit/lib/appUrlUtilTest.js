@@ -37,39 +37,6 @@ describe('appUrlUtil test', function () {
         'chrome-extension://fmdpfempfmekjkcfdehndghogpnpjeno/')
     })
   })
-  describe('getBaseUrl', function () {
-    it('no arg', function () {
-      assert.equal(appUrlUtil.getBaseUrl(), '')
-    })
-    it('builtin URL', function () {
-      assert.equal(appUrlUtil.getBaseUrl('about:preferences#security?abc=123'), 'about:preferences')
-      assert.equal(appUrlUtil.getBaseUrl('about:preferences?abc=123'), 'about:preferences')
-    })
-  })
-  describe('getSourceAboutUrl', function () {
-    it('no arg', function () {
-      assert.equal(appUrlUtil.getSourceAboutUrl(), undefined)
-    })
-    it('basic URL', function () {
-      assert.equal(appUrlUtil.getSourceAboutUrl('https://brave.com'), undefined)
-    })
-    it('about URLs', function () {
-      assert.equal(appUrlUtil.getSourceAboutUrl('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-preferences.html'), 'about:preferences')
-      assert.equal(appUrlUtil.getSourceAboutUrl('chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-preferences.html#security'), 'about:preferences#security')
-    })
-  })
-  describe('getTargetAboutUrl', function () {
-    it('no arg', function () {
-      assert.equal(appUrlUtil.getTargetAboutUrl(), undefined)
-    })
-    it('basic URL', function () {
-      assert.equal(appUrlUtil.getTargetAboutUrl('https://brave.com'), undefined)
-    })
-    it('aboutURLs', function () {
-      assert.equal(appUrlUtil.getTargetAboutUrl('about:blank'), 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-blank.html')
-      assert.equal(appUrlUtil.getTargetAboutUrl('about:preferences#test?123'), 'chrome-extension://mnojpmjdmbbfmejpflffifhffcmidifd/about-preferences.html#test?123')
-    })
-  })
   describe('aboutUrls', function () {
     it('about:about', function () {
       assert.equal(appUrlUtil.aboutUrls.get('about:about'),

@@ -100,7 +100,6 @@ const settings = {
   PINTEREST_ENABLED: 'extensions.pinterest.enabled',
   METAMASK_ENABLED: 'extensions.metamask.enabled',
   METAMASK_PROMPT_DISMISSED: 'extensions.metamask.promptDismissed',
-  ETHWALLET_ENABLED: 'extensions.ethwallet.enabled',
   // Debug settings
   DEBUG_ALLOW_MANUAL_TAB_DISCARD: 'debug.manual-tab-discard.enabled',
   DEBUG_VERBOSE_TAB_INFO: 'debug.verbose-tab-info.enabled',

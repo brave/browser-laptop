@@ -57,19 +57,6 @@ class PopupWindow extends React.Component {
       })
       webview.addEventListener('did-attach', () => {
         webview.enablePreferredSizeMode(true)
-        if (this.isWalletPopup) {
-          const height = 180
-          const width = 280
-          webview.style.height = height + 'px'
-          webview.style.width = width + 'px'
-          windowActions.setPopupWindowDetail(Immutable.fromJS({
-            left: this.props.left,
-            top: this.props.top,
-            height,
-            width,
-            src: this.props.src
-          }))
-        }
         // Workaround first-draw blankness by forcing hide and show.
         if (!this.hasDrawn) {
           forceDrawWebview(webview)
@@ -103,9 +90,6 @@ class PopupWindow extends React.Component {
         if (shouldDebugWebviewEvents) {
           console.log('preferred-size-changed')
         }
-        if (this.isWalletPopup) {
-          return
-        }
         webview.getPreferredSize((preferredSize) => {
           const width = preferredSize.width
           const height = preferredSize.height
@@ -129,10 +113,6 @@ class PopupWindow extends React.Component {
     if (e.keyCode === KeyCodes.ESC) {
       windowActions.setPopupWindowDetail()
     }
-  }
-
-  get isWalletPopup () {
-    return this.props.src && this.props.src.startsWith('chrome-extension://dakeiobolocmlkdebloniehpglcjkgcp/')
   }
 
   mergeProps (state, ownProps) {
@@ -205,7 +185,6 @@ const styles = StyleSheet.create({
     padding: 0,
     position: 'absolute',
     userSelect: 'none',
-    overflowY: 'auto',
     zIndex: globalStyles.zindex.zindexPopupWindow
   },
 
