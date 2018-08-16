@@ -21,7 +21,6 @@ const appActions = require('../../../../js/actions/appActions')
 const messages = require('../../../../js/constants/messages')
 const settings = require('../../../../js/constants/settings')
 const KeyCodes = require('../../../common/constants/keyCodes')
-const {ethwalletExtensionId} = require('../../../../js/constants/config')
 
 // State
 const frameStateUtil = require('../../../../js/state/frameStateUtil')
@@ -515,7 +514,7 @@ class UrlBar extends React.Component {
     props.isWideURLbarEnabled = getSetting(settings.WIDE_URL_BAR)
     props.publisherButtonVisible = publisherUtil.shouldShowAddPublisherButton(state, location, publisherKey)
     props.titleMode = ownProps.titleMode
-    props.hostValue = hostValue === ethwalletExtensionId ? null : hostValue
+    props.hostValue = hostValue
     props.urlbarLocation = urlbarLocation
     props.title = activeFrame.get('title', '')
     props.displayURL = displayURL
