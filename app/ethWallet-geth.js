@@ -25,7 +25,7 @@ const isWindows = process.platform === 'win32'
 const gethProcessKey = isWindows ? 'geth.exe' : 'geth'
 
 const ipcPath = isWindows ? '\\\\.\\pipe\\geth.ipc' : path.join(gethDataDir, 'geth.ipc')
-const pidPath = isWindows ? '\\\\.\\pipe\\geth.pid' : path.join(gethDataDir, 'geth.pid')
+const pidPath = path.join(gethDataDir, 'geth.pid')
 const pwPath = path.join(gethDataDir, 'wallets.pw')
 const gethProcessPath = path.join(getExtensionsPath('bin'), gethProcessKey)
 
@@ -183,9 +183,9 @@ const cleanupGethAndExit = (exitCode) => {
 }
 
 const cleanupGeth = (processId) => {
-  processId = processId || gethProcessId
+  processId = (processId || gethProcessId) || (geth && geth.pid)
 
-  if (!processId) return console.warn('GET: nothing to cleanup')
+  if (!processId) return console.warn('GETH: nothing to cleanup')
 
   // Set geth to null to remove bound listeners
   // Otherwise, geth will attempt to restart itself
