@@ -1,8 +1,8 @@
-var VersionInfo = require('./lib/versionInfo')
-var execute = require('./lib/execute')
-var format = require('util').format
-var path = require('path')
-var fs = require('fs')
+const VersionInfo = require('./lib/versionInfo')
+const execute = require('./lib/execute')
+const format = require('util').format
+const path = require('path')
+const fs = require('fs')
 
 const fileExists = (path) => new Promise((resolve, reject) => fs.access(path, (err, exists) => {
   resolve(!err)
@@ -17,9 +17,9 @@ const execPromise = (cmd) => new Promise((resolve, reject) => {
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
-var outDir = 'dist'
-var arch = 'x64'
-var cmds
+let outDir = 'dist'
+let arch = 'x64'
+let cmds
 
 if (isWindows) {
   if (process.env.TARGET_ARCH === 'ia32') {
@@ -29,12 +29,12 @@ if (isWindows) {
 
 const channel = process.env.CHANNEL
 
-var channels = { nightly: true, developer: true, beta: true, dev: true }
+const channels = { nightly: true, developer: true, beta: true, dev: true }
 if (!channels[channel]) {
   throw new Error('CHANNEL environment variable must be set to nightly, developer, beta or dev')
 }
 
-var appName
+let appName
 switch (channel) {
   case 'nightly':
     appName = 'Brave-Nightly'
@@ -52,7 +52,7 @@ switch (channel) {
     throw new Error('CHANNEL environment variable must be set to nightly, developer, beta or dev')
 }
 
-var tarName
+let tarName
 if (isLinux) {
   tarName = appName
   appName = appName.toLowerCase()
@@ -190,8 +190,8 @@ if (isDarwin) {
     // need to store the output files in separate directories
     outDir = path.join(outDir, arch)
 
-    var muonInstaller = require('muon-winstaller')
-    var resultPromise = muonInstaller.createWindowsInstaller({
+    const muonInstaller = require('muon-winstaller')
+    const resultPromise = muonInstaller.createWindowsInstaller({
       appDirectory: buildDir,
       outputDirectory: outDir,
       title: appName,

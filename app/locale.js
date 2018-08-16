@@ -12,7 +12,7 @@ const app = electron.app
 const {LANGUAGE, REQUEST_LANGUAGE} = require('../js/constants/messages')
 
 // Exhaustive list of identifiers used by top and context menus
-var rendererIdentifiers = function () {
+const rendererIdentifiers = function () {
   const countryCodes = require('./common/constants/countryCodes')
 
   return [
@@ -312,9 +312,9 @@ var rendererIdentifiers = function () {
   ].concat(countryCodes).concat(availableLanguages)
 }
 
-var ctx = null
-var translations = {}
-var lang = 'en-US'
+let ctx = null
+let translations = {}
+let lang = 'en-US'
 
 // Return a translate token from cache or a placeholder
 // indicating that no translation is available
@@ -342,7 +342,7 @@ const PDI = '\u2069'
 
 exports.translationReplace = function (translation, replacements = {}) {
   let returnVal = translation
-  for (var key in replacements) {
+  for (let key in replacements) {
     returnVal = returnVal.replace(new RegExp(FSI + '{{\\s*' + key + '\\s*}}' + PDI), replacements[key])
   }
   return returnVal
@@ -389,7 +389,7 @@ availableLanguages.forEach(function (lang) {
 // Return the default locale in xx-XX format I.e. pt-BR
 module.exports.getDefaultLocale = function (allowUnsupported = false) {
   if (app.getLocale()) {
-    var lang = app.getLocale().replace('_', '-')
+    let lang = app.getLocale().replace('_', '-')
     // If there is no country code designated use the language code
     if (!lang.match(/-/)) {
       lang = lang + '-' + lang.toUpperCase()
@@ -458,7 +458,7 @@ exports.init = function (language) {
   ctx = env.createContext(langs, propertyFiles)
 
   // Translate the renderer identifiers
-  var identifiers = rendererIdentifiers()
+  const identifiers = rendererIdentifiers()
   return ctx.formatValues.apply(ctx, identifiers).then(function (values) {
     // Cache the translations for later retrieval
     values.forEach(function (value, idx) {

@@ -121,8 +121,8 @@ Server.prototype = {
  * @param {Function} callback [Error err, Server server].
  */
 Server.create = function (root, callback) {
-  var fork = require('child_process').fork
-  var child = fork(`${__dirname}/serverChild.js`, [root])
+  const fork = require('child_process').fork
+  const child = fork(`${__dirname}/serverChild.js`, [root])
 
   process.on('exit', () => child.kill('SIGQUIT'))
   process.on('SIGHUP', () => child.kill('SIGHUP'))

@@ -10,8 +10,8 @@ const underscore = require('underscore')
 const urlParse = require('../../app/common/urlParse')
 const ipc = electron.ipcMain
 
-var cachedDefaultSession = null
-var backgroundPageWebContents = null
+let cachedDefaultSession = null
+let backgroundPageWebContents = null
 
 if (ipc) {
   ipc.on('got-background-page-webcontents', (e) => {
@@ -34,9 +34,9 @@ const getDefaultSession = () => {
  * @param {Object=} session - muon session to use if not the default
  */
 module.exports.request = (options, callback, session) => {
-  var params
-  var responseType = options.responseType || 'text'
-  var defaultSession = session || getDefaultSession()
+  let params
+  const responseType = options.responseType || 'text'
+  const defaultSession = session || getDefaultSession()
 
   if (!defaultSession) return callback(new Error('Request failed, no session available'))
 
@@ -60,7 +60,7 @@ module.exports.request = (options, callback, session) => {
   }
 
   defaultSession.webRequest.fetch(options.url, params, (err, response, body) => {
-    var rsp = underscore.pick(response || {},
+    const rsp = underscore.pick(response || {},
                               [ 'statusCode', 'statusMessage', 'headers', 'httpVersionMajor', 'httpVersionMinor' ])
 
     underscore.keys(rsp.headers).forEach((header) => {
@@ -78,7 +78,7 @@ module.exports.request = (options, callback, session) => {
 }
 
 module.exports.requestDataFile = (url, headers, path, reject, resolve) => {
-  var defaultSession = getDefaultSession()
+  const defaultSession = getDefaultSession()
   if (!defaultSession) {
     reject('Request failed, no session available')
   } else {

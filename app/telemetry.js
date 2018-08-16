@@ -9,13 +9,13 @@ const _ = require('underscore')
 const Channel = require('./channel')
 const request = require('request')
 
-var telemetry = Immutable.Map()
-var eventList = Immutable.List()
-var enabled = false
+let telemetry = Immutable.Map()
+let eventList = Immutable.List()
+let enabled = false
 const params = {}
 const DEBUG = !!process.env.TELEMETRY_DEBUG
 
-var platforms = {
+const platforms = {
   'darwin': 'osx',
   'win32x64': 'winx64',
   'win32ia32': 'winia32',
@@ -50,7 +50,7 @@ if (!!process.env.TELEMETRY_URL &&
  */
 function setCheckpoint (checkpoint, ts) {
   ts = ts || (new Date()).getTime()
-  var delta = 0
+  let delta = 0
 
   telemetry = telemetry.set(checkpoint, ts)
 
@@ -82,8 +82,8 @@ function clearCheckpoint (checkpoint) {
  * @param checkpoint2 {String} - name of later checkpoint
  */
 function deltaBetween (checkpoint1, checkpoint2) {
-  var ts1 = telemetry.get(checkpoint1)
-  var ts2 = telemetry.get(checkpoint2)
+  const ts1 = telemetry.get(checkpoint1)
+  const ts2 = telemetry.get(checkpoint2)
   if (_.isNumber(ts1) && _.isNumber(ts2)) {
     return Math.abs(ts2 - ts1)
   }
@@ -109,8 +109,8 @@ function setCheckpointAndReport (checkpoint, initialCheckpoint, extra, ts) {
 }
 
 // Build payload object and send telemetry if configured
-var sendTelemetry = (measure, value, extra) => {
-  var payload = _.extend(params, {
+const sendTelemetry = (measure, value, extra) => {
+  const payload = _.extend(params, {
     measure: measure,
     value: value / 1000,
     ts: (new Date()).getTime(),

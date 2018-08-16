@@ -17,22 +17,22 @@ const LRUCache = require('lru-cache')
 const getHostnamePatterns = require('../js/lib/urlutil').getHostnamePatterns
 
 // Map of ruleset ID to ruleset content
-var db = null
+let db = null
 // Map of hostname pattern to ruleset ID
-var targets = null
+let targets = null
 // Counter for detecting infinite redirect loops
-var redirectCounter = {}
+let redirectCounter = {}
 // Blacklist of canonicalized hosts (host+pathname) that lead to redirect loops
-var redirectBlacklist = []
+let redirectBlacklist = []
 // Canonicalized hosts that have been recently redirected via a 307
-var recent307Counter = {}
+let recent307Counter = {}
 // Map of url to applyRuleset response
-var cachedRewrites = new LRUCache(100)
+let cachedRewrites = new LRUCache(100)
 
 module.exports.resourceName = 'httpsEverywhere'
 
 function loadRulesets (data) {
-  var parsedData = JSON.parse(data)
+  const parsedData = JSON.parse(data)
   targets = parsedData.targets
   db = parsedData.rulesetStrings
   return true
@@ -49,19 +49,19 @@ function getRewrittenUrl (url) {
     return undefined
   }
 
-  var cachedRewrite = cachedRewrites.get(url)
+  const cachedRewrite = cachedRewrites.get(url)
   if (cachedRewrite) {
     return cachedRewrite
   } else {
     // Get the set of ruleset IDs applicable to this host
-    let rulesetIds = getHostnamePatterns(url).reduce((prev, hostname) => {
-      var target = targets[hostname]
+    const rulesetIds = getHostnamePatterns(url).reduce((prev, hostname) => {
+      const target = targets[hostname]
       return target ? prev.concat(target) : prev
     }, [])
 
-    for (var i = 0; i < rulesetIds.length; ++i) {
+    for (let i = 0; i < rulesetIds.length; ++i) {
       // Try applying each ruleset
-      let result = applyRuleset(url, db[rulesetIds[i]])
+      const result = applyRuleset(url, db[rulesetIds[i]])
       if (result) {
         cachedRewrites.set(url, result)
         // Redirect to the first rewritten URL
@@ -79,7 +79,7 @@ function getRewrittenUrl (url) {
  * @return {{redirectURL: string|undefined, ruleset: string|undefined}|null}
  */
 function applyRuleset (url, applicableRule) {
-  var i, ruleset, exclusion, rule, fromPattern, newUrl, exclusionPattern
+  let i, ruleset, exclusion, rule, fromPattern, newUrl, exclusionPattern
   ruleset = applicableRule.ruleset
   exclusion = ruleset.exclusion
   rule = ruleset.rule
@@ -151,7 +151,7 @@ function onBeforeRedirect (details, isPrivate) {
     return
   }
 
-  var canonicalUrl = canonicalizeUrl(details.url)
+  const canonicalUrl = canonicalizeUrl(details.url)
 
   // If the URL is already blacklisted, we are done
   if (redirectBlacklist.includes(canonicalUrl)) {
@@ -198,7 +198,7 @@ function onBeforeRedirect (details, isPrivate) {
  * @return {string}
  */
 function canonicalizeUrl (url) {
-  var parsed = urlParse(url)
+  const parsed = urlParse(url)
   return [parsed.host, parsed.pathname].join('')
 }
 

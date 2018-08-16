@@ -39,7 +39,7 @@ try {
 } catch (e) {}
 
 try {
-var idb = indexedDB.open('idb', 1)
+const idb = indexedDB.open('idb', 1)
 idb.onsuccess = function () {
    indexedDB.webkitGetDatabaseNames().onsuccess = (sender) => {
       setText('idb', sender.target.result)
@@ -48,7 +48,7 @@ idb.onsuccess = function () {
 } catch (e) {}
 
 try {
-var wdb = openDatabase("wdb", "0.1", "test", 1024 * 1024)
+const wdb = openDatabase("wdb", "0.1", "test", 1024 * 1024)
 if (wdb.transaction) {
 wdb.transaction(function (tx) {
   tx.executeSql("CREATE TABLE IF NOT EXISTS " +

@@ -16,10 +16,10 @@
 
 const path = require('path')
 const fs = require('fs')
-const request = require('request')
+var request = require('request')
 
 // The names of the directories in the locales folder are used as a list of languages to retrieve
-var languages = fs.readdirSync(path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales')).filter(function (language) {
+let languages = fs.readdirSync(path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales')).filter(function (language) {
   return language !== 'en-US'
 }).map(function (language) {
   return language.replace('-', '_')
@@ -31,7 +31,7 @@ if (process.env.LANG_CODE) {
 }
 
 if (process.env.META) {
-  var localLanguages = fs.readdirSync(path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales'))
+  const localLanguages = fs.readdirSync(path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales'))
   console.log(`    <meta name="availableLanguages" content="${localLanguages.join(', ')}">`)
   console.log(localLanguages.map(function (l) {
     return `'${l}'`
@@ -50,7 +50,7 @@ if (!(username && password)) {
 const TEMPLATE = 'https://www.transifex.com/api/2/project/brave-laptop/resource/RESOURCE_SLUG/translation/LANG_CODE/?file'
 
 // Retrieve resource names dynamically
-var resources = fs.readdirSync(path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales', 'en-US')).map(function (language) {
+let resources = fs.readdirSync(path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales', 'en-US')).map(function (language) {
   return language.split(/\./)[0]
 })
 
@@ -63,7 +63,7 @@ if (process.env.RESOURCE) {
 languages.forEach(function (languageCode) {
   resources.forEach(function (resource) {
     // Build the URI
-    var URI = TEMPLATE.replace('RESOURCE_SLUG', resource.toLowerCase() + 'properties')
+    let URI = TEMPLATE.replace('RESOURCE_SLUG', resource.toLowerCase() + 'properties')
     URI = URI.replace('LANG_CODE', languageCode)
 
     // Authorize and request the translation file
@@ -82,7 +82,7 @@ languages.forEach(function (languageCode) {
           throw new Error('Unauthorized - Are the USERNAME and PASSWORD env vars set correctly?')
         }
         // Check to see if the directory exists, if not create it
-        var directory = path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales', languageCode.replace('_', '-'))
+        const directory = path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales', languageCode.replace('_', '-'))
         if (!fs.existsSync(directory)) {
           console.log(`${languageCode} does not exist - creating directory`)
           if (!process.env.TEST) {
@@ -95,7 +95,7 @@ languages.forEach(function (languageCode) {
         }
 
         // Build the filename and store the translation file
-        var filename = path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales', languageCode.replace('_', '-'), resource + '.properties')
+        const filename = path.join(__dirname, '..', 'app', 'extensions', 'brave', 'locales', languageCode.replace('_', '-'), resource + '.properties')
         console.log('[*] ' + filename)
         if (process.env.TEST) {
           console.log(body)

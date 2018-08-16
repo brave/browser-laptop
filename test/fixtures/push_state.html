@@ -12,12 +12,12 @@
   </ul>
   <script type="text/javascript">
     function setData(url) {
-      var current = document.getElementById('current');
+      const current = document.getElementById('current');
       current.textContent = url;
     }
     document.getElementById('items').addEventListener('click', e => {
       e.preventDefault();
-      var url = e.target.href;
+      const url = e.target.href;
       window.history.pushState({url: url}, e.target.title, url);
       setData(url);
     });

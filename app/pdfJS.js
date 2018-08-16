@@ -19,7 +19,7 @@ const getViewerUrl = UrlUtil.getPDFViewerUrl
  * @return {boolean} True if the resource is a PDF file.
  */
 function isPDFFile (details) {
-  var header = details.responseHeaders && details.responseHeaders['Content-Type']
+  const header = details.responseHeaders && details.responseHeaders['Content-Type']
   if (header) {
     if (header.includes('application/pdf')) {
       return true
@@ -28,7 +28,7 @@ function isPDFFile (details) {
       if (details.url.toLowerCase().indexOf('.pdf') > 0) {
         return true
       }
-      var cdHeader = details.responseHeaders['Content-Disposition']
+      const cdHeader = details.responseHeaders['Content-Disposition']
       if (cdHeader && /\.pdf(["']|$)/i.test(cdHeader[0])) {
         return true
       }
@@ -56,7 +56,7 @@ function isPDFDownloadable (details) {
       details.url.indexOf('=download') === -1) {
     return false
   }
-  var cdHeader = (details.responseHeaders &&
+  const cdHeader = (details.responseHeaders &&
     details.responseHeaders['Content-Disposition'])
   return (cdHeader && /^attachment/i.test(cdHeader[0]))
 }
@@ -69,8 +69,8 @@ function isPDFDownloadable (details) {
  * @return {Object|undefined} The return value for the responseHeaders property
  */
 function getHeadersWithContentDispositionAttachment (details) {
-  var headers = details.responseHeaders
-  var cdHeader = headers['Content-Disposition'] || []
+  const headers = details.responseHeaders
+  const cdHeader = headers['Content-Disposition'] || []
   cdHeader.push('attachment')
   headers['Content-Disposition'] = cdHeader
   return headers

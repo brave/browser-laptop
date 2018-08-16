@@ -134,7 +134,7 @@ class AppDispatcher {
   }
 
   waitFor (promiseIndexes, callback) {
-    var selectedPromises = promiseIndexes.map((index) => this.promises[index])
+    const selectedPromises = promiseIndexes.map((index) => this.promises[index])
     return Promise.all(selectedPromises).then(callback)
   }
 
@@ -273,14 +273,14 @@ if (processType === 'browser') {
       dispatchEventPayload(event, payload)
     }
 
-    for (var i = 0; i < payload.length; i++) {
+    for (let i = 0; i < payload.length; i++) {
       dispatchEventPayload(event, payload[i])
     }
   })
 } else if (processType === 'renderer') {
   ipc.on(messages.DISPATCH_ACTION, (e, serializedPayload) => {
     let payload = Serializer.deserialize(serializedPayload)
-    for (var i = 0; i < payload.length; i++) {
+    for (let i = 0; i < payload.length; i++) {
       appDispatcher.dispatch(payload[i])
     }
   })

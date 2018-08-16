@@ -100,7 +100,7 @@ describe('navigationBar tests', function () {
           .ipcSend(messages.SHORTCUT_CLOSE_FRAME, 2)
       })
       it('newtab with page has focus in webview', function * () {
-        var page1Url = Brave.server.url('tabnapping.html')
+        const page1Url = Brave.server.url('tabnapping.html')
         yield this.app.client
           .newTab({ url: page1Url })
           .waitUntil(function () {
@@ -115,7 +115,7 @@ describe('navigationBar tests', function () {
       Brave.beforeAll(this)
 
       before(function * () {
-        var page1 = Brave.server.url('tabnapping.html')
+        const page1 = Brave.server.url('tabnapping.html')
         yield setup(this.app.client)
         yield this.app.client
           .tabByUrl(Brave.newTabUrl)
@@ -138,7 +138,7 @@ describe('navigationBar tests', function () {
       Brave.beforeAll(this)
 
       before(function * () {
-        var page1 = Brave.server.url('urlbarSpoof.html')
+        const page1 = Brave.server.url('urlbarSpoof.html')
         yield setup(this.app.client)
         yield this.app.client
           .tabByUrl(Brave.newTabUrl)
@@ -159,7 +159,7 @@ describe('navigationBar tests', function () {
       Brave.beforeAll(this)
 
       before(function * () {
-        var page1 = Brave.server.url('spoof_opener.html')
+        const page1 = Brave.server.url('spoof_opener.html')
         yield setup(this.app.client)
         yield this.app.client
           .tabByUrl(Brave.newTabUrl)
@@ -193,7 +193,7 @@ describe('navigationBar tests', function () {
       Brave.beforeAll(this)
 
       before(function * () {
-        var page1 = Brave.server.url('in_page_nav.html')
+        const page1 = Brave.server.url('in_page_nav.html')
         yield setup(this.app.client)
         yield this.app.client
           .tabByUrl(Brave.newTabUrl)
@@ -202,7 +202,7 @@ describe('navigationBar tests', function () {
       })
 
       it('location does not change', function * () {
-        var page1 = Brave.server.url('in_page_nav.html')
+        const page1 = Brave.server.url('in_page_nav.html')
         yield this.app.client
           .windowByUrl(Brave.browserWindowUrl)
           .waitForInputText(urlInput, page1)
@@ -213,7 +213,7 @@ describe('navigationBar tests', function () {
       Brave.beforeAll(this)
       before(function * () {
         yield setup(this.app.client)
-        var page1 = Brave.server.url('page1.html')
+        const page1 = Brave.server.url('page1.html')
         yield this.app.client
           .tabByUrl(Brave.newTabUrl)
           .loadUrl(page1)
@@ -340,7 +340,7 @@ describe('navigationBar tests', function () {
       })
 
       it('updates the location in the navbar', function * () {
-        var page = this.page
+        const page = this.page
         yield this.app.client
           .activateTitleMode()
           .click(activeWebview)

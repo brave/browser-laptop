@@ -8,12 +8,13 @@ proxy blocking being tested
 <script>
 (function () {
 
-    var canvas = document.createElement("canvas")
+    const canvas = document.createElement("canvas")
     canvas.width = 2000
     canvas.height = 200
     canvas.style.display = "inline"
-    var gl = canvas.getContext("webgl")
-    var format = gl.getShaderPrecisionFormat(gl.VERTEX_SHADER, gl.MEDIUM_FLOAT)
+
+    const gl = canvas.getContext("webgl")
+    const format = gl.getShaderPrecisionFormat(gl.VERTEX_SHADER, gl.MEDIUM_FLOAT)
 
     // If blocking is working correctly, format will not be a
     // WebGLShaderPrecisionFormat instance, but a proxy instance, that allows

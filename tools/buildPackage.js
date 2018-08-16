@@ -2,18 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var VersionInfo = require('./lib/versionInfo')
-var execute = require('./lib/execute')
+const VersionInfo = require('./lib/versionInfo')
+const execute = require('./lib/execute')
 const ignoredPaths = require('./lib/ignoredPaths')
 const config = require('./lib/config')
 const path = require('path')
 
 const isWindows = process.platform === 'win32'
 const isDarwin = process.platform === 'darwin'
-var arch = 'x64'
+let arch = 'x64'
 const isLinux = process.platform === 'linux'
 
-var env = {
+const env = {
   NODE_ENV: 'production',
   CHANNEL: process.env.CHANNEL,
   REF: process.env.REF || null,
@@ -23,12 +23,12 @@ var env = {
 const channel = env.CHANNEL
 const ref = env.REF
 
-var channels = { nightly: true, developer: true, beta: true, dev: true }
+const channels = { nightly: true, developer: true, beta: true, dev: true }
 if (!channels[channel]) {
   throw new Error('CHANNEL environment variable must be set to nightly, developer, beta or dev')
 }
 
-var appIcon
+let appIcon
 if (isWindows) {
   appIcon = `res/${channel}/app.ico`
   if (process.env.TARGET_ARCH === 'ia32') {
@@ -40,7 +40,7 @@ if (isWindows) {
   appIcon = `res/${channel}/app.png`
 }
 
-var appName
+let appName
 switch (channel) {
   case 'nightly':
     appName = 'Brave-Nightly'
@@ -66,7 +66,7 @@ if (isWindows) {
   appName = appName.replace(/-/, '')
 }
 
-var productDirName = 'brave'
+let productDirName = 'brave'
 if (channel !== 'dev') {
   productDirName += `-${channel}`
 }
@@ -85,7 +85,7 @@ config.writeBuildConfig(
   'buildConfig.js'
 )
 
-var cmds = ['echo cleaning up target...']
+let cmds = ['echo cleaning up target...']
 
 if (isWindows) {
   cmds = cmds.concat([
