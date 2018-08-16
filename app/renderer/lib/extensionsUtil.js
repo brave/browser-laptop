@@ -21,7 +21,6 @@ const vimium = config.vimiumExtensionId
 const honey = config.honeyExtensionId
 const pinterest = config.pinterestExtensionId
 const metamask = config.metamaskExtensionId
-const ethwallet = config.ethwalletExtensionId
 
 /**
  * Stores dummy data for all known extensions based on vault-updater extension manifest.
@@ -80,12 +79,6 @@ const dummyData = [
     name: 'MetaMask',
     description: 'metamaskDesc',
     icon: 'img/extensions/metamask-128.png'
-  },
-  {
-    id: ethwallet,
-    name: 'Ethereum Wallet',
-    description: 'ethwalletDesc',
-    icon: 'img/extensions/ethereum-128.png'
   }
   // {
   //   id: metamask,
@@ -183,9 +176,6 @@ module.exports.getExtensionKey = (extensionId) => {
       break
     case metamask:
       extensionSetting = settings.METAMASK_ENABLED
-      break
-    case ethwallet:
-      extensionSetting = settings.ETHWALLET_ENABLED
       break
     default:
       break

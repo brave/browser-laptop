@@ -85,7 +85,6 @@ class ExtensionsTab extends ImmutableComponent {
     if (!this.props.extensions) {
       return null
     }
-    const extensions = this.props.extensions.filter(ext => ext.get('id') !== config.ethwalletExtensionId)
     return <section>
       <DefaultSectionTitle data-l10n-id='extensions' />
       <SortableTable
@@ -94,9 +93,9 @@ class ExtensionsTab extends ImmutableComponent {
         sortingDisabled
         headings={['icon', 'name', 'description', 'version', 'enabled'] /* 'exclude' */}
         rowClassNames={
-          extensions.map(entry => css(styles.tableRow)).toJS()
+          this.props.extensions.map(entry => css(styles.tableRow)).toJS()
         }
-        rows={extensions.map(entry => this.getRow(entry))}
+        rows={this.props.extensions.map(entry => this.getRow(entry))}
       />
       <footer className={css(styles.moreInfo)}>
         <HelpfulText l10nId='extensionsTabFooterInfo'>&nbsp;
