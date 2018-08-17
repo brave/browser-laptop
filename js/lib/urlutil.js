@@ -423,6 +423,21 @@ const UrlUtil = {
   },
 
   /**
+   * Checks if URL is safe to open via 'open in new tab/window' context menu
+   * @param {string} url - URL to check
+   * @return {boolean}
+   */
+  openableByContextMenu: function (url) {
+    if (!url) {
+      return false
+    }
+    const protocol = urlParse(url).protocol
+    // file: is untrusted but handled in a separate check
+    return ['http:', 'https:', 'ws:', 'wss:', 'magnet:', 'file:', 'data:',
+      'blob:', 'about:', 'chrome-extension:'].includes(protocol)
+  },
+
+  /**
    * Gets the origin of a given URL
    * @param {string} url The URL to get the origin from
    * @return {string} url The origin of the given URL

@@ -328,6 +328,34 @@ module.exports = {
     }
   },
 
+  'openableByContextMenu': {
+    'returns true when input:': {
+      'is an absolute file path with scheme': (test) => {
+        test.equal(urlUtil().openableByContextMenu('file:///file/path/to/file'), true)
+      },
+      'is http': (test) => {
+        test.equal(urlUtil().openableByContextMenu('http://example.com'), true)
+      },
+      'is https': (test) => {
+        test.equal(urlUtil().openableByContextMenu('HTtpS://brave.com/?abc=1#test'), true)
+      },
+      'is about:blank': (test) => {
+        test.equal(urlUtil().openableByContextMenu('about:blank'), true)
+      }
+    },
+    'returns false when input:': {
+      'is chrome:': (test) => {
+        test.equal(urlUtil().openableByContextMenu('chrome://brave/etc/passwd'), false)
+      },
+      'is ssh:': (test) => {
+        test.equal(urlUtil().openableByContextMenu('ssh://test@127.0.0.1'), false)
+      },
+      'is null': (test) => {
+        test.equal(urlUtil().openableByContextMenu(null), false)
+      }
+    }
+  },
+
   'getDisplayHost': {
     'url is http': (test) => {
       const result = urlUtil().getDisplayHost('http://brave.com')
