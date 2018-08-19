@@ -3585,7 +3585,8 @@ describe('ledger api unit tests', function () {
       const expectedState = defaultAppState
         .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_CHECK)
         .setIn(['ledger', 'promotion', 'captcha'], 'data:image/jpeg;base64,/9j/2wA=')
-      const result = ledgerApi.onCaptchaResponse(defaultAppState, null, body)
+        .setIn(['ledger', 'promotion', 'captchaHint'], 'grey')
+      const result = ledgerApi.onCaptchaResponse(defaultAppState, null, body, 'grey')
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
 
@@ -3595,7 +3596,8 @@ describe('ledger api unit tests', function () {
       const expectedState = defaultAppState
         .setIn(['ledger', 'promotion', 'promotionStatus'], promotionStatuses.CAPTCHA_ERROR)
         .setIn(['ledger', 'promotion', 'captcha'], 'data:image/jpeg;base64,/9j/2wA=')
-      const result = ledgerApi.onCaptchaResponse(state, null, body)
+        .setIn(['ledger', 'promotion', 'captchaHint'], 'grey')
+      const result = ledgerApi.onCaptchaResponse(state, null, body, 'grey')
       assert.deepEqual(result.toJS(), expectedState.toJS())
     })
   })
