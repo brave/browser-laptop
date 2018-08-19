@@ -262,6 +262,7 @@ AppStore
     },
     promotion: {
       activeState: string,
+      captchaHint: string,
       claimedTimestamp: number,
       minimumReconcileTimestamp: number,
       promotionId: number,

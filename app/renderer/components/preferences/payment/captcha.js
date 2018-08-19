@@ -112,7 +112,12 @@ class Captcha extends ImmutableComponent {
         <img src={arrowIcon} draggable='false' className={css(styles.enabledContent__captcha__arrow, styles.disableDND)} />
       </div>
       <div draggable='false' onDrop={this.onCaptchaDrop} onDragOver={this.preventDefault} className={css(styles.enabledContent__captcha__drop, styles.disableDND)} />
-      <p draggable='false' className={css(styles.enabledContent__overlay_text, styles.disableDND)} data-l10n-id='promotionCaptchaMessage' />
+      <p
+        draggable='false'
+        className={css(styles.enabledContent__overlay_text, styles.disableDND)}
+        data-l10n-id='promotionCaptchaMessageNew'
+        data-l10n-args={JSON.stringify({hint: this.props.promo.get('captchaHint')})}
+    />
     </div>
   }
 }

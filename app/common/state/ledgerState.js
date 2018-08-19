@@ -559,6 +559,7 @@ const ledgerState = {
     const claim = state.getIn(['ledger', 'promotion', 'claimedTimestamp']) || null
     const status = state.getIn(['ledger', 'promotion', 'promotionStatus']) || null
     const captcha = state.getIn(['ledger', 'promotion', 'captcha']) || null
+    const captchaHint = state.getIn(['ledger', 'promotion', 'captchaHint']) || null
 
     if (claim) {
       promotion = promotion.set('claimedTimestamp', claim)
@@ -570,6 +571,10 @@ const ledgerState = {
 
     if (captcha) {
       promotion = promotion.set('captcha', captcha)
+    }
+
+    if (captchaHint) {
+      promotion = promotion.set('captchaHint', captchaHint)
     }
 
     return promotion
