@@ -250,8 +250,8 @@ const tabsReducer = (state, action, immutableAction) => {
         windows.focus(windowId)
       }
       const url = action.getIn(['createProperties', 'url'])
-      if (!openableByContextMenu(url) ||
-        (isFileScheme(url) && !action.get('allowFile'))) {
+      if (url && (!openableByContextMenu(url) ||
+        (isFileScheme(url) && !action.get('allowFile')))) {
         // Don't allow 'open in new tab' to open file:// URLs for security
         action = action.setIn(['createProperties', 'url'], 'about:blank')
       }
