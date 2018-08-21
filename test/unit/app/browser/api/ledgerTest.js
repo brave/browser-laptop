@@ -2711,17 +2711,13 @@ describe('ledger api unit tests', function () {
   })
 
   describe('schedulePromoRefFetch', function () {
-    const fortySeconds = 40000
-    const seventySeconds = 70000
-    let fakeClock, onPromoRefFetchSpy
+    let onPromoRefFetchSpy
 
     before(function () {
-      fakeClock = sinon.useFakeTimers()
       onPromoRefFetchSpy = sinon.spy(appActions, 'onPromoRefFetch')
     })
 
     after(function () {
-      fakeClock.restore()
       onPromoRefFetchSpy.restore()
     })
 
@@ -2729,16 +2725,9 @@ describe('ledger api unit tests', function () {
       onPromoRefFetchSpy.reset()
     })
 
-    it('dispatches onPromoRefFetch after 50 - 70 seconds', function () {
+    it('dispatches onPromoRefFetch', function () {
       ledgerApi.schedulePromoRefFetch(defaultAppState)
-      fakeClock.tick(seventySeconds)
       assert(onPromoRefFetchSpy.calledOnce)
-    })
-
-    it('does not dispatch onPromoRefFetch after 40 seconds', function () {
-      ledgerApi.schedulePromoRefFetch(defaultAppState)
-      fakeClock.tick(fortySeconds)
-      assert(onPromoRefFetchSpy.notCalled)
     })
   })
 

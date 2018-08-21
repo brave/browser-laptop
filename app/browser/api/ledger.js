@@ -87,7 +87,6 @@ let promotionTimeoutId
 let togglePromotionTimeoutId
 let publisherInfoTimeoutId = false
 let publisherInfoUpdateIntervalId
-let promoRefFetchTimeoutId = false
 
 const statePath = 'ledger-state.json'
 
@@ -2278,13 +2277,7 @@ const initialize = (state, paymentsEnabled) => {
 }
 
 const schedulePromoRefFetch = () => {
-  if (promoRefFetchTimeoutId) {
-    clearTimeout(promoRefFetchTimeoutId)
-  }
-
-  promoRefFetchTimeoutId = setTimeout(() => {
-    appActions.onPromoRefFetch()
-  }, random.randomInt({min: 50 * ledgerUtil.milliseconds.second, max: 70 * ledgerUtil.milliseconds.second}))
+  appActions.onPromoRefFetch()
 }
 
 const onRunPromoRefFetch = (state) => {
