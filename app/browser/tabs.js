@@ -20,6 +20,7 @@ const siteSettings = require('../../js/state/siteSettings')
 const messages = require('../../js/constants/messages')
 const webrtcConstants = require('../../js/constants/webrtcConstants')
 const debounce = require('../../js/lib/debounce')
+const urlParse = require('../common/urlParse')
 const aboutHistoryState = require('../common/state/aboutHistoryState')
 const aboutNewTabState = require('../common/state/aboutNewTabState')
 const appStore = require('../../js/stores/appStore')
@@ -92,7 +93,14 @@ const getPartitionNumber = (partition) => {
   return Number(partition.split('persist:partition-')[1] || 0)
 }
 
-const shouldWaitForTorLoad = (webContents, appState) => {
+/**
+ * Returns true if the URL should not be allowed to load for security/privacy
+ * reasons.
+ */
+const shouldBlockLoad = (webContents, url, appState) => {
+  if (url && urlParse(url).origin === 'chrome://brave/') {
+    return true
+  }
   if (webContents &&
     webContents.session &&
     webContents.session.partition === appConfig.tor.partition) {
@@ -914,11 +922,11 @@ const api = {
     action = makeImmutable(action)
     const tabId = action.get('tabId')
     const tab = webContentsCache.getWebContents(tabId)
-    if (shouldWaitForTorLoad(tab)) {
+    const url = normalizeUrl(action.get('url'))
+    if (shouldBlockLoad(tab, url)) {
       return
     }
     if (tab && !tab.isDestroyed()) {
-      const url = normalizeUrl(action.get('url'))
       const currentUrl = tab.getURL()
       // We only allow loading URLs explicitly when the origin is
       // the same for pinned tabs.  This is to help preserve a users
@@ -956,11 +964,11 @@ const api = {
 
   loadURLInTab: (state, tabId, url) => {
     const tab = webContentsCache.getWebContents(tabId)
-    if (shouldWaitForTorLoad(tab)) {
+    url = normalizeUrl(url)
+    if (shouldBlockLoad(tab, url)) {
       return
     }
     if (tab && !tab.isDestroyed()) {
-      url = normalizeUrl(url)
       tab.loadURL(url)
     }
     return state
