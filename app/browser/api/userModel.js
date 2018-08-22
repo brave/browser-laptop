@@ -641,13 +641,13 @@ const checkReadyAdServe = (state, windowId, forceP) => {  // around here is wher
 
   if (!forceP) {
     if (!foregroundP) { // foregroundP is sensible but questionable -SCL
-      appActions.onUserModelLog('Ad not served', { reason: 'not in foreground' })
+      appActions.onUserModelLog('Notification not made', { reason: 'not in foreground' })
 
       return state
     }
 
     if (!userModelState.allowedToShowAdBasedOnHistory(state)) {
-      appActions.onUserModelLog('Ad not served', { reason: 'not allowed based on history' })
+      appActions.onUserModelLog('Notification not made', { reason: 'not allowed based on history' })
 
       return state
     }
@@ -655,25 +655,28 @@ const checkReadyAdServe = (state, windowId, forceP) => {  // around here is wher
   // SCL uncomment when ready
   // let whatnext = elphSaysGo(state)
   // if (!whatnext) {
-  //   appActions.onUserModelLog('Ad not served', { reason: 'elph says user unlikely to click' })
+  //   appActions.onUserModelLog('Notification not made', { reason: 'elph says user unlikely to click' })
   //   state = userModelState.elphDeferRecorder(state)
   //   return state
   // }
   // let reset = true
   // state = userModelState.elphDeferRecorder(state, reset) // reset deferral counter
 
+ // NB: temporary survey logic for beta
     const first = userModelState.getUserModelValue(state, 'firstContactTimestamp')
     const finale = userModelState.getUserModelValue(state, 'finalContactTimestamp')
     if (first && finale) {
       const surveys = userModelState.getUserSurveyQueue(state).toJS()
       const available = underscore.where(surveys, { status: 'available' }) || []
+      const complete = underscore.where(surveys, { status: 'complete' }) || []
       const survey = underscore.first(available)
-      const allowed = (available.length > 1) ? (first + (86400 * 1000)) : (finale - (2 * 86400 * 1000))
+      const delta = (finale - first) - (2 * 86400 * 1000)
+      const ratio = survey ? ((complete.length + 1) / (available.length + complete.length)) : 1
+      const allowed = first + (ratio * delta)
 
-      /* NB: temporary survey logic for beta
-             - first survey appears no earlier than one day after start; otherwise,
-             - surveys appear no earlier than two days before end of trial
-      */
+      appActions.onUserModelLog('Survey calculation', {
+        available: available.length, complete: complete.length, surveyP: !!survey, delta, ratio, allowed, now: underscore.now()
+      })
       if ((survey) && (allowed <= underscore.now())) {
         survey.status = 'display'
         survey.status_at = new Date().toISOString()
@@ -695,7 +698,7 @@ const checkReadyAdServe = (state, windowId, forceP) => {  // around here is wher
   const indexOfMax = um.vectorIndexOfMax(scores)
   const category = catNames[indexOfMax]
   if (!category) {
-    appActions.onUserModelLog('Ad not served', { reason: 'no category at offset indexOfMax', indexOfMax })
+    appActions.onUserModelLog('Notification not made', { reason: 'no category at offset indexOfMax', indexOfMax })
 
     return state
   }
@@ -706,7 +709,7 @@ const checkReadyAdServe = (state, windowId, forceP) => {  // around here is wher
 const serveAdFromCategory = (state, windowId, category) => {
   const bundle = sampleAdFeed
   if (!bundle) {
-    appActions.onUserModelLog('Ad not served', { reason: 'no ad catalog' })
+    appActions.onUserModelLog('Notification not made', { reason: 'no ad catalog' })
 
     return state
   }
@@ -721,7 +724,7 @@ const serveAdFromCategory = (state, windowId, category) => {
     if (result) break
   }
   if (!result) {
-    appActions.onUserModelLog('Ad not served', { reason: 'no ads for category', category })
+    appActions.onUserModelLog('Notification not made', { reason: 'no ads for category', category })
 
     return state
   }
@@ -744,7 +747,7 @@ const serveAdFromCategory = (state, windowId, category) => {
   const payload = adsNotSeen[arbitraryKey]
 
   if (!payload) {
-    appActions.onUserModelLog('Ad not served',
+    appActions.onUserModelLog('Notification not made',
                               { reason: 'no ad for winnerOverTime', category, winnerOverTime, arbitraryKey })
 
     return state
@@ -754,7 +757,7 @@ const serveAdFromCategory = (state, windowId, category) => {
   const notificationUrl = payload.notificationURL
   const advertiser = payload.advertiser
   if (!notificationText || !notificationUrl || !advertiser) {
-    appActions.onUserModelLog('Ad not served',
+    appActions.onUserModelLog('Notification not made',
                               { reason: 'incomplete ad information', category, winnerOverTime, arbitraryKey, notificationUrl, notificationText, advertiser })
 
     return state
@@ -978,7 +981,8 @@ const downloadSurveys = (state, surveys) => {
   if (noop(state)) return state
 
   appActions.onUserModelLog('Surveys downloaded', surveys)
-  surveys = surveys.sortBy(survey => survey.get('created_at')).filter(survey => survey.get('status') === 'available')
+  surveys = surveys.sortBy(survey => survey.get('created_at'))
+    .filter(survey => survey.get('status') === 'available' || survey.get('status') === 'complete')
   appActions.onUserModelLog('Surveys available', surveys)
 
   return userModelState.setUserSurveyQueue(state, surveys)
