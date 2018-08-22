@@ -43,6 +43,7 @@ let nextEasterEgg = 0
 let initP
 let foregroundP
 let onceP
+let userModelOptions = {}
 
 let matrixData
 let priorData
@@ -65,6 +66,10 @@ const generateAdReportingEvent = (state, eventType, action) => {
     onceP = true
 
     state = generateAdReportingEvent(state, 'restart', action)
+
+    const revision = parseInt(underscore.last(app.getVersion().split('.')), 10)
+    if (revision >= 3000) userModelOptions.noEventLogging = true
+    appActions.onUserModelLog('Options', userModelOptions)
   }
 
   const map = { type: eventType, stamp: new Date().toISOString() }
@@ -908,7 +913,7 @@ const collectActivity = (state) => {
       reportId: mark.uuid,
       reportStamp: now.toISOString(),
       reportTZO: sign + hh + ':' + mm,
-      events: events
+      events: userModelOptions.noEventLogging ? [] : events
     }
   }, roundTripOptions, (err, response, result) => {
     if (err) {
