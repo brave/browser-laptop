@@ -442,7 +442,7 @@ const UrlUtil = {
     const protocol = urlParse(url).protocol
     // file: is untrusted but handled in a separate check
     return ['http:', 'https:', 'ws:', 'wss:', 'magnet:', 'file:', 'data:',
-      'blob:', 'about:', 'chrome-extension:'].includes(protocol)
+      'blob:', 'about:', 'chrome-extension:', 'view-source:'].includes(protocol)
   },
 
   /**
