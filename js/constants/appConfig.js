@@ -164,6 +164,7 @@ module.exports = {
     'tabs.show-tab-previews': true,
     'tabs.preview-timing': tabPreviewTiming.SHORT,
     'tabs.show-dashboard-images': true,
+    'tabs.clock-display-twenty-four': false,
     'privacy.history-suggestions': true,
     'privacy.bookmark-suggestions': true,
     'privacy.topsite-suggestions': true,

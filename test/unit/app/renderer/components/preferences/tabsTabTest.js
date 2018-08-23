@@ -278,5 +278,17 @@ describe('TabsTab component', function () {
         true
       )
     })
+
+    it('dashboard shows a 12/24 hour clock', function () {
+      settingDefaultValue = true
+      const wrapper = shallow(<TabsTab settings={settingDefaultValue} />)
+
+      assert.notEqual(
+        wrapper.find('[dataTestId="clockDisplayTwentyFour"]')
+          .map(option => option.props().value)
+          .includes(settingDefaultValue),
+        true
+      )
+    })
   })
 })
