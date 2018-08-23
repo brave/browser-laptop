@@ -43,8 +43,8 @@ class Captcha extends ImmutableComponent {
     event.preventDefault()
     const target = this.captchaBox.getBoundingClientRect()
 
-    let x = event.clientX - target.left - this.dndStartPosition.x + (this.dndStartPosition.height / 2)
-    let y = event.clientY - target.top - this.dndStartPosition.y + (this.dndStartPosition.width / 2)
+    let x = event.clientX - target.left - this.dndStartPosition.x + (this.dndStartPosition.width / 2)
+    let y = event.clientY - target.top - this.dndStartPosition.y + (this.dndStartPosition.height / 2)
 
     if (isWindows) {
       const dpr = window.devicePixelRatio
@@ -198,9 +198,9 @@ const styles = StyleSheet.create({
   },
 
   enabledContent__captcha__image: {
-    flexBasis: '66px',
-    height: '62px',
-    marginTop: '10px',
+    flexBasis: '57px',
+    height: '49px',
+    marginTop: '15px',
     position: 'relative',
     zIndex: '2',
     cursor: 'pointer'
