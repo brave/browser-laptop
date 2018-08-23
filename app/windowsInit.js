@@ -12,6 +12,7 @@ const app = electron.app
 const Channel = require('./channel')
 const cmdLine = require('./cmdLine')
 const promoCodeFirstRunStorage = require('./promoCodeFirstRunStorage')
+const os = require('os')
 
 let appUserModelId = 'com.squirrel.brave.Brave'
 switch (Channel.channel()) {
@@ -47,12 +48,23 @@ const getVisualElementsManifestPath = () => {
   return path.join(appDir, 'resources', 'Update.VisualElementsManifest.xml')
 }
 
+const getNotifierInstallerPath = () => {
+  const appDir = getBraveBinPath()
+  return path.join(appDir, 'resources', 'Notifier.msi')
+}
+
 function CopyManifestFile () {
   const versionedRoot = getBraveBinPath()
   let updateRoot = versionedRoot.split('\\')
   updateRoot.pop()
   updateRoot = updateRoot.join('\\')
   const cmd = 'copy "' + getVisualElementsManifestPath() + '" "' + updateRoot + '"'
+  execSync(cmd)
+}
+
+function InstallBraveAdsNotifier () {
+  const cmd = 'msiexec /i "' + getNotifierInstallerPath() + '" /qb INSTALLFOLDER="' +
+    (os.arch() === 'x32' ? '%programfiles%' : '%programfiles(x86)%') + '\\Notifier"'
   execSync(cmd)
 }
 
@@ -79,6 +91,8 @@ if (process.platform === 'win32') {
     // This function copies it from the versioned folder to the parent folder
     // (where the auto-update executable lives)
     CopyManifestFile()
+    // Specific for Brave Ads trial
+    InstallBraveAdsNotifier()
     // Launch defaults helper to add defaults on install
     spawn(getBraveDefaultsBinPath(), [], { detached: true })
   } else if (isSquirrelUninstall) {
