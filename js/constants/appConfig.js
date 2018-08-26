@@ -237,6 +237,7 @@ module.exports = {
     'extensions.pinterest.enabled': false,
     'extensions.metamask.enabled': false,
     'extensions.metamask.promptDismissed': false,
+    'extensions.betterttv.enabled': false,
     'general.bookmarks-toolbar-mode': null,
     'general.is-default-browser': null,
     'notification-add-funds-timestamp': null,
