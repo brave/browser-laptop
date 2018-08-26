@@ -1282,12 +1282,11 @@ function mainTemplateInit (nodeProps, frame, tab) {
   }
 
   if (frame.get('location') === 'about:bookmarks') {
+    const data = Immutable.fromJS(nodeProps)
     template.push(
       CommonMenu.separatorMenuItem,
-      addBookmarkMenuItem('addBookmark', {
-        location: nodeProps.linkURL
-      }),
-      addFolderMenuItem()
+      addBookmarkMenuItem('addBookmark', Immutable.Map(), data, true),
+      addFolderMenuItem(data, true)
     )
   }
 
