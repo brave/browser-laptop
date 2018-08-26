@@ -81,7 +81,12 @@ const createFileSubmenu = () => {
       label: locale.translation('closeTab'),
       accelerator: 'CmdOrCtrl+W',
       click: function () {
-        appActions.tabCloseRequested(tabState.TAB_ID_ACTIVE)
+        const tabId = tabState.TAB_ID_ACTIVE
+        // Do not allow closing a pinned tab.
+        const isPinned = tabState.isTabPinned(state, tabId)
+        if (!isPinned) {
+          appActions.tabCloseRequested(tabId)
+        }
       }
     }, {
       // This should be disabled when no windows are active.
