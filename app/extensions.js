@@ -95,6 +95,19 @@ let generateBraveManifest = () => {
         ]
       },
       {
+        js: [
+          'content/scripts/sharemenot/socialwidgetsObject.js',
+          'content/scripts/sharemenot/socialwidgets.js'
+        ],
+        matches: ['<all_urls>'],
+        exclude_globs: [
+          indexHTML,
+          getBraveExtUrl('*')
+        ],
+        all_frames: true,
+        run_at: 'document_idle'
+      },
+      {
         run_at: 'document_end',
         all_frames: true,
         matches: ['<all_urls>'],
@@ -197,6 +210,7 @@ let generateBraveManifest = () => {
     ],
     web_accessible_resources: [
       'img/favicon.ico',
+      'content/scripts/sharemenot/img/*',
       'img/newtab/defaultTopSitesIcon/appstore.png',
       'img/newtab/defaultTopSitesIcon/brave.ico',
       'img/newtab/defaultTopSitesIcon/github.png',
