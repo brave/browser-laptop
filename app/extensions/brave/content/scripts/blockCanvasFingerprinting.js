@@ -148,7 +148,7 @@ function reportBlock (type) {
     scriptUrl: stripLineAndColumnNumbers(script_url)
   }
 
-  // Block the read from occuring; send info to background page instead
+  // Block the read from occurring; send info to background page instead
   chrome.ipcRenderer.sendToHost('got-canvas-fingerprinting', msg)
 
   return allPurposeProxy
