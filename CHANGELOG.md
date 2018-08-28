@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.23.104](https://github.com/brave/browser-laptop/releases/tag/v0.23.104dev)
+
+ - Added support for window.prompt. ([#94](https://github.com/brave/browser-laptop/issues/94))
+ - Fixed loading of chrome://brave URLs. ([#15074](https://github.com/brave/browser-laptop/issues/15074))
+ - Fixed certain promotional tabs not appearing right after startup. ([#15067](https://github.com/brave/browser-laptop/issues/15067))
+ - Fixed chrome:// new tab issue. ([#15045](https://github.com/brave/browser-laptop/issues/15045))
+ - Fixed security issue with brave://. ([#14967](https://github.com/brave/browser-laptop/issues/14967))
+ - Fixed publisher data file not being removed when wallet is deleted using preferences. ([#14758](https://github.com/brave/browser-laptop/issues/14758))
+ - Fixed permission prompt with window.open. ([#14681](https://github.com/brave/browser-laptop/issues/14681))
+ - Fixed visited links not being reset when closing Brave. ([#14667](https://github.com/brave/browser-laptop/issues/14667))
+ - Fixed issues where file can be opened in new tab. ([#14522](https://github.com/brave/browser-laptop/issues/14522))
+ - Fixed downloads not working when right clicking and opening in new tab. ([#14409](https://github.com/brave/browser-laptop/issues/14409))
+ - Fixed issue where cookie is unintentionally sent. ([#14250](https://github.com/brave/browser-laptop/issues/14250))
+ - Fixed URL-like strings can cause empty autocomplete results. ([#13718](https://github.com/brave/browser-laptop/issues/13718))
+ - Fixed Flash permission notification being displayed when clicking the Adobe test page via search results. ([#13500](https://github.com/brave/browser-laptop/issues/13500))
+ - Upgraded to muon 8.0.8. ([#15018](https://github.com/brave/browser-laptop/issues/15018))
+
 ## [0.23.79](https://github.com/brave/browser-laptop/releases/tag/v0.23.79dev)
 
  - Fixed crash when tabs are discarded. ([#14955](https://github.com/brave/browser-laptop/issues/14955))
