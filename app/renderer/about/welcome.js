@@ -30,35 +30,31 @@ class AboutWelcome extends React.Component {
           </div>
           <div className={css(styles.et_pb_column, styles.et_pb_column_2_3)}>
             <p className={css(styles.p3, styles.note)}>
-              <b className={css(styles.p3_b)}>Note</b>: This version of Brave should only be used by those who have been invited to participate in the
-              Brave Ads Test Program. If you have found your way here by accident, please download the current
+              <b className={css(styles.p3_b)}>Note</b>: This version of Brave should only be used by those who have been invited to participate
+              in the Brave Ads Trial program. If you have found your way here by accident, please download the normal
               release version for your device at <a href='https://brave.com/download' target='_blank' className={css(styles.link)}>https://brave.com/download</a>
             </p>
             <p className={css(styles.p3)}>
               <b className={css(styles.p3_b)}>Brave Ads will give you your fair share of ad dollars.</b>&nbsp;
-              For this early test, <b className={css(styles.p3_b)}>we need volunteers who are willing to share their
-              data</b> to help us build Brave Ads, a private Ad platform. Information
-              collected during this experiment will be used to test, calibrate, and improve Brave’s advertising
-              agent and to administer the experiment.
-            </p>
-            <p className={css(styles.p3)}>
-              <b className={css(styles.p3_b)}>When Brave Ads launches
-              later this year, all personal data and browsing history will remain on-device and will not be
-              transmitted to Brave or anyone else. The data being collected in this test is specific to this
-              early test.</b>
+              For that to happen, <b className={css(styles.p3_b)}>we need volunteers who are willing to share their data</b> to
+              help us build a private ad platform. This will enable the production version of Brave Ads to allow
+              you to have more control of your data while being paid to view and interact with ads, in the form of
+              BAT, the Basic Attention Token. <b className={css(styles.p3_b)}>This version of Brave is a test build for those volunteers only.</b>
             </p>
             <p className={css(styles.p3, styles.pr_no)}>
-              <b className={css(styles.p3_b)}>How the test works:</b> A few times per day, a handful of relevant
-              ads are presented to you.  In exchange for your participation in downloading and using the test
-              browser for 14 days, you will be compensated with an Amazon gift card or you can choose to get paid
-              in BAT by sending us your Ethereum address. Try it now and let us know what you think of the new Brave Ads.
+              <b className={css(styles.p3_b)}>How the test works:</b> A few times per day, a handful of relevant ads
+              are presented to you. In exchange for your participation in downloading and using the test browser
+              for 28 days. Try it now and let us know what you think of the new Brave Ads.
             </p>
             <div className={css(styles.et_pb_divider_internal)} />
             <p className={css(styles.p3)}>
-              This version of Brave Ads is part of a test <b className={css(styles.p3_b)}>which sends your browsing
-              activity and other potentially sensitive data to Brave.</b> If you’re not part of this test program,
-              do not use this version of Brave. The test will complete in 14 days, after which we recommend an
-              upgrade to the Brave production version that will no longer collect any browsing history or activity.
+              This version of Brave Ads is part of a test which sends your browsing activity and other potentially
+              sensitive data to Brave. If you’re not part of this test program, do not use this version of Brave.
+              The test will complete in 28 days, after which we recommend an upgrade to the Brave production version
+              that will no longer collect any browsing history or activity. <b className={css(styles.p3_b)}>When Brave
+              Ads launches later this year, all personal data and browsing history will remain on-device and will
+              not be transmitted to Brave or anyone else. The data being collected in this test is specific
+              to this test.</b>
             </p>
             <p className={css(styles.p3, styles.pr_no)}>
               <a href='https://brave.com/hc-privacy' target='_blank' className={css(styles.link)}>
