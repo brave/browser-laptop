@@ -128,10 +128,10 @@ describe('immutableUtil unit test', function () {
     it('converts null to null', function () {
       assert.equal(immutableUtil.makeJS(null), null)
     })
-    it('converts null to default value if a deafult value is specified', function () {
+    it('converts null to default value if a default value is specified', function () {
       assert.deepEqual(immutableUtil.makeJS(null, {a: 1}), {a: 1})
     })
-    it('converts undefined to default value if a deafult value is specified', function () {
+    it('converts undefined to default value if a default value is specified', function () {
       assert.deepEqual(immutableUtil.makeJS(undefined, {a: 1}), {a: 1})
     })
     it('converts false to false when a default value is specified', function () {
