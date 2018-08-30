@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.23.105](https://github.com/brave/browser-laptop/releases/tag/v0.23.105dev)
+
+ - Fixed Windows crash. ([#15025](https://github.com/brave/browser-laptop/issues/15025))
+ - Fixed issues with extensions (LastPass, Bitwarden, and DashLane). ([#14841](https://github.com/brave/browser-laptop/issues/14841))
+ - Upgraded to muon 8.0.9. ([#15119](https://github.com/brave/browser-laptop/issues/15119))
+
 ## [0.23.104](https://github.com/brave/browser-laptop/releases/tag/v0.23.104dev)
 
  - Added support for window.prompt. ([#94](https://github.com/brave/browser-laptop/issues/94))
