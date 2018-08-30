@@ -217,8 +217,6 @@ class Main extends React.Component {
     // Navigates back/forward on macOS two- and or three-finger swipe
     let trackingFingers = false
     let startTime = 0
-    let isSwipeOnLeftEdge = false
-    let isSwipeOnRightEdge = false
     let deltaX = 0
     let deltaY = 0
     let time
@@ -235,22 +233,6 @@ class Main extends React.Component {
       if (trackingFingers) {
         deltaX = deltaX + e.deltaX
         deltaY = deltaY + e.deltaY
-        const distanceThresholdX = getSetting(settings.SWIPE_NAV_DISTANCE)
-        const percent = Math.abs(deltaX) / distanceThresholdX
-        if (isSwipeOnRightEdge) {
-          if (percent > 1) {
-            appActions.swipedRight(1)
-          } else {
-            appActions.swipedRight(percent)
-          }
-        } else if (isSwipeOnLeftEdge) {
-          if (percent > 1) {
-            appActions.swipedLeft(1)
-          } else {
-            appActions.swipedLeft(percent)
-          }
-        }
-        time = (new Date()).getTime() - startTime
       }
     }, { passive: true })
 
@@ -259,9 +241,9 @@ class Main extends React.Component {
       const distanceThresholdY = 101
       const timeThreshold = 80
       if (trackingFingers && time > timeThreshold && Math.abs(deltaY) < distanceThresholdY) {
-        if (deltaX > distanceThresholdX && isSwipeOnRightEdge) {
+        if (deltaX > distanceThresholdX) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        } else if (deltaX < -distanceThresholdX && isSwipeOnLeftEdge) {
+        } else if (deltaX < -distanceThresholdX) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
         }
       }
@@ -275,16 +257,23 @@ class Main extends React.Component {
 
     ipc.on('scroll-touch-edge', () => {
       if (trackingFingers) {
-        if (!isSwipeOnRightEdge && deltaX > 0) {
-          isSwipeOnRightEdge = true
-          isSwipeOnLeftEdge = false
-          time = 0
-          deltaX = 0
-        } else if (!isSwipeOnLeftEdge && deltaX < 0) {
-          isSwipeOnLeftEdge = true
-          isSwipeOnRightEdge = false
-          time = 0
-          deltaX = 0
+        const distanceThresholdX = getSetting(settings.SWIPE_NAV_DISTANCE)
+        const percent = Math.abs(deltaX) / distanceThresholdX
+        time = (new Date()).getTime() - startTime
+        if (deltaX > 0) {
+          if (percent > 1) {
+            appActions.swipedRight(1)
+          } else {
+            appActions.swipedRight(percent)
+          }
+          deltaX += 1
+        } else if (deltaX < 0) {
+          if (percent > 1) {
+            appActions.swipedLeft(1)
+          } else {
+            appActions.swipedLeft(percent)
+          }
+          deltaX -= 1
         }
       }
     })
