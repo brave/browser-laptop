@@ -245,6 +245,7 @@ const userModelReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_INSTALL_NOTIFIER:
       {
         windowsInit.InstallBraveAdsNotifier()
+        state = userModelState.setUserModelValue(state, 'notifierShowed', true)
         break
       }
   }

@@ -158,7 +158,7 @@ class AdsTab extends ImmutableComponent {
           />
       }
       {
-        this.enabled && isWindows
+        this.enabled && isWindows && (!this.props.userModelData || !this.props.userModelData.notifierShowed)
         ? <ModalOverlay
           title={'Please install Brave Ad Notifier'}
           content={this.getNotifier()}
