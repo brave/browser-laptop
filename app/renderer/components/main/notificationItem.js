@@ -59,8 +59,8 @@ class NotificationItem extends React.Component {
         buttonActionId
       )
     }
-	  // return focus to the content area
-	  webviewActions.setWebviewFocused()
+    // return focus to the content area
+    webviewActions.setWebviewFocused()
   }
 
   openAdvanced () {

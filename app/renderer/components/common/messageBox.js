@@ -15,6 +15,7 @@ const {PromptTextBox} = require('./textbox')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
+const webviewActions = require('../../../../js/actions/webviewActions')
 
 // Constants
 const KeyCodes = require('../../../common/constants/keyCodes')
@@ -96,6 +97,8 @@ class MessageBox extends React.Component {
     }
 
     appActions.tabMessageBoxDismissed(tabId, response)
+    // return focus to the content area
+    webviewActions.setWebviewFocused()
   }
 
   get messageBoxButtons () {
