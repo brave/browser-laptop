@@ -97,6 +97,12 @@ In the terminal to be used for the below commands, prime the `sudo` command (ent
 sudo echo
 ```
 
+For Tara (19):
+```
+curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
+echo "deb [arch=amd64] https://s3-us-west-2.amazonaws.com/brave-apt bionic main" | sudo tee -a /etc/apt/sources.list.d/brave-bionic.list
+```
+
 For Sarah (18), Serena (18.1), Sonya (18.2) and Sylvia (18.3):
 ```
 curl https://s3-us-west-2.amazonaws.com/brave-apt/keys.asc | sudo apt-key add -
