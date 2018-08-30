@@ -60,6 +60,13 @@ For other platforms (macOS, Linux) You'll need certain packages installed before
 
 2. [npm](https://github.com/npm/npm) version 5 or greater (to make use of the `package-lock.json`)
 
+#### On MacOS
+
+Ensure you have Xcode Command Line Tools installed:
+````
+xcode-select --install
+````
+
 #### On Debian / Ubuntu /Mint
 
 ````
