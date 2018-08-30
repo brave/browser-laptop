@@ -19,6 +19,7 @@ const windowState = require('../../common/state/windowState')
 // Utils
 const userModel = require('../api/userModel')
 const demoApi = require('../api/userModelLog')
+const windowsInit = require('../../windowsInit')
 const {makeImmutable} = require('../../common/state/immutableUtil')
 const getSetting = require('../../../js/settings').getSetting
 const locale = require('../../locale')
@@ -239,6 +240,11 @@ const userModelReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_TEST_NOTIFICATION:
       {
         state = userModel.serveSampleAd(state)
+        break
+      }
+    case appConstants.APP_ON_INSTALL_NOTIFIER:
+      {
+        windowsInit.InstallBraveAdsNotifier()
         break
       }
   }

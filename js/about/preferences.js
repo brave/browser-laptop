@@ -815,6 +815,8 @@ class AboutPreferences extends React.Component {
           onChangeSetting={this.onChangeSetting}
           demoValue={demoValue}
           userModelData={userModelData}
+          showOverlay={this.setOverlayVisible.bind(this, true)}
+          hideOverlay={this.setOverlayVisible.bind(this, false)}
         />
         break
     }

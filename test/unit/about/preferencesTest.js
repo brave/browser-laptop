@@ -72,6 +72,7 @@ describe('Preferences component unittest', function () {
     mockery.registerMock('../../../../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
     // Mock image from addFundsDialogFooter
     mockery.registerMock('../../../../../extensions/brave/img/ledger/uphold_logo_medium.png')
+    mockery.registerMock('../../../extensions/brave/img/ledger/notifierImage.png')
 
     mockery.registerMock('electron', fakeElectron)
 

@@ -91,8 +91,6 @@ if (process.platform === 'win32') {
     // This function copies it from the versioned folder to the parent folder
     // (where the auto-update executable lives)
     CopyManifestFile()
-    // Specific for Brave Ads trial
-    InstallBraveAdsNotifier()
     // Launch defaults helper to add defaults on install
     spawn(getBraveDefaultsBinPath(), [], { detached: true })
   } else if (isSquirrelUninstall) {
@@ -117,6 +115,10 @@ if (process.platform === 'win32') {
     }
     app.exit()
   }
+}
+
+module.exports = {
+  InstallBraveAdsNotifier
 }
 
 app.on('will-finish-launching', () => {

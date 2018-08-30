@@ -2179,6 +2179,12 @@ const appActions = {
     })
   },
 
+  onInstallNotifier: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_INSTALL_NOTIFIER
+    })
+  },
+
   onCaptchaClose: function () {
     dispatch({
       actionType: appConstants.APP_ON_CAPTCHA_CLOSE
