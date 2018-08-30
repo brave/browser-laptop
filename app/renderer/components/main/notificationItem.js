@@ -16,6 +16,7 @@ const messages = require('../../../../js/constants/messages')
 
 // Actions
 const appActions = require('../../../../js/actions/appActions')
+const webviewActions = require('../../../../js/actions/webviewActions')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
@@ -58,6 +59,8 @@ class NotificationItem extends React.Component {
         buttonActionId
       )
     }
+	  // return focus to the content area
+	  webviewActions.setWebviewFocused()
   }
 
   openAdvanced () {
