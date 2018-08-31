@@ -1016,15 +1016,39 @@ module.exports.runImportDefaultSettings = (data) => {
   return data
 }
 
-module.exports.setDefaultSearchEngine = (immutableData) => {
-  const defaultLocale = locale.getDefaultLocale(true)
-  let defaultSearchEngine = config.defaultSearchEngineByLocale.default
+const getCanonicalCountryName = () => {
+  const countryName = app.getCountryName()
+  switch (countryName) {
+    case 'US':
+    case 'en_US.UTF-8':
+    case 'es_US.UTF-8':
+      return 'USA'
 
-  for (let entry in config.defaultSearchEngineByLocale) {
-    if (entry === defaultLocale) {
-      defaultSearchEngine = config.defaultSearchEngineByLocale[entry]
-      break
-    }
+    case 'France':
+    case 'Frankreich':
+    case 'FR':
+    case 'fr_FR.UTF-8':
+      return 'France'
+
+    case 'Germany':
+    case 'Deutschland':
+    case 'Allemagne':
+    case 'DE':
+    case 'de_DE.UTF-8':
+      return 'Germany'
+  }
+  return countryName
+}
+
+module.exports.setDefaultSearchEngine = (immutableData) => {
+  let defaultSearchEngine = config.defaultSearchEngineByCountry.default
+  const countryName = getCanonicalCountryName()
+  const countrySpecificEntry = countryName && config.defaultSearchEngineByCountry[countryName]
+
+  if (countrySpecificEntry) {
+    defaultSearchEngine = countrySpecificEntry
+    // don't promote private tab engine override if region specific default search engine is set
+    immutableData = immutableData.setIn(['settings', settings.SHOW_ALTERNATIVE_PRIVATE_SEARCH_ENGINE], false)
   }
 
   return defaultSearchEngine
@@ -1098,13 +1122,13 @@ module.exports.loadAppState = () => {
 
     locale.init(immutableData.getIn(['settings', settings.LANGUAGE])).then((lang) => {
       immutableData = setVersionInformation(immutableData)
-      app.setLocale(lang)
 
       // Set default search engine for locale (if not already set)
       if (immutableData.getIn(['settings', settings.DEFAULT_SEARCH_ENGINE]) == null) {
         immutableData = module.exports.setDefaultSearchEngine(immutableData)
       }
 
+      app.setLocale(lang)
       resolve(immutableData)
     })
   })
