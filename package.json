@@ -89,7 +89,7 @@
   "homepage": "https://www.brave.com/",
   "dependencies": {
     "@brave-intl/bat-elph": "^0.1.2",
-    "@brave-intl/bat-usermodel": "^0.4.4",
+    "@brave-intl/bat-usermodel": "^0.4.6",
     "aphrodite": "1.1.0",
     "async": "^2.0.1",
     "bat-balance": "^1.1.0",

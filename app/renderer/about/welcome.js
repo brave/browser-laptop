@@ -43,8 +43,7 @@ class AboutWelcome extends React.Component {
             </p>
             <p className={css(styles.p3, styles.pr_no)}>
               <b className={css(styles.p3_b)}>How the test works:</b> A few times per day, a handful of relevant ads
-              are presented to you. In exchange for your participation in downloading and using the test browser
-              for 28 days. Try it now and let us know what you think of the new Brave Ads.
+              are presented to you. Try it now and let us know what you think of the new Brave Ads.
             </p>
             <div className={css(styles.et_pb_divider_internal)} />
             <p className={css(styles.p3)}>
