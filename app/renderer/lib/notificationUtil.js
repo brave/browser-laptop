@@ -53,9 +53,15 @@ const notificationUtil = {
 
       Windows_NT: () => {
         if (!notifier.utils.isLessThanWin8()) {
-          return {
-            appID: 'com.squirrel.brave.Brave'
-          }
+          const channel = require('../../channel')
+          const appID = {
+            nightly: 'com.squirrel.BraveNightly.BraveNightly',
+            developer: 'com.squirrel.BraveDeveloper.BraveDeveloper',
+            beta: 'com.squirrel.BraveBeta.BraveBeta'
+          }[channel.channel()] || 'com.squirrel.brave.Brave'
+
+          console.log(channel.channel() + ' -> ' + appID + ' -> ' + JSON.stringify({ appID }, null, 2))
+          return { appID }
         }
       }
     }[type]
