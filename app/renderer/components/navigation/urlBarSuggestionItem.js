@@ -22,10 +22,10 @@ const {getCurrentWindowId} = require('../../currentWindow')
 class UrlBarSuggestionItem extends ImmutableComponent {
   constructor () {
     super()
-    this.onMouseOver = this.onMouseOver.bind(this)
+    this.onMouseMove = this.onMouseMove.bind(this)
   }
 
-  onMouseOver (e) {
+  onMouseMove (e) {
     let newIndex = parseInt(e.target.getAttribute('data-index'), 10)
 
     if (newIndex < 0) {
@@ -58,7 +58,7 @@ class UrlBarSuggestionItem extends ImmutableComponent {
       data-test-id='list-item'
       data-test2-id={this.props.selected ? 'selected' : 'notSelected'}
       data-index={this.props.currentIndex}
-      onMouseOver={this.onMouseOver}
+      onMouseMove={this.onMouseMove}
       onClick={this.onClick}
       key={`${this.props.suggestion.get('location')}|${this.props.currentIndex + this.props.i}`}
       ref={(node) => { this.node = node }}

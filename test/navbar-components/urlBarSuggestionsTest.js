@@ -123,6 +123,26 @@ describe('urlBarSuggestions', function () {
       .tabByIndex(1).getUrl().should.become(this.page2Url)
   })
 
+  it('should keep the first suggestion selected when mouse was one the second suggestion before the list opened', function * () {
+    const firstItem = urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"]'
+    const secondItem = urlBarSuggestions + ' [data-test-id="list-item"][data-index="1"]'
+
+    yield this.app.client
+      .addHistorySite({ location: 'https://www.youtube.com', title: 'YouTube' })
+      .addHistorySite({ location: 'http://yoyow.org/', title: 'YOYOW', count: 20 })
+      .waitForElementFocus(urlInput)
+      .setValue(urlInput, 'y')
+      .waitForExist(urlBarSuggestions)
+      .waitForInputText(urlInput, 'youtube.com')
+      .waitForExist(firstItem + '[data-test2-id="selected"]')
+      .moveToObject(secondItem)
+      .keys(Brave.keys.ESCAPE)
+      .setValue(urlInput, 'y')
+      .waitForExist(urlBarSuggestions)
+      .waitForInputText(urlInput, 'youtube.com')
+      .waitForExist(firstItem + '[data-test2-id="selected"]')
+  })
+
   it('selected item works with mouse hover', function * () {
     const firstItem = urlBarSuggestions + ' [data-test-id="list-item"][data-index="0"]'
     const secondItem = urlBarSuggestions + ' [data-test-id="list-item"][data-index="1"]'
