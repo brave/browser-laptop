@@ -316,8 +316,8 @@ const api = {
         win.on('scroll-touch-end', function (e) {
           win.webContents.send('scroll-touch-end')
         })
-        win.on('scroll-touch-edge', function (e) {
-          win.webContents.send('scroll-touch-edge')
+        win.on('scroll-touch-edge', function (e, dict) {
+          win.webContents.send('scroll-touch-edge', dict)
         })
         win.on('swipe', function (e, direction) {
           win.webContents.send('swipe', direction)
