@@ -216,64 +216,47 @@ class Main extends React.Component {
   registerSwipeListener () {
     // Navigates back/forward on macOS two- and or three-finger swipe
     let trackingFingers = false
-    let startTime = 0
     let deltaX = 0
-    let deltaY = 0
-    let time
 
     // isSwipeTrackingFromScrollEventsEnabled is only true if "two finger scroll to swipe" is enabled
     ipc.on('scroll-touch-begin', () => {
       if (this.props.mouseInFrame) {
         trackingFingers = true
-        startTime = (new Date()).getTime()
       }
     })
 
-    this.mainWindow.addEventListener('wheel', (e) => {
-      if (trackingFingers) {
-        deltaX = deltaX + e.deltaX
-        deltaY = deltaY + e.deltaY
-      }
-    }, { passive: true })
-
     ipc.on('scroll-touch-end', () => {
       const distanceThresholdX = getSetting(settings.SWIPE_NAV_DISTANCE)
-      const distanceThresholdY = 101
-      const timeThreshold = 80
-      if (trackingFingers && time > timeThreshold && Math.abs(deltaY) < distanceThresholdY) {
+      if (trackingFingers) {
         if (deltaX > distanceThresholdX) {
-          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        } else if (deltaX < -distanceThresholdX) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+        } else if (deltaX < -distanceThresholdX) {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
         }
       }
       appActions.swipedLeft(0)
       appActions.swipedRight(0)
       trackingFingers = false
       deltaX = 0
-      deltaY = 0
-      startTime = 0
     })
 
-    ipc.on('scroll-touch-edge', () => {
+    ipc.on('scroll-touch-edge', (e, dict) => {
       if (trackingFingers) {
+        deltaX += dict.deltaX
         const distanceThresholdX = getSetting(settings.SWIPE_NAV_DISTANCE)
         const percent = Math.abs(deltaX) / distanceThresholdX
-        time = (new Date()).getTime() - startTime
         if (deltaX > 0) {
-          if (percent > 1) {
-            appActions.swipedRight(1)
-          } else {
-            appActions.swipedRight(percent)
-          }
-          deltaX += 1
-        } else if (deltaX < 0) {
           if (percent > 1) {
             appActions.swipedLeft(1)
           } else {
             appActions.swipedLeft(percent)
           }
-          deltaX -= 1
+        } else {
+          if (percent > 1) {
+            appActions.swipedRight(1)
+          } else {
+            appActions.swipedRight(percent)
+          }
         }
       }
     })
