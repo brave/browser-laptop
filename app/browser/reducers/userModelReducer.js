@@ -248,6 +248,11 @@ const userModelReducer = (state, action, immutableAction) => {
         state = userModelState.setUserModelValue(state, 'notifierShowed', true)
         break
       }
+    case appConstants.APP_ON_CLOSE_NOTIFIER:
+      {
+        state = userModelState.setUserModelValue(state, 'notifierShowed', true)
+        break
+      }
   }
 
   return state

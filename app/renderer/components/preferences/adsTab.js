@@ -65,6 +65,11 @@ class AdsTab extends ImmutableComponent {
     appActions.onInstallNotifier()
   }
 
+  onCloseNotifier () {
+    appActions.onCloseNotifier()
+    this.props.hideOverlay.bind(this, 'adsNotification')
+  }
+
   render () {
     return <div className={css(styles.payments)} data-test-id='adsContainer'>
       <SectionTitleWrapper>
@@ -166,7 +171,7 @@ class AdsTab extends ImmutableComponent {
             primaryColor
             onClick={this.onInstallNotifier}
           />}
-          onHide={this.props.hideOverlay.bind(this, 'adsNotification')}
+          onHide={this.onCloseNotifier}
         />
         : null
       }

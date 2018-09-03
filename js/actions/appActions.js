@@ -2185,6 +2185,12 @@ const appActions = {
     })
   },
 
+  onCloseNotifier: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_CLOSE_NOTIFIER
+    })
+  },
+
   onCaptchaClose: function () {
     dispatch({
       actionType: appConstants.APP_ON_CAPTCHA_CLOSE
