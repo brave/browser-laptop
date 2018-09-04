@@ -228,9 +228,9 @@ class Main extends React.Component {
     ipc.on('scroll-touch-end', () => {
       const distanceThresholdX = getSetting(settings.SWIPE_NAV_DISTANCE)
       if (trackingFingers) {
-        if (deltaX > distanceThresholdX) {
+        if (deltaX >= distanceThresholdX) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
-        } else if (deltaX < -distanceThresholdX) {
+        } else if (deltaX <= -distanceThresholdX) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
         }
       }
@@ -248,12 +248,14 @@ class Main extends React.Component {
         if (deltaX > 0) {
           if (percent > 1) {
             appActions.swipedLeft(1)
+            deltaX = distanceThresholdX
           } else {
             appActions.swipedLeft(percent)
           }
         } else {
           if (percent > 1) {
             appActions.swipedRight(1)
+            deltaX = -distanceThresholdX
           } else {
             appActions.swipedRight(percent)
           }
