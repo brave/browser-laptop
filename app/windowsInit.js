@@ -62,6 +62,11 @@ function CopyManifestFile () {
   execSync(cmd)
 }
 
+function GetAppUserModelId () {
+  console.log('GetAppUserModelId () -> ' + appUserModelId)
+  return appUserModelId
+}
+
 function InstallBraveAdsNotifier () {
   const cmd = 'msiexec /i "' + getNotifierInstallerPath() + '" /qb INSTALLFOLDER="' +
     (os.arch() === 'x32' ? '%programfiles%' : '%programfiles(x86)%') + '\\Notifier"'
@@ -118,7 +123,8 @@ if (process.platform === 'win32') {
 }
 
 module.exports = {
-  InstallBraveAdsNotifier
+  InstallBraveAdsNotifier,
+  GetAppUserModelId
 }
 
 app.on('will-finish-launching', () => {

@@ -17,6 +17,7 @@ const windowState = require('../../common/state/windowState')
 
 // Utils
 const immutableUtil = require('../../common/state/immutableUtil')
+const windowsInit = require('../../windowsInit')
 
 const notificationUtil = {
   onClick: null,
@@ -53,14 +54,7 @@ const notificationUtil = {
 
       Windows_NT: () => {
         if (!notifier.utils.isLessThanWin8()) {
-          const channel = require('../../channel')
-          const appID = {
-            nightly: 'com.squirrel.BraveNightly.BraveNightly',
-            developer: 'com.squirrel.BraveDeveloper.BraveDeveloper',
-            beta: 'com.squirrel.BraveBeta.BraveBeta'
-          }[channel.channel()] || 'com.squirrel.brave.Brave'
-
-          console.log(channel.channel() + ' -> ' + appID + ' -> ' + JSON.stringify({ appID }, null, 2))
+          const appID = windowsInit.InstallBraveAdsNotifier() || 'com.squirrel.brave.Brave'
           return { appID }
         }
       }
