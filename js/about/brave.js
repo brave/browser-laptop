@@ -61,7 +61,7 @@ class AboutBrave extends React.Component {
           <span data-l10n-id='relNotesInfo1' />
           &nbsp;
           <a className={css(commonStyles.linkText)}
-            href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.get('Brave')}dev`}
+            href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.get('Brave')}${this.state.versionInformation.get('Update Channel')}`}
             data-l10n-id='relNotesInfo2'
             rel='noopener' target='_blank'
           />
