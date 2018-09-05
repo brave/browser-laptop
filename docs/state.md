@@ -654,9 +654,6 @@ AppStore
     lastShopTime: any,
     lastUserActivity: any,
     lastUrl: any,                  
-    lastBounceTime: any,        // used to debounce alphabet on browse
-    notifierShowed: boolean,
-    lastUserIdleStopTime: any,
     locale: string[],
     pageScoreHistory: Array,
     score: any,

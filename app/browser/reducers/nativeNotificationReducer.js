@@ -87,6 +87,12 @@ const nativeNotifications = (state, action, immutableAction) => {
         }
         break
       }
+
+    case appConstants.APP_ON_HTML5_NOTIFICATION_CLOSE:
+      {
+        notificationUtil.onHTML5NotificationClose(action.get('options'))
+        break
+      }
   }
 
   return state

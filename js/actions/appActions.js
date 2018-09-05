@@ -2082,13 +2082,6 @@ const appActions = {
     })
   },
 
-  onNativeNotificationClick: function (data) {
-    dispatch({
-      actionType: appConstants.APP_ON_NATIVE_NOTIFICATION_CLICK,
-      data
-    })
-  },
-
   onLedgerMediaPublisher: function (mediaKey, response, duration, revisited) {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER,
@@ -2179,15 +2172,10 @@ const appActions = {
     })
   },
 
-  onInstallNotifier: function () {
+  onHtml5NotificationClose: function (options) {
     dispatch({
-      actionType: appConstants.APP_ON_INSTALL_NOTIFIER
-    })
-  },
-
-  onCloseNotifier: function () {
-    dispatch({
-      actionType: appConstants.APP_ON_CLOSE_NOTIFIER
+      actionType: appConstants.APP_ON_HTML5_NOTIFICATION_CLOSE,
+      options
     })
   },
 

@@ -5,7 +5,6 @@
 'use strict'
 const um = require('@brave-intl/bat-usermodel')
 const notifier = require('brave-ads-notifier')
-const path = require('path')
 const getSSID = require('detect-ssid')
 const underscore = require('underscore')
 const urlFormat = require('url').format
@@ -464,25 +463,7 @@ function randomKey (dictionary) {
 }
 
 const goAheadAndShowTheAd = (state, windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId) => {
-  appActions.nativeNotificationCreate(
-    windowId,
-    {
-      title: notificationTitle,
-      message: notificationText,
-      icon: process.env.NODE_ENV === 'development'
-        ? path.join(__dirname, '../../extensions/brave/img/BAT_icon.png')
-        : path.normalize(path.join(process.resourcesPath, 'extensions', 'brave', 'img', 'BAT_icon.png')),
-      sound: true,
-      timeout: 60,
-      wait: true,
-      uuid: uuid,
-      data: {
-        windowId,
-        notificationUrl,
-        notificationId: notificationId || notificationTypes.ADS
-      }
-    }
-  )
+  userModelState.createNotification(state, windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId)
 
   adTabUrl = notificationUrl
 }

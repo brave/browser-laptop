@@ -6,11 +6,15 @@
 
 const Immutable = require('immutable')
 const assert = require('assert')
+const os = require('os')
+const path = require('path')
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
+const windowActions = require('../../../js/actions/windowActions')
 
 // Constants
+const notificationTypes = require('../../common/constants/notificationTypes')
 const settings = require('../../../js/constants/settings')
 
 // State
@@ -464,7 +468,55 @@ const userModelState = {
 
   getReportingEventQueue,
 
-  setReportingEventQueue
+  setReportingEventQueue,
+
+  notificationStyle: () => {
+    const style = process.env.NOTIFICATION_STYLE || (os.type() === 'Windows_NT' ? 'html5' : 'external')
+
+    appActions.changeSiteSetting('chrome://brave', 'notificationsPermission', style === 'html5', false, true)
+    return style
+  },
+
+  createNotification: (state, windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId) => {
+    if (userModelState.notificationStyle() === 'html5') {
+      windowActions.html5NotificationCreate(
+        windowId,
+        notificationTitle,
+        {
+          body: notificationText,
+          icon: process.env.NODE_ENV === 'development'
+            ? path.join(__dirname, '../../extensions/brave/img/BAT_icon.png')
+            : path.normalize(path.join(process.resourcesPath, 'extensions', 'brave', 'img', 'BAT_icon.png')),
+          data: {
+            uuid,
+            notificationUrl,
+            notificationId: notificationId || notificationTypes.ADS
+          }
+        }
+      )
+      return
+    }
+
+    appActions.nativeNotificationCreate(
+      windowId,
+      {
+        title: notificationTitle,
+        message: notificationText,
+        icon: process.env.NODE_ENV === 'development'
+          ? path.join(__dirname, '../../extensions/brave/img/BAT_icon.png')
+          : path.normalize(path.join(process.resourcesPath, 'extensions', 'brave', 'img', 'BAT_icon.png')),
+        sound: true,
+        timeout: 60,
+        wait: true,
+        uuid: uuid,
+        data: {
+          windowId,
+          notificationUrl,
+          notificationId: notificationId || notificationTypes.ADS
+        }
+      }
+    )
+  }
 }
 
 module.exports = userModelState

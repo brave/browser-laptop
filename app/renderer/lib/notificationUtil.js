@@ -17,7 +17,6 @@ const windowState = require('../../common/state/windowState')
 
 // Utils
 const immutableUtil = require('../../common/state/immutableUtil')
-const windowsInit = require('../../windowsInit')
 
 const notificationUtil = {
   onClick: null,
@@ -54,8 +53,7 @@ const notificationUtil = {
 
       Windows_NT: () => {
         if (!notifier.utils.isLessThanWin8()) {
-          const appID = windowsInit.InstallBraveAdsNotifier() || 'com.squirrel.brave.Brave'
-          return { appID }
+          return { appID: 'com.squirrel.brave.Brave' }
         }
       }
     }[type]
@@ -170,6 +168,12 @@ const notificationUtil = {
       appActions.onUserModelLog(appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_CHECK, {err, result})
       appActions.onNativeNotificationAllowedReport(!err && result, serveP)
     })
+  },
+
+  onHTML5NotificationClose: (options) => {
+    options = immutableUtil.makeJS(options)
+
+    notificationUtil[(options.data.reason === 'click') ? 'clickHandler' : 'timeoutHandler'](options)
   }
 }
 
