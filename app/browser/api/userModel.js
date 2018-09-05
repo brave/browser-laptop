@@ -4,7 +4,6 @@
 
 'use strict'
 const um = require('@brave-intl/bat-usermodel')
-const elph = require('@brave-intl/bat-elph')
 const notifier = require('brave-ads-notifier')
 const path = require('path')
 const getSSID = require('detect-ssid')
@@ -148,13 +147,6 @@ const generateAdReportingEvent = (state, eventType, action) => {
                 const delayMillis = 10 * 1000
                 setTimeout(cb, delayMillis, state, adTabUrl)
               }
-
-//              uncomment testing SCL
-//              if (map.notificationType === 'clicked' || map.notificationType === 'dismissed' || map.notificationType === 'timeout') {
-//                const translateElph = { 'clicked': 'z', 'dismissed': 'y', 'timeout': 'y' } // refers to elph alphabetizer
-//                state = updateTimingModel(state, translateElph[map.notificationType])
-//              }
-
               break
             }
 
@@ -366,112 +358,6 @@ const saveCachedInfo = (state) => {
   return state
 }
 
-// begin timing related pieces
-const updateTimingModel = (state, special = 'invalid') => {
-  if (noop(state)) return state
-  let letter
-  if (special === 'invalid') {
-    letter = stateToLetterStd(state)
-  } else if (special.length === 1) {
-    letter = special
-  } // anything else is an error
-  let mdl = userModelState.getUserModelTimingMdl(state, true)
-  if (mdl.length === 0) {
-    mdl = elph.initOnlineELPH() // next init with useful Hspace
-    mdl = elph.setBulkELPH('48485&########$##z($99999A//1111y11000000000./100#####z(y4885&#####$##z($999A//1111y110000000./10####z', mdl)
-    mdl = elph.setBulkELPH('z(y88z84yy11..@zA/', mdl)
-  }
-  mdl = elph.updateOnlineELPH(letter, mdl)
-  console.log('letter is ' + letter)
-  state = userModelState.elphAppendLetter(state, letter)
-  return userModelState.setUserModelTimingMdl(state, mdl)
-}
-
-const stateToLetterStd = (state) => {
-  let tvar = topicVariance(state)
-  let sch = userModelState.getSearchState(state)
-  let shp = userModelState.getShoppingState(state)
-//  let buy = shp || userModelState.getUserBuyingState(state) // this is broken
-  let rec = recencyCalc(state)
-  let freq = frequencyCalc(state)
-//  console.log('calc rec  ' + rec + ', search= ' + sch + ', tvar = ' + tvar + ', shop ' + shp + ', since search ' + freq)
-  let letter = elph.alphabetizer(tvar, sch, shp, false, false, freq, rec) // one more for buy perhaps, or xor
-  return letter
-}
-
-const elphSaysGo = (state) => {
-  let mdl = userModelState.getUserModelTimingMdl(state)
-//  let defers = userModelState.elphDeferRemember(state)
-  let out = false
-  // magic number needs accounting for -SCL
-  let value = elph.predictOnlineELPH(mdl)
-//    console.log('elph predicts ' + value)
-  let pred = elph.dealphabet(value)
-  switch (pred) {
-    case 'servead' :
-      out = true
-      break
-    case 'clickad':
-      out = true
-      break
-    default :
-      out = false
-      break
-  }
-
-  return out
-}
-
-// the following fixes a problem with "text available" in the reducer firing multiple times on one page load
-// in principle we might check for corner cases which change state as time passes, but main thing is to
-// avoid updating timing model too many times for one page load. First noticed at smothsonian website
-// delay .... 1.5 maybe too long, but at least it smooths out for slow networks
-const debouncedTimingUpdate = (state, url, delay = 1.5) => {
-  let bounce = userModelState.scraperDebounceQuery(state)
-  const now = underscore.now()
-  let diff = (now - bounce.time) / 1000
-  if (bounce.url === url && diff < delay) { // houston we have a problem; do not update
-    state = userModelState.scraperDebounceSet(state, url, now)
-    return state
-  } else {
-    state = userModelState.scraperDebounceSet(state, url, now)
-    state = updateTimingModel(state)        // otherwise update as normal
-    let canwe = userModelState.allowedToShowAdBasedOnHistory(state)
-    if (canwe) {
-//      console.log('what does elph say')
-      elphSaysGo(state)
-    }
-    return state
-  }
-}
-
-const topicVariance = (state) => { // this is a fairly random function; would have preferred something else
-  let history = userModelState.getPageScoreHistory(state, true)
-  let nback = history.length
-  let scores = um.deriveCategoryScores(history)
-  let indexOfMax = um.vectorIndexOfMax(scores)
-  let varval = nback / scores[indexOfMax]
-  return valueToLowHigh(varval, 2.5) // 2.5 needs to be changed for ANY algo change here
-}
-
-const recencyCalc = (state) => { // was using unidle time here; switched to last shopping time
-  const now = underscore.now()
-  let diff = (now - userModelState.getLastShoppingTime(state)) / 1000 // milliseconds
-  return valueToLowHigh(diff, 600) // shorter than 10 minutes from idle
-}
-
-const frequencyCalc = (state) => {
-  const now = underscore.now()
-  let diff = (now - userModelState.getLastSearchTime(state)) / 1000 // milliseconds
-  return valueToLowHigh(diff, 180) // 3 minutes from search
-}
-
-const valueToLowHigh = (x, thresh) => {
-  let out = (x < thresh) ? 'low' : 'high'
-  return out
-}
-// end timing related pieces
-
 const amazonSearchQueryFields = ['field-keywords', 'keywords']
 
 const extractURLKeywordsByField = (url, queryFields) => {
@@ -641,7 +527,7 @@ const classifyPage = (state, action, windowId) => {
   return state
 }
 
-const checkReadyAdServe = (state, windowId, forceP) => {  // around here is where you will check in with elph
+const checkReadyAdServe = (state, windowId, forceP) => {
   if (noop(state)) return state
 
   if (!forceP) {
@@ -657,17 +543,7 @@ const checkReadyAdServe = (state, windowId, forceP) => {  // around here is wher
       return state
     }
 
-  // SCL uncomment when ready
-  // let whatnext = elphSaysGo(state)
-  // if (!whatnext) {
-  //   appActions.onUserModelLog('Notification not made', { reason: 'elph says user unlikely to click' })
-  //   state = userModelState.elphDeferRecorder(state)
-  //   return state
-  // }
-  // let reset = true
-  // state = userModelState.elphDeferRecorder(state, reset) // reset deferral counter
-
- // NB: temporary survey logic for beta
+  // NB: temporary survey logic for beta
     const first = userModelState.getUserModelValue(state, 'firstContactTimestamp')
     const finale = userModelState.getUserModelValue(state, 'finalContactTimestamp')
     if (first && finale) {
@@ -1017,7 +893,6 @@ const getMethods = () => {
     uploadLogs,
     downloadSurveys,
     retrieveSSID,
-    debouncedTimingUpdate,
     checkReadyAdServe,
     serveSampleAd
   }

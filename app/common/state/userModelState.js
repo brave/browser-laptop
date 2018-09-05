@@ -154,32 +154,6 @@ const userModelState = {
     return respectsHourLimit && respectsDayLimit && respectsMinimumTimeSinceLast
   },
 
-  elphAppendLetter: (state, letter) => {
-    state = validateState(state)
-    let tmp = state.getIn(['userModel', 'elphstring'])
-    if (typeof (tmp) === 'undefined') { // graceful cold start
-      return state.setIn(['userModel', 'elphstring'], letter)
-    }
-    const longstr = tmp + letter
-    console.log(longstr)
-    return state.setIn(['userModel', 'elphstring'], longstr)
-  },
-
-  elphDeferRecorder: (state, reset = false) => {
-    state = validateState(state)
-    let defer = 0
-    if (!reset) {
-      defer = 1 + state.getIn([ 'userModel', 'elphDefer' ])
-    }
-    return state
-      .setIn(['userModel', 'elphDefer'], defer)
-  },
-
-  elphDeferRemember: (state) => {
-    state = validateState(state)
-    return state.getIn([ 'userModel', 'elphDefer' ])
-  },
-
   getPageScoreHistory: (state, mutable = false) => {
     state = validateState(state)
     const history = state.getIn([ 'userModel', 'pageScoreHistory' ]) || []

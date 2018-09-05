@@ -655,10 +655,7 @@ AppStore
     lastUserActivity: any,
     lastUrl: any,                  
     lastBounceTime: any,        // used to debounce alphabet on browse
-    elphDefer: any,                  // records elph saying "do it later
-    elphstring: string,              // internal state history in alphabet form
     notifierShowed: boolean,
-    timingModel: any,             // actual elph model (it's a complex object when it exists)
     lastUserIdleStopTime: any,
     locale: string[],
     pageScoreHistory: Array,
