@@ -4,10 +4,12 @@
 
 module.exports = {
   ADS: 'ads',
-  AD_SHOWN: 'Ad shown',
+  SURVEYS: 'surveys',
+
+  NOTIFICATION_SHOWN: 'Notification shown',
+  SURVEY_SHOWN: 'Survey shown',
+
   NOTIFICATION_RESULT: 'notification result',
   NOTIFICATION_CLICK: 'notification click',
-  NOTIFICATION_TIMEOUT: 'notification timeout',
-  SURVEYS: 'surveys',
-  SURVEY_SHOWN: 'Survey shown'
+  NOTIFICATION_TIMEOUT: 'notification timeout'
 }

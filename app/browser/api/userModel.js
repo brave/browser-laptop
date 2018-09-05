@@ -81,7 +81,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
         const data = action.get('data')
 
         switch (eventName) {
-          case notificationTypes.AD_SHOWN:
+          case notificationTypes.NOTIFICATION_SHOWN:
             {
               const classification = data.get('hierarchy')
               map.notificationType = 'generated'
@@ -647,7 +647,7 @@ const serveAdFromCategory = (state, windowId, category) => {
   const uuid = payload.uuid
 
   goAheadAndShowTheAd(state, windowId, advertiser, notificationText, notificationUrl, uuid)
-  appActions.onUserModelLog(notificationTypes.AD_SHOWN,
+  appActions.onUserModelLog(notificationTypes.NOTIFICATION_SHOWN,
                             {category, winnerOverTime, arbitraryKey, notificationUrl, notificationText, advertiser, uuid, hierarchy})
 
   return userModelState.appendAdShownToAdHistory(state)
