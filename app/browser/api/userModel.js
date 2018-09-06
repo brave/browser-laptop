@@ -388,7 +388,7 @@ const testShoppingData = (state, url) => {
     const score = 1.0   // eventually this will be more sophisticated than if(), but amazon is always a shopping destination
     state = userModelState.flagShoppingState(state, url, score)
     const keywords = extractURLKeywordsByField(url, amazonSearchQueryFields)
-    console.log('keywords: ', keywords)
+    if (roundTripOptions.verboseP) console.log('keywords: ', keywords)
   } else if (hostname !== 'www.amazon.com' && lastShopState) { // do we need lastShopState? assumes amazon queries hostname changes
     state = userModelState.unFlagShoppingState(state)
   }
@@ -443,7 +443,7 @@ const recordMediaPlaying = (state, active, tabId) => {
   if (active) mediaTabs[tabId] = true
   else delete mediaTabs[tabId]
 
-  console.log('recordMediaPlaying: ' + underscore.size(mediaTabs) + ' active media tags')
+  if (roundTripOptions.verboseP) console.log('recordMediaPlaying: ' + underscore.size(mediaTabs) + ' active media tags')
   return state
 }
 

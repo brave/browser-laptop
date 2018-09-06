@@ -27,6 +27,8 @@ const urlUtil = require('../../../js/lib/urlutil')
 const maxRowsInPageScoreHistory = 5
 const maxRowsInAdsShownHistory = 99
 
+let initP
+
 const validateState = function (state) {
   state = makeImmutable(state)
   assert.ok(isMap(state), 'state must be an Immutable.Map')
@@ -473,7 +475,12 @@ const userModelState = {
   notificationStyle: () => {
     const style = process.env.NOTIFICATION_STYLE || (os.type() === 'Windows_NT' ? 'html5' : 'external')
 
-    appActions.changeSiteSetting('chrome://brave', 'notificationsPermission', style === 'html5', false, true)
+    if (!initP) {
+      initP = true
+
+      if (process.env.LEDGER_VERBOSE === 'true') console.log('notificationStyle: ' + style)
+      appActions.changeSiteSetting('chrome://brave', 'notificationsPermission', style === 'html5', false, true)
+    }
     return style
   },
 
