@@ -1020,6 +1020,7 @@ const getCanonicalCountryName = () => {
   const countryName = app.getCountryName()
   switch (countryName) {
     case 'US':
+    case 'Vereinigte Staaten':
     case 'en_US.UTF-8':
     case 'es_US.UTF-8':
       return 'USA'
