@@ -1017,7 +1017,7 @@ module.exports.runImportDefaultSettings = (data) => {
 }
 
 const getCanonicalCountryName = () => {
-  const countryName = app.getCountryName()
+  const countryName = (app.getCountryName() || '').replace(/\0/g, '')
   switch (countryName) {
     case 'US':
     case 'Vereinigte Staaten':
