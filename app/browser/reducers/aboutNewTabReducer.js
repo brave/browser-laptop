@@ -36,11 +36,25 @@ const aboutNewTabReducer = (state, action) => {
       }
       break
     case appConstants.APP_CHANGE_SETTING:
-      if (action.key === settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE) {
-        state = aboutNewTabState.mergeDetails(state, {
-          newTabPageDetail: {
-            useAlternativePrivateSearchEngine: action.value
+      if (action.key === settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE ||
+          action.key === settings.SHOW_ALTERNATIVE_PRIVATE_SEARCH_ENGINE) {
+        const showAlternativePrivateSearchEngines = action.key === settings.SHOW_ALTERNATIVE_PRIVATE_SEARCH_ENGINE
+          ? action.value
+          : getSetting(settings.SHOW_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, state.get('settings'))
+
+        const useAlternativePrivateSearchEngine = action.key === settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE
+          ? action.value
+          : getSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, state.get('settings'))
+
+        let newTabPageDetail = {}
+        if (showAlternativePrivateSearchEngines) {
+          newTabPageDetail = {
+            useAlternativePrivateSearchEngine
           }
+        }
+
+        state = aboutNewTabState.mergeDetails(state, {
+          newTabPageDetail: newTabPageDetail
         })
       }
   }
