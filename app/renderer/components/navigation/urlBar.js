@@ -53,6 +53,7 @@ class UrlBar extends React.Component {
     this.lastVal = ''
     this.lastSuffix = ''
     this.isOnComposition = false
+    this.inFocus = false
     this.onFocus = this.onFocus.bind(this)
     this.onBlur = this.onBlur.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
@@ -210,6 +211,10 @@ class UrlBar extends React.Component {
   }
 
   onClick () {
+    if (!this.inFocus && this.urlInput.selectionEnd == this.urlInput.selectionStart){
+      this.inFocus = true;
+      this.select()
+    }
     if (this.props.isSelected) {
       windowActions.setUrlBarActive(true)
     }
@@ -220,6 +225,8 @@ class UrlBar extends React.Component {
   }
 
   onBlur (e) {
+    window.getSelection().empty()
+    this.inFocus = false
     windowActions.urlBarOnBlur(getCurrentWindowId(), e.target.value, this.props.urlbarLocation, eventElHasAncestorWithClasses(e, ['urlBarSuggestions', 'urlbarForm']))
   }
 
@@ -340,7 +347,6 @@ class UrlBar extends React.Component {
   }
 
   onFocus () {
-    this.select()
     windowActions.urlBarOnFocus(getCurrentWindowId())
   }
 
@@ -416,7 +422,6 @@ class UrlBar extends React.Component {
     }
 
     if (this.props.isSelected && !prevProps.isSelected) {
-      this.select()
       windowActions.urlBarSelected(false)
     }
 
