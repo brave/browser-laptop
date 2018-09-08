@@ -82,6 +82,7 @@ class NewPrivateTab extends React.Component {
           }
           {
             isTor &&
+            this.props.newTabData.hasIn(useAlternativePrivateSearchEngineDataKeys) &&
             <div className={css(styles.privateSearch)}>
               <div className={css(styles.privateSearch__setting)}>
                 <p>

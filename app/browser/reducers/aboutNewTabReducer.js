@@ -13,11 +13,17 @@ const { calculateTopSites } = require('../api/topSites')
 const aboutNewTabReducer = (state, action) => {
   switch (action.actionType) {
     case appConstants.APP_SET_STATE:
+      // only show private search engine override options if needed
+      // (ex: not shown if a region specific default is provided)
       const useAlternativePrivateSearchEngine = getSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, state.get('settings'))
-      state = aboutNewTabState.mergeDetails(state, {
-        newTabPageDetail: {
+      let newTabPageDetail = {}
+      if (getSetting(settings.SHOW_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, state.get('settings'))) {
+        newTabPageDetail = {
           useAlternativePrivateSearchEngine
         }
+      }
+      state = aboutNewTabState.mergeDetails(state, {
+        newTabPageDetail: newTabPageDetail
       })
       break
     case appConstants.APP_TOP_SITE_DATA_AVAILABLE:
@@ -30,11 +36,25 @@ const aboutNewTabReducer = (state, action) => {
       }
       break
     case appConstants.APP_CHANGE_SETTING:
-      if (action.key === settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE) {
-        state = aboutNewTabState.mergeDetails(state, {
-          newTabPageDetail: {
-            useAlternativePrivateSearchEngine: action.value
+      if (action.key === settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE ||
+          action.key === settings.SHOW_ALTERNATIVE_PRIVATE_SEARCH_ENGINE) {
+        const showAlternativePrivateSearchEngines = action.key === settings.SHOW_ALTERNATIVE_PRIVATE_SEARCH_ENGINE
+          ? action.value
+          : getSetting(settings.SHOW_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, state.get('settings'))
+
+        const useAlternativePrivateSearchEngine = action.key === settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE
+          ? action.value
+          : getSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE, state.get('settings'))
+
+        let newTabPageDetail = {}
+        if (showAlternativePrivateSearchEngines) {
+          newTabPageDetail = {
+            useAlternativePrivateSearchEngine
           }
+        }
+
+        state = aboutNewTabState.mergeDetails(state, {
+          newTabPageDetail: newTabPageDetail
         })
       }
   }

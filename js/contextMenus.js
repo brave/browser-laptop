@@ -51,8 +51,11 @@ const isLinux = platformUtil.isLinux()
  */
 const getSearchUrl = (activeFrame, searchTerms) => {
   const searchUrl = (
-    (getSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE_TOR) && frameStateUtil.isTor(activeFrame)) ||
-    (getSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE) && activeFrame.get('isPrivate'))
+    getSetting(settings.SHOW_ALTERNATIVE_PRIVATE_SEARCH_ENGINE) &&
+    (
+      (getSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE_TOR) && frameStateUtil.isTor(activeFrame)) ||
+      (getSetting(settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE) && activeFrame.get('isPrivate'))
+    )
   )
   ? 'https://duckduckgo.com/?q={searchTerms}'
   : appStoreRenderer.state.getIn(['searchDetail', 'searchURL'])

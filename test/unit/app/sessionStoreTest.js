@@ -69,7 +69,7 @@ describe('sessionStore unit tests', function () {
     }
   }
   const fakeConfig = {
-    defaultSearchEngineByLocale: {
+    defaultSearchEngineByCountry: {
       default: 'MetaCrawler'
     }
   }
@@ -1987,26 +1987,26 @@ describe('sessionStore unit tests', function () {
   })
 
   describe('setDefaultSearchEngine', function () {
-    let getDefaultLocaleSpy
+    let getCountryNameSpy
 
     beforeEach(function () {
-      getDefaultLocaleSpy = sinon.spy(fakeLocale, 'getDefaultLocale')
+      getCountryNameSpy = sinon.spy(fakeElectron.app, 'getCountryName')
     })
 
     afterEach(function () {
-      getDefaultLocaleSpy.restore()
-      if (fakeConfig.defaultSearchEngineByLocale['en-US']) {
-        delete fakeConfig.defaultSearchEngineByLocale['en-US']
+      getCountryNameSpy.restore()
+      if (fakeConfig.defaultSearchEngineByCountry['USA']) {
+        delete fakeConfig.defaultSearchEngineByCountry['USA']
       }
-      if (!fakeConfig.defaultSearchEngineByLocale.default) {
-        fakeConfig.defaultSearchEngineByLocale.default = 'MetaCrawler'
+      if (!fakeConfig.defaultSearchEngineByCountry.default) {
+        fakeConfig.defaultSearchEngineByCountry.default = 'MetaCrawler'
       }
     })
 
-    it('calls getDefaultLocale with true', function () {
+    it('calls app.getCountryName', function () {
       const input = Immutable.fromJS({settings: {}})
       sessionStore.setDefaultSearchEngine(input)
-      assert(getDefaultLocaleSpy.calledOnce)
+      assert(getCountryNameSpy.calledOnce)
     })
 
     it('defaults to `default` entry', function () {
@@ -2016,14 +2016,14 @@ describe('sessionStore unit tests', function () {
     })
 
     it('matches a locale specific entry (if present)', function () {
-      fakeConfig.defaultSearchEngineByLocale['en-US'] = 'Yahoo'
+      fakeConfig.defaultSearchEngineByCountry['USA'] = 'Yahoo'
       const input = Immutable.fromJS({settings: {}})
       const output = sessionStore.setDefaultSearchEngine(input)
       assert.equal(output.getIn(['settings', settings.DEFAULT_SEARCH_ENGINE]), 'Yahoo')
     })
 
     it('does not change input if there is no default in config', function () {
-      delete fakeConfig.defaultSearchEngineByLocale.default
+      delete fakeConfig.defaultSearchEngineByCountry.default
       const input = Immutable.fromJS({settings: {}})
       const output = sessionStore.setDefaultSearchEngine(input)
       assert.deepEqual(input, output)
