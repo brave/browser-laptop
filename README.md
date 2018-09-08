@@ -1,18 +1,14 @@
 [![Lint](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=lint&label=lint)](https://travis-ci.org/brave/browser-laptop)
 [![Unit Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=unit&label=unit-tests)](https://travis-ci.org/brave/browser-laptop)
-[![About Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=about&label=about-tests)](https://travis-ci.org/brave/browser-laptop)
-[![App Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=app&label=app-tests)](https://travis-ci.org/brave/browser-laptop)
-[![Bookmark Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=bookmark-components&label=bookmark-component-tests)](https://travis-ci.org/brave/browser-laptop)
-[![Bravery Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=bravery-components&label=bravery-component-tests)](https://travis-ci.org/brave/browser-laptop)
-[![Contents Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=contents&label=contents-tests)](https://travis-ci.org/brave/browser-laptop)
-[![Misc Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=misc-components&label=misc-components-tests)](https://travis-ci.org/brave/browser-laptop)
-[![Navbar Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=navbar-components&label=navbar-components-tests)](https://travis-ci.org/brave/browser-laptop)
-[![Tab Tests](https://badges.herokuapp.com/travis/brave/browser-laptop?env=TEST_DIR=tab-components&label=tab-components-tests)](https://travis-ci.org/brave/browser-laptop)
 [![codecov.io](https://codecov.io/github/brave/browser-laptop/coverage.svg?branch=master)](https://codecov.io/gh/brave/browser-laptop?branch=master)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 [![Open Source Helpers](https://www.codetriage.com/brave/browser-laptop/badges/users.svg)](https://www.codetriage.com/brave/browser-laptop)
 
 # Brave Browser
+
+_**Please note: this repository is for the older Muon (our fork of Electron) version of Brave.**_<br>
+_**The newer version of the browser (`brave-core`) [can be found here](https://github.com/brave/brave-browser).**_<br>
+_**Development is being wound down on this version as issues are migrated to the new code-base**_
 
 Desktop browser for macOS, Windows, and Linux.
 
@@ -28,14 +24,12 @@ To download the latest release, [see our releases page](https://github.com/brave
 
 You can also [visit our website](https://brave.com/downloads.html) to get the latest stable release (along with a more user-friendly download page).
 
-Brave supports 4 [release channels](https://github.com/brave/browser-laptop/wiki/Release-channels): Release, Beta, Developer, and Nightly.
+The Muon version of Brave only has two active [release channels](https://github.com/brave/browser-laptop/wiki/Release-channels): Release and Beta. [Developer channel](https://brave.com/download-dev) is now using the [`brave-core`](https://github.com/brave/brave-browser) code-base.
 
 ## Community
 
 [Join the Q&A community](https://community.brave.com/) if you'd like to get more involved with Brave. You can [ask for help](https://community.brave.com/c/help-me),
 [discuss features you'd like to see](https://community.brave.com/c/feature-requests), and a lot more. We'd love to have your help so that we can continue improving Brave.
-
-Join our [Discord community chat](https://discordapp.com/invite/k57tYrS) for higher bandwidth discussions.
 
 ## Useful documentation
 
