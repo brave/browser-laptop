@@ -45,9 +45,8 @@ module.exports = {
   // NOTE: values here correspond to `name` field in:
   // js/data/searchProviders.js
   defaultSearchEngineByCountry: {
-    // Example entries look like this:
-    // 'Germany': 'YouTube',
-    // 'France': 'GitHub',
+    'Germany': 'Qwant',
+    'France': 'Qwant',
     'default': 'Google'
   },
   defaultOpenSearchPath: 'content/search/google.xml',
