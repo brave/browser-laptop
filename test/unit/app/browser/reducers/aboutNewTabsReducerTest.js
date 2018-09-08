@@ -47,7 +47,7 @@ describe('aboutNewTabReducerTest', function () {
   })
 
   describe('useAlternativePrivateSearchEngine', function () {
-    const initialState = Immutable.fromJS({
+    let initialState = Immutable.fromJS({
       settings: { },
       about: {
         newtab: { pinnedTopSites: [] }

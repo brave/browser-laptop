@@ -62,7 +62,7 @@ const getDefaultSetting = (settingKey, settingsCollection) => {
       return contributionDefaultAmount(settingKey, settingsCollection)
     // >> locale is intialized (which determines default search engine)
     case settings.DEFAULT_SEARCH_ENGINE:
-      return config.defaultSearchEngineByLocale.default
+      return config.defaultSearchEngineByCountry.default
   }
   return undefined
 }
