@@ -507,6 +507,9 @@ const handleAppAction = (action) => {
     case ExtensionConstants.CONTEXT_MENU_CREATED:
       appState = extensionState.contextMenuCreated(appState, action)
       break
+    case ExtensionConstants.CONTEXT_MENU_REMOVED:
+      appState = extensionState.contextMenuRemoved(appState, action)
+      break
     case ExtensionConstants.CONTEXT_MENU_ALL_REMOVED:
       appState = extensionState.contextMenuAllRemoved(appState, action)
       break

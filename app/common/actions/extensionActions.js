@@ -98,6 +98,36 @@ const extensionActions = {
   },
 
   /**
+   * Dispatched when an extension has an updated context menu
+   *
+   * @param {string} extensionId - the extension id
+   * @param {string} menuItemId - the id of the menu item that was clicked
+   * @param {object} properties - updateProperties of chrome.contextMenus.update
+   */
+  contextMenuUpdated: function (extensionId, menuItemId, properties) {
+    appDispatcher.dispatch({
+      actionType: ExtensionConstants.CONTEXT_MENU_UPDATED,
+      extensionId,
+      menuItemId,
+      updateProperties: properties
+    })
+  },
+
+  /**
+   * Dispatched when an extension has removed one item in a context menu
+   *
+   * @param {string} extensionId - the extension id
+   * @param {string} menuItemId - the id of the menu item that is being removed
+   */
+  contextMenuRemoved: function (extensionId, menuItemId) {
+    appDispatcher.dispatch({
+      actionType: ExtensionConstants.CONTEXT_MENU_REMOVED,
+      extensionId,
+      menuItemId
+    })
+  },
+
+  /**
    * Dispatched when an extension has removed all item in context menu
    *
    * @param {string} extensionId - the extension id

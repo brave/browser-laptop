@@ -52,12 +52,11 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
-    if (extension) {
-      extension = extension.set('browserAction', browserActionDefaults.merge(action.get('browserAction')))
-      return state.setIn(['extensions', extensionId], extension)
-    } else {
+    if (!extension) {
       return state
     }
+    extension = extension.set('browserAction', browserActionDefaults.merge(action.get('browserAction')))
+    return state.setIn(['extensions', extensionId], extension)
   },
 
   browserActionUpdated: (state, action) => {
@@ -65,20 +64,25 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
-    if (extension && extension.get('browserAction')) {
-      let tabId = action.get('tabId')
-      if (tabId) {
-        let tabs = extension.getIn(['browserAction', 'tabs'])
-        let tab = tabs.get(tabId) || Immutable.Map()
-        tabs = tabs.set(tabId, tab.merge(action.get('browserAction')))
-        extension = extension.setIn(['browserAction', 'tabs'], tabs)
-      } else {
-        extension = extension.set('browserAction', extension.get('browserAction').merge(action.get('browserAction')))
-      }
-      return state.setIn(['extensions', extensionId], extension)
-    } else {
+    if (!extension) {
       return state
     }
+
+    if (extension.get('browserAction')) {
+      return state
+    }
+
+    let tabId = action.get('tabId')
+    if (!tabId) {
+      extension = extension.get('browserAction').merge(action.get('browserAction'))
+    }
+
+    let tabs = extension.getIn(['browserAction', 'tabs'])
+    let tab = tabs.get(tabId) || Immutable.Map()
+    tabs = tabs.set(tabId, tab.merge(action.get('browserAction')))
+    extension = extension.setIn(['browserAction', 'tabs'], tabs)
+
+    return state.setIn(['extensions', extensionId], extension)
   },
 
   browserActionBackgroundImage: (browserAction, tabId) => {
@@ -117,10 +121,11 @@ const extensionState = {
     // Since we populate uninstalled extensions with dummyContent,
     // removing installInfo would just add dummy data instead of removing it
     // so we add a prop called 'excluded' and use it to hide extension on UI
-    if (extension) {
-      return state.setIn(['extensions', extensionId], extension.set('excluded', true))
+    if (!extension) {
+      return state
     }
-    return state
+
+    return state.setIn(['extensions', extensionId], extension.set('excluded', true))
   },
 
   extensionEnabled: (state, action) => {
@@ -128,11 +133,11 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
-    if (extension) {
-      return state.setIn(['extensions', extensionId], extension.set('enabled', true))
-    } else {
+    if (!extension) {
       return state
     }
+
+    return state.setIn(['extensions', extensionId], extension.set('enabled', true))
   },
 
   extensionDisabled: (state, action) => {
@@ -140,11 +145,11 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
-    if (extension) {
-      return state.setIn(['extensions', extensionId], extension.set('enabled', false))
-    } else {
+    if (!extension) {
       return state
     }
+
+    return state.setIn(['extensions', extensionId], extension.set('enabled', false))
   },
 
   getPersistentTabState: (extension) => {
@@ -160,33 +165,105 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
-    if (extension) {
-      if (state.getIn(['extensions', extensionId, 'contextMenus']) === undefined) {
-        state = state.setIn(['extensions', extensionId, 'contextMenus'], new Immutable.List())
-      }
-      let contextMenus = state.getIn(['extensions', extensionId, 'contextMenus'])
-      const basePath =
-        platformUtil.getPathFromFileURI(state.getIn(['extensions', extensionId, 'base_path']))
-      const iconPath = action.get('icon')
-      if (!iconPath) {
-        contextMenus = contextMenus.push({
-          extensionId: extensionId,
-          menuItemId: action.get('menuItemId'),
-          properties: action.get('properties').toJS()
-        })
-      } else {
-        contextMenus = contextMenus.push({
-          extensionId: extensionId,
-          menuItemId: action.get('menuItemId'),
-          properties: action.get('properties').toJS(),
-          icon: basePath + '/' + iconPath
-        })
-      }
-      return state.setIn(['extensions', extensionId, 'contextMenus'],
-        contextMenus)
-    } else {
+    if (!extension) {
       return state
     }
+
+    let contextMenus = state.getIn(['extensions', extensionId, 'contextMenus'])
+    if (!contextMenus) {
+      contextMenus = new Immutable.List()
+    }
+
+    let props = action.get('properties').toJS()
+    let menu = {
+      extensionId: extensionId,
+      menuItemId: action.get('menuItemId')
+    }
+
+    const alreadyExists = (all, current) => all.map(m => m.menuItemId)
+      .some(function (id) {
+        return id.toString().toLowerCase() === current.menuItemId.toString().toLowerCase()
+      })
+
+    if (alreadyExists(contextMenus, menu)) {
+      action.set('updateProperties', props)
+      action.set('properties', undefined)
+      return this.contextMenuUpdated(state, action)
+    }
+    menu.properties = menuProperties({}, props)
+    menu.properties.id = menu.menuItemId
+
+    const basePath = platformUtil.getPathFromFileURI(state.getIn(['extensions', extensionId, 'base_path']))
+    const iconPath = action.get('icon')
+    if (iconPath) {
+      menu.icon = basePath + '/' + iconPath
+    }
+
+    contextMenus = contextMenus.push(menu)
+
+    return state.setIn(['extensions', extensionId, 'contextMenus'], contextMenus)
+  },
+
+  contextMenuUpdated: (state, action) => {
+    action = makeImmutable(action)
+    state = makeImmutable(state)
+
+    let extensionId = action.get('extensionId').toString()
+    let extension = extensionState.getExtensionById(state, extensionId)
+    if (!extension) {
+      return state
+    }
+
+    let menuItemId = action.get('menuItemId').toString()
+    if (!menuItemId) {
+      return state
+    }
+
+    let props = action.get('updateProperties')
+    if (!props) {
+      return state
+    }
+
+    let menus = extension.get('contextMenus')
+    let idx = Array.from(menus)
+      .findIndex(m => m.menuItemId.toString().toLowerCase() === menuItemId.toString().toLowerCase())
+
+    if (idx === -1) {
+      action.set('properties', props)
+      action.set('updateProperties', undefined)
+      menus.push(this.contextMenuCreated(state, action))
+      return state.setIn(['extensions', extensionId, 'contextMenus'], menus)
+    }
+
+    let menu = menus[idx]
+    menu.menuItemId = menuItemId
+    menu.properties = menuProperties(menu.properties, props)
+    menu.properties.id = menuItemId
+
+    menus[idx] = menu
+
+    return state.setIn(['extensions', extensionId, 'contextMenus'], menus)
+  },
+
+  contextMenuRemoved: (state, action) => {
+    action = makeImmutable(action)
+    state = makeImmutable(state)
+
+    let menuItemId = action.get('menuItemId').toString()
+    if (!menuItemId) {
+      return state
+    }
+
+    let extensionId = action.get('extensionId').toString()
+    let extension = extensionState.getExtensionById(state, extensionId)
+    if (!extension) {
+      return state
+    }
+
+    let contextMenus = Array.from(extension.get('contextMenus'))
+      .filter((contextMenu) => menuItemId !== contextMenu.menuItemId)
+
+    return state.setIn(['extensions', extensionId, 'contextMenus'], contextMenus)
   },
 
   contextMenuAllRemoved: (state, action) => {
@@ -194,11 +271,11 @@ const extensionState = {
     state = makeImmutable(state)
     let extensionId = action.get('extensionId').toString()
     let extension = extensionState.getExtensionById(state, extensionId)
-    if (extension) {
-      return state.deleteIn(['extensions', extensionId, 'contextMenus'])
-    } else {
+    if (!extension) {
       return state
     }
+
+    return state.deleteIn(['extensions', extensionId, 'contextMenus'])
   },
 
   getContextMenusProperties: (state) => {
@@ -221,6 +298,81 @@ const extensionState = {
     const settingsState = state.get('settings')
     return getSetting(settings.TORRENT_VIEWER_ENABLED, settingsState)
   }
+}
+
+function menuProperties (properties, props) {
+  let updated = properties || {}
+
+  updated = menuType(updated, props.type)
+  updated = menuContexts(updated, props.contexts)
+
+  if (props.title) {
+    updated.title = props.title.toString()
+  }
+  if (props.visible) {
+    updated.visible = Boolean(props.visible)
+  }
+  if (props.checked) {
+    updated.checked = Boolean(props.checked)
+  }
+  if (props.parentId) {
+    updated.parentId = props.parentId.toString()
+  }
+
+  // TODO https://github.com/brave/browser-laptop/issues/8331
+  // TODO https://github.com/brave/browser-laptop/issues/8789
+  // @see https://developer.chrome.com/extensions/contextMenus
+  // if (props.enabled) {}
+  // if (props.documentUrlPatterns) {}
+  // if (props.targetUrlPatterns) {}
+
+  return updated
+}
+
+function menuType (props, type) {
+  if (typeof type !== 'string') {
+    return props
+  }
+
+  let supported = ['normal', 'checkbox', 'radio', 'separator']
+  if (!supported.some((t) => props.type.toLowerCase() === t)) {
+    throw new Error('Unsupported `type` property. Acceptable values are:' + supported.toString())
+  }
+
+  return Object.assign(props, {type: type.toLowerCase()})
+}
+
+function menuContexts (props, contexts) {
+  if (!contexts) {
+    return props
+  }
+
+  if (!Array.isArray(contexts)) {
+    contexts = [contexts]
+  }
+
+  let acceptable = [
+    'all', 'page', 'frame', 'selection', 'link', 'editable',
+    'image', 'video', 'audio', 'launcher', 'browser_action', 'page_action'
+  ]
+
+  function isSupported (c) {
+    if (typeof c !== 'string') {
+      return false
+    }
+
+    if (c === '') {
+      return true
+    }
+
+    return acceptable.includes(c.toLowerCase())
+  }
+
+  if (!contexts.every((c) => isSupported(c.trim()))) {
+    throw new Error('At least one `context` is not supported. Acceptable values are:' + acceptable.toString())
+  }
+
+  return Object.assign(props, {contexts: contexts.map(c => c.toLowerCase())})
 }
 
 module.exports = extensionState
