@@ -43,7 +43,11 @@ const updateSearchEngineInfoFromInput = (state, frameProps) => {
     if (frameProps.get('isPrivate')) {
       // handle private tab search with default search provider
       const useAlternateDefaultPrivateSearchProvider =
-        getSetting(isTor(frameProps) ? settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE_TOR : settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE)
+        getSetting(settings.SHOW_ALTERNATIVE_PRIVATE_SEARCH_ENGINE)
+          ? getSetting(isTor(frameProps)
+            ? settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE_TOR
+            : settings.USE_ALTERNATIVE_PRIVATE_SEARCH_ENGINE)
+          : false
       if (useAlternateDefaultPrivateSearchProvider === true) {
         // DuckDuckGo hard-coded as Private Tab default provider
         // if asked to use a privacy-centric 'alternative'

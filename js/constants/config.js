@@ -42,12 +42,12 @@ module.exports = {
     defaultSearchSuggestions: false,
     maxHistorySites: 10
   },
-  // NOTE: names here correspond to `name` field in:
+  // NOTE: values here correspond to `name` field in:
   // js/data/searchProviders.js
-  defaultSearchEngineByLocale: {
+  defaultSearchEngineByCountry: {
     // Example entries look like this:
-    // 'en-US': 'GitHub',
-    // 'es-MX': 'YouTube',
+    // 'Germany': 'YouTube',
+    // 'France': 'GitHub',
     'default': 'Google'
   },
   defaultOpenSearchPath: 'content/search/google.xml',
