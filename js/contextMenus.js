@@ -139,6 +139,10 @@ function urlBarTemplateInit (activeFrame, e) {
   return items
 }
 
+function editBookmarkTemplateInit () {
+  return getEditableItems(window.getSelection().toString())
+}
+
 function findBarTemplateInit () {
   return getEditableItems(window.getSelection().toString())
 }
@@ -1439,6 +1443,12 @@ function onReloadContextMenu () {
   menu.popup(getCurrentWindow())
 }
 
+function onEditBookmarkContextMenu (e) {
+  e.stopPropagation()
+  const inputMenu = Menu.buildFromTemplate(editBookmarkTemplateInit())
+  inputMenu.popup(getCurrentWindow())
+}
+
 module.exports = {
   onHamburgerMenu,
   onMainContextMenu,
@@ -1450,5 +1460,6 @@ module.exports = {
   onFindBarContextMenu,
   onSiteDetailContextMenu,
   onShowAutofillMenu,
-  onReloadContextMenu
+  onReloadContextMenu,
+  onEditBookmarkContextMenu
 }

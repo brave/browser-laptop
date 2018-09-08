@@ -28,6 +28,7 @@ const settings = require('../../../../js/constants/settings')
 const UrlUtil = require('../../../../js/lib/urlutil')
 const {getSetting} = require('../../../../js/settings')
 const {isBookmarkNameValid} = require('../../../common/lib/bookmarkUtil')
+const contextMenus = require('../../../../js/contextMenus')
 
 // Styles
 const globalStyles = require('../styles/global')
@@ -43,6 +44,7 @@ class AddEditBookmarkForm extends React.Component {
     this.onClose = this.onClose.bind(this)
     this.onSave = this.onSave.bind(this)
     this.onRemoveBookmark = this.onRemoveBookmark.bind(this)
+    this.onContextMenu = this.onContextMenu.bind(this)
     this.state = {
       title: props.title,
       location: props.location,
@@ -66,6 +68,10 @@ class AddEditBookmarkForm extends React.Component {
         this.onClose()
         break
     }
+  }
+
+  onContextMenu (e) {
+    contextMenus.onEditBookmarkContextMenu(e)
   }
 
   onClose () {
@@ -174,6 +180,7 @@ class AddEditBookmarkForm extends React.Component {
                   commonStyles.textbox__outlineable,
                   commonFormStyles.input__box
                 )}
+                onContextMenu={this.onContextMenu}
                 data-test-id='bookmarkNameInput'
                 spellCheck='false'
                 onKeyDown={this.onKeyDown}
@@ -196,6 +203,7 @@ class AddEditBookmarkForm extends React.Component {
                     htmlFor='bookmarkLocation'
                   />
                   <CommonFormTextbox
+                    onContextMenu={this.onContextMenu}
                     data-test-id='bookmarkLocationInput'
                     spellCheck='false'
                     onKeyDown={this.onKeyDown}
