@@ -151,6 +151,7 @@ module.exports = {
     'general.spellcheck-languages': Immutable.fromJS(['en-US']),
     'search.default-search-engine': null,
     'search.offer-search-suggestions': false, // false by default for privacy reasons
+    'search.show-alternate-private-search-engine': true,
     'search.use-alternate-private-search-engine': false,
     'search.use-alternate-private-search-engine-tor': true,
     'tabs.switch-to-new-tabs': false,
