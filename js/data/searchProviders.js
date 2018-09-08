@@ -169,8 +169,8 @@ module.exports = { "providers" :
       "base" : "https://www.qwant.com/",
       "image" : getPath('qwant'),
       "localImage" : getFaviconUrl('qwant'),
-      "search" : "https://www.qwant.com/?q={searchTerms}&client=brave",
-      "autocomplete": "https://api.qwant.com/api/suggest/?q={searchTerms}&client=brave",
+      "search" : "https://www.qwant.com/?q={searchTerms}&client=brz-brave",
+      "autocomplete": "https://api.qwant.com/api/suggest/?q={searchTerms}&client=opensearch",
       "shortcut" : ":q"
     },
     {
