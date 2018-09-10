@@ -43,8 +43,11 @@ class DownloadItem extends React.Component {
     appActions.downloadRevealed(this.props.downloadId)
   }
 
-  onOpenDownload () {
-    appActions.downloadOpened(this.props.downloadId)
+  onOpenDownload (e) {
+    const targetType = e.target.tagName
+    if (targetType && targetType !== 'BUTTON') {
+      appActions.downloadOpened(this.props.downloadId)
+    }
   }
 
   onClearDownload () {
@@ -144,7 +147,7 @@ class DownloadItem extends React.Component {
 
     return <span
       onContextMenu={contextMenus.onDownloadsToolbarContextMenu.bind(null, this.props.downloadId, this.props.download)}
-      onDoubleClick={this.onOpenDownload}
+      onClick={this.onOpenDownload}
       onMouseLeave={this.onHideDeleteConfirmation}
       data-test-id='downloadItem'
       data-test2-id={this.isCompleted ? 'completed' : null}
