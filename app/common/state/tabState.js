@@ -712,6 +712,12 @@ const tabState = {
     }
     path = [...path, 'zoomPercent']
     return state.setIn(path, zoomPercent)
+  },
+
+  resetErrorState: (state, tabId) => {
+    let tab = tabState.getByTabId(state, tabId)
+    tab = tab.delete('aboutDetails')
+    return tabState.updateTabValue(state, tab, true)
   }
 }
 
