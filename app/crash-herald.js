@@ -18,9 +18,9 @@ const initCrashKeys = () => {
 }
 
 exports.init = (enabled) => {
-  initCrashKeys()
-  muon.crashReporter.setEnabled(enabled)
   if (enabled) {
+    initCrashKeys()
+    muon.crashReporter.setEnabled(enabled)
     console.log('Crash reporting enabled')
   } else {
     console.log('Crash reporting disabled')
