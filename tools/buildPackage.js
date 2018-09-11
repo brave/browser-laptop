@@ -46,7 +46,7 @@ switch (channel) {
     appName = 'Brave-Nightly'
     break
   case 'developer':
-    appName = 'Brave-Developer'
+    appName = 'Brave-Ads-Test'
     break
   case 'beta':
     appName = 'Brave-Beta'
@@ -63,7 +63,7 @@ if (isLinux) {
 }
 
 if (isWindows) {
-  appName = appName.replace(/-/, '')
+  appName = appName.replace(/-/g, '')
 }
 
 var productDirName = 'brave'
@@ -171,9 +171,13 @@ if (isDarwin) {
   const macAppName = `${appName}.app`
   cmds.push('mkdirp ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten'))
   cmds.push('ncp ' + path.join('node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem') + ' ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem'))
+  cmds.push('mkdirp ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'brave-ads-notifier', 'vendor'))
+  cmds.push('ncp ' + path.join('node_modules', 'brave-ads-notifier', 'vendor') + ' ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'app.asar.unpacked', 'node_modules', 'brave-ads-notifier', 'vendor'))
 } else {
   cmds.push('mkdirp ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten'))
   cmds.push('ncp ' + path.join('node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem') + ' ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'node-anonize2-relic-emscripten', 'anonize2.js.mem'))
+  cmds.push('mkdirp ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'brave-ads-notifier', 'vendor'))
+  cmds.push('ncp ' + path.join('node_modules', 'brave-ads-notifier', 'vendor') + ' ' + path.join(buildDir, 'resources', 'app.asar.unpacked', 'node_modules', 'brave-ads-notifier', 'vendor'))
 }
 
 execute(cmds, env, (err) => {

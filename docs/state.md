@@ -103,6 +103,7 @@ AppStore
     }
   }
   clearBrowsingDataDefaults: {
+    adsSettings: boolean,
     allSiteCookies: boolean,
     autocompleteData: boolean,
     autofillData: boolean,
@@ -635,6 +636,38 @@ AppStore
     referralPromoCode: string, // promo code for the referral
     status: string, // updateStatus from js/constants/updateStatus.js
     verbose: boolean // whether to show update UI for checking, downloading, and errors
+  },
+  userModel: {
+    adClass: any,
+    adFrequency: any,
+    adServed: any,
+    allowed: boolean,
+    available: boolean,
+    config: boolean,
+    currentSSID: string,
+    error: {
+      caller: string,
+      error: string
+    }
+    lastAdTime: any,
+    lastSearchTime: any,
+    lastShopTime: any,
+    lastUserActivity: any,
+    lastUrl: any,                  
+    locale: string[],
+    pageScoreHistory: Array,
+    score: any,
+    searchActivity: any,
+    searchUrl: any,                  // url of last searching activity
+    shopActivity: any,              // shopping now bool
+    shopUrl: any,                     // url of last shopping activity
+    pageClass: any,               
+    places: string[],
+    purchaseActive: any,
+    purchaseTime: any,
+    purchaseUrl: any,
+    updated: any,
+    url: any
   },
   visits: [{
     endTime: number, // datetime.getTime()

@@ -1,12 +1,12 @@
 {
   "appId": "com.electron.brave",
-  "productName": "Brave-Developer",
+  "productName": "Brave-Ads-Test",
   "npmRebuild": false,
   "mac": {
     "target": "dmg"
   },
   "dmg": {
-    "title": "Brave-Developer",
+    "title": "Brave-Ads-Test",
     "background": "res/background.png",
     "icon": "res/developer/brave_installer.icns",
     "iconSize": 80,

@@ -42,6 +42,8 @@ const {getWindow, notifyWindowWebContentsAdded} = require('./windows')
 const activeTabHistory = require('./activeTabHistory')
 const path = require('path')
 const {getTorSocksProxy} = require('../channel')
+const demoApi = require('./api/userModelLog')
+const userModelState = require('../common/state/userModelState')
 
 let adBlockRegions
 let currentPartitionNumber = 0
@@ -311,6 +313,12 @@ const updateAboutDetails = (tabId) => {
   } else if (url === 'about:preferences#sync' || location === 'about:contributions' || onPaymentsPage) {
     const sync = appState.get('sync', Immutable.Map())
     sendAboutDetails(tabId, messages.SYNC_UPDATED, sync)
+  } else if (url === 'about:preferences#ads') {
+    const userModelData = userModelState.getModel(appState)
+    sendAboutDetails(tabId, messages.DEMO_UPDATED, Immutable.fromJS({
+      demoValue: demoApi.getValue(),
+      userModelData
+    }))
   } else if (location === 'about:extensions' || url === 'about:preferences#extensions') {
     const extensionsValue = appState.get('extensions', Immutable.Map())
     sendAboutDetails(tabId, messages.EXTENSIONS_UPDATED, extensionsValue)
@@ -1120,10 +1128,22 @@ const api = {
         }
         extensions.createTab(createProperties, (tab) => {
           if (tab) {
+            const tabId = tab.getId()
+            if (shouldDebugTabEvents) {
+              console.log(`[Tab ${tabId}] createTab callback`)
+            }
+            // add custom manual properties to state
+            if (createProperties.adData) {
+              tabActions.setAdData(tabId, createProperties.adData)
+            }
             // Initialize WebRTC IP handling to the safest default. This will
             // be set based on shield settings in reducers/tabReducer.js once
             // navigation starts.
             tab.setWebRTCIPHandlingPolicy(webrtcConstants.disableNonProxiedUdp)
+          } else {
+            if (shouldDebugTabEvents) {
+              console.error(`Got createTab callback with no tab object!`)
+            }
           }
           cb && cb(tab)
         })

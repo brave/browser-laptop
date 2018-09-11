@@ -57,16 +57,13 @@ class AboutBrave extends React.Component {
       })}>
         <AboutPageSectionSubTitle data-l10n-id='releaseNotes' />
 
-        <div>
-          <span data-l10n-id='relNotesInfo1' />
-          &nbsp;
-          <a className={css(commonStyles.linkText)}
-            href={`https://github.com/brave/browser-laptop/releases/tag/v${this.state.versionInformation.get('Brave')}dev`}
-            data-l10n-id='relNotesInfo2'
-            rel='noopener' target='_blank'
-          />
-          &nbsp;
-          <span data-l10n-id='relNotesInfo3' />
+        <div className={css(styles.ads_wrapper)}>
+          Thank you for participating in the testing program for Brave Ads. This build of the Brave browser is only
+          for volunteers of the Brave Ads testing program. If you have downloaded this version by error,
+          we recommend you download the current version.
+          <div>
+            <a className={css(styles.ads_wrapper__button)} href='https://brave.com/download'>Download</a>
+          </div>
         </div>
 
         <div className={css(styles.versionInformationWrapper)}>
@@ -100,6 +97,35 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'baseline',
     width: '400px'
+  },
+
+  ads_wrapper: {
+    background: `linear-gradient(180deg,#5c32e5 10%,#6b2f8e 100%);`,
+    borderRadius: '8px',
+    boxSizing: 'border-box',
+    padding: '20px',
+    lineHeight: '1.4em',
+    fontSize: '15px',
+    width: '400px',
+    color: '#fff'
+  },
+
+  ads_wrapper__button: {
+    background: 'none',
+    marginTop: '20px',
+    border: '2px solid #FFF',
+    borderRadius: '20px',
+    textTransform: 'uppercase',
+    color: '#FFF',
+    padding: '10px 50px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    textDecoration: 'none',
+    display: 'inline-block',
+
+    ':hover': {
+      textDecoration: 'none'
+    }
   }
 })
 

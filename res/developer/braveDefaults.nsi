@@ -13,8 +13,8 @@
 
 SilentInstall silent
 
-Name "BraveDeveloper"
-OutFile "../../BraveDeveloper-win32-${ARCH}/resources/BraveDefaults.exe"
+Name "BraveAdsTest"
+OutFile "../../BraveAdsTest-win32-${ARCH}/resources/BraveDefaults.exe"
 RequestExecutionLevel user
 Var BraveEXEPath
 Var BraveIconPath
@@ -42,8 +42,8 @@ Function .onInit
   Call GetParent
   POP $0
 
-  StrCpy $BraveEXEPath "$0\BraveDeveloper.exe"
-  StrCpy $BraveIconPath "$0\BraveDeveloper.exe,0"
+  StrCpy $BraveEXEPath "$0\BraveAdsTest.exe"
+  StrCpy $BraveIconPath "$0\BraveAdsTest.exe,0"
 
   Call GetParameters
   Pop $1
@@ -61,15 +61,15 @@ Function .onInit
     ; These need to always be in HKCU becuase they contain the actual path of the exe which changes
     ; on each update.  If on HKLM then the user could not elevate later and cause a problem.
     ; They should also be in this block early because we always want to re-create on each update.
-    WriteRegStr HKCU "SOFTWARE\Classes\BraveDeveloperHTML" "" "BraveDeveloper HTML Document"
-    WriteRegStr HKCU "SOFTWARE\Classes\BraveDeveloperHTML\DefaultIcon" "" "$BraveIconPath"
-    WriteRegStr HKCU "SOFTWARE\Classes\BraveDeveloperHTML\shell\open\command" "" '"$BraveEXEPath" "--user-data-dir=brave-developer" -- "%1"'
+    WriteRegStr HKCU "SOFTWARE\Classes\BraveAdsTestHTML" "" "BraveAdsTest HTML Document"
+    WriteRegStr HKCU "SOFTWARE\Classes\BraveAdsTestHTML\DefaultIcon" "" "$BraveIconPath"
+    WriteRegStr HKCU "SOFTWARE\Classes\BraveAdsTestHTML\shell\open\command" "" '"$BraveEXEPath" "--user-data-dir=brave-developer" -- "%1"'
   ${EndIf}
 
   ; If we already have the defaults key, there's nothing to do so we can abort early without even needing to elevate on Win7.
   ${If} $IsUninstall == "0"
     ClearErrors
-    ReadRegStr $2 SHCTX "SOFTWARE\RegisteredApplications" "BraveDeveloper"
+    ReadRegStr $2 SHCTX "SOFTWARE\RegisteredApplications" "BraveAdsTest"
     ${IfNot} ${Errors}
       Quit
     ${EndIf}
@@ -103,36 +103,36 @@ Section "Defaults Section" SecDummy
   Pop $1
 
   ${If} $IsUninstall == "1"
-    DeleteRegKey HKCU "SOFTWARE\Classes\BraveDeveloperHTML"
-    DeleteRegKey SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper"
-    DeleteRegValue SHCTX "SOFTWARE\RegisteredApplications" "BraveDeveloper"
+    DeleteRegKey HKCU "SOFTWARE\Classes\BraveAdsTestHTML"
+    DeleteRegKey SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest"
+    DeleteRegValue SHCTX "SOFTWARE\RegisteredApplications" "BraveAdsTest"
 
     SetShellVarContext current
-    Delete "$DESKTOP\BraveDeveloper.lnk"
+    Delete "$DESKTOP\BraveAdsTest.lnk"
   ${Else}
 
     ; Define capabilities
-    WriteRegStr SHCTX "SOFTWARE\RegisteredApplications" "BraveDeveloper" "Software\Clients\StartMenuInternet\BraveDeveloper\Capabilities"
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities\StartMenu" "StartMenuInternet" "BraveDeveloper"
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper" "" "BraveDeveloper"
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities" "ApplicationDescription" "BraveDeveloper is the new and fast web browser that protects your privacy and security by blocking intrusive ads and trackers."
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities" "ApplicationName" "BraveDeveloper"
-    WriteRegDWORD SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\InstallInfo" "IconsVisible" 1
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\shell\open\command" "" "$BraveEXEPath"
+    WriteRegStr SHCTX "SOFTWARE\RegisteredApplications" "BraveAdsTest" "Software\Clients\StartMenuInternet\BraveAdsTest\Capabilities"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities\StartMenu" "StartMenuInternet" "BraveAdsTest"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest" "" "BraveAdsTest"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities" "ApplicationDescription" "BraveAdsTest is the new and fast web browser that protects your privacy and security by blocking intrusive ads and trackers."
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities" "ApplicationName" "BraveAdsTest"
+    WriteRegDWORD SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\InstallInfo" "IconsVisible" 1
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\shell\open\command" "" "$BraveEXEPath"
     ; File associations
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities\FileAssociations" ".htm" "BraveDeveloperHTML"
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities\FileAssociations" ".html" "BraveDeveloperHTML"
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities\FileAssociations" ".shtml" "BraveDeveloperHTML"
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities\FileAssociations" ".xht" "BraveDeveloperHTML"
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities\FileAssociations" ".xhtml" "BraveDeveloperHTML"
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities\FileAssociations" ".webp" "BraveDeveloperHTML"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities\FileAssociations" ".htm" "BraveAdsTestHTML"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities\FileAssociations" ".html" "BraveAdsTestHTML"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities\FileAssociations" ".shtml" "BraveAdsTestHTML"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities\FileAssociations" ".xht" "BraveAdsTestHTML"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities\FileAssociations" ".xhtml" "BraveAdsTestHTML"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities\FileAssociations" ".webp" "BraveAdsTestHTML"
     ; Protocol associations
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities\URLAssociations" "ftp" "BraveDeveloperHTML"
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities\URLAssociations" "http" "BraveDeveloperHTML"
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities\URLAssociations" "https" "BraveDeveloperHTML"
-    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveDeveloper\Capabilities\URLAssociations" "mailto" "BraveDeveloperHTML"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities\URLAssociations" "ftp" "BraveAdsTestHTML"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities\URLAssociations" "http" "BraveAdsTestHTML"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities\URLAssociations" "https" "BraveAdsTestHTML"
+    WriteRegStr SHCTX "SOFTWARE\Clients\StartMenuInternet\BraveAdsTest\Capabilities\URLAssociations" "mailto" "BraveAdsTestHTML"
     ; Uninstall icon
     SetRegView 64
-    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\BraveDeveloper" "DisplayIcon" "$BraveIconPath"
+    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\BraveAdsTest" "DisplayIcon" "$BraveIconPath"
   ${EndIf}
 SectionEnd

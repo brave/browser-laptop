@@ -43,6 +43,7 @@ class ClearBrowsingDataPanel extends React.Component {
     this.onToggleSavedSiteSettings = this.onToggleSetting.bind(this, 'savedSiteSettings')
     this.onTogglePublishersClear = this.onToggleSetting.bind(this, 'publishersClear')
     this.onTogglePaymentHistory = this.onToggleSetting.bind(this, 'paymentHistory')
+    this.onToggleAdsSettings = this.onToggleSetting.bind(this, 'adsSettings')
     this.onClear = this.onClear.bind(this)
     this.onCancel = this.onCancel.bind(this)
   }
@@ -90,6 +91,7 @@ class ClearBrowsingDataPanel extends React.Component {
     props.savedSiteSettings = data.get('savedSiteSettings')
     props.publishersClear = props.inProgress ? false : data.get('publishersClear')
     props.paymentHistory = props.inProgress ? false : data.get('paymentHistory')
+    props.adsSettings = data.get('adsSettings')
 
     return props
   }
@@ -135,6 +137,11 @@ class ClearBrowsingDataPanel extends React.Component {
             testId='siteSettingsSwitch'
             checkedOn={this.props.savedSiteSettings}
             onClick={this.onToggleSavedSiteSettings} />
+          <SwitchControl
+            rightl10nId='braveAds'
+            testId='adsSettingsSwitch'
+            checkedOn={this.props.adsSettings}
+            onClick={this.onToggleAdsSettings} />
           <SwitchControl
             rightl10nId='publishersClear'
             testId='publishersClear'

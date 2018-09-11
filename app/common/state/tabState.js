@@ -712,6 +712,32 @@ const tabState = {
     }
     path = [...path, 'zoomPercent']
     return state.setIn(path, zoomPercent)
+  },
+
+  setAdData: (state, tabId, adData) => {
+    let path = tabState.getPathByTabId(state, tabId)
+    if (!path) {
+      console.error(`setAdData: tab with ID ${tabId} not found in state!`)
+      return state
+    }
+    return state.setIn([...path, 'adData'], adData)
+  },
+
+  deleteAdData: (state, tabId, adData) => {
+    let path = tabState.getPathByTabId(state, tabId)
+    if (!path) {
+      console.error(`deteleAdData: tab with ID ${tabId} not found in state!`)
+      return state
+    }
+    return state.deleteIn([...path, 'adData'])
+  },
+
+  getAdData: (state, tabId) => {
+    let path = tabState.getPathByTabId(state, tabId)
+    if (!path) {
+      return null
+    }
+    return state.getIn([...path, 'adData'])
   }
 }
 

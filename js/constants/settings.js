@@ -51,6 +51,7 @@ const settings = {
   SHUTDOWN_CLEAR_AUTOFILL_DATA: 'shutdown.clear-autofill-data',
   SHUTDOWN_CLEAR_SITE_SETTINGS: 'shutdown.clear-site-settings',
   SHUTDOWN_CLEAR_PUBLISHERS: 'shutdown.clear-publishers',
+  SHUTDOWN_CLEAR_ADS: 'shutdown.clear-ads',
   FLASH_INSTALLED: 'security.flash.installed',
   FULLSCREEN_CONTENT: 'security.fullscreen.content',
   AUTOPLAY_MEDIA: 'security.autoplay.media',
@@ -104,6 +105,13 @@ const settings = {
   // Debug settings
   DEBUG_ALLOW_MANUAL_TAB_DISCARD: 'debug.manual-tab-discard.enabled',
   DEBUG_VERBOSE_TAB_INFO: 'debug.verbose-tab-info.enabled',
+  // Ads
+  ADS_ENABLED: 'ads.enabled',
+  ADS_LOCALE: 'ads.locale',
+  ADS_PER_DAY: 'ads.amount.day',
+  ADS_PER_HOUR: 'ads.amount.hour',
+  ADS_PLACE: 'ads.place',
+  ADS_OPERATING_MODE: 'ads.operating-mode',
 
   // DEPRECATED settings
   // DO NOT REMOVE OR CHANGE THESE VALUES

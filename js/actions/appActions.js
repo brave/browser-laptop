@@ -560,7 +560,7 @@ const appActions = {
   /**
    * Changes an application level setting
    * @param {string} key - The key name for the setting
-   * @param {string} value - The value of the setting
+   * @param {any} value - The value of the setting
    */
   changeSetting: function (key, value) {
     dispatch({
@@ -1890,6 +1890,16 @@ const appActions = {
     })
   },
 
+  nativeNotificationCreate: function (windowId, options) {
+    dispatch({
+      actionType: appConstants.APP_NATIVE_NOTIFICATION_CREATE,
+      options,
+      queryInfo: {
+        windowId
+      }
+    })
+  },
+
   saveLedgerPromotion: function (promotion) {
     dispatch({
       actionType: appConstants.APP_SAVE_LEDGER_PROMOTION,
@@ -1980,6 +1990,43 @@ const appActions = {
     })
   },
 
+  onUserModelSustainedAdInteraction: function (data) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_SUSTAINED_AD_INTERACTION,
+      data
+    })
+  },
+
+  onUserModelLog: function (eventName, data) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_LOG,
+      eventName,
+      data
+    })
+  },
+
+  onUserModelCollectActivity: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_COLLECT_ACTIVITY
+    })
+  },
+
+  onUserModelUploadLogs: function (stamp, retryIn, result) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_UPLOAD_LOGS,
+      stamp,
+      retryIn,
+      result
+    })
+  },
+
+  onUserModelDownloadSurveys: function (entries) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_DOWNLOAD_SURVEYS,
+      entries
+    })
+  },
+
   onReferralCodeFail: function () {
     dispatch({
       actionType: appConstants.APP_ON_REFERRAL_CODE_FAIL
@@ -2028,6 +2075,13 @@ const appActions = {
     })
   },
 
+  onSSIDReceived: function (value) {
+    dispatch({
+      actionType: appConstants.APP_ON_ADS_SSID_RECEIVED,
+      value
+    })
+  },
+
   onLedgerMediaPublisher: function (mediaKey, response, duration, revisited) {
     dispatch({
       actionType: appConstants.APP_ON_LEDGER_MEDIA_PUBLISHER,
@@ -2043,6 +2097,18 @@ const appActions = {
       actionType: appConstants.APP_ON_LEDGER_FUZZING,
       newStamp,
       pruned
+    })
+  },
+
+  onUserModelExpired: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_EXPIRED
+    })
+  },
+
+  onUserModelDisabled: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_DISABLED
     })
   },
 
@@ -2068,6 +2134,48 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_ON_PUBLISHER_TOGGLE_UPDATE,
       viewData
+    })
+  },
+
+  onNativeNotificationConfigurationCheck: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_NATIVE_NOTIFICATION_CONFIGURATION_CHECK
+    })
+  },
+
+  onNativeNotificationConfigurationReport: function (ok) {
+    dispatch({
+      actionType: appConstants.APP_ON_NATIVE_NOTIFICATION_CONFIGURATION_REPORT,
+      ok
+    })
+  },
+
+  onNativeNotificationAllowedCheck: function (serveP) {
+    dispatch({
+      actionType: appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_CHECK,
+      serveP
+    })
+  },
+
+  onNativeNotificationCheck: function (serveP) {
+    dispatch({
+      actionType: appConstants.APP_ON_NATIVE_NOTIFICATION_CHECK,
+      serveP
+    })
+  },
+
+  onNativeNotificationAllowedReport: function (ok, serveP) {
+    dispatch({
+      actionType: appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_REPORT,
+      ok,
+      serveP
+    })
+  },
+
+  onHtml5NotificationClose: function (options) {
+    dispatch({
+      actionType: appConstants.APP_ON_HTML5_NOTIFICATION_CLOSE,
+      options
     })
   },
 
@@ -2129,6 +2237,12 @@ const appActions = {
   restartTor: function () {
     dispatch({
       actionType: appConstants.APP_RESTART_TOR
+    })
+  },
+
+  onTestNotification: function () {
+    dispatch({
+      actionType: appConstants.APP_ON_TEST_NOTIFICATION
     })
   },
 

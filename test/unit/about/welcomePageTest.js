@@ -16,8 +16,9 @@ describe('AboutWelcome component', function () {
       warnOnUnregistered: false,
       useCleanCache: true
     })
-    AboutWelcome = require('../../../app/renderer/about/welcome')
     mockery.registerMock('../../../less/about/common.less', {})
+    mockery.registerMock('../../extensions/brave/img/preferences/ads_welcome_BG.png')
+    AboutWelcome = require('../../../app/renderer/about/welcome')
   })
 
   after(function () {

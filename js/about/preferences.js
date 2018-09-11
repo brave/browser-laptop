@@ -25,6 +25,7 @@ const SitePermissionsPage = require('../../app/renderer/components/preferences/s
 const PaymentsTab = require('../../app/renderer/components/preferences/paymentsTab')
 const TabsTab = require('../../app/renderer/components/preferences/tabsTab')
 const ShieldsTab = require('../../app/renderer/components/preferences/shieldsTab')
+const AdsTab = require('../../app/renderer/components/preferences/adsTab')
 const SyncTab = require('../../app/renderer/components/preferences/syncTab')
 const PluginsTab = require('../../app/renderer/components/preferences/pluginsTab')
 const ExtensionsTab = require('../../app/renderer/components/preferences/extensionsTab')
@@ -339,6 +340,7 @@ class SecurityTab extends ImmutableComponent {
         <SettingCheckbox dataL10nId='autofillData' prefKey={settings.SHUTDOWN_CLEAR_AUTOFILL_DATA} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='savedSiteSettings' prefKey={settings.SHUTDOWN_CLEAR_SITE_SETTINGS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         <SettingCheckbox dataL10nId='publishersClear' prefKey={settings.SHUTDOWN_CLEAR_PUBLISHERS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
+        <SettingCheckbox dataL10nId='Brave Ads' prefKey={settings.SHUTDOWN_CLEAR_ADS} settings={this.props.settings} onChangeSetting={this.props.onChangeSetting} />
         {/* TODO: move this inline style to Aphrodite once refactored */}
         <div style={{marginTop: '15px'}}>
           <BrowserButton
@@ -491,7 +493,9 @@ class AboutPreferences extends React.Component {
       siteSettings: Immutable.Map(),
       braveryDefaults: Immutable.Map(),
       ledgerData: Immutable.Map(),
-      syncData: Immutable.Map()
+      syncData: Immutable.Map(),
+      userModelData: Immutable.Map(),
+      demoValue: []
     }
 
     // Similar to tabFromCurrentHash, this allows to set
@@ -522,6 +526,9 @@ class AboutPreferences extends React.Component {
     })
     ipc.on(messages.LANGUAGE, (e, {langCode, languageCodes}) => {
       this.setState({ languageCodes })
+    })
+    ipc.on(messages.DEMO_UPDATED, (e, demoValue) => {
+      this.setState(demoValue || {})
     })
     ipc.send(messages.REQUEST_LANGUAGE)
     this.onChangeSetting = this.onChangeSetting.bind(this)
@@ -720,6 +727,9 @@ class AboutPreferences extends React.Component {
     const ledgerData = this.state.ledgerData
     const syncData = this.state.syncData
     const extensions = this.state.extensions
+    const demoValue = this.state.demoValue
+    const userModelData = this.state.userModelData
+
     switch (this.state.preferenceTab) {
       case preferenceTabs.GENERAL:
         tab = <GeneralTab settings={settings} onChangeSetting={this.onChangeSetting} languageCodes={languageCodes} />
@@ -805,6 +815,14 @@ class AboutPreferences extends React.Component {
           settings={settings}
           languageCodes={languageCodes}
           onChangeSetting={this.onChangeSetting} />
+        break
+      case preferenceTabs.ADS:
+        tab = <AdsTab
+          settings={settings}
+          onChangeSetting={this.onChangeSetting}
+          demoValue={demoValue}
+          userModelData={userModelData}
+        />
         break
     }
     return <div>

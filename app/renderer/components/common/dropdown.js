@@ -19,10 +19,14 @@ class Dropdown extends ImmutableComponent {
       this.props['data-isFullWidth'] && styles.fullWidth,
       this.props['data-isSettings'] && styles.settings,
       this.props['data-isPanel'] && styles.settings_panel,
-      this.props['data-isBraveryPanel'] && styles.braveryPanel
+      this.props['data-isBraveryPanel'] && styles.braveryPanel,
+      this.props.customClass && this.props.customClass
     )
 
-    return <select className={className} {...this.props}>
+    const props = Object.assign({}, this.props)
+    delete props.customClass
+
+    return <select className={className} {...props}>
       {this.props.children}
     </select>
   }

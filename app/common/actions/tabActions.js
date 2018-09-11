@@ -72,6 +72,13 @@ const tabActions = {
       tabId,
       errorDetails
     })
+  },
+
+  setAdData (tabId, adData) {
+    dispatchAction(tabActionConstants.SET_AD_DATA, {
+      tabId,
+      adData
+    })
   }
 }
 

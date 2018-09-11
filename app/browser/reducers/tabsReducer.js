@@ -99,23 +99,40 @@ function expireContentSettings (state, tabId, origin) {
   }
 }
 
+function onStartOrFinishNavigation (state, action) {
+  const tabId = action.get('tabId')
+  const originalOrigin = tabState.getVisibleOrigin(state, tabId)
+  state = tabState.setNavigationState(state, tabId, action.get('navigationState'))
+  const newOrigin = tabState.getVisibleOrigin(state, tabId)
+  // For cross-origin navigation, clear temp approvals
+  if (originalOrigin !== newOrigin) {
+    expireContentSettings(state, tabId, originalOrigin)
+  }
+  setImmediate(() => {
+    tabs.setWebRTCIPHandlingPolicy(tabId, getWebRTCPolicy(state, tabId))
+  })
+  return state
+}
+
 const tabsReducer = (state, action, immutableAction) => {
   action = immutableAction || makeImmutable(action)
   switch (action.get('actionType')) {
     case tabActionConsts.FINISH_NAVIGATION:
+      {
+        state = onStartOrFinishNavigation(state, action)
+        break
+      }
     case tabActionConsts.START_NAVIGATION:
       {
         const tabId = action.get('tabId')
-        const originalOrigin = tabState.getVisibleOrigin(state, tabId)
-        state = tabState.setNavigationState(state, tabId, action.get('navigationState'))
-        const newOrigin = tabState.getVisibleOrigin(state, tabId)
-        // For cross-origin navigation, clear temp approvals
-        if (originalOrigin !== newOrigin) {
-          expireContentSettings(state, tabId, originalOrigin)
+        // Reset tab ad data if we navigate away from ad.
+        // This only works correctly this way since deleteAdData
+        // is called after the initial START_NAVIGATION.
+        const isAdTab = tabState.getAdData(state, tabId)
+        if (isAdTab) {
+          state = tabState.deleteAdData(state, tabId)
         }
-        setImmediate(() => {
-          tabs.setWebRTCIPHandlingPolicy(tabId, getWebRTCPolicy(state, tabId))
-        })
+        state = onStartOrFinishNavigation(state, action)
         break
       }
     case tabActionConsts.NAVIGATION_PROGRESS_CHANGED:
@@ -159,6 +176,12 @@ const tabsReducer = (state, action, immutableAction) => {
         const tabId = tabState.resolveTabId(state, action.get('tabId'))
         const zoomPercent = action.get('zoomPercent')
         state = tabState.setZoomPercent(state, tabId, zoomPercent)
+        break
+      }
+    case tabActionConsts.SET_AD_DATA:
+      {
+        const tabId = tabState.resolveTabId(state, action.get('tabId'))
+        state = tabState.setAdData(state, tabId, action.get('adData'))
         break
       }
     case appConstants.APP_SET_STATE:
@@ -227,24 +250,21 @@ const tabsReducer = (state, action, immutableAction) => {
       break
     }
     case appConstants.APP_CREATE_TAB_REQUESTED:
-      if (action.getIn(['createProperties', 'windowId']) == null) {
-        const senderWindowId = action.getIn(['senderWindowId'])
-        if (senderWindowId != null) {
-          action = action.setIn(['createProperties', 'windowId'], senderWindowId)
-        } else {
-          // no specified window, so use active one, or create one
-          const activeWindowId = windows.getActiveWindowId()
-          if (activeWindowId === windowState.WINDOW_ID_NONE) {
-            setImmediate(() => appActions.newWindow(action.get('createProperties')))
-            // this action will get dispatched again
-            // once the new window is ready to have tabs
-            break
-          }
-          action = action.setIn(['createProperties', 'windowId'], activeWindowId)
-        }
-      }
-      // option to focus the window the tab is being created in
       const windowId = action.getIn(['createProperties', 'windowId'])
+      if (windowId == null || !windows.getWindow(windowId)) {
+        // no specified window, so use active one, or create one
+        const activeWindowId = windows.getActiveWindowId()
+        if (activeWindowId === windowState.WINDOW_ID_NONE) {
+          action = action.deleteIn(['createProperties', 'windowId'])
+          setImmediate(() => appActions.newWindow(action.get('createProperties')))
+          // this action will get dispatched again
+          // once the new window is ready to have tabs
+          break
+        }
+        action = action.setIn(['createProperties', 'windowId'], activeWindowId)
+      }
+
+      // option to focus the window the tab is being created in
       const shouldFocusWindow = action.get('focusWindow')
       if (shouldFocusWindow && windowId) {
         windows.focus(windowId)

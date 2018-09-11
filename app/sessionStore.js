@@ -1240,6 +1240,7 @@ module.exports.defaultAppState = () => {
       },
       promotion: {}
     },
+    userModel: {},
     windowReady: false
   }
 }
