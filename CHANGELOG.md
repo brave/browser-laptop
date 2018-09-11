@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.23.107](https://github.com/brave/browser-laptop/releases/tag/v0.23.107dev)
+
+ - Upgraded to muon 8.0.10. ([#15177](https://github.com/brave/browser-laptop/issues/15177))
+
 ## [0.23.105](https://github.com/brave/browser-laptop/releases/tag/v0.23.105dev)
 
  - Fixed Windows crash. ([#15025](https://github.com/brave/browser-laptop/issues/15025))
