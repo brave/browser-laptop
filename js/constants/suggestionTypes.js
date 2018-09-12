@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const suggestionTypes = {
+  CURRENT_SEARCH: 'currentSearch',
   TAB: 'tabSuggestion',
   BOOKMARK: 'bookmarkSuggestion',
   HISTORY: 'historySuggestion',

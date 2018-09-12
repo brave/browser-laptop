@@ -76,7 +76,6 @@ select {
 
     .suggestionTitle {
       display: inline-block;
-      font-size: 15px;
       font-weight: 200;
       margin-bottom: 6px;
       overflow: hidden;
@@ -84,6 +83,12 @@ select {
       white-space: nowrap;
       width: 100%;
       vertical-align: middle;
+    }
+
+    .suggestionItem {
+      .suggestionSectionIcon {
+        margin-right: 10px;
+      }
     }
 
     .suggestionLocation {
@@ -108,7 +113,8 @@ select {
       }
 
       .suggestionSectionIcon {
-        margin-right: 4px;
+        margin-right: 10px;
+
         &.bookmarksTitle {
           color: @braveOrange;
         }

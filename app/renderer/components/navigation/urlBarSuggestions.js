@@ -31,7 +31,7 @@ class UrlBarSuggestions extends React.Component {
     let index = 0
 
     const addToItems = (suggestions, sectionKey, title, icon) => {
-      if (suggestions.length > 0) {
+      if (suggestions.length > 0 && title === 'Tabs') {
         items.push(<li className='suggestionSection'>
           {
             icon
@@ -53,6 +53,9 @@ class UrlBarSuggestions extends React.Component {
         return <UrlBarSuggestionItem
           suggestion={suggestion}
           selected={selected}
+          sectionKey={sectionKey}
+          icon={icon}
+          currentSearchValue={this.props.currentSearchValue}
           currentIndex={currentIndex}
           i={i} />
       }))
@@ -61,12 +64,13 @@ class UrlBarSuggestions extends React.Component {
 
     const list = suggestions.filterSuggestionListByType(this.props.suggestionList)
 
+    addToItems(list.currentSearch, 'currentSearchTitle', locale.translation('searchSuggestionTitle'), 'fa-search')
     addToItems(list.historySuggestions, 'historyTitle', locale.translation('historySuggestionTitle'), 'fa-clock-o')
     addToItems(list.bookmarkSuggestions, 'bookmarksTitle', locale.translation('bookmarksSuggestionTitle'), 'fa-star-o')
     addToItems(list.aboutPagesSuggestions, 'aboutPagesTitle', locale.translation('aboutPagesSuggestionTitle'), null)
-    addToItems(list.tabSuggestions, 'tabsTitle', locale.translation('tabsSuggestionTitle'), 'fa-external-link')
     addToItems(list.searchSuggestions, 'searchTitle', locale.translation('searchSuggestionTitle'), 'fa-search')
     addToItems(list.topSiteSuggestions, 'topSiteTitle', locale.translation('topSiteSuggestionTitle'), 'fa-link')
+    addToItems(list.tabSuggestions, 'tabsTitle', locale.translation('tabsSuggestionTitle'), 'fa-external-link')
 
     return items
   }
@@ -75,6 +79,7 @@ class UrlBarSuggestions extends React.Component {
     const currentWindow = state.get('currentWindow')
     const activeFrame = frameStateUtil.getActiveFrame(currentWindow) || Immutable.Map()
     const urlBar = activeFrame.getIn(['navbar', 'urlbar'], Immutable.Map())
+    const currentSearchValue = urlBar.get('location')
     const documentHeight = domUtil.getStyleConstants('navbar-height')
     const menubarVisible = menuBarState.isMenuBarVisible(currentWindow)
     const menuHeight = menubarVisible ? 30 : 0
@@ -82,6 +87,7 @@ class UrlBarSuggestions extends React.Component {
     const props = {}
     // used in renderer
     props.maxHeight = document.documentElement.offsetHeight - documentHeight - 2 - menuHeight
+    props.currentSearchValue = currentSearchValue
 
     // used in functions
     props.suggestionList = urlBar.getIn(['suggestions', 'suggestionList']) // TODO (nejc) improve, use primitives
