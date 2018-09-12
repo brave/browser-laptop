@@ -133,7 +133,7 @@ describe('sessionStore unit tests', function () {
 
     it('calls cleanAppData', function (cb) {
       cleanAppDataStub.reset()
-      return sessionStore.saveAppState(Immutable.Map())
+      sessionStore.saveAppState(Immutable.Map())
         .then(function (result) {
           assert.equal(cleanAppDataStub.calledOnce, true)
           cb()
@@ -151,7 +151,7 @@ describe('sessionStore unit tests', function () {
       })
       it('calls cleanSessionDataOnShutdown if true', function (cb) {
         cleanSessionDataOnShutdownStub.reset()
-        return sessionStore.saveAppState(Immutable.Map(), true)
+        sessionStore.saveAppState(Immutable.Map(), true)
           .then(() => {
             assert.equal(cleanSessionDataOnShutdownStub.calledOnce, true)
             cb()
@@ -162,7 +162,7 @@ describe('sessionStore unit tests', function () {
 
       it('does not call cleanSessionDataOnShutdown if false', function (cb) {
         cleanSessionDataOnShutdownStub.reset()
-        return sessionStore.saveAppState(Immutable.Map(), false)
+        sessionStore.saveAppState(Immutable.Map(), false)
           .then(() => {
             assert.equal(cleanSessionDataOnShutdownStub.notCalled, true)
             cb()
