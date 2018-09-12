@@ -44,7 +44,9 @@ const navigateSiteClickHandler = (suggestionData, isForSecondaryAction, shiftKey
     })
   } else {
     const activeFrame = getActiveFrame(windowStore.state)
-    appActions.loadURLRequested(activeFrame.get('tabId'), url)
+    if (activeFrame) {
+      appActions.loadURLRequested(activeFrame.get('tabId'), url)
+    }
     windowActions.setUrlBarActive(false)
   }
 }
