@@ -232,6 +232,11 @@ class UrlBar extends React.Component {
         this.urlInput.setSelectionRange(newValue.length, newValue.length + newSuffix.length + 1)
       }
       return true
+      // this is if the new value normalized IS CONTAINED within the suggestion, then just set the url input
+      // instead of just updating the suffix
+    } else if (this.props.normalizedSuggestion.includes(newValueNormalized) && this.props.normalizedSuggestion.length > 0 && this.props.activeIndex !== null) {
+      this.urlInput.value = this.props.normalizedSuggestion
+      return true
     } else {
       this.setValue(newValue, '')
       return false
