@@ -190,16 +190,26 @@ const openInNewSessionTabMenuItem = (url, openerTabId) => {
       }
     }
   } else {
+    const newPartitionedMenuItem = (partitionNumber) => {
+      return {
+        label: `${locale.translation('openInNewSessionTab')} ${partitionNumber}`,
+        click: (item) => {
+          appActions.createTabRequested({
+            url,
+            partitionNumber: partitionNumber,
+            openerTabId,
+            active
+          })
+        }
+      }
+    }
+
+    const maxNewSessions = Array(9)
+    const newPartitionedSubmenu = Array.from(maxNewSessions, (_, i) => newPartitionedMenuItem(i + 1))
+
     return {
       label: locale.translation('openInNewSessionTab'),
-      click: () => {
-        appActions.createTabRequested({
-          url,
-          isPartitioned: true,
-          openerTabId,
-          active
-        })
-      }
+      submenu: newPartitionedSubmenu
     }
   }
 }
