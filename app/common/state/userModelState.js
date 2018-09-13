@@ -479,7 +479,9 @@ const userModelState = {
       initP = true
 
       if (process.env.LEDGER_VERBOSE === 'true') console.log('notificationStyle: ' + style)
-      appActions.changeSiteSetting('chrome://brave', 'notificationsPermission', style === 'html5', false, true)
+      if (process.env.NOTIFICATION_PERMISSION === undefined) {
+        appActions.changeSiteSetting('chrome://brave', 'notificationsPermission', style === 'html5', false, true)
+      }
     }
     return style
   },
