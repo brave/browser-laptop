@@ -478,12 +478,17 @@ const userModelState = {
     if (!initP) {
       initP = true
 
-      if (process.env.LEDGER_VERBOSE === 'true') console.log('notificationStyle: ' + style)
-      if (process.env.NOTIFICATION_PERMISSION === undefined) {
-        appActions.changeSiteSetting('chrome://brave', 'notificationsPermission', style === 'html5', false, true)
-        if (process.env.LEDGER_VERBOSE === 'true') console.log('notification permission set to ' + (style === 'html5'))
-      } else if (process.env.LEDGER_VERBOSE === 'true') console.log('notification permission not updated')
+      appActions.changeSiteSetting('chrome://brave', 'notificationsPermission', style === 'html5', false, true)
+      if (process.env.LEDGER_VERBOSE === 'true') {
+        console.log('notification permission set to ' + (style === 'html5'))
+        console.log('notificationStyle: ' + style)
+        console.log('environment: ' + process.env.NODE_ENV)
+        console.log('icon: ' +
+                    (process.env.NODE_ENV === 'development' ? path.join(__dirname, '../../extensions/brave/img/BAT_icon.png')
+                     : path.normalize(path.join(process.resourcesPath, 'extensions', 'brave', 'img', 'BAT_icon.png'))))
+      }
     }
+
     return style
   },
 

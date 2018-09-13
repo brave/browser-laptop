@@ -463,7 +463,12 @@ function randomKey (dictionary) {
 }
 
 const goAheadAndShowTheAd = (state, windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId) => {
+try {
   userModelState.createNotification(state, windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId)
+} catch (ex) {
+  return console.log('\n\ncreateNotification fails: ' + ex.stack)
+}
+console.log('\n\ncreateNotificationSucceeds')
 
   adTabUrl = notificationUrl
 }
