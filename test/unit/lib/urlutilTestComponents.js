@@ -341,6 +341,9 @@ module.exports = {
       },
       'is about:blank': (test) => {
         test.equal(urlUtil().openableByContextMenu('about:blank'), true)
+      },
+      'is empty': (test) => {
+        test.equal(urlUtil().openableByContextMenu(), true)
       }
     },
     'returns false when input:': {
@@ -349,9 +352,6 @@ module.exports = {
       },
       'is ssh:': (test) => {
         test.equal(urlUtil().openableByContextMenu('ssh://test@127.0.0.1'), false)
-      },
-      'is null': (test) => {
-        test.equal(urlUtil().openableByContextMenu(null), false)
       }
     }
   },

@@ -429,7 +429,7 @@ const UrlUtil = {
    */
   openableByContextMenu: function (url) {
     if (!url) {
-      return false
+      return true
     }
     const protocol = urlParse(url).protocol
     // file: is untrusted but handled in a separate check
