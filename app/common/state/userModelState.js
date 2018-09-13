@@ -481,7 +481,8 @@ const userModelState = {
       if (process.env.LEDGER_VERBOSE === 'true') console.log('notificationStyle: ' + style)
       if (process.env.NOTIFICATION_PERMISSION === undefined) {
         appActions.changeSiteSetting('chrome://brave', 'notificationsPermission', style === 'html5', false, true)
-      }
+        if (process.env.LEDGER_VERBOSE === 'true') console.log('notification permission set to ' + (style === 'html5'))
+      } else if (process.env.LEDGER_VERBOSE === 'true') console.log('notification permission not updated')
     }
     return style
   },
