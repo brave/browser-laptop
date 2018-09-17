@@ -43,6 +43,8 @@ const {makeImmutable, isMap} = require('../../common/state/immutableUtil')
 const {getCurrentWindow, getCurrentWindowId} = require('../../renderer/currentWindow')
 const {getSetting} = require('../../../js/settings')
 
+const sanitizeUrl = urlUtil.sanitizeForContextMenu
+
 const validateAction = function (action) {
   action = makeImmutable(action)
   assert.ok(isMap(action), 'action must be an Immutable.Map')
@@ -117,7 +119,7 @@ const openInNewTabMenuItem = (url, partitionNumber, openerTabId) => {
       click: () => {
         for (let i = 0; i < url.length; ++i) {
           appActions.createTabRequested({
-            url: url[i],
+            url: sanitizeUrl(url[i]),
             partitionNumber: partitionNumber[i],
             openerTabId,
             active
@@ -130,7 +132,7 @@ const openInNewTabMenuItem = (url, partitionNumber, openerTabId) => {
       label: locale.translation('openInNewTab'),
       click: () => {
         appActions.createTabRequested({
-          url,
+          url: sanitizeUrl(url),
           partitionNumber,
           openerTabId,
           active
@@ -148,7 +150,7 @@ const openInNewPrivateTabMenuItem = (url, openerTabId, isTor) => {
       click: () => {
         for (let i = 0; i < url.length; ++i) {
           appActions.createTabRequested({
-            url: url[i],
+            url: sanitizeUrl(url[i]),
             isPrivate: true,
             isTor,
             openerTabId,
@@ -162,7 +164,7 @@ const openInNewPrivateTabMenuItem = (url, openerTabId, isTor) => {
       label: locale.translation(isTor ? 'openInNewTorTab' : 'openInNewPrivateTab'),
       click: () => {
         appActions.createTabRequested({
-          url,
+          url: sanitizeUrl(url),
           isPrivate: true,
           isTor,
           openerTabId,
@@ -181,7 +183,7 @@ const openInNewSessionTabMenuItem = (url, openerTabId) => {
       click: () => {
         for (let i = 0; i < url.length; ++i) {
           appActions.createTabRequested({
-            url: url[i],
+            url: sanitizeUrl(url[i]),
             isPartitioned: true,
             openerTabId,
             active
@@ -194,7 +196,7 @@ const openInNewSessionTabMenuItem = (url, openerTabId) => {
       label: locale.translation('openInNewSessionTab'),
       click: () => {
         appActions.createTabRequested({
-          url,
+          url: sanitizeUrl(url),
           isPartitioned: true,
           openerTabId,
           active
@@ -208,7 +210,10 @@ const openInNewWindowMenuItem = (location, partitionNumber) => {
   return {
     label: locale.translation('openInNewWindow'),
     click: () => {
-      appActions.newWindow({ location, partitionNumber })
+      appActions.newWindow({
+        location: sanitizeUrl(location),
+        partitionNumber
+      })
     }
   }
 }
@@ -557,7 +562,7 @@ const onLongBackHistory = (state, action) => {
         click: function (e) {
           if (eventUtil.isForSecondaryAction(e)) {
             appActions.createTabRequested({
-              url,
+              url: sanitizeUrl(url),
               partitionNumber: action.get('partitionNumber'),
               active: !!e.shiftKey
             })
@@ -610,7 +615,7 @@ const onLongForwardHistory = (state, action) => {
         click: function (e) {
           if (eventUtil.isForSecondaryAction(e)) {
             appActions.createTabRequested({
-              url,
+              url: sanitizeUrl(url),
               partitionNumber: action.get('partitionNumber'),
               active: !!e.shiftKey
             })
