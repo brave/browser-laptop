@@ -22,7 +22,6 @@ const {makeImmutable, isImmutable} = require('../../common/state/immutableUtil')
 const electron = require('electron')
 const BrowserWindow = electron.BrowserWindow
 const firstDefinedValue = require('../../../js/lib/functional').firstDefinedValue
-const {isFileScheme, openableByContextMenu} = require('../../../js/lib/urlutil')
 const settings = require('../../../js/constants/settings')
 const getSetting = require('../../../js/settings').getSetting
 
@@ -267,11 +266,6 @@ const handleCreateWindowAction = (state, action = Immutable.Map()) => {
         if (Array.isArray(frameOpts)) {
           frames = frameOpts
         } else {
-          // Don't allow 'open in new window' to open a file:// URL for
-          // security reasons
-          if (isFileScheme(frameOpts.location) || !openableByContextMenu(frameOpts.location)) {
-            frameOpts.location = 'about:blank'
-          }
           frames = [ frameOpts ]
         }
       } else {

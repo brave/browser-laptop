@@ -43,6 +43,8 @@ const ledgerUtil = require('../app/common/lib/ledgerUtil')
 const isDarwin = platformUtil.isDarwin()
 const isLinux = platformUtil.isLinux()
 
+const sanitizeUrl = urlUtil.sanitizeForContextMenu
+
 /**
  * Gets the correct search URL for the current frame.
  * @param {Immutable.Map} activeFrame - currently active frame
@@ -772,7 +774,7 @@ const openInNewTabMenuItem = (url, partitionNumber, openerTabId) => {
       click: () => {
         for (let i = 0; i < url.length; ++i) {
           appActions.createTabRequested({
-            url: url[i],
+            url: sanitizeUrl(url[i]),
             partitionNumber: partitionNumber[i],
             openerTabId,
             active
@@ -785,7 +787,7 @@ const openInNewTabMenuItem = (url, partitionNumber, openerTabId) => {
       label: locale.translation('openInNewTab'),
       click: () => {
         appActions.createTabRequested({
-          url,
+          url: sanitizeUrl(url),
           partitionNumber,
           openerTabId,
           active
@@ -812,7 +814,7 @@ const openInNewPrivateTabMenuItem = (url, openerTabId, isTor) => {
       click: () => {
         for (let i = 0; i < url.length; ++i) {
           appActions.createTabRequested({
-            url: url[i],
+            url: sanitizeUrl(url[i]),
             isPrivate: true,
             isTor,
             openerTabId,
@@ -826,7 +828,7 @@ const openInNewPrivateTabMenuItem = (url, openerTabId, isTor) => {
       label: locale.translation(isTor ? 'openInNewTorTab' : 'openInNewPrivateTab'),
       click: () => {
         appActions.createTabRequested({
-          url,
+          url: sanitizeUrl(url),
           isPrivate: true,
           isTor,
           openerTabId,
@@ -841,7 +843,12 @@ const openInNewWindowMenuItem = (location, isPrivate, partitionNumber, isTor) =>
   return {
     label: locale.translation('openInNewWindow'),
     click: () => {
-      appActions.newWindow({ location, isPrivate, isTor, partitionNumber })
+      appActions.newWindow({
+        location: sanitizeUrl(location),
+        isPrivate,
+        isTor,
+        partitionNumber
+      })
     }
   }
 }
@@ -854,7 +861,7 @@ const openInNewSessionTabMenuItem = (url, openerTabId) => {
       click: (item) => {
         for (let i = 0; i < url.length; ++i) {
           appActions.createTabRequested({
-            url: url[i],
+            url: sanitizeUrl(url[i]),
             isPartitioned: true,
             openerTabId,
             active
@@ -867,7 +874,7 @@ const openInNewSessionTabMenuItem = (url, openerTabId) => {
       label: locale.translation('openInNewSessionTab'),
       click: (item) => {
         appActions.createTabRequested({
-          url,
+          url: sanitizeUrl(url),
           isPartitioned: true,
           openerTabId,
           active
@@ -920,7 +927,7 @@ const searchSelectionMenuItem = (location) => {
         const isPrivate = frame.get('isPrivate')
         const isTor = frameStateUtil.isTor(frame)
         appActions.createTabRequested({
-          url: searchUrl,
+          url: sanitizeUrl(searchUrl),
           isPrivate,
           isTor,
           partitionNumber: frame.get('partitionNumber'),
@@ -1007,7 +1014,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
         click: (item) => {
           if (nodeProps.srcURL) {
             appActions.createTabRequested({
-              url: nodeProps.srcURL,
+              url: sanitizeUrl(nodeProps.srcURL),
               openerTabId: frame.get('tabId'),
               isPrivate,
               isTor,
@@ -1035,7 +1042,7 @@ function mainTemplateInit (nodeProps, frame, tab) {
           label: locale.translation('searchImage'),
           click: () => {
             appActions.createTabRequested({
-              url: searchUrl.replace('?q', 'byimage?image_url'),
+              url: sanitizeUrl(searchUrl.replace('?q', 'byimage?image_url')),
               isPrivate,
               isTor,
               partitionNumber: frame.get('partitionNumber')
