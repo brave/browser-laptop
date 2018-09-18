@@ -49,6 +49,7 @@ let priorData
 let sampleAdFeed
 
 let lastSingleClassification
+let pageScoreCache = {}
 
 let adTabUrl
 
@@ -179,7 +180,8 @@ const generateAdReportingEvent = (state, eventType, action) => {
 
         if (!tabUrl.startsWith('http://') && !tabUrl.startsWith('https://')) return state
 
-        map.tabId = String(tabValue.get('tabId'))
+        const tabId = tabValue.get('tabId')
+        map.tabId = String(tabId)
         map.tabType = 'click'
 
         const searchState = userModelState.getSearchState(state)
@@ -191,6 +193,9 @@ const generateAdReportingEvent = (state, eventType, action) => {
 
         if (!Array.isArray(classification)) classification = classification.toArray()
         map.tabClassification = classification
+
+        let cachedValue = pageScoreCache[tabId] || {}
+        if (cachedValue.url === tabUrl) map.pageScore = cachedValue.pageScore
 
         const now = underscore.now()
         if ((testingP) && (tabUrl === 'https://www.iab.com/') && (nextEasterEgg < now)) {
@@ -490,6 +495,7 @@ const goAheadAndShowTheAd = (state, windowId, notificationTitle, notificationTex
 const classifyPage = (state, action, windowId) => {
   if (noop(state)) return state
 
+  console.log('\n\nclassifyPage: ' + JSON.stringify(action, null, 2))
   const url = action.getIn([ 'scrapedData', 'url' ])
   let headers = action.getIn([ 'scrapedData', 'headers' ])
   let body = action.getIn([ 'scrapedData', 'body' ])
@@ -523,6 +529,8 @@ const classifyPage = (state, action, windowId) => {
   const indexOfMax = um.vectorIndexOfMax(scores)
   const winnerOverTime = catNames[indexOfMax].split('-')
   appActions.onUserModelLog('Site visited', { url, immediateWinner, winnerOverTime, pageScore })
+
+  pageScoreCache[action.get('tabId')] = { url, pageScore }
 
   return state
 }
