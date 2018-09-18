@@ -527,7 +527,7 @@ const classifyPage = (state, action, windowId) => {
   const scores = um.deriveCategoryScores(history)
   const indexOfMax = um.vectorIndexOfMax(scores)
   const winnerOverTime = catNames[indexOfMax].split('-')
-  appActions.onUserModelLog('Site visited', { url, immediateWinner, winnerOverTime, pageScore })
+  appActions.onUserModelLog('Site visited', { url, immediateWinner, winnerOverTime })
 
   pageScoreCache[action.get('tabId')] = { url, pageScore }
 
