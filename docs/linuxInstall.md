@@ -20,7 +20,7 @@ Once `snapd` is installed, installing Brave looks like this:
     snap install brave
 ```
 
-## Debian (Jessie) and Ubuntu (Artful, Zesty, Yakkety, Xenial, and Trusty) AMD64:
+## Debian (Jessie, Stretch and Buster) and Ubuntu (Cosmic, Bionic, Xenial, and Trusty) AMD64:
 
 In the terminal to be used for the below commands, prime the `sudo` command (enter your password once).
 ```
@@ -188,6 +188,14 @@ Alternatively you can install the rpm directly, but then you won't get automatic
 ```
 wget -O brave.rpm https://laptop-updates.brave.com/latest/openSUSE64
 sudo rpm -i ./brave.rpm
+```
+
+## Solus
+
+To install Brave through eopkg:
+
+```
+sudo eopkg it brave
 ```
 
 ## Raw x64 binaries:
