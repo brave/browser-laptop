@@ -10,7 +10,6 @@ const {SettingCheckbox} = require('../common/settings')
 const BrowserButton = require('../common/browserButton')
 const DisabledContent = require('./ads/disabledContent')
 const EnabledContent = require('./ads/enabledContent')
-const ModalOverlay = require('../common/modalOverlay')
 const {
   sectionTitleStyles,
   SectionTitleWrapper,
@@ -27,47 +26,19 @@ const appActions = require('../../../../js/actions/appActions')
 // Utils
 const cx = require('../../../../js/lib/classSet')
 const getSetting = require('../../../../js/settings').getSetting
-const isWindows = require('../../../common/lib/platformUtil').isWindows()
 
 // Style
 const globalStyles = require('../styles/global')
 const {paymentStylesVariables} = require('../styles/payment')
 const batIcon = require('../../../extensions/brave/img/ledger/cryptoIcons/BAT_icon.svg')
-const notifierImage = require('../../../extensions/brave/img/ledger/notifierImage.png')
 
 class AdsTab extends ImmutableComponent {
-  constructor (props) {
-    super(props)
-
-    this.onInstallNotifier = this.onInstallNotifier.bind(this)
-  }
-
   get enabled () {
     return getSetting(settings.ADS_ENABLED, this.props.settings)
   }
 
   onTestNotification () {
     appActions.onTestNotification()
-  }
-
-  getNotifier () {
-    return <div>
-      <p className={css(styles.notifier_text)}>
-        For Ads to display on Windows, you'll need to install our notifier app. <br />
-        Please be sure to click <b className={css(styles.notifier_bold)}>Yes</b> on the prompt.
-      </p>
-      <img src={notifierImage} alt='notifier' width={'100%'} />
-    </div>
-  }
-
-  onInstallNotifier () {
-    this.props.hideOverlay.bind(this, 'adsNotification')
-    appActions.onInstallNotifier()
-  }
-
-  onCloseNotifier () {
-    appActions.onCloseNotifier()
-    this.props.hideOverlay.bind(this, 'adsNotification')
   }
 
   render () {
@@ -161,19 +132,6 @@ class AdsTab extends ImmutableComponent {
           : <DisabledContent
             userModelData={this.props.userModelData}
           />
-      }
-      {
-        this.enabled && isWindows && (!this.props.userModelData || !this.props.userModelData.notifierShowed)
-        ? <ModalOverlay
-          title={'Please install Brave Ad Notifier'}
-          content={this.getNotifier()}
-          footer={<BrowserButton l10nId='Install Notifier App'
-            primaryColor
-            onClick={this.onInstallNotifier}
-          />}
-          onHide={this.onCloseNotifier}
-        />
-        : null
       }
     </div>
   }
@@ -341,15 +299,6 @@ const styles = StyleSheet.create({
 
   sample_ad: {
     textAlign: 'center'
-  },
-
-  notifier_text: {
-    display: 'block',
-    marginBottom: '20px'
-  },
-
-  notifier_bold: {
-    fontWeight: 600
   }
 })
 
