@@ -63,7 +63,7 @@ const createFileSubmenu = () => {
               appActions.createTabRequested({
                 url: fileUrl(path),
                 windowId: focusedWindow.id
-              }, false, false, false, true)
+              })
             })
           }
         })

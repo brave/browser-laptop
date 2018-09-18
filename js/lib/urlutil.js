@@ -432,17 +432,20 @@ const UrlUtil = {
 
   /**
    * Checks if URL is safe to open via 'open in new tab/window' context menu
+   * If so, returns the URL. If not, returns about:blank.
    * @param {string} url - URL to check
-   * @return {boolean}
+   * @return {string}
    */
-  openableByContextMenu: function (url) {
+  sanitizeForContextMenu: function (url) {
     if (!url) {
-      return true
+      return url
     }
     const protocol = urlParse(url).protocol
-    // file: is untrusted but handled in a separate check
-    return ['http:', 'https:', 'ws:', 'wss:', 'magnet:', 'file:', 'data:',
-      'blob:', 'about:', 'chrome-extension:', 'view-source:'].includes(protocol)
+    if (['http:', 'https:', 'ws:', 'wss:', 'magnet:', 'data:', 'blob:',
+      'about:', 'chrome-extension:', 'view-source:'].includes(protocol)) {
+      return url
+    }
+    return 'about:blank'
   },
 
   /**
