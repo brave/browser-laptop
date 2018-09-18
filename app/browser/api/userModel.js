@@ -495,7 +495,6 @@ const goAheadAndShowTheAd = (state, windowId, notificationTitle, notificationTex
 const classifyPage = (state, action, windowId) => {
   if (noop(state)) return state
 
-  console.log('\n\nclassifyPage: ' + JSON.stringify(action, null, 2))
   const url = action.getIn([ 'scrapedData', 'url' ])
   let headers = action.getIn([ 'scrapedData', 'headers' ])
   let body = action.getIn([ 'scrapedData', 'body' ])
