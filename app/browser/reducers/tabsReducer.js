@@ -37,7 +37,6 @@ const {getFlashResourceId} = require('../../../js/flash')
 const {l10nErrorText} = require('../../common/lib/httpUtil')
 const flash = require('../../../js/flash')
 const {isSourceAboutUrl, isTargetAboutUrl, isNavigatableAboutPage} = require('../../../js/lib/appUrlUtil')
-const {isFileScheme, openableByContextMenu} = require('../../../js/lib/urlutil')
 const {shouldDebugTabEvents} = require('../../cmdLine')
 
 const getWebRTCPolicy = (state, tabId) => {
@@ -250,11 +249,6 @@ const tabsReducer = (state, action, immutableAction) => {
         windows.focus(windowId)
       }
       const url = action.getIn(['createProperties', 'url'])
-      if (url && (!openableByContextMenu(url) ||
-        (isFileScheme(url) && !action.get('allowFile')))) {
-        // Don't allow 'open in new tab' to open file:// URLs for security
-        action = action.setIn(['createProperties', 'url'], 'about:blank')
-      }
       setImmediate(() => {
         if (action.get('activateIfOpen') ||
             ((isSourceAboutUrl(url) || isTargetAboutUrl(url)) && isNavigatableAboutPage(url))) {

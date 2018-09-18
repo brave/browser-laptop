@@ -269,15 +269,13 @@ const appActions = {
    * switch to it instead of creating a new one
    * @param {Boolean} isRestore when true, won't try to activate the new tab, even if the user preference indicates to
    * @param {Boolean} focusWindow
-   * @param {Boolean} allowFile - When true, allows file:// URLs to be opened
    */
-  createTabRequested: function (createProperties, activateIfOpen = false, isRestore = false, focusWindow = false, allowFile = false) {
+  createTabRequested: function (createProperties, activateIfOpen = false, isRestore = false, focusWindow = false) {
     dispatch({
       actionType: appConstants.APP_CREATE_TAB_REQUESTED,
       createProperties,
       activateIfOpen,
       isRestore,
-      allowFile,
       focusWindow
     })
   },

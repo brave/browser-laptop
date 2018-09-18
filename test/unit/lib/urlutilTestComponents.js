@@ -1,6 +1,8 @@
 // lazy load requires for dual use in and outside muon
 const urlUtil = () => require('../../../js/lib/urlutil')
 
+const blank = 'about:blank'
+
 module.exports = {
   'getScheme': {
     'null for empty': (test) => {
@@ -328,30 +330,36 @@ module.exports = {
     }
   },
 
-  'openableByContextMenu': {
-    'returns true when input:': {
-      'is an absolute file path with scheme': (test) => {
-        test.equal(urlUtil().openableByContextMenu('file:///file/path/to/file'), true)
-      },
+  'sanitizeForContextMenu': {
+    'returns original URL when input:': {
       'is http': (test) => {
-        test.equal(urlUtil().openableByContextMenu('http://example.com'), true)
+        const url = 'http://example.com'
+        test.equal(urlUtil().sanitizeForContextMenu(url), url)
       },
       'is https': (test) => {
-        test.equal(urlUtil().openableByContextMenu('HTtpS://brave.com/?abc=1#test'), true)
+        const url = 'HTtpS://brave.com/?abc=1#test'
+        test.equal(urlUtil().sanitizeForContextMenu(url), url)
       },
       'is about:blank': (test) => {
-        test.equal(urlUtil().openableByContextMenu('about:blank'), true)
+        const url = 'about:blank'
+        test.equal(urlUtil().sanitizeForContextMenu(url), url)
       },
       'is empty': (test) => {
-        test.equal(urlUtil().openableByContextMenu(), true)
+        test.equal(urlUtil().sanitizeForContextMenu(), undefined)
       }
     },
-    'returns false when input:': {
+    'returns blank when input:': {
+      'is an absolute file path with scheme': (test) => {
+        test.equal(urlUtil().sanitizeForContextMenu('file:///file/path/to/file'), blank)
+      },
+      'is file without scheme': (test) => {
+        test.equal(urlUtil().sanitizeForContextMenu('/file/path/to/file'), blank)
+      },
       'is chrome:': (test) => {
-        test.equal(urlUtil().openableByContextMenu('chrome://brave/etc/passwd'), false)
+        test.equal(urlUtil().sanitizeForContextMenu('chrome://brave/etc/passwd'), blank)
       },
       'is ssh:': (test) => {
-        test.equal(urlUtil().openableByContextMenu('ssh://test@127.0.0.1'), false)
+        test.equal(urlUtil().sanitizeForContextMenu('ssh://test@127.0.0.1'), blank)
       }
     }
   },
