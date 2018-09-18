@@ -5,6 +5,7 @@
 const React = require('react')
 const Immutable = require('immutable')
 const {StyleSheet, css} = require('aphrodite/no-important')
+const {tabs} = require('../../../../js/constants/config')
 
 // Components
 const BrowserButton = require('../common/browserButton')
@@ -32,6 +33,7 @@ const {isBookmarkNameValid} = require('../../../common/lib/bookmarkUtil')
 // Styles
 const globalStyles = require('../styles/global')
 const commonStyles = require('../styles/commonStyles')
+const locale = require('../../../../js/l10n')
 
 class AddEditBookmarkForm extends React.Component {
   constructor (props) {
@@ -39,6 +41,7 @@ class AddEditBookmarkForm extends React.Component {
     this.onNameChange = this.onNameChange.bind(this)
     this.onLocationChange = this.onLocationChange.bind(this)
     this.onParentFolderChange = this.onParentFolderChange.bind(this)
+    this.onPartitionNumberChange = this.onPartitionNumberChange.bind(this)
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onClose = this.onClose.bind(this)
     this.onSave = this.onSave.bind(this)
@@ -47,7 +50,8 @@ class AddEditBookmarkForm extends React.Component {
       title: props.title,
       location: props.location,
       parentFolderId: props.parentFolderId,
-      isDisabled: props.isDisabled
+      isDisabled: props.isDisabled,
+      partitionNumber: props.partitionNumber
     }
   }
 
@@ -104,6 +108,12 @@ class AddEditBookmarkForm extends React.Component {
     })
   }
 
+  onPartitionNumberChange (e) {
+    this.setState({
+      partitionNumber: Number(e.target.value)
+    })
+  }
+
   onSave () {
     // First check if the title of the bookmarkDetail is set
     if (this.state.isDisabled) {
@@ -138,6 +148,12 @@ class AddEditBookmarkForm extends React.Component {
       }
     }
     data = data.set('location', location)
+
+    let partitionNumber = this.state.partitionNumber
+    if (partitionNumber < 0 || partitionNumber > tabs.maxAllowedNewSessions) {
+      partitionNumber = 0
+    }
+    data = data.set('partitionNumber', partitionNumber)
 
     if (this.props.editKey != null) {
       appActions.editBookmark(this.props.editKey, data)
@@ -227,6 +243,34 @@ class AddEditBookmarkForm extends React.Component {
               }
             </CommonFormDropdown>
           </div>
+
+          {
+            !this.props.isAdded
+              ? <section className={css(styles.bookmarkHanger__marginRow)}>
+                <div className={css(
+                  commonFormStyles.inputWrapper,
+                  commonFormStyles.inputWrapper__input,
+                  styles.bookmarkHanger__marginRow
+                )}>
+                  <label
+                    className={css(styles.bookmarkHanger__label)}
+                    data-l10n-id='openInNewSessionTab'
+                    htmlFor='bookmarkPartitionNumber'
+                  />
+                  <CommonFormDropdown
+                    data-test-id='bookmarkPartitionNumber'
+                    defaultValue={this.state.partitionNumber}
+                    onChange={this.onPartitionNumberChange} >
+                    <option value='0' data-l10n-id='openInNewTab' />
+                    {
+                      Array.from(Array(tabs.maxAllowedNewSessions), (_, i) => <option value={i + 1}>{locale.translation('openInNewSessionTab')} {i + 1}</option>)
+                      // this.props.partitionNumber.map((folder) => <option value={folder.folderId}>{folder.label}</option>)
+                    }
+                  </CommonFormDropdown>
+                </div>
+              </section>
+              : null
+          }
         </div>
       </CommonFormSection>
       <CommonFormButtonWrapper>
