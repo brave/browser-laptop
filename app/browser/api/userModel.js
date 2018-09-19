@@ -44,9 +44,9 @@ let foregroundP
 let onceP
 let userModelOptions = {}
 
+let bundle
 let matrixData
 let priorData
-let sampleAdFeed
 
 let lastSingleClassification
 let pageScoreCache = {}
@@ -87,7 +87,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
               const classification = data.get('hierarchy')
               map.notificationType = 'generated'
               map.notificationClassification = classification
-              map.notificationCatalog = 'unspecified-catalog'
+              map.notificationCatalog = bundle.catalog || 'unspecified-catalog'
               map.notificationUrl = data.get('notificationUrl')
               break
             }
@@ -322,7 +322,7 @@ const initialize = (state, adEnabled) => {
   setImmediate(function () {
     matrixData = um.getMatrixDataSync()
     priorData = um.getPriorDataSync()
-    sampleAdFeed = um.getSampleAdFeed()
+    bundle = um.getSampleAdFeed() // KEVIN: here is where to plug in the new catalog
   })
 
   retrieveSSID()
@@ -595,7 +595,6 @@ const checkReadyAdServe = (state, windowId, forceP) => {
 }
 
 const serveAdFromCategory = (state, windowId, category) => {
-  const bundle = sampleAdFeed
   if (!bundle) {
     appActions.onUserModelLog('Notification not made', { reason: 'no ad catalog' })
 
@@ -617,23 +616,44 @@ const serveAdFromCategory = (state, windowId, category) => {
     return state
   }
 
-  const seen = userModelState.getAdUUIDSeen(state)
+  let adsNotSeen
+  if (bundle.catalog) {
+    adsNotSeen = {}
 
-  const adsSeen = result.filter(x => seen.get(x.uuid))
-  let adsNotSeen = result.filter(x => !seen.get(x.uuid))
-  const allSeen = (adsNotSeen.length <= 0)
+/* NB: when the translation code is integrated, bundle.campaigns and bundle.categories will be kept in userModelState
+       for now, you only have to keep the counts necessary for the "if we have ..." tests below in userModelState instead of
+       what's used by the getAdUUIDSeen and recordAdUUIDSeen methods
 
-  if (allSeen) {
-    appActions.onUserModelLog('Ad round-robin', { category, adsSeen, adsNotSeen })
-    // unmark all
-    for (let i = 0; i < result.length; i++) state = userModelState.recordAdUUIDSeen(state, result[i].uuid, 0)
-    adsNotSeen = adsSeen
-  } // else - recordAdUUIDSeen - this actually only happens in click-or-close event capture in generateAdReportingEvent in this file
+   loop through result:
+     creativeSet = bundle.creativeSets[entry.creativeSet]
+     if not present, log error and continue
+     campaign = bundle.campaigns[creativeSet.campaignId]
+     if not present, log error and continue
 
-  // select an ad that isn't seen
+     if we have already displayed a notification from this creativeSet within the last creativeSet.perDay days, continue
+     if we have already displayed creativeSet.totalMax notifications, continue
+     if we have already displayed campaign.dailyCap notifications within the last 24 hours, continue
+     add entry to adsNotSeen
+*/
+  } else {
+    const seen = userModelState.getAdUUIDSeen(state)
+    adsNotSeen = result.filter(x => !seen.get(x.uuid))
+
+    const adsSeen = result.filter(x => seen.get(x.uuid))
+    const allSeen = (adsNotSeen.length <= 0)
+
+    if (allSeen) {
+      appActions.onUserModelLog('Ad round-robin', { category, adsSeen, adsNotSeen })
+      // unmark all
+      for (let i = 0; i < result.length; i++) state = userModelState.recordAdUUIDSeen(state, result[i].uuid, 0)
+      adsNotSeen = adsSeen
+    } // else - recordAdUUIDSeen - this actually only happens in click-or-close event capture in generateAdReportingEvent in this file
+
+  }
+
+  // select an ad from the eligible list
   const arbitraryKey = randomKey(adsNotSeen)
   const payload = adsNotSeen[arbitraryKey]
-
   if (!payload) {
     appActions.onUserModelLog('Notification not made',
                               { reason: 'no ad for winnerOverTime', category, winnerOverTime, arbitraryKey })
