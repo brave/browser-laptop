@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.24.0](https://github.com/brave/browser-laptop/releases/tag/v0.24.0dev)
+
+ - Fixed back and forward navigation buttons animating when scrolling on macOS. ([#14785](https://github.com/brave/browser-laptop/issues/14785))
+ - Fixed back navigation button animating when attempting to scroll up while the page is already at the top on macOS. ([#14829](https://github.com/brave/browser-laptop/issues/14829))
+ - Disabled swipe navigation when content is horizontally scrollable. ([#14871](https://github.com/brave/browser-laptop/issues/14871))
+ - Fixed notifications not being displayed on certain websites. (https://github.com/brave/browser-laptop/issues/15124))
+ - Fixed about:blank tabs being opened when Brave configured to start with home page address. ([#15125](https://github.com/brave/browser-laptop/issues/15125))
+ - Fixed opening local files creates about:blank tabs. ([#15134](https://github.com/brave/browser-laptop/issues/15134))
+ - Fixed opening tabs when there is no windows opened creates about:blank tabs on macOS. ([#15162](https://github.com/brave/browser-laptop/issues/15162))
+ - Fixed opening local files via drag and drop creates about:blank tabs. ([#15203](https://github.com/brave/browser-laptop/issues/15203))
+ - Upgraded to Tor 0.3.4 series. ([#15179](https://github.com/brave/browser-laptop/issues/15179))
+ - Upgraded to muon 8.1.6. ([#15101](https://github.com/brave/browser-laptop/issues/15101))
+ - Upgraded to Chromium 69.0.3497.100. ([#15102](https://github.com/brave/browser-laptop/issues/15102))
+
 ## [0.21.18](https://github.com/brave/browser-laptop/releases/tag/v0.21.18dev)
 
  - Added the ability to pay Twitch publishers with BAT. ([#13139](https://github.com/brave/browser-laptop/issues/13139))
