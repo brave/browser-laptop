@@ -7,7 +7,7 @@ GPG_KEY=${2:-4A1B4360}
 KEY_NAME=keys.asc
 KEY_FILE=/tmp/${KEY_NAME}
 SNAP_TAG=`date +'%s'`
-DIST='artful zesty yakkety xenial jessie trusty serena stretch bionic'
+DIST='artful zesty yakkety xenial jessie trusty serena stretch bionic buster'
 
 cat <<EOF > $HOME/.aptly.conf
 { "rootDir": "$HOME/.aptly",
@@ -79,5 +79,5 @@ for i in ${DIST}
 done
 
 for i in ${DIST}
-	do aptly publish snapshot -force-overwrite=true -passphrase=$PASSPHRASE -gpg-key=${GPG_KEY} ${i}-snapshot s3:${OPTION}:
+	do aptly publish snapshot -force-overwrite=true -gpg-key=${GPG_KEY} ${i}-snapshot s3:${OPTION}:
 done
