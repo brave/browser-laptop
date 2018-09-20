@@ -762,6 +762,7 @@ const roundTripOptions = {
   server: urlParse('https://' + (hackStagingOn ? 'collector-staging.brave.com'
                                  : testingP ? 'collector-testing.brave.com' : 'collector.brave.com'))
 }
+const catalogServer = process.env.CATALOG_SERVER && urlParse(process.env.CATALOG_SERVER)
 
 const collectActivityAsNeeded = (state, adEnabled) => {
   if (!adEnabled) {
@@ -905,9 +906,120 @@ const downloadSurveys = (state, surveys) => {
   appActions.onUserModelLog('Surveys downloaded', surveys)
   surveys = surveys.sortBy(survey => survey.get('created_at'))
     .filter(survey => survey.get('status') === 'available' || survey.get('status') === 'complete')
+
+  state = userModelState.setUserSurveyQueue(state, surveys)
   appActions.onUserModelLog('Surveys available', surveys)
 
-  return userModelState.setUserSurveyQueue(state, surveys)
+  if (!process.env.CATALOG_SERVER) return state
+
+  const options = underscore.defaults({ server: catalogServer }, roundTripOptions)
+  const path = '/catalog'
+  roundtrip({
+    method: 'GET',
+    path: path
+  }, options, (err, response, catalog) => {
+    if (!err) return appActions.onUserModelDownloadCatalog(catalog)
+
+    appActions.onUserModelLog('Catalog download failed', {
+      method: 'GET',
+      server: urlFormat(options.server),
+      path: path,
+      reason: err.toString()
+    })
+  })
+
+  return state
+}
+
+const downloadCatalog = (state, catalog) => {
+  if (noop(state)) return state
+
+  catalog = catalog.toJS()
+
+  const data = { version: catalog.version, catalog: catalog.catalogId }
+
+  data.status = (data.catalog === bundle.catalog) ? 'already processed'
+    : (data.version !== 1) ? ('unsupported version: ' + catalog.version) : 'processing'
+  appActions.onUserModelLog('Catalog downloaded', data)
+  if (data !== 'processing') return state
+
+  let failP
+  const oops = (reason) => {
+    failP = true
+    appActions.onUserModelLog('Catalog invalid', reason)
+
+    return state
+  }
+
+  const categories = {}
+  const campaigns = {}
+  const creativeSets = {}
+  const now = underscore.now()
+  catalog.campaigns.forEach((campaign) => {
+    if (failP) return
+
+    const campaignId = campaign.campaignId
+    if (campaigns[campaignId]) return oops('duplicated campaignId: ' + campaignId)
+
+    const startTimestamp = new Date(campaign.startAt).getTime()
+    if (isNaN(startTimestamp)) return oops('invalid startAt for campaignId: ' + campaignId)
+    const stopTimestamp = new Date(campaign.endAt).getTime()
+    if (isNaN(stopTimestamp)) return oops('invalid endAt for campaignId: ' + campaignId)
+    if (stopTimestamp <= now) return
+
+  // TODO: budget & geoTargets
+    campaigns[campaignId] = underscore.extend({ startTimestamp, stopTimestamp, creativeSets: 0 },
+                                              underscore.pick(campaign, [ 'name', 'dailyCap' ]))
+
+    campaign.creativeSets.forEach((creativeSet) => {
+      if (failP) return
+
+      if (creativeSet.execution !== 'per_click') return oops('creativeSet with unknown execution: ' + creativeSet.execution)
+
+      const creativeSetId = creativeSet.creativeSetId
+      if (creativeSets[creativeSetId]) return oops('duplicated creativeSetId: ' + creativeSetId)
+
+      let hierarchy = []
+      creativeSet.segments.forEach((segment) => {
+        const name = segment.name.toLowerCase()
+
+        if (hierarchy.indexOf(name) === -1) hierarchy.push(name)
+      })
+      if (hierarchy.length === 0) return oops('creativeSet with no segments: ' + creativeSetId)
+
+      const category = hierarchy.join('-')
+      const toplevel = hierarchy[0]
+      let entries = 0
+      creativeSet.creatives.forEach((creative) => {
+        if (creative.type !== 'notification') return
+
+        const entry = {
+          advertiser: creative.payload.title,
+          notificationText: creative.payload.body,
+          notificationURL: creative.payload.targetUrl,
+          uuid: creative.creativeId,
+          creativeSet: creativeSetId
+        }
+
+        if (!categories[category]) categories[category] = []
+        categories[category].push(entry)
+        if (!categories[toplevel]) categories[toplevel] = []
+        categories[toplevel].push(entry)
+
+        entries += 2
+      })
+      if (!entries) return
+
+      campaigns[campaignId].creativeSets++
+      creativeSets[creativeSetId] = underscore.extend({ campaignId, entries },
+                                                      underscore.pick(creativeSet, [ 'totalMax', 'perDay' ]))
+    })
+  })
+  underscore.extend(data, { categories, campaigns, creativeSets })
+
+  /* TODO: merge into user state */
+
+  return state
 }
 
 const privateTest = () => {
@@ -933,6 +1045,7 @@ const getMethods = () => {
     collectActivity,
     uploadLogs,
     downloadSurveys,
+    downloadCatalog,
     retrieveSSID,
     checkReadyAdServe,
     serveSampleAd

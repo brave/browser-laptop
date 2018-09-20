@@ -2027,6 +2027,13 @@ const appActions = {
     })
   },
 
+  onUserModelDownloadCatalog: function (catalog) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_DOWNLOAD_CATALOG,
+      catalog
+    })
+  },
+
   onReferralCodeFail: function () {
     dispatch({
       actionType: appConstants.APP_ON_REFERRAL_CODE_FAIL

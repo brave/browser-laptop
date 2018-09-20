@@ -189,6 +189,11 @@ const userModelReducer = (state, action, immutableAction) => {
         state = userModel.downloadSurveys(state, action.get('entries'))
         break
       }
+    case appConstants.APP_ON_USERMODEL_DOWNLOAD_CATALOG:
+      {
+        state = userModel.downloadCatalog(state, action.get('catalog'))
+        break
+      }
     case appConstants.APP_NETWORK_CONNECTED:
       {
         userModel.retrieveSSID()
