@@ -12,6 +12,7 @@ const urlFormat = require('url').format
 const uuidv4 = require('uuid/v4')
 
 const app = require('electron').app
+const fs = require('fs')
 const os = require('os')
 
 // Actions
@@ -322,7 +323,21 @@ const initialize = (state, adEnabled) => {
   setImmediate(function () {
     matrixData = um.getMatrixDataSync()
     priorData = um.getPriorDataSync()
-    bundle = um.getSampleAdFeed() // KEVIN: here is where to plug in the new catalog
+
+    const bundlePath = path.join(app.getPath('userData'), 'bundle.json')
+    fs.readFile(bundlePath, 'utf8', (err, data) => {
+      if (!err) {
+        try {
+          bundle = JSON.parse(data)
+          return
+        } catch (ex) {
+          err = ex
+        }
+      }
+
+      appActions.onUserModelLog('Bundle error', { bundlePath, reason: err.toString() })
+      bundle = um.getSampleAdFeed()
+    })
   })
 
   retrieveSSID()
@@ -648,7 +663,6 @@ const serveAdFromCategory = (state, windowId, category) => {
       for (let i = 0; i < result.length; i++) state = userModelState.recordAdUUIDSeen(state, result[i].uuid, 0)
       adsNotSeen = adsSeen
     } // else - recordAdUUIDSeen - this actually only happens in click-or-close event capture in generateAdReportingEvent in this file
-
   }
 
   // select an ad from the eligible list
