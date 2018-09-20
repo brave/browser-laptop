@@ -936,12 +936,16 @@ const downloadCatalog = (state, catalog) => {
 
   catalog = catalog.toJS()
 
-  const data = { version: catalog.version, catalog: catalog.catalogId }
-
-  data.status = (data.catalog === bundle.catalog) ? 'already processed'
-    : (data.version !== 1) ? ('unsupported version: ' + catalog.version) : 'processing'
-  appActions.onUserModelLog('Catalog downloaded', data)
+  const data = {
+    version: catalog.version,
+    catalog: catalog.catalogId,
+    status: (catalog.catalogId === bundle.catalog) ? 'already processed'
+      : (catalog.version !== 1) ? ('unsupported version: ' + catalog.version) : 'processing'
+  }
+  appActions.onUserModelLog('Catalog downloaded', underscore.pick(data, [ 'version', 'catalog', 'status' ]))
+/*
   if (data !== 'processing') return state
+ */
 
   let failP
   const oops = (reason) => {
@@ -1016,6 +1020,12 @@ const downloadCatalog = (state, catalog) => {
     })
   })
   underscore.extend(data, { categories, campaigns, creativeSets })
+
+  appActions.onUserModelLog('Catalog parsed',
+                            underscore.extend(underscore.pick(data, [ 'version', 'catalog', 'status' ]), {
+                              campaigns: underscore.keys(campaigns).length,
+                              creativeSets: underscore.keys(creativeSets).length
+                            }))
 
   /* TODO: merge into user state */
 
