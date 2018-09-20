@@ -632,19 +632,39 @@ const serveAdFromCategory = (state, windowId, category) => {
     return state
   }
 
-  let adsNotSeen
-  if (bundle.catalog) {
-    adsNotSeen = {}
+  const usingBundleCatalogFormatVersion = bundle.catalog
 
+  let adsNotSeen
+  if (usingBundleCatalogFormatVersion) {
+
+    for (let ad of result) {
+console.log(ad)
+
+      let creativeSet = bundle.creativeSets[ad.creativeSet]
+      if (!creativeSet) {
+        appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no creativeSet found for ad', ad})
+        continue
+      }
+
+      let campaign = bundle.campaigns[creativeSet.campaignId]
+      if (!campaign) {
+        appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no campaign found for ad', ad})
+        continue
+      }
+
+    }
+
+    adsNotSeen = {}
+    
 /* NB: when the translation code is integrated, bundle.campaigns and bundle.categories will be kept in userModelState
        for now, you only have to keep the counts necessary for the "if we have ..." tests below in userModelState instead of
        what's used by the getAdUUIDSeen and recordAdUUIDSeen methods
 
    loop through result:
-     creativeSet = bundle.creativeSets[entry.creativeSet]
-     if not present, log error and continue
-     campaign = bundle.campaigns[creativeSet.campaignId]
-     if not present, log error and continue
+      creativeSet = bundle.creativeSets[entry.creativeSet]
+        if not present, log error and continue
+      campaign = bundle.campaigns[creativeSet.campaignId]
+        if not present, log error and continue
 
      if we have already displayed a notification from this creativeSet within the last creativeSet.perDay days, continue
      if we have already displayed creativeSet.totalMax notifications, continue
