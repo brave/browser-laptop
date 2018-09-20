@@ -88,6 +88,20 @@ const setReportingEventQueue = (state, queue) => {
   return state.setIn([ 'userModel', 'reportingEventQueue' ], queue)
 }
 
+const getCatalogData = (state, type, id) => {
+  return state.getIn([ 'userModel', 'catalog', type, id ])
+}
+
+const setCatalogData = (state, type, id, data) => {
+  if (!userModelState.getAdEnabledValue(state)) return state
+
+  return state.setIn([ 'userModel', 'catalog', type, id ], data)
+}
+
+const removeCatalogData = (state, type, id) => {
+  return state.deleteIn([ 'userModel', 'catalog', type, id ])
+}
+
 const userModelState = {
   setUserModelValue: (state, key, value) => {
     if (!key) return state
@@ -464,7 +478,31 @@ const userModelState = {
 
   getReportingEventQueue,
 
-  setReportingEventQueue
+  setReportingEventQueue,
+
+  getCampaign: (state, campaignId) => {
+    return getCatalogData(state, 'campaign', campaignId)
+  },
+
+  setCampaign: (state, campaignId, data) => {
+    return setCatalogData(state, 'campaign', campaignId, data)
+  },
+
+  removeCampaign: (state, campaignId) => {
+    return removeCatalogData(state, 'campaign', campaignId)
+  },
+
+  getCreativeSet: (state, creativeSetId) => {
+    return getCatalogData(state, 'creativeSet', creativeSetId)
+  },
+
+  setCreativeSet: (state, creativeSetId, data) => {
+    return setCatalogData(state, 'creativeSet', creativeSetId, data)
+  },
+
+  removeCreativeSet: (state, creativeSetId) => {
+    return removeCatalogData(state, 'creativeSet', creativeSetId)
+  }
 }
 
 module.exports = userModelState
