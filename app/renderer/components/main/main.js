@@ -216,75 +216,49 @@ class Main extends React.Component {
   registerSwipeListener () {
     // Navigates back/forward on macOS two- and or three-finger swipe
     let trackingFingers = false
-    let startTime = 0
-    let isSwipeOnLeftEdge = false
-    let isSwipeOnRightEdge = false
     let deltaX = 0
-    let deltaY = 0
-    let time
 
     // isSwipeTrackingFromScrollEventsEnabled is only true if "two finger scroll to swipe" is enabled
     ipc.on('scroll-touch-begin', () => {
       if (this.props.mouseInFrame) {
         trackingFingers = true
-        startTime = (new Date()).getTime()
       }
     })
 
-    this.mainWindow.addEventListener('wheel', (e) => {
-      if (trackingFingers) {
-        deltaX = deltaX + e.deltaX
-        deltaY = deltaY + e.deltaY
-        const distanceThresholdX = getSetting(settings.SWIPE_NAV_DISTANCE)
-        const percent = Math.abs(deltaX) / distanceThresholdX
-        if (isSwipeOnRightEdge) {
-          if (percent > 1) {
-            appActions.swipedRight(1)
-          } else {
-            appActions.swipedRight(percent)
-          }
-        } else if (isSwipeOnLeftEdge) {
-          if (percent > 1) {
-            appActions.swipedLeft(1)
-          } else {
-            appActions.swipedLeft(percent)
-          }
-        }
-        time = (new Date()).getTime() - startTime
-      }
-    }, { passive: true })
-
     ipc.on('scroll-touch-end', () => {
       const distanceThresholdX = getSetting(settings.SWIPE_NAV_DISTANCE)
-      const distanceThresholdY = 101
-      const timeThreshold = 80
-      if (trackingFingers && time > timeThreshold && Math.abs(deltaY) < distanceThresholdY) {
-        if (deltaX > distanceThresholdX && isSwipeOnRightEdge) {
-          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
-        } else if (deltaX < -distanceThresholdX && isSwipeOnLeftEdge) {
+      if (trackingFingers) {
+        if (deltaX >= distanceThresholdX) {
           ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_BACK)
+        } else if (deltaX <= -distanceThresholdX) {
+          ipc.emit(messages.SHORTCUT_ACTIVE_FRAME_FORWARD)
         }
       }
       appActions.swipedLeft(0)
       appActions.swipedRight(0)
       trackingFingers = false
       deltaX = 0
-      deltaY = 0
-      startTime = 0
     })
 
-    ipc.on('scroll-touch-edge', () => {
+    ipc.on('scroll-touch-edge', (e, dict) => {
       if (trackingFingers) {
-        if (!isSwipeOnRightEdge && deltaX > 0) {
-          isSwipeOnRightEdge = true
-          isSwipeOnLeftEdge = false
-          time = 0
-          deltaX = 0
-        } else if (!isSwipeOnLeftEdge && deltaX < 0) {
-          isSwipeOnLeftEdge = true
-          isSwipeOnRightEdge = false
-          time = 0
-          deltaX = 0
+        deltaX += dict.deltaX
+        const distanceThresholdX = getSetting(settings.SWIPE_NAV_DISTANCE)
+        const percent = Math.abs(deltaX) / distanceThresholdX
+        if (deltaX > 0) {
+          if (percent > 1) {
+            appActions.swipedLeft(1)
+            deltaX = distanceThresholdX
+          } else {
+            appActions.swipedLeft(percent)
+          }
+        } else {
+          if (percent > 1) {
+            appActions.swipedRight(1)
+            deltaX = -distanceThresholdX
+          } else {
+            appActions.swipedRight(percent)
+          }
         }
       }
     })

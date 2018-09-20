@@ -15,8 +15,8 @@ echo "%_signature gpg
 
 rm -rf $TMP_REPO
 mkdir -pv $TMP_REPO/x86_64
-if !rpm --checksig dist/*.rpm | grep pgp; then
-  env GPG_PASS=$PASSPHRASE ./tools/auto_rpm_sign
+if ! rpm --checksig dist/*.rpm | grep pgp; then
+  ./tools/auto_rpm_sign
   rpm --checksig dist/*.rpm | grep pgp
 fi
 # Ensure the rpm has the correct signature before continuing
