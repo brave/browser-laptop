@@ -7,6 +7,7 @@ const um = require('@brave-intl/bat-usermodel')
 const notifier = require('brave-ads-notifier')
 const path = require('path')
 const getSSID = require('detect-ssid')
+const jsondiff = require('jsondiffpatch')
 const underscore = require('underscore')
 const urlFormat = require('url').format
 const uuidv4 = require('uuid/v4')
@@ -290,7 +291,7 @@ const processLocales = (state, result) => {
 
   if (locale) {
     try { locale = um.setLocaleSync(locale) } catch (ex) {
-      appActions.onUserModelLog('Locale error', { locale: locale, reason: ex.toString(), stack: ex.stack })
+      appActions.onUserModelLog('Locale error', { reason: ex.toString(), locale, stack: ex.stack })
       locale = ''
     }
   }
@@ -335,7 +336,7 @@ const initialize = (state, adEnabled) => {
         }
       }
 
-      appActions.onUserModelLog('Bundle error', { bundlePath, reason: err.toString() })
+      appActions.onUserModelLog('Bundle error', { reason: err.toString(), bundlePath })
       bundle = um.getSampleAdFeed()
     })
   })
@@ -708,7 +709,7 @@ const changeLocale = (state, locale) => {
   if (noop(state)) return state
 
   try { locale = um.setLocaleSync(locale) } catch (ex) {
-    appActions.onUserModelLog('Locale error', { locale: locale, reason: ex.toString(), stack: ex.stack })
+    appActions.onUserModelLog('Locale error', { reason: ex.toString(), locale, stack: ex.stack })
 
     return state
   }
@@ -836,10 +837,10 @@ const collectActivity = (state) => {
   }, roundTripOptions, (err, response, result) => {
     if (err) {
       appActions.onUserModelLog('Event upload failed', {
+        reason: err.toString(),
         method: 'PUT',
         server: urlFormat(roundTripOptions.server),
-        path: path,
-        reason: err.toString()
+        path: path
       })
 
       if (response.statusCode !== 400) stamp = null
@@ -890,41 +891,46 @@ const uploadLogs = (state, stamp, retryIn, result) => {
     if (!err) return appActions.onUserModelDownloadSurveys(surveys)
 
     appActions.onUserModelLog('Survey download failed', {
+      reason: err.toString(),
       method: 'GET',
       server: urlFormat(roundTripOptions.server),
-      path: path,
-      reason: err.toString()
+      path: path
     })
   })
 
   return state
 }
 
-const downloadSurveys = (state, surveys) => {
+const downloadSurveys = (state, surveys, resetP) => {
   if (noop(state)) return state
 
-  appActions.onUserModelLog('Surveys downloaded', surveys)
-  surveys = surveys.sortBy(survey => survey.get('created_at'))
-    .filter(survey => survey.get('status') === 'available' || survey.get('status') === 'complete')
+  if (surveys) {
+    appActions.onUserModelLog('Surveys downloaded', surveys)
+    surveys = surveys.sortBy(survey => survey.get('created_at'))
+      .filter(survey => survey.get('status') === 'available' || survey.get('status') === 'complete')
 
-  state = userModelState.setUserSurveyQueue(state, surveys)
-  appActions.onUserModelLog('Surveys available', surveys)
+    state = userModelState.setUserSurveyQueue(state, surveys)
+    appActions.onUserModelLog('Surveys available', surveys)
+  }
 
   if (!process.env.CATALOG_SERVER) return state
 
   const options = underscore.defaults({ server: catalogServer }, roundTripOptions)
-  const path = '/catalog'
+  let path = '/catalog'
+  if ((!resetP) && (bundle.catalog)) path += '/' + bundle.catalog
+
   roundtrip({
     method: 'GET',
     path: path
   }, options, (err, response, catalog) => {
     if (!err) return appActions.onUserModelDownloadCatalog(catalog)
 
+    if ((!resetP) && (response.statusCode === 404)) return appActions.onUserModelDownloadSurveys(null, true)
     appActions.onUserModelLog('Catalog download failed', {
+      reason: err.toString(),
       method: 'GET',
       server: urlFormat(options.server),
-      path: path,
-      reason: err.toString()
+      path: path
     })
   })
 
@@ -932,6 +938,48 @@ const downloadSurveys = (state, surveys) => {
 }
 
 const downloadCatalog = (state, catalog) => {
+  if (noop(state)) return state
+
+  const diff = catalog.get('diff')
+
+  if (!diff) return applyCatalog(state, catalog)
+
+  const oops = (data) => {
+    appActions.onUserModelLog('Patch invalid', data)
+
+    appActions.onUserModelDownloadSurveys(null, true)
+    return state
+  }
+
+  const version = catalog.get('version')
+
+  if (version !== 1) return oops({ reason: 'unsupported version', version: version })
+
+  const catalogIds = diff.get('catalogId')
+
+  if (catalogIds[0] !== bundle.catalog) {
+    return oops({ reason: 'incorrect previous catalogId', previous: bundle.catalog, catalogIds: catalogIds })
+  }
+
+  const catalogPath = path.join(app.getPath('userData'), 'catalog.json')
+  fs.readfile(catalogPath, 'utf8', (err, data) => {
+    if (!err) {
+      try {
+        catalog = jsondiff.patch(JSON.parse(data), diff.toJS())
+        appActions.onUserModelLog('Catalog patched', { previous: catalogIds[0], current: catalogIds[1] })
+        return appActions.onUserModelApplyCatalog(catalog)
+      } catch (ex) {
+        err = ex
+      }
+    }
+
+    oops({ reason: err.toString(), catalogPath })
+  })
+
+  return state
+}
+
+const applyCatalog = (state, catalog) => {
   if (noop(state)) return state
 
   catalog = catalog.toJS()
@@ -943,9 +991,7 @@ const downloadCatalog = (state, catalog) => {
       : (catalog.version !== 1) ? ('unsupported version: ' + catalog.version) : 'processing'
   }
   appActions.onUserModelLog('Catalog downloaded', underscore.pick(data, [ 'version', 'catalog', 'status' ]))
-/*
   if (data !== 'processing') return state
- */
 
   let failP
   const oops = (reason) => {
@@ -1029,6 +1075,16 @@ const downloadCatalog = (state, catalog) => {
 
   /* TODO: merge into user state */
 
+  const catalogPath = path.join(app.getPath('userData'), 'catalog.json')
+  fs.writeFile(catalogPath, 'utf8', JSON.stringify(catalog), (err) => {
+    if (!err) return
+
+    appActions.onUserModelLog('Catalog write error', { reason: err.toString(), catalogPath })
+    fs.unlink(catalogPath, (err) => {
+      appActions.onUserModelLog('Catalog unlink error', { reason: err.toString(), catalogPath })
+    })
+  })
+
   return state
 }
 
@@ -1056,6 +1112,7 @@ const getMethods = () => {
     uploadLogs,
     downloadSurveys,
     downloadCatalog,
+    applyCatalog,
     retrieveSSID,
     checkReadyAdServe,
     serveSampleAd

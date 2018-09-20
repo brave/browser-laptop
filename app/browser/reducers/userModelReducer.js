@@ -186,12 +186,17 @@ const userModelReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_USERMODEL_DOWNLOAD_SURVEYS:
       {
-        state = userModel.downloadSurveys(state, action.get('entries'))
+        state = userModel.downloadSurveys(state, action.get('surveys'), action.get('resetP'))
         break
       }
     case appConstants.APP_ON_USERMODEL_DOWNLOAD_CATALOG:
       {
         state = userModel.downloadCatalog(state, action.get('catalog'))
+        break
+      }
+    case appConstants.APP_ON_USERMODEL_APPLY_CATALOG:
+      {
+        state = userModel.applyCatalog(state, action.get('catalog'))
         break
       }
     case appConstants.APP_NETWORK_CONNECTED:

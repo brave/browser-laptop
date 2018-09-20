@@ -2020,16 +2020,24 @@ const appActions = {
     })
   },
 
-  onUserModelDownloadSurveys: function (entries) {
+  onUserModelDownloadSurveys: function (surveys, resetP) {
     dispatch({
       actionType: appConstants.APP_ON_USERMODEL_DOWNLOAD_SURVEYS,
-      entries
+      surveys,
+      resetP
     })
   },
 
   onUserModelDownloadCatalog: function (catalog) {
     dispatch({
       actionType: appConstants.APP_ON_USERMODEL_DOWNLOAD_CATALOG,
+      catalog
+    })
+  },
+
+  onUserModelApplyCatalog: function (catalog) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_APPLY_CATALOG,
       catalog
     })
   },
