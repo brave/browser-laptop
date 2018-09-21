@@ -318,6 +318,8 @@ const initialize = (state, adEnabled) => {
   appActions.onNativeNotificationConfigurationCheck()
   appActions.onNativeNotificationAllowedCheck(false)
 
+  const header = userModelState.getCatalog(state).toJS()
+
   // after the app has initialized, load the big files we need
   // this could be done however slowly in the background
   // on the other side, return early until these are populated
@@ -330,14 +332,36 @@ const initialize = (state, adEnabled) => {
       if (!err) {
         try {
           bundle = JSON.parse(data)
-          return
         } catch (ex) {
           err = ex
         }
       }
+      if (err) appActions.onUserModelLog('Bundle error', { reason: err.toString(), bundlePath })
+      else if (header) {
+        if (bundle.catalog === header.catalog) return appActions.onUserModelLog('Catalog', header)
 
-      appActions.onUserModelLog('Bundle error', { reason: err.toString(), bundlePath })
-      bundle = um.getSampleAdFeed()
+        appActions.onUserModelLog('Bundle error',
+                                  { reason: 'catalogId mismatch', bundle: bundle.catalog, header: header.catalog })
+        bundle = null
+      }
+
+      const catalogPath = path.join(app.getPath('userData'), 'catalog.json')
+
+      fs.readFile(catalogPath, 'utf8', (err, data) => {
+        if (!err) {
+          try {
+            const catalog = JSON.parse(data)
+
+            bundle = null
+            return appActions.onUserModelApplyCatalog(catalog)
+          } catch (ex) {
+            err = ex
+          }
+        }
+
+        appActions.onUserModelLog('Catalog error', { reason: err.toString(), catalogPath })
+        bundle = um.getSampleAdFeed()
+      })
     })
   })
 
@@ -640,12 +664,15 @@ const serveAdFromCategory = (state, windowId, category) => {
     for (let ad of result) {
 console.log(ad)
 
+// use userModelState.getCreativeSet() instead
+
       let creativeSet = bundle.creativeSets[ad.creativeSet]
       if (!creativeSet) {
         appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no creativeSet found for ad', ad})
         continue
       }
 
+// use userModelState.getCampaign() instead
       let campaign = bundle.campaigns[creativeSet.campaignId]
       if (!campaign) {
         appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no campaign found for ad', ad})
@@ -655,7 +682,7 @@ console.log(ad)
     }
 
     adsNotSeen = {}
-    
+
 /* NB: when the translation code is integrated, bundle.campaigns and bundle.categories will be kept in userModelState
        for now, you only have to keep the counts necessary for the "if we have ..." tests below in userModelState instead of
        what's used by the getAdUUIDSeen and recordAdUUIDSeen methods
@@ -730,7 +757,6 @@ const changeLocale = (state, locale) => {
 
   try { locale = um.setLocaleSync(locale) } catch (ex) {
     appActions.onUserModelLog('Locale error', { reason: ex.toString(), locale, stack: ex.stack })
-
     return state
   }
 
@@ -1007,11 +1033,12 @@ const applyCatalog = (state, catalog) => {
   const data = {
     version: catalog.version,
     catalog: catalog.catalogId,
-    status: (catalog.catalogId === bundle.catalog) ? 'already processed'
+    status: (!bundle) ? 'initializing'
+      : (catalog.catalogId === bundle.catalog) ? 'already processed'
       : (catalog.version !== 1) ? ('unsupported version: ' + catalog.version) : 'processing'
   }
   appActions.onUserModelLog('Catalog downloaded', underscore.pick(data, [ 'version', 'catalog', 'status' ]))
-  if (data !== 'processing') return state
+  if ((bundle) && (data !== 'processing')) return state
 
   let failP
   const oops = (reason) => {
@@ -1085,27 +1112,72 @@ const applyCatalog = (state, catalog) => {
                                                       underscore.pick(creativeSet, [ 'totalMax', 'perDay' ]))
     })
   })
-  underscore.extend(data, { categories, campaigns, creativeSets })
+  if (failP) return
+
+  state = userModelState.idleCatalog(state)
+  underscore.keys(campaigns).forEach((campaignId) => {
+    let campaign = userModelState.getCampaign(state, campaignId)
+
+    campaign = underscore.extend(campaign ? campaign.toJS() : {}, campaigns[campaignId])
+    state = userModelState.setCampaign(state, campaignId, campaign)
+  })
+  underscore.keys(creativeSets).forEach((creativeSetId) => {
+    let creativeSet = userModelState.getCreativeSet(state, creativeSetId)
+
+    creativeSet = underscore.extend(creativeSet ? creativeSet.toJS() : {}, creativeSets[creativeSetId])
+    state = userModelState.setCreativeSet(state, creativeSetId, creativeSet)
+  })
+  state = userModelState.flushCatalog(state)
+
+  const header = underscore.pick(data, [ 'version', 'catalog' ])
+
+  state = userModelState.setCatalog(state, header)
+
+  data.categories = categories
+  delete data.status
 
   appActions.onUserModelLog('Catalog parsed',
-                            underscore.extend(underscore.pick(data, [ 'version', 'catalog', 'status' ]), {
+                            underscore.extend(underscore.clone(header), {
+                              status: 'processed',
                               campaigns: underscore.keys(campaigns).length,
                               creativeSets: underscore.keys(creativeSets).length
                             }))
 
-  /* TODO: merge into user state */
+  if (!bundle) {
+    bundle = data
+
+    return state
+  }
 
   const catalogPath = path.join(app.getPath('userData'), 'catalog.json')
   fs.writeFile(catalogPath, 'utf8', JSON.stringify(catalog), (err) => {
-    if (!err) return
+    const bundlePath = path.join(app.getPath('userData'), 'bundle.json')
+    const loser = () => {
+      fs.unlink(bundlePath, (err) => {
+        if (err) appActions.onUserModelLog('Bundle unlink error', { reason: err.toString(), bundlePath })
+      })
+    }
 
-    appActions.onUserModelLog('Catalog write error', { reason: err.toString(), catalogPath })
-    fs.unlink(catalogPath, (err) => {
-      appActions.onUserModelLog('Catalog unlink error', { reason: err.toString(), catalogPath })
+    if (err) {
+      appActions.onUserModelLog('Catalog write error', { reason: err.toString(), catalogPath })
+      fs.unlink(catalogPath, (err) => {
+        if (err) appActions.onUserModelLog('Catalog unlink error', { reason: err.toString(), catalogPath })
+      })
+      return loser()
+    }
+
+    fs.writeFile(bundlePath, 'utf8', JSON.stringify(data), (err) => {
+      if (!err) return
+
+      appActions.onUserModelLog('Bundle write error', { reason: err.toString(), bundlePath })
+      loser()
     })
   })
 
   return state
+}
+
+const initializeCatalog = (state) => {
 }
 
 const privateTest = () => {
@@ -1133,6 +1205,7 @@ const getMethods = () => {
     downloadSurveys,
     downloadCatalog,
     applyCatalog,
+    initializeCatalog,
     retrieveSSID,
     checkReadyAdServe,
     serveSampleAd

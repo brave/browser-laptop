@@ -199,6 +199,11 @@ const userModelReducer = (state, action, immutableAction) => {
         state = userModel.applyCatalog(state, action.get('catalog'))
         break
       }
+    case appConstants.APP_ON_USERMODEL_INITIALIZE_CATALOG:
+      {
+        state = userModel.initializeCatalog(state, action.get('catalog'))
+        break
+      }
     case appConstants.APP_NETWORK_CONNECTED:
       {
         userModel.retrieveSSID()

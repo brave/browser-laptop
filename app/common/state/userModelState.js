@@ -88,6 +88,23 @@ const setReportingEventQueue = (state, queue) => {
   return state.setIn([ 'userModel', 'reportingEventQueue' ], queue)
 }
 
+const idleCatalogData = (state, type) => {
+  let data = state.getIn([ 'userModel', 'catalog', type ]) || Immutable.Map()
+
+  data = data.mapEntries(([ k, v ]) => {
+    v.idleP = true
+    return [ k, v ]
+  })
+
+  return state.setIn([ 'userModel', 'catalog', type ], data)
+}
+
+const flushCatalogData = (state, type) => {
+  const data = state.getIn([ 'userModel', 'catalog', type ]).filter((v) => !v.idleP)
+
+  return state.setIn([ 'userModel', 'catalog', type ], data)
+}
+
 const getCatalogData = (state, type, id) => {
   return state.getIn([ 'userModel', 'catalog', type, id ])
 }
@@ -95,11 +112,8 @@ const getCatalogData = (state, type, id) => {
 const setCatalogData = (state, type, id, data) => {
   if (!userModelState.getAdEnabledValue(state)) return state
 
+  delete data.idleP
   return state.setIn([ 'userModel', 'catalog', type, id ], data)
-}
-
-const removeCatalogData = (state, type, id) => {
-  return state.deleteIn([ 'userModel', 'catalog', type, id ])
 }
 
 const userModelState = {
@@ -480,28 +494,40 @@ const userModelState = {
 
   setReportingEventQueue,
 
+  idleCatalog: (state) => {
+    state = idleCatalogData(state, 'campaigns')
+    state = idleCatalogData(state, 'creativeSets')
+    return state
+  },
+
+  flushCatalog: (state) => {
+    state = flushCatalogData(state, 'campaigns')
+    state = flushCatalogData(state, 'creativeSets')
+    return state
+  },
+
+  getCatalog: (state) => {
+    return getCatalogData(state, 'catalogs', 'current')
+  },
+
+  setCatalog: (state, data) => {
+    return setCatalogData(state, 'catalogs', 'current', data)
+  },
+
   getCampaign: (state, campaignId) => {
-    return getCatalogData(state, 'campaign', campaignId)
+    return getCatalogData(state, 'campaigns', campaignId)
   },
 
   setCampaign: (state, campaignId, data) => {
-    return setCatalogData(state, 'campaign', campaignId, data)
-  },
-
-  removeCampaign: (state, campaignId) => {
-    return removeCatalogData(state, 'campaign', campaignId)
+    return setCatalogData(state, 'campaigns', campaignId, data)
   },
 
   getCreativeSet: (state, creativeSetId) => {
-    return getCatalogData(state, 'creativeSet', creativeSetId)
+    return getCatalogData(state, 'creativeSets', creativeSetId)
   },
 
   setCreativeSet: (state, creativeSetId, data) => {
-    return setCatalogData(state, 'creativeSet', creativeSetId, data)
-  },
-
-  removeCreativeSet: (state, creativeSetId) => {
-    return removeCatalogData(state, 'creativeSet', creativeSetId)
+    return setCatalogData(state, 'creativeSets', creativeSetId, data)
   }
 }
 
