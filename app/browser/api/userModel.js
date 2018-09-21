@@ -660,42 +660,45 @@ const serveAdFromCategory = (state, windowId, category) => {
 
   let adsNotSeen
   if (usingBundleCatalogFormatVersion) {
+    
+    adsNotSeen = []
 
     for (let ad of result) {
-console.log(ad)
 
-
-      let creativeSet = userModelState.getCreativeSet(state, ad.creativeSet)
+      const creativeSetId = ad.creativeSet
+      let creativeSet = userModelState.getCreativeSet(state, creativeSetId).toJS()
       if (!creativeSet) {
         appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no creativeSet found for ad', ad})
         continue
       }
 
-      let campaign = userModelState.getCampaign(state, creativeSet.campaignId)
+      let campaign = userModelState.getCampaign(state, creativeSet.campaignId).toJS()
       if (!campaign) {
         appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no campaign found for ad', ad})
         continue
       }
 
+      let creativeSetHistory = creativeSet.history || []
+      let campaignHistory = campaign.history || []
+
+      const hourWindow = 60 * 60
+      const dayWindow = 24 * hourWindow
+
+      if (creativeSetHistory.length >= creativeSet.totalMax) {
+        continue
+      }
+        
+      if (!userModelState.historyRespectsRollingTimeConstraint(creativeSetHistory, dayWindow, creativeSet.perDay)) {
+        continue
+      }
+
+
+      if (!userModelState.historyRespectsRollingTimeConstraint(campaignHistory, dayWindow, campaign.dailyCap)) {
+        continue
+      }
+
+      adsNotSeen.push(ad)
     }
-
-    adsNotSeen = {}
-
-/* NB: when the translation code is integrated, bundle.campaigns and bundle.categories will be kept in userModelState
-       for now, you only have to keep the counts necessary for the "if we have ..." tests below in userModelState instead of
-       what's used by the getAdUUIDSeen and recordAdUUIDSeen methods
-
-   loop through result:
-      creativeSet = bundle.creativeSets[entry.creativeSet]
-        if not present, log error and continue
-      campaign = bundle.campaigns[creativeSet.campaignId]
-        if not present, log error and continue
-
-     if we have already displayed a notification from this creativeSet within the last creativeSet.perDay days, continue
-     if we have already displayed creativeSet.totalMax notifications, continue
-     if we have already displayed campaign.dailyCap notifications within the last 24 hours, continue
-     add entry to adsNotSeen
-*/
   } else {
     const seen = userModelState.getAdUUIDSeen(state)
     adsNotSeen = result.filter(x => !seen.get(x.uuid))
@@ -716,7 +719,7 @@ console.log(ad)
   const payload = adsNotSeen[arbitraryKey]
   if (!payload) {
     appActions.onUserModelLog('Notification not made',
-                              { reason: 'no ad for winnerOverTime', category, winnerOverTime, arbitraryKey })
+                              { reason: 'no ad (or permitted ad) for winnerOverTime', category, winnerOverTime, arbitraryKey })
 
     return state
   }
@@ -737,7 +740,28 @@ console.log(ad)
   appActions.onUserModelLog(notificationTypes.NOTIFICATION_SHOWN,
                             {category, winnerOverTime, arbitraryKey, notificationUrl, notificationText, advertiser, uuid, hierarchy})
 
-  return userModelState.appendAdShownToAdHistory(state)
+  state = userModelState.appendAdShownToAdHistory(state)
+
+  // manage `creativeSet` and `campaign` based on selected & successfully shown ad
+  const unixTime = userModelState.unixTimeNowSeconds()
+  const creativeSetId = payload.creativeSet
+  let creativeSet = userModelState.getCreativeSet(state, creativeSetId).toJS()
+  const campaignId = creativeSet.campaignId
+  let campaign = userModelState.getCampaign(state, campaignId).toJS()
+
+  let creativeSetHistory = creativeSet.history || []
+  let campaignHistory = campaign.history || []
+
+  creativeSetHistory.push(unixTime)
+  campaignHistory.push(unixTime)
+
+  creativeSet.history = creativeSetHistory
+  campaign.history = campaignHistory
+
+  state = userModelState.setCreativeSet(state, creativeSetId, creativeSet)
+  state = userModelState.setCampaign(state, campaignId, campaign)
+
+  return state
 }
 
 const serveSampleAd = (state, windowId) => {

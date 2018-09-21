@@ -48,7 +48,7 @@ const historyRespectsRollingTimeConstraint = function (history, secondsWindow, a
   return (recentCount <= allowableAdCount)
 }
 
-const appendToRingBufferUnderKey = (state, key, item, maxRows) => {
+const appendToRingBufferUnderKey = (state, key, item, maxRows = Number.MAX_SAFE_INTEGER) => {
   if (!userModelState.getAdEnabledValue(state)) return state
 
   state = validateState(state)
@@ -106,6 +106,7 @@ const flushCatalogData = (state, type) => {
 }
 
 const getCatalogData = (state, type, id) => {
+  state = validateState(state)
   return state.getIn([ 'userModel', 'catalog', type, id ])
 }
 
@@ -528,7 +529,10 @@ const userModelState = {
 
   setCreativeSet: (state, creativeSetId, data) => {
     return setCatalogData(state, 'creativeSets', creativeSetId, data)
-  }
+  },
+
+	unixTimeNowSeconds,
+	historyRespectsRollingTimeConstraint,
 }
 
 module.exports = userModelState
