@@ -2035,10 +2035,11 @@ const appActions = {
     })
   },
 
-  onUserModelApplyCatalog: function (catalog) {
+  onUserModelApplyCatalog: function (catalog, bootP) {
     dispatch({
       actionType: appConstants.APP_ON_USERMODEL_APPLY_CATALOG,
-      catalog
+      catalog,
+      bootP
     })
   },
 

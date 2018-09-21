@@ -196,7 +196,7 @@ const userModelReducer = (state, action, immutableAction) => {
       }
     case appConstants.APP_ON_USERMODEL_APPLY_CATALOG:
       {
-        state = userModel.applyCatalog(state, action.get('catalog'))
+        state = userModel.applyCatalog(state, action.get('catalog'), action.get('bootP'))
         break
       }
     case appConstants.APP_ON_USERMODEL_INITIALIZE_CATALOG:

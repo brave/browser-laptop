@@ -44,6 +44,7 @@ const notificationUtil = {
       // Terminal.icns has been updated!
       Darwin: () => {
         if (notifier.utils.isMountainLion()) {
+          delete options.icon
           return {
             actions: 'View',
             closeLabel: 'Close'
