@@ -660,21 +660,19 @@ const serveAdFromCategory = (state, windowId, category) => {
 
   let adsNotSeen
   if (usingBundleCatalogFormatVersion) {
-    
     adsNotSeen = []
 
     for (let ad of result) {
-
       const creativeSetId = ad.creativeSet
       let creativeSet = userModelState.getCreativeSet(state, creativeSetId).toJS()
       if (!creativeSet) {
-        appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no creativeSet found for ad', ad})
+        appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no creativeSet found for ad', ad })
         continue
       }
 
       let campaign = userModelState.getCampaign(state, creativeSet.campaignId).toJS()
       if (!campaign) {
-        appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no campaign found for ad', ad})
+        appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no campaign found for ad', ad })
         continue
       }
 
@@ -687,11 +685,10 @@ const serveAdFromCategory = (state, windowId, category) => {
       if (creativeSetHistory.length >= creativeSet.totalMax) {
         continue
       }
-        
+
       if (!userModelState.historyRespectsRollingTimeConstraint(creativeSetHistory, dayWindow, creativeSet.perDay)) {
         continue
       }
-
 
       if (!userModelState.historyRespectsRollingTimeConstraint(campaignHistory, dayWindow, campaign.dailyCap)) {
         continue

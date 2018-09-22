@@ -531,8 +531,8 @@ const userModelState = {
     return setCatalogData(state, 'creativeSets', creativeSetId, data)
   },
 
-	unixTimeNowSeconds,
-	historyRespectsRollingTimeConstraint,
+  unixTimeNowSeconds,
+  historyRespectsRollingTimeConstraint
 }
 
 module.exports = userModelState
