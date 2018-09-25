@@ -1,0 +1,18 @@
+/*
+    The extension offering doesn't apply to brave-muon. This CSS will
+    hide the element. When the user clicks the [x] to close the panel,
+    www.qwant.com calls ExtensionHelper.closePopin. This creates a key
+    "closedExtPanel" in Local Storage with a value of Date.now().
+*/
+.extension_popin {
+    display: none !important
+}
+
+/*
+    When scripting is disabled, users will be auto-directed to the
+    lite.qwant.com page. At the top of this page users are offered an
+    extension for Firefox. This also doesn't apply to brave-muon.
+*/
+.extension-item[href*=firefox] {
+    display: none !important
+}
