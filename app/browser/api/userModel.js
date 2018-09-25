@@ -981,7 +981,7 @@ const downloadSurveys = (state, surveys, resetP) => {
   if (!catalogServer) return state
 
   const options = underscore.defaults({ server: catalogServer }, roundTripOptions)
-  let path = '/catalog'
+  let path = '/v1/catalog'
   if ((!resetP) && (bundle.catalog)) path += '/' + bundle.catalog
 
   roundtrip({
@@ -991,8 +991,10 @@ const downloadSurveys = (state, surveys, resetP) => {
     if (!err) return appActions.onUserModelDownloadCatalog(catalog)
 
     if ((!resetP) && (response.statusCode === 404)) return appActions.onUserModelDownloadSurveys(null, true)
-    appActions.onUserModelLog('Catalog download failed', {
-      reason: err.toString(),
+
+    const failP = response.statusCode !== 304
+    appActions.onUserModelLog(failP ? 'Catalog download failed' : 'Catalog current', {
+      reason: failP && err.toString(),
       method: 'GET',
       server: urlFormat(options.server),
       path: path
