@@ -6,15 +6,11 @@
 
 const Immutable = require('immutable')
 const assert = require('assert')
-const os = require('os')
-const path = require('path')
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
-const windowActions = require('../../../js/actions/windowActions')
 
 // Constants
-const notificationTypes = require('../../common/constants/notificationTypes')
 const settings = require('../../../js/constants/settings')
 
 // State
@@ -26,8 +22,6 @@ const urlUtil = require('../../../js/lib/urlutil')
 
 const maxRowsInPageScoreHistory = 5
 const maxRowsInAdsShownHistory = 99
-
-let initP
 
 const validateState = function (state) {
   state = makeImmutable(state)
@@ -54,7 +48,7 @@ const historyRespectsRollingTimeConstraint = function (history, secondsWindow, a
   return (recentCount <= allowableAdCount)
 }
 
-const appendToRingBufferUnderKey = (state, key, item, maxRows) => {
+const appendToRingBufferUnderKey = (state, key, item, maxRows = Number.MAX_SAFE_INTEGER) => {
   if (!userModelState.getAdEnabledValue(state)) return state
 
   state = validateState(state)
@@ -92,6 +86,35 @@ const setReportingEventQueue = (state, queue) => {
   if (!userModelState.getAdEnabledValue(state)) return state
 
   return state.setIn([ 'userModel', 'reportingEventQueue' ], queue)
+}
+
+const idleCatalogData = (state, type) => {
+  let data = state.getIn([ 'userModel', 'catalog', type ]) || Immutable.Map()
+
+  data = data.mapEntries(([ k, v ]) => {
+    v.idleP = true
+    return [ k, v ]
+  })
+
+  return state.setIn([ 'userModel', 'catalog', type ], data)
+}
+
+const flushCatalogData = (state, type) => {
+  const data = state.getIn([ 'userModel', 'catalog', type ]).filter((v) => !v.idleP)
+
+  return state.setIn([ 'userModel', 'catalog', type ], data)
+}
+
+const getCatalogData = (state, type, id) => {
+  state = validateState(state)
+  return state.getIn([ 'userModel', 'catalog', type, id ])
+}
+
+const setCatalogData = (state, type, id, data) => {
+  if (!userModelState.getAdEnabledValue(state)) return state
+
+  delete data.idleP
+  return state.setIn([ 'userModel', 'catalog', type, id ], data)
 }
 
 const userModelState = {
@@ -472,66 +495,44 @@ const userModelState = {
 
   setReportingEventQueue,
 
-  notificationStyle: () => {
-    const style = process.env.NOTIFICATION_STYLE || (os.type() === 'Windows_NT' ? 'html5' : 'external')
-
-    if (!initP) {
-      initP = true
-
-      appActions.changeSiteSetting('chrome://brave', 'notificationsPermission', style === 'html5', false, true)
-      if (process.env.LEDGER_VERBOSE === 'true') {
-        console.log('notification permission set to ' + (style === 'html5'))
-        console.log('notificationStyle: ' + style)
-        console.log('environment: ' + process.env.NODE_ENV)
-        console.log('icon: ' +
-                    (process.env.NODE_ENV === 'development' ? path.join(__dirname, '../../extensions/brave/img/BAT_icon.png')
-                     : path.normalize(path.join(process.resourcesPath, 'extensions', 'brave', 'img', 'BAT_icon.png'))))
-      }
-    }
-
-    return style
+  idleCatalog: (state) => {
+    state = idleCatalogData(state, 'campaigns')
+    state = idleCatalogData(state, 'creativeSets')
+    return state
   },
 
-  createNotification: (state, windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId) => {
-    if (userModelState.notificationStyle() === 'html5') {
-      windowActions.html5NotificationCreate(
-        windowId,
-        notificationTitle,
-        {
-          body: notificationText,
-          icon: process.env.NODE_ENV === 'development'
-            ? path.join(__dirname, '../../extensions/brave/img/BAT_icon.png')
-            : path.normalize(path.join(process.resourcesPath, 'extensions', 'brave', 'img', 'BAT_icon.png')),
-          data: {
-            uuid,
-            notificationUrl,
-            notificationId: notificationId || notificationTypes.ADS
-          }
-        }
-      )
-      return
-    }
+  flushCatalog: (state) => {
+    state = flushCatalogData(state, 'campaigns')
+    state = flushCatalogData(state, 'creativeSets')
+    return state
+  },
 
-    appActions.nativeNotificationCreate(
-      windowId,
-      {
-        title: notificationTitle,
-        message: notificationText,
-        icon: process.env.NODE_ENV === 'development'
-          ? path.join(__dirname, '../../extensions/brave/img/BAT_icon.png')
-          : path.normalize(path.join(process.resourcesPath, 'extensions', 'brave', 'img', 'BAT_icon.png')),
-        sound: true,
-        timeout: 60,
-        wait: true,
-        uuid: uuid,
-        data: {
-          windowId,
-          notificationUrl,
-          notificationId: notificationId || notificationTypes.ADS
-        }
-      }
-    )
-  }
+  getCatalog: (state) => {
+    return getCatalogData(state, 'catalogs', 'current')
+  },
+
+  setCatalog: (state, data) => {
+    return setCatalogData(state, 'catalogs', 'current', data)
+  },
+
+  getCampaign: (state, campaignId) => {
+    return getCatalogData(state, 'campaigns', campaignId)
+  },
+
+  setCampaign: (state, campaignId, data) => {
+    return setCatalogData(state, 'campaigns', campaignId, data)
+  },
+
+  getCreativeSet: (state, creativeSetId) => {
+    return getCatalogData(state, 'creativeSets', creativeSetId)
+  },
+
+  setCreativeSet: (state, creativeSetId, data) => {
+    return setCatalogData(state, 'creativeSets', creativeSetId, data)
+  },
+
+  unixTimeNowSeconds,
+  historyRespectsRollingTimeConstraint
 }
 
 module.exports = userModelState

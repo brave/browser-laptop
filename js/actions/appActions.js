@@ -2020,10 +2020,33 @@ const appActions = {
     })
   },
 
-  onUserModelDownloadSurveys: function (entries) {
+  onUserModelDownloadSurveys: function (surveys, resetP) {
     dispatch({
       actionType: appConstants.APP_ON_USERMODEL_DOWNLOAD_SURVEYS,
-      entries
+      surveys,
+      resetP
+    })
+  },
+
+  onUserModelDownloadCatalog: function (catalog) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_DOWNLOAD_CATALOG,
+      catalog
+    })
+  },
+
+  onUserModelApplyCatalog: function (catalog, bootP) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_APPLY_CATALOG,
+      catalog,
+      bootP
+    })
+  },
+
+  onUserModelInitializeCatalog: function (catalog) {
+    dispatch({
+      actionType: appConstants.APP_ON_USERMODEL_INITIALIZE_CATALOG,
+      catalog
     })
   },
 
@@ -2169,13 +2192,6 @@ const appActions = {
       actionType: appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_REPORT,
       ok,
       serveP
-    })
-  },
-
-  onHtml5NotificationClose: function (options) {
-    dispatch({
-      actionType: appConstants.APP_ON_HTML5_NOTIFICATION_CLOSE,
-      options
     })
   },
 

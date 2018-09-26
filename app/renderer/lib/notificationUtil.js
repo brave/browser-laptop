@@ -44,6 +44,7 @@ const notificationUtil = {
       // Terminal.icns has been updated!
       Darwin: () => {
         if (notifier.utils.isMountainLion()) {
+          delete options.icon
           return {
             actions: 'View',
             closeLabel: 'Close'
@@ -168,12 +169,6 @@ const notificationUtil = {
       appActions.onUserModelLog(appConstants.APP_ON_NATIVE_NOTIFICATION_ALLOWED_CHECK, {err, result})
       appActions.onNativeNotificationAllowedReport(!err && result, serveP)
     })
-  },
-
-  onHTML5NotificationClose: (options) => {
-    options = immutableUtil.makeJS(options)
-
-    notificationUtil[(options.data.reason === 'click') ? 'clickHandler' : 'timeoutHandler'](options)
   }
 }
 

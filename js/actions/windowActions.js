@@ -1074,17 +1074,6 @@ const windowActions = {
     })
   },
 
-  html5NotificationCreate: function (windowId, title, options) {
-    dispatch({
-      actionType: windowConstants.WINDOW_ON_HTML5_NOTIFICATION_CREATE,
-      title,
-      options,
-      queryInfo: {
-        windowId
-      }
-    })
-  },
-
   onSiteDetailMenu: function (bookmarkKey, type) {
     dispatch({
       actionType: windowConstants.WINDOW_ON_SITE_DETAIL_MENU,

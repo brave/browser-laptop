@@ -28,7 +28,6 @@ const bookmarkFoldersState = require('../../app/common/state/bookmarkFoldersStat
 const bookmarksState = require('../../app/common/state/bookmarksState')
 const tabState = require('../../app/common/state/tabState')
 const bookmarkUtil = require('../../app/common/lib/bookmarkUtil')
-const html5NotificationUtil = require('../../app/renderer/lib/html5NotificationUtil')
 
 let windowState = Immutable.fromJS({
   activeFrameKey: null,
@@ -822,11 +821,6 @@ const doAction = (action) => {
       const sourceFrameTabId = sourceFrame.get('tabId')
       appActions.tabIndexChangeRequested(sourceFrameTabId, destinationFrameIndex)
       break
-    case windowConstants.WINDOW_ON_HTML5_NOTIFICATION_CREATE:
-      {
-        html5NotificationUtil.createNotification(action.title, action.options)
-        break
-      }
     default:
       break
   }

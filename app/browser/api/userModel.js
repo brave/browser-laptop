@@ -5,12 +5,15 @@
 'use strict'
 const um = require('@brave-intl/bat-usermodel')
 const notifier = require('brave-ads-notifier')
+const path = require('path')
 const getSSID = require('detect-ssid')
+const jsondiff = require('jsondiffpatch')
 const underscore = require('underscore')
 const urlFormat = require('url').format
 const uuidv4 = require('uuid/v4')
 
 const app = require('electron').app
+const fs = require('fs')
 const os = require('os')
 
 // Actions
@@ -43,11 +46,12 @@ let foregroundP
 let onceP
 let userModelOptions = {}
 
+let bundle
 let matrixData
 let priorData
-let sampleAdFeed
 
 let lastSingleClassification
+let pageScoreCache = {}
 
 let adTabUrl
 
@@ -85,7 +89,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
               const classification = data.get('hierarchy')
               map.notificationType = 'generated'
               map.notificationClassification = classification
-              map.notificationCatalog = 'unspecified-catalog'
+              map.notificationCatalog = bundle.catalog || 'sample-catalog'
               map.notificationUrl = data.get('notificationUrl')
               break
             }
@@ -178,7 +182,8 @@ const generateAdReportingEvent = (state, eventType, action) => {
 
         if (!tabUrl.startsWith('http://') && !tabUrl.startsWith('https://')) return state
 
-        map.tabId = String(tabValue.get('tabId'))
+        const tabId = tabValue.get('tabId')
+        map.tabId = String(tabId)
         map.tabType = 'click'
 
         const searchState = userModelState.getSearchState(state)
@@ -190,6 +195,9 @@ const generateAdReportingEvent = (state, eventType, action) => {
 
         if (!Array.isArray(classification)) classification = classification.toArray()
         map.tabClassification = classification
+
+        let cachedValue = pageScoreCache[tabId] || {}
+        if (cachedValue.url === tabUrl) map.pageScore = cachedValue.pageScore
 
         const now = underscore.now()
         if ((testingP) && (tabUrl === 'https://www.iab.com/') && (nextEasterEgg < now)) {
@@ -283,7 +291,7 @@ const processLocales = (state, result) => {
 
   if (locale) {
     try { locale = um.setLocaleSync(locale) } catch (ex) {
-      appActions.onUserModelLog('Locale error', { locale: locale, reason: ex.toString(), stack: ex.stack })
+      appActions.onUserModelLog('Locale error', { reason: ex.toString(), locale, stack: ex.stack })
       locale = ''
     }
   }
@@ -310,13 +318,66 @@ const initialize = (state, adEnabled) => {
   appActions.onNativeNotificationConfigurationCheck()
   appActions.onNativeNotificationAllowedCheck(false)
 
+  const header = userModelState.getCatalog(state)
+
   // after the app has initialized, load the big files we need
   // this could be done however slowly in the background
   // on the other side, return early until these are populated
   setImmediate(function () {
     matrixData = um.getMatrixDataSync()
     priorData = um.getPriorDataSync()
-    sampleAdFeed = um.getSampleAdFeed()
+
+    const bundlePath = path.join(app.getPath('userData'), 'bundle.json')
+    fs.readFile(bundlePath, 'utf8', (err, data) => {
+      if (!err) {
+        try {
+          bundle = JSON.parse(data)
+        } catch (ex) {
+          err = ex
+        }
+      }
+      if (err) {
+        if ((catalogServer) && (err.code !== 'ENOENT')) {
+          appActions.onUserModelLog('Bundle error', { reason: err.toString(), bundlePath })
+        }
+      } else if (header) {
+        if (bundle.catalog === header.get('catalog')) return appActions.onUserModelLog('Catalog', header)
+
+        appActions.onUserModelLog('Bundle error',
+                                  { reason: 'catalogId mismatch', bundle: bundle.catalog, header: header.catalog })
+        bundle = null
+      }
+
+      const catalogPath = path.join(app.getPath('userData'), 'catalog.json')
+
+      fs.readFile(catalogPath, 'utf8', (err, data) => {
+        if (!err) {
+          try {
+            const catalog = JSON.parse(data)
+
+            bundle = null
+            return appActions.onUserModelApplyCatalog(catalog, !bundle)
+          } catch (ex) {
+            err = ex
+          }
+        }
+
+        if (!catalogServer) {
+          appActions.onUserModelLog('Catalog bootstrap')
+          bundle = um.getSampleAdFeed()
+          return
+        }
+
+        if (err.code !== 'ENOENT') appActions.onUserModelLog('Catalog error', { reason: err.toString(), catalogPath })
+        if (collectActivityId) {
+          clearTimeout(collectActivityId)
+          collectActivityId = undefined
+        }
+
+        appActions.onUserModelDownloadSurveys(null)
+        collectActivityId = setTimeout(appActions.onUserModelCollectActivity, oneHour)
+      })
+    })
   })
 
   retrieveSSID()
@@ -463,12 +524,25 @@ function randomKey (dictionary) {
 }
 
 const goAheadAndShowTheAd = (state, windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId) => {
-try {
-  userModelState.createNotification(state, windowId, notificationTitle, notificationText, notificationUrl, uuid, notificationId)
-} catch (ex) {
-  return console.log('\n\ncreateNotification fails: ' + ex.stack)
-}
-console.log('\n\ncreateNotificationSucceeds')
+  appActions.nativeNotificationCreate(
+    windowId,
+    {
+      title: notificationTitle,
+      message: notificationText,
+      icon: process.env.NODE_ENV === 'development'
+        ? path.join(__dirname, '../../extensions/brave/img/BAT_icon.png')
+        : path.normalize(path.join(process.resourcesPath, 'extensions', 'brave', 'img', 'BAT_icon.png')),
+      sound: true,
+      timeout: 60,
+      wait: true,
+      uuid: uuid,
+      data: {
+        windowId,
+        notificationUrl,
+        notificationId: notificationId || notificationTypes.ADS
+      }
+    }
+  )
 
   adTabUrl = notificationUrl
 }
@@ -508,7 +582,9 @@ const classifyPage = (state, action, windowId) => {
   const scores = um.deriveCategoryScores(history)
   const indexOfMax = um.vectorIndexOfMax(scores)
   const winnerOverTime = catNames[indexOfMax].split('-')
-  appActions.onUserModelLog('Site visited', { url, immediateWinner, winnerOverTime, pageScore })
+  appActions.onUserModelLog('Site visited', { url, immediateWinner, winnerOverTime })
+
+  pageScoreCache[action.get('tabId')] = { url, pageScore }
 
   return state
 }
@@ -574,7 +650,6 @@ const checkReadyAdServe = (state, windowId, forceP) => {
 }
 
 const serveAdFromCategory = (state, windowId, category) => {
-  const bundle = sampleAdFeed
   if (!bundle) {
     appActions.onUserModelLog('Notification not made', { reason: 'no ad catalog' })
 
@@ -596,26 +671,70 @@ const serveAdFromCategory = (state, windowId, category) => {
     return state
   }
 
-  const seen = userModelState.getAdUUIDSeen(state)
+  const usingBundleCatalogFormatVersion = bundle.catalog
 
-  const adsSeen = result.filter(x => seen.get(x.uuid))
-  let adsNotSeen = result.filter(x => !seen.get(x.uuid))
-  const allSeen = (adsNotSeen.length <= 0)
+  let adsNotSeen
+  if (usingBundleCatalogFormatVersion) {
+    adsNotSeen = []
 
-  if (allSeen) {
-    appActions.onUserModelLog('Ad round-robin', { category, adsSeen, adsNotSeen })
-    // unmark all
-    for (let i = 0; i < result.length; i++) state = userModelState.recordAdUUIDSeen(state, result[i].uuid, 0)
-    adsNotSeen = adsSeen
-  } // else - recordAdUUIDSeen - this actually only happens in click-or-close event capture in generateAdReportingEvent in this file
+    for (let ad of result) {
+      const creativeSetId = ad.creativeSet
+      let creativeSet = userModelState.getCreativeSet(state, creativeSetId)
 
-  // select an ad that isn't seen
+      if (!creativeSet) {
+        appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no creativeSet found for ad', ad })
+        continue
+      }
+      creativeSet = creativeSet.toJS()
+
+      let campaign = userModelState.getCampaign(state, creativeSet.campaignId)
+      if (!campaign) {
+        appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no campaign found for ad', ad })
+        continue
+      }
+      campaign = campaign.toJS()
+
+      let creativeSetHistory = creativeSet.history || []
+      let campaignHistory = campaign.history || []
+
+      const hourWindow = 60 * 60
+      const dayWindow = 24 * hourWindow
+
+      if (creativeSetHistory.length >= creativeSet.totalMax) {
+        continue
+      }
+
+      if (!userModelState.historyRespectsRollingTimeConstraint(creativeSetHistory, dayWindow, creativeSet.perDay)) {
+        continue
+      }
+
+      if (!userModelState.historyRespectsRollingTimeConstraint(campaignHistory, dayWindow, campaign.dailyCap)) {
+        continue
+      }
+
+      adsNotSeen.push(ad)
+    }
+  } else {
+    const seen = userModelState.getAdUUIDSeen(state)
+    adsNotSeen = result.filter(x => !seen.get(x.uuid))
+
+    const adsSeen = result.filter(x => seen.get(x.uuid))
+    const allSeen = (adsNotSeen.length <= 0)
+
+    if (allSeen) {
+      appActions.onUserModelLog('Ad round-robin', { category, adsSeen, adsNotSeen })
+      // unmark all
+      for (let i = 0; i < result.length; i++) state = userModelState.recordAdUUIDSeen(state, result[i].uuid, 0)
+      adsNotSeen = adsSeen
+    } // else - recordAdUUIDSeen - this actually only happens in click-or-close event capture in generateAdReportingEvent in this file
+  }
+
+  // select an ad from the eligible list
   const arbitraryKey = randomKey(adsNotSeen)
   const payload = adsNotSeen[arbitraryKey]
-
   if (!payload) {
     appActions.onUserModelLog('Notification not made',
-                              { reason: 'no ad for winnerOverTime', category, winnerOverTime, arbitraryKey })
+                              { reason: 'no ad (or permitted ad) for winnerOverTime', category, winnerOverTime, arbitraryKey })
 
     return state
   }
@@ -636,7 +755,31 @@ const serveAdFromCategory = (state, windowId, category) => {
   appActions.onUserModelLog(notificationTypes.NOTIFICATION_SHOWN,
                             {category, winnerOverTime, arbitraryKey, notificationUrl, notificationText, advertiser, uuid, hierarchy})
 
-  return userModelState.appendAdShownToAdHistory(state)
+  state = userModelState.appendAdShownToAdHistory(state)
+  if (!usingBundleCatalogFormatVersion) return state
+
+  // manage `creativeSet` and `campaign` based on selected & successfully shown ad
+  const unixTime = userModelState.unixTimeNowSeconds()
+  const creativeSetId = payload.creativeSet
+  let creativeSet = userModelState.getCreativeSet(state, creativeSetId)
+  if (creativeSet) creativeSet = creativeSet.toJS()
+  const campaignId = creativeSet.campaignId
+  let campaign = userModelState.getCampaign(state, campaignId)
+  if (campaign) campaign = campaign.toJS()
+
+  let creativeSetHistory = creativeSet.history || []
+  let campaignHistory = campaign.history || []
+
+  creativeSetHistory.push(unixTime)
+  campaignHistory.push(unixTime)
+
+  creativeSet.history = creativeSetHistory
+  campaign.history = campaignHistory
+
+  state = userModelState.setCreativeSet(state, creativeSetId, creativeSet)
+  state = userModelState.setCampaign(state, campaignId, campaign)
+
+  return state
 }
 
 const serveSampleAd = (state, windowId) => {
@@ -653,8 +796,7 @@ const changeLocale = (state, locale) => {
   if (noop(state)) return state
 
   try { locale = um.setLocaleSync(locale) } catch (ex) {
-    appActions.onUserModelLog('Locale error', { locale: locale, reason: ex.toString(), stack: ex.stack })
-
+    appActions.onUserModelLog('Locale error', { reason: ex.toString(), locale, stack: ex.stack })
     return state
   }
 
@@ -707,6 +849,8 @@ const roundTripOptions = {
   server: urlParse('https://' + (hackStagingOn ? 'collector-staging.brave.com'
                                  : testingP ? 'collector-testing.brave.com' : 'collector.brave.com'))
 }
+const catalogServer = process.env.CATALOG_SERVER && urlParse(process.env.CATALOG_SERVER)
+let nextCatalogCheck = 0
 
 const collectActivityAsNeeded = (state, adEnabled) => {
   if (!adEnabled) {
@@ -780,10 +924,10 @@ const collectActivity = (state) => {
   }, roundTripOptions, (err, response, result) => {
     if (err) {
       appActions.onUserModelLog('Event upload failed', {
+        reason: err.toString(),
         method: 'PUT',
         server: urlFormat(roundTripOptions.server),
-        path: path,
-        reason: err.toString()
+        path: path
       })
 
       if (response.statusCode !== 400) stamp = null
@@ -834,25 +978,268 @@ const uploadLogs = (state, stamp, retryIn, result) => {
     if (!err) return appActions.onUserModelDownloadSurveys(surveys)
 
     appActions.onUserModelLog('Survey download failed', {
+      reason: err.toString(),
       method: 'GET',
       server: urlFormat(roundTripOptions.server),
-      path: path,
-      reason: err.toString()
+      path: path
     })
   })
 
   return state
 }
 
-const downloadSurveys = (state, surveys) => {
+const downloadSurveys = (state, surveys, resetP) => {
   if (noop(state)) return state
 
-  appActions.onUserModelLog('Surveys downloaded', surveys)
-  surveys = surveys.sortBy(survey => survey.get('created_at'))
-    .filter(survey => survey.get('status') === 'available' || survey.get('status') === 'complete')
-  appActions.onUserModelLog('Surveys available', surveys)
+  if (surveys) {
+    appActions.onUserModelLog('Surveys downloaded', surveys)
+    surveys = surveys.sortBy(survey => survey.get('created_at'))
+      .filter(survey => survey.get('status') === 'available' || survey.get('status') === 'complete')
 
-  return userModelState.setUserSurveyQueue(state, surveys)
+    state = userModelState.setUserSurveyQueue(state, surveys)
+    appActions.onUserModelLog('Surveys available', surveys)
+  }
+
+  if ((!catalogServer) || (nextCatalogCheck > underscore.now())) return state
+
+  const options = underscore.defaults({ server: catalogServer }, roundTripOptions)
+  let path = '/v1/catalog'
+  if ((!resetP) && (bundle) && (bundle.catalog)) path += '/' + bundle.catalog
+
+  roundtrip({
+    method: 'GET',
+    path: path
+  }, options, (err, response, catalog) => {
+    if (!err) return appActions.onUserModelDownloadCatalog(catalog)
+
+    if ((!resetP) && (response.statusCode === 404)) return appActions.onUserModelDownloadSurveys(null, true)
+
+    const failP = response.statusCode !== 304
+    appActions.onUserModelLog(failP ? 'Catalog download failed' : 'Catalog current', {
+      reason: failP ? err.toString() : undefined,
+      method: 'GET',
+      server: urlFormat(options.server),
+      path: path
+    })
+  })
+
+  return state
+}
+
+const downloadCatalog = (state, catalog) => {
+  if (noop(state)) return state
+
+  const oops = (data) => {
+    appActions.onUserModelLog('Patch invalid', data)
+
+    appActions.onUserModelDownloadSurveys(null, true)
+    return state
+  }
+
+  const version = catalog.get('version')
+
+  if (version !== 1) return oops({ reason: 'unsupported version', version: version })
+
+  const diff = catalog.get('diff')
+
+  if (!diff) {
+    const campaigns = catalog.get('campaigns')
+
+    if (campaigns) {
+      const ping = parseInt(catalog.get('ping'), 10)
+
+      if ((!isNaN(ping)) && (ping > 0)) nextCatalogCheck = underscore.now() + ping
+
+      return applyCatalog(state, catalog)
+    }
+
+    appActions.onUserModelLog('Catalog current', {
+      method: 'GET',
+      server: urlFormat(catalogServer.server),
+      path: path
+    })
+    return
+  }
+
+  const catalogIds = diff.get('catalogId') && diff.get('catalogId').toJS()
+
+  if (catalogIds[0] !== bundle.catalog) {
+    return oops({ reason: 'incorrect previous catalogId', previous: bundle.catalog, catalogIds: catalogIds })
+  }
+
+  const catalogPath = path.join(app.getPath('userData'), 'catalog.json')
+  fs.readFile(catalogPath, 'utf8', (err, data) => {
+    if (!err) {
+      try {
+        catalog = jsondiff.patch(JSON.parse(data), diff.toJS())
+        appActions.onUserModelLog('Catalog patched', { previous: catalogIds[0], current: catalogIds[1] })
+        return appActions.onUserModelApplyCatalog(catalog)
+      } catch (ex) {
+        err = ex
+      }
+    }
+
+    oops({ reason: err.toString(), catalogPath })
+  })
+
+  return state
+}
+
+const applyCatalog = (state, catalog, bootP) => {
+  if (noop(state)) return state
+
+  catalog = catalog.toJS()
+
+  const data = {
+    version: catalog.version,
+    catalog: catalog.catalogId,
+    status: (!bundle) ? 'initializing'
+      : (catalog.catalogId === bundle.catalog) ? 'already processed'
+      : (catalog.version !== 1) ? ('unsupported version: ' + catalog.version) : 'processing'
+  }
+  appActions.onUserModelLog('Catalog downloaded', underscore.pick(data, [ 'version', 'catalog', 'status' ]))
+  if ((bundle) && (data.status !== 'processing')) return state
+
+  let failP
+  const oops = (reason) => {
+    failP = true
+    appActions.onUserModelLog('Catalog invalid', reason)
+
+    return state
+  }
+
+  const categories = {}
+  const campaigns = {}
+  const creativeSets = {}
+  const now = underscore.now()
+  catalog.campaigns.forEach((campaign) => {
+    if (failP) return
+
+    const campaignId = campaign.campaignId
+    if (campaigns[campaignId]) return oops('duplicated campaignId: ' + campaignId)
+
+    const startTimestamp = new Date(campaign.startAt).getTime()
+    if (isNaN(startTimestamp)) return oops('invalid startAt for campaignId: ' + campaignId)
+    const stopTimestamp = new Date(campaign.endAt).getTime()
+    if (isNaN(stopTimestamp)) return oops('invalid endAt for campaignId: ' + campaignId)
+    if (stopTimestamp <= now) return
+
+  // TODO: budget & geoTargets
+    campaigns[campaignId] = underscore.extend({ startTimestamp, stopTimestamp, creativeSets: 0 },
+                                              underscore.pick(campaign, [ 'name', 'dailyCap' ]))
+
+    campaign.creativeSets.forEach((creativeSet) => {
+      if (failP) return
+
+      if (creativeSet.execution !== 'per_click') return oops('creativeSet with unknown execution: ' + creativeSet.execution)
+
+      const creativeSetId = creativeSet.creativeSetId
+      if (creativeSets[creativeSetId]) return oops('duplicated creativeSetId: ' + creativeSetId)
+
+      let hierarchy = []
+      creativeSet.segments.forEach((segment) => {
+        const name = segment.name.toLowerCase()
+
+        if (hierarchy.indexOf(name) === -1) hierarchy.push(name)
+      })
+      if (hierarchy.length === 0) return oops('creativeSet with no segments: ' + creativeSetId)
+
+      const category = hierarchy.join('-')
+      const toplevel = hierarchy[0]
+      let entries = 0
+      creativeSet.creatives.forEach((creative) => {
+        if ((!creative.type) || (creative.type.name !== 'notification')) {
+          return oops('creative with invalid type: ' + creative.creativeId + ' type=' + JSON.stringify(creative.type))
+        }
+
+        const entry = {
+          advertiser: creative.payload.title,
+          notificationText: creative.payload.body,
+          notificationURL: creative.payload.targetUrl,
+          uuid: creative.creativeId,
+          creativeSet: creativeSetId
+        }
+
+        if (!categories[category]) categories[category] = []
+        categories[category].push(entry)
+        if (!categories[toplevel]) categories[toplevel] = []
+        categories[toplevel].push(entry)
+
+        entries += 2
+      })
+      if (!entries) return
+
+      campaigns[campaignId].creativeSets++
+      creativeSets[creativeSetId] = underscore.extend({ campaignId, entries },
+                                                      underscore.pick(creativeSet, [ 'totalMax', 'perDay' ]))
+    })
+  })
+  if (failP) return
+
+  state = userModelState.idleCatalog(state)
+  underscore.keys(campaigns).forEach((campaignId) => {
+    let campaign = userModelState.getCampaign(state, campaignId)
+
+    campaign = underscore.extend(campaign || {}, campaigns[campaignId])
+    state = userModelState.setCampaign(state, campaignId, campaign)
+  })
+  underscore.keys(creativeSets).forEach((creativeSetId) => {
+    let creativeSet = userModelState.getCreativeSet(state, creativeSetId)
+
+    creativeSet = underscore.extend(creativeSet || {}, creativeSets[creativeSetId])
+    state = userModelState.setCreativeSet(state, creativeSetId, creativeSet)
+  })
+  state = userModelState.flushCatalog(state)
+
+  const header = underscore.pick(data, [ 'version', 'catalog' ])
+
+  state = userModelState.setCatalog(state, header)
+
+  data.categories = categories
+  delete data.status
+
+  appActions.onUserModelLog('Catalog parsed',
+                            underscore.extend(underscore.clone(header), {
+                              status: 'processed',
+                              campaigns: underscore.keys(campaigns).length,
+                              creativeSets: underscore.keys(creativeSets).length
+                            }))
+
+  if (!bundle) bundle = data
+
+  const bundlePath = path.join(app.getPath('userData'), 'bundle.json')
+  const writeBundle = () => {
+    fs.writeFile(bundlePath, JSON.stringify(data), 'utf8', (err) => {
+      if (!err) return
+
+      appActions.onUserModelLog('Bundle write error', { reason: err.toString(), bundlePath })
+      unlinkBundle()
+    })
+  }
+  const unlinkBundle = () => {
+    fs.unlink(bundlePath, (err) => {
+      if (err) appActions.onUserModelLog('Bundle unlink error', { reason: err.toString(), bundlePath })
+    })
+  }
+
+  if (!bootP) {
+    const catalogPath = path.join(app.getPath('userData'), 'catalog.json')
+
+    fs.writeFile(catalogPath, JSON.stringify(catalog), 'utf8', (err) => {
+      if (!err) return writeBundle()
+
+      appActions.onUserModelLog('Catalog write error', { reason: err.toString(), catalogPath })
+      fs.unlink(catalogPath, (err) => {
+        if (err) appActions.onUserModelLog('Catalog unlink error', { reason: err.toString(), catalogPath })
+      })
+      unlinkBundle()
+    })
+  } else writeBundle()
+
+  return state
+}
+
+const initializeCatalog = (state) => {
 }
 
 const privateTest = () => {
@@ -878,6 +1265,9 @@ const getMethods = () => {
     collectActivity,
     uploadLogs,
     downloadSurveys,
+    downloadCatalog,
+    applyCatalog,
+    initializeCatalog,
     retrieveSSID,
     checkReadyAdServe,
     serveSampleAd
