@@ -89,7 +89,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
               const classification = data.get('hierarchy')
               map.notificationType = 'generated'
               map.notificationClassification = classification
-              map.notificationCatalog = bundle.catalog || 'unspecified-catalog'
+              map.notificationCatalog = bundle.catalog || 'sample-catalog'
               map.notificationUrl = data.get('notificationUrl')
               break
             }
@@ -336,8 +336,11 @@ const initialize = (state, adEnabled) => {
           err = ex
         }
       }
-      if (err) appActions.onUserModelLog('Bundle error', { reason: err.toString(), bundlePath })
-      else if (header) {
+      if (err) {
+        if ((catalogServer) && (err.code !== 'ENOENT')) {
+          appActions.onUserModelLog('Bundle error', { reason: err.toString(), bundlePath })
+        }
+      } else if (header) {
         if (bundle.catalog === header.get('catalog')) return appActions.onUserModelLog('Catalog', header)
 
         appActions.onUserModelLog('Bundle error',
@@ -359,8 +362,20 @@ const initialize = (state, adEnabled) => {
           }
         }
 
-        appActions.onUserModelLog('Catalog error', { reason: err.toString(), catalogPath })
-        bundle = um.getSampleAdFeed()
+        if (!catalogServer) {
+          appActions.onUserModelLog('Catalog bootstrap')
+          bundle = um.getSampleAdFeed()
+          return
+        }
+
+        if (err.code !== 'ENOENT') appActions.onUserModelLog('Catalog error', { reason: err.toString(), catalogPath })
+        if (collectActivityId) {
+          clearTimeout(collectActivityId)
+          collectActivityId = undefined
+        }
+
+        appActions.onUserModelDownloadSurveys(null)
+        collectActivityId = setTimeout(appActions.onUserModelCollectActivity, oneHour)
       })
     })
   })
@@ -664,17 +679,20 @@ const serveAdFromCategory = (state, windowId, category) => {
 
     for (let ad of result) {
       const creativeSetId = ad.creativeSet
-      let creativeSet = userModelState.getCreativeSet(state, creativeSetId).toJS()
+      let creativeSet = userModelState.getCreativeSet(state, creativeSetId)
+
       if (!creativeSet) {
         appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no creativeSet found for ad', ad })
         continue
       }
+      creativeSet = creativeSet.toJS()
 
-      let campaign = userModelState.getCampaign(state, creativeSet.campaignId).toJS()
+      let campaign = userModelState.getCampaign(state, creativeSet.campaignId)
       if (!campaign) {
         appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no campaign found for ad', ad })
         continue
       }
+      campaign = campaign.toJS()
 
       let creativeSetHistory = creativeSet.history || []
       let campaignHistory = campaign.history || []
@@ -738,13 +756,16 @@ const serveAdFromCategory = (state, windowId, category) => {
                             {category, winnerOverTime, arbitraryKey, notificationUrl, notificationText, advertiser, uuid, hierarchy})
 
   state = userModelState.appendAdShownToAdHistory(state)
+  if (!usingBundleCatalogFormatVersion) return state
 
   // manage `creativeSet` and `campaign` based on selected & successfully shown ad
   const unixTime = userModelState.unixTimeNowSeconds()
   const creativeSetId = payload.creativeSet
-  let creativeSet = userModelState.getCreativeSet(state, creativeSetId).toJS()
+  let creativeSet = userModelState.getCreativeSet(state, creativeSetId)
+  if (creativeSet) creativeSet = creativeSet.toJS()
   const campaignId = creativeSet.campaignId
-  let campaign = userModelState.getCampaign(state, campaignId).toJS()
+  let campaign = userModelState.getCampaign(state, campaignId)
+  if (campaign) campaign = campaign.toJS()
 
   let creativeSetHistory = creativeSet.history || []
   let campaignHistory = campaign.history || []
@@ -829,6 +850,7 @@ const roundTripOptions = {
                                  : testingP ? 'collector-testing.brave.com' : 'collector.brave.com'))
 }
 const catalogServer = process.env.CATALOG_SERVER && urlParse(process.env.CATALOG_SERVER)
+let nextCatalogCheck = 0
 
 const collectActivityAsNeeded = (state, adEnabled) => {
   if (!adEnabled) {
@@ -978,11 +1000,11 @@ const downloadSurveys = (state, surveys, resetP) => {
     appActions.onUserModelLog('Surveys available', surveys)
   }
 
-  if (!catalogServer) return state
+  if ((!catalogServer) || (nextCatalogCheck > underscore.now())) return state
 
   const options = underscore.defaults({ server: catalogServer }, roundTripOptions)
   let path = '/v1/catalog'
-  if ((!resetP) && (bundle.catalog)) path += '/' + bundle.catalog
+  if ((!resetP) && (bundle) && (bundle.catalog)) path += '/' + bundle.catalog
 
   roundtrip({
     method: 'GET',
@@ -994,7 +1016,7 @@ const downloadSurveys = (state, surveys, resetP) => {
 
     const failP = response.statusCode !== 304
     appActions.onUserModelLog(failP ? 'Catalog download failed' : 'Catalog current', {
-      reason: failP && err.toString(),
+      reason: failP ? err.toString() : undefined,
       method: 'GET',
       server: urlFormat(options.server),
       path: path
@@ -1007,10 +1029,6 @@ const downloadSurveys = (state, surveys, resetP) => {
 const downloadCatalog = (state, catalog) => {
   if (noop(state)) return state
 
-  const diff = catalog.get('diff')
-
-  if (!diff) return applyCatalog(state, catalog)
-
   const oops = (data) => {
     appActions.onUserModelLog('Patch invalid', data)
 
@@ -1022,14 +1040,35 @@ const downloadCatalog = (state, catalog) => {
 
   if (version !== 1) return oops({ reason: 'unsupported version', version: version })
 
-  const catalogIds = diff.get('catalogId')
+  const diff = catalog.get('diff')
+
+  if (!diff) {
+    const campaigns = catalog.get('campaigns')
+
+    if (campaigns) {
+      const ping = parseInt(catalog.get('ping'), 10)
+
+      if ((!isNaN(ping)) && (ping > 0)) nextCatalogCheck = underscore.now() + ping
+
+      return applyCatalog(state, catalog)
+    }
+
+    appActions.onUserModelLog('Catalog current', {
+      method: 'GET',
+      server: urlFormat(catalogServer.server),
+      path: path
+    })
+    return
+  }
+
+  const catalogIds = diff.get('catalogId') && diff.get('catalogId').toJS()
 
   if (catalogIds[0] !== bundle.catalog) {
     return oops({ reason: 'incorrect previous catalogId', previous: bundle.catalog, catalogIds: catalogIds })
   }
 
   const catalogPath = path.join(app.getPath('userData'), 'catalog.json')
-  fs.readfile(catalogPath, 'utf8', (err, data) => {
+  fs.readFile(catalogPath, 'utf8', (err, data) => {
     if (!err) {
       try {
         catalog = jsondiff.patch(JSON.parse(data), diff.toJS())
@@ -1059,7 +1098,7 @@ const applyCatalog = (state, catalog, bootP) => {
       : (catalog.version !== 1) ? ('unsupported version: ' + catalog.version) : 'processing'
   }
   appActions.onUserModelLog('Catalog downloaded', underscore.pick(data, [ 'version', 'catalog', 'status' ]))
-  if ((bundle) && (data !== 'processing')) return state
+  if ((bundle) && (data.status !== 'processing')) return state
 
   let failP
   const oops = (reason) => {
@@ -1109,7 +1148,9 @@ const applyCatalog = (state, catalog, bootP) => {
       const toplevel = hierarchy[0]
       let entries = 0
       creativeSet.creatives.forEach((creative) => {
-        if (creative.type !== 'notification') return
+        if ((!creative.type) || (creative.type.name !== 'notification')) {
+          return oops('creative with invalid type: ' + creative.creativeId + ' type=' + JSON.stringify(creative.type))
+        }
 
         const entry = {
           advertiser: creative.payload.title,
@@ -1139,13 +1180,13 @@ const applyCatalog = (state, catalog, bootP) => {
   underscore.keys(campaigns).forEach((campaignId) => {
     let campaign = userModelState.getCampaign(state, campaignId)
 
-    campaign = underscore.extend(campaign ? campaign.toJS() : {}, campaigns[campaignId])
+    campaign = underscore.extend(campaign || {}, campaigns[campaignId])
     state = userModelState.setCampaign(state, campaignId, campaign)
   })
   underscore.keys(creativeSets).forEach((creativeSetId) => {
     let creativeSet = userModelState.getCreativeSet(state, creativeSetId)
 
-    creativeSet = underscore.extend(creativeSet ? creativeSet.toJS() : {}, creativeSets[creativeSetId])
+    creativeSet = underscore.extend(creativeSet || {}, creativeSets[creativeSetId])
     state = userModelState.setCreativeSet(state, creativeSetId, creativeSet)
   })
   state = userModelState.flushCatalog(state)
