@@ -318,6 +318,13 @@ const initialize = (state, adEnabled) => {
   appActions.onNativeNotificationConfigurationCheck()
   appActions.onNativeNotificationAllowedCheck(false)
 
+  let regionName = (app.getCountryName() || '').replace(/\0/g, '')
+  let x = regionName.indexOf('_')
+
+  if (x !== -1) regionName = regionName.substr(x + 1)
+  x = regionName.indexOf('.')
+  if (x !== -1) regionName = regionName.substr(0, x)
+
   const header = userModelState.getCatalog(state)
 
   // after the app has initialized, load the big files we need
@@ -685,14 +692,14 @@ const serveAdFromCategory = (state, windowId, category) => {
         appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no creativeSet found for ad', ad })
         continue
       }
-      creativeSet = creativeSet.toJS()
+      if (Immutable.Map.isMap(creativeSet)) creativeSet = creativeSet.toJS()
 
       let campaign = userModelState.getCampaign(state, creativeSet.campaignId)
       if (!campaign) {
         appActions.onUserModelLog('Category\'s ad skipped', { reason: 'no campaign found for ad', ad })
         continue
       }
-      campaign = campaign.toJS()
+      if (Immutable.Map.isMap(campaign)) campaign = campaign.toJS()
 
       let creativeSetHistory = creativeSet.history || []
       let campaignHistory = campaign.history || []
@@ -762,10 +769,10 @@ const serveAdFromCategory = (state, windowId, category) => {
   const unixTime = userModelState.unixTimeNowSeconds()
   const creativeSetId = payload.creativeSet
   let creativeSet = userModelState.getCreativeSet(state, creativeSetId)
-  if (creativeSet) creativeSet = creativeSet.toJS()
+  if (creativeSet && Immutable.Map.isMap(creativeSet)) creativeSet = creativeSet.toJS()
   const campaignId = creativeSet.campaignId
   let campaign = userModelState.getCampaign(state, campaignId)
-  if (campaign) campaign = campaign.toJS()
+  if (campaign && Immutable.Map.isMap(campaign)) campaign = campaign.toJS()
 
   let creativeSetHistory = creativeSet.history || []
   let campaignHistory = campaign.history || []
@@ -851,6 +858,7 @@ const roundTripOptions = {
 }
 const catalogServer = process.env.CATALOG_SERVER && urlParse(process.env.CATALOG_SERVER)
 let nextCatalogCheck = 0
+let regionName
 
 const collectActivityAsNeeded = (state, adEnabled) => {
   if (!adEnabled) {
