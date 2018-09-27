@@ -43,7 +43,7 @@ let nextEasterEgg = 0
 
 let initP
 let foregroundP
-let onceP
+let bootP
 let userModelOptions = {}
 
 let bundle
@@ -58,14 +58,14 @@ let adTabUrl
 const noop = (state) => {
 // IF [ we haven't initialized yet OR we're not enabled ], RETURN state
 
-  return (((!matrixData) || (!priorData) || (!userModelState.getAdEnabledValue(state))) && state)
+  return ((!matrixData) || (!priorData) || (!state) || (!userModelState.getAdEnabledValue(state)))
 }
 
 const generateAdReportingEvent = (state, eventType, action) => {
   if (noop(state)) return state
 
-  if (!onceP) {
-    onceP = true
+  if (!bootP) {
+    bootP = true
 
     state = generateAdReportingEvent(state, 'restart', action)
 
@@ -302,6 +302,24 @@ const processLocales = (state, result) => {
 }
 
 const initialize = (state, adEnabled) => {
+  const bundlePath = path.join(app.getPath('userData'), 'bundle.json')
+  const catalogPath = path.join(app.getPath('userData'), 'catalog.json')
+
+  if (!adEnabled) {
+    const unlinkPath = (path) => {
+      fs.unlink(path, (err) => {
+        if ((!err) || (err.code === 'ENOENT')) return
+
+        appActions.onUserModelLog('cache unlink error', { reason: err.toString(), path })
+      })
+    }
+
+    state = removeAllHistory(state)
+    unlinkPath(bundlePath)
+    unlinkPath(catalogPath)
+
+    initP = bootP = false
+  }
   if (!adEnabled || initP) return state
 
   initP = true
@@ -318,13 +336,6 @@ const initialize = (state, adEnabled) => {
   appActions.onNativeNotificationConfigurationCheck()
   appActions.onNativeNotificationAllowedCheck(false)
 
-  let regionName = (app.getCountryName() || '').replace(/\0/g, '')
-  let x = regionName.indexOf('_')
-
-  if (x !== -1) regionName = regionName.substr(x + 1)
-  x = regionName.indexOf('.')
-  if (x !== -1) regionName = regionName.substr(0, x)
-
   const header = userModelState.getCatalog(state)
 
   // after the app has initialized, load the big files we need
@@ -334,7 +345,6 @@ const initialize = (state, adEnabled) => {
     matrixData = um.getMatrixDataSync()
     priorData = um.getPriorDataSync()
 
-    const bundlePath = path.join(app.getPath('userData'), 'bundle.json')
     fs.readFile(bundlePath, 'utf8', (err, data) => {
       if (!err) {
         try {
@@ -354,8 +364,6 @@ const initialize = (state, adEnabled) => {
                                   { reason: 'catalogId mismatch', bundle: bundle.catalog, header: header.catalog })
         bundle = null
       }
-
-      const catalogPath = path.join(app.getPath('userData'), 'catalog.json')
 
       fs.readFile(catalogPath, 'utf8', (err, data) => {
         if (!err) {
@@ -416,12 +424,15 @@ const removeHistorySite = (state, action) => {
 
 const removeAllHistory = (state) => {
   const locales = userModelState.getUserModelValue(state, 'locales')
+
   state = userModelState.removeAllHistory(state)
   state = processLocales(state, locales)
   return confirmAdUUIDIfAdEnabled(state)
 }
 
 const saveCachedInfo = (state) => {
+  if (!userModelState.getAdEnabledValue(state)) state = userModelState.removeAllHistory(state)
+
   return state
 }
 
@@ -683,6 +694,12 @@ const serveAdFromCategory = (state, windowId, category) => {
   let adsNotSeen
   if (usingBundleCatalogFormatVersion) {
     const now = underscore.now()
+    let regionName = (app.getCountryName() || '').replace(/\0/g, '')
+    let x = regionName.indexOf('_')
+
+    if (x !== -1) regionName = regionName.substr(x + 1)
+    x = regionName.indexOf('.')
+    if (x !== -1) regionName = regionName.substr(0, x)
 
     adsNotSeen = []
 
@@ -856,7 +873,6 @@ const roundTripOptions = {
 }
 const catalogServer = process.env.CATALOG_SERVER && urlParse(process.env.CATALOG_SERVER)
 let nextCatalogCheck = 0
-let regionName
 
 const collectActivityAsNeeded = (state, adEnabled) => {
   if (!adEnabled) {

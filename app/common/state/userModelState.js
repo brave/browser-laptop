@@ -193,8 +193,6 @@ const userModelState = {
   removeAllHistory: (state) => {
 // DO NOT check settings.ADS_ENABLED
 
-    state = validateState(state)
-
     return state.setIn([ 'userModel' ], Immutable.Map())
   },
 
