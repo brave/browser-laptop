@@ -41,9 +41,9 @@ const debugP = (process.env.NODE_ENV === 'test') || (process.env.LEDGER_VERBOSE 
 const testingP = true
 let nextEasterEgg = 0
 
+let bootP
 let initP
 let foregroundP
-let bootP
 let userModelOptions = {}
 
 let bundle
@@ -54,6 +54,24 @@ let lastSingleClassification
 let pageScoreCache = {}
 
 let adTabUrl
+
+const reset = () => {
+  nextEasterEgg = 0
+
+  bootP = initP = foregroundP = undefined
+  userModelOptions = {}
+
+  bundle = matrixData = priorData = undefined
+
+  lastSingleClassification = undefined
+  pageScoreCache = {}
+
+  adTabUrl = undefined
+
+  collectActivityId = undefined
+
+  nextCatalogCheck = 0
+}
 
 const noop = (state) => {
 // IF [ we haven't initialized yet OR we're not enabled ], RETURN state
@@ -318,7 +336,7 @@ const initialize = (state, adEnabled) => {
     unlinkPath(bundlePath)
     unlinkPath(catalogPath)
 
-    initP = bootP = bundle = matrixData = priorData = pageScoreCache = undefined
+    reset()
   }
   if (!adEnabled || initP) return state
 
@@ -436,7 +454,7 @@ const saveCachedInfo = (state) => {
   return state
 }
 
-const amazonSearchQueryFields = ['field-keywords', 'keywords']
+const amazonSearchQueryFields = [ 'field-keywords', 'keywords' ]
 
 const extractURLKeywordsByField = (url, queryFields) => {
   const parsed = urlParse2(url, true)
