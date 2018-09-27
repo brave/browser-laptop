@@ -703,10 +703,7 @@ const serveAdFromCategory = (state, windowId, category) => {
       }
       if (Immutable.Map.isMap(campaign)) campaign = campaign.toJS()
       if ((campaign.startTimestamp >= now) || (now >= campaign.stopTimestamp)) continue
-      if (regionName && campaign.regions && campaign.regions.length && (campaign.regions.indexOf(regionName) === -1)) {
-        console.log('\n\n!!! regions: ' + regionName + ' not in ' + JSON.stringify(campaign.regions))
-        continue
-      }
+      if (regionName && campaign.regions && (campaign.regions.indexOf(regionName) === -1)) continue
 
 // TODO: campaign.budget
 
