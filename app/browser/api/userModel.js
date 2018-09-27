@@ -318,7 +318,7 @@ const initialize = (state, adEnabled) => {
     unlinkPath(bundlePath)
     unlinkPath(catalogPath)
 
-    initP = bootP = false
+    initP = bootP = bundle = matrixData = priorData = pageScoreCache = undefined
   }
   if (!adEnabled || initP) return state
 
