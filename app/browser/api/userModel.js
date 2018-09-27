@@ -682,6 +682,8 @@ const serveAdFromCategory = (state, windowId, category) => {
 
   let adsNotSeen
   if (usingBundleCatalogFormatVersion) {
+    const now = underscore.now()
+
     adsNotSeen = []
 
     for (let ad of result) {
@@ -700,6 +702,13 @@ const serveAdFromCategory = (state, windowId, category) => {
         continue
       }
       if (Immutable.Map.isMap(campaign)) campaign = campaign.toJS()
+      if ((campaign.startTimestamp >= now) || (now >= campaign.stopTimestamp)) continue
+      if (regionName && campaign.regions && campaign.regions.length && (campaign.regions.indexOf(regionName) === -1)) {
+        console.log('\n\n!!! regions: ' + regionName + ' not in ' + JSON.stringify(campaign.regions))
+        continue
+      }
+
+// TODO: campaign.budget
 
       let creativeSetHistory = creativeSet.history || []
       let campaignHistory = campaign.history || []
@@ -707,17 +716,9 @@ const serveAdFromCategory = (state, windowId, category) => {
       const hourWindow = 60 * 60
       const dayWindow = 24 * hourWindow
 
-      if (creativeSetHistory.length >= creativeSet.totalMax) {
-        continue
-      }
-
-      if (!userModelState.historyRespectsRollingTimeConstraint(creativeSetHistory, dayWindow, creativeSet.perDay)) {
-        continue
-      }
-
-      if (!userModelState.historyRespectsRollingTimeConstraint(campaignHistory, dayWindow, campaign.dailyCap)) {
-        continue
-      }
+      if ((creativeSetHistory.length >= creativeSet.totalMax) ||
+          (!userModelState.historyRespectsRollingTimeConstraint(creativeSetHistory, dayWindow, creativeSet.perDay)) ||
+          (!userModelState.historyRespectsRollingTimeConstraint(campaignHistory, dayWindow, campaign.dailyCap))) continue
 
       adsNotSeen.push(ad)
     }
@@ -1132,9 +1133,12 @@ const applyCatalog = (state, catalog, bootP) => {
     if (isNaN(stopTimestamp)) return oops('invalid endAt for campaignId: ' + campaignId)
     if (stopTimestamp <= now) return
 
-  // TODO: budget & geoTargets
-    campaigns[campaignId] = underscore.extend({ startTimestamp, stopTimestamp, creativeSets: 0 },
-                                              underscore.pick(campaign, [ 'name', 'dailyCap' ]))
+    const regions = []
+    if (campaign.geoTargets) {
+      campaign.geoTargets.forEach((region) => { regions.push(region.code) })
+    }
+    campaigns[campaignId] = underscore.extend({ startTimestamp, stopTimestamp, creativeSets: 0, regions: regions },
+                                              underscore.pick(campaign, [ 'name', 'dailyCap', 'budget' ]))
 
     campaign.creativeSets.forEach((creativeSet) => {
       if (failP) return
