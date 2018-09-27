@@ -956,6 +956,7 @@ const collectActivity = (state) => {
     payload: {
       braveVersion: app.getVersion(),
       platform: { darwin: 'mac', win32: os.arch() === 'x32' ? 'winia32' : 'winx64' }[os.platform()] || 'linux',
+      platformVersion: os.release(),
       reportId: mark.uuid,
       reportStamp: now.toISOString(),
       reportTZO: sign + hh + ':' + mm,
