@@ -45,6 +45,17 @@ let generateBraveManifest = () => {
       {
         run_at: 'document_start',
         all_frames: true,
+        matches: [
+          'https://www.qwant.com/*',
+          'https://lite.qwant.com/*'
+        ],
+        css: [
+          'content/styles/siteHack-qwant.com.css'
+        ]
+      },
+      {
+        run_at: 'document_start',
+        all_frames: true,
         matches: ['https://www.marketwatch.com/*'],
         css: [
           'content/styles/siteHack-marketwatch.com.css'
