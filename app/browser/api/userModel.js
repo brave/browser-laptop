@@ -15,6 +15,7 @@ const uuidv4 = require('uuid/v4')
 const app = require('electron').app
 const fs = require('fs')
 const os = require('os')
+const querystring = require('querystring')
 
 // Actions
 const appActions = require('../../../js/actions/appActions')
@@ -890,6 +891,11 @@ const roundTripOptions = {
                                  : testingP ? 'collector-testing.brave.com' : 'collector.brave.com'))
 }
 const catalogServer = process.env.CATALOG_SERVER && urlParse(process.env.CATALOG_SERVER)
+const catalogParams = {
+  braveVersion: app.getVersion(),
+  platform: { darwin: 'mac', win32: os.arch() === 'x32' ? 'winia32' : 'winx64' }[os.platform()] || 'linux',
+  platformVersion: os.release()
+}
 let nextCatalogCheck = 0
 
 const collectActivityAsNeeded = (state, adEnabled) => {
@@ -953,15 +959,12 @@ const collectActivity = (state) => {
   roundtrip({
     method: 'PUT',
     path: path,
-    payload: {
-      braveVersion: app.getVersion(),
-      platform: { darwin: 'mac', win32: os.arch() === 'x32' ? 'winia32' : 'winx64' }[os.platform()] || 'linux',
-      platformVersion: os.release(),
+    payload: underscore.extend({
       reportId: mark.uuid,
       reportStamp: now.toISOString(),
       reportTZO: sign + hh + ':' + mm,
       events: userModelOptions.noEventLogging ? [] : events
-    }
+    }, catalogParams)
   }, roundTripOptions, (err, response, result) => {
     if (err) {
       appActions.onUserModelLog('Event upload failed', {
@@ -1049,7 +1052,7 @@ const downloadSurveys = (state, surveys, resetP) => {
 
   roundtrip({
     method: 'GET',
-    path: path
+    path: path + '?' + querystring.stringify(catalogParams)
   }, options, (err, response, catalog) => {
     if (!err) return appActions.onUserModelDownloadCatalog(catalog)
 
