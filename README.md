@@ -6,13 +6,13 @@
 
 # Brave Browser
 
-_**Please note: this repository is for the older Muon (our fork of Electron) version of Brave.**_<br>
+Desktop browser for macOS, Windows, and Linux.
+
+_**Deprecation notice: this repository is for the older Muon (our fork of Electron) version of Brave.**_<br>
 _**The newer version of the browser (`brave-core`) [can be found here](https://github.com/brave/brave-browser).**_<br>
 _**Development is being wound down on this version as issues are migrated to the new code-base**_
 
-Desktop browser for macOS, Windows, and Linux.
-
-Follow [@brave](https://twitter.com/brave) on Twitter for important news and announcements.
+If you're experiencing issues with Brave or would like to contribute, [please check out the new code-base instead](https://github.com/brave/brave-browser)
 
 For other versions of our browser, please see:
 * iPhone - [brave/browser-ios](https://github.com/brave/browser-ios)
@@ -24,7 +24,7 @@ To download the latest release, [see our releases page](https://github.com/brave
 
 You can also [visit our website](https://brave.com/downloads.html) to get the latest stable release (along with a more user-friendly download page).
 
-The Muon version of Brave only has two active [release channels](https://github.com/brave/browser-laptop/wiki/Release-channels): Release and Beta. [Developer channel](https://brave.com/download-dev) is now using the [`brave-core`](https://github.com/brave/brave-browser) code-base.
+The Muon version of Brave has only one active [release channel](https://github.com/brave/browser-laptop/wiki/Release-channels): Release. This will be deprecated as we move to `brave-core`. Both the [Beta channel](https://brave.com/download-beta) and [Developer channel](https://brave.com/download-dev) are already using the [`brave-core`](https://github.com/brave/brave-browser) code-base.
 
 ## Community
 
