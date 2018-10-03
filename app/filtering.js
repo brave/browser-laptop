@@ -526,6 +526,10 @@ function registerPermissionHandler (session, partition) {
     const appState = appStore.getState()
     const isBraveOrigin = mainFrameOrigin.startsWith(`chrome-extension://${config.braveExtensionId}/`)
     const isPDFOrigin = mainFrameOrigin.startsWith(`${pdfjsOrigin}/`)
+
+    // From: https://cs.chromium.org/chromium/src/chrome/browser/external_protocol/external_protocol_handler.cc?l=36
+    const deniedScheme = ['afp:', 'disk:', 'disks:', 'hcp:', 'ms-help:', 'nntp:', 'shell:',
+      'vnd.ms.radio:', 'url:']
     let response = []
     let position
 
@@ -542,6 +546,7 @@ function registerPermissionHandler (session, partition) {
       const alwaysAllowFullscreen = module.exports.alwaysAllowFullscreen() === fullscreenOption.ALWAYS_ALLOW
       const isFullscreen = permission === 'fullscreen'
       const isOpenExternal = permission === 'openExternal'
+      const protocol = urlParse(requestingUrl).protocol
 
       let requestingOrigin
 
@@ -555,13 +560,16 @@ function registerPermissionHandler (session, partition) {
       }
 
       if (isOpenExternal) {
-        // Open external is a special case since we want to apply the permission
-        // for the entire scheme to avoid cluttering the saved permissions. See
-        // https://github.com/brave/browser-laptop/issues/13642
-        const protocol = urlParse(requestingUrl).protocol
-        requestingOrigin = protocol ? `${protocol} URLs` : requestingUrl
-        mainFrameOrigin = null
-        position = 'global'
+        if (deniedScheme.indexOf(protocol.toLowerCase()) >= 0) {
+          response.push(false)
+        } else {
+          // Open external is a special case since we want to apply the permission
+          // for the entire scheme to avoid cluttering the saved permissions. See
+          // https://github.com/brave/browser-laptop/issues/13642
+          requestingOrigin = protocol ? `${protocol} URLs` : requestingUrl
+          mainFrameOrigin = null
+          position = 'global'
+        }
       }
 
       // Look up by host pattern since requestingOrigin is not necessarily
