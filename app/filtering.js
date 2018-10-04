@@ -118,7 +118,8 @@ if (process.env.NODE_ENV === 'development') {
 function registerForBeforeRequest (session, partition) {
   const isPrivate = module.exports.isPrivate(partition)
   session.webRequest.onBeforeRequest((details, muonCb) => {
-    if (details.url && details.url.includes('chrome://brave/') &&
+    if (details.url &&
+      (details.url.startsWith('chrome://brave') || details.url.startsWith('brave://')) &&
       details.tabId !== -1) {
       muonCb({ cancel: true })
       return
