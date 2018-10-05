@@ -7,7 +7,7 @@ GPG_KEY=${2:-4A1B4360}
 KEY_NAME=keys.asc
 KEY_FILE=/tmp/${KEY_NAME}
 SNAP_TAG=`date +'%s'`
-DIST='trusty xenial bionic cosmic jessie stretch buster serena'
+DIST='artful zesty yakkety xenial jessie trusty serena stretch bionic buster cosmic'
 
 cat <<EOF > $HOME/.aptly.conf
 { "rootDir": "$HOME/.aptly",
