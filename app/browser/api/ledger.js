@@ -2475,6 +2475,17 @@ const run = (state, delayTime) => {
   }
 
   let winners
+/* NOTA BENE: the optional parameter for client.ballots() specifies that ballots only for the specified viewingId are desired
+
+   also, it is the browser's responsibility to apply the options.directions publishers for the winners, e.g.,
+
+     const transaction = client.getTransaction(viewingId)
+     if (!transaction) oops!
+
+     const probiPerVote = transaction.contribution.probi / transaction.count
+
+   now the browser should cast the number of votes for each of the options.direction publishers
+ */
   const ballots = client.ballots()
   const data = (synopsis) && (ballots > 0) && synopsisNormalizer(state, null, false, true)
 
@@ -2566,6 +2577,16 @@ const run = (state, delayTime) => {
   }
 
   if (client.isReadyToReconcile(synopsis, onFuzzing)) {
+/* NOTA BENE: new (second) parameter is of the form:
+
+     { immediateP: true/false, directions: [ { publisher: '...', amount: nnn, currency: 'BAT' }, ... ]
+
+  e.g.,
+
+     { immediateP: true, [ { publisher: 'example.com', amount: 5, currency: 'BAT' } ] }
+
+  also, record the viewingId (first parameter) to use with client.ballots()
+ */
     client.reconcile(uuid.v4().toLowerCase(), callback)
   }
 }
