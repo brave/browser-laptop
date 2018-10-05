@@ -111,35 +111,6 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 /**
- * Returns true if this is a chrome://brave or brave:// URL load that should be
- * blocked for security reasons.
- */
-function shouldCancelBraveUrlRequest (details) {
-  const url = details.url
-  if (!url) {
-    return false
-  }
-  const isBraveUrl = url.startsWith('chrome://brave') || url.startsWith('brave://')
-  if (isBraveUrl) {
-    if (details.tabId !== -1) {
-      // This is loading in a tab, not the main window
-      return true
-    }
-    let urlPath = urlParse(url).path || ''
-    while (urlPath.startsWith('//')) {
-      // Trim excess leading slashes
-      urlPath = urlPath.slice(1)
-    }
-    const expectedPathPrefix = path.resolve(__dirname, 'extensions', 'brave') + '/'
-    if (!urlPath.startsWith(expectedPathPrefix)) {
-      // Not a whitelisted path
-      return true
-    }
-  }
-  return false
-}
-
-/**
  * Register for notifications for webRequest.onBeforeRequest for a particular
  * session.
  * @param {object} session Session to add webRequest filtering on
@@ -147,7 +118,9 @@ function shouldCancelBraveUrlRequest (details) {
 function registerForBeforeRequest (session, partition) {
   const isPrivate = module.exports.isPrivate(partition)
   session.webRequest.onBeforeRequest((details, muonCb) => {
-    if (shouldCancelBraveUrlRequest(details)) {
+    if (details.url &&
+      (details.url.startsWith('chrome://brave') || details.url.startsWith('brave://')) &&
+      details.tabId !== -1) {
       muonCb({ cancel: true })
       return
     }
