@@ -2579,11 +2579,15 @@ const run = (state, delayTime) => {
   if (client.isReadyToReconcile(synopsis, onFuzzing)) {
 /* NOTA BENE: new (second) parameter is of the form:
 
-     { immediateP: true/false, directions: [ { publisher: '...', amount: nnn, currency: 'BAT' }, ... ]
+     { immediateP: true/false, directions: [ { publisher: '...', amount: nnn, currency: 'BAT' }, ... ] }
 
-  e.g.,
+  e.g., for a one-time contribution (a single publisher)
 
-     { immediateP: true, [ { publisher: 'example.com', amount: 5, currency: 'BAT' } ] }
+     { immediateP: true, directions: [ { publisher: 'example.com', amount: 5, currency: 'BAT' } ] }
+
+  and for a monthly contribution (zero or more publishers)
+
+     { immediateP: false, directions: [ { publisher: '...', amount: nnn, currency: 'BAT' }, ... ] }
 
   also, record the viewingId (first parameter) to use with client.ballots()
  */
