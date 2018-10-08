@@ -2589,6 +2589,14 @@ const run = (state, delayTime) => {
 
      { immediateP: false, directions: [ { publisher: '...', amount: nnn, currency: 'BAT' }, ... ] }
 
+  or, for a monthly contribution:
+
+     { immediateP: false } // for attention-based
+
+  with one of these for each recurring contribution:
+
+     { immediateP: true, directions: [ { publisher: 'example.com', amount: 5, currency: 'BAT' } ] }
+
   also, record the viewingId (first parameter) to use with client.ballots()
  */
     client.reconcile(uuid.v4().toLowerCase(), callback)
