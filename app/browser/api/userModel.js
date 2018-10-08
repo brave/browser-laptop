@@ -89,7 +89,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
     state = generateAdReportingEvent(state, 'restart', action)
 
     const revision = parseInt(underscore.last(app.getVersion().split('.')), 10)
-    if (revision >= 3000) userModelOptions.noEventLogging = true
+    userModelOptions.noEventLogging = true
     appActions.onUserModelLog('Options', userModelOptions)
   }
 
