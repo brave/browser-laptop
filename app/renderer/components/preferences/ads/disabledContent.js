@@ -102,30 +102,13 @@ class DisabledContent extends React.Component {
 
     return <div>
       <p className={css(styles.disabledContent__message__text, styles.disabledContent__message_white)}>
-        Thank you for helping us develop Brave Ads in Brave. This test phase involves
-        <b className={css(styles.disabledContent__message_bold)}> sending a detailed log of your browsing activity
-        (including full URLs) in non-private tabs, which ads are seen and clicked, IP address, operating system and
-        browser version, browser ads settings, when the browser is being used, and a unique identifier per
-        participant to Brave. In addition, you may choose to send Brave a self-selected description of the
-        location associated with your current WiFi network (“home”, “work”, etc.).</b>&nbsp;
-        We use this information as algorithmic test data for our machine learning system that will be used upon release of Brave Ads.
+        Thanks for participating in the Brave Ads Early Access Test Program! This test program does not collect any user data, and does not transmit user data from your browser to Brave servers.
       </p>
       <p className={css(styles.disabledContent__message__text, styles.disabledContent__message_white)}>
-        Once you have opted into the program, you can check the details of the log files collected and
-        sent to Brave by clicking on ‘Click to see Logs’ on this page.
+        The integrated ad platform in this Brave browser build uses a local machine learning model that evaluates your browsing to match the best and most relevant ads, directly from your device. The ads in the test program are pre-packaged in this build to prevent ads being pulled from the server. No metrics or logs are sent to the server.
       </p>
       <p className={css(styles.disabledContent__message__text, styles.disabledContent__message_white)}>
-        This is not a production version of Brave and&nbsp;
-        <b className={css(styles.disabledContent__message_bold)}>does NOT offer the same privacy guarantees as the
-        production version of the Brave browser.</b> Only use this version as part of the Brave Ads test program.
-        Otherwise, download Brave from <a className={css(styles.disabledContent__message_white, styles.disabledContent__message_link)} href='https://brave.com/download'>https://brave.com/download</a>.
-        When Brave Ads launches later this year, all personal data and browsing history will remain on-device
-        and will not be transmitted to Brave or anyone else. The data being collected in this early test is
-        specific to this test.
-      </p>
-      <p className={css(styles.disabledContent__message__text, styles.disabledContent__message_white)}>
-        You can leave this test at any time by switching off this feature, or using the current release
-        version of Brave. Any browsing done in private tabs is not subject to data collection. <a className={css(styles.disabledContent__message_white, styles.disabledContent__message_link)} href='https://brave.com/hc-privacy'>Learn more about this test.</a>
+        You can leave the test at any time by switching off this feature, or using the current production version of Brave that can be downloaded at <a className={css(styles.disabledContent__message_white, styles.disabledContent__message_link)} href='https://brave.com/download'>https://brave.com/download</a>.
       </p>
       {
         config && available

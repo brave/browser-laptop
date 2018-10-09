@@ -15,7 +15,7 @@ class AboutWelcome extends React.Component {
       <div className={css(styles.et_pb_section)}>
         <div className={css(styles.et_pb_row, styles.et_pb_row_0)}>
           <h1 className={css(styles.h1)}>
-            Thank you for participating in the Brave Ads Test Program
+            Thank you for participating in the Brave Ads Early Access Test Program
           </h1>
         </div>
         <div className={css(styles.et_pb_row)}>
@@ -31,34 +31,22 @@ class AboutWelcome extends React.Component {
           <div className={css(styles.et_pb_column, styles.et_pb_column_2_3)}>
             <p className={css(styles.p3, styles.note)}>
               <b className={css(styles.p3_b)}>Note</b>: This version of Brave should only be used by those who have been invited to participate
-              in the Brave Ads Trial program. If you have found your way here by accident, please download the normal
-              release version for your device at <a href='https://brave.com/download' target='_blank' className={css(styles.link)}>https://brave.com/download</a>
-            </p>
-            <p className={css(styles.p3)}>
-              <b className={css(styles.p3_b)}>Brave Ads will give you your fair share of ad dollars.</b>&nbsp;
-              For that to happen, <b className={css(styles.p3_b)}>we need volunteers who are willing to share their data</b> to
-              help us build a private ad platform. This will enable the production version of Brave Ads to allow
-              you to have more control of your data while being paid to view and interact with ads, in the form of
-              BAT, the Basic Attention Token. <b className={css(styles.p3_b)}>This version of Brave is a test build for those volunteers only.</b>
+              to download via Brave Business Development teams only. If you have found your way here by accident, please download the production version of Brave from <a href='https://brave.com/download' target='_blank' className={css(styles.link)}>https://brave.com/download</a>
             </p>
             <p className={css(styles.p3, styles.pr_no)}>
               <b className={css(styles.p3_b)}>How the test works:</b> A few times per day, a handful of relevant ads
-              are presented to you. Try it now and let us know what you think of the new Brave Ads.
+              are presented to you while you browse. The test is designed end 28 days from the initial opt in. There is no way to extend the test beyond the 28 days. Please evaluate and let us know what you think of the new Brave Ads!
             </p>
             <div className={css(styles.et_pb_divider_internal)} />
             <p className={css(styles.p3)}>
-              This version of Brave Ads is part of a test which sends your browsing activity and other potentially
-              sensitive data to Brave. If you’re not part of this test program, do not use this version of Brave.
-              The test will complete in 28 days, after which we recommend an upgrade to the Brave production version
-              that will no longer collect any browsing history or activity. <b className={css(styles.p3_b)}>When Brave
-              Ads launches later this year, all personal data and browsing history will remain on-device and will
-              not be transmitted to Brave or anyone else. The data being collected in this test is specific
-              to this test.</b>
+              This version of the test does not pull any ads from the server via a network connection, nor does it send any data back to Brave servers for learning and/or test purposes. The ads are matched and presented locally from your device, using machine learning models to match the best ads and present them at the right time.
             </p>
             <p className={css(styles.p3, styles.pr_no)}>
+              Brave browser's
               <a href='https://brave.com/hc-privacy' target='_blank' className={css(styles.link)}>
-                Learn more about this test.
+                privacy policy
               </a>
+              covers this test build.
             </p>
           </div>
           <div className={css(styles.clear)} />
