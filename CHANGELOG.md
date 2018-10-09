@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.25.2](https://github.com/brave/browser-laptop/releases/tag/v0.25.2dev)
+
+ - [Security] Fixed NoScript issue, credit to Xiaoyin Liu and David Albert. ([#15232](https://github.com/brave/browser-laptop/issues/15232))
+ - [Security] Fixed chrome://brave issues, credit to Qab and Vladimir Metnew. ([#15237](https://github.com/brave/browser-laptop/issues/15237))
+ - Fixed .onion requests not being blocked in none Tor tabs. ([#14431](https://github.com/brave/browser-laptop/issues/14431))
+ - Fixed web compatibility with Qwant. ([#15229](https://github.com/brave/browser-laptop/issues/15229))
+ - Upgraded to muon 8.1.8. ([#15242](https://github.com/brave/browser-laptop/issues/15242))
+
 ## [0.24.0](https://github.com/brave/browser-laptop/releases/tag/v0.24.0dev)
 
  - Fixed back and forward navigation buttons animating when scrolling on macOS. ([#14785](https://github.com/brave/browser-laptop/issues/14785))
