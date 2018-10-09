@@ -35,18 +35,14 @@ class AboutWelcome extends React.Component {
             </p>
             <p className={css(styles.p3, styles.pr_no)}>
               <b className={css(styles.p3_b)}>How the test works:</b> A few times per day, a handful of relevant ads
-              are presented to you while you browse. The test is designed end 28 days from the initial opt in. There is no way to extend the test beyond the 28 days. Please evaluate and let us know what you think of the new Brave Ads!
+              are presented to you while you browse. The test is designed end 28 days from the initial opt in. There is no way to extend the test beyond the 28 days. <br /><br />Please evaluate and let us know what you think of the new Brave Ads!
             </p>
             <div className={css(styles.et_pb_divider_internal)} />
             <p className={css(styles.p3)}>
               This version of the test does not pull any ads from the server via a network connection, nor does it send any data back to Brave servers for learning and/or test purposes. The ads are matched and presented locally from your device, using machine learning models to match the best ads and present them at the right time.
             </p>
             <p className={css(styles.p3, styles.pr_no)}>
-              Brave browser's
-              <a href='https://brave.com/hc-privacy' target='_blank' className={css(styles.link)}>
-                privacy policy
-              </a>
-              covers this test build.
+              Brave's <a href='https://brave.com/privacy' target='_blank' className={css(styles.link)}>privacy policy</a> covers this test build.
             </p>
           </div>
           <div className={css(styles.clear)} />
