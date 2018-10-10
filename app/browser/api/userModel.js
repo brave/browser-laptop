@@ -89,7 +89,7 @@ const generateAdReportingEvent = (state, eventType, action) => {
     state = generateAdReportingEvent(state, 'restart', action)
 
     const revision = parseInt(underscore.last(app.getVersion().split('.')), 10)
-    userModelOptions.noEventLogging = true
+    if (revision >= 0) userModelOptions.noEventLogging = true
     appActions.onUserModelLog('Options', userModelOptions)
   }
 
@@ -632,6 +632,12 @@ const checkReadyAdServe = (state, windowId, forceP) => {
   if (!forceP) {
     if (!foregroundP) { // foregroundP is sensible but questionable -SCL
       appActions.onUserModelLog('Notification not made', { reason: 'not in foreground' })
+
+      return state
+    }
+
+    if (underscore.keys(mediaTabs).length > 0) {
+      appActions.onUserModelLog('Notification not made', { reason: 'media playing in browser' })
 
       return state
     }
