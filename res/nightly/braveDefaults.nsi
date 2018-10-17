@@ -57,6 +57,8 @@ Function .onInit
   ${If} $4 != ""
   ${OrIf} $5 != ""
     StrCpy $IsUninstall "1"
+    ; REMOVE friendly name (shown in `Default app settings`)
+    DeleteRegKey HKCU "Software\Classes\Applications\BraveNightly.exe"
   ${Else}
     StrCpy $IsUninstall "0"
     ; Document / protocol handler class
@@ -66,6 +68,8 @@ Function .onInit
     WriteRegStr HKCU "SOFTWARE\Classes\BraveNightlyHTML" "" "Brave Nightly HTML Document"
     WriteRegStr HKCU "SOFTWARE\Classes\BraveNightlyHTML\DefaultIcon" "" "$BraveIconPath"
     WriteRegStr HKCU "SOFTWARE\Classes\BraveNightlyHTML\shell\open\command" "" '"$BraveEXEPath" "--user-data-dir=brave-nightly" -- "%1"'
+    ; ADD friendly name (shown in `Default app settings`)
+    WriteRegStr HKCU "Software\Classes\Applications\BraveNightly.exe\shell\open" "FriendlyAppName" "BraveNightly (old)"
   ${EndIf}
 
   ; If we already have the defaults key, there's nothing to do so we can abort early without even needing to elevate on Win7.

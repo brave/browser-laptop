@@ -56,6 +56,41 @@ function CopyManifestFile () {
   execSync(cmd)
 }
 
+const getBraveCoreInstallerPath = () => {
+  const os = require('os')
+  const appDir = getBraveBinPath()
+  return path.join(appDir, 'resources',
+    os.arch() === 'x32' ? 'BraveBrowserSetup32.exe' : 'BraveBrowserSetup64.exe')
+}
+
+function InstallBraveCore () {
+  const fs = require('fs')
+
+  // expected install paths
+  const braveCoreInstallLocations = [
+    '%USERPROFILE%\\AppData\\Local\\BraveSoftware\\Brave-Browser\\Application',
+    '%ProgramFiles(x86)%\\BraveSoftware\\Brave-Browser\\Application',
+    '%ProgramFiles%\\BraveSoftware\\Brave-Browser\\Application'
+  ]
+
+  // check for existing installations
+  for (let i=0; i < braveCoreInstallLocations.length; i++) {
+    const path = braveCoreInstallLocations[i]
+    const resolvedPath = path.replace(/%([^%]+)%/g, function(_, variableToResolve) {
+      return process.env[variableToResolve]
+    })
+    if (fs.existsSync(resolvedPath)) {
+      return false
+    }
+  }
+
+  // brave-core is not installed; go ahead with silent install
+  const cmd = getBraveCoreInstallerPath() + " /silent /install"
+  execSync(cmd)
+
+  return true
+}
+
 // windows installation events etc...
 if (process.platform === 'win32') {
   const shouldQuit = require('electron-squirrel-startup')
@@ -85,6 +120,16 @@ if (process.platform === 'win32') {
     // Launch defaults helper to remove defaults on uninstall
     // Sync to avoid file path in use on uninstall
     spawnSync(getBraveDefaultsBinPath(), ['-uninstall'])
+  }
+  // silent install brave-core
+  if (isSquirrelFirstRun || isSquirrelInstall || isSquirrelUpdate) {
+    if (InstallBraveCore()) {
+      // relaunch and append argument expected in:
+      // https://github.com/brave/brave-browser/issues/1545
+      app.relaunch({args: ['--relaunch', '--upgrade-from-muon']})
+      app.exit()
+      return
+    }
   }
 
   if (shouldQuit(channel)) {
