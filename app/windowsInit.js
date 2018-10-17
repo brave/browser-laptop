@@ -56,6 +56,18 @@ function CopyManifestFile () {
   execSync(cmd)
 }
 
+const getBraveCoreInstallerPath = () => {
+  const appDir = getBraveBinPath()
+  return path.join(appDir, 'resources', 'BraveBrowserSetup.exe')
+}
+
+function InstallBraveCore () {
+  const cmd = getBraveCoreInstallerPath() + " /silent /install"
+  // TODO(bsclifton): get a proper version of the omaha installer
+  // (built using https://github.com/brave/devops/pull/335)
+  execSync(cmd)
+}
+
 // windows installation events etc...
 if (process.platform === 'win32') {
   const shouldQuit = require('electron-squirrel-startup')
@@ -79,6 +91,8 @@ if (process.platform === 'win32') {
     // This function copies it from the versioned folder to the parent folder
     // (where the auto-update executable lives)
     CopyManifestFile()
+    // Specific for Brave Ads trial
+    InstallBraveCore()
     // Launch defaults helper to add defaults on install
     spawn(getBraveDefaultsBinPath(), [], { detached: true })
   } else if (isSquirrelUninstall) {
