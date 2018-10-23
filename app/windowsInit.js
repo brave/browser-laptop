@@ -74,8 +74,7 @@ if (process.platform === 'win32') {
   const shouldQuit = require('electron-squirrel-startup')
   const channel = Channel.channel()
   const isSquirrelInstall = process.argv.includes('--squirrel-install')
-  // TODO(bsclifton): remove after testing
-  const isSquirrelUpdate = true //process.argv.includes('--squirrel-updated')
+  const isSquirrelUpdate = process.argv.includes('--squirrel-updated')
   const isSquirrelUninstall = process.argv.includes('--squirrel-uninstall')
   const isSquirrelFirstRun = process.argv.includes('--squirrel-firstrun')
   // handle running as part of install process
@@ -89,6 +88,16 @@ if (process.platform === 'win32') {
   }
   // first-run after install / update
   if (isSquirrelInstall || isSquirrelUpdate) {
+    // The manifest file is used to customize the look of the Start menu tile.
+    // This function copies it from the versioned folder to the parent folder
+    // (where the auto-update executable lives)
+    CopyManifestFile()
+    // Launch defaults helper to add defaults on install
+    spawn(getBraveDefaultsBinPath(), [], { detached: true })
+    // Silent install brave-core
+    // TODO(bsclifton):
+    // - don't install if already installed
+    // - verify this doesn't run twice AND that it doesn't run on uninstall
     InstallBraveCore()
     // relaunch and append argument expected in:
     // https://github.com/brave/brave-browser/issues/1545
