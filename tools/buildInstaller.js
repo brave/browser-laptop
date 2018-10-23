@@ -194,7 +194,7 @@ if (isDarwin) {
     var resultPromise = muonInstaller.createWindowsInstaller({
       appDirectory: buildDir,
       outputDirectory: outDir,
-      title: appName,
+      title: appName + ' (old)',
       name: appName,
       authors: 'Brave Software',
       loadingGif: 'res/brave_splash_installing.gif',
