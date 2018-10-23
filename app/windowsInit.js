@@ -62,9 +62,10 @@ const getBraveCoreInstallerPath = () => {
 }
 
 function InstallBraveCore () {
-  const cmd = getBraveCoreInstallerPath() + " /silent /install"
   // TODO(bsclifton): get a proper version of the omaha installer
   // (built using https://github.com/brave/devops/pull/335)
+  //const cmd = getBraveCoreInstallerPath() + " /silent /install"
+  const cmd = getBraveCoreInstallerPath() + " /install"
   execSync(cmd)
 }
 
@@ -73,7 +74,8 @@ if (process.platform === 'win32') {
   const shouldQuit = require('electron-squirrel-startup')
   const channel = Channel.channel()
   const isSquirrelInstall = process.argv.includes('--squirrel-install')
-  const isSquirrelUpdate = process.argv.includes('--squirrel-updated')
+  // TODO(bsclifton): remove after testing
+  const isSquirrelUpdate = true //process.argv.includes('--squirrel-updated')
   const isSquirrelUninstall = process.argv.includes('--squirrel-uninstall')
   const isSquirrelFirstRun = process.argv.includes('--squirrel-firstrun')
   // handle running as part of install process
@@ -87,14 +89,13 @@ if (process.platform === 'win32') {
   }
   // first-run after install / update
   if (isSquirrelInstall || isSquirrelUpdate) {
-    // The manifest file is used to customize the look of the Start menu tile.
-    // This function copies it from the versioned folder to the parent folder
-    // (where the auto-update executable lives)
-    CopyManifestFile()
-    // Specific for Brave Ads trial
     InstallBraveCore()
-    // Launch defaults helper to add defaults on install
-    spawn(getBraveDefaultsBinPath(), [], { detached: true })
+    // relaunch and append argument expected in:
+    // https://github.com/brave/brave-browser/issues/1545
+    app.relaunch({args: ['--relaunch', '--upgrade-from-muon']})
+    app.exit()
+    return
+
   } else if (isSquirrelUninstall) {
     // Launch defaults helper to remove defaults on uninstall
     // Sync to avoid file path in use on uninstall
