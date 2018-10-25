@@ -57,6 +57,10 @@ if (process.platform === 'linux') {
   require('./linuxInit')
 }
 
+if (process.platform === 'darwin') {
+  require('./darwinInit')
+}
+
 const electron = require('electron')
 const app = electron.app
 const ipcMain = electron.ipcMain
