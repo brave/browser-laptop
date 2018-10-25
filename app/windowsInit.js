@@ -74,9 +74,9 @@ function InstallBraveCore () {
   ]
 
   // check for existing installations
-  for (let i=0; i < braveCoreInstallLocations.length; i++) {
+  for (let i = 0; i < braveCoreInstallLocations.length; i++) {
     const path = braveCoreInstallLocations[i]
-    const resolvedPath = path.replace(/%([^%]+)%/g, function(_, variableToResolve) {
+    const resolvedPath = path.replace(/%([^%]+)%/g, function (_, variableToResolve) {
       return process.env[variableToResolve]
     })
     if (fs.existsSync(resolvedPath)) {
@@ -85,8 +85,13 @@ function InstallBraveCore () {
   }
 
   // brave-core is not installed; go ahead with silent install
-  const cmd = getBraveCoreInstallerPath() + " /silent /install"
-  execSync(cmd)
+  const cmd = getBraveCoreInstallerPath() + ' /silent /install'
+  try {
+    execSync(cmd)
+  } catch (e) {
+    // TODO(bsclifton): add error handling
+    return false
+  }
 
   return true
 }
