@@ -1,6 +1,6 @@
 {
   "name": "brave",
-  "version": "0.25.0",
+  "version": "0.25.217",
   "description": "Brave laptop and desktop browser",
   "main": "./app/index.js",
   "config": {
@@ -182,7 +182,7 @@
     "mkdirp": "^0.5.1",
     "mocha": "^5.2.0",
     "mockery": "^2.1.0",
-    "muon-winstaller-test": "^3.1.1",
+    "muon-winstaller-test": "^3.1.2",
     "ncp": "^2.0.0",
     "node-gyp": "^3.3.1",
     "node-libs-browser": "~2.0.0",
