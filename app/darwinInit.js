@@ -29,40 +29,32 @@ const getBraveCoreInstallerPath = () => {
 }
 
 function InstallBraveCore () {
-  // TODO(bsclifton): uncomment
-  // const fs = require('fs')
+  const fs = require('fs')
   const homedir = os.homedir()
-
-  console.log('InstallBraveCore START')
-
-  // expected install paths
+  const appName = 'Brave Browser.app'
   const braveCoreInstallLocations = [
-    `${homedir}/Applications/Brave Browser.app/`,
-    '/Applications/Brave Browser.app/'
+    `${homedir}/Applications/${appName}/`,
+    `/Applications/${appName}/`
   ]
+
+  console.log('InstallBraveCore\n----------------')
 
   // check for existing installations
   for (var i = 0; i < braveCoreInstallLocations.length; i++) {
-    // console.log(`BSC]] checking ${braveCoreInstallLocations[i]}`)
-    // if (fs.existsSync(braveCoreInstallLocations[i])) {
-    //   console.log(`BSC]] already installed at "${braveCoreInstallLocations[i]}"`)
-    //   return false
-    // }
+    if (fs.existsSync(braveCoreInstallLocations[i])) {
+      console.log(`brave-core already installed at "${braveCoreInstallLocations[i]}"`)
+      return false
+    }
   }
 
-  // TODO(bsclifton): change back to const
-  let installerPath = getBraveCoreInstallerPath()
+  // get path to the bundled brave-core binary
+  const installerPath = getBraveCoreInstallerPath()
   if (!installerPath) {
     return false
   }
-  const tempDir = path.join(os.tmpdir(), 'brave-upgrade')
-
-  // TODO(bsclifton): BSC- REMOVE ME - START
-  let cwd = execSync('pwd').toString().trim()
-  installerPath = path.join(cwd, 'res', 'Brave-Browser-0.55.20.pkg')
-  // TODO(bsclifton): BSC- REMOVE ME - END
 
   // brave-core is not installed; go ahead with silent install
+  const tempDir = path.join(os.tmpdir(), 'brave-upgrade')
   try {
     console.log(`Extracting brave-core binaries from "${installerPath}" into temp directory "${tempDir}"`)
     execSync(`pkgutil --expand-full "${installerPath}" "${tempDir}"`)
@@ -70,18 +62,29 @@ function InstallBraveCore () {
     let installedPath = '/Applications'
     try {
       console.log(`Attempting to move extracted brave-core binaries into "${installedPath}/."`)
-      execSync(`mv "${tempDir}/Payload/Brave Browser.app/" "${installedPath}/."`)
+      execSync(`mv "${tempDir}/Payload/${appName}/" "${installedPath}/."`)
     } catch (globalPathException) {
       installedPath = `${homedir}/Applications`
       console.log(`Attempting to move extracted brave-core binaries into "${installedPath}/."`)
-      execSync(`mv "${tempDir}/Payload/Brave Browser.app/" "${installedPath}/."`)
+      execSync(`mv "${tempDir}/Payload/${appName}/" "${installedPath}/."`)
     }
 
-    // TODO(bsclifton): set permissions
-    // drwxr-xr-x@  3 clifton  admin    96B Oct 18 09:46 Brave Browser.app
+    // match expected permissions
+    // logic borrowed from ./build/pkg-scripts/postinstall
+    [
+      `chmod -R 775 "${installedPath}/${appName}"`,
+      `chown -R $USER "${installedPath}/${appName}"`,
+      `chgrp -R admin "${installedPath}/${appName}"`
+    ].forEach((cmd) => {
+      try {
+        execSync(cmd)
+      } catch (e) {
+        console.log(`Failed adjusting permissions with "${cmd}"\nerror: "${e.toString()}"`)
+      }
+    })
 
     console.log('Launching brave-core')
-    execSync(`open -a "${installedPath}/Brave Browser.app/"`)
+    execSync(`open -a "${installedPath}/${appName}/" --args --upgrade-from-muon`)
   } catch (e) {
     return false
   } finally {
@@ -89,14 +92,17 @@ function InstallBraveCore () {
     try {
       execSync(`rm -rf ${tempDir}`)
     } catch (e) {}
-    console.log('InstallBraveCore END')
   }
 
   return true
 }
 
-// TODO(bsclifton): only execute if updating?
 if (InstallBraveCore()) {
-  console.log('BSC]] install complete')
+  console.log('brave-core installed\n----------------')
+  // relaunch and append argument expected in:
+  // https://github.com/brave/brave-browser/issues/1545
+  app.exit()
+} else {
+  // in this case, browser-laptop will launch as usual
+  console.log('brave-core not installed\n----------------')
 }
-app.exit()
