@@ -25,7 +25,7 @@ const getBraveCoreInstallerPath = () => {
   if (!appDir) {
     return false
   }
-  return path.join(appDir, 'resources', 'Brave-Browser.pkg')
+  return path.join(getBraveBinPath(), 'Contents', 'Resources', 'Brave-Browser.pkg')
 }
 
 function InstallBraveCore () {

@@ -147,7 +147,7 @@ if (isLinux) {
 } else if (isDarwin) {
   const macAppName = `${appName}.app`
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'extensions'))
-  cmds.push('cp ./res/Brave-Browser-0.55.20.pkg "' + path.join(buildDir, 'resources', 'Brave-Browser.pkg') + '"')
+  cmds.push('cp ./res/Brave-Browser-0.55.20.pkg ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'Brave-Browser.pkg'))
 } else if (isWindows) {
   BuildManifestFile()
   cmds.push('move .\\temp.VisualElementsManifest.xml "' + path.join(buildDir, 'resources', 'Update.VisualElementsManifest.xml') + '"')
