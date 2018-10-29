@@ -247,6 +247,29 @@ ul {
         }
       }
     }
+
+    .deprecationNotice {
+      @typography-display();
+      border-radius: @borderRadius;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+      background-color: #fff;
+      margin-top: 20px;
+      max-width: 505px;
+      width: 100%;
+      display: inline-block;
+      padding: 20px;
+      text-align: left;
+
+      .note {
+        color: @braveOrange;
+      }
+
+      a {
+        color: @braveOrange;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
   }
 
   .siteRemovalNotification {

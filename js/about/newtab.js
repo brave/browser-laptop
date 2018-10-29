@@ -330,6 +330,18 @@ class NewTabPage extends React.Component {
                 })
               }
             </nav>
+
+            <div>
+              <div className='deprecationNotice'>
+                <div>
+                  <span className='note'>Note:</span> This version of Brave Browser (0.26.0) is no longer supported and will never receive updates.
+                </div>
+                <div style={{marginTop: '20px'}}>
+                  Please move over to the latest version of the Brave Browser as soon as possible.&nbsp;
+                  <a href=''>Learn more…</a>
+                </div>
+              </div>
+            </div>
           </div>
         </main>
         {
