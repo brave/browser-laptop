@@ -48,6 +48,7 @@ const {isImmutable, makeImmutable, deleteImmutablePaths} = require('./common/sta
 const {getSetting} = require('../js/settings')
 const platformUtil = require('./common/lib/platformUtil')
 const historyUtil = require('./common/lib/historyUtil')
+const {newTabMode} = require('./common/constants/settingsEnums')
 
 const sessionStorageVersion = 1
 const sessionStorageName = `session-store-${sessionStorageVersion}`
@@ -692,6 +693,10 @@ module.exports.runPreMigrations = (data) => {
       data.settings[settings.PAYMENTS_NOTIFICATION_TRY_PAYMENTS_DISMISSED] = data.settings['payments.notificationTryPaymentsDismissed']
       delete data.settings['payments.notificationTryPaymentsDismissed']
     }
+
+    // force NEWTAB_MODE to be dashboard so folks can see deprecation notice
+    // preference is also disabled (see js/about/preferences.js)
+    data.settings[settings.NEWTAB_MODE] = newTabMode.NEW_TAB_PAGE
   }
 
   if (data.sites) {

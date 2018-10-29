@@ -371,6 +371,10 @@ const updateAboutDetails = (tabId) => {
       adblockCount,
       httpsUpgradedCount,
       torEnabled,
+      versionInformation: {
+        browserLaptop: app.getVersion().toString(),
+        initState: appState.getIn(['about', 'init']).toJS()
+      },
       newTabDetail: newTabDetail.toJS()
     })
   } else if (location === 'about:autofill') {
