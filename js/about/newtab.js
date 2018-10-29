@@ -338,7 +338,7 @@ class NewTabPage extends React.Component {
                 </div>
                 <div style={{marginTop: '20px'}}>
                   Please move over to the latest version of the Brave Browser as soon as possible.&nbsp;
-                  <a href=''>Learn more…</a>
+                  <a href='https://support.brave.com/hc/en-us/articles/360018538092'>Learn more…</a>
                 </div>
               </div>
             </div>
