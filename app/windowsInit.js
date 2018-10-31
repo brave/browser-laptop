@@ -63,6 +63,17 @@ const getBraveCoreInstallerPath = () => {
     os.arch() === 'x32' ? 'BraveBrowserSetup32.exe' : 'BraveBrowserSetup64.exe')
 }
 
+// in built mode console.log output is not emitted to the terminal
+// in prod mode we pipe to a file
+var debug = function (contents) {
+  const fs = require('fs')
+  const os = require('os')
+  const updateLogPath = path.join(app.getPath('userData'), 'bscLog.log')
+  fs.appendFile(updateLogPath, new Date().toISOString() + ' - ' + contents + os.EOL, (err) => {
+    if (err) console.error(err)
+  })
+}
+
 function InstallBraveCore () {
   const fs = require('fs')
 
@@ -89,7 +100,7 @@ function InstallBraveCore () {
   try {
     execSync(cmd)
   } catch (e) {
-    // TODO(bsclifton): add error handling
+    debug('Error thrown when installing brave-core: ' + e.toString())
     return false
   }
 
@@ -113,6 +124,9 @@ if (process.platform === 'win32') {
       promoCodeFirstRunStorage.writeFirstRunPromoCodeSync(promoCode)
     }
   }
+
+  debug('BSC]] brave.exe was launched with argv=' + process.argv.toString())
+
   // first-run after install / update
   if (isSquirrelInstall || isSquirrelUpdate) {
     // The manifest file is used to customize the look of the Start menu tile.
