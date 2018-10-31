@@ -153,8 +153,11 @@ if (isLinux) {
   cmds.push('move .\\temp.VisualElementsManifest.xml "' + path.join(buildDir, 'resources', 'Update.VisualElementsManifest.xml') + '"')
   cmds.push('copy .\\res\\start-tile-70.png "' + path.join(buildDir, 'resources', 'start-tile-70.png') + '"')
   cmds.push('copy .\\res\\start-tile-150.png "' + path.join(buildDir, 'resources', 'start-tile-150.png') + '"')
-  cmds.push('copy .\\res\\BraveBrowserSetup32.exe "' + path.join(buildDir, 'resources', 'BraveBrowserSetup32.exe') + '"')
-  cmds.push('copy .\\res\\BraveBrowserSetup64.exe "' + path.join(buildDir, 'resources', 'BraveBrowserSetup64.exe') + '"')
+  if (process.env.TARGET_ARCH === 'ia32') {
+    cmds.push('copy .\\res\\BraveBrowserSetup32.exe "' + path.join(buildDir, 'resources', 'BraveBrowserSetup32.exe') + '"')
+  } else {
+    cmds.push('copy .\\res\\BraveBrowserSetup64.exe "' + path.join(buildDir, 'resources', 'BraveBrowserSetup64.exe') + '"')
+  }
   cmds.push('makensis.exe -DARCH=' + arch + ` res/${channel}/braveDefaults.nsi`)
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
   // Make sure the Brave.exe binary is squirrel aware so we get squirrel events and so that Squirrel doesn't auto create shortcuts.

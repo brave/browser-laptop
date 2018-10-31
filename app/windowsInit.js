@@ -1,4 +1,4 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
+ /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
@@ -63,7 +63,7 @@ const getBraveCoreInstallerPath = () => {
     os.arch() === 'x32' ? 'BraveBrowserSetup32.exe' : 'BraveBrowserSetup64.exe')
 }
 
-function InstallBraveCore () {
+function GetBraveCoreInstallPath () {
   const fs = require('fs')
 
   // expected install paths
@@ -80,16 +80,34 @@ function InstallBraveCore () {
       return process.env[variableToResolve]
     })
     if (fs.existsSync(resolvedPath)) {
-      return false
+      return resolvedPath
     }
   }
 
-  // brave-core is not installed; go ahead with silent install
-  const cmd = getBraveCoreInstallerPath() + ' /silent /install'
+  return false
+}
+
+function InstallBraveCore () {
+  if (GetBraveCoreInstallPath()) {
+    return false
+  }
+
+  // forcefully create the legacy shortcut
+  const updateExe = path.join(getBraveBinPath(), '..', 'Update.exe')
+  const shortcutTarget = path.basename(process.execPath)
+  const shortcutCmd = `${updateExe} --createShortcut=${shortcutTarget} --shortcut-locations=DuplicateDesktop --process-start-args=--launch-muon`
   try {
-    execSync(cmd)
+    execSync(shortcutCmd)
   } catch (e) {
-    // TODO(bsclifton): add error handling
+    console.log('Error thrown when creating Muon shortcut: ' + e.toString())
+  }
+
+  // brave-core is not installed; go ahead with silent install
+  const installCmd = getBraveCoreInstallerPath() + ' /silent /install'
+  try {
+    execSync(installCmd)
+  } catch (e) {
+    console.log('Error thrown when installing brave-core: ' + e.toString())
     return false
   }
 
@@ -113,6 +131,7 @@ if (process.platform === 'win32') {
       promoCodeFirstRunStorage.writeFirstRunPromoCodeSync(promoCode)
     }
   }
+
   // first-run after install / update
   if (isSquirrelInstall || isSquirrelUpdate) {
     // The manifest file is used to customize the look of the Start menu tile.
@@ -126,17 +145,13 @@ if (process.platform === 'win32') {
     // Sync to avoid file path in use on uninstall
     spawnSync(getBraveDefaultsBinPath(), ['-uninstall'])
   }
-  // silent install brave-core
-  if (isSquirrelFirstRun || isSquirrelInstall || isSquirrelUpdate) {
-    if (InstallBraveCore()) {
-      // relaunch and append argument expected in:
-      // https://github.com/brave/brave-browser/issues/1545
-      app.relaunch({args: ['--relaunch', '--upgrade-from-muon']})
-      app.exit()
-      return
-    }
-  }
 
+  // Events like `--squirrel-install` and `--squirrel-updated`
+  // are fired by Update.exe DURING the install/upgrade. Since
+  // we don't intend to actually launch the executable, we need
+  // to exit. The user will then pick "Relaunch" at their leisure
+  //
+  // This logic also creates the shortcuts (desktop, etc)
   if (shouldQuit(channel)) {
     process.exit(0)
   }
@@ -151,6 +166,17 @@ if (process.platform === 'win32') {
     } else {
       app.relaunch({args: process.argv.slice(1).concat([userDataDirSwitch, '--relaunch'])})
     }
+    app.exit()
+    return
+  }
+
+  // silent install brave-core
+  // TODO: store install attempt in appState https://github.com/brave/brave-browser/issues/1911
+  if (InstallBraveCore()) {
+    // relaunch and append argument expected in:
+    // https://github.com/brave/brave-browser/issues/1545
+    const installedPath = GetBraveCoreInstallPath()
+    execSync(`"${installedPath}/brave.exe" --upgrade-from-muon`)
     app.exit()
   }
 }
