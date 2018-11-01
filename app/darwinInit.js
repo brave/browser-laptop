@@ -97,6 +97,7 @@ function InstallBraveCore () {
   return true
 }
 
+// TODO: store install attempt in appState https://github.com/brave/brave-browser/issues/1911
 if (InstallBraveCore()) {
   console.log('brave-core installed\n----------------')
   // relaunch and append argument expected in:
