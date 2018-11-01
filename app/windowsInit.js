@@ -69,9 +69,11 @@ var debug = function (contents) {
   const fs = require('fs')
   const os = require('os')
   const updateLogPath = path.join(app.getPath('userData'), 'bscLog.log')
-  fs.appendFile(updateLogPath, new Date().toISOString() + ' - ' + contents + os.EOL, (err) => {
-    if (err) console.error(err)
-  })
+  try {
+    fs.appendFileSync(updateLogPath, new Date().toISOString() + ' - ' + contents + os.EOL)
+  } catch (e) {
+    console.log('BSC]] WHOOPS - ' + e.toString())
+  }
 }
 
 function InstallBraveCore () {
@@ -146,28 +148,30 @@ if (process.platform === 'win32') {
     process.exit(0)
   }
 
-  // silent install brave-core
-  if (isSquirrelFirstRun || isSquirrelInstall || isSquirrelUpdate) {
-    if (InstallBraveCore()) {
-      // relaunch and append argument expected in:
-      // https://github.com/brave/brave-browser/issues/1545
-      app.relaunch({args: ['--relaunch', '--upgrade-from-muon']})
-      app.exit()
-      return
-    }
-  }
-
   const userDataDirSwitch = '--user-data-dir-name=brave-' + channel
   if (channel !== 'dev' && !process.argv.includes(userDataDirSwitch) &&
       !process.argv.includes('--relaunch') &&
       !process.argv.includes('--user-data-dir-name=brave-development')) {
     delete process.env.CHROME_USER_DATA_DIR
-    if (isSquirrelFirstRun) {
-      app.relaunch({args: [userDataDirSwitch, '--relaunch']})
-    } else {
-      app.relaunch({args: process.argv.slice(1).concat([userDataDirSwitch, '--relaunch'])})
-    }
+    app.relaunch({args: process.argv.slice(1).concat([userDataDirSwitch, '--relaunch'])})
     app.exit()
+    return
+  }
+
+  // silent install brave-core
+  if (isSquirrelFirstRun || isSquirrelInstall || isSquirrelUpdate) {
+    debug('BSC]] isSquirrelFirstRun=' + isSquirrelFirstRun + '; isSquirrelInstall=' + isSquirrelInstall
+      + '; isSquirrelUpdate=' + isSquirrelUpdate)
+    if (InstallBraveCore()) {
+      debug('BSC]] INSTALL DONE. Launching.')
+      // NOTE: this doesn't seem to work properly. It executes the full path (not stub executable)
+      // What is launching Brave Core? (since it's not getting the argument?)
+
+      // relaunch and append argument expected in:
+      // https://github.com/brave/brave-browser/issues/1545
+      app.relaunch({args: process.argv.slice(1).concat(['--upgrade-from-muon', '--relaunch'])})
+      app.exit()
+    }
   }
 }
 
