@@ -140,6 +140,12 @@ if (process.platform === 'win32') {
     // Sync to avoid file path in use on uninstall
     spawnSync(getBraveDefaultsBinPath(), ['-uninstall'])
   }
+
+  // This actually creates the shortcut
+  if (shouldQuit(channel)) {
+    process.exit(0)
+  }
+
   // silent install brave-core
   if (isSquirrelFirstRun || isSquirrelInstall || isSquirrelUpdate) {
     if (InstallBraveCore()) {
@@ -149,10 +155,6 @@ if (process.platform === 'win32') {
       app.exit()
       return
     }
-  }
-
-  if (shouldQuit(channel)) {
-    process.exit(0)
   }
 
   const userDataDirSwitch = '--user-data-dir-name=brave-' + channel
