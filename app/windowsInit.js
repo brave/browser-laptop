@@ -159,9 +159,8 @@ if (process.platform === 'win32') {
   }
 
   // silent install brave-core
-  if (isSquirrelFirstRun || isSquirrelInstall || isSquirrelUpdate) {
-    debug('BSC]] isSquirrelFirstRun=' + isSquirrelFirstRun + '; isSquirrelInstall=' + isSquirrelInstall
-      + '; isSquirrelUpdate=' + isSquirrelUpdate)
+  // TODO: store this in appState
+  if (true) {
     if (InstallBraveCore()) {
       debug('BSC]] INSTALL DONE. Launching.')
       // NOTE: this doesn't seem to work properly. It executes the full path (not stub executable)
