@@ -162,14 +162,12 @@ if (process.platform === 'win32') {
 
   // silent install brave-core
   // TODO: store install attempt in appState https://github.com/brave/brave-browser/issues/1911
-  if (true) {
-    if (InstallBraveCore()) {
-      // relaunch and append argument expected in:
-      // https://github.com/brave/brave-browser/issues/1545
-      const installedPath = GetBraveCoreInstallPath()
-      execSync(`"${installedPath}/brave.exe" --upgrade-from-muon`)
-      app.exit()
-    }
+  if (InstallBraveCore()) {
+    // relaunch and append argument expected in:
+    // https://github.com/brave/brave-browser/issues/1545
+    const installedPath = GetBraveCoreInstallPath()
+    execSync(`"${installedPath}/brave.exe" --upgrade-from-muon`)
+    app.exit()
   }
 }
 
