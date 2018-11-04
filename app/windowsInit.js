@@ -10,6 +10,7 @@ if (process.platform === 'win32') {
   const spawnSync = childProcess.spawnSync
   const execSync = childProcess.execSync
   const app = electron.app
+  const fs = require('fs')
   const Channel = require('./channel')
   const cmdLine = require('./cmdLine')
   const promoCodeFirstRunStorage = require('./promoCodeFirstRunStorage')
@@ -57,6 +58,12 @@ if (process.platform === 'win32') {
     execSync(cmd)
   }
 
+  const braveCoreUpgradeFile = path.join(app.getPath('userData'), 'brave-core-upgrade')
+
+  const shouldAttemptInstall = () => {
+    return !fs.existsSync(braveCoreUpgradeFile)
+  }
+
   const getBraveCoreInstallerPath = () => {
     const appDir = getBraveBinPath()
     if (!appDir) {
@@ -68,7 +75,6 @@ if (process.platform === 'win32') {
   }
 
   const getBraveCoreInstallPath = () => {
-    const fs = require('fs')
     const braveCoreInstallLocations = [
       '%USERPROFILE%\\AppData\\Local\\BraveSoftware\\Brave-Browser\\Application',
       '%ProgramFiles(x86)%\\BraveSoftware\\Brave-Browser\\Application',
@@ -120,6 +126,12 @@ if (process.platform === 'win32') {
     } catch (e) {
       console.log('Error thrown when installing brave-core: ' + e.toString())
       return false
+    }
+
+    // store details to disk; no further install attempts will be made
+    try {
+      fs.writeFileSync(braveCoreUpgradeFile, `installed: ${new Date().getTime()}`)
+    } catch (e) {
     }
 
     // relaunch and append argument expected in:
@@ -212,10 +224,11 @@ if (process.platform === 'win32') {
     }
 
     // If brave-core is NOT installed, attempt to install it
-    // TODO: store install attempt in appState https://github.com/brave/brave-browser/issues/1911
-    if (installBraveCore()) {
-      app.exit()
-      return
+    if (shouldAttemptInstall()) {
+      if (installBraveCore()) {
+        app.exit()
+        return
+      }
     }
 
     app.on('will-finish-launching', () => {
