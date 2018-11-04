@@ -8,6 +8,7 @@ if (process.platform === 'darwin') {
   const childProcess = require('child_process')
   const execSync = childProcess.execSync
   const app = electron.app
+  const fs = require('fs')
   const os = require('os')
   const appName = 'Brave Browser.app'
   const homedir = os.homedir()
@@ -23,6 +24,12 @@ if (process.platform === 'darwin') {
     return false
   }
 
+  const braveCoreUpgradeFile = path.join(app.getPath('userData'), 'brave-core-upgrade')
+
+  const shouldAttemptInstall = () => {
+    return !fs.existsSync(braveCoreUpgradeFile)
+  }
+
   const getBraveCoreInstallerPath = () => {
     const appDir = getBraveBinPath()
     if (!appDir) {
@@ -32,7 +39,6 @@ if (process.platform === 'darwin') {
   }
 
   const getBraveCoreInstallPath = () => {
-    const fs = require('fs')
     const braveCoreInstallLocations = [
       `${homedir}/Applications/${appName}/`,
       `/Applications/${appName}/`
@@ -87,6 +93,12 @@ if (process.platform === 'darwin') {
         }
       })
 
+      // store details to disk; no further install attempts will be made
+      try {
+        fs.writeFileSync(braveCoreUpgradeFile, `installed: ${new Date().getTime()}`)
+      } catch (e) {
+      }
+
       // relaunch and append argument expected in:
       // https://github.com/brave/brave-browser/issues/1545
       console.log('Launching brave-core')
@@ -124,9 +136,10 @@ if (process.platform === 'darwin') {
     }
 
     // If brave-core is NOT installed, attempt to install it
-    // TODO: store install attempt in appState https://github.com/brave/brave-browser/issues/1911
-    if (installBraveCore()) {
-      app.exit()
+    if (shouldAttemptInstall()) {
+      if (installBraveCore()) {
+        app.exit()
+      }
     }
   }
 }
