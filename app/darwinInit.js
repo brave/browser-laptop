@@ -132,7 +132,7 @@ if (process.platform === 'darwin') {
         }
       } catch (e) {}
 
-      return {braveCoreInstallPath, braveCoreVersion}
+      return {braveCoreInstalled: true, braveCoreInstallPath, braveCoreVersion}
     }
 
     // If brave-core is NOT installed, attempt to install it
@@ -141,5 +141,7 @@ if (process.platform === 'darwin') {
         app.exit()
       }
     }
+
+    return {braveCoreInstalled: false}
   }
 }

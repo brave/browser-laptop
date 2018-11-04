@@ -277,7 +277,8 @@ class NewTabPage extends React.Component {
     const formattedMuonVersion = muonVersion
       ? ('(' + muonVersion + ')')
       : ''
-    const braveCoreVersion = this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreVersion'])
+    const braveCoreInstalled = (this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreInstalled'])) || false
+    const braveCoreVersion = braveCoreInstalled && this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreVersion'])
     const formattedBraveCoreVersion = braveCoreVersion
       ? ('(' + braveCoreVersion + ')')
       : ''
@@ -288,19 +289,25 @@ class NewTabPage extends React.Component {
       ? `Launch Brave ${braveCoreFriendlyVersion}`
       : 'Launch Brave'
 
-    if (isLinux()) {
+    if (braveCoreInstalled) {
       return <div className='deprecationNotice'>
         <div>
-          <span className='note'>Hello!</span> This version of Brave {formattedMuonVersion} is no longer supported and will not be updated.
-          To avoid potential security risks, please follow these <a href='https://brave-browser.readthedocs.io/en/latest/installing-brave.html#linux'>instructions</a> to upgrade to the latest version of the Brave Browser.
+          <span className='note'>Note:</span>&nbsp;
+          A newer version of Brave {formattedBraveCoreVersion} has already been installed.
+          This version of Brave {formattedMuonVersion} is no longer supported and will not be updated.
+        </div>
+        <div style={{marginTop: '20px'}}>
+          To avoid potential security risks, please move over to the latest version of the Brave Browser.
         </div>
         <div style={{marginTop: '40px'}}>
-          <span style={{width: '50%', display: 'inline-block'}} />
+          <span style={{width: '50%', textAlign: 'center', display: 'inline-block'}}>
+            <a href='https://support.brave.com/hc/en-us/articles/360018538092'>Learn more…</a>
+          </span>
           <BrowserButton
             primaryColor
-            l10nId='Help Me Upgrade'
+            l10nId={launchButtonText}
             inlineStyles={{width: '50%'}}
-            onClick={this.openHelp}
+            onClick={this.launchBraveCore.bind(this)}
           />
         </div>
       </div>
@@ -308,22 +315,20 @@ class NewTabPage extends React.Component {
 
     return <div className='deprecationNotice'>
       <div>
-        <span className='note'>Note:</span>&nbsp;
-        A newer version of Brave {formattedBraveCoreVersion} has already been installed.
-        This version of Brave {formattedMuonVersion} is no longer supported and will not be updated.
-      </div>
-      <div style={{marginTop: '20px'}}>
-        To avoid potential security risks, please move over to the latest version of the Brave Browser.
+        <span className='note'>Hello!</span> This version of Brave {formattedMuonVersion} is no longer supported and will not be updated.
+        {
+          isLinux()
+            ? <span>&nbsp;To avoid potential security risks, please follow these <a href='https://brave-browser.readthedocs.io/en/latest/installing-brave.html#linux'>instructions</a> to upgrade to the latest version of the Brave Browser.</span>
+            : <span>&nbsp;To avoid potential security risks, please <a href='https://brave.com/download'>download the latest version</a> of the Brave Browser.</span>
+        }
       </div>
       <div style={{marginTop: '40px'}}>
-        <span style={{width: '50%', textAlign: 'center', display: 'inline-block'}}>
-          <a href='https://support.brave.com/hc/en-us/articles/360018538092'>Learn more…</a>
-        </span>
+        <span style={{width: '50%', display: 'inline-block'}} />
         <BrowserButton
           primaryColor
-          l10nId={launchButtonText}
+          l10nId='Help Me Upgrade'
           inlineStyles={{width: '50%'}}
-          onClick={this.launchBraveCore.bind(this)}
+          onClick={this.openHelp}
         />
       </div>
     </div>
