@@ -202,6 +202,10 @@ if (process.platform === 'win32') {
       return
     }
 
+    app.on('will-finish-launching', () => {
+      app.setAppUserModelId(appUserModelId)
+    })
+
     // If brave-core is installed, find the path and version
     const braveCoreInstallPath = getBraveCoreInstallPath()
     if (braveCoreInstallPath) {
@@ -220,7 +224,7 @@ if (process.platform === 'win32') {
         }
       } catch (e) {}
 
-      return {braveCoreInstallPath, braveCoreVersion}
+      return {braveCoreInstalled: true, braveCoreInstallPath, braveCoreVersion}
     }
 
     // If brave-core is NOT installed, attempt to install it
@@ -231,8 +235,6 @@ if (process.platform === 'win32') {
       }
     }
 
-    app.on('will-finish-launching', () => {
-      app.setAppUserModelId(appUserModelId)
-    })
+    return {braveCoreInstalled: false}
   }
 }
