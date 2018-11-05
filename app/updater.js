@@ -29,6 +29,7 @@ const UpdateStatus = require('../js/constants/updateStatus')
 // Utils
 const request = require('../js/lib/request').request
 const ledgerUtil = require('./common/lib/ledgerUtil')
+const {isLinux} = require('./common/lib/platformUtil')
 const dates = require('./dates')
 const Channel = require('./channel')
 
@@ -83,6 +84,21 @@ var scheduleUpdates = () => {
     setInterval(() => {
       exports.checkForUpdate()
     }, appConfig.updates.appUpdateCheckFrequency)
+  }
+
+  // Linux doesn't have an auto-update mechanism.
+  // Instead, show a persistent nag linking to instructions
+  if (isLinux()) {
+    appActions.showNotification({
+      buttons: [],
+      options: {
+        persist: false,
+        advancedText: 'See instructions to upgrade to the latest version',
+        advancedLink: 'https://brave-browser.readthedocs.io/en/latest/installing-brave.html#linux'
+      },
+      position: 'global',
+      message: 'This version of Brave is no longer supported and will not be updated.'
+    })
   }
 
   // Startup check
