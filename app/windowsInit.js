@@ -115,9 +115,6 @@ if (process.platform === 'win32') {
       console.log('Error thrown when creating Muon shortcut: ' + e.toString())
     }
 
-    // TODO: possibly put file in place to prevent brave-core
-    // from immediately launching after install
-
     // brave-core is not installed; go ahead with silent install
     const installCmd = `${installerPath} /silent /install`
     try {
@@ -147,7 +144,6 @@ if (process.platform === 'win32') {
     return true
   }
 
-  // TODO: pass in state that specifies whether or not install was attempted
   module.exports = function () {
     const shouldQuit = require('electron-squirrel-startup')
     const channel = Channel.channel()
