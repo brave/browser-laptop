@@ -55,19 +55,12 @@ if (process.platform === 'darwin') {
     return false
   }
 
-  const getDefaultBrowser = () => {
-    // credit to https://stackoverflow.com/questions/32458095/how-can-i-get-the-default-browser-name-in-bash-script-on-mac-os-x
-    const getDefaultBrowserCmd = `x=~/Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist; \
-plutil -convert xml1 $x; \
-grep 'https' -b3 $x | awk 'NR==2 {split($2, arr, "[><]"); print arr[3]}'; \
-plutil -convert binary1 $x`
+  const isDefaultBrowser = () => {
     try {
-      const defaultBrowser = execSync(getDefaultBrowserCmd).toString().trim()
-      console.log(`Default browser detected as ${defaultBrowser}`)
-      return defaultBrowser
-    } catch (e) {
-      return undefined
-    }
+      const defaultProtocols = ['http', 'https']
+      return defaultProtocols.every(p => app.isDefaultProtocolClient(p))
+    } catch (e) {}
+    return false
   }
 
   const installBraveCore = () => {
@@ -114,18 +107,17 @@ plutil -convert binary1 $x`
       } catch (e) {
       }
 
-      // if user has the Muon version of Brave as their default browser, let's
-      // ask the user to make Brave Core their new default. Passing this extra
-      // argument will prompt the user to ensure they agree with the choice
-      let defaultBrowserArg = ''
-      if (getDefaultBrowser() === 'com.electron.brave') {
-        defaultBrowserArg = ' --make-default-browser'
-      }
-
       // launch into freshly installed brave-core and append argument expected in:
       // https://github.com/brave/brave-browser/issues/1545
+      let openCmd = `open -a "${installedPath}/${appName}/" --args --upgrade-from-muon`
+      if (isDefaultBrowser()) {
+        // if user has the Muon version of Brave as their default browser, let's
+        // ask the user to make Brave Core their new default. Passing this extra
+        // argument will prompt the user to ensure they agree with the choice
+        openCmd += ' --make-default-browser'
+      }
       console.log('Launching brave-core')
-      execSync(`open -a "${installedPath}/${appName}/" --args --upgrade-from-muon${defaultBrowserArg}`)
+      execSync(openCmd)
     } catch (e) {
       return false
     } finally {
