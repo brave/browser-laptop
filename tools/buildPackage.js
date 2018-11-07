@@ -131,7 +131,7 @@ cmds = cmds.concat([
     ` --product-dir-name="${productDirName}"` +
     ' --version-string.CompanyName="Brave Software"' +
     ` --version-string.ProductName="${appName}"` +
-    ' --version-string.Copyright="Copyright 2017, Brave Software"' +
+    ' --version-string.Copyright="Copyright 2018, Brave Software"' +
     ` --version-string.FileDescription="${appName}"`
 ])
 
