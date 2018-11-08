@@ -59,8 +59,9 @@ if (process.platform === 'darwin') {
     try {
       const defaultProtocols = ['http', 'https']
       return defaultProtocols.every(p => app.isDefaultProtocolClient(p))
-    } catch (e) {}
-    return false
+    } catch (e) {
+      return false
+    }
   }
 
   const installBraveCore = () => {
