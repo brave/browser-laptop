@@ -71,7 +71,11 @@ if (channel !== 'dev') {
   productDirName += `-${channel}`
 }
 
-const buildDir = appName + '-' + process.platform + '-' + arch
+function getBuildDirName (name) {
+  return name + '-' + process.platform + '-' + arch
+}
+
+const buildDir = getBuildDirName(appName)
 
 console.log('Writing buildConfig.js...')
 config.writeBuildConfig(
@@ -112,10 +116,14 @@ cmds = cmds.concat([
 
 console.log('Building version ' + VersionInfo.braveVersion + ' in ' + buildDir + ' with Electron ' + VersionInfo.electronVersion)
 
+// Only way to give a different CFBundleName is to modify the 'app' name passed to electron-builder,
+// which also changes the output path.
+const tempModifiedAppName = (isDarwin && process.env.BUNDLE_NAME) ? process.env.BUNDLE_NAME : null
+
 cmds = cmds.concat([
   '"./node_modules/.bin/webpack"',
   'npm run checks',
-  `node ./node_modules/electron-packager/cli.js . ${appName}` +
+  `node ./node_modules/electron-packager/cli.js . ${tempModifiedAppName || appName}` +
     ' --overwrite=true' +
     ' --ignore="' + ignoredPaths.join('|') + '"' +
     ' --platform=' + process.platform +
@@ -134,6 +142,12 @@ cmds = cmds.concat([
     ' --version-string.Copyright="Copyright 2018, Brave Software"' +
     ` --version-string.FileDescription="${appName}"`
 ])
+
+if (tempModifiedAppName) {
+  // rename back
+  cmds.push(`mv ${getBuildDirName(tempModifiedAppName)} ${buildDir}`)
+  cmds.push(`mv ${path.join(buildDir, tempModifiedAppName + '.app')} ${path.join(buildDir, appName + '.app')}`)
+}
 
 function BuildManifestFile () {
   const fs = require('fs')
