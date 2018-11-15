@@ -122,7 +122,7 @@ module.exports = { "providers" :
       "shortcut" : ":yt"
     },
     {
-      "name" : "StartPage",
+      "name" : "Startpage.com",
       "base" : "https://www.startpage.com",
       "image" : getPath('startpage', 'png'),
       "localImage" : getFaviconUrl('startpage', 'png'),
