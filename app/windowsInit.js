@@ -11,6 +11,7 @@ if (process.platform === 'win32') {
   const execSync = childProcess.execSync
   const app = electron.app
   const fs = require('fs')
+  const os = require('os')
   const Channel = require('./channel')
   const cmdLine = require('./cmdLine')
   const promoCodeFirstRunStorage = require('./promoCodeFirstRunStorage')
@@ -60,6 +61,17 @@ if (process.platform === 'win32') {
 
   const braveCoreUpgradeFile = path.join(app.getPath('userData'), 'brave-core-upgrade')
 
+  var debugLog = function (contents) {
+    const logPath = braveCoreUpgradeFile + '-debug.log'
+    const logLine = new Date().toISOString() + ' - ' + contents + os.EOL
+    try {
+      fs.appendFileSync(logPath, logLine)
+      console.log(logLine)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   const shouldAttemptInstall = () => {
     return !fs.existsSync(braveCoreUpgradeFile)
   }
@@ -69,7 +81,6 @@ if (process.platform === 'win32') {
     if (!appDir) {
       return false
     }
-    const os = require('os')
     return path.join(appDir, 'resources',
       os.arch() === 'x32' ? 'BraveBrowserSetup32.exe' : 'BraveBrowserSetup64.exe')
   }
@@ -88,7 +99,7 @@ if (process.platform === 'win32') {
         return process.env[variableToResolve]
       })
       if (fs.existsSync(resolvedPath)) {
-        console.log(`brave-core already installed at "${resolvedPath}"`)
+        debugLog(`brave-core already installed at "${resolvedPath}"`)
         return resolvedPath
       }
     }
@@ -100,7 +111,7 @@ if (process.platform === 'win32') {
     // get path to the bundled brave-core binary
     const installerPath = getBraveCoreInstallerPath()
     if (!installerPath) {
-      console.log('brave-core installer not found')
+      debugLog('brave-core installer not found')
       return false
     }
 
@@ -109,19 +120,19 @@ if (process.platform === 'win32') {
     const shortcutTarget = path.basename(process.execPath)
     const shortcutCmd = `${updateExe} --createShortcut=${shortcutTarget} --shortcut-locations=DuplicateDesktop --process-start-args=--launch-muon`
     try {
-      console.log('Creating "Brave (old)" shortcut on desktop')
+      debugLog('Creating "Brave (old)" shortcut on desktop')
       execSync(shortcutCmd)
     } catch (e) {
-      console.log('Error thrown when creating Muon shortcut: ' + e.toString())
+      debugLog('Error thrown when creating Muon shortcut: ' + e.toString())
     }
 
     // brave-core is not installed; go ahead with silent install
     const installCmd = `${installerPath} /silent /install`
     try {
-      console.log(`Attempting silent install using "${installerPath}"`)
+      debugLog(`Attempting silent install using "${installerPath}"`)
       execSync(installCmd)
     } catch (e) {
-      console.log('Error thrown when installing brave-core: ' + e.toString())
+      debugLog('Error thrown when installing brave-core: ' + e.toString())
       return false
     }
 
@@ -134,8 +145,8 @@ if (process.platform === 'win32') {
     // relaunch and append argument expected in:
     // https://github.com/brave/brave-browser/issues/1545
     try {
-      console.log('Launching brave-core')
       const installedPath = getBraveCoreInstallPath()
+      debugLog(`Launching brave-core at "${installedPath}/brave.exe" with "--upgrade-from-muon" flag`)
       execSync(`"${installedPath}/brave.exe" --upgrade-from-muon`)
     } catch (e) {
       return false
