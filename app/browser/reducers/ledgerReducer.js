@@ -437,6 +437,7 @@ const ledgerReducer = (state, action, immutableAction) => {
         break
       }
     case appConstants.APP_ON_CAPTCHA_CLOSE:
+    case appConstants.APP_ON_PROMOTION_CLOSE:
       {
         state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
         break
@@ -486,11 +487,6 @@ const ledgerReducer = (state, action, immutableAction) => {
     case appConstants.APP_ON_PROMOTION_GET:
       {
         ledgerApi.getPromotion(state)
-        break
-      }
-    case appConstants.APP_ON_PROMOTION_CLOSE:
-      {
-        state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
         break
       }
     case appConstants.APP_ON_REFERRAL_CODE_READ:

@@ -331,7 +331,7 @@ class LedgerTable extends ImmutableComponent {
       threshold = unPinnedRows.reduce((value, publisher) => value + publisher.get('percentage'), 0) * limit
       unPinnedRows = unPinnedRows.filter(publisher => {
         sumUnPinned += publisher.get('percentage')
-        return !(sumUnPinned >= threshold)
+        return sumUnPinned < threshold
       })
     }
 

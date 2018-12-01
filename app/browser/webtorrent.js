@@ -108,7 +108,7 @@ function isTorrentFile (details) {
       return true
     }
     if (headerValue === 'application/octet-stream') {
-      if (details.url.toLowerCase().indexOf('.torrent') > 0) {
+      if (details.url.toLowerCase().includes('.torrent')) {
         return true
       }
       var cdHeader =

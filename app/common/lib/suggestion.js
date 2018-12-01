@@ -115,14 +115,12 @@ const sortByAccessCountWithAgeDecay = (s1, s2) => {
  *
  */
 const isSimpleDomainNameValue = (site) => isParsedUrlSimpleDomainNameValue(urlParse(getURL(site)))
-const isParsedUrlSimpleDomainNameValue = (parsed) => {
-  if ((!parsed.hash || parsed.hash === '#') &&
-    !parsed.search && !parsed.query && parsed.pathname === '/') {
-    return true
-  } else {
-    return false
-  }
-}
+const isParsedUrlSimpleDomainNameValue = (parsed) => (
+  (!parsed.hash || parsed.hash === '#') &&
+  !parsed.search &&
+  !parsed.query &&
+  parsed.pathname === '/'
+)
 
 /*
  * Normalize a location for url suggestion sorting

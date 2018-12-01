@@ -25,7 +25,7 @@ function isPDFFile (details) {
       return true
     }
     if (header.includes('application/octet-stream')) {
-      if (details.url.toLowerCase().indexOf('.pdf') > 0) {
+      if (details.url.toLowerCase().includes('.pdf')) {
         return true
       }
       var cdHeader = details.responseHeaders['Content-Disposition']

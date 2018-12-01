@@ -19,7 +19,7 @@ class Textbox extends ImmutableComponent {
       this.props['data-isCommonForm'] && commonStyles.isCommonForm,
       this.props['data-isSettings'] && styles.isSettings,
       this.props['data-isPrompt'] && styles.isPrompt,
-      this.props.customClass && this.props.customClass
+      this.props.customClass
     )
 
     const props = Object.assign({}, this.props)
