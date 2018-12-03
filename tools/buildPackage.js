@@ -147,16 +147,16 @@ if (isLinux) {
 } else if (isDarwin) {
   const macAppName = `${appName}.app`
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'extensions'))
-  cmds.push('cp ./res/Brave-Browser-0.55.20.pkg ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'Brave-Browser.pkg'))
+  cmds.push('cp ./res/Brave-Browser-0.57.18.pkg ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'Brave-Browser.pkg'))
 } else if (isWindows) {
   BuildManifestFile()
   cmds.push('move .\\temp.VisualElementsManifest.xml "' + path.join(buildDir, 'resources', 'Update.VisualElementsManifest.xml') + '"')
   cmds.push('copy .\\res\\start-tile-70.png "' + path.join(buildDir, 'resources', 'start-tile-70.png') + '"')
   cmds.push('copy .\\res\\start-tile-150.png "' + path.join(buildDir, 'resources', 'start-tile-150.png') + '"')
   if (process.env.TARGET_ARCH === 'ia32') {
-    cmds.push('copy .\\res\\BraveBrowserStandaloneSetup32_70_0_56_8.exe "' + path.join(buildDir, 'resources', 'BraveBrowserSetup32.exe') + '"')
+    cmds.push('copy .\\res\\BraveBrowserStandaloneSetup32_71_0_57_18.exe "' + path.join(buildDir, 'resources', 'BraveBrowserSetup32.exe') + '"')
   } else {
-    cmds.push('copy .\\res\\BraveBrowserStandaloneSetup_70_0_56_8.exe "' + path.join(buildDir, 'resources', 'BraveBrowserSetup64.exe') + '"')
+    cmds.push('copy .\\res\\BraveBrowserStandaloneSetup_71_0_57_18.exe "' + path.join(buildDir, 'resources', 'BraveBrowserSetup64.exe') + '"')
   }
   cmds.push('makensis.exe -DARCH=' + arch + ` res/${channel}/braveDefaults.nsi`)
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
