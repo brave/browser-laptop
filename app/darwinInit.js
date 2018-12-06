@@ -55,15 +55,6 @@ if (process.platform === 'darwin') {
     return false
   }
 
-  const isDefaultBrowser = () => {
-    try {
-      const defaultProtocols = ['http', 'https']
-      return defaultProtocols.every(p => app.isDefaultProtocolClient(p))
-    } catch (e) {
-      return false
-    }
-  }
-
   const installBraveCore = () => {
     // get path to the bundled brave-core binary
     const installerPath = getBraveCoreInstallerPath()
@@ -111,12 +102,6 @@ if (process.platform === 'darwin') {
       // launch into freshly installed brave-core and append argument expected in:
       // https://github.com/brave/brave-browser/issues/1545
       let openCmd = `open -a "${installedPath}/${appName}/" --args --upgrade-from-muon`
-      if (isDefaultBrowser()) {
-        // if user has the Muon version of Brave as their default browser, let's
-        // ask the user to make Brave Core their new default. Passing this extra
-        // argument will prompt the user to ensure they agree with the choice
-        openCmd += ' --make-default-browser'
-      }
       console.log('Launching brave-core')
       execSync(openCmd)
     } catch (e) {
