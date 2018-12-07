@@ -49,12 +49,14 @@ process.on('unhandledRejection', function (reason, promise) {
 
 process.on('warning', warning => console.warn(warning.stack))
 
-if (process.platform === 'win32') {
-  require('./windowsInit')
-}
+let initState
 
-if (process.platform === 'linux') {
+if (process.platform === 'win32') {
+  initState = require('./windowsInit')()
+} else if (process.platform === 'linux') {
   require('./linuxInit')
+} else if (process.platform === 'darwin') {
+  initState = require('./darwinInit')()
 }
 
 const electron = require('electron')
@@ -185,6 +187,9 @@ app.on('ready', () => {
   })
 
   loadAppStatePromise.then((initialImmutableState) => {
+    // merge state which was set during optional platform-specific init
+    initialImmutableState = initialImmutableState.setIn(['about', 'init'], Immutable.fromJS(initState || {}))
+
     // Do this after loading the state
     // For tests we always want to load default app state
     const loadedPerWindowImmutableState = initialImmutableState.get('perWindowState')

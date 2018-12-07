@@ -122,7 +122,7 @@ module.exports = { "providers" :
       "shortcut" : ":yt"
     },
     {
-      "name" : "StartPage",
+      "name" : "Startpage.com",
       "base" : "https://www.startpage.com",
       "image" : getPath('startpage', 'png'),
       "localImage" : getFaviconUrl('startpage', 'png'),
@@ -188,15 +188,6 @@ module.exports = { "providers" :
       "localImage" : getFaviconUrl('favicon_that_shall_not_be_named', 'png'),
       "search" : "https://searx.me/?q={searchTerms}&categories=general",
       "shortcut" : ":x"
-    },
-    {
-      "name": "findx",
-      "base": "https://www.findx.com",
-      "image": getPath('findx'),
-      "localImage" : getFaviconUrl('findx'),
-      "search": "https://www.findx.com/search?q={searchTerms}&type=web",
-      "autocomplete": "https://www.findx.com/api/web-search/suggestions/?q={searchTerms}&type=opensearch",
-      "shortcut": ":fx"
     }
   ]
 }

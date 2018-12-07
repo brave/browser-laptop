@@ -55,6 +55,8 @@ Function .onInit
   ${If} $4 != ""
   ${OrIf} $5 != ""
     StrCpy $IsUninstall "1"
+    ; REMOVE friendly name (shown in `Default app settings`)
+    DeleteRegKey HKCU "Software\Classes\Applications\BraveBeta.exe"
   ${Else}
     StrCpy $IsUninstall "0"
     ; Document / protocol handler class
@@ -64,6 +66,8 @@ Function .onInit
     WriteRegStr HKCU "SOFTWARE\Classes\BraveBetaHTML" "" "BraveBeta HTML Document"
     WriteRegStr HKCU "SOFTWARE\Classes\BraveBetaHTML\DefaultIcon" "" "$BraveIconPath"
     WriteRegStr HKCU "SOFTWARE\Classes\BraveBetaHTML\shell\open\command" "" '"$BraveEXEPath" "--user-data-dir=brave-beta" -- "%1"'
+    ; ADD friendly name (shown in `Default app settings`)
+    WriteRegStr HKCU "Software\Classes\Applications\BraveBeta.exe\shell\open" "FriendlyAppName" "BraveBeta (old)"
   ${EndIf}
 
   ; If we already have the defaults key, there's nothing to do so we can abort early without even needing to elevate on Win7.

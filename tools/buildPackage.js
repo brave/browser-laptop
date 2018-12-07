@@ -71,7 +71,11 @@ if (channel !== 'dev') {
   productDirName += `-${channel}`
 }
 
-const buildDir = appName + '-' + process.platform + '-' + arch
+function getBuildDirName (name) {
+  return name + '-' + process.platform + '-' + arch
+}
+
+const buildDir = getBuildDirName(appName)
 
 console.log('Writing buildConfig.js...')
 config.writeBuildConfig(
@@ -112,10 +116,14 @@ cmds = cmds.concat([
 
 console.log('Building version ' + VersionInfo.braveVersion + ' in ' + buildDir + ' with Electron ' + VersionInfo.electronVersion)
 
+// Only way to give a different CFBundleName is to modify the 'app' name passed to electron-builder,
+// which also changes the output path.
+const tempModifiedAppName = (isDarwin && process.env.BUNDLE_NAME) ? process.env.BUNDLE_NAME : null
+
 cmds = cmds.concat([
   '"./node_modules/.bin/webpack"',
   'npm run checks',
-  `node ./node_modules/electron-packager/cli.js . ${appName}` +
+  `node ./node_modules/electron-packager/cli.js . ${tempModifiedAppName || appName}` +
     ' --overwrite=true' +
     ' --ignore="' + ignoredPaths.join('|') + '"' +
     ' --platform=' + process.platform +
@@ -131,9 +139,15 @@ cmds = cmds.concat([
     ` --product-dir-name="${productDirName}"` +
     ' --version-string.CompanyName="Brave Software"' +
     ` --version-string.ProductName="${appName}"` +
-    ' --version-string.Copyright="Copyright 2017, Brave Software"' +
+    ' --version-string.Copyright="Copyright 2018, Brave Software"' +
     ` --version-string.FileDescription="${appName}"`
 ])
+
+if (tempModifiedAppName) {
+  // rename back
+  cmds.push(`mv ${getBuildDirName(tempModifiedAppName)} ${buildDir}`)
+  cmds.push(`mv ${path.join(buildDir, tempModifiedAppName + '.app')} ${path.join(buildDir, appName + '.app')}`)
+}
 
 function BuildManifestFile () {
   const fs = require('fs')
@@ -147,11 +161,17 @@ if (isLinux) {
 } else if (isDarwin) {
   const macAppName = `${appName}.app`
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'extensions'))
+  cmds.push('cp ./res/Brave-Browser-0.57.18.pkg ' + path.join(buildDir, macAppName, 'Contents', 'Resources', 'Brave-Browser.pkg'))
 } else if (isWindows) {
   BuildManifestFile()
   cmds.push('move .\\temp.VisualElementsManifest.xml "' + path.join(buildDir, 'resources', 'Update.VisualElementsManifest.xml') + '"')
   cmds.push('copy .\\res\\start-tile-70.png "' + path.join(buildDir, 'resources', 'start-tile-70.png') + '"')
   cmds.push('copy .\\res\\start-tile-150.png "' + path.join(buildDir, 'resources', 'start-tile-150.png') + '"')
+  if (process.env.TARGET_ARCH === 'ia32') {
+    cmds.push('copy .\\res\\BraveBrowserStandaloneSetup32_71_0_57_18.exe "' + path.join(buildDir, 'resources', 'BraveBrowserSetup32.exe') + '"')
+  } else {
+    cmds.push('copy .\\res\\BraveBrowserStandaloneSetup_71_0_57_18.exe "' + path.join(buildDir, 'resources', 'BraveBrowserSetup64.exe') + '"')
+  }
   cmds.push('makensis.exe -DARCH=' + arch + ` res/${channel}/braveDefaults.nsi`)
   cmds.push('ncp ./app/extensions ' + path.join(buildDir, 'resources', 'extensions'))
   // Make sure the Brave.exe binary is squirrel aware so we get squirrel events and so that Squirrel doesn't auto create shortcuts.

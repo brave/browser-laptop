@@ -112,6 +112,7 @@ class SyncTab extends ImmutableComponent {
         l10nId='syncStart'
         testId='syncStartButton'
         onClick={this.showSyncStart.bind(this)}
+        disabled
       />
       <BrowserButton groupedItem secondaryColor
         l10nId='syncAdd'
@@ -130,6 +131,7 @@ class SyncTab extends ImmutableComponent {
           prefKey={settings.SYNC_ENABLED}
           settings={this.props.settings}
           onChangeSetting={this.toggleSync}
+          disabled
         />
         <div className={css(styles.device__item)}>
           <span className={css(styles.device__syncDeviceLabel)} data-l10n-id='syncDeviceName' />
@@ -143,6 +145,7 @@ class SyncTab extends ImmutableComponent {
         l10nId='syncNewDevice'
         testId='syncNewDeviceButton'
         onClick={this.showSyncNewDevice.bind(this)}
+        disabled
       />
     </SettingsList>
   }
@@ -468,15 +471,6 @@ class SyncTab extends ImmutableComponent {
         : null
       }
       {
-      !this.isSetup && this.props.syncStartOverlayVisible
-        ? <ModalOverlay
-          title={'syncStart'}
-          content={this.startOverlayContent}
-          footer={this.startOverlayFooter}
-          onHide={this.props.hideOverlay.bind(this, 'syncStart')} />
-        : null
-      }
-      {
       !this.isSetup && this.props.syncAddOverlayVisible
         ? <ModalOverlay
           title={'syncAdd'}
@@ -502,16 +496,14 @@ class SyncTab extends ImmutableComponent {
 
         <div className={css(styles.settingsListContainerMargin__bottom)}>
           <span className='settingsListTitle' data-l10n-id='syncTitleMessage' />
-          <a href='https://github.com/brave/sync/wiki/Design' rel='noopener' target='_blank'>
-            <span className={cx({
-              fa: true,
-              'fa-question-circle': true
-            })} />
-          </a>
           <div className={cx({
-            settingsListTitle: true,
-            [css(styles.subText)]: true
-          })} data-l10n-id='syncBetaMessage' />
+            settingsListTitle: true
+          })}>
+            Please download the <a className={css(commonStyles.linkText)}
+            onClick={aboutActions.createTabRequested.bind(null, {
+              url: 'https://brave.com/download'
+            })}>new version of Brave for desktop</a>.
+          </div>
           {
             this.setupError
             ? this.errorContent
@@ -530,19 +522,19 @@ class SyncTab extends ImmutableComponent {
                 dataL10nId='syncBookmarks'
                 prefKey={settings.SYNC_TYPE_BOOKMARK}
                 settings={this.props.settings}
-                onChangeSetting={this.props.onChangeSetting}
+                disabled
               />
               <SettingCheckbox
                 dataL10nId='syncSiteSettings'
                 prefKey={settings.SYNC_TYPE_SITE_SETTING}
                 settings={this.props.settings}
-                onChangeSetting={this.props.onChangeSetting}
+                disabled
               />
               <SettingCheckbox
                 dataL10nId='syncHistory'
                 prefKey={settings.SYNC_TYPE_HISTORY}
                 settings={this.props.settings}
-                onChangeSetting={this.props.onChangeSetting}
+                disabled
               />
             </SettingsList>
           </section>
