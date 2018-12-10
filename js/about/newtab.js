@@ -15,6 +15,7 @@ const Block = require('./newTabComponents/block')
 const SiteRemovalNotification = require('./newTabComponents/siteRemovalNotification')
 const FooterInfo = require('./newTabComponents/footerInfo')
 const NewPrivateTab = require('./newprivatetab')
+const BrowserButton = require('../../app/renderer/components/common/browserButton')
 
 // Constants
 const messages = require('../constants/messages')
@@ -31,6 +32,7 @@ const backgrounds = require('../data/backgrounds')
 const urlutils = require('../lib/urlutil')
 const random = require('../../app/common/lib/randomUtil')
 const cx = require('../lib/classSet')
+const {isLinux} = require('../../app/common/lib/platformUtil')
 const ipc = window.chrome.ipcRenderer
 
 // Styles
@@ -65,6 +67,7 @@ class NewTabPage extends React.Component {
 
       const showEmptyPage = !!data.get('showEmptyPage')
       const showImages = !!data.get('showImages') && !showEmptyPage
+      const versionInformation = data.get('versionInformation')
       this.setState({
         newTabData: data,
         updatedStamp,
@@ -73,7 +76,8 @@ class NewTabPage extends React.Component {
         showImages: !!data.get('showImages') && !showEmptyPage,
         backgroundImage: showImages
           ? this.state.backgroundImage || this.randomBackgroundImage
-          : undefined
+          : undefined,
+        versionInformation
       })
     })
   }
@@ -257,6 +261,79 @@ class NewTabPage extends React.Component {
     return name.charAt(0).toUpperCase()
   }
 
+  launchBraveCore () {
+    const braveCoreInstallPath = this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreInstallPath'])
+    if (braveCoreInstallPath) {
+      aboutActions.launchBraveCore()
+    }
+  }
+
+  openHelp () {
+    window.location = 'https://support.brave.com/hc/en-us/articles/360018538092'
+  }
+
+  getDeprecatedText () {
+    const muonVersion = this.state.versionInformation && this.state.versionInformation.get('browserLaptop')
+    const formattedMuonVersion = muonVersion
+      ? ('(' + muonVersion + ')')
+      : ''
+    const braveCoreInstalled = (this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreInstalled'])) || false
+    const braveCoreVersion = braveCoreInstalled && this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreVersion'])
+    const formattedBraveCoreVersion = braveCoreVersion
+      ? ('(' + braveCoreVersion + ')')
+      : ''
+    let braveCoreFriendlyVersion = (braveCoreVersion && braveCoreVersion.split('.').length === 3)
+      ? braveCoreVersion.split('.').slice(0, 2).join('.')
+      : undefined
+    const launchButtonText = braveCoreFriendlyVersion
+      ? `Launch Brave ${braveCoreFriendlyVersion}`
+      : 'Launch Brave'
+
+    if (braveCoreInstalled) {
+      return <div className='deprecationNotice'>
+        <div>
+          <span className='note'>Note:</span>&nbsp;
+          A newer version of Brave {formattedBraveCoreVersion} has already been installed.
+          This version of Brave {formattedMuonVersion} is no longer supported and will not be updated.
+        </div>
+        <div style={{marginTop: '20px'}}>
+          To avoid potential security risks, please move over to the latest version of the Brave Browser.
+        </div>
+        <div style={{marginTop: '40px'}}>
+          <span style={{width: '50%', textAlign: 'center', display: 'inline-block'}}>
+            <a href='https://support.brave.com/hc/en-us/articles/360018538092'>Learn more…</a>
+          </span>
+          <BrowserButton
+            primaryColor
+            l10nId={launchButtonText}
+            inlineStyles={{width: '50%'}}
+            onClick={this.launchBraveCore.bind(this)}
+          />
+        </div>
+      </div>
+    }
+
+    return <div className='deprecationNotice'>
+      <div>
+        <span className='note'>Hello!</span> This version of Brave {formattedMuonVersion} is no longer supported and will not be updated.
+        {
+          isLinux()
+            ? <span>&nbsp;To avoid potential security risks, please follow these <a href='https://brave-browser.readthedocs.io/en/latest/installing-brave.html#linux'>instructions</a> to upgrade to the latest version of the Brave Browser.</span>
+            : <span>&nbsp;To avoid potential security risks, please <a href='https://brave.com/download'>download the latest version</a> of the Brave Browser.</span>
+         }
+      </div>
+      <div style={{marginTop: '40px'}}>
+        <span style={{width: '50%', display: 'inline-block'}} />
+        <BrowserButton
+          primaryColor
+          l10nId='Help Me Upgrade'
+          inlineStyles={{width: '50%'}}
+          onClick={this.openHelp}
+        />
+      </div>
+    </div>
+  }
+
   render () {
     // don't render if user prefers an empty page
     if (this.state.showEmptyPage && !this.props.isIncognito) {
@@ -330,6 +407,10 @@ class NewTabPage extends React.Component {
                 })
               }
             </nav>
+
+            <div>
+              {this.getDeprecatedText()}
+            </div>
           </div>
         </main>
         {
