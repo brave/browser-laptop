@@ -219,7 +219,8 @@ const appConstants = {
   APP_ON_PUBLISHERS_INFO_WRITE: _,
   APP_ON_PUBLISHERS_INFO_READ: _,
   APP_ON_CHECK_BROWSER_ACTIVITY_TIME: _,
-  APP_ON_PROMO_REF_FETCH: _
+  APP_ON_PROMO_REF_FETCH: _,
+  APP_LAUNCH_BRAVE_CORE: _
 }
 
 module.exports = mapValuesByKeys(appConstants)
