@@ -114,6 +114,10 @@ class NewTabPage extends React.Component {
     return this.state.newTabData.getIn(['newTabDetail', 'gridLayoutSize'], 'small')
   }
 
+  get showDeprecationNotice () {
+    return this.state.newTabData.getIn(['newTabDetail', 'showDeprecationNotice'], true)
+  }
+
   isPinned (siteKey) {
     return this.pinnedTopSites.some(site => {
       if (!site || !site.get) {
@@ -272,6 +276,10 @@ class NewTabPage extends React.Component {
     window.location = 'https://support.brave.com/hc/en-us/articles/360018538092'
   }
 
+  dismissNotice () {
+    aboutActions.setNewTabDetail({showDeprecationNotice: false}, true)
+  }
+
   getDeprecatedText () {
     const muonVersion = this.state.versionInformation && this.state.versionInformation.get('browserLaptop')
     const formattedMuonVersion = muonVersion
@@ -291,6 +299,10 @@ class NewTabPage extends React.Component {
 
     if (braveCoreInstalled) {
       return <div className='deprecationNotice'>
+        <button
+          className='fa fa-close'
+          onClick={this.dismissNotice.bind(this)}
+        />
         <div>
           <span className='note'>Note:</span>&nbsp;
           A newer version of Brave {formattedBraveCoreVersion} has already been installed.
@@ -409,7 +421,11 @@ class NewTabPage extends React.Component {
             </nav>
 
             <div>
-              {this.getDeprecatedText()}
+              {
+                this.showDeprecationNotice
+                  ? this.getDeprecatedText()
+                  : null
+              }
             </div>
           </div>
         </main>
