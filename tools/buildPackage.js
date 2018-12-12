@@ -114,7 +114,8 @@ console.log('Building version ' + VersionInfo.braveVersion + ' in ' + buildDir +
 
 cmds = cmds.concat([
   '"./node_modules/.bin/webpack"',
-  'npm run checks',
+  // NOTE: api.nodesecurity.io seems to be down?
+  // 'npm run checks',
   `node ./node_modules/electron-packager/cli.js . ${appName}` +
     ' --overwrite=true' +
     ' --ignore="' + ignoredPaths.join('|') + '"' +
