@@ -187,6 +187,13 @@ const styles = StyleSheet.create({
     userSelect: 'none',
     cursor: 'default'
   },
+  notificationItem__messageMajor: {
+    color: '#000',
+    fontSize: '17px',
+    margin: 'auto 6px auto 0',
+    userSelect: 'none',
+    cursor: 'default'
+  },
   notificationItem__secondaryMessage: {
     color: '#888',
     fontSize: '14px',

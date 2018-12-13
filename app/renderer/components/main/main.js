@@ -575,6 +575,7 @@ class Main extends React.Component {
     props.isWidevineReady = state.getIn([appConfig.resourceNames.WIDEVINE, 'ready'])
     props.widevineLocation = urlUtil.getOrigin(widevinePanelDetail.get('location'))
     props.widevineRememberSettings = widevinePanelDetail.get('alsoAddRememberSiteSetting') ? 1 : 0
+    props.arch = state.getIn(['about', 'brave', 'arch']) || ''
 
     return props
   }
@@ -682,7 +683,7 @@ class Main extends React.Component {
         }
         {
           this.props.showUpdate
-          ? <UpdateBar />
+          ? <UpdateBar arch={this.props.arch} />
           : null
         }
         {
