@@ -22,6 +22,7 @@ const updateState = require('../../../common/state/updateState')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
+const platformUtil = require('../../../common/lib/platformUtil')
 
 // Styles
 const commonStyles = require('../styles/commonStyles')
@@ -181,6 +182,55 @@ class UpdateNotAvailable extends ImmutableComponent {
   }
 }
 
+class MajorUpdateAvailable extends ImmutableComponent {
+  downloadClicked () {
+    let downloadUrl
+
+    if (platformUtil.isDarwin()) {
+      downloadUrl = 'https://laptop-updates.brave.com/latest/osx'
+    } else if (platformUtil.isWindows()) {
+      if (this.props.arch === 'ia32') {
+        downloadUrl = 'https://laptop-updates.brave.com/latest/winia32'
+      } else {
+        downloadUrl = 'https://laptop-updates.brave.com/latest/winx64'
+      }
+    } else {
+      downloadUrl = 'https://brave-browser.readthedocs.io/en/latest/installing-brave.html#linux'
+    }
+
+    appActions.createTabRequested({
+      url: downloadUrl
+    })
+  }
+
+  render () {
+    return <div className={css(styles.flexJustifyBetween, styles.flexAlignCenter, styles.majorUpdateTopPadding)}>
+      <div>
+        <UpdateHello updateStatus={this.props.updateStatus} l10nId='updateHelloMajor' />
+        <span className={css(commonStyles.notificationItem__messageMajor)} data-l10n-id='updateAvailMajor' />
+      </div>
+      <span className={css(styles.flexAlignCenter)} data-test-id='notificationOptions'>
+        <UpdateHide reset />
+        <BrowserButton groupedItem notificationItem primaryColor
+          testId='updateNow'
+          l10nId='updateNowMajor'
+          onClick={this.downloadClicked.bind(this)} />
+      </span>
+      <div style={{marginTop: '15px', width: '100%', padding: '20px 0'}}>
+        <span data-l10n-id='updateAvailMajor2' style={{fontWeight: '200'}} />
+        &nbsp;&nbsp;
+        <a
+          className={css(commonStyles.linkText)}
+          onClick={appActions.createTabRequested.bind(null, {
+            url: 'https://support.brave.com/hc/en-us/articles/360018538092'
+          })}
+          data-l10n-id='updateAvailMajor3'
+        />
+      </div>
+    </div>
+  }
+}
+
 class UpdateBar extends React.Component {
   mergeProps (state, ownProps) {
     const props = {}
@@ -191,6 +241,7 @@ class UpdateBar extends React.Component {
     props.isDownloading = props.updateStatus === UpdateStatus.UPDATE_DOWNLOADING
     props.isNotAvailable = props.updateStatus === UpdateStatus.UPDATE_NOT_AVAILABLE
     props.isError = props.updateStatus === UpdateStatus.UPDATE_ERROR
+    props.braveCoreInstalled = state.getIn(['about', 'init', 'braveCoreInstalled']) || false
 
     return props
   }
@@ -219,7 +270,9 @@ class UpdateBar extends React.Component {
       {
 
         this.props.isNotAvailable
-          ? <UpdateNotAvailable updateStatus={this.props.updateStatus} />
+          ? this.props.braveCoreInstalled
+            ? <UpdateNotAvailable updateStatus={this.props.updateStatus} />
+            : <MajorUpdateAvailable updateStatus={this.props.updateStatus} />
           : null
       }
       {
@@ -242,6 +295,9 @@ const styles = StyleSheet.create({
   flexAlignCenter: {
     display: 'flex',
     alignItems: 'center'
+  },
+  majorUpdateTopPadding: {
+    marginTop: '10px'
   }
 })
 
