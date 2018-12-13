@@ -290,12 +290,6 @@ class NewTabPage extends React.Component {
     const formattedBraveCoreVersion = braveCoreVersion
       ? ('(' + braveCoreVersion + ')')
       : ''
-    let braveCoreFriendlyVersion = (braveCoreVersion && braveCoreVersion.split('.').length === 3)
-      ? braveCoreVersion.split('.').slice(0, 2).join('.')
-      : undefined
-    const launchButtonText = braveCoreFriendlyVersion
-      ? `Launch Brave ${braveCoreFriendlyVersion}`
-      : 'Launch Brave'
 
     if (braveCoreInstalled) {
       return <div className='deprecationNotice'>
@@ -304,12 +298,21 @@ class NewTabPage extends React.Component {
           onClick={this.dismissNotice.bind(this)}
         />
         <div>
-          <span className='note'>Note:</span>&nbsp;
-          A newer version of Brave {formattedBraveCoreVersion} has already been installed.
-          This version of Brave {formattedMuonVersion} is no longer supported and will not be updated.
+          <span className='note'>Bad news:</span>&nbsp;this version of Brave {formattedMuonVersion} is out of date.
+        </div>
+        <div style={{marginTop: '5px'}}>
+          <span className='note'>Good news:</span>&nbsp;the replacement {formattedBraveCoreVersion} is already installed.
         </div>
         <div style={{marginTop: '20px'}}>
-          To avoid potential security risks, please move over to the latest version of the Brave Browser.
+          This version is only still
+          here so that you can check everything was imported right and move all your info over.
+          We aren't maintaining this version any more, so please don't use it for browsing — it almost
+          certainly has security bugs.
+        </div>
+        <div style={{marginTop: '20px'}}>
+          If you've already imported your profile, you can uninstall this, use the new Brave, and never
+          look back. If it doesn't look like all your stuff got imported into the new version of Brave,
+          try running the importer again.
         </div>
         <div style={{marginTop: '40px'}}>
           <span style={{width: '50%', textAlign: 'center', display: 'inline-block'}}>
@@ -317,7 +320,7 @@ class NewTabPage extends React.Component {
           </span>
           <BrowserButton
             primaryColor
-            l10nId={launchButtonText}
+            l10nId='Launch the new Brave'
             inlineStyles={{width: '50%'}}
             onClick={this.launchBraveCore.bind(this)}
           />
@@ -326,13 +329,24 @@ class NewTabPage extends React.Component {
     }
 
     return <div className='deprecationNotice'>
+      <button
+        className='fa fa-close'
+        onClick={this.dismissNotice.bind(this)}
+      />
       <div>
-        <span className='note'>Hello!</span> This version of Brave {formattedMuonVersion} is no longer supported and will not be updated.
-        {
-          isLinux()
-            ? <span>&nbsp;To avoid potential security risks, please follow these <a href='https://brave-browser.readthedocs.io/en/latest/installing-brave.html#linux'>instructions</a> to upgrade to the latest version of the Brave Browser.</span>
-            : <span>&nbsp;To avoid potential security risks, please <a href='https://brave.com/download'>download the latest version</a> of the Brave Browser.</span>
-         }
+        <span className='note'>Well, this is embarrassing.</span> This version of
+        Brave {formattedMuonVersion} is out of date and you don't seem to have the
+        new version installed. We aren't maintaining this version any more, so please
+        don't use it for browsing — it almost certainly has security bugs.
+      </div>
+      <div style={{marginTop: '20px'}}>
+        You should definitely upgrade. You can <a onClick={aboutActions.createTabRequested.bind(null, {
+          url: 'https://brave.com/download'
+        })}>
+        download a new version of Brave here</a>. The new version can import all your stuff,
+        including bookmarks, history, payments info, and so on. The only thing you'll have
+        to move over yourself is extensions because we have a whole new (much better) setup
+        for extensions in the new version. Sorry about that.
       </div>
       <div style={{marginTop: '40px'}}>
         <span style={{width: '50%', display: 'inline-block'}} />
@@ -340,7 +354,9 @@ class NewTabPage extends React.Component {
           primaryColor
           l10nId='Help Me Upgrade'
           inlineStyles={{width: '50%'}}
-          onClick={this.openHelp}
+          onClick={aboutActions.createTabRequested.bind(null, {
+            url: 'https://support.brave.com/hc/en-us/articles/360018538092'
+          })}
         />
       </div>
     </div>

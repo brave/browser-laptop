@@ -369,6 +369,15 @@ const aboutActions = {
       actionType: appConstants.APP_RENDER_TO_PDF,
       savePath: savePath
     })
+  },
+
+  /**
+   * Launch into Brave Core using path discovered during init
+   */
+  launchBraveCore: function () {
+    aboutActions.dispatchAction({
+      actionType: appConstants.APP_LAUNCH_BRAVE_CORE
+    })
   }
 }
 module.exports = aboutActions
