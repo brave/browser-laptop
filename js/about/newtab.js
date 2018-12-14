@@ -32,7 +32,6 @@ const backgrounds = require('../data/backgrounds')
 const urlutils = require('../lib/urlutil')
 const random = require('../../app/common/lib/randomUtil')
 const cx = require('../lib/classSet')
-const {isLinux} = require('../../app/common/lib/platformUtil')
 const ipc = window.chrome.ipcRenderer
 
 // Styles
