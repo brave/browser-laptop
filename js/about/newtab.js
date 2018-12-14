@@ -287,9 +287,6 @@ class NewTabPage extends React.Component {
       : ''
     const braveCoreInstalled = (this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreInstalled'])) || false
     const braveCoreVersion = braveCoreInstalled && this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreVersion'])
-    const formattedBraveCoreVersion = braveCoreVersion
-      ? ('(' + braveCoreVersion + ')')
-      : ''
 
     if (braveCoreInstalled) {
       return <div className='deprecationNotice'>
@@ -298,32 +295,35 @@ class NewTabPage extends React.Component {
           onClick={this.dismissNotice.bind(this)}
         />
         <div>
-          <span className='note'>Bad news:</span>&nbsp;this version of Brave {formattedMuonVersion} is out of date.
-        </div>
-        <div style={{marginTop: '5px'}}>
-          <span className='note'>Good news:</span>&nbsp;the replacement {formattedBraveCoreVersion} is already installed.
+          <span className='note'>Your new Brave Browser is already installed!</span>
         </div>
         <div style={{marginTop: '20px'}}>
-          This version is only still
-          here so that you can check everything was imported right and move all your info over.
-          We aren't maintaining this version any more, so please don't use it for browsing — it almost
-          certainly has security bugs.
+          Experience an updated toolbar layout, full Chrome extension
+          support, and contribute to your favorite content creators with
+          Brave Rewards (previously Brave Payments).
         </div>
         <div style={{marginTop: '20px'}}>
-          If you've already imported your profile, you can uninstall this, use the new Brave, and never
-          look back. If it doesn't look like all your stuff got imported into the new version of Brave,
-          try running the importer again.
+          <span className='note'>Please note:</span> Your current version
+          of Brave {formattedMuonVersion} will no longer be supported. To
+          avoid security risks, migrate to the new Brave as soon as possible.
         </div>
         <div style={{marginTop: '40px'}}>
           <span style={{width: '50%', textAlign: 'center', display: 'inline-block'}}>
-            <a href='https://support.brave.com/hc/en-us/articles/360018538092'>Learn more…</a>
+            <a onClick={aboutActions.createTabRequested.bind(null, {
+              url: 'https://support.brave.com/hc/en-us/articles/360018538092'
+            })}>Learn more…</a>
           </span>
-          <BrowserButton
-            primaryColor
-            l10nId='Launch the new Brave'
-            inlineStyles={{width: '50%'}}
-            onClick={this.launchBraveCore.bind(this)}
-          />
+          <div style={{width: '50%', display: 'inline-block'}}>
+            <div style={{marginBottom: '10px', textAlign: 'center'}} className='note'>
+              Installed version: {braveCoreVersion}
+            </div>
+            <BrowserButton
+              primaryColor
+              l10nId='Launch the new Brave'
+              inlineStyles={{width: '100%'}}
+              onClick={this.launchBraveCore.bind(this)}
+            />
+          </div>
         </div>
       </div>
     }
@@ -334,28 +334,30 @@ class NewTabPage extends React.Component {
         onClick={this.dismissNotice.bind(this)}
       />
       <div>
-        <span className='note'>Well, this is embarrassing.</span> This version of
-        Brave {formattedMuonVersion} is out of date and you don't seem to have the
-        new version installed. We aren't maintaining this version any more, so please
-        don't use it for browsing — it almost certainly has security bugs.
+        <span className='note'>The new Brave Browser has arrived!</span>
       </div>
       <div style={{marginTop: '20px'}}>
-        You should definitely upgrade. You can <a onClick={aboutActions.createTabRequested.bind(null, {
-          url: 'https://brave.com/download'
-        })}>
-        download a new version of Brave here</a>. The new version can import all your stuff,
-        including bookmarks, history, payments info, and so on. The only thing you'll have
-        to move over yourself is extensions because we have a whole new (much better) setup
-        for extensions in the new version. Sorry about that.
+        Experience an updated toolbar layout, full Chrome extension
+        support, and contribute to your favorite content creators with
+        Brave Rewards (previously Brave Payments).
+      </div>
+      <div style={{marginTop: '20px'}}>
+        <span className='note'>Please note:</span> Your current version
+        of Brave {formattedMuonVersion} will no longer be supported. To
+        avoid security risks, migrate to the new Brave as soon as possible.
       </div>
       <div style={{marginTop: '40px'}}>
-        <span style={{width: '50%', display: 'inline-block'}} />
+        <span style={{width: '50%', textAlign: 'center', display: 'inline-block'}}>
+          <a onClick={aboutActions.createTabRequested.bind(null, {
+            url: 'https://support.brave.com/hc/en-us/articles/360018538092'
+          })}>Learn more…</a>
+        </span>
         <BrowserButton
           primaryColor
-          l10nId='Help Me Upgrade'
+          l10nId='Download the new Brave'
           inlineStyles={{width: '50%'}}
           onClick={aboutActions.createTabRequested.bind(null, {
-            url: 'https://support.brave.com/hc/en-us/articles/360018538092'
+            url: 'https://brave.com/download'
           })}
         />
       </div>
