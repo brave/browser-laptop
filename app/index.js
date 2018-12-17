@@ -87,6 +87,9 @@ const {getSetting} = require('../js/settings')
 const BookmarksExporter = require('./browser/bookmarksExporter')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
+// Fix https://github.com/brave/browser-laptop/issues/15337
+app.commandLine.appendSwitch('disable-databases')
+
 
 // Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
 let acceptCertDomains = {}
