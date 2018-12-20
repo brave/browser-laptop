@@ -92,7 +92,6 @@ app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferH
 // Fix https://github.com/brave/browser-laptop/issues/15337
 app.commandLine.appendSwitch('disable-databases')
 
-
 // Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
 let acceptCertDomains = {}
 let errorCerts = {}
