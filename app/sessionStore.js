@@ -586,6 +586,7 @@ const setVersionInformation = (immutableData) => {
     immutableData = immutableData.set('about', Immutable.Map())
   }
   immutableData = immutableData.setIn(['about', 'brave', 'versionInformation'], Immutable.fromJS(versionInformation))
+  immutableData = immutableData.setIn(['about', 'brave', 'arch'], os.arch())
   return immutableData
 }
 
@@ -1202,7 +1203,8 @@ module.exports.defaultAppState = () => {
         gridLayoutSize: 'small',
         sites: [],
         ignoredTopSites: [],
-        pinnedTopSites: []
+        pinnedTopSites: [],
+        showDeprecationNotice: true
       },
       preferences: {},
       welcome: {

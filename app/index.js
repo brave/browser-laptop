@@ -49,12 +49,14 @@ process.on('unhandledRejection', function (reason, promise) {
 
 process.on('warning', warning => console.warn(warning.stack))
 
-if (process.platform === 'win32') {
-  require('./windowsInit')
-}
+let initState
 
-if (process.platform === 'linux') {
+if (process.platform === 'win32') {
+  initState = require('./windowsInit')()
+} else if (process.platform === 'linux') {
   require('./linuxInit')
+} else if (process.platform === 'darwin') {
+  initState = require('./darwinInit')()
 }
 
 const electron = require('electron')
@@ -89,7 +91,6 @@ const BookmarksExporter = require('./browser/bookmarksExporter')
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 // Fix https://github.com/brave/browser-laptop/issues/15337
 app.commandLine.appendSwitch('disable-databases')
-
 
 // Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
 let acceptCertDomains = {}
@@ -188,6 +189,10 @@ app.on('ready', () => {
   })
 
   loadAppStatePromise.then((initialImmutableState) => {
+    // merge state which was set during optional platform-specific init
+    initialImmutableState = initialImmutableState.setIn(['about', 'init'],
+        Immutable.fromJS(initState || {}))
+
     // Do this after loading the state
     // For tests we always want to load default app state
     const loadedPerWindowImmutableState = initialImmutableState.get('perWindowState')
@@ -370,6 +375,15 @@ app.on('ready', () => {
       // This is fired by a menu entry
       process.on(messages.CHECK_FOR_UPDATE, () => updater.checkForUpdate(true))
       ipcMain.on(messages.CHECK_FOR_UPDATE, () => updater.checkForUpdate(true))
+
+      // if user does NOT have brave-core installed, trigger an update
+      // so that banner is shown. Delayed so updater can initialize.
+      const braveCoreInstalled = initialImmutableState.getIn(['about', 'init', 'braveCoreInstalled']) || false
+      if (!braveCoreInstalled) {
+        setTimeout(() => {
+          updater.checkForUpdate(true)
+        }, 5 * 1000)
+      }
 
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {

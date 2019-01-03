@@ -23,7 +23,8 @@ AppStore
     brave: {
       versionInformation: {
         [name]: string
-      } // map of property name to version. used on about:brave. not persisted (removed on save)
+      }, // map of property name to version. used on about:brave. not persisted (removed on save)
+      arch: string
     },
     history: {
       entries: [object] // used on about:history. not persisted (removed on save)
@@ -34,6 +35,7 @@ AppStore
       pinnedTopSites: [string], // list of pinned sites to be used on gridLayout. Defaults to 1 Brave-related site; see data/newTabData.js => pinnedTopSites
       sites: [string], // list of sites to be used on gridLayout. Defaults to 6 Brave-related sites; see data/newTabData.js => topSites
       updatedStamp: number, // timestamp for when the data was last updated
+      showDeprecationNotice: boolean // if true, show a Muon deprecation on new tab page
     },
     preferences: {
       backupNotifyCount: number, // number of times user has been reminded to backup wallet
