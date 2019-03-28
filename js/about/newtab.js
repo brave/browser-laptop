@@ -9,12 +9,6 @@ const {DragDropContext} = require('react-dnd')
 const HTML5Backend = require('react-dnd-html5-backend')
 
 // Components
-const Stats = require('./newTabComponents/stats')
-const Clock = require('./newTabComponents/clock')
-const Block = require('./newTabComponents/block')
-const SiteRemovalNotification = require('./newTabComponents/siteRemovalNotification')
-const FooterInfo = require('./newTabComponents/footerInfo')
-const NewPrivateTab = require('./newprivatetab')
 const BrowserButton = require('../../app/renderer/components/common/browserButton')
 
 // Constants
@@ -294,7 +288,7 @@ class NewTabPage extends React.Component {
         <div>
           <span className='note'>Note:</span>&nbsp;
           A newer version of Brave {formattedBraveCoreVersion} has already been installed.
-          This version of Brave {formattedMuonVersion} is no longer supported and will not be updated.
+          This version of Brave {formattedMuonVersion} is no longer supported and will no longer work.
         </div>
         <div style={{marginTop: '20px'}}>
           To avoid potential security risks, please move over to the latest version of the Brave Browser.
@@ -315,7 +309,7 @@ class NewTabPage extends React.Component {
 
     return <div className='deprecationNotice'>
       <div>
-        <span className='note'>Hello!</span> This version of Brave {formattedMuonVersion} is no longer supported and will not be updated.
+        <span className='note'>Hello!</span> This version of Brave {formattedMuonVersion} is no longer supported and will no longer work.
         {
           isLinux()
             ? <span>&nbsp;To avoid potential security risks, please follow these <a href='https://brave-browser.readthedocs.io/en/latest/installing-brave.html#linux'>instructions</a> to upgrade to the latest version of the Brave Browser.</span>
@@ -335,94 +329,17 @@ class NewTabPage extends React.Component {
   }
 
   render () {
-    // don't render if user prefers an empty page
-    if (this.state.showEmptyPage && !this.props.isIncognito) {
-      return <div className='empty' />
-    }
-
-    // TODO: use this.props.isIncognito when muon supports it for tor tabs
-    if (this.props.isIncognito) {
-      return <NewPrivateTab newTabData={this.state.newTabData} torEnabled={this.state.torEnabled} />
-    }
-
-    // don't render until object is found
-    if (!this.state.newTabData) {
-      return null
-    }
-    const gridLayout = this.gridLayout
     return <div data-test-id='dynamicBackground' className='dynamicBackground'>
-      {
-        this.showImages &&
-        <div
-          className={cx({
-            imageBackground: true,
-            hasLoaded: this.state.imageLoadComplete
-          }
-        )}>
-          <img
-            src={this.state.backgroundImage.source}
-            onLoad={this.onImageLoadCompleted.bind(this)}
-            onError={this.onImageLoadFailed.bind(this)}
-            data-test-id='backgroundImage' />
-        </div>
-      }
       <div className={cx({
         content: true,
         backgroundLoaded: this.state.imageLoadComplete,
         showImages: this.showImages
       })}>
         <main className='newTabDashboard'>
-          <div className='statsBar'>
-            <Stats newTabData={this.state.newTabData} />
-            <Clock />
-          </div>
-          <div className='topSitesContainer'>
-            <nav className='topSitesGrid'>
-              {
-                gridLayout.map(site => {
-                  // the removal action should be immediate
-                  // which is why the logic is set here in the component
-                  // given that newtab updates can be debounced
-                  if (this.ignoredTopSites.includes(site.get('key'))) {
-                    return
-                  }
-                  return <Block
-                    key={site.get('location')}
-                    id={site.get('key')}
-                    title={site.get('title')}
-                    href={site.get('location')}
-                    favicon={
-                      site.get('favicon') == null
-                      ? this.getLetterFromUrl(site)
-                      : <img src={site.get('favicon')} />
-                    }
-                    style={{backgroundColor: site.get('themeColor')}}
-                    onToggleBookmark={this.onToggleBookmark.bind(this, site)}
-                    onPinnedTopSite={this.onPinnedTopSite.bind(this, site.get('key'))}
-                    onIgnoredTopSite={this.onIgnoredTopSite.bind(this, site.get('key'))}
-                    onDraggedSite={this.onDraggedSite.bind(this)}
-                    isPinned={this.isPinned(site.get('key'))}
-                    isBookmarked={site.get('bookmarked')}
-                  />
-                })
-              }
-            </nav>
-
-            <div>
-              {this.getDeprecatedText()}
-            </div>
+          <div>
+            {this.getDeprecatedText()}
           </div>
         </main>
-        {
-          this.state.showNotification
-            ? <SiteRemovalNotification
-              onUndoIgnoredTopSite={this.onUndoIgnoredTopSite.bind(this)}
-              onRestoreAll={this.onRestoreAll.bind(this)}
-              onCloseNotification={this.hideSiteRemovalNotification.bind(this)}
-              />
-            : null
-        }
-        <FooterInfo backgroundImage={this.state.backgroundImage} />
       </div>
     </div>
   }

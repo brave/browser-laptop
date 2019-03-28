@@ -92,7 +92,6 @@ app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferH
 // Fix https://github.com/brave/browser-laptop/issues/15337
 app.commandLine.appendSwitch('disable-databases')
 
-
 // Domains to accept bad certs for. TODO: Save the accepted cert fingerprints.
 let acceptCertDomains = {}
 let errorCerts = {}
@@ -195,7 +194,8 @@ app.on('ready', () => {
 
     // Do this after loading the state
     // For tests we always want to load default app state
-    const loadedPerWindowImmutableState = initialImmutableState.get('perWindowState')
+    // Disable tab restore as part of the muon deprecation plan
+    const loadedPerWindowImmutableState = Immutable.List()
     initialImmutableState = initialImmutableState.delete('perWindowState')
     // Restore map order after load
     appActions.setState(initialImmutableState)

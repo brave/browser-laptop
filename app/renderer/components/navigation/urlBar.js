@@ -41,7 +41,6 @@ const {normalizeLocation, getNormalizedSuggestion} = require('../../../common/li
 const isDarwin = require('../../../common/lib/platformUtil').isDarwin()
 const publisherUtil = require('../../../common/lib/publisherUtil')
 const historyUtil = require('../../../common/lib/historyUtil')
-const locale = require('../../../../js/l10n')
 
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
@@ -423,24 +422,7 @@ class UrlBar extends React.Component {
   }
 
   get placeholderValue () {
-    if (this.props.isTor) {
-      if (this.props.torError) {
-        console.log(`tor error: ${this.props.torError}`)
-        return `${locale.translation('torConnectionError')}.`
-      } else if (!this.props.torPercentInitialized ||
-                 this.props.torPercentInitialized === '0') {
-        return `${locale.translation('urlbarPlaceholderTorProgress')}...`
-      } else if (this.props.torPercentInitialized !== '100') {
-        const msg = locale.translation('urlbarPlaceholderTorProgress')
-        const percentInitialized = this.props.torPercentInitialized
-        return `${msg}: ${percentInitialized}%...`
-      } else if (!this.props.torOnline) {
-        return `${locale.translation('torConnectionError')}.`
-      } else {
-        return locale.translation('urlbarPlaceholderTorSuccess')
-      }
-    }
-    return locale.translation('urlbarPlaceholder')
+    return 'Please update to the latest version of Brave'
   }
 
   get titleValue () {
@@ -565,8 +547,7 @@ class UrlBar extends React.Component {
   }
 
   get shouldDisable () {
-    return (this.props.displayURL === undefined && this.loadTime === '') ||
-      this.torInitializing
+    return true
   }
 
   setUrlBarRef (ref) {

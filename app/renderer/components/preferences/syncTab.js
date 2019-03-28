@@ -500,9 +500,9 @@ class SyncTab extends ImmutableComponent {
             settingsListTitle: true
           })}>
             Please download the <a className={css(commonStyles.linkText)}
-            onClick={aboutActions.createTabRequested.bind(null, {
-              url: 'https://brave.com/download'
-            })}>new version of Brave for desktop</a>.
+              onClick={aboutActions.createTabRequested.bind(null, {
+                url: 'https://brave.com/download'
+              })}>new version of Brave for desktop</a>.
           </div>
           {
             this.setupError
