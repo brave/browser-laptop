@@ -20,7 +20,25 @@
 strong, div, span, li, em, p, a {
   font-family: inherit;
   font-weight: inherit;
+  color: white;
   -webkit-font-smoothing: antialiased; // light text on dark backgrounds on macOS looks better with this
+}
+
+.deprecationNotice {
+  margin-top: 20px;
+  display: inline-block;
+  padding: 20px;
+  text-align: left;
+
+  .note {
+    color: @braveOrange;
+  }
+
+  a {
+    color: @braveOrange;
+    text-decoration: underline;
+    cursor: pointer;
+  }
 }
 
 .newTabDashboard
@@ -245,28 +263,6 @@ ul {
             visibility: hidden;
           }
         }
-      }
-    }
-
-    .deprecationNotice {
-      border-radius: @borderRadius;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.5);
-      background-color: #fff;
-      margin-top: 20px;
-      max-width: 505px;
-      width: 100%;
-      display: inline-block;
-      padding: 20px;
-      text-align: left;
-
-      .note {
-        color: @braveOrange;
-      }
-
-      a {
-        color: @braveOrange;
-        text-decoration: underline;
-        cursor: pointer;
       }
     }
   }
