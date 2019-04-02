@@ -9,6 +9,12 @@ const {DragDropContext} = require('react-dnd')
 const HTML5Backend = require('react-dnd-html5-backend')
 
 // Components
+const Stats = require('./newTabComponents/stats')
+const Clock = require('./newTabComponents/clock')
+const Block = require('./newTabComponents/block')
+const SiteRemovalNotification = require('./newTabComponents/siteRemovalNotification')
+const FooterInfo = require('./newTabComponents/footerInfo')
+const NewPrivateTab = require('./newprivatetab')
 const BrowserButton = require('../../app/renderer/components/common/browserButton')
 
 // Constants
@@ -26,7 +32,6 @@ const backgrounds = require('../data/backgrounds')
 const urlutils = require('../lib/urlutil')
 const random = require('../../app/common/lib/randomUtil')
 const cx = require('../lib/classSet')
-const {isLinux} = require('../../app/common/lib/platformUtil')
 const ipc = window.chrome.ipcRenderer
 
 // Styles
@@ -106,6 +111,10 @@ class NewTabPage extends React.Component {
 
   get gridLayoutSize () {
     return this.state.newTabData.getIn(['newTabDetail', 'gridLayoutSize'], 'small')
+  }
+
+  get showDeprecationNotice () {
+    return this.state.newTabData.getIn(['newTabDetail', 'showDeprecationNotice'], true)
   }
 
   isPinned (siteKey) {
@@ -266,6 +275,10 @@ class NewTabPage extends React.Component {
     window.location = 'https://support.brave.com/hc/en-us/articles/360018538092'
   }
 
+  dismissNotice () {
+    aboutActions.setNewTabDetail({showDeprecationNotice: false}, true)
+  }
+
   getDeprecatedText () {
     const muonVersion = this.state.versionInformation && this.state.versionInformation.get('browserLaptop')
     const formattedMuonVersion = muonVersion
@@ -273,73 +286,176 @@ class NewTabPage extends React.Component {
       : ''
     const braveCoreInstalled = (this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreInstalled'])) || false
     const braveCoreVersion = braveCoreInstalled && this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreVersion'])
-    const formattedBraveCoreVersion = braveCoreVersion
-      ? ('(' + braveCoreVersion + ')')
-      : ''
-    let braveCoreFriendlyVersion = (braveCoreVersion && braveCoreVersion.split('.').length === 3)
-      ? braveCoreVersion.split('.').slice(0, 2).join('.')
-      : undefined
-    const launchButtonText = braveCoreFriendlyVersion
-      ? `Launch Brave ${braveCoreFriendlyVersion}`
-      : 'Launch Brave'
 
     if (braveCoreInstalled) {
       return <div className='deprecationNotice'>
+        <button
+          className='fa fa-close'
+          onClick={this.dismissNotice.bind(this)}
+        />
         <div>
-          <span className='note'>Note:</span>&nbsp;
-          A newer version of Brave {formattedBraveCoreVersion} has already been installed.
-          This version of Brave {formattedMuonVersion} is no longer supported and will no longer work.
+          <span className='note'>Your new Brave Browser is already installed!</span>
         </div>
         <div style={{marginTop: '20px'}}>
-          To avoid potential security risks, please move over to the latest version of the Brave Browser.
+          Experience an updated toolbar layout, full Chrome extension
+          support, and contribute to your favorite content creators with
+          Brave Rewards (previously Brave Payments).
+        </div>
+        <div style={{marginTop: '20px'}}>
+          <span className='note'>Please note:</span> Your current version
+          of Brave {formattedMuonVersion} will no longer be supported. To
+          avoid security risks, migrate to the new Brave as soon as possible.
         </div>
         <div style={{marginTop: '40px'}}>
           <span style={{width: '50%', textAlign: 'center', display: 'inline-block'}}>
-            <a href='https://support.brave.com/hc/en-us/articles/360018538092'>Learn more…</a>
+            <a onClick={aboutActions.createTabRequested.bind(null, {
+              url: 'https://support.brave.com/hc/en-us/articles/360018538092'
+            })}>Learn more…</a>
           </span>
-          <BrowserButton
-            primaryColor
-            l10nId={launchButtonText}
-            inlineStyles={{width: '50%'}}
-            onClick={this.launchBraveCore.bind(this)}
-          />
+          <div style={{width: '50%', display: 'inline-block'}}>
+            <div style={{marginBottom: '10px', textAlign: 'center'}} className='note'>
+              Installed version: {braveCoreVersion}
+            </div>
+            <BrowserButton
+              primaryColor
+              l10nId='Launch the new Brave'
+              inlineStyles={{width: '100%'}}
+              onClick={this.launchBraveCore.bind(this)}
+            />
+          </div>
         </div>
       </div>
     }
 
     return <div className='deprecationNotice'>
+      <button
+        className='fa fa-close'
+        onClick={this.dismissNotice.bind(this)}
+      />
       <div>
-        <span className='note'>Hello!</span> This version of Brave {formattedMuonVersion} is no longer supported and will no longer work.
-        {
-          isLinux()
-            ? <span>&nbsp;To avoid potential security risks, please follow these <a href='https://brave-browser.readthedocs.io/en/latest/installing-brave.html#linux'>instructions</a> to upgrade to the latest version of the Brave Browser.</span>
-            : <span>&nbsp;To avoid potential security risks, please <a href='https://brave.com/download'>download the latest version</a> of the Brave Browser.</span>
-        }
+        <span className='note'>The new Brave Browser has arrived!</span>
+      </div>
+      <div style={{marginTop: '20px'}}>
+        Experience an updated toolbar layout, full Chrome extension
+        support, and contribute to your favorite content creators with
+        Brave Rewards (previously Brave Payments).
+      </div>
+      <div style={{marginTop: '20px'}}>
+        <span className='note'>Please note:</span> Your current version
+        of Brave {formattedMuonVersion} will no longer be supported. To
+        avoid security risks, migrate to the new Brave as soon as possible.
       </div>
       <div style={{marginTop: '40px'}}>
-        <span style={{width: '50%', display: 'inline-block'}} />
+        <span style={{width: '50%', textAlign: 'center', display: 'inline-block'}}>
+          <a onClick={aboutActions.createTabRequested.bind(null, {
+            url: 'https://support.brave.com/hc/en-us/articles/360018538092'
+          })}>Learn more…</a>
+        </span>
         <BrowserButton
           primaryColor
-          l10nId='Help Me Upgrade'
+          l10nId='Download the new Brave'
           inlineStyles={{width: '50%'}}
-          onClick={this.openHelp}
+          onClick={aboutActions.createTabRequested.bind(null, {
+            url: 'https://brave.com/download'
+          })}
         />
       </div>
     </div>
   }
 
   render () {
+    // don't render if user prefers an empty page
+    if (this.state.showEmptyPage && !this.props.isIncognito) {
+      return <div className='empty' />
+    }
+
+    // TODO: use this.props.isIncognito when muon supports it for tor tabs
+    if (this.props.isIncognito) {
+      return <NewPrivateTab newTabData={this.state.newTabData} torEnabled={this.state.torEnabled} />
+    }
+
+    // don't render until object is found
+    if (!this.state.newTabData) {
+      return null
+    }
+    const gridLayout = this.gridLayout
     return <div data-test-id='dynamicBackground' className='dynamicBackground'>
+      {
+        this.showImages &&
+        <div
+          className={cx({
+            imageBackground: true,
+            hasLoaded: this.state.imageLoadComplete
+          }
+        )}>
+          <img
+            src={this.state.backgroundImage.source}
+            onLoad={this.onImageLoadCompleted.bind(this)}
+            onError={this.onImageLoadFailed.bind(this)}
+            data-test-id='backgroundImage' />
+        </div>
+      }
       <div className={cx({
         content: true,
         backgroundLoaded: this.state.imageLoadComplete,
         showImages: this.showImages
       })}>
         <main className='newTabDashboard'>
-          <div>
-            {this.getDeprecatedText()}
+          <div className='statsBar'>
+            <Stats newTabData={this.state.newTabData} />
+            <Clock />
+          </div>
+          <div className='topSitesContainer'>
+            <nav className='topSitesGrid'>
+              {
+                gridLayout.map(site => {
+                  // the removal action should be immediate
+                  // which is why the logic is set here in the component
+                  // given that newtab updates can be debounced
+                  if (this.ignoredTopSites.includes(site.get('key'))) {
+                    return
+                  }
+                  return <Block
+                    key={site.get('location')}
+                    id={site.get('key')}
+                    title={site.get('title')}
+                    href={site.get('location')}
+                    favicon={
+                      site.get('favicon') == null
+                      ? this.getLetterFromUrl(site)
+                      : <img src={site.get('favicon')} />
+                    }
+                    style={{backgroundColor: site.get('themeColor')}}
+                    onToggleBookmark={this.onToggleBookmark.bind(this, site)}
+                    onPinnedTopSite={this.onPinnedTopSite.bind(this, site.get('key'))}
+                    onIgnoredTopSite={this.onIgnoredTopSite.bind(this, site.get('key'))}
+                    onDraggedSite={this.onDraggedSite.bind(this)}
+                    isPinned={this.isPinned(site.get('key'))}
+                    isBookmarked={site.get('bookmarked')}
+                  />
+                })
+              }
+            </nav>
+
+            <div>
+              {
+                this.showDeprecationNotice
+                  ? this.getDeprecatedText()
+                  : null
+              }
+            </div>
           </div>
         </main>
+        {
+          this.state.showNotification
+            ? <SiteRemovalNotification
+              onUndoIgnoredTopSite={this.onUndoIgnoredTopSite.bind(this)}
+              onRestoreAll={this.onRestoreAll.bind(this)}
+              onCloseNotification={this.hideSiteRemovalNotification.bind(this)}
+              />
+            : null
+        }
+        <FooterInfo backgroundImage={this.state.backgroundImage} />
       </div>
     </div>
   }

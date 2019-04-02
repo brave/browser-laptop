@@ -87,6 +87,7 @@ const privacy = require('../js/state/privacy')
 const settings = require('../js/constants/settings')
 const {getSetting} = require('../js/settings')
 const BookmarksExporter = require('./browser/bookmarksExporter')
+const isObsolete = require('./common/state/isObsolete')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 // Fix https://github.com/brave/browser-laptop/issues/15337
@@ -195,8 +196,9 @@ app.on('ready', () => {
 
     // Do this after loading the state
     // For tests we always want to load default app state
-    // Disable tab restore as part of the muon deprecation plan
-    const loadedPerWindowImmutableState = Immutable.List()
+    const loadedPerWindowImmutableState = isObsolete
+                ? Immutable.List()
+                : initialImmutableState.get('perWindowState')
     initialImmutableState = initialImmutableState.delete('perWindowState')
     // Restore map order after load
     appActions.setState(initialImmutableState)
