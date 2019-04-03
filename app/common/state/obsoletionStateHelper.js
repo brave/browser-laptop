@@ -42,3 +42,9 @@ module.exports.getIsObsolete = function getIsObsolete (state) {
   return getDaysUntilObsolete(state) === 0
 }
 module.exports.getDaysUntilObsolete = getDaysUntilObsolete
+
+if (process.env.NODE_ENV === 'test') {
+  module.exports.test_fireResetInterval = function () {
+    lastValue = null
+  }
+}
