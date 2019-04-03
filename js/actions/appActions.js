@@ -2123,6 +2123,15 @@ const appActions = {
     dispatch({
       actionType: appConstants.APP_ON_PROMO_REF_FETCH
     })
+  },
+
+  /**
+   * Launch into Brave Core using path discovered during init
+   */
+  launchBraveCore: function () {
+    dispatch({
+      actionType: appConstants.APP_LAUNCH_BRAVE_CORE
+    })
   }
 }
 

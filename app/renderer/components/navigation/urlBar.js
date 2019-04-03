@@ -29,7 +29,7 @@ const urlBarState = require('../../../common/state/urlBarState')
 const tabState = require('../../../common/state/tabState')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
 const ledgerState = require('../../../common/state/ledgerState')
-const isObsolete = require('../../../common/state/isObsolete')
+const {getIsObsolete} = require('../../../common/state/obsoletionStateHelper')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
@@ -533,7 +533,7 @@ class UrlBar extends React.Component {
     props.isActive = urlbar.get('active')
     props.showUrlBarSuggestions = urlbar.getIn(['suggestions', 'shouldRender']) === true &&
       suggestionList && suggestionList.size > 0
-    props.isObsolete = isObsolete(state)
+    props.isObsolete = getIsObsolete(state)
 
     // used in other functions
     props.activeFrameKey = activeFrame.get('key')
