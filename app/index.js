@@ -380,15 +380,6 @@ app.on('ready', () => {
       process.on(messages.CHECK_FOR_UPDATE, () => updater.checkForUpdate(true))
       ipcMain.on(messages.CHECK_FOR_UPDATE, () => updater.checkForUpdate(true))
 
-      // if user does NOT have brave-core installed, trigger an update
-      // so that banner is shown. Delayed so updater can initialize.
-      const braveCoreInstalled = initialImmutableState.getIn(['about', 'init', 'braveCoreInstalled']) || false
-      if (!braveCoreInstalled) {
-        setTimeout(() => {
-          updater.checkForUpdate(true)
-        }, 5 * 1000)
-      }
-
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {
         console.log(metadata)

@@ -122,12 +122,6 @@ describe('Common menu module unit tests', function () {
     })
   })
 
-  describe('checkForUpdateMenuItem', function () {
-    it('has the expected defaults set', function () {
-      checkExpectedDefaults(commonMenu.checkForUpdateMenuItem, false)
-    })
-  })
-
   describe('preferencesMenuItem', function () {
     it('has the expected defaults set', function () {
       checkExpectedDefaults(commonMenu.preferencesMenuItem)

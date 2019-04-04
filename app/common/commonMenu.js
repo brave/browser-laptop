@@ -182,20 +182,6 @@ module.exports.findOnPageMenuItem = () => {
   }
 }
 
-module.exports.checkForUpdateMenuItem = () => {
-  return {
-    label: locale.translation('checkForUpdates'),
-    click: function (item, focusedWindow) {
-      if (process.type === 'browser') {
-        ensureAtLeastOneWindow()
-        process.emit(messages.CHECK_FOR_UPDATE)
-      } else {
-        electron.ipcRenderer.send(messages.CHECK_FOR_UPDATE)
-      }
-    }
-  }
-}
-
 module.exports.preferencesMenuItem = () => {
   return {
     label: locale.translation(isDarwin ? 'preferences' : 'settings'),

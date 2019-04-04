@@ -478,10 +478,6 @@ const createHelpSubmenu = () => {
     CommonMenu.submitFeedbackMenuItem()
   ]
 
-  if (!isDarwin && !isLinux) {
-    submenu.push(CommonMenu.separatorMenuItem)
-    submenu.push(CommonMenu.checkForUpdateMenuItem())
-  }
   if (!isDarwin) {
     submenu.push(CommonMenu.separatorMenuItem)
     submenu.push(CommonMenu.aboutBraveMenuItem())
@@ -601,7 +597,6 @@ const createMenu = (state) => {
         CommonMenu.preferencesMenuItem(),
         CommonMenu.separatorMenuItem,
         CommonMenu.importBrowserDataMenuItem(),
-        CommonMenu.checkForUpdateMenuItem(),
         CommonMenu.submitFeedbackMenuItem(),
         CommonMenu.separatorMenuItem,
         {

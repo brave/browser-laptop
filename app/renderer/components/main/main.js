@@ -22,7 +22,6 @@ const GuestInstanceRenderer = require('../frame/guestInstanceRenderer')
 const TabPages = require('../tabs/tabPages')
 const TabsToolbar = require('../tabs/tabsToolbar')
 const FindBar = require('./findbar')
-const UpdateBar = require('./updateBar')
 const {NotificationBar, BraveNotificationBar} = require('./notificationBar')
 const DownloadsBar = require('../download/downloadsBar')
 const SiteInfo = require('./siteInfo')
@@ -61,7 +60,6 @@ const defaultBrowserState = require('../../../common/state/defaultBrowserState')
 const shieldState = require('../../../common/state/shieldState')
 const menuBarState = require('../../../common/state/menuBarState')
 const windowState = require('../../../common/state/windowState')
-const updateState = require('../../../common/state/updateState')
 const tabState = require('../../../common/state/tabState')
 const tabMessageBoxState = require('../../../common/state/tabMessageBoxState')
 const obsoletionStateHelper = require('../../../common/state/obsoletionStateHelper')
@@ -549,7 +547,6 @@ class Main extends React.Component {
       urlUtil.getOrigin(activeFrame.get('location'))
     props.showReleaseNotes = currentWindow.getIn(['ui', 'releaseNotes', 'isVisible'])
     props.showCheckDefault = focused && defaultBrowserState.shouldDisplayDialog(state)
-    props.showUpdate = updateState.isUpdateVisible(state)
     props.showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, focused)
     props.isSinglePage = nonPinnedFrames.size <= tabsPerPage
@@ -720,11 +717,6 @@ class Main extends React.Component {
         { this.renderDeprecationBanner() }
         {
           <BraveNotificationBar />
-        }
-        {
-          this.props.showUpdate
-          ? <UpdateBar arch={this.props.arch} />
-          : null
         }
         {
           this.props.showBookmarksToolbar

@@ -41,7 +41,6 @@ const {makeImmutable} = require('../app/common/state/immutableUtil')
 const ledgerUtil = require('../app/common/lib/ledgerUtil')
 
 const isDarwin = platformUtil.isDarwin()
-const isLinux = platformUtil.isLinux()
 
 const sanitizeUrl = urlUtil.sanitizeForContextMenu
 
@@ -689,12 +688,6 @@ function hamburgerTemplateInit (location, e) {
     CommonMenu.aboutBraveMenuItem(),
     CommonMenu.separatorMenuItem
   ]
-
-  if (!isLinux) {
-    helpSubmenu.push(
-      CommonMenu.checkForUpdateMenuItem(),
-      CommonMenu.separatorMenuItem)
-  }
 
   helpSubmenu.push(CommonMenu.submitFeedbackMenuItem())
 
