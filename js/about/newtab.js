@@ -9,6 +9,7 @@ const {DragDropContext} = require('react-dnd')
 const HTML5Backend = require('react-dnd-html5-backend')
 
 // Components
+const BrowserObsoletePage = require('./browserObsoletePage')
 const Stats = require('./newTabComponents/stats')
 const Clock = require('./newTabComponents/clock')
 const Block = require('./newTabComponents/block')
@@ -50,7 +51,8 @@ class NewTabPage extends React.Component {
       showEmptyPage: true,
       showImages: false,
       torEnabled: false,
-      backgroundImage: undefined
+      backgroundImage: undefined,
+      isObsolete: false
     }
 
     ipc.on(messages.NEWTAB_DATA_UPDATED, (e, newData) => {
@@ -76,7 +78,9 @@ class NewTabPage extends React.Component {
         backgroundImage: showImages
           ? this.state.backgroundImage || this.randomBackgroundImage
           : undefined,
-        versionInformation
+        versionInformation,
+        braveCoreInstalled: (versionInformation && versionInformation.getIn(['initState', 'braveCoreInstalled'])) || false,
+        isObsolete: data.get('isObsolete')
       })
     })
   }
@@ -267,6 +271,14 @@ class NewTabPage extends React.Component {
     }
   }
 
+  onObsoleteAction = () => {
+    if (this.state.braveCoreInstalled) {
+      this.launchBraveCore()
+    } else {
+      document.location = 'https://brave.com/download'
+    }
+  }
+
   openHelp () {
     window.location = 'https://support.brave.com/hc/en-us/articles/360018538092'
   }
@@ -276,10 +288,9 @@ class NewTabPage extends React.Component {
     const formattedMuonVersion = muonVersion
       ? ('(' + muonVersion + ')')
       : ''
-    const braveCoreInstalled = (this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreInstalled'])) || false
-    const braveCoreVersion = braveCoreInstalled && this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreVersion'])
+    const braveCoreVersion = this.state.braveCoreInstalled && this.state.versionInformation && this.state.versionInformation.getIn(['initState', 'braveCoreVersion'])
 
-    if (braveCoreInstalled) {
+    if (this.state.braveCoreInstalled) {
       return <div className='deprecationNotice'>
         <div>
           <span className='note'>Your new Brave Browser is already installed!</span>
@@ -348,6 +359,16 @@ class NewTabPage extends React.Component {
   }
 
   render () {
+    if (this.state.isObsolete) {
+      const obsoleteActionText = this.state.braveCoreInstalled
+                  ? 'Launch the new Brave'
+                  : 'Download the new Brave'
+      return <BrowserObsoletePage
+        onObsoleteActionClick={this.onObsoleteAction}
+        obsoleteActionText={obsoleteActionText}
+      />
+    }
+
     // don't render if user prefers an empty page
     if (this.state.showEmptyPage && !this.props.isIncognito) {
       return <div className='empty' />

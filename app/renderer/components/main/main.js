@@ -594,11 +594,19 @@ class Main extends React.Component {
     }
   }
 
+  getDeprecationBannerMessageText () {
+    const prefix = 'This version of Brave is unsupported and'
+    if (this.props.daysUntilObsolete === 0) {
+      return `${prefix} can no longer be used.`
+    }
+    return `${prefix} can only be used for ${this.props.daysUntilObsolete} more day${this.props.daysUntilObsolete > 1 ? 's' : ''}.`
+  }
+
   renderDeprecationBanner () {
     return <div className={css(styles.deprecationBanner)}>
       <p className={css(styles.deprecationBanner_Message)}>
         <span className={css(styles.deprecationBanner_Message_Greeting)}>Hello! </span>
-        This version of Brave is unsupported and can only be used for {this.props.daysUntilObsolete} more days.
+        { this.getDeprecationBannerMessageText() }
         { this.props.isBraveCoreInstalled ? ' Start using the' : ' Upgrade to the' } new Brave as soon as possible.
       </p>
       <div className={css(styles.deprecationBanner_Action)}>
