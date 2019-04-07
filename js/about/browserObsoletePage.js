@@ -17,7 +17,7 @@ module.exports = function BrowserObsoletePage ({
         You made it to the last day that we can allow you to safely use this old version of Brave.
       </p>
       <p className={'obsolete_paragraph'}>
-        Your safety and pricacy on the web is our top priority. Download the new Brave browser to continue on this journey with us to fix the web.
+        Your safety and privacy on the web is our top priority. Download the new Brave browser to continue on this journey with us to fix the web.
       </p>
       <p className={'obsolete_paragraph'}>
         You'll be able to import all of your data from this browser, including bookmarks, passwords, and Brave Payments wallet.
