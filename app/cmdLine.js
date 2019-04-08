@@ -33,7 +33,7 @@ const focusOrOpenWindow = function (url) {
   if (url) {
     const tabCreateProperties = {
       url,
-      fromCmdLine: true
+      isObsoleteAction: true
     }
     // request to create tab in a new or existing window, and focus the window
     appActions.createTabRequested(tabCreateProperties, false, false, true)

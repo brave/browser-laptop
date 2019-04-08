@@ -227,7 +227,7 @@ const tabsReducer = (state, action, immutableAction) => {
       break
     }
     case appConstants.APP_CREATE_TAB_REQUESTED:
-      if (action.getIn(['createProperties', 'fromCmdLine']) && getIsObsolete(state)) {
+      if (action.getIn(['createProperties', 'isObsoleteAction']) && getIsObsolete(state)) {
         action = action.deleteIn(['createProperties', 'url'])
       }
       if (action.getIn(['createProperties', 'windowId']) == null) {
@@ -428,9 +428,11 @@ const tabsReducer = (state, action, immutableAction) => {
       })
       break
     case appConstants.APP_LOAD_URL_REQUESTED:
-      setImmediate(() => {
-        tabs.loadURL(action)
-      })
+      if (!action.get('isObsoleteAction') || !getIsObsolete(state)) {
+        setImmediate(() => {
+          tabs.loadURL(action)
+        })
+      }
       break
     case appConstants.APP_LOAD_URL_IN_ACTIVE_TAB_REQUESTED:
       setImmediate(() => {

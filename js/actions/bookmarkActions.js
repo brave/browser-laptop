@@ -24,12 +24,14 @@ const bookmarkActions = {
         if (i <= 25) {
           appActions.createTabRequested(
             Object.assign(bookmarksUtil.toCreateProperties(bookmark), {
+              isObsoleteAction: true,
               active: false
             }), getSetting(SWITCH_TO_NEW_TABS))
         } else {
           appActions.createTabRequested({
             url: bookmark.get('location'),
             partitionNumber: bookmark.get('partitionNumber'),
+            isObsoleteAction: true,
             discarded: true
           }, false)
         }
@@ -49,10 +51,11 @@ const bookmarkActions = {
         appActions.createTabRequested({
           url: bookmarkItem.get('location'),
           partitionNumber: bookmarkItem.get('partitionNumber') || undefined,
+          isObsoleteAction: true,
           active: !!e.shiftKey || getSetting(SWITCH_TO_NEW_TABS)
         })
       } else {
-        appActions.loadURLRequested(tabId, bookmarkItem.get('location'))
+        appActions.loadURLRequested(tabId, bookmarkItem.get('location'), undefined, true)
       }
 
       windowActions.setContextMenuDetail()

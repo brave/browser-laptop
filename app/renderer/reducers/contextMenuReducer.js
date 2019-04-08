@@ -122,6 +122,7 @@ const openInNewTabMenuItem = (url, partitionNumber, openerTabId) => {
             url: sanitizeUrl(url[i]),
             partitionNumber: partitionNumber[i],
             openerTabId,
+            isObsoleteAction: true,
             active
           })
         }
@@ -135,6 +136,7 @@ const openInNewTabMenuItem = (url, partitionNumber, openerTabId) => {
           url: sanitizeUrl(url),
           partitionNumber,
           openerTabId,
+          isObsoleteAction: true,
           active
         })
       }
@@ -154,6 +156,7 @@ const openInNewPrivateTabMenuItem = (url, openerTabId, isTor) => {
             isPrivate: true,
             isTor,
             openerTabId,
+            isObsoleteAction: true,
             active
           })
         }
@@ -168,6 +171,7 @@ const openInNewPrivateTabMenuItem = (url, openerTabId, isTor) => {
           isPrivate: true,
           isTor,
           openerTabId,
+          isObsoleteAction: true,
           active
         })
       }
@@ -186,6 +190,7 @@ const openInNewSessionTabMenuItem = (url, openerTabId) => {
             url: sanitizeUrl(url[i]),
             isPartitioned: true,
             openerTabId,
+            isObsoleteAction: true,
             active
           })
         }
@@ -199,6 +204,7 @@ const openInNewSessionTabMenuItem = (url, openerTabId) => {
           url: sanitizeUrl(url),
           isPartitioned: true,
           openerTabId,
+          isObsoleteAction: true,
           active
         })
       }
