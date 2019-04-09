@@ -23,6 +23,7 @@ const debounce = require('../../js/lib/debounce')
 const urlParse = require('../common/urlParse')
 const aboutHistoryState = require('../common/state/aboutHistoryState')
 const aboutNewTabState = require('../common/state/aboutNewTabState')
+const {getIsObsolete} = require('../common/state/obsoletionStateHelper')
 const appStore = require('../../js/stores/appStore')
 const appConfig = require('../../js/constants/appConfig')
 const config = require('../../js/constants/config')
@@ -365,6 +366,7 @@ const updateAboutDetails = (tabId) => {
     const adblockCount = appState.getIn(['adblock', 'count'], 0)
     const torEnabled = isTor(getTabValue(tabId))
     sendAboutDetails(tabId, messages.NEWTAB_DATA_UPDATED, {
+      isObsolete: getIsObsolete(appState),
       showEmptyPage,
       showImages,
       trackedBlockersCount,

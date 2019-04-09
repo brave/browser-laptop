@@ -263,7 +263,8 @@ const handleAppAction = (action) => {
       require('../../app/browser/reducers/torReducer'),
       require('../../app/browser/reducers/pageDataReducer'),
       ledgerReducer,
-      require('../../app/browser/menu')
+      require('../../app/browser/menu'),
+      require('../../app/browser/reducers/obsoletionReducer')
     ]
     initialized = true
     appState = action.appState

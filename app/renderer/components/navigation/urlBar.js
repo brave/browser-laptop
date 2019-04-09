@@ -29,6 +29,7 @@ const urlBarState = require('../../../common/state/urlBarState')
 const tabState = require('../../../common/state/tabState')
 const siteSettingsState = require('../../../common/state/siteSettingsState')
 const ledgerState = require('../../../common/state/ledgerState')
+const {getIsObsolete} = require('../../../common/state/obsoletionStateHelper')
 
 // Utils
 const cx = require('../../../../js/lib/classSet')
@@ -41,6 +42,7 @@ const {normalizeLocation, getNormalizedSuggestion} = require('../../../common/li
 const isDarwin = require('../../../common/lib/platformUtil').isDarwin()
 const publisherUtil = require('../../../common/lib/publisherUtil')
 const historyUtil = require('../../../common/lib/historyUtil')
+const locale = require('../../../../js/l10n')
 
 // Icons
 const iconNoScript = require('../../../../img/url-bar-no-script.svg')
@@ -422,7 +424,27 @@ class UrlBar extends React.Component {
   }
 
   get placeholderValue () {
-    return 'Please update to the latest version of Brave'
+    if (this.props.isObsolete) {
+      return 'Please update to the latest version of Brave'
+    }
+    if (this.props.isTor) {
+      if (this.props.torError) {
+        console.log(`tor error: ${this.props.torError}`)
+        return `${locale.translation('torConnectionError')}.`
+      } else if (!this.props.torPercentInitialized ||
+                 this.props.torPercentInitialized === '0') {
+        return `${locale.translation('urlbarPlaceholderTorProgress')}...`
+      } else if (this.props.torPercentInitialized !== '100') {
+        const msg = locale.translation('urlbarPlaceholderTorProgress')
+        const percentInitialized = this.props.torPercentInitialized
+        return `${msg}: ${percentInitialized}%...`
+      } else if (!this.props.torOnline) {
+        return `${locale.translation('torConnectionError')}.`
+      } else {
+        return locale.translation('urlbarPlaceholderTorSuccess')
+      }
+    }
+    return locale.translation('urlbarPlaceholder')
   }
 
   get titleValue () {
@@ -511,6 +533,7 @@ class UrlBar extends React.Component {
     props.isActive = urlbar.get('active')
     props.showUrlBarSuggestions = urlbar.getIn(['suggestions', 'shouldRender']) === true &&
       suggestionList && suggestionList.size > 0
+    props.isObsolete = getIsObsolete(state)
 
     // used in other functions
     props.activeFrameKey = activeFrame.get('key')
@@ -547,7 +570,11 @@ class UrlBar extends React.Component {
   }
 
   get shouldDisable () {
-    return true
+    if (this.props.isObsolete) {
+      return true
+    }
+    return (this.props.displayURL === undefined && this.loadTime === '') ||
+      this.torInitializing
   }
 
   setUrlBarRef (ref) {

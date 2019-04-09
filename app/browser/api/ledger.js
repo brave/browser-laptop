@@ -45,7 +45,6 @@ const request = require('../../../js/lib/request')
 const ledgerUtil = require('../../common/lib/ledgerUtil')
 const tabState = require('../../common/state/tabState')
 const pageDataUtil = require('../../common/lib/pageDataUtil')
-const ledgerNotifications = require('./ledgerNotifications')
 const ledgerVideoCache = require('../../common/cache/ledgerVideoCache')
 const updater = require('../../updater')
 const promoCodeFirstRunStorage = require('../../promoCodeFirstRunStorage')
@@ -1583,7 +1582,6 @@ const observeTransactions = (state, transactions) => {
       const newestTransaction = transactions.first()
       if (newestTransaction && newestTransaction.get('contribution')) {
         state = ledgerState.setAboutProp(state, 'status', '')
-        ledgerNotifications.showPaymentDone(newestTransaction.get('contribution', Immutable.Map()))
       }
     }
   }
@@ -2192,8 +2190,6 @@ const initialize = (state, paymentsEnabled) => {
   let fs
 
   state = enable(state, paymentsEnabled)
-
-  ledgerNotifications.init()
 
   if (!userAgent) {
     const versionInformation = state.getIn(['about', 'brave', 'versionInformation'])
@@ -3016,7 +3012,6 @@ const onPromotionResponse = (state, status) => {
     state = ledgerState.setPromotionProp(state, 'promotionStatus', null)
   }
 
-  ledgerNotifications.removePromotionNotification(state)
   state = ledgerState.setPromotionProp(state, 'claimedTimestamp', new Date().getTime())
 
   const currentTimestamp = ledgerState.getInfoProp(state, 'reconcileStamp')

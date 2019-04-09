@@ -22,7 +22,6 @@ const GuestInstanceRenderer = require('../frame/guestInstanceRenderer')
 const TabPages = require('../tabs/tabPages')
 const TabsToolbar = require('../tabs/tabsToolbar')
 const FindBar = require('./findbar')
-const UpdateBar = require('./updateBar')
 const {NotificationBar, BraveNotificationBar} = require('./notificationBar')
 const DownloadsBar = require('../download/downloadsBar')
 const SiteInfo = require('./siteInfo')
@@ -43,6 +42,7 @@ const NoScriptInfo = require('./noScriptInfo')
 const CheckDefaultBrowserDialog = require('./checkDefaultBrowserDialog')
 const HrefPreview = require('../frame/hrefPreview')
 const MessageBox = require('../common/messageBox')
+const BrowserButton = require('../common/browserButton')
 const FullScreenWarning = require('../frame/fullScreenWarning')
 
 // Constants
@@ -60,9 +60,9 @@ const defaultBrowserState = require('../../../common/state/defaultBrowserState')
 const shieldState = require('../../../common/state/shieldState')
 const menuBarState = require('../../../common/state/menuBarState')
 const windowState = require('../../../common/state/windowState')
-const updateState = require('../../../common/state/updateState')
 const tabState = require('../../../common/state/tabState')
 const tabMessageBoxState = require('../../../common/state/tabMessageBoxState')
+const obsoletionStateHelper = require('../../../common/state/obsoletionStateHelper')
 
 // Util
 const _ = require('underscore')
@@ -547,7 +547,6 @@ class Main extends React.Component {
       urlUtil.getOrigin(activeFrame.get('location'))
     props.showReleaseNotes = currentWindow.getIn(['ui', 'releaseNotes', 'isVisible'])
     props.showCheckDefault = focused && defaultBrowserState.shouldDisplayDialog(state)
-    props.showUpdate = updateState.isUpdateVisible(state)
     props.showBookmarksToolbar = getSetting(settings.SHOW_BOOKMARKS_TOOLBAR)
     props.shouldAllowWindowDrag = windowState.shouldAllowWindowDrag(state, currentWindow, activeFrame, focused)
     props.isSinglePage = nonPinnedFrames.size <= tabsPerPage
@@ -563,6 +562,8 @@ class Main extends React.Component {
       ? urlResolve(loginRequiredDetails.getIn(['request', 'url']), '/')
       : null
     props.showMessageBox = tabMessageBoxState.hasMessageBoxDetail(state, activeTabId)
+    props.daysUntilObsolete = obsoletionStateHelper.getDaysUntilObsolete(state)
+    props.isBraveCoreInstalled = !!state.hasIn(['about', 'init', 'braveCoreVersion'])
 
     // used in other functions
     props.menubarSelectedIndex = currentWindow.getIn(['ui', 'menubar', 'selectedIndex'])
@@ -578,6 +579,41 @@ class Main extends React.Component {
     props.arch = state.getIn(['about', 'brave', 'arch']) || ''
 
     return props
+  }
+
+  onDeprecationButtonClick = () => {
+    if (!this.props.isBraveCoreInstalled) {
+      appActions.createTabRequested({
+        url: 'https://brave.com/download'
+      })
+    } else {
+      appActions.launchBraveCore()
+    }
+  }
+
+  getDeprecationBannerMessageText () {
+    const prefix = 'This version of Brave is unsupported and'
+    if (this.props.daysUntilObsolete === 0) {
+      return `${prefix} can no longer be used.`
+    }
+    return `${prefix} can only be used for ${this.props.daysUntilObsolete} more day${this.props.daysUntilObsolete > 1 ? 's' : ''}.`
+  }
+
+  renderDeprecationBanner () {
+    return <div className={css(styles.deprecationBanner)}>
+      <p className={css(styles.deprecationBanner_Message)}>
+        <span className={css(styles.deprecationBanner_Message_Greeting)}>Hello! </span>
+        { this.getDeprecationBannerMessageText() }
+        { this.props.isBraveCoreInstalled ? ' Start using the' : ' Upgrade to the' } new Brave as soon as possible.
+      </p>
+      <div className={css(styles.deprecationBanner_Action)}>
+        <BrowserButton
+          primaryColor
+          l10nId={this.props.isBraveCoreInstalled ? 'Launch the new Brave' : 'Download the new Brave'}
+          onClick={this.onDeprecationButtonClick}
+        />
+      </div>
+    </div>
   }
 
   render () {
@@ -678,13 +714,9 @@ class Main extends React.Component {
             ? <CheckDefaultBrowserDialog />
             : null
         }
+        { this.renderDeprecationBanner() }
         {
           <BraveNotificationBar />
-        }
-        {
-          this.props.showUpdate
-          ? <UpdateBar arch={this.props.arch} />
-          : null
         }
         {
           this.props.showBookmarksToolbar
@@ -758,6 +790,32 @@ const styles = StyleSheet.create({
 
   tabPagesWrap_allowDragging: {
     WebkitAppRegion: 'drag'
+  },
+
+  deprecationBanner: {
+    backgroundColor: 'white',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '8px 20px'
+  },
+
+  deprecationBanner_Message: {
+    color: globalStyles.color.commonTextColor,
+    fontSize: '15px',
+    cursor: 'default',
+    userSelect: 'none'
+  },
+
+  deprecationBanner_Message_Greeting: {
+    color: globalStyles.color.braveOrange,
+    fontSize: '16px'
+  },
+
+  deprecationBanner_Action: {
+    minWidth: '178px',
+    marginLeft: '10px'
   }
 })
 

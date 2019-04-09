@@ -87,6 +87,7 @@ const privacy = require('../js/state/privacy')
 const settings = require('../js/constants/settings')
 const {getSetting} = require('../js/settings')
 const BookmarksExporter = require('./browser/bookmarksExporter')
+const {getIsObsolete} = require('./common/state/obsoletionStateHelper')
 
 app.commandLine.appendSwitch('enable-features', 'BlockSmallPluginContent,PreferHtmlOverPlugins')
 // Fix https://github.com/brave/browser-laptop/issues/15337
@@ -195,8 +196,10 @@ app.on('ready', () => {
 
     // Do this after loading the state
     // For tests we always want to load default app state
-    // Disable tab restore as part of the muon deprecation plan
-    const loadedPerWindowImmutableState = Immutable.List()
+    const isObsolete = getIsObsolete(initialImmutableState)
+    const loadedPerWindowImmutableState = isObsolete
+                ? Immutable.List()
+                : initialImmutableState.get('perWindowState')
     initialImmutableState = initialImmutableState.delete('perWindowState')
     // Restore map order after load
     appActions.setState(initialImmutableState)
@@ -376,15 +379,6 @@ app.on('ready', () => {
       // This is fired by a menu entry
       process.on(messages.CHECK_FOR_UPDATE, () => updater.checkForUpdate(true))
       ipcMain.on(messages.CHECK_FOR_UPDATE, () => updater.checkForUpdate(true))
-
-      // if user does NOT have brave-core installed, trigger an update
-      // so that banner is shown. Delayed so updater can initialize.
-      const braveCoreInstalled = initialImmutableState.getIn(['about', 'init', 'braveCoreInstalled']) || false
-      if (!braveCoreInstalled) {
-        setTimeout(() => {
-          updater.checkForUpdate(true)
-        }, 5 * 1000)
-      }
 
       // This is fired from a auto-update metadata call
       process.on(messages.UPDATE_META_DATA_RETRIEVED, (metadata) => {

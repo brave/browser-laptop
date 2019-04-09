@@ -293,12 +293,13 @@ const appActions = {
    * @param {string} url - The url to load
    * @param {boolean} reloadMatchingUrl - would you like to force reload provided tab
    */
-  loadURLRequested: function (tabId, url, reloadMatchingUrl) {
+  loadURLRequested: function (tabId, url, reloadMatchingUrl, isObsoleteAction) {
     dispatch({
       actionType: appConstants.APP_LOAD_URL_REQUESTED,
       tabId,
       url,
-      reloadMatchingUrl
+      reloadMatchingUrl,
+      isObsoleteAction
     })
   },
 
@@ -2122,6 +2123,15 @@ const appActions = {
   onPromoRefFetch: function () {
     dispatch({
       actionType: appConstants.APP_ON_PROMO_REF_FETCH
+    })
+  },
+
+  /**
+   * Launch into Brave Core using path discovered during init
+   */
+  launchBraveCore: function () {
+    dispatch({
+      actionType: appConstants.APP_LAUNCH_BRAVE_CORE
     })
   }
 }

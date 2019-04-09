@@ -17,6 +17,7 @@ const siteSettings = require('../../../js/state/siteSettings')
 const siteSettingsState = require('../../common/state/siteSettingsState')
 const {frameOptsFromFrame, isTor} = require('../../../js/state/frameStateUtil')
 const updateState = require('../../common/state/updateState')
+const {getIsObsolete} = require('../../common/state/obsoletionStateHelper')
 
 // Constants
 const appConfig = require('../../../js/constants/appConfig')
@@ -226,6 +227,9 @@ const tabsReducer = (state, action, immutableAction) => {
       break
     }
     case appConstants.APP_CREATE_TAB_REQUESTED:
+      if (action.getIn(['createProperties', 'isObsoleteAction']) && getIsObsolete(state)) {
+        action = action.deleteIn(['createProperties', 'url'])
+      }
       if (action.getIn(['createProperties', 'windowId']) == null) {
         const senderWindowId = action.getIn(['senderWindowId'])
         if (senderWindowId != null) {
@@ -424,9 +428,11 @@ const tabsReducer = (state, action, immutableAction) => {
       })
       break
     case appConstants.APP_LOAD_URL_REQUESTED:
-      setImmediate(() => {
-        tabs.loadURL(action)
-      })
+      if (!action.get('isObsoleteAction') || !getIsObsolete(state)) {
+        setImmediate(() => {
+          tabs.loadURL(action)
+        })
+      }
       break
     case appConstants.APP_LOAD_URL_IN_ACTIVE_TAB_REQUESTED:
       setImmediate(() => {

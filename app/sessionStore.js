@@ -1203,8 +1203,7 @@ module.exports.defaultAppState = () => {
         gridLayoutSize: 'small',
         sites: [],
         ignoredTopSites: [],
-        pinnedTopSites: [],
-        showDeprecationNotice: true
+        pinnedTopSites: []
       },
       preferences: {},
       welcome: {
