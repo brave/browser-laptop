@@ -139,6 +139,7 @@ class GeneralTab extends ImmutableComponent {
         </SettingItem>
         <SettingItem dataL10nId='newTabMode'>
           <SettingDropdown value={getSetting(settings.NEWTAB_MODE, this.props.settings)}
+            disabled
             onChange={changeSetting.bind(null, this.props.onChangeSetting, settings.NEWTAB_MODE)} >
             <option data-l10n-id='newTabNewTabPage' value={newTabMode.NEW_TAB_PAGE} />
             <option data-l10n-id='newTabHomePage' value={newTabMode.HOMEPAGE} />
