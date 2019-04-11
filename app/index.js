@@ -274,7 +274,8 @@ app.on('ready', () => {
 
     if (CmdLine.newWindowURL()) {
       appActions.newWindow(Immutable.fromJS({
-        location: CmdLine.newWindowURL()
+        location: CmdLine.newWindowURL(),
+        isObsoleteAction: true
       }))
     }
 

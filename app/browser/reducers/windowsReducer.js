@@ -14,6 +14,7 @@ const windowConstants = require('../../../js/constants/windowConstants')
 
 // State
 const windowState = require('../../common/state/windowState')
+const {getIsObsolete} = require('../../common/state/obsoletionStateHelper')
 
 // Utils
 const windows = require('../windows')
@@ -162,6 +163,9 @@ const handleCreateWindowAction = (state, action = Immutable.Map()) => {
   const frameOpts = (action.get('frameOpts') || Immutable.Map()).toJS()
   let browserOpts = (action.get('browserOpts') || Immutable.Map()).toJS()
   let immutableWindowState = action.get('restoredState') || Immutable.Map()
+  if (frameOpts.isObsoleteAction && frameOpts.location && getIsObsolete(state)) {
+    delete frameOpts.location
+  }
   state = setDefaultWindowSize(state)
   const defaults = windowDefaults(state)
   const isMaximized = setMaximized(state, browserOpts, immutableWindowState)
